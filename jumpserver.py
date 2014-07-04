@@ -66,6 +66,7 @@ import termios
 import signal
 import MySQLdb
 import re
+import time
 
 """
 #Test user
@@ -80,6 +81,9 @@ db_user = 'root'
 db_password = 'redhat'
 db_db = 'jump'
 db_port = 3306
+
+log_dir = '/tmp/logfile/'
+
 
 
 def sigwinch_passthrough (sig, data):
@@ -129,8 +133,15 @@ def is_ip(ip):
     else:
         return False
         
-def connect(host, port, user, password ):
-    foo = pexpect.spawn('ssh -p %s %s@%s' % (port, user, host))
+def connect(host, port, user, password):
+    if not os.path.isdir(log_dir):
+        os.mkdir(log_dir)
+    logfile = open("%s/%s_%s_%s" % (log_dir, host, time.strftime('%Y%m%d'), user), 'a')
+    logfile.write('\n\n\n%s' % time.strftime('%Y%m%d_%H%M%S'))
+    #cmd = 'ssh -p %s %s@%s | tee -a %s' % (port, user, host, logfile)
+    cmd = 'ssh -p %s %s@%s' % (port, user, host)
+    foo = pexpect.spawn('/bin/bash', ['-c', cmd])
+    foo.logfile = logfile
     while True:
         index = foo.expect(['continue', 
                             'assword', 
@@ -150,8 +161,9 @@ def connect(host, port, user, password ):
             signal.signal(signal.SIGWINCH, sigwinch_passthrough)
             size = getwinsize()
             foo.setwinsize(size[0], size[1])
-            foo.interact()
             print "Login success!"
+            foo.interact()
+            
             break
         else:
             print "Login failed, please contact system administrator!"
@@ -189,7 +201,6 @@ def sth_select(username='', ip=''):
             
 if __name__ == '__main__':
     username = run_cmd('whoami')
-    print username
     while True:
         option = raw_input("""
         Welcome Use JumpServer To Login.
