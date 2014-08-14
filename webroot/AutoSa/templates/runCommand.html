@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+    <form method="post" action="">
+    <div style="float: left; width: 400px;">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button">IP(s)</button>
+                    </span>
+                    <input type="text" class="form-control" name="ip" placeholder="IP or IPS" value={{ old_ip }}>
+
+                </div><!-- /input-group -->
+                <span class="help-block" style="margin-left: 20px;"> 输入一个IP,或者多个IP逗号隔开。</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="input-group">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="button">CMD</button>
+                    </span>
+                    <input type="text" class="form-control" name="cmd" placeholder="Command or Commands">
+                </div><!-- /input-group -->
+                    <span class="help-block" style="margin-left: 20px;"> 输入在执行的命令，多个命令分号隔开.</span>
+            </div>
+        </div>
+    </div>
+
+    <div style="float: left; margin-top: 74px; margin-left: 40px;">
+        <button type="submit" class="btn btn-primary">执行</button>
+    </div>
+    <div style="clear: both;"></div>
+
+    </form>
+    {% if stdout %}
+        <div class="alert alert-success">{{ stdout }}</div>
+    {% endif %}
+    {% if stderr %}
+        <div class="alert alert-warning">{{ stderr }}</div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<h2 class="text-center">修改主机信息</h2>
+<form  role="form" action="" method="post">
+<div class="form-group has-success">
+  <label class="control-label" for="inputSuccess">编号</label>
+  <input type="text" class="form-control" id="inputSuccess" name="s_num" value='{{ post.s_num }}'>
+
+  <label class="control-label" for="inputSuccess">IP</label>
+  <input type="text" class="form-control" id="inputSuccess" name="s_ip" value='{{ post.s_ip }}'>
+
+  <label class="control-label" for="inputSuccess">主机名</label>
+  <input type="text" class="form-control" id="inputSuccess" name="s_hostname" value='{{ post.s_hostname }}'>
+
+  <label class="control-label" for="inputSuccess">CPU</label>
+  <input type="text" class="form-control" id="inputSuccess" name="s_cpu" value='{{ post.s_cpu }}'>
+
+  <label class="control-label" for="inputSuccess">内存</label>
+  <input type="text" class="form-control" id="inputSuccess"  name="s_mem" value='{{ post.s_mem }}'>
+
+  <label class="control-label" for="inputSuccess">硬盘</label>
+  <input type="text" class="form-control" id="inputSuccess" name="s_disk" value='{{ post.s_disk }}'>
+
+  <label class="control-label" for="inputSuccess">操作系统</label>
+  <input type="text" class="form-control" id="inputSuccess" name="s_system" value='{{ post.s_system }}'>
+  
+  <div class="form-group has-success">
+  <label class="control-label" for="inputSuccess">内核版本</label>
+  <input type="text" class="form-control" id="inputSuccess" name="s_kernel" value='{{ post.s_kernel }}'>
+  </div>
+  <button type="submit" class="btn btn-success col-sm-offset-5">提交更改</button>
+</div>
+</form>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+<div style="float:left"><h2>主机列表</h2></div>
+<div style="float:right;margin-top:16pt"><a href="/assets/add/" target="_black" class="btn btn-info">添加&nbsp;<i class="glyphicon glyphicon-plus-sign"></i></a></div>
+</div>
+<table class="table table-striped table-hover table-bordered" id="sample_editable_1">
+  <thead>
+    <tr>
+      <th class="text-center">编号</th>
+      <th class="text-center">IP</th>
+      <th class="text-center">主机名</th>
+      <th class="text-center">cpu</th>
+      <th class="text-center">内存</th>
+      <th class="text-center">硬盘</th>
+      <th class="text-center">操作系统</th>
+      <th class="text-center">详情</th>
+      <th class="text-center">编辑</th>
+      <th class="text-center">删除</th>
+    </tr>
+  </thead>
+  <tbody>
+  
+  {% for post in contacts.object_list %}
+  <tr class="">
+    <td class="text-center">{{ post.s_num }}</td>
+    <td class="text-center">{{ post.s_ip }}</td>
+    <td class="text-center">{{ post.s_hostname }}</td>
+    <td class="text-center">{{ post.s_cpu }}</td>
+    <td class="text-center">{{ post.s_mem }}</td>
+    <td class="text-center">{{ post.s_disk }}</td>
+    <td class="text-center">{{ post.s_system }}</td>
+    <td class="text-center"><a  href="/assets/show/{{ post.s_ip }}">详情</a></td>
+    <td class="text-center"><a  href="/assets/edit/{{ post.s_ip }}">编辑</a></td>
+    <td class="text-center"><a  href="/assets/delete/{{ post.s_ip }}">删除</a></td>
+  </tr>
+  {% endfor %}
+    </tbody>
+  
+</table>
+<ul class="pagination">
+  {% if contacts.has_previous %}
+      <li><a href="?page={{ contacts.previous_page_number }}">&laquo;</a></li>
+  {% endif %}
+
+  {% for page in p.page_range %}
+      {% ifequal offset1 page %}
+          <li class="active"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
+      {% else %}
+          <li><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
+      {% endifequal %}
+  {% endfor %}
+  {% if contacts.has_next %}
+      <li><a href="?page={{ contacts.next_page_number }}">&raquo;</a></li>
+  {% endif %}
+</ul>
+
+{% endblock %} 

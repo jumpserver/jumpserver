@@ -1,97 +1,72 @@
 #!/usr/bin/python
 # coding: utf-8
 
-"""
-This script is used to let server to be a jump server.
-业务逻辑： 用户通过自己这套账号密码连接到跳板机，
-然后从跳板机链接到各个业务Server, 该脚本可以实现
-登录到其他业务机的功能，并且针对不同的用户实现不
-同的授权的， 可以讲用户的负责的主机print出来，用
-户的权限密码存放在数据库中。现在要考虑是否得用ex-
-pect模块，还是os.command.用户选择别的，或者Ctrl+D,
-Ctrl+C直接退出。改脚本二进制方式存放。
-
-使用方法：
-1. 把该文件放到合适的问题如/tmp，保证所有用户都能访问的到。
-2. vim /etc/profile.d/jump.sh
-   #/bin/bash
-   python /tmp/jump.py
-   if [ $USER == 'root' ]:
-       echo ""
-   else
-       exit
-   fi
-   
-数据库表结构：
-user
-id  username  password 
-
-server
-id  ip  port
-
-user_server
-id user_id server_id
-
-CREATE TABLE user(id INT NOT NULL,
-                  username VARCHAR(30),
-                  password VARCHAR(30),
-                  PRIMARY KEY(id)
-                  ) ENGINE=INNODB;
-           
-CREATE TABLE server(id INT NOT NULL,
-                    ip VARCHAR(20),
-                    port SMALLINT,
-                    PRIMARY KEY(id)
-                    ) ENGINE=INNODB;
-                    
-CREATE TABLE user_server(id INT NOT NULL,
-                        user_id INT,
-                        server_id INT,
-                        PRIMARY KEY(id),
-                        FOREIGN KEY(user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE,
-                        FOREIGN KEY(user_id) REFERENCES user(id) ON DELETE CASCADE ON UPDATE CASCADE
-                        ) ENGINE=INNODB;
-                        
-select * from user t1, server t2, user_server t3 where t1.username='ldapuser' and t1.id=t3.user_id and t2.id = t3.server_id;
-                        
-"""
-
 import os
 import sys
 import subprocess
+import MySQLdb
 import pexpect
 import struct
 import fcntl
 import termios
 import signal
-import MySQLdb
 import re
 import time
+from Crypto.Cipher import AES
+from binascii import b2a_hex, a2b_hex
+import ConfigParser
+import paramiko
+import interactive
 
-"""
-#Test user
-host = '192.168.2.143'
-port = 22
-user = 'ldapuser'
-password = 'redhat'
-"""
+base_dir = "/opt/jumpserver/"
+cf = ConfigParser.ConfigParser()
+cf.read('%s/jumpserver.conf' % base_dir)
 
-db_host = '127.0.0.1'
-db_user = 'root'
-db_password = 'redhat'
-db_db = 'jump'
-db_port = 3306
-
-log_dir = '/tmp/logfile/'
-
+db_host = cf.get('db', 'host')
+db_port = cf.getint('db', 'port')
+db_user = cf.get('db', 'user')
+db_password = cf.get('db', 'password')
+db_db = cf.get('db', 'db')
+log_dir = cf.get('jumpserver', 'log_dir')
+user_table = cf.get('jumpserver', 'user_table')
+assets_table = cf.get('jumpserver', 'assets_table')
+assets_user_table = cf.get('jumpserver', 'assets_user_table')
+key = cf.get('jumpserver', 'key')
 
 
-def sigwinch_passthrough (sig, data):
+class PyCrypt(object):
+    """It's used to encrypt and decrypt password."""
+    def __init__(self, key):
+        self.key = key
+        self.mode = AES.MODE_CBC
+
+    def encrypt(self, text):
+        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
+        length = 16
+        count = len(text)
+        if count < length:
+            add = (length - count)
+            text += ('\0' * add)
+        elif count > length:
+            add = (length - (count % length))
+            text += ('\0' * add)
+        ciphertext = cryptor.encrypt(text)
+        return b2a_hex(ciphertext)
+
+    def decrypt(self, text):
+        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
+        plain_text = cryptor.decrypt(a2b_hex(text))
+        return plain_text.rstrip('\0')
+
+
+def sigwinch_passthrough(sig, data):
+    """This function use to set the window size of the terminal!"""
     winsize = getwinsize()
-    global bar
-    bar.setwinsize(winsize[0],winsize[1])
+    foo.setwinsize(winsize[0], winsize[1])
+
 
 def getwinsize():
+    """This function use to get the size of the windows!"""
     if 'TIOCGWINSZ' in dir(termios):
         TIOCGWINSZ = termios.TIOCGWINSZ
     else:
@@ -99,140 +74,226 @@ def getwinsize():
     s = struct.pack('HHHH', 0, 0, 0, 0)
     x = fcntl.ioctl(sys.stdout.fileno(), TIOCGWINSZ, s)
     return struct.unpack('HHHH', x)[0:2]
-    
-def progress(second, nums, sym='.'):
-    for i in range(nums):
-        os.write(1, sym)
-        time.sleep(second)
-    sys.stdout.flush()
+
 
 def connect_db(user, passwd, db, host='127.0.0.1', port=3306):
+    """This function connect db and return db and cursor"""
     db = MySQLdb.connect(host=host,
-                        port=port,
-                        user=user,
-                        passwd=passwd,
-                        db=db)
+                         port=port,
+                         user=user,
+                         passwd=passwd,
+                         db=db,
+                         charset='utf8')
     cursor = db.cursor()
-    return (db, cursor)
+    return db, cursor
+
 
 def run_cmd(cmd):
+    """run command and return stdout"""
     pipe = subprocess.Popen(cmd, 
                             shell=True, 
                             stdout=subprocess.PIPE, 
                             stderr=subprocess.PIPE)
     if pipe.stdout:
-        return pipe.stdout.read().strip()
+        stdout = pipe.stdout.read().strip()
+        pipe.wait()
+        return stdout
     if pipe.stderr:
-        return pipe.stdout.read()
+        stderr = pipe.stderr.read()
+        pipe.wait()
+        return stderr
 
-def is_ip(ip):
-    ip_re = re.compile(r'^(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[0-9]{1,2})(\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[0-9]{1,2})){3}$')
-    match = ip_re.match(ip)
-    if match:
-        return True
-    else:
-        return False
-        
+
 def connect(host, port, user, password):
+    """Use pexpect module to connect other server."""
     if not os.path.isdir(log_dir):
         os.mkdir(log_dir)
     logfile = open("%s/%s_%s_%s" % (log_dir, host, time.strftime('%Y%m%d'), user), 'a')
-    logfile.write('\n\n\n%s' % time.strftime('%Y%m%d_%H%M%S'))
-    #cmd = 'ssh -p %s %s@%s | tee -a %s' % (port, user, host, logfile)
+    logfile.write('\n\n%s\n\n' % time.strftime('%Y%m%d_%H%M%S'))
     cmd = 'ssh -p %s %s@%s' % (port, user, host)
+    global foo
     foo = pexpect.spawn('/bin/bash', ['-c', cmd])
     foo.logfile = logfile
     while True:
-        index = foo.expect(['continue', 
-                            'assword', 
-                            pexpect.EOF, 
+        index = foo.expect(['continue',
+                            'assword',
+                            pexpect.EOF,
                             pexpect.TIMEOUT], timeout=3)
         if index == 0:
             foo.sendline('yes')
             continue
         elif index == 1:
             foo.sendline(password)
-        
-        index = foo.expect([']', 
-                            'assword', 
-                            pexpect.EOF, 
+
+        index = foo.expect(['assword',
+                            '.*',
+                            pexpect.EOF,
                             pexpect.TIMEOUT], timeout=3)
-        if index == 0:
+        if index == 1:
             signal.signal(signal.SIGWINCH, sigwinch_passthrough)
             size = getwinsize()
             foo.setwinsize(size[0], size[1])
-            print "Login success!"
+            print "\033[32;1mLogin %s success!\033[0m" % host
             foo.interact()
-            
+            break
+        elif index == 0:
+            print "Password error."
             break
         else:
             print "Login failed, please contact system administrator!"
             break
+    foo.terminate(force=True)
+
 
 def ip_all_select(username):
+    """select all the server of the user can control."""
     ip_all = []
+    ip_all_dict = {}
     db, cursor = connect_db(db_user, db_password, db_db, db_host, db_port)
-    cursor.execute('select t2.ip from user t1, server t2, user_server t3 where t1.username="%s" and t1.id=t3.user_id and t2.id = t3.server_id;' % username)
+    cursor.execute('select t2.ip, t2.comment from %s t1, %s t2, %s t3 where t1.username="%s" and t1.id=t3.uid_id and t2.id = t3.aid_id;' %
+                   (user_table, assets_table, assets_user_table, username))
     ip_all_record = cursor.fetchall()
     if ip_all_record:
         for record in ip_all_record:
             ip_all.append(record[0])
+            ip_all_dict[record[0]] = record[1]
     db.close()
-    return ip_all
+    return ip_all, ip_all_dict
+
 
 def sth_select(username='', ip=''):
+    """if username: return password elif ip return port"""
     db, cursor = connect_db(db_user, db_password, db_db, db_host, db_port)
     if username:
-        cursor.execute('select password from user where username="%s"' % username)
+        cursor.execute('select password from %s where username="%s"' % (user_table, username))
         try:
             password = cursor.fetchone()[0]
         except IndexError:
             password = ''
+        db.close()
         return password
-    if  ip:
-        cursor.execute('select port from server where ip="%s"' % ip)
+    if ip:
+        cursor.execute('select port from %s where ip="%s"' % (assets_table, ip))
         try:
-            port = cursor.fetchone()[0]
+            port = int(cursor.fetchone()[0])
         except IndexError:
             port = 22
+        db.close()
         return port
-    
-    return Null
-            
+    return None
+
+
+def remote_exec_cmd(host, user, cmd):
+    jm = PyCrypt(key)
+    ssh = paramiko.SSHClient()
+    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    port = sth_select(ip=host)
+    password = jm.decrypt(sth_select(username=username))
+    try:
+        ssh.connect(host, port, user, password)
+    except paramiko.AuthenticationException:
+        print 'Password Error .'
+        return None
+    stdin, stdout, stderr = ssh.exec_command(cmd)
+    print '\033[32m' + '#'*15 + ' ' + host + ' ' + '#'*15 + '\n' + '\033[0m'
+    output = stdout.read()
+    error = stderr.read()
+    if output:
+        print output
+    if error:
+        print error
+    print '\033[32m' + '#'*15 + '  End result  ' + '#'*15 + '\n' + '\033[0m'
+    ssh.close()
+
+
+def match_ip(all_ip, string):
+    ip_matched = []
+    pattern = re.compile(r'%s' % string)
+
+    for ip in all_ip:
+        if pattern.search(ip):
+            ip_matched.append(ip)
+    return ip_matched
+
+
+def print_prompt():
+        print """
+\033[1;32m###  Welcome Use JumpServer To Login. ### \033[0m
+1) Type \033[32mIP ADDRESS\033[0m To Login.
+2) Type \033[32mP/p\033[0m To Print The Servers You Available.
+3) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
+4) Type \033[32mQ/q\033[0m To Quit.
+"""
+
+
+def print_your_server(username):
+    ip_all, ip_all_dict = ip_all_select(username)
+    for ip in ip_all:
+        if ip_all_dict[ip]:
+            print "%s -- %s" % (ip, ip_all_dict[ip])
+        else:
+            print ip
+
+
+def exec_cmd_servers(username):
+    print '\nInput the \033[32mHost IP(s)\033[0m,Separated by Commas, q/Q to Quit.\n'
+    while True:
+        hosts = raw_input('\033[1;32mip(s)>: \033[0m')
+        if hosts in ['q', 'Q']:
+            break
+        hosts = hosts.split(',')
+        hosts.append('')
+        hosts = list(set(hosts))
+        hosts.remove('')
+        ip_all, ip_all_dict = ip_all_select(username)
+        no_perm = set(hosts)-set(ip_all)
+        if no_perm:
+            print "You have no permission on %s." % list(no_perm)
+            continue
+        print '\nInput the \033[32mCommand\033[0m , The command will be Execute on servers, q/Q to quit.\n'
+        while True:
+            cmd = raw_input('\033[1;32mCmd(s): \033[0m')
+            if cmd in ['q', 'Q']:
+                break
+            for host in hosts:
+                remote_exec_cmd(host, username, cmd)
+
+
+def connect_one(username, option):
+    ip = option.strip()
+    ip_all, ip_all_dict = ip_all_select(username)
+    ip_matched = match_ip(ip_all, ip)
+    ip_len = len(ip_matched)
+    if ip_len == 1:
+        ip = ip_matched[0]
+        password = jm.decrypt(sth_select(username=username))
+        port = sth_select(ip=ip)
+        print "Connecting %s ..." % ip
+        connect(ip, port, username, password)
+    elif ip_len > 1:
+        for ip in ip_matched:
+            print ip
+    else:
+        print '\033[31mNo permision .\033[0m'
+
+
 if __name__ == '__main__':
     username = run_cmd('whoami')
-    while True:
-        option = raw_input("""
-        Welcome Use JumpServer To Login.
-        1) Type L/l To Login.
-        2) Type P/p To Print The Servers You Available.
-        3) Other To Quit.
-        Your Choince: """)
-        if option in ['P', 'p']:
-            ip_all = ip_all_select(username)
-            for ip in ip_all:
-                print '\n' * 2
-                print ip
-                print '\n' * 2
-            continue
-        elif option not in ['L', 'l']:
-            sys.exit()
-            
-        try:
-            while True:
-                ip = raw_input('Please input the Host IP: ')
-                if is_ip(ip) and ip in ip_all_select(username):
-                    password = sth_select(username=username)
-                    port = sth_select(ip=ip)
-                    print "Connecting %s ." % ip
-                    connect(ip, port, username, password)
-                elif ip == 'admin':
-                    break
-                elif ip in ['Q', 'q']:
-                    break
-                else:
-                    print 'No permision.'
-                    continue            
-        except (BaseException,Exception):
-            print "Error!"
-            sys.exit()
+    jm = PyCrypt(key)
+    print_prompt()
+    try:
+        while True:
+            option = raw_input("\033[1;32mOpt or IP>:\033[0m ")
+            if option in ['P', 'p']:
+                print_your_server(username)
+                continue
+            elif option in ['e', 'E']:
+                exec_cmd_servers(username)
+            elif option in ['q', 'Q']:
+                sys.exit()
+            else:
+                connect_one(username, option)
+    except (BaseException, Exception):
+    #except IndexError:
+        print "Exit."
+        sys.exit()

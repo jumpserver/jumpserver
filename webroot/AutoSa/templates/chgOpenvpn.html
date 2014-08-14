@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+    <form class="form-horizontal" role="form" method="post" action="" >
+        <fieldset >
+            <legend>修改OpenVPN登陆密码</legend>
+            {% if error %}
+                <div class="alert alert-danger">
+                    {{ error }}
+                </div>
+            {% endif %}
+            {% if msg %}
+                <div class="alert alert-success">
+                    {{ msg }}
+                </div>
+            {% endif %}
+            <div class="form-group">
+                <label for="oldpass" class="col-sm-2 control-label">原来密码<span style="color: red"> *</span></label>
+                <div class="col-sm-4">
+                    <input type="password" class="form-control" id="oldpass" name="oldpass" placeholder="用户名">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password" class="col-sm-2 control-label">新密码<span style="color: red"> *</span></label>
+                <div class="col-sm-4">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="密码">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password_confirm" class="col-sm-2 control-label">确认密码<span style="color: red"> *</span></label>
+                <div class="col-sm-4">
+                    <input type="password" class="form-control" id="password_confirm" name="password_confirm" placeholder="确认密码">
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-4">
+                    <button class="btn btn-primary">确认修改</button>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+{% endblock %}

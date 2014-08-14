@@ -1,0 +1,133 @@
+/*!
+ * Bootstrap v3.0.3 (http://getbootstrap.com)
+ * Copyright 2013 Twitter, Inc.
+ * Licensed under http://www.apache.org/licenses/LICENSE-2.0
+ */
+
+/*设置全局字体*/
+body,button, input, p, select, textarea,h1 ,h2, h3, h4, h5, h6 {
+    font-family: "Helvetica Neue", Helvetica, STheiti, "微软雅黑", "宋体", Arial, Tahoma, sans-serif, serif;}
+
+/*左侧下拉菜单样式*/
+
+/*左侧菜单*/
+.sidebar-menu {
+	border-right: 1px solid #c4c8cb;
+}
+/*一级菜单*/
+.menu-first {
+	height: 45px;
+	line-height: 45px;
+	background-color: #e9e9e9;
+	border-top: 1px solid #efefef;
+	border-bottom: 1px solid #e1e1e1;
+	padding: 0;
+	font-size: 14px;
+	font-weight: normal;
+	text-align: center;
+}
+/*一级菜单鼠标划过状态*/
+.menu-first:hover {
+	text-decoration: none;
+	background-color: #d6d4d5;
+	border-top: 1px solid #b7b7b7;
+	border-bottom: 1px solid #acacac;
+}
+/*二级菜单*/
+.menu-second li a {
+	background-color: #f6f6f6;
+	height: 31px;
+	line-height: 31px;
+	border-top: 1px solid #efefef;
+	border-bottom: 1px solid #efefef;
+	font-size: 12px;
+	text-align: center;
+}
+/*二级菜单鼠标划过样式*/
+.menu-second li a:hover {
+	text-decoration: none;
+	background-color: #66c3ec;
+	border-top: 1px solid #83ceed;
+	border-bottom: 1px solid #83ceed;
+	border-right: 3px solid #f8881c;
+	border-left: 3px solid #66c3ec;
+}
+/*二级菜单选中状态*/
+.menu-second-selected {
+	background-color: #66c3ec;
+	height: 31px;
+	line-height: 31px;
+	border-top: 1px solid #83ceed;
+	border-bottom: 1px solid #83ceed;
+	border-right: 3px solid #f8881c;
+	border-left: 3px solid #66c3ec;
+	text-align: center;
+}
+
+/*覆盖bootstrap的样式*/
+	.nav-list,.nav-list li a{
+		padding: 0px;
+		margin: 0px;
+	}
+
+/*覆盖bootstrap的样式-大屏幕*/
+.screen {
+  padding: 10px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 200;
+  line-height: 2.1428571435;
+  color: inherit;
+  background-color: #eeeeee;
+}
+
+.jumbotron h1,
+.jumbotron .h1 {
+  line-height: 1;
+  color: inherit;
+}
+
+.jumbotron p {
+  line-height: 1.4;
+}
+
+.container .jumbotron {
+  border-radius: 6px;
+}
+
+.jumbotron .container {
+  max-width: 100%;
+}
+
+@media screen and (min-width: 768px) {
+  .jumbotron {
+    padding-top: 48px;
+    padding-bottom: 48px;
+  }
+  .container .jumbotron {
+    padding-right: 60px;
+    padding-left: 60px;
+  }
+  .jumbotron h1,
+  .jumbotron .h1 {
+    font-size: 63px;
+  }
+}	
+
+.control-label {
+    text-align: left !important;
+}
+
+.session_btn {
+    margin-right: 40px !important;
+    margin-top: 7px;
+}
+
+select.add-perm {
+    height: 300px !important;
+}
+
+/*li.dropdown-logout, ul.dropdown-logout {
+    min-width: 20px !important;
+    margin-right: 15px;
+}*/
