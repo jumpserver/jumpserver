@@ -12,7 +12,7 @@ from binascii import b2a_hex, a2b_hex
 import random
 import ConfigParser
 import pam
-import paramiko
+
 
 base_dir = "/opt/jumpserver/"
 cf = ConfigParser.ConfigParser()
@@ -25,17 +25,11 @@ sudoadd_shell = cf.get('jumpserver', 'sudoadd_shell')
 sudodel_shell = cf.get('jumpserver', 'sudodel_shell')
 keygen_shell = cf.get('jumpserver', 'keygen_shell')
 chgpass_shell = cf.get('jumpserver', 'chgpass_shell')
-host_pptp = cf.get('vpn', 'host_pptp')
-pptp_port = cf.get('vpn', 'pptp_port')
-pptp_user = cf.get('vpn', 'pptp_user')
-pptp_pass_file = cf.get('vpn', 'pptp_pass_file')
-host_openvpn = cf.get('vpn', 'host_openvpn')
-openvpn_port = cf.get('vpn', 'openvpn_port')
-openvpn_user = cf.get('vpn', 'openvpn_user')
 admin = ['admin']
 
 
 def keygen(num):
+    """生成随机密码"""
     seed = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     sa = []
     for i in range(num):
@@ -45,6 +39,7 @@ def keygen(num):
 
 
 class PyCrypt(object):
+    """对称加密解密"""
     def __init__(self, key):
         self.key = key
         self.mode = AES.MODE_CBC
@@ -69,6 +64,7 @@ class PyCrypt(object):
 
 
 def login(request):
+    """登录界面"""
     if request.session.get('username'):
         return HttpResponseRedirect('/')
     if request.method == 'GET':
@@ -91,6 +87,7 @@ def login(request):
 
 
 def login_required(func):
+    """要求登录的装饰器"""
     def _deco(request, *args, **kwargs):
         if not request.session.get('username'):
             return HttpResponseRedirect('/login/')
@@ -99,6 +96,7 @@ def login_required(func):
 
 
 def admin_required(func):
+    """要求用户是admin的装饰器"""
     def _deco(request, *args, **kwargs):
         if not request.session.get('admin'):
             return HttpResponseRedirect('/')
@@ -107,6 +105,7 @@ def admin_required(func):
 
 
 def logout(request):
+    """注销登录调用"""
     if request.session.get('username'):
         del request.session['username']
     return HttpResponseRedirect('/login/')
@@ -114,6 +113,7 @@ def logout(request):
 
 @login_required
 def downKey(request):
+    """下载key"""
     username = request.session.get('username')
     filename = '%s/keys/%s' % (base_dir, username)
     f = open(filename)
@@ -126,6 +126,7 @@ def downKey(request):
 
 @login_required
 def index(request):
+    """主页"""
     username = request.session.get('username')
     name = User.objects.filter(username=username)
     assets = []
@@ -140,6 +141,7 @@ def index(request):
 
 @admin_required
 def showUser(request):
+    """查看所有用户"""
     users = User.objects.all()
     info = ''
     error = ''
@@ -160,6 +162,7 @@ def showUser(request):
 
 @admin_required
 def addUser(request):
+    """添加用户"""
     jm = PyCrypt(key)
     if request.method == 'GET':
         return render_to_response('addUser.html', {'user_menu': 'active'},
@@ -209,6 +212,7 @@ def addUser(request):
 
 @admin_required
 def showAssets(request):
+    """查看服务器"""
     info = ''
     assets = Assets.objects.all()
     if request.method == 'POST':
@@ -223,6 +227,7 @@ def showAssets(request):
 
 @admin_required
 def addAssets(request):
+    """添加服务器"""
     error = ''
     msg = ''
     if request.method == 'POST':
@@ -245,6 +250,7 @@ def addAssets(request):
 
 @admin_required
 def showPerm(request):
+    """查看权限"""
     users = User.objects.all()
     if request.method == 'POST':
         assets_del = request.REQUEST.getlist('selected')
@@ -271,6 +277,7 @@ def showPerm(request):
 
 @admin_required
 def addPerm(request):
+    """增加授权"""
     users = User.objects.all()
     have_assets = []
     if request.method == 'POST':
@@ -301,6 +308,7 @@ def addPerm(request):
 
 @login_required
 def chgPass(request):
+    """修改登录系统的密码"""
     error = ''
     msg = ''
     if request.method == 'POST':
@@ -328,6 +336,7 @@ def chgPass(request):
 
 @login_required
 def chgKey(request):
+    """修改密钥密码"""
     error = ''
     msg = ''
     username = request.session.get('username')
@@ -353,136 +362,3 @@ def chgKey(request):
                              {'error': error, 'msg': msg},
                               context_instance=RequestContext(request))
 
-
-def ssh_host(host, port, user='root'):
-    ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(host, port, user)
-    return ssh
-
-
-@login_required
-def chgPptp(request):
-    error = ''
-    msg = ''
-    if request.method == 'POST':
-        username = request.session.get('username')
-        oldpass = request.POST.get('oldpass')
-        password = request.POST.get('password')
-        password_confirm = request.POST.get('password_confirm')
-        if '' in [oldpass, password, password_confirm]:
-            error = '带*内容不能为空'
-        elif password != password_confirm:
-            error = '两次密码不匹配'
-
-        if not error:
-            ssh = ssh_host(host_pptp, pptp_port, pptp_user)
-            stdin, stdout, stderr = ssh.exec_command("sudo awk '/%s/ { print $3 }' %s" % (username, pptp_pass_file))
-            oldpass_confirm = stdout.read().strip()
-
-            if oldpass != oldpass_confirm:
-                error = '原来密码不正确'
-            elif not oldpass_confirm:
-                error = '您尚未开通PPTP VPN服务'
-            else:
-                stdin, stdout, stderr = ssh.exec_command("sudo sed -i '/%s/ s@%s@%s@g' %s" % (username, oldpass_confirm,
-                                                         password, pptp_pass_file))
-                if stderr.read():
-                    error = '密码更改失败'
-                else:
-                    msg = '密码更改成功'
-    return render_to_response('chgPptp.html',
-                             {'error': error, 'msg': msg},
-                              context_instance=RequestContext(request))
-
-
-@login_required
-def chgOpenvpn(request):
-    error = ''
-    msg = ''
-    if request.method == 'POST':
-        username = request.session.get('username')
-        password = request.POST.get('password')
-        password_confirm = request.POST.get('password_confirm')
-        if '' in [password, password_confirm]:
-            error = '带*内容不能为空'
-        elif password != password_confirm:
-            error = '两次密码不匹配'
-
-        if not error:
-            ssh = paramiko.SSHClient()
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh.connect(host_openvpn, openvpn_port, openvpn_user)
-
-            stdin, stdout, stderr = ssh.exec_command("id %s" % username)
-            if stderr.read():
-                error = '您尚未开通OpenVPN服务'
-            else:
-                stdin, stdout, stderr = ssh.exec_command("echo %s | sudo passwd --stdin %s" % (password, username))
-                if stderr.read():
-                    error = '密码更改失败'
-                else:
-                    msg = '密码更改成功'
-    return render_to_response('chgOpenvpn.html',
-                              {'error': error, 'msg': msg},
-                              context_instance=RequestContext(request))
-
-
-@admin_required
-def addPptp(request):
-    error = ''
-    msg = ''
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        password_confirm = request.POST.get('password_confirm')
-
-        if '' in [username, password, password_confirm]:
-            error = '带*内容不能为空'
-        elif password != password_confirm:
-            error = '两次输入不匹配'
-
-        if not error:
-            ssh = ssh_host(host_pptp, pptp_port, pptp_user)
-            stdin, stdout, stderr = ssh.exec_command('grep %s %s' % (username, pptp_pass_file))
-
-            if stdout.read():
-                error = '用户已存在'
-            else:
-                stdin, stdout, stderr = ssh.exec_command('sudo echo -e "%s\tpptpd\t%s\t*" >> %s' %
-                                                         (username, password, pptp_pass_file))
-                if not stderr.read():
-                    msg = '用户添加成功'
-    return render_to_response('addPptp.html',
-                              {'error': error, 'msg': msg},
-                              context_instance=RequestContext(request))
-
-
-@admin_required
-def addOpenvpn(request):
-    error = ''
-    msg = ''
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        password_confirm = request.POST.get('password_confirm')
-
-        if '' in [username, password, password_confirm]:
-            error = '带*内容不能为空'
-        elif password != password_confirm:
-            error = '两次输入不匹配'
-
-        if not error:
-            ssh = ssh_host(host_openvpn, openvpn_port, openvpn_user)
-            stdin, stdout, stderr = ssh.exec_command('id %s' % username)
-
-            if stdout.read():
-                error = '用户已存在'
-            else:
-                stdin, stdout, stderr = ssh.exec_command('sudo useradd -s /sbin/nologin %s;echo %s | sudo passwd --stdin %s' %
-                                                         (username, password, username))
-                if not stderr.read():
-                    msg = '用户添加成功'
-    return render_to_response('addOpenvpn.html',
-                              {'error': error, 'msg': msg},
-                              context_instance=RequestContext(request))
