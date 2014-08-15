@@ -29,4 +29,4 @@ fi
 
 sed -e "s@guanghongwei@$username@g" ${sudo_file} > $user_sudo_file
 
-ldapadd -x -h ${host} -w ${ldapassword} -D "cn=admin,dc=yolu,dc=com" -f $user_sudo_file
+ldapadd -x -h ${host} -w ${ldapassword} -D "cn=admin,dc=$domain,dc=$suffix" -f $user_sudo_file

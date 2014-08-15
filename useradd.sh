@@ -31,8 +31,8 @@ cd /usr/share/migrationtools/
 ./migrate_passwd.pl /etc/passwd > /tmp/passwd.ldif
 ./migrate_group.pl /etc/group > /tmp/group.ldif
 
-grep -A15 "dn: uid=$username,ou=People,dc=yolu,dc=com" /tmp/passwd.ldif > /tmp/user.ldif
-grep -A6 "dn: cn=$username,ou=Group,dc=yolu,dc=com" /tmp/group.ldif > /tmp/usergroup.ldif
+grep -A15 "dn: uid=$username,ou=People,dc=$domain,dc=$suffix" /tmp/passwd.ldif > /tmp/user.ldif
+grep -A6 "dn: cn=$username,ou=Group,dc=$domain,dc=$suffix" /tmp/group.ldif > /tmp/usergroup.ldif
 
-ldapadd -x -h $host -w $ldapassword -D "cn=admin,dc=yolu,dc=com" -f /tmp/user.ldif
-ldapadd -x -h $host -w $ldapassword -D "cn=admin,dc=yolu,dc=com" -f /tmp/usergroup.ldif
+ldapadd -x -h $host -w $ldapassword -D "cn=admin,dc=$domain,dc=$suffix" -f /tmp/user.ldif
+ldapadd -x -h $host -w $ldapassword -D "cn=admin,dc=$domain,dc=$suffix" -f /tmp/usergroup.ldif

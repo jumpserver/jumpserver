@@ -15,4 +15,4 @@ if [ $? == '0' ];then
 else
     echo "$username is not exist."
 fi
-ldapdelete -x -h $host -D "cn=admin,dc=yolu,dc=com" -w $ldapassword "cn=$username,ou=Sudoers,dc=yolu,dc=com"
+ldapdelete -x -h $host -D "cn=admin,dc=$domain,dc=$suffix" -w $ldapassword "cn=$username,ou=Sudoers,dc=$domain,dc=$suffix"

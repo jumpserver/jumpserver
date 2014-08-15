@@ -3,7 +3,7 @@
 if [ $USER = 'admin' ] || [ $USER == 'root' ];then
     echo ""
 else
-    python /opt/jumpserver/jumpserver.pyo
+    python /opt/jumpserver/jumpserver.py
     if [ $USER == 'guanghongwei' ];then
         echo
     else
