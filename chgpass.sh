@@ -18,4 +18,4 @@ fi
 
 echo "$password" | passwd --stdin "$username"
 
-ssh -p $host2_port $host2 "echo \"$password\" | passwd --stdin \"$username\""
+#ssh -p $host2_port $host2 "echo \"$password\" | passwd --stdin \"$username\""

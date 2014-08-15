@@ -25,13 +25,13 @@ fi
 gen_key ${password}
 
 mkdir -p /home/${user}/.ssh
-ssh -p ${host2_port} ${host2} "mkdir -p /home/$user/.ssh"
+#ssh -p ${host2_port} ${host2} "mkdir -p /home/$user/.ssh"
 
 cat ${keyfile}.pub > /home/${user}/.ssh/authorized_keys
-ssh -p ${host2_port} ${host2} "cat > /home/$user/.ssh/authorized_keys" < ${keyfile}.pub
+#ssh -p ${host2_port} ${host2} "cat > /home/$user/.ssh/authorized_keys" < ${keyfile}.pub
 
 chmod 600 /home/${user}/.ssh/authorized_keys
-ssh -p ${host2_port} ${host2} "chmod 600 /home/$user/.ssh/authorized_keys"
+#ssh -p ${host2_port} ${host2} "chmod 600 /home/$user/.ssh/authorized_keys"
 
 chown -R ${user}:${user} /home/${user}/.ssh
-ssh -p ${host2_port} ${host2} "chown -R $user:$user /home/$user/.ssh"
+#ssh -p ${host2_port} ${host2} "chown -R $user:$user /home/$user/.ssh"

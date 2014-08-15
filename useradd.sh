@@ -20,7 +20,7 @@ fi
 id $username &> /dev/null
 if [ $? != '0' ];then
     useradd $username
-    ssh -p $host2_port $host2  "useradd $username"
+    #ssh -p $host2_port $host2  "useradd $username"
     echo $password | passwd --stdin $username
 else
     echo "$username have been exits."

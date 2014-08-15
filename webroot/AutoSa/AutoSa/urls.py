@@ -22,8 +22,4 @@ urlpatterns = patterns('',
     (r'^downKey/$', views.downKey),
     (r'^chgPass/$', views.chgPass),
     (r'^chgKey/$', views.chgKey),
-    (r'^chgPptp/$', views.chgPptp),
-    (r'^chgOpenvpn/$', views.chgOpenvpn),
-    (r'^addPptp/$', views.addPptp),
-    (r'^addOpenvpn/$', views.addOpenvpn),
 )

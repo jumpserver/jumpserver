@@ -13,7 +13,7 @@ dir=$(cwd)
 id $username &> /dev/null
 if [ $? == '0' ];then
     userdel -r $username
-    ssh -p $host2_port $host2 "userdel -r $username"
+    #ssh -p $host2_port $host2 "userdel -r $username"
 else
     echo "$username is not exist."
 fi

@@ -1,10 +1,10 @@
 #!/bin/bash
 
-if [ $USER = 'yolu' ] || [ $USER == 'root' ];then
+if [ $USER = 'admin' ] || [ $USER == 'root' ];then
     echo ""
 else
     python /opt/jumpserver/jumpserver.pyo
-    if [ $USER == 'guanghongwei' ] || [ $USER  == 'liufuhua' ];then
+    if [ $USER == 'guanghongwei' ];then
         echo
     else
         exit 3
