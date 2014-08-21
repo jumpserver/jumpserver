@@ -12,7 +12,7 @@ dir=$(cwd)
 
 
 sudo_file=${dir}/sudo.ldif
-user_sudo_file=${dir}/sudouser.ldif
+user_sudo_file=${dir}/${username}.ldif
 
 if [ -z $1 ];then
     echo 
@@ -27,6 +27,10 @@ if [ $? != '0' ];then
     exit 3
 fi
 
+sed -i "/guanghongwei/ s@dianping@$domain@g" ${sudo_file}
+sed -i "/guanghongwei/ s@com@$suffix@g" ${sudo_file}
 sed -e "s@guanghongwei@$username@g" ${sudo_file} > $user_sudo_file
 
+
 ldapadd -x -h ${host} -w ${ldapassword} -D "cn=admin,dc=$domain,dc=$suffix" -f $user_sudo_file
+rm -f $user_sudo_file

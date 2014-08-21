@@ -1,4 +1,4 @@
-dn: cn=guanghongwei,ou=Sudoers,dc=yolu,dc=com
+dn: cn=guanghongwei,ou=Sudoers,dc=dianping,dc=com
 objectClass: top
 objectClass: sudoRole
 cn: guanghongwei
