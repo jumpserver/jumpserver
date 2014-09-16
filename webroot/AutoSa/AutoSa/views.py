@@ -12,7 +12,7 @@ from binascii import b2a_hex, a2b_hex
 import random
 import ConfigParser
 import pam
-from UserManage.forms import UserAddForm, GroupAddFrom
+from UserManage.forms import UserAddForm, GroupAddForm
 
 
 
