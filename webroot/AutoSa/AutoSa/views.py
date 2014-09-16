@@ -171,43 +171,10 @@ def addUser(request):
         return render_to_response('addUser.html', {'user_menu': 'active', 'form': form},
                                   context_instance=RequestContext(request))
     else:
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        password_confirm = request.POST.get('password_confirm')
-        keypass = request.POST.get('keypass')
-        keypass_confirm = request.POST.get('keypass_confirm')
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        error = ''
-
-        if '' in (username, password, password_confirm, name):
-            error += '带*号内容不能为空。'
-        if User.objects.filter(username=username):
-            error += '用户名已存在。'
-        if password != password_confirm or keypass != keypass_confirm:
-            error += '两次输入密码不匹配。'
-        if error:
-            return render_to_response('addUser.html', {'error': error, 'user_menu': 'active'},
-                                      context_instance=RequestContext(request))
-        ldap_password = keygen(15)
-        ret = subprocess.call("%s '%s' '%s';%s '%s';%s '%s' '%s'" %
-                              (useradd_shell, username, ldap_password,
-                               sudoadd_shell, username,
-                               keygen_shell, username, keypass), shell=True)
-
-        if not ret:
-            ret = subprocess.call('echo %s | passwd --stdin %s' % (password, username), shell=True)
-            if not ret:
-                user = User(username=username,
-                            password=jm.encrypt(ldap_password),
-                            name=name,
-                            email=email)
-                user.save()
-                msg = u'添加用户 %s 成功。' % name
-            else:
-                msg = u'添加用户 %s 失败。' % name
-        else:
-            msg = u'添加用户 %s 失败。' % name
+        form = UserAddForm(request.POST)
+        if form.is_valid():
+            user = form.cleaned_data
+            return HttpResponse(user)
 
         return render_to_response('addUser.html', {'msg': msg, 'user_menu': 'active'},
                                   context_instance=RequestContext(request))
