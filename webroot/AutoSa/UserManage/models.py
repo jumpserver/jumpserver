@@ -1,6 +1,13 @@
 from django.db import models
 
 
+class Group(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __unicode__(self):
+        return self.name
+
+
 class User(models.Model):
     username = models.CharField(max_length=50)
     password = models.CharField(max_length=100)
@@ -15,8 +22,3 @@ class User(models.Model):
         return self.username
 
 
-class Group(models.Model):
-    name = models.CharField(max_length=50)
-
-    def __unicode__(self):
-        return self.name
