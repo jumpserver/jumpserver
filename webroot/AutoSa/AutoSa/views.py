@@ -4,14 +4,13 @@ from django.http import HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
-from UserManage.models import User
+from UserManage.models import User, Group
 from Assets.models import Assets, AssetsUser
 import subprocess
 from Crypto.Cipher import AES
 from binascii import b2a_hex, a2b_hex
 import random
 import ConfigParser
-import pam
 from UserManage.forms import UserAddForm, GroupAddForm
 
 
@@ -176,15 +175,21 @@ def addUser(request):
         if form.is_valid():
             user = form.cleaned_data
             ldap_password = keygen(16)
+            group_post = user['group']
+            groups = []
+            for group_name in group_post:
+                groups.append(Group.objects.get(name=group_name))
+
             u = User(
                 username=user['username'],
                 password=user['password'],
                 key_pass=user['key_pass'],
                 name=user['name'],
-                group=user['group'],
                 is_admin=user['is_admin'],
                 is_superuser=user['is_superuser'],
                 ldap_password=ldap_password)
+            u.save()
+            u.group = groups
             u.save()
 
         return render_to_response('addUser.html', {'msg': msg, 'user_menu': 'active'},

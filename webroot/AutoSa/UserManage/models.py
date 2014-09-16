@@ -2,14 +2,14 @@ from django.db import models
 
 
 class Group(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=50, unique=True)
 
     def __unicode__(self):
         return self.name
 
 
 class User(models.Model):
-    username = models.CharField(max_length=50)
+    username = models.CharField(max_length=50, unique=True)
     password = models.CharField(max_length=100)
     key_pass = models.CharField(max_length=100)
     name = models.CharField(max_length=50)
