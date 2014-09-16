@@ -64,12 +64,14 @@
                 </div>
             </div>
             <div class="form-group">
+                {{ form.is_admin.errors }}
                 <label for="id_is_admin" class="col-sm-2 control-label">组admin</label>
                 <div class="col-sm-4">
                     {{ form.is_admin }}
                 </div>
             </div>
             <div class="form-group">
+                {{ form.is_superuser.errors }}
                 <label for="id_is_superuser" class="col-sm-2 control-label">超级admin</label>
                 <div class="col-sm-4">
                     {{ form.is_superuser }}

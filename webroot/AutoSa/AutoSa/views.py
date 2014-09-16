@@ -165,6 +165,7 @@ def showUser(request):
 @admin_required
 def addUser(request):
     """添加用户"""
+    msg = ''
     form = UserAddForm()
     jm = PyCrypt(key)
     if request.method == 'GET':
@@ -174,7 +175,17 @@ def addUser(request):
         form = UserAddForm(request.POST)
         if form.is_valid():
             user = form.cleaned_data
-            return HttpResponse(user)
+            ldap_password = keygen(16)
+            u = User(
+                username=user['username'],
+                password=user['password'],
+                key_pass=user['key_pass'],
+                name=user['name'],
+                group=user['group'],
+                is_admin=user['is_admin'],
+                is_superuser=user['is_superuser'],
+                ldap_password=ldap_password)
+            u.save()
 
         return render_to_response('addUser.html', {'msg': msg, 'user_menu': 'active'},
                                   context_instance=RequestContext(request))

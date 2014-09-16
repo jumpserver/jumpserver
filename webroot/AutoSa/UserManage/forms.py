@@ -25,8 +25,8 @@ class UserAddForm(forms.Form):
                            widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '姓名'}))
     group = forms.ModelMultipleChoiceField(queryset=Group.objects.all(),
                                            widget=forms.SelectMultiple(attrs={'class': 'form-control'}))
-    is_admin = forms.BooleanField()
-    is_superuser = forms.BooleanField()
+    is_admin = forms.BooleanField(required=False)
+    is_superuser = forms.BooleanField(required=False)
 
     def clean_password_again(self):
         password = self.cleaned_data['password']
