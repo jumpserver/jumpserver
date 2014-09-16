@@ -11,6 +11,7 @@ class Group(models.Model):
 class User(models.Model):
     username = models.CharField(max_length=50)
     password = models.CharField(max_length=100)
+    key_pass = models.CharField(max_length=100)
     name = models.CharField(max_length=50)
     group = models.ManyToManyField(Group)
     is_admin = models.BooleanField()

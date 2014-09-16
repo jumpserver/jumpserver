@@ -12,6 +12,8 @@ from binascii import b2a_hex, a2b_hex
 import random
 import ConfigParser
 import pam
+from UserManage.forms import UserAddForm, GroupAddFrom
+
 
 
 base_dir = "/opt/jumpserver/"
@@ -165,7 +167,7 @@ def addUser(request):
     """添加用户"""
     jm = PyCrypt(key)
     if request.method == 'GET':
-        return render_to_response('addUser.html', {'user_menu': 'active'},
+        return render_to_response('addUser.html', {'user_menu': 'active', 'form': UserAddForm},
                                   context_instance=RequestContext(request))
     else:
         username = request.POST.get('username')

@@ -3,56 +3,76 @@
     <form class="form-horizontal" role="form" method="post" action="" >
         <fieldset >
             <legend>添加用户</legend>
-            {% if error %}
+            {% if form.errors %}
                 <div class="alert alert-danger">
-                    {{ error }}
+                     Please correct the error{{ form.errors|pluralize }} below.
                 </div>
             {% endif %}
+
             {% if msg %}
                 <div class="alert alert-success">
                     {{ msg }}
                 </div>
             {% endif %}
             <div class="form-group">
-                <label for="username" class="col-sm-2 control-label">用户名<span style="color: red"> *</span></label>
+                {{ form.username.errors }}
+                <label for="id_username" class="col-sm-2 control-label">用户名<span style="color: red"> *</span></label>
                 <div class="col-sm-4">
-                    <input type="text" class="form-control" id="username" name="username" placeholder="用户名">
+                    {{ form.username }}
                 </div>
             </div>
             <div class="form-group">
-                <label for="password" class="col-sm-2 control-label">密码<span style="color: red"> *</span></label>
+                {{ form.password.errors }}
+                <label for="id_password" class="col-sm-2 control-label">密码<span style="color: red"> *</span></label>
                 <div class="col-sm-4">
-                    <input type="password" class="form-control" id="password" name="password" placeholder="密码">
+                    {{ form.password }}
                 </div>
             </div>
             <div class="form-group">
-                <label for="password_confirm" class="col-sm-2 control-label">确认密码<span style="color: red"> *</span></label>
+                {{ form.password_again.errors }}
+                <label for="id_password_again" class="col-sm-2 control-label">确认密码<span style="color: red"> *</span></label>
                 <div class="col-sm-4">
-                    <input type="password" class="form-control" id="password_confirm" name="password_confirm" placeholder="确认密码">
+                    {{ form.password_again }}
                 </div>
             </div>
             <div class="form-group">
-                <label for="keypass" class="col-sm-2 control-label">Key密码<span style="color: red"> *</span></label>
+                {{ form.key_pass.errors }}
+                <label for="id_keypass" class="col-sm-2 control-label">密钥密码<span style="color: red"> *</span></label>
                 <div class="col-sm-4">
-                    <input type="password" class="form-control" id="keypass" name="keypass" placeholder="Key密码">
+                    {{ form.key_pass }}
                 </div>
             </div>
             <div class="form-group">
-                <label for="keypass_confirm" class="col-sm-2 control-label">确认密码<span style="color: red"> *</span></label>
+                {{ form.key_pass_again.errors }}
+                <label for="id_keypass_again" class="col-sm-2 control-label">确认密码<span style="color: red"> *</span></label>
                 <div class="col-sm-4">
-                    <input type="password" class="form-control" id="keypass_confirm" name="keypass_confirm" placeholder="确认密码">
+                    {{ form.key_pass_again }}
                 </div>
             </div>
             <div class="form-group">
-                <label for="name" class="col-sm-2 control-label">姓名<span style="color: red"> *</span></label>
+                {{ form.name.errors }}
+                <label for="id_name" class="col-sm-2 control-label">姓名<span style="color: red"> *</span></label>
                 <div class="col-sm-4">
-                    <input type="text" class="form-control" id="name" name='name' placeholder="姓名">
+                    {{ form.name }}
                 </div>
             </div>
             <div class="form-group">
-                <label for="email" class="col-sm-2 control-label">E-mail</label>
+                {{ form.group.errors }}
+                <label for="id_group" class="col-sm-2 control-label">属组</label>
                 <div class="col-sm-4">
-                    <input type="email" class="form-control" id="email" name="email" placeholder="用户名">
+                    {{ form.group }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="id_is_admin" class="col-sm-2 control-label">组admin</label>
+                <div class="col-sm-4">
+                    {{ form.is_admin }}
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="id_is_superuser" class="col-sm-2 control-label">超级admin</label>
+                <div class="col-sm-4">
+                    {{ form.is_superuser }}
                 </div>
             </div>
             <div class="form-group">
