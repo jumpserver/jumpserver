@@ -165,9 +165,10 @@ def showUser(request):
 @admin_required
 def addUser(request):
     """添加用户"""
+    form = UserAddForm()
     jm = PyCrypt(key)
     if request.method == 'GET':
-        return render_to_response('addUser.html', {'user_menu': 'active', 'form': UserAddForm},
+        return render_to_response('addUser.html', {'user_menu': 'active', 'form': form},
                                   context_instance=RequestContext(request))
     else:
         username = request.POST.get('username')
