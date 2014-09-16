@@ -24,7 +24,7 @@ class UserAddForm(forms.Form):
     name = forms.CharField(max_length=30,
                            widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '姓名'}))
     group = forms.ModelMultipleChoiceField(queryset=Group.objects.all(),
-                                           widget=forms.MultipleChoiceField(attrs={'class': 'form-control'}))
+                                           widget=forms.SelectMultiple(attrs={'class': 'form-control'}))
     is_admin = forms.BooleanField()
     is_superuser = forms.BooleanField()
 
