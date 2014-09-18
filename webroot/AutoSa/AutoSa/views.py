@@ -305,18 +305,18 @@ def addUser(request):
 
             user_dn = "uid=%s,ou=People,%s" % (username, ldap_base_dn)
             userPassword = gen_sha512(keygen(6), ldap_password)
-            user_attr  = {'uid': [username],
-                          'cn': [username],
-                          'objectClass': ['account', 'posixAccount', 'top', 'shadowAccount'],
-                          'userPassword': ['{crypt}%s' % userPassword],
-                          'shadowLastChange': ['16328'],
-                          'shadowMin': ['0'],
-                          'shadowMax': ['99999'],
-                          'shadowWarning': ['7'],
-                          'loginShell': ['/bin/bash'],
-                          'uidNumber': [u.id],
-                          'gidNumber': [u.id],
-                          'homeDirectory': ['/home/%s' % username]
+            user_attr = {'uid': [str(username)],
+                         'cn': [str(username)],
+                         'objectClass': ['account', 'posixAccount', 'top', 'shadowAccount'],
+                         'userPassword': ['{crypt}%s' % userPassword],
+                         'shadowLastChange': ['16328'],
+                         'shadowMin': ['0'],
+                         'shadowMax': ['99999'],
+                         'shadowWarning': ['7'],
+                         'loginShell': ['/bin/bash'],
+                         'uidNumber': [str(u.id)],
+                         'gidNumber': [str(u.id)],
+                         'homeDirectory': [str('/home/%s' % username)]
                           }
 
             group_dn = "cn=%s,out=Group,%s" % (username, ldap_base_dn)
@@ -324,20 +324,20 @@ def addUser(request):
                 'objectClass': ['posixGroup', 'top'],
                 'cn': [username],
                 'userPassword': ['{crypt}x'],
-                'gidNumber': [u.id]
+                'gidNumber': [str(u.id)]
             }
 
             try:
                 ldap_user = LDAPMgmt()
                 ldap_user.add(user_dn, user_attr)
                 ldap_user.add(group_dn, group_attr)
-            except ldap.LDAPError, e:
+            except Exception, e:
                 error = u'添加ladp用户失败' + unicode(e)
                 try:
-                    ldap_user.delete(user_dn)
-                    ldap_user.delete(group_dn)
                     bash('userdel -r %s' % username)
                     u.delete()
+                    ldap_user.delete(user_dn)
+                    ldap_user.delete(group_dn)
                 except:
                     pass
                 return render_to_response('addUser.html', {'user_menu': 'active', 'form': form, 'error': error},
