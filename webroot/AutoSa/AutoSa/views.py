@@ -305,24 +305,24 @@ def addUser(request):
 
             user_dn = "uid=%s,ou=People,%s" % (username, ldap_base_dn)
             userPassword = gen_sha512(keygen(6), ldap_password)
-            user_attr = {'uid': [str(username)],
-                         'cn': [str(username)],
-                         'objectClass': ['account', 'posixAccount', 'top', 'shadowAccount'],
-                         'userPassword': ['{crypt}%s' % userPassword],
-                         'shadowLastChange': ['16328'],
-                         'shadowMin': ['0'],
-                         'shadowMax': ['99999'],
-                         'shadowWarning': ['7'],
-                         'loginShell': ['/bin/bash'],
-                         'uidNumber': [str(u.id)],
-                         'gidNumber': [str(u.id)],
-                         'homeDirectory': [str('/home/%s' % username)]
-                          }
+            user_attr = {
+                'uid': [str(username)],
+                'cn': [str(username)],
+                'objectClass': ['account', 'posixAccount', 'top', 'shadowAccount'],
+                'userPassword': ['{crypt}%s' % userPassword],
+                'shadowLastChange': ['16328'],
+                'shadowMin': ['0'],
+                'shadowMax': ['99999'],
+                'shadowWarning': ['7'],
+                'loginShell': ['/bin/bash'],
+                'uidNumber': [str(u.id)],
+                'gidNumber': [str(u.id)],
+                'homeDirectory': [str('/home/%s' % username)]}
 
             group_dn = "cn=%s,out=Group,%s" % (username, ldap_base_dn)
             group_attr = {
                 'objectClass': ['posixGroup', 'top'],
-                'cn': [username],
+                'cn': [str(username)],
                 'userPassword': ['{crypt}x'],
                 'gidNumber': [str(u.id)]
             }

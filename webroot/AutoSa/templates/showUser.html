@@ -26,8 +26,15 @@
                 <td><input type="checkbox" name="selected" value="{{ user.id }}"></td>
                 <td>{{ user.id }}</td>
                 <td>{{ user.username }}</td>
-                <td>{{ user.group }}</td>
                 <td>{{ user.name }}</td>
+                <!--<td>{{ user.group }}</td>-->
+                <td>
+                    {% for group in user.group.all() %}
+                        {{ group.name }}
+                    {% endfor}
+                </td>
+                <td>{{ user.is_admin }}</td>
+                <td>{{ user.is_superuser }}</td>
                 <td>{{ user.email }}</td>
                 <td><a href="/downKey/">下载</a></td>
             </tr>
