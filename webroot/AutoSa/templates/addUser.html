@@ -3,6 +3,12 @@
     <form class="form-horizontal" role="form" method="post" action="" >
         <fieldset >
             <legend>添加用户</legend>
+            {% if error %}
+                <div class="alert alert-danger">
+                    {{ error }}
+                </div>
+            {% endif %}
+
             {% if form.errors %}
                 <div class="alert alert-danger">
                      Please correct the error{{ form.errors|pluralize }} below.

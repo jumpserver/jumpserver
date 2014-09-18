@@ -13,6 +13,9 @@
                 <th>ID</th>
                 <th>用户名</th>
                 <th>姓名</th>
+                <th>属组</th>
+                <th>is_admin</th>
+                <th>is_superuser</th>
                 <th>Email</th>
                 <th>Key</th>
             </tr>
@@ -23,6 +26,7 @@
                 <td><input type="checkbox" name="selected" value="{{ user.id }}"></td>
                 <td>{{ user.id }}</td>
                 <td>{{ user.username }}</td>
+                <td>{{ user.group }}</td>
                 <td>{{ user.name }}</td>
                 <td>{{ user.email }}</td>
                 <td><a href="/downKey/">下载</a></td>

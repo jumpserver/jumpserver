@@ -11,8 +11,12 @@ from Crypto.Cipher import AES
 from binascii import b2a_hex, a2b_hex
 import random
 import ConfigParser
+import pam
+import os
+import ldap
+import ldap.modlist as modlist
+import crypt
 from UserManage.forms import UserAddForm, GroupAddForm
-
 
 
 base_dir = "/opt/jumpserver/"
@@ -20,6 +24,7 @@ cf = ConfigParser.ConfigParser()
 cf.read('%s/jumpserver.conf' % base_dir)
 
 key = cf.get('jumpserver', 'key')
+rsa_dir = cf.get('jumpserver', 'rsa_dir')
 useradd_shell = cf.get('jumpserver', 'useradd_shell')
 userdel_shell = cf.get('jumpserver', 'userdel_shell')
 sudoadd_shell = cf.get('jumpserver', 'sudoadd_shell')
@@ -27,6 +32,10 @@ sudodel_shell = cf.get('jumpserver', 'sudodel_shell')
 keygen_shell = cf.get('jumpserver', 'keygen_shell')
 chgpass_shell = cf.get('jumpserver', 'chgpass_shell')
 admin = ['admin']
+ldap_host = cf.get('jumpserver', 'ldap_host')
+ldap_base_dn = cf.get('jumpserver', 'ldap_base_dn')
+admin_cn = cf.get('jumpserver', 'admin_cn')
+admin_pass = cf.get('jumpserver', 'admin_pass')
 
 
 def keygen(num):
@@ -161,6 +170,86 @@ def showUser(request):
                               context_instance=RequestContext(request))
 
 
+def bash(cmd):
+    return subprocess.call(cmd, shell=True)
+
+
+def rsa_gen(username, key_pass, rsa_dir=rsa_dir):
+    rsa_file = '%s/%s' % (rsa_dir, username)
+    pub_file = '%s.pub' % rsa_file
+    authorized_file = '/home/%s/.ssh/authorized_keys' % username
+    if os.path.exists(rsa_file):
+        os.unlink(rsa_file)
+    ret = bash('ssh-keygen -t rsa -f %s -P %s &> /dev/null && echo "######## rsa_gen Ok."' % (rsa_file, key_pass))
+    if not ret:
+        try:
+            if not os.path.isdir('/home/%s/.ssh' % username):
+                os.mkdir('/home/%s/.ssh' % username)
+            pub = open(pub_file, 'r')
+            authorized = open(authorized_file, 'w')
+            authorized.write(pub.read())
+            pub.close()
+            authorized.close()
+        except Exception:
+            return 1
+        else:
+            return 0
+
+
+class LDAPMgmt():
+    def __init__(self,
+                 ldap_host=ldap_host,
+                 ldap_base_dn=ldap_base_dn,
+                 admin_cn=admin_cn,
+                 admin_pass=admin_pass):
+        self.ldap_host = ldap_host
+        self.ldap_base_dn = ldap_base_dn
+        self.admin_cn = admin_cn
+        self.admin_pass = admin_pass
+        self.conn = ldap.initialize(ldap_host)
+        self.conn.set_option(ldap.OPT_REFERRALS, 0)
+        self.conn.protocol_version = ldap.VERSION3
+        self.conn.simple_bind_s(admin_cn, admin_pass)
+
+    def list(self, filter, scope=ldap.SCOPE_SUBTREE, attr=None):
+        try:
+            ldap_result = self.conn.search_s(self.ldap_base_dn, scope, filter, attr)
+            print 'Here is the result: '
+            for entry in ldap_result:
+                name, data = entry
+                print '#'*20, name, '#'*20
+                for k, v in data.items():
+                    print '%s: %s' % (k,v)
+        except ldap.LDAPError, e:
+            print e
+
+    def add(self, dn, attrs):
+        try:
+            ldif = modlist.addModlist(attrs)
+            self.conn.add_s(dn, ldif)
+        except ldap.LDAPError, e:
+            print e
+
+    def modify(self, dn, attrs):
+        try:
+            attr_s = []
+            for k, v in attrs.items():
+                attr_s.append((2, k, v))
+            self.conn.modify_s(dn, attr_s)
+        except ldap.LDAPError, e:
+            print e
+
+    def delete(self, dn):
+        try:
+            self.conn.delete_s(dn)
+        except ldap.LDAPError, e:
+            print e
+
+
+def gen_sha512(salt, password):
+    return crypt.crypt(password, '$6$%s$' % salt)
+
+
 @admin_required
 def addUser(request):
     """添加用户"""
@@ -174,6 +263,12 @@ def addUser(request):
         form = UserAddForm(request.POST)
         if form.is_valid():
             user = form.cleaned_data
+            username = user['username']
+            password = user['password']
+            key_pass = user['key_pass']
+            name = user['name']
+            is_admin = user['is_admin']
+            is_superuser = user['is_superuser']
             ldap_password = keygen(16)
             group_post = user['group']
             groups = []
@@ -181,19 +276,75 @@ def addUser(request):
                 groups.append(Group.objects.get(name=group_name))
 
             u = User(
-                username=user['username'],
-                password=user['password'],
-                key_pass=user['key_pass'],
-                name=user['name'],
-                is_admin=user['is_admin'],
-                is_superuser=user['is_superuser'],
+                username=username,
+                password=password,
+                key_pass=key_pass,
+                name=name,
+                is_admin=is_admin,
+                is_superuser=is_superuser,
                 ldap_password=ldap_password)
-            u.save()
-            u.group = groups
-            u.save()
+            try:
+                u.save()
+                u.group = groups
+                u.save()
+            except Exception, e:
+                error = u'数据库插入用户错误' + unicode(e)
+                return render_to_response('addUser.html', {'user_menu': 'active', 'form': form, 'error': error},
+                                          context_instance=RequestContext(request))
 
-        return render_to_response('addUser.html', {'msg': msg, 'user_menu': 'active'},
-                                  context_instance=RequestContext(request))
+            ret_add = bash('useradd %s' % username)
+            ret_passwd = bash('echo %s | passwd --stdin %s' % (password, username))
+            ret_rsa = rsa_gen(username, key_pass)
+
+            if [ret_add, ret_passwd, ret_rsa].count(0) < 3:
+                error = u'跳板机添加用户失败'
+                ret_del = bash('userdel -r %s' % username)
+                u.delete()
+                return render_to_response('addUser.html', {'user_menu': 'active', 'form': form, 'error': error},
+                                          context_instance=RequestContext(request))
+
+            user_dn = "uid=%s,ou=People,%s" % (username, ldap_base_dn)
+            userPassword = gen_sha512(keygen(6), ldap_password)
+            user_attr  = {'uid': [username],
+                          'cn': [username],
+                          'objectClass': ['account', 'posixAccount', 'top', 'shadowAccount'],
+                          'userPassword': ['{crypt}%s' % userPassword],
+                          'shadowLastChange': ['16328'],
+                          'shadowMin': ['0'],
+                          'shadowMax': ['99999'],
+                          'shadowWarning': ['7'],
+                          'loginShell': ['/bin/bash'],
+                          'uidNumber': [u.id],
+                          'gidNumber': [u.id],
+                          'homeDirectory': ['/home/%s' % username]
+                          }
+
+            group_dn = "cn=%s,out=Group,%s" % (username, ldap_base_dn)
+            group_attr = {
+                'objectClass': ['posixGroup', 'top'],
+                'cn': [username],
+                'userPassword': ['{crypt}x'],
+                'gidNumber': [u.id]
+            }
+
+            try:
+                ldap_user = LDAPMgmt()
+                ldap_user.add(user_dn, user_attr)
+                ldap_user.add(group_dn, group_attr)
+            except ldap.LDAPError, e:
+                error = u'添加ladp用户失败' + unicode(e)
+                try:
+                    ldap_user.delete(user_dn)
+                    ldap_user.delete(group_dn)
+                    bash('userdel -r %s' % username)
+                    u.delete()
+                except:
+                    pass
+                return render_to_response('addUser.html', {'user_menu': 'active', 'form': form, 'error': error},
+                                          context_instance=RequestContext(request))
+            msg = u'添加用户成功'
+            return render_to_response('addUser.html', {'user_menu': 'active', 'form': form, 'msg': msg},
+                                      context_instance=RequestContext(request))
 
 
 @admin_required
