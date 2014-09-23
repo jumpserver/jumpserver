@@ -36,7 +36,7 @@
                 <td>{{ user.is_admin }}</td>
                 <td>{{ user.is_superuser }}</td>
                 <td>{{ user.email }}</td>
-                <td><a href="/downKey/">下载</a></td>
+                <td><a href="/downKey/?username={{ user.username }}">下载</a></td>
             </tr>
             {% endfor %}
         </tbody>

@@ -153,27 +153,37 @@ def gen_sha512(salt, password):
     return crypt.crypt(password, '$6$%s$' % salt)
 
 
+def group_member(username):
+    member = []
+    user = User.objects.get(username=username)
+    for group in user.group.all():
+        member.extend(group.user_set.all())
+    return list(set(member))
+
+
 def login(request):
     """登录界面"""
     if request.session.get('username'):
         return HttpResponseRedirect('/')
     if request.method == 'GET':
         return render_to_response('login.html')
-    if request.method == 'POST':
+    else:
         username = request.POST.get('username')
         password = request.POST.get('password')
-        if pam.authenticate(username, password):
-            if username in admin:
-                request.session['username'] = username
+        user = User.objects.get(username=username)
+        if password == user.password:
+            request.session['username'] = username
+            if user.is_admin:
                 request.session['admin'] = 1
+            elif user.is_superuser:
+                request.session['admin'] = 2
             else:
-                request.session['username'] = username
                 request.session['admin'] = 0
             return HttpResponseRedirect('/')
         else:
             error = '密码错误，请重新输入。'
 
-        return render_to_response('login.html',{'error': error})
+        return render_to_response('login.html', {'error': error})
 
 
 def login_required(func):
@@ -194,10 +204,20 @@ def admin_required(func):
     return _deco
 
 
+def superuser_required(func):
+    """要求用户是superuser"""
+    def _deco(request, *args, **kwargs):
+        if request.session.get('admin') != 2:
+            return HttpResponseRedirect('/')
+        return func(request, *args, **kwargs)
+    return _deco
+
+
 def logout(request):
     """注销登录调用"""
     if request.session.get('username'):
         del request.session['username']
+        del request.session['admin']
     return HttpResponseRedirect('/login/')
 
 
@@ -205,6 +225,13 @@ def logout(request):
 def downKey(request):
     """下载key"""
     username = request.session.get('username')
+    if request.session.get('admin') == 1:
+        user = User.objects.get(username=username)
+        if user in group_member(username):
+            username = request.GET.get('username')
+    elif request.session.get('admin') == 2:
+        username = request.GET.get('username')
+
     filename = '%s/keys/%s' % (base_dir, username)
     f = open(filename)
     data = f.read()
@@ -232,9 +259,7 @@ def index(request):
 @admin_required
 def showUser(request):
     """查看所有用户"""
-    users = User.objects.all()
-    info = ''
-    error = ''
+
     if request.method == 'POST':
         selected_user = request.REQUEST.getlist('selected')
         if selected_user:
@@ -243,7 +268,7 @@ def showUser(request):
                     user_del = User.objects.get(id=id)
                     username = user_del.username
                     user_del.delete()
-                except Exception,e:
+                except Exception, e:
                     error = u'数据库中用户删除错误' + unicode(e)
                 bash_del = bash("userdel -r %s" % username)
                 if bash_del != 0:
@@ -252,16 +277,25 @@ def showUser(request):
                 try:
                     ldap_del = LDAPMgmt()
                     user_dn = "uid=%s,ou=People,%s" % (username, ldap_base_dn)
+                    group_dn = "cn=%s,ou=Group,%s" % (username, ldap_base_dn)
                     ldap_del.delete(user_dn)
+                    ldap_del.delete(group_dn)
                 except Exception, e:
                     error = u'ldap中用户删除错误' + unicode(e)
 
                 if not error:
                     info = '用户删除成功'
 
-    return render_to_response('showUser.html',
-                              {'users': users, 'info': info, 'error': error, 'user_menu': 'active'},
-                              context_instance=RequestContext(request))
+    else:
+        if request.session.get('admin') == 2:
+            users = User.objects.all()
+        elif request.session.get('admin') == 1:
+            users = group_member(request.session.get('username'))
+
+    return render_to_response(
+                            'showUser.html',
+                            {'users': users, 'info': info, 'error': error, 'user_menu': 'active'},
+                            context_instance=RequestContext(request))
 
 
 @admin_required
