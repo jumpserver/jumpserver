@@ -48,6 +48,10 @@ def keygen(num):
     return salt
 
 
+def bash(cmd):
+    return subprocess.call(cmd, shell=True)
+
+
 class PyCrypt(object):
     """对称加密解密"""
     def __init__(self, key):
@@ -71,6 +75,82 @@ class PyCrypt(object):
         cryptor = AES.new(self.key, self.mode, b'0000000000000000')
         plain_text = cryptor.decrypt(a2b_hex(text))
         return plain_text.rstrip('\0')
+
+
+def rsa_gen(username, key_pass, rsa_dir=rsa_dir):
+    rsa_file = '%s/%s' % (rsa_dir, username)
+    pub_file = '%s.pub' % rsa_file
+    authorized_file = '/home/%s/.ssh/authorized_keys' % username
+    if os.path.exists(rsa_file):
+        os.unlink(rsa_file)
+    ret = bash('ssh-keygen -t rsa -f %s -P %s &> /dev/null && echo "######## rsa_gen Ok."' % (rsa_file, key_pass))
+    if not ret:
+        try:
+            if not os.path.isdir('/home/%s/.ssh' % username):
+                os.mkdir('/home/%s/.ssh' % username)
+            pub = open(pub_file, 'r')
+            authorized = open(authorized_file, 'w')
+            authorized.write(pub.read())
+            pub.close()
+            authorized.close()
+        except Exception:
+            return 1
+        else:
+            return 0
+
+
+class LDAPMgmt():
+    def __init__(self,
+                 ldap_host=ldap_host,
+                 ldap_base_dn=ldap_base_dn,
+                 admin_cn=admin_cn,
+                 admin_pass=admin_pass):
+        self.ldap_host = ldap_host
+        self.ldap_base_dn = ldap_base_dn
+        self.admin_cn = admin_cn
+        self.admin_pass = admin_pass
+        self.conn = ldap.initialize(ldap_host)
+        self.conn.set_option(ldap.OPT_REFERRALS, 0)
+        self.conn.protocol_version = ldap.VERSION3
+        self.conn.simple_bind_s(admin_cn, admin_pass)
+
+    def list(self, filter, scope=ldap.SCOPE_SUBTREE, attr=None):
+        try:
+            ldap_result = self.conn.search_s(self.ldap_base_dn, scope, filter, attr)
+            print 'Here is the result: '
+            for entry in ldap_result:
+                name, data = entry
+                print '#'*20, name, '#'*20
+                for k, v in data.items():
+                    print '%s: %s' % (k,v)
+        except ldap.LDAPError, e:
+            print e
+
+    def add(self, dn, attrs):
+        try:
+            ldif = modlist.addModlist(attrs)
+            self.conn.add_s(dn, ldif)
+        except ldap.LDAPError, e:
+            print e
+
+    def modify(self, dn, attrs):
+        try:
+            attr_s = []
+            for k, v in attrs.items():
+                attr_s.append((2, k, v))
+            self.conn.modify_s(dn, attr_s)
+        except ldap.LDAPError, e:
+            print e
+
+    def delete(self, dn):
+        try:
+            self.conn.delete_s(dn)
+        except ldap.LDAPError, e:
+            print e
+
+
+def gen_sha512(salt, password):
+    return crypt.crypt(password, '$6$%s$' % salt)
 
 
 def login(request):
@@ -159,95 +239,29 @@ def showUser(request):
         selected_user = request.REQUEST.getlist('selected')
         if selected_user:
             for id in selected_user:
-                user_del = User.objects.get(id=id)
-                username = user_del.username
-                subprocess.call("'%s' '%s';'%s' '%s';" %
-                                (userdel_shell, username, sudodel_shell, username), shell=True)
-                user_del.delete()
-                info = "删除用户成功。"
+                try:
+                    user_del = User.objects.get(id=id)
+                    username = user_del.username
+                    user_del.delete()
+                except Exception,e:
+                    error = u'数据库中用户删除错误' + unicode(e)
+                bash_del = bash("userdel -r %s" % username)
+                if bash_del != 0:
+                    error = u'bash中用户删除错误'
+
+                try:
+                    ldap_del = LDAPMgmt()
+                    user_dn = "uid=%s,ou=People,%s" % (username, ldap_base_dn)
+                    ldap_del.delete(user_dn)
+                except Exception, e:
+                    error = u'ldap中用户删除错误' + unicode(e)
+
+                if not error:
+                    info = '用户删除成功'
+
     return render_to_response('showUser.html',
                               {'users': users, 'info': info, 'error': error, 'user_menu': 'active'},
                               context_instance=RequestContext(request))
-
-
-def bash(cmd):
-    return subprocess.call(cmd, shell=True)
-
-
-def rsa_gen(username, key_pass, rsa_dir=rsa_dir):
-    rsa_file = '%s/%s' % (rsa_dir, username)
-    pub_file = '%s.pub' % rsa_file
-    authorized_file = '/home/%s/.ssh/authorized_keys' % username
-    if os.path.exists(rsa_file):
-        os.unlink(rsa_file)
-    ret = bash('ssh-keygen -t rsa -f %s -P %s &> /dev/null && echo "######## rsa_gen Ok."' % (rsa_file, key_pass))
-    if not ret:
-        try:
-            if not os.path.isdir('/home/%s/.ssh' % username):
-                os.mkdir('/home/%s/.ssh' % username)
-            pub = open(pub_file, 'r')
-            authorized = open(authorized_file, 'w')
-            authorized.write(pub.read())
-            pub.close()
-            authorized.close()
-        except Exception:
-            return 1
-        else:
-            return 0
-
-
-class LDAPMgmt():
-    def __init__(self,
-                 ldap_host=ldap_host,
-                 ldap_base_dn=ldap_base_dn,
-                 admin_cn=admin_cn,
-                 admin_pass=admin_pass):
-        self.ldap_host = ldap_host
-        self.ldap_base_dn = ldap_base_dn
-        self.admin_cn = admin_cn
-        self.admin_pass = admin_pass
-        self.conn = ldap.initialize(ldap_host)
-        self.conn.set_option(ldap.OPT_REFERRALS, 0)
-        self.conn.protocol_version = ldap.VERSION3
-        self.conn.simple_bind_s(admin_cn, admin_pass)
-
-    def list(self, filter, scope=ldap.SCOPE_SUBTREE, attr=None):
-        try:
-            ldap_result = self.conn.search_s(self.ldap_base_dn, scope, filter, attr)
-            print 'Here is the result: '
-            for entry in ldap_result:
-                name, data = entry
-                print '#'*20, name, '#'*20
-                for k, v in data.items():
-                    print '%s: %s' % (k,v)
-        except ldap.LDAPError, e:
-            print e
-
-    def add(self, dn, attrs):
-        try:
-            ldif = modlist.addModlist(attrs)
-            self.conn.add_s(dn, ldif)
-        except ldap.LDAPError, e:
-            print e
-
-    def modify(self, dn, attrs):
-        try:
-            attr_s = []
-            for k, v in attrs.items():
-                attr_s.append((2, k, v))
-            self.conn.modify_s(dn, attr_s)
-        except ldap.LDAPError, e:
-            print e
-
-    def delete(self, dn):
-        try:
-            self.conn.delete_s(dn)
-        except ldap.LDAPError, e:
-            print e
-
-
-def gen_sha512(salt, password):
-    return crypt.crypt(password, '$6$%s$' % salt)
 
 
 @admin_required

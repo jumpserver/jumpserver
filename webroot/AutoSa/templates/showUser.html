@@ -29,9 +29,9 @@
                 <td>{{ user.name }}</td>
                 <!--<td>{{ user.group }}</td>-->
                 <td>
-                    {% for group in user.group.all() %}
+                    {% for group in user.group.all %}
                         {{ group.name }}
-                    {% endfor}
+                    {% endfor %}
                 </td>
                 <td>{{ user.is_admin }}</td>
                 <td>{{ user.is_superuser }}</td>
