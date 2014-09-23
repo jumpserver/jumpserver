@@ -170,18 +170,23 @@ def login(request):
     else:
         username = request.POST.get('username')
         password = request.POST.get('password')
-        user = User.objects.get(username=username)
-        if password == user.password:
-            request.session['username'] = username
-            if user.is_admin:
-                request.session['admin'] = 1
-            elif user.is_superuser:
-                request.session['admin'] = 2
+        user = User.objects.filter(username=username)
+        if user:
+            user = user[0]
+            if user and password == user.password:
+                request.session['username'] = username
+                if user.is_admin:
+                    request.session['admin'] = 1
+                elif user.is_superuser:
+                    request.session['admin'] = 2
+                else:
+                    request.session['admin'] = 0
+                return HttpResponseRedirect('/')
             else:
-                request.session['admin'] = 0
-            return HttpResponseRedirect('/')
+                error = '密码错误，请重新输入。'
+
         else:
-            error = '密码错误，请重新输入。'
+            error = '用户不存在。'
 
         return render_to_response('login.html', {'error': error})
 
