@@ -264,7 +264,8 @@ def index(request):
 @admin_required
 def showUser(request):
     """查看所有用户"""
-
+    info = ''
+    error = ''
     if request.method == 'POST':
         selected_user = request.REQUEST.getlist('selected')
         if selected_user:
@@ -290,6 +291,7 @@ def showUser(request):
 
                 if not error:
                     info = '用户删除成功'
+                    return HttpResponseRedirect('/showUser/')
 
     else:
         if request.session.get('admin') == 2:
@@ -297,7 +299,7 @@ def showUser(request):
         elif request.session.get('admin') == 1:
             users = group_member(request.session.get('username'))
 
-    return render_to_response(
+        return render_to_response(
                             'showUser.html',
                             {'users': users, 'info': info, 'error': error, 'user_menu': 'active'},
                             context_instance=RequestContext(request))
