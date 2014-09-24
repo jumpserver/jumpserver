@@ -272,6 +272,10 @@ def showUser(request):
             for id in selected_user:
                 try:
                     user_del = User.objects.get(id=id)
+                    if user_del.is_admin or user_del.is_superuser:
+                        if request.session.get('admin') == 1:
+                            error = 'No Permision.'
+                            return HttpResponseRedirect('/showUser/')
                     username = user_del.username
                     user_del.delete()
                 except Exception, e:
@@ -327,6 +331,11 @@ def addUser(request):
             ldap_password = keygen(16)
             group_post = user['group']
             groups = []
+
+            if request.session.get('admin') < 1:
+                is_admin = False
+                is_superuser = False
+
             for group_name in group_post:
                 groups.append(Group.objects.get(name=group_name))
 
