@@ -219,7 +219,7 @@ def login(request):
         user = User.objects.filter(username=username)
         if user:
             user = user[0]
-            if password == user.password:
+            if md5_crypt(password) == user.password:
                 request.session['username'] = username
                 if user.is_admin:
                     request.session['admin'] = 1
@@ -343,7 +343,7 @@ def addUser(request):
             user = form.cleaned_data
             username = user['username']
             password = md5_crypt(user['password'])
-            key_pass = user['key_pass']
+            key_pass = md5_crypt(user['key_pass'])
             name = user['name']
             is_admin = user['is_admin']
             is_superuser = user['is_superuser']
