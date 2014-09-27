@@ -221,6 +221,7 @@ def install(request):
             is_superuser=True,
             ldap_password=md5_crypt('admin'))
         u.save()
+        return HttpResponse('Install successfully, please refresh this page.')
 
 
 def login(request):
