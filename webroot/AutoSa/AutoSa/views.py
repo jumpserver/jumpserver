@@ -207,6 +207,22 @@ def is_super_user(request):
         return False
 
 
+def install(request):
+    user = User.objects.filter(username='admin')
+    if user:
+        return HttpResponseRedirect('/login/')
+    else:
+        u = User(
+            username='admin',
+            password=md5_crypt('admin'),
+            key_pass=md5_crypt('admin'),
+            name='admin',
+            is_admin=False,
+            is_superuser=True,
+            ldap_password=md5_crypt('admin'))
+        u.save()
+
+
 def login(request):
     """登录界面"""
     if request.session.get('username'):
