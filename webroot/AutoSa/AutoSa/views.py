@@ -166,6 +166,13 @@ def group_member(username):
     return list(set(member))
 
 
+def user_assets(username):
+    assets = []
+    user = User.objects.get(username=username)
+    for asset in user.assetsuser_set.all():
+        assets.append(asset.aid)
+    return assets
+
 def login_required(func):
     """要求登录的装饰器"""
     def _deco(request, *args, **kwargs):
@@ -559,7 +566,10 @@ def addPerm(request):
             for asset_user in assets_user:
                 have_assets.append(asset_user.aid)
 
-            all_assets = Assets.objects.all()
+            if request.session.get('admin') == 2:
+                all_assets = Assets.objects.all()
+            else:
+                all_assets = user_assets(request.session.get('username'))
             other_assets = list(set(all_assets) - set(have_assets))
             return render_to_response('addUserPerm.html',
                                       {'user': user, 'assets': other_assets, 'perm_menu': 'active'},
