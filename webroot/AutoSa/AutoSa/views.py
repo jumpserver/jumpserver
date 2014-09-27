@@ -11,11 +11,11 @@ from Crypto.Cipher import AES
 from binascii import b2a_hex, a2b_hex
 import random
 import ConfigParser
-import pam
 import os
 import ldap
 import ldap.modlist as modlist
 import crypt
+import hashlib
 from UserManage.forms import UserAddForm, GroupAddForm
 
 
@@ -41,15 +41,20 @@ admin_pass = cf.get('jumpserver', 'admin_pass')
 def keygen(num):
     """生成随机密码"""
     seed = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    sa = []
+    salt_list = []
     for i in range(num):
-        sa.append(random.choice(seed))
-    salt = ''.join(sa)
+        salt_list.append(random.choice(seed))
+    salt = ''.join(salt_list)
     return salt
 
 
 def bash(cmd):
+    """执行bash命令"""
     return subprocess.call(cmd, shell=True)
+
+
+def md5_crypt(string):
+    return hashlib.new("md5", string).hexdigest()
 
 
 class PyCrypt(object):
@@ -161,36 +166,6 @@ def group_member(username):
     return list(set(member))
 
 
-def login(request):
-    """登录界面"""
-    if request.session.get('username'):
-        return HttpResponseRedirect('/')
-    if request.method == 'GET':
-        return render_to_response('login.html')
-    else:
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = User.objects.filter(username=username)
-        if user:
-            user = user[0]
-            if user and password == user.password:
-                request.session['username'] = username
-                if user.is_admin:
-                    request.session['admin'] = 1
-                elif user.is_superuser:
-                    request.session['admin'] = 2
-                else:
-                    request.session['admin'] = 0
-                return HttpResponseRedirect('/')
-            else:
-                error = '密码错误，请重新输入。'
-
-        else:
-            error = '用户不存在。'
-
-        return render_to_response('login.html', {'error': error})
-
-
 def login_required(func):
     """要求登录的装饰器"""
     def _deco(request, *args, **kwargs):
@@ -216,6 +191,48 @@ def superuser_required(func):
             return HttpResponseRedirect('/')
         return func(request, *args, **kwargs)
     return _deco
+
+
+def is_admin_user(request):
+    if request.session.get('admin') == 1:
+        return True
+    else:
+        return False
+
+
+def is_super_user(request):
+    if request.session.get('admin') == 2:
+        return True
+    else:
+        return False
+
+
+def login(request):
+    """登录界面"""
+    if request.session.get('username'):
+        return HttpResponseRedirect('/')
+    if request.method == 'GET':
+        return render_to_response('login.html')
+    else:
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = User.objects.filter(username=username)
+        if user:
+            user = user[0]
+            if password == user.password:
+                request.session['username'] = username
+                if user.is_admin:
+                    request.session['admin'] = 1
+                elif user.is_superuser:
+                    request.session['admin'] = 2
+                else:
+                    request.session['admin'] = 0
+                return HttpResponseRedirect('/')
+            else:
+                error = '密码错误，请重新输入。'
+        else:
+            error = '用户不存在。'
+    return render_to_response('login.html', {'error': error})
 
 
 def logout(request):
@@ -266,24 +283,33 @@ def showUser(request):
     """查看所有用户"""
     info = ''
     error = ''
+
+    if is_super_user(request):
+        users = User.objects.all()
+    else:
+        users = group_member(request.session.get('username'))
+
     if request.method == 'POST':
         selected_user = request.REQUEST.getlist('selected')
         if selected_user:
-            for id in selected_user:
+            for user_id in selected_user:
+                # 从数据库中删除
                 try:
-                    user_del = User.objects.get(id=id)
-                    if user_del.is_admin or user_del.is_superuser:
-                        if request.session.get('admin') == 1:
-                            error = 'No Permision.'
+                    user = User.objects.get(id=user_id)
+                    if user.is_admin or user.is_superuser:
+                        if is_admin_user(request):
                             return HttpResponseRedirect('/showUser/')
-                    username = user_del.username
-                    user_del.delete()
+                    username = user.username
+                    user.delete()
                 except Exception, e:
                     error = u'数据库中用户删除错误' + unicode(e)
+
+                # 在bash中删除
                 bash_del = bash("userdel -r %s" % username)
                 if bash_del != 0:
                     error = u'bash中用户删除错误'
 
+                # 从LDAP中删除
                 try:
                     ldap_del = LDAPMgmt()
                     user_dn = "uid=%s,ou=People,%s" % (username, ldap_base_dn)
@@ -295,18 +321,13 @@ def showUser(request):
 
                 if not error:
                     info = '用户删除成功'
-                    return HttpResponseRedirect('/showUser/')
 
-    else:
-        if request.session.get('admin') == 2:
-            users = User.objects.all()
-        elif request.session.get('admin') == 1:
-            users = group_member(request.session.get('username'))
-
-        return render_to_response(
-                            'showUser.html',
-                            {'users': users, 'info': info, 'error': error, 'user_menu': 'active'},
-                            context_instance=RequestContext(request))
+    return render_to_response('showUser.html',
+                              {'users': users,
+                               'info': info,
+                               'error': error,
+                               'user_menu': 'active'},
+                              context_instance=RequestContext(request))
 
 
 @admin_required
@@ -315,30 +336,31 @@ def addUser(request):
     msg = ''
     form = UserAddForm()
     jm = PyCrypt(key)
-    if request.method == 'GET':
-        return render_to_response('addUser.html', {'user_menu': 'active', 'form': form},
-                                  context_instance=RequestContext(request))
-    else:
+
+    if request.method == 'POST':
         form = UserAddForm(request.POST)
         if form.is_valid():
             user = form.cleaned_data
             username = user['username']
-            password = user['password']
+            password = md5_crypt(user['password'])
             key_pass = user['key_pass']
             name = user['name']
             is_admin = user['is_admin']
             is_superuser = user['is_superuser']
-            ldap_password = keygen(16)
+            ldap_password = jm.encrypt(keygen(16))
             group_post = user['group']
             groups = []
 
-            if request.session.get('admin') < 1:
+            # 如果用户是admin，那么不能委任其他admin或者超级用户
+            if is_admin_user(request):
                 is_admin = False
                 is_superuser = False
 
+            # 组
             for group_name in group_post:
                 groups.append(Group.objects.get(name=group_name))
 
+            # 数据中保存用户，如果失败就返回
             u = User(
                 username=username,
                 password=password,
@@ -356,24 +378,26 @@ def addUser(request):
                 return render_to_response('addUser.html', {'user_menu': 'active', 'form': form, 'error': error},
                                           context_instance=RequestContext(request))
 
+            # 系统中添加用户
             ret_add = bash('useradd %s' % username)
             ret_passwd = bash('echo %s | passwd --stdin %s' % (password, username))
             ret_rsa = rsa_gen(username, key_pass)
 
             if [ret_add, ret_passwd, ret_rsa].count(0) < 3:
                 error = u'跳板机添加用户失败'
-                ret_del = bash('userdel -r %s' % username)
+                bash('userdel -r %s' % username)
                 u.delete()
                 return render_to_response('addUser.html', {'user_menu': 'active', 'form': form, 'error': error},
                                           context_instance=RequestContext(request))
 
+            # 添加到ldap中
             user_dn = "uid=%s,ou=People,%s" % (username, ldap_base_dn)
-            userPassword = gen_sha512(keygen(6), ldap_password)
+            password_sha512 = gen_sha512(keygen(6), ldap_password)
             user_attr = {
                 'uid': [str(username)],
                 'cn': [str(username)],
                 'objectClass': ['account', 'posixAccount', 'top', 'shadowAccount'],
-                'userPassword': ['{crypt}%s' % userPassword],
+                'userPassword': ['{crypt}%s' % password_sha512],
                 'shadowLastChange': ['16328'],
                 'shadowMin': ['0'],
                 'shadowMax': ['99999'],
@@ -392,31 +416,41 @@ def addUser(request):
             }
 
             try:
-                ldap_user = LDAPMgmt()
-                ldap_user.add(user_dn, user_attr)
-                ldap_user.add(group_dn, group_attr)
+                ldap_conn = LDAPMgmt()
+                ldap_conn.add(user_dn, user_attr)
+                ldap_conn.add(group_dn, group_attr)
             except Exception, e:
                 error = u'添加ladp用户失败' + unicode(e)
                 try:
                     bash('userdel -r %s' % username)
                     u.delete()
-                    ldap_user.delete(user_dn)
-                    ldap_user.delete(group_dn)
-                except:
+                    ldap_conn.delete(user_dn)
+                    ldap_conn.delete(group_dn)
+                except Exception:
                     pass
                 return render_to_response('addUser.html', {'user_menu': 'active', 'form': form, 'error': error},
                                           context_instance=RequestContext(request))
+
             msg = u'添加用户成功'
-            return render_to_response('addUser.html', {'user_menu': 'active', 'form': form, 'msg': msg},
-                                      context_instance=RequestContext(request))
+    return render_to_response('addUser.html', {'user_menu': 'active', 'form': form, 'msg': msg},
+                              context_instance=RequestContext(request))
 
 
 @admin_required
 def showAssets(request):
     """查看服务器"""
     info = ''
-    assets = Assets.objects.all()
+    if request.session.get('admin') < 2:
+        assets = []
+        username = request.session.get('username')
+        user = User.objects.get(username=username)
+        for asset in user.assetsuser_set.all():
+            assets.append(asset.aid)
+    else:
+        assets = Assets.objects.all()
     if request.method == 'POST':
+        if request.session.get('admin') < 2:
+            return HttpResponseRedirect('/showAssets/')
         assets_del = request.REQUEST.getlist('selected')
         for asset_id in assets_del:
             asset_del = Assets.objects.get(id=asset_id)
@@ -426,7 +460,7 @@ def showAssets(request):
                               context_instance=RequestContext(request))
 
 
-@admin_required
+@superuser_required
 def addAssets(request):
     """添加服务器"""
     error = ''
@@ -434,6 +468,7 @@ def addAssets(request):
     if request.method == 'POST':
         ip = request.POST.get('ip')
         port = request.POST.get('port')
+        idc = request.POST.get('idc')
         comment = request.POST.get('comment')
 
         if '' in (ip, port):
@@ -441,7 +476,7 @@ def addAssets(request):
         elif Assets.objects.filter(ip=ip):
             error = '主机已存在。'
         if not error:
-            asset = Assets(ip=ip, port=port, comment=comment)
+            asset = Assets(ip=ip, port=port, idc=idc, comment=comment)
             asset.save()
             msg = u'%s 添加成功' % ip
 
@@ -452,7 +487,11 @@ def addAssets(request):
 @admin_required
 def showPerm(request):
     """查看权限"""
-    users = User.objects.all()
+    if is_super_user(request):
+        users = User.objects.all()
+    else:
+        users = group_member(request.session.get('username'))
+
     if request.method == 'POST':
         assets_del = request.REQUEST.getlist('selected')
         username = request.POST.get('username')
@@ -479,7 +518,11 @@ def showPerm(request):
 @admin_required
 def addPerm(request):
     """增加授权"""
-    users = User.objects.all()
+    if is_super_user(request):
+        users = User.objects.all()
+    else:
+        users = group_member(request.session.get('username'))
+
     have_assets = []
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -490,6 +533,7 @@ def addPerm(request):
             asset_user = AssetsUser(uid=user, aid=asset)
             asset_user.save()
         return HttpResponseRedirect('/addPerm/?username=%s' % username)
+
     elif request.method == 'GET':
         if request.GET.get('username'):
             username = request.GET.get('username')
@@ -497,11 +541,13 @@ def addPerm(request):
             assets_user = AssetsUser.objects.filter(uid=user.id)
             for asset_user in assets_user:
                 have_assets.append(asset_user.aid)
+
             all_assets = Assets.objects.all()
             other_assets = list(set(all_assets) - set(have_assets))
             return render_to_response('addUserPerm.html',
                                       {'user': user, 'assets': other_assets, 'perm_menu': 'active'},
                                       context_instance=RequestContext(request))
+
     return render_to_response('addPerm.html',
                               {'users': users, 'perm_menu': 'active'},
                               context_instance=RequestContext(request))
@@ -517,19 +563,17 @@ def chgPass(request):
         oldpass = request.POST.get('oldpass')
         password = request.POST.get('password')
         password_confirm = request.POST.get('password_confirm')
+        user = User.objects.get(username)
         if '' in [oldpass, password, password_confirm]:
             error = '带*内容不能为空'
-        elif not pam.authenticate(username, oldpass):
+        elif md5_crypt(oldpass) != user.password:
             error = '密码不正确'
         elif password != password_confirm:
             error = '两次密码不匹配'
 
         if not error:
-            ret = subprocess.call('%s %s %s' % (chgpass_shell, username, password), shell=True)
-            if ret:
-                error = '密码修改失败'
-            else:
-                msg = '修改密码成功'
+            user.password = password
+            user.save()
 
     return render_to_response('chgPass.html', {'msg': msg, 'error': error, 'pass_menu': 'active'},
                               context_instance=RequestContext(request))
@@ -560,6 +604,6 @@ def chgKey(request):
                 msg = '修改密码成功'
 
     return render_to_response('chgKey.html',
-                             {'error': error, 'msg': msg},
+                              {'error': error, 'msg': msg},
                               context_instance=RequestContext(request))
 
