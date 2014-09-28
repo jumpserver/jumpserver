@@ -367,7 +367,7 @@ def addUser(request):
             user = form.cleaned_data
             username = user['username']
             password = md5_crypt(user['password'])
-            key_pass = md5_crypt(user['key_pass'])
+            key_pass = jm.encrypt(user['key_pass'])
             name = user['name']
             is_admin = user['is_admin']
             is_superuser = user['is_superuser']
@@ -458,6 +458,69 @@ def addUser(request):
             msg = u'添加用户成功'
     return render_to_response('addUser.html', {'user_menu': 'active', 'form': form, 'msg': msg},
                               context_instance=RequestContext(request))
+
+
+@admin_required
+def chgUser(request):
+    """修改用户信息"""
+    error = ''
+    msg = ''
+    form = UserAddForm()
+    jm = PyCrypt()
+
+    if request.method == "GET":
+        username = request.GET.get('username')
+        user = User.objects.get(username=username)
+        return render_to_response('chgUser.html',
+                                  {'user': user, 'user_menu': 'active', 'form': form},
+                                  context_instance=RequestContext(request))
+    else:
+        form = UserAddForm(request.POST)
+        if form.is_valid():
+            user = form.cleaned_data
+            username = user['username']
+            password = md5_crypt(user['password'])
+            key_pass = md5_crypt(user['key_pass'])
+            name = user['name']
+            is_admin = user['is_admin']
+            is_superuser = user['is_superuser']
+            ldap_password = jm.encrypt(keygen(16))
+            group_post = user['group']
+            groups = []
+
+            keyfile = '%s/keys/%s' % (base_dir, username)
+
+            # 如果用户是admin，那么不能委任其他admin或者超级用户
+            if is_admin_user(request):
+                is_admin = False
+                is_superuser = False
+
+            # 组
+            for group_name in group_post:
+                groups.append(Group.objects.get(name=group_name))
+
+            u = User.objects.get(username=username)
+
+            chg_keypass = bash('ssh-keygen -p -P %s -N %s -f %s' % (jm.decrypt(u.password), password, keyfile))
+            if chg_keypass != 0:
+                error = '修改密钥密码失败'
+                return render_to_response('chgUser.html',
+                                          {'user': user, 'user_menu': 'active', 'form': form, 'error': error},
+                                          context_instance=RequestContext(request))
+
+            u.password = password
+            u.key_pass = key_pass
+            u.name = name
+            u.is_admin = is_admin
+            u.is_superuser = is_superuser
+            u.ldap_password = ldap_password
+            u.group = groups
+
+            u.save()
+            msg = '修改用户信息成功'
+            return render_to_response('chgUser.html',
+                                      {'user': user, 'user_menu': 'active', 'form': form, 'msg': msg},
+                                      context_instance=RequestContext(request))
 
 
 @admin_required
@@ -580,19 +643,7 @@ def addPerm(request):
                               context_instance=RequestContext(request))
 
 
-@admin_required
-def chgUser(request):
-    """修改用户信息"""
-    error = ''
-    msg = ''
-    form = UserAddForm()
 
-    if request.method == "GET":
-        username = request.GET.get('username')
-        user = User.objects.get(username=username)
-        return render_to_response('chgUser.html',
-                                  {'user': user, 'user_menu': 'active', 'form': form},
-                                  context_instance=RequestContext(request))
 
 
 @login_required
