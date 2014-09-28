@@ -585,12 +585,13 @@ def chgUser(request):
     """修改用户信息"""
     error = ''
     msg = ''
+    form = UserAddForm()
 
     if request.method == "GET":
         username = request.GET.get('username')
         user = User.objects.get(username=username)
         return render_to_response('chgUser.html',
-                                  {'user': user, 'user_menu': 'active'},
+                                  {'user': user, 'user_menu': 'active', 'form': form},
                                   context_instance=RequestContext(request))
 
 
