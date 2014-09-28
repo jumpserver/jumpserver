@@ -466,7 +466,7 @@ def chgUser(request):
     error = ''
     msg = ''
     form = UserAddForm()
-    jm = PyCrypt()
+    jm = PyCrypt(key)
 
     if request.method == "GET":
         username = request.GET.get('username')
