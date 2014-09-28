@@ -18,6 +18,7 @@
                 <th>is_superuser</th>
                 <th>Email</th>
                 <th>Key</th>
+                <th>修改</th>
             </tr>
         </thead>
         <tbody>
@@ -37,6 +38,7 @@
                 <td>{{ user.is_superuser }}</td>
                 <td>{{ user.email }}</td>
                 <td><a href="/downKey/?username={{ user.username }}">下载</a></td>
+                <td><a href="/chgUser/?username={{ user.username }}">修改</a></td>
             </tr>
             {% endfor %}
         </tbody>

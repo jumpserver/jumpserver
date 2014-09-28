@@ -10,9 +10,11 @@ class GroupAddForm(forms.Form):
 
 class UserAddForm(forms.Form):
     username = forms.CharField(max_length=30,
-                               widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': '用户名'}))
+                               widget=forms.TextInput(
+                                   attrs={'class': 'form-control', 'placeholder': '用户名'}))
     password = forms.CharField(max_length=30,
-                               widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '密码'}))
+                               widget=forms.PasswordInput(
+                                   attrs={'class': 'form-control', 'placeholder': '密码'}))
     password_again = forms.CharField(max_length=30,
                                      widget=forms.PasswordInput(
                                          attrs={'class': 'form-control', 'placeholder': '确认密码'}))

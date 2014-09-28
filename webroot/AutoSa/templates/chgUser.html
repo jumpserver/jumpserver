@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+{% block content %}
+    <form class="form-horizontal" role="form" method="post" action="" >
+        <fieldset >
+            <legend>修改用户信息</legend>
+            {% if error %}
+                <div class="alert alert-danger">
+                    {{ error }}
+                </div>
+            {% endif %}
+
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                     Please correct the error{{ form.errors|pluralize }} below.
+                </div>
+            {% endif %}
+
+            {% if msg %}
+                <div class="alert alert-success">
+                    {{ msg }}
+                </div>
+            {% endif %}
+            <div class="form-group">
+                {{ form.username.errors }}
+                <label for="id_username" class="col-sm-2 control-label">用户名<span style="color: red"> *</span></label>
+                <div class="col-sm-4">
+                    <input type="text" id="id_username" name="id_username" class="form-control" value="{{ user.username }}" disabled="disabled" >
+                </div>
+            </div>
+            <div class="form-group">
+                {{ form.password.errors }}
+                <label for="id_password" class="col-sm-2 control-label">密码<span style="color: red"> *</span></label>
+                <div class="col-sm-4">
+                    {{ form.password }}
+                </div>
+            </div>
+            <div class="form-group">
+                {{ form.password_again.errors }}
+                <label for="id_password_again" class="col-sm-2 control-label">确认密码<span style="color: red"> *</span></label>
+                <div class="col-sm-4">
+                    {{ form.password_again }}
+                </div>
+            </div>
+            <div class="form-group">
+                {{ form.key_pass.errors }}
+                <label for="id_keypass" class="col-sm-2 control-label">密钥密码<span style="color: red"> *</span></label>
+                <div class="col-sm-4">
+                    {{ form.key_pass }}
+                </div>
+            </div>
+            <div class="form-group">
+                {{ form.key_pass_again.errors }}
+                <label for="id_keypass_again" class="col-sm-2 control-label">确认密码<span style="color: red"> *</span></label>
+                <div class="col-sm-4">
+                    {{ form.key_pass_again }}
+                </div>
+            </div>
+            <div class="form-group">
+                {{ form.name.errors }}
+                <label for="id_name" class="col-sm-2 control-label">姓名<span style="color: red"> *</span></label>
+                <div class="col-sm-4">
+                    {{ form.name }}
+                    {{ user.name }}
+                </div>
+            </div>
+            <div class="form-group">
+                {{ form.group.errors }}
+                <label for="id_group" class="col-sm-2 control-label">属组</label>
+                <div class="col-sm-4">
+                    {{ form.group }}
+                </div>
+            </div>
+            <div class="form-group">
+                {{ form.is_admin.errors }}
+                <label for="id_is_admin" class="col-sm-2 control-label">组admin</label>
+                <div class="col-sm-4">
+                    {{ form.is_admin }}
+                    {{ user.is_admin }}
+                </div>
+            </div>
+            <div class="form-group">
+                {{ form.is_superuser.errors }}
+                <label for="id_is_superuser" class="col-sm-2 control-label">超级admin</label>
+                <div class="col-sm-4">
+                    {{ form.is_superuser }}
+                    {{ user.is_superuser }}
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-4">
+                    <button class="btn btn-primary">添加</button>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+{% endblock %}

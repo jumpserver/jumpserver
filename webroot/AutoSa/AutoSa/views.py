@@ -580,6 +580,20 @@ def addPerm(request):
                               context_instance=RequestContext(request))
 
 
+@admin_required
+def chgUser(request):
+    """修改用户信息"""
+    error = ''
+    msg = ''
+
+    if request.method == "GET":
+        username = request.GET.get('username')
+        user = User.objects.get(username=username)
+        return render_to_response('chgUser.html',
+                                  {'user': user, 'user_menu': 'active'},
+                                  context_instance=RequestContext(request))
+
+
 @login_required
 def chgPass(request):
     """修改登录系统的密码"""
@@ -599,7 +613,7 @@ def chgPass(request):
             error = '两次密码不匹配'
 
         if not error:
-            user.password = password
+            user.password = md5_crypt(password)
             user.save()
 
     return render_to_response('chgPass.html', {'msg': msg, 'error': error, 'pass_menu': 'active'},
