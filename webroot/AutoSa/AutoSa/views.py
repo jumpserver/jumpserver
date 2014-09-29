@@ -439,9 +439,8 @@ def addUser(request):
                 'userPassword': ['{crypt}x'],
                 'gidNumber': [str(u.id)]
             }
-
+            ldap_conn = LDAPMgmt()
             try:
-                ldap_conn = LDAPMgmt()
                 ldap_conn.add(user_dn, user_attr)
                 ldap_conn.add(group_dn, group_attr)
             except Exception, e:
@@ -490,7 +489,6 @@ def chgUser(request):
         name = request.POST.get('name')
         is_admin = request.POST.get('is_admin')
         is_superuser = request.POST.get('is_superuser')
-        ldap_password = jm.encrypt(keygen(16))
         group_post = request.REQUEST.getlist('group')
 
         user = User.objects.get(username=username)
@@ -506,17 +504,17 @@ def chgUser(request):
             is_superuser = False
 
         if password != password_again or key_pass != key_pass_again:
-            error = '密码不匹配'
+            error = u'密码不匹配'
 
         if '' in [username, password, key_pass, name, group_post]:
-            error = '带*内容不能为空'
+            error = u'带*内容不能为空'
 
         u = User.objects.get(username=username)
 
-        chg_keypass = bash('ssh-keygen -p -P %s -N %s -f %s' % (jm.decrypt(u.password), password, keyfile))
+        chg_keypass = bash('ssh-keygen -p -P %s -N %s -f %s' % (jm.decrypt(u.key_pass), key_pass, keyfile))
 
         if chg_keypass != 0:
-            error = '修改密钥密码失败'
+            error = u'修改密钥密码失败'
 
         if error:
             return render_to_response('chgUser.html',
@@ -529,7 +527,6 @@ def chgUser(request):
         u.name = name
         u.is_admin = is_admin
         u.is_superuser = is_superuser
-        u.ldap_password = ldap_password
         u.group = groups
 
         u.save()
