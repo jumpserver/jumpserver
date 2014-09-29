@@ -18,7 +18,7 @@ class UserAddForm(forms.Form):
     password_again = forms.CharField(max_length=30,
                                      widget=forms.PasswordInput(
                                          attrs={'class': 'form-control', 'placeholder': '确认密码'}))
-    key_pass = forms.CharField(max_length=30,
+    key_pass = forms.CharField(max_length=30, min_length=6,
                                widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': '密钥密码'}))
     key_pass_again = forms.CharField(max_length=30,
                                      widget=forms.PasswordInput(

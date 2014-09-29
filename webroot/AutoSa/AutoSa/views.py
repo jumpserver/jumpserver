@@ -509,6 +509,9 @@ def chgUser(request):
         if '' in [username, password, key_pass, name, group_post]:
             error = u'带*内容不能为空'
 
+        if len(password) < 6 or len(key_pass) < 6:
+            error = u'密码长度需>6'
+
         u = User.objects.get(username=username)
 
         chg_keypass = bash('ssh-keygen -p -P %s -N %s -f %s' % (jm.decrypt(u.key_pass), key_pass, keyfile))
