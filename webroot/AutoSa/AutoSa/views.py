@@ -491,7 +491,7 @@ def chgUser(request):
         is_admin = request.POST.get('is_admin')
         is_superuser = request.POST.get('is_superuser')
         ldap_password = jm.encrypt(keygen(16))
-        group_post = request.POST.getlist()
+        group_post = request.REQUEST.getlist('group')
 
         user = User.objects.get(username=username)
         is_admin = "checked" if user.is_admin else ''
