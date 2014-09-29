@@ -467,14 +467,13 @@ def chgUser(request):
     error = ''
     msg = ''
     jm = PyCrypt(key)
-    username = request.GET.get('username')
-    user = User.objects.get(username=username)
-    groups = user.group.all()
-
-    is_admin = "checked" if user.is_admin else ''
-    is_superuser = 'checked' if user.is_superuser else ''
 
     if request.method == "GET":
+        username = request.GET.get('username')
+        user = User.objects.get(username=username)
+        is_admin = "checked" if user.is_admin else ''
+        is_superuser = 'checked' if user.is_superuser else ''
+        groups = user.group.all()
         if not username:
             return HttpResponseRedirect('/showUser/')
 
@@ -493,7 +492,11 @@ def chgUser(request):
         is_superuser = request.POST.get('is_superuser')
         ldap_password = jm.encrypt(keygen(16))
         group_post = request.POST.getlist()
-        groups = []
+
+        user = User.objects.get(username=username)
+        is_admin = "checked" if user.is_admin else ''
+        is_superuser = 'checked' if user.is_superuser else ''
+        groups = user.group.all()
 
         keyfile = '%s/keys/%s' % (base_dir, username)
 
@@ -507,10 +510,6 @@ def chgUser(request):
 
         if '' in [username, password, key_pass, name, group_post]:
             error = '带*内容不能为空'
-
-        # 组
-        for group_name in group_post:
-            groups.append(Group.objects.get(name=group_name))
 
         u = User.objects.get(username=username)
 
