@@ -472,13 +472,13 @@ def chgUser(request):
         if not username:
             return HttpResponseRedirect('/showUser/')
         user = User.objects.get(username=username)
-        is_admin = "checked" if user.is_admin else ''
-        is_superuser = 'checked' if user.is_superuser else ''
+        ori_is_admin = "checked" if user.is_admin else ''
+        ori_is_superuser = 'checked' if user.is_superuser else ''
         all_groups = user.group.all()
 
         return render_to_response('chgUser.html',
-                                  {'user': user, 'user_menu': 'active', 'is_admin': is_admin,
-                                   'is_superuser': is_superuser, 'groups': all_groups},
+                                  {'user': user, 'user_menu': 'active', 'is_admin': ori_is_admin,
+                                   'is_superuser': ori_is_superuser, 'groups': all_groups},
                                   context_instance=RequestContext(request))
     else:
         username = request.POST.get('username')
@@ -492,11 +492,11 @@ def chgUser(request):
         group_post = request.REQUEST.getlist('group')
         groups = []
         user = User.objects.get(username=username)
-        is_admin = "checked" if user.is_admin else ''
-        is_superuser = 'checked' if user.is_superuser else ''
         all_groups = Group.objects.all()
 
         keyfile = '%s/keys/%s' % (base_dir, username)
+        ori_is_admin = "checked" if user.is_admin else ''
+        ori_is_superuser = 'checked' if user.is_superuser else ''
 
         for group_name in group_post:
             groups.append(Group.objects.get(name=group_name))
@@ -527,8 +527,8 @@ def chgUser(request):
 
         if error:
             return render_to_response('chgUser.html',
-                                      {'user': user, 'user_menu': 'active', 'is_admin': is_admin,
-                                       'is_superuser': is_superuser, 'groups': all_groups, 'error': error},
+                                      {'user': user, 'user_menu': 'active', 'is_admin': ori_is_admin,
+                                       'is_superuser': ori_is_superuser, 'groups': all_groups, 'error': error},
                                       context_instance=RequestContext(request))
 
         u.password = md5_crypt(password)
