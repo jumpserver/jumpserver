@@ -525,8 +525,8 @@ def chgUser(request):
                                        'is_superuser': is_superuser, 'groups': groups, 'error': error},
                                       context_instance=RequestContext(request))
 
-        u.password = password
-        u.key_pass = key_pass
+        u.password = md5_crypt(password)
+        u.key_pass = jm.encrypt(key_pass)
         u.name = name
         u.is_admin = is_admin
         u.is_superuser = is_superuser
