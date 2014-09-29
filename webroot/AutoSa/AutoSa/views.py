@@ -470,12 +470,12 @@ def chgUser(request):
 
     if request.method == "GET":
         username = request.GET.get('username')
+        if not username:
+            return HttpResponseRedirect('/showUser/')
         user = User.objects.get(username=username)
         is_admin = "checked" if user.is_admin else ''
         is_superuser = 'checked' if user.is_superuser else ''
         groups = user.group.all()
-        if not username:
-            return HttpResponseRedirect('/showUser/')
 
         return render_to_response('chgUser.html',
                                   {'user': user, 'user_menu': 'active', 'is_admin': is_admin,
