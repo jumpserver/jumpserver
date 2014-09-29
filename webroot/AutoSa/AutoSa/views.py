@@ -471,8 +471,8 @@ def chgUser(request):
     user = User.objects.get(username=username)
     groups = user.group.all()
 
-    is_admin = "checked" if user.is_admin else is_admin = ''
-    is_superuser = 'checked' if user.is_superuser else is_admin = ''
+    is_admin = "checked" if user.is_admin else ''
+    is_superuser = 'checked' if user.is_superuser else ''
 
     if request.method == "GET":
         if not username:
