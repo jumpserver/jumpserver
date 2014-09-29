@@ -173,6 +173,7 @@ def user_assets(username):
         assets.append(asset.aid)
     return assets
 
+
 def login_required(func):
     """要求登录的装饰器"""
     def _deco(request, *args, **kwargs):
@@ -476,51 +477,61 @@ def chgUser(request):
                                   context_instance=RequestContext(request))
     else:
         form = UserAddForm(request.POST)
-        if form.is_valid():
-            user = form.cleaned_data
-            username = user['username']
-            password = md5_crypt(user['password'])
-            key_pass = md5_crypt(user['key_pass'])
-            name = user['name']
-            is_admin = user['is_admin']
-            is_superuser = user['is_superuser']
-            ldap_password = jm.encrypt(keygen(16))
-            group_post = user['group']
-            groups = []
+        user = form.cleaned_data
+        username = request.POST.get('username')
+        password = user['password']
+        password_again = user['password_again']
+        key_pass = user['key_pass']
+        key_pass_again = user['key_pass_again']
+        name = user['name']
+        is_admin = user['is_admin']
+        is_superuser = user['is_superuser']
+        ldap_password = jm.encrypt(keygen(16))
+        group_post = user['group']
+        groups = []
 
-            keyfile = '%s/keys/%s' % (base_dir, username)
+        keyfile = '%s/keys/%s' % (base_dir, username)
 
-            # 如果用户是admin，那么不能委任其他admin或者超级用户
-            if is_admin_user(request):
-                is_admin = False
-                is_superuser = False
+        # 如果用户是admin，那么不能委任其他admin或者超级用户
+        if is_admin_user(request):
+            is_admin = False
+            is_superuser = False
 
-            # 组
-            for group_name in group_post:
-                groups.append(Group.objects.get(name=group_name))
+        if password != password_again or key_pass != key_pass_again:
+            error = '密码不匹配'
 
-            u = User.objects.get(username=username)
+        if '' in [username, password, key_pass, name, group_post]:
+            error = '带*内容不能为空'
 
-            chg_keypass = bash('ssh-keygen -p -P %s -N %s -f %s' % (jm.decrypt(u.password), password, keyfile))
-            if chg_keypass != 0:
-                error = '修改密钥密码失败'
-                return render_to_response('chgUser.html',
-                                          {'user': user, 'user_menu': 'active', 'form': form, 'error': error},
-                                          context_instance=RequestContext(request))
+        # 组
+        for group_name in group_post:
+            groups.append(Group.objects.get(name=group_name))
 
-            u.password = password
-            u.key_pass = key_pass
-            u.name = name
-            u.is_admin = is_admin
-            u.is_superuser = is_superuser
-            u.ldap_password = ldap_password
-            u.group = groups
+        u = User.objects.get(username=username)
 
-            u.save()
-            msg = '修改用户信息成功'
+        chg_keypass = bash('ssh-keygen -p -P %s -N %s -f %s' % (jm.decrypt(u.password), password, keyfile))
+
+        if chg_keypass != 0:
+            error = '修改密钥密码失败'
+
+        if error:
             return render_to_response('chgUser.html',
-                                      {'user': user, 'user_menu': 'active', 'form': form, 'msg': msg},
+                                      {'user': user, 'user_menu': 'active', 'form': form, 'error': error},
                                       context_instance=RequestContext(request))
+
+        u.password = password
+        u.key_pass = key_pass
+        u.name = name
+        u.is_admin = is_admin
+        u.is_superuser = is_superuser
+        u.ldap_password = ldap_password
+        u.group = groups
+
+        u.save()
+        msg = '修改用户信息成功'
+        return render_to_response('chgUser.html',
+                                  {'user': user, 'user_menu': 'active', 'form': form, 'msg': msg},
+                                  context_instance=RequestContext(request))
 
 
 @admin_required
