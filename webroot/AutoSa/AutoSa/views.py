@@ -367,12 +367,12 @@ def addUser(request):
         if form.is_valid():
             user = form.cleaned_data
             username = user['username']
-            password = md5_crypt(user['password'])
-            key_pass = jm.encrypt(user['key_pass'])
+            password = user['password']
+            key_pass = user['key_pass']
             name = user['name']
             is_admin = user['is_admin']
             is_superuser = user['is_superuser']
-            ldap_password = jm.encrypt(keygen(16))
+            ldap_password = keygen(16)
             group_post = user['group']
             groups = []
 
@@ -388,12 +388,12 @@ def addUser(request):
             # 数据中保存用户，如果失败就返回
             u = User(
                 username=username,
-                password=password,
-                key_pass=key_pass,
+                password=md5_crypt(password),
+                key_pass=jm.encrypt(key_pass),
                 name=name,
                 is_admin=is_admin,
                 is_superuser=is_superuser,
-                ldap_password=ldap_password)
+                ldap_password=jm.encrypt(ldap_password))
             try:
                 u.save()
                 u.group = groups
@@ -530,7 +530,7 @@ def chgUser(request):
         u.group = groups
 
         u.save()
-        msg = '修改用户信息成功'
+        msg = u'修改用户信息成功'
         return render_to_response('chgUser.html',
                                   {'user': user, 'user_menu': 'active', 'is_admin': is_admin,
                                    'is_superuser': is_superuser, 'groups': groups, 'msg': msg},
