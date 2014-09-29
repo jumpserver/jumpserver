@@ -474,11 +474,11 @@ def chgUser(request):
         user = User.objects.get(username=username)
         is_admin = "checked" if user.is_admin else ''
         is_superuser = 'checked' if user.is_superuser else ''
-        groups = user.group.all()
+        all_groups = user.group.all()
 
         return render_to_response('chgUser.html',
                                   {'user': user, 'user_menu': 'active', 'is_admin': is_admin,
-                                   'is_superuser': is_superuser, 'groups': groups},
+                                   'is_superuser': is_superuser, 'groups': all_groups},
                                   context_instance=RequestContext(request))
     else:
         username = request.POST.get('username')
@@ -490,18 +490,24 @@ def chgUser(request):
         is_admin = request.POST.get('is_admin')
         is_superuser = request.POST.get('is_superuser')
         group_post = request.REQUEST.getlist('group')
-
+        groups = []
         user = User.objects.get(username=username)
         is_admin = "checked" if user.is_admin else ''
         is_superuser = 'checked' if user.is_superuser else ''
-        groups = user.group.all()
+        all_groups = Group.objects.all()
 
         keyfile = '%s/keys/%s' % (base_dir, username)
+
+        for group_name in group_post:
+            groups.append(Group.objects.get(name=group_name))
 
         # 如果用户是admin，那么不能委任其他admin或者超级用户
         if is_admin_user(request):
             is_admin = False
             is_superuser = False
+        else:
+            is_admin = True if is_admin else False
+            is_superuser = True if is_superuser else False
 
         if password != password_again or key_pass != key_pass_again:
             error = u'密码不匹配'
@@ -522,7 +528,7 @@ def chgUser(request):
         if error:
             return render_to_response('chgUser.html',
                                       {'user': user, 'user_menu': 'active', 'is_admin': is_admin,
-                                       'is_superuser': is_superuser, 'groups': groups, 'error': error},
+                                       'is_superuser': is_superuser, 'groups': all_groups, 'error': error},
                                       context_instance=RequestContext(request))
 
         u.password = md5_crypt(password)
@@ -536,7 +542,7 @@ def chgUser(request):
         msg = u'修改用户信息成功'
         return render_to_response('chgUser.html',
                                   {'user': user, 'user_menu': 'active', 'is_admin': is_admin,
-                                   'is_superuser': is_superuser, 'groups': groups, 'msg': msg},
+                                   'is_superuser': is_superuser, 'groups': all_groups, 'msg': msg},
                                   context_instance=RequestContext(request))
 
 
