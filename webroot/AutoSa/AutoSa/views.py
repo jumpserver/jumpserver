@@ -467,38 +467,32 @@ def chgUser(request):
     error = ''
     msg = ''
     jm = PyCrypt(key)
+    username = request.GET.get('username')
+    user = User.objects.get(username=username)
+    groups = user.group.all()
+
+    is_admin = "checked" if user.is_admin else is_admin = ''
+    is_superuser = 'checked' if user.is_superuser else is_admin = ''
 
     if request.method == "GET":
-        username = request.GET.get('username')
         if not username:
             return HttpResponseRedirect('/showUser/')
-        user = User.objects.get(username=username)
-        groups = user.group.all()
-        if user.is_admin:
-            is_admin = "checked"
-        else:
-            is_admin = ''
-        if user.is_superuser:
-            is_superuser = "checked"
-        else:
-            is_superuser = ''
+
         return render_to_response('chgUser.html',
                                   {'user': user, 'user_menu': 'active', 'is_admin': is_admin,
                                    'is_superuser': is_superuser, 'groups': groups},
                                   context_instance=RequestContext(request))
     else:
-        form = UserAddForm(request.POST)
-        user = form.cleaned_data
         username = request.POST.get('username')
-        password = user['password']
-        password_again = user['password_again']
-        key_pass = user['key_pass']
-        key_pass_again = user['key_pass_again']
-        name = user['name']
-        is_admin = user['is_admin']
-        is_superuser = user['is_superuser']
+        password = request.POST.get('password')
+        password_again = request.POST.get('password_again')
+        key_pass = request.POST.get('key_pass')
+        key_pass_again = request.POST.get('key_pass_again')
+        name = request.POST.get('name')
+        is_admin = request.POST.get('is_admin')
+        is_superuser = request.POST.get('is_superuser')
         ldap_password = jm.encrypt(keygen(16))
-        group_post = user['group']
+        group_post = request.POST.getlist()
         groups = []
 
         keyfile = '%s/keys/%s' % (base_dir, username)
@@ -527,7 +521,8 @@ def chgUser(request):
 
         if error:
             return render_to_response('chgUser.html',
-                                      {'user': user, 'user_menu': 'active', 'form': form, 'error': error},
+                                      {'user': user, 'user_menu': 'active', 'is_admin': is_admin,
+                                       'is_superuser': is_superuser, 'groups': groups, 'error': error},
                                       context_instance=RequestContext(request))
 
         u.password = password
@@ -541,7 +536,8 @@ def chgUser(request):
         u.save()
         msg = '修改用户信息成功'
         return render_to_response('chgUser.html',
-                                  {'user': user, 'user_menu': 'active', 'form': form, 'msg': msg},
+                                  {'user': user, 'user_menu': 'active', 'is_admin': is_admin,
+                                   'is_superuser': is_superuser, 'groups': groups, 'msg': msg},
                                   context_instance=RequestContext(request))
 
 
