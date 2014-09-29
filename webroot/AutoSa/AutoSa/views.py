@@ -470,6 +470,8 @@ def chgUser(request):
 
     if request.method == "GET":
         username = request.GET.get('username')
+        if not username:
+            return HttpResponseRedirect('/showUser/')
         user = User.objects.get(username=username)
         groups = user.group.all()
         if user.is_admin:

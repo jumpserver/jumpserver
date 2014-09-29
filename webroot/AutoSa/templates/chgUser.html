@@ -41,25 +41,25 @@
             <div class="form-group">
                 <label for="keypass" class="col-sm-2 control-label">密钥密码<span style="color: red"> *</span></label>
                 <div class="col-sm-4">
-                    <input type="password" id="keypass" name="keypass" class="form-control" value="{{ user.keypass }}" >
+                    <input type="password" id="keypass" name="keypass" class="form-control" value="{{ user.key_pass }}" >
                 </div>
             </div>
             <div class="form-group">
                 <label for="keypass_again" class="col-sm-2 control-label">确认密码<span style="color: red"> *</span></label>
                 <div class="col-sm-4">
-                    <input type="password" id="keypass_again" name="keypass_again" class="form-control" value="{{ user.keypass }}" >
+                    <input type="password" id="keypass_again" name="keypass_again" class="form-control" value="{{ user.key_pass }}" >
                 </div>
             </div>
             <div class="form-group">
                 <label for="name" class="col-sm-2 control-label">姓名<span style="color: red"> *</span></label>
                 <div class="col-sm-4">
-                    <input type="password" id="name" name="name" class="form-control" value="{{ user.name }}" >
+                    <input type="text" id="name" name="name" class="form-control" value="{{ user.name }}" >
                 </div>
             </div>
             <div class="form-group">
                 <label for="group" class="col-sm-2 control-label">属组<span style="color: red"> *</span></label>
                 <div class="col-sm-4">
-                    <select multiple name="group" id="group">
+                    <select multiple name="group" id="group" class="form-control">
                         {% for group in groups %}
                         <option value="{{ group.name }}" >{{ group.name }}</option>
                         {% endfor %}
