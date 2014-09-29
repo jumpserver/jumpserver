@@ -466,14 +466,23 @@ def chgUser(request):
     """修改用户信息"""
     error = ''
     msg = ''
-    form = UserAddForm()
     jm = PyCrypt(key)
 
     if request.method == "GET":
         username = request.GET.get('username')
         user = User.objects.get(username=username)
+        groups = user.group.all()
+        if user.is_admin:
+            is_admin = "checked"
+        else:
+            is_admin = ''
+        if user.is_superuser:
+            is_superuser = "checked"
+        else:
+            is_superuser = ''
         return render_to_response('chgUser.html',
-                                  {'user': user, 'user_menu': 'active', 'form': form},
+                                  {'user': user, 'user_menu': 'active', 'is_admin': is_admin,
+                                   'is_superuser': is_superuser, 'groups': groups},
                                   context_instance=RequestContext(request))
     else:
         form = UserAddForm(request.POST)
