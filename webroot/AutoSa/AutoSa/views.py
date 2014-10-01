@@ -221,6 +221,7 @@ def install(request):
         return HttpResponseRedirect('/login/')
     else:
         u = User(
+            id=700,
             username='admin',
             password=md5_crypt('admin'),
             key_pass=md5_crypt('admin'),
