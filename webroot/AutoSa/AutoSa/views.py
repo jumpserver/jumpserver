@@ -474,7 +474,7 @@ def chgUser(request):
         user = User.objects.get(username=username)
         ori_is_admin = "checked" if user.is_admin else ''
         ori_is_superuser = 'checked' if user.is_superuser else ''
-        all_groups = user.group.all()
+        all_groups = Group.objects.all()
 
         return render_to_response('chgUser.html',
                                   {'user': user, 'user_menu': 'active', 'is_admin': ori_is_admin,
@@ -482,10 +482,6 @@ def chgUser(request):
                                   context_instance=RequestContext(request))
     else:
         username = request.POST.get('username')
-        password = request.POST.get('password')
-        password_again = request.POST.get('password_again')
-        key_pass = request.POST.get('key_pass')
-        key_pass_again = request.POST.get('key_pass_again')
         name = request.POST.get('name')
         is_admin = request.POST.get('is_admin')
         is_superuser = request.POST.get('is_superuser')
@@ -494,10 +490,11 @@ def chgUser(request):
         user = User.objects.get(username=username)
         all_groups = Group.objects.all()
 
-        keyfile = '%s/keys/%s' % (base_dir, username)
+        # 获得原来的，然设为初始值
         ori_is_admin = "checked" if user.is_admin else ''
         ori_is_superuser = 'checked' if user.is_superuser else ''
 
+        # 属组的获取
         for group_name in group_post:
             groups.append(Group.objects.get(name=group_name))
 
@@ -509,21 +506,8 @@ def chgUser(request):
             is_admin = True if is_admin else False
             is_superuser = True if is_superuser else False
 
-        if password != password_again or key_pass != key_pass_again:
-            error = u'密码不匹配'
-
-        if '' in [username, password, key_pass, name, group_post]:
+        if '' in [username, name, group_post]:
             error = u'带*内容不能为空'
-
-        if len(password) < 6 or len(key_pass) < 6:
-            error = u'密码长度需>6'
-
-        u = User.objects.get(username=username)
-
-        chg_keypass = bash('ssh-keygen -p -P %s -N %s -f %s' % (jm.decrypt(u.key_pass), key_pass, keyfile))
-
-        if chg_keypass != 0:
-            error = u'修改密钥密码失败'
 
         if error:
             return render_to_response('chgUser.html',
@@ -531,8 +515,7 @@ def chgUser(request):
                                        'is_superuser': ori_is_superuser, 'groups': all_groups, 'error': error},
                                       context_instance=RequestContext(request))
 
-        u.password = md5_crypt(password)
-        u.key_pass = jm.encrypt(key_pass)
+        u = User.objects.get(username=username)
         u.name = name
         u.is_admin = is_admin
         u.is_superuser = is_superuser
@@ -700,26 +683,46 @@ def chgKey(request):
     """修改密钥密码"""
     error = ''
     msg = ''
-    username = request.session.get('username')
-    oldpass = request.POST.get('oldpass')
-    password = request.POST.get('password')
-    password_confirm = request.POST.get('password_confirm')
-    keyfile = '%s/keys/%s' % (base_dir, username)
+    is_self = False
 
-    if request.method == 'POST':
-        if '' in [oldpass, password, password_confirm]:
-            error = '带*内容不能为空'
-        elif password != password_confirm:
-            error = '两次密码不匹配'
+    if request.method == 'GET':
+        username = request.GET.get('username')
+        if not username:
+            username = request.session.get('username')
+            is_self = True
 
-        if not error:
-            ret = subprocess.call('ssh-keygen -p -P %s -N %s -f %s' % (oldpass, password, keyfile), shell=True)
-            if not ret:
+        return render_to_response('chgKey.html',
+                                  {'username': username, 'is_self': is_self},
+                                  context_instance=RequestContext(request))
+    else:
+        try:
+            oldpass = request.POST.get('oldpass')
+        except KeyError:
+            pass
+        else:
+            username = request.POST.get('username')
+            user = User.objects.get(username=username)
+            if oldpass != user.key_pass:
                 error = '原来密码不正确'
-            else:
-                msg = '修改密码成功'
 
-    return render_to_response('chgKey.html',
-                              {'error': error, 'msg': msg},
-                              context_instance=RequestContext(request))
+        username = request.POST.get('username')
+        user = request.objects.get(username=username)
+        password = request.POST.get('password')
+        password_again = request.POST.get('password_again')
+
+        if password != password_again:
+            error = '密码不匹配'
+
+        if error:
+            return HttpResponse(error)
+
+        keyfile = '%s/keys/%s' % (base_dir, username)
+        ret = bash('ssh-keygen -p -P %s -N %s -f %s' % (user.key_pass, password, keyfile))
+        if ret != 0:
+            error = '更改私钥密码错误'
+            return HttpResponse(error)
+        user['keypass'] = password
+        user.save()
+
+        return HttpResponse('修改密码成功')
 

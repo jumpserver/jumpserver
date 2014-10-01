@@ -14,11 +14,19 @@
                 </div>
             {% endif %}
             <div class="form-group">
-                <label for="oldpass" class="col-sm-2 control-label">原来的密码<span style="color: red"> *</span></label>
+                <label for="username" class="col-sm-2 control-label">用户名<span style="color: red"> *</span></label>
                 <div class="col-sm-4">
-                    <input type="password" class="form-control" id="oldpass" name="oldpass" placeholder="用户名">
+                    <input type="text" class="form-control" id="username" name="username" placeholder="用户名" readonly="readOnly">
                 </div>
             </div>
+            {% if is_self %}
+            <div class="form-group">
+                <label for="oldpass" class="col-sm-2 control-label">原来的密码<span style="color: red"> *</span></label>
+                <div class="col-sm-4">
+                    <input type="password" class="form-control" id="oldpass" name="oldpass" placeholder="原来密码">
+                </div>
+            </div>
+            {% endif %}
             <div class="form-group">
                 <label for="password" class="col-sm-2 control-label">新密码<span style="color: red"> *</span></label>
                 <div class="col-sm-4">
