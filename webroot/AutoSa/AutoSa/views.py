@@ -718,7 +718,8 @@ def chgKey(request):
             return HttpResponse(error)
 
         keyfile = '%s/keys/%s' % (base_dir, username)
-        ret = bash('ssh-keygen -p -P %s -N %s -f %s' % (user.key_pass, password, keyfile))
+        jm = PyCrypt(key)
+        ret = bash('ssh-keygen -p -P %s -N %s -f %s' % (jm.decrypt(user.key_pass), password, keyfile))
         if ret != 0:
             error = '更改私钥密码错误'
             return HttpResponse(error)
