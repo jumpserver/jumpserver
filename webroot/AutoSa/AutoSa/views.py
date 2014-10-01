@@ -707,7 +707,7 @@ def chgKey(request):
                 error = '原来密码不正确'
 
         username = request.POST.get('username')
-        user = request.objects.get(username=username)
+        user = User.objects.get(username=username)
         password = request.POST.get('password')
         password_again = request.POST.get('password_again')
 
