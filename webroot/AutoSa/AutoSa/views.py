@@ -561,11 +561,11 @@ def chgGroup(request):
     error = ''
     msg = ''
     if request.method == 'GET':
-        group_id = request.GET.get(id)
+        group_id = request.GET.get('id')
         group = Group.objects.get(id=group_id)
     else:
-        group_id = request.POST.get(id)
-        group_name = request.POST.get(name)
+        group_id = request.POST.get('id')
+        group_name = request.POST.get('name')
         if not group_name:
             error = u'不能为空'
         else:
