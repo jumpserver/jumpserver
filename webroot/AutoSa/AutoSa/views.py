@@ -552,7 +552,7 @@ def showGroup(request):
         else:
             error = '请选择删除的组'
 
-    return render_to_response('showGroup.html', {'error': error, 'msg': msg},
+    return render_to_response('showGroup.html', {'error': error, 'msg': msg, 'groups': groups},
                               context_instance=RequestContext(request))
 
 
