@@ -186,7 +186,7 @@ def login_required(func):
 def admin_required(func):
     """要求用户是admin的装饰器"""
     def _deco(request, *args, **kwargs):
-        if not request.session.get('admin'):
+        if request.session.get('admin') < 1:
             return HttpResponseRedirect('/')
         return func(request, *args, **kwargs)
     return _deco
@@ -199,6 +199,13 @@ def superuser_required(func):
             return HttpResponseRedirect('/')
         return func(request, *args, **kwargs)
     return _deco
+
+
+def is_admin_role(request):
+    if request.session.get('admin') > 0:
+        return True
+    else:
+        return False
 
 
 def is_admin_user(request):
@@ -570,7 +577,7 @@ def chgGroup(request):
             error = u'不能为空'
         else:
             group = Group.objects.get(id=group_id)
-            group['name'] = group_name
+            group.name = group_name
             group.save()
             msg = u'修改成功'
 
@@ -709,13 +716,13 @@ def chgPass(request):
     is_self = False
 
     if request.method == 'GET':
-        if is_admin_user(request):
+        if is_admin_role(request):
             username = request.GET.get('username')
         else:
             username = request.session.get('username')
             is_self = True
 
-        return render_to_response('chgKey.html',
+        return render_to_response('chgPass.html',
                                   {'username': username, 'is_self': is_self},
                                   context_instance=RequestContext(request))
     else:
@@ -724,7 +731,7 @@ def chgPass(request):
         password = request.POST.get('password')
         password_again = request.POST.get('password_again')
 
-        if not is_admin_user(request):
+        if not is_admin_role(request):
             oldpass = request.POST.get('oldpass')
             if oldpass != user.password:
                 error = '原来密码不正确'
@@ -735,7 +742,7 @@ def chgPass(request):
         if error:
             return render_to_response('info.html', {'error': error})
 
-        user['password'] = password
+        user.password = password
         user.save()
 
         return render_to_response('info.html', {'msg': '修改密码成功'})
@@ -749,7 +756,7 @@ def chgKey(request):
     is_self = False
 
     if request.method == 'GET':
-        if is_admin_user(request):
+        if is_admin_role(request):
             username = request.GET.get('username')
         else:
             username = request.session.get('username')
@@ -764,7 +771,7 @@ def chgKey(request):
         password = request.POST.get('password')
         password_again = request.POST.get('password_again')
 
-        if not is_admin_user(request):
+        if not is_admin_role(request):
             oldpass = request.POST.get('oldpass')
             if oldpass != user.key_pass:
                 error = '原来密码不正确'
