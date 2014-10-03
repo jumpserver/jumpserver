@@ -540,7 +540,7 @@ def addGroup(request):
         else:
             error = u'不能为空'
     return render_to_response('addGroup.html',
-                              {'error': error, 'msg': msg},
+                              {'error': error, 'msg': msg, 'user_menu': 'active'},
                               context_instance=RequestContext(request))
 
 
@@ -559,7 +559,7 @@ def showGroup(request):
         else:
             error = '请选择删除的组'
 
-    return render_to_response('showGroup.html', {'error': error, 'msg': msg, 'groups': groups},
+    return render_to_response('showGroup.html', {'error': error, 'msg': msg, 'groups': groups, 'user_menu': 'active'},
                               context_instance=RequestContext(request))
 
 
@@ -581,7 +581,7 @@ def chgGroup(request):
             group.save()
             msg = u'修改成功'
 
-    return render_to_response('chgGroup.html', {'group': group, 'error': error, 'msg': msg},
+    return render_to_response('chgGroup.html', {'group': group, 'error': error, 'msg': msg, 'user_menu': 'active'},
                               context_instance=RequestContext(request))
 
 
@@ -723,7 +723,7 @@ def chgPass(request):
             is_self = True
 
         return render_to_response('chgPass.html',
-                                  {'username': username, 'is_self': is_self},
+                                  {'username': username, 'is_self': is_self, 'user_menu': 'active'},
                                   context_instance=RequestContext(request))
     else:
         username = request.POST.get('username')
@@ -763,7 +763,7 @@ def chgKey(request):
             is_self = True
 
         return render_to_response('chgKey.html',
-                                  {'username': username, 'is_self': is_self},
+                                  {'username': username, 'is_self': is_self, 'user_menu': 'active'},
                                   context_instance=RequestContext(request))
     else:
         username = request.POST.get('username')
@@ -788,7 +788,7 @@ def chgKey(request):
         if ret != 0:
             error = '更改私钥密码错误'
             return render_to_response('info.hmtl', {'error': error})
-        user['keypass'] = password
+        user.key_pass = password
         user.save()
 
         return render_to_response('info.html', {'msg': '修改密码成功'})
