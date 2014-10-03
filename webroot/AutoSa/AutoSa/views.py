@@ -526,7 +526,7 @@ def addGroup(request):
     msg = ''
     if request.method == 'POST':
         group_name = request.POST.get('name')
-        if not group_name:
+        if group_name:
             group = Group(name=group_name)
             group.save()
             msg = u'%s 属组添加成功' % group_name
@@ -539,6 +539,8 @@ def addGroup(request):
 
 @superuser_required
 def showGroup(request):
+    error = ''
+    msg = ''
     groups = Group.objects.all()
     if request.method == 'POST':
         selected_group = request.REQUEST.getlist('selected')
