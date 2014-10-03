@@ -218,10 +218,11 @@ def is_super_user(request):
 def install(request):
     user = User.objects.filter(username='admin')
     if user:
-        return HttpResponseRedirect('/login/')
+        error = '已经安装，请出重复安装.'
+        return render_to_response('info.html', {'error': error})
     else:
         u = User(
-            id=700,
+            id=800,
             username='admin',
             password=md5_crypt('admin'),
             key_pass=md5_crypt('admin'),
@@ -230,7 +231,8 @@ def install(request):
             is_superuser=True,
             ldap_password=md5_crypt('admin'))
         u.save()
-        return HttpResponse('Install successfully, please refresh this page.')
+        msg = '安装成功'
+        return render_to_response('info.html', {'msg': msg})
 
 
 def login(request):
@@ -466,7 +468,6 @@ def chgUser(request):
     """修改用户信息"""
     error = ''
     msg = ''
-    jm = PyCrypt(key)
 
     if request.method == "GET":
         username = request.GET.get('username')
@@ -489,11 +490,6 @@ def chgUser(request):
         group_post = request.REQUEST.getlist('group')
         groups = []
         user = User.objects.get(username=username)
-        all_groups = Group.objects.all()
-
-        # 获得原来的，然设为初始值
-        ori_is_admin = "checked" if user.is_admin else ''
-        ori_is_superuser = 'checked' if user.is_superuser else ''
 
         # 属组的获取
         for group_name in group_post:
@@ -511,10 +507,7 @@ def chgUser(request):
             error = u'带*内容不能为空'
 
         if error:
-            return render_to_response('chgUser.html',
-                                      {'user': user, 'user_menu': 'active', 'is_admin': ori_is_admin,
-                                       'is_superuser': ori_is_superuser, 'groups': all_groups, 'error': error},
-                                      context_instance=RequestContext(request))
+            return render_to_response('info.html', {'error': error})
 
         u = User.objects.get(username=username)
         u.name = name
@@ -524,10 +517,63 @@ def chgUser(request):
 
         u.save()
         msg = u'修改用户信息成功'
-        return render_to_response('chgUser.html',
-                                  {'user': user, 'user_menu': 'active', 'is_admin': is_admin,
-                                   'is_superuser': is_superuser, 'groups': all_groups, 'msg': msg},
-                                  context_instance=RequestContext(request))
+        return render_to_response('info.html', {'msg': msg})
+
+
+@superuser_required
+def addGroup(request):
+    error = ''
+    msg = ''
+    if request.method == 'POST':
+        group_name = request.POST.get('name')
+        if not group_name:
+            group = Group(name=group_name)
+            group.save()
+            msg = u'%s 属组添加成功' % group_name
+        else:
+            error = u'不能为空'
+    return render_to_response('addGroup.html',
+                              {'error': error, 'msg': msg},
+                              context_instance=RequestContext(request))
+
+
+@superuser_required
+def showGroup(request):
+    groups = Group.objects.all()
+    if request.method == 'POST':
+        selected_group = request.REQUEST.getlist('selected')
+        if selected_group:
+            for group_id in selected_group:
+                group = Group.objects.get(id=group_id)
+                group.delete()
+                msg = '删除成功'
+        else:
+            error = '请选择删除的组'
+
+    return render_to_response('showGroup.html', {'error': error, 'msg': msg},
+                              context_instance=RequestContext(request))
+
+
+@superuser_required
+def chgGroup(request):
+    error = ''
+    msg = ''
+    if request.method == 'GET':
+        group_id = request.GET.get(id)
+        group = Group.objects.get(id=group_id)
+    else:
+        group_id = request.POST.get(id)
+        group_name = request.POST.get(name)
+        if not group_name:
+            error = u'不能为空'
+        else:
+            group = Group.objects.get(id=group_id)
+            group['name'] = group_name
+            group.save()
+            msg = u'修改成功'
+
+    return render_to_response('chgGroup.html', {'group': group, 'error': error, 'msg': msg},
+                              context_instance=RequestContext(request))
 
 
 @admin_required
@@ -600,8 +646,8 @@ def showPerm(request):
     elif request.method == 'GET':
         if request.GET.get('username'):
             username = request.GET.get('username')
-            user = User.objects.filter(username=username)[0]
-            assets_user = AssetsUser.objects.filter(uid=user.id)
+            user = User.objects.get(username=username)
+            assets_user = AssetsUser.objects.filter(uid=user.id).order_by()
             return render_to_response('perms.html',
                                       {'user': user, 'assets': assets_user, 'perm_menu': 'active'},
                                       context_instance=RequestContext(request))
@@ -655,28 +701,42 @@ def addPerm(request):
 
 @login_required
 def chgPass(request):
-    """修改登录系统的密码"""
+    """修改登录密码"""
     error = ''
     msg = ''
-    if request.method == 'POST':
-        username = request.session.get('username')
-        oldpass = request.POST.get('oldpass')
+    is_self = False
+
+    if request.method == 'GET':
+        if is_admin_user(request):
+            username = request.GET.get('username')
+        else:
+            username = request.session.get('username')
+            is_self = True
+
+        return render_to_response('chgKey.html',
+                                  {'username': username, 'is_self': is_self},
+                                  context_instance=RequestContext(request))
+    else:
+        username = request.POST.get('username')
+        user = User.objects.get(username=username)
         password = request.POST.get('password')
-        password_confirm = request.POST.get('password_confirm')
-        user = User.objects.get(username)
-        if '' in [oldpass, password, password_confirm]:
-            error = '带*内容不能为空'
-        elif md5_crypt(oldpass) != user.password:
-            error = '密码不正确'
-        elif password != password_confirm:
-            error = '两次密码不匹配'
+        password_again = request.POST.get('password_again')
 
-        if not error:
-            user.password = md5_crypt(password)
-            user.save()
+        if not is_admin_user(request):
+            oldpass = request.POST.get('oldpass')
+            if oldpass != user.password:
+                error = '原来密码不正确'
 
-    return render_to_response('chgPass.html', {'msg': msg, 'error': error, 'pass_menu': 'active'},
-                              context_instance=RequestContext(request))
+        if password != password_again:
+            error = '密码不匹配'
+
+        if error:
+            return render_to_response('info.html', {'error': error})
+
+        user['password'] = password
+        user.save()
+
+        return render_to_response('info.html', {'msg': '修改密码成功'})
 
 
 @login_required
@@ -687,8 +747,9 @@ def chgKey(request):
     is_self = False
 
     if request.method == 'GET':
-        username = request.GET.get('username')
-        if not username:
+        if is_admin_user(request):
+            username = request.GET.get('username')
+        else:
             username = request.session.get('username')
             is_self = True
 
@@ -696,35 +757,30 @@ def chgKey(request):
                                   {'username': username, 'is_self': is_self},
                                   context_instance=RequestContext(request))
     else:
-        try:
-            oldpass = request.POST.get('oldpass')
-        except KeyError:
-            pass
-        else:
-            username = request.POST.get('username')
-            user = User.objects.get(username=username)
-            if oldpass != user.key_pass:
-                error = '原来密码不正确'
-
         username = request.POST.get('username')
         user = User.objects.get(username=username)
         password = request.POST.get('password')
         password_again = request.POST.get('password_again')
 
+        if not is_admin_user(request):
+            oldpass = request.POST.get('oldpass')
+            if oldpass != user.key_pass:
+                error = '原来密码不正确'
+
         if password != password_again:
             error = '密码不匹配'
 
         if error:
-            return HttpResponse(error)
+            return render_to_response('info.html', {'error': error})
 
         keyfile = '%s/keys/%s' % (base_dir, username)
         jm = PyCrypt(key)
         ret = bash('ssh-keygen -p -P %s -N %s -f %s' % (jm.decrypt(user.key_pass), password, keyfile))
         if ret != 0:
             error = '更改私钥密码错误'
-            return HttpResponse(error)
+            return render_to_response('info.hmtl', {'error': error})
         user['keypass'] = password
         user.save()
 
-        return HttpResponse('修改密码成功')
+        return render_to_response('info.html', {'msg': '修改密码成功'})
 

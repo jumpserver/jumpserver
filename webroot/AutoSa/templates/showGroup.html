@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+    <form method="post" action="">
+        {% if info %}
+            <p class="alert alert-success">
+                {{ info }}
+            </p>
+        {% endif %}
+        <table class="table table-striped table-hover table-condensed">
+        <thead>
+            <tr>
+                <th><input onclick="selectAll()" type="checkbox"  name="select_all" style="select_all" id="select_all"/></th>
+                <th>ID</th>
+                <th>属组</th>
+                <th>修改</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for group in groups %}
+            <tr>
+                <td><input type="checkbox" name="selected" value="{{ group.id }}"></td>
+                <td>{{ group.id }}</td>
+                <td>{{ group.name }}</td>
+                <td><a href="/chgGroup/?id={{ group.id }}">修改</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        </form>
+    </table>
+    <button class="btn btn-primary">删除</button>
+    </form>
+{% endblock %}

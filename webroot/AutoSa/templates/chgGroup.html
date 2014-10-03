@@ -1,36 +1,34 @@
 {% extends 'base.html' %}
 {% block content %}
-    <form class="form-horizontal" role="form" method="post" action="" >
+    <form class="form-horizontal" role="form" method="post" action="/chgGroup/" >
         <fieldset >
-            <legend>修改密码</legend>
+            <legend>修改用户信息</legend>
             {% if error %}
                 <div class="alert alert-danger">
                     {{ error }}
                 </div>
             {% endif %}
+
             {% if msg %}
                 <div class="alert alert-success">
                     {{ msg }}
                 </div>
             {% endif %}
-            {% if is_self %}
             <div class="form-group">
-                <label for="oldpass" class="col-sm-2 control-label">原来的密码<span style="color: red"> *</span></label>
                 <div class="col-sm-4">
-                    <input type="password" class="form-control" id="oldpass" name="oldpass" placeholder="原来密码">
-                </div>
-            </div>
-            {% endif %}
-            <div class="form-group">
-                <label for="password" class="col-sm-2 control-label">新密码<span style="color: red"> *</span></label>
-                <div class="col-sm-4">
-                    <input type="password" class="form-control" id="password" name="password" placeholder="密码">
+                    <input type="text" id="oldname" name="oldname" class="form-control" value="{{ group.id }}" hidden="hidden">
                 </div>
             </div>
             <div class="form-group">
-                <label for="password_again" class="col-sm-2 control-label">确认密码<span style="color: red"> *</span></label>
+                <label for="oldname" class="col-sm-2 control-label">原来属组<span style="color: red"> *</span></label>
                 <div class="col-sm-4">
-                    <input type="password" class="form-control" id="password_again" name="password_again" placeholder="确认密码">
+                    <input type="text" id="oldname" name="oldname" class="form-control" value="{{ group.name }}" readOnly="readOnly">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="name" class="col-sm-2 control-label">属组<span style="color: red"> *</span></label>
+                <div class="col-sm-4">
+                    <input type="text" id="name" name="name" class="form-control"  placeholder="属组">
                 </div>
             </div>
             <div class="form-group">
