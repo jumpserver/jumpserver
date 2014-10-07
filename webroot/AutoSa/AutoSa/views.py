@@ -609,16 +609,20 @@ def showSudo(request):
         if not username:
             return HttpResponseRedirect('/showUser/')
         l = LDAPMgmt()
-        result = l.list('entryDN=cn=%s,Sudoers,%s' % (str(username), ldap_base_dn), attr=['sudoHost', 'sudoCommand'])
+        result = l.list('entryDN=cn=%s,ou=Sudoers,%s' % (str(username), ldap_base_dn), attr=['sudoHost', 'sudoCommand'])
         sudoHost = result.get('sudoHost')
         sudoCommand = result.get('sudoCommand')
         return render_to_response('showSudo.html',
-                                  {'sudoHost': sudoHost,
+                                  {'username': username,
+                                   'sudoHost': sudoHost,
                                    'sudoCommand': sudoCommand,
                                    'user_menu': 'active'},
                                   context_instance=RequestContext(request))
 
 
+@admin_required
+def chgSudo(request):
+    pass
 
 
 
