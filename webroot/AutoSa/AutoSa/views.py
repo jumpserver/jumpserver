@@ -122,10 +122,8 @@ class LDAPMgmt():
     def list(self, filter, scope=ldap.SCOPE_SUBTREE, attr=None):
         try:
             ldap_result = self.conn.search_s(self.ldap_base_dn, scope, filter, attr)
-            print 'Here is the result: '
             for entry in ldap_result:
                 name, data = entry
-                print '#'*20, name, '#'*20
                 for k, v in data.items():
                     print '%s: %s' % (k,v)
         except ldap.LDAPError, e:
@@ -349,8 +347,10 @@ def showUser(request):
                     ldap_del = LDAPMgmt()
                     user_dn = "uid=%s,ou=People,%s" % (username, ldap_base_dn)
                     group_dn = "cn=%s,ou=Group,%s" % (username, ldap_base_dn)
+                    sudo_dn = 'cn=%s,ou=Sudoers,%s' % (username, ldap_base_dn)
                     ldap_del.delete(user_dn)
                     ldap_del.delete(group_dn)
+                    ldap_del.delete(sudo_dn)
                 except Exception, e:
                     error = u'ldap中用户删除错误' + unicode(e)
 
@@ -442,17 +442,30 @@ def addUser(request):
                 'gidNumber': [str(u.id)],
                 'homeDirectory': [str('/home/%s' % username)]}
 
-            group_dn = "cn=%s,out=Group,%s" % (username, ldap_base_dn)
+            group_dn = "cn=%s,ou=Group,%s" % (username, ldap_base_dn)
             group_attr = {
                 'objectClass': ['posixGroup', 'top'],
                 'cn': [str(username)],
                 'userPassword': ['{crypt}x'],
                 'gidNumber': [str(u.id)]
             }
+
+            sudo_dn = 'cn=%s,ou=Sudoers,%s' % (username, ldap_base_dn)
+            sudo_attr = {
+                'objectClass': ['top'],
+                'objectClass': ['sudoRole'],
+                'cn': ['%s' % username],
+                'sudoCommand': ['/bin/pwd'],
+                'sudoHost': ['192.168.1.1'],
+                'sudoOption': ['!authenticate'],
+                'sudoRunAsUser': ['root'],
+                'sudoUser': ['%s' % username]
+            }
             ldap_conn = LDAPMgmt()
             try:
                 ldap_conn.add(user_dn, user_attr)
                 ldap_conn.add(group_dn, group_attr)
+                ldap_conn.add(sudo_dn, sudo_attr)
             except Exception, e:
                 error = u'添加ladp用户失败' + unicode(e)
                 try:
@@ -460,6 +473,7 @@ def addUser(request):
                     u.delete()
                     ldap_conn.delete(user_dn)
                     ldap_conn.delete(group_dn)
+                    ldap_conn.delete(sudo_dn)
                 except Exception:
                     pass
                 return render_to_response('addUser.html', {'user_menu': 'active', 'form': form, 'error': error},
@@ -583,6 +597,15 @@ def chgGroup(request):
 
     return render_to_response('chgGroup.html', {'group': group, 'error': error, 'msg': msg, 'user_menu': 'active'},
                               context_instance=RequestContext(request))
+
+
+@admin_required
+def showSudo(request):
+    if request.method == 'GET':
+        username = request.GET.get('username')
+        if not username:
+            return HttpResponseRedirect('/showUser/')
+        
 
 
 @admin_required
@@ -779,6 +802,9 @@ def chgKey(request):
         if password != password_again:
             error = '密码不匹配'
 
+        if len(password) < 5:
+            error = '密码长度需要>5'
+
         if error:
             return render_to_response('info.html', {'error': error})
 
@@ -787,7 +813,7 @@ def chgKey(request):
         ret = bash('ssh-keygen -p -P %s -N %s -f %s' % (jm.decrypt(user.key_pass), password, keyfile))
         if ret != 0:
             error = '更改私钥密码错误'
-            return render_to_response('info.hmtl', {'error': error})
+            return render_to_response('info.html', {'error': error})
         user.key_pass = password
         user.save()
 

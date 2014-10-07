@@ -19,6 +19,8 @@
                 <th>Email</th>
                 <th>Key</th>
                 <th>修改</th>
+                <th>sudo</th>
+                <th>sudo</th>
             </tr>
         </thead>
         <tbody>
@@ -39,6 +41,8 @@
                 <td>{{ user.email }}</td>
                 <td><a href="/downKey/?username={{ user.username }}">下载</a></td>
                 <td><a href="/chgUser/?username={{ user.username }}">修改</a></td>
+                <td><a href="/showSudo/?username={{ user.username }">查看</a></td>
+                <td><a href="/chgSudo/?username={{ user.username }">修改</a></td>
             </tr>
             {% endfor %}
         </tbody>
