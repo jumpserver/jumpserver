@@ -120,12 +120,15 @@ class LDAPMgmt():
         self.conn.simple_bind_s(admin_cn, admin_pass)
 
     def list(self, filter, scope=ldap.SCOPE_SUBTREE, attr=None):
+        result = {}
         try:
             ldap_result = self.conn.search_s(self.ldap_base_dn, scope, filter, attr)
             for entry in ldap_result:
                 name, data = entry
                 for k, v in data.items():
-                    print '%s: %s' % (k,v)
+                    print '%s: %s' % (k, v)
+                    result[k] = v
+            return result
         except ldap.LDAPError, e:
             print e
 
@@ -605,6 +608,17 @@ def showSudo(request):
         username = request.GET.get('username')
         if not username:
             return HttpResponseRedirect('/showUser/')
+        l = LDAPMgmt()
+        result = l.list('entryDN=cn=%s,Sudoers,%s' % (str(username), ldap_base_dn), attr=['sudoHost', 'sudoCommand'])
+        sudoHost = result.get('sudoHost')
+        sudoCommand = result.get('sudoCommand')
+        return render_to_response('showSudo.html',
+                                  {'sudoHost': sudoHost,
+                                   'sudoCommand': sudoCommand,
+                                   'user_menu': 'active'},
+                                  context_instance=RequestContext(request))
+
+
 
 
 
