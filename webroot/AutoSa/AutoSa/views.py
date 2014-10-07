@@ -454,12 +454,12 @@ def addUser(request):
             sudo_attr = {
                 'objectClass': ['top'],
                 'objectClass': ['sudoRole'],
-                'cn': ['%s' % username],
+                'cn': ['%s' % str(username)],
                 'sudoCommand': ['/bin/pwd'],
                 'sudoHost': ['192.168.1.1'],
                 'sudoOption': ['!authenticate'],
                 'sudoRunAsUser': ['root'],
-                'sudoUser': ['%s' % username]
+                'sudoUser': ['%s' % str(username)]
             }
             ldap_conn = LDAPMgmt()
             try:
@@ -605,7 +605,7 @@ def showSudo(request):
         username = request.GET.get('username')
         if not username:
             return HttpResponseRedirect('/showUser/')
-        
+
 
 
 @admin_required
