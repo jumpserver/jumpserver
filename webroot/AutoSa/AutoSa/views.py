@@ -625,9 +625,48 @@ def chgSudo(request):
         username = request.GET.get('username')
         if not username:
             return HttpResponseRedirect('/showUser/')
-        return render_to_response('chgSudo.html')
+        return render_to_response('chgSudo.html',
+                                  {'username': username,
+                                   'user_menu': 'active',
+                                   },
+                                  context_instance=RequestContext(request))
     else:
-        return HttpResponseRedirect('/')
+        l = LDAPMgmt()
+        username = request.POST.get('username')
+        user_dn = 'cn=%s,ou=Sudoers,%s' % (str(username), ldap_base_dn)
+        msg = ''
+        if request.POST.get('addHost') or request.POST.get('delHost'):
+            host = request.POST.get('host')
+            hosts = host.split(',')
+            ori_hosts = l.list('entryDN=cn=%s,ou=Sudoers,%s' %
+                               (str(username), ldap_base_dn), attr=['sudoHost']).get('sudoHost')
+            if request.POST.get('addHost'):
+                new_hosts = list(set(ori_hosts.extend(hosts)))
+            else:
+                new_hosts = list(set(ori_hosts) - set(hosts))
+            l.modify(user_dn, {'sudoHost': new_hosts})
+
+            msg = '修改sudo主机成功' % hosts
+
+        if request.POST.get('addCMD') or request.POST.get('delCMD'):
+            cmd = request.POST.get('cmd')
+            cmds = cmd.split(',')
+            ori_cmds = l.list('entryDN=cn=%s,ou=Sudoers,%s' %
+                              (str(username), ldap_base_dn), attr=['sudoCommand']).get('sudoCommand')
+            if request.POST.get('addCMD'):
+                new_cmds = list(set(ori_cmds.extend(cmds)))
+            else:
+                new_cmds = list(set(ori_hosts) - cmds)
+
+            l.modify(user_dn, {'sudoCommand': new_cmds})
+            msg = '修改sudo命令成功'
+
+        if msg:
+            return render_to_response('info.html',
+                                      {'msg': msg})
+        else:
+            return HttpResponseRedirect('/chgSudo/?username=%s' % username)
+
 
 
 @admin_required
