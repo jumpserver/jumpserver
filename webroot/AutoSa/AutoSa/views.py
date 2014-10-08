@@ -619,11 +619,15 @@ def showSudo(request):
                                    'user_menu': 'active'},
                                   context_instance=RequestContext(request))
 
-
 @admin_required
 def chgSudo(request):
-    pass
-
+    if request.method == 'GET':
+        username = request.GET.get('username')
+        if not username:
+            return HttpResponseRedirect('/showUser/')
+        return render_to_response('chgSudo.html')
+    else:
+        return HttpResponseRedirect('/')
 
 
 @admin_required

@@ -2,20 +2,18 @@
 {% block content %}
         <fieldset >
             <legend>{{ username }}</legend>
-            允许sudo的主机：
+            <div class="alert alert-success" role="alert"><b>允许sudo的主机：</b></div>允许sudo的主机：
             <ul class="list-group">
               {% for host in sudoHost %}
               <li class="list-group-item">{{ host }}</li>
               {% endfor %}
             </ul>
             <br />
-            允许的sudo命令：
-
+            <div class="alert alert-success" role="alert"><b>允许的sudo命令：</b></div>允许sudo的主机：
             <ul class="list-group">
               {% for cmd in sudoCommand %}
               <li class="list-group-item">{{ cmd }}</li>
               {% endfor %}
             </ul>
-
         </fieldset>
 {% endblock %}
