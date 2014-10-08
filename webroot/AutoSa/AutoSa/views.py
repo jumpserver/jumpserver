@@ -635,12 +635,13 @@ def chgSudo(request):
         username = request.POST.get('username')
         user_dn = 'cn=%s,ou=Sudoers,%s' % (str(username), ldap_base_dn)
         msg = ''
-        if request.POST.get('addHost') or request.POST.get('delHost'):
-            host = request.POST.get('host')
+        if request.POST.get('add_host') or request.POST.get('del_host'):
+            host = request.POST.get('add_host') if request.POST.get('add_host') else request.POST.get('del_host')
             hosts = host.split(',')
             ori_hosts = l.list('entryDN=cn=%s,ou=Sudoers,%s' %
                                (str(username), ldap_base_dn), attr=['sudoHost']).get('sudoHost')
-            if request.POST.get('addHost'):
+
+            if request.POST.get('add_host'):
                 new_hosts = list(set(ori_hosts.extend(hosts)))
             else:
                 new_hosts = list(set(ori_hosts) - set(hosts))
@@ -648,12 +649,12 @@ def chgSudo(request):
 
             msg = '修改sudo主机成功' % hosts
 
-        if request.POST.get('addCMD') or request.POST.get('delCMD'):
-            cmd = request.POST.get('cmd')
+        if request.POST.get('add_cmd') or request.POST.get('del_cmd'):
+            cmd = request.POST.get('add_cmd') if request.POST.get('add_cmd') else request.POST.get('del_cmd')
             cmds = cmd.split(',')
             ori_cmds = l.list('entryDN=cn=%s,ou=Sudoers,%s' %
                               (str(username), ldap_base_dn), attr=['sudoCommand']).get('sudoCommand')
-            if request.POST.get('addCMD'):
+            if request.POST.get('add_cmd'):
                 new_cmds = list(set(ori_cmds.extend(cmds)))
             else:
                 new_cmds = list(set(ori_hosts) - cmds)

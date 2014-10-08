@@ -2,12 +2,12 @@
 {% block content %}
         <fieldset >
             <legend>{{ username }}--修改sudo</legend>
-            <form class="form-horizontal" role="form" method="post" action="/chgSudo/?addHost=1" >
+            <form class="form-horizontal" role="form" method="post" action="/chgSudo/" >
                <div class="row">
                   <div class="col-lg-6">
                     <div class="input-group">
                       <input type="text" name="username" value="{{ username }}" hidden="hidden">
-                      <input type="text" class="form-control" name="host" placeholder="主机IP,多个逗号分隔">
+                      <input type="text" class="form-control" name="add_host" placeholder="主机IP,多个逗号分隔">
                       <span class="input-group-btn">
                         <button class="btn btn-success" type="submit">新增主机</button>
                       </span>
@@ -17,12 +17,12 @@
             </form>
             <br>
 
-            <form class="form-horizontal" role="form" method="post" action="/chgSudo/?delHost=1" >
+            <form class="form-horizontal" role="form" method="post" action="/chgSudo/" >
                <div class="row">
                   <div class="col-lg-6">
                     <div class="input-group">
                         <input type="text" name="username" value="{{ username }}" hidden="hidden">
-                      <input type="text" class="form-control" name="host" placeholder="主机IP,多个逗号分隔">
+                      <input type="text" class="form-control" name="del_host" placeholder="主机IP,多个逗号分隔">
                       <span class="input-group-btn">
                         <button class="btn btn-primary" type="submit">删除主机</button>
                       </span>
@@ -32,12 +32,12 @@
             </form>
             <br>
 
-            <form class="form-horizontal" role="form" method="post" action="/chgSudo/?addCMD=1" >
+            <form class="form-horizontal" role="form" method="post" action="/chgSudo/" >
                <div class="row">
                   <div class="col-lg-6">
                     <div class="input-group">
                       <input type="text" name="username" value="{{ username }}" hidden="hidden">
-                      <input type="text" class="form-control" name="cmd" placeholder="添加命令,多个逗号分隔">
+                      <input type="text" class="form-control" name="add_cmd" placeholder="添加命令,多个逗号分隔">
                       <span class="input-group-btn">
                         <button class="btn btn-info" type="submit">添加命令</button>
                       </span>
@@ -52,7 +52,7 @@
                   <div class="col-lg-6">
                     <div class="input-group">
                       <input type="text" name="username" value="{{ username }}" hidden="hidden">
-                      <input type="text" class="form-control" name="cmd" placeholder="删除命令,多个逗号分隔">
+                      <input type="text" class="form-control" name="del_cmd" placeholder="删除命令,多个逗号分隔">
                       <span class="input-group-btn">
                         <button class="btn btn-danger" type="submit">删除命令</button>
                       </span>
