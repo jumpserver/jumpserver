@@ -642,7 +642,8 @@ def chgSudo(request):
                                (str(username), ldap_base_dn), attr=['sudoHost']).get('sudoHost')
 
             if request.POST.get('add_host'):
-                new_hosts = list(set(ori_hosts.extend(hosts)))
+                ori_hosts.extend(hosts)
+                new_hosts = list(set(ori_hosts))
             else:
                 new_hosts = list(set(ori_hosts) - set(hosts))
             l.modify(user_dn, {'sudoHost': new_hosts})
@@ -655,7 +656,8 @@ def chgSudo(request):
             ori_cmds = l.list('entryDN=cn=%s,ou=Sudoers,%s' %
                               (str(username), ldap_base_dn), attr=['sudoCommand']).get('sudoCommand')
             if request.POST.get('add_cmd'):
-                new_cmds = list(set(ori_cmds.extend(cmds)))
+                ori_cmds.extend(cmds)
+                new_cmds = list(set(ori_cmds))
             else:
                 new_cmds = list(set(ori_hosts) - cmds)
 
