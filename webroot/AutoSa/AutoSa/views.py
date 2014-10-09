@@ -17,6 +17,7 @@ import ldap.modlist as modlist
 import crypt
 import hashlib
 from UserManage.forms import UserAddForm, GroupAddForm
+import paramiko
 
 
 base_dir = "/opt/jumpserver/"
@@ -900,7 +901,19 @@ def upFile(request):
             for chunk in upload_file.chunks():
                 f.write(chunk)
             f.close()
-            return HttpResponse('save %s Ok, size %s' % (upload_file.name, upload_file.size))
+            asset = Assets.objects.get(ip=host, None)
+            if asset:
+                port = asset.port
+                jm = PyCrypt(key)
+                user = User.objects.get(username)
+                t = paramiko.Transport(host, port)
+                t.connect(username=username, password=jm.decrypt(user.password))
+                sftp = paramiko.SFTPClient.from_transport(t)
+                sftp.put(filename, path)
+
+                return HttpResponse('save %s Ok, size %s' % (upload_file.name, upload_file.size))
+        else:
+            return render_to_response('info.html', {'error': u"上传失败"})
 
     return render_to_response('upFile.html',
                               {'username': username},
