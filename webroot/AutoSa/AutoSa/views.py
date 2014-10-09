@@ -637,11 +637,13 @@ def chgSudo(request):
         msg = ''
         if request.POST.get('add_host') or request.POST.get('del_host'):
             host = request.POST.get('add_host') if request.POST.get('add_host') else request.POST.get('del_host')
-            hosts = host.split(',')
+            hosts = str(host).split(',')
             ori_hosts = l.list('entryDN=cn=%s,ou=Sudoers,%s' %
                                (str(username), ldap_base_dn), attr=['sudoHost']).get('sudoHost')
 
             if request.POST.get('add_host'):
+                if not ori_hosts:
+                    ori_hosts = []
                 ori_hosts.extend(hosts)
                 new_hosts = list(set(ori_hosts))
             else:
@@ -652,10 +654,12 @@ def chgSudo(request):
 
         if request.POST.get('add_cmd') or request.POST.get('del_cmd'):
             cmd = request.POST.get('add_cmd') if request.POST.get('add_cmd') else request.POST.get('del_cmd')
-            cmds = cmd.split(',')
+            cmds = str(cmd).split(',')
             ori_cmds = l.list('entryDN=cn=%s,ou=Sudoers,%s' %
                               (str(username), ldap_base_dn), attr=['sudoCommand']).get('sudoCommand')
             if request.POST.get('add_cmd'):
+                if not ori_cmds:
+                    ori_cmds = []
                 ori_cmds.extend(cmds)
                 new_cmds = list(set(ori_cmds))
             else:
