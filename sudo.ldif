@@ -1,9 +1,0 @@
-dn: cn=guanghongwei,ou=Sudoers,dc=dianping,dc=com
-objectClass: top
-objectClass: sudoRole
-cn: guanghongwei
-sudoCommand: /bin/pwd
-sudoHost: ALL
-sudoOption: !authenticate
-sudoRunAsUser: ALL
-sudoUser: guanghongwei

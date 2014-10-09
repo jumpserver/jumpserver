@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block content %}
+    <form class="form-horizontal" enctype="multipart/form-data" role="form" method="post" action="" >
+        <fieldset >
+            <legend>{{ username }} -- 上传文件</legend>
+            {% if error %}
+                <div class="alert alert-danger">
+                    {{ error }}
+                </div>
+            {% endif %}
+            {% if msg %}
+                <div class="alert alert-success">
+                    {{ msg }}
+                </div>
+            {% endif %}
+                    <input type="text"   name="username" value="{{ username }}" hidden="hidden">
+            <div class="form-group">
+                <label for="host" class="col-sm-2 control-label">服务器IP<span style="color: red"> *</span></label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" id="host" name="host" placeholder="IP">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="path" class="col-sm-2 control-label">上传目录<span style="color: red"> *</span></label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" id="path" name="path" placeholder="服务器目录">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="file" class="col-sm-2 control-label">上传目录<span style="color: red"> *</span></label>
+                <div class="col-sm-4">
+                    <input type="file" class="form-control" id="file" name="file" placeholder="点击添加">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-4">
+                    <button class="btn btn-primary">上传</button>
+                </div>
+            </div>
+        </fieldset>
+    </form>
+{% endblock %}

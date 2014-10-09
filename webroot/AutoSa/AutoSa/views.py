@@ -25,13 +25,6 @@ cf.read('%s/jumpserver.conf' % base_dir)
 
 key = cf.get('jumpserver', 'key')
 rsa_dir = cf.get('jumpserver', 'rsa_dir')
-useradd_shell = cf.get('jumpserver', 'useradd_shell')
-userdel_shell = cf.get('jumpserver', 'userdel_shell')
-sudoadd_shell = cf.get('jumpserver', 'sudoadd_shell')
-sudodel_shell = cf.get('jumpserver', 'sudodel_shell')
-keygen_shell = cf.get('jumpserver', 'keygen_shell')
-chgpass_shell = cf.get('jumpserver', 'chgpass_shell')
-admin = ['admin']
 ldap_host = cf.get('jumpserver', 'ldap_host')
 ldap_base_dn = cf.get('jumpserver', 'ldap_base_dn')
 admin_cn = cf.get('jumpserver', 'admin_cn')
@@ -684,10 +677,10 @@ def showAssets(request):
         assets = []
         username = request.session.get('username')
         user = User.objects.get(username=username)
-        for asset in user.assetsuser_set.all():
+        for asset in user.assetsuser_set.all().order_by('ip'):
             assets.append(asset.aid)
     else:
-        assets = Assets.objects.all()
+        assets = Assets.objects.all().order_by('ip')
     if request.method == 'POST':
         if request.session.get('admin') < 2:
             return HttpResponseRedirect('/showAssets/')
@@ -747,7 +740,7 @@ def showPerm(request):
         if request.GET.get('username'):
             username = request.GET.get('username')
             user = User.objects.get(username=username)
-            assets_user = AssetsUser.objects.filter(uid=user.id).order_by()
+            assets_user = AssetsUser.objects.filter(uid=user.id)
             return render_to_response('perms.html',
                                       {'user': user, 'assets': assets_user, 'perm_menu': 'active'},
                                       context_instance=RequestContext(request))
@@ -887,3 +880,21 @@ def chgKey(request):
 
         return render_to_response('info.html', {'msg': '修改密码成功'})
 
+
+@login_required
+def upFile(request):
+    username = request.session.get('username')
+    msg = ''
+    error = ''
+    upload_dir = '/tmp/upload/'
+    if request.method == 'POST':
+        host = request.POST.get('host')
+        path = request.POST.get('path')
+        upload_file = request.FILES.get('file', None)
+
+        return HttpResponse('%s: %s' % (upload_file.name, upload_file.size))
+
+
+    return render_to_response('upFile.html',
+                              {'username': username},
+                              context_instance=RequestContext(request))
