@@ -886,14 +886,21 @@ def upFile(request):
     username = request.session.get('username')
     msg = ''
     error = ''
-    upload_dir = '/tmp/upload/'
+    upload_dir = '/tmp/upload/%s' % username
     if request.method == 'POST':
         host = request.POST.get('host')
         path = request.POST.get('path')
         upload_file = request.FILES.get('file', None)
 
-        return HttpResponse('%s: %s' % (upload_file.name, upload_file.size))
-
+        if upload_file:
+            if not os.path.exists(upload_dir):
+                os.makedirs(upload_dir)
+            filename = '%s/%s' % (upload_dir, upload_file.name)
+            f = open(filename, 'wb')
+            for chunk in upload_file.chunks():
+                f.write(chunk)
+            f.close()
+            return HttpResponse('save %s Ok, size %s' % (upload_file.name, upload_file.size))
 
     return render_to_response('upFile.html',
                               {'username': username},
