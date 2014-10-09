@@ -663,7 +663,7 @@ def chgSudo(request):
                 ori_cmds.extend(cmds)
                 new_cmds = list(set(ori_cmds))
             else:
-                new_cmds = list(set(ori_cmds) - cmds)
+                new_cmds = list(set(ori_cmds) - set(cmds))
 
             l.modify(user_dn, {'sudoCommand': new_cmds})
             msg = '修改sudo命令成功'
