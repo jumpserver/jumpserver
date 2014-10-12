@@ -164,7 +164,7 @@ def sth_select(username='', ip=''):
     """if username: return password elif ip return port"""
     db, cursor = connect_db(db_user, db_password, db_db, db_host, db_port)
     if username:
-        cursor.execute('select password from %s where username="%s"' % (user_table, username))
+        cursor.execute('select ldap_password from %s where username="%s"' % (user_table, username))
         try:
             password = cursor.fetchone()[0]
         except IndexError:
@@ -292,7 +292,7 @@ if __name__ == '__main__':
                 sys.exit()
             else:
                 connect_one(username, option)
-    except (BaseException, Exception):
-    #except IndexError:
+    #except (BaseException, Exception):
+    except IndexError:
         print "Exit."
         sys.exit()

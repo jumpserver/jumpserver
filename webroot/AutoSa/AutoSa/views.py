@@ -901,20 +901,55 @@ def upFile(request):
             for chunk in upload_file.chunks():
                 f.write(chunk)
             f.close()
-            asset = Assets.objects.get(ip=host, None)
+            asset = Assets.objects.get(ip=host)
             if asset:
                 port = asset.port
                 jm = PyCrypt(key)
-                user = User.objects.get(username)
-                t = paramiko.Transport(host, port)
-                t.connect(username=username, password=jm.decrypt(user.password))
+                user = User.objects.get(username=username)
+                t = paramiko.Transport((host, port))
+                t.connect(username=username, password=jm.decrypt(user.ldap_password))
                 sftp = paramiko.SFTPClient.from_transport(t)
-                sftp.put(filename, path)
+                sftp.put(filename, '%s/%s' % (path, upload_file.name))
+                msg = u'上传成功，位于 %s主机，位置 %s.' % (host, path)
 
-                return HttpResponse('save %s Ok, size %s' % (upload_file.name, upload_file.size))
+                return render_to_response('info.html', {'msg': msg})
         else:
             return render_to_response('info.html', {'error': u"上传失败"})
 
     return render_to_response('upFile.html',
+                              {'username': username},
+                              context_instance=RequestContext(request))
+
+
+@login_required
+def downFile(request):
+    username = request.session.get('username')
+    if request.method == 'POST':
+        host = request.POST.get('host')
+        path = request.POST.get('path')
+        download_dir = '/tmp/download/%s' % username
+        download_file = '%s/%s' % (download_dir, os.path.basename(path))
+        if not os.path.exists(download_dir):
+            os.makedirs(download_dir)
+        asset = Assets.objects.get(ip=host)
+        jm = PyCrypt(key)
+        port = asset.port
+        user = User.objects.get(username=username)
+        t = paramiko.Transport((host, port))
+        t.connect(username=username, password=jm.decrypt(user.ldap_password))
+        sftp = paramiko.SFTPClient.from_transport(t)
+        sftp.get(path, download_file)
+        if os.path.isfile(download_file):
+            f = open(download_file)
+            data = f.read()
+            f.close()
+
+            response = HttpResponse(data, mimetype='application/octet-stream')
+            response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(path)
+            return response
+
+
+
+    return render_to_response('downFile.html',
                               {'username': username},
                               context_instance=RequestContext(request))
