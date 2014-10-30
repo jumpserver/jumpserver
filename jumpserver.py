@@ -132,7 +132,6 @@ def connect(host, port, user, password):
             signal.signal(signal.SIGWINCH, sigwinch_passthrough)
             size = getwinsize()
             foo.setwinsize(size[0], size[1])
-            print "\033[32;1mLogin %s success!\033[0m" % host
             foo.interact()
             break
         elif index == 0:
@@ -259,19 +258,26 @@ def exec_cmd_servers(username):
 
 
 def connect_one(username, option):
-    ip = option.strip()
+    ip_input = option.strip()
     ip_all, ip_all_dict = ip_all_select(username)
-    ip_matched = match_ip(ip_all, ip)
+    ip_matched = match_ip(ip_all, ip_input)
     ip_len = len(ip_matched)
-    if ip_len == 1:
-        ip = ip_matched[0]
-        password = jm.decrypt(sth_select(username=username))
-        port = sth_select(ip=ip)
-        print "Connecting %s ..." % ip
-        connect(ip, port, username, password)
-    elif ip_len > 1:
-        for ip in ip_matched:
-            print ip
+    ip = ''
+    if ip_len >= 1:
+        if ip_len == 1:
+            ip = ip_matched[0]
+        else:
+            for one_ip in ip_matched:
+                if one_ip.endswith(ip_input):
+                    ip = one_ip
+                    break
+                else:
+                    print one_ip
+        if ip:
+            password = jm.decrypt(sth_select(username=username))
+            port = sth_select(ip=ip_input)
+            print "Connecting %s ..." % ip
+            connect(ip, port, username, password)
     else:
         print '\033[31mNo permision .\033[0m'
 

@@ -18,6 +18,7 @@ import crypt
 import hashlib
 from UserManage.forms import UserAddForm, GroupAddForm
 import paramiko
+from django.core.servers.basehttp import FileWrapper
 
 
 base_dir = "/opt/jumpserver/"
@@ -940,11 +941,9 @@ def downFile(request):
         sftp = paramiko.SFTPClient.from_transport(t)
         sftp.get(path, download_file)
         if os.path.isfile(download_file):
-            f = open(download_file)
-            data = f.read()
-            f.close()
+            wrapper = FileWrapper(open(download_file))
 
-            response = HttpResponse(data, mimetype='application/octet-stream')
+            response = HttpResponse(wrapper, mimetype='application/octet-stream')
             response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(path)
             return response
 
