@@ -109,7 +109,7 @@ def connect(host, port, user, password):
         os.mkdir(log_dir)
     logfile = open("%s/%s_%s_%s" % (log_dir, host, time.strftime('%Y%m%d'), user), 'a')
     logfile.write('\n\n%s\n\n' % time.strftime('%Y%m%d_%H%M%S'))
-    cmd = 'ssh -p %s %s@%s' % (port, user, host)
+    cmd = 'ssh -q -p %s %s@%s' % (port, user, host)
     global foo
     foo = pexpect.spawn('/bin/bash', ['-c', cmd])
     foo.logfile = logfile
@@ -267,15 +267,14 @@ def connect_one(username, option):
         if ip_len == 1:
             ip = ip_matched[0]
         else:
-            for one_ip in ip_matched:
-                if one_ip.endswith(ip_input):
-                    ip = one_ip
-                    break
-                else:
+            if ip_input in ip_matched:
+                ip = ip_input
+            else:
+                for one_ip in ip_matched:
                     print one_ip
         if ip:
             password = jm.decrypt(sth_select(username=username))
-            port = sth_select(ip=ip_input)
+            port = sth_select(ip=ip)
             print "Connecting %s ..." % ip
             connect(ip, port, username, password)
     else:
