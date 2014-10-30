@@ -105,9 +105,10 @@ def run_cmd(cmd):
 
 def connect(host, port, user, password):
     """Use pexpect module to connect other server."""
-    if not os.path.isdir(log_dir):
-        os.mkdir(log_dir)
-    logfile = open("%s/%s_%s_%s" % (log_dir, host, time.strftime('%Y%m%d'), user), 'a')
+    log_date_dir = '%s/%s' % (log_dir, time.strftime('%Y%m%d'))
+    if not os.path.isdir(log_date_dir):
+        os.mkdir(log_date_dir)
+    logfile = open("%s/%s_%s" % (log_date_dir, host, user), 'a')
     logfile.write('\n\n%s\n\n' % time.strftime('%Y%m%d_%H%M%S'))
     cmd = 'ssh -q -p %s %s@%s' % (port, user, host)
     global foo
