@@ -62,7 +62,10 @@ class PyCrypt(object):
 def sigwinch_passthrough(sig, data):
     """This function use to set the window size of the terminal!"""
     winsize = getwinsize()
-    foo.setwinsize(winsize[0], winsize[1])
+    try:
+        foo.setwinsize(winsize[0], winsize[1])
+    except:
+        pass
 
 
 def getwinsize():
@@ -70,7 +73,7 @@ def getwinsize():
     if 'TIOCGWINSZ' in dir(termios):
         TIOCGWINSZ = termios.TIOCGWINSZ
     else:
-        TIOCGWINSZ = 1074295912L # Assume
+        TIOCGWINSZ = 1074295912L  # Assume
     s = struct.pack('HHHH', 0, 0, 0, 0)
     x = fcntl.ioctl(sys.stdout.fileno(), TIOCGWINSZ, s)
     return struct.unpack('HHHH', x)[0:2]
@@ -118,11 +121,9 @@ def connect(host, port, user, password):
         foo.logfile = logfile
         foo.sendline('')
         signal.signal(signal.SIGWINCH, sigwinch_passthrough)
-        size = getwinsize()
-        foo.setwinsize(size[0], size[1])
-        foo.interact()
+        foo.interact(escape_character=chr(28))
     except pxssh.ExceptionPxssh as e:
-        print('密码错误: %s' % e)
+        print('登录失败: %s' % e)
     except KeyboardInterrupt:
         foo.logout()
 
