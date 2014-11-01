@@ -19,7 +19,7 @@ import paramiko
 import pxssh
 
 cur_dir = os.path.dirname(__file__)
-sys.path.append('%s/webroot/AutoSA/' % cur_dir)
+sys.path.append('%s/webroot/AutoSa/' % cur_dir)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'AutoSa.settings'
 
 from UserManage.models import User
@@ -33,7 +33,7 @@ db_port = cf.getint('db', 'port')
 db_user = cf.get('db', 'user')
 db_password = cf.get('db', 'password')
 db_db = cf.get('db', 'db')
-log_dir = cf.get('jumpserver', 'log_dir')
+log_dir = os.path.join(cur_dir, 'logs')
 user_table = cf.get('jumpserver', 'user_table')
 assets_table = cf.get('jumpserver', 'assets_table')
 assets_user_table = cf.get('jumpserver', 'assets_user_table')

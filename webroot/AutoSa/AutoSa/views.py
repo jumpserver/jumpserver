@@ -19,11 +19,11 @@ import hashlib
 from UserManage.forms import UserAddForm, GroupAddForm
 import paramiko
 from django.core.servers.basehttp import FileWrapper
+from AutoSa.settings import CONF_DIR
 
 
-base_dir = "/opt/jumpserver/"
 cf = ConfigParser.ConfigParser()
-cf.read('%s/jumpserver.conf' % base_dir)
+cf.read('%s/jumpserver.conf' % CONF_DIR)
 
 key = cf.get('jumpserver', 'key')
 rsa_dir = cf.get('jumpserver', 'rsa_dir')
