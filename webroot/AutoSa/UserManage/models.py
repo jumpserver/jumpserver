@@ -23,3 +23,16 @@ class User(models.Model):
         return self.username
 
 
+class Logs(models.Model):
+    user = models.CharField(max_length=50)
+    host = models.CharField(max_length=20)
+    logfile = models.CharField(max_length=1000)
+    finish = models.SmallIntegerField(max_length=4)
+    start_time = models.IntegerField()
+    end_time = models.IntegerField()
+
+    def __unicode__(self):
+        return self.logfile
+
+
+

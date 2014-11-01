@@ -1,11 +1,14 @@
 #!/usr/bin/python
 # coding: utf-8
 
+cur_dir = os.path.dirname(__file__)
+sys.path.append('%s/webroot/AutoSA/' % cur_dir)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'AutoSa.settings'
+
 import os
 import sys
 import subprocess
 import MySQLdb
-import pexpect
 import struct
 import fcntl
 import termios
@@ -17,10 +20,11 @@ from binascii import b2a_hex, a2b_hex
 import ConfigParser
 import paramiko
 import pxssh
+from UserManage.models import User
 
-base_dir = "/opt/jumpserver/"
+
 cf = ConfigParser.ConfigParser()
-cf.read('%s/jumpserver.conf' % base_dir)
+cf.read('%s/jumpserver.conf' % cur_dir)
 
 db_host = cf.get('db', 'host')
 db_port = cf.getint('db', 'port')
@@ -32,6 +36,8 @@ user_table = cf.get('jumpserver', 'user_table')
 assets_table = cf.get('jumpserver', 'assets_table')
 assets_user_table = cf.get('jumpserver', 'assets_user_table')
 key = cf.get('jumpserver', 'key')
+
+
 
 
 class PyCrypt(object):
@@ -112,8 +118,11 @@ def connect(host, port, user, password):
     log_date_dir = '%s/%s' % (log_dir, time.strftime('%Y%m%d'))
     if not os.path.isdir(log_date_dir):
         os.mkdir(log_date_dir)
-    logfile = open("%s/%s_%s" % (log_date_dir, host, user), 'a')
-    logfile.write('\n\n%s\n\n' % time.strftime('%Y%m%d_%H%M%S'))
+    logfile = open("%s/%s_%s_%s" % (log_date_dir, host, user, time.strftime('%Y%m%d%H%M%S')), 'a')
+    db, cursor = connect_db(db_user, db_password, db_db, db_host, db_port)
+    cursor.execute('insert into logs (Fuser, Fhost, Flogfile, Fstart_time)  value (%s, %s, %s, UNIX_TIMESTAMP())'
+                   % (user, host, logfile))
+    logfile.write('\n%s\n' % time.strftime('%Y/%m/%d %H:%M:%S'))
     try:
         global foo
         foo = pxssh.pxssh()
@@ -122,10 +131,13 @@ def connect(host, port, user, password):
         foo.sendline('')
         signal.signal(signal.SIGWINCH, sigwinch_passthrough)
         foo.interact(escape_character=chr(28))
+        cursor.execute('update logs set Ffindsh=True, Fend_time=UNIX_TIMESTAMP() where Flogfile=%s' % logfile)
     except pxssh.ExceptionPxssh as e:
         print('登录失败: %s' % e)
+        cursor.execute('update logs set Ffindsh=2  where Flogfile=%s' % logfile)
     except KeyboardInterrupt:
         foo.logout()
+        cursor.execute('update logs set Ffindsh=True, Fend_time=UNIX_TIMESTAMP() where Flogfile=%s ' % logfile)
 
 
 def ip_all_select(username):

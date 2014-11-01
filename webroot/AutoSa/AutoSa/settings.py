@@ -12,16 +12,16 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 import ConfigParser
 
-base_dir = "/opt/jumpserver/"
-cf = ConfigParser.ConfigParser()
-cf.read('%s/jumpserver.conf' % base_dir)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+CONF_DIR = os.path.dirname(os.path.dirname(BASE_DIR))
+CF = ConfigParser.ConfigParser()
+CF.read('%s/jumpserver.conf' % CONF_DIR)
 
-db_host = cf.get('db', 'host')
-db_port = cf.getint('db', 'port')
-db_user = cf.get('db', 'user')
-db_password = cf.get('db', 'password')
-db_db = cf.get('db', 'db')
+DB_HOST = CF.get('db', 'host')
+DB_PORT = CF.getint('db', 'port')
+DB_USER = CF.get('db', 'user')
+DB_PASSWORD = CF.get('db', 'password')
+DB_DB = CF.get('db', 'db')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
@@ -71,11 +71,11 @@ WSGI_APPLICATION = 'AutoSa.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': db_db,
-        'USER': db_user,
-        'PASSWORD': db_password,
-        'HOST': db_host,
-        'PORT': db_port,
+        'NAME': DB_DB,
+        'USER': DB_USER,
+        'PASSWORD': DB_PASSWORD,
+        'HOST': DB_HOST,
+        'PORT': DB_PORT,
     }
 }
 
