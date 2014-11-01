@@ -1,9 +1,6 @@
 #!/usr/bin/python
 # coding: utf-8
 
-cur_dir = os.path.dirname(__file__)
-sys.path.append('%s/webroot/AutoSA/' % cur_dir)
-os.environ['DJANGO_SETTINGS_MODULE'] = 'AutoSa.settings'
 
 import os
 import sys
@@ -20,6 +17,11 @@ from binascii import b2a_hex, a2b_hex
 import ConfigParser
 import paramiko
 import pxssh
+
+cur_dir = os.path.dirname(__file__)
+sys.path.append('%s/webroot/AutoSA/' % cur_dir)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'AutoSa.settings'
+
 from UserManage.models import User
 
 
