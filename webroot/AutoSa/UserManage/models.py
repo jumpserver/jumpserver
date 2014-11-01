@@ -27,7 +27,7 @@ class Logs(models.Model):
     user = models.CharField(max_length=50)
     host = models.CharField(max_length=20)
     logfile = models.CharField(max_length=1000)
-    finish = models.SmallIntegerField(max_length=4)
+    finish = models.SmallIntegerField(max_length=4, default=0)
     start_time = models.IntegerField()
     end_time = models.IntegerField()
 

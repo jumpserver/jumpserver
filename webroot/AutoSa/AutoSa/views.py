@@ -26,7 +26,7 @@ cf = ConfigParser.ConfigParser()
 cf.read('%s/jumpserver.conf' % CONF_DIR)
 
 key = cf.get('jumpserver', 'key')
-rsa_dir = cf.get('jumpserver', 'rsa_dir')
+rsa_dir = os.path.join(CONF_DIR, 'keys')
 ldap_host = cf.get('jumpserver', 'ldap_host')
 ldap_base_dn = cf.get('jumpserver', 'ldap_base_dn')
 admin_cn = cf.get('jumpserver', 'admin_cn')
