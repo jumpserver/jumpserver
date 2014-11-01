@@ -247,7 +247,7 @@ def exec_cmd_servers(username):
         ip_all, ip_all_dict = ip_all_select(username)
         no_perm = set(hosts)-set(ip_all)
         if no_perm:
-            print "You have no permission on %s." % list(no_perm)
+            print "You have NO PERMISSION on %s..." % list(no_perm)
             continue
         print '\nInput the \033[32mCommand\033[0m , The command will be Execute on servers, q/Q to quit.\n'
         while True:
@@ -288,7 +288,11 @@ if __name__ == '__main__':
     print_prompt()
     try:
         while True:
-            option = raw_input("\033[1;32mOpt or IP>:\033[0m ")
+            try:
+                option = raw_input("\033[1;32mOpt or IP>:\033[0m ")
+            except EOFError:
+                print
+                continue
             if option in ['P', 'p']:
                 print_your_server(username)
                 continue
