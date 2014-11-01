@@ -16,6 +16,7 @@ from Crypto.Cipher import AES
 from binascii import b2a_hex, a2b_hex
 import ConfigParser
 import paramiko
+import pxssh
 
 base_dir = "/opt/jumpserver/"
 cf = ConfigParser.ConfigParser()
@@ -61,7 +62,10 @@ class PyCrypt(object):
 def sigwinch_passthrough(sig, data):
     """This function use to set the window size of the terminal!"""
     winsize = getwinsize()
-    foo.setwinsize(winsize[0], winsize[1])
+    try:
+        foo.setwinsize(winsize[0], winsize[1])
+    except:
+        pass
 
 
 def getwinsize():
@@ -69,7 +73,7 @@ def getwinsize():
     if 'TIOCGWINSZ' in dir(termios):
         TIOCGWINSZ = termios.TIOCGWINSZ
     else:
-        TIOCGWINSZ = 1074295912L # Assume
+        TIOCGWINSZ = 1074295912L  # Assume
     s = struct.pack('HHHH', 0, 0, 0, 0)
     x = fcntl.ioctl(sys.stdout.fileno(), TIOCGWINSZ, s)
     return struct.unpack('HHHH', x)[0:2]
@@ -110,38 +114,18 @@ def connect(host, port, user, password):
         os.mkdir(log_date_dir)
     logfile = open("%s/%s_%s" % (log_date_dir, host, user), 'a')
     logfile.write('\n\n%s\n\n' % time.strftime('%Y%m%d_%H%M%S'))
-    cmd = 'ssh -q -p %s %s@%s' % (port, user, host)
-    global foo
-    foo = pexpect.spawn('/bin/bash', ['-c', cmd])
-    foo.logfile = logfile
-    while True:
-        index = foo.expect(['continue',
-                            'assword',
-                            pexpect.EOF,
-                            pexpect.TIMEOUT], timeout=3)
-        if index == 0:
-            foo.sendline('yes')
-            continue
-        elif index == 1:
-            foo.sendline(password)
-
-        index = foo.expect(['assword',
-                            '.*',
-                            pexpect.EOF,
-                            pexpect.TIMEOUT], timeout=3)
-        if index == 1:
-            signal.signal(signal.SIGWINCH, sigwinch_passthrough)
-            size = getwinsize()
-            foo.setwinsize(size[0], size[1])
-            foo.interact()
-            break
-        elif index == 0:
-            print "Password error."
-            break
-        else:
-            print "Login failed, please contact system administrator!"
-            break
-    foo.terminate(force=True)
+    try:
+        global foo
+        foo = pxssh.pxssh()
+        foo.login(host, user, password, port=port, auto_prompt_reset=False)
+        foo.logfile = logfile
+        foo.sendline('')
+        signal.signal(signal.SIGWINCH, sigwinch_passthrough)
+        foo.interact(escape_character=chr(28))
+    except pxssh.ExceptionPxssh as e:
+        print('登录失败: %s' % e)
+    except KeyboardInterrupt:
+        foo.logout()
 
 
 def ip_all_select(username):
