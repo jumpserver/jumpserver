@@ -124,19 +124,22 @@ def connect(host, port, user, password):
     logtime_start = time.strftime('%Y/%m/%d %H:%M:%S', structtime_start)
     timestamp_start = int(time.mktime(structtime_start))
     logfile_name = "%s/%s_%s_%s" % (log_date_dir, host, user, datetime_start)
-    logfile = open(logfile_name, 'a')
-    log = Logs(user=user, host=host, logfile=logfile_name, start_time=timestamp_start)
-    log.save()
-    logfile.write('\n%s\n' % logtime_start)
+
     try:
         global foo
         foo = pxssh.pxssh()
         foo.login(host, user, password, port=port, auto_prompt_reset=False)
+        log = Logs(user=user, host=host, logfile=logfile_name, start_time=timestamp_start)  # 日志信息记录到数据库
+        log.save()
+        pid = Pid(ppid=os.getpid(), cpid=foo.pid)
+        pid.save()
+
+        logfile = open(logfile_name, 'a')  # 记录日志文件
+        logfile.write('\n%s\n' % logtime_start)
         foo.logfile = logfile
         foo.sendline('')
         signal.signal(signal.SIGWINCH, sigwinch_passthrough)
-        pid = Pid(pid=os.getpid())
-        pid.save()
+
         foo.interact(escape_character=chr(28))
         logfile.write('\n%s' % time.strftime('%Y/%m/%d %H:%M:%S'))
         log.finish = 1
@@ -144,8 +147,6 @@ def connect(host, port, user, password):
         log.save()
     except pxssh.ExceptionPxssh as e:
         print('登录失败: %s' % e)
-        log.finish = 2
-        log.save()
     except KeyboardInterrupt:
         foo.logout()
         log.finish = 1

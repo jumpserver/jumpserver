@@ -36,7 +36,10 @@ class Logs(models.Model):
 
 
 class Pid(models.Model):
-    pid = models.IntegerField()
-
-
+    """
+    ppid : parent pid
+    cpid: child pid
+    """
+    ppid = models.IntegerField()
+    cpid = models.IntegerField()
 
