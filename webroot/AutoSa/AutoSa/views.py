@@ -4,7 +4,7 @@ from django.http import HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
-from UserManage.models import User, Group
+from UserManage.models import User, Group, Logs, Pid
 from Assets.models import Assets, AssetsUser
 import subprocess
 from Crypto.Cipher import AES
@@ -20,6 +20,8 @@ from UserManage.forms import UserAddForm, GroupAddForm
 import paramiko
 from django.core.servers.basehttp import FileWrapper
 from AutoSa.settings import CONF_DIR
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
+import time, datetime
 
 
 cf = ConfigParser.ConfigParser()
@@ -285,7 +287,7 @@ def downKey(request):
     elif request.session.get('admin') == 2:
         username = request.GET.get('username')
 
-    filename = '%s/keys/%s' % (base_dir, username)
+    filename = '%s/%s' % (rsa_dir, username)
     f = open(filename)
     data = f.read()
     f.close()
@@ -871,7 +873,7 @@ def chgKey(request):
         if error:
             return render_to_response('info.html', {'error': error})
 
-        keyfile = '%s/keys/%s' % (base_dir, username)
+        keyfile = '%s/%s' % (rsa_dir, username)
         jm = PyCrypt(key)
         ret = bash('ssh-keygen -p -P %s -N %s -f %s' % (jm.decrypt(user.key_pass), password, keyfile))
         if ret != 0:
@@ -947,8 +949,41 @@ def downFile(request):
             response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(path)
             return response
 
-
-
     return render_to_response('downFile.html',
                               {'username': username},
                               context_instance=RequestContext(request))
+
+
+@admin_required
+def logView(request):
+    thirtyDayAgo = (datetime.datetime.now() - datetime.timedelta(30))
+    thirtyDayAgoStamp = int(thirtyDayAgo.timetuple())
+    logs_all = Logs.objects.filter(start_time__gt=thirtyDayAgoStamp)
+    paginator = Paginator(logs_all, 20)
+
+    try:
+        page = int(request.GET.get('page', 1))
+    except ValueError:
+        page = 1
+
+    try:
+        logs = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        logs = paginator.page(paginator.num_pages)
+
+    return render_to_response('logView.html',
+                              {'logs': logs},
+                              context_instance=RequestContext(request))
+
+
+
+
+
+
+
+
+
+
+
+
+

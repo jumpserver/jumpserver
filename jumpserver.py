@@ -129,19 +129,19 @@ def connect(host, port, user, password):
         global foo
         foo = pxssh.pxssh()
         foo.login(host, user, password, port=port, auto_prompt_reset=False)
-        log = Logs(user=user, host=host, logfile=logfile_name, start_time=timestamp_start)  # 日志信息记录到数据库
+        log = Logs(user=user, host=host, logfile=logfile_name, start_time=timestamp_start, ppid=os.getpid())  # 日志信息记录到数据库
         log.save()
         pid = Pid(ppid=os.getpid(), cpid=foo.pid)
         pid.save()
 
         logfile = open(logfile_name, 'a')  # 记录日志文件
-        logfile.write('\n%s\n' % logtime_start)
+        logfile.write('\nDateTime:%s' % logtime_start)
         foo.logfile = logfile
         foo.sendline('')
         signal.signal(signal.SIGWINCH, sigwinch_passthrough)
 
-        foo.interact(escape_character=chr(28))
-        logfile.write('\n%s' % time.strftime('%Y/%m/%d %H:%M:%S'))
+        foo.interact(escape_character=chr(28))  # 进入交互模式
+        logfile.write('\nEndTime: %s' % time.strftime('%Y/%m/%d %H:%M:%S'))
         log.finish = 1
         log.end_time = int(time.time())
         log.save()
