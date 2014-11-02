@@ -957,7 +957,7 @@ def downFile(request):
 @admin_required
 def logView(request):
     thirtyDayAgo = (datetime.datetime.now() - datetime.timedelta(30))
-    thirtyDayAgoStamp = int(thirtyDayAgo.timetuple())
+    thirtyDayAgoStamp = int(time.mktime(thirtyDayAgo.timetuple()))
     logs_all = Logs.objects.filter(start_time__gt=thirtyDayAgoStamp)
     paginator = Paginator(logs_all, 20)
 

@@ -4,7 +4,7 @@ from django import template
 register = template.Library
 
 
-@register.filter('stamp2str')
+@register.filter(name='stamp2str')
 def stamp2str(value):
     try:
         return time.strftime('%Y/%m/%d %H:%M:%S',time.localtime(value))
