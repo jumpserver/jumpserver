@@ -1,7 +1,7 @@
 import time
 from django import template
 
-register = template.Library
+register = template.Library()
 
 
 @register.filter(name='stamp2str')
