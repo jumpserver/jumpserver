@@ -31,4 +31,5 @@ urlpatterns = patterns('',
     (r'^chgKey/$', views.chgKey),
     (r'^upFile/$', views.upFile),
     (r'^downFile/$', views.downFile),
+    (r'^logView/$', views.logView),
 )
