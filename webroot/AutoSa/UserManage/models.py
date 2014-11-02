@@ -35,4 +35,8 @@ class Logs(models.Model):
         return self.logfile
 
 
+class Pid(models.Model):
+    pid = models.IntegerField()
+
+
 

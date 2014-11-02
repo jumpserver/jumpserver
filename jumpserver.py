@@ -22,7 +22,7 @@ cur_dir = os.path.dirname(__file__)
 sys.path.append('%s/webroot/AutoSa/' % cur_dir)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'AutoSa.settings'
 
-from UserManage.models import User, Logs
+from UserManage.models import User, Logs, Pid
 from Assets.models import Assets
 
 
@@ -123,7 +123,6 @@ def connect(host, port, user, password):
     datetime_start = time.strftime('%Y%m%d%H%M%S', structtime_start)
     logtime_start = time.strftime('%Y/%m/%d %H:%M:%S', structtime_start)
     timestamp_start = int(time.mktime(structtime_start))
-
     logfile_name = "%s/%s_%s_%s" % (log_date_dir, host, user, datetime_start)
     logfile = open(logfile_name, 'a')
     log = Logs(user=user, host=host, logfile=logfile_name, start_time=timestamp_start)
@@ -136,6 +135,8 @@ def connect(host, port, user, password):
         foo.logfile = logfile
         foo.sendline('')
         signal.signal(signal.SIGWINCH, sigwinch_passthrough)
+        pid = Pid(pid=os.getpid())
+        pid.save()
         foo.interact(escape_character=chr(28))
         logfile.write('\n%s' % time.strftime('%Y/%m/%d %H:%M:%S'))
         log.finish = 1
