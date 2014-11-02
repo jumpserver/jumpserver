@@ -22,7 +22,8 @@ cur_dir = os.path.dirname(__file__)
 sys.path.append('%s/webroot/AutoSa/' % cur_dir)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'AutoSa.settings'
 
-from UserManage.models import User, Logs, Assets
+from UserManage.models import User, Logs
+from Assets.models import Assets
 
 
 cf = ConfigParser.ConfigParser()
@@ -85,16 +86,16 @@ def getwinsize():
     return struct.unpack('HHHH', x)[0:2]
 
 
-def connect_db(user, passwd, db, host='127.0.0.1', port=3306):
-    """This function connect db and return db and cursor"""
-    db = MySQLdb.connect(host=host,
-                         port=port,
-                         user=user,
-                         passwd=passwd,
-                         db=db,
-                         charset='utf8')
-    cursor = db.cursor()
-    return db, cursor
+# def connect_db(user, passwd, db, host='127.0.0.1', port=3306):
+#     """This function connect db and return db and cursor"""
+#     db = MySQLdb.connect(host=host,
+#                          port=port,
+#                          user=user,
+#                          passwd=passwd,
+#                          db=db,
+#                          charset='utf8')
+#     cursor = db.cursor()
+#     return db, cursor
 
 
 def run_cmd(cmd):
@@ -168,8 +169,8 @@ def sth_select(username='', ip=''):
     """if username: return password elif ip return port"""
     if username:
         user = User.objects.get(username=username)
-        password = user.password
-        return password
+        ldap_password = user.ldap_password
+        return ldap_password
 
     if ip:
         asset = Assets.objects.get(ip=ip)
