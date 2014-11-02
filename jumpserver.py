@@ -22,7 +22,7 @@ cur_dir = os.path.dirname(__file__)
 sys.path.append('%s/webroot/AutoSa/' % cur_dir)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'AutoSa.settings'
 
-from UserManage.models import User,Logs
+from UserManage.models import User, Logs, Assets
 
 
 cf = ConfigParser.ConfigParser()
@@ -118,16 +118,16 @@ def connect(host, port, user, password):
     log_date_dir = '%s/%s' % (log_dir, time.strftime('%Y%m%d'))
     if not os.path.isdir(log_date_dir):
         os.mkdir(log_date_dir)
-    structtime_now = time.localtime()
-    datetime_now = time.strftime('%Y%m%d%H%M%S', structtime_now)
-    logtime_now = time.strftime('%Y/%m/%d %H:%M:%S', structtime_now)
-    timestamp_now = int(time.mktime(structtime_now))
+    structtime_start = time.localtime()
+    datetime_start = time.strftime('%Y%m%d%H%M%S', structtime_start)
+    logtime_start = time.strftime('%Y/%m/%d %H:%M:%S', structtime_start)
+    timestamp_start = int(time.mktime(structtime_start))
 
-    logfile_name = "%s/%s_%s_%s" % (log_date_dir, host, user, datetime_now)
+    logfile_name = "%s/%s_%s_%s" % (log_date_dir, host, user, datetime_start)
     logfile = open(logfile_name, 'a')
-    log = Logs(user=user, host=host, logfile=logfile_name, start_time=timestamp_now)
+    log = Logs(user=user, host=host, logfile=logfile_name, start_time=timestamp_start)
     log.save()
-    logfile.write('\n%s\n' % logtime_now)
+    logfile.write('\n%s\n' % logtime_start)
     try:
         global foo
         foo = pxssh.pxssh()
@@ -136,6 +136,7 @@ def connect(host, port, user, password):
         foo.sendline('')
         signal.signal(signal.SIGWINCH, sigwinch_passthrough)
         foo.interact(escape_character=chr(28))
+        logfile.write('\n%s' % time.strftime('%Y/%m/%d %H:%M:%S'))
         log.finish = 1
         log.end_time = int(time.time())
         log.save()
@@ -154,36 +155,25 @@ def ip_all_select(username):
     """select all the server of the user can control."""
     ip_all = []
     ip_all_dict = {}
-    db, cursor = connect_db(db_user, db_password, db_db, db_host, db_port)
-    cursor.execute('select t2.ip, t2.comment from %s t1, %s t2, %s t3 where t1.username="%s" and t1.id=t3.uid_id and t2.id = t3.aid_id;' %
-                   (user_table, assets_table, assets_user_table, username))
-    ip_all_record = cursor.fetchall()
-    if ip_all_record:
-        for record in ip_all_record:
-            ip_all.append(record[0])
-            ip_all_dict[record[0]] = record[1]
-    db.close()
+    user = User.objects.get(username=username)
+    all_assets_user = user.assetsuser_set.all()
+    for assets_user in all_assets_user:
+        ip_all.append(assets_user.aid.ip)
+        ip_all_dict[assets_user.aid.ip] = assets_user.aid.comment
+
     return ip_all, ip_all_dict
 
 
 def sth_select(username='', ip=''):
     """if username: return password elif ip return port"""
-    db, cursor = connect_db(db_user, db_password, db_db, db_host, db_port)
     if username:
-        cursor.execute('select ldap_password from %s where username="%s"' % (user_table, username))
-        try:
-            password = cursor.fetchone()[0]
-        except IndexError:
-            password = ''
-        db.close()
+        user = User.objects.get(username=username)
+        password = user.password
         return password
+
     if ip:
-        cursor.execute('select port from %s where ip="%s"' % (assets_table, ip))
-        try:
-            port = int(cursor.fetchone()[0])
-        except IndexError:
-            port = 22
-        db.close()
+        asset = Assets.objects.get(ip=ip)
+        port = asset.port
         return port
     return None
 

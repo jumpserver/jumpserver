@@ -29,7 +29,7 @@ class Logs(models.Model):
     logfile = models.CharField(max_length=1000)
     finish = models.SmallIntegerField(max_length=4, default=0)
     start_time = models.IntegerField()
-    end_time = models.IntegerField()
+    end_time = models.IntegerField(default=0)
 
     def __unicode__(self):
         return self.logfile
