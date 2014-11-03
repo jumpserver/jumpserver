@@ -43,4 +43,6 @@ class Pid(models.Model):
     """
     ppid = models.IntegerField()
     cpid = models.IntegerField()
+    logid = models.IntegerField()
+    start_time = models.IntegerField()
 

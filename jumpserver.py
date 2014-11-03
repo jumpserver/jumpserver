@@ -5,7 +5,6 @@
 import os
 import sys
 import subprocess
-import MySQLdb
 import struct
 import fcntl
 import termios
@@ -17,6 +16,7 @@ from binascii import b2a_hex, a2b_hex
 import ConfigParser
 import paramiko
 import pxssh
+import pexpect
 
 cur_dir = os.path.dirname(__file__)
 sys.path.append('%s/webroot/AutoSa/' % cur_dir)
@@ -131,7 +131,7 @@ def connect(host, port, user, password):
         foo.login(host, user, password, port=port, auto_prompt_reset=False)
         log = Logs(user=user, host=host, logfile=logfile_name, start_time=timestamp_start, ppid=os.getpid())  # 日志信息记录到数据库
         log.save()
-        pid = Pid(ppid=os.getpid(), cpid=foo.pid)
+        pid = Pid(ppid=os.getpid(), cpid=foo.pid, start_time=timestamp_start, logid=log.id)
         pid.save()
 
         logfile = open(logfile_name, 'a')  # 记录日志文件
@@ -145,8 +145,11 @@ def connect(host, port, user, password):
         log.finish = 1
         log.end_time = int(time.time())
         log.save()
+
     except pxssh.ExceptionPxssh as e:
         print('登录失败: %s' % e)
+    except pexpect.EOF:
+        print('登录失败: Host refuse')
     except KeyboardInterrupt:
         foo.logout()
         log.finish = 1
