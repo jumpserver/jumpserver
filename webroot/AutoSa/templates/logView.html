@@ -7,7 +7,6 @@
         <thead>
             <tr>
                 <th><input onclick="selectAll()" type="checkbox"  name="select_all" style="select_all" id="select_all"/></th>
-                <th>id</th>
                 <th>用户名</th>
                 <th>主机</th>
                 <th>监控</th>
@@ -36,16 +35,16 @@
     </form>
         <nav>
           <ul class="pager">
-            {% if contacts.has_previous %}
-            <li><a href="?page={{ contacts.previous_page_number }}">上一页</a></li>
+            {% if logs.has_previous %}
+            <li><a href="?page={{ logs.previous_page_number }}">上一页</a></li>
             {% endif %}
 
             <span class="current">
-             Page {{ contacts.number }} of {{ contacts.paginator.num_pages }}.
+             Page {{ logs.number }} of {{ logs.paginator.num_pages }}.
             </span>
 
-            {% if contacts.has_next %}
-            <li><a href="?page={{ contacts.next_page_number }}">下一页</a></li>
+            {% if logs.has_next %}
+            <li><a href="?page={{ logs.next_page_number }}">下一页</a></li>
             {% endif %}
           </ul>
         </nav>
