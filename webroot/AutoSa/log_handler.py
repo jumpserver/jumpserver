@@ -48,16 +48,22 @@ def pid_exist(pid):
         return False
 
 
+def del_pid(pid_id):
+    pid = Pid.objects.filter(id=pid_id)
+    if pid:
+        pid[0].delete()
+
+
 def get_pids():
     pids = []
     pids_obj = Pid.objects.all()
     for pid_obj in pids_obj:
-        pids.append((pid_obj.ppid, pid_obj.cpid, pid_obj.logid, pid_obj.start_time))
+        pids.append((pid_obj.id, pid_obj.ppid, pid_obj.cpid, pid_obj.logid, pid_obj.start_time))
     return pids
 
 
 def run():
-    for ppid, cpid, logid, start_time in get_pids():
+    for pid_id, ppid, cpid, logid, start_time in get_pids():
         if pid_exist(cpid):
             if pid_exist(ppid):
                 structtime_start = time.localtime()
@@ -65,13 +71,16 @@ def run():
                 if timestamp_end - start_time > 7200:
                     kill_pid(ppid)
                     kill_pid(cpid)
+                    del_pid(pid_id)
                     set_finish(logid)
                     log_hanler(logid)
             else:
                 kill_pid(cpid)
+                del_pid(pid_id)
                 set_finish(logid)
                 log_hanler(logid)
         else:
+            del_pid(pid_id)
             set_finish(logid)
             log_hanler(logid)
 
