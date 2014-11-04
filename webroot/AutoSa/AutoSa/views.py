@@ -1011,7 +1011,6 @@ def echo(request):
     request.websocket.send(message)
 
 
-
 @accept_websocket
 def lower_case(request):
     f = open('/tmp/websocket.log')
@@ -1019,6 +1018,10 @@ def lower_case(request):
         message = f.read()
         request.websocket.send(message)
         time.sleep(5)
+
+
+def test_websocket(request):
+    return HttpResponse('websocket.html')
 
 
 

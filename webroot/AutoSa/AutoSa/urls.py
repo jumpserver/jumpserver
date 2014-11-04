@@ -36,4 +36,5 @@ urlpatterns = patterns('',
     (r'^killSession/$', views.killSession),
     (r'^echo/$', views.echo),
     (r'^low_case/$', views.low_case),
+    (r'^test_websocket/$', view.test_websocket),
 )
