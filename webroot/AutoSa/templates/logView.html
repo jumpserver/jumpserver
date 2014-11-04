@@ -33,7 +33,7 @@
         </table>
         <script >
            $('.log_command').on('click',function(){
-               var url = this.attr('href');
+               var url = $(this).attr('href');
                 $.ajax({url:url,success:function(data){
                 BootstrapDialog.show({title:'命令统计',message:data});
                 }});
