@@ -33,4 +33,5 @@ urlpatterns = patterns('',
     (r'^downFile/$', views.downFile),
     (r'^logView/$', views.logView),
     (r'^logHistory/$', views.logHistory),
+    (r'^killSession/$', views.killSession),
 )

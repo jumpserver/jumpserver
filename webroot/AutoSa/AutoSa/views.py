@@ -990,6 +990,17 @@ def logHistory(request):
                 return HttpResponse(content)
 
 
+@admin_required
+def killSession(request):
+    if request.method == 'GET':
+        logid = request.GET.get('id', 0)
+        pid = Pid.objects.filter(logid=logid)
+        if pid:
+            pid = pid[0]
+            os.kill(pid.cpid, 9)
+
+
+
 
 
 
