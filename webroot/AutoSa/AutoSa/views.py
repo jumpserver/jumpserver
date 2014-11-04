@@ -976,6 +976,23 @@ def logView(request):
                               context_instance=RequestContext(request))
 
 
+@admin_required
+def logHistory(request):
+    if request.method == 'GET':
+        logid = request.GET.get('id', 0)
+        log = Logs.objects.filter(id=int(logid))
+        if log:
+            log = log[0]
+            log_his = "%s.his" % log.filename
+            if os.path.isfile(log_his):
+                f = open(log_his)
+                content = f.read()
+                return render_to_response(content)
+
+
+
+
+
 
 
 

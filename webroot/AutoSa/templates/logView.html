@@ -23,7 +23,7 @@
                 <td>{{ log.user }}</td>
                 <td>{{ log.host }}</td>
                 <td><a href="#">监控</a></td>
-                <td><a href="#">命令统计</a></td>
+                <td><a href="/logHistory/?id={{ log.id }}">命令统计</a></td>
                 <td><a href="#">阻断</a> </td>
                 <td>{{ log.start_time|stamp2str }}</td>
                 <td>{{ log.end_time|stamp2str }}</td>

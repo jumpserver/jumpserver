@@ -19,6 +19,8 @@ import pxssh
 import pexpect
 
 cur_dir = os.path.dirname(__file__)
+if not cur_dir:
+    cur_dir = "./"
 sys.path.append('%s/webroot/AutoSa/' % cur_dir)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'AutoSa.settings'
 
