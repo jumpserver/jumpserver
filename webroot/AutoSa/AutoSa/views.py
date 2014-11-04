@@ -1021,7 +1021,7 @@ def lower_case(request):
 
 
 def test_websocket(request):
-    return HttpResponse('websocket.html')
+    return render_to_response('websocket.html')
 
 
 
