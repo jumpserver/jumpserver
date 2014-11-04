@@ -21,7 +21,10 @@ import paramiko
 from django.core.servers.basehttp import FileWrapper
 from AutoSa.settings import CONF_DIR
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-import time, datetime
+import time
+import datetime
+from django_websocket import require_websocket
+from django_websocket import accept_websocket
 
 
 cf = ConfigParser.ConfigParser()
@@ -999,6 +1002,23 @@ def killSession(request):
             pid = pid[0]
             os.kill(pid.cpid, 9)
             return HttpResponse('ok')
+
+
+@require_websocket
+def echo(request):
+    f = open('/tmp/websocket.log')
+    message = f.read()
+    request.websocket.send(message)
+
+
+
+@accept_websocket
+def lower_case(request):
+    f = open('/tmp/websocket.log')
+    while True:
+        message = f.read()
+        request.websocket.send(message)
+        time.sleep(5)
 
 
 
