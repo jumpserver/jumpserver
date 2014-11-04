@@ -987,7 +987,7 @@ def logHistory(request):
             if os.path.isfile(log_his):
                 f = open(log_his)
                 content = f.read()
-                return render_to_response(content)
+                return HttpResponse(content)
 
 
 
