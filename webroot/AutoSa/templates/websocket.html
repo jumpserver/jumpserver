@@ -3,17 +3,18 @@
 <title>WebSocket Test</title>
 <script language="javascript" type="text/javascript">
  // <!--var wsUri = "ws://172.10.10.9/echo/"; -->
-    var ws =  "ws://echo.websocket.org/";
+    var wsUri =  "ws://echo.websocket.org/";
     var output;
     function init() {
         output = document.getElementById("output"); testWebSocket(); }
     function testWebSocket() {
-        websocket = new WebSocket(ws);
+        websocket = new WebSocket(wsUri);
         websocket.onopen = function(evt) { onOpen(evt) };
         websocket.onclose = function(evt) { onClose(evt) };
         websocket.onmessage = function(evt) { onMessage(evt) };
-        websocket.onerror = function(evt) { onError(evt) }; }
+        websocket.onerror = function(evt) { onError(evt) };
     }
+
     function onOpen(evt) {
        writeToScreen("CONNECTED"); doSend("WebSocket rocks sssssssssssssssssssssssssss"); }
     function onClose(evt) { writeToScreen("DISCONNECTED"); }
