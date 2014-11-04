@@ -983,7 +983,7 @@ def logHistory(request):
         log = Logs.objects.filter(id=int(logid))
         if log:
             log = log[0]
-            log_his = "%s.his" % log.filename
+            log_his = "%s.his" % log.logfile
             if os.path.isfile(log_his):
                 f = open(log_his)
                 content = f.read()

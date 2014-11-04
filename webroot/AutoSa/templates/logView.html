@@ -23,7 +23,7 @@
                 <td>{{ log.user }}</td>
                 <td>{{ log.host }}</td>
                 <td><a href="#">监控</a></td>
-                <td><a href="/logHistory/?id={{ log.id }}">命令统计</a></td>
+                <td><a href="/logHistory/?id={{ log.id }}" class="log_command">命令统计</a></td>
                 <td><a href="#">阻断</a> </td>
                 <td>{{ log.start_time|stamp2str }}</td>
                 <td>{{ log.end_time|stamp2str }}</td>
@@ -31,6 +31,15 @@
             {% endfor %}
         </tbody>
         </table>
+        <script >
+           $('.log_command').on('click',function(){
+               var url = this.attr('href');
+                $.ajax({url:url,success:function(data){
+                BootstrapDialog.show({title:'命令统计',message:data});
+                }});
+               return false;
+            })
+        </script>
     <!--<button class="btn btn-primary">删除</button>-->
     </form>
         <nav>
