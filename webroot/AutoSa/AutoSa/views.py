@@ -998,7 +998,7 @@ def killSession(request):
         if pid:
             pid = pid[0]
             os.kill(pid.cpid, 9)
-
+            return HttpResponse('ok')
 
 
 
