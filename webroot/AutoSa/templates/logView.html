@@ -22,9 +22,15 @@
                 <td><input type="checkbox" name="selected" value="{{ log.id }}"></td>
                 <td>{{ log.user }}</td>
                 <td>{{ log.host }}</td>
-                <td><a href="#">监控</a></td>
+                {% if log.finish %}
+                <td>监控</td>
                 <td><a href="/logHistory/?id={{ log.id }}" class="log_command">命令统计</a></td>
+                <td>阻断</td>
+                {% else %}
+                <td><a href="#">监控</a></td>
+                <td>命令统计</td>
                 <td><a href="/killSession/?id={{ log.id }}">阻断</a> </td>
+                {% endif %}
                 <td>{{ log.start_time|stamp2str }}</td>
                 <td>{{ log.end_time|stamp2str }}</td>
             </tr>
