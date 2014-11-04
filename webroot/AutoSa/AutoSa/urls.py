@@ -34,4 +34,6 @@ urlpatterns = patterns('',
     (r'^logView/$', views.logView),
     (r'^logHistory/$', views.logHistory),
     (r'^killSession/$', views.killSession),
+    (r'^echo/$', views.echo),
+    (r'^low_case/$', views.low_case),
 )
