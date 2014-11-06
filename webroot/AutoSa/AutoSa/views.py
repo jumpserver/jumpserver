@@ -23,8 +23,6 @@ from AutoSa.settings import CONF_DIR
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 import time
 import datetime
-from django_websocket import require_websocket
-from django_websocket import accept_websocket
 
 
 cf = ConfigParser.ConfigParser()
@@ -1004,24 +1002,7 @@ def killSession(request):
             return HttpResponse('ok')
 
 
-@require_websocket
-def echo(request):
-    f = open('/tmp/websocket.log')
-    message = f.read()
-    request.websocket.send(message)
 
-
-@accept_websocket
-def lower_case(request):
-    f = open('/tmp/websocket.log')
-    while True:
-        message = f.read()
-        request.websocket.send(message)
-        time.sleep(5)
-
-
-def test_websocket(request):
-    return render_to_response('websocket.html')
 
 
 

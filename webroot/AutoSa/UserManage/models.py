@@ -14,7 +14,7 @@ class User(models.Model):
     key_pass = models.CharField(max_length=100)
     name = models.CharField(max_length=50)
     group = models.ManyToManyField(Group)
-    is_admin = models.BooleanField()
+    is_admin = models.BooleanField(default=False)
     is_superuser = models.BooleanField()
     ldap_password = models.CharField(max_length=100, null=False)
     email = models.EmailField(max_length=50, null=True, blank=True)
