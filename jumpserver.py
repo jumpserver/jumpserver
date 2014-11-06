@@ -110,6 +110,7 @@ def connect(host, port, user, password):
     """Use pexpect module to connect other server."""
     log_date_dir = '%s/%s' % (log_dir, time.strftime('%Y%m%d'))
     if not os.path.isdir(log_date_dir):
+        os.mkdir(log_date_dir)
         os.mkdir(log_date_dir, 0777)
     structtime_start = time.localtime()
     datetime_start = time.strftime('%Y%m%d%H%M%S', structtime_start)
@@ -250,11 +251,12 @@ def exec_cmd_servers(username):
                 break
             exec_log_dir = os.path.join(log_dir, 'exec_cmds')
             if not os.path.isdir(exec_log_dir):
-                os.mkdir(exec_log_dir, 0777)
-                filename = "%s/%s.log" % (exec_log_dir, time.strftime('%Y%m%d'))
-                f = open(filename, 'a')
-                f.write("DateTime: %s User: %s Host: %s Cmds: %s" %
-                        (time.strftime('%Y/%m/%d %H:%M:%S'), username, hosts, cmd))
+                os.mkdir(exec_log_dir)
+                os.chmod(exec_log_dir, 0777)
+            filename = "%s/%s.log" % (exec_log_dir, time.strftime('%Y%m%d'))
+            f = open(filename, 'a')
+            f.write("DateTime: %s User: %s Host: %s Cmds: %s\n" %
+                    (time.strftime('%Y/%m/%d %H:%M:%S'), username, hosts, cmd))
             for host in hosts:
                 remote_exec_cmd(host, username, cmd)
 
