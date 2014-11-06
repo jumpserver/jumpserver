@@ -24,6 +24,8 @@ if not cur_dir:
 sys.path.append('%s/webroot/AutoSa/' % cur_dir)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'AutoSa.settings'
 
+import django
+django.setup()
 from UserManage.models import User, Logs, Pid
 from Assets.models import Assets
 
@@ -88,18 +90,6 @@ def getwinsize():
     return struct.unpack('HHHH', x)[0:2]
 
 
-# def connect_db(user, passwd, db, host='127.0.0.1', port=3306):
-#     """This function connect db and return db and cursor"""
-#     db = MySQLdb.connect(host=host,
-#                          port=port,
-#                          user=user,
-#                          passwd=passwd,
-#                          db=db,
-#                          charset='utf8')
-#     cursor = db.cursor()
-#     return db, cursor
-
-
 def run_cmd(cmd):
     """run command and return stdout"""
     pipe = subprocess.Popen(cmd, 
@@ -120,8 +110,7 @@ def connect(host, port, user, password):
     """Use pexpect module to connect other server."""
     log_date_dir = '%s/%s' % (log_dir, time.strftime('%Y%m%d'))
     if not os.path.isdir(log_date_dir):
-        os.mkdir(log_date_dir)
-        os.chmod(log_date_dir, 0777)
+        os.mkdir(log_date_dir, 0777)
     structtime_start = time.localtime()
     datetime_start = time.strftime('%Y%m%d%H%M%S', structtime_start)
     logtime_start = time.strftime('%Y/%m/%d %H:%M:%S', structtime_start)
@@ -259,6 +248,13 @@ def exec_cmd_servers(username):
             cmd = raw_input('\033[1;32mCmd(s): \033[0m')
             if cmd in ['q', 'Q']:
                 break
+            if not os.path.isdir():
+                exec_log_dir = os.path.join(log_dir, 'exec_cmds')
+                os.mkdir(exec_log_dir, 0777)
+                filename = "%s/%s.log" % (exec_log_dir, time.strftime('%Y%m%d'))
+                f = open(filename, 'a')
+                f.write("DateTime: %s User: %s Host: %s Cmds: %s" %
+                        (time.strftime('%Y/%m/%d %H:%M:%S'), username, hosts, cmd))
             for host in hosts:
                 remote_exec_cmd(host, username, cmd)
 

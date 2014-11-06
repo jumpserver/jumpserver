@@ -30,7 +30,6 @@
                 <td>{{ user.id }}</td>
                 <td>{{ user.username }}</td>
                 <td>{{ user.name }}</td>
-                <!--<td>{{ user.group }}</td>-->
                 <td>
                     {% for group in user.group.all %}
                         {{ group.name }}
