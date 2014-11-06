@@ -248,8 +248,8 @@ def exec_cmd_servers(username):
             cmd = raw_input('\033[1;32mCmd(s): \033[0m')
             if cmd in ['q', 'Q']:
                 break
-            if not os.path.isdir():
-                exec_log_dir = os.path.join(log_dir, 'exec_cmds')
+            exec_log_dir = os.path.join(log_dir, 'exec_cmds')
+            if not os.path.isdir(exec_log_dir):
                 os.mkdir(exec_log_dir, 0777)
                 filename = "%s/%s.log" % (exec_log_dir, time.strftime('%Y%m%d'))
                 f = open(filename, 'a')

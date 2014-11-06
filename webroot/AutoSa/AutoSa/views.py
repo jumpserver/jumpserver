@@ -34,6 +34,7 @@ ldap_host = cf.get('jumpserver', 'ldap_host')
 ldap_base_dn = cf.get('jumpserver', 'ldap_base_dn')
 admin_cn = cf.get('jumpserver', 'admin_cn')
 admin_pass = cf.get('jumpserver', 'admin_pass')
+log_dir = os.path.join(CONF_DIR, 'logs')
 
 
 def keygen(num):
@@ -915,6 +916,14 @@ def upFile(request):
                 sftp = paramiko.SFTPClient.from_transport(t)
                 sftp.put(filename, '%s/%s' % (path, upload_file.name))
                 msg = u'上传成功，位于 %s主机，位置 %s.' % (host, path)
+                uplog_dir = os.path.join(log_dir, 'upload')
+                if not os.path.isdir(uplog_dir):
+                    os.mkdir(uplog_dir)
+                filename = os.path.join(uplog_dir, time.strftime('%Y%m%d'))
+                f = open(filename, 'a')
+                f.write('DateTime: %s User: %s Host: %s File: %s' %
+                        (time.strftime('%Y/%m/%d %H:%M:%S'), username, host, path))
+                f.close()
 
                 return render_to_response('info.html', {'msg': msg})
         else:
@@ -944,8 +953,15 @@ def downFile(request):
         sftp = paramiko.SFTPClient.from_transport(t)
         sftp.get(path, download_file)
         if os.path.isfile(download_file):
+            downlog_dir = os.path.join(log_dir, 'download')
+            if not os.path.isdir(downlog_dir):
+                os.mkdir(downlog_dir)
+            filename = os.path.join(downlog_dir, time.strftime('%Y%m%d'))
+            f = open(filename, 'a')
+            f.write('DateTime: %s User: %s Host: %s File: %s' %
+                    (time.strftime('%Y/%m/%d %H:%M:%S'), username, host, path))
+            f.close()
             wrapper = FileWrapper(open(download_file))
-
             response = HttpResponse(wrapper, mimetype='application/octet-stream')
             response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(path)
             return response
