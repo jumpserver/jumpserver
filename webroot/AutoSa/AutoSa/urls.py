@@ -34,7 +34,4 @@ urlpatterns = patterns('',
     (r'^logView/$', views.logView),
     (r'^logHistory/$', views.logHistory),
     (r'^killSession/$', views.killSession),
-    (r'^echo/$', views.echo),
-    (r'^lower_case/$', views.lower_case),
-    (r'^test_websocket/$', views.test_websocket),
 )
