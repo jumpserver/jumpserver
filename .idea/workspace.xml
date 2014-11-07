@@ -1,0 +1,793 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="3a3feb99-ffa7-4370-b111-c1793a147bed" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/jumpserver.iml" afterPath="$PROJECT_DIR$/.idea/jumpserver.iml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/jumpserver.py" afterPath="$PROJECT_DIR$/jumpserver.py" />
+    </list>
+    <ignored path="jumpserver.iws" />
+    <ignored path=".idea/workspace.xml" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ChangesViewManager" flattened_view="true" show_ignored="false" />
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="DaemonCodeAnalyzer">
+    <disable_hints />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="jumpserver" />
+  </component>
+  <component name="FileEditorManager">
+    <leaf>
+      <file leaf-file-name="views.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webroot/AutoSa/AutoSa/views.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="38" column="0" selection-start="1129" selection-end="1129" vertical-scroll-proportion="0.0" vertical-offset="418" max-vertical-offset="19817">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="jumpserver.py" pinned="false" current="true" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/jumpserver.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="111" column="39" selection-start="3028" selection-end="3028" vertical-scroll-proportion="-5.6809607" vertical-offset="5421" max-vertical-offset="6004">
+              <folding>
+                <element signature="e#36#45#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="models.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webroot/AutoSa/UserManage/models.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="28" column="4" selection-start="848" selection-end="855" vertical-scroll-proportion="0.0" vertical-offset="532" max-vertical-offset="1026">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="urls.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webroot/AutoSa/AutoSa/urls.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="35" column="43" selection-start="1202" selection-end="1202" vertical-scroll-proportion="0.0" vertical-offset="665" max-vertical-offset="817">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="settings.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webroot/AutoSa/AutoSa/settings.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="56" column="48" selection-start="1521" selection-end="1521" vertical-scroll-proportion="0.0" vertical-offset="1064" max-vertical-offset="2451">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="showUser.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/showUser.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="31" column="40" selection-start="1091" selection-end="1091" vertical-scroll-proportion="0.0" vertical-offset="386" max-vertical-offset="1083">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="showSudo.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/showSudo.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="13" column="32" selection-start="437" selection-end="437" vertical-scroll-proportion="0.0" vertical-offset="247" max-vertical-offset="456">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="jumpserver.conf" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/jumpserver.conf">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="17" column="33" selection-start="359" selection-end="359" vertical-scroll-proportion="0.0" vertical-offset="323" max-vertical-offset="437">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="upFile.html" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/upFile.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="0" column="0" selection-start="0" selection-end="45" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="912">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="log_handler.py" pinned="false" current="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/webroot/AutoSa/log_handler.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state line="82" column="17" selection-start="2150" selection-end="2150" vertical-scroll-proportion="0.0" vertical-offset="1558" max-vertical-offset="1938">
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindManager">
+    <FindUsagesManager>
+      <setting name="OPEN_NEW_TAB" value="false" />
+    </FindUsagesManager>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="changedFiles">
+      <list>
+        <option value="$PROJECT_DIR$/shell.conf" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/index.html" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/Assets/models.py" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/UserManage/forms.py" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/chgKey.html" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/error.html" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/addGroup.html" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/showGroup.html" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/chgGroup.html" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/chgUser.html" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/chgPass.html" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/chgSudo.html" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/showSudo.html" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/info.html" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/upFile.html" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/downFile.html" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/addAssets.html" />
+        <option value="$PROJECT_DIR$/pip-requirement.txt" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/AutoSa/settings.py" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/AutoSa/templatetags/mytags.py" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/loghandler.py" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/logHistory.html" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/base.html" />
+        <option value="$PROJECT_DIR$/scripts/pip-requirement.txt" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/UserManage/models.py" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/AutoSa/urls.py" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/showUser.html" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/addUser.html" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/log_handler.py" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/templates/logView.html" />
+        <option value="$PROJECT_DIR$/jumpserver.conf" />
+        <option value="$PROJECT_DIR$/webroot/AutoSa/AutoSa/views.py" />
+        <option value="$PROJECT_DIR$/jumpserver.py" />
+      </list>
+    </option>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-8" />
+    <option name="y" value="-8" />
+    <option name="width" value="1382" />
+    <option name="height" value="744" />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="false">
+    <OptionsSetting value="true" id="Add" />
+    <OptionsSetting value="true" id="Remove" />
+    <OptionsSetting value="true" id="Checkout" />
+    <OptionsSetting value="true" id="Update" />
+    <OptionsSetting value="true" id="Status" />
+    <OptionsSetting value="true" id="Edit" />
+    <ConfirmationsSetting value="2" id="Add" />
+    <ConfirmationsSetting value="0" id="Remove" />
+  </component>
+  <component name="ProjectReloadState">
+    <option name="STATE" value="0" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1" splitterProportion="0.5">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+    </navigator>
+    <panes>
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="jumpserver" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="jumpserver" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="jumpserver" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="jumpserver" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="jumpserver" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webroot" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="jumpserver" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="jumpserver" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="webroot" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="AutoSa" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="options.lastSelected" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+    <property name="options.splitter.main.proportions" value="0.3" />
+    <property name="options.splitter.details.proportions" value="0.2" />
+    <property name="options.searchVisible" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="FullScreen" value="false" />
+    <property name="DefaultHtmlFileTemplate" value="Html5" />
+    <property name="SearchEverywhereHistory" value="&#10;《" />
+  </component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myPythonConsoleState">
+      <console-settings is-module-sdk="true">
+        <option name="myUseModuleSdk" value="true" />
+      </console-settings>
+    </option>
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\ThinkPad\jumpserver\webroot\AutoSa" />
+      <recent name="C:\Users\ThinkPad\jumpserver\webroot\AutoSa\AutoSa" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="DjangoTestsConfigurationType" factoryName="Django tests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="jumpserver" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="TARGET" value="" />
+      <option name="SETTINGS_FILE" value="" />
+      <option name="CUSTOM_SETTINGS" value="false" />
+      <option name="USE_OPTIONS" value="false" />
+      <option name="OPTIONS" value="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="py.test">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="jumpserver" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <option name="testToRun" value="" />
+      <option name="keywords" value="" />
+      <option name="params" value="" />
+      <option name="USE_PARAM" value="false" />
+      <option name="USE_KEYWORD" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Nosetests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="jumpserver" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <option name="PARAMS" value="" />
+      <option name="USE_PARAM" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="PythonConfigurationType" factoryName="Python">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="jumpserver" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="PARAMETERS" value="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Unittests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="jumpserver" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <option name="PUREUNITTEST" value="true" />
+      <option name="PARAMS" value="" />
+      <option name="USE_PARAM" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug" singleton="true">
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Doctests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="jumpserver" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="tests" factoryName="Attests">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="jumpserver" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" enabled="false" sample_coverage="true" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="FOLDER_NAME" value="" />
+      <option name="TEST_TYPE" value="TEST_SCRIPT" />
+      <option name="PATTERN" value="" />
+      <option name="USE_PATTERN" value="false" />
+      <method />
+    </configuration>
+    <list size="0" />
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false" />
+  <component name="SvnConfiguration" maxAnnotateRevisions="500" myUseAcceleration="nothing" myAutoUpdateAfterCommit="false" cleanupOnStartRun="false" SSL_PROTOCOLS="all">
+    <option name="USER" value="" />
+    <option name="PASSWORD" value="" />
+    <option name="mySSHConnectionTimeout" value="30000" />
+    <option name="mySSHReadTimeout" value="30000" />
+    <option name="LAST_MERGED_REVISION" />
+    <option name="MERGE_DRY_RUN" value="false" />
+    <option name="MERGE_DIFF_USE_ANCESTRY" value="true" />
+    <option name="UPDATE_LOCK_ON_DEMAND" value="false" />
+    <option name="IGNORE_SPACES_IN_MERGE" value="false" />
+    <option name="CHECK_NESTED_FOR_QUICK_MERGE" value="false" />
+    <option name="IGNORE_SPACES_IN_ANNOTATE" value="true" />
+    <option name="SHOW_MERGE_SOURCES_IN_ANNOTATE" value="true" />
+    <option name="FORCE_UPDATE" value="false" />
+    <option name="IGNORE_EXTERNALS" value="false" />
+    <myIsUseDefaultProxy>false</myIsUseDefaultProxy>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3a3feb99-ffa7-4370-b111-c1793a147bed" name="Default" comment="" />
+      <created>1410786645479</created>
+      <updated>1410786645479</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <editor active="true" />
+    <layout>
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.14787701" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="Vcs.Log.UiProperties">
+    <option name="RECENTLY_FILTERED_USER_GROUPS">
+      <collection />
+    </option>
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="myTodoPanelSettings">
+      <TodoPanelSettings />
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/downFile.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="27" column="18" selection-start="1290" selection-end="1290" vertical-scroll-proportion="0.0" vertical-offset="105" max-vertical-offset="798">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/jumpserver.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="61" column="20" selection-start="1546" selection-end="1546" vertical-scroll-proportion="0.0" vertical-offset="1159" max-vertical-offset="5757">
+          <folding>
+            <element signature="e#36#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/jumpserver.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="12" column="0" selection-start="167" selection-end="167" vertical-scroll-proportion="0.0" vertical-offset="228" max-vertical-offset="437">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/logView.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="35" column="46" selection-start="1299" selection-end="1299" vertical-scroll-proportion="0.0" vertical-offset="329" max-vertical-offset="1235" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/base.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="5" column="31" selection-start="106" selection-end="106" vertical-scroll-proportion="0.0" vertical-offset="2280" max-vertical-offset="2964" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/perms.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="32" selection-start="664" selection-end="664" vertical-scroll-proportion="0.0" vertical-offset="304" max-vertical-offset="760" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/base.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="135" column="11" selection-start="6455" selection-end="6455" vertical-scroll-proportion="0.0" vertical-offset="2219" max-vertical-offset="2850" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/info.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="30" selection-start="957" selection-end="957" vertical-scroll-proportion="0.0" vertical-offset="414" max-vertical-offset="1140" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/addUser.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="21" column="23" selection-start="689" selection-end="689" vertical-scroll-proportion="0.0" vertical-offset="171" max-vertical-offset="1862" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/UserManage/forms.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="19" column="28" selection-start="791" selection-end="791" vertical-scroll-proportion="0.0" vertical-offset="57" max-vertical-offset="931" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/UserManage/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="38" selection-start="432" selection-end="432" vertical-scroll-proportion="0.0" vertical-offset="285" max-vertical-offset="589" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/Assets/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="0" selection-start="396" selection-end="396" vertical-scroll-proportion="0.0" vertical-offset="266" max-vertical-offset="437" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/AutoSa/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="38" selection-start="641" selection-end="641" vertical-scroll-proportion="0.0" vertical-offset="418" max-vertical-offset="2432" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/AutoSa/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="23" column="33" selection-start="747" selection-end="747" vertical-scroll-proportion="0.0" vertical-offset="437" max-vertical-offset="589">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/jumpserver.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="14" column="22" selection-start="259" selection-end="259" vertical-scroll-proportion="0.0" vertical-offset="266" max-vertical-offset="513" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="9" column="33" selection-start="265" selection-end="265" vertical-scroll-proportion="0.0" vertical-offset="171" max-vertical-offset="855" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/AutoSa/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="22" column="38" selection-start="641" selection-end="641" vertical-scroll-proportion="0.0" vertical-offset="1473" max-vertical-offset="2432" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/AutoSa/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="23" column="33" selection-start="747" selection-end="747" vertical-scroll-proportion="0.0" vertical-offset="437" max-vertical-offset="589">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/index.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="25" column="5" selection-start="890" selection-end="890" vertical-scroll-proportion="-14.428572" vertical-offset="71" max-vertical-offset="836" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/login.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="10" column="0" selection-start="357" selection-end="432" vertical-scroll-proportion="-6.785714" vertical-offset="0" max-vertical-offset="1425" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/error.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="106" column="0" selection-start="2131" selection-end="2131" vertical-scroll-proportion="0.93153155" vertical-offset="1497" max-vertical-offset="2318" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/showAssets.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="-0.23243243" vertical-offset="129" max-vertical-offset="741" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/AutoSa/context_processors.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="6" column="40" selection-start="159" selection-end="164" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="228" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/showGroup.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="23" column="46" selection-start="848" selection-end="848" vertical-scroll-proportion="0.0" vertical-offset="85" max-vertical-offset="703" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/chgGroup.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="18" column="55" selection-start="623" selection-end="623" vertical-scroll-proportion="0.0" vertical-offset="342" max-vertical-offset="874" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/chgPass.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="12" column="29" selection-start="431" selection-end="431" vertical-scroll-proportion="0.0" vertical-offset="228" max-vertical-offset="1026" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/chgUser.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="57" column="36" selection-start="2610" selection-end="2615" vertical-scroll-proportion="1.4378378" vertical-offset="285" max-vertical-offset="1539" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/UserManage/forms.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="28" selection-start="316" selection-end="316" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="950" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/addGroup.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="45" vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="665" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/chgKey.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="4" column="35" selection-start="126" selection-end="173" vertical-scroll-proportion="-2.7142856" vertical-offset="0" max-vertical-offset="1026" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/info.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="32" column="0" selection-start="980" selection-end="980" vertical-scroll-proportion="0.0" vertical-offset="608" max-vertical-offset="1140" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/perms.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="32" selection-start="664" selection-end="664" vertical-scroll-proportion="0.0" vertical-offset="304" max-vertical-offset="760" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/chgSudo.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="32" column="16" selection-start="1608" selection-end="1608" vertical-scroll-proportion="0.0" vertical-offset="570" max-vertical-offset="1311" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/Assets/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="583" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/downFile.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="27" column="18" selection-start="1290" selection-end="1290" vertical-scroll-proportion="0.0" vertical-offset="105" max-vertical-offset="798">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/Assets/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="0" selection-start="64" selection-end="64" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="418" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/AutoSa/templatetags/mytags.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="11" column="17" selection-start="256" selection-end="256" vertical-scroll-proportion="0.32590052" vertical-offset="0" max-vertical-offset="583" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/base.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="2" column="6" selection-start="29" selection-end="29" vertical-scroll-proportion="0.0" vertical-offset="2223" max-vertical-offset="2926" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/addAssets.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="41" column="52" selection-start="1892" selection-end="1892" vertical-scroll-proportion="-11.678572" vertical-offset="452" max-vertical-offset="1007" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/AutoSa/urls.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="35" column="43" selection-start="1202" selection-end="1202" vertical-scroll-proportion="0.0" vertical-offset="177" max-vertical-offset="760">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/AutoSa/settings.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="56" column="48" selection-start="1521" selection-end="1521" vertical-scroll-proportion="0.0" vertical-offset="723" max-vertical-offset="2432">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/showUser.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="31" column="40" selection-start="1091" selection-end="1091" vertical-scroll-proportion="0.0" vertical-offset="386" max-vertical-offset="1083">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/showSudo.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="13" column="32" selection-start="437" selection-end="437" vertical-scroll-proportion="0.0" vertical-offset="247" max-vertical-offset="456">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/addUser.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="76" column="18" selection-start="3126" selection-end="3126" vertical-scroll-proportion="-8.964286" vertical-offset="1193" max-vertical-offset="1976" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/log_handler.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="82" column="17" selection-start="2150" selection-end="2150" vertical-scroll-proportion="0.0" vertical-offset="1336" max-vertical-offset="1900">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/UserManage/models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="28" column="4" selection-start="848" selection-end="855" vertical-scroll-proportion="0.0" vertical-offset="405" max-vertical-offset="1026">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/upFile.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="0" column="0" selection-start="0" selection-end="45" vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="912">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/templates/logView.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="15" column="29" selection-start="435" selection-end="435" vertical-scroll-proportion="0.5135135" vertical-offset="0" max-vertical-offset="1368" />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/jumpserver.conf">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="17" column="33" selection-start="359" selection-end="359" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="437">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/webroot/AutoSa/AutoSa/views.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="38" column="0" selection-start="1129" selection-end="1129" vertical-scroll-proportion="0.0" vertical-offset="418" max-vertical-offset="19817">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/jumpserver.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="111" column="39" selection-start="3028" selection-end="3028" vertical-scroll-proportion="-5.6809607" vertical-offset="5421" max-vertical-offset="6004">
+          <folding>
+            <element signature="e#36#45#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>
+

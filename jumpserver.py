@@ -111,7 +111,7 @@ def connect(host, port, user, password):
     log_date_dir = '%s/%s' % (log_dir, time.strftime('%Y%m%d'))
     if not os.path.isdir(log_date_dir):
         os.mkdir(log_date_dir)
-        os.mkdir(log_date_dir, 0777)
+        os.chmod(log_date_dir, 0777)
     structtime_start = time.localtime()
     datetime_start = time.strftime('%Y%m%d%H%M%S', structtime_start)
     logtime_start = time.strftime('%Y/%m/%d %H:%M:%S', structtime_start)
