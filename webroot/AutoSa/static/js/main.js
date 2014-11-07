@@ -44,7 +44,9 @@ $.fn.webSocket = function(opt){
             //告诉服务器端有用户登录
             socket.emit('login', {userid:message.id, filename:message.filename});
             socket.on('message',function(obj){
-                tag.append('<p>'+escapeString(obj.content)+'</p>');
+                //去除log中的颜色控制字符
+                var regx =  /\x1B\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[m|K]/g;
+                tag.append('<p>'+escapeString(obj.content.replace(regx,''))+'</p>');
             });
             return tag[0];
         } ,
