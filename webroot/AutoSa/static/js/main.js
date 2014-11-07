@@ -44,7 +44,7 @@ $.fn.webSocket = function(opt){
             //告诉服务器端有用户登录
             socket.emit('login', {userid:message.id, filename:message.filename});
             socket.on('message',function(obj){
-                tag.append(escapeString(obj.content));
+                tag.append('<p>'+escapeString(obj.content)+'</p>');
             });
             return tag[0];
         } ,
