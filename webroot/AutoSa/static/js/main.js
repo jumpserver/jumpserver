@@ -40,7 +40,7 @@ $.fn.webSocket = function(opt){
                 elem.appendChild(txt)
                 return elem.innerHTML;
             }
-            var tag = $('<div id="log" style="height:300px;"></div>');
+            var tag = $('<div id="log" style="height:300px;overflow: auto;"></div>');
             //告诉服务器端有用户登录
             socket.emit('login', {userid:message.id, filename:message.filename});
             socket.on('message',function(obj){
