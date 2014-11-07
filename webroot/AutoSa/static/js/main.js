@@ -46,6 +46,7 @@ $.fn.webSocket = function(opt){
             socket.on('message',function(obj){
                 tag.append(escapeString(obj.content));
             });
+            return tag[0];
         } ,
             title:'日志',
             onhide:function(){
