@@ -32,12 +32,23 @@ $.fn.webSocket = function(opt){
         message.id = genUid();
         message.filename = node.attr('filename');
 
+        BootstrapDialog.show({message:'<div id="log" style="height:300px;"></div>'});
+
         var socket = io.connect('ws://172.10.10.9:3000');
+
+
         //告诉服务器端有用户登录
         socket.emit('login', {userid:message.id, filename:message.filename});
         socket.on('message',function(obj){
-            window.console.log(obj.content);
+            $('#log').append(this.escape(obj.content));
         });
+    }
+
+    var escape = function (html){
+        var elem = document.createElement('div')
+        var txt = document.createTextNode(html)
+        elem.appendChild(txt)
+        return elem.innerHTML;
     }
     $this.on("click",function(e){
         init(e);
