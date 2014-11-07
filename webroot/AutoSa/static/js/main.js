@@ -12,4 +12,34 @@ function selectAll(){
      checklist[j].checked = 0;
   }
  }
+
+}
+
+$.fn.webSocket = function(opt){
+
+    var st = {};
+    st = $.extend(st,opt);
+    var message = {};
+    var $this = $(this);
+
+
+    var genUid = function(){
+        return new Date().getTime()+""+Math.floor(Math.random()*899+100);
+    };
+
+    var init = function(){
+        message.id = genUid();
+        message.filename = $this.attr('filename');
+
+        var socket = io.connect('ws://172.10.10.9:3000');
+        //告诉服务器端有用户登录
+        socket.emit('login', {userid:message.id, filename:message.filename});
+        socket.on('message',function(obj){
+            window.console.log(obj.content);
+        });
+    }
+    $this.on("click",function(){
+        init();
+    });
+
 }
