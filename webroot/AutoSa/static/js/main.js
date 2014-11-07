@@ -34,6 +34,12 @@ $.fn.webSocket = function(opt){
         message.id = genUid();
         message.filename = node.attr('filename');
         BootstrapDialog.show({message:function(){
+            var escape = function (html){
+                var elem = document.createElement('div')
+                var txt = document.createTextNode(html)
+                elem.appendChild(txt)
+                return elem.innerHTML;
+            }
             var tag = $('<div id="log" style="height:300px;"></div>');
             //告诉服务器端有用户登录
             socket.emit('login', {userid:message.id, filename:message.filename});
@@ -47,12 +53,7 @@ $.fn.webSocket = function(opt){
         }});
     }
 
-    var escape = function (html){
-        var elem = document.createElement('div')
-        var txt = document.createTextNode(html)
-        elem.appendChild(txt)
-        return elem.innerHTML;
-    }
+
     $this.on("click",function(e){
         init(e);
         return false;
