@@ -28,8 +28,9 @@ $.fn.webSocket = function(opt){
     };
 
     var init = function(){
+        var node = $(this);
         message.id = genUid();
-        message.filename = $this.attr('filename');
+        message.filename = node.attr('filename');
 
         var socket = io.connect('ws://172.10.10.9:3000');
         //告诉服务器端有用户登录
