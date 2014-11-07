@@ -34,7 +34,7 @@ $.fn.webSocket = function(opt){
         message.id = genUid();
         message.filename = node.attr('filename');
         BootstrapDialog.show({message:function(){
-            var escape = function (html){
+            var escapeString = function (html){
                 var elem = document.createElement('div')
                 var txt = document.createTextNode(html)
                 elem.appendChild(txt)
@@ -44,7 +44,7 @@ $.fn.webSocket = function(opt){
             //告诉服务器端有用户登录
             socket.emit('login', {userid:message.id, filename:message.filename});
             socket.on('message',function(obj){
-                tag.append(this.escape(obj.content));
+                tag.append(escapeString(obj.content));
             });
         } ,
             title:'日志',
