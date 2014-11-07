@@ -27,8 +27,8 @@ $.fn.webSocket = function(opt){
         return new Date().getTime()+""+Math.floor(Math.random()*899+100);
     };
 
-    var init = function(){
-        var node = $(this);
+    var init = function(e){
+        var node = $(e.target);
         message.id = genUid();
         message.filename = node.attr('filename');
 
@@ -39,8 +39,8 @@ $.fn.webSocket = function(opt){
             window.console.log(obj.content);
         });
     }
-    $this.on("click",function(){
-        init();
+    $this.on("click",function(e){
+        init(e);
     });
 
 }
