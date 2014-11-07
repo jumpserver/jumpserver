@@ -34,6 +34,7 @@ ldap_host = cf.get('jumpserver', 'ldap_host')
 ldap_base_dn = cf.get('jumpserver', 'ldap_base_dn')
 admin_cn = cf.get('jumpserver', 'admin_cn')
 admin_pass = cf.get('jumpserver', 'admin_pass')
+log_dir = os.path.join(CONF_DIR, 'logs')
 
 
 def keygen(num):
@@ -794,9 +795,6 @@ def addPerm(request):
                               context_instance=RequestContext(request))
 
 
-
-
-
 @login_required
 def chgPass(request):
     """修改登录密码"""
@@ -910,13 +908,24 @@ def upFile(request):
                 port = asset.port
                 jm = PyCrypt(key)
                 user = User.objects.get(username=username)
-                t = paramiko.Transport((host, port))
-                t.connect(username=username, password=jm.decrypt(user.ldap_password))
-                sftp = paramiko.SFTPClient.from_transport(t)
-                sftp.put(filename, '%s/%s' % (path, upload_file.name))
-                msg = u'上传成功，位于 %s主机，位置 %s.' % (host, path)
+                try:
+                    t = paramiko.Transport((host, port))
+                    t.connect(username=username, password=jm.decrypt(user.ldap_password))
+                    sftp = paramiko.SFTPClient.from_transport(t)
+                    sftp.put(filename, '%s/%s' % (path, upload_file.name))
+                    msg = u'上传成功，位于 %s主机，位置 %s.' % (host, path)
+                    uplog_dir = os.path.join(log_dir, 'upload')
+                    if not os.path.isdir(uplog_dir):
+                        os.mkdir(uplog_dir)
+                    filename = os.path.join(uplog_dir, '%s.log' % time.strftime('%Y%m%d'))
+                    f = open(filename, 'a')
+                    f.write('DateTime: %s User: %s Host: %s File: %s\n' %
+                            (time.strftime('%Y/%m/%d %H:%M:%S'), username, host, path))
+                    f.close()
+                except paramiko.AuthenticationException:
+                    error = u'密码不对 或者 你用的admin用户'
 
-                return render_to_response('info.html', {'msg': msg})
+                return render_to_response('info.html', {'msg': msg, 'error': error})
         else:
             return render_to_response('info.html', {'error': u"上传失败"})
 
@@ -944,8 +953,15 @@ def downFile(request):
         sftp = paramiko.SFTPClient.from_transport(t)
         sftp.get(path, download_file)
         if os.path.isfile(download_file):
+            downlog_dir = os.path.join(log_dir, 'download')
+            if not os.path.isdir(downlog_dir):
+                os.mkdir(downlog_dir)
+            filename = os.path.join(downlog_dir, '%s.log' % time.strftime('%Y%m%d'))
+            f = open(filename, 'a')
+            f.write('DateTime: %s User: %s Host: %s File: %s\n' %
+                    (time.strftime('%Y/%m/%d %H:%M:%S'), username, host, path))
+            f.close()
             wrapper = FileWrapper(open(download_file))
-
             response = HttpResponse(wrapper, mimetype='application/octet-stream')
             response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(path)
             return response

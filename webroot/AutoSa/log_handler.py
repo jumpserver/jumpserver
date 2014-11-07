@@ -9,6 +9,8 @@ cur_dir = os.path.dirname(__file__)
 sys.path.append('%s/webroot/AutoSa/' % cur_dir)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'AutoSa.settings'
 
+import django
+django.setup()
 from UserManage.models import Logs, Pid
 
 
@@ -17,12 +19,12 @@ def log_hanler(logid):
     if log:
         log = log[0]
         filename = log.logfile
-        ret1 = os.system('cat %s | grep "DateTime" > %s.his' % (filename, filename))
-        ret2 = os.system('cat %s | grep "\[.*@.*\][\$\#]" >> %s.his' % (filename, filename))
-        ret3 = os.system('cat %s | grep "EndTime" >> %s.his' % (filename, filename))
-        if (ret1 + ret2 + ret3) == 0:
-            print 'Handler % ok.' % filename
-
+        if os.path.isfile(filename):
+            ret1 = os.system('cat %s | grep "DateTime" > %s.his' % (filename, filename))
+            ret2 = os.system('cat %s | grep "\[.*@.*\][\$\#]" >> %s.his' % (filename, filename))
+            ret3 = os.system('cat %s | grep "EndTime" >> %s.his' % (filename, filename))
+            if (ret1 + ret2 + ret3) == 0:
+                print 'Handler % ok.' % filename
 
 
 def set_finish(id):
