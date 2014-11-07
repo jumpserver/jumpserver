@@ -28,20 +28,23 @@ $.fn.webSocket = function(opt){
     };
 
     var init = function(e){
+
+        var socket = io.connect('ws://172.10.10.9:3000');
         var node = $(e.target);
         message.id = genUid();
         message.filename = node.attr('filename');
-
-        BootstrapDialog.show({message:'<div id="log" style="height:300px;"></div>'});
-
-        var socket = io.connect('ws://172.10.10.9:3000');
-
-
-        //告诉服务器端有用户登录
-        socket.emit('login', {userid:message.id, filename:message.filename});
-        socket.on('message',function(obj){
-            $('#log').append(this.escape(obj.content));
-        });
+        BootstrapDialog.show({message:function(){
+            var tag = $('<div id="log" style="height:300px;"></div>');
+            //告诉服务器端有用户登录
+            socket.emit('login', {userid:message.id, filename:message.filename});
+            socket.on('message',function(obj){
+                tag.append(this.escape(obj.content));
+            });
+        } ,
+            title:'日志',
+            onhide:function(){
+                socket.emit('disconnect');
+        }});
     }
 
     var escape = function (html){
@@ -52,6 +55,7 @@ $.fn.webSocket = function(opt){
     }
     $this.on("click",function(e){
         init(e);
+        return false;
     });
 
 }

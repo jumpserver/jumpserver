@@ -28,7 +28,7 @@
                 <td><a href="/logHistory/?id={{ log.id }}" class="log_command">统计</a></td>
                 <td>阻断</td>
                 {% else %}
-                <td><span class='monitor' filename="{{ log.logfile }}">监控</span></td>
+                <td><a class='monitor' filename="{{ log.logfile }}">监控</a></td>
                 <td>命令统计</td>
                 <td><a href="/killSession/?id={{ log.id }}">阻断</a> </td>
                 {% endif %}
