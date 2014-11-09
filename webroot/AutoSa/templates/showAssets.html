@@ -33,4 +33,19 @@
         </table>
         <button class="btn btn-primary">删除</button></td>
     </form>
+       <nav>
+          <ul class="pager">
+            {% if assets.has_previous %}
+            <li><a href="?page={{ assets.previous_page_number }}">上一页</a></li>
+            {% endif %}
+
+            <span class="current">
+             Page {{ assets.number }} of {{ assets.paginator.num_pages }}.
+            </span>
+
+            {% if assets.has_next %}
+            <li><a href="?page={{ assets.next_page_number }}">下一页</a></li>
+            {% endif %}
+          </ul>
+        </nav>
 {% endblock %}

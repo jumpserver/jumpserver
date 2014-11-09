@@ -320,9 +320,21 @@ def showUser(request):
     error = ''
 
     if is_super_user(request):
-        users = User.objects.all()
+        users_all = User.objects.all()
     else:
-        users = group_member(request.session.get('username'))
+        users_all = group_member(request.session.get('username'))
+
+    paginator = Paginator(users_all, 20)
+
+    try:
+        page = int(request.GET.get('page', 1))
+    except ValueError:
+        page = 1
+
+    try:
+        users = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        users = paginator.page(paginator.num_pages)
 
     if request.method == 'POST':
         selected_user = request.REQUEST.getlist('selected')
@@ -680,13 +692,25 @@ def showAssets(request):
     """查看服务器"""
     info = ''
     if request.session.get('admin') < 2:
-        assets = []
+        assets_all = []
         username = request.session.get('username')
         user = User.objects.get(username=username)
         for asset in user.assetsuser_set.all().order_by('ip'):
-            assets.append(asset.aid)
+            assets_all.append(asset.aid)
     else:
-        assets = Assets.objects.all().order_by('ip')
+        assets_all = Assets.objects.all().order_by('ip')
+    paginator = Paginator(assets_all, 20)
+
+    try:
+        page = int(request.GET.get('page', 1))
+    except ValueError:
+        page = 1
+
+    try:
+        assets = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        assets = paginator.page(paginator.num_pages)
+
     if request.method == 'POST':
         if request.session.get('admin') < 2:
             return HttpResponseRedirect('/showAssets/')
@@ -727,9 +751,21 @@ def addAssets(request):
 def showPerm(request):
     """查看权限"""
     if is_super_user(request):
-        users = User.objects.all()
+        users_all = User.objects.all()
     else:
-        users = group_member(request.session.get('username'))
+        users_all = group_member(request.session.get('username'))
+
+    paginator = Paginator(users_all, 20)
+
+    try:
+        page = int(request.GET.get('page', 1))
+    except ValueError:
+        page = 1
+
+    try:
+        users = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        users = paginator.page(paginator.num_pages)
 
     if request.method == 'POST':
         assets_del = request.REQUEST.getlist('selected')
