@@ -596,12 +596,11 @@ def chgGroup(request):
     error = ''
     msg = ''
     if request.method == 'GET':
-        group_id = request.GET.filter('id')
+        group_id = request.GET.filter('id', None)
         if group_id:
-            group_id = group_id[0]
+            group = Group.objects.get(id=group_id)
         else:
             return HttpResponseRedirect('/showGroup/')
-        group = Group.objects.get(id=group_id)
     else:
         group_id = request.POST.get('id')
         group_name = request.POST.get('name')
@@ -643,12 +642,11 @@ def chgIDC(request):
     error = ''
     msg = ''
     if request.method == 'GET':
-        idc_id = request.GET.filter('id')
-        if idc_id:
-            idc_id = idc_id[0]
-            idc = Group.objects.get(id=idc_id)
-        else:
+        idc_id = request.GET.get('id', None)
+        if not idc_id:
             return HttpResponseRedirect('/showIDC/')
+        else:
+            idc = IDC.objects.get(id=idc_id)
     else:
         idc_id = request.POST.get('id')
         idc_name = request.POST.get('name')
@@ -661,7 +659,7 @@ def chgIDC(request):
             idc.save()
             msg = u'修改成功'
 
-    return render_to_response('chgGroup.html', {'group': idc, 'error': error, 'msg': msg, 'asset_menu': 'active'},
+    return render_to_response('chgGroup.html', {'idc': idc, 'error': error, 'msg': msg, 'asset_menu': 'active'},
                               context_instance=RequestContext(request))
 
 
