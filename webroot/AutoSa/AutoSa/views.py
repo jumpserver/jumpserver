@@ -842,7 +842,7 @@ def showPerm(request):
         user = User.objects.get(username=username)
 
         for asset_id in assets_del:
-            asset = Assets.objects.get(id=asset_id)
+            asset = Assets.objects.get(id=int(asset_id))
             asset_user_del = AssetsUser.objects.get(uid=user, aid=asset)
             asset_user_del.delete()
         return HttpResponseRedirect('/showPerm/?username=%s' % username)
@@ -1080,7 +1080,7 @@ def downFile(request):
 def logView(request):
     thirtyDayAgo = (datetime.datetime.now() - datetime.timedelta(30))
     thirtyDayAgoStamp = int(time.mktime(thirtyDayAgo.timetuple()))
-    logs_all = Logs.objects.filter(start_time__gt=thirtyDayAgoStamp)
+    logs_all = Logs.objects.filter(start_time__gt=thirtyDayAgoStamp).order_by("-id")
     paginator = Paginator(logs_all, 20)
 
     try:
