@@ -670,8 +670,8 @@ def addIDC(request):
     if request.method == 'POST':
         idc_name = request.POST.get('name')
         if idc_name:
-            group = Group(name=idc_name)
-            group.save()
+            idc = IDC(name=idc_name)
+            idc.save()
             msg = u'%s IDC添加成功' % idc_name
         else:
             error = u'不能为空'
