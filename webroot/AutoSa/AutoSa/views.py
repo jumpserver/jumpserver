@@ -5,7 +5,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from UserManage.models import User, Group, Logs, Pid
-from Assets.models import Assets, AssetsUser
+from Assets.models import Assets, AssetsUser, IDC
 import subprocess
 from Crypto.Cipher import AES
 from binascii import b2a_hex, a2b_hex
@@ -599,10 +599,15 @@ def chgGroup(request):
         group_id = request.GET.get('id')
         group = Group.objects.get(id=group_id)
     else:
-        group_id = request.POST.get('id')
-        group_name = request.POST.get('name')
+        group_id = request.POST.filter('id')
+        if group_id:
+            group_id = group_id[0]
+            group_name = request.POST.get('name')
+        else:
+            return HttpResponseRedirect('/showGroup/')
         if not group_name:
             error = u'不能为空'
+            return render_to_response('info.html', {'error': error})
         else:
             group = Group.objects.get(id=group_id)
             group.name = group_name
@@ -612,6 +617,68 @@ def chgGroup(request):
     return render_to_response('chgGroup.html', {'group': group, 'error': error, 'msg': msg, 'user_menu': 'active'},
                               context_instance=RequestContext(request))
 
+
+@superuser_required
+def showIDC(request):
+    error = ''
+    msg = ''
+    idcs = IDC.objects.all()
+
+    if request.method == 'POST':
+        selected_idc = request.REQUEST.getlist('selected')
+        if selected_idc:
+            for idc_id in selected_idc:
+                idc = IDC.objects.get(id=idc_id)
+                idc.delete()
+                msg = '删除成功'
+
+    return render_to_response('showIDC.html',
+                              {'idcs': idcs, 'error': error, 'msg': msg, 'asset_menu': 'active'},
+                              context_instance=RequestContext(request))
+
+
+@superuser_required
+def chgIDC(request):
+    error = ''
+    msg = ''
+    if request.method == 'GET':
+        idc_id = request.GET.filter('id')
+        if idc_id:
+            idc_id = idc_id[0]
+            idc = Group.objects.get(id=idc_id)
+        else:
+            return HttpResponseRedirect('/showIDC/')
+    else:
+        idc_id = request.POST.get('id')
+        idc_name = request.POST.get('name')
+        if not idc_name:
+            error = u'不能为空'
+            return render_to_response('info.html', {'error': error})
+        else:
+            idc = Group.objects.get(id=idc_id)
+            idc.name = idc_name
+            idc.save()
+            msg = u'修改成功'
+
+    return render_to_response('chgGroup.html', {'group': idc, 'error': error, 'msg': msg, 'asset_menu': 'active'},
+                              context_instance=RequestContext(request))
+
+
+@superuser_required
+def addIDC(request):
+    error = ''
+    msg = ''
+    if request.method == 'POST':
+        idc_name = request.POST.get('name')
+        if idc_name:
+            group = Group(name=idc_name)
+            group.save()
+            msg = u'%s IDC添加成功' % idc_name
+        else:
+            error = u'不能为空'
+    return render_to_response('addIDC.html',
+                              {'error': error, 'msg': msg, 'user_menu': 'active'},
+                              context_instance=RequestContext(request))
 
 @admin_required
 def showSudo(request):
@@ -728,11 +795,14 @@ def addAssets(request):
     """添加服务器"""
     error = ''
     msg = ''
+    idcs = IDC.objects.all()
     if request.method == 'POST':
         ip = request.POST.get('ip')
         port = request.POST.get('port')
         idc = request.POST.get('idc')
         comment = request.POST.get('comment')
+
+        idc = IDC.objects.get(id=idc)
 
         if '' in (ip, port):
             error = '带*号内容不能为空。'
@@ -743,7 +813,7 @@ def addAssets(request):
             asset.save()
             msg = u'%s 添加成功' % ip
 
-    return render_to_response('addAssets.html', {'msg': msg, 'error': error, 'asset_menu': 'active'},
+    return render_to_response('addAssets.html', {'msg': msg, 'error': error, 'idcs': idcs,  'asset_menu': 'active'},
                               context_instance=RequestContext(request))
 
 
