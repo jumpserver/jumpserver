@@ -596,15 +596,16 @@ def chgGroup(request):
     error = ''
     msg = ''
     if request.method == 'GET':
-        group_id = request.GET.get('id')
-        group = Group.objects.get(id=group_id)
-    else:
-        group_id = request.POST.filter('id')
+        group_id = request.GET.filter('id')
         if group_id:
             group_id = group_id[0]
-            group_name = request.POST.get('name')
         else:
             return HttpResponseRedirect('/showGroup/')
+        group = Group.objects.get(id=group_id)
+    else:
+        group_id = request.POST.get('id')
+        group_name = request.POST.get('name')
+
         if not group_name:
             error = u'不能为空'
             return render_to_response('info.html', {'error': error})
