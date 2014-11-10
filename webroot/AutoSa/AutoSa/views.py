@@ -596,7 +596,7 @@ def chgGroup(request):
     error = ''
     msg = ''
     if request.method == 'GET':
-        group_id = request.GET.filter('id', None)
+        group_id = request.GET.get('id', None)
         if group_id:
             group = Group.objects.get(id=group_id)
         else:
