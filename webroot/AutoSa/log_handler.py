@@ -24,7 +24,7 @@ def log_hanler(logid):
             ret2 = os.system('cat %s | grep "\[.*@.*\][\$\#]" >> %s.his' % (filename, filename))
             ret3 = os.system('cat %s | grep "EndTime" >> %s.his' % (filename, filename))
             if (ret1 + ret2 + ret3) == 0:
-                print 'Handler % ok.' % filename
+                print 'Handler %s ok.' % filename
 
 
 def set_finish(id):

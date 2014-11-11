@@ -290,7 +290,11 @@ def downKey(request):
         username = request.GET.get('username')
 
     filename = '%s/%s' % (rsa_dir, username)
-    f = open(filename)
+    try:
+        f = open(filename)
+    except IOError:
+        error = u'密钥文件不存在'
+        return render_to_response('info.html', {'error': error})
     data = f.read()
     f.close()
     response = HttpResponse(data, content_type='application/octet-stream')
@@ -1120,7 +1124,7 @@ def killSession(request):
         if pid:
             pid = pid[0]
             os.kill(pid.cpid, 9)
-            return HttpResponse('ok')
+            return render_to_response('info.html', {'msg': u'结束会话成功，返回中.'})
 
 
 
