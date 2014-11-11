@@ -39,8 +39,10 @@ class UserAddForm(forms.Form):
         return password_again
 
     def clean_key_pass_again(self):
-        key_pass = self.cleaned_data['key_pass']
-        key_pass_again = self.cleaned_data['key_pass_again']
+        key_pass = self.data['key_pass']
+        key_pass_again = self.data['key_pass_again']
         if key_pass != key_pass_again:
+            raise forms.ValidationError('Key Password input twice not match. ')
+        if len(key_pass) < 6:
             raise forms.ValidationError('Key Password input twice not match. ')
         return key_pass_again

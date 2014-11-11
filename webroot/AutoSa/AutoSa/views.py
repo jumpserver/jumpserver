@@ -392,7 +392,9 @@ def addUser(request):
 
     if request.method == 'POST':
         form = UserAddForm(request.POST)
-        if form.is_valid():
+        if not form.is_valid():
+            return HttpResponse('error')
+        else:
             user = form.cleaned_data
             username = user['username']
             password = user['password']
@@ -929,7 +931,7 @@ def chgPass(request):
 
         if not is_admin_role(request):
             oldpass = request.POST.get('oldpass')
-            if oldpass != user.password:
+            if md5_crypt(oldpass) != user.password:
                 error = '原来密码不正确'
 
         if password != password_again:
@@ -938,7 +940,7 @@ def chgPass(request):
         if error:
             return render_to_response('info.html', {'error': error})
 
-        user.password = password
+        user.password = md5_crypt(password)
         user.save()
 
         return render_to_response('info.html', {'msg': '修改密码成功'})
@@ -966,10 +968,11 @@ def chgKey(request):
         user = User.objects.get(username=username)
         password = request.POST.get('password')
         password_again = request.POST.get('password_again')
+        jm = PyCrypt(key)
 
         if not is_admin_role(request):
             oldpass = request.POST.get('oldpass')
-            if oldpass != user.key_pass:
+            if jm.encrypt(oldpass) != user.key_pass:
                 error = '原来密码不正确'
 
         if password != password_again:
@@ -982,12 +985,11 @@ def chgKey(request):
             return render_to_response('info.html', {'error': error})
 
         keyfile = '%s/%s' % (rsa_dir, username)
-        jm = PyCrypt(key)
         ret = bash('ssh-keygen -p -P %s -N %s -f %s' % (jm.decrypt(user.key_pass), password, keyfile))
         if ret != 0:
             error = '更改私钥密码错误'
             return render_to_response('info.html', {'error': error})
-        user.key_pass = password
+        user.key_pass = jm.encrypt(password)
         user.save()
 
         return render_to_response('info.html', {'msg': '修改密码成功'})
@@ -1071,7 +1073,7 @@ def downFile(request):
                     (time.strftime('%Y/%m/%d %H:%M:%S'), username, host, path))
             f.close()
             wrapper = FileWrapper(open(download_file))
-            response = HttpResponse(wrapper, mimetype='application/octet-stream')
+            response = HttpResponse(wrapper, content_type='application/octet-stream')
             response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(path)
             return response
 
