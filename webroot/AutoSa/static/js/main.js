@@ -47,6 +47,7 @@ $.fn.webSocket = function(opt){
                 //去除log中的颜色控制字符
                 var regx =  /\x1B\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[m|K]/g;
                 tag.append('<p>'+escapeString(obj.content.replace(regx,''))+'</p>');
+                tag.animate({ scrollTop: tag[0].scrollHeight}, 1000);
             });
             return tag[0];
         } ,
