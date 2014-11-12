@@ -5,7 +5,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from UserManage.models import User, Group, Logs, Pid
-from Assets.models import Assets, AssetsUser
+from Assets.models import Assets, AssetsUser, IDC
 import subprocess
 from Crypto.Cipher import AES
 from binascii import b2a_hex, a2b_hex
@@ -290,7 +290,11 @@ def downKey(request):
         username = request.GET.get('username')
 
     filename = '%s/%s' % (rsa_dir, username)
-    f = open(filename)
+    try:
+        f = open(filename)
+    except IOError:
+        error = u'密钥文件不存在'
+        return render_to_response('info.html', {'error': error})
     data = f.read()
     f.close()
     response = HttpResponse(data, content_type='application/octet-stream')
@@ -320,9 +324,21 @@ def showUser(request):
     error = ''
 
     if is_super_user(request):
-        users = User.objects.all()
+        users_all = User.objects.all()
     else:
-        users = group_member(request.session.get('username'))
+        users_all = group_member(request.session.get('username'))
+
+    paginator = Paginator(users_all, 20)
+
+    try:
+        page = int(request.GET.get('page', 1))
+    except ValueError:
+        page = 1
+
+    try:
+        users = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        users = paginator.page(paginator.num_pages)
 
     if request.method == 'POST':
         selected_user = request.REQUEST.getlist('selected')
@@ -376,7 +392,9 @@ def addUser(request):
 
     if request.method == 'POST':
         form = UserAddForm(request.POST)
-        if form.is_valid():
+        if not form.is_valid():
+            return HttpResponse('error')
+        else:
             user = form.cleaned_data
             username = user['username']
             password = user['password']
@@ -584,13 +602,18 @@ def chgGroup(request):
     error = ''
     msg = ''
     if request.method == 'GET':
-        group_id = request.GET.get('id')
-        group = Group.objects.get(id=group_id)
+        group_id = request.GET.get('id', None)
+        if group_id:
+            group = Group.objects.get(id=group_id)
+        else:
+            return HttpResponseRedirect('/showGroup/')
     else:
         group_id = request.POST.get('id')
         group_name = request.POST.get('name')
+
         if not group_name:
             error = u'不能为空'
+            return render_to_response('info.html', {'error': error})
         else:
             group = Group.objects.get(id=group_id)
             group.name = group_name
@@ -600,6 +623,67 @@ def chgGroup(request):
     return render_to_response('chgGroup.html', {'group': group, 'error': error, 'msg': msg, 'user_menu': 'active'},
                               context_instance=RequestContext(request))
 
+
+@superuser_required
+def showIDC(request):
+    error = ''
+    msg = ''
+    idcs = IDC.objects.all()
+
+    if request.method == 'POST':
+        selected_idc = request.REQUEST.getlist('selected')
+        if selected_idc:
+            for idc_id in selected_idc:
+                idc = IDC.objects.get(id=idc_id)
+                idc.delete()
+                msg = '删除成功'
+
+    return render_to_response('showIDC.html',
+                              {'idcs': idcs, 'error': error, 'msg': msg, 'asset_menu': 'active'},
+                              context_instance=RequestContext(request))
+
+
+@superuser_required
+def chgIDC(request):
+    error = ''
+    msg = ''
+    if request.method == 'GET':
+        idc_id = request.GET.get('id', None)
+        if not idc_id:
+            return HttpResponseRedirect('/showIDC/')
+        else:
+            idc = IDC.objects.get(id=idc_id)
+    else:
+        idc_id = request.POST.get('id')
+        idc_name = request.POST.get('name')
+        if not idc_name:
+            error = u'不能为空'
+            return render_to_response('info.html', {'error': error})
+        else:
+            idc = Group.objects.get(id=idc_id)
+            idc.name = idc_name
+            idc.save()
+            msg = u'修改成功'
+
+    return render_to_response('chgGroup.html', {'idc': idc, 'error': error, 'msg': msg, 'asset_menu': 'active'},
+                              context_instance=RequestContext(request))
+
+
+@superuser_required
+def addIDC(request):
+    error = ''
+    msg = ''
+    if request.method == 'POST':
+        idc_name = request.POST.get('name')
+        if idc_name:
+            idc = IDC(name=idc_name)
+            idc.save()
+            msg = u'%s IDC添加成功' % idc_name
+        else:
+            error = u'不能为空'
+    return render_to_response('addIDC.html',
+                              {'error': error, 'msg': msg, 'user_menu': 'active'},
+                              context_instance=RequestContext(request))
 
 @admin_required
 def showSudo(request):
@@ -680,13 +764,25 @@ def showAssets(request):
     """查看服务器"""
     info = ''
     if request.session.get('admin') < 2:
-        assets = []
+        assets_all = []
         username = request.session.get('username')
         user = User.objects.get(username=username)
         for asset in user.assetsuser_set.all().order_by('ip'):
-            assets.append(asset.aid)
+            assets_all.append(asset.aid)
     else:
-        assets = Assets.objects.all().order_by('ip')
+        assets_all = Assets.objects.all().order_by('ip')
+    paginator = Paginator(assets_all, 20)
+
+    try:
+        page = int(request.GET.get('page', 1))
+    except ValueError:
+        page = 1
+
+    try:
+        assets = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        assets = paginator.page(paginator.num_pages)
+
     if request.method == 'POST':
         if request.session.get('admin') < 2:
             return HttpResponseRedirect('/showAssets/')
@@ -704,11 +800,14 @@ def addAssets(request):
     """添加服务器"""
     error = ''
     msg = ''
+    idcs = IDC.objects.all()
     if request.method == 'POST':
         ip = request.POST.get('ip')
         port = request.POST.get('port')
         idc = request.POST.get('idc')
         comment = request.POST.get('comment')
+
+        idc = IDC.objects.get(id=idc)
 
         if '' in (ip, port):
             error = '带*号内容不能为空。'
@@ -719,7 +818,7 @@ def addAssets(request):
             asset.save()
             msg = u'%s 添加成功' % ip
 
-    return render_to_response('addAssets.html', {'msg': msg, 'error': error, 'asset_menu': 'active'},
+    return render_to_response('addAssets.html', {'msg': msg, 'error': error, 'idcs': idcs,  'asset_menu': 'active'},
                               context_instance=RequestContext(request))
 
 
@@ -727,9 +826,21 @@ def addAssets(request):
 def showPerm(request):
     """查看权限"""
     if is_super_user(request):
-        users = User.objects.all()
+        users_all = User.objects.all()
     else:
-        users = group_member(request.session.get('username'))
+        users_all = group_member(request.session.get('username'))
+
+    paginator = Paginator(users_all, 20)
+
+    try:
+        page = int(request.GET.get('page', 1))
+    except ValueError:
+        page = 1
+
+    try:
+        users = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        users = paginator.page(paginator.num_pages)
 
     if request.method == 'POST':
         assets_del = request.REQUEST.getlist('selected')
@@ -737,7 +848,7 @@ def showPerm(request):
         user = User.objects.get(username=username)
 
         for asset_id in assets_del:
-            asset = Assets.objects.get(id=asset_id)
+            asset = Assets.objects.get(id=int(asset_id))
             asset_user_del = AssetsUser.objects.get(uid=user, aid=asset)
             asset_user_del.delete()
         return HttpResponseRedirect('/showPerm/?username=%s' % username)
@@ -820,7 +931,7 @@ def chgPass(request):
 
         if not is_admin_role(request):
             oldpass = request.POST.get('oldpass')
-            if oldpass != user.password:
+            if md5_crypt(oldpass) != user.password:
                 error = '原来密码不正确'
 
         if password != password_again:
@@ -829,7 +940,7 @@ def chgPass(request):
         if error:
             return render_to_response('info.html', {'error': error})
 
-        user.password = password
+        user.password = md5_crypt(password)
         user.save()
 
         return render_to_response('info.html', {'msg': '修改密码成功'})
@@ -857,10 +968,11 @@ def chgKey(request):
         user = User.objects.get(username=username)
         password = request.POST.get('password')
         password_again = request.POST.get('password_again')
+        jm = PyCrypt(key)
 
         if not is_admin_role(request):
             oldpass = request.POST.get('oldpass')
-            if oldpass != user.key_pass:
+            if jm.encrypt(oldpass) != user.key_pass:
                 error = '原来密码不正确'
 
         if password != password_again:
@@ -873,12 +985,11 @@ def chgKey(request):
             return render_to_response('info.html', {'error': error})
 
         keyfile = '%s/%s' % (rsa_dir, username)
-        jm = PyCrypt(key)
         ret = bash('ssh-keygen -p -P %s -N %s -f %s' % (jm.decrypt(user.key_pass), password, keyfile))
         if ret != 0:
             error = '更改私钥密码错误'
             return render_to_response('info.html', {'error': error})
-        user.key_pass = password
+        user.key_pass = jm.encrypt(password)
         user.save()
 
         return render_to_response('info.html', {'msg': '修改密码成功'})
@@ -962,7 +1073,7 @@ def downFile(request):
                     (time.strftime('%Y/%m/%d %H:%M:%S'), username, host, path))
             f.close()
             wrapper = FileWrapper(open(download_file))
-            response = HttpResponse(wrapper, mimetype='application/octet-stream')
+            response = HttpResponse(wrapper, content_type='application/octet-stream')
             response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(path)
             return response
 
@@ -975,7 +1086,7 @@ def downFile(request):
 def logView(request):
     thirtyDayAgo = (datetime.datetime.now() - datetime.timedelta(30))
     thirtyDayAgoStamp = int(time.mktime(thirtyDayAgo.timetuple()))
-    logs_all = Logs.objects.filter(start_time__gt=thirtyDayAgoStamp)
+    logs_all = Logs.objects.filter(start_time__gt=thirtyDayAgoStamp).order_by("-id")
     paginator = Paginator(logs_all, 20)
 
     try:
@@ -1015,7 +1126,7 @@ def killSession(request):
         if pid:
             pid = pid[0]
             os.kill(pid.cpid, 9)
-            return HttpResponse('ok')
+            return render_to_response('info.html', {'msg': u'结束会话成功，返回中.'})
 
 
 

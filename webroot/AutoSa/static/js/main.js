@@ -27,19 +27,39 @@ $.fn.webSocket = function(opt){
         return new Date().getTime()+""+Math.floor(Math.random()*899+100);
     };
 
-    var init = function(){
-        message.id = genUid();
-        message.filename = $this.attr('filename');
+    var init = function(e){
 
         var socket = io.connect('ws://172.10.10.9:3000');
-        //告诉服务器端有用户登录
-        socket.emit('login', {userid:message.id, filename:message.filename});
-        socket.on('message',function(obj){
-            window.console.log(obj.content);
-        });
+        var node = $(e.target);
+        message.id = genUid();
+        message.filename = node.attr('filename');
+        BootstrapDialog.show({message:function(){
+            var escapeString = function (html){
+                var elem = document.createElement('div')
+                var txt = document.createTextNode(html)
+                elem.appendChild(txt)
+                return elem.innerHTML;
+            }
+            var tag = $('<div id="log" style="height:300px;overflow: auto;"></div>');
+            //告诉服务器端有用户登录
+            socket.emit('login', {userid:message.id, filename:message.filename});
+            socket.on('message',function(obj){
+                //去除log中的颜色控制字符
+                var regx =  /\x1B\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[m|K]/g;
+                tag.append('<p>'+escapeString(obj.content.replace(regx,''))+'</p>');
+            });
+            return tag[0];
+        } ,
+            title:'日志',
+            onhide:function(){
+                socket.emit('disconnect');
+        }});
     }
-    $this.on("click",function(){
-        init();
+
+
+    $this.on("click",function(e){
+        init(e);
+        return false;
     });
 
 }
