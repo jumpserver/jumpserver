@@ -29,7 +29,7 @@ $.fn.webSocket = function(opt){
 
     var init = function(e){
 
-        var socket = io.connect('ws://172.10.10.9:3000');
+        var socket = io.connect('ws://'+globalConfig.SOCKET_HOST);
         var node = $(e.target);
         message.id = genUid();
         message.filename = node.attr('filename');
@@ -47,7 +47,6 @@ $.fn.webSocket = function(opt){
                 //去除log中的颜色控制字符
                 var regx =  /\x1B\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[m|K]/g;
                 tag.append('<p>'+escapeString(obj.content.replace(regx,''))+'</p>');
-                tag.animate({ scrollTop: tag[0].scrollHeight}, 1000);
             });
             return tag[0];
         } ,
