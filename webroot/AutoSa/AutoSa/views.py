@@ -393,9 +393,7 @@ def addUser(request):
 
     if request.method == 'POST':
         form = UserAddForm(request.POST)
-        if not form.is_valid():
-            return HttpResponse('error')
-        else:
+        if form.is_valid():
             user = form.cleaned_data
             username = user['username']
             password = user['password']
@@ -808,13 +806,12 @@ def addAssets(request):
         idc = request.POST.get('idc')
         comment = request.POST.get('comment')
 
-        idc = IDC.objects.get(id=idc)
-
-        if '' in (ip, port):
+        if '' in (ip, port, idc):
             error = '带*号内容不能为空。'
         elif Assets.objects.filter(ip=ip):
             error = '主机已存在。'
         if not error:
+            idc = IDC.objects.get(id=idc)
             asset = Assets(ip=ip, port=port, idc=idc, comment=comment)
             asset.save()
             msg = u'%s 添加成功' % ip

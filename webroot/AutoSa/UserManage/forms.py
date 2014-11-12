@@ -35,14 +35,14 @@ class UserAddForm(forms.Form):
         password_again = self.cleaned_data['password_again']
 
         if password != password_again:
-            raise forms.ValidationError('Password input twice not match. ')
+            raise forms.ValidationError(u'密码二次输入不一致. ')
         return password_again
 
     def clean_key_pass_again(self):
         key_pass = self.data['key_pass']
         key_pass_again = self.data['key_pass_again']
         if key_pass != key_pass_again:
-            raise forms.ValidationError('Key Password input twice not match. ')
+            raise forms.ValidationError(u'密码二次输入不一致. ')
         if len(key_pass) < 6:
-            raise forms.ValidationError('Key Password input twice not match. ')
+            raise forms.ValidationError(u'密码二次输入不一致. ')
         return key_pass_again
