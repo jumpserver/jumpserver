@@ -1,0 +1,5 @@
+#!/bin/bash
+pids=$(ps axu | grep -E '(manage.py|log_handler|index.js)' | grep -v 'grep'  | awk '{ print $2 }')
+for pid in $pids;do
+    kill -15 $pid
+done
