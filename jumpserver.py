@@ -152,7 +152,10 @@ def ip_all_select(username):
     """select all the server of the user can control."""
     ip_all = []
     ip_all_dict = {}
-    user = User.objects.get(username=username)
+    try:
+        user = User.objects.get(username=username)
+    except:
+        return (['error'], {'error':"Don't Use Root To Do That or User isn't Exist."})
     all_assets_user = user.assetsuser_set.all()
     for assets_user in all_assets_user:
         ip_all.append(assets_user.aid.ip)
