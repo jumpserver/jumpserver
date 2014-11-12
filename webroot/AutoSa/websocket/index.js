@@ -18,7 +18,7 @@ var onlineUsers = {};
 var onlineCount = 0;
 
 io.on('connection', function(socket){
-    console.log('a user connected');
+    //console.log('a user connected');
 
     //监听新用户加入
     socket.on('login', function(obj){
@@ -26,16 +26,16 @@ io.on('connection', function(socket){
         socket.name = obj.userid;
         socket.fileName = obj.filename;
         var  tail = new Tail(obj.filename);
-	console.log(obj.filename);
+	//console.log(obj.filename);
         tail.on('line',function(data) {
-            console.log(data);
+            //console.log(data);
            var newData = {userid:obj.userid,username:obj.username,content:data};
             socket.emit('message',newData);
         });
 //        var tail = spawn("tail", ['-f', obj.filename]);
 //        tail.stdout.on('data',function(data){
 //            var content = data.toString();
-//            console.log(content);
+//            //console.log(content);
 //            var newData = {userid:obj.userid,username:obj.username,content:content};
 //            socket.emit('message',newData);
 //        });
@@ -52,7 +52,7 @@ io.on('connection', function(socket){
 
         //向所有客户端广播用户加入
         io.emit('login', {onlineUsers:onlineUsers, onlineCount:onlineCount, user:obj});
-        console.log(obj.username+'加入了聊天室');
+        //console.log(obj.username+'加入了聊天室');
     });
 
     //监听用户退出
@@ -73,7 +73,7 @@ io.on('connection', function(socket){
 
             //向所有客户端广播用户退出
             io.emit('logout', {onlineUsers:onlineUsers, onlineCount:onlineCount, user:obj});
-            console.log(obj.username+'退出了聊天室');
+            ////console.log(obj.username+'退出了聊天室');
         }
     });
 
@@ -82,7 +82,7 @@ io.on('connection', function(socket){
         //向所有客户端广播发布的消息
         io.emit('message', obj);
         socket.emit('message',obj);
-        //console.log(obj.username+'说：'+obj.content);
+        ////console.log(obj.username+'说：'+obj.content);
     });
 
 });
