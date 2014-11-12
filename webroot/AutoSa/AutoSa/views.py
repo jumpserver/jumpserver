@@ -35,6 +35,7 @@ ldap_base_dn = cf.get('jumpserver', 'ldap_base_dn')
 admin_cn = cf.get('jumpserver', 'admin_cn')
 admin_pass = cf.get('jumpserver', 'admin_pass')
 log_dir = os.path.join(CONF_DIR, 'logs')
+web_socket_host = cf.get('jumpserver', 'web_socket_host')
 
 
 def keygen(num):
@@ -1100,7 +1101,7 @@ def logView(request):
         logs = paginator.page(paginator.num_pages)
 
     return render_to_response('logView.html',
-                              {'logs': logs},
+                              {'logs': logs, 'web_socket_host': web_socket_host},
                               context_instance=RequestContext(request))
 
 
