@@ -50,7 +50,7 @@ $.fn.webSocket = function(opt){
             });
             return tag[0];
         } ,
-            title:'日志',
+            title:'实时监控:',
             onhide:function(){
                 socket.emit('disconnect');
         }});
