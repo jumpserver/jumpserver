@@ -37,9 +37,6 @@ db_user = cf.get('db', 'user')
 db_password = cf.get('db', 'password')
 db_db = cf.get('db', 'db')
 log_dir = os.path.join(cur_dir, 'logs')
-user_table = cf.get('jumpserver', 'user_table')
-assets_table = cf.get('jumpserver', 'assets_table')
-assets_user_table = cf.get('jumpserver', 'assets_user_table')
 key = cf.get('jumpserver', 'key')
 
 
