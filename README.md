@@ -4,15 +4,15 @@ Jumpserver是用Python+Django写的一个开源的跳板机(堡垒机)项目，�
 
 1.1版本更新
 -----------------
-更新Log见笔者blog
+更新Log见笔者blog<br>
 [走起](http://laoguang.blog.51cto.com/6013350/1576502)
 
 部署文档
 -----------------
-部署文档见笔者blog
+部署文档见笔者blog<br>
 [走起](http://laoguang.blog.51cto.com/6013350/1576729)
 
 功能截图
 -----------------
 1. 安装
- ![install](https://github.com/ibuler/static/raw/master/jumpserver1.1/1.install.png)
+ ![install](https://github.com/ibuler/static/blog/master/jumpserver1.1/1.install.png)
