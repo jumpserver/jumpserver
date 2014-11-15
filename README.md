@@ -5,12 +5,12 @@ Jumpserver是用Python+Django写的一个开源的跳板机(堡垒机)项目，�
 1.1版本更新
 -----------------
 更新Log见笔者blog<br>
-[走起](http://laoguang.blog.51cto.com/6013350/1576502)
+http://laoguang.blog.51cto.com/6013350/1576502
 
 部署文档
 -----------------
 部署文档见笔者blog<br>
-[走起](http://laoguang.blog.51cto.com/6013350/1576729)
+http://laoguang.blog.51cto.com/6013350/1576729
 
 功能截图
 -----------------
@@ -28,7 +28,7 @@ Jumpserver是用Python+Django写的一个开源的跳板机(堡垒机)项目，�
 9. 登陆shell<br>![addgroup](https://github.com/ibuler/static/blob/master/jumpserver1.1/17.loginshell.png)
 10. 显示有权限的主机<br>![addgroup](https://github.com/ibuler/static/blob/master/jumpserver1.1/18.p.png)
 11. 批量执行命令<br>![addgroup](https://github.com/ibuler/static/blob/master/jumpserver1.1/19.e.png)
-12. 登陆有权限的主机<br>![addgroup](https://github.com/ibuler/static/blob/master/jumpserver1.1/20.loginserver.png)
+12. 登陆有权限的主机<br>![addgroup](https://github.com/ibuler/static/blob/master/jumpserver1.1/20.%20loginserver.png)
 13. 查看sudo<br>![addgroup](https://github.com/ibuler/static/blob/master/jumpserver1.1/22.showsudo.png)
 14. 修改sudo<br>![addgroup](https://github.com/ibuler/static/blob/master/jumpserver1.1/25.addsudohost.png)
 15. 查看实时监控<br>![addgroup](https://github.com/ibuler/static/blob/master/jumpserver1.1/29.monitor1ok.png)
