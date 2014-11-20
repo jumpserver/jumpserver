@@ -127,7 +127,8 @@ def connect(host, port, user, password):
         foo.logfile = logfile
         foo.sendline('')
         signal.signal(signal.SIGWINCH, sigwinch_passthrough)
-
+        size = getwinsize()
+        foo.setwinsize(size[0], size[1])
         foo.interact(escape_character=chr(28))  # 进入交互模式
         logfile.write('\nEndTime: %s' % time.strftime('%Y/%m/%d %H:%M:%S'))
         log.finish = 1
