@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ $USER = 'admin' ] || [ $USER == 'root' ];then
+if [ $USER == 'admin' ] || [ $USER == 'root' ];then
     echo ""
 else
     python /opt/jumpserver/jumpserver.py
