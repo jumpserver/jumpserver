@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Group(models):
+class Group(models.Model):
     name = models.CharField(max_length=80, unique=True)
     comment = models.CharField(max_length=160, blank=True, null=True)
 
