@@ -32,6 +32,11 @@ def red_print(string):
     print '\033[1;31m%s\033[0m' % string
 
 
+def alert_print(string):
+    red_print(string)
+    time.sleep(2)
+    sys.exit()
+
 def get_win_size():
     """This function use to get the size of the windows!"""
     if 'TIOCGWINSZ' in dir(termios):
@@ -67,14 +72,12 @@ def posix_shell(chan, user, host):
         try:
             os.makedirs(today_connect_log_dir)
         except OSError:
-            red_print('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, connect_log_dir))
-            sys.exit()
+            alert_print('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, connect_log_dir))
 
     try:
         log = open(log_file_path, 'a')
     except IOError:
-        red_print('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
-        sys.exit()
+        alert_print('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 
     old_tty = termios.tcgetattr(sys.stdin)
     try:
@@ -124,13 +127,9 @@ def connect(username, password, host, port):
     try:
         ssh.connect(host, port=port, username=username, password=password, compress=True)
     except paramiko.ssh_exception.AuthenticationException:
-        red_print('Password Error, Please Correct it.')
-        time.sleep(2)
-        sys.exit()
+        alert_print('Host Password Error, Please Correct it.')
     except socket.error:
-        red_print('Connect SSH Socket Port Error, Please Correct it.')
-        time.sleep(2)
-        sys.exit()
+        alert_print('Connect SSH Socket Port Error, Please Correct it.')
 
     # Make a channel and set windows size
     global channel
@@ -144,7 +143,7 @@ def connect(username, password, host, port):
 
     # Modify PS1
     channel.send('PS1=%s' % ps1)
-    channel.send("clear;echo -e '\\033[32mLogin %s OK.\\033[0m'\n" % host)
+    channel.send("clear;echo -e '\\033[32mLogin %s done. Enjoy it.\\033[0m'\n" % host)
 
     # Make ssh interactive tunnel
     posix_shell(channel, username, host)
