@@ -129,7 +129,7 @@ def connect(username, password, host, port):
     posix_shell(channel, username, host)
 
     # shutdown channel socket
-    channel.shutdown()
+    ssh.close()
 
 
 if __name__ == '__main__':
