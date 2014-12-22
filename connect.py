@@ -10,6 +10,7 @@ import sys
 import struct
 import fcntl
 import signal
+import socket
 
 try:
     import termios
@@ -112,7 +113,16 @@ def connect(username, password, host, port):
     ssh = paramiko.SSHClient()
     ssh.load_system_host_keys()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    ssh.connect(host, port=port, username=username, password=password, compress=True)
+    try:
+        ssh.connect(host, port=port, username=username, password=password, compress=True)
+    except paramiko.ssh_exception.AuthenticationException:
+        print 'Password Error, Please Correct it.'
+        time.sleep(2)
+        sys.exit()
+    except socket.error:
+        print 'Connect SSH Socket Port Error, Please Correct it.'
+        time.sleep(2)
+        sys.exit()
 
     # Make a channel and set windows size
     global channel
