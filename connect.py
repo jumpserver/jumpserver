@@ -106,6 +106,8 @@ def connect(username, password, host, port):
     Connect server.
     """
 
+    ps1 = '[\u@%s \W]\$' % host
+
     # Make a ssh connection
     ssh = paramiko.SSHClient()
     ssh.load_system_host_keys()
@@ -120,8 +122,14 @@ def connect(username, password, host, port):
     except:
         pass
 
+    # Modify PS1
+    channel.send('PS1=%s' % ps1)
+
     # Make ssh interactive tunnel
     posix_shell(channel, username, host)
+
+    # shutdown channel socket
+    channel.shutdown()
 
 
 if __name__ == '__main__':
