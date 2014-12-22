@@ -106,7 +106,7 @@ def connect(username, password, host, port):
     Connect server.
     """
 
-    ps1 = '[\u@%s \W]\$' % host
+    ps1 = "'[\u@%s \W]\$ '\n" % host
 
     # Make a ssh connection
     ssh = paramiko.SSHClient()
@@ -114,9 +114,11 @@ def connect(username, password, host, port):
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     ssh.connect(host, port=port, username=username, password=password, compress=True)
 
-    # Make a channel
+    # Make a channel and set windows size
     global channel
     channel = ssh.invoke_shell()
+    win_size = get_win_size()
+    channel.resize_pty(height=win_size[0], width=win_size[1])
     try:
         signal.signal(signal.SIGWINCH, set_win_size)
     except:
@@ -124,6 +126,7 @@ def connect(username, password, host, port):
 
     # Modify PS1
     channel.send('PS1=%s' % ps1)
+    channel.send("clear;echo -e '\\033[32mLogin %s OK.\\033[0m'\n" % host)
 
     # Make ssh interactive tunnel
     posix_shell(channel, username, host)
@@ -134,6 +137,4 @@ def connect(username, password, host, port):
 
 if __name__ == '__main__':
     connect('guanghongwei', 'Lov@j1ax1n', '172.16.1.122', 2001)
-
-
 
