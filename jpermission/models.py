@@ -12,6 +12,7 @@ class Permission(models.Model):
     asset = models.ForeignKey(Asset)
     is_ldap = models.BooleanField(default=True)
     perm_user_type = models.CharField(choices=PERM_USER_TYPE_CHOICE,
+                                      max_length=1,
                                       blank=True,
                                       null=True)
 
