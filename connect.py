@@ -6,11 +6,10 @@ import os
 import select
 import time
 import paramiko
-import sys
 import struct
 import fcntl
 import signal
-import socket
+
 
 try:
     import termios
@@ -117,8 +116,8 @@ def connect(username, password, host, port):
     """
     Connect server.
     """
-
-    ps1 = "'[\u@%s \W]\$ '\n" % host
+    ps1 = "PS1='[\u@%s \W]\$ '\n" % host
+    login_msg = "clear;echo -e '\\033[32mLogin %s done. Enjoy it.\\033[0m'\n" % host
 
     # Make a ssh connection
     ssh = paramiko.SSHClient()
@@ -141,9 +140,9 @@ def connect(username, password, host, port):
     except:
         pass
 
-    # Modify PS1
-    channel.send('PS1=%s' % ps1)
-    channel.send("clear;echo -e '\\033[32mLogin %s done. Enjoy it.\\033[0m'\n" % host)
+    # set PS1 and msg it
+    channel.send(ps1)
+    channel.send(login_msg)
 
     # Make ssh interactive tunnel
     posix_shell(channel, username, host)
