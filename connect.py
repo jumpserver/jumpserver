@@ -16,12 +16,20 @@ try:
     import termios
     import tty
 except ImportError:
-    print 'Only postfix supported.'
+    print '\033[1;31mOnly postfix supported.\033[0m'
     sys.exit()
 
 
 CURRENT_DIR = os.path.abspath('.')
 LOG_DIR = os.path.join(CURRENT_DIR, 'logs')
+
+
+def green_print(string):
+    print '\033[1;32m%s\033[0m' % string
+
+
+def red_print(string):
+    print '\033[1;31m%s\033[0m' % string
 
 
 def get_win_size():
@@ -59,13 +67,13 @@ def posix_shell(chan, user, host):
         try:
             os.makedirs(today_connect_log_dir)
         except OSError:
-            print 'Create %s failed, Please modify %s permission.' % (today_connect_log_dir, connect_log_dir)
+            red_print('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, connect_log_dir))
             sys.exit()
 
     try:
         log = open(log_file_path, 'a')
     except IOError:
-        print 'Create logfile failed, Please modify %s permission.' % today_connect_log_dir
+        red_print('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
         sys.exit()
 
     old_tty = termios.tcgetattr(sys.stdin)
@@ -116,11 +124,11 @@ def connect(username, password, host, port):
     try:
         ssh.connect(host, port=port, username=username, password=password, compress=True)
     except paramiko.ssh_exception.AuthenticationException:
-        print 'Password Error, Please Correct it.'
+        red_print('Password Error, Please Correct it.')
         time.sleep(2)
         sys.exit()
     except socket.error:
-        print 'Connect SSH Socket Port Error, Please Correct it.'
+        red_print('Connect SSH Socket Port Error, Please Correct it.')
         time.sleep(2)
         sys.exit()
 
