@@ -48,6 +48,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'juser',
     'jasset',
+    'jpermission',
 )
 
 MIDDLEWARE_CLASSES = (
