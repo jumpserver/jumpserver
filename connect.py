@@ -10,7 +10,6 @@ import struct
 import fcntl
 import signal
 
-
 try:
     import termios
     import tty
@@ -32,9 +31,10 @@ def red_print(string):
 
 
 def alert_print(string):
-    red_print(string)
+    red_print('AlertError: %s' % string)
     time.sleep(2)
     sys.exit()
+
 
 def get_win_size():
     """This function use to get the size of the windows!"""
@@ -110,6 +110,7 @@ def posix_shell(chan, user, host):
 
     finally:
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)
+        log.close()
 
 
 def connect(username, password, host, port):
@@ -140,7 +141,7 @@ def connect(username, password, host, port):
     except:
         pass
 
-    # set PS1 and msg it
+    # Set PS1 and msg it
     channel.send(ps1)
     channel.send(login_msg)
     print channel.get_name()
@@ -148,7 +149,7 @@ def connect(username, password, host, port):
     # Make ssh interactive tunnel
     posix_shell(channel, username, host)
 
-    # shutdown channel socket
+    # Shutdown channel socket
     channel.close()
     ssh.close()
 
