@@ -143,11 +143,13 @@ def connect(username, password, host, port):
     # set PS1 and msg it
     channel.send(ps1)
     channel.send(login_msg)
+    print channel.get_name()
 
     # Make ssh interactive tunnel
     posix_shell(channel, username, host)
 
     # shutdown channel socket
+    channel.close()
     ssh.close()
 
 
