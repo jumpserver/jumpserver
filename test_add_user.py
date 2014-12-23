@@ -12,14 +12,18 @@ from jpermission.models import Permission
 g = Group(name='wzp', comment='wzp project')
 g.save()
 
-u = User(username='hadoop', password='hadoop', name='hadoop', email='ibuler@qq.com', group=g,
+u = User(username='hadoop', password='hadoop', name='hadoop', email='ibuler@qq.com', 
          ldap_pwd='hadoop', ssh_key_pwd='hadoop', date_joined=0)
+u.save()
+u.group=[g]
 u.save()
 
 i = IDC(name='lf')
 i.save()
 
-a = Asset(ip='172.16.1.122', port=2001, idc=i, group=g, date_added=0)
+a = Asset(ip='172.16.1.122', port=2001, idc=i, date_added=0)
+a.save()
+a.group = [g]
 a.save()
 
 p = Permission(user=u, asset=a)
