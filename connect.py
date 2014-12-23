@@ -9,6 +9,18 @@ import paramiko
 import struct
 import fcntl
 import signal
+import textwrap
+import django
+from django.core.exceptions import ObjectDoesNotExist
+from Crypto.Cipher import AES
+from binascii import b2a_hex, a2b_hex
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'AutoSa.settings'
+django.setup()
+
+from juser.models import User, Group
+from jasset.models import Asset, IDC
+from jpermission.models import Permission
 
 try:
     import termios
@@ -34,6 +46,31 @@ def alert_print(string):
     red_print('AlertError: %s' % string)
     time.sleep(2)
     sys.exit()
+
+
+class PyCrypt(object):
+    """It's used to encrypt and decrypt password."""
+    def __init__(self, key):
+        self.key = key
+        self.mode = AES.MODE_CBC
+
+    def encrypt(self, text):
+        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
+        length = 16
+        count = len(text)
+        if count < length:
+            add = (length - count)
+            text += ('\0' * add)
+        elif count > length:
+            add = (length - (count % length))
+            text += ('\0' * add)
+        ciphertext = cryptor.encrypt(text)
+        return b2a_hex(ciphertext)
+
+    def decrypt(self, text):
+        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
+        plain_text = cryptor.decrypt(a2b_hex(text))
+        return plain_text.rstrip('\0')
 
 
 def get_win_size():
@@ -113,6 +150,36 @@ def posix_shell(chan, user, host):
         log.close()
 
 
+def get_host_all(username):
+    host_all = {}
+    try:
+        user = User.objects.get(username=username)
+    except AttributeError:
+        red_print("Don't Use Root To Do That or User isn't Exist.")
+    else:
+        perm_all = user.permission_set.all()
+        for perm in perm_all:
+            host_all[perm.asset.ip] = perm.asset.comment
+            return host_all
+
+
+def print_prompt():
+    msg = """
+          \033[1;32m###  Welcome Use JumpServer To Login. ### \033[0m
+          1) Type \033[32mIP ADDRESS\033[0m To Login.
+          2) Type \033[32mP/p\033[0m To Print The Servers You Available.
+          3) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
+          4) Type \033[32mQ/q\033[0m To Quit.
+          """
+    print textwrap.dedent(msg)
+
+
+def print_user_host(username):
+    host_all = get_host_all(username)
+    for ip, comment in host_all.items():
+        print '%s -- %s' % (ip, comment)
+
+
 def connect(username, password, host, port):
     """
     Connect server.
@@ -155,5 +222,24 @@ def connect(username, password, host, port):
 
 
 if __name__ == '__main__':
-    connect('guanghongwei', 'Lov@j1ax1n', '172.16.1.122', 2001)
+    username = os.getlogin()
+    print_prompt()
+    try:
+        while True:
+            try:
+                option = raw_input("\033[1;32mOpt or IP>:\033[0m ")
+            except EOFError:
+                continue
+            if option in ['P', 'p']:
+                print_user_host()
+                continue
+            elif option in ['E', 'e']:
+                pass
+            elif option in ['Q', 'q']:
+                sys.exit()
+            else:
+                pass
+    except IndexError:
+        pass
+
 
