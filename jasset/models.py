@@ -20,7 +20,7 @@ class Asset(models.Model):
     password_common = models.CharField(max_length=160, blank=True, null=True)
     username_super = models.CharField(max_length=80, blank=True, null=True)
     password_super = models.CharField(max_length=160, blank=True, null=True)
-    date_added = models.CharField(max_length=80)
+    date_added = models.IntegerField(max_length=80)
     comment = models.CharField(max_length=100, blank=True, null=True)
 
     def __unicode__(self):
