@@ -150,8 +150,8 @@ def posix_shell(chan, user, host):
         log.close()
 
 
-def get_host_all(username):
-    host_all = {}
+def get_user_host(username):
+    hosts = {}
     try:
         user = User.objects.get(username=username)
     except AttributeError:
@@ -159,8 +159,8 @@ def get_host_all(username):
     else:
         perm_all = user.permission_set.all()
         for perm in perm_all:
-            host_all[perm.asset.ip] = perm.asset.comment
-            return host_all
+            hosts[perm.asset.ip] = perm.asset.comment
+            return hosts
 
 
 def print_prompt():
@@ -175,7 +175,7 @@ def print_prompt():
 
 
 def print_user_host(username):
-    host_all = get_host_all(username)
+    host_all = get_user_host(username)
     for ip, comment in host_all.items():
         print '%s -- %s' % (ip, comment)
 
@@ -231,7 +231,7 @@ if __name__ == '__main__':
             except EOFError:
                 continue
             if option in ['P', 'p']:
-                print_user_host()
+                print_user_host(username)
                 continue
             elif option in ['E', 'e']:
                 pass
