@@ -222,7 +222,7 @@ def connect(username, password, host, port):
 
 
 if __name__ == '__main__':
-    username = os.getlogin()
+    login_name = os.getlogin()
     print_prompt()
     try:
         while True:
@@ -231,7 +231,7 @@ if __name__ == '__main__':
             except EOFError:
                 continue
             if option in ['P', 'p']:
-                print_user_host(username)
+                print_user_host(login_name)
                 continue
             elif option in ['E', 'e']:
                 pass
