@@ -155,8 +155,8 @@ def get_user_host(username):
     hosts = {}
     try:
         user = User.objects.get(username=username)
-    except AttributeError, ObjectDoesNotExist:
-        red_print("Don't Use Root To Do That or User isn't Exist.")
+    except ObjectDoesNotExist:
+        return {'Error': 'username %s is not exist.' % username}
     else:
         perm_all = user.permission_set.all()
         for perm in perm_all:
