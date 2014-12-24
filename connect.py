@@ -11,6 +11,7 @@ import fcntl
 import signal
 import textwrap
 import django
+import getpass
 from django.core.exceptions import ObjectDoesNotExist
 from Crypto.Cipher import AES
 from binascii import b2a_hex, a2b_hex
@@ -154,7 +155,7 @@ def get_user_host(username):
     hosts = {}
     try:
         user = User.objects.get(username=username)
-    except AttributeError:
+    except AttributeError, ObjectDoesNotExist:
         red_print("Don't Use Root To Do That or User isn't Exist.")
     else:
         perm_all = user.permission_set.all()
@@ -164,8 +165,7 @@ def get_user_host(username):
 
 
 def print_prompt():
-    msg = """
-          \033[1;32m###  Welcome Use JumpServer To Login. ### \033[0m
+    msg = """\033[1;32m###  Welcome Use JumpServer To Login. ### \033[0m
           1) Type \033[32mIP ADDRESS\033[0m To Login.
           2) Type \033[32mP/p\033[0m To Print The Servers You Available.
           3) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
@@ -222,7 +222,8 @@ def connect(username, password, host, port):
 
 
 if __name__ == '__main__':
-    login_name = os.getlogin()
+    #login_name = os.getlogin()
+    login_name = getpass.getuser()
     print_prompt()
     try:
         while True:
