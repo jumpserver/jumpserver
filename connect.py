@@ -164,6 +164,24 @@ def get_user_host(username):
             return hosts
 
 
+def get_port(ip):
+    pass
+
+
+def get_ldap_pwd(username):
+    pass
+
+
+def connect_one(username, segment):
+    assets = Asset.objects.filter(ip__icontains=segment)
+    if len(assets) > 1:
+        for asset in assets:
+            print '%s -- %s' % (asset.ip, asset.comment)
+    elif len(assets) == 1:
+        asset = assets[0]
+        permission = asset.permission_set.all()
+
+
 def print_prompt():
     msg = """\033[1;32m###  Welcome Use JumpServer To Login. ### \033[0m
           1) Type \033[32mIP ADDRESS\033[0m To Login.
@@ -230,6 +248,7 @@ if __name__ == '__main__':
             try:
                 option = raw_input("\033[1;32mOpt or IP>:\033[0m ")
             except EOFError:
+                print
                 continue
             if option in ['P', 'p']:
                 print_user_host(login_name)
