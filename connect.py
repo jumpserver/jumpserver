@@ -15,7 +15,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from Crypto.Cipher import AES
 from binascii import b2a_hex, a2b_hex
 
-os.environ['DJANGO_SETTINGS_MODULE'] = 'AutoSa.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 django.setup()
 
 from juser.models import User, Group
