@@ -15,6 +15,7 @@ import getpass
 from django.core.exceptions import ObjectDoesNotExist
 from Crypto.Cipher import AES
 from binascii import b2a_hex, a2b_hex
+import re
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 django.setup()
@@ -152,34 +153,62 @@ def posix_shell(chan, user, host):
 
 
 def get_user_host(username):
-    hosts = {}
+    hosts_comments = {}
     try:
         user = User.objects.get(username=username)
     except ObjectDoesNotExist:
-        return {'Error': 'username %s is not exist.' % username}
+        return {'Error': 'username %s is not exist.' % username}, ['Error']
     else:
         perm_all = user.permission_set.all()
         for perm in perm_all:
-            hosts[perm.asset.ip] = perm.asset.comment
-            return hosts
+            hosts_comments[perm.asset.ip] = perm.asset.comment
+        hosts = hosts_comments.keys()
+        hosts.sort()
+        return hosts_comments, hosts
 
 
-def get_port(ip):
-    pass
+def get_connect_item(username, ip):
+    try:
+        asset = Asset.objects.get(ip=ip)
+        port = asset.port
+    except ObjectDoesNotExist:
+        red_print("Host %s isn't exist." % ip)
+        return
+
+    if not asset.ldap_enable:
+        user = User.objects.get(username=username)
+        ldap_pwd = user.ldap_pwd
+        return username, ldap_pwd, ip, port
+
+    else:
+        perms = asset.permission_set.all()
+        perm = perms[0]
+
+        if perm.perm_user_type == 'S':
+            return asset.username_super, asset.password_super, ip, port
+        else:
+            return asset.username_common, asset.password_common, ip, port
 
 
-def get_ldap_pwd(username):
-    pass
+def verify_connect(username, part_ip):
+    ip_matched = []
+    hosts_comments, hosts = get_user_host(username)
+    for ip in hosts:
+        if part_ip in ip:
+            ip_matched.append(ip)
 
-
-def connect_one(username, segment):
-    assets = Asset.objects.filter(ip__icontains=segment)
-    if len(assets) > 1:
-        for asset in assets:
-            print '%s -- %s' % (asset.ip, asset.comment)
-    elif len(assets) == 1:
-        asset = assets[0]
-        permission = asset.permission_set.all()
+    if len(ip_matched) > 1:
+        for ip in ip_matched:
+            print '%s -- %s' % (ip, hosts_comments[ip])
+    elif len(ip_matched) < 1:
+        red_print('No Permission or No host.')
+    else:
+        try:
+            username, password, host, port = get_connect_item(username, ip_matched[0])
+        except (ObjectDoesNotExist, IndexError):
+            red_print('Get get_connect_item Error.')
+        else:
+            connect(username, password, host, port)
 
 
 def print_prompt():
@@ -193,9 +222,9 @@ def print_prompt():
 
 
 def print_user_host(username):
-    host_all = get_user_host(username)
-    for ip, comment in host_all.items():
-        print '%s -- %s' % (ip, comment)
+    hosts_comments, hosts = get_user_host(username)
+    for ip in hosts:
+        print '%s -- %s' % (ip, hosts_comments[ip])
 
 
 def connect(username, password, host, port):
@@ -258,7 +287,7 @@ if __name__ == '__main__':
             elif option in ['Q', 'q']:
                 sys.exit()
             else:
-                pass
+                verify_connect(login_name, option)
     except IndexError:
         pass
 
