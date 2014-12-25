@@ -15,13 +15,10 @@ import getpass
 from django.core.exceptions import ObjectDoesNotExist
 from Crypto.Cipher import AES
 from binascii import b2a_hex, a2b_hex
-import re
-
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 django.setup()
-
-from juser.models import User, Group
-from jasset.models import Asset, IDC
+from juser.models import User
+from jasset.models import Asset
 from jpermission.models import Permission
 
 try:
@@ -109,6 +106,7 @@ def posix_shell(chan, user, host):
     if not os.path.isdir(today_connect_log_dir):
         try:
             os.makedirs(today_connect_log_dir)
+            os.chmod(today_connect_log_dir, 0777)
         except OSError:
             alert_print('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, connect_log_dir))
 
@@ -258,7 +256,6 @@ def connect(username, password, host, port):
     # Set PS1 and msg it
     channel.send(ps1)
     channel.send(login_msg)
-    print channel.get_name()
 
     # Make ssh interactive tunnel
     posix_shell(channel, username, host)
