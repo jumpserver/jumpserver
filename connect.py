@@ -175,7 +175,7 @@ def get_connect_item(username, ip):
         red_print("Host %s isn't exist." % ip)
         return
 
-    if not asset.ldap_enable:
+    if asset.ldap_enable:
         user = User.objects.get(username=username)
         ldap_pwd = user.ldap_pwd
         return username, ldap_pwd, ip, port
