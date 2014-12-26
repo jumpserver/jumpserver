@@ -122,7 +122,7 @@ def posix_shell(chan, username, host):
     except IOError:
         alert_print('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 
-    log = Log(user=user, asset=asset, log_path=log_file_path, start_time=timestamp_now, pid=pid)
+    log = Log(user=user, asset=asset, log_path=log_file_path, start_time=timestamp_start, pid=pid)
     log.save()
 
     old_tty = termios.tcgetattr(sys.stdin)
