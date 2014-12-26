@@ -5,7 +5,7 @@ from jasset.models import Asset
 
 
 class Log(models.Model):
-    username = models.ForeignKey(User)
+    user = models.ForeignKey(User)
     asset = models.ForeignKey(Asset)
     log_path = models.CharField(max_length=100)
     start_time = models.IntegerField()

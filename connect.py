@@ -21,6 +21,7 @@ django.setup()
 
 from juser.models import User
 from jasset.models import Asset
+from jlog.models import Log
 
 try:
     import termios
@@ -93,16 +94,21 @@ def set_win_size(sig, data):
         pass
 
 
-def posix_shell(chan, user, host):
+def posix_shell(chan, username, host):
     """
     Use paramiko channel connect server and logging.
     """
     connect_log_dir = os.path.join(LOG_DIR, 'connect')
-    today = time.strftime('%Y%m%d')
-    date_now = time.strftime('%Y%m%d%H%M%S')
+    timestamp_start = int(time.time())
+    today = time.strftime('%Y%m%d', time.localtime(timestamp_start))
+    date_now = time.strftime('%Y%m%d%H%M%S', time.localtime(timestamp_start))
+
     today_connect_log_dir = os.path.join(connect_log_dir, today)
-    log_filename = '%s_%s_%s.log' % (user, host, date_now)
+    log_filename = '%s_%s_%s.log' % (username, host, date_now)
     log_file_path = os.path.join(today_connect_log_dir, log_filename)
+    user = User.objects.get(username=username)
+    asset = Asset.objects.get(ip=host)
+    pid = os.getpid()
 
     if not os.path.isdir(today_connect_log_dir):
         try:
@@ -112,9 +118,12 @@ def posix_shell(chan, user, host):
             alert_print('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, connect_log_dir))
 
     try:
-        log = open(log_file_path, 'a')
+        log_file = open(log_file_path, 'a')
     except IOError:
         alert_print('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
+
+    log = Log(user=user, asset=asset, log_path=log_file_path, start_time=timestamp_now, pid=pid)
+    log.save()
 
     old_tty = termios.tcgetattr(sys.stdin)
     try:
@@ -135,8 +144,8 @@ def posix_shell(chan, user, host):
                         break
                     sys.stdout.write(x)
                     sys.stdout.flush()
-                    log.write(x)
-                    log.flush()
+                    log_file.write(x)
+                    log_file.flush()
                 except socket.timeout:
                     pass
 
@@ -147,8 +156,12 @@ def posix_shell(chan, user, host):
                 chan.send(x)
 
     finally:
+        timestamp_end = time.time()
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)
-        log.close()
+        log_file.close()
+        log.is_finished = True
+        log.end_time = timestamp_end
+        log.save()
 
 
 def get_user_host(username):
