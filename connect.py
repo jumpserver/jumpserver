@@ -151,7 +151,7 @@ def posix_shell(chan, user, host):
 
 
 def get_user_host(username):
-    hosts_comments = {}
+    hosts_attr = {}
     try:
         user = User.objects.get(username=username)
     except ObjectDoesNotExist:
@@ -159,10 +159,10 @@ def get_user_host(username):
     else:
         perm_all = user.permission_set.all()
         for perm in perm_all:
-            hosts_comments[perm.asset.ip] = perm.asset.comment
-        hosts = hosts_comments.keys()
+            hosts_attr[perm.asset.ip] = [perm.asset.id, perm.asset.comment]
+        hosts = hosts_attr.keys()
         hosts.sort()
-        return hosts_comments, hosts
+        return hosts_attr, hosts
 
 
 def get_connect_item(username, ip):
@@ -190,14 +190,14 @@ def get_connect_item(username, ip):
 
 def verify_connect(username, part_ip):
     ip_matched = []
-    hosts_comments, hosts = get_user_host(username)
+    hosts_mix, hosts = get_user_host(username)
     for ip in hosts:
         if part_ip in ip:
             ip_matched.append(ip)
 
     if len(ip_matched) > 1:
         for ip in ip_matched:
-            print '%s -- %s' % (ip, hosts_comments[ip])
+            print '[%s] %s -- %s' % (hosts_mix[ip][0], ip, hosts_mix[ip][1])
     elif len(ip_matched) < 1:
         red_print('No Permission or No host.')
     else:
@@ -220,9 +220,9 @@ def print_prompt():
 
 
 def print_user_host(username):
-    hosts_comments, hosts = get_user_host(username)
+    hosts_attr, hosts = get_user_host(username)
     for ip in hosts:
-        print '%s -- %s' % (ip, hosts_comments[ip])
+        print '[%s] %s -- %s' % (hosts_attr[ip][0], ip, hosts_attr[ip][1])
 
 
 def connect(username, password, host, port):
