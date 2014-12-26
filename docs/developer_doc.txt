@@ -1,0 +1,21 @@
+# coding: utf8
+
+Jumpserver开发者文档
+
+开发规范：
+  1. 遵守PE8规范  1) 命名规范  2) 导入模块规范 3) 空行规范 4) 长度规范
+  2. 缩进统一4个空格
+  3. 变量命名明了易懂多个单词下划线隔开
+  4. 注释到位
+
+
+框架说明：
+  1. 项目名称 Jumpserver
+  2. APP:
+       juser 			用户管理
+       jasset 			资产管理(设备管理)
+       jpermission 		授权管理
+       jlog				日志管理
+  3. connect.py 		用户登录入口程序
+  4. logs        		日志保存目录
+  5. jumpserver.conf 	配置文件

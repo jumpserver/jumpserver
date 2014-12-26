@@ -49,6 +49,7 @@ INSTALLED_APPS = (
     'juser',
     'jasset',
     'jpermission',
+    'jlog',
 )
 
 MIDDLEWARE_CLASSES = (
