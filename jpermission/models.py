@@ -11,7 +11,7 @@ class Permission(models.Model):
     user = models.ForeignKey(User)
     asset = models.ForeignKey(Asset)
     role = models.CharField(choices=USER_ROLE_CHOICES,
-                            max_length=1,
+                            max_length=2,
                             blank=True,
                             null=True)
 
