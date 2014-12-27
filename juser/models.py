@@ -11,9 +11,9 @@ class Group(models.Model):
 
 class User(models.Model):
     USER_ROLE_CHOICES = (
-        ('SU', 'Super_User'),
-        ('GA', 'Group_Admin'),
-        ('CU', 'Common_User'),
+        ('SU', 'SuperUser'),
+        ('GA', 'GroupAdmin'),
+        ('CU', 'CommonUser'),
     )
     username = models.CharField(max_length=80, unique=True)
     password = models.CharField(max_length=100)

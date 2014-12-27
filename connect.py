@@ -173,7 +173,7 @@ def get_user_host(username):
     try:
         user = User.objects.get(username=username)
     except ObjectDoesNotExist:
-        return {'Error': 'username %s is not exist.' % username}, ['Error']
+        return {'Error': ['0', "Username \033[1;31m%s\033[0m doesn't exist on Jumpserver." % username]}, ['Error']
     else:
         perm_all = user.permission_set.all()
         for perm in perm_all:
