@@ -8,19 +8,23 @@ from juser.models import User, Group
 from jasset.models import Asset, IDC
 from jpermission.models import Permission
 
+from connect import PyCrypt, KEY
+cryptor = PyCrypt(KEY)
 
-def add_group(group):
-    group = Group(name='hadoop')
+
+def add_group(name):
+    group = Group(name=name)
     group.save()
     return group
 
 
-def add_user(username, name,  group, ldap_pwd='hadoop', ssh_key_pwd='hadoop',
+def add_user(username, name, ldap_pwd='hadoop', ssh_key_pwd='hadoop',
              date_joined=0, role='CU', is_active=True, password='hadoop',):
-    user = User(username=username, password=password, name=name, group=group, ldap_pwd=ldap_pwd,
+    user = User(username=username, password=password, name=name, ldap_pwd=cryptor.encrypt(ldap_pwd),
                 ssh_key_pwd=ssh_key_pwd, date_joined=date_joined, role=role, is_active=is_active)
     user.save()
     return user
+
 
 
 def add_idc(name):
@@ -29,29 +33,16 @@ def add_idc(name):
     return idc
 
 
-def add_asset(ip, idc, password_common, port=2001, ldap_enable=False, username_common='guanghongwei', date_add=0):
+def add_asset(ip, idc, password_common, port=2001, ldap_enable=False, username_common='guanghongwei', date_added=0):
     asset = Asset(ip=ip, idc=idc, password_common=password_common, port=port,
-                  ldap_enable=ldap_enable, username_common=username_common, date_add=date_add)
+                  ldap_enable=ldap_enable, username_common=cryptor.encrypt(username_common), date_added=date_added)
     asset.save()
     return asset
 
 
 def add_perm(user, asset, is_ldap, perm_user_type='C'):
-    perm = Permission(user, asset, is_ldap, perm_user_type)
+    perm = Permission(user=user, asset=asset, is_ldap=is_ldap, perm_user_type=perm_user_type)
     perm.save()
     return perm
-
-
-wrm = add_group('wrm')
-guanghongwei = add_user('guanghongwei', 'guanghongwei', wrm)
-
-sd = add_idc('sd')
-test1 = add_asset('172.16.1.122', sd, 'Lov@j1ax1n')
-
-perm = add_perm(guanghongwei, test1, is_ldap=False)
-
-
-
-
 
 
