@@ -37,6 +37,8 @@ CONF = ConfigParser()
 CONF.read(os.path.join(CURRENT_DIR, 'jumpserver.conf'))
 LOG_DIR = os.path.join(CURRENT_DIR, 'logs')
 KEY = CONF.get('web', 'key')
+LOGIN_NAME = getpass.getuser()
+#LOGIN_NAME = os.getlogin()
 
 
 def green_print(string):
@@ -225,7 +227,7 @@ def verify_connect(username, part_ip):
         except (ObjectDoesNotExist, IndexError):
             red_print('Get get_connect_item Error.')
         else:
-            connect(username, password, host, port)
+            connect(username, password, host, port, LOGIN_NAME)
 
 
 def print_prompt():
@@ -244,7 +246,7 @@ def print_user_host(username):
         print '[%s] %s -- %s' % (hosts_attr[ip][0], ip, hosts_attr[ip][1])
 
 
-def connect(username, password, host, port):
+def connect(username, password, host, port, login_name):
     """
     Connect server.
     """
@@ -277,7 +279,7 @@ def connect(username, password, host, port):
     channel.send(login_msg)
 
     # Make ssh interactive tunnel
-    posix_shell(channel, username, host)
+    posix_shell(channel, login_name, host)
 
     # Shutdown channel socket
     channel.close()
@@ -285,8 +287,6 @@ def connect(username, password, host, port):
 
 
 if __name__ == '__main__':
-    #login_name = os.getlogin()
-    login_name = getpass.getuser()
     print_prompt()
     try:
         while True:
@@ -296,14 +296,14 @@ if __name__ == '__main__':
                 print
                 continue
             if option in ['P', 'p']:
-                print_user_host(login_name)
+                print_user_host(LOGIN_NAME)
                 continue
             elif option in ['E', 'e']:
                 pass
             elif option in ['Q', 'q']:
                 sys.exit()
             else:
-                verify_connect(login_name, option)
+                verify_connect(LOGIN_NAME, option)
     except IndexError:
         pass
 
