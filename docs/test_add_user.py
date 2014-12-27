@@ -36,11 +36,20 @@ def add_asset(ip, idc, password_common, port=2001, ldap_enable=False, username_c
     return asset
 
 
+def add_perm(user, asset, is_ldap, perm_user_type='C'):
+    perm = Permission(user, asset, is_ldap, perm_user_type)
+    perm.save()
+    return perm
+
+
 wrm = add_group('wrm')
 guanghongwei = add_user('guanghongwei', 'guanghongwei', wrm)
 
 sd = add_idc('sd')
 test1 = add_asset('172.16.1.122', sd, 'Lov@j1ax1n')
+
+perm = add_perm(guanghongwei, test1, is_ldap=False)
+
 
 
 
