@@ -201,7 +201,7 @@ def get_connect_item(username, ip):
         perms = asset.permission_set.all()
         perm = perms[0]
 
-        if perm.perm_user_type == 'S':
+        if perm.role == 'SU':
             return asset.username_super, cryptor.decrypt(asset.password_super), ip, port
         else:
             return asset.username_common, cryptor.decrypt(asset.password_common), ip, port
