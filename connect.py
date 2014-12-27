@@ -14,6 +14,7 @@ import django
 import getpass
 from Crypto.Cipher import AES
 from binascii import b2a_hex, a2b_hex
+from ConfigParser import ConfigParser
 
 from django.core.exceptions import ObjectDoesNotExist
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
@@ -32,7 +33,10 @@ except ImportError:
 
 
 CURRENT_DIR = os.path.abspath('.')
+CONF = ConfigParser()
+CONF.read(os.path.join(CURRENT_DIR, 'jumpserver.conf'))
 LOG_DIR = os.path.join(CURRENT_DIR, 'logs')
+KEY = CONF.get('web', 'key')
 
 
 def green_print(string):
@@ -180,6 +184,8 @@ def get_user_host(username):
 
 
 def get_connect_item(username, ip):
+    cryptor = PyCrypt(KEY)
+
     try:
         asset = Asset.objects.get(ip=ip)
         port = asset.port
@@ -189,17 +195,16 @@ def get_connect_item(username, ip):
 
     if asset.ldap_enable:
         user = User.objects.get(username=username)
-        ldap_pwd = user.ldap_pwd
+        ldap_pwd = cryptor.decrypt(user.ldap_pwd)
         return username, ldap_pwd, ip, port
-
     else:
         perms = asset.permission_set.all()
         perm = perms[0]
 
         if perm.perm_user_type == 'S':
-            return asset.username_super, asset.password_super, ip, port
+            return asset.username_super, cryptor.decrypt(asset.password_super), ip, port
         else:
-            return asset.username_common, asset.password_common, ip, port
+            return asset.username_common, cryptor.decrypt(asset.password_common), ip, port
 
 
 def verify_connect(username, part_ip):

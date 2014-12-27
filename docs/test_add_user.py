@@ -9,25 +9,40 @@ from jasset.models import Asset, IDC
 from jpermission.models import Permission
 
 
-g = Group(name='wzp', comment='wzp project')
-g.save()
+def add_group(group):
+    group = Group(name='hadoop')
+    group.save()
+    return group
 
-u = User(username='hadoop', password='hadoop', name='hadoop', email='ibuler@qq.com', 
-         ldap_pwd='hadoop', ssh_key_pwd='hadoop', date_joined=0)
-u.save()
-u.group=[g]
-u.save()
 
-i = IDC(name='lf')
-i.save()
+def add_user(username, name,  group, ldap_pwd='hadoop', ssh_key_pwd='hadoop',
+             date_joined=0, role='CU', is_active=True, password='hadoop',):
+    user = User(username=username, password=password, name=name, group=group, ldap_pwd=ldap_pwd,
+                ssh_key_pwd=ssh_key_pwd, date_joined=date_joined, role=role, is_active=is_active)
+    user.save()
+    return user
 
-a = Asset(ip='172.16.1.122', port=2001, idc=i, date_added=0)
-a.save()
-a.group = [g]
-a.save()
 
-p = Permission(user=u, asset=a)
-p.save()
+def add_idc(name):
+    idc = IDC(name=name)
+    idc.save()
+    return idc
+
+
+def add_asset(ip, idc, password_common, port=2001, ldap_enable=False, username_common='guanghongwei', date_add=0):
+    asset = Asset(ip=ip, idc=idc, password_common=password_common, port=port,
+                  ldap_enable=ldap_enable, username_common=username_common, date_add=date_add)
+    asset.save()
+    return asset
+
+
+wrm = add_group('wrm')
+guanghongwei = add_user('guanghongwei', 'guanghongwei', wrm)
+
+sd = add_idc('sd')
+test1 = add_asset('172.16.1.122', sd, 'Lov@j1ax1n')
+
+
 
 
 
