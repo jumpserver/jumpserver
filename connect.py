@@ -204,9 +204,15 @@ def get_connect_item(username, ip):
         perm = perms[0]
 
         if perm.role == 'SU':
-            return asset.username_super, cryptor.decrypt(asset.password_super), ip, port
+            try:
+                return asset.username_super, cryptor.decrypt(asset.password_super), ip, port
+            except TypeError:
+                red_print('User %s password error to decrypt.' % username)
         else:
-            return asset.username_common, cryptor.decrypt(asset.password_common), ip, port
+            try:
+                return asset.username_common, cryptor.decrypt(asset.password_common), ip, port
+            except TypeError:
+                red_print('User %s password error to decrypt.' % username)
 
 
 def verify_connect(username, part_ip):
@@ -306,5 +312,3 @@ if __name__ == '__main__':
                 verify_connect(LOGIN_NAME, option)
     except IndexError:
         pass
-
-
