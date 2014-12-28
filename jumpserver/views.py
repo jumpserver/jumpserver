@@ -5,7 +5,7 @@ from django.shortcuts import render_to_response
 
 
 def base(request):
-    render_to_response('base.html')
+    return render_to_response('base.html')
 
 
 
