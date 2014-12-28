@@ -1,0 +1,73 @@
+/* 
+Justified Gallery
+Version: 2.1
+Author: Miro Mannino
+Author URI: http://miromannino.it
+
+Copyright 2012 Miro Mannino (miro.mannino@gmail.com)
+
+This file is part of Justified Gallery.
+
+This work is licensed under the Creative Commons Attribution 3.0 Unported License. 
+
+To view a copy of this license, visit http://creativecommons.org/licenses/by/3.0/ 
+or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
+*/
+
+html { overflow-y: scroll; } /*to prevent the loop when the scrollbar appear and disappear*/
+
+.justifiedGallery { width: 100%; margin-bottom: 10px; }
+.justifiedGallery .jg-image {
+    position: absolute;
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 0px;
+}
+.justifiedGallery .jg-image img {
+    border: none;
+    margin: 0;
+    padding: 0;
+    display: none;
+}
+.justifiedGallery .jg-image a { text-decoration: none; }
+.justifiedGallery .jg-image-label {
+    white-space: normal;
+    font: normal 12px arial;
+    background: #000;
+    color: #fff;
+    position: absolute;
+    left: 0;
+    right: 0;
+    padding: 5px 5px 10px 8px;
+    text-align: left;
+    opacity: 0;
+    filter:alpha(opacity=0); /* IE8 or Earlier */
+}
+.justifiedGallery .jg-loading-img{
+    margin: auto;
+    width: 50px;
+    height: 50px;
+    background:url(loading.gif) no-repeat center center;
+}
+.justifiedGallery .jg-loading{
+    margin: auto;
+    width: 50px;
+    height: 50px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+.justifiedGallery .jg-row {
+    position: relative;
+    white-space: nowrap;    
+    overflow:hidden;
+    margin-bottom: 4px;
+}
+
+.justifiedGallery .jg-error {
+    font-size: 12px; 
+    border: 1px solid red; 
+    background-color: #faa; 
+    margin: 10px 0px 10px 0px; 
+    padding: 5px 0px 5px 5px;
+}
