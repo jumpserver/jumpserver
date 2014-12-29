@@ -234,7 +234,7 @@ def verify_connect(username, part_ip):
         red_print('No Permission or No host.')
     else:
         try:
-            username, password, host, port, key_filename = get_connect_item(username, ip_matched[0])
+            username, password, host, port = get_connect_item(username, ip_matched[0])
         except (ObjectDoesNotExist, IndexError):
             red_print('Get get_connect_item Error.')
         else:
