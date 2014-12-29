@@ -16,6 +16,7 @@ class Asset(models.Model):
     idc = models.ForeignKey(IDC)
     group = models.ManyToManyField(Group)
     ldap_enable = models.BooleanField(default=True)
+    ssh_key_enable = models.BooleanField(default=False)
     username_common = models.CharField(max_length=80, blank=True, null=True)
     password_common = models.CharField(max_length=160, blank=True, null=True)
     username_super = models.CharField(max_length=80, blank=True, null=True)

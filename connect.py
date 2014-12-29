@@ -36,6 +36,8 @@ CURRENT_DIR = os.path.abspath('.')
 CONF = ConfigParser()
 CONF.read(os.path.join(CURRENT_DIR, 'jumpserver.conf'))
 LOG_DIR = os.path.join(CURRENT_DIR, 'logs')
+SSH_KEY_DIR = os.path.join(CURRENT_DIR, 'keys')
+SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
 KEY = CONF.get('web', 'key')
 LOGIN_NAME = getpass.getuser()
 #LOGIN_NAME = os.getlogin()
@@ -195,10 +197,13 @@ def get_connect_item(username, ip):
         red_print("Host %s isn't exist." % ip)
         return
 
+    user = User.objects.get(username=username)
     if asset.ldap_enable:
-        user = User.objects.get(username=username)
         ldap_pwd = cryptor.decrypt(user.ldap_pwd)
         return username, ldap_pwd, ip, port
+    elif asset.ssh_key_enable:
+        ssh_key_pwd = cryptor.decrypt(user.ssh_key_pwd)
+        return username, ssh_key_pwd, ip, port
     else:
         perms = asset.permission_set.all()
         perm = perms[0]
@@ -229,7 +234,7 @@ def verify_connect(username, part_ip):
         red_print('No Permission or No host.')
     else:
         try:
-            username, password, host, port = get_connect_item(username, ip_matched[0])
+            username, password, host, port, key_filename = get_connect_item(username, ip_matched[0])
         except (ObjectDoesNotExist, IndexError):
             red_print('Get get_connect_item Error.')
         else:
@@ -258,13 +263,19 @@ def connect(username, password, host, port, login_name):
     """
     ps1 = "PS1='[\u@%s \W]\$ '\n" % host
     login_msg = "clear;echo -e '\\033[32mLogin %s done. Enjoy it.\\033[0m'\n" % host
+    user_key_file = os.path.join(SERVER_KEY_DIR, username)
+
+    if os.path.isfile(user_key_file):
+        key_filename = user_key_file
+    else:
+        key_filename = None
 
     # Make a ssh connection
     ssh = paramiko.SSHClient()
     ssh.load_system_host_keys()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
-        ssh.connect(host, port=port, username=username, password=password, compress=True)
+        ssh.connect(host, port=port, username=username, password=password, key_filename=key_filename, compress=True)
     except paramiko.ssh_exception.AuthenticationException:
         alert_print('Host Password Error, Please Correct it.')
     except socket.error:
@@ -272,9 +283,9 @@ def connect(username, password, host, port, login_name):
 
     # Make a channel and set windows size
     global channel
-    channel = ssh.invoke_shell()
     win_size = get_win_size()
-    channel.resize_pty(height=win_size[0], width=win_size[1])
+    channel = ssh.invoke_shell(height=win_size[0], width=win_size[1])
+    #channel.resize_pty(height=win_size[0], width=win_size[1])
     try:
         signal.signal(signal.SIGWINCH, set_win_size)
     except:
