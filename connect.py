@@ -357,12 +357,12 @@ def connect(username, password, host, port, login_name, login_type='L'):
     ssh.close()
 
 
-def remote_exec_cmd(ip, port, username, passwd, cmd):
+def remote_exec_cmd(ip, port, username, password, cmd):
     try:
         time.sleep(3)
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(ip, port, username, passwd, timeout=5)
+        ssh.connect(ip, port, username, password, timeout=5)
         stdin, stdout, stderr = ssh.exec_command("bash -l -c '%s'" % cmd)
         out = stdout.readlines()
         err = stderr.readlines()
@@ -377,18 +377,19 @@ def remote_exec_cmd(ip, port, username, passwd, cmd):
         red_print(str(e))
 
 
-def mutli_remote_exec_cmd(hosts, username, cmd):
+def multi_remote_exec_cmd(hosts, username, cmd):
     pool = Pool(processes=3)
     for host in hosts:
-        username, passwd, ip, port = get_connect_item(username, host)
-        pool.apply_async(remote_exec_cmd, (ip, port, username, passwd, cmd))
+        login_type, username, password, ip, port = get_connect_item(username, host)
+        pool.apply_async(remote_exec_cmd, (ip, port, username, password, cmd))
     pool.close()
     pool.join()
 
 
 def exec_cmd_servers(username):
     hosts = []
-    green_print("Input the Host IP(s),Separated by Commas, q/Q to Quit.\nYou can choose in the following IP(s), Use Linux / Unix glob.")
+    green_print("Input the Host IP(s),Separated by Commas, q/Q to Quit.\n \
+                You can choose in the following IP(s), Use Linux / Unix glob.")
     print_user_host(LOGIN_NAME)
     while True:
         inputs = raw_input('\033[1;32mip(s)>: \033[0m')
@@ -416,7 +417,7 @@ def exec_cmd_servers(username):
             f = open(filename, 'a')
             f.write("DateTime: %s User: %s Host: %s Cmds: %s\n" %
                     (time.strftime('%Y/%m/%d %H:%M:%S'), username, hosts, cmd))
-            mutli_remote_exec_cmd(hosts, username, cmd)
+            multi_remote_exec_cmd(hosts, username, cmd)
 
 
 if __name__ == '__main__':
