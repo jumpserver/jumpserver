@@ -210,10 +210,16 @@ def get_connect_item(username, ip):
     except ObjectDoesNotExist:
         raise ServerError("Host %s does not exist." % ip)
 
+    if not asset.is_active:
+        raise ServerError('Host %s is not active.' % ip)
+
     try:
         user = User.objects.get(username=username)
     except ObjectDoesNotExist:
         raise ServerError('User %s does not exist.' % username)
+
+    if not user.is_active:
+        raise ServerError('User %s is not active.' % username)
 
     if asset.login_type == 'L':
         try:
