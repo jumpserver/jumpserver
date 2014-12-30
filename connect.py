@@ -1,4 +1,4 @@
-#coding: utf-8
+# coding: utf-8
 
 import socket
 import sys
@@ -12,11 +12,14 @@ import signal
 import textwrap
 import django
 import getpass
+import fnmatch
+from multiprocessing import Pool
 from Crypto.Cipher import AES
 from binascii import b2a_hex, a2b_hex
 from ConfigParser import ConfigParser
 
 from django.core.exceptions import ObjectDoesNotExist
+
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 django.setup()
 
@@ -31,7 +34,6 @@ except ImportError:
     print '\033[1;31mOnly postfix supported.\033[0m'
     sys.exit()
 
-
 CURRENT_DIR = os.path.abspath('.')
 CONF = ConfigParser()
 CONF.read(os.path.join(CURRENT_DIR, 'jumpserver.conf'))
@@ -43,6 +45,10 @@ LOGIN_NAME = getpass.getuser()
 
 def green_print(string):
     print '\033[1;32m%s\033[0m' % string
+
+
+def blue_print(string):
+    print '\033[1;36m%s\033[0m' % string
 
 
 def red_print(string):
@@ -57,6 +63,7 @@ def alert_print(string):
 
 class PyCrypt(object):
     """It's used to encrypt and decrypt password."""
+
     def __init__(self, key):
         self.key = key
         self.mode = AES.MODE_CBC
@@ -264,6 +271,7 @@ def connect(username, password, host, port, login_name):
     ssh.load_system_host_keys()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
+        print port, username, password
         ssh.connect(host, port=port, username=username, password=password, compress=True)
     except paramiko.ssh_exception.AuthenticationException:
         alert_print('Host Password Error, Please Correct it.')
@@ -292,6 +300,68 @@ def connect(username, password, host, port, login_name):
     ssh.close()
 
 
+def remote_exec_cmd(ip, port, username, passwd, cmd):
+    try:
+        time.sleep(3)
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(ip, port, username, passwd, timeout=5)
+        stdin, stdout, stderr = ssh.exec_command("bash -l -c '%s'" % cmd)
+        out = stdout.readlines()
+        err = stderr.readlines()
+        blue_print(ip + ':')
+        for i in out:
+            green_print(" " * 4 + i.strip())
+        for j in err:
+            red_print(" " * 4 + j.strip())
+        ssh.close()
+    except Exception as e:
+        blue_print(ip + ':')
+        red_print(str(e))
+
+
+def mutli_remote_exec_cmd(hosts, username, cmd):
+    pool = Pool(processes=3)
+    for host in hosts:
+        username, passwd, ip, port = get_connect_item(username, host)
+        pool.apply_async(remote_exec_cmd, (ip, port, username, passwd, cmd))
+    pool.close()
+    pool.join()
+
+
+def exec_cmd_servers(username):
+    hosts = []
+    green_print("Input the Host IP(s),Separated by Commas, q/Q to Quit.\nYou can choose in the following IP(s), Use Linux / Unix glob.")
+    print_user_host(LOGIN_NAME)
+    while True:
+        inputs = raw_input('\033[1;32mip(s)>: \033[0m')
+        if inputs in ['q', 'Q']:
+            break
+        get_hosts = get_user_host(username)[0].keys()
+        for host in get_hosts:
+            if fnmatch.fnmatch(host, inputs):
+                hosts.append(host.strip())
+        if len(hosts) == 0:
+            red_print("Check again, Not matched any ip!")
+            continue
+        else:
+            print "You matched ip: %s" % hosts
+        green_print("Input the Command , The command will be Execute on servers, q/Q to quit.")
+        while True:
+            cmd = raw_input('\033[1;32mCmd(s): \033[0m')
+            if cmd in ['q', 'Q']:
+                break
+            exec_log_dir = os.path.join(LOG_DIR, 'exec_cmds')
+            if not os.path.isdir(exec_log_dir):
+                os.mkdir(exec_log_dir)
+                os.chmod(exec_log_dir, 0777)
+            filename = "%s/%s.log" % (exec_log_dir, time.strftime('%Y%m%d'))
+            f = open(filename, 'a')
+            f.write("DateTime: %s User: %s Host: %s Cmds: %s\n" %
+                    (time.strftime('%Y/%m/%d %H:%M:%S'), username, hosts, cmd))
+            mutli_remote_exec_cmd(hosts, username, cmd)
+
+
 if __name__ == '__main__':
     print_prompt()
     try:
@@ -305,7 +375,7 @@ if __name__ == '__main__':
                 print_user_host(LOGIN_NAME)
                 continue
             elif option in ['E', 'e']:
-                pass
+                exec_cmd_servers(LOGIN_NAME)
             elif option in ['Q', 'q']:
                 sys.exit()
             else:
