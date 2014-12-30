@@ -260,7 +260,7 @@ def get_connect_item(username, ip):
                 password_common = asset.password_common
             except TypeError:
                 raise ServerError('Decrypt %s map to %s password in %s error.' % (username, username_common, ip))
-            return username_common, password_common, ip, port
+            return 'CU', username_common, password_common, ip, port
 
         else:
             raise ServerError('Perm in %s for %s map role is not in ["SU", "CU"].' % (ip, username))
