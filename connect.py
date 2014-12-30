@@ -323,7 +323,7 @@ def connect(username, password, host, port, login_name, login_type='L'):
             ssh.connect(host, port=port, username=username, password=password, key_filename=key_filename, compress=True)
         else:
             ssh.connect(host, port=port, username=username, password=password, compress=True)
-    except paramiko.ssh_exception.AuthenticationException:
+    except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
         raise ServerError('Authentication Error.')
     except socket.error:
         raise ServerError('Connect SSH Socket Port Error, Please Correct it.')
