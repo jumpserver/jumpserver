@@ -57,6 +57,16 @@ def alert_print(string):
     sys.exit()
 
 
+class ServerError(Exception):
+    def __init__(self, error):
+        self.error = error
+
+    def __str__(self):
+        return self.error
+
+    __repr__ = __str__
+
+
 class PyCrypt(object):
     """It's used to encrypt and decrypt password."""
     def __init__(self, key):
@@ -114,21 +124,25 @@ def posix_shell(chan, username, host):
     today_connect_log_dir = os.path.join(connect_log_dir, today)
     log_filename = '%s_%s_%s.log' % (username, host, date_now)
     log_file_path = os.path.join(today_connect_log_dir, log_filename)
-    user = User.objects.get(username=username)
-    asset = Asset.objects.get(ip=host)
-    pid = os.getpid()
 
+    try:
+        user = User.objects.get(username=username)
+        asset = Asset.objects.get(ip=host)
+    except ObjectDoesNotExist:
+        raise ServerError('user %s or asset %s does not exist.' % (username, host))
+
+    pid = os.getpid()
     if not os.path.isdir(today_connect_log_dir):
         try:
             os.makedirs(today_connect_log_dir)
             os.chmod(today_connect_log_dir, 0777)
         except OSError:
-            alert_print('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, connect_log_dir))
+            raise ServerError('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, connect_log_dir))
 
     try:
         log_file = open(log_file_path, 'a')
     except IOError:
-        alert_print('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
+        raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 
     log = Log(user=user, asset=asset, log_path=log_file_path, start_time=timestamp_start, pid=pid)
     log.save()
@@ -177,7 +191,7 @@ def get_user_host(username):
     try:
         user = User.objects.get(username=username)
     except ObjectDoesNotExist:
-        return {'Error': ['0', "Username \033[1;31m%s\033[0m doesn't exist on Jumpserver." % username]}, ['Error']
+        raise ServerError("Username \033[1;31m%s\033[0m doesn't exist on Jumpserver." % username)
     else:
         perm_all = user.permission_set.all()
         for perm in perm_all:
@@ -194,30 +208,58 @@ def get_connect_item(username, ip):
         asset = Asset.objects.get(ip=ip)
         port = asset.port
     except ObjectDoesNotExist:
-        red_print("Host %s isn't exist." % ip)
-        return
+        raise ServerError("Host %s does not exist." % ip)
 
-    user = User.objects.get(username=username)
-    if asset.ldap_enable:
-        ldap_pwd = cryptor.decrypt(user.ldap_pwd)
-        return username, ldap_pwd, ip, port
-    elif asset.ssh_key_enable:
-        ssh_key_pwd = cryptor.decrypt(user.ssh_key_pwd)
-        return username, ssh_key_pwd, ip, port
-    else:
-        perms = asset.permission_set.all()
-        perm = perms[0]
+    try:
+        user = User.objects.get(username=username)
+    except ObjectDoesNotExist:
+        raise ServerError('User %s does not exist.' % username)
+
+    if asset.login_type == 'L':
+        try:
+            ldap_pwd = cryptor.decrypt(user.ldap_pwd)
+        except TypeError:
+            raise ServerError('Decrypt %s ldap password error.' % username)
+        return 'L', username, ldap_pwd, ip, port
+    elif asset.login_type == 'S':
+        try:
+            ssh_key_pwd = cryptor.decrypt(user.ssh_key_pwd2)
+        except TypeError:
+            raise ServerError('Decrypt %s ssh key password error.' % username)
+        return 'S', username, ssh_key_pwd, ip, port
+    elif asset.login_type == 'P':
+        try:
+            ssh_pwd = cryptor.decrypt(user.ssh_pwd)
+        except TypeError:
+            raise ServerError('Decrypt %s ssh password error.' % username)
+        return 'P', username, ssh_pwd, ip, port
+    elif asset.login_type == 'M':
+        perms = asset.permission_set.filter(user=user)
+        try:
+            perm = perms[0]
+        except IndexError:
+            raise ServerError('Permission %s to %s does not exist.' % (username, ip))
 
         if perm.role == 'SU':
+            username_super = asset.username_super
             try:
-                return asset.username_super, cryptor.decrypt(asset.password_super), ip, port
+                password_super = cryptor.decrypt(asset.password_super)
             except TypeError:
-                red_print('User %s password error to decrypt.' % username)
+                raise ServerError('Decrypt %s map to %s password in %s error.' % (username, username_super, ip))
+            return 'M', username_super, password_super, ip, port
+
+        elif perm.role == 'CU':
+            username_common = asset.username_common
+            try:
+                password_common = asset.password_common
+            except TypeError:
+                raise ServerError('Decrypt %s map to %s password in %s error.' % (username, username_common, ip))
+            return username_common, password_common, ip, port
+
         else:
-            try:
-                return asset.username_common, cryptor.decrypt(asset.password_common), ip, port
-            except TypeError:
-                red_print('User %s password error to decrypt.' % username)
+            raise ServerError('Perm in %s for %s map role is not in ["SU", "CU"].' % (ip, username))
+    else:
+        raise ServerError('Login type is not in ["L", "S", "P", "M"]')
 
 
 def verify_connect(username, part_ip):
@@ -233,12 +275,8 @@ def verify_connect(username, part_ip):
     elif len(ip_matched) < 1:
         red_print('No Permission or No host.')
     else:
-        try:
-            username, password, host, port = get_connect_item(username, ip_matched[0])
-        except (ObjectDoesNotExist, IndexError):
-            red_print('Get get_connect_item Error.')
-        else:
-            connect(username, password, host, port, LOGIN_NAME)
+        login_type, username, password, host, port = get_connect_item(username, ip_matched[0])
+        connect(username, password, host, port, LOGIN_NAME, login_type=login_type)
 
 
 def print_prompt():
@@ -257,7 +295,7 @@ def print_user_host(username):
         print '[%s] %s -- %s' % (hosts_attr[ip][0], ip, hosts_attr[ip][1])
 
 
-def connect(username, password, host, port, login_name):
+def connect(username, password, host, port, login_name, login_type='L'):
     """
     Connect server.
     """
@@ -275,11 +313,14 @@ def connect(username, password, host, port, login_name):
     ssh.load_system_host_keys()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
-        ssh.connect(host, port=port, username=username, password=password, key_filename=key_filename, compress=True)
+        if login_type == 'L':
+            ssh.connect(host, port=port, username=username, password=password, key_filename=key_filename, compress=True)
+        else:
+            ssh.connect(host, port=port, username=username, password=password, compress=True)
     except paramiko.ssh_exception.AuthenticationException:
-        alert_print('Host Password Error, Please Correct it.')
+        raise ServerError('Authentication Error.')
     except socket.error:
-        alert_print('Connect SSH Socket Port Error, Please Correct it.')
+        raise ServerError('Connect SSH Socket Port Error, Please Correct it.')
 
     # Make a channel and set windows size
     global channel
@@ -320,6 +361,9 @@ if __name__ == '__main__':
             elif option in ['Q', 'q']:
                 sys.exit()
             else:
-                verify_connect(LOGIN_NAME, option)
+                try:
+                    verify_connect(LOGIN_NAME, option)
+                except ServerError, e:
+                    red_print(e)
     except IndexError:
         pass
