@@ -122,7 +122,7 @@ def set_win_size(sig, data):
 
 def get_object(model, **kwargs):
     try:
-        the_object = model.objects.get(kwargs)
+        the_object = model.objects.get(**kwargs)
     except ObjectDoesNotExist:
         raise ServerError('Object get %s failed.' % str(kwargs.values()))
     return the_object
@@ -220,7 +220,7 @@ def get_user_host(username):
 def get_connect_item(username, ip):
     cryptor = PyCrypt(KEY)
 
-    asset = Asset.objects.get(Asset, ip=ip)
+    asset = get_object(Asset, ip=ip)
     port = asset.port
 
     if not asset.is_active:
