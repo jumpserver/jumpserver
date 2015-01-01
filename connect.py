@@ -376,7 +376,7 @@ def exec_cmd_servers(username):
         inputs = raw_input('\033[1;32mip(s)>: \033[0m')
         if inputs in ['q', 'Q']:
             break
-        get_hosts = get_user_host(username)[0].keys()
+        get_hosts = get_user_host(username).keys()
         for host in get_hosts:
             if fnmatch.fnmatch(host, inputs):
                 hosts.append(host.strip())
