@@ -34,7 +34,7 @@ $(document).ready(function () {
     });
 
     // Append config box / Only for demo purpose
-    $.get("/skin-config/", function (data) {
+    $.get("/skin_config/", function (data) {
         $('body').append(data);
     });
 
