@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>INSPINIA | intimeline</title>
+    <title>Jumpserver | 开源跳板机(堡垒机)系统</title>
 
     <link href="/static/css/bootstrap.min.css" rel="stylesheet">
     <link href="/static/font-awesome/css/font-awesome.css" rel="stylesheet">
@@ -28,12 +28,11 @@
                             <img alt="image" class="img-circle" src="/static/img/profile_small.jpg" />
                              </span>
                             <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                            <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">David Williams</strong>
-                             </span> <span class="text-muted text-xs block">Art Director <b class="caret"></b></span> </span> </a>
+                            <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">Admin</strong>
+                             </span> <span class="text-muted text-xs block">SuperUser<b class="caret"></b></span> </span> </a>
                             <ul class="dropdown-menu animated fadeInRight m-t-xs">
                                 <li><a href="profile.html">Profile</a></li>
                                 <li><a href="contacts.html">Contacts</a></li>
-                                <li><a href="mailbox.html">Mailbox</a></li>
                                 <li class="divider"></li>
                                 <li><a href="login.html">Logout</a></li>
                             </ul>
@@ -43,97 +42,54 @@
                         </div>
                     </li>
                     <li>
-                        <a href="index.html"><i class="fa fa-th-large"></i> <span class="nav-label">Dashboards</span> <span class="fa arrow"></span></a>
+                     
+                       <a href="css_animation.html"><i class="fa fa-th-large"></i> <span class="nav-label">仪表盘</span><span class="label label-info pull-right"></span></a>
+                       <!-- <a href="index.html"><i class="fa fa-th-large"></i> <span class="nav-label">仪表盘</span> <span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
                             <li><a href="index.html">Dashboard v.1</a></li>
                             <li ><a href="dashboard_2.html">Dashboard v.2</a></li>
                             <li ><a href="dashboard_3.html">Dashboard v.3</a></li>
+                        </ul>-->
+                    </li>
+                    <li>
+                        <a href="#"><i class="fa fa-user"></i> <span class="nav-label">用户管理</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level">
+                            <li><a href="graph_flot.html">查看用户</a></li>
+                            <li><a href="graph_morris.html">添加用户</a></li>
+                            <li><a href="graph_rickshaw.html">查看属组</a></li>
+                            <li><a href="graph_chartjs.html">添加属组</a></li>
                         </ul>
                     </li>
                     <li>
-                        <a href="#"><i class="fa fa-bar-chart-o"></i> <span class="nav-label">Graphs</span><span class="fa arrow"></span></a>
+                        <a href="mailbox.html"><i class="fa fa-cube"></i> <span class="nav-label">资产管理</span><span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
-                            <li><a href="graph_flot.html">Flot Charts</a></li>
-                            <li><a href="graph_morris.html">Morris.js Charts</a></li>
-                            <li><a href="graph_rickshaw.html">Rickshaw Charts</a></li>
-                            <li><a href="graph_chartjs.html">Chart.js</a></li>
-                            <li><a href="graph_peity.html">Peity Charts</a></li>
-                            <li><a href="graph_sparkline.html">Sparkline Charts</a></li>
+                            <li><a href="mailbox.html">查看资产</a></li>
+                            <li><a href="mail_detail.html">添加资产</a></li>
+                            <li><a href="mail_compose.html">查看机房</a></li>
+                            <li><a href="mail_compose.html">添加机房</a></li>
                         </ul>
                     </li>
                     <li>
-                        <a href="mailbox.html"><i class="fa fa-envelope"></i> <span class="nav-label">Mailbox </span><span class="label label-warning pull-right">16/24</span></a>
+                        <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">授权管理</span><span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
-                            <li><a href="mailbox.html">Inbox</a></li>
-                            <li><a href="mail_detail.html">Email view</a></li>
-                            <li><a href="mail_compose.html">Compose email</a></li>
-                            <li><a href="email_template.html">Email templates</a></li>
+                            <li><a href="form_basic.html">查看授权</a></li>
+                            <li><a href="form_advanced.html">添加授权</a></li>
+                            <li><a href="form_basic.html">查看sudo</a></li>
+                            <li><a href="form_advanced.html">添加sudo</a></li>
                         </ul>
                     </li>
                     <li>
-                        <a href="widgets.html"><i class="fa fa-flask"></i> <span class="nav-label">Widgets</span> </a>
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">Forms</span><span class="fa arrow"></span></a>
+                        <a href="#"><i class="fa fa-files-o"></i> <span class="nav-label">日志管理</span><span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
-                            <li><a href="form_basic.html">Basic form</a></li>
-                            <li><a href="form_advanced.html">Advanced Plugins</a></li>
-                            <li><a href="form_wizard.html">Wizard</a></li>
-                            <li><a href="form_file_upload.html">File Upload</a></li>
-                            <li><a href="form_editors.html">Text Editor</a></li>
-                        </ul>
-                    </li>
-                    <li class="active">
-                        <a href="#"><i class="fa fa-desktop"></i> <span class="nav-label">App Views</span>  <span class="pull-right label label-primary">SPECIAL</span></a>
-                        <ul class="nav nav-second-level">
-                            <li><a href="contacts.html">Contacts</a></li>
-                            <li><a href="profile.html">Profile</a></li>
-                            <li><a href="projects.html">Projects</a></li>
-                            <li><a href="project_detail.html">Project detail</a></li>
-                            <li><a href="file_manager.html">File manager</a></li>
-                            <li><a href="calendar.html">Calendar</a></li>
-                            <li><a href="faq.html">FAQ</a></li>
-                            <li class="active"><a href="timeline.html">Timeline</a></li>
-                            <li><a href="pin_board.html">Pin board</a></li>
+                            <li><a href="search_results.html">查看日志</a></li>
+                            <li><a href="lockscreen.html">日志分析</a></li>
                         </ul>
                     </li>
                     <li>
-                        <a href="#"><i class="fa fa-files-o"></i> <span class="nav-label">Other Pages</span><span class="fa arrow"></span></a>
+                        <a href="#"><i class="fa fa-download"></i> <span class="nav-label">上传下载</span><span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
-                            <li><a href="search_results.html">Search results</a></li>
-                            <li><a href="lockscreen.html">Lockscreen</a></li>
-                            <li><a href="invoice.html">Invoice</a></li>
-                            <li><a href="login.html">Login</a></li>
-                            <li><a href="register.html">Register</a></li>
-                            <li><a href="404.html">404 Page</a></li>
-                            <li><a href="500.html">500 Page</a></li>
-                            <li><a href="empty_page.html">Empty page</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-globe"></i> <span class="nav-label">Miscellaneous</span><span class="label label-info pull-right">NEW</span></a>
-                        <ul class="nav nav-second-level">
-                            <li><a href="toastr_notifications.html">Notification</a></li>
-                            <li><a href="nestable_list.html">Nestable list</a></li>
-                            <li><a href="timeline_2.html">Timeline v.2</a></li>
-                            <li><a href="forum_main.html">Forum view</a></li>
-                            <li><a href="google_maps.html">Google maps</a></li>
-                            <li><a href="code_editor.html">Code editor</a></li>
-                            <li><a href="modal_window.html">Modal window</a></li>
-                            <li><a href="validation.html">Validation</a></li>
-                        </ul>
-                    </li>
-                    <li>
-                        <a href="#"><i class="fa fa-flask"></i> <span class="nav-label">UI Elements</span><span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                            <li><a href="typography.html">Typography</a></li>
-                            <li><a href="icons.html">Icons</a></li>
-                            <li><a href="draggable_panels.html">Draggable Panels</a></li>
-                            <li><a href="buttons.html">Buttons</a></li>
-                            <li><a href="video.html">Video</a></li>
-                            <li><a href="tabs_panels.html">Tabs & Panels</a></li>
-                            <li><a href="notifications.html">Notifications & Tooltips</a></li>
-                            <li><a href="badges_labels.html">Badges, Labels, Progress</a></li>
+                            <li><a href="typography.html">文件上传</a></li>
+                            <li><a href="icons.html">文件下载</a></li>
                         </ul>
                     </li>
 
