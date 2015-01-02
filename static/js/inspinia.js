@@ -34,9 +34,9 @@ $(document).ready(function () {
     });
 
     // Append config box / Only for demo purpose
-    $.get("/skin_config/", function (data) {
-        $('body').append(data);
-    });
+//    $.get("/skin_config/", function (data) {
+//        $('body').append(data);
+//    });
 
     // minimalize menu
     $('.navbar-minimalize').click(function () {

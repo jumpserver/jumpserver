@@ -9,5 +9,4 @@ urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
     (r'^base/$', views.base),
-    (r'^skin_config$', views.skin_config),
 )
