@@ -1,24 +1,9 @@
+        <nav class="navbar-default navbar-static-side" role="navigation">
+            <div class="sidebar-collapse">
                 <ul class="nav" id="side-menu">
-                    <li class="nav-header">
-                        <div class="dropdown profile-element"> <span>
-                            <img alt="image" class="img-circle" src="/static/img/profile_small.jpg" />
-                             </span>
-                            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                            <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">Admin</strong>
-                             </span> <span class="text-muted text-xs block">SuperUser<b class="caret"></b></span> </span> </a>
-                            <ul class="dropdown-menu animated fadeInRight m-t-xs">
-                                <li><a href="/profile/">Profile</a></li>
-                                <li><a href="/contacts/">Contacts</a></li>
-                                <li class="divider"></li>
-                                <li><a href="/login/">Logout</a></li>
-                            </ul>
-                        </div>
-                        <div class="logo-element">
-                            JS+
-                        </div>
-                    </li>
+                    {% include 'nav_li_profile.html' %}
                     <li>
-                     
+
                        <a href="css_animation.html"><i class="fa fa-th-large"></i> <span class="nav-label">仪表盘</span><span class="label label-info pull-right"></span></a>
                       <!--<a href="index.html"><i class="fa fa-th-large"></i> <span class="nav-label">仪表盘</span> <span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level">
@@ -74,3 +59,5 @@
                     </li>
                 </ul>
 
+            </div>
+        </nav>
