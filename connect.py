@@ -13,6 +13,7 @@ import textwrap
 import django
 import getpass
 import fnmatch
+import readline
 from multiprocessing import Pool
 from Crypto.Cipher import AES
 from binascii import b2a_hex, a2b_hex
