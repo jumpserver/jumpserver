@@ -341,14 +341,14 @@ def connect(username, password, host, port, login_name):
 
 def remote_exec_cmd(ip, port, username, password, cmd):
     try:
-        time.sleep(3)
+        time.sleep(5)
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         ssh.connect(ip, port, username, password, key_filename=USER_KEY_FILE, timeout=5)
         stdin, stdout, stderr = ssh.exec_command("bash -l -c '%s'" % cmd)
         out = stdout.readlines()
         err = stderr.readlines()
-        color_print('%s:', 'blue')
+        color_print('%s:' %ip, 'blue')
         for i in out:
             color_print(" " * 4 + i.strip(), 'green')
         for j in err:
@@ -360,7 +360,7 @@ def remote_exec_cmd(ip, port, username, password, cmd):
 
 
 def multi_remote_exec_cmd(hosts, username, cmd):
-    pool = Pool(processes=3)
+    pool = Pool(processes=5)
     for host in hosts:
         username, password, ip, port = get_connect_item(username, host)
         pool.apply_async(remote_exec_cmd, (ip, port, username, password, cmd))
