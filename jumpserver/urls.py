@@ -7,6 +7,7 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     (r'^skin_config/$', 'jumpserver.views.skin_config'),
+    (r'^base/$', 'jumpserver.views.base'),
     (r'^juser/', include('juser.urls')),
     url(r'^jasset/', include('jasset.urls')),
 )
