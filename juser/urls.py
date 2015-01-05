@@ -6,5 +6,5 @@ urlpatterns = patterns('juser.views',
     # url(r'^$', 'jumpserver.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
 
-    (r'^useradd/$', 'user_add'),
+    (r'^user_add/$', 'user_add'),
 )
