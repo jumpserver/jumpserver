@@ -1,6 +1,5 @@
 from django.conf.urls import patterns, include, url
-from django.contrib import admin
-from jumpserver import views
+
 
 urlpatterns = patterns('',
     # Examples:
@@ -8,4 +7,5 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     (r'^user/', include('juser.urls')),
+    url(r'^jasset/', include('jasset.urls')),
 )
