@@ -21,7 +21,7 @@
             <div class="row border-bottom">
                 {% include 'nav_bar_header.html' %}
             </div>
-            {{ content }}
+            {% block content %}{% endblock %}
             {% include 'footer.html' %}
         </div>
     </div>

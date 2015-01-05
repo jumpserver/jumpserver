@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>添加主机</h1>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>请在以下填写主机详细信息</h5>
+            </div>
+            <div class="ibox-content">
+                <form method="get" class="form-horizontal">
+                    <div class="form-group"><label class="col-sm-2 control-label">IP地址</label>
+                        <div class="col-sm-10"><input type="text" placeholder="192.168.1.1" class="form-control"></div>
+                    </div>
+
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group"><label class="col-sm-2 control-label">端口号</label>
+                        <div class="col-sm-10"><input type="text" placeholder="22" class="form-control"></div>
+                    </div>
+
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group"><label class="col-sm-2 control-label"> 登录方式 </label>
+                        <div class="col-sm-10">
+                            <div class="radio i-checks"><label> <input type="radio" checked="" value="option1" name="a" onclick="show(this)"> <i> LDAP </i></label></div>
+                            <div class="radio i-checks"><label> <input type="radio" value="option2" name="a" onclick="show(this)"> <i> SSH_KEY </i></label></div>
+                            <div class="radio i-checks"><label> <input type="radio" value="option3" name="a" onclick="show(this)"> <i> SSH_PASSWORD </i></label></div>
+                            <div class="radio i-checks"><label> <input type="radio" value="option4" name="a" onclick="show(this)"> <i> JUMPSER_MAP </i></label></div>
+                        </div>
+
+                        <div name="a1" id=a1 style="display:none;">
+                            <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 普通用户名 </label>
+                                <div class="col-sm-8"><input type="text" placeholder="lilei" class="form-control"></div>
+                            </div>
+
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 普通用户密码 </label>
+                                <div class="col-sm-8"><input type="password"  placeholder="Password" class="form-control" name="password"></div>
+                            </div>
+
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 超管用户名 </label>
+                                <div class="col-sm-8"><input type="text" placeholder="root" class="form-control"></div>
+                            </div>
+
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 超管用户密码 </label>
+                                <div class="col-sm-8"><input type="password"  placeholder="Password" class="form-control" name="password"></div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group"><label class="col-sm-2 control-label"> 所属IDC </label>
+                        <div class="col-sm-10"><input type="text" placeholder="北京联通" class="form-control"></div>
+                    </div>
+
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group"><label class="col-sm-2 control-label"> 所属业务组 </label>
+                        <div class="col-sm-10"><input type="text" placeholder="数据库" class="form-control"></div>
+                    </div>
+
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group"><label class="col-sm-2 control-label"> 是否激活 </label>
+                        <div class="col-sm-10">
+                            <div class="radio i-checks"><label> <input type="radio" checked="" value="o1" name="b"> <i> 激活 </i></label></div>
+                            <div class="radio i-checks"><label> <input type="radio"  value="o2" name="b"> <i> 禁用 </i></label></div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group"><label class="col-sm-2 control-label"> 密码 </label>
+                        <div class="col-sm-10"><input type="password"  placeholder="Password" class="form-control" name="password"></div>
+                    </div>
+
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group"><label class="col-sm-2 control-label"> 备注 </label>
+                        <div class="col-sm-10"><input type="text" placeholder="hadoop01" class="form-control"></div>
+                    </div>
+
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-5">
+                            <button class="btn btn-white" type="submit"> 重置 </button>
+                            <button class="btn btn-primary" type="submit"> 提交 </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script>
+var showFlag={};
+    function show(o){
+    showFlag[o.name]=o.value;
+    if(showFlag.a=="option4"){
+        document.getElementById("a1").style.display="";
+    }
+    else{
+        document.getElementById("a1").style.display="none";
+    }};
+
+</script>
+
+{% endblock %}
