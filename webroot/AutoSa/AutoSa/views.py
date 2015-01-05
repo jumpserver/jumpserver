@@ -766,7 +766,7 @@ def showAssets(request):
         assets_all = []
         username = request.session.get('username')
         user = User.objects.get(username=username)
-        for asset in user.assetsuser_set.all().order_by('ip'):
+        for asset in user.assetsuser_set.all():
             assets_all.append(asset.aid)
     else:
         assets_all = Assets.objects.all().order_by('ip')
