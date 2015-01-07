@@ -28,6 +28,12 @@
                     </div>
                     <div class="ibox-content">
                         <form method="post" class="form-horizontal" action="">
+                            {% if error %}
+                                <div class="alert alert-warning text-center">{{ error }}</div>
+                            {% endif %}
+                            {% if msg %}
+                                <div class="alert alert-success text-center">{{ msg }}</div>
+                            {% endif %}
                             <div class="form-group">
                                 <label for="j_group_name" class="col-sm-2 control-label">组名<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
