@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% include 'nav_cat_bar.html' %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-lg-10">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>填写基本信息  <small> Fill group info.</small></h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#">未启用 1</a>
+                                </li>
+                                <li><a href="#">未启用 2</a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <form method="post" class="form-horizontal" action="">
+                            <div class="form-group">
+                                <label for="j_group_name" class="col-sm-2 control-label">组名<span class="red-fonts">*</span></label>
+                                <div class="col-sm-8">
+                                    <input id="j_group_name" name="j_group_name" placeholder="Group name" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label for="j_comment" class="col-sm-2 control-label">备注</label>
+                                <div class="col-sm-8">
+                                    <input id="j_comment" name="j_comment" placeholder="Comment" type="password" class="form-control">
+                                </div>
+                            </div>
+
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <button class="btn btn-white" type="submit">取消</button>
+                                    <button class="btn btn-primary" type="submit">确认保存</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
