@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from juser.models import Group, User
 
@@ -5,6 +6,13 @@ from juser.models import Group, User
 class IDC(models.Model):
     name = models.CharField(max_length=40, unique=True)
     comment = models.CharField(max_length=80, blank=True, null=True)
+
+    def __unicode__(self):
+        return self.name
+
+class Group(models.Model):
+    name = models.CharField(max_length=80, unique=True)
+    comment = models.CharField(max_length=160, blank=True, null=True)
 
     def __unicode__(self):
         return self.name
@@ -26,7 +34,7 @@ class Asset(models.Model):
     password_common = models.CharField(max_length=80, blank=True, null=True)
     username_super = models.CharField(max_length=20, blank=True, null=True)
     password_super = models.CharField(max_length=80, blank=True, null=True)
-    date_added = models.IntegerField(max_length=12)
+    date_added = models.DateTimeField(auto_now=True,default=datetime.datetime.now(), null=True)
     is_active = models.BooleanField(default=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
 
