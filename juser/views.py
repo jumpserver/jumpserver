@@ -24,7 +24,7 @@ def group_add(request):
             group = Group.objects.filter(name=group_name)
             if group:
                 error = u'组 %s 已存在' % group_name
-                assert AddError
+                raise AddError
 
             group = Group(name=group_name, comment=comment)
             group.save()
