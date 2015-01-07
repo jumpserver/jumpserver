@@ -35,7 +35,7 @@ def group_add(request):
             error = u'保存用户失败'
 
         else:
-            msg = u'添加用户成功'
+            msg = u'添加组 %s 成功' % group_name
 
     return render_to_response('juser/group_add.html',
                               {'header_title': u'添加属组 | Add Group',
