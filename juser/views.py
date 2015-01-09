@@ -43,6 +43,14 @@ def group_add(request):
                                'error': error, 'msg': msg})
 
 
+def group_list(request):
+    return render_to_response('juser/group_list.html')
+
+
+def user_list(request):
+    pass
+
+
 def user_add(request):
     return render_to_response('juser/user_add.html',
                               {'header_title': u'添加用户 | Add User', 'path1': 'juser', 'path2': 'user_add'})

@@ -7,5 +7,7 @@ urlpatterns = patterns('juser.views',
     # url(r'^blog/', include('blog.urls')),
 
     (r'^user_add/$', 'user_add'),
+    (r'^user_list/$', 'user_list'),
     (r'^group_add/$', 'group_add'),
+    (r'^group_list/$', 'group_list'),
 )
