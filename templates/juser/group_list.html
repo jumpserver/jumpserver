@@ -27,60 +27,36 @@
                         </div>
                     </div>
                     <div class="ibox-content" style="display: block;">
-                        <form>
-                            <table class="table table-hover">
-                                <thead>
-                                <tr>
-                                    <th>
-                                        <div class="icheckbox_square-green" style="position: relative;">
-                                            <input type="checkbox" checked="" class="i-checks" name="input[]" style="position: absolute; opacity: 0;">
-                                            <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; border: 0px; opacity: 0; background: rgb(255, 255, 255);"></ins>
-                                        </div>
-                                    </th>
-                                    <th>ID</th>
-                                    <th>组名</th>
-                                    <th>备注</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td>
-                                        <div class="icheckbox_square-green" style="position: relative;">
-                                            <input type="checkbox" checked="" class="i-checks" name="input[]" style="position: absolute; opacity: 0;">
-                                            <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; border: 0px; opacity: 0; background: rgb(255, 255, 255);"></ins>
-                                        </div>
-                                    </td>
-                                    <td><span class="pie" style="display: none;">0.52,1.041</span><svg class="peity" height="16" width="16"><path d="M 8 8 L 8 0 A 8 8 0 0 1 14.933563796318165 11.990700825968545 Z" fill="#1ab394"></path><path d="M 8 8 L 14.933563796318165 11.990700825968545 A 8 8 0 1 1 7.999999999999998 0 Z" fill="#d7d7d7"></path></svg></td>
-                                    <td>Samantha</td>
-                                    <td class="text-navy"> <i class="fa fa-level-up"></i> 40% </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="icheckbox_square-green" style="position: relative;">
-                                            <input type="checkbox" checked="" class="i-checks" name="input[]" style="position: absolute; opacity: 0;">
-                                            <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; border: 0px; opacity: 0; background: rgb(255, 255, 255);"></ins>
-                                        </div>
-                                    </td>
-                                    <td>2</td>
-                                    <td><span class="pie" style="display: none;">226,134</span><svg class="peity" height="16" width="16"><path d="M 8 8 L 8 0 A 8 8 0 1 1 2.2452815972907922 13.55726696367198 Z" fill="#1ab394"></path><path d="M 8 8 L 2.2452815972907922 13.55726696367198 A 8 8 0 0 1 7.999999999999998 0 Z" fill="#d7d7d7"></path></svg></td>
-                                    <td>Jacob</td>
-                                    <td class="text-warning"> <i class="fa fa-level-down"></i> -20% </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="icheckbox_square-green" style="position: relative;">
-                                            <input type="checkbox" checked="" class="i-checks" name="input[]" style="position: absolute; opacity: 0;">
-                                            <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; border: 0px; opacity: 0; background: rgb(255, 255, 255);"></ins>
-                                        </div>
-                                    </td>
-                                    <td>3</td>
-                                    <td><span class="pie" style="display: none;">0.52/1.561</span><svg class="peity" height="16" width="16"><path d="M 8 8 L 8 0 A 8 8 0 0 1 14.933563796318165 11.990700825968545 Z" fill="#1ab394"></path><path d="M 8 8 L 14.933563796318165 11.990700825968545 A 8 8 0 1 1 7.999999999999998 0 Z" fill="#d7d7d7"></path></svg></td>
-                                    <td>Damien</td>
-                                    <td class="text-navy"> <i class="fa fa-level-up"></i> 26% </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </form>
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>
+                                    <div class="icheckbox_square-green" style="position: relative;">
+                                        <input type="checkbox" checked="" class="i-checks" name="input[]" style="position: absolute; opacity: 0;">
+                                        <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; border: 0px; opacity: 0; background: rgb(255, 255, 255);"></ins>
+                                    </div>
+                                </th>
+                                <th>ID</th>
+                                <th>组名</th>
+                                <th>备注</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for group in groups %}
+                            <tr>
+                                <td>
+                                    <div class="icheckbox_square-green" style="position: relative;">
+                                        <input type="checkbox" checked="" class="i-checks" name="input[]" style="position: absolute; opacity: 0;">
+                                        <ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; border: 0px; opacity: 0; background: rgb(255, 255, 255);"></ins>
+                                    </div>
+                                </td>
+                                <td>{{ group.id }}</td>
+                                <td>{{ group.name }}</td>
+                                <td>{{ group.comment }}</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>

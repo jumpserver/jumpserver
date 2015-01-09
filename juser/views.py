@@ -44,7 +44,11 @@ def group_add(request):
 
 
 def group_list(request):
-    return render_to_response('juser/group_list.html')
+    groups = Group.objects.all()
+    return render_to_response('juser/group_list.html',
+                              {'header_title': u'查看属组 | Add Group',
+                               'path1': 'juser', 'path2': 'group_add',
+                               'groups': groups})
 
 
 def user_list(request):
