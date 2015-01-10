@@ -91,7 +91,7 @@
                                 <label for="role" class="col-lg-2 control-label">角色<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
                                     <select id="role" name="role" class="form-control m-b">
-                                        {% for r, role_name in user_role %}
+                                        {% for r, role_name in user_role.items %}
                                             {% ifequal r role_post %}
                                                 <option value="{{ r }}" selected>{{ role_name }}</option>
                                             {% else %}
