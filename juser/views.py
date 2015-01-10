@@ -56,8 +56,25 @@ def user_list(request):
 
 
 def user_add(request):
+    error = ''
+    msg = ''
+
+    user_role = {'SU': 'SuperUser', 'GA': 'GroupAdmin', 'CU': 'CommonUser'}
+    groups = Group.objects.all()
+    if request.method == 'POST':
+        username = request.POST.get('j_username', None)
+        password = request.POST.get('j_password', None)
+        name = request.POST.get('j_name', None)
+        email = request.POST.get('j_email', '')
+        groups = request.POST.getlist('j_group', None)
+        role = request.POST.get('j_role', None)
+        ssh_pwd = request.POST.get('j_ssh_pwd', None)
+        is_active = request.POST.get('j_is_active', None)
+
     return render_to_response('juser/user_add.html',
-                              {'header_title': u'添加用户 | Add User', 'path1': 'juser', 'path2': 'user_add'})
+                              {'header_title': u'添加用户 | Add User',
+                               'path1': 'juser', 'path2': 'user_add',
+                               'roles': user_role, 'groups': groups})
 
 
 
