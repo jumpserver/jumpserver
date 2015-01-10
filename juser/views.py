@@ -3,10 +3,31 @@
 # Email: ibuler@qq.com
 
 import time
+import hashlib
+import random
 
 from django.shortcuts import render_to_response
 
 from juser.models import UserGroup, User
+from connect import PyCrypt, KEY
+from jumpserver.views import header_path
+
+
+cryptor = PyCrypt(KEY)
+
+
+def md5_crypt(string):
+    return hashlib.new("md5", string).hexdigest()
+
+
+def gen_rand_pass(num):
+    """生成随机密码"""
+    seed = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    salt_list = []
+    for i in range(num):
+        salt_list.append(random.choice(seed))
+    salt = ''.join(salt_list)
+    return salt
 
 
 class AddError(Exception):
@@ -16,6 +37,8 @@ class AddError(Exception):
 def group_add(request):
     error = ''
     msg = ''
+    header_title, path1, path2 = header_path('添加属组 | Add Group', 'juser', 'group_add')
+
     if request.method == 'POST':
         group_name = request.POST.get('group_name', None)
         comment = request.POST.get('comment', None)
@@ -42,12 +65,11 @@ def group_add(request):
             msg = u'添加组 %s 成功' % group_name
 
     return render_to_response('juser/group_add.html',
-                              {'header_title': u'添加属组 | Add Group',
-                               'path1': 'juser', 'path2': 'group_add',
-                               'error': error, 'msg': msg})
+                              locals())
 
 
 def group_list(request):
+
     groups = UserGroup.objects.all()
     return render_to_response('juser/group_list.html',
                               {'header_title': u'查看属组 | Add Group',
