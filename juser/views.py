@@ -13,8 +13,8 @@ def group_add(request):
     error = ''
     msg = ''
     if request.method == 'POST':
-        group_name = request.POST.get('j_group_name', None)
-        comment = request.POST.get('j_comment', None)
+        group_name = request.POST.get('group_name', None)
+        comment = request.POST.get('comment', None)
 
         try:
             if not group_name:
@@ -77,15 +77,15 @@ def user_add(request):
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
     all_group = UserGroup.objects.all()
     if request.method == 'POST':
-        username = request.POST.get('j_username', None)
-        password = request.POST.get('j_password', None)
-        name = request.POST.get('j_name', None)
-        email = request.POST.get('j_email', '')
-        groups = request.POST.getlist('j_group', None)
-        role = request.POST.get('j_role', None)
-        ssh_pwd = request.POST.get('j_ssh_pwd', None)
-        ssh_key_pwd1 = request.POST.get('j_ssh_key_pwd1', None)
-        is_active = request.POST.get('j_is_active', None)
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
+        name = request.POST.get('name', None)
+        email = request.POST.get('email', '')
+        groups = request.POST.getlist('groups', None)
+        role = request.POST.get('role', None)
+        ssh_pwd = request.POST.get('ssh_pwd', None)
+        ssh_key_pwd1 = request.POST.get('ssh_key_pwd1', None)
+        is_active = request.POST.get('is_active', '1')
 
         try:
             if None in [username, password, ssh_key_pwd1, name, groups, role, is_active]:
