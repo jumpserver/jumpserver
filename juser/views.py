@@ -10,7 +10,6 @@ from django.shortcuts import render_to_response
 
 from juser.models import UserGroup, User
 from connect import PyCrypt, KEY
-from jumpserver.views import header_path
 
 
 cryptor = PyCrypt(KEY)
@@ -37,7 +36,7 @@ class AddError(Exception):
 def group_add(request):
     error = ''
     msg = ''
-    header_title, path1, path2 = header_path('添加属组 | Add Group', 'juser', 'group_add')
+    header_title, path1, path2 = '添加属组 | Add Group', 'juser', 'group_add'
 
     if request.method == 'POST':
         group_name = request.POST.get('group_name', None)
@@ -69,12 +68,10 @@ def group_add(request):
 
 
 def group_list(request):
-
+    header_title, path1, path2 = '查看属组 | Add Group', 'juser', 'group_add'
     groups = UserGroup.objects.all()
     return render_to_response('juser/group_list.html',
-                              {'header_title': u'查看属组 | Add Group',
-                               'path1': 'juser', 'path2': 'group_add',
-                               'groups': groups})
+                              locals())
 
 
 def user_list(request):
@@ -100,7 +97,7 @@ def db_del_user(username):
 def user_add(request):
     error = ''
     msg = ''
-
+    header_title, path1, path2 = '添加用户 | Add User', 'juser', 'user_add'
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
     all_group = UserGroup.objects.all()
     if request.method == 'POST':
@@ -109,13 +106,13 @@ def user_add(request):
         name = request.POST.get('name', None)
         email = request.POST.get('email', '')
         groups = request.POST.getlist('groups', None)
-        role = request.POST.get('role', None)
+        role_post = request.POST.get('role', None)
         ssh_pwd = request.POST.get('ssh_pwd', None)
         ssh_key_pwd1 = request.POST.get('ssh_key_pwd1', None)
         is_active = request.POST.get('is_active', '1')
 
         try:
-            if None in [username, password, ssh_key_pwd1, name, groups, role, is_active]:
+            if None in [username, password, ssh_key_pwd1, name, groups, role_post, is_active]:
                 error = u'带*内容不能为空'
                 raise AddError
             user = User.objects.filter(username=username)
@@ -132,10 +129,7 @@ def user_add(request):
                         is_active=is_active, date_joined=time_now)
             msg = u'添加用户成功'
     return render_to_response('juser/user_add.html',
-                              {'header_title': u'添加用户 | Add User',
-                               'path1': 'juser', 'path2': 'user_add',
-                               'roles': user_role, 'all_group': all_group,
-                               'error': error, 'msg': msg})
+                              locals())
 
 
 
