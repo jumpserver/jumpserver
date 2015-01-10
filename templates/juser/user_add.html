@@ -65,9 +65,9 @@
                                     <select id="j_group" name="j_group" class="form-control m-b" multiple>
                                         {% for group in groups %}
                                             {% if forloop.first %}
-                                                <option value="{{ group.id }}" selected>group.name</option>
+                                                <option value="{{ group.id }}" selected>{{ group.name }}</option>
                                             {% endif %}
-                                            <option value="{{ group.id }}">group.name</option>
+                                            <option value="{{ group.id }}">{{ group.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
