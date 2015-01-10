@@ -27,34 +27,42 @@
                         </div>
                     </div>
                     <div class="ibox-content" style="display: block;">
-                        <table class="table table-hover">
-                            <thead>
-                            <tr>
-                                <th>
-                                    <div class="radio i-checks">
-                                        <input type="checkbox" value="1" name="j_is_active" checked>
-                                    </div>
-                                </th>
-                                <th>ID</th>
-                                <th>组名</th>
-                                <th>备注</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {% for group in groups %}
-                            <tr>
-                                <td>
-                                    <div class="radio i-checks">
-                                        <input type="checkbox" value="1" name="j_is_active" checked>
-                                    </div>
-                                </td>
-                                <td>{{ group.id }}</td>
-                                <td>{{ group.name }}</td>
-                                <td>{{ group.comment }}</td>
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
+                        <form method="post" action="">
+                            <table class="table table-hover">
+                                <thead>
+                                <tr>
+                                    <th>
+                                        <div class="checkbox i-checks">
+                                            <input onclick="selectAll()" type="checkbox" name="select_all" style="select_all" id="select_all">
+                                        </div>
+                                    </th>
+                                    <th>ID</th>
+                                    <th>组名</th>
+                                    <th>备注</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% for group in groups %}
+                                <tr>
+                                    <td>
+                                        <div class="checkbox i-checks">
+                                            <input type="checkbox" value="{{ group.id }}" name="selected">
+                                        </div>
+                                    </td>
+                                    <td>{{ group.id }}</td>
+                                    <td>{{ group.name }}</td>
+                                    <td>{{ group.comment }}</td>
+                                </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <button class="btn btn-white" type="submit">取消</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit">确认删除</button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
