@@ -73,7 +73,7 @@
                                 <div class="col-sm-8">
                                     <select id="groups" name="groups" class="form-control m-b" multiple>
                                         {% for group in all_group %}
-                                            {% if groups and group.id in groups %}
+                                            {% if group.id in groups_str %}
                                                 <option value="{{ group.id }}" selected>{{ group.name }}</option>
                                             {% else %}
                                                 {% if forloop.first %}

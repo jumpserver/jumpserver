@@ -106,6 +106,7 @@ def user_add(request):
         name = request.POST.get('name', None)
         email = request.POST.get('email', '')
         groups = request.POST.getlist('groups', None)
+        groups_str = ' '.join(groups)
         role_post = request.POST.get('role', None)
         ssh_pwd = request.POST.get('ssh_pwd', None)
         ssh_key_pwd1 = request.POST.get('ssh_key_pwd1', None)
