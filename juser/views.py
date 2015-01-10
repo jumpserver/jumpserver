@@ -58,7 +58,7 @@ def user_list(request):
 def db_add_user(**kwargs):
     user = User(**kwargs)
     group_select = []
-    for group_id in groups:
+    for group_id in kwargs.get('groups', None):
         group = UserGroup.objects.filter(id=group_id)
         group_select.extend(group)
     user.user_group = group_select
