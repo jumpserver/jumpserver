@@ -2,7 +2,7 @@
 
 from django.shortcuts import render_to_response
 
-from juser.models import Group, User
+from juser.models import UserGroup, User
 
 
 class AddError(Exception):
@@ -21,12 +21,12 @@ def group_add(request):
                 error = u'组名不能为空'
                 raise AddError
 
-            group = Group.objects.filter(name=group_name)
+            group = UserGroup.objects.filter(name=group_name)
             if group:
                 error = u'组 %s 已存在' % group_name
                 raise AddError
 
-            group = Group(name=group_name, comment=comment)
+            group = UserGroup(name=group_name, comment=comment)
             group.save()
         except AddError:
             pass
@@ -44,7 +44,7 @@ def group_add(request):
 
 
 def group_list(request):
-    groups = Group.objects.all()
+    groups = UserGroup.objects.all()
     return render_to_response('juser/group_list.html',
                               {'header_title': u'查看属组 | Add Group',
                                'path1': 'juser', 'path2': 'group_add',
@@ -60,7 +60,7 @@ def user_add(request):
     msg = ''
 
     user_role = {'SU': 'SuperUser', 'GA': 'GroupAdmin', 'CU': 'CommonUser'}
-    groups = Group.objects.all()
+    groups = UserGroup.objects.all()
     if request.method == 'POST':
         username = request.POST.get('j_username', None)
         password = request.POST.get('j_password', None)
