@@ -55,12 +55,27 @@ def user_list(request):
     pass
 
 
+def db_add_user(**kwargs):
+    user = User(**kwargs)
+    group_select = []
+    for group_id in groups:
+        group = UserGroup.objects.filter(id=group_id)
+        group_select.extend(group)
+    user.user_group = group_select
+    user.save()
+
+
+def db_del_user(username):
+    user = User.objects.get(username=username)
+    user.delete()
+
+
 def user_add(request):
     error = ''
     msg = ''
 
-    user_role = {'SU': 'SuperUser', 'GA': 'GroupAdmin', 'CU': 'CommonUser'}
-    groups = UserGroup.objects.all()
+    user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
+    all_group = UserGroup.objects.all()
     if request.method == 'POST':
         username = request.POST.get('j_username', None)
         password = request.POST.get('j_password', None)
@@ -69,12 +84,30 @@ def user_add(request):
         groups = request.POST.getlist('j_group', None)
         role = request.POST.get('j_role', None)
         ssh_pwd = request.POST.get('j_ssh_pwd', None)
+        ssh_key_pwd1 = request.POST.get('j_ssh_key_pwd1', None)
         is_active = request.POST.get('j_is_active', None)
 
+        try:
+            if None in [username, password, ssh_key_pwd1, name, groups, role, is_active]:
+                error = u'带*内容不能为空'
+                raise AddError
+            user = User.objects.filter(username=username)
+            if user:
+                error = u'用户 %s 已存在' % username
+                raise AddError
+
+        except AddError:
+            pass
+        else:
+            db_add_user(username=username, password=password, name=name, email=email,
+                        groups=groups, role=role, ssh_pwd=ssh_pwd, ssh_key_pwd1=ssh_key_pwd1,
+                        is_active=is_active)
+            msg = u'添加用户成功'
     return render_to_response('juser/user_add.html',
                               {'header_title': u'添加用户 | Add User',
                                'path1': 'juser', 'path2': 'user_add',
-                               'roles': user_role, 'groups': groups})
+                               'roles': user_role, 'all_group': all_group,
+                               'error': error, 'msg': msg})
 
 
 
