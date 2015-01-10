@@ -66,8 +66,9 @@
                                         {% for group in groups %}
                                             {% if forloop.first %}
                                                 <option value="{{ group.id }}" selected>{{ group.name }}</option>
+                                            {% else %}
+                                                <option value="{{ group.id }}">{{ group.name }}</option>
                                             {% endif %}
-                                            <option value="{{ group.id }}">{{ group.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
