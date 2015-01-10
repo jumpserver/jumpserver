@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Group(models.Model):
+class UserGroup(models.Model):
     name = models.CharField(max_length=80, unique=True)
     comment = models.CharField(max_length=160, blank=True, null=True)
 
@@ -20,7 +20,7 @@ class User(models.Model):
     name = models.CharField(max_length=80)
     email = models.EmailField(max_length=75, null=True, blank=True)
     role = models.CharField(max_length=2, choices=USER_ROLE_CHOICES, default='CU')
-    group = models.ManyToManyField(Group)
+    user_group = models.ManyToManyField(UserGroup)
     ldap_pwd = models.CharField(max_length=100)
     ssh_key_pwd1 = models.CharField(max_length=100)
     ssh_key_pwd2 = models.CharField(max_length=100)
