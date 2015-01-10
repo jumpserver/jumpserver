@@ -1,4 +1,8 @@
 # coding: utf-8
+# Author: Guanghongwei
+# Email: ibuler@qq.com
+
+import time
 
 from django.shortcuts import render_to_response
 
@@ -56,13 +60,14 @@ def user_list(request):
 
 
 def db_add_user(**kwargs):
+    groups_post = kwargs.pop('groups')
     user = User(**kwargs)
     group_select = []
-    for group_id in kwargs.get('groups', None):
+    for group_id in groups_post:
         group = UserGroup.objects.filter(id=group_id)
         group_select.extend(group)
-    user.user_group = group_select
     user.save()
+    user.user_group = group_select
 
 
 def db_del_user(username):
@@ -99,9 +104,10 @@ def user_add(request):
         except AddError:
             pass
         else:
+            time_now = time.time()
             db_add_user(username=username, password=password, name=name, email=email,
                         groups=groups, role=role, ssh_pwd=ssh_pwd, ssh_key_pwd1=ssh_key_pwd1,
-                        is_active=is_active)
+                        is_active=is_active, date_joined=time_now)
             msg = u'添加用户成功'
     return render_to_response('juser/user_add.html',
                               {'header_title': u'添加用户 | Add User',
