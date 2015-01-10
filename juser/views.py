@@ -126,7 +126,7 @@ def user_add(request):
         else:
             time_now = time.time()
             db_add_user(username=username, password=password, name=name, email=email,
-                        groups=groups, role=role, ssh_pwd=ssh_pwd, ssh_key_pwd1=ssh_key_pwd1,
+                        groups=groups, role=role_post, ssh_pwd=ssh_pwd, ssh_key_pwd1=ssh_key_pwd1,
                         is_active=is_active, date_joined=time_now)
             msg = u'添加用户成功'
     return render_to_response('juser/user_add.html',
