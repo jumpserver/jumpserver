@@ -52,7 +52,7 @@
                                 <td> {{ post.login_type}} </td>
                                 <td class="center"> {{ post.idc.name }} </td>
                                 <td class="center">
-                                    {% for group in post.group.all %}
+                                    {% for group in post.bis_group.all %}
                                         {{ group }}
                                     {% endfor %}
                                 </td>

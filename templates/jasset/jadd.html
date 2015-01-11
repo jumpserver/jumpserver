@@ -5,7 +5,13 @@
     <div class="row">
         <div class="col-lg-10">
             <div class="ibox float-e-margins">
-                <div class="ibox-title">
+                <div class="text-center">
+                    <span>请选择添加内容: </span>
+                    <a href="#" class="btn btn-xs btn-primary" id="lightVersion">添加主机</a>
+                    <a href="#" class="btn btn-xs btn-primary" id="darkVersion">添加IDC</a>
+                    <a href="#" class="btn btn-xs btn-primary" id="leftVersion">添加业务组</a>
+                </div>
+                <div id="ibox-content" class="ibox-title">
                     <h5> 填写主机基本信息 </h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
@@ -37,16 +43,16 @@
 
                         <div class="hr-line-dashed"></div>
                         <div class="form-group"><label class="col-sm-2 control-label"> 端口号 </label>
-                            <div class="col-sm-8"><input type="text" value="{{ s_port }}" placeholder="22" name="j_port" class="form-control"></div>
+                            <div class="col-sm-8"><input type="text" value="{{ j_port }}" placeholder="22" name="j_port" class="form-control"></div>
                         </div>
 
                         <div class="hr-line-dashed"></div>
                         <div class="form-group"><label class="col-sm-2 control-label"> 登录方式 </label>
                             <div class="col-sm-8">
-                                <div class="radio i-checks"><label> <input type="radio" checked="" value="LDAP" name="j_type" onclick="show(this)"> <i> LDAP </i></label></div>
-                                <div class="radio i-checks"><label> <input type="radio" value="SSH_KEY" name="j_type" onclick="show(this)"> <i> SSH_KEY </i></label></div>
-                                <div class="radio i-checks"><label> <input type="radio" value="PASSWORD" name="j_type" onclick="show(this)"> <i> PASSWORD </i></label></div>
-                                <div class="radio i-checks"><label> <input type="radio" value="MAP" name="j_type" onclick="show(this)"> <i> MAP </i></label></div>
+                                <div class="radio i-checks"><label> <input type="radio" checked="" value="L" name="j_type" onclick="show(this)"> <i> LDAP </i></label></div>
+                                <div class="radio i-checks"><label> <input type="radio" value="S" name="j_type" onclick="show(this)"> <i> SSH_KEY </i></label></div>
+                                <div class="radio i-checks"><label> <input type="radio" value="P" name="j_type" onclick="show(this)"> <i> PASSWORD </i></label></div>
+                                <div class="radio i-checks"><label> <input type="radio" value="M" name="j_type" onclick="show(this)"> <i> MAP </i></label></div>
                             </div>
 
                             <div name="a1" id=a1 style="display:none;">
@@ -98,14 +104,14 @@
                         <div class="hr-line-dashed"></div>
                         <div class="form-group"><label class="col-sm-2 control-label"> 是否激活 </label>
                             <div class="col-sm-8">
-                                <div class="radio i-checks"><label> <input type="radio" checked="" value="active" name="j_active"> <i> 激活 </i></label></div>
-                                <div class="radio i-checks"><label> <input type="radio"  value="no_active" name="j_active"> <i> 禁用 </i></label></div>
+                                <div class="radio i-checks"><label> <input type="radio" checked="" value="1" name="j_active"> <i> 激活 </i></label></div>
+                                <div class="radio i-checks"><label> <input type="radio"  value="0" name="j_active"> <i> 禁用 </i></label></div>
                             </div>
                         </div>
 
                         <div class="hr-line-dashed"></div>
                         <div class="form-group"><label class="col-sm-2 control-label"> 备注 </label>
-                            <div class="col-sm-8"><input type="text" placeholder="hadoop01" name="j_comment" class="form-control"></div>
+                            <div class="col-sm-8"><input type="text" value="{{ j_comment }}" placeholder="hadoop01" name="j_comment" class="form-control"></div>
                         </div>
 
                         <div class="hr-line-dashed"></div>
@@ -123,7 +129,15 @@
 </div>
 
 
+<!-- Peity -->
+<script src="static/js/plugins/peity/jquery.peity.min.js"></script>
 
+<!-- Custom and plugin javascript -->
+<script src="static/js/inspinia.js"></script>
+<script src="static/js/plugins/pace/pace.min.js"></script>
+
+<!-- Peity -->
+<script src="static/js/demo/peity-demo.js"></script>
 
 <script>
 var showFlag={};
@@ -135,7 +149,6 @@ var showFlag={};
     else{
         document.getElementById("a1").style.display="none";
     }};
-
 </script>
 
 {% endblock %}

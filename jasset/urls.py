@@ -4,8 +4,10 @@ from jasset.views import *
 
 urlpatterns = patterns('',
     url(r'^$', index),
-    url(r'jadd', jadd),
-    url(r'jlist', jlist),
-    url(r'jadd_idc', jadd_idc),
-    url(r'jlist_idc', jlist_idc),
+    url(r'host_add', jadd_host),
+    url(r'host_list', jlist_host),
+    url(r'idc_add', jadd_idc),
+    url(r'idc_list', jlist_idc),
+    url(r'group_add', jadd_group),
+    url(r'group_list', jlist_group),
 )
