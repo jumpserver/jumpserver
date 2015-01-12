@@ -125,7 +125,7 @@ def connect(host, port, user, password):
         logfile = open(logfile_name, 'a')  # 记录日志文件
         logfile.write('\nDateTime:%s' % logtime_start)
         foo.logfile = logfile
-        foo.sendline('')
+        foo.sendline("export PS1='[\u@%s \W]\$ ';clear" % host)
         signal.signal(signal.SIGWINCH, sigwinch_passthrough)
         size = getwinsize()
         foo.setwinsize(size[0], size[1])
