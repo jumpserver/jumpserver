@@ -300,14 +300,17 @@ def user_add(request):
                 server_add_user(username, password, ssh_key_pwd1)
                 if LDAP_ENABLE:
                     ldap_add_user(username, ldap_pwd)
-                msg = '添加用户%s成功！'
+                msg = u'添加用户 %s 成功！' % username
 
             except Exception, e:
-                error = '添加用户%s失败 %s' % e
-                db_del_user(username)
-                server_del_user(username)
-                if LDAP_ENABLE:
-                    ldap_del_user(username)
+                error = u'添加用户 %s 失败 %s ' % (username, e)
+                try:
+                    db_del_user(username)
+                    server_del_user(username)
+                    if LDAP_ENABLE:
+                        ldap_del_user(username)
+                except Exception:
+                    pass
 
     return render_to_response('juser/user_add.html', locals())
 
