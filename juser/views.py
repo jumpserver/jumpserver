@@ -191,7 +191,7 @@ def gen_ssh_key(username, password=None, length=2048):
     with open(public_key_file, 'w') as pub_f:
         pub_f.write(pub_key.exportKey('OpenSSH'))
     os.chmod(public_key_file, 0600)
-    os.chown(public_key_file, username, username)
+    bash('chown %s:%s %s' % (username, username, public_key_file))
 
 
 def server_add_user(username, password, ssh_key_pwd1):
