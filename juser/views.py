@@ -22,7 +22,7 @@ from connect import CONF
 
 
 CRYPTOR = PyCrypt(KEY)
-LDAP_ENABLE = CONF.get('ldap', 'ldap_enable')
+LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
 if LDAP_ENABLE:
     LDAP_HOST_URL = CONF.get('ldap', 'host_url')
     LDAP_BASE_DN = CONF.get('ldap', 'base_dn')
