@@ -34,12 +34,12 @@ except ImportError:
     time.sleep(3)
     sys.exit()
 
-CURRENT_DIR = os.path.dirname(__file__)
+BASE_DIR = os.path.dirname(__file__)
 CONF = ConfigParser()
-CONF.read(os.path.join(CURRENT_DIR, 'jumpserver.conf'))
-LOG_DIR = os.path.join(CURRENT_DIR, 'logs')
+CONF.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
 # Web generate user ssh_key dir.
-SSH_KEY_DIR = os.path.join(CURRENT_DIR, 'keys')
+SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys')
 # User upload the server key to this dir.
 SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
 # The key of decryptor.

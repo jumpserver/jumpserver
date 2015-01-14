@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response
 from django.core.paginator import Paginator, EmptyPage
 
 from models import IDC, Asset, BisGroup
+from models import IDC, Asset, UserGroup
 from connect import PyCrypt, KEY
 
 
@@ -17,6 +18,9 @@ def jadd_host(request):
     cryptor = PyCrypt(KEY)
     eidc = IDC.objects.all()
     egroup = BisGroup.objects.all()
+    egroup = UserGroup.objects.all()
+    is_actived = {'active': 1, 'no_active': 0}
+    login_typed = {'LDAP': 'L', 'SSH_KEY': 'S', 'PASSWORD': 'P', 'MAP': 'M'}
 
     if request.method == 'POST':
         j_ip = request.POST.get('j_ip')
@@ -30,6 +34,7 @@ def jadd_host(request):
         j_idc = IDC.objects.get(name=j_idc)
         for group in j_group:
             c = BisGroup.objects.get(name=group)
+            c = UserGroup.objects.get(name=group)
             groups.append(c)
 
         if Asset.objects.filter(ip=str(j_ip)):
