@@ -61,10 +61,10 @@ class AddError(Exception):
 
 class LDAPMgmt():
     def __init__(self,
-                 host_url=LDAP_HOST_URL,
-                 base_dn=LDAP_BASE_DN,
-                 root_cn=LDAP_ROOT_DN,
-                 root_pw=LDAP_ROOT_PW):
+                 host_url,
+                 base_dn,
+                 root_cn,
+                 root_pw):
         self.ldap_host = host_url
         self.ldap_base_dn = base_dn
         self.conn = ldap.initialize(host_url)
@@ -236,7 +236,7 @@ def ldap_add_user(username, ldap_pwd):
                  'sudoRunAsUser': ['root'],
                  'sudoUser': ['%s' % str(username)]}
 
-    ldap_conn = LDAPMgmt()
+    ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
 
     ldap_conn.add(user_dn, user_attr)
     ldap_conn.add(group_dn, group_attr)
