@@ -146,13 +146,15 @@ def group_add(request):
 
 
 def group_list(request):
-    header_title, path1, path2 = '查看属组 | Add Group', 'juser', 'group_add'
+    header_title, path1, path2 = '查看属组 | Add Group', 'juser', 'group_list'
     groups = UserGroup.objects.all()
     return render_to_response('juser/group_list.html', locals())
 
 
 def user_list(request):
-    pass
+    header_title, path1, path2 = '查看用户 | Add User', 'juser', 'user_list'
+    users = User.objects.all()
+    return render_to_response('juser/user_list.html', locals())
 
 
 def db_add_user(**kwargs):
@@ -301,6 +303,7 @@ def user_add(request):
                 if LDAP_ENABLE:
                     ldap_add_user(username, ldap_pwd)
                 msg = u'添加用户 %s 成功！' % username
+                locals = lambda: {}
 
             except Exception, e:
                 error = u'添加用户 %s 失败 %s ' % (username, e)
