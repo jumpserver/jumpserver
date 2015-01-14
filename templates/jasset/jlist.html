@@ -47,9 +47,9 @@
                         <tbody>
                         {% for post in contacts.object_list %}
                             <tr class="gradeX">
-                                <td> {{ post.ip }} </td>
+                                <td> <a class="iframe" href="/jasset/{{ post.ip }}/">{{ post.ip }}</a></td>
                                 <td> {{ post.port }} </td>
-                                <td> {{ post.login_type}} </td>
+                                <td> {{ post.get_login_type}} </td>
                                 <td class="center"> {{ post.idc.name }} </td>
                                 <td class="center">
                                     {% for group in post.bis_group.all %}
@@ -84,5 +84,11 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function(){
+        $(".iframe").colorbox({iframe:true, width:"70%", height:"70%"});
+    });
+</script>
 
 {% endblock %}

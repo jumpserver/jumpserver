@@ -7,9 +7,9 @@
             <div class="ibox float-e-margins">
                 <div class="text-center">
                     <span>请选择添加内容: </span>
-                    <a href="#" class="btn btn-xs btn-primary" id="lightVersion">添加主机</a>
-                    <a href="#" class="btn btn-xs btn-primary" id="darkVersion">添加IDC</a>
-                    <a href="#" class="btn btn-xs btn-primary" id="leftVersion">添加业务组</a>
+                    <a href="#" class="btn btn-xs btn-primary" id="addhost">添加主机</a>
+                    <a href="#" class="btn btn-xs btn-primary" id="addidc">添加IDC</a>
+                    <a href="#" class="btn btn-xs btn-primary" id="addbis">添加业务组</a>
                 </div>
                 <div id="ibox-content" class="ibox-title">
                     <h5> 填写主机基本信息 </h5>
@@ -31,8 +31,11 @@
                         </a>
                     </div>
                 </div>
+                <div class="ibox-content" name="addidc" id="addidc" onclick="show(this)">
+                    addidc
+                </div>
 
-                <div class="ibox-content">
+                <div class="ibox-content" id="addhost">
                     {% if emg %}
                         <div class="alert alert-warning text-center">{{ emg }}</div>
                     {% endif %}
@@ -146,6 +149,9 @@ var showFlag={};
     if(showFlag.j_type=="MAP"){
         document.getElementById("a1").style.display="";
     }
+    else if(showFlag.addidc=="addidc"){
+        document.getElementById("addidc").style.display="";
+        }
     else{
         document.getElementById("a1").style.display="none";
     }};

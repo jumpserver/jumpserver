@@ -1,10 +1,6 @@
 # coding:utf-8
-import datetime
-from django.shortcuts import render
-from django.http import HttpResponse
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage
 
 from models import IDC, Asset, BisGroup
@@ -73,7 +69,7 @@ def jlist_host(request):
     header_title, path1, path2 = '查看主机 | List Host', '资产管理', '查看主机'
     posts = contact_list = Asset.objects.all().order_by('ip')
     print posts
-    paginator = Paginator(contact_list, 5)
+    p = paginator = Paginator(contact_list, 5)
     try:
         page = int(request.GET.get('page', '1'))
     except ValueError:
@@ -86,6 +82,11 @@ def jlist_host(request):
 
     return render_to_response('jasset/jlist.html', locals(), context_instance=RequestContext(request))
 
+def jlist_ip(request, offset):
+    header_title, path1, path2 = '主机详细信息 | Host Detail.', '资产管理', '主机详情'
+    print offset
+    post = contact_list = Asset.objects.get(ip = str(offset))
+    return render_to_response('jasset/jlist_ip.html', locals(), context_instance=RequestContext(request))
 
 def jadd_idc(request):
     header_title, path1, path2 = '添加IDC | Add IDC', '资产管理', '添加IDC'
