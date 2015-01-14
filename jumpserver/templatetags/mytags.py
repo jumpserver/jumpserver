@@ -1,5 +1,6 @@
 import time
 from django import template
+from juser.models import User
 
 register = template.Library()
 
@@ -22,8 +23,9 @@ def get_value(dicts, key):
     return dicts.get(key, '')
 
 @register.filter(name='groups_str')
-def groups_str(group_list):
+def groups_str(username):
     groups = []
-    for group in group_list:
+    user = User.objects.get(username=username)
+    for group in user.user_group.all():
         groups.append(group.name)
     return ','.join(groups)

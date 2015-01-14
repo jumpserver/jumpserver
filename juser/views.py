@@ -304,7 +304,7 @@ def user_add(request):
                 if LDAP_ENABLE:
                     ldap_add_user(username, ldap_pwd)
                 msg = u'添加用户 %s 成功！' % username
-                locals = lambda: {}
+                # locals = lambda: {}
 
             except Exception, e:
                 error = u'添加用户 %s 失败 %s ' % (username, e)
