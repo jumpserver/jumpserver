@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load mytags %}
 
 {% block content %}
     {% include 'nav_cat_bar.html' %}
@@ -39,19 +40,27 @@
                                     <th>ID</th>
                                     <th>用户名</th>
                                     <th>姓名</th>
+                                    <th>属组</th>
+                                    <th>角色</th>
+                                    <th>Email</th>
+                                    <th>激活</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for group in groups %}
+                                {% for user in users %}
                                 <tr>
                                     <td>
                                         <div class="checkbox i-checks">
-                                            <input type="checkbox" value="{{ group.id }}" name="selected">
+                                            <input type="checkbox" value="{{ user.id }}" name="selected">
                                         </div>
                                     </td>
-                                    <td>{{ group.id }}</td>
-                                    <td>{{ group.name }}</td>
-                                    <td>{{ group.comment }}</td>
+                                    <td>{{ user.id }}</td>
+                                    <td>{{ user.username }}</td>
+                                    <td>{{ user.name }}</td>
+                                    <td>{{ user.user_group.all|groups_str }}</td>
+                                    <td>{{ user_roler|get_value:user.role }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.is_active }}</td>
                                 </tr>
                                 {% endfor %}
                                 </tbody>

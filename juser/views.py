@@ -152,6 +152,7 @@ def group_list(request):
 
 
 def user_list(request):
+    user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
     header_title, path1, path2 = '查看用户 | Add User', 'juser', 'user_list'
     users = User.objects.all()
     return render_to_response('juser/user_list.html', locals())
