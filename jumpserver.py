@@ -17,6 +17,7 @@ import ConfigParser
 import paramiko
 import pxssh
 import pexpect
+import readline
 
 cur_dir = os.path.abspath(os.path.dirname(__file__))
 sys.path.append('%s/webroot/AutoSa/' % cur_dir)
