@@ -6,7 +6,7 @@
         <div class="col-lg-10">
             <div class="ibox float-e-margins">
                 <div id="ibox-content" class="ibox-title">
-                    <h5> 填写业务组基本信息 </h5>
+                    <h5> 填写IDC基本信息 </h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -30,21 +30,24 @@
                     {% if emg %}
                         <div class="alert alert-warning text-center">{{ emg }}</div>
                     {% endif %}
-                    <form method="post" class="form-horizontal">
-                        <div class="form-group"><label class="col-sm-2 control-label"> 业务组名 </label>
-                            <div class="col-sm-8"><input type="text" value="{{ j_ip }}" placeholder="网站" name="j_group" class="form-control"></div>
+                    {% if smg %}
+                        <div class="alert alert-success text-center">{{ smg }}</div>
+                    {% endif %}
+                    <form id="assetForm" method="post" class="form-horizontal">
+                        <div class="form-group"><label class="col-sm-2 control-label"> IDC名 </label>
+                            <div class="col-sm-8"><input type="text" value="{{ j_ip }}" placeholder="北京联通" name="j_idc" class="form-control"></div>
                         </div>
 
                         <div class="hr-line-dashed"></div>
                         <div class="form-group"><label class="col-sm-2 control-label"> 备注 </label>
-                            <div class="col-sm-8"><input type="text" value="{{ s_port }}" placeholder=包括web组所有主机 name="j_comment" class="form-control"></div>
+                            <div class="col-sm-8"><input type="text" value="{{ s_port }}" placeholder="核心联通机房" name="j_comment" class="form-control"></div>
                         </div>
 
                         <div class="hr-line-dashed"></div>
                         <div class="form-group">
                             <div class="col-sm-4 col-sm-offset-5">
                                 <button class="btn btn-white" type="submit"> 重置 </button>
-                                <button class="btn btn-primary" type="submit"> 提交 </button>
+                                <button class="btn btn-primary" type="sumbit"> 提交 </button>
                             </div>
                         </div>
                     </form>
@@ -54,53 +57,23 @@
     </div>
 </div>
 
-
-<!-- Peity -->
-<script src="static/js/plugins/peity/jquery.peity.min.js"></script>
-
-<!-- Custom and plugin javascript -->
-<script src="static/js/inspinia.js"></script>
-<script src="static/js/plugins/pace/pace.min.js"></script>
-
-<!-- Peity -->
-<script src="static/js/demo/peity-demo.js"></script>
-
 <script>
-var showFlag={};
-    function show(o){
-    showFlag[o.name]=o.value;
-    if(showFlag.j_type=="MAP"){
-        document.getElementById("a1").style.display="";
+$('#assetForm').validator({
+    timely: 2,
+    theme: "yellow_right_effect",
+    fields: {
+        "j_idc": {
+            rule: "required",
+            tip: "输入IDC名",
+            ok: "",
+            msg: {required: "IDC名必须填写!"},
+            data: {'data-ok':"主机名可以使用", 'data-msg-required': '主机名已正确'}
+        }
+    },
+    valid: function(form) {
+        form.submit();
     }
-    else{
-        document.getElementById("a1").style.display="none";
-    }};
-
-$(document).ready(function(){
-
-    // Local script for demo purpose only
-    $('#lightVersion').click(function(event) {
-        event.preventDefault()
-        $('#ibox-content').removeClass('ibox-content');
-        $('#vertical-timeline').removeClass('dark-timeline');
-        $('#vertical-timeline').addClass('light-timeline');
-    });
-
-    $('#darkVersion').click(function(event) {
-        event.preventDefault()
-        $('#ibox-content').addClass('ibox-content');
-        $('#vertical-timeline').removeClass('light-timeline');
-        $('#vertical-timeline').addClass('dark-timeline');
-    });
-
-    $('#leftVersion').click(function(event) {
-        event.preventDefault()
-        $('#vertical-timeline').toggleClass('center-orientation');
-    });
-
-
-    });
-
+});
 </script>
 
 {% endblock %}

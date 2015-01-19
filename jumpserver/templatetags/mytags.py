@@ -15,3 +15,7 @@ def stamp2str(value):
 @register.filter(name='int2str')
 def int2str(value):
     return str(value)
+
+@register.filter(name='get_item')
+def get_item(dictionary, key):
+    return dictionary.get(key)
