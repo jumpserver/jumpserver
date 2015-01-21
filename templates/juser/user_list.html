@@ -5,75 +5,109 @@
     {% include 'nav_cat_bar.html' %}
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
-            <div class="col-lg-10">
-                <div class="ibox float-e-margins">
-                    <div class="ibox-title">
-                        <h5>用户信息  <small> show user info.</small></h5>
-                        <div class="ibox-tools">
-                            <a class="collapse-link">
-                                <i class="fa fa-chevron-up"></i>
-                            </a>
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                <i class="fa fa-wrench"></i>
-                            </a>
-                            <ul class="dropdown-menu dropdown-user">
-                                <li><a href="#">未启用 1</a>
-                                </li>
-                                <li><a href="#">未启用 2</a>
-                                </li>
-                            </ul>
-                            <a class="close-link">
-                                <i class="fa fa-times"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="ibox-content" style="display: block;">
-                        <form method="post" action="">
-                            <table class="table table-hover">
-                                <thead>
-                                <tr>
-                                    <th>
-                                        <div class="checkbox i-checks">
-                                            <input onclick="selectAll()" type="checkbox" name="select_all" style="select_all" id="select_all">
-                                        </div>
-                                    </th>
-                                    <th>ID</th>
-                                    <th>用户名</th>
-                                    <th>姓名</th>
-                                    <th>属组</th>
-                                    <th>角色</th>
-                                    <th>Email</th>
-                                    <th>激活</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for user in users %}
-                                <tr>
-                                    <td>
-                                        <div class="checkbox i-checks">
-                                            <input type="checkbox" value="{{ user.id }}" name="selected">
-                                        </div>
-                                    </td>
-                                    <td>{{ user.id }}</td>
-                                    <td>{{ user.username }}</td>
-                                    <td>{{ user.name }}</td>
-                                    <td>{{ user.username|groups_str }}</td>
-                                    <td>{{ user.id|get_role }}</td>
-                                    <td>{{ user.email }}</td>
-                                    <td>{{ user.is_active }}</td>
-                                </tr>
-                                {% endfor %}
-                                </tbody>
-                            </table>
-                            <div class="form-group">
-                                <div class="col-sm-4 col-sm-offset-2">
-                                    <button class="btn btn-white" type="submit">取消</button>
-                                    <button id="submit_button" class="btn btn-primary" type="submit">确认删除</button>
-                                </div>
-                            </div>
-                        </form>
+            <div class="col-lg-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>Editable Table in- combination with jEditable</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li><a href="#">Config option 1</a>
+                            </li>
+                            <li><a href="#">Config option 2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
                     </div>
                 </div>
+            <div class="ibox-content">
+            <div class="">
+            <a onclick="fnClickAddRow();" href="javascript:void(0);" class="btn btn-primary ">Add a new row</a>
+            </div>
+            <div id="editable_wrapper" class="dataTables_wrapper form-inline"><div class="row"><div class="col-sm-6"><div class="dataTables_length" id="editable_length"><label><select name="editable_length" aria-controls="editable" class="form-control input-sm"><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option></select> records per page</label></div></div><div class="col-sm-6"><div id="editable_filter" class="dataTables_filter"><label>Search:<input type="search" class="form-control input-sm" placeholder="" aria-controls="editable"></label></div></div></div><table class="table table-striped table-bordered table-hover  dataTable" id="editable" role="grid" aria-describedby="editable_info">
+            <thead>
+            <tr role="row"><th class="sorting_desc" tabindex="0" aria-controls="editable" rowspan="1" colspan="1" aria-label="Rendering engine: activate to sort column ascending" style="width: 185px;" aria-sort="descending">Rendering engine</th><th class="sorting" tabindex="0" aria-controls="editable" rowspan="1" colspan="1" aria-label="Browser: activate to sort column ascending" style="width: 248px;">Browser</th><th class="sorting" tabindex="0" aria-controls="editable" rowspan="1" colspan="1" aria-label="Platform(s): activate to sort column ascending" style="width: 233px;">Platform(s)</th><th class="sorting" tabindex="0" aria-controls="editable" rowspan="1" colspan="1" aria-label="Engine version: activate to sort column ascending" style="width: 161px;">Engine version</th><th class="sorting" tabindex="0" aria-controls="editable" rowspan="1" colspan="1" aria-label="CSS grade: activate to sort column ascending" style="width: 121px;">CSS grade</th></tr>
+            </thead>
+            <tbody>
+            <tr class="gradeA odd" role="row">
+                <td class="sorting_1">Webkit</td>
+                <td class="">Safari 3.0</td>
+                <td>OSX.4+</td>
+                <td class="center">522.1</td>
+                <td class="center">A</td>
+            </tr><tr class="gradeA even" role="row">
+                <td class="sorting_1">Webkit</td>
+                <td class="">Safari 2.0</td>
+                <td>OSX.4+</td>
+                <td class="center">419.3</td>
+                <td class="center">A</td>
+            </tr><tr class="gradeA odd" role="row">
+                <td class="sorting_1">Webkit</td>
+                <td class="">Safari 1.3</td>
+                <td>OSX.3</td>
+                <td class="center">312.8</td>
+                <td class="center">A</td>
+            </tr><tr class="gradeA even" role="row">
+                <td class="sorting_1">Webkit</td>
+                <td class="">Safari 1.2</td>
+                <td>OSX.3</td>
+                <td class="center">125.5</td>
+                <td class="center">A</td>
+            </tr><tr class="gradeA odd" role="row">
+                <td class="sorting_1">Webkit</td>
+                <td class="">S60</td>
+                <td>S60</td>
+                <td class="center">413</td>
+                <td class="center">A</td>
+            </tr><tr class="gradeA even" role="row">
+                <td class="sorting_1">Webkit</td>
+                <td class="">OmniWeb 5.5</td>
+                <td>OSX.4+</td>
+                <td class="center">420</td>
+                <td class="center">A</td>
+            </tr><tr class="gradeA odd" role="row">
+                <td class="sorting_1">Webkit</td>
+                <td class="">iPod Touch / iPhone</td>
+                <td>iPod</td>
+                <td class="center">420.1</td>
+                <td class="center">A</td>
+            </tr><tr class="gradeA even" role="row">
+                <td class="sorting_1">Trident</td>
+                <td class="">Internet Explorer 7</td>
+                <td>Win XP SP2+</td>
+                <td class="center">7</td>
+                <td class="center">A</td>
+            </tr><tr class="gradeA odd" role="row">
+                <td class="sorting_1">Trident</td>
+                <td class="">Internet
+                    Explorer 6
+                </td>
+                <td>Win 98+</td>
+                <td class="center">6</td>
+                <td class="center">A</td>
+            </tr><tr class="gradeA even" role="row">
+                <td class="sorting_1">Trident</td>
+                <td class="">Internet
+                    Explorer 5.5
+                </td>
+                <td>Win 95+</td>
+                <td class="center">5.5</td>
+                <td class="center">A</td>
+            </tr></tbody>
+            <tfoot>
+            <tr><th rowspan="1" colspan="1">Rendering engine</th><th rowspan="1" colspan="1">Browser</th><th rowspan="1" colspan="1">Platform(s)</th><th rowspan="1" colspan="1">Engine version</th><th rowspan="1" colspan="1">CSS grade</th></tr>
+            </tfoot>
+            </table><div class="row"><div class="col-sm-6"><div class="dataTables_info" id="editable_info" role="status" aria-live="polite">Showing 1 to 10 of 57 entries</div></div><div class="col-sm-6"><div class="dataTables_paginate paging_simple_numbers" id="editable_paginate"><ul class="pagination"><li class="paginate_button previous disabled" aria-controls="editable" tabindex="0" id="editable_previous"><a href="#">Previous</a></li><li class="paginate_button active" aria-controls="editable" tabindex="0"><a href="#">1</a></li><li class="paginate_button " aria-controls="editable" tabindex="0"><a href="#">2</a></li><li class="paginate_button " aria-controls="editable" tabindex="0"><a href="#">3</a></li><li class="paginate_button " aria-controls="editable" tabindex="0"><a href="#">4</a></li><li class="paginate_button " aria-controls="editable" tabindex="0"><a href="#">5</a></li><li class="paginate_button " aria-controls="editable" tabindex="0"><a href="#">6</a></li><li class="paginate_button next" aria-controls="editable" tabindex="0" id="editable_next"><a href="#">Next</a></li></ul></div></div></div></div>
+
+            </div>
+            </div>
             </div>
         </div>
     </div>
