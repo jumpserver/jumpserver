@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load mytags %}
 
 {% block content %}
     {% include 'nav_cat_bar.html' %}
@@ -8,7 +7,7 @@
             <div class="col-lg-10">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h5>用户信息  <small> show user info.</small></h5>
+                        <h5>权限主机 {{ user.username }} <small> show perm host info.</small></h5>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -33,15 +32,14 @@
                                 <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>添加授权</th>
+                                    <th>IP</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% for user in users %}
+                                {% for host in hosts %}
                                 <tr>
-                                    <td>{{ user.id }}</td>
-                                    <td>{{ user.username }}</td>
-                                    <td><a href="../perm_add/?username={{ user.username }}">添加权限</a></td>
+                                    <td>{{ host.id }}</td>
+                                    <td>{{ host.ip }}</td>
                                 </tr>
                                 {% endfor %}
                                 </tbody>

@@ -40,3 +40,23 @@ def perm_add(request):
             msg = u'添加成功'
 
     return render_to_response('jperm/perm_add.html', locals())
+
+
+def perm_user_show(request):
+    header_title, path1, path2 = u'查看授权用户 | Perm User Detail.', u'授权管理', u'用户详情'
+    users = User.objects.all()
+    return render_to_response('jperm/perm_user_show.html', locals(),)
+
+
+def perm_list(request):
+    header_title, path1, path2 = u'查看用户授权 | Perm User Detail.', u'授权管理', u'用户详情'
+    username = request.GET.get('username', None)
+    if not username:
+        return HttpResponseRedirect('/')
+
+    user = User.objects.get(username=username)
+    hosts = []
+    for perm in user.permission_set.all():
+        hosts.append(perm.asset)
+
+    return render_to_response('jperm/perm_list.html', locals())

@@ -8,4 +8,6 @@ urlpatterns = patterns('jpermission.views',
 
     (r'^perm_user_list/$', 'perm_user_list'),
     (r'^perm_add/$', 'perm_add'),
+    (r'^perm_user_show/$', 'perm_user_show'),
+    (r'^perm_list/$', 'perm_list'),
 )
