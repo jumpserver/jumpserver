@@ -18,9 +18,12 @@ def int2str(value):
     return str(value)
 
 
-@register.filter(name='get_value')
-def get_value(dicts, key):
-    return dicts.get(key, '')
+@register.filter(name='get_role')
+def get_role(user_id):
+    user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
+    user = User.objects.get(id=user_id)
+    return user_role.get(user.role)
+
 
 @register.filter(name='groups_str')
 def groups_str(username):

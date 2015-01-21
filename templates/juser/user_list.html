@@ -58,7 +58,7 @@
                                     <td>{{ user.username }}</td>
                                     <td>{{ user.name }}</td>
                                     <td>{{ user.username|groups_str }}</td>
-                                    <td>{{ user_roler|get_value:user.role }}</td>
+                                    <td>{{ user.id|get_role }}</td>
                                     <td>{{ user.email }}</td>
                                     <td>{{ user.is_active }}</td>
                                 </tr>
