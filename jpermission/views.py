@@ -30,11 +30,11 @@ def perm_add(request):
 
     else:
         username = request.POST.get('username', None)
-        host_ips = request.POST.getlist('host_ips', None)
+        host_ids = request.POST.getlist('host_ids', None)
 
         user = User.objects.get(username=username)
-        for ip in host_ips:
-            asset = Asset.objects.get(ip=ip)
+        for id in host_ids:
+            asset = Asset.objects.get(id=id)
             perm = Permission(user=user, asset=asset)
             perm.save()
             msg = u'添加成功'

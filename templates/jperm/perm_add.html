@@ -42,7 +42,7 @@
                             </div>
                             <div class="form-group">
                                 <div class="col-sm-8">
-                                    <select id="host_ips" name="host_ips" multiple style="width: 100%">
+                                    <select id="host_ids" name="host_ids" multiple style="width: 100%">
                                         {% for host in hosts %}
                                         <option value="{{ host.id }}">{{ host.ip }}</option>
                                         {% endfor %}
