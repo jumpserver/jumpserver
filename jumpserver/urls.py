@@ -9,5 +9,6 @@ urlpatterns = patterns('',
     (r'^skin_config/$', 'jumpserver.views.skin_config'),
     (r'^base/$', 'jumpserver.views.base'),
     (r'^juser/', include('juser.urls')),
+    (r'^jperm/', include('jpermission.urls')),
     url(r'^jasset/', include('jasset.urls')),
 )
