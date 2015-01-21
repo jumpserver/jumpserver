@@ -1,3 +1,10 @@
+<link href="/static/css/bootstrap.min.css" rel="stylesheet">
+<link href="/static/font-awesome/css/font-awesome.css" rel="stylesheet">
+<link href="/static/css/plugins/iCheck/custom.css" rel="stylesheet">
+<link href="/static/css/animate.css" rel="stylesheet">
+<link href="/static/css/style.css" rel="stylesheet">
+<link href="/static/css/colorbox.css" rel="stylesheet">
+
 <!-- Mainly scripts -->
 <script src="/static/js/jquery-2.1.1.js"></script>
 <script src="/static/js/bootstrap.min.js"></script>
@@ -17,19 +24,10 @@
 <!-- Peity -->
 <script src="/static/js/demo/peity-demo.js"></script>
 
-<!--<script>-->
-        <!--$(document).ready(function(){-->
-            <!--$('.i-checks').iCheck({-->
-                <!--checkboxClass: 'icheckbox_square-green',-->
-                <!--radioClass: 'iradio_square-green',-->
-            <!--});-->
-        <!--});-->
-
-<!--</script>-->
-
 <!-- pop windows -->
 <script src="/static/js/jquery.colorbox.js"></script>
-
-<!-- validator js -->
-<script src="/static/js/validator/jquery.validator.js"></script>
-<script src="/static/js/validator/zh_CN.js"></script>
+<script>
+    $(document).ready(function(){
+        $(".iframe").colorbox({iframe:true, width:"90%", height:"90%"});
+    });
+</script>

@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
+{% load mytags %}
 {% block content %}
 {% include 'nav_cat_bar.html' %}
 
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
-        <div class="col-lg-10">
+        <div class="col-lg-12">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
                     <h5> 主机详细信息列表 </h5>
@@ -29,35 +30,43 @@
 
                 <div class="ibox-content">
                     <div class="">
-                    <a onclick="fnClickAddRow();" href="javascript:void(0);" class="btn btn-primary "> 添加 </a>
+                    <a target="_blank" href="/jasset/host_add" class="btn btn-sm btn-primary "> 添加 </a>
                     </div>
 
                     <table class="table table-striped table-bordered table-hover " id="editable" >
                         <thead>
                             <tr>
-                                <th> IP地址 </th>
-                                <th> 端口号 </th>
-                                <th> 登录方式 </th>
-                                <th> 所属IDC </th>
-                                <th> 所属业务组 </th>
-                                <th> 添加时间 </th>
-                                <th> 备注 </th>
+                                <th class="text-center"><input type="checkbox" class="i-checks" name=""></th>
+                                <th class="text-center"> IP地址 </th>
+                                <th class="text-center"> 端口号 </th>
+                                <th class="text-center"> 登录方式 </th>
+                                <th class="text-center"> 所属IDC </th>
+                                <th class="text-center"> 所属业务组 </th>
+                                <th class="text-center"> 添加时间 </th>
+                                <th class="text-center"> 备注 </th>
+                                <th class="text-center"> 操作 </th>
                             </tr>
                         </thead>
                         <tbody>
                         {% for post in contacts.object_list %}
                             <tr class="gradeX">
-                                <td> {{ post.ip }} </td>
-                                <td> {{ post.port }} </td>
-                                <td> {{ post.login_type}} </td>
-                                <td class="center"> {{ post.idc.name }} </td>
-                                <td class="center">
-                                    {% for group in post.group.all %}
+                                <td class="text-center"><input type="checkbox" class="i-checks" name=""></td>
+                                <td class="text-center"> {{ post.ip }} </td>
+                                <td class="text-center"> {{ post.port }} </td>
+                                <td class="text-center"> {{ login_types|get_item:post.login_type }} </td>
+                                <td class="text-center"> {{ post.idc.name }} </td>
+                                <td class="text-center">
+                                    {% for group in post.bis_group.all %}
                                         {{ group }}
                                     {% endfor %}
                                 </td>
-                                <td class="center"> {{ post.date_added }} </td>
-                                <td class="center"> {{ post.comment }} </td>
+                                <td class="text-center"> {{ post.date_added }} </td>
+                                <td class="text-center"> {{ post.comment }} </td>
+                                <td class="text-center">
+                                    <a href="/jasset/{{ post.ip }}/" class="iframe btn btn-xs btn-primary">详情</a>
+                                    <a href="/jasset/host_edit/{{ post.ip }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a href="/jasset/host_del/{{ post.ip }}" class="btn btn-xs btn-danger">删除</a>
+                                </td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -84,5 +93,11 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function(){
+        $(".iframe").colorbox({iframe:true, width:"70%", height:"70%"});
+    });
+</script>
 
 {% endblock %}

@@ -107,7 +107,6 @@ class LDAPMgmt():
         except ldap.LDAPError, e:
             print e
 
-
 def gen_sha512(salt, password):
     return crypt.crypt(password, '$6$%s$' % salt)
 
@@ -161,7 +160,6 @@ def user_list(request):
 def db_add_user(**kwargs):
     groups_post = kwargs.pop('groups')
     user = User(**kwargs)
-    group_select = []
     for group_id in groups_post:
         group = UserGroup.objects.filter(id=group_id)
         group_select.extend(group)

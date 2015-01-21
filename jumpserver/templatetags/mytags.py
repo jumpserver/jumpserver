@@ -34,3 +34,7 @@ def groups_str(username):
     for group in user.user_group.all():
         groups.append(group.name)
     return ','.join(groups)
+
+@register.filter(name='get_item')
+def get_item(dictionary, key):
+    return dictionary.get(key)
