@@ -1,3 +1,5 @@
+# coding: utf-8
+
 import time
 from django import template
 from juser.models import User
