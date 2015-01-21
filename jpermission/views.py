@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from juser.models import User
 from jasset.models import Asset
+from jpermission.models import Permission
 
 
 def perm_user_list(request):
@@ -14,16 +15,28 @@ def perm_user_list(request):
 
 def perm_add(request):
     header_title, path1, path2 = u'添加授权 | Add User perm.', u'授权管理', u'添加授权'
-    username = request.GET.get('username', None)
-    if not username:
-        return HttpResponseRedirect('/')
+    if request.method == 'GET':
+        username = request.GET.get('username', None)
+        if not username:
+            return HttpResponseRedirect('/')
 
-    user = User.objects.get(username=username)
-    permed_hosts = []
-    for perm in user.permission_set.all():
-        permed_hosts.append(perm.asset)
+        user = User.objects.get(username=username)
+        permed_hosts = []
+        for perm in user.permission_set.all():
+            permed_hosts.append(perm.asset)
 
-    hosts_all = Asset.objects.all()
-    hosts = list(set(hosts_all) - set(permed_hosts))
+        hosts_all = Asset.objects.all()
+        hosts = list(set(hosts_all) - set(permed_hosts))
+
+    else:
+        username = request.POST.get('username', None)
+        host_ips = request.POST.getlist('host_ips', None)
+
+        user = User.objects.get(username=username)
+        for ip in host_ips:
+            asset = Asset.objects.get(ip=ip)
+            perm = Permission(user=user, asset=asset)
+            perm.save()
+            msg = u'添加成功'
 
     return render_to_response('jperm/perm_add.html', locals())

@@ -37,14 +37,17 @@
                             {% endif %}
                             <div class="form-group">
                                 <div class="col-sm-8">
-                                    <select id="host_ips" name="host_ips" multiple>
+                                    <input name="username" value="{{ user.username }}" hidden="hidden">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-8">
+                                    <select id="host_ips" name="host_ips" multiple style="width: 100%">
                                         {% for host in hosts %}
                                         <option value="{{ host.id }}">{{ host.ip }}</option>
                                         {% endfor %}
                                     </select>
-                                    {% for host in hosts %}
 
-                                    {% endfor %}
                                 </div>
                             </div>
 
