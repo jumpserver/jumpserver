@@ -59,7 +59,7 @@
                                 <td class="text-center">{{ user.email }}</td>
                                 <td class="text-center">{{ user.is_active|bool2str }}</td>
                                 <td class="text-center">
-                                    <a href="/juser/{{ user.username }}/" class="iframe btn btn-xs btn-primary">详情</a>
+                                    <a href="/juser/user_detail/?{{ user.username }}/" class="iframe btn btn-xs btn-primary">详情</a>
                                     <a href="/juser/user_edit/{{ user.username }}" class="btn btn-xs btn-info">编辑</a>
                                     <a href="/juser/user_del/{{ user.username }}" class="btn btn-xs btn-danger">删除</a>
                                 </td>

@@ -11,6 +11,7 @@ import ldap
 from ldap import modlist
 from Crypto.PublicKey import RSA
 import crypt
+from django.http import HttpResponseRedirect
 
 from django.shortcuts import render_to_response
 from django.core.exceptions import ObjectDoesNotExist
@@ -167,6 +168,14 @@ def user_list(request):
     except (EmptyPage, InvalidPage):
         contacts = paginator.page(paginator.num_pages)
     return render_to_response('juser/user_list.html', locals())
+
+
+def user_detail(request):
+    username = request.GET.get('username', None)
+    if not username:
+        return HttpResponseRedirect('/')
+    user = User.objects.get(username=username)
+    return render_to_response('juser/user_detail.html', locals(), context_instance=RequestContext(request))
 
 
 def db_add_user(**kwargs):
