@@ -11,4 +11,5 @@ urlpatterns = patterns('juser.views',
     (r'^group_add/$', 'group_add'),
     (r'^group_list/$', 'group_list'),
     (r'^user_detail/$', 'user_detail'),
+    (r'^user_del/$', 'user_del'),
 )
