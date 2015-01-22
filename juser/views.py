@@ -178,6 +178,15 @@ def user_detail(request):
     return render_to_response('juser/user_detail.html', locals())
 
 
+def user_del(request):
+    username = request.GET.get('username', None)
+    if not username:
+        return HttpResponseRedirect('/')
+    user = User.objects.get(username=username)
+    user.delete()
+    return HttpResponseRedirect('/juser/user_list/', locals())
+
+
 def db_add_user(**kwargs):
     groups_post = kwargs.pop('groups')
     user = User(**kwargs)
