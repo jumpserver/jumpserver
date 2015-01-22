@@ -19,7 +19,7 @@ from juser.models import UserGroup, User
 from connect import PyCrypt, KEY
 from connect import BASE_DIR
 from connect import CONF
-
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 CRYPTOR = PyCrypt(KEY)
 LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
@@ -107,6 +107,7 @@ class LDAPMgmt():
         except ldap.LDAPError, e:
             print e
 
+
 def gen_sha512(salt, password):
     return crypt.crypt(password, '$6$%s$' % salt)
 
@@ -153,13 +154,25 @@ def group_list(request):
 def user_list(request):
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
     header_title, path1, path2 = '查看用户 | Add User', 'juser', 'user_list'
-    users = User.objects.all()
-    return render_to_response('juser/user_list.html', locals())
+    users = contact_list = User.objects.all()
+    p = paginator = Paginator(contact_list, 5)
+
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    try:
+        contacts = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        contacts = paginator.page(paginator.num_pages)
+    return render_to_response('juser/user_list2.html', locals())
 
 
 def db_add_user(**kwargs):
     groups_post = kwargs.pop('groups')
     user = User(**kwargs)
+    group_select = []
     for group_id in groups_post:
         group = UserGroup.objects.filter(id=group_id)
         group_select.extend(group)
