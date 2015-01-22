@@ -166,7 +166,7 @@ def user_list(request):
         contacts = paginator.page(page)
     except (EmptyPage, InvalidPage):
         contacts = paginator.page(paginator.num_pages)
-    return render_to_response('juser/user_list2.html', locals())
+    return render_to_response('juser/user_list.html', locals())
 
 
 def db_add_user(**kwargs):
