@@ -187,6 +187,27 @@ def user_del(request):
     return HttpResponseRedirect('/juser/user_list/', locals())
 
 
+def user_edit(request):
+    if request.method == 'GET':
+        username = request.GET.get('username', None)
+        if not username:
+            return HttpResponseRedirect('/')
+        user = User.objects.get(username=username)
+        username = user.username
+        password = user.password
+        ssh_key_pwd1 = user.ssh_key_pwd1
+        name = user.name
+        all_group = UserGroup.objects.all()
+        groups = user.user_group.all()
+        groups_str = ' '.join([group.name for group in groups])
+        user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
+        role_post = user.role
+        ssh_pwd = user.ssh_pwd
+        email = user.email
+
+        return render_to_response('juser/user_add.html', locals())
+
+
 def db_add_user(**kwargs):
     groups_post = kwargs.pop('groups')
     user = User(**kwargs)
