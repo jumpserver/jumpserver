@@ -68,12 +68,12 @@
                         </tbody>
                     </table>
                     <div class="row">
-                        <div class="col-sm-5">
+                        <div class="col-sm-6">
                             <div class="dataTables_info" id="editable_info" role="status" aria-live="polite">Showing 1 to 25 of 57 entries</div>
                         </div>
-                        <div class="col-sm-5">
+                        <div class="col-sm-6">
                             <div class="dataTables_paginate paging_simple_numbers" id="editable_paginate">
-                                <ul class="pagination" style="margin-top: 0; ">
+                                <ul class="pagination" style="margin-top: 0; float: right">
                                     {% if contacts.has_previous %}
                                         <li class="paginate_button previous" aria-controls="editable" tabindex="0" id="editable_previous">
                                             <a href="?page={{ contacts.previous_page_number }}">Previous</a>
