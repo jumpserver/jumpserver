@@ -153,9 +153,9 @@ def group_list(request):
 
 def user_list(request):
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
-    header_title, path1, path2 = '查看用户 | Add User', 'juser', 'user_list'
-    users = contact_list = User.objects.all()
-    p = paginator = Paginator(contact_list, 5)
+    header_title, path1, path2 = '查看用户 | Show User', 'juser', 'user_list'
+    users = contact_list = User.objects.all().order_by('id')
+    p = paginator = Paginator(contact_list, 10)
 
     try:
         page = int(request.GET.get('page', '1'))
