@@ -49,7 +49,7 @@
                             <div class="col-sm-8">
                                 {% for t, type in login_types.items %}
                                     {% ifequal t post.login_type %}
-                                        <div class="radio i-checks"><label> <input type="radio" id="{{ t }}" checked value="{{ t }}" name="j_type" onclick="show(this)"> <i> {{ type }} </i></label></div>
+                                        <div class="radio i-checks"><label> <input type="radio" id="{{ t }}" checked="" value="{{ t }}" name="j_type" onclick="show(this)"> <i> {{ type }} </i></label></div>
                                     {% else %}
                                         <div class="radio i-checks"><label> <input type="radio" id="{{ t }}" value="{{ t }}" name="j_type" onclick="show(this)"> <i> {{ type }} </i></label></div>
                                     {% endifequal %}
@@ -58,22 +58,22 @@
 
                             <div name="a1" id=a1 style="display:none;">
                                 <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 普通用户名 </label>
-                                    <div class="col-sm-6"><input type="text" value="{{ post.username_common }}" name="j_user" placeholder="lilei" class="form-control"></div>
+                                    <div class="col-sm-6"><input type="text" name="j_user" placeholder="lilei" class="form-control"></div>
                                 </div>
 
                                 <div class="hr-line-dashed"></div>
                                 <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 普通用户密码 </label>
-                                    <div class="col-sm-6"><input type="password" value="{{ post.password_common }}" name="j_password" placeholder="Password" class="form-control"></div>
+                                    <div class="col-sm-6"><input type="password" name="j_password" placeholder="Password" class="form-control"></div>
                                 </div>
 
                                 <div class="hr-line-dashed"></div>
                                 <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 超管用户名 </label>
-                                    <div class="col-sm-6"><input type="text" value="{{ post.username_super }}" name="j_root" placeholder="root" class="form-control"></div>
+                                    <div class="col-sm-6"><input type="text" name="j_root" placeholder="root" class="form-control"></div>
                                 </div>
 
                                 <div class="hr-line-dashed"></div>
                                 <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 超管用户密码 </label>
-                                    <div class="col-sm-6"><input type="password" value="{{ post.password_super }}" name="j_passwd" placeholder="Password" class="form-control"></div>
+                                    <div class="col-sm-6"><input type="password" name="j_passwd" placeholder="Password" class="form-control"></div>
                                 </div>
 
                             </div>
@@ -211,5 +211,6 @@ $('#assetForm').validator({
 });
 
 </script>
+
 
 {% endblock %}
