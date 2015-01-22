@@ -67,23 +67,38 @@
                         {% endfor %}
                         </tbody>
                     </table>
-
-                    <ul class="pagination">
-                        {% if contacts.has_previous %}
-                            <li><a href="?page={{ contacts.previous_page_number }}">&laquo;</a></li>
-                        {% endif %}
-
-                        {% for page in p.page_range %}
-                            {% ifequal offset1 page %}
-                                <li class="active"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
-                            {% else %}
-                              <li><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
-                            {% endifequal %}
-                        {% endfor %}
-                        {% if contacts.has_next %}
-                            <li><a href="?page={{ contacts.next_page_number }}">&raquo;</a></li>
-                        {% endif %}
-                    </ul>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="dataTables_info" id="editable_info" role="status" aria-live="polite">Showing 1 to 25 of 57 entries</div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="dataTables_paginate paging_simple_numbers" id="editable_paginate">
+                                <ul class="pagination">
+                                    {% if contacts.has_previous %}
+                                        <li class="paginate_button previous" aria-controls="editable" tabindex="0" id="editable_previous">
+                                    {% else %}
+                                        <li class="paginate_button previous disabled" aria-controls="editable" tabindex="0" id="editable_previous">
+                                    {% endif %}
+                                             <a href="?page={{ contacts.previous_page_number }}">Previous</a>
+                                        </li>
+                                    {% for page in p.page_range %}
+                                        {% ifequal offset1 page %}
+                                            <li class="paginate_button active"  aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
+                                        {% else %}
+                                            <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
+                                        {% endifequal %}
+                                    {% endfor %}
+                                    {% if contacts.has_next %}
+                                        <li class="paginate_button next" aria-controls="editable" tabindex="0" id="editable_next">
+                                    {% else %}
+                                        <li class="paginate_button next disabled" aria-controls="editable" tabindex="0" id="editable_next">
+                                    {% endif %}
+                                        <a href="#">Next</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
