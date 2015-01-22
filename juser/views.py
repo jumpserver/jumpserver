@@ -175,7 +175,7 @@ def user_detail(request):
     if not username:
         return HttpResponseRedirect('/')
     user = User.objects.get(username=username)
-    return render_to_response('juser/user_detail.html', locals(), context_instance=RequestContext(request))
+    return render_to_response('juser/user_detail.html', locals())
 
 
 def db_add_user(**kwargs):
