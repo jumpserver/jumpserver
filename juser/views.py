@@ -199,7 +199,7 @@ def user_edit(request):
         name = user.name
         all_group = UserGroup.objects.all()
         groups = user.user_group.all()
-        groups_str = ' '.join([group.name for group in groups])
+        groups_str = ' '.join([group.id for group in groups])
         user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
         role_post = user.role
         ssh_pwd = user.ssh_pwd
