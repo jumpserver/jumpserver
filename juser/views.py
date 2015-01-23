@@ -189,7 +189,8 @@ def user_del(request):
 
 def user_edit(request):
     header_title, path1, path2 = '编辑用户 | Edit User', 'juser', 'user_edit'
-    disabled = 'disabled'
+    hidden = "hidden"
+    li_class = "disabled"
     if request.method == 'GET':
         username = request.GET.get('username', None)
         if not username:
@@ -366,6 +367,7 @@ def user_add(request):
     header_title, path1, path2 = '添加用户 | Add User', 'juser', 'user_add'
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
     all_group = UserGroup.objects.all()
+    li_class = "hidden"
     if request.method == 'POST':
         username = request.POST.get('username', None)
         password = request.POST.get('password', None)
