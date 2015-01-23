@@ -188,6 +188,8 @@ def user_del(request):
 
 
 def user_edit(request):
+    header_title, path1, path2 = '编辑用户 | Edit User', 'juser', 'user_edit'
+    disabled = 'disabled'
     if request.method == 'GET':
         username = request.GET.get('username', None)
         if not username:
@@ -205,12 +207,63 @@ def user_edit(request):
         ssh_pwd = user.ssh_pwd
         email = user.email
 
-        return render_to_response('juser/user_add.html', locals())
+    else:
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
+        name = request.POST.get('name', None)
+        email = request.POST.get('email', '')
+        groups = request.POST.getlist('groups', None)
+        groups_str = ' '.join(groups)
+        role_post = request.POST.get('role', None)
+        ssh_pwd = request.POST.get('ssh_pwd', None)
+        ssh_key_pwd1 = request.POST.get('ssh_key_pwd1', None)
+        is_active = request.POST.get('is_active', '1')
+        ldap_pwd = gen_rand_pwd(16)
+
+        if username:
+            user = User.objects.filter(username=username)
+        else:
+            return HttpResponseRedirect('/')
+
+        if password != user.password:
+            password = md5_crypt(password)
+
+        if ssh_pwd != user.ssh_pwd:
+            ssh_pwd = CRYPTOR.encrypt(ssh_pwd)
+
+        if ssh_key_pwd1 != user.ssh_key_pwd1:
+            ssh_key_pwd1 = CRYPTOR.encrypt(ssh_key_pwd1)
+
+        db_update_user(username=username,
+                       password=password,
+                       name=name,
+                       email=email,
+                       groups=groups,
+                       role=role_post,
+                       ssh_pwd=ssh_pwd,
+                       ssh_key_pwd1=ssh_key_pwd1)
+        msg = u'修改用户成功'
+
+    return render_to_response('juser/user_add.html', locals())
 
 
 def db_add_user(**kwargs):
     groups_post = kwargs.pop('groups')
     user = User(**kwargs)
+    group_select = []
+    for group_id in groups_post:
+        group = UserGroup.objects.filter(id=group_id)
+        group_select.extend(group)
+    user.save()
+    user.user_group = group_select
+
+
+def db_update_user(**kwargs):
+    groups_post = kwargs.pop('groups')
+    username = kwargs.get('username')
+    user = User.objects.filter(username=username)
+    user.update(**kwargs)
+    user = User.objects.get(username=username)
     group_select = []
     for group_id in groups_post:
         group = UserGroup.objects.filter(id=group_id)
@@ -301,7 +354,7 @@ def ldap_del_user(username):
     group_dn = "cn=%s,ou=Group,%s" % (username, LDAP_BASE_DN)
     sudo_dn = 'cn=%s,ou=Sudoers,%s' % (username, LDAP_BASE_DN)
 
-    ldap_conn = LDAPMgmt()
+    ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
     ldap_conn.delete(user_dn)
     ldap_conn.delete(group_dn)
     ldap_conn.delete(sudo_dn)
