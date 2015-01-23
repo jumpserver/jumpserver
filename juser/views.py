@@ -221,7 +221,7 @@ def user_edit(request):
         ldap_pwd = gen_rand_pwd(16)
 
         if username:
-            user = User.objects.filter(username=username)
+            user = User.objects.get(username=username)
         else:
             return HttpResponseRedirect('/')
 
