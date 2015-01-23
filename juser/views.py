@@ -245,6 +245,7 @@ def user_edit(request):
                        ssh_pwd=ssh_pwd,
                        ssh_key_pwd1=ssh_key_pwd1)
         msg = u'修改用户成功'
+        return HttpResponseRedirect('/juser/user_edit/')
 
     return render_to_response('juser/user_add.html', locals())
 
