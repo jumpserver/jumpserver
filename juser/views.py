@@ -219,6 +219,8 @@ def user_edit(request):
         ssh_key_pwd1 = request.POST.get('ssh_key_pwd1', None)
         is_active = request.POST.get('is_active', '1')
         ldap_pwd = gen_rand_pwd(16)
+        all_group = UserGroup.objects.all()
+        user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
 
         if username:
             user = User.objects.get(username=username)
