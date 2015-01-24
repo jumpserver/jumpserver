@@ -11,6 +11,7 @@ import ldap
 from ldap import modlist
 from Crypto.PublicKey import RSA
 import crypt
+from django.http import HttpResponseRedirect
 
 from django.shortcuts import render_to_response
 from django.core.exceptions import ObjectDoesNotExist
@@ -19,7 +20,7 @@ from juser.models import UserGroup, User
 from connect import PyCrypt, KEY
 from connect import BASE_DIR
 from connect import CONF
-
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 CRYPTOR = PyCrypt(KEY)
 LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
@@ -107,6 +108,7 @@ class LDAPMgmt():
         except ldap.LDAPError, e:
             print e
 
+
 def gen_sha512(salt, password):
     return crypt.crypt(password, '$6$%s$' % salt)
 
@@ -152,14 +154,121 @@ def group_list(request):
 
 def user_list(request):
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
-    header_title, path1, path2 = '查看用户 | Add User', 'juser', 'user_list'
-    users = User.objects.all()
+    header_title, path1, path2 = '查看用户 | Show User', 'juser', 'user_list'
+    users = contact_list = User.objects.all().order_by('id')
+    p = paginator = Paginator(contact_list, 10)
+
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    try:
+        contacts = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        contacts = paginator.page(paginator.num_pages)
     return render_to_response('juser/user_list.html', locals())
+
+
+def user_detail(request):
+    username = request.GET.get('username', None)
+    if not username:
+        return HttpResponseRedirect('/')
+    user = User.objects.get(username=username)
+    return render_to_response('juser/user_detail.html', locals())
+
+
+def user_del(request):
+    username = request.GET.get('username', None)
+    if not username:
+        return HttpResponseRedirect('/')
+    user = User.objects.get(username=username)
+    user.delete()
+    return HttpResponseRedirect('/juser/user_list/', locals())
+
+
+def user_edit(request):
+    header_title, path1, path2 = '编辑用户 | Edit User', 'juser', 'user_edit'
+    hidden = "hidden"
+    if request.method == 'GET':
+        username = request.GET.get('username', None)
+        if not username:
+            return HttpResponseRedirect('/')
+        user = User.objects.get(username=username)
+        username = user.username
+        password = user.password
+        ssh_key_pwd1 = user.ssh_key_pwd1
+        name = user.name
+        all_group = UserGroup.objects.all()
+        groups = user.user_group.all()
+        groups_str = ' '.join([str(group.id) for group in groups])
+        user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
+        role_post = user.role
+        ssh_pwd = user.ssh_pwd
+        email = user.email
+
+    else:
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', None)
+        name = request.POST.get('name', None)
+        email = request.POST.get('email', '')
+        groups = request.POST.getlist('groups', None)
+        groups_str = ' '.join(groups)
+        role_post = request.POST.get('role', None)
+        ssh_pwd = request.POST.get('ssh_pwd', None)
+        ssh_key_pwd1 = request.POST.get('ssh_key_pwd1', None)
+        is_active = request.POST.get('is_active', '1')
+        ldap_pwd = gen_rand_pwd(16)
+        all_group = UserGroup.objects.all()
+        user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
+
+        if username:
+            user = User.objects.get(username=username)
+        else:
+            return HttpResponseRedirect('/')
+
+        if password != user.password:
+            password = md5_crypt(password)
+
+        if ssh_pwd != user.ssh_pwd:
+            ssh_pwd = CRYPTOR.encrypt(ssh_pwd)
+
+        if ssh_key_pwd1 != user.ssh_key_pwd1:
+            ssh_key_pwd1 = CRYPTOR.encrypt(ssh_key_pwd1)
+
+        db_update_user(username=username,
+                       password=password,
+                       name=name,
+                       email=email,
+                       groups=groups,
+                       role=role_post,
+                       ssh_pwd=ssh_pwd,
+                       ssh_key_pwd1=ssh_key_pwd1)
+        msg = u'修改用户成功'
+
+        return HttpResponseRedirect('/juser/user_list/')
+
+    return render_to_response('juser/user_add.html', locals())
 
 
 def db_add_user(**kwargs):
     groups_post = kwargs.pop('groups')
     user = User(**kwargs)
+    group_select = []
+    for group_id in groups_post:
+        group = UserGroup.objects.filter(id=group_id)
+        group_select.extend(group)
+    user.save()
+    user.user_group = group_select
+
+
+def db_update_user(**kwargs):
+    groups_post = kwargs.pop('groups')
+    username = kwargs.get('username')
+    user = User.objects.filter(username=username)
+    user.update(**kwargs)
+    user = User.objects.get(username=username)
+    group_select = []
     for group_id in groups_post:
         group = UserGroup.objects.filter(id=group_id)
         group_select.extend(group)
@@ -249,7 +358,7 @@ def ldap_del_user(username):
     group_dn = "cn=%s,ou=Group,%s" % (username, LDAP_BASE_DN)
     sudo_dn = 'cn=%s,ou=Sudoers,%s' % (username, LDAP_BASE_DN)
 
-    ldap_conn = LDAPMgmt()
+    ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
     ldap_conn.delete(user_dn)
     ldap_conn.delete(group_dn)
     ldap_conn.delete(sudo_dn)

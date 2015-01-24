@@ -38,3 +38,11 @@ def groups_str(username):
 @register.filter(name='get_item')
 def get_item(dictionary, key):
     return dictionary.get(key)
+
+
+@register.filter(name='bool2str')
+def bool2str(value):
+    if value:
+        return u'是'
+    else:
+        return u'否'

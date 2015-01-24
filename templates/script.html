@@ -33,3 +33,9 @@
 <!-- validator js -->
 <script src="/static/js/validator/jquery.validator.js"></script>
 <script src="/static/js/validator/zh_CN.js"></script>
+
+<!-- active menu -->
+<script>
+    var str = document.location.pathname.split("/")[1];
+    $("#"+str).addClass('active');
+</script>

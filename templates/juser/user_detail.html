@@ -1,0 +1,71 @@
+{% load mytags %}
+<html>
+    <head>
+        {% include 'link_css.html' %}
+
+        <style type="text/css">
+        body
+        {
+        background: #FFFFFF;
+        }
+        </style>
+    </head>
+
+    <body>
+        <div class="row">
+            <div class="contact-box">
+                <h2 class="text-center">{{ user.name }} 用户详情</h2>
+                <div class="ibox-content">
+                    <div class="">
+                    <a target="_blank" href="/juser/user_add/" class="btn btn-sm btn-primary "> 添加 </a>
+                    </div>
+
+                    <table class="table table-striped table-bordered table-hover " id="editable" >
+                        <thead>
+                            <tr>
+                                <th class="text-center">用户</th>
+                                <th class="text-center">详情</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="gradeX">
+                            <td class="text-center">ID</td>
+                            <td class="text-center">{{ user.id }}</td>
+                        </tr>
+                        <tr class="gradeX">
+                            <td class="text-center">username</td>
+                            <td class="text-center">{{ user.username }}</td>
+                        </tr>
+                        <tr class="gradeX">
+                            <td class="text-center">姓名</td>
+                            <td class="text-center">{{ user.name }}</td>
+                        </tr>
+                        <tr class="gradeX">
+                            <td class="text-center">角色</td>
+                            <td class="text-center">{{ user.id|get_role }}</td>
+                        </tr>
+                        <tr class="gradeX">
+                            <td class="text-center">属组</td>
+                            <td class="text-center">{{ user.username|groups_str }}</td>
+                        </tr>
+                        <tr class="gradeX">
+                            <td class="text-center">Email</td>
+                            <td class="text-center">{{ user.email }}</td>
+                        </tr>
+                        <tr class="gradeX">
+                            <td class="text-center">激活</td>
+                            <td class="text-center">{{ user.is_active|bool2str }}</td>
+                        </tr>
+                        <tr class="gradeX">
+                            <td class="text-center">添加时间</td>
+                            <td class="text-center">{{ user.joined }}</td>
+                        </tr>
+                        <tr class="gradeX">
+                            <td class="text-center">最后登录</td>
+                            <td class="text-center">{{ user.last_login }}</td>
+                        </tr>
+                    </table>
+            </div>
+        </div>
+    </body>
+</html>
