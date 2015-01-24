@@ -71,23 +71,34 @@
                         {% endfor %}
                         </tbody>
                     </table>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="dataTables_info" id="editable_info" role="status" aria-live="polite">
+                                Showing {{ contacts.start_index }} to {{ contacts.end_index }} of {{ p.count }} entries
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="dataTables_paginate paging_simple_numbers" id="editable_paginate">
+                                <ul class="pagination" style="margin-top: 0; float: right">
 
-                    <ul class="pagination">
-                        {% if contacts.has_previous %}
-                            <li><a href="?page={{ contacts.previous_page_number }}">&laquo;</a></li>
-                        {% endif %}
+                                    {% if contacts.has_previous %}
+                                        <li><a href="?page={{ contacts.previous_page_number }}">&laquo;</a></li>
+                                    {% endif %}
 
-                        {% for page in p.page_range %}
-                            {% ifequal offset1 page %}
-                                <li class="active"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
-                            {% else %}
-                              <li><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
-                            {% endifequal %}
-                        {% endfor %}
-                        {% if contacts.has_next %}
-                            <li><a href="?page={{ contacts.next_page_number }}">&raquo;</a></li>
-                        {% endif %}
-                    </ul>
+                                    {% for page in p.page_range %}
+                                        {% ifequal offset1 page %}
+                                            <li class="active"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
+                                        {% else %}
+                                          <li><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
+                                        {% endifequal %}
+                                    {% endfor %}
+                                    {% if contacts.has_next %}
+                                        <li><a href="?page={{ contacts.next_page_number }}">&raquo;</a></li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
