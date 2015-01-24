@@ -28,6 +28,13 @@ def perm_host(request):
     return render_to_response('jperm/perm_host.html', locals())
 
 
+def perm_edit(request):
+    header_title, path1, path2 = u'授权编辑 | Perm Edit.', u'jperm', u'perm_edit'
+    if request.method == 'GET':
+        if request.GET.get('id', None):
+            pass
+
+
 def perm_add(request):
     header_title, path1, path2 = u'添加授权 | Add User perm.', u'授权管理', u'添加授权'
     if request.method == 'GET':

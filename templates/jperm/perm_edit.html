@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load mytags %}
+
+{% block content %}
+    {% include 'nav_cat_bar.html' %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-lg-10">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>编辑授权 {{ user.name }} <small> Edit perm info.</small></h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#">未启用 1</a>
+                                </li>
+                                <li><a href="#">未启用 2</a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <form method="post" class="form-horizontal" action="">
+                            {% if error %}
+                                <div class="alert alert-warning text-center">{{ error }}</div>
+                            {% endif %}
+                            {% if msg %}
+                                <div class="alert alert-success text-center">{{ msg }}</div>
+                            {% endif %}
+                            <div class="form-group">
+                                <div class="col-sm-8">
+                                    <input name="username" value="{{ user.username }}" readonly="readonly">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-4">
+                                    <input id="filter" name="filter" placeholder="过滤" type="text" class="form-control">
+                                    <select id="host_ids" name="host_ids" multiple style="width: 100%">
+                                        {% for host in hosts %}
+                                        <option value="{{ host.id }}">{{ host.ip }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-sm-2">
+
+                                </div>
+                                <div class="col-sm-4">
+                                    <select id="host_ids" name="host_ids" multiple style="width: 100%">
+                                        {% for host in hosts %}
+                                        <option value="{{ host.id }}">{{ host.ip }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <button class="btn btn-white" type="submit">取消</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit">确认保存</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
