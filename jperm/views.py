@@ -32,7 +32,7 @@ def perm_edit(request):
     header_title, path1, path2 = u'授权编辑 | Perm Edit.', u'jperm', u'perm_edit'
     if request.method == 'GET':
         if request.GET.get('id', None):
-            pass
+            return render_to_response('jperm/perm_edit.html', locals())
 
 
 def perm_add(request):
