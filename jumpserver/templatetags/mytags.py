@@ -47,6 +47,7 @@ def bool2str(value):
     else:
         return u'否'
 
+
 @register.filter(name='perm_count')
 def perm_count(user_id):
     user = User.objects.get(int(user_id))
