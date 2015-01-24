@@ -192,7 +192,13 @@ def group_edit(request):
 
         return render_to_response('juser/group_add.html', locals())
     else:
-        pass
+        group_id = request.POST.get('id', None)
+        group_name = request.POST.get('group_name', None)
+        comment = request.POST.get('comment', '')
+        group = UserGroup.objects.filter(id=group_id)
+        group.update(name=group_name, comment=comment)
+
+        return HttpResponseRedirect('/juser/group_list/')
 
 
 def user_list(request):
@@ -234,10 +240,10 @@ def user_edit(request):
     header_title, path1, path2 = '编辑用户 | Edit User', 'juser', 'user_edit'
     readonly = "readonly"
     if request.method == 'GET':
-        username = request.GET.get('username', None)
-        if not username:
+        user_id = request.GET.get('id', None)
+        if not user_id:
             return HttpResponseRedirect('/')
-        user = User.objects.get(username=username)
+        user = User.objects.get(id=user_id)
         username = user.username
         password = user.password
         ssh_key_pwd1 = user.ssh_key_pwd1
