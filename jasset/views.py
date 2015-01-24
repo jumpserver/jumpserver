@@ -5,7 +5,9 @@ from django.shortcuts import render_to_response
 from django.core.paginator import Paginator, EmptyPage
 
 from models import IDC, Asset, BisGroup
+from juser.models import UserGroup
 from connect import PyCrypt, KEY
+from jpermission.models import Permission
 
 cryptor = PyCrypt(KEY)
 
@@ -20,6 +22,7 @@ def jadd_host(request):
     groups = []
     eidc = IDC.objects.all()
     egroup = BisGroup.objects.all()
+    eusergroup = UserGroup.objects.all()
 
     if request.method == 'POST':
         j_ip = request.POST.get('j_ip')
