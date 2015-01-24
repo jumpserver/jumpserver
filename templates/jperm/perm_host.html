@@ -150,9 +150,9 @@
                                                     {% endif %}
                                                     {% for page in p2.page_range %}
                                                         {% ifequal offset1 page %}
-                                                            <li class="paginate_button active"  aria-controls="editable" tabindex="0"><a href="?page={{ page2 }}"  title="第{{ page2 }}页">{{ page2 }}</a></li>
+                                                            <li class="paginate_button active"  aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
                                                         {% else %}
-                                                            <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?page={{ page2 }}"  title="第{{ page2 }}页">{{ page2 }}</a></li>
+                                                            <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
                                                         {% endifequal %}
                                                     {% endfor %}
                                                     {% if contacts2.has_next %}
