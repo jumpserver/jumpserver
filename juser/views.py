@@ -163,6 +163,38 @@ def group_list(request):
     return render_to_response('juser/group_list.html', locals())
 
 
+def group_detail(request):
+    group_id = request.GET.get('id', None)
+    if not group_id:
+        return HttpResponseRedirect('/')
+    group = UserGroup.objects.get(id=group_id)
+    return render_to_response('juser/group_detail.html', locals())
+
+
+def group_del(request):
+    group_id = request.GET.get('id', None)
+    if not group_id:
+        return HttpResponseRedirect('/')
+    group = UserGroup.objects.get(id=group_id)
+    group.delete()
+    return HttpResponseRedirect('/juser/group_list/', locals())
+
+
+def group_edit(request):
+    error = ''
+    msg = ''
+    header_title, path1, path2 = '修改属组 | Edit Group', 'juser', 'group_edit'
+    if request.method == 'GET':
+        group_id = request.GET.get('id', None)
+        group = UserGroup.objects.get(id=group_id)
+        group_name = group.name
+        comment = group.comment
+
+        return render_to_response('juser/group_add.html', locals())
+    else:
+        pass
+
+
 def user_list(request):
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
     header_title, path1, path2 = '查看用户 | Show User', 'juser', 'user_list'
@@ -200,7 +232,7 @@ def user_del(request):
 
 def user_edit(request):
     header_title, path1, path2 = '编辑用户 | Edit User', 'juser', 'user_edit'
-    hidden = "hidden"
+    readonly = "readonly"
     if request.method == 'GET':
         username = request.GET.get('username', None)
         if not username:

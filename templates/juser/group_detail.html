@@ -1,0 +1,44 @@
+{% load mytags %}
+<html>
+    <head>
+        {% include 'link_css.html' %}
+
+        <style type="text/css">
+        body
+        {
+        background: #FFFFFF;
+        }
+        </style>
+    </head>
+
+    <body>
+        <div class="row">
+            <div class="contact-box">
+                <h2 class="text-center">{{ group.name }} 属组详情</h2>
+                <div class="ibox-content">
+
+                    <table class="table table-striped table-bordered table-hover " id="editable" >
+                        <thead>
+                            <tr>
+                                <th class="text-center">属组</th>
+                                <th class="text-center">详情</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <tr class="gradeX">
+                            <td class="text-center">ID</td>
+                            <td class="text-center">{{ group.id }}</td>
+                        </tr>
+                        <tr class="gradeX">
+                            <td class="text-center">组名</td>
+                            <td class="text-center">{{ group.name }}</td>
+                        </tr>
+                        <tr class="gradeX">
+                            <td class="text-center">备注</td>
+                            <td class="text-center">{{ group_comment }}</td>
+                        </tr>
+                    </table>
+            </div>
+        </div>
+    </body>
+</html>
