@@ -29,11 +29,7 @@
                 </div>
 
                 <div class="ibox-content">
-                    <div class="">
-                    <a target="_blank" href="/jperm/perm_edit/" class="btn btn-sm btn-primary "> 添加 </a>
-                    </div>
                     <div class="panel blank-panel">
-
                         <div class="panel-heading">
                             <div class="panel-options">
                                 <ul class="nav nav-tabs">
@@ -113,6 +109,65 @@
                                 </div>
 
                                 <div id="tab-2" class="tab-pane">
+                                    <table class="table table-striped table-bordered table-hover " id="editable" >
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">组名</th>
+                                                <th class="text-center">备注</th>
+                                                <th class="text-center">操作</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for group in contacts2.object_list %}
+                                            <tr class="gradeX">
+                                                <td class="text-center"> {{ group.name }} </td>
+                                                <td class="text-center"> {{ group.comment }} </td>
+                                                <td class="text-center">
+                                                    <a href="../perm_detail/?id={{ user.id }}" class="iframe btn btn-xs btn-primary">详情</a>
+                                                    <a href="../perm_edit/?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="dataTables_info" id="editable_info" role="status" aria-live="polite">
+                                                Showing {{ contacts2.start_index }} to {{ contacts2.end_index }} of {{ p2.count }} entries
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="dataTables_paginate paging_simple_numbers" id="editable_paginate">
+                                                <ul class="pagination" style="margin-top: 0; float: right">
+                                                    {% if contacts2.has_previous %}
+                                                        <li class="paginate_button previous" aria-controls="editable" tabindex="0" id="editable_previous">
+                                                            <a href="?page={{ contacts2.previous_page_number }}">Previous</a>
+                                                        </li>
+                                                    {% else %}
+                                                        <li class="paginate_button previous disabled" aria-controls="editable" tabindex="0" id="editable_previous">
+                                                             <a href="#">Previous</a>
+                                                        </li>
+                                                    {% endif %}
+                                                    {% for page in p2.page_range %}
+                                                        {% ifequal offset1 page %}
+                                                            <li class="paginate_button active"  aria-controls="editable" tabindex="0"><a href="?page={{ page2 }}"  title="第{{ page2 }}页">{{ page2 }}</a></li>
+                                                        {% else %}
+                                                            <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?page={{ page2 }}"  title="第{{ page2 }}页">{{ page2 }}</a></li>
+                                                        {% endifequal %}
+                                                    {% endfor %}
+                                                    {% if contacts2.has_next %}
+                                                        <li class="paginate_button next" aria-controls="editable" tabindex="0" id="editable_next">
+                                                            <a href="?page={{ contacts2.next_page_number }}">Next</a>
+                                                        </li>
+                                                    {% else %}
+                                                        <li class="paginate_button next disabled" aria-controls="editable" tabindex="0" id="editable_next">
+                                                            <a href="#">Next</a>
+                                                        </li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
 
                                 </div>
                             </div>

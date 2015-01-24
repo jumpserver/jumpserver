@@ -2,7 +2,7 @@
 
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
-from juser.models import User
+from juser.models import User, UserGroup
 from jasset.models import Asset
 from jperm.models import Perm
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
@@ -11,7 +11,9 @@ from django.core.paginator import Paginator, EmptyPage, InvalidPage
 def perm_host(request):
     header_title, path1, path2 = u'主机授权 | Perm Host Detail.', u'jperm', u'perm_host'
     users = contact_list = User.objects.all().order_by('id')
+    groups = contact_list2 = UserGroup.objects.all().order_by('id')
     p = paginator = Paginator(contact_list, 10)
+    p2 = paginator2 = Paginator(contact_list2, 10)
     try:
         page = int(request.GET.get('page', '1'))
     except ValueError:
@@ -19,9 +21,11 @@ def perm_host(request):
 
     try:
         contacts = paginator.page(page)
+        contacts2 = paginator2.page(page)
     except (EmptyPage, InvalidPage):
         contacts = paginator.page(paginator.num_pages)
-    return render_to_response('jperm/perm_host.html', locals(),)
+        contacts2 = paginator2.page(paginator2.num_pages)
+    return render_to_response('jperm/perm_host.html', locals())
 
 
 def perm_add(request):
