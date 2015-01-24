@@ -104,6 +104,16 @@
                         </div>
 
                         <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="j_group" class="col-sm-2 control-label"> 所属用户组 </label>
+                            <div class="col-sm-8">
+                                {% for g in eusergroup %}
+                                    <label class="checkbox-inline"><input type="checkbox" id="j_usergroup" value="{{ g }}" name="j_usergroup"> {{ g }} </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
                         <div class="form-group"><label class="col-sm-2 control-label"> 是否激活 </label>
                             <div class="col-sm-8">
                                 <div class="radio i-checks"><label> <input type="radio" checked="" value="1" name="j_active"> <i> 激活 </i></label></div>
@@ -166,6 +176,12 @@ $('#assetForm').validator({
         "j_group": {
             rule: "checked",
             tip: "选择业务组",
+            ok: "",
+            msg: {checked: "至少选择一个组"}
+        },
+        "j_usergroup": {
+            rule: "checked",
+            tip: "选择用户组",
             ok: "",
             msg: {checked: "至少选择一个组"}
         },
