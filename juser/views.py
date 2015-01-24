@@ -147,8 +147,19 @@ def group_add(request):
 
 
 def group_list(request):
-    header_title, path1, path2 = '查看属组 | Add Group', 'juser', 'group_list'
-    groups = UserGroup.objects.all()
+    header_title, path1, path2 = '查看属组 | Show Group', 'juser', 'group_list'
+    groups = contact_list = UserGroup.objects.all().order_by('id')
+    p = paginator = Paginator(contact_list, 10)
+
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    try:
+        contacts = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        contacts = paginator.page(paginator.num_pages)
     return render_to_response('juser/group_list.html', locals())
 
 
