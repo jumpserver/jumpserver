@@ -220,18 +220,18 @@ def user_list(request):
 
 
 def user_detail(request):
-    username = request.GET.get('username', None)
-    if not username:
+    user_id = request.GET.get('id', None)
+    if not user_id:
         return HttpResponseRedirect('/')
-    user = User.objects.get(username=username)
+    user = User.objects.get(id=user_id)
     return render_to_response('juser/user_detail.html', locals())
 
 
 def user_del(request):
-    username = request.GET.get('username', None)
-    if not username:
+    user_id = request.GET.get('id', None)
+    if not user_id:
         return HttpResponseRedirect('/')
-    user = User.objects.get(username=username)
+    user = User.objects.get(id=user_id)
     user.delete()
     return HttpResponseRedirect('/juser/user_list/', locals())
 
