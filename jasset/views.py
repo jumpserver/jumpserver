@@ -7,7 +7,7 @@ from django.core.paginator import Paginator, EmptyPage
 from models import IDC, Asset, BisGroup
 from juser.models import UserGroup
 from connect import PyCrypt, KEY
-from jpermission.models import Permission
+from jperm.models import Permission
 
 cryptor = PyCrypt(KEY)
 

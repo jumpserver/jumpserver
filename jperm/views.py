@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from juser.models import User
 from jasset.models import Asset
-from jpermission.models import Permission
+from jperm.models import Permission
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 
