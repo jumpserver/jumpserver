@@ -51,4 +51,4 @@ def bool2str(value):
 @register.filter(name='perm_count')
 def perm_count(user_id):
     user = User.objects.get(int(user_id))
-    return user.permission_set.all().count()
+    return user.perm_set.all().count()
