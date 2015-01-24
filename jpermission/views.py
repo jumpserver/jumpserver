@@ -5,12 +5,23 @@ from django.http import HttpResponseRedirect
 from juser.models import User
 from jasset.models import Asset
 from jpermission.models import Permission
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 
-def perm_user_list(request):
-    header_title, path1, path2 = u'查看授权用户 | Perm User Detail.', u'授权管理', u'用户详情'
-    users = User.objects.all()
-    return render_to_response('jperm/perm_user_list.html', locals(),)
+def perm_host(request):
+    header_title, path1, path2 = u'主机授权 | Perm Host Detail.', u'jperm', u'perm_host'
+    users = contact_list = User.objects.all().order_by('id')
+    p = paginator = Paginator(contact_list, 10)
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    try:
+        contacts = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        contacts = paginator.page(paginator.num_pages)
+    return render_to_response('jperm/perm_host.html', locals(),)
 
 
 def perm_add(request):

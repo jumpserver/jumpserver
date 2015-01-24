@@ -46,3 +46,8 @@ def bool2str(value):
         return u'是'
     else:
         return u'否'
+
+@register.filter(name='perm_total')
+def perm_total(user_id):
+    user = User.objects.get(int(user_id))
+    return user.permission_set.all().count()
