@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from juser.models import User
 from jasset.models import Asset
-from jperm.models import Permission
+from jperm.models import Perm
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 
@@ -33,7 +33,7 @@ def perm_add(request):
 
         user = User.objects.get(username=username)
         permed_hosts = []
-        for perm in user.permission_set.all():
+        for perm in user.perm_set.all():
             permed_hosts.append(perm.asset)
 
         hosts_all = Asset.objects.all()
@@ -46,7 +46,7 @@ def perm_add(request):
         user = User.objects.get(username=username)
         for id in host_ids:
             asset = Asset.objects.get(id=id)
-            perm = Permission(user=user, asset=asset)
+            perm = Perm(user=user, asset=asset)
             perm.save()
             msg = u'添加成功'
 
@@ -67,7 +67,7 @@ def perm_list(request):
 
     user = User.objects.get(username=username)
     hosts = []
-    for perm in user.permission_set.all():
+    for perm in user.perm_set.all():
         hosts.append(perm.asset)
 
     return render_to_response('jperm/perm_list.html', locals())

@@ -3,7 +3,7 @@ from juser.models import User
 from jasset.models import Asset
 
 
-class Permission(models.Model):
+class Perm(models.Model):
     USER_ROLE_CHOICES = (
         ('SU', 'SuperUser'),
         ('CU', 'CommonUser'),
