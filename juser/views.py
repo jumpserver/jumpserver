@@ -192,7 +192,7 @@ def group_edit(request):
 
         return render_to_response('juser/group_add.html', locals())
     else:
-        group_id = request.POST.get('id', None)
+        group_id = request.POST.get('group_id', None)
         group_name = request.POST.get('group_name', None)
         comment = request.POST.get('comment', '')
         group = UserGroup.objects.filter(id=group_id)
