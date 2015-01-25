@@ -1,0 +1,15 @@
+{
+  "name": "path-to-regexp",
+  "description": "Express style path to RegExp utility",
+  "version": "0.1.3",
+  "keywords": [
+    "express",
+    "regexp",
+    "route",
+    "routing"
+  ],
+  "scripts": [
+    "index.js"
+  ],
+  "license": "MIT"
+}

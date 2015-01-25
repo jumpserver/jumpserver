@@ -1,0 +1,56 @@
+{
+  "name": "cookie-signature",
+  "version": "1.0.5",
+  "description": "Sign and unsign cookies",
+  "keywords": [
+    "cookie",
+    "sign",
+    "unsign"
+  ],
+  "author": {
+    "name": "TJ Holowaychuk",
+    "email": "tj@learnboost.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/visionmedia/node-cookie-signature.git"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*"
+  },
+  "main": "index",
+  "gitHead": "73ed69b511b3ef47555d71b4ed1deea9e5ed6e1f",
+  "bugs": {
+    "url": "https://github.com/visionmedia/node-cookie-signature/issues"
+  },
+  "homepage": "https://github.com/visionmedia/node-cookie-signature",
+  "_id": "cookie-signature@1.0.5",
+  "scripts": {},
+  "_shasum": "a122e3f1503eca0f5355795b0711bb2368d450f9",
+  "_from": "cookie-signature@1.0.5",
+  "_npmVersion": "1.4.20",
+  "_npmUser": {
+    "name": "natevw",
+    "email": "natevw@yahoo.com"
+  },
+  "maintainers": [
+    {
+      "name": "tjholowaychuk",
+      "email": "tj@vision-media.ca"
+    },
+    {
+      "name": "natevw",
+      "email": "natevw@yahoo.com"
+    }
+  ],
+  "dist": {
+    "shasum": "a122e3f1503eca0f5355795b0711bb2368d450f9",
+    "tarball": "http://registry.npmjs.org/cookie-signature/-/cookie-signature-1.0.5.tgz"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/cookie-signature/-/cookie-signature-1.0.5.tgz",
+  "readme": "ERROR: No README data found!"
+}

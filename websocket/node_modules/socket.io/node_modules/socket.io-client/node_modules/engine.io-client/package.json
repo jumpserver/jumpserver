@@ -1,0 +1,84 @@
+{
+  "name": "engine.io-client",
+  "description": "Client for the realtime Engine",
+  "version": "1.4.3",
+  "homepage": "http://socket.io",
+  "contributors": [
+    {
+      "name": "Guillermo Rauch",
+      "email": "rauchg@gmail.com"
+    },
+    {
+      "name": "Vladimir Dronnikov",
+      "email": "dronnikov@gmail.com"
+    },
+    {
+      "name": "Christoph Dorn",
+      "url": "https://github.com/cadorn"
+    },
+    {
+      "name": "Mark Mokryn",
+      "email": "mokesmokes@gmail.com"
+    }
+  ],
+  "dependencies": {
+    "has-cors": "1.0.3",
+    "ws": "0.4.31",
+    "xmlhttprequest": "https://github.com/LearnBoost/node-XMLHttpRequest/archive/0f36d0b5ebc03d85f860d42a64ae9791e1daa433.tar.gz",
+    "component-emitter": "1.1.2",
+    "indexof": "0.0.1",
+    "engine.io-parser": "1.1.0",
+    "debug": "1.0.4",
+    "parseuri": "0.0.4",
+    "parsejson": "0.0.1",
+    "parseqs": "0.0.2",
+    "component-inherit": "0.0.3"
+  },
+  "devDependencies": {
+    "blob": "0.0.2",
+    "browserify": "6.2.0",
+    "concat-stream": "1.4.6",
+    "derequire": "1.2.0",
+    "engine.io": "1.4.3",
+    "expect.js": "0.2.0",
+    "express": "3.4.8",
+    "istanbul": "0.2.3",
+    "mocha": "1.16.2",
+    "zuul": "1.10.2"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "browser": {
+    "xmlhttprequest": "./lib/xmlhttprequest.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Automattic/engine.io-client.git"
+  },
+  "gitHead": "57ca9fea8ebf7d0762d6d1eeda302d622226243c",
+  "bugs": {
+    "url": "https://github.com/Automattic/engine.io-client/issues"
+  },
+  "_id": "engine.io-client@1.4.3",
+  "_shasum": "7227cb6b29376435f0c819957ce6ba3ec1a8d955",
+  "_from": "engine.io-client@1.4.3",
+  "_npmVersion": "1.4.21",
+  "_npmUser": {
+    "name": "rauchg",
+    "email": "rauchg@gmail.com"
+  },
+  "maintainers": [
+    {
+      "name": "rauchg",
+      "email": "rauchg@gmail.com"
+    }
+  ],
+  "dist": {
+    "shasum": "7227cb6b29376435f0c819957ce6ba3ec1a8d955",
+    "tarball": "http://registry.npmjs.org/engine.io-client/-/engine.io-client-1.4.3.tgz"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/engine.io-client/-/engine.io-client-1.4.3.tgz",
+  "readme": "ERROR: No README data found!"
+}

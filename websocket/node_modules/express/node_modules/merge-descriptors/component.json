@@ -1,0 +1,10 @@
+{
+  "name": "merge-descriptors",
+  "description": "Merge objects using descriptors",
+  "version": "0.0.2",
+  "scripts": [
+    "index.js"
+  ],
+  "repo": "component/merge-descriptors",
+  "license": "MIT"
+}

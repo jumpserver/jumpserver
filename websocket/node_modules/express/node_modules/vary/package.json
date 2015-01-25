@@ -1,0 +1,71 @@
+{
+  "name": "vary",
+  "description": "Manipulate the HTTP Vary header",
+  "version": "1.0.0",
+  "author": {
+    "name": "Douglas Christopher Wilson",
+    "email": "doug@somethingdoug.com"
+  },
+  "license": "MIT",
+  "keywords": [
+    "http",
+    "res",
+    "vary"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jshttp/vary"
+  },
+  "devDependencies": {
+    "istanbul": "0.3.0",
+    "mocha": "~1.21.4",
+    "should": "~4.0.4",
+    "supertest": "~0.13.0"
+  },
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "mocha --reporter spec --bail --check-leaks test/",
+    "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --reporter dot --check-leaks test/",
+    "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --reporter spec --check-leaks test/"
+  },
+  "gitHead": "56acecd9fa20888132563b00576625ea02a69a35",
+  "bugs": {
+    "url": "https://github.com/jshttp/vary/issues"
+  },
+  "homepage": "https://github.com/jshttp/vary",
+  "_id": "vary@1.0.0",
+  "_shasum": "c5e76cec20d3820d8f2a96e7bee38731c34da1e7",
+  "_from": "vary@~1.0.0",
+  "_npmVersion": "1.4.21",
+  "_npmUser": {
+    "name": "dougwilson",
+    "email": "doug@somethingdoug.com"
+  },
+  "maintainers": [
+    {
+      "name": "dougwilson",
+      "email": "doug@somethingdoug.com"
+    },
+    {
+      "name": "jongleberry",
+      "email": "jonathanrichardong@gmail.com"
+    },
+    {
+      "name": "fishrock123",
+      "email": "fishrock123@rocketmail.com"
+    },
+    {
+      "name": "shtylman",
+      "email": "shtylman@gmail.com"
+    }
+  ],
+  "dist": {
+    "shasum": "c5e76cec20d3820d8f2a96e7bee38731c34da1e7",
+    "tarball": "http://registry.npmjs.org/vary/-/vary-1.0.0.tgz"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/vary/-/vary-1.0.0.tgz",
+  "readme": "ERROR: No README data found!"
+}

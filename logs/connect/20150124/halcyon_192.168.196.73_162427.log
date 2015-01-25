@@ -1,0 +1,169 @@
+PS1='[\u@192.168.196.73 \W]\$ '
+Last login: Sat Jan 24 08:04:04 2015 from 192.168.192.84
+clear;echo -e '\033[32mLogin 192.168.196.73 done. Enjoy it.\033[0m'
+[halcyon@localhost ~]$ PS1='[\u@192.168.196.73 \W]\$ '
+[halcyon@192.168.196.73 ~]$ clear;echo -e '\033[32mLogin 192.168.196.73 done. Enjoy it.\033[0m'
+[H[J[32mLogin 192.168.196.73 done. Enjoy it.[0m
+[halcyon@192.168.196.73 ~]$ pwd
+/home/halcyon
+[halcyon@192.168.196.73 ~]$ heh
+-bash: heh: command not found
+[halcyon@192.168.196.73 ~]$ ls
+[halcyon@192.168.196.73 ~]$ ifconfig
+eth0      Link encap:Ethernet  HWaddr 08:00:27:AE:97:4F  
+          inet addr:10.0.2.15  Bcast:10.0.2.255  Mask:255.255.255.0
+          inet6 addr: fe80::a00:27ff:feae:974f/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:616 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:431 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:63001 (61.5 KiB)  TX bytes:53086 (51.8 KiB)
+
+eth1      Link encap:Ethernet  HWaddr 08:00:27:B6:17:22  
+          inet addr:192.168.196.73  Bcast:192.168.199.255  Mask:255.255.248.0
+          inet6 addr: fe80::a00:27ff:feb6:1722/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:53473 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:548 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:3543072 (3.3 MiB)  TX bytes:72052 (70.3 KiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:0 (0.0 b)  TX bytes:0 (0.0 b)
+
+[halcyon@192.168.196.73 ~]$ ls
+[halcyon@192.168.196.73 ~]$ pwd
+/home/halcyon
+[halcyon@192.168.196.73 ~]$ ifconfig
+eth0      Link encap:Ethernet  HWaddr 08:00:27:AE:97:4F  
+          inet addr:10.0.2.15  Bcast:10.0.2.255  Mask:255.255.255.0
+          inet6 addr: fe80::a00:27ff:feae:974f/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:616 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:431 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:63001 (61.5 KiB)  TX bytes:53086 (51.8 KiB)
+
+eth1      Link encap:Ethernet  HWaddr 08:00:27:B6:17:22  
+          inet addr:192.168.196.73  Bcast:192.168.199.255  Mask:255.255.248.0
+          inet6 addr: fe80::a00:27ff:feb6:1722/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:54022 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:560 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:3583036 (3.4 MiB)  TX bytes:73616 (71.8 KiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:0 (0.0 b)  TX bytes:0 (0.0 b)
+
+[halcyon@192.168.196.73 ~]$ ifconfig
+eth0      Link encap:Ethernet  HWaddr 08:00:27:AE:97:4F  
+          inet addr:10.0.2.15  Bcast:10.0.2.255  Mask:255.255.255.0
+          inet6 addr: fe80::a00:27ff:feae:974f/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:616 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:431 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:63001 (61.5 KiB)  TX bytes:53086 (51.8 KiB)
+
+eth1      Link encap:Ethernet  HWaddr 08:00:27:B6:17:22  
+          inet addr:192.168.196.73  Bcast:192.168.199.255  Mask:255.255.248.0
+          inet6 addr: fe80::a00:27ff:feb6:1722/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:54145 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:569 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:3593530 (3.4 MiB)  TX bytes:74598 (72.8 KiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:0 (0.0 b)  TX bytes:0 (0.0 b)
+
+[halcyon@192.168.196.73 ~]$ ll
+total 0
+[halcyon@192.168.196.73 ~]$ ll
+total 0
+[halcyon@192.168.196.73 ~]$ ll
+total 0
+[halcyon@192.168.196.73 ~]$ pwd
+/home/halcyon
+[halcyon@192.168.196.73 ~]$ ll
+total 0
+[halcyon@192.168.196.73 ~]$ ll
+total 0
+[halcyon@192.168.196.73 ~]$ ifconfig
+eth0      Link encap:Ethernet  HWaddr 08:00:27:AE:97:4F  
+          inet addr:10.0.2.15  Bcast:10.0.2.255  Mask:255.255.255.0
+          inet6 addr: fe80::a00:27ff:feae:974f/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:616 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:431 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:63001 (61.5 KiB)  TX bytes:53086 (51.8 KiB)
+
+eth1      Link encap:Ethernet  HWaddr 08:00:27:B6:17:22  
+          inet addr:192.168.196.73  Bcast:192.168.199.255  Mask:255.255.248.0
+          inet6 addr: fe80::a00:27ff:feb6:1722/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:63814 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:609 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:4187378 (3.9 MiB)  TX bytes:78400 (76.5 KiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:0 (0.0 b)  TX bytes:0 (0.0 b)
+
+[halcyon@192.168.196.73 ~]$ ll
+total 0
+[halcyon@192.168.196.73 ~]$ ifconfgi[K[Kig
+eth0      Link encap:Ethernet  HWaddr 08:00:27:AE:97:4F  
+          inet addr:10.0.2.15  Bcast:10.0.2.255  Mask:255.255.255.0
+          inet6 addr: fe80::a00:27ff:feae:974f/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:616 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:431 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:63001 (61.5 KiB)  TX bytes:53086 (51.8 KiB)
+
+eth1      Link encap:Ethernet  HWaddr 08:00:27:B6:17:22  
+          inet addr:192.168.196.73  Bcast:192.168.199.255  Mask:255.255.248.0
+          inet6 addr: fe80::a00:27ff:feb6:1722/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:64147 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:631 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:4208452 (4.0 MiB)  TX bytes:80576 (78.6 KiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:0 (0.0 b)  TX bytes:0 (0.0 b)
+
+[halcyon@192.168.196.73 ~]$ 

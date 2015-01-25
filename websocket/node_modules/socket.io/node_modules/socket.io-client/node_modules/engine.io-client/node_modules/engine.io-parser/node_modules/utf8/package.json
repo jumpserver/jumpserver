@@ -1,0 +1,73 @@
+{
+  "name": "utf8",
+  "version": "2.0.0",
+  "description": "A well-tested UTF-8 encoder/decoder written in JavaScript.",
+  "homepage": "http://mths.be/utf8js",
+  "main": "utf8.js",
+  "keywords": [
+    "charset",
+    "encoding",
+    "unicode",
+    "utf8"
+  ],
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://mths.be/mit"
+    },
+    {
+      "type": "GPL",
+      "url": "http://mths.be/gpl"
+    }
+  ],
+  "author": {
+    "name": "Mathias Bynens",
+    "url": "http://mathiasbynens.be/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mathiasbynens/utf8.js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mathiasbynens/utf8.js/issues"
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "node tests/tests.js"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-shell": "~0.2.2",
+    "istanbul": "~0.1.36",
+    "qunit-clib": "~1.3.0",
+    "qunitjs": "~1.11.0",
+    "requirejs": "~2.1.6"
+  },
+  "_id": "utf8@2.0.0",
+  "dist": {
+    "shasum": "79ce59eced874809cab9a71fc7102c7d45d4118d",
+    "tarball": "http://registry.npmjs.org/utf8/-/utf8-2.0.0.tgz"
+  },
+  "_from": "utf8@2.0.0",
+  "_npmVersion": "1.2.30",
+  "_npmUser": {
+    "name": "mathias",
+    "email": "mathias@qiwi.be"
+  },
+  "maintainers": [
+    {
+      "name": "ryanmcgrath",
+      "email": "ryan@venodesigns.net"
+    },
+    {
+      "name": "mathias",
+      "email": "mathias@qiwi.be"
+    }
+  ],
+  "_shasum": "79ce59eced874809cab9a71fc7102c7d45d4118d",
+  "_resolved": "https://registry.npmjs.org/utf8/-/utf8-2.0.0.tgz",
+  "readme": "ERROR: No README data found!"
+}

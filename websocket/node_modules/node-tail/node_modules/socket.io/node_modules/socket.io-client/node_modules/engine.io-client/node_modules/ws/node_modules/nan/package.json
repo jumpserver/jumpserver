@@ -1,0 +1,53 @@
+{
+  "name": "nan",
+  "version": "0.3.2",
+  "description": "Native Abstractions for Node.js: C++ header for Node 0.8->0.12 compatibility",
+  "main": ".index.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rvagg/nan.git"
+  },
+  "contributors": [
+    {
+      "name": "Rod Vagg",
+      "email": "r@va.gg",
+      "url": "https://github.com/rvagg"
+    },
+    {
+      "name": "Benjamin Byholm",
+      "email": "bbyholm@abo.fi",
+      "url": "https://github.com/kkoopa/"
+    },
+    {
+      "name": "Trevor Norris",
+      "email": "trev.norris@gmail.com",
+      "url": "https://github.com/trevnorris"
+    }
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rvagg/nan/issues"
+  },
+  "_id": "nan@0.3.2",
+  "dist": {
+    "shasum": "0df1935cab15369075ef160ad2894107aa14dc2d",
+    "tarball": "http://registry.npmjs.org/nan/-/nan-0.3.2.tgz"
+  },
+  "_from": "nan@~0.3.0",
+  "_npmVersion": "1.3.8",
+  "_npmUser": {
+    "name": "rvagg",
+    "email": "rod@vagg.org"
+  },
+  "maintainers": [
+    {
+      "name": "rvagg",
+      "email": "rod@vagg.org"
+    }
+  ],
+  "directories": {},
+  "_shasum": "0df1935cab15369075ef160ad2894107aa14dc2d",
+  "_resolved": "https://registry.npmjs.org/nan/-/nan-0.3.2.tgz",
+  "readme": "ERROR: No README data found!",
+  "homepage": "https://github.com/rvagg/nan"
+}

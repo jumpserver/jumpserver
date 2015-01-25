@@ -5,6 +5,7 @@ import sys
 import os
 import select
 import time
+from datetime import datetime
 import paramiko
 import struct
 import fcntl
@@ -34,7 +35,7 @@ except ImportError:
     time.sleep(3)
     sys.exit()
 
-BASE_DIR = os.path.dirname(__file__)
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 CONF = ConfigParser()
 CONF.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
@@ -155,7 +156,7 @@ def log_record(username, host):
     except IOError:
         raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 
-    log = Log(user=user, asset=asset, log_path=log_file_path, start_time=timestamp_start, pid=pid)
+    log = Log(user=user, asset=asset, log_path=log_file_path, start_time=datetime.now(), pid=pid)
     log.save()
     return log_file, log
 
@@ -200,7 +201,7 @@ def posix_shell(chan, username, host):
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)
         log_file.close()
         log.is_finished = True
-        log.end_time = timestamp_end
+        log.end_time = datetime.now()
         log.save()
 
 

@@ -1,0 +1,74 @@
+{
+  "name": "engine.io",
+  "version": "1.5.1",
+  "description": "The realtime engine behind Socket.IO. Provides the foundation of a bidirectional connection between client and server",
+  "main": "./lib/engine.io",
+  "author": {
+    "name": "Guillermo Rauch",
+    "email": "guillermo@learnboost.com"
+  },
+  "homepage": "https://github.com/LearnBoost/engine.io",
+  "contributors": [
+    {
+      "name": "Eugen Dueck",
+      "url": "https://github.com/EugenDueck"
+    },
+    {
+      "name": "Afshin Mehrabani",
+      "url": "https://github.com/afshinm"
+    },
+    {
+      "name": "Christoph Dorn",
+      "url": "https://github.com/cadorn"
+    },
+    {
+      "name": "Mark Mokryn",
+      "email": "mokesmokes@gmail.com"
+    }
+  ],
+  "dependencies": {
+    "debug": "1.0.3",
+    "ws": "0.5.0",
+    "engine.io-parser": "1.2.1",
+    "base64id": "0.1.0"
+  },
+  "devDependencies": {
+    "mocha": "1.12.0",
+    "expect.js": "0.2.0",
+    "superagent": "0.15.4",
+    "engine.io-client": "1.5.1",
+    "s": "0.1.1"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Automattic/engine.io.git"
+  },
+  "gitHead": "ba530a47624b1a71f05cc172d9b89e49d375d9b5",
+  "bugs": {
+    "url": "https://github.com/Automattic/engine.io/issues"
+  },
+  "_id": "engine.io@1.5.1",
+  "_shasum": "8f7a4b2aadf974b71ffd185cffe1e2bdf384ddfb",
+  "_from": "engine.io@1.5.1",
+  "_npmVersion": "1.4.28",
+  "_npmUser": {
+    "name": "rauchg",
+    "email": "rauchg@gmail.com"
+  },
+  "maintainers": [
+    {
+      "name": "rauchg",
+      "email": "rauchg@gmail.com"
+    }
+  ],
+  "dist": {
+    "shasum": "8f7a4b2aadf974b71ffd185cffe1e2bdf384ddfb",
+    "tarball": "http://registry.npmjs.org/engine.io/-/engine.io-1.5.1.tgz"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/engine.io/-/engine.io-1.5.1.tgz",
+  "readme": "ERROR: No README data found!"
+}

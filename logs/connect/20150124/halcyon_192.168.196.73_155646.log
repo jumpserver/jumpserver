@@ -1,0 +1,10 @@
+PS1='[\u@192.168.196.73 \W]\$ '
+Last login: Sat Jan 24 07:37:41 2015 from 192.168.192.84
+clear;echo -e '\033[32mLogin 192.168.196.73 done. Enjoy it.\033[0m'
+[halcyon@localhost ~]$ PS1='[\u@192.168.196.73 \W]\$ '
+[halcyon@192.168.196.73 ~]$ clear;echo -e '\033[32mLogin 192.168.196.73 done. Enjoy it.\033[0m'
+[H[J[32mLogin 192.168.196.73 done. Enjoy it.[0m
+[halcyon@192.168.196.73 ~]$ ll
+total 0
+[halcyon@192.168.196.73 ~]$ exit
+logout

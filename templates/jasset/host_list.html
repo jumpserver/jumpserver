@@ -60,7 +60,7 @@
                                         {{ group }}
                                     {% endfor %}
                                 </td>
-                                <td class="text-center"> {{ post.date_added }} </td>
+                                <td class="text-center"> {{ post.date_added|date:"Y-m-d H:i:s" }} </td>
                                 <td class="text-center"> {{ post.comment }} </td>
                                 <td class="text-center">
                                     <a href="/jasset/{{ post.ip }}/" class="iframe btn btn-xs btn-primary">详情</a>

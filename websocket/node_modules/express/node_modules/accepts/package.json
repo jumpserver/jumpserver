@@ -1,0 +1,92 @@
+{
+  "name": "accepts",
+  "description": "Higher-level content negotiation",
+  "version": "1.1.4",
+  "author": {
+    "name": "Jonathan Ong",
+    "email": "me@jongleberry.com",
+    "url": "http://jongleberry.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jshttp/accepts"
+  },
+  "dependencies": {
+    "mime-types": "~2.0.4",
+    "negotiator": "0.4.9"
+  },
+  "devDependencies": {
+    "istanbul": "~0.3.4",
+    "mocha": "~2.0.1"
+  },
+  "files": [
+    "LICENSE",
+    "HISTORY.md",
+    "index.js"
+  ],
+  "engines": {
+    "node": ">= 0.8"
+  },
+  "scripts": {
+    "test": "mocha --reporter spec --check-leaks --bail test/",
+    "test-cov": "istanbul cover node_modules/mocha/bin/_mocha -- --reporter dot --check-leaks test/",
+    "test-travis": "istanbul cover node_modules/mocha/bin/_mocha --report lcovonly -- --reporter spec --check-leaks test/"
+  },
+  "keywords": [
+    "content",
+    "negotiation",
+    "accept",
+    "accepts"
+  ],
+  "gitHead": "df66414d80f096627b28f137127fce0a851d7900",
+  "bugs": {
+    "url": "https://github.com/jshttp/accepts/issues"
+  },
+  "homepage": "https://github.com/jshttp/accepts",
+  "_id": "accepts@1.1.4",
+  "_shasum": "d71c96f7d41d0feda2c38cd14e8a27c04158df4a",
+  "_from": "accepts@~1.1.4",
+  "_npmVersion": "1.4.21",
+  "_npmUser": {
+    "name": "dougwilson",
+    "email": "doug@somethingdoug.com"
+  },
+  "maintainers": [
+    {
+      "name": "jongleberry",
+      "email": "jonathanrichardong@gmail.com"
+    },
+    {
+      "name": "federomero",
+      "email": "federomero@gmail.com"
+    },
+    {
+      "name": "dougwilson",
+      "email": "doug@somethingdoug.com"
+    },
+    {
+      "name": "tjholowaychuk",
+      "email": "tj@vision-media.ca"
+    },
+    {
+      "name": "shtylman",
+      "email": "shtylman@gmail.com"
+    },
+    {
+      "name": "mscdex",
+      "email": "mscdex@mscdex.net"
+    },
+    {
+      "name": "fishrock123",
+      "email": "fishrock123@rocketmail.com"
+    }
+  ],
+  "dist": {
+    "shasum": "d71c96f7d41d0feda2c38cd14e8a27c04158df4a",
+    "tarball": "http://registry.npmjs.org/accepts/-/accepts-1.1.4.tgz"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/accepts/-/accepts-1.1.4.tgz",
+  "readme": "ERROR: No README data found!"
+}

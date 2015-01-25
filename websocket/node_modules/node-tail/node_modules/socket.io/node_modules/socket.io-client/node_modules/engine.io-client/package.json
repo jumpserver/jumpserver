@@ -1,0 +1,84 @@
+{
+  "name": "engine.io-client",
+  "description": "Client for the realtime Engine",
+  "version": "1.5.1",
+  "homepage": "http://socket.io",
+  "contributors": [
+    {
+      "name": "Guillermo Rauch",
+      "email": "rauchg@gmail.com"
+    },
+    {
+      "name": "Vladimir Dronnikov",
+      "email": "dronnikov@gmail.com"
+    },
+    {
+      "name": "Christoph Dorn",
+      "url": "https://github.com/cadorn"
+    },
+    {
+      "name": "Mark Mokryn",
+      "email": "mokesmokes@gmail.com"
+    }
+  ],
+  "dependencies": {
+    "has-cors": "1.0.3",
+    "ws": "0.4.31",
+    "xmlhttprequest": "https://github.com/rase-/node-XMLHttpRequest/archive/a6b6f2.tar.gz",
+    "component-emitter": "1.1.2",
+    "indexof": "0.0.1",
+    "engine.io-parser": "1.2.1",
+    "debug": "1.0.4",
+    "parseuri": "0.0.4",
+    "parsejson": "0.0.1",
+    "parseqs": "0.0.2",
+    "component-inherit": "0.0.3"
+  },
+  "devDependencies": {
+    "blob": "0.0.2",
+    "browserify": "6.2.0",
+    "concat-stream": "1.4.6",
+    "derequire": "1.2.0",
+    "engine.io": "1.5.1",
+    "expect.js": "0.2.0",
+    "express": "3.4.8",
+    "istanbul": "0.2.3",
+    "mocha": "1.16.2",
+    "zuul": "git+https://github.com/rase-/zuul#9d3a02"
+  },
+  "scripts": {
+    "test": "make test"
+  },
+  "browser": {
+    "xmlhttprequest": "./lib/xmlhttprequest.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Automattic/engine.io-client.git"
+  },
+  "gitHead": "8b2f97878ce6c34cdcfd429becc9fc95aac41884",
+  "bugs": {
+    "url": "https://github.com/Automattic/engine.io-client/issues"
+  },
+  "_id": "engine.io-client@1.5.1",
+  "_shasum": "ecd0026d90b065169b9885960183f3d56b8da18e",
+  "_from": "engine.io-client@1.5.1",
+  "_npmVersion": "1.4.28",
+  "_npmUser": {
+    "name": "rauchg",
+    "email": "rauchg@gmail.com"
+  },
+  "maintainers": [
+    {
+      "name": "rauchg",
+      "email": "rauchg@gmail.com"
+    }
+  ],
+  "dist": {
+    "shasum": "ecd0026d90b065169b9885960183f3d56b8da18e",
+    "tarball": "http://registry.npmjs.org/engine.io-client/-/engine.io-client-1.5.1.tgz"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/engine.io-client/-/engine.io-client-1.5.1.tgz",
+  "readme": "ERROR: No README data found!"
+}

@@ -1,0 +1,28 @@
+{
+  "name": "wscat",
+  "version": "1.0.0",
+  "description": "WebSocket cat",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/einaros/ws/tree/master/wscat"
+  },
+  "keywords": [
+    "wscat",
+    "websocket",
+    "cat"
+  ],
+  "author": "Arnout Kazemier, Einar Otto Stangvik",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "2.5.x",
+    "tinycolor": "0.0.x",
+    "ws": "0.4.x"
+  },
+  "bin": {
+    "wscat": "./bin/wscat"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "name": "nan",
+  "version": "1.4.3",
+  "description": "Native Abstractions for Node.js: C++ header for Node 0.8->0.12 compatibility",
+  "main": "include_dirs.js",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/rvagg/nan.git"
+  },
+  "scripts": {
+    "test": "tap --gc test/js/*-test.js",
+    "rebuild-tests": "node-gyp rebuild --directory test"
+  },
+  "contributors": [
+    {
+      "name": "Rod Vagg",
+      "email": "r@va.gg",
+      "url": "https://github.com/rvagg"
+    },
+    {
+      "name": "Benjamin Byholm",
+      "email": "bbyholm@abo.fi",
+      "url": "https://github.com/kkoopa/"
+    },
+    {
+      "name": "Trevor Norris",
+      "email": "trev.norris@gmail.com",
+      "url": "https://github.com/trevnorris"
+    },
+    {
+      "name": "Nathan Rajlich",
+      "email": "nathan@tootallnate.net",
+      "url": "https://github.com/TooTallNate"
+    },
+    {
+      "name": "Brett Lawson",
+      "email": "brett19@gmail.com",
+      "url": "https://github.com/brett19"
+    },
+    {
+      "name": "Ben Noordhuis",
+      "email": "info@bnoordhuis.nl",
+      "url": "https://github.com/bnoordhuis"
+    }
+  ],
+  "devDependencies": {
+    "bindings": "~1.2.1",
+    "node-gyp": "~1.0.2",
+    "tap": "~0.4.13",
+    "xtend": "~4.0.0"
+  },
+  "license": "MIT",
+  "gitHead": "75121a4413c4729170ec97c73c4826600f4a763e",
+  "bugs": {
+    "url": "https://github.com/rvagg/nan/issues"
+  },
+  "homepage": "https://github.com/rvagg/nan",
+  "_id": "nan@1.4.3",
+  "_shasum": "c56b5404698063696f597435f9163c312aea5009",
+  "_from": "nan@1.4.x",
+  "_npmVersion": "2.1.6",
+  "_nodeVersion": "0.10.33",
+  "_npmUser": {
+    "name": "rvagg",
+    "email": "rod@vagg.org"
+  },
+  "maintainers": [
+    {
+      "name": "rvagg",
+      "email": "rod@vagg.org"
+    },
+    {
+      "name": "kkoopa",
+      "email": "bbyholm@abo.fi"
+    }
+  ],
+  "dist": {
+    "shasum": "c56b5404698063696f597435f9163c312aea5009",
+    "tarball": "http://registry.npmjs.org/nan/-/nan-1.4.3.tgz"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/nan/-/nan-1.4.3.tgz",
+  "readme": "ERROR: No README data found!"
+}

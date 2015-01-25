@@ -147,9 +147,58 @@ def group_add(request):
 
 
 def group_list(request):
-    header_title, path1, path2 = '查看属组 | Add Group', 'juser', 'group_list'
-    groups = UserGroup.objects.all()
+    header_title, path1, path2 = '查看属组 | Show Group', 'juser', 'group_list'
+    groups = contact_list = UserGroup.objects.all().order_by('id')
+    p = paginator = Paginator(contact_list, 10)
+
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    try:
+        contacts = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        contacts = paginator.page(paginator.num_pages)
     return render_to_response('juser/group_list.html', locals())
+
+
+def group_detail(request):
+    group_id = request.GET.get('id', None)
+    if not group_id:
+        return HttpResponseRedirect('/')
+    group = UserGroup.objects.get(id=group_id)
+    return render_to_response('juser/group_detail.html', locals())
+
+
+def group_del(request):
+    group_id = request.GET.get('id', None)
+    if not group_id:
+        return HttpResponseRedirect('/')
+    group = UserGroup.objects.get(id=group_id)
+    group.delete()
+    return HttpResponseRedirect('/juser/group_list/', locals())
+
+
+def group_edit(request):
+    error = ''
+    msg = ''
+    header_title, path1, path2 = '修改属组 | Edit Group', 'juser', 'group_edit'
+    if request.method == 'GET':
+        group_id = request.GET.get('id', None)
+        group = UserGroup.objects.get(id=group_id)
+        group_name = group.name
+        comment = group.comment
+
+        return render_to_response('juser/group_add.html', locals())
+    else:
+        group_id = request.POST.get('group_id', None)
+        group_name = request.POST.get('group_name', None)
+        comment = request.POST.get('comment', '')
+        group = UserGroup.objects.filter(id=group_id)
+        group.update(name=group_name, comment=comment)
+
+        return HttpResponseRedirect('/juser/group_list/')
 
 
 def user_list(request):
@@ -171,30 +220,30 @@ def user_list(request):
 
 
 def user_detail(request):
-    username = request.GET.get('username', None)
-    if not username:
+    user_id = request.GET.get('id', None)
+    if not user_id:
         return HttpResponseRedirect('/')
-    user = User.objects.get(username=username)
+    user = User.objects.get(id=user_id)
     return render_to_response('juser/user_detail.html', locals())
 
 
 def user_del(request):
-    username = request.GET.get('username', None)
-    if not username:
+    user_id = request.GET.get('id', None)
+    if not user_id:
         return HttpResponseRedirect('/')
-    user = User.objects.get(username=username)
+    user = User.objects.get(id=user_id)
     user.delete()
     return HttpResponseRedirect('/juser/user_list/', locals())
 
 
 def user_edit(request):
     header_title, path1, path2 = '编辑用户 | Edit User', 'juser', 'user_edit'
-    hidden = "hidden"
+    readonly = "readonly"
     if request.method == 'GET':
-        username = request.GET.get('username', None)
-        if not username:
+        user_id = request.GET.get('id', None)
+        if not user_id:
             return HttpResponseRedirect('/')
-        user = User.objects.get(username=username)
+        user = User.objects.get(id=user_id)
         username = user.username
         password = user.password
         ssh_key_pwd1 = user.ssh_key_pwd1
