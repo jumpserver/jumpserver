@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from juser.models import User, UserGroup
 from jasset.models import Asset
 from jperm.models import Perm
@@ -28,6 +28,13 @@ def perm_host(request):
     return render_to_response('jperm/perm_host.html', locals())
 
 
+def perm_user_host(username, ip):
+    user = User.objects.get(username=username)
+    asset = Asset.objects.get(ip=ip)
+    if not Perm.objects.filter(user=user, asset=asset):
+        Perm.objects.create(user=user, asset=asset)
+
+
 def perm_edit(request):
     header_title, path1, path2 = u'授权编辑 | Perm Edit.', u'jperm', u'perm_edit'
     if request.method == 'GET':
@@ -35,7 +42,18 @@ def perm_edit(request):
             user_id = request.GET.get('id')
             user = User.objects.get(id=user_id)
             assets = Asset.objects.all()
+            assets_permed = []
+            for perm in user.perm_set.all():
+                assets_permed.append(perm.asset)
+            assets_unperm = list(set(assets)-set(assets_permed))
             return render_to_response('jperm/perm_edit.html', locals())
+    else:
+        host_ips = request.POST.getlist('host_permed', '')
+        username = request.POST.get('username')
+        for ip in host_ips:
+            perm_user_host(username, ip)
+
+        return HttpResponseRedirect('/jperm/perm_host/')
 
 
 def perm_add(request):

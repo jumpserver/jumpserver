@@ -240,28 +240,13 @@ def get_connect_item(username, ip):
 
     if asset.login_type in login_type_dict:
         password = cryptor.decrypt(login_type_dict[asset.login_type])
-
         return username, password, ip, port
 
     elif asset.login_type == 'M':
-        perms = asset.permission_set.filter(user=user)
-        if perms:
-            perm = perms[0]
-        else:
-            raise ServerError('Permission %s to %s does not exist.' % (username, ip))
+        username = asset.username
+        password= cryptor.decrypt(asset.password)
+        return username, password, ip, port
 
-        if perm.role == 'SU':
-            username_super = asset.username_super
-            password_super = cryptor.decrypt(asset.password_super)
-            return username_super, password_super, ip, port
-
-        elif perm.role == 'CU':
-            username_common = asset.username_common
-            password_common = asset.password_common
-            return username_common, password_common, ip, port
-
-        else:
-            raise ServerError('Perm in %s for %s map role is not in ["SU", "CU"].' % (ip, username))
     else:
         raise ServerError('Login type is not in ["L", "S", "P", "M"]')
 
