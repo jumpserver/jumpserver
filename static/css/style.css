@@ -2623,6 +2623,9 @@ a:focus {
 .b-r {
   border-right: 1px solid #e7eaec;
 }
+.b-l {
+  border-left: 1px solid #e7eaec;
+}
 .hr-line-dashed {
   border-top: 1px dashed #e7eaec;
   color: #ffffff;

@@ -2,13 +2,40 @@
 {% load mytags %}
 
 {% block content %}
+<script type="text/javascript">
+
+    function move(from, to) {
+        $("#"+from+" option").each(function(){
+          if ( $(this).prop("selected") == true ) {
+            $("#"+to).append(this);
+          }
+        });
+    }
+
+    function move_all(from, to){
+        $("#"+from).children().each(function(){
+        $("#"+to).append(this);
+        });
+    }
+
+    function search_host(text){
+        $("#host_unperm").children().each(function(){$(this).remove();});
+        $("#host_all").children().each(function(){
+        if ($(this).text().search(text) != -1) {
+          $("#host_unperm").append($(this).clone())
+        }
+        });
+    }
+</script>
+
     {% include 'nav_cat_bar.html' %}
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
             <div class="col-lg-10">
                 <div class="ibox float-e-margins">
+                    <!-- title -->
                     <div class="ibox-title">
-                        <h5>编辑授权 {{ user.name }} <small> Edit perm info.</small></h5>
+                        <h5>Basic form <small>Simple login form example</small></h5>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -17,9 +44,9 @@
                                 <i class="fa fa-wrench"></i>
                             </a>
                             <ul class="dropdown-menu dropdown-user">
-                                <li><a href="#">未启用 1</a>
+                                <li><a href="#">Config option 1</a>
                                 </li>
-                                <li><a href="#">未启用 2</a>
+                                <li><a href="#">Config option 2</a>
                                 </li>
                             </ul>
                             <a class="close-link">
@@ -27,52 +54,90 @@
                             </a>
                         </div>
                     </div>
+                    <!-- end title -->
                     <div class="ibox-content">
-                        <form method="post" class="form-horizontal" action="">
-                            {% if error %}
-                                <div class="alert alert-warning text-center">{{ error }}</div>
-                            {% endif %}
-                            {% if msg %}
-                                <div class="alert alert-success text-center">{{ msg }}</div>
-                            {% endif %}
-                            <div class="form-group">
-                                <div class="col-sm-8">
-                                    <input name="username" value="{{ user.username }}" readonly="readonly">
+                        <div class="row">
+                            <div class="col-sm-5 ">
+                                <div class="form-group">
+                                    <label></label>
+                                    <input type="text" id="host_filter" placeholder="过滤" class="form-control" value="" oninput="search_host(this.value)">
                                 </div>
                             </div>
-                            <div class="form-group">
-                                <div class="col-sm-4">
-                                    <input id="filter" name="filter" placeholder="过滤" type="text" class="form-control">
-                                    <select id="host_ids" name="host_ids" multiple style="width: 100%">
-                                        {% for host in hosts %}
-                                        <option value="{{ host.id }}">{{ host.ip }}</option>
-                                        {% endfor %}
-                                    </select>
+                            <div class="col-sm-1 ">
+                                <div class="form-group">
+                                    <label></label>
                                 </div>
-                                <div class="col-sm-2">
-
-                                </div>
-                                <div class="col-sm-4">
-                                    <select id="host_ids" name="host_ids" multiple style="width: 100%">
-                                        {% for host in hosts %}
-                                        <option value="{{ host.id }}">{{ host.ip }}</option>
-                                        {% endfor %}
-                                    </select>
+                            </div>
+                            <div class="col-sm-5 ">
+                                <div class="form-group">
+                                    <label></label>
+                                    <input type="text"  class="form-control" value="{{ user.name }}" readonly>
                                 </div>
                             </div>
 
-                            <div class="hr-line-dashed"></div>
-                            <div class="form-group">
+                        </div>
+                        <form method="post"  action="">
+                            <div class="row">
+                                <div class="col-sm-5"><h4>未授权主机</h4>
+                                    <div>
+                                        <select id="host_all" name="host_all" class="form-control" size="10" multiple style="display: none">
+                                            {% for asset in assets %}
+                                            <option value="{{ asset.ip }}">{{ asset.ip }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <select id="host_unperm" name="host_unperm" class="form-control m-b" size="12" multiple>
+                                            {% for asset in assets %}
+                                            <option value="{{ asset.ip }}">{{ asset.ip }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-1">
+                                    <div class="btn-group" style="margin-top: 50px;">
+                                        <button type="button" class="btn btn-white" onclick="move('host_unperm', 'host_permed')"><i class="fa fa-chevron-right"></i></button>
+                                        <button type="button" class="btn btn-white" onclick="move('host_permed', 'host_unperm')"><i class="fa fa-chevron-left"></i> </button>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-5"><h4>已授权主机</h4>
+                                    <div>
+                                        <select id="host_permed" name="host_permed" class="form-control m-b" size="12"  multiple>
+                                        </select>
+                                    </div>
+                                </div>
+                             </div>
+                            <div class="row">
+                                <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-2">
                                     <button class="btn btn-white" type="submit">取消</button>
-                                    <button id="submit_button" class="btn btn-primary" type="submit">确认保存</button>
+                                    <button class="btn btn-primary" type="submit">确认保存</button>
                                 </div>
                             </div>
+                            </div>
                         </form>
+
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+        var str = document.location.pathname.split("/")[1];
+        var str1 = document.location.pathname.split("/")[2];
+        $("#"+str).addClass('active');
+        $("#"+str1).addClass('active');
+    </script>
+    <script type="text/javascript">
+        $("#host_permed").children().each(function(){
+          $("#host_all").append($(this).clone());
+
+          if ($(this).prop("selected") == false) {
+            $("#host_unperm").append(this);
+          }
+
+          $("#host_all").children().each(function(){$(this).prop("selected", false)});
+        });
+    </script>
 
 {% endblock %}
