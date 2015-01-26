@@ -20,14 +20,13 @@
 
     function search_host(text){
         $("#host_unperm").children().each(function(){$(this).remove();});
+        var permArray = [];
+        $("#host_permed").children().each(function(){
+                permArray.push($(this).text());
+        });
         $("#host_all").children().each(function(){
-        if ($(this).text().search(text) != -1){
-{#            $("#host_permed").children().each(function(){#}
-{#                if ($(this).text().search(text) == -1){#}
-{#                    $("#host_unperm").append($(this).clone())#}
-{#                }#}
-{#            });#}
-            $("#host_unperm").append($(this).clone())
+        if ($(this).text().search(text) != -1 && permArray.indexOf($(this).text()) == -1) {
+          $("#host_unperm").append($(this).clone())
         }
         });
     }
