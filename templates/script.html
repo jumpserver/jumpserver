@@ -4,30 +4,46 @@
 <script src="/static/js/plugins/metisMenu/jquery.metisMenu.js"></script>
 <script src="/static/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
 
-<!-- Peity -->
-<script src="/static/js/plugins/peity/jquery.peity.min.js"></script>
-
 <!-- Custom and plugin javascript -->
 <script src="/static/js/inspinia.js"></script>
 <script src="/static/js/plugins/pace/pace.min.js"></script>
 
-<!-- iCheck -->
+<!-- iCheck box -->
 <script src="/static/js/plugins/iCheck/icheck.min.js"></script>
+
+<!-- Peity -->
+<script src="/static/js/plugins/peity/jquery.peity.min.js"></script>
 
 <!-- Peity -->
 <script src="/static/js/demo/peity-demo.js"></script>
 
-<!--<script>-->
-        <!--$(document).ready(function(){-->
-            <!--$('.i-checks').iCheck({-->
-                <!--checkboxClass: 'icheckbox_square-green',-->
-                <!--radioClass: 'iradio_square-green',-->
-            <!--});-->
-        <!--});-->
+<script>
+    $(document).ready(function(){
+        $('.i-checks').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+        });
+    });
 
-<!--</script>-->
+    function selectAll(){
+         var checklist = document.getElementsByName ("selected");
+            if(document.getElementById("select_all").checked)
+            {
+            for(var i=0;i<checklist.length;i++)
+            {
+              checklist[i].checked = 1;
+            }
+            }else{
+            for(var j=0;j<checklist.length;j++)
+            {
+             checklist[j].checked = 0;
+            }
+            }
 
-<script src="/static/js/plugins/fullcalendar/fullcalendar.min.js"></script>
+        }
+
+</script>
+
 
 <!-- pop windows -->
 <script src="/static/js/jquery.colorbox.js"></script>

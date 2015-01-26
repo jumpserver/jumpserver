@@ -36,9 +36,7 @@
                     <table class="table table-striped table-bordered table-hover " id="editable" >
                         <thead>
                             <tr>
-                                <th class="text-center">
-                                    <input type="checkbox" id="select_all" onclick="selectAll()"  name="select_all">
-                                </th>
+                                <th class="text-center"><input type="checkbox" class="i-checks" name=""></th>
                                 <th class="text-center">ID</th>
                                 <th class="text-center">用户名</th>
                                 <th class="text-center">姓名</th>
@@ -52,9 +50,7 @@
                         <tbody>
                         {% for user in contacts.object_list %}
                             <tr class="gradeX">
-                                <td class="text-center">
-                                    <input type="checkbox"  name="selected" value="{{ user.id }}">
-                                </td>
+                                <td class="text-center"><input type="checkbox" class="i-checks" name=""></td>
                                 <td class="text-center"> {{ user.id }} </td>
                                 <td class="text-center"> {{ user.username }} </td>
                                 <td class="text-center"> {{ user.name }} </td>
@@ -118,6 +114,16 @@
 <script>
     $(document).ready(function(){
         $(".iframe").colorbox({iframe:true, width:"70%", height:"70%"});
+    });
+</script>
+
+<script>
+    $(document).ready(function(){
+      $('input').iCheck({
+        checkboxClass: 'icheckbox_square',
+        radioClass: 'iradio_square',
+        increaseArea: '20%' // optional
+      });
     });
 </script>
 

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load mytags %}
 
+
 {% block content %}
     {% include 'nav_cat_bar.html' %}
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -28,7 +29,7 @@
                         </div>
                     </div>
                     <div class="ibox-content">
-                        <form method="post" class="form-horizontal" action="">
+                        <form method="post" id="userForm" class="form-horizontal" action="">
                             {% if error %}
                                 <div class="alert alert-warning text-center">{{ error }}</div>
                             {% endif %}
@@ -147,5 +148,62 @@
             </div>
         </div>
     </div>
+
+<script>
+$('#userForm').validator({
+    timely: 2,
+    theme: "yellow_right_effect",
+    rules: {
+        check_ip: [/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])){3}$/, 'ip地址不正确'],
+        check_port: [/^\d{1,5}$/, '端口号不正确'],
+        type_m: function(element){
+                    return  $("#M").is(":checked");
+            }
+    },
+    fields: {
+        "username": {
+            rule: "required",
+            tip: "输入用户名",
+            ok: "",
+            msg: {required: "必须填写!"}
+        },
+        "password": {
+            rule: "required;length[6~16]",
+            tip: "输入密码",
+            ok: "",
+            msg: {required: "必须填写!"}
+        },
+        "ssh_key_pwd1": {
+            rule: "required;length[6~16]",
+            tip: "ssh私钥密码",
+            ok: "",
+            msg: {required: "必须填写"}
+        },
+        "groups": {
+            rule: "checked",
+            tip: "选择用户组",
+            ok: "",
+            msg: {checked: "至少选择一个组"}
+        },
+        "name": {
+            rule: "required",
+            tip: "姓名",
+            ok: "",
+            msg: {required: "必须填写"}
+        },
+        "role": {
+            rule: "checked",
+            tip: "角色",
+            ok: "",
+            msg: {required: "选择一个"}
+        }
+    },
+    valid: function(form) {
+        form.submit();
+    }
+});
+
+</script>
+
 
 {% endblock %}

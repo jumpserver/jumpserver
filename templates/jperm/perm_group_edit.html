@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load mytags %}
+
+{% block content %}
+<script type="text/javascript">
+
+    function move(from, to) {
+        $("#"+from+" option").each(function(){
+          if ( $(this).prop("selected") == true ) {
+            $("#"+to).append(this);
+          }
+        });
+    }
+
+    function move_all(from, to){
+        $("#"+from).children().each(function(){
+        $("#"+to).append(this);
+        });
+    }
+
+    function search_host(text){
+        $("#host_unperm").children().each(function(){$(this).remove();});
+        var permArray = [];
+        $("#host_permed").children().each(function(){
+                permArray.push($(this).text());
+        });
+        $("#host_all").children().each(function(){
+        if ($(this).text().search(text) != -1 && permArray.indexOf($(this).text()) == -1) {
+          $("#host_unperm").append($(this).clone())
+        }
+        });
+    }
+</script>
+
+    {% include 'nav_cat_bar.html' %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-lg-10">
+                <div class="ibox float-e-margins">
+                    <!-- title -->
+                    <div class="ibox-title">
+                        <h5>授权编辑表单 <small>Edit perm of user group</small></h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#">Config option 1</a>
+                                </li>
+                                <li><a href="#">Config option 2</a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <!-- end title -->
+                    <div class="ibox-content">
+                        <div class="row">
+                            <div class="col-sm-5 ">
+                                <div class="form-group">
+                                    <label></label>
+                                    <input type="text" id="host_filter" placeholder="Search" class="form-control" value="" oninput="search_host(this.value)">
+                                </div>
+                            </div>
+                            <div class="col-sm-1 ">
+                                <div class="form-group">
+                                    <label></label>
+                                </div>
+                            </div>
+                            <div class="col-sm-5 ">
+                                <div class="form-group">
+                                    <label></label>
+                                    <input type="text" class="form-control" value="{{ group.name }}" readonly>
+                                </div>
+                            </div>
+
+                        </div>
+                        <form method="post"  action="">
+                            <input type="text" name="username" class="form-control" value="{{ group.name }}" style="display: none">
+                            <div class="row">
+                                <div class="col-sm-5"><h4>未授权主机</h4>
+                                    <div>
+                                        <select id="host_all" name="host_all" class="form-control" size="10" multiple style="display: none">
+                                            {% for asset in assets %}
+                                            <option value="{{ asset.ip }}">{{ asset.ip }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <select id="host_unperm" name="host_unperm" class="form-control m-b" size="12" multiple>
+                                            {% for asset in assets_unperm %}
+                                            <option value="{{ asset.ip }}">{{ asset.ip }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-1">
+                                    <div class="btn-group" style="margin-top: 50px;">
+                                        <button type="button" class="btn btn-white" onclick="move('host_unperm', 'host_permed')"><i class="fa fa-chevron-right"></i></button>
+                                        <button type="button" class="btn btn-white" onclick="move('host_permed', 'host_unperm')"><i class="fa fa-chevron-left"></i> </button>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-5"><h4>授权主机</h4>
+                                    <div>
+                                        <select id="host_permed" name="host_permed" class="form-control m-b" size="12"  multiple>
+                                          {% for asset in assets_permed %}
+                                                <option value="{{ asset.ip }}">{{ asset.ip }}</option>
+                                          {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                             </div>
+                            <div class="row">
+                                <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <button class="btn btn-white" type="submit">取消</button>
+                                    <button class="btn btn-primary" type="submit" onclick="javascript: (function(){$('#host_permed option').each(function(){$(this).prop('selected', true)})})()">确认保存</button>
+                                </div>
+                            </div>
+                            </div>
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        var str = document.location.pathname.split("/")[1];
+        var str1 = document.location.pathname.split("/")[2];
+        $("#"+str).addClass('active');
+        $("#"+str1).addClass('active');
+    </script>
+{#    <script type="text/javascript">#}
+{#        $("#host_permed").children().each(function(){#}
+{#          $("#host_all").append($(this).clone());#}
+{##}
+{#          if ($(this).prop("selected") == false) {#}
+{#            $("#host_unperm").append(this);#}
+{#          }#}
+{##}
+{#          $("#host_all").children().each(function(){$(this).prop("selected", false)});#}
+{#        });#}
+{#    </script>#}
+
+{% endblock %}

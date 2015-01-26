@@ -61,8 +61,8 @@
                                                 <td class="text-center"> {{ user.username|groups_str }} </td>
                                                 <td class="text-center"> {{ user.id|perm_count }} </td>
                                                 <td class="text-center">
-                                                    <a href="../perm_detail/?id={{ user.id }}" class="iframe btn btn-xs btn-primary">详情</a>
-                                                    <a href="../perm_edit/?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
+                                                    <a href="../perm_user_detail/?id={{ user.id }}" class="iframe btn btn-xs btn-primary">详情</a>
+                                                    <a href="../perm_user_edit/?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
                                                 </td>
                                             </tr>
                                         {% endfor %}
@@ -123,8 +123,8 @@
                                                 <td class="text-center"> {{ group.name }} </td>
                                                 <td class="text-center"> {{ group.comment }} </td>
                                                 <td class="text-center">
-                                                    <a href="../perm_detail/?id={{ user.id }}" class="iframe btn btn-xs btn-primary">详情</a>
-                                                    <a href="../perm_edit/?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
+                                                    <a href="../perm_group_detail/?id={{ user.id }}" class="iframe btn btn-xs btn-primary">详情</a>
+                                                    <a href="../perm_group_edit/?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
                                                 </td>
                                             </tr>
                                         {% endfor %}
