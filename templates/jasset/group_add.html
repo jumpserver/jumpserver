@@ -4,28 +4,17 @@
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-lg-10">
+            <div class="panel-options">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#tab-1" class="text-center"><i class="fa fa-laptop"></i> 添加主机组 </a></li>
+                    <li><a href="/jasset/idc_add" class="text-center"><i class="fa fa-bar-chart-o"></i> 添加IDC </a></li>
+                </ul>
+            </div>
+
             <div class="ibox float-e-margins">
                 <div id="ibox-content" class="ibox-title">
-                    <h5> 填写业务组基本信息 </h5>
-                    <div class="ibox-tools">
-                        <a class="collapse-link">
-                            <i class="fa fa-chevron-up"></i>
-                        </a>
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="fa fa-wrench"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">未启用 1</a>
-                            </li>
-                            <li><a href="#">未启用 2</a>
-                            </li>
-                        </ul>
-                        <a class="close-link">
-                            <i class="fa fa-times"></i>
-                        </a>
-                    </div>
+                    <h5> 填写主机组基本信息 </h5>
                 </div>
-
                 <div class="ibox-content">
                     {% if emg %}
                         <div class="alert alert-warning text-center">{{ emg }}</div>
@@ -34,7 +23,7 @@
                         <div class="alert alert-success text-center">{{ smg }}</div>
                     {% endif %}
                     <form id="assetForm" method="post" class="form-horizontal">
-                        <div class="form-group"><label class="col-sm-2 control-label"> 业务组名 </label>
+                        <div class="form-group"><label class="col-sm-2 control-label"> 主机组名 </label>
                             <div class="col-sm-8"><input type="text" value="{{ j_group }}" placeholder="网站" name="j_group" class="form-control"></div>
                         </div>
 

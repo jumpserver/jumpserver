@@ -1,0 +1,191 @@
+Last login: Mon Jan 26 23:36:06 2015 from 192.168.8.59
+PS1='[\u@192.168.8.63 \W]\$ '
+clear;echo -e '\033[32mLogin 192.168.8.63 done. Enjoy it.\033[0m'
+[halcyon@hadoop03 ~]$ PS1='[\u@192.168.8.63 \W]\$ '
+[halcyon@192.168.8.63 ~]$ clear;echo -e '\033[32mLogin 192.168.8.63 done. Enjoy it.\033[0m'
+[H[J[32mLogin 192.168.8.63 done. Enjoy it.[0m
+[halcyon@192.168.8.63 ~]$ ls
+[halcyon@192.168.8.63 ~]$ ifconfig
+eth1      Link encap:Ethernet  HWaddr 00:0C:29:8E:55:19  
+          inet addr:192.168.8.63  Bcast:192.168.8.255  Mask:255.255.255.0
+          inet6 addr: fe80::20c:29ff:fe8e:5519/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:4436319 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:9571 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:337484326 (321.8 MiB)  TX bytes:1915263 (1.8 MiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:1304 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1304 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:70416 (68.7 KiB)  TX bytes:70416 (68.7 KiB)
+
+[halcyon@192.168.8.63 ~]$ pwd
+/home/halcyon
+[halcyon@192.168.8.63 ~]$ heh[K[K[Kmaybe
+-bash: maybe: command not found
+[halcyon@192.168.8.63 ~]$ how
+-bash: how: command not found
+[halcyon@192.168.8.63 ~]$ huhu
+-bash: huhu: command not found
+[halcyon@192.168.8.63 ~]$ pwd
+/home/halcyon
+[halcyon@192.168.8.63 ~]$ ifconfig
+eth1      Link encap:Ethernet  HWaddr 00:0C:29:8E:55:19  
+          inet addr:192.168.8.63  Bcast:192.168.8.255  Mask:255.255.255.0
+          inet6 addr: fe80::20c:29ff:fe8e:5519/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:4437537 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:9615 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:337578408 (321.9 MiB)  TX bytes:1920203 (1.8 MiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:1304 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1304 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:70416 (68.7 KiB)  TX bytes:70416 (68.7 KiB)
+
+[halcyon@192.168.8.63 ~]$ ifconfig
+eth1      Link encap:Ethernet  HWaddr 00:0C:29:8E:55:19  
+          inet addr:192.168.8.63  Bcast:192.168.8.255  Mask:255.255.255.0
+          inet6 addr: fe80::20c:29ff:fe8e:5519/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:4437654 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:9626 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:337588208 (321.9 MiB)  TX bytes:1921389 (1.8 MiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:1304 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1304 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:70416 (68.7 KiB)  TX bytes:70416 (68.7 KiB)
+
+[halcyon@192.168.8.63 ~]$ pwd
+/home/halcyon
+[halcyon@192.168.8.63 ~]$ ifconfig
+eth1      Link encap:Ethernet  HWaddr 00:0C:29:8E:55:19  
+          inet addr:192.168.8.63  Bcast:192.168.8.255  Mask:255.255.255.0
+          inet6 addr: fe80::20c:29ff:fe8e:5519/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:4437694 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:9641 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:337591983 (321.9 MiB)  TX bytes:1922967 (1.8 MiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:1304 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1304 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:70416 (68.7 KiB)  TX bytes:70416 (68.7 KiB)
+
+[halcyon@192.168.8.63 ~]$ vim /tmp/
+hadoop-root-datanode.pid                             wrapper.lock.httpstatus.root.20141125.130438.136186
+hadoop-root-tasktracker.pid                          wrapper.lock.httpstatus.root.20141125.131403.032406
+.ICE-unix/                                           wrapper.lock.httpstatus.root.20141125.131621.456149
+Jetty_0_0_0_0_50060_task____.2vcltf/                 wrapper.lock.httpstatus.root.20141125.131847.452498
+Jetty_0_0_0_0_50075_datanode____hwtdwq/              wrapper.lock.httpstatus.root.20141126.025922.246937
+wrapper.lock.httpip.root.20141126.025845.557424      yum.log
+[halcyon@192.168.8.63 ~]$ vim /tmp/yum.log 
+[?1h=[1;31r[m[m[0m[H[J[31;1H"/tmp/yum.log" [Permission Denied][2;1H[1m~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~
+~[0m[31;119H0,0-1[9CAll[1;1H[31;1H[K[31;1H:q[?1l>[31;1H[K[31;1H[halcyon@192.168.8.63 ~]$ ls
+[halcyon@192.168.8.63 ~]$ ll
+total 0
+[halcyon@192.168.8.63 ~]$ p[Kcat /etc/fstab 
+
+#
+# /etc/fstab
+# Created by anaconda on Wed Nov 26 01:40:31 2014
+#
+# Accessible filesystems, by reference, are maintained under '/dev/disk'
+# See man pages fstab(5), findfs(8), mount(8) and/or blkid(8) for more info
+#
+/dev/mapper/VolGroup-lv_root /                       ext4    defaults        1 1
+UUID=9a5f99a4-0ae3-4c37-b4e4-150d4d8651a8 /boot                   ext4    defaults        1 2
+/dev/mapper/VolGroup-lv_home /home                   ext4    defaults        1 2
+/dev/mapper/VolGroup-lv_swap swap                    swap    defaults        0 0
+tmpfs                   /dev/shm                tmpfs   defaults        0 0
+devpts                  /dev/pts                devpts  gid=5,mode=620  0 0
+sysfs                   /sys                    sysfs   defaults        0 0
+proc                    /proc                   proc    defaults        0 0
+[halcyon@192.168.8.63 ~]$ ls
+[halcyon@192.168.8.63 ~]$ ifconfig
+eth1      Link encap:Ethernet  HWaddr 00:0C:29:8E:55:19  
+          inet addr:192.168.8.63  Bcast:192.168.8.255  Mask:255.255.255.0
+          inet6 addr: fe80::20c:29ff:fe8e:5519/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:4438782 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:9702 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:337675818 (322.0 MiB)  TX bytes:1929961 (1.8 MiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:1304 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1304 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:70416 (68.7 KiB)  TX bytes:70416 (68.7 KiB)
+
+[halcyon@192.168.8.63 ~]$ ifconfig
+eth1      Link encap:Ethernet  HWaddr 00:0C:29:8E:55:19  
+          inet addr:192.168.8.63  Bcast:192.168.8.255  Mask:255.255.255.0
+          inet6 addr: fe80::20c:29ff:fe8e:5519/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:4438810 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:9714 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:337678202 (322.0 MiB)  TX bytes:1931161 (1.8 MiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:1304 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1304 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:70416 (68.7 KiB)  TX bytes:70416 (68.7 KiB)
+
+[halcyon@192.168.8.63 ~]$ 

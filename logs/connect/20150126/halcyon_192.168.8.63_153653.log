@@ -1,0 +1,35 @@
+Last login: Mon Jan 26 18:34:04 2015 from 192.168.8.59
+PS1='[\u@192.168.8.63 \W]\$ '
+clear;echo -e '\033[32mLogin 192.168.8.63 done. Enjoy it.\033[0m'
+[halcyon@hadoop03 ~]$ PS1='[\u@192.168.8.63 \W]\$ '
+[halcyon@192.168.8.63 ~]$ clear;echo -e '\033[32mLogin 192.168.8.63 done. Enjoy it.\033[0m'
+[H[J[32mLogin 192.168.8.63 done. Enjoy it.[0m
+[halcyon@192.168.8.63 ~]$ ls
+[halcyon@192.168.8.63 ~]$ python
+Python 2.6.6 (r266:84292, Nov 22 2013, 12:16:22) 
+[GCC 4.4.7 20120313 (Red Hat 4.4.7-4)] on linux2
+Type "help", "copyright", "credits" or "license" for more information.
+>>> exit()
+[halcyon@192.168.8.63 ~]$ ls
+[halcyon@192.168.8.63 ~]$ pwd
+/home/halcyon
+[halcyon@192.168.8.63 ~]$ ifconfig
+eth1      Link encap:Ethernet  HWaddr 00:0C:29:8E:55:19  
+          inet addr:192.168.8.63  Bcast:192.168.8.255  Mask:255.255.255.0
+          inet6 addr: fe80::20c:29ff:fe8e:5519/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:4435390 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:9526 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000 
+          RX bytes:337415164 (321.7 MiB)  TX bytes:1908969 (1.8 MiB)
+
+lo        Link encap:Local Loopback  
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:16436  Metric:1
+          RX packets:1304 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1304 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0 
+          RX bytes:70416 (68.7 KiB)  TX bytes:70416 (68.7 KiB)
+
+[halcyon@192.168.8.63 ~]$ 
