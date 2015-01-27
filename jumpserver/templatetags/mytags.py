@@ -2,7 +2,7 @@
 
 import time
 from django import template
-from juser.models import User
+from juser.models import User, UserGroup
 
 register = template.Library()
 
@@ -31,8 +31,10 @@ def get_role(user_id):
 def groups_str(username):
     groups = []
     user = User.objects.get(username=username)
+    group_default = UserGroup.objects.get(name=username)
     for group in user.user_group.all():
         groups.append(group.name)
+    groups.remove(group_default)
     return ','.join(groups)
 
 @register.filter(name='get_item')

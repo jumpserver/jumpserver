@@ -143,15 +143,11 @@ def group_add(request):
             if not group_name:
                 error = u'组名不能为空'
                 raise AddError
-
             group_db_add(name=group_name, comment=comment, type='M')
-
         except AddError:
             pass
-
         except TypeError:
             error = u'保存用户失败'
-
         else:
             msg = u'添加组 %s 成功' % group_name
 
