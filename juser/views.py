@@ -259,7 +259,7 @@ def user_edit(request):
         ssh_key_pwd1 = user.ssh_key_pwd1
         name = user.name
         all_group = UserGroup.objects.all()
-        groups = user.user_group.all()
+        groups = user.user_group.filter(type='M')
         groups_str = ' '.join([str(group.id) for group in groups])
         user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
         role_post = user.role
