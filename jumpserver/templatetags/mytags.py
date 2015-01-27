@@ -31,11 +31,8 @@ def get_role(user_id):
 def groups_str(username):
     groups = []
     user = User.objects.get(username=username)
-    group_default = UserGroup.objects.get(name=username)
-    for group in user.user_group.all():
+    for group in user.user_group.filter(type='M'):
         groups.append(group.name)
-    if group_default in groups:
-        groups.remove(group_default)
     return ','.join(groups)
 
 
