@@ -121,6 +121,15 @@ def group_db_add(**kwargs):
     UserGroup.objects.create(**kwargs)
 
 
+def user_group_add(username, group_name):
+    user = User.objects.get(username=username)
+    group = UserGroup.objects.get(name=group_name)
+    groups = [group]
+    for g in user.user_group.all():
+        groups.append(g)
+    user.user_group = groups
+
+
 def group_add(request):
     error = ''
     msg = ''
@@ -461,6 +470,7 @@ def user_add(request):
 
                 server_add_user(username, password, ssh_key_pwd1)
                 group_db_add(name=username, comment=username, type='U')
+                user_group_add(username=username, group_name=username)
                 if LDAP_ENABLE:
                     ldap_add_user(username, ldap_pwd)
                 msg = u'添加用户 %s 成功！' % username
