@@ -113,6 +113,14 @@ def gen_sha512(salt, password):
     return crypt.crypt(password, '$6$%s$' % salt)
 
 
+def group_db_add(**kwargs):
+    group_name = kwargs.get('name')
+    group = UserGroup.objects.filter(name=group_name)
+    if group:
+        raise AddError
+    UserGroup.objects.create(**kwargs)
+
+
 def group_add(request):
     error = ''
     msg = ''
@@ -127,13 +135,8 @@ def group_add(request):
                 error = u'组名不能为空'
                 raise AddError
 
-            group = UserGroup.objects.filter(name=group_name)
-            if group:
-                error = u'组 %s 已存在' % group_name
-                raise AddError
+            group_db_add(name=group_name, comment=comment, type='M')
 
-            group = UserGroup(name=group_name, comment=comment)
-            group.save()
         except AddError:
             pass
 
@@ -148,7 +151,7 @@ def group_add(request):
 
 def group_list(request):
     header_title, path1, path2 = '查看属组 | Show Group', 'juser', 'group_list'
-    groups = contact_list = UserGroup.objects.all().order_by('id')
+    groups = contact_list = UserGroup.objects.filter(type='M').order_by('id')
     p = paginator = Paginator(contact_list, 10)
 
     try:
@@ -418,7 +421,7 @@ def user_add(request):
     msg = ''
     header_title, path1, path2 = '添加用户 | Add User', 'juser', 'user_add'
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
-    all_group = UserGroup.objects.all()
+    all_group = UserGroup.objects.filter(type='M')
     if request.method == 'POST':
         username = request.POST.get('username', None)
         password = request.POST.get('password', None)
@@ -457,10 +460,10 @@ def user_add(request):
                             date_joined=time_now)
 
                 server_add_user(username, password, ssh_key_pwd1)
+                group_db_add(name=username, comment=username, type='U')
                 if LDAP_ENABLE:
                     ldap_add_user(username, ldap_pwd)
                 msg = u'添加用户 %s 成功！' % username
-                # locals = lambda: {}
 
             except Exception, e:
                 error = u'添加用户 %s 失败 %s ' % (username, e)

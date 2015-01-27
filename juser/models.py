@@ -2,7 +2,13 @@ from django.db import models
 
 
 class UserGroup(models.Model):
+    GROUP_TYPE_CHOICES = (
+        ('U', 'UniqueUserGroup'),
+        ('M', 'ManyUserGroup')
+    )
+
     name = models.CharField(max_length=80, unique=True)
+    type = models.CharField(max_length=1, choices=GROUP_TYPE_CHOICES, default='U')
     comment = models.CharField(max_length=160, blank=True, null=True)
 
     def __unicode__(self):
