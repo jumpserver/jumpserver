@@ -245,6 +245,8 @@ def user_del(request):
         return HttpResponseRedirect('/')
     user = User.objects.get(id=user_id)
     user.delete()
+    group = UserGroup.objects.get(name=user.username)
+    group.delete()
     return HttpResponseRedirect('/juser/user_list/', locals())
 
 
