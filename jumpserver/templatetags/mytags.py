@@ -34,8 +34,10 @@ def groups_str(username):
     group_default = UserGroup.objects.get(name=username)
     for group in user.user_group.all():
         groups.append(group.name)
-    groups.remove(group_default)
+    if group_default in groups:
+        groups.remove(group_default)
     return ','.join(groups)
+
 
 @register.filter(name='get_item')
 def get_item(dictionary, key):
