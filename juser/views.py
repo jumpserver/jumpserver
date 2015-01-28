@@ -256,7 +256,7 @@ def user_edit(request):
         user = User.objects.get(id=user_id)
         username = user.username
         password = user.password
-        ssh_key_pwd1 = user.ssh_key_pwd1
+        ssh_key_pwd = user.ssh_key_pwd
         name = user.name
         all_group = UserGroup.objects.all()
         groups = user.user_group.filter(type='M')
@@ -275,7 +275,7 @@ def user_edit(request):
         groups_str = ' '.join(groups)
         role_post = request.POST.get('role', None)
         ssh_pwd = request.POST.get('ssh_pwd', None)
-        ssh_key_pwd1 = request.POST.get('ssh_key_pwd1', None)
+        ssh_key_pwd = request.POST.get('ssh_key_pwd', None)
         is_active = request.POST.get('is_active', '1')
         ldap_pwd = gen_rand_pwd(16)
         all_group = UserGroup.objects.all()
@@ -292,8 +292,8 @@ def user_edit(request):
         if ssh_pwd != user.ssh_pwd:
             ssh_pwd = CRYPTOR.encrypt(ssh_pwd)
 
-        if ssh_key_pwd1 != user.ssh_key_pwd1:
-            ssh_key_pwd1 = CRYPTOR.encrypt(ssh_key_pwd1)
+        if ssh_key_pwd != user.ssh_key_pwd:
+            ssh_key_pwd = CRYPTOR.encrypt(ssh_key_pwd)
 
         db_update_user(username=username,
                        password=password,
@@ -302,7 +302,7 @@ def user_edit(request):
                        groups=groups,
                        role=role_post,
                        ssh_pwd=ssh_pwd,
-                       ssh_key_pwd1=ssh_key_pwd1)
+                       ssh_key_pwd=ssh_key_pwd)
         msg = u'修改用户成功'
 
         return HttpResponseRedirect('/juser/user_list/')
@@ -363,9 +363,9 @@ def gen_ssh_key(username, password=None, length=2048):
     bash('chown %s:%s %s' % (username, username, public_key_file))
 
 
-def server_add_user(username, password, ssh_key_pwd1):
+def server_add_user(username, password, ssh_key_pwd):
     bash('useradd %s; echo %s | passwd --stdin %s' % (username, password, username))
-    gen_ssh_key(username, ssh_key_pwd1)
+    gen_ssh_key(username, ssh_key_pwd)
 
 
 def server_del_user(username):
@@ -438,12 +438,12 @@ def user_add(request):
         groups_str = ' '.join(groups)
         role_post = request.POST.get('role', None)
         ssh_pwd = request.POST.get('ssh_pwd', None)
-        ssh_key_pwd1 = request.POST.get('ssh_key_pwd1', None)
+        ssh_key_pwd = request.POST.get('ssh_key_pwd', None)
         is_active = request.POST.get('is_active', '1')
         ldap_pwd = gen_rand_pwd(16)
 
         try:
-            if None in [username, password, ssh_key_pwd1, name, groups, role_post, is_active]:
+            if None in [username, password, ssh_key_pwd, name, groups, role_post, is_active]:
                 error = u'带*内容不能为空'
                 raise AddError
             user = User.objects.filter(username=username)
@@ -461,12 +461,12 @@ def user_add(request):
                             name=name, email=email,
                             groups=groups, role=role_post,
                             ssh_pwd=CRYPTOR.encrypt(ssh_pwd),
-                            ssh_key_pwd1=CRYPTOR.encrypt(ssh_key_pwd1),
+                            ssh_key_pwd=CRYPTOR.encrypt(ssh_key_pwd),
                             ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
                             is_active=is_active,
                             date_joined=time_now)
 
-                server_add_user(username, password, ssh_key_pwd1)
+                server_add_user(username, password, ssh_key_pwd)
                 group_db_add(name=username, comment=username, type='U')
                 user_group_add(username=username, group_name=username)
                 if LDAP_ENABLE:
