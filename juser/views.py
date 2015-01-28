@@ -372,6 +372,8 @@ def user_del(request):
     user.delete()
     group = UserGroup.objects.get(name=user.username)
     group.delete()
+    server_del_user(user.username)
+    ldap_del_user(user.username)
     return HttpResponseRedirect('/juser/user_list/', locals())
 
 
