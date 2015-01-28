@@ -73,19 +73,19 @@
                             <div class="form-group">
                                 <label for="groups" class="col-lg-2 control-label">属组<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <select id="groups" name="groups" class="form-control m-b" multiple>
+                                    <select id="groups" name="groups" class="form-control m-b" multiple size="10">
                                         {% for group in all_group %}
                                             {% if groups_str %}
                                                 {% if group.id|int2str in groups_str %}
-                                                    <option value="{{ group.id }}" selected>{{ group.name }}</option>
+                                                    <option value="{{ group.id }}" selected>{{ group.name }} --- {{ group.type|group_type_to_str }}</option>
                                                 {% else %}
-                                                    <option value="{{ group.id }}">{{ group.name }}</option>
+                                                    <option value="{{ group.id }}">{{ group.name }} --- {{ group.type|group_type_to_str }}</option>
                                                 {% endif %}
                                             {% else %}
                                                 {% if forloop.first %}
-                                                    <option value="{{ group.id }}" selected>{{ group.name }}</option>
+                                                    <option value="{{ group.id }}" selected>{{ group.name }} --- {{ group.type|group_type_to_str }}</option>
                                                 {% else %}
-                                                    <option value="{{ group.id }}">{{ group.name }}</option>
+                                                    <option value="{{ group.id }}">{{ group.name }} --- {{ group.type|group_type_to_str }}</option>
                                                 {% endif %}
                                             {% endif %}
                                         {% endfor %}

@@ -3,7 +3,7 @@
 import time
 from django import template
 from django.db.models import Q
-from juser.models import User
+from juser.models import User, UserGroup
 
 register = template.Library()
 
@@ -56,6 +56,12 @@ def perm_count(user_id):
     return user.perm_set.all().count()
 
 
+@register.filter(name='member_count')
+def member_count(group_id):
+    group = UserGroup.objects.get(id=group_id)
+    return group.user_set.count()
+
+
 @register.filter(name='group_type_to_str')
 def group_type_to_str(type_name):
     group_types = {
@@ -63,5 +69,4 @@ def group_type_to_str(type_name):
         'M': '管理组',
         'A': '授权组',
     }
-
     return group_types.get(type_name)
