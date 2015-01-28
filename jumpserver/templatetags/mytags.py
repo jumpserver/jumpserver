@@ -50,16 +50,16 @@ def bool2str(value):
         return u'否'
 
 
-@register.filter(name='perm_count')
-def perm_count(user_id):
-    user = User.objects.get(id=int(user_id))
-    return user.perm_set.all().count()
-
-
 @register.filter(name='member_count')
 def member_count(group_id):
     group = UserGroup.objects.get(id=group_id)
     return group.user_set.count()
+
+
+@register.filter(name='perm_count')
+def perm_count(group_id):
+    group = UserGroup.objects.get(id=group_id)
+    return group.perm_set.count()
 
 
 @register.filter(name='group_type_to_str')
