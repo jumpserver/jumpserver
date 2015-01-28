@@ -54,9 +54,9 @@
                             </div>
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
-                                <label for="ssh_key_pwd1" class="col-sm-2 control-label">密钥密码<span class="red-fonts">*</span></label>
+                                <label for="ssh_key_pwd" class="col-sm-2 control-label">密钥密码<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <input id="ssh_key_pwd1" name="ssh_key_pwd" placeholder="SSH Key Password" type="password" class="form-control" value="{{ ssh_key_pwd1 }}">
+                                    <input id="ssh_key_pwd" name="ssh_key_pwd" placeholder="SSH Key Password" type="password" class="form-control" value="{{ ssh_key_pwd }}">
                                     <span class="help-block m-b-none">
                                         登陆 Jumpserver 使用的SSH密钥的密码
                                     </span>
@@ -173,7 +173,7 @@ $('#userForm').validator({
             ok: "",
             msg: {required: "必须填写!"}
         },
-        "ssh_key_pwd1": {
+        "ssh_key_pwd": {
             rule: "required;length[6~50]",
             tip: "ssh私钥密码",
             ok: "",

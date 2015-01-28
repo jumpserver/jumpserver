@@ -15,6 +15,7 @@ from django.http import HttpResponseRedirect
 
 from django.shortcuts import render_to_response
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 
 from juser.models import UserGroup, User
 from connect import PyCrypt, KEY
@@ -117,37 +118,57 @@ def group_db_add(**kwargs):
     group_name = kwargs.get('name')
     group = UserGroup.objects.filter(name=group_name)
     if group:
-        raise AddError
+        raise AddError('Group %s have been exist .' % group_name)
     UserGroup.objects.create(**kwargs)
 
 
-def user_group_add(username, group_name):
-    user = User.objects.get(username=username)
+def add_user_to_group(username, group_name):
+    try:
+        user = User.objects.get(username=username)
+        group = UserGroup.objects.get(name=group_name)
+    except ObjectDoesNotExist:
+        raise AddError('User %s or group % does not exit. ' % username, group_name)
+    else:
+        groups = [group]
+        for g in user.user_group.all():
+            groups.append(g)
+        user.user_group = groups
+
+
+def group_add_user(group_name, user_id):
     group = UserGroup.objects.get(name=group_name)
-    groups = [group]
-    for g in user.user_group.all():
-        groups.append(g)
-    user.user_group = groups
+    user = User.objects.get(id=user_id)
+    group.user_set.add(user)
 
 
 def group_add(request):
     error = ''
     msg = ''
     header_title, path1, path2 = '添加属组 | Add Group', 'juser', 'group_add'
-
+    group_types = {
+        'P': '私有组',
+        'M': '管理组',
+        'A': '授权组',
+    }
+    users = User.objects.all()
     if request.method == 'POST':
-        group_name = request.POST.get('group_name', None)
-        comment = request.POST.get('comment', None)
+        group_name = request.POST.get('group_name', '')
+        group_type = request.POST.get('group_type', 'A')
+        users_selected = request.POST.getlist('users_selected', '')
+        comment = request.POST.get('comment', '')
 
         try:
             if not group_name:
                 error = u'组名不能为空'
                 raise AddError
-            group_db_add(name=group_name, comment=comment, type='M')
+            group_db_add(name=group_name, comment=comment, type=group_type)
+            for user_id in users_selected:
+                group_add_user(group_name, user_id)
+
         except AddError:
             pass
         except TypeError:
-            error = u'保存用户失败'
+            error = u'保存用户组失败'
         else:
             msg = u'添加组 %s 成功' % group_name
 
@@ -156,7 +177,7 @@ def group_add(request):
 
 def group_list(request):
     header_title, path1, path2 = '查看属组 | Show Group', 'juser', 'group_list'
-    groups = contact_list = UserGroup.objects.filter(type='M').order_by('id')
+    groups = contact_list = UserGroup.objects.filter(Q(type='M') | Q(type='A')).order_by('id')
     p = paginator = Paginator(contact_list, 10)
 
     try:
@@ -467,8 +488,8 @@ def user_add(request):
                             date_joined=time_now)
 
                 server_add_user(username, password, ssh_key_pwd)
-                group_db_add(name=username, comment=username, type='U')
-                user_group_add(username=username, group_name=username)
+                group_db_add(name=username, comment=username, type='P')
+                add_user_to_group(username=username, group_name=username)
                 if LDAP_ENABLE:
                     ldap_add_user(username, ldap_pwd)
                 msg = u'添加用户 %s 成功！' % username

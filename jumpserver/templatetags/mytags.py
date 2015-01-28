@@ -2,7 +2,8 @@
 
 import time
 from django import template
-from juser.models import User, UserGroup
+from django.db.models import Q
+from juser.models import User
 
 register = template.Library()
 
@@ -24,16 +25,16 @@ def int2str(value):
 def get_role(user_id):
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
     user = User.objects.get(id=user_id)
-    return user_role.get(user.role)
+    return user_role.get(str(user.role))
 
 
 @register.filter(name='groups_str')
 def groups_str(username):
     groups = []
     user = User.objects.get(username=username)
-    for group in user.user_group.filter(type='M'):
+    for group in user.user_group.filter(Q(type='A') | Q(type='M')):
         groups.append(group.name)
-    return ','.join(groups)
+    return ' '.join(groups)
 
 
 @register.filter(name='get_item')
@@ -53,3 +54,14 @@ def bool2str(value):
 def perm_count(user_id):
     user = User.objects.get(id=int(user_id))
     return user.perm_set.all().count()
+
+
+@register.filter(name='group_type_to_str')
+def group_type_to_str(type_name):
+    group_types = {
+        'P': '私有组',
+        'M': '管理组',
+        'A': '授权组',
+    }
+
+    return group_types.get(type_name)

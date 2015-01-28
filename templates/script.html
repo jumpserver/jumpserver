@@ -21,7 +21,7 @@
     $(document).ready(function(){
         $('.i-checks').iCheck({
             checkboxClass: 'icheckbox_square-green',
-            radioClass: 'iradio_square-green',
+            radioClass: 'iradio_square-green'
         });
     });
 
@@ -42,7 +42,24 @@
 
         }
 
+        function move(from, to) {
+        $("#"+from+" option").each(function(){
+          if ( $(this).prop("selected") == true ) {
+            $("#"+to).append(this);
+          }
+        });
+    }
+
+    function move_all(from, to){
+        $("#"+from).children().each(function(){
+        $("#"+to).append(this);
+        });
+    }
+
+
 </script>
+
+
 
 
 <!-- pop windows -->

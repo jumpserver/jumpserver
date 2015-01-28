@@ -9,7 +9,7 @@ class UserGroup(models.Model):
     )
 
     name = models.CharField(max_length=80, unique=True)
-    type = models.CharField(max_length=1, choices=GROUP_TYPE_CHOICES, default='U')
+    type = models.CharField(max_length=1, choices=GROUP_TYPE_CHOICES, default='P')
     comment = models.CharField(max_length=160, blank=True, null=True)
 
     def __unicode__(self):
