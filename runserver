@@ -11,7 +11,7 @@ if [ $? != '0' ];then
 fi
 node $websocket_file &
 if [ -f $manage_file -a -e $manage_file ] && [ -f $log_handler_file -a -e $log_handler_file ];then
-    $manage_file runserver 0.0.0.0:80 &> logs/access.log &
+    sudo $manage_file runserver 0.0.0.0:80 &> logs/access.log &
     $log_handler_file &> logs/handler.log   &
 else
     echo "manage.py or log_handler.py isn't exist or executable."
