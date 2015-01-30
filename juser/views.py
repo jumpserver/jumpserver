@@ -33,10 +33,6 @@ if LDAP_ENABLE:
     LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
 
 
-def md5_crypt(string):
-    return hashlib.new("md5", string).hexdigest()
-
-
 def gen_rand_pwd(num):
     """生成随机密码"""
     seed = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
