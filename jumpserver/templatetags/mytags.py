@@ -4,6 +4,7 @@ import time
 from django import template
 from django.db.models import Q
 from juser.models import User, UserGroup
+from jperm.views import perm_user_asset
 
 register = template.Library()
 
@@ -73,3 +74,7 @@ def group_type_to_str(type_name):
         'A': '授权组',
     }
     return group_types.get(type_name)
+
+@register.filter(name='perm_asset_count')
+def perm_asset_count(user_id):
+    return len(perm_user_asset(user_id))

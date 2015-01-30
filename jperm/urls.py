@@ -10,4 +10,5 @@ urlpatterns = patterns('jperm.views',
     (r'^perm_list/$', 'perm_list'),
     (r'^perm_detail/$', 'perm_detail'),
     (r'^perm_del/$', 'perm_del'),
+    (r'^perm_asset_detail/$', 'perm_asset_detail'),
 )
