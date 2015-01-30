@@ -16,6 +16,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from django.http import HttpResponse
 
 from juser.models import UserGroup, User
 from connect import PyCrypt, KEY
@@ -132,6 +133,14 @@ def group_add_user(group_name, user_id=None, username=None):
         raise AddError('用户获取失败')
     else:
         group = UserGroup.objects.get(name=group_name)
+        group.user_set.add(user)
+
+
+def group_update_user(group_id, users_id):
+    group = UserGroup.objects.get(id=group_id)
+    group.user_set.clear()
+    for user_id in users_id:
+        user = User.objects.get(id=user_id)
         group.user_set.add(user)
 
 
@@ -253,7 +262,7 @@ def group_add(request):
     msg = ''
     header_title, path1, path2 = '添加属组 | Add Group', 'juser', 'group_add'
     group_types = {
-        'P': '私有组',
+        # 'P': '私有组',
         'M': '管理组',
         'A': '授权组',
     }
@@ -321,19 +330,32 @@ def group_edit(request):
     error = ''
     msg = ''
     header_title, path1, path2 = '修改属组 | Edit Group', 'juser', 'group_edit'
+    group_types = {
+        # 'P': '私有组',
+        'M': '管理组',
+        'A': '授权组',
+    }
     if request.method == 'GET':
         group_id = request.GET.get('id', None)
         group = UserGroup.objects.get(id=group_id)
         group_name = group.name
         comment = group.comment
+        group_type = group.type
+        users_all = User.objects.all()
+        users_selected = group.user_set.all()
+        users = [user for user in users_all if user not in users_selected]
 
         return render_to_response('juser/group_add.html', locals())
     else:
         group_id = request.POST.get('group_id', None)
         group_name = request.POST.get('group_name', None)
         comment = request.POST.get('comment', '')
+        users_selected = request.POST.getlist('users_selected')
+        group_type = request.POST.get('group_type')
         group = UserGroup.objects.filter(id=group_id)
-        group.update(name=group_name, comment=comment)
+        # return HttpResponse(group_type)
+        group.update(name=group_name, comment=comment, type=group_type)
+        group_update_user(group_id, users_selected)
 
         return HttpResponseRedirect('/juser/group_list/')
 

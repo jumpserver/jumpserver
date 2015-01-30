@@ -52,7 +52,7 @@
                                 <div class="col-sm-8">
                                     <select id="group_type" name="group_type" class="form-control m-b">
                                         {% for t, type_name in group_types.items %}
-                                            {% ifequal t type_name %}
+                                            {% ifequal t group_type %}
                                                 <option value="{{ t }}" selected>{{ type_name }}</option>
                                             {% else %}
                                                 <option value="{{ t }}">{{ type_name }}</option>
@@ -80,6 +80,9 @@
                                 <div class="col-sm-3">
                                     <div>
                                         <select id="users_selected" name="users_selected" class="form-control m-b" size="12"  multiple>
+                                            {% for user in users_selected %}
+                                            <option value="{{ user.id }}">{{ user.name }}</option>
+                                        {% endfor %}
                                         </select>
                                     </div>
                                 </div>
@@ -96,7 +99,7 @@
                             <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-2">
                                     <button class="btn btn-white" type="submit">取消</button>
-                                    <button class="btn btn-primary" type="submit">确认保存</button>
+                                    <button class="btn btn-primary" type="submit" onclick="javascript: (function(){$('#users_selected option').each(function(){$(this).prop('selected', true)})})()">确认保存</button>
                                 </div>
                             </div>
                         </form>

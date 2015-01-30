@@ -34,7 +34,10 @@ def groups_str(username):
     user = User.objects.get(username=username)
     for group in user.user_group.filter(Q(type='A') | Q(type='M')):
         groups.append(group.name)
-    return ' '.join(groups)
+    if len(groups) < 4:
+        return ' '.join(groups)
+    else:
+        return "%s ..." % ' '.join(groups[0:3])
 
 
 @register.filter(name='get_item')
