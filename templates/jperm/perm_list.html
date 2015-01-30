@@ -61,9 +61,9 @@
                                                 <td class="text-center"> {{ group.id|member_count }} </td>
                                                 <td class="text-center"> {{ group.id|perm_count }} </td>
                                                 <td class="text-center">
-                                                    <a href="../perm_user_detail/?id={{ group.id }}" class="iframe btn btn-xs btn-primary">详情</a>
+                                                    <a href="../perm_detail/?id={{ group.id }}" class="iframe btn btn-xs btn-primary">详情</a>
                                                     <a href="../perm_edit/?id={{ group.id }}" class="btn btn-xs btn-info">编辑</a>
-                                                    <a href="../perm_user_edit/?id={{ usgrouper.id }}" class="btn btn-xs btn-danger">删除</a>
+                                                    <a href="../perm_del/?id={{ group.id }}" class="btn btn-xs btn-danger">删除</a>
                                                 </td>
                                             </tr>
                                         {% endfor %}

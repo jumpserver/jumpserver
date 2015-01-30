@@ -14,29 +14,23 @@
     <body>
         <div class="row">
             <div class="contact-box">
-                <h2 class="text-center">{{ user.name }} 授权详情</h2>
+                <h2 class="text-center">{{ group.name }} 授权详情</h2>
                 <div class="ibox-content">
 
                     <table class="table table-striped table-bordered table-hover " id="editable" >
                         <thead>
                             <tr>
                                 <th class="text-center">ID</th>
-                                <th class="text-center">IP</th>
                                 <th class="text-center">主机组</th>
-                                <th class="text-center">IDC</th>
+                                <th class="text-center">主机数量</th>
                             </tr>
                         </thead>
                         <tbody>
-                        {% for asset in host_permed %}
+                        {% for asset_group in asset_groups %}
                         <tr class="gradeX">
-                            <td class="text-center">{{ asset.id }}</td>
-                            <td class="text-center">{{ asset.ip }}</td>
-                            <td class="text-center">
-                                {% for group in asset.bis_group.all %}
-                                        {{ group }}
-                                {% endfor %}
-                            </td>
-                            <td class="text-center">{{ asset.idc.name }}</td>
+                            <td class="text-center">{{ asset_group.id }}</td>
+                            <td class="text-center">{{ asset_group.name }}</td>
+                            <td class="text-center">{{ asset_group.asset_set.count }}</td>
                         </tr>
                         {% endfor %}
 

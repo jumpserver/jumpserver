@@ -7,6 +7,7 @@ urlpatterns = patterns('jperm.views',
     # url(r'^blog/', include('blog.urls')),
 
     (r'^perm_edit/$', 'perm_edit'),
-    (r'^perm_user_show/$', 'perm_user_show'),
     (r'^perm_list/$', 'perm_list'),
+    (r'^perm_detail/$', 'perm_detail'),
+    (r'^perm_del/$', 'perm_del'),
 )

@@ -61,6 +61,21 @@ def perm_edit(request):
         return HttpResponseRedirect('/jperm/perm_list/')
 
 
+def perm_detail(request):
+    user_group_id = request.GET.get('id')
+    user_group = UserGroup.objects.get(id=user_group_id)
+    asset_groups = [perm.asset_group for perm in user_group.perm_set.all()]
+    return render_to_response('jperm/perm_detail.html', locals())
+
+
+def perm_del(request):
+    user_group_id = request.GET.get('id')
+    user_group = UserGroup.objects.get(id=user_group_id)
+    Perm.objects.filter(user_group=user_group).delete()
+    return HttpResponseRedirect('/jperm/perm_list/')
+
+
+
 # def perm_user_host(username, ips):
 #     user = User.objects.get(username=username)
 #     user.perm_set.all().delete()
@@ -96,7 +111,7 @@ def perm_edit(request):
 #     for perm in user.perm_set.all():
 #         host_permed.append(perm.asset)
 #
-#     return render_to_response('jperm/perm_user_detail.html', locals())
+#     return render_to_response('jperm/perm_detail.html', locals())
 #
 #
 # def perm_group_edit(request):
