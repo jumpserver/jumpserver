@@ -4,13 +4,13 @@
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-lg-10">
-            <div class="ibox float-e-margins">
-                <div class="text-center">
-                    <span>请选择添加内容: </span>
-                    <a href="#" class="btn btn-xs btn-primary" id="addhost">添加主机</a>
-                    <a href="#" class="btn btn-xs btn-primary" id="addidc">添加IDC</a>
-                    <a href="#" class="btn btn-xs btn-primary" id="addbis">添加业务组</a>
-                </div>
+            <div class="text-center">
+                <span>请选择添加内容: </span>
+                <a href="#" class="btn btn-xs btn-primary" onclick='change("addhost")'>添加主机</a>
+                <a href="#" class="btn btn-xs btn-primary" onclick='change("addidc")'>添加IDC</a>
+                <a href="#" class="btn btn-xs btn-primary" onclick='change("addgroup")'>添加业务组</a>
+            </div>
+            <div id="add_asset" class="ibox float-e-margins">
                 <div id="ibox-content" class="ibox-title">
                     <h5> 填写主机基本信息 </h5>
                     <div class="ibox-tools">
@@ -150,6 +150,18 @@
     else{
         document.getElementById("a1").style.display="none";
     }};
+
+    function change(type){
+        if (type == 'addhost') {
+            var data = $('#add_asset');
+        } else if (type == 'addidc') {
+            var data = $('#addidc');
+        } else {
+            var data = $('addgroup');
+        }
+        $("#add_asset").html(data);
+    }
+
 $('#assetForm').validator({
     timely: 2,
     theme: "yellow_right_effect",

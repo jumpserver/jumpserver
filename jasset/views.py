@@ -7,7 +7,7 @@ from django.core.paginator import Paginator, EmptyPage
 from models import IDC, Asset, BisGroup
 from juser.models import UserGroup
 from connect import PyCrypt, KEY
-from jpermission.models import Permission
+from jumpserver.views import jasset_group_add, jasset_host_edit
 
 cryptor = PyCrypt(KEY)
 
@@ -21,7 +21,7 @@ def jadd_host(request):
     header_title, path1, path2 = u'添加主机 | Add Host', u'资产管理', u'添加主机'
     groups = []
     eidc = IDC.objects.all()
-    egroup = BisGroup.objects.all()
+    egroup = BisGroup.objects.filter(type='A')
     eusergroup = UserGroup.objects.all()
 
     if request.method == 'POST':
@@ -60,12 +60,38 @@ def jadd_host(request):
                       login_type=j_type, idc=j_idc,
                       is_active=int(j_active),
                       comment=j_comment)
+        jasset_group_add(j_ip, j_ip, 'P')
         a.save()
-        print 'ok'
         a.bis_group = groups
         a.save()
         smg = u'主机 %s 添加成功' %j_ip
     return render_to_response('jasset/host_add.html', locals(), context_instance=RequestContext(request))
+
+def batch_host_edit(request):
+    if request.method == 'POST':
+        len_table = request.POST.get('len_table')
+        print len_table
+        for i in range(int(len_table)):
+            j_ip = "editable["+str(i)+"][j_ip]"
+            j_port = "editable["+str(i)+"][j_port]"
+            j_idc = "editable["+str(i)+"][j_idc]"
+            j_type = "editable["+str(i)+"][j_type]"
+            j_group = "editable["+str(i)+"][j_group]"
+            j_active = "editable["+str(i)+"][j_active]"
+            j_comment = "editable["+str(i)+"][j_comment]"
+
+            j_ip = request.POST.get(j_ip).strip()
+            j_port = request.POST.get(j_port).strip()
+            j_idc = request.POST.get(j_idc).strip()
+            j_type = request.POST.get(j_type).strip()
+            j_group = request.POST.getlist(j_group)
+            j_active = request.POST.get(j_active).strip()
+            j_comment = request.POST.get(j_comment).strip()
+            print j_ip
+
+            jasset_host_edit(j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment)
+
+        return render_to_response('jasset/host_list.html')
 
 
 def jlist_host(request):
@@ -87,7 +113,13 @@ def jlist_host(request):
     return render_to_response('jasset/host_list.html', locals(), context_instance=RequestContext(request))
 
 def host_del(request, offset):
-    Asset.objects.filter(ip=str(offset)).delete()
+    len_list = request.POST.get("len_list")
+    for i in range(int(len_list)):
+        key = "id_list["+str(i)+"]"
+        print key
+        jid = request.POST.get(key)
+        print jid
+        Asset.objects.filter(id=jid).delete()
     return HttpResponseRedirect('/jasset/host_list/')
 
 def host_edit(request, offset):
@@ -96,10 +128,10 @@ def host_edit(request, offset):
     header_title, path1, path2 = u'修改主机 | Edit Host', u'资产管理', u'修改主机'
     groups, e_group = [], []
     eidc = IDC.objects.all()
-    egroup = BisGroup.objects.all()
-    for g in Asset.objects.get(ip=offset).bis_group.all():
+    egroup = BisGroup.objects.filter(type='A')
+    for g in Asset.objects.get(id=int(offset)).bis_group.all():
         e_group.append(g)
-    post = Asset.objects.get(ip = str(offset))
+    post = Asset.objects.get(id = int(offset))
     if request.method == 'POST':
         j_ip = request.POST.get('j_ip')
         j_idc = request.POST.get('j_idc')
@@ -113,7 +145,7 @@ def host_edit(request, offset):
             c = BisGroup.objects.get(name=group)
             groups.append(c)
 
-        a = Asset.objects.get(ip=str(offset))
+        a = Asset.objects.get(ip=int(offset))
 
         if j_type == 'M':
             j_user = request.POST.get('j_user')
@@ -180,24 +212,24 @@ def idc_del(request, offset):
     return HttpResponseRedirect('/jasset/idc_list/')
 
 def jadd_group(request):
-    header_title, path1, path2 = u'添加业务组 | Add Group', u'资产管理', u'添加业务组'
+    header_title, path1, path2 = u'添加主机组 | Add Group', u'资产管理', u'添加主机组'
     if request.method == 'POST':
         j_group = request.POST.get('j_group')
         j_comment = request.POST.get('j_comment')
 
         if BisGroup.objects.filter(name=j_group):
-            emg = u'该业务组已存在!'
+            emg = u'该主机组已存在!'
             return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
         else:
-            smg = u'业务组%s添加成功' %j_group
-            BisGroup.objects.create(name=j_group, comment=j_comment)
+            smg = u'主机组%s添加成功' %j_group
+            BisGroup.objects.create(name=j_group, comment=j_comment, type='A')
 
     return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
 
 
 def jlist_group(request):
     header_title, path1, path2 = u'查看业务组 | Add Group', u'资产管理', u'查看业务组'
-    posts = BisGroup.objects.all().order_by('id')
+    posts = BisGroup.objects.filter(type='A').order_by('id')
     return render_to_response('jasset/group_list.html', locals(), context_instance=RequestContext(request))
 
 def group_del(request, offset):
