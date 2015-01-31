@@ -2577,7 +2577,7 @@ a.forum-item-title:hover {
   padding-right: 20px !important;
 }
 body {
-  font-family: "open sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-family: "open sans", "Helvetica Neue", Helvetica, Arial, "微软雅黑", sans-serif;
   background-color: #2f4050;
   font-size: 13px;
   color: #676a6c;
@@ -2622,6 +2622,9 @@ a:focus {
 }
 .b-r {
   border-right: 1px solid #e7eaec;
+}
+.b-l {
+  border-left: 1px solid #e7eaec;
 }
 .hr-line-dashed {
   border-top: 1px dashed #e7eaec;

@@ -8,6 +8,7 @@ from models import IDC, Asset, BisGroup
 from juser.models import UserGroup
 from connect import PyCrypt, KEY
 from jumpserver.views import jasset_group_add, jasset_host_edit
+from jperm.models import Perm
 
 cryptor = PyCrypt(KEY)
 

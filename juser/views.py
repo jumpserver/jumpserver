@@ -15,6 +15,8 @@ from django.http import HttpResponseRedirect
 
 from django.shortcuts import render_to_response
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
+from django.http import HttpResponse
 
 from juser.models import UserGroup, User
 from connect import PyCrypt, KEY
@@ -29,10 +31,6 @@ if LDAP_ENABLE:
     LDAP_BASE_DN = CONF.get('ldap', 'base_dn')
     LDAP_ROOT_DN = CONF.get('ldap', 'root_dn')
     LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
-
-
-def md5_crypt(string):
-    return hashlib.new("md5", string).hexdigest()
 
 
 def gen_rand_pwd(num):
@@ -113,191 +111,33 @@ def gen_sha512(salt, password):
     return crypt.crypt(password, '$6$%s$' % salt)
 
 
-def group_add(request):
-    error = ''
-    msg = ''
-    header_title, path1, path2 = '添加属组 | Add Group', 'juser', 'group_add'
+def group_db_add(**kwargs):
+    group_name = kwargs.get('name')
+    group = UserGroup.objects.filter(name=group_name)
+    if group:
+        raise AddError('Group %s have been exist .' % group_name)
+    UserGroup.objects.create(**kwargs)
 
-    if request.method == 'POST':
-        group_name = request.POST.get('group_name', None)
-        comment = request.POST.get('comment', None)
 
-        try:
-            if not group_name:
-                error = u'组名不能为空'
-                raise AddError
-
-            group = UserGroup.objects.filter(name=group_name)
-            if group:
-                error = u'组 %s 已存在' % group_name
-                raise AddError
-
-            group = UserGroup(name=group_name, comment=comment)
-            group.save()
-        except AddError:
-            pass
-
-        except TypeError:
-            error = u'保存用户失败'
-
+def group_add_user(group_name, user_id=None, username=None):
+    try:
+        if user_id:
+            user = User.objects.get(id=user_id)
         else:
-            msg = u'添加组 %s 成功' % group_name
-
-    return render_to_response('juser/group_add.html', locals())
-
-
-def group_list(request):
-    header_title, path1, path2 = '查看属组 | Show Group', 'juser', 'group_list'
-    groups = contact_list = UserGroup.objects.all().order_by('id')
-    p = paginator = Paginator(contact_list, 10)
-
-    try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
-
-    try:
-        contacts = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        contacts = paginator.page(paginator.num_pages)
-    return render_to_response('juser/group_list.html', locals())
-
-
-def group_detail(request):
-    group_id = request.GET.get('id', None)
-    if not group_id:
-        return HttpResponseRedirect('/')
-    group = UserGroup.objects.get(id=group_id)
-    return render_to_response('juser/group_detail.html', locals())
-
-
-def group_del(request):
-    group_id = request.GET.get('id', None)
-    if not group_id:
-        return HttpResponseRedirect('/')
-    group = UserGroup.objects.get(id=group_id)
-    group.delete()
-    return HttpResponseRedirect('/juser/group_list/', locals())
-
-
-def group_edit(request):
-    error = ''
-    msg = ''
-    header_title, path1, path2 = '修改属组 | Edit Group', 'juser', 'group_edit'
-    if request.method == 'GET':
-        group_id = request.GET.get('id', None)
-        group = UserGroup.objects.get(id=group_id)
-        group_name = group.name
-        comment = group.comment
-
-        return render_to_response('juser/group_add.html', locals())
-    else:
-        group_id = request.POST.get('group_id', None)
-        group_name = request.POST.get('group_name', None)
-        comment = request.POST.get('comment', '')
-        group = UserGroup.objects.filter(id=group_id)
-        group.update(name=group_name, comment=comment)
-
-        return HttpResponseRedirect('/juser/group_list/')
-
-
-def user_list(request):
-    user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
-    header_title, path1, path2 = '查看用户 | Show User', 'juser', 'user_list'
-    users = contact_list = User.objects.all().order_by('id')
-    p = paginator = Paginator(contact_list, 10)
-
-    try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
-
-    try:
-        contacts = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        contacts = paginator.page(paginator.num_pages)
-    return render_to_response('juser/user_list.html', locals())
-
-
-def user_detail(request):
-    user_id = request.GET.get('id', None)
-    if not user_id:
-        return HttpResponseRedirect('/')
-    user = User.objects.get(id=user_id)
-    return render_to_response('juser/user_detail.html', locals())
-
-
-def user_del(request):
-    user_id = request.GET.get('id', None)
-    if not user_id:
-        return HttpResponseRedirect('/')
-    user = User.objects.get(id=user_id)
-    user.delete()
-    return HttpResponseRedirect('/juser/user_list/', locals())
-
-
-def user_edit(request):
-    header_title, path1, path2 = '编辑用户 | Edit User', 'juser', 'user_edit'
-    readonly = "readonly"
-    if request.method == 'GET':
-        user_id = request.GET.get('id', None)
-        if not user_id:
-            return HttpResponseRedirect('/')
-        user = User.objects.get(id=user_id)
-        username = user.username
-        password = user.password
-        ssh_key_pwd1 = user.ssh_key_pwd1
-        name = user.name
-        all_group = UserGroup.objects.all()
-        groups = user.user_group.all()
-        groups_str = ' '.join([str(group.id) for group in groups])
-        user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
-        role_post = user.role
-        ssh_pwd = user.ssh_pwd
-        email = user.email
-
-    else:
-        username = request.POST.get('username', None)
-        password = request.POST.get('password', None)
-        name = request.POST.get('name', None)
-        email = request.POST.get('email', '')
-        groups = request.POST.getlist('groups', None)
-        groups_str = ' '.join(groups)
-        role_post = request.POST.get('role', None)
-        ssh_pwd = request.POST.get('ssh_pwd', None)
-        ssh_key_pwd1 = request.POST.get('ssh_key_pwd1', None)
-        is_active = request.POST.get('is_active', '1')
-        ldap_pwd = gen_rand_pwd(16)
-        all_group = UserGroup.objects.all()
-        user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
-
-        if username:
             user = User.objects.get(username=username)
-        else:
-            return HttpResponseRedirect('/')
+    except ObjectDoesNotExist:
+        raise AddError('用户获取失败')
+    else:
+        group = UserGroup.objects.get(name=group_name)
+        group.user_set.add(user)
 
-        if password != user.password:
-            password = md5_crypt(password)
 
-        if ssh_pwd != user.ssh_pwd:
-            ssh_pwd = CRYPTOR.encrypt(ssh_pwd)
-
-        if ssh_key_pwd1 != user.ssh_key_pwd1:
-            ssh_key_pwd1 = CRYPTOR.encrypt(ssh_key_pwd1)
-
-        db_update_user(username=username,
-                       password=password,
-                       name=name,
-                       email=email,
-                       groups=groups,
-                       role=role_post,
-                       ssh_pwd=ssh_pwd,
-                       ssh_key_pwd1=ssh_key_pwd1)
-        msg = u'修改用户成功'
-
-        return HttpResponseRedirect('/juser/user_list/')
-
-    return render_to_response('juser/user_add.html', locals())
+def group_update_user(group_id, users_id):
+    group = UserGroup.objects.get(id=group_id)
+    group.user_set.clear()
+    for user_id in users_id:
+        user = User.objects.get(id=user_id)
+        group.user_set.add(user)
 
 
 def db_add_user(**kwargs):
@@ -353,9 +193,9 @@ def gen_ssh_key(username, password=None, length=2048):
     bash('chown %s:%s %s' % (username, username, public_key_file))
 
 
-def server_add_user(username, password, ssh_key_pwd1):
+def server_add_user(username, password, ssh_key_pwd):
     bash('useradd %s; echo %s | passwd --stdin %s' % (username, password, username))
-    gen_ssh_key(username, ssh_key_pwd1)
+    gen_ssh_key(username, ssh_key_pwd)
 
 
 def server_del_user(username):
@@ -413,13 +253,169 @@ def ldap_del_user(username):
     ldap_conn.delete(sudo_dn)
 
 
-def user_add(request):
+def group_add(request):
     error = ''
     msg = ''
-    header_title, path1, path2 = '添加用户 | Add User', 'juser', 'user_add'
-    user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
-    all_group = UserGroup.objects.all()
+    header_title, path1, path2 = '添加属组 | Add Group', 'juser', 'group_add'
+    group_types = {
+        # 'P': '私有组',
+        'M': '管理组',
+        'A': '授权组',
+    }
+    users = User.objects.all()
     if request.method == 'POST':
+        group_name = request.POST.get('group_name', '')
+        group_type = request.POST.get('group_type', 'A')
+        users_selected = request.POST.getlist('users_selected', '')
+        comment = request.POST.get('comment', '')
+
+        try:
+            if not group_name:
+                error = u'组名不能为空'
+                raise AddError
+            group_db_add(name=group_name, comment=comment, type=group_type)
+            for user_id in users_selected:
+                group_add_user(group_name, user_id=user_id)
+
+        except AddError:
+            pass
+        except TypeError:
+            error = u'保存用户组失败'
+        else:
+            msg = u'添加组 %s 成功' % group_name
+
+    return render_to_response('juser/group_add.html', locals())
+
+
+def group_list(request):
+    header_title, path1, path2 = '查看属组 | Show Group', 'juser', 'group_list'
+    groups = contact_list = UserGroup.objects.filter(Q(type='M') | Q(type='A')).order_by('id')
+    p = paginator = Paginator(contact_list, 10)
+
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    try:
+        contacts = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        contacts = paginator.page(paginator.num_pages)
+    return render_to_response('juser/group_list.html', locals())
+
+
+def group_detail(request):
+    group_id = request.GET.get('id', None)
+    if not group_id:
+        return HttpResponseRedirect('/')
+    group = UserGroup.objects.get(id=group_id)
+    users = group.user_set.all()
+    return render_to_response('juser/group_detail.html', locals())
+
+
+def group_del(request):
+    group_id = request.GET.get('id', None)
+    if not group_id:
+        return HttpResponseRedirect('/')
+    group = UserGroup.objects.get(id=group_id)
+    group.delete()
+    return HttpResponseRedirect('/juser/group_list/', locals())
+
+
+def group_edit(request):
+    error = ''
+    msg = ''
+    header_title, path1, path2 = '修改属组 | Edit Group', 'juser', 'group_edit'
+    group_types = {
+        # 'P': '私有组',
+        'M': '管理组',
+        'A': '授权组',
+    }
+    if request.method == 'GET':
+        group_id = request.GET.get('id', None)
+        group = UserGroup.objects.get(id=group_id)
+        group_name = group.name
+        comment = group.comment
+        group_type = group.type
+        users_all = User.objects.all()
+        users_selected = group.user_set.all()
+        users = [user for user in users_all if user not in users_selected]
+
+        return render_to_response('juser/group_add.html', locals())
+    else:
+        group_id = request.POST.get('group_id', None)
+        group_name = request.POST.get('group_name', None)
+        comment = request.POST.get('comment', '')
+        users_selected = request.POST.getlist('users_selected')
+        group_type = request.POST.get('group_type')
+        group = UserGroup.objects.filter(id=group_id)
+        # return HttpResponse(group_type)
+        group.update(name=group_name, comment=comment, type=group_type)
+        group_update_user(group_id, users_selected)
+
+        return HttpResponseRedirect('/juser/group_list/')
+
+
+def user_list(request):
+    user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
+    header_title, path1, path2 = '查看用户 | Show User', 'juser', 'user_list'
+    users = contact_list = User.objects.all().order_by('id')
+    p = paginator = Paginator(contact_list, 10)
+
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    try:
+        contacts = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        contacts = paginator.page(paginator.num_pages)
+    return render_to_response('juser/user_list.html', locals())
+
+
+def user_detail(request):
+    user_id = request.GET.get('id', None)
+    if not user_id:
+        return HttpResponseRedirect('/')
+    user = User.objects.get(id=user_id)
+    return render_to_response('juser/user_detail.html', locals())
+
+
+def user_del(request):
+    user_id = request.GET.get('id', None)
+    if not user_id:
+        return HttpResponseRedirect('/')
+    user = User.objects.get(id=user_id)
+    user.delete()
+    group = UserGroup.objects.get(name=user.username)
+    group.delete()
+    server_del_user(user.username)
+    ldap_del_user(user.username)
+    return HttpResponseRedirect('/juser/user_list/', locals())
+
+
+def user_edit(request):
+    header_title, path1, path2 = '编辑用户 | Edit User', 'juser', 'user_edit'
+    readonly = "readonly"
+    if request.method == 'GET':
+        user_id = request.GET.get('id', None)
+        if not user_id:
+            return HttpResponseRedirect('/')
+        user = User.objects.get(id=user_id)
+        username = user.username
+        password = user.password
+        ssh_key_pwd = user.ssh_key_pwd
+        name = user.name
+        all_group = UserGroup.objects.filter(Q(type='M') | Q(type='A'))
+        groups = user.user_group.filter(Q(type='M') | Q(type='A'))
+        groups_str = ' '.join([str(group.id) for group in groups])
+        user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
+        role_post = user.role
+        ssh_pwd = user.ssh_pwd
+        email = user.email
+
+    else:
         username = request.POST.get('username', None)
         password = request.POST.get('password', None)
         name = request.POST.get('name', None)
@@ -428,12 +424,62 @@ def user_add(request):
         groups_str = ' '.join(groups)
         role_post = request.POST.get('role', None)
         ssh_pwd = request.POST.get('ssh_pwd', None)
-        ssh_key_pwd1 = request.POST.get('ssh_key_pwd1', None)
+        ssh_key_pwd = request.POST.get('ssh_key_pwd', None)
+        is_active = request.POST.get('is_active', '1')
+        ldap_pwd = gen_rand_pwd(16)
+        all_group = UserGroup.objects.filter(Q(type='M') | Q(type='A'))
+        user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
+
+        if username:
+            user = User.objects.get(username=username)
+        else:
+            return HttpResponseRedirect('/')
+
+        if password != user.password:
+            password = md5_crypt(password)
+
+        if ssh_pwd != user.ssh_pwd:
+            ssh_pwd = CRYPTOR.encrypt(ssh_pwd)
+
+        if ssh_key_pwd != user.ssh_key_pwd:
+            ssh_key_pwd = CRYPTOR.encrypt(ssh_key_pwd)
+
+        db_update_user(username=username,
+                       password=password,
+                       name=name,
+                       email=email,
+                       groups=groups,
+                       role=role_post,
+                       ssh_pwd=ssh_pwd,
+                       ssh_key_pwd=ssh_key_pwd)
+        msg = u'修改用户成功'
+
+        return HttpResponseRedirect('/juser/user_list/')
+
+    return render_to_response('juser/user_add.html', locals())
+
+
+def user_add(request):
+    error = ''
+    msg = ''
+    header_title, path1, path2 = '添加用户 | Add User', 'juser', 'user_add'
+    user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
+    all_group = UserGroup.objects.filter(Q(type='M') | Q(type='A')).order_by('-type')
+    if request.method == 'POST':
+        username = request.POST.get('username', None)
+        password = request.POST.get('password', '')
+        name = request.POST.get('name', None)
+        email = request.POST.get('email', '')
+        groups = request.POST.getlist('groups', None)
+        groups_str = ' '.join(groups)
+        role_post = request.POST.get('role', 'CU')
+        ssh_pwd = request.POST.get('ssh_pwd', '')
+        ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
         is_active = request.POST.get('is_active', '1')
         ldap_pwd = gen_rand_pwd(16)
 
         try:
-            if None in [username, password, ssh_key_pwd1, name, groups, role_post, is_active]:
+            if None in [username, password, ssh_key_pwd, name, groups, role_post, is_active]:
                 error = u'带*内容不能为空'
                 raise AddError
             user = User.objects.filter(username=username)
@@ -450,17 +496,18 @@ def user_add(request):
                             password=md5_crypt(password),
                             name=name, email=email,
                             groups=groups, role=role_post,
-                            ssh_pwd=CRYPTOR.encrypt(ssh_pwd),
-                            ssh_key_pwd1=CRYPTOR.encrypt(ssh_key_pwd1),
+                            ssh_pwd=CRYPTOR.encrypt(ssh_pwd) if ssh_pwd else '',
+                            ssh_key_pwd=CRYPTOR.encrypt(ssh_key_pwd),
                             ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
                             is_active=is_active,
                             date_joined=time_now)
 
-                server_add_user(username, password, ssh_key_pwd1)
+                server_add_user(username, password, ssh_key_pwd)
+                group_db_add(name=username, comment=username, type='P')
+                group_add_user(group_name=username, username=username)
                 if LDAP_ENABLE:
                     ldap_add_user(username, ldap_pwd)
                 msg = u'添加用户 %s 成功！' % username
-                # locals = lambda: {}
 
             except Exception, e:
                 error = u'添加用户 %s 失败 %s ' % (username, e)

@@ -7,28 +7,63 @@
 <script src="/static/js/mindmup-editabletable.js"></script>
 <script src="/static/js/base.js"></script>
 
-<!-- Peity -->
-<script src="/static/js/plugins/peity/jquery.peity.min.js"></script>
-
 <!-- Custom and plugin javascript -->
 <script src="/static/js/inspinia.js"></script>
 <script src="/static/js/plugins/pace/pace.min.js"></script>
 
-<!-- iCheck -->
+<!-- iCheck box -->
 <script src="/static/js/plugins/iCheck/icheck.min.js"></script>
+
+<!-- Peity -->
+<script src="/static/js/plugins/peity/jquery.peity.min.js"></script>
 
 <!-- Peity -->
 <script src="/static/js/demo/peity-demo.js"></script>
 
-<!--<script>-->
-        <!--$(document).ready(function(){-->
-            <!--$('.i-checks').iCheck({-->
-                <!--checkboxClass: 'icheckbox_square-green',-->
-                <!--radioClass: 'iradio_square-green',-->
-            <!--});-->
-        <!--});-->
+<script>
+    $(document).ready(function(){
+        $('.i-checks').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green'
+        });
+    });
 
-<!--</script>-->
+    function selectAll(){
+         var checklist = document.getElementsByName ("selected");
+            if(document.getElementById("select_all").checked)
+            {
+            for(var i=0;i<checklist.length;i++)
+            {
+              checklist[i].checked = 1;
+            }
+            }else{
+            for(var j=0;j<checklist.length;j++)
+            {
+             checklist[j].checked = 0;
+            }
+            }
+
+        }
+
+        function move(from, to) {
+        $("#"+from+" option").each(function(){
+          if ( $(this).prop("selected") == true ) {
+            $("#"+to).append(this);
+          }
+        });
+    }
+
+    function move_all(from, to){
+        $("#"+from).children().each(function(){
+        $("#"+to).append(this);
+        });
+    }
+
+
+</script>
+
+
+
 
 <!-- pop windows -->
 <script src="/static/js/jquery.colorbox.js"></script>

@@ -16,9 +16,6 @@
             <div class="contact-box">
                 <h2 class="text-center">{{ user.name }} 用户详情</h2>
                 <div class="ibox-content">
-                    <div class="">
-                    <a target="_blank" href="/juser/user_add/" class="btn btn-sm btn-primary "> 添加 </a>
-                    </div>
 
                     <table class="table table-striped table-bordered table-hover " id="editable" >
                         <thead>
@@ -46,7 +43,11 @@
                         </tr>
                         <tr class="gradeX">
                             <td class="text-center">属组</td>
-                            <td class="text-center">{{ user.username|groups_str }}</td>
+                            <td class="text-center">
+                                {% for group in user.user_group.all %}
+                                    {{ group.name }}
+                                {% endfor %}
+                            </td>
                         </tr>
                         <tr class="gradeX">
                             <td class="text-center">Email</td>
@@ -58,7 +59,7 @@
                         </tr>
                         <tr class="gradeX">
                             <td class="text-center">添加时间</td>
-                            <td class="text-center">{{ user.joined }}</td>
+                            <td class="text-center">{{ user.date_joined|stamp2str }}</td>
                         </tr>
                         <tr class="gradeX">
                             <td class="text-center">最后登录</td>

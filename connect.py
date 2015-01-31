@@ -26,6 +26,7 @@ django.setup()
 from juser.models import User
 from jasset.models import Asset
 from jlog.models import Log
+from jperm.views import perm_user_asset
 
 try:
     import termios
@@ -208,15 +209,10 @@ def posix_shell(chan, username, host):
 def get_user_host(username):
     """Get the hosts of under the user control."""
     hosts_attr = {}
-    try:
-        user = User.objects.get(username=username)
-    except ObjectDoesNotExist:
-        raise ServerError("Username \033[1;31m%s\033[0m doesn't exist on Jumpserver." % username)
-    else:
-        perm_all = user.permission_set.all()
-        for perm in perm_all:
-            hosts_attr[perm.asset.ip] = [perm.asset.id, perm.asset.comment]
-        return hosts_attr
+    asset_all = perm_user_asset(username=username)
+    for asset in asset_all:
+        hosts_attr[asset.ip] = [asset.id, asset.comment]
+    return hosts_attr
 
 
 def get_connect_item(username, ip):
@@ -235,34 +231,18 @@ def get_connect_item(username, ip):
 
     login_type_dict = {
         'L': user.ldap_pwd,
-        'S': user.ssh_key_pwd2,
         'P': user.ssh_pwd,
     }
 
     if asset.login_type in login_type_dict:
         password = cryptor.decrypt(login_type_dict[asset.login_type])
-
         return username, password, ip, port
 
     elif asset.login_type == 'M':
-        perms = asset.permission_set.filter(user=user)
-        if perms:
-            perm = perms[0]
-        else:
-            raise ServerError('Permission %s to %s does not exist.' % (username, ip))
+        username = asset.username
+        password = cryptor.decrypt(asset.password)
+        return username, password, ip, port
 
-        if perm.role == 'SU':
-            username_super = asset.username_super
-            password_super = cryptor.decrypt(asset.password_super)
-            return username_super, password_super, ip, port
-
-        elif perm.role == 'CU':
-            username_common = asset.username_common
-            password_common = asset.password_common
-            return username_common, password_common, ip, port
-
-        else:
-            raise ServerError('Perm in %s for %s map role is not in ["SU", "CU"].' % (ip, username))
     else:
         raise ServerError('Login type is not in ["L", "S", "P", "M"]')
 

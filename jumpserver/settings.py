@@ -49,7 +49,7 @@ INSTALLED_APPS = (
     'jumpserver',
     'juser',
     'jasset',
-    'jpermission',
+    'jperm',
     'jlog',
 )
 

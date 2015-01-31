@@ -1,7 +1,18 @@
 #coding: utf-8
+
+import hashlib
+
+from django.http import HttpResponse
+from django.shortcuts import render_to_response
+from django.http import HttpResponseRedirect
+
+from juser.models import User
 from connect import PyCrypt, KEY
 from jasset.models import Asset, BisGroup, IDC
-from django.shortcuts import render_to_response
+
+
+def md5_crypt(string):
+    return hashlib.new("md5", string).hexdigest()
 
 
 def base(request):
@@ -12,6 +23,7 @@ def skin_config(request):
     return render_to_response('skin_config.html')
 
 
+<<<<<<< HEAD
 def jasset_group_add(name, comment, type):
     if BisGroup.objects.filter(name=name):
         emg = u'该业务组已存在!'
@@ -52,3 +64,38 @@ def jasset_host_edit(j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment):
     a.save()
     a.bis_group = groups
     a.save()
+=======
+def login(request):
+    """登录界面"""
+    if request.session.get('username'):
+        return HttpResponseRedirect('/')
+    if request.method == 'GET':
+        return render_to_response('login.html')
+    else:
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = User.objects.filter(username=username)
+        if user:
+            user = user[0]
+            if md5_crypt(password) == user.password:
+                request.session['username'] = username
+                if user.role == 'SU':
+                    request.session['role'] = 2
+                elif user.role == 'GA':
+                    request.session['role'] = 1
+                else:
+                    request.session['role'] = 0
+                return HttpResponseRedirect('/')
+            else:
+                error = '密码错误，请重新输入。'
+        else:
+            error = '用户不存在。'
+    return render_to_response('login.html', {'error': error})
+
+
+def logout(request):
+    request.session.delete()
+    return HttpResponseRedirect('/login/')
+
+
+>>>>>>> guanghongwei

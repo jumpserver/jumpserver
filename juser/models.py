@@ -2,7 +2,14 @@ from django.db import models
 
 
 class UserGroup(models.Model):
+    GROUP_TYPE_CHOICES = (
+        ('P', 'PrivateGroup'),
+        ('M', 'ManageGroup'),
+        ('A', 'AuthorizeGroup'),
+    )
+
     name = models.CharField(max_length=80, unique=True)
+    type = models.CharField(max_length=1, choices=GROUP_TYPE_CHOICES, default='P')
     comment = models.CharField(max_length=160, blank=True, null=True)
 
     def __unicode__(self):
@@ -22,8 +29,7 @@ class User(models.Model):
     role = models.CharField(max_length=2, choices=USER_ROLE_CHOICES, default='CU')
     user_group = models.ManyToManyField(UserGroup)
     ldap_pwd = models.CharField(max_length=100)
-    ssh_key_pwd1 = models.CharField(max_length=100)
-    ssh_key_pwd2 = models.CharField(max_length=100)
+    ssh_key_pwd = models.CharField(max_length=100)
     ssh_pwd = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
     last_login = models.IntegerField(default=0)
