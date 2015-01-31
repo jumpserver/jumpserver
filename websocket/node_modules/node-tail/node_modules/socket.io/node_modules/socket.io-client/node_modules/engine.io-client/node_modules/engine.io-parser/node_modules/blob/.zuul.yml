@@ -1,8 +1,0 @@
-ui: mocha-bdd
-browsers:
-  - name: chrome
-    version: [8, latest]
-  - name: ie
-    version: 10
-  - name: android
-    version: latest
