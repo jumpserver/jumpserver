@@ -23,7 +23,6 @@ def skin_config(request):
     return render_to_response('skin_config.html')
 
 
-<<<<<<< HEAD
 def jasset_group_add(name, comment, type):
     if BisGroup.objects.filter(name=name):
         emg = u'该业务组已存在!'
@@ -64,7 +63,7 @@ def jasset_host_edit(j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment):
     a.save()
     a.bis_group = groups
     a.save()
-=======
+
 def login(request):
     """登录界面"""
     if request.session.get('username'):
@@ -96,6 +95,3 @@ def login(request):
 def logout(request):
     request.session.delete()
     return HttpResponseRedirect('/login/')
-
-
->>>>>>> guanghongwei
