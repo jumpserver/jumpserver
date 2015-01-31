@@ -36,3 +36,5 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+node_modules
+logs
