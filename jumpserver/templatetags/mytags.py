@@ -5,6 +5,7 @@ from django import template
 from django.db.models import Q
 from juser.models import User, UserGroup
 from jperm.views import perm_user_asset
+from jasset.models import BisGroup
 
 register = template.Library()
 
@@ -75,6 +76,15 @@ def group_type_to_str(type_name):
     }
     return group_types.get(type_name)
 
+
 @register.filter(name='perm_asset_count')
 def perm_asset_count(user_id):
     return len(perm_user_asset(user_id))
+
+
+@register.filter(name='filter_private')
+def filter_private(group):
+    agroup = []
+    p = BisGroup.objects.get(name='ALL')
+    [agroup.append(g) for g in group if g != p]
+    return agroup

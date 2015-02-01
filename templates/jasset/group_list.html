@@ -22,6 +22,7 @@
                             <tr>
                                 <th class="text-center"> ID </th>
                                 <th class="text-center"> 主机组名 </th>
+                                <th class="text-center"> 主机数量 </th>
                                 <th class="text-center"> 备注 </th>
                                 <th class="text-center"> 操作 </th>
                             </tr>
@@ -31,10 +32,10 @@
                             <tr class="gradeX">
                                 <td class="text-center"> {{ post.id }} </td>
                                 <td class="text-center"> {{ post.name }} </td>
+                                <td class="text-center"> <a href="/jasset/group_detail/{{ post.id }}">{{ post.asset_set.count }}</a> </td>
                                 <td class="text-center"> {{ post.comment }} </td>
                                 <td class="text-center">
-                                    <a href="/jasset/{{ post.ip }}/" class="iframe btn btn-xs btn-primary">详情</a>
-                                    <a href="/jasset/host_edit/{{ post.ip }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a href="/jasset/group_detail/{{ post.id }}" class="btn btn-xs btn-info">详情</a>
                                     <a href="/jasset/group_del/{{ post.id }}" class="btn btn-xs btn-danger">删除</a>
                                 </td>
                             </tr>

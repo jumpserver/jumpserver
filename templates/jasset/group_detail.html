@@ -8,7 +8,7 @@
         <div class="col-lg-12">
             <div class="ibox float-e-margins" id="all">
                 <div class="ibox-title">
-                    <h5> 主机详细信息列表 </h5>
+                    <h5> 主机组<span class="text-info">{{ group_name }}</span>详细信息列表 </h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -57,7 +57,7 @@
                                 <td class="text-center" name="j_port"> {{ post.port }} </td>
                                 <td class="text-center" name="j_type"> {{ login_types|get_item:post.login_type }} </td>
                                 <td class="text-center" name="j_idc"> {{ post.idc.name }} </td>
-                                <td class="text-center" name="j_group">{% for group in post.bis_group.all|filter_private %} {{ group }} {% endfor %}</td>
+                                <td class="text-center" name="j_group">{% for group in post.bis_group.all %} {{ group }} {% endfor %}</td>
                                 <td class="text-center" name="j_active"> {{ post.is_active|bool2str }} </td>
                                 <td class="text-center"> {{ post.date_added|date:"Y-m-d H:i:s" }} </td>
                                 <td class="text-center" name="j_comment"> {{ post.comment }} </td>
@@ -125,27 +125,27 @@
         }
     }
 
-        function del(form) {
-            var checkboxes = document.getElementById(form);
-            var id_list = {};
-            var j = 0;
-            for (var i = 0; i < checkboxes.elements.length; i++) {
-                if (checkboxes.elements[i].type == "checkbox" && checkboxes.elements[i].checked == true && checkboxes.elements[i].value != "checkall") {
-                    id_list[j] = checkboxes.elements[i].value;
-                    j++;
-                }
-            }
-            if (confirm("确定删除")) {
-                $.ajax({
-                    type: "POST",
-                    url: "/jasset/host_del/multi/",
-                    data: {"id_list": id_list, "len_list": j},
-                    success: function (data) {
-                        window.open("/jasset/host_list/", "_self");
-                    }
-                });
+    function del(form) {
+        var checkboxes = document.getElementById(form);
+        var id_list = {};
+        var j = 0;
+        for (var i = 0; i < checkboxes.elements.length; i++) {
+            if (checkboxes.elements[i].type == "checkbox" && checkboxes.elements[i].checked == true && checkboxes.elements[i].value != "checkall") {
+                id_list[j] = checkboxes.elements[i].value;
+                j++;
             }
         }
+        if (confirm("确定删除")) {
+            $.ajax({
+                type: "POST",
+                url: "/jasset/host_del/",
+                data: {"id_list": id_list, "len_list": j},
+                success: function (data) {
+                    window.open("/jasset/host_list/", "_self");
+                }
+            });
+        }
+    }
 </script>
 
 {% endblock %}
