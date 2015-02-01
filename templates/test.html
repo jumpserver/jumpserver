@@ -1,0 +1,74 @@
+
+<html>
+<head>
+	<meta charset='utf8'>
+<script src="http://cdn.bootcss.com/jquery/1.11.2/jquery.min.js"></script>
+<style type="text/css">
+
+	.blue
+	{
+		color: blue;
+	}
+</style>
+{#<script>#}
+{#$('html').ajaxSend(function(event, xhr, settings) {#}
+{#    function getCookie(name) {#}
+{#        var cookieValue = null;#}
+{#        if (document.cookie && document.cookie != '') {#}
+{#            var cookies = document.cookie.split(';');#}
+{#            for (var i = 0; i < cookies.length; i++) {#}
+{#                var cookie = jQuery.trim(cookies[i]);#}
+{#                // Does this cookie string begin with the name we want?#}
+{#                if (cookie.substring(0, name.length + 1) == (name + '=')) {#}
+{#                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));#}
+{#                    break;#}
+{#                }#}
+{#            }#}
+{#        }#}
+{#        return cookieValue;#}
+{#    }#}
+{#    if (!(/^http:.*/.test(settings.url) || /^https:.*/.test(settings.url))) {#}
+{#        // Only send the token to relative URLs i.e. locally.#}
+{#        xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));#}
+{#    }#}
+{#});#}
+{#</script>#}
+<script>
+$(document).ready(function(){
+  $("#btn1").click(function(){
+    $("#test").text(function(i,origText){
+    	return "Old text: " + origText + "New text: Hllo" + i
+    })
+  });
+
+  $("#btn2").click(function(){
+    $.post('/test_ajax/',
+          {'name': 'join', 'age': 10},
+          function(data, status){
+            $('#btn1').text(data)
+          })
+
+  });
+
+  $("#btn3").click(function(){
+  	$("p").toggleClass('blue')
+  	// $("p").addClass('blue')
+    // $("p").before("Some thine")
+  });
+})
+</script>
+</head>
+
+<body>
+<p id="test" class="blue">
+  这是段落中的<b>粗体</b>文本。
+  <p><span>hello</span></p>
+  
+</p>
+<!-- <input type="text" id="test2" name="nameaaaaaaaaaa" value="米老鼠"> -->
+<button id="btn1">显示文本</button>
+<button id="btn2">显示 HTML</button>
+<button id="btn3">显示 value</button>
+</body>
+
+</html>

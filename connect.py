@@ -259,6 +259,7 @@ def verify_connect(username, part_ip):
         color_print('No Permission or No host.', 'red')
     else:
         username, password, host, port = get_connect_item(username, ip_matched[0])
+        print username, password, host, port
         connect(username, password, host, port, LOGIN_NAME)
 
 

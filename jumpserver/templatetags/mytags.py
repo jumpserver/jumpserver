@@ -33,12 +33,22 @@ def get_role(user_id):
 def groups_str(username):
     groups = []
     user = User.objects.get(username=username)
-    for group in user.user_group.filter(Q(type='A') | Q(type='M')):
+    for group in user.user_group.filter(type='A'):
         groups.append(group.name)
     if len(groups) < 4:
         return ' '.join(groups)
     else:
         return "%s ..." % ' '.join(groups[0:3])
+
+
+@register.filter(name='group_manage_str')
+def group_manage_str(username):
+    user = User.objects.get(username=username)
+    group = user.user_group.filter(type='M')
+    if group:
+        return group[0].name
+    else:
+        return ''
 
 
 @register.filter(name='get_item')
@@ -70,8 +80,8 @@ def perm_count(group_id):
 def group_type_to_str(type_name):
     group_types = {
         'P': '私有组',
-        'M': '管理组',
-        'A': '授权组',
+        'M': '部门',
+        'A': '用户组',
     }
     return group_types.get(type_name)
 
