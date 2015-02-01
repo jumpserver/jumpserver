@@ -59,3 +59,35 @@ function GetTableDataBox() {
     return returnData;
 }
 
+
+function selectAll(){
+         var checklist = document.getElementsByName ("selected");
+            if(document.getElementById("select_all").checked)
+            {
+            for(var i=0;i<checklist.length;i++)
+            {
+              checklist[i].checked = 1;
+            }
+            }else{
+            for(var j=0;j<checklist.length;j++)
+            {
+             checklist[j].checked = 0;
+            }
+            }
+
+        }
+
+function move(from, to) {
+    $("#"+from+" option").each(function(){
+        if ( $(this).prop("selected") == true ) {
+            $("#"+to).append(this);
+            }
+    });
+}
+
+function move_all(from, to){
+    $("#"+from).children().each(function(){
+        $("#"+to).append(this);
+    });
+}
+
