@@ -13,12 +13,14 @@ from jlog.models import Log
 CONF = ConfigParser.ConfigParser()
 CONF.read('%s/jumpserver.conf' % BASE_DIR)
 
-def jlog_list(request):
+
+def jlog_list(request, offset='online'):
     header_title, path1, path2 = u'查看日志 | Log List.', u'查看日志', u'日志列表'
+    web_socket_host = CONF.get('websocket', 'web_socket_host')
     online = Log.objects.filter(is_finished=0)
     offline = Log.objects.filter(is_finished=1)
-    web_socket_host = CONF.get('websocket', 'web_socket_host')
-    return render_to_response('jlog/log_list.html',locals())
+
+    return render_to_response('jlog/log_list.html', locals())
 
 
 def jlog_kill(request, offset):
@@ -26,4 +28,4 @@ def jlog_kill(request, offset):
     if pid:
         os.kill(int(pid), 9)
         Log.objects.filter(pid=pid).update(is_finished=1, end_time=datetime.now())
-        return render_to_response('jlog/log_list.html', locals())
+        return HttpResponseRedirect('jlog/log_list.html', locals())

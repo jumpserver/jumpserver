@@ -35,17 +35,17 @@
                         <div class="alert alert-success text-center">{{ smg }}</div>
                     {% endif %}
                     <form id="assetForm" method="post" class="form-horizontal" autocomplete="off">
-                        <div class="form-group"><label class="col-sm-2 control-label"> IP地址 </label>
+                        <div class="form-group"><label class="col-sm-2 control-label"> IP地址<span class="red-fonts">*</span> </label>
                             <div class="col-sm-8"><input type="text" name="j_ip" value="{{ post.ip }}" placeholder="192.168.1.1" class="form-control"></div>
                         </div>
 
                         <div class="hr-line-dashed"></div>
-                        <div class="form-group"><label class="col-sm-2 control-label"> 端口号 </label>
+                        <div class="form-group"><label class="col-sm-2 control-label"> 端口号<span class="red-fonts">*</span> </label>
                             <div class="col-sm-8"><input type="text" placeholder="22" name="j_port" value="{{ post.port }}" class="form-control"></div>
                         </div>
 
                         <div class="hr-line-dashed"></div>
-                        <div class="form-group"><label class="col-sm-2 control-label"> 登录方式 </label>
+                        <div class="form-group"><label class="col-sm-2 control-label"> 登录方式<span class="red-fonts">*</span> </label>
                             <div class="col-sm-8">
                                 {% for t, type in login_types.items %}
                                     {% ifequal t post.login_type %}
@@ -61,27 +61,15 @@
                                     <div class="col-sm-6"><input type="text" name="j_user" placeholder="lilei" class="form-control"></div>
                                 </div>
 
-                                <div class="hr-line-dashed"></div>
                                 <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 普通用户密码 </label>
                                     <div class="col-sm-6"><input type="password" name="j_password" placeholder="Password" class="form-control"></div>
                                 </div>
-
-                                <div class="hr-line-dashed"></div>
-                                <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 超管用户名 </label>
-                                    <div class="col-sm-6"><input type="text" name="j_root" placeholder="root" class="form-control"></div>
-                                </div>
-
-                                <div class="hr-line-dashed"></div>
-                                <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 超管用户密码 </label>
-                                    <div class="col-sm-6"><input type="password" name="j_passwd" placeholder="Password" class="form-control"></div>
-                                </div>
-
                             </div>
                         </div>
 
                         <div class="hr-line-dashed"></div>
                         <div class="form-group">
-                            <label for="j_idc"  class="col-lg-2 control-label"> 所属IDC </label>
+                            <label for="j_idc"  class="col-lg-2 control-label"> 所属IDC<span class="red-fonts">*</span> </label>
                             <div class="col-sm-8">
                                 <select id="j_idc" name="j_idc" class="form-control m-b">
                                     {% for i in eidc %}
@@ -97,20 +85,22 @@
 
                         <div class="hr-line-dashed"></div>
                         <div class="form-group">
-                            <label for="j_group" class="col-sm-2 control-label"> 所属业务组 </label>
+                            <label for="j_group" class="col-lg-2 control-label"> 所属主机组<span class="red-fonts">*</span> </label>
                             <div class="col-sm-8">
-                                {% for g in egroup %}
-                                    {% if g in e_group %}
-                                        <label class="checkbox-inline"><input type="checkbox" id="j_group" checked value="{{ g }}" name="j_group"> {{ g }} </label>
-                                    {% else %}
-                                        <label class="checkbox-inline"><input type="checkbox" id="j_group" value="{{ g }}" name="j_group"> {{ g }} </label>
-                                    {% endif %}
-                                {% endfor %}
+                                <select id="j_group" name="j_group" class="form-control m-b" multiple size="10">
+                                    {% for g in egroup %}
+                                        {% if g in e_group %}
+                                            <option type="checkbox" value="{{ g.name }}" selected>{{ g.name }} --- {{ g.comment }}</option>
+                                        {% else %}
+                                            <option type="checkbox" value="{{ g.name }}" >{{ g.name }} --- {{ g.comment }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
                             </div>
                         </div>
 
                         <div class="hr-line-dashed"></div>
-                        <div class="form-group"><label class="col-sm-2 control-label"> 是否激活 </label>
+                        <div class="form-group"><label class="col-sm-2 control-label"> 是否激活<span class="red-fonts">*</span> </label>
                             <div class="col-sm-8">
                                 {% for a,active in actives.items %}
                                     {% ifequal a post.is_active %}

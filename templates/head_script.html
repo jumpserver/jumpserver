@@ -1,48 +1,54 @@
 <script src="/static/js/jquery-2.1.1.js"></script>
 <script src="/static/js/bootstrap.min.js"></script>
+<script src="/static/js/base.js"></script>
+<!--<script>-->
+    <!--$(document).ready(function(){-->
+        <!--$('.i-checks').iCheck({-->
+            <!--checkboxClass: 'icheckbox_square-green',-->
+            <!--radioClass: 'iradio_square-green'-->
+        <!--});-->
+    <!--});-->
 
-<script>
+    <!--function selectAll(){-->
+         <!--var checklist = document.getElementsByName ("selected");-->
+            <!--if(document.getElementById("select_all").checked)-->
+            <!--{-->
+            <!--for(var i=0;i<checklist.length;i++)-->
+            <!--{-->
+              <!--checklist[i].checked = 1;-->
+            <!--}-->
+            <!--}else{-->
+            <!--for(var j=0;j<checklist.length;j++)-->
+            <!--{-->
+             <!--checklist[j].checked = 0;-->
+            <!--}-->
+            <!--}-->
 
-    function selectAll(){
-         var checklist = document.getElementsByName ("selected");
-            if(document.getElementById("select_all").checked)
-            {
-            for(var i=0;i<checklist.length;i++)
-            {
-              checklist[i].checked = 1;
-            }
-            }else{
-            for(var j=0;j<checklist.length;j++)
-            {
-             checklist[j].checked = 0;
-            }
-            }
+        <!--}-->
 
-        }
+        <!--function move(from, to) {-->
+        <!--$("#"+from+" option").each(function(){-->
+          <!--if ( $(this).prop("selected") == true ) {-->
+            <!--$("#"+to).append(this);-->
+          <!--}-->
+        <!--});-->
+    <!--}-->
 
-        function move(from, to) {
-        $("#"+from+" option").each(function(){
-          if ( $(this).prop("selected") == true ) {
-            $("#"+to).append(this);
-          }
-        });
-    }
-
-    function move_all(from, to){
-        $("#"+from).children().each(function(){
-        $("#"+to).append(this);
-        });
-    }
+    <!--function move_all(from, to){-->
+        <!--$("#"+from).children().each(function(){-->
+        <!--$("#"+to).append(this);-->
+        <!--});-->
+    <!--}-->
 
 
 </script>
 
-<!-- validator js -->
-<script src="/static/js/validator/jquery.validator.js"></script>
-<script src="/static/js/validator/zh_CN.js"></script>
+
 
 
 <!-- pop windows -->
 <script src="/static/js/jquery.colorbox.js"></script>
 
-
+<!-- validator js -->
+<script src="/static/js/validator/jquery.validator.js"></script>
+<script src="/static/js/validator/zh_CN.js"></script>

@@ -4,13 +4,7 @@
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-lg-10">
-            <div class="text-center">
-                <span>请选择添加内容: </span>
-                <a href="#" class="btn btn-xs btn-primary" onclick='change("addhost")'>添加主机</a>
-                <a href="#" class="btn btn-xs btn-primary" onclick='change("addidc")'>添加IDC</a>
-                <a href="#" class="btn btn-xs btn-primary" onclick='change("addgroup")'>添加业务组</a>
-            </div>
-            <div id="add_asset" class="ibox float-e-margins">
+            <div class="ibox float-e-margins">
                 <div id="ibox-content" class="ibox-title">
                     <h5> 填写主机基本信息 </h5>
                     <div class="ibox-tools">
@@ -33,107 +27,112 @@
                 </div>
 
                 <div class="ibox-content">
-                    {% if emg %}
-                        <div class="alert alert-warning text-center">{{ emg }}</div>
-                    {% endif %}
-                    {% if smg %}
-                        <div class="alert alert-success text-center">{{ smg }}</div>
-                    {% endif %}
-                    <form id="assetForm" method="post" class="form-horizontal">
-                        <div class="form-group"><label class="col-sm-2 control-label"> IP地址 </label>
-                            <div class="col-sm-8"><input type="text" name="j_ip" placeholder="192.168.1.1" class="form-control"></div>
+                    <div class="panel blank-panel">
+                        <div class="panel-options">
+                            <ul class="nav nav-tabs">
+                                <li class="active"><a href="/jasset/host_add/" class="text-center"><i class="fa fa-laptop"></i> 单台添加 </a></li>
+                                <li><a href="/jasset/host_add_multi" class="text-center"><i class="fa fa-bar-chart-o"></i> 批量添加 </a></li>
+                            </ul>
                         </div>
+                        <div class="panel-body">
+                            <div class="tab-content">
+                                <div id="tab-1" class="ibox float-e-margins tab-pane active">
+                                    {% if emg %}
+                                        <div class="alert alert-warning text-center">{{ emg }}</div>
+                                    {% endif %}
+                                    {% if smg %}
+                                        <div class="alert alert-success text-center">{{ smg }}</div>
+                                    {% endif %}
+                                    <form id="assetForm" method="post" class="form-horizontal">
+                                        <div class="form-group"><label class="col-sm-2 control-label"> IP地址<span class="red-fonts">*</span> </label>
+                                            <div class="col-sm-8"><input type="text" name="j_ip" placeholder="192.168.1.1" class="form-control"></div>
+                                        </div>
 
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group"><label class="col-sm-2 control-label"> 端口号 </label>
-                            <div class="col-sm-8"><input type="text" placeholder="22" name="j_port" class="form-control"></div>
-                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group"><label class="col-sm-2 control-label"> 端口号<span class="red-fonts">*</span> </label>
+                                            <div class="col-sm-8"><input type="text" placeholder="22" name="j_port" class="form-control"></div>
+                                        </div>
 
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group"><label class="col-sm-2 control-label"> 登录方式 </label>
-                            <div class="col-sm-8">
-                                <div class="radio i-checks"><label> <input type="radio" id="L" checked="" value="L" name="j_type" onclick="show(this)"> <i> LDAP </i></label></div>
-                                <div class="radio i-checks"><label> <input type="radio" id="S" value="S" name="j_type" onclick="show(this)"> <i> SSH_KEY </i></label></div>
-                                <div class="radio i-checks"><label> <input type="radio" id="P" value="P" name="j_type" onclick="show(this)"> <i> PASSWORD </i></label></div>
-                                <div class="radio i-checks"><label> <input type="radio" id="M" value="M" name="j_type" onclick="show(this)"> <i> MAP </i></label></div>
-                            </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group"><label class="col-sm-2 control-label"> 登录方式<span class="red-fonts">*</span> </label>
+                                            <div class="col-sm-8">
+                                                <div class="radio i-checks"><label> <input type="radio" id="L" checked="" value="L" name="j_type" onclick="show(this)"> <i> LDAP </i></label></div>
+                                                <div class="radio i-checks"><label> <input type="radio" id="S" value="S" name="j_type" onclick="show(this)"> <i> SSH_KEY </i></label></div>
+                                                <div class="radio i-checks"><label> <input type="radio" id="P" value="P" name="j_type" onclick="show(this)"> <i> PASSWORD </i></label></div>
+                                                <div class="radio i-checks"><label> <input type="radio" id="M" value="M" name="j_type" onclick="show(this)"> <i> MAP </i></label></div>
+                                            </div>
 
-                            <div name="a1" id=a1 style="display:none;">
-                                <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 普通用户名 </label>
-                                    <div class="col-sm-6"><input type="text" name="j_user" placeholder="lilei" class="form-control"></div>
+                                            <div name="a1" id=a1 style="display:none;">
+                                                <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 普通用户名 </label>
+                                                    <div class="col-sm-6"><input type="text" name="j_user" placeholder="lilei" class="form-control"></div>
+                                                </div>
+
+                                                <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 普通用户密码 </label>
+                                                    <div class="col-sm-6"><input type="password" name="j_password" placeholder="Password" class="form-control"></div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label for="j_idc"  class="col-lg-2 control-label"> 所属IDC<span class="red-fonts">*</span> </label>
+                                            <div class="col-sm-8">
+                                                <select id="j_idc" name="j_idc" class="form-control m-b">
+                                                    {% for i in eidc %}
+                                                        <option> {{ i }} </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label for="j_group" class="col-lg-2 control-label">所属主机组<span class="red-fonts">*</span></label>
+                                            <div class="col-sm-8">
+                                                <select id="j_group" name="j_group" class="form-control m-b" multiple size="10">
+                                                    {% for g in egroup %}
+                                                        <option type="checkbox" value="{{ g.name }}">{{ g.name }} --- {{ g.comment }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label for="j_group" class="col-sm-2 control-label"> 所属用户组<span class="red-fonts">*</span> </label>
+                                            <div class="col-sm-8">
+                                                {% for g in eusergroup %}
+                                                    <label class="checkbox-inline"><input type="checkbox" id="j_usergroup" value="{{ g }}" name="j_usergroup"> {{ g }} </label>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group"><label class="col-sm-2 control-label"> 是否激活<span class="red-fonts">*</span> </label>
+                                            <div class="col-sm-8">
+                                                <div class="radio i-checks"><label> <input type="radio" checked="" value="1" name="j_active"> <i> 激活 </i></label></div>
+                                                <div class="radio i-checks"><label> <input type="radio"  value="0" name="j_active"> <i> 禁用 </i></label></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group"><label class="col-sm-2 control-label"> 备注 </label>
+                                            <div class="col-sm-8"><input type="text" placeholder="hadoop01" name="j_comment" class="form-control"></div>
+                                        </div>
+
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <div class="col-sm-4 col-sm-offset-5">
+                                                <button class="btn btn-white" type="submit"> 重置 </button>
+                                                <button class="btn btn-primary" type="submit"> 提交 </button>
+                                            </div>
+                                        </div>
+                                    </form>
                                 </div>
-
-                                <div class="hr-line-dashed"></div>
-                                <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 普通用户密码 </label>
-                                    <div class="col-sm-6"><input type="password" name="j_password" placeholder="Password" class="form-control"></div>
-                                </div>
-
-                                <div class="hr-line-dashed"></div>
-                                <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 超管用户名 </label>
-                                    <div class="col-sm-6"><input type="text" name="j_root" placeholder="root" class="form-control"></div>
-                                </div>
-
-                                <div class="hr-line-dashed"></div>
-                                <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 超管用户密码 </label>
-                                    <div class="col-sm-6"><input type="password" name="j_passwd" placeholder="Password" class="form-control"></div>
-                                </div>
-
                             </div>
                         </div>
-
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label for="j_idc"  class="col-lg-2 control-label"> 所属IDC </label>
-                            <div class="col-sm-8">
-                                <select id="j_idc" name="j_idc" class="form-control m-b">
-                                    {% for i in eidc %}
-                                        <option> {{ i }} </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label for="j_group" class="col-sm-2 control-label"> 所属业务组 </label>
-                            <div class="col-sm-8">
-                                {% for g in egroup %}
-                                    <label class="checkbox-inline"><input type="checkbox" id="j_group" value="{{ g }}" name="j_group"> {{ g }} </label>
-                                {% endfor %}
-                            </div>
-                        </div>
-
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <label for="j_group" class="col-sm-2 control-label"> 所属用户组 </label>
-                            <div class="col-sm-8">
-                                {% for g in eusergroup %}
-                                    <label class="checkbox-inline"><input type="checkbox" id="j_usergroup" value="{{ g }}" name="j_usergroup"> {{ g }} </label>
-                                {% endfor %}
-                            </div>
-                        </div>
-
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group"><label class="col-sm-2 control-label"> 是否激活 </label>
-                            <div class="col-sm-8">
-                                <div class="radio i-checks"><label> <input type="radio" checked="" value="1" name="j_active"> <i> 激活 </i></label></div>
-                                <div class="radio i-checks"><label> <input type="radio"  value="0" name="j_active"> <i> 禁用 </i></label></div>
-                            </div>
-                        </div>
-
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group"><label class="col-sm-2 control-label"> 备注 </label>
-                            <div class="col-sm-8"><input type="text" placeholder="hadoop01" name="j_comment" class="form-control"></div>
-                        </div>
-
-                        <div class="hr-line-dashed"></div>
-                        <div class="form-group">
-                            <div class="col-sm-4 col-sm-offset-5">
-                                <!--<button class="btn btn-white" type="submit"> 重置 </button>-->
-                                <button class="btn btn-primary" type="submit"> 提交 </button>
-                            </div>
-                        </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -150,17 +149,6 @@
     else{
         document.getElementById("a1").style.display="none";
     }};
-
-    function change(type){
-        if (type == 'addhost') {
-            var data = $('#add_asset');
-        } else if (type == 'addidc') {
-            var data = $('#addidc');
-        } else {
-            var data = $('addgroup');
-        }
-        $("#add_asset").html(data);
-    }
 
 $('#assetForm').validator({
     timely: 2,
