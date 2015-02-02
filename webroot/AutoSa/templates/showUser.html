@@ -49,4 +49,19 @@
     </table>
     <button class="btn btn-primary">删除</button>
     </form>
+    <nav>
+        <ul class="pager">
+        {% if users.has_previous %}
+        <li><a href="?page={{ users.previous_page_number }}">上一页</a></li>
+        {% endif %}
+        
+        <span class="current">
+         Page {{ users.number }} of {{ users.paginator.num_pages }}.
+        </span>
+        
+        {% if users.has_next %}
+        <li><a href="?page={{ users.next_page_number }}">下一页</a></li>
+        {% endif %}
+        </ul>
+    </nav>
 {% endblock %}
