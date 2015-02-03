@@ -42,8 +42,8 @@
                                 <th class="text-center"> 端口号 </th>
                                 <th class="text-center" name="j_type"> 登录方式 </th>
                                 <th class="text-center" name="j_idc"> 所属IDC </th>
-                                <th class="text-center"> 所属业务组 </th>
-                                 <th class="text-center"> 是否激活 </th>
+                                <th class="text-center" id="j_group_name" value="{{ group_name }}"> 所属业务组 </th>
+                                <th class="text-center"> 是否激活 </th>
                                 <th class="text-center" name="j_time"> 添加时间 </th>
                                 <th class="text-center" name="j_comment"> 备注 </th>
                                 <th class="text-center"> 操作 </th>
@@ -57,7 +57,7 @@
                                 <td class="text-center" name="j_port"> {{ post.port }} </td>
                                 <td class="text-center" name="j_type"> {{ login_types|get_item:post.login_type }} </td>
                                 <td class="text-center" name="j_idc"> {{ post.idc.name }} </td>
-                                <td class="text-center" name="j_group">{% for group in post.bis_group.all %} {{ group }} {% endfor %}</td>
+                                <td class="text-center" name="j_group">{% for group in post.bis_group.all|filter_private %} {{ group }} {% endfor %}</td>
                                 <td class="text-center" name="j_active"> {{ post.is_active|bool2str }} </td>
                                 <td class="text-center"> {{ post.date_added|date:"Y-m-d H:i:s" }} </td>
                                 <td class="text-center" name="j_comment"> {{ post.comment }} </td>
@@ -128,6 +128,8 @@
     function del(form) {
         var checkboxes = document.getElementById(form);
         var id_list = {};
+        var group_name = $('#j_group_name').attr("value");
+        console.log(group_name);
         var j = 0;
         for (var i = 0; i < checkboxes.elements.length; i++) {
             if (checkboxes.elements[i].type == "checkbox" && checkboxes.elements[i].checked == true && checkboxes.elements[i].value != "checkall") {
@@ -135,13 +137,13 @@
                 j++;
             }
         }
-        if (confirm("确定删除")) {
+        if (confirm("确定从主机组中删除")) {
             $.ajax({
                 type: "POST",
-                url: "/jasset/host_del/",
-                data: {"id_list": id_list, "len_list": j},
+                url: "/jasset/group_del_host/group/",
+                data: {"id_list": id_list, "len_list": j, "group_name": group_name},
                 success: function (data) {
-                    window.open("/jasset/host_list/", "_self");
+                    window.open(window.location.pathname, "_self");
                 }
             });
         }

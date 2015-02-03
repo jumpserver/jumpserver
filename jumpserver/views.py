@@ -32,7 +32,6 @@ def jasset_group_add(name, comment, type):
 
 
 def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment):
-    print 'ok'
     groups = []
     is_active = {u'是': '1', u'否': '2'}
     login_types = {'LDAP': 'L', 'SSH_KEY': 'S', 'PASSWORD': 'P', 'MAP': 'M'}
