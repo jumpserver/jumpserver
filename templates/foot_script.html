@@ -1,6 +1,6 @@
 <!-- Mainly scripts -->
-<script src="/static/js/jquery-2.1.1.js"></script>
-<script src="/static/js/bootstrap.min.js"></script>
+{#<script src="/static/js/jquery-2.1.1.js"></script>#}
+{#<script src="/static/js/bootstrap.min.js"></script>#}
 <script src="/static/js/plugins/metisMenu/jquery.metisMenu.js"></script>
 <script src="/static/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
 <script src="/static/js/bootstrap-dialog.js"></script>
@@ -21,7 +21,8 @@
 
 <script src="/static/js/base.js"></script>
 
-
+<!-- pop windows -->
+<script src="/static/js/jquery.colorbox.js"></script>
 
 <!-- active menu -->
 <script>
@@ -29,4 +30,10 @@
     var str1 = document.location.pathname.split("/")[2];
     $("#"+str).addClass('active');
     $("#"+str1).addClass('active');
+</script>
+
+<script>
+    $(document).ready(function(){
+        $(".iframe").colorbox({iframe:true, width:"70%", height:"80%"});
+    });
 </script>

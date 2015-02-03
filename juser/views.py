@@ -259,7 +259,6 @@ def group_add(request, group_type_select='A'):
     msg = ''
     header_title, path1, path2 = '添加属组 | Add Group', 'juser', 'group_add'
     group_types = {
-        # 'P': '私有组',
         'M': '部门',
         'A': '用户组',
     }
@@ -345,7 +344,6 @@ def group_edit(request):
     msg = ''
     header_title, path1, path2 = '修改属组 | Edit Group', 'juser', 'group_edit'
     group_types = {
-        # 'P': '私有组',
         'M': '部门',
         'A': '用户组',
     }
@@ -367,7 +365,6 @@ def group_edit(request):
         users_selected = request.POST.getlist('users_selected')
         group_type = request.POST.get('group_type')
         group = UserGroup.objects.filter(id=group_id)
-        # return HttpResponse(group_type)
         group.update(name=group_name, comment=comment, type=group_type)
         group_update_user(group_id, users_selected)
 

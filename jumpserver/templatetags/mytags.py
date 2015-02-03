@@ -80,7 +80,7 @@ def perm_count(group_id):
 @register.filter(name='group_type_to_str')
 def group_type_to_str(type_name):
     group_types = {
-        'P': '私有组',
+        'P': '用户',
         'M': '部门',
         'A': '用户组',
     }
