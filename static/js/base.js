@@ -59,3 +59,17 @@ function GetTableDataBox() {
     return returnData;
 }
 
+
+function move(from, to) {
+    $("#" + from + " option").each(function () {
+        if ($(this).prop("selected") == true) {
+            $("#" + to).append(this);
+        }
+    });
+}
+
+function move_all(from, to) {
+    $("#" + from).children().each(function () {
+        $("#" + to).append(this);
+    });
+}

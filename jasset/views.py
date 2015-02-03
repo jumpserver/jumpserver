@@ -163,7 +163,6 @@ def jlist_host(request):
 
 
 def host_del(request, offset):
-    print offset
     if offset == 'multi':
         len_list = request.POST.get("len_list")
         for i in range(int(len_list)):
@@ -197,13 +196,11 @@ def host_edit(request, offset):
         j_active = request.POST.get('j_active')
         j_comment = request.POST.get('j_comment')
         j_idc = IDC.objects.get(name=j_idc)
-        print j_group
         for group in j_group:
             c = BisGroup.objects.get(name=group)
             groups.append(c)
 
         a = Asset.objects.get(id=int(offset))
-
         if j_type == 'M':
             j_user = request.POST.get('j_user')
             j_password = cryptor.encrypt(request.POST.get('j_password'))
@@ -211,7 +208,7 @@ def host_edit(request, offset):
             a.port = j_port
             a.login_type = j_type
             a.idc = j_idc
-            a.is_active = j_active
+            a.is_active = int(j_active)
             a.comment = j_comment
             a.username = j_user
             a.password = j_password
@@ -220,7 +217,7 @@ def host_edit(request, offset):
             a.port = j_port
             a.idc = j_idc
             a.login_type = j_type
-            a.is_active = j_active
+            a.is_active = int(j_active)
             a.comment = j_comment
 
         a.save()
@@ -234,7 +231,6 @@ def host_edit(request, offset):
 
 def jlist_ip(request, offset):
     header_title, path1, path2 = u'主机详细信息 | Host Detail.', u'资产管理', u'主机详情'
-    print offset
     post = contact_list = Asset.objects.get(ip=str(offset))
     return render_to_response('jasset/jlist_ip.html', locals(), context_instance=RequestContext(request))
 
@@ -244,8 +240,6 @@ def jadd_idc(request):
     if request.method == 'POST':
         j_idc = request.POST.get('j_idc')
         j_comment = request.POST.get('j_comment')
-        print j_idc,j_comment
-
         if IDC.objects.filter(name=j_idc):
             emg = u'该IDC已存在!'
             return render_to_response('jasset/idc_add.html', locals(), context_instance=RequestContext(request))
@@ -269,16 +263,22 @@ def idc_del(request, offset):
 
 def jadd_group(request):
     header_title, path1, path2 = u'添加主机组 | Add Group', u'资产管理', u'添加主机组'
+    posts = Asset.objects.all()
     if request.method == 'POST':
         j_group = request.POST.get('j_group')
+        j_hosts = request.POST.getlist('j_hosts')
         j_comment = request.POST.get('j_comment')
 
         if BisGroup.objects.filter(name=j_group):
             emg = u'该主机组已存在!'
             return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
         else:
-            smg = u'主机组%s添加成功' %j_group
             BisGroup.objects.create(name=j_group, comment=j_comment, type='A')
+            group = BisGroup.objects.get(name=j_group)
+            for host in j_hosts:
+                g = Asset.objects.get(id=host)
+                group.asset_set.add(g)
+            smg = u'主机组%s添加成功' %j_group
 
     return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
 
@@ -287,6 +287,28 @@ def jlist_group(request):
     header_title, path1, path2 = u'查看主机组 | List Group', u'资产管理', u'查看主机组'
     posts = BisGroup.objects.filter(type='A').order_by('id')
     return render_to_response('jasset/group_list.html', locals(), context_instance=RequestContext(request))
+
+
+def group_edit(request, offset):
+    header_title, path1, path2 = u'编辑主机组 | Edit Group', u'资产管理', u'编辑主机组'
+    group = BisGroup.objects.get(id=offset)
+    all = Asset.objects.all()
+    eposts = contact_list = Asset.objects.filter(bis_group=group).order_by('ip')
+    posts = [g for g in all if g not in eposts]
+    if request.method == 'POST':
+        j_group = request.POST.get('j_group')
+        j_hosts = request.POST.getlist('j_hosts')
+        j_comment = request.POST.get('j_comment')
+
+        group = BisGroup.objects.get(name=j_group)
+        group.asset_set.clear()
+        for host in j_hosts:
+            g = Asset.objects.get(id=host)
+            group.asset_set.add(g)
+        smg = u'主机组%s修改成功' %j_group
+        return HttpResponseRedirect('/jasset/group_detail/%s' %offset)
+
+    return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
 
 
 def group_detail(request, offset):
@@ -325,6 +347,27 @@ def idc_detail(request, offset):
     except (EmptyPage, InvalidPage):
         contacts = paginator.page(paginator.num_pages)
     return render_to_response('jasset/idc_detail.html', locals(), context_instance=RequestContext(request))
+
+
+def group_del_host(request, offset):
+    if request.method == 'POST':
+        group_name = request.POST.get('group_name')
+        print group_name
+        if offset == 'group':
+            group = BisGroup.objects.get(name=group_name)
+        elif offset == 'idc':
+            group = IDC.objects.get(name=group_name)
+        len_list = request.POST.get("len_list")
+        for i in range(int(len_list)):
+            key = "id_list["+str(i)+"]"
+            print key
+            jid = request.POST.get(key)
+            print jid
+            g = Asset.objects.get(id=jid)
+            print g
+            group.asset_set.remove(g)
+            print 'ok'
+        return HttpResponseRedirect('/jasset/%s_detail/%s' %(offset, group.id))
 
 
 def group_del(request, offset):
