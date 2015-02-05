@@ -47,7 +47,8 @@ SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
 # The key of decryptor.
 KEY = CONF.get('web', 'key')
 # Login user.
-LOGIN_NAME = getpass.getuser()
+#LOGIN_NAME = getpass.getuser()
+LOGIN_NAME = 'halcyon'
 #LOGIN_NAME = os.getlogin()
 USER_KEY_FILE = os.path.join(SERVER_KEY_DIR, LOGIN_NAME)
 
@@ -259,6 +260,7 @@ def verify_connect(username, part_ip):
         color_print('No Permission or No host.', 'red')
     else:
         username, password, host, port = get_connect_item(username, ip_matched[0])
+        print username, password, host, port
         connect(username, password, host, port, LOGIN_NAME)
 
 

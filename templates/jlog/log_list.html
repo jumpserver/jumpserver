@@ -102,7 +102,7 @@
                                             <tr class="gradeX">
                                                 <td class="text-center"> {{ post.user.name }} </td>
                                                 <td class="text-center"> {{ post.asset.ip }} </td>
-                                                <td class="text-center"> 命令统计 </td>
+                                                <td class="text-center"> <a href="/logHistory/?id={{ log.id }}" class="log_command">命令统计</a></td>
                                                 <td class="text-center"> {{ post.start_time|date:"Y-m-d H:i:s"}} </td>
                                                 <td class="text-center"> {{ post.end_time|date:"Y-m-d H:i:s" }} </td>
                                             </tr>

@@ -28,7 +28,7 @@
 		maxHeight: false,
 		scalePhotos: true,
 		scrolling: true,
-		opacity: 0.9,
+		opacity: 0.3,
 		preloading: true,
 		className: false,
 		overlayClose: true,
@@ -418,7 +418,8 @@
 			$overlay.css({
 				opacity: opacity === opacity ? opacity : '',
 				cursor: settings.get('overlayClose') ? 'pointer' : '',
-				visibility: 'visible'
+				visibility: 'visible',
+//                'background-color': 'black'
 			}).show();
 			
 			if (settings.get('closeButton')) {

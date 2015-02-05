@@ -4,7 +4,6 @@
 
 import time
 import os
-import hashlib
 import random
 import subprocess
 import ldap
@@ -17,12 +16,14 @@ from django.shortcuts import render_to_response
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.http import HttpResponse
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 from juser.models import UserGroup, User
 from connect import PyCrypt, KEY
 from connect import BASE_DIR
 from connect import CONF
-from django.core.paginator import Paginator, EmptyPage, InvalidPage
+from jumpserver.views import md5_crypt
+
 
 CRYPTOR = PyCrypt(KEY)
 LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
@@ -253,16 +254,21 @@ def ldap_del_user(username):
     ldap_conn.delete(sudo_dn)
 
 
-def group_add(request):
+def group_add(request, group_type_select='A'):
     error = ''
     msg = ''
     header_title, path1, path2 = '添加属组 | Add Group', 'juser', 'group_add'
     group_types = {
-        # 'P': '私有组',
-        'M': '管理组',
-        'A': '授权组',
+        'M': '部门',
+        'A': '用户组',
     }
-    users = User.objects.all()
+
+    users_all = User.objects.all()
+    if group_type_select == 'M':
+        users = [user for user in users_all if not user.user_group.filter(type='M')]
+    else:
+        users = users_all
+
     if request.method == 'POST':
         group_name = request.POST.get('group_name', '')
         group_type = request.POST.get('group_type', 'A')
@@ -287,9 +293,20 @@ def group_add(request):
     return render_to_response('juser/group_add.html', locals())
 
 
+def group_add_ajax(request):
+    group_type = request.POST.get('type', 'A')
+    users_all = User.objects.all()
+    if group_type == 'A':
+        users = users_all
+    else:
+        users = [user for user in users_all if not user.user_group.filter(type='M')]
+
+    return render_to_response('juser/group_add_ajax.html', locals())
+
+
 def group_list(request):
     header_title, path1, path2 = '查看属组 | Show Group', 'juser', 'group_list'
-    groups = contact_list = UserGroup.objects.filter(Q(type='M') | Q(type='A')).order_by('id')
+    groups = contact_list = UserGroup.objects.filter(Q(type='M') | Q(type='A')).order_by('type')
     p = paginator = Paginator(contact_list, 10)
 
     try:
@@ -327,9 +344,8 @@ def group_edit(request):
     msg = ''
     header_title, path1, path2 = '修改属组 | Edit Group', 'juser', 'group_edit'
     group_types = {
-        # 'P': '私有组',
-        'M': '管理组',
-        'A': '授权组',
+        'M': '部门',
+        'A': '用户组',
     }
     if request.method == 'GET':
         group_id = request.GET.get('id', None)
@@ -341,7 +357,7 @@ def group_edit(request):
         users_selected = group.user_set.all()
         users = [user for user in users_all if user not in users_selected]
 
-        return render_to_response('juser/group_add.html', locals())
+        return render_to_response('juser/group_edit.html', locals())
     else:
         group_id = request.POST.get('group_id', None)
         group_name = request.POST.get('group_name', None)
@@ -349,7 +365,6 @@ def group_edit(request):
         users_selected = request.POST.getlist('users_selected')
         group_type = request.POST.get('group_type')
         group = UserGroup.objects.filter(id=group_id)
-        # return HttpResponse(group_type)
         group.update(name=group_name, comment=comment, type=group_type)
         group_update_user(group_id, users_selected)
 
@@ -407,9 +422,10 @@ def user_edit(request):
         password = user.password
         ssh_key_pwd = user.ssh_key_pwd
         name = user.name
-        all_group = UserGroup.objects.filter(Q(type='M') | Q(type='A'))
-        groups = user.user_group.filter(Q(type='M') | Q(type='A'))
-        groups_str = ' '.join([str(group.id) for group in groups])
+        manage_groups = UserGroup.objects.filter(type='M')
+        auth_groups = UserGroup.objects.filter(type='A')
+        manage_group_id = user.user_group.get(type='M').id
+        groups_str = ' '.join([str(group.id) for group in auth_groups])
         user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
         role_post = user.role
         ssh_pwd = user.ssh_pwd
@@ -420,8 +436,11 @@ def user_edit(request):
         password = request.POST.get('password', None)
         name = request.POST.get('name', None)
         email = request.POST.get('email', '')
-        groups = request.POST.getlist('groups', None)
-        groups_str = ' '.join(groups)
+        manage_group_id = request.POST.get('manage_group', '')
+        auth_groups = request.POST.getlist('groups', None)
+        groups = auth_groups
+        groups.append(manage_group_id)
+        groups_str = ' '.join(auth_groups)
         role_post = request.POST.get('role', None)
         ssh_pwd = request.POST.get('ssh_pwd', None)
         ssh_key_pwd = request.POST.get('ssh_key_pwd', None)
@@ -464,14 +483,18 @@ def user_add(request):
     msg = ''
     header_title, path1, path2 = '添加用户 | Add User', 'juser', 'user_add'
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
-    all_group = UserGroup.objects.filter(Q(type='M') | Q(type='A')).order_by('-type')
+    manage_groups = UserGroup.objects.filter(type='M')
+    auth_groups = UserGroup.objects.filter(type='A')
     if request.method == 'POST':
         username = request.POST.get('username', None)
         password = request.POST.get('password', '')
         name = request.POST.get('name', None)
         email = request.POST.get('email', '')
-        groups = request.POST.getlist('groups', None)
-        groups_str = ' '.join(groups)
+        manage_group_id = request.POST.get('manage_group')
+        auth_groups = request.POST.getlist('groups', None)
+        groups = auth_groups
+        groups.append(manage_group_id)
+        groups_str = ' '.join(auth_groups)
         role_post = request.POST.get('role', 'CU')
         ssh_pwd = request.POST.get('ssh_pwd', '')
         ssh_key_pwd = request.POST.get('ssh_key_pwd', '')

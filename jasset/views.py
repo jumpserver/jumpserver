@@ -16,10 +16,38 @@ def index(request):
     return render_to_response('jasset/jasset.html', )
 
 
-def jadd_host(request):
+def f_add_host(ip, port, idc, jtype, group, active, comment, username='', password=''):
+    groups = []
+    idc = IDC.objects.get(name=idc)
+    if type == 'M':
+        a = Asset(ip=ip, port=port,
+                  login_type=jtype, idc=idc,
+                  is_active=int(active),
+                  comment=comment,
+                  username=username,
+                  password=password)
+    else:
+        a = Asset(ip=ip, port=port,
+                  login_type=jtype, idc=idc,
+                  is_active=int(active),
+                  comment=comment)
+    a.save()
+
+    jasset_group_add(ip, ip, 'P')
+    all_group = BisGroup.objects.get(name='ALL')
+    private_group = BisGroup.objects.get(name=ip.strip())
+    for g in group:
+        c = BisGroup.objects.get(name=g)
+        groups.append(c)
+    groups.extend([all_group, private_group])
+
+    a.bis_group = groups
+    a.save()
+
+
+def add_host(request):
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
     header_title, path1, path2 = u'添加主机 | Add Host', u'资产管理', u'添加主机'
-    groups = []
     eidc = IDC.objects.all()
     egroup = BisGroup.objects.filter(type='A')
     eusergroup = UserGroup.objects.all()
@@ -32,13 +60,6 @@ def jadd_host(request):
         j_group = request.POST.getlist('j_group')
         j_active = request.POST.get('j_active')
         j_comment = request.POST.get('j_comment')
-        j_idc = IDC.objects.get(name=j_idc)
-
-        all_group = BisGroup.objects.get(name='ALL')
-        for group in j_group:
-            c = BisGroup.objects.get(name=group)
-            groups.append(c)
-        groups.append(all_group)
 
         if Asset.objects.filter(ip=str(j_ip)):
             emg = u'该IP %s 已存在!' %j_ip
@@ -47,47 +68,31 @@ def jadd_host(request):
         if j_type == 'M':
             j_user = request.POST.get('j_user')
             j_password = cryptor.encrypt(request.POST.get('j_password'))
-            a = Asset(ip=j_ip, port=j_port,
-                      login_type=j_type, idc=j_idc,
-                      is_active=int(j_active),
-                      comment=j_comment,
-                      username_common=j_user,
-                      password_common=j_password)
+            f_add_host(j_ip, j_port, j_idc, j_type, j_group, j_active, j_comment, j_user, j_password)
         else:
-            a = Asset(ip=j_ip, port=j_port,
-                      login_type=j_type, idc=j_idc,
-                      is_active=int(j_active),
-                      comment=j_comment)
-        jasset_group_add(j_ip, j_ip, 'P')
-        a.save()
-        a.bis_group = groups
-        a.save()
+            f_add_host(j_ip, j_port, j_idc, j_type, j_group, j_active, j_comment)
+
         smg = u'主机 %s 添加成功' %j_ip
 
     return render_to_response('jasset/host_add.html', locals(), context_instance=RequestContext(request))
 
 
-def jadd_host_multi(request):
+def add_host_multi(request):
     header_title, path1, path2 = u'批量添加主机 | Add Hosts', u'资产管理', u'批量添加主机'
     login_types = {'LDAP': 'L', 'SSH_KEY': 'S', 'PASSWORD': 'P', 'MAP': 'M'}
+    j_group = []
     if request.method == 'POST':
         multi_hosts = request.POST.get('j_multi').split('\n')
         for host in multi_hosts:
             if host == '':
                 break
-            groups = []
-            j_ip, j_port, j_type, j_idc, j_group, j_user_group, j_active, j_comment = host.split()
-            j_idc = IDC.objects.get(name=j_idc)
+            j_ip, j_port, j_type, j_idc, j_groups, j_user_group, j_active, j_comment = host.split()
             j_type = login_types[j_type]
-            all_group = BisGroup.objects.get(name='ALL')
-            j_group = j_group.split(',')
-            for group in j_group:
-                g = group.strip('[]')
-                print g
-                c = BisGroup.objects.get(name=g)
-                groups.append(c)
-            groups.append(all_group)
-
+            j_groups = j_groups.split(',')
+            for group in j_groups:
+                g = group.strip('[]').encode('utf-8').strip()
+                j_group.append(g)
+            print j_group,type(j_group)
             if Asset.objects.filter(ip=str(j_ip)):
                 emg = u'该IP %s 已存在!' %j_ip
                 return render_to_response('jasset/host_add_multi.html', locals(), context_instance=RequestContext(request))
@@ -95,23 +100,13 @@ def jadd_host_multi(request):
             if j_type == 'M':
                 j_user = request.POST.get('j_user')
                 j_password = cryptor.encrypt(request.POST.get('j_password'))
-                a = Asset(ip=j_ip, port=j_port,
-                          login_type=j_type, idc=j_idc,
-                          is_active=int(j_active),
-                          comment=j_comment,
-                          username_common=j_user,
-                          password_common=j_password)
+                f_add_host(j_ip, j_port, j_idc, j_type, j_group, j_active, j_comment, j_user, j_password)
             else:
-                a = Asset(ip=j_ip, port=j_port,
-                          login_type=j_type, idc=j_idc,
-                          is_active=int(j_active),
-                          comment=j_comment)
-            jasset_group_add(j_ip, j_ip, 'P')
-            a.save()
-            a.bis_group = groups
-            a.save()
+                f_add_host(j_ip, j_port, j_idc, j_type, j_group, j_active, j_comment)
+
         smg = u'批量添加添加成功'
         return HttpResponseRedirect('/jasset/host_list/')
+
     return render_to_response('jasset/host_add_multi.html', locals(), context_instance=RequestContext(request))
 
 
@@ -136,14 +131,13 @@ def batch_host_edit(request):
             j_group = request.POST.getlist(j_group)
             j_active = request.POST.get(j_active).strip()
             j_comment = request.POST.get(j_comment).strip()
-            print j_ip
 
             jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment)
 
         return render_to_response('jasset/host_list.html')
 
 
-def jlist_host(request):
+def list_host(request):
     header_title, path1, path2 = u'查看主机 | List Host', u'资产管理', u'查看主机'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
     posts = contact_list = Asset.objects.all().order_by('ip')
@@ -167,12 +161,14 @@ def host_del(request, offset):
         len_list = request.POST.get("len_list")
         for i in range(int(len_list)):
             key = "id_list["+str(i)+"]"
-            print key
             jid = request.POST.get(key)
-            print jid
+            a = Asset.objects.get(id=jid).ip
             Asset.objects.filter(id=jid).delete()
+            BisGroup.objects.filter(name=a).delete()
     else:
         jid = int(offset)
+        a = Asset.objects.get(id=jid).ip
+        BisGroup.objects.filter(name=a).delete()
         Asset.objects.filter(id=jid).delete()
     return HttpResponseRedirect('/jasset/host_list/')
 
@@ -235,7 +231,7 @@ def jlist_ip(request, offset):
     return render_to_response('jasset/jlist_ip.html', locals(), context_instance=RequestContext(request))
 
 
-def jadd_idc(request):
+def add_idc(request):
     header_title, path1, path2 = u'添加IDC | Add IDC', u'资产管理', u'添加IDC'
     if request.method == 'POST':
         j_idc = request.POST.get('j_idc')
@@ -250,18 +246,18 @@ def jadd_idc(request):
     return render_to_response('jasset/idc_add.html', locals(), context_instance=RequestContext(request))
 
 
-def jlist_idc(request):
+def list_idc(request):
     header_title, path1, path2 = u'查看IDC | List IDC', u'资产管理', u'查看IDC'
     posts = IDC.objects.all().order_by('id')
     return render_to_response('jasset/idc_list.html', locals(), context_instance=RequestContext(request))
 
 
-def idc_del(request, offset):
+def del_idc(request, offset):
     IDC.objects.filter(id=offset).delete()
     return HttpResponseRedirect('/jasset/idc_list/')
 
 
-def jadd_group(request):
+def add_group(request):
     header_title, path1, path2 = u'添加主机组 | Add Group', u'资产管理', u'添加主机组'
     posts = Asset.objects.all()
     if request.method == 'POST':
@@ -283,13 +279,13 @@ def jadd_group(request):
     return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
 
 
-def jlist_group(request):
+def list_group(request):
     header_title, path1, path2 = u'查看主机组 | List Group', u'资产管理', u'查看主机组'
     posts = BisGroup.objects.filter(type='A').order_by('id')
     return render_to_response('jasset/group_list.html', locals(), context_instance=RequestContext(request))
 
 
-def group_edit(request, offset):
+def edit_group(request, offset):
     header_title, path1, path2 = u'编辑主机组 | Edit Group', u'资产管理', u'编辑主机组'
     group = BisGroup.objects.get(id=offset)
     all = Asset.objects.all()
@@ -311,7 +307,7 @@ def group_edit(request, offset):
     return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
 
 
-def group_detail(request, offset):
+def detail_group(request, offset):
     header_title, path1, path2 = u'主机组详情 | Group Detail', u'资产管理', u'主机组详情'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
     group_name = BisGroup.objects.get(id=offset).name
@@ -330,7 +326,7 @@ def group_detail(request, offset):
     return render_to_response('jasset/group_detail.html', locals(), context_instance=RequestContext(request))
 
 
-def idc_detail(request, offset):
+def detail_idc(request, offset):
     header_title, path1, path2 = u'主机组详情 | Group Detail', u'资产管理', u'主机组详情'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
     idc_name = IDC.objects.get(id=offset).name

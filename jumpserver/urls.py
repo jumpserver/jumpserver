@@ -14,4 +14,5 @@ urlpatterns = patterns('',
     (r'^jasset/', include('jasset.urls')),
     (r'^jlog/', include('jlog.urls')),
     (r'^jperm/', include('jperm.urls')),
+
 )

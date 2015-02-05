@@ -65,6 +65,41 @@ def perm_list(request):
     return render_to_response('jperm/perm_list.html', locals())
 
 
+def perm_list_ajax(request):
+    tab = request.POST.get('tab', 'tab1')
+    search = request.POST.get('search', '')
+
+    if tab == 'tab1':
+        groups = contact_list = UserGroup.objects.filter(name__icontains=search).order_by('type')
+        p = paginator = Paginator(contact_list, 10)
+
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+
+        try:
+            contacts = paginator.page(page)
+        except (EmptyPage, InvalidPage):
+            contacts = paginator.page(paginator.num_pages)
+
+    else:
+        users = contact_list2 = User.objects.filter(name__icontains=search).order_by('id')
+        p2 = paginator2 = Paginator(contact_list2, 10)
+
+        try:
+            page = int(request.GET.get('page', '1'))
+        except ValueError:
+            page = 1
+
+        try:
+            contacts2 = paginator2.page(page)
+        except (EmptyPage, InvalidPage):
+            contacts2 = paginator2.page(paginator2.num_pages)
+
+    return render_to_response('jperm/perm_list_ajax.html', locals())
+
+
 def perm_edit(request):
     if request.method == 'GET':
         header_title, path1, path2 = u'编辑授权 | Perm Host Edit.', u'jperm', u'perm_edit'

@@ -42,7 +42,8 @@
                                 <th class="text-center">ID</th>
                                 <th class="text-center">用户名</th>
                                 <th class="text-center">姓名</th>
-                                <th class="text-center">属组</th>
+                                <th class="text-center">部门</th>
+                                <th class="text-center">用户组</th>
                                 <th class="text-center">角色</th>
                                 <th class="text-center">激活</th>
                                 <th class="text-center">操作</th>
@@ -57,11 +58,12 @@
                                 <td class="text-center"> {{ user.id }} </td>
                                 <td class="text-center"> {{ user.username }} </td>
                                 <td class="text-center"> {{ user.name }} </td>
+                                <td class="text-center"> {{ user.username|group_manage_str }} </td>
                                 <td class="text-center"> {{ user.username|groups_str }}</td>
                                 <td class="text-center">{{ user.id|get_role }}</td>
                                 <td class="text-center">{{ user.is_active|bool2str }}</td>
                                 <td class="text-center">
-                                    <a href="../user_detail/?id={{ user.id }}" class="iframe btn btn-xs btn-primary">详情</a>
+                                    <a title="[ {{ user.name }} ] 详情" href="../user_detail/?id={{ user.id }}" class="iframe btn btn-xs btn-primary">详情</a>
                                     <a href="../user_edit/?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a href="../user_del/?id={{ user.id }}" class="btn btn-xs btn-danger">删除</a>
                                 </td>
@@ -113,10 +115,5 @@
     </div>
 </div>
 
-<script>
-    $(document).ready(function(){
-        $(".iframe").colorbox({iframe:true, width:"70%", height:"70%"});
-    });
-</script>
 
 {% endblock %}
