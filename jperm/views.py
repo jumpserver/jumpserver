@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 from juser.models import User, UserGroup
 from jasset.models import Asset, BisGroup
-from jperm.models import Perm
+from jperm.models import Perm, SudoPerm
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 
@@ -135,5 +135,25 @@ def perm_asset_detail(request):
     user = User.objects.get(id=user_id)
     assets = perm_user_asset(user_id)
     return render_to_response('jperm/perm_asset_detail.html', locals())
+
+
+def sudo_list(request):
+    header_title, path1, path2 = u'Sudo授权 | Perm Sudo Detail.', u'jperm', u'sudo_list'
+    sudo_perms = contact_list = SudoPerm.objects.all()
+    users = contact_list2 = User.objects.all().order_by('id')
+    p = paginator = Paginator(contact_list, 10)
+    p2 = paginator2 = Paginator(contact_list2, 10)
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    try:
+        contacts = paginator.page(page)
+        contacts2 = paginator2.page(page)
+    except (EmptyPage, InvalidPage):
+        contacts = paginator.page(paginator.num_pages)
+        contacts2 = paginator2.page(paginator2.num_pages)
+    return render_to_response('jperm/sudo_list.html', locals())
 
 
