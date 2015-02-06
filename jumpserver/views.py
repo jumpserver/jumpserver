@@ -1,6 +1,8 @@
 #coding: utf-8
 
 import hashlib
+import ldap
+from ldap import modlist
 
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
@@ -98,4 +100,54 @@ def login(request):
 def logout(request):
     request.session.delete()
     return HttpResponseRedirect('/login/')
+
+
+class LDAPMgmt():
+    def __init__(self,
+                 host_url,
+                 base_dn,
+                 root_cn,
+                 root_pw):
+        self.ldap_host = host_url
+        self.ldap_base_dn = base_dn
+        self.conn = ldap.initialize(host_url)
+        self.conn.set_option(ldap.OPT_REFERRALS, 0)
+        self.conn.protocol_version = ldap.VERSION3
+        self.conn.simple_bind_s(root_cn, root_pw)
+
+    def list(self, filter, scope=ldap.SCOPE_SUBTREE, attr=None):
+        result = {}
+        try:
+            ldap_result = self.conn.search_s(self.ldap_base_dn, scope, filter, attr)
+            for entry in ldap_result:
+                name, data = entry
+                for k, v in data.items():
+                    print '%s: %s' % (k, v)
+                    result[k] = v
+            return result
+        except ldap.LDAPError, e:
+            print e
+
+    def add(self, dn, attrs):
+        try:
+            ldif = modlist.addModlist(attrs)
+            self.conn.add_s(dn, ldif)
+        except ldap.LDAPError, e:
+            print e
+
+    def modify(self, dn, attrs):
+        try:
+            attr_s = []
+            for k, v in attrs.items():
+                attr_s.append((2, k, v))
+            self.conn.modify_s(dn, attr_s)
+        except ldap.LDAPError, e:
+            print e
+
+    def delete(self, dn):
+        try:
+            self.conn.delete_s(dn)
+        except ldap.LDAPError, e:
+            print e
+
 
