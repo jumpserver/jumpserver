@@ -1,13 +1,15 @@
 # coding:utf-8
+
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from django.core.paginator import Paginator, EmptyPage
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 from models import IDC, Asset, BisGroup
 from juser.models import UserGroup
 from connect import PyCrypt, KEY
-from jumpserver.views import jasset_group_add, jasset_host_edit
+from jumpserver.views import jasset_group_add, jasset_host_edit, pages
 
 cryptor = PyCrypt(KEY)
 
@@ -86,13 +88,13 @@ def add_host_multi(request):
         for host in multi_hosts:
             if host == '':
                 break
-            j_ip, j_port, j_type, j_idc, j_groups, j_user_group, j_active, j_comment = host.split()
+            j_ip, j_port, j_type, j_idc, j_groups, j_active, j_comment = host.split()
             j_type = login_types[j_type]
             j_groups = j_groups.split(',')
             for group in j_groups:
                 g = group.strip('[]').encode('utf-8').strip()
                 j_group.append(g)
-            print j_group,type(j_group)
+
             if Asset.objects.filter(ip=str(j_ip)):
                 emg = u'该IP %s 已存在!' %j_ip
                 return render_to_response('jasset/host_add_multi.html', locals(), context_instance=RequestContext(request))
@@ -141,7 +143,6 @@ def list_host(request):
     header_title, path1, path2 = u'查看主机 | List Host', u'资产管理', u'查看主机'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
     posts = contact_list = Asset.objects.all().order_by('ip')
-    print posts
     p = paginator = Paginator(contact_list, 20)
     try:
         page = int(request.GET.get('page', '1'))
@@ -285,9 +286,10 @@ def list_group(request):
     return render_to_response('jasset/group_list.html', locals(), context_instance=RequestContext(request))
 
 
-def edit_group(request, offset):
+def edit_group(request):
     header_title, path1, path2 = u'编辑主机组 | Edit Group', u'资产管理', u'编辑主机组'
-    group = BisGroup.objects.get(id=offset)
+    group_id = request.GET.get('id')
+    group = BisGroup.objects.get(id=group_id)
     all = Asset.objects.all()
     eposts = contact_list = Asset.objects.filter(bis_group=group).order_by('ip')
     posts = [g for g in all if g not in eposts]
@@ -296,13 +298,13 @@ def edit_group(request, offset):
         j_hosts = request.POST.getlist('j_hosts')
         j_comment = request.POST.get('j_comment')
 
-        group = BisGroup.objects.get(name=j_group)
         group.asset_set.clear()
         for host in j_hosts:
             g = Asset.objects.get(id=host)
             group.asset_set.add(g)
+        BisGroup.objects.filter(id=group_id).update(name=j_group, comment=j_comment)
         smg = u'主机组%s修改成功' %j_group
-        return HttpResponseRedirect('/jasset/group_detail/%s' %offset)
+        return HttpResponseRedirect('/jasset/group_detail/%s' % group_id)
 
     return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
 
@@ -369,6 +371,18 @@ def group_del_host(request, offset):
 def group_del(request, offset):
     BisGroup.objects.filter(id=offset).delete()
     return HttpResponseRedirect('/jasset/group_list/')
+
+
+def host_search(request):
+    keyword = request.GET.get('keyword')
+    login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
+    posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
+                                 Q(bis_group__name__contains=keyword) | Q(comment__contains=keyword)).distinct().order_by('ip')
+    print posts
+    contact_list, p, contacts = pages(posts, request)
+    print contact_list, p, contacts
+
+    return render_to_response('jasset/host_search.html', locals(), context_instance=RequestContext(request))
 
 
 def test(request):

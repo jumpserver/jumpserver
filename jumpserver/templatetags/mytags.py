@@ -101,5 +101,9 @@ def filter_private(group):
     for g in group:
         if not pattern.match(g.name):
             agroup.append(g)
-    agroup.remove(p)
+    try:
+        agroup.remove(p)
+    except ValueError:
+        pass
+
     return agroup

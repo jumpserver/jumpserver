@@ -29,8 +29,19 @@
                 </div>
 
                 <div class="ibox-content">
-                    <div class="">
-                    <a target="_blank" href="/jasset/host_add" class="btn btn-sm btn-primary "> 添加 </a>
+                    <div>
+                        <a target="_blank" href="/jasset/host_add" class="btn btn-sm btn-primary "> 添加 </a>
+                        <form id="search_form" method="get" action="" class="pull-right mail-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
+                                <input type="text" style="display: none">
+                                <div class="input-group-btn">
+                                    <button id='search_btn' type="button" class="btn btn-sm btn-primary" onclick="host_search()">
+                                        Search
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
                     </div>
 
                     <form id="contents_form" name="contents_form">
@@ -125,27 +136,46 @@
         }
     }
 
-        function del(form) {
-            var checkboxes = document.getElementById(form);
-            var id_list = {};
-            var j = 0;
-            for (var i = 0; i < checkboxes.elements.length; i++) {
-                if (checkboxes.elements[i].type == "checkbox" && checkboxes.elements[i].checked == true && checkboxes.elements[i].value != "checkall") {
-                    id_list[j] = checkboxes.elements[i].value;
-                    j++;
-                }
-            }
-            if (confirm("确定删除")) {
-                $.ajax({
-                    type: "POST",
-                    url: "/jasset/host_del/multi/",
-                    data: {"id_list": id_list, "len_list": j},
-                    success: function (data) {
-                        window.open("/jasset/host_list/", "_self");
-                    }
-                });
+    function del(form) {
+        var checkboxes = document.getElementById(form);
+        var id_list = {};
+        var j = 0;
+        for (var i = 0; i < checkboxes.elements.length; i++) {
+            if (checkboxes.elements[i].type == "checkbox" && checkboxes.elements[i].checked == true && checkboxes.elements[i].value != "checkall") {
+                id_list[j] = checkboxes.elements[i].value;
+                j++;
             }
         }
+        if (confirm("确定删除")) {
+            $.ajax({
+                type: "POST",
+                url: "/jasset/host_del/multi/",
+                data: {"id_list": id_list, "len_list": j},
+                success: function (data) {
+                    window.open("/jasset/host_list/", "_self");
+                }
+            });
+        }
+    }
+
+    function host_search(){
+        $.ajax({
+            type: "GET",
+            url: "/jasset/search/",
+            data: $("#search_form").serialize(),
+            success: function (data) {
+                $("#contents_form").html(data);
+            }
+        });
+    }
+
+    $("#search_input").keydown(function(e){
+        if(e.keyCode==13){
+            host_search()
+            }
+    })
+
+
 </script>
 
 {% endblock %}

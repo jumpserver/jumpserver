@@ -2,12 +2,11 @@
 
 import hashlib
 
-from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 from juser.models import User
-from connect import PyCrypt, KEY
 from jasset.models import Asset, BisGroup, IDC
 
 
@@ -45,7 +44,6 @@ def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_com
     print j_idc
     print
     a = Asset.objects.get(id=j_id)
-    print '123'
     if j_type == 'M':
         a.ip = j_ip
         a.port = j_port
@@ -65,6 +63,22 @@ def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_com
     a.save()
     a.bis_group = groups
     a.save()
+
+
+def pages(posts, r):
+    contact_list = posts
+    p = paginator = Paginator(contact_list, 10)
+    try:
+        page = int(r.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    try:
+        contacts = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        contacts = paginator.page(paginator.num_pages)
+
+    return contact_list, p, contacts
 
 
 def login(request):
