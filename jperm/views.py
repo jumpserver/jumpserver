@@ -163,28 +163,41 @@ def user_asset_cmd_groups_get(user_groups_select, asset_groups_select, cmd_group
     return user_groups_select_list, asset_groups_select_list, cmd_groups_select_list
 
 
-def sudo_db_add(user_groups_select, asset_groups_select, cmd_groups_select, comment):
+def sudo_db_add(name, user_runas , user_groups_select, asset_groups_select, cmd_groups_select, comment):
     user_groups_select_list, asset_groups_select_list, cmd_groups_select_list = \
         user_asset_cmd_groups_get(user_groups_select, asset_groups_select, cmd_groups_select)
 
-    sudo_perm = SudoPerm(comment=comment)
+    sudo_perm = SudoPerm(name=name, user_runas=user_runas, comment=comment)
     sudo_perm.save()
     sudo_perm.user_group = user_groups_select_list
     sudo_perm.asset_group = asset_groups_select_list
     sudo_perm.cmd_group = cmd_groups_select_list
 
 
+def sudo_db_update(sudo_perm_id, name, user_runas, user_groups_select, asset_groups_select, cmd_groups_select, comment):
+    user_groups_select_list, asset_groups_select_list, cmd_groups_select_list = \
+        user_asset_cmd_groups_get(user_groups_select, asset_groups_select, cmd_groups_select)
+    sudo_perm = SudoPerm.objects.filter(id=sudo_perm_id)
+    if sudo_perm:
+        sudo_perm.update(name=name, user_runas=user_runas, comment=comment)
+        sudo_perm = sudo_perm[0]
+        sudo_perm.user_group = user_groups_select_list
+        sudo_perm.asset_group = asset_groups_select_list
+        sudo_perm.cmd_group = cmd_groups_select_list
+
+
 def unicode2str(unicode_list):
     return [str(i) for i in unicode_list]
 
 
-def sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select, cmd_groups_select):
+def sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select, cmd_groups_select, update=False):
     user_groups_select_list, asset_groups_select_list, cmd_groups_select_list = \
         user_asset_cmd_groups_get(user_groups_select, asset_groups_select, cmd_groups_select)
 
     users = []
     assets = []
     cmds = []
+    users_runas = users_runas.split(',')
 
     for user_group in user_groups_select_list:
         users.extend(user_group.user_set.all())
@@ -195,7 +208,7 @@ def sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select, cm
     for cmd_group in cmd_groups_select_list:
         cmds.extend(cmd_group.cmd.split(','))
 
-    users_name = [user.name for user in users]
+    users_name = [user.username for user in users]
     assets_ip = [asset.ip for asset in assets]
 
     sudo_dn = 'cn=%s,ou=Sudoers,%s' % (name, LDAP_BASE_DN)
@@ -206,6 +219,9 @@ def sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select, cm
                  'sudoOption': ['!authenticate'],
                  'sudoRunAsUser': unicode2str(users_runas),
                  'sudoUser': unicode2str(users_name)}
+
+    if update:
+        ldap_conn.delete(sudo_dn)
 
     ldap_conn.add(sudo_dn, sudo_attr)
 
@@ -218,13 +234,13 @@ def sudo_add(request):
 
     if request.method == 'POST':
         name = request.POST.get('name')
-        users_runas = request.POST.get('runas', 'root').split(',')
+        users_runas = request.POST.get('runas', 'root')
         user_groups_select = request.POST.getlist('user_groups_select')
         asset_groups_select = request.POST.getlist('asset_groups_select')
         cmd_groups_select = request.POST.getlist('cmd_groups_select')
         comment = request.POST.get('comment', '')
 
-        sudo_db_add(user_groups_select, asset_groups_select, cmd_groups_select, comment)
+        sudo_db_add(name, users_runas, user_groups_select, asset_groups_select, cmd_groups_select, comment)
         sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select, cmd_groups_select)
 
         msg = '添加成功'
@@ -233,21 +249,99 @@ def sudo_add(request):
 
 def sudo_list(request):
     header_title, path1, path2 = u'Sudo授权 | Perm Sudo Detail.', u'jperm', u'sudo_list'
-    sudo_perms = contact_list2 = SudoPerm.objects.all()
-    p2 = paginator2 = Paginator(contact_list2, 10)
+    sudo_perms = contact_list = SudoPerm.objects.all()
+    p1 = paginator1 = Paginator(contact_list, 10)
     user_groups = UserGroup.objects.filter(Q(type='A') | Q(type='P'))
     asset_groups = BisGroup.objects.all()
     cmd_groups = CmdGroup.objects.all()
-    try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
 
     try:
-        contacts2 = paginator2.page(page)
+        page1 = int(request.GET.get('page', '1'))
+    except ValueError:
+        page1 = 1
+
+    try:
+        contacts1 = paginator1.page(page1)
     except (EmptyPage, InvalidPage):
-        contacts2 = paginator2.page(paginator2.num_pages)
+        contacts1 = paginator1.page(paginator1.num_pages)
     return render_to_response('jperm/sudo_list.html', locals())
+
+
+def sudo_edit(request):
+    header_title, path1, path2 = u'Sudo授权 | Perm Sudo Detail.', u'jperm', u'sudo_list'
+
+    if request.method == 'GET':
+        sudo_perm_id = request.GET.get('id', '0')
+        sudo_perm = SudoPerm.objects.filter(id=int(sudo_perm_id))
+        if sudo_perm:
+            user_group_all = UserGroup.objects.filter(Q(type='A') | Q(type='P'))
+            asset_group_all = BisGroup.objects.filter()
+            cmd_group_all = CmdGroup.objects.all()
+
+            sudo_perm = sudo_perm[0]
+            user_group_permed = sudo_perm.user_group.all()
+            asset_group_permed = sudo_perm.asset_group.all()
+            cmd_group_permed = sudo_perm.cmd_group.all()
+
+            user_groups = [user_group for user_group in user_group_all if user_group not in user_group_permed]
+            asset_groups = [asset_group for asset_group in asset_group_all if asset_group not in asset_group_permed]
+            cmd_groups = [cmd_group for cmd_group in cmd_group_all if cmd_group not in cmd_group_permed]
+
+            name = sudo_perm.name
+            user_runas = sudo_perm.user_runas
+            comment = sudo_perm.comment
+
+    else:
+        sudo_perm_id = request.POST.get('sudo_perm_id')
+        name = request.POST.get('name')
+        users_runas = request.POST.get('runas', 'root')
+        user_groups_select = request.POST.getlist('user_groups_select')
+        asset_groups_select = request.POST.getlist('asset_groups_select')
+        cmd_groups_select = request.POST.getlist('cmd_groups_select')
+        comment = request.POST.get('comment', '')
+
+        sudo_db_update(sudo_perm_id, name, users_runas, user_groups_select,
+                       asset_groups_select, cmd_groups_select, comment)
+        sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select, cmd_groups_select, update=True)
+        msg = '修改成功'
+
+        return HttpResponseRedirect('/jperm/sudo_list/')
+
+    return render_to_response('jperm/sudo_edit.html', locals())
+
+
+def sudo_detail(request):
+    sudo_perm_id = request.GET.get('id')
+    sudo_perm = SudoPerm.objects.filter(id=sudo_perm_id)
+    if sudo_perm:
+        sudo_perm = sudo_perm[0]
+        user_groups = sudo_perm.user_group.all()
+        asset_groups = sudo_perm.asset_group.all()
+        cmd_groups = sudo_perm.cmd_group.all()
+
+        users_list = []
+        assets_list = []
+        cmds_list = []
+
+        for user_group in user_groups:
+            users_list.extend(user_group.user_set.all())
+        for asset_group in asset_groups:
+            assets_list.extend(asset_group.asset_set.all())
+        for cmd_group in cmd_groups:
+            cmds_list.extend(cmd_group.cmd.split(','))
+
+        return render_to_response('jperm/sudo_detail.html', locals())
+
+
+def sudo_del(request):
+    sudo_perm_id = request.GET.get('id', '0')
+    sudo_perm = SudoPerm.objects.filter(id=int(sudo_perm_id))
+    if sudo_perm:
+        name = sudo_perm[0].name
+        sudo_perm.delete()
+        sudo_dn = 'cn=%s,ou=Sudoers,%s' % (name, LDAP_BASE_DN)
+        ldap_conn.delete(sudo_dn)
+    return HttpResponseRedirect('/jperm/sudo_list/')
 
 
 def cmd_add(request):

@@ -60,106 +60,86 @@
 
                             <div class="tab-content">
                                 <div id="tab-1" class="tab-pane active">
-                                    <form id="sudoPerm" method="post" class="form-horizontal" action="">
-                                        {% if error %}
-                                            <div class="alert alert-warning text-center">{{ error }}</div>
-                                        {% endif %}
-                                        {% if msg %}
-                                            <div class="alert alert-success text-center">{{ msg }}</div>
-                                        {% endif %}
-                                        <div class="row">
-                                            <div class="col-sm-5"><h4>用户组</h4>
-                                                <div>
-                                                    <select id="user_groups" name="user_groups" class="form-control" size="5" multiple>
-                                                        {% for user_group in user_groups %}
-                                                        <option value="{{ user_group.id }}">{{ user_group.name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </div>
-                                            </div>
+                                    <table class="table table-striped table-bordered table-hover " id="editable" >
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">授权名</th>
+                                                <th class="text-center">user_runas</th>
+                                                <th class="text-center">用户组</th>
+                                                <th class="text-center">主机组</th>
+                                                <th class="text-center">命令组</th>
+                                                <th class="text-center">备注</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="perm_list">
+                                        {% for sudo_perm in contacts1.object_list %}
+                                            <tr class="gradeX">
+                                                <td class="text-center"> {{ sudo_perm.name }} </td>
+                                                <td class="text-center"> {{ sudo_perm.user_runas }} </td>
+                                                <td class="text-center">
+                                                    {% for user_group in sudo_perm.user_group.all %}
+                                                        {{ user_group.name }}
+                                                    {% endfor %}
+                                                </td>
 
-                                            <div class="col-sm-1">
-                                                <div class="btn-group" style="margin-top: 50px;">
-                                                    <button type="button" class="btn btn-white" onclick="move('user_groups', 'user_groups_select')"><i class="fa fa-chevron-right"></i></button>
-                                                    <button type="button" class="btn btn-white" onclick="move('user_groups_select', 'user_groups')"><i class="fa fa-chevron-left"></i> </button>
-                                                </div>
-                                            </div>
+                                                <td class="text-center">
+                                                    {% for asset_group in sudo_perm.asset_group.all %}
+                                                        {{ asset_group.name }}
+                                                    {% endfor %}
+                                                </td>
 
-                                            <div class="col-sm-5"><h4>授权用户组</h4>
-                                                <div>
-                                                    <select id="user_groups_select" name="user_groups_select" class="form-control m-b" size="5"  multiple>
-                                                    </select>
-                                                </div>
+                                                <td class="text-center">
+                                                    {% for cmd_group in sudo_perm.cmd_group.all %}
+                                                        {{ cmd_group.name }}
+                                                    {% endfor %}
+                                                </td>
+                                                <td class="text-center">
+                                                    <a title="[ {{ sudo_perm.name }} 授权详情 ]" href="../sudo_detail/?id={{ sudo_perm.id }}" class="iframe btn btn-xs btn-primary">详情</a>
+                                                    <a href="../sudo_edit/?id={{ sudo_perm.id }}" class="btn btn-xs btn-info">编辑</a>
+                                                    <a href="../sudo_del/?id={{ sudo_perm.id }}" class="btn btn-xs btn-danger">删除</a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="dataTables_info" id="editable_info" role="status" aria-live="polite">
+                                                Showing {{ contacts1.start_index }} to {{ contacts1.end_index }} of {{ p1.count }} entries
                                             </div>
                                         </div>
-
-                                    <div class="hr-line-dashed"></div>
-
-                                    <div class="row">
-                                            <div class="col-sm-5"><h4>主机组</h4>
-                                                <div>
-                                                    <select id="asset_groups" name="asset_groups" class="form-control m-b" size="5" multiple>
-                                                        {% for asset_group in asset_groups %}
-                                                        <option value="{{ asset_group.id }}">{{ asset_group.name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </div>
+                                        <div class="col-sm-6">
+                                            <div class="dataTables_paginate paging_simple_numbers" id="editable_paginate">
+                                                <ul class="pagination" style="margin-top: 0; float: right">
+                                                    {% if contacts1.has_previous %}
+                                                        <li class="paginate_button previous" aria-controls="editable" tabindex="0" id="editable_previous">
+                                                            <a href="?page={{ contacts1.previous_page_number }}">Previous</a>
+                                                        </li>
+                                                    {% else %}
+                                                        <li class="paginate_button previous disabled" aria-controls="editable" tabindex="0" id="editable_previous">
+                                                             <a href="#">Previous</a>
+                                                        </li>
+                                                    {% endif %}
+                                                    {% for page in p1.page_range %}
+                                                        {% ifequal offset1 page %}
+                                                            <li class="paginate_button active"  aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
+                                                        {% else %}
+                                                            <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
+                                                        {% endifequal %}
+                                                    {% endfor %}
+                                                    {% if contacts1.has_next %}
+                                                        <li class="paginate_button next" aria-controls="editable" tabindex="0" id="editable_next">
+                                                            <a href="?page={{ contacts1.next_page_number }}">Next</a>
+                                                        </li>
+                                                    {% else %}
+                                                        <li class="paginate_button next disabled" aria-controls="editable" tabindex="0" id="editable_next">
+                                                            <a href="#">Next</a>
+                                                        </li>
+                                                    {% endif %}
+                                                </ul>
                                             </div>
-
-                                            <div class="col-sm-1">
-                                                <div class="btn-group" style="margin-top: 50px;">
-                                                    <button type="button" class="btn btn-white" onclick="move('asset_groups', 'asset_groups_select')"><i class="fa fa-chevron-right"></i></button>
-                                                    <button type="button" class="btn btn-white" onclick="move('asset_groups_select', 'asset_groups')"><i class="fa fa-chevron-left"></i> </button>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-sm-5"><h4>授权主机组</h4>
-                                                <div>
-                                                    <select id="asset_groups_select" name="asset_groups_select" class="form-control m-b" size="5"  multiple>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    <div class="hr-line-dashed"></div>
-
-                                    <div class="row">
-                                            <div class="col-sm-5"><h4>命令组</h4>
-                                                <div>
-                                                    <select id="cmd_groups" name="cmd_groups" class="form-control m-b" size="5" multiple>
-                                                        {% for cmd_group in cmd_groups %}
-                                                        <option value="{{ cmd_group.id }}">{{ cmd_group.name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-sm-1">
-                                                <div class="btn-group" style="margin-top: 50px;">
-                                                    <button type="button" class="btn btn-white" onclick="move('cmd_groups', 'cmd_groups_select')"><i class="fa fa-chevron-right"></i></button>
-                                                    <button type="button" class="btn btn-white" onclick="move('cmd_groups_select', 'cmd_groups')"><i class="fa fa-chevron-left"></i> </button>
-                                                </div>
-                                            </div>
-
-                                            <div class="col-sm-5"><h4>命令组</h4>
-                                                <div>
-                                                    <select id="cmd_groups_select" name="cmd_groups_select" class="form-control m-b" size="5"  multiple>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                    <div class="hr-line-dashed"></div>
-
-                                    <div class="row">
-                                        <div class="form-group">
-                                        <div class="col-sm-4 col-sm-offset-2">
-                                            <button class="btn btn-white" type="submit">取消</button>
-                                            <button class="btn btn-primary" type="submit" onclick="javascript: (function(){$('#sudoPerm option').each(function(){$(this).prop('selected', true)})})()">确认保存</button>
                                         </div>
                                     </div>
-                                    </div>
-                                </form>
 
                                 </div>
 
@@ -179,7 +159,7 @@
                                             <tr class="gradeX">
                                                 <td class="text-center"> {{ user.name }} </td>
                                                 <td class="text-center"> {{ user.id | get_role }} </td>
-                                                <td class="text-center"> {{ user.username | groups_str }} </td>
+                                                <td class="text-center"> {{ user.username }} </td>
                                                 <td class="text-center"> {{ user.id | perm_asset_count }} </td>
                                                 <td class="text-center">
                                                     <a title="[ {{ user.name }} ] 授权详情" href="../perm_asset_detail/?id={{ user.id }}" class="iframe btn btn-xs btn-primary">详情</a>
