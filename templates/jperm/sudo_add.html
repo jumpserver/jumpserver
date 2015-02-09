@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load mytags %}
+{% block content %}
+{% include 'nav_cat_bar.html' %}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-10">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5> Sudo授权 <small> show sudo perm info.</small> </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li><a href="#">未启用 1</a>
+                            </li>
+                            <li><a href="#">未启用 2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="ibox-content">
+                    <form id="sudoPerm" method="post" class="form-horizontal" action="">
+                        {% if error %}
+                            <div class="alert alert-warning text-center">{{ error }}</div>
+                        {% endif %}
+                        {% if msg %}
+                            <div class="alert alert-success text-center">{{ msg }}</div>
+                        {% endif %}
+                        <div class="row">
+                            <div class="col-sm-5"><h4>用户组</h4>
+                                <div>
+                                    <select id="user_groups" name="user_groups" class="form-control" size="5" multiple>
+                                        {% for user_group in user_groups %}
+                                        <option value="{{ user_group.id }}">{{ user_group.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-1">
+                                <div class="btn-group" style="margin-top: 50px;">
+                                    <button type="button" class="btn btn-white" onclick="move('user_groups', 'user_groups_select')"><i class="fa fa-chevron-right"></i></button>
+                                    <button type="button" class="btn btn-white" onclick="move('user_groups_select', 'user_groups')"><i class="fa fa-chevron-left"></i> </button>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-5"><h4>授权用户组</h4>
+                                <div>
+                                    <select id="user_groups_select" name="user_groups_select" class="form-control m-b" size="5"  multiple>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                    <div class="hr-line-dashed"></div>
+
+                    <div class="row">
+                        <div class="col-sm-5"><h4>主机组</h4>
+                            <div>
+                                <select id="asset_groups" name="asset_groups" class="form-control m-b" size="5" multiple>
+                                    {% for asset_group in asset_groups %}
+                                    <option value="{{ asset_group.id }}">{{ asset_group.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-1">
+                            <div class="btn-group" style="margin-top: 50px;">
+                                <button type="button" class="btn btn-white" onclick="move('asset_groups', 'asset_groups_select')"><i class="fa fa-chevron-right"></i></button>
+                                <button type="button" class="btn btn-white" onclick="move('asset_groups_select', 'asset_groups')"><i class="fa fa-chevron-left"></i> </button>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-5"><h4>授权主机组</h4>
+                            <div>
+                                <select id="asset_groups_select" name="asset_groups_select" class="form-control m-b" size="5"  multiple>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hr-line-dashed"></div>
+
+                    <div class="row">
+                        <div class="col-sm-5"><h4>命令组</h4>
+                            <div>
+                                <select id="cmd_groups" name="cmd_groups" class="form-control m-b" size="5" multiple>
+                                    {% for cmd_group in cmd_groups %}
+                                    <option value="{{ cmd_group.id }}">{{ cmd_group.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-1">
+                            <div class="btn-group" style="margin-top: 50px;">
+                                <button type="button" class="btn btn-white" onclick="move('cmd_groups', 'cmd_groups_select')"><i class="fa fa-chevron-right"></i></button>
+                                <button type="button" class="btn btn-white" onclick="move('cmd_groups_select', 'cmd_groups')"><i class="fa fa-chevron-left"></i> </button>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-5"><h4>命令组</h4>
+                            <div>
+                                <select id="cmd_groups_select" name="cmd_groups_select" class="form-control m-b" size="5"  multiple>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label for="group_name" class="col-sm-2 control-label">备注</label>
+                                <div class="col-sm-8">
+                                    <input id="comment" name="comment" placeholder="备注说明" type="text" class="form-control">
+                                </div>
+                            </div>
+                    <div class="hr-line-dashed"></div>
+
+
+                    <div class="row">
+                        <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-2">
+                            <button class="btn btn-white" type="submit">取消</button>
+                            <button class="btn btn-primary" type="submit" onclick="javascript: (function(){$('#sudoPerm option').each(function(){$(this).prop('selected', true)})})()">确认保存</button>
+                        </div>
+                    </div>
+                    </div>
+                </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}
