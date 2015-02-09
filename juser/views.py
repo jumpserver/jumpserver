@@ -20,16 +20,15 @@ from juser.models import UserGroup, User
 from connect import PyCrypt, KEY
 from connect import BASE_DIR
 from connect import CONF
-from jumpserver.views import md5_crypt,LDAPMgmt
+from jumpserver.views import md5_crypt, LDAPMgmt, LDAP_ENABLE, ldap_conn
 
-
-CRYPTOR = PyCrypt(KEY)
-LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
 if LDAP_ENABLE:
     LDAP_HOST_URL = CONF.get('ldap', 'host_url')
     LDAP_BASE_DN = CONF.get('ldap', 'base_dn')
     LDAP_ROOT_DN = CONF.get('ldap', 'root_dn')
     LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
+
+CRYPTOR = PyCrypt(KEY)
 
 
 def gen_rand_pwd(num):
@@ -176,20 +175,18 @@ def ldap_add_user(username, ldap_pwd):
                   'userPassword': ['{crypt}x'],
                   'gidNumber': [str(user.id)]}
 
-    sudo_dn = 'cn=%s,ou=Sudoers,%s' % (username, LDAP_BASE_DN)
-    sudo_attr = {'objectClass': ['top', 'sudoRole'],
-                 'cn': ['%s' % str(username)],
-                 'sudoCommand': ['/bin/pwd'],
-                 'sudoHost': ['192.168.1.1'],
-                 'sudoOption': ['!authenticate'],
-                 'sudoRunAsUser': ['root'],
-                 'sudoUser': ['%s' % str(username)]}
-
-    ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
+    # sudo_dn = 'cn=%s,ou=Sudoers,%s' % (username, LDAP_BASE_DN)
+    # sudo_attr = {'objectClass': ['top', 'sudoRole'],
+    #              'cn': ['%s' % str(username)],
+    #              'sudoCommand': ['/bin/pwd'],
+    #              'sudoHost': ['192.168.1.1'],
+    #              'sudoOption': ['!authenticate'],
+    #              'sudoRunAsUser': ['root'],
+    #              'sudoUser': ['%s' % str(username)]}
 
     ldap_conn.add(user_dn, user_attr)
     ldap_conn.add(group_dn, group_attr)
-    ldap_conn.add(sudo_dn, sudo_attr)
+    # ldap_conn.add(sudo_dn, sudo_attr)
 
 
 def ldap_del_user(username):
@@ -197,10 +194,19 @@ def ldap_del_user(username):
     group_dn = "cn=%s,ou=Group,%s" % (username, LDAP_BASE_DN)
     sudo_dn = 'cn=%s,ou=Sudoers,%s' % (username, LDAP_BASE_DN)
 
-    ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
     ldap_conn.delete(user_dn)
     ldap_conn.delete(group_dn)
     ldap_conn.delete(sudo_dn)
+
+
+# def ldap_group_add(group_name, username_list, gid):
+#     group_dn = "cn=%s,ou=Group,%s" % (group_name, LDAP_BASE_DN)
+#     group_attr = {'objectClass': ['posixGroup', 'top'],
+#                   'cn': [str(group_name)],
+#                   'userPassword': ['{crypt}x'],
+#                   'gidNumber': [gid],
+#                   'memberUid': username_list}
+#     ldap_conn.add(group_dn, group_attr)
 
 
 def group_add(request, group_type_select='A'):

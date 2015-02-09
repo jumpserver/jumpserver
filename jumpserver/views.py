@@ -3,14 +3,28 @@
 import hashlib
 import ldap
 from ldap import modlist
+from Crypto.Cipher import AES
+from binascii import b2a_hex, a2b_hex
+from ConfigParser import ConfigParser
+import os
 
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 
 from juser.models import User
-from connect import PyCrypt, KEY
 from jasset.models import Asset, BisGroup, IDC
+
+BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+CONF = ConfigParser()
+CONF.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
+
+LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
+if LDAP_ENABLE:
+    LDAP_HOST_URL = CONF.get('ldap', 'host_url')
+    LDAP_BASE_DN = CONF.get('ldap', 'base_dn')
+    LDAP_ROOT_DN = CONF.get('ldap', 'root_dn')
+    LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
 
 
 def md5_crypt(string):
@@ -30,7 +44,7 @@ def jasset_group_add(name, comment, type):
         emg = u'该业务组已存在!'
     else:
         BisGroup.objects.create(name=name, comment=comment, type=type)
-        smg = u'业务组%s添加成功' %name
+        smg = u'业务组%s添加成功' % name
 
 
 def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment):
@@ -149,5 +163,40 @@ class LDAPMgmt():
             self.conn.delete_s(dn)
         except ldap.LDAPError, e:
             print e
+
+
+class PyCrypt(object):
+    """This class used to encrypt and decrypt password."""
+
+    def __init__(self, key):
+        self.key = key
+        self.mode = AES.MODE_CBC
+
+    def encrypt(self, text):
+        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
+        length = 16
+        try:
+            count = len(text)
+        except TypeError:
+            raise ServerError('Encrypt password error, TYpe error.')
+        add = (length - (count % length))
+        text += ('\0' * add)
+        ciphertext = cryptor.encrypt(text)
+        return b2a_hex(ciphertext)
+
+    def decrypt(self, text):
+        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
+        try:
+            plain_text = cryptor.decrypt(a2b_hex(text))
+        except TypeError:
+            raise ServerError('Decrypt password error, TYpe error.')
+        return plain_text.rstrip('\0')
+
+
+if LDAP_ENABLE:
+    ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
+else:
+    ldap_conn = None
+
 
 

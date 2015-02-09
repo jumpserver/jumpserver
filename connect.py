@@ -16,8 +16,6 @@ import getpass
 import fnmatch
 import readline
 from multiprocessing import Pool
-from Crypto.Cipher import AES
-from binascii import b2a_hex, a2b_hex
 from ConfigParser import ConfigParser
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -27,6 +25,7 @@ from juser.models import User
 from jasset.models import Asset
 from jlog.models import Log
 from jperm.views import perm_user_asset
+from jumpserver.views import PyCrypt
 
 try:
     import termios
@@ -73,34 +72,6 @@ def color_print_exit(msg, color='red'):
 
 class ServerError(Exception):
     pass
-
-
-class PyCrypt(object):
-    """This class used to encrypt and decrypt password."""
-
-    def __init__(self, key):
-        self.key = key
-        self.mode = AES.MODE_CBC
-
-    def encrypt(self, text):
-        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
-        length = 16
-        try:
-            count = len(text)
-        except TypeError:
-            raise ServerError('Encrypt password error, TYpe error.')
-        add = (length - (count % length))
-        text += ('\0' * add)
-        ciphertext = cryptor.encrypt(text)
-        return b2a_hex(ciphertext)
-
-    def decrypt(self, text):
-        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
-        try:
-            plain_text = cryptor.decrypt(a2b_hex(text))
-        except TypeError:
-            raise ServerError('Decrypt password error, TYpe error.')
-        return plain_text.rstrip('\0')
 
 
 def get_win_size():

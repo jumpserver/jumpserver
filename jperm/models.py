@@ -18,7 +18,8 @@ class CmdGroup(models.Model):
 
 
 class SudoPerm(models.Model):
+    name = models.CharField(max_length=20)
     user_group = models.ManyToManyField(UserGroup)
     asset_group = models.ManyToManyField(BisGroup)
     cmd_group = models.ManyToManyField(CmdGroup)
-    comment = models.CharField(max_length=30)
+    comment = models.CharField(max_length=30, null=True, blank=True)

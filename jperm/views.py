@@ -7,6 +7,14 @@ from jasset.models import Asset, BisGroup
 from jperm.models import Perm, SudoPerm, CmdGroup
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.db.models import Q
+from jumpserver.views import LDAP_ENABLE, ldap_conn, CONF
+
+
+if LDAP_ENABLE:
+    LDAP_HOST_URL = CONF.get('ldap', 'host_url')
+    LDAP_BASE_DN = CONF.get('ldap', 'base_dn')
+    LDAP_ROOT_DN = CONF.get('ldap', 'root_dn')
+    LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
 
 
 def perm_group_update(user_group_name='', user_group_id='', asset_groups_name='', asset_groups_id=''):
@@ -138,7 +146,6 @@ def perm_asset_detail(request):
     return render_to_response('jperm/perm_asset_detail.html', locals())
 
 
-
 def user_asset_cmd_groups_get(user_groups_select, asset_groups_select, cmd_groups_select):
     user_groups_select_list = []
     asset_groups_select_list = []
@@ -167,9 +174,40 @@ def sudo_db_add(user_groups_select, asset_groups_select, cmd_groups_select, comm
     sudo_perm.cmd_group = cmd_groups_select_list
 
 
-def sudo_ldap_add(user_groups_select, asset_groups_select, cmd_groups_select):
+def unicode2str(unicode_list):
+    return [str(i) for i in unicode_list]
+
+
+def sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select, cmd_groups_select):
     user_groups_select_list, asset_groups_select_list, cmd_groups_select_list = \
         user_asset_cmd_groups_get(user_groups_select, asset_groups_select, cmd_groups_select)
+
+    users = []
+    assets = []
+    cmds = []
+
+    for user_group in user_groups_select_list:
+        users.extend(user_group.user_set.all())
+
+    for asset_group in asset_groups_select_list:
+        assets.extend(asset_group.asset_set.all())
+
+    for cmd_group in cmd_groups_select_list:
+        cmds.extend(cmd_group.cmd.split(','))
+
+    users_name = [user.name for user in users]
+    assets_ip = [asset.ip for asset in assets]
+
+    sudo_dn = 'cn=%s,ou=Sudoers,%s' % (name, LDAP_BASE_DN)
+    sudo_attr = {'objectClass': ['top', 'sudoRole'],
+                 'cn': ['%s' % str(name)],
+                 'sudoCommand': unicode2str(cmds),
+                 'sudoHost': unicode2str(assets_ip),
+                 'sudoOption': ['!authenticate'],
+                 'sudoRunAsUser': unicode2str(users_runas),
+                 'sudoUser': unicode2str(users_name)}
+
+    ldap_conn.add(sudo_dn, sudo_attr)
 
 
 def sudo_add(request):
@@ -179,16 +217,17 @@ def sudo_add(request):
     cmd_groups = CmdGroup.objects.all()
 
     if request.method == 'POST':
+        name = request.POST.get('name')
+        users_runas = request.POST.get('runas', 'root').split(',')
         user_groups_select = request.POST.getlist('user_groups_select')
         asset_groups_select = request.POST.getlist('asset_groups_select')
         cmd_groups_select = request.POST.getlist('cmd_groups_select')
         comment = request.POST.get('comment', '')
 
         sudo_db_add(user_groups_select, asset_groups_select, cmd_groups_select, comment)
-
+        sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select, cmd_groups_select)
 
         msg = '添加成功'
-
     return render_to_response('jperm/sudo_add.html', locals())
 
 
