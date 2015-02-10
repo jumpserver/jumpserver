@@ -19,4 +19,6 @@ urlpatterns = patterns('jperm.views',
     (r'^sudo_detail/$', 'sudo_detail'),
     (r'^cmd_add/$', 'cmd_add'),
     (r'^cmd_list/$', 'cmd_list'),
+    (r'^cmd_del/$', 'cmd_del'),
+    (r'^cmd_edit/$', 'cmd_edit'),
 )

@@ -1,6 +1,6 @@
 from django.db import models
-from juser.models import User, UserGroup
-from jasset.models import Asset, BisGroup
+from juser.models import UserGroup
+from jasset.models import BisGroup
 
 
 class Perm(models.Model):

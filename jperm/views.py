@@ -55,7 +55,7 @@ def perm_user_asset(user_id=None, username=None):
 
 
 def perm_list(request):
-    header_title, path1, path2 = u'主机授权 | Perm Host Detail.', u'jperm', u'perm_list'
+    header_title, path1, path2 = u'主机授权 | Perm Host Detail.', u'授权管理', u'授权详情'
     groups = contact_list = UserGroup.objects.all().order_by('type')
     users = contact_list2 = User.objects.all().order_by('id')
     p = paginator = Paginator(contact_list, 10)
@@ -111,7 +111,7 @@ def perm_list_ajax(request):
 
 def perm_edit(request):
     if request.method == 'GET':
-        header_title, path1, path2 = u'编辑授权 | Perm Host Edit.', u'jperm', u'perm_edit'
+        header_title, path1, path2 = u'编辑授权 | Perm Host Edit.', u'授权管理', u'授权编辑'
         user_group_id = request.GET.get('id')
         user_group = UserGroup.objects.get(id=user_group_id)
         asset_groups = BisGroup.objects.all()
@@ -254,11 +254,12 @@ def sudo_add(request):
         sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select, cmd_groups_select)
 
         msg = '添加成功'
+        return HttpResponseRedirect('/jperm/sudo_list/')
     return render_to_response('jperm/sudo_add.html', locals())
 
 
 def sudo_list(request):
-    header_title, path1, path2 = u'Sudo授权 | Perm Sudo Detail.', u'jperm', u'sudo_list'
+    header_title, path1, path2 = u'Sudo授权 | Perm Sudo Detail.', u'权限管理', u'Sudo权限详情'
     sudo_perms = contact_list = SudoPerm.objects.all()
     p1 = paginator1 = Paginator(contact_list, 10)
     user_groups = UserGroup.objects.filter(Q(type='A') | Q(type='P'))
@@ -278,7 +279,7 @@ def sudo_list(request):
 
 
 def sudo_edit(request):
-    header_title, path1, path2 = u'Sudo授权 | Perm Sudo Detail.', u'jperm', u'sudo_list'
+    header_title, path1, path2 = u'Sudo授权 | Perm Sudo Detail.', u'授权管理', u'Sudo修改'
 
     if request.method == 'GET':
         sudo_perm_id = request.GET.get('id', '0')
@@ -359,7 +360,7 @@ def sudo_del(request):
 
 
 def cmd_add(request):
-    header_title, path1, path2 = u'sudo命令添加 | Sudo Cmd Add.', u'jperm', u'sudo_cmd_add'
+    header_title, path1, path2 = u'sudo命令添加 | Sudo Cmd Add.', u'授权管理管理', u'命令组添加'
 
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -369,11 +370,39 @@ def cmd_add(request):
         CmdGroup.objects.create(name=name, cmd=cmd, comment=comment)
         msg = u'命令组添加成功'
 
+        return HttpResponseRedirect('/jperm/cmd_list/')
+
+    return render_to_response('jperm/sudo_cmd_add.html', locals())
+
+
+def cmd_edit(request):
+    header_title, path1, path2 = u'sudo命令修改 | Sudo Cmd Edit.', u'授权管理管理', u'命令组修改'
+
+    cmd_group_id = request.GET.get('id')
+    cmd_group = CmdGroup.objects.filter(id=cmd_group_id)
+
+    if cmd_group:
+        cmd_group = cmd_group[0]
+        cmd_group_id = cmd_group.id
+        name = cmd_group.name
+        cmd = cmd_group.cmd
+        comment = cmd_group.comment
+
+    if request.method == 'POST':
+        cmd_group_id = request.POST.get('cmd_group_id')
+        name = request.POST.get('name')
+        cmd = ','.join(request.POST.get('cmd').split())
+        comment = request.POST.get('comment')
+
+        cmd_group = CmdGroup.objects.filter(id=cmd_group_id)
+        if cmd_group:
+            cmd_group.update(name=name, cmd=cmd, comment=comment)
+            return HttpResponseRedirect('/jperm/cmd_list/')
     return render_to_response('jperm/sudo_cmd_add.html', locals())
 
 
 def cmd_list(request):
-    header_title, path1, path2 = u'sudo命令查看 | Sudo Cmd List.', u'jperm', u'sudo_cmd_list'
+    header_title, path1, path2 = u'sudo命令查看 | Sudo Cmd List.', u'权限管理', u'Sudo命令添加'
 
     cmd_groups = contact_list = CmdGroup.objects.all()
     p = paginator = Paginator(contact_list, 10)
@@ -389,3 +418,11 @@ def cmd_list(request):
         contacts = paginator.page(paginator.num_pages)
     return render_to_response('jperm/sudo_cmd_list.html', locals())
 
+
+def cmd_del(request):
+    cmd_group_id = request.GET.get('id')
+    cmd_group = CmdGroup.objects.filter(id=cmd_group_id)
+
+    if cmd_group:
+        cmd_group[0].delete()
+    return HttpResponseRedirect('/jperm/cmd_list/')

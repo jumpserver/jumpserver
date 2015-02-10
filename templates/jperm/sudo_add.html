@@ -38,7 +38,7 @@
                         {% endif %}
                         <div class="row">
                             <div class="form-group">
-                                <label for="name" class="col-sm-2 control-label">授权名</label>
+                                <label for="name" class="col-sm-2 control-label">授权名<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
                                     <input id="name" name="name" placeholder="OnlyForEnglish" type="text" class="form-control">
                                     <span class="help-block m-b-none">取个名字方便辨识，只支持英文</span>
@@ -47,7 +47,7 @@
                             <div class="hr-line-dashed"></div>
 
                             <div class="form-group">
-                                <label for="runas" class="col-sm-2 control-label">RunAsUser</label>
+                                <label for="runas" class="col-sm-2 control-label">RunAsUser<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
                                     <input id="runas" name="runas" placeholder="RunAsUser" type="text" class="form-control">
                                     <span class="help-block m-b-none">
@@ -58,7 +58,7 @@
                             <div class="hr-line-dashed"></div>
 
                             <div class="form-group">
-                                <label for="" class="col-sm-2 control-label">用户组</label>
+                                <label for="" class="col-sm-2 control-label">用户组<span class="red-fonts">*</span></label>
                                 <div class="col-sm-4">
                                     <div>
                                         <select id="user_groups" name="user_groups" class="form-control" size="5" multiple>
@@ -88,7 +88,7 @@
                             <div class="hr-line-dashed"></div>
 
                             <div class="form-group">
-                                <label for="" class="col-sm-2 control-label">主机组</label>
+                                <label for="" class="col-sm-2 control-label">主机组<span class="red-fonts">*</span></label>
                                 <div class="col-sm-4">
                                     <div>
                                         <select id="asset_groups" name="asset_groups" class="form-control m-b" size="5" multiple>
@@ -117,7 +117,7 @@
                             <div class="hr-line-dashed"></div>
 
                             <div class="form-group">
-                                <label for="" class="col-sm-2 control-label">命令组</label>
+                                <label for="" class="col-sm-2 control-label">命令组<span class="red-fonts">*</span></label>
                                 <div class="col-sm-4">
                                     <div>
                                         <select id="cmd_groups" name="cmd_groups" class="form-control m-b" size="5" multiple>
@@ -158,7 +158,7 @@
                             <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-2">
                                     <button class="btn btn-white" type="reset">取消</button>
-                                    <button class="btn btn-primary" type="submit" onclick="javascript: (function(){$('#sudoPerm option').each(function(){$(this).prop('selected', true)})})()">确认保存</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit">确认保存</button>
                                 </div>
                             </div>
                         </div>
@@ -170,5 +170,57 @@
     </div>
 </div>
 
+
+<script>
+$('#sudoPerm').validator({
+    timely: 2,
+    theme: "yellow_right_effect",
+    fields: {
+        "name": {
+            rule: "required",
+            tip: "输入授权名",
+            ok: "",
+            msg: {required: "必须填写!"}
+        },
+        "runas": {
+            rule: "required",
+            tip: "输入sudoas用户",
+            ok: "",
+            msg: {required: "必须填写!"}
+        },
+        "user_groups_select": {
+            rule: "required",
+            tip: "选择用户组",
+            ok: "",
+            msg: {checked: "至少选择一个用户组"}
+        },
+        "asset_groups_select": {
+            rule: "required",
+            tip: "选择主机组",
+            ok: "",
+            msg: {checked: "至少选择一个主机组"}
+        },
+        "cmd_groups_select": {
+            rule: "required",
+            tip: "选择命令组",
+            ok: "",
+            msg: {checked: "至少选择一个命令组"}
+        }
+
+    },
+    valid: function(form) {
+        form.submit();
+    }
+});
+
+
+$(document).ready(function(){
+    $("#submit_button").click(function(){
+        $('#users_selected option').each(function(){
+            $(this).prop('selected', true)
+        })
+    })
+})
+</script>
 
 {% endblock %}

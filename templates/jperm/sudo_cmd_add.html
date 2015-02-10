@@ -37,14 +37,15 @@
                             <div class="form-group">
                                 <label for="group_name" class="col-sm-2 control-label">组名<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <input id="name" name="name" placeholder="Group name" type="text" class="form-control">
+                                    <input id="name" name="name" placeholder="Group name" type="text" class="form-control" value="{{ name }}" required="">
+                                    <input id="cmd_group_id" name="cmd_group_id"  type="text" class="form-control" value="{{ cmd_group_id }}" style="display: none">
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
                                 <label for="group_type" class="col-sm-2 control-label">命令<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <textarea id='cmd' name='cmd' class="form-control" rows="10" placeholder="命令"></textarea>
+                                    <textarea id='cmd' name='cmd' class="form-control" rows="10" placeholder="命令">{{ cmd }}</textarea>
                                     <span class="help-block m-b-none">
                                         输入命令一行一个
                                     </span>
@@ -52,9 +53,9 @@
                             </div>
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
-                                <label for="group_name" class="col-sm-2 control-label">备注<span class="red-fonts">*</span></label>
+                                <label for="group_name" class="col-sm-2 control-label">备注</label>
                                 <div class="col-sm-8">
-                                    <input id="comment" name="comment" placeholder="备注说明" type="text" class="form-control">
+                                    <input id="comment" name="comment" placeholder="备注说明" type="text" class="form-control" value="{{ comment }}">
                                 </div>
                             </div>
 
@@ -74,21 +75,21 @@
     </div>
 
 <script>
-$('#groupForm').validator({
+$('#cmdForm').validator({
     timely: 2,
     theme: "yellow_right_effect",
     fields: {
-        "group_name": {
+        "name": {
             rule: "required",
             tip: "输入组名",
             ok: "",
             msg: {required: "必须填写!"}
         },
-        "group_type": {
-            rule: "checked",
-            tip: "选择组类型",
+        "cmd": {
+            rule: "required",
+            tip: "输入组名",
             ok: "",
-            msg: {required: "至少选择一个组!"}
+            msg: {required: "必须填写!"}
         }
     },
     valid: function(form) {
@@ -96,13 +97,6 @@ $('#groupForm').validator({
     }
 });
 
-function change_type(type){
-    $.post('/juser/group_add_ajax/',
-           {'type': type},
-           function(data){
-               $('#users').html(data)
-           })
-}
 
 $(document).ready(function(){
     $("#submit_button").click(function(){
