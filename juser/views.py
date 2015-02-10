@@ -328,7 +328,7 @@ def group_edit(request):
 
 def user_list(request):
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
-    header_title, path1, path2 = '查看用户 | Show User', 'juser', 'user_list'
+    header_title, path1, path2 = '查看用户 | Show User', '用户管理', '用户列表'
     users = contact_list = User.objects.all().order_by('id')
     p = paginator = Paginator(contact_list, 10)
 

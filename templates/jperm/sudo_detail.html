@@ -5,10 +5,10 @@
     {% include 'nav_cat_bar.html' %}
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
-            <div class="col-lg-10">
+            <div class="col-lg-6">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h5>详情 {{ user.name }} <small> Add perm info.</small></h5>
+                        <h5>授权用户 <small> User.</small></h5>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -28,10 +28,126 @@
                         </div>
                     </div>
                     <div class="ibox-content">
-                        {{  }}
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>用户名</th>
+                                <th>姓名</th>
+                                <th>部门</th>
+                                <th>属组</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users_list %}
+                                    <tr>
+                                        <td>{{ user.username }}</td>
+                                        <td>{{ user.name }}</td>
+                                        <td>{{ user.username|group_manage_str }}</td>
+                                        <td>{{ user.username|groups_str }}</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
+
+            <div class="col-lg-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>授权主机 <small> Asset.</small></h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#">未启用 1</a>
+                                </li>
+                                <li><a href="#">未启用 2</a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>IP</th>
+                                <th>IDC</th>
+                                <th>主机组</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for asset in assets_list %}
+                                    <tr>
+                                        <td>{{ asset.ip }}</td>
+                                        <td>{{ asset.idc.name }}</td>
+                                        <td>
+                                            {% for group in asset.bis_group.all|filter_private %}
+                                                {{ group }}
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>授权命令 <small> Command.</small></h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#">未启用 1</a>
+                                </li>
+                                <li><a href="#">未启用 2</a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>命令</th>
+                                <th>命令组</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                {% for cmd_group in cmds_list %}
+                                    {% for cmd_group_name, cmds in cmd_group.items %}
+                                        {% for cmd in cmds %}
+                                        <tr>
+                                            <td>{{ cmd }}</td>
+                                            <td>{{ cmd_group_name }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    {% endfor %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 

@@ -31,26 +31,26 @@
                 <div class="ibox-content">
                     <div class="" style="margin-left: 15px;">
                         <a target="_blank" href="/jperm/cmd_add/" class="btn btn-sm btn-primary "> 添加命令组 </a>
-                        <a target="_blank" href="/jperm/cmd_list/" class="btn btn-sm btn-primary "> 查看命令组 </a>
+                        <a target="_blank" href="/jperm/cmd_list/" class="btn btn-sm btn-warning "> 查看命令组 </a>
                     </div>
 
                     <div class="panel blank-panel">
                         <div class="panel-heading">
                             <div class="panel-options">
                                 <ul class="nav nav-tabs">
-                                    <li id="tab1" class="active"><a data-toggle="tab" href="#tab-1">添加授权</a></li>
-                                    <li id="tab2" class=""><a data-toggle="tab" href="#tab-2">查看授权</a></li>
+                                    <li id="tab1" class="active"><a data-toggle="tab" href="#tab-1">查看授权</a></li>
+{#                                    <li id="tab2" class=""><a data-toggle="tab" href="#tab-2">用户授权详情</a></li>#}
                                     <li style="float: right">
-                                        <form method="get" action="" class="pull-right mail-search">
-                                            <div class="input-group">
-                                                <input type="text" class="form-control input-sm" id="search_input" name="search" placeholder="Search">
-                                                <div class="input-group-btn">
-                                                    <button id='search_btn' type="button" class="btn btn-sm btn-primary">
-                                                        Search
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </form>
+{#                                        <form method="get" action="" class="pull-right mail-search">#}
+{#                                            <div class="input-group">#}
+{#                                                <input type="text" class="form-control input-sm" id="search_input" name="search" placeholder="Search">#}
+{#                                                <div class="input-group-btn">#}
+{#                                                    <button id='search_btn' type="button" class="btn btn-sm btn-primary">#}
+{#                                                        Search#}
+{#                                                    </button>#}
+{#                                                </div>#}
+{#                                            </div>#}
+{#                                        </form>#}
                                     </li>
                                 </ul>
                             </div>
@@ -64,11 +64,11 @@
                                         <thead>
                                             <tr>
                                                 <th class="text-center">授权名</th>
-                                                <th class="text-center">user_runas</th>
+                                                <th class="text-center">UserRunAs</th>
                                                 <th class="text-center">用户组</th>
                                                 <th class="text-center">主机组</th>
                                                 <th class="text-center">命令组</th>
-                                                <th class="text-center">备注</th>
+                                                <th class="text-center">操作</th>
                                             </tr>
                                         </thead>
                                         <tbody id="perm_list">
@@ -94,7 +94,7 @@
                                                     {% endfor %}
                                                 </td>
                                                 <td class="text-center">
-                                                    <a title="[ {{ sudo_perm.name }} 授权详情 ]" href="../sudo_detail/?id={{ sudo_perm.id }}" class="iframe btn btn-xs btn-primary">详情</a>
+                                                    <a title="[ {{ sudo_perm.name }} 授权详情 ]" href="../sudo_detail/?id={{ sudo_perm.id }}" class="btn btn-xs btn-primary">详情</a>
                                                     <a href="../sudo_edit/?id={{ sudo_perm.id }}" class="btn btn-xs btn-info">编辑</a>
                                                     <a href="../sudo_del/?id={{ sudo_perm.id }}" class="btn btn-xs btn-danger">删除</a>
                                                 </td>

@@ -163,7 +163,7 @@ def user_asset_cmd_groups_get(user_groups_select, asset_groups_select, cmd_group
     return user_groups_select_list, asset_groups_select_list, cmd_groups_select_list
 
 
-def sudo_db_add(name, user_runas , user_groups_select, asset_groups_select, cmd_groups_select, comment):
+def sudo_db_add(name, user_runas, user_groups_select, asset_groups_select, cmd_groups_select, comment):
     user_groups_select_list, asset_groups_select_list, cmd_groups_select_list = \
         user_asset_cmd_groups_get(user_groups_select, asset_groups_select, cmd_groups_select)
 
@@ -190,7 +190,8 @@ def unicode2str(unicode_list):
     return [str(i) for i in unicode_list]
 
 
-def sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select, cmd_groups_select, update=False):
+def sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select,
+                  cmd_groups_select, update=False, old_name=''):
     user_groups_select_list, asset_groups_select_list, cmd_groups_select_list = \
         user_asset_cmd_groups_get(user_groups_select, asset_groups_select, cmd_groups_select)
 
@@ -198,18 +199,26 @@ def sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select, cm
     assets = []
     cmds = []
     users_runas = users_runas.split(',')
+    asset_all = False
 
     for user_group in user_groups_select_list:
         users.extend(user_group.user_set.all())
 
     for asset_group in asset_groups_select_list:
-        assets.extend(asset_group.asset_set.all())
+        if u'ALL' in asset_group.name:
+            asset_all = True
+            break
+        else:
+            assets.extend(asset_group.asset_set.all())
 
     for cmd_group in cmd_groups_select_list:
         cmds.extend(cmd_group.cmd.split(','))
 
     users_name = [user.username for user in users]
-    assets_ip = [asset.ip for asset in assets]
+    if asset_all:
+        assets_ip = ['ALL']
+    else:
+        assets_ip = [asset.ip for asset in assets]
 
     sudo_dn = 'cn=%s,ou=Sudoers,%s' % (name, LDAP_BASE_DN)
     sudo_attr = {'objectClass': ['top', 'sudoRole'],
@@ -221,13 +230,14 @@ def sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select, cm
                  'sudoUser': unicode2str(users_name)}
 
     if update:
-        ldap_conn.delete(sudo_dn)
+        old_sudo_dn = 'cn=%s,ou=Sudoers,%s' % (old_name, LDAP_BASE_DN)
+        ldap_conn.delete(old_sudo_dn)
 
     ldap_conn.add(sudo_dn, sudo_attr)
 
 
 def sudo_add(request):
-    header_title, path1, path2 = u'Sudo授权 | Perm Sudo Add.', u'jperm', u'sudo_add'
+    header_title, path1, path2 = u'Sudo授权 | Perm Sudo Add.', u'权限管理', u'添加Sudo权限'
     user_groups = UserGroup.objects.filter(Q(type='A') | Q(type='P')).order_by('type')
     asset_groups = BisGroup.objects.all().order_by('type')
     cmd_groups = CmdGroup.objects.all()
@@ -300,9 +310,12 @@ def sudo_edit(request):
         cmd_groups_select = request.POST.getlist('cmd_groups_select')
         comment = request.POST.get('comment', '')
 
+        sudo_perm = SudoPerm.objects.get(id=sudo_perm_id)
+        old_name = sudo_perm.name
         sudo_db_update(sudo_perm_id, name, users_runas, user_groups_select,
                        asset_groups_select, cmd_groups_select, comment)
-        sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select, cmd_groups_select, update=True)
+        sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select,
+                      cmd_groups_select, update=True, old_name=str(old_name))
         msg = '修改成功'
 
         return HttpResponseRedirect('/jperm/sudo_list/')
@@ -311,6 +324,7 @@ def sudo_edit(request):
 
 
 def sudo_detail(request):
+    header_title, path1, path2 = u'Sudo授权详情 | Perm Sudo Detail.', u'授权管理', u'授权详情'
     sudo_perm_id = request.GET.get('id')
     sudo_perm = SudoPerm.objects.filter(id=sudo_perm_id)
     if sudo_perm:
@@ -328,7 +342,7 @@ def sudo_detail(request):
         for asset_group in asset_groups:
             assets_list.extend(asset_group.asset_set.all())
         for cmd_group in cmd_groups:
-            cmds_list.extend(cmd_group.cmd.split(','))
+            cmds_list.append({cmd_group.name: cmd_group.cmd.split(',')})
 
         return render_to_response('jperm/sudo_detail.html', locals())
 
