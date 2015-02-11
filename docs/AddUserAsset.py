@@ -8,8 +8,45 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 django.setup()
 
 from juser.views import db_add_user, md5_crypt, CRYPTOR
-from jasset.models import Asset, IDC
+from jasset.models import Asset, IDC, BisGroup
+from juser.models import UserGroup
 from jasset.views import jasset_group_add
+from jperm.models import CmdGroup
+
+
+def test_add_idc():
+    for i in range(1, 20):
+        name = 'IDC' + str(i)
+        IDC.objects.create(name=name, comment='')
+        print 'Add: %s' % name
+
+
+def test_add_asset_group():
+    BisGroup.objects.create(name='ALL', type='A', comment='ALL')
+    for i in range(1, 20):
+        name = 'AssetGroup' + str(i)
+        BisGroup.objects.create(name=name, type='A', comment=name)
+        print 'Add: %s' % name
+
+
+def test_add_user_group():
+    for i in range(1, 20):
+        name = 'DepartGroup' + str(i)
+        UserGroup.objects.create(name=name, type='M', comment=name)
+        print 'Add: %s' % name
+
+    for i in range(1, 20):
+        name = 'UserGroup' + str(i)
+        UserGroup.objects.create(name=name, type='A', comment=name)
+        print 'Add: %s' % name
+
+
+def test_add_cmd_group():
+    for i in range(1, 20):
+        name = 'CMD' + str(i)
+        cmd = '/sbin/ping%s, /sbin/ifconfig/' % str(i)
+        CmdGroup.objects.create(name=name, cmd=cmd, comment=name)
+        print 'Add: %s' % name
 
 
 def test_add_user():
@@ -36,11 +73,12 @@ def test_add_asset():
 
 
 if __name__ == '__main__':
-    args = sys.argv
-    if args[1] == 'user':
-        test_add_user()
-    if args[1] == 'asset':
-        test_add_asset()
+    test_add_idc()
+    test_add_asset_group()
+    test_add_user_group()
+    test_add_cmd_group()
+    test_add_asset()
+    test_add_user()
 
 
 

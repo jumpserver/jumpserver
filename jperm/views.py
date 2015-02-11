@@ -176,16 +176,31 @@ def perm_edit(request):
 
 
 def perm_detail(request):
-    user_group_id = request.GET.get('id')
-    user_group = UserGroup.objects.get(id=user_group_id)
-    asset_groups = [perm.asset_group for perm in user_group.perm_set.all()]
+    header_title, path1, path2 = u'编辑授权 | Perm Host Edit.', u'授权管理', u'授权详情'
+    perm_id = request.GET.get('id')
+    perm = Perm.objects.filter(id=perm_id)
+    if perm:
+        perm = perm[0]
+        user_groups = perm.user_group.all()
+        asset_groups = perm.asset_group.all()
+
+        users_list = []
+        assets_list = []
+
+        for user_group in user_groups:
+            users_list.extend(user_group.user_set.all())
+        for asset_group in asset_groups:
+            assets_list.extend(asset_group.asset_set.all())
+
     return render_to_response('jperm/perm_detail.html', locals())
 
 
 def perm_del(request):
-    user_group_id = request.GET.get('id')
-    user_group = UserGroup.objects.get(id=user_group_id)
-    Perm.objects.filter(user_group=user_group).delete()
+    perm_id = request.GET.get('id')
+    perm = Perm.objects.filter(id=perm_id)
+    if perm:
+        perm = perm[0]
+        perm.delete()
     return HttpResponseRedirect('/jperm/perm_list/')
 
 
