@@ -33,8 +33,8 @@
                         <div class="panel-heading">
                             <div class="panel-options">
                                 <ul class="nav nav-tabs">
-                                    <li id="tab1" class="active"><a data-toggle="tab" href="#tab-1">授权编辑</a></li>
-                                    <li id="tab2" class=""><a data-toggle="tab" href="#tab-2">查看授权</a></li>
+                                    <li id="tab1" class="active"><a data-toggle="tab" href="#tab-1">授权查看</a></li>
+                                    <li id="tab2" class=""><a data-toggle="tab" href="#tab-2">用户授权详情</a></li>
                                     <li style="float: right">
                                         <form method="get" action="" class="pull-right mail-search">
                                             <div class="input-group">
@@ -58,26 +58,32 @@
                                     <table class="table table-striped table-bordered table-hover " id="editable" >
                                         <thead>
                                             <tr>
-                                                <th class="text-center">组名</th>
-                                                <th class="text-center">
-                                                <span class="text-muted text-xs block">类型</span>
-                                                </th>
-                                                <th class="text-center">成员数量</th>
-                                                <th class="text-center">授权数量</th>
+                                                <th class="text-center">名称</th>
+                                                <th class="text-center">用户组</th>
+                                                <th class="text-center">主机组</th>
+                                                <th class="text-center">备注</th>
                                                 <th class="text-center">操作</th>
                                             </tr>
                                         </thead>
                                         <tbody id="perm_edit">
-                                        {% for group in contacts.object_list %}
+                                        {% for perm in contacts.object_list %}
                                             <tr class="gradeX">
-                                                <td class="text-center"> {{ group.name }} </td>
-                                                <td class="text-center"> {{ group.type|group_type_to_str }} </td>
-                                                <td class="text-center"> {{ group.id|member_count }} </td>
-                                                <td class="text-center"> {{ group.id|perm_count }} </td>
+                                                <td class="text-center"> {{ perm.name }} </td>
                                                 <td class="text-center">
-                                                    <a title="[ {{ group.name }} 授权详情 ]" href="../perm_detail/?id={{ group.id }}" class="iframe btn btn-xs btn-primary">详情</a>
-                                                    <a href="../perm_edit/?id={{ group.id }}" class="btn btn-xs btn-info">编辑</a>
-                                                    <a href="../perm_del/?id={{ group.id }}" class="btn btn-xs btn-danger">删除</a>
+                                                    {% for user_group in perm.user_group.all %}
+                                                        {{ user_group.name }}
+                                                    {% endfor %}
+                                                </td>
+                                                <td class="text-center">
+                                                    {% for asset_group in perm.asset_group.all %}
+                                                        {{ asset_group.name }}
+                                                    {% endfor %}
+                                                </td>
+                                                <td class="text-center"> {{ perm.comment }} </td>
+                                                <td class="text-center">
+                                                    <a title="[ {{ group.name }} 授权详情 ]" href="../perm_detail/?id={{ perm.id }}" class="iframe btn btn-xs btn-primary">详情</a>
+                                                    <a href="../perm_edit/?id={{ perm.id }}" class="btn btn-xs btn-info">编辑</a>
+                                                    <a href="../perm_del/?id={{ perm.id }}" class="btn btn-xs btn-danger">删除</a>
                                                 </td>
                                             </tr>
                                         {% endfor %}
@@ -137,11 +143,11 @@
                                         <tbody id="perm_list">
                                         {% for user in contacts2.object_list %}
                                             <tr class="gradeX">
-                                                <td class="text-center"> {{ user.name }} </td>
-                                                <td class="text-center"> {{ user.id | get_role }} </td>
-                                                <td class="text-center"> {{ user.username | groups_str }} </td>
-                                                <td class="text-center"> {{ user.id | perm_asset_count }} </td>
-                                                <td class="text-center">
+{#                                                <td class="text-center"> {{ user.name }} </td>#}
+{#                                                <td class="text-center"> {{ user.id | get_role }} </td>#}
+{#                                                <td class="text-center"> {{ user.username | groups_str }} </td>#}
+{#                                                <td class="text-center"> {{ user.id | perm_asset_count }} </td>#}
+{#                                                <td class="text-center">#}
                                                     <a title="[ {{ user.name }} ] 授权详情" href="../perm_asset_detail/?id={{ user.id }}" class="iframe btn btn-xs btn-primary">详情</a>
                                                 </td>
                                             </tr>

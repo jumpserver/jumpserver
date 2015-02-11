@@ -32,8 +32,18 @@
             <li id="jperm">
                 <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">授权管理</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
-                    <li id="perm_list"><a href="/jperm/perm_list/">主机授权</a></li>
-                    <li class="active">
+                    <li id="perm_list"><a href="/jperm/perm_list/">主机授权<span class="fa arrow"></span></a>
+                        <ul class="nav nav-third-level">
+                            <li id="perm_add">
+                                <a href="/jperm/perm_add/">授权添加</a>
+                            </li>
+                            <li id="perm_list">
+                                <a href="/jperm/perm_list/">授权查看</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                    <li>
                         <a href="#">Sudo授权<span class="fa arrow"></span></a>
                         <ul class="nav nav-third-level">
                             <li id="cmd_add">
