@@ -27,8 +27,8 @@
             <td class="text-center"> {{ post.date_added|date:"Y-m-d H:i:s" }} </td>
             <td class="text-center" name="j_comment"> {{ post.comment }} </td>
             <td class="text-center" data-editable='false'>
-                <a href="/jasset/{{ post.ip }}/" class="iframe btn btn-xs btn-primary">详情</a>
-                <a href="/jasset/host_edit/{{ post.id }}" class="btn btn-xs btn-info">编辑</a>
+                <a value="/jasset/{{ post.ip }}/" class="iframe btn btn-xs btn-primary">详情</a>
+                <a href="/jasset/host_edit/?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>
                 <a href="/jasset/host_del/{{ post.id }}" class="btn btn-xs btn-danger">删除</a>
             </td>
         </tr>
@@ -62,3 +62,80 @@
         </div>
     </div>
 </div>
+
+<script>
+    $(document).ready(function(){
+        $('#editable').editableTableWidget();
+    });
+
+    $(".iframe").on('click', function(){
+        var url= $(this).attr("value");
+        $.layer({
+            type: 2,
+            title: 'JumpServer主机详情',
+            maxmin: true,
+            shift: 'top',
+            border: [2, 0.3, '#1AB394'],
+            shade: [0.5, '#000000'],
+            shadeClose: true,
+            area : ['800px' , '600px'],
+            iframe: {src: url}
+        });
+    });
+
+    function alter(form) {
+        selectData = GetTableDataBox();
+        if (selectData[1] != 0) {
+            $.ajax({
+                type: "post",
+                url: "/jasset/host_edit/batch/",
+                data: {"editable": selectData[0], "len_table": selectData[1]},
+                success: function (data) {
+                    alert("修改成功");
+                    window.open("/jasset/host_list/", "_self");
+                }
+            });
+        }
+    }
+
+    function del(form) {
+        var checkboxes = document.getElementById(form);
+        var id_list = {};
+        var j = 0;
+        for (var i = 0; i < checkboxes.elements.length; i++) {
+            if (checkboxes.elements[i].type == "checkbox" && checkboxes.elements[i].checked == true && checkboxes.elements[i].value != "checkall") {
+                id_list[j] = checkboxes.elements[i].value;
+                j++;
+            }
+        }
+        if (confirm("确定删除")) {
+            $.ajax({
+                type: "POST",
+                url: "/jasset/host_del/multi/",
+                data: {"id_list": id_list, "len_list": j},
+                success: function (data) {
+                    window.open("/jasset/host_list/", "_self");
+                }
+            });
+        }
+    }
+
+    function host_search(){
+        $.ajax({
+            type: "GET",
+            url: "/jasset/search/",
+            data: $("#search_form").serialize(),
+            success: function (data) {
+                $("#contents_form").html(data);
+            }
+        });
+    }
+
+    $("#search_input").keydown(function(e){
+        if(e.keyCode==13){
+            host_search()
+            }
+    })
+
+
+</script>

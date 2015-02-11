@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'nav_cat_bar.html' %}
+
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-success pull-right">Monthly</span>
+                    <h5>用户总数</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">{{ users.count}}</h1>
+                    <div class="stat-percent font-bold text-success">98% <i class="fa fa-bolt"></i></div>
+                    <small>All user</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-info pull-right">Annual</span>
+                    <h5>主机总数</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">{{ hosts.count }}</h1>
+                    <div class="stat-percent font-bold text-info">20% <i class="fa fa-level-up"></i></div>
+                    <small>All host</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-primary pull-right">Today</span>
+                    <h5>在线用户</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">{{ online_user.count }}</h1>
+                    <div class="stat-percent font-bold text-navy">44% <i class="fa fa-level-up"></i></div>
+                    <small>Online user</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-danger pull-right">Low value</span>
+                    <h5>已连接服务器</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins">{{ online_host.count }}</h1>
+                    <div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>
+                    <small>Connect host</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

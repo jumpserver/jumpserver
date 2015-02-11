@@ -9,6 +9,7 @@ from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from models import IDC, Asset, BisGroup
 from juser.models import UserGroup
 from connect import PyCrypt, KEY
+from jlog.models import Log
 from jumpserver.views import jasset_group_add, jasset_host_edit, pages
 
 cryptor = PyCrypt(KEY)
@@ -174,13 +175,14 @@ def host_del(request, offset):
     return HttpResponseRedirect('/jasset/host_list/')
 
 
-def host_edit(request, offset):
+def host_edit(request):
     actives = {1: u'激活', 0: u'禁用'}
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
     header_title, path1, path2 = u'修改主机 | Edit Host', u'资产管理', u'修改主机'
     groups, e_group = [], []
     eidc = IDC.objects.all()
     egroup = BisGroup.objects.filter(type='A')
+    offset = request.GET.get('id')
     for g in Asset.objects.get(id=int(offset)).bis_group.all():
         e_group.append(g)
     post = Asset.objects.get(id=int(offset))
@@ -228,7 +230,9 @@ def host_edit(request, offset):
 
 def jlist_ip(request, offset):
     header_title, path1, path2 = u'主机详细信息 | Host Detail.', u'资产管理', u'主机详情'
+    login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
     post = contact_list = Asset.objects.get(ip=str(offset))
+    log = Log.objects.filter(host=str(offset))
     return render_to_response('jasset/jlist_ip.html', locals(), context_instance=RequestContext(request))
 
 
@@ -309,9 +313,10 @@ def edit_group(request):
     return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
 
 
-def detail_group(request, offset):
+def detail_group(request):
     header_title, path1, path2 = u'主机组详情 | Group Detail', u'资产管理', u'主机组详情'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
+    offset = request.GET.get('id')
     group_name = BisGroup.objects.get(id=offset).name
     b = BisGroup.objects.get(id=offset)
     posts = contact_list = Asset.objects.filter(bis_group=b).order_by('ip')
@@ -328,9 +333,10 @@ def detail_group(request, offset):
     return render_to_response('jasset/group_detail.html', locals(), context_instance=RequestContext(request))
 
 
-def detail_idc(request, offset):
+def detail_idc(request):
     header_title, path1, path2 = u'主机组详情 | Group Detail', u'资产管理', u'主机组详情'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
+    offset = request.GET.get('id')
     idc_name = IDC.objects.get(id=offset).name
     b = IDC.objects.get(id=offset)
     posts = contact_list = Asset.objects.filter(idc=b).order_by('ip')

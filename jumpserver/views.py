@@ -7,6 +7,7 @@ from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 from juser.models import User
+from jlog.models import Log
 from jasset.models import Asset, BisGroup, IDC
 
 
@@ -14,8 +15,13 @@ def md5_crypt(string):
     return hashlib.new("md5", string).hexdigest()
 
 
-def base(request):
-    return render_to_response('base.html')
+def index(request):
+    path1, path2 = u'仪表盘', 'Dashboard'
+    users = User.objects.all()
+    hosts = Asset.objects.all()
+    online_host = Log.objects.filter(is_finished=0)
+    online_user = online_host.distinct()
+    return render_to_response('index.html', locals())
 
 
 def skin_config(request):

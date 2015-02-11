@@ -32,10 +32,10 @@
                             <tr class="gradeX">
                                 <td class="text-center"> {{ post.id }} </td>
                                 <td class="text-center"> {{ post.name }} </td>
-                                <td class="text-center"> <a href="/jasset/idc_detail/{{ post.id }}">{{ post.asset_set.count }}</a> </td>
+                                <td class="text-center"> <a href="/jasset/idc_detail/?id={{ post.id }}">{{ post.asset_set.count }}</a> </td>
                                 <td class="text-center"> {{ post.comment }} </td>
                                 <td class="text-center">
-                                    <a href="/jasset/idc_detail/{{ post.id }}" class="iframe btn btn-xs btn-primary">详情</a>
+                                    <a href="/jasset/?id={{ post.id }}" class="iframe btn btn-xs btn-primary">详情</a>
                                     <a href="/jasset/idc_del/{{ post.id }}" class="btn btn-xs btn-danger">删除</a>
                                 </td>
                             </tr>
