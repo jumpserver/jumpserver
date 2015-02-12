@@ -47,6 +47,9 @@ def jasset_group_add(name, comment, type):
         smg = u'业务组%s添加成功' % name
 
 
+class ServerError(Exception):
+    pass
+
 def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment):
     groups = []
     is_active = {u'是': '1', u'否': '2'}
@@ -191,6 +194,28 @@ class PyCrypt(object):
         except TypeError:
             raise ServerError('Decrypt password error, TYpe error.')
         return plain_text.rstrip('\0')
+
+
+def perm_user_asset(user_id=None, username=None):
+    if user_id:
+        user = User.objects.get(id=user_id)
+    else:
+        user = User.objects.get(username=username)
+    user_groups = user.user_group.all()
+    perms = []
+    assets = []
+    asset_groups = []
+    for user_group in user_groups:
+        perm = user_group.perm_set.all()
+        perms.extend(perm)
+
+    for perm in perms:
+        asset_groups.extend(perm.asset_group.all())
+
+    for asset_group in asset_groups:
+        assets.extend(list(asset_group.asset_set.all()))
+
+    return assets
 
 
 if LDAP_ENABLE:

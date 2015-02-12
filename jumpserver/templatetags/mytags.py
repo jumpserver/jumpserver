@@ -2,10 +2,9 @@
 
 import time
 from django import template
-from django.db.models import Q
 from juser.models import User, UserGroup
-from jperm.views import perm_user_asset
 from jasset.models import BisGroup
+from jumpserver.views import perm_user_asset
 
 register = template.Library()
 

@@ -7,7 +7,7 @@ from jasset.models import Asset, BisGroup
 from jperm.models import Perm, SudoPerm, CmdGroup
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.db.models import Q
-from jumpserver.views import LDAP_ENABLE, ldap_conn, CONF
+from jumpserver.views import LDAP_ENABLE, ldap_conn, CONF, perm_user_asset
 
 
 if LDAP_ENABLE:
@@ -32,26 +32,6 @@ def perm_group_update(user_group_name='', user_group_id='', asset_groups_name=''
         for asset_group_id in asset_groups_id:
             asset_group = BisGroup.objects.get(id=asset_group_id)
             Perm(user_group=user_group, asset_group=asset_group).save()
-
-
-def perm_user_asset(user_id=None, username=None):
-    if user_id:
-        user = User.objects.get(id=user_id)
-    else:
-        user = User.objects.get(username=username)
-    user_groups = user.user_group.all()
-    perms = []
-    assets = []
-    for user_group in user_groups:
-        perm = user_group.perm_set.all()
-        perms.extend(perm)
-
-    asset_groups = [perm.asset_group for perm in perms]
-
-    for asset_group in asset_groups:
-        assets.extend(list(asset_group.asset_set.all()))
-
-    return list(set(assets))
 
 
 def perm_list(request):
@@ -205,9 +185,12 @@ def perm_del(request):
 
 
 def perm_asset_detail(request):
+    header_title, path1, path2 = u'用户授权主机 | User Perm Asset.', u'权限管理', u'用户主机详情'
     user_id = request.GET.get('id')
-    user = User.objects.get(id=user_id)
-    assets = perm_user_asset(user_id)
+    user = User.objects.filter(id=user_id)
+    if user:
+        user = user[0]
+        assets_list = perm_user_asset(user_id)
     return render_to_response('jperm/perm_asset_detail.html', locals())
 
 

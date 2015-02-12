@@ -143,12 +143,12 @@
                                         <tbody id="perm_list">
                                         {% for user in contacts2.object_list %}
                                             <tr class="gradeX">
-{#                                                <td class="text-center"> {{ user.name }} </td>#}
-{#                                                <td class="text-center"> {{ user.id | get_role }} </td>#}
-{#                                                <td class="text-center"> {{ user.username | groups_str }} </td>#}
-{#                                                <td class="text-center"> {{ user.id | perm_asset_count }} </td>#}
-{#                                                <td class="text-center">#}
-                                                    <a title="[ {{ user.name }} ] 授权详情" href="../perm_asset_detail/?id={{ user.id }}" class="iframe btn btn-xs btn-primary">详情</a>
+                                                <td class="text-center"> {{ user.name }} </td>
+                                                <td class="text-center"> {{ user.id | get_role }} </td>
+                                                <td class="text-center"> {{ user.username | groups_str }} </td>
+                                                <td class="text-center"> {{ user.id | perm_asset_count }} </td>
+                                                <td class="text-center">
+                                                    <a title="[ {{ user.name }} ] 授权详情" href="../perm_asset_detail/?id={{ user.id }}" class="btn btn-xs btn-primary">详情</a>
                                                 </td>
                                             </tr>
                                         {% endfor %}

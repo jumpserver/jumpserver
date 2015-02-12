@@ -24,8 +24,7 @@ django.setup()
 from juser.models import User
 from jasset.models import Asset
 from jlog.models import Log
-from jperm.views import perm_user_asset
-from jumpserver.views import PyCrypt
+from jumpserver.views import PyCrypt, perm_user_asset
 
 try:
     import termios
