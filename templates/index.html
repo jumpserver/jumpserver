@@ -11,7 +11,7 @@
                     <h5>用户总数</h5>
                 </div>
                 <div class="ibox-content">
-                    <h1 class="no-margins">{{ users.count}}</h1>
+                    <h1 class="no-margins"><a href="/juser/user_list/">{{ users.count}}</a></h1>
                     <div class="stat-percent font-bold text-success">98% <i class="fa fa-bolt"></i></div>
                     <small>All user</small>
                 </div>
@@ -24,7 +24,7 @@
                     <h5>主机总数</h5>
                 </div>
                 <div class="ibox-content">
-                    <h1 class="no-margins">{{ hosts.count }}</h1>
+                    <h1 class="no-margins"><a href="/jasset/host_list/">{{ hosts.count }}</a></h1>
                     <div class="stat-percent font-bold text-info">20% <i class="fa fa-level-up"></i></div>
                     <small>All host</small>
                 </div>
@@ -38,7 +38,7 @@
                     <h5>在线用户</h5>
                 </div>
                 <div class="ibox-content">
-                    <h1 class="no-margins">{{ online_user.count }}</h1>
+                    <h1 class="no-margins"><a href="/jlog/log_list/online/">{{ online_user.count }}</a></h1>
                     <div class="stat-percent font-bold text-navy">44% <i class="fa fa-level-up"></i></div>
                     <small>Online user</small>
                 </div>
@@ -52,14 +52,64 @@
                     <h5>已连接服务器</h5>
                 </div>
                 <div class="ibox-content">
-                    <h1 class="no-margins">{{ online_host.count }}</h1>
+                    <h1 class="no-margins"><a href="/jlog/log_list/online/">{{ online_host.count }}</a></h1>
                     <div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>
                     <small>Connect host</small>
                 </div>
             </div>
         </div>
+        <div id="high" style="width:100%;height:400px;"></div>
     </div>
 </div>
 
+<script>
+$(function () {
+    $('#high').highcharts({
+        title: {
+            text: '一周用户登录TOP10',
+            x: -20 //center
+        },
+        subtitle: {
+            text: 'Source: JumpServer',
+            x: -20
+        },
+        xAxis: {
+            categories: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六','星期日']
+        },
+        yAxis: {
+            title: {
+                text: '登陆次数'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            valueSuffix: '次'
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+        series: [{
+            name: '{{ user }}',
+            data: [5, 10, 20, 10, 8, 1, 0]
+        }, {
+            name: '广宏伟',
+            data: [10, 11, 13, 12, 18, 11, 6]
+        }, {
+            name: '刘德华',
+            data: [2, 2, 5, 6, 4, 7, 3]
+        }, {
+            name: '梁朝伟',
+            data: [3, 4, 5, 8, 11, 15, 8]
+        }]
+    });
+});
+</script>
 
 {% endblock %}

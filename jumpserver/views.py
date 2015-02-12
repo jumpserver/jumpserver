@@ -19,6 +19,7 @@ def index(request):
     path1, path2 = u'仪表盘', 'Dashboard'
     users = User.objects.all()
     hosts = Asset.objects.all()
+    user = 'wangyong'
     online_host = Log.objects.filter(is_finished=0)
     online_user = online_host.distinct()
     return render_to_response('index.html', locals())
