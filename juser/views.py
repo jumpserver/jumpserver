@@ -20,7 +20,7 @@ from juser.models import UserGroup, User
 from connect import PyCrypt, KEY
 from connect import BASE_DIR
 from connect import CONF
-from jumpserver.views import md5_crypt, LDAPMgmt, LDAP_ENABLE, ldap_conn
+from jumpserver.views import md5_crypt, LDAPMgmt, LDAP_ENABLE, ldap_conn, page_list_return
 
 if LDAP_ENABLE:
     LDAP_HOST_URL = CONF.get('ldap', 'host_url')
@@ -265,12 +265,14 @@ def group_list(request):
     p = paginator = Paginator(contact_list, 10)
 
     try:
-        page = int(request.GET.get('page', '1'))
+        current_page = int(request.GET.get('page', '1'))
     except ValueError:
-        page = 1
+        current_page = 1
+
+    page_range = page_list_return(len(p.page_range), current_page)
 
     try:
-        contacts = paginator.page(page)
+        contacts = paginator.page(current_page)
     except (EmptyPage, InvalidPage):
         contacts = paginator.page(paginator.num_pages)
     return render_to_response('juser/group_list.html', locals())
@@ -333,12 +335,14 @@ def user_list(request):
     p = paginator = Paginator(contact_list, 10)
 
     try:
-        page = int(request.GET.get('page', '1'))
+        current_page = int(request.GET.get('page', '1'))
     except ValueError:
-        page = 1
+        current_page = 1
+
+    page_range = page_list_return(len(p.page_range), current_page)
 
     try:
-        contacts = paginator.page(page)
+        contacts = paginator.page(current_page)
     except (EmptyPage, InvalidPage):
         contacts = paginator.page(paginator.num_pages)
     return render_to_response('juser/user_list.html', locals())

@@ -7,7 +7,7 @@ from jasset.models import Asset, BisGroup
 from jperm.models import Perm, SudoPerm, CmdGroup
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.db.models import Q
-from jumpserver.views import LDAP_ENABLE, ldap_conn, CONF, perm_user_asset
+from jumpserver.views import LDAP_ENABLE, ldap_conn, CONF, perm_user_asset, page_list_return
 
 
 if LDAP_ENABLE:
@@ -39,19 +39,22 @@ def perm_list(request):
     groups = contact_list = Perm.objects.all()
     users = contact_list2 = User.objects.all().order_by('id')
     p = paginator = Paginator(contact_list, 10)
-    p2 = paginator2 = Paginator(contact_list2, 10)
     try:
-        page = int(request.GET.get('page', '1'))
+        current_page = int(request.GET.get('page', '1'))
     except ValueError:
-        page = 1
+        current_page = 1
+
+    page_range = page_list_return(len(p.page_range), current_page)
 
     try:
-        contacts = paginator.page(page)
-        contacts2 = paginator2.page(page)
+        contacts = paginator.page(current_page)
     except (EmptyPage, InvalidPage):
         contacts = paginator.page(paginator.num_pages)
-        contacts2 = paginator2.page(paginator2.num_pages)
     return render_to_response('jperm/perm_list.html', locals())
+
+
+def perm_user_detail(request):
+    header_title, path1, path2 = u'用户授权详情 | Perm User Detail.', u'授权管理', u'授权详情'
 
 
 def user_asset_cmd_groups_get(user_groups_select='', asset_groups_select='', cmd_groups_select=''):
