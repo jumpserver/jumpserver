@@ -1,7 +1,10 @@
 #coding: utf-8
 
 import hashlib
+import datetime
 
+from django.db.models import Q
+from django.db.models import Count
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
@@ -15,11 +18,34 @@ def md5_crypt(string):
     return hashlib.new("md5", string).hexdigest()
 
 
+def getDaysByNum(num):
+    today = datetime.date.today()
+    oneday = datetime.timedelta(days=1)
+    li = []
+    for i in range(0, num):
+        today = today-oneday
+        li.append(str(today)[0:10])
+    li.reverse()
+    return li
+
+
 def index(request):
     path1, path2 = u'仪表盘', 'Dashboard'
+    dic = {}
+    today = datetime.datetime.now().day
+    from_week = datetime.datetime.now() - datetime.timedelta(days=7)
+    week_data = Log.objects.filter(start_time__range=[from_week, datetime.datetime.now()])
+    top_ten = week_data.values('user').annotate(times=Count('user')).order_by('-times')[:10]
+    for user in top_ten:
+        username = user['user']
+        li = []
+        for t in getDaysByNum(7):
+            times = week_data.filter(user=user).filter(start_time__gt=t).count()
+            li.append(times)
+        dic[username] = li
+    print dic
     users = User.objects.all()
     hosts = Asset.objects.all()
-    user = 'wangyong'
     online_host = Log.objects.filter(is_finished=0)
     online_user = online_host.distinct()
     return render_to_response('index.html', locals())

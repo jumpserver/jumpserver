@@ -78,7 +78,7 @@ $(function () {
         },
         yAxis: {
             title: {
-                text: '登陆次数'
+                text: '登录次数'
             },
             plotLines: [{
                 value: 0,
@@ -95,19 +95,25 @@ $(function () {
             verticalAlign: 'middle',
             borderWidth: 0
         },
-        series: [{
-            name: '{{ user }}',
-            data: [5, 10, 20, 10, 8, 1, 0]
-        }, {
-            name: '广宏伟',
-            data: [10, 11, 13, 12, 18, 11, 6]
-        }, {
-            name: '刘德华',
-            data: [2, 2, 5, 6, 4, 7, 3]
-        }, {
-            name: '梁朝伟',
-            data: [3, 4, 5, 8, 11, 15, 8]
-        }]
+{#        series: [{#}
+{#            name: '{{ user }}',#}
+{#            data: [5, 10, 20, 10, 8, 1, 0]#}
+{#        }, {#}
+{#            name: '广宏伟',#}
+{#            data: [10, 11, 13, 12, 18, 11, 6]#}
+{#        }, {#}
+{#            name: '刘德华',#}
+{#            data: [2, 2, 5, 6, 4, 7, 3]#}
+{#        }, {#}
+{#            name: '梁朝伟',#}
+{#            data: [3, 4, 5, 8, 11, 15, 8]#}
+{#        }]#}
+        series: [
+            {% for k,v in dic.items %}
+                {name: '{{ k }}',
+                data: {{ v }}},
+            {% endfor %}
+        ]
     });
 });
 </script>
