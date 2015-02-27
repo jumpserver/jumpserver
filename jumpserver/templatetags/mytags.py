@@ -97,3 +97,18 @@ def filter_private(group):
     p = BisGroup.objects.get(name='ALL')
     [agroup.append(g) for g in group if g != p]
     return agroup
+
+
+@register.filter(name='to_name')
+def to_name(user_id):
+    user = User.objects.filter(id=user_id)
+    if user:
+        user = user[0]
+        return user.name
+    else:
+        return '非法用户'
+
+@register.filter(name='to_role_name')
+def to_role_name(role_id):
+    role_dict = {'0': '普通用户', '1': '组管理员', '2': '超级管理员'}
+    return role_dict.get(role_id, '未知')

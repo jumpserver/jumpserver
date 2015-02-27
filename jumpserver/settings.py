@@ -90,6 +90,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.core.context_processors.tz',
     'django.contrib.messages.context_processors.messages',
+    'jumpserver.context_processors.name_proc'
 )
 
 TEMPLATE_DIRS = (

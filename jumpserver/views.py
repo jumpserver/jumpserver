@@ -11,6 +11,7 @@ import os
 from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
+from django.template import RequestContext
 
 from juser.models import User
 from jasset.models import Asset, BisGroup, IDC
@@ -32,7 +33,7 @@ def md5_crypt(string):
 
 
 def base(request):
-    return render_to_response('base.html')
+    return render_to_response('base.html', context_instance=RequestContext(request))
 
 
 def skin_config(request):
@@ -49,6 +50,7 @@ def jasset_group_add(name, comment, type):
 
 class ServerError(Exception):
     pass
+
 
 def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment):
     groups = []
@@ -99,7 +101,7 @@ def login(request):
         if user:
             user = user[0]
             if md5_crypt(password) == user.password:
-                request.session['username'] = username
+                request.session['user_id'] = user.id
                 if user.role == 'SU':
                     request.session['role'] = 2
                 elif user.role == 'GA':

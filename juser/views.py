@@ -13,6 +13,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from django.template import RequestContext
 from django.http import HttpResponse
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
@@ -212,7 +213,7 @@ def ldap_del_user(username):
 def group_add(request, group_type_select='A'):
     error = ''
     msg = ''
-    header_title, path1, path2 = '添加属组 | Add Group', 'juser', 'group_add'
+    header_title, path1, path2 = '添加属组 | Group Add', '用户管理', '添加用户组'
     group_types = {
         'M': '部门',
         'A': '用户组',
@@ -245,7 +246,7 @@ def group_add(request, group_type_select='A'):
         else:
             msg = u'添加组 %s 成功' % group_name
 
-    return render_to_response('juser/group_add.html', locals())
+    return render_to_response('juser/group_add.html', locals(), context_instance=RequestContext(request))
 
 
 def group_add_ajax(request):
@@ -256,11 +257,11 @@ def group_add_ajax(request):
     else:
         users = [user for user in users_all if not user.user_group.filter(type='M')]
 
-    return render_to_response('juser/group_add_ajax.html', locals())
+    return render_to_response('juser/group_add_ajax.html', locals(), context_instance=RequestContext(request))
 
 
 def group_list(request):
-    header_title, path1, path2 = '查看属组 | Show Group', 'juser', 'group_list'
+    header_title, path1, path2 = '查看属组 | Show Group', '用户管理', '查看用户组'
     groups = contact_list = UserGroup.objects.filter(Q(type='M') | Q(type='A')).order_by('type')
     p = paginator = Paginator(contact_list, 10)
 
@@ -273,7 +274,7 @@ def group_list(request):
         contacts = paginator.page(page)
     except (EmptyPage, InvalidPage):
         contacts = paginator.page(paginator.num_pages)
-    return render_to_response('juser/group_list.html', locals())
+    return render_to_response('juser/group_list.html', locals(), context_instance=RequestContext(request))
 
 
 def group_detail(request):
@@ -282,7 +283,7 @@ def group_detail(request):
         return HttpResponseRedirect('/')
     group = UserGroup.objects.get(id=group_id)
     users = group.user_set.all()
-    return render_to_response('juser/group_detail.html', locals())
+    return render_to_response('juser/group_detail.html', locals(), context_instance=RequestContext(request))
 
 
 def group_del(request):
@@ -291,7 +292,7 @@ def group_del(request):
         return HttpResponseRedirect('/')
     group = UserGroup.objects.get(id=group_id)
     group.delete()
-    return HttpResponseRedirect('/juser/group_list/', locals())
+    return HttpResponseRedirect('/juser/group_list/', locals(), context_instance=RequestContext(request))
 
 
 def group_edit(request):
@@ -312,7 +313,7 @@ def group_edit(request):
         users_selected = group.user_set.all()
         users = [user for user in users_all if user not in users_selected]
 
-        return render_to_response('juser/group_edit.html', locals())
+        return render_to_response('juser/group_edit.html', locals(), context_instance=RequestContext(request))
     else:
         group_id = request.POST.get('group_id', None)
         group_name = request.POST.get('group_name', None)
@@ -341,7 +342,7 @@ def user_list(request):
         contacts = paginator.page(page)
     except (EmptyPage, InvalidPage):
         contacts = paginator.page(paginator.num_pages)
-    return render_to_response('juser/user_list.html', locals())
+    return render_to_response('juser/user_list.html', locals(), context_instance=RequestContext(request))
 
 
 def user_detail(request):
@@ -349,7 +350,7 @@ def user_detail(request):
     if not user_id:
         return HttpResponseRedirect('/')
     user = User.objects.get(id=user_id)
-    return render_to_response('juser/user_detail.html', locals())
+    return render_to_response('juser/user_detail.html', locals(), context_instance=RequestContext(request))
 
 
 def user_del(request):
@@ -362,7 +363,7 @@ def user_del(request):
     group.delete()
     server_del_user(user.username)
     ldap_del_user(user.username)
-    return HttpResponseRedirect('/juser/user_list/', locals())
+    return HttpResponseRedirect('/juser/user_list/', locals(), context_instance=RequestContext(request))
 
 
 def user_edit(request):
@@ -430,13 +431,13 @@ def user_edit(request):
 
         return HttpResponseRedirect('/juser/user_list/')
 
-    return render_to_response('juser/user_add.html', locals())
+    return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
 
 
 def user_add(request):
     error = ''
     msg = ''
-    header_title, path1, path2 = '添加用户 | Add User', 'juser', 'user_add'
+    header_title, path1, path2 = '添加用户 | User Add', '用户管理', '添加用户'
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
     manage_groups = UserGroup.objects.filter(type='M')
     auth_groups = UserGroup.objects.filter(type='A')
@@ -497,7 +498,7 @@ def user_add(request):
                 except Exception:
                     pass
 
-    return render_to_response('juser/user_add.html', locals())
+    return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
 
 
 

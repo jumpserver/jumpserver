@@ -1,7 +1,8 @@
 # coding: utf-8
 
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect
+from django.template import RequestContext
 from juser.models import User, UserGroup
 from jasset.models import Asset, BisGroup
 from jperm.models import Perm, SudoPerm, CmdGroup
@@ -51,7 +52,7 @@ def perm_list(request):
     except (EmptyPage, InvalidPage):
         contacts = paginator.page(paginator.num_pages)
         contacts2 = paginator2.page(paginator2.num_pages)
-    return render_to_response('jperm/perm_list.html', locals())
+    return render_to_response('jperm/perm_list.html', locals(), context_instance=RequestContext(request))
 
 
 def user_asset_cmd_groups_get(user_groups_select='', asset_groups_select='', cmd_groups_select=''):
@@ -92,7 +93,7 @@ def perm_add(request):
         perm.user_group = user_groups
         perm.asset_group = asset_groups
         msg = '添加成功'
-    return render_to_response('jperm/perm_add.html', locals())
+    return render_to_response('jperm/perm_add.html', locals(), context_instance=RequestContext(request))
 
 
 def perm_list_ajax(request):
@@ -151,8 +152,8 @@ def perm_edit(request):
         user_group_name = request.POST.get('user_group_name')
         asset_groups_selected = request.POST.getlist('asset_group_permed')
         perm_group_update(user_group_name=user_group_name, asset_groups_id=asset_groups_selected)
-        return HttpResponseRedirect('/jperm/perm_list/', locals())
-    return render_to_response('jperm/perm_edit.html', locals())
+        return HttpResponseRedirect('/jperm/perm_list/', locals(), context_instance=RequestContext(request))
+    return render_to_response('jperm/perm_edit.html', locals(), context_instance=RequestContext(request))
 
 
 def perm_detail(request):
@@ -172,7 +173,7 @@ def perm_detail(request):
         for asset_group in asset_groups:
             assets_list.extend(asset_group.asset_set.all())
 
-    return render_to_response('jperm/perm_detail.html', locals())
+    return render_to_response('jperm/perm_detail.html', locals(), context_instance=RequestContext(request))
 
 
 def perm_del(request):
@@ -191,7 +192,7 @@ def perm_asset_detail(request):
     if user:
         user = user[0]
         assets_list = perm_user_asset(user_id)
-    return render_to_response('jperm/perm_asset_detail.html', locals())
+    return render_to_response('jperm/perm_asset_detail.html', locals(), context_instance=RequestContext(request))
 
 
 def sudo_db_add(name, user_runas, user_groups_select, asset_groups_select, cmd_groups_select, comment):
@@ -286,7 +287,7 @@ def sudo_add(request):
 
         msg = '添加成功'
         return HttpResponseRedirect('/jperm/sudo_list/')
-    return render_to_response('jperm/sudo_add.html', locals())
+    return render_to_response('jperm/sudo_add.html', locals(), context_instance=RequestContext(request))
 
 
 def sudo_list(request):
@@ -306,7 +307,7 @@ def sudo_list(request):
         contacts1 = paginator1.page(page1)
     except (EmptyPage, InvalidPage):
         contacts1 = paginator1.page(paginator1.num_pages)
-    return render_to_response('jperm/sudo_list.html', locals())
+    return render_to_response('jperm/sudo_list.html', locals(), context_instance=RequestContext(request))
 
 
 def sudo_edit(request):
@@ -352,7 +353,7 @@ def sudo_edit(request):
 
         return HttpResponseRedirect('/jperm/sudo_list/')
 
-    return render_to_response('jperm/sudo_edit.html', locals())
+    return render_to_response('jperm/sudo_edit.html', locals(), context_instance=RequestContext(request))
 
 
 def sudo_detail(request):
@@ -376,7 +377,7 @@ def sudo_detail(request):
         for cmd_group in cmd_groups:
             cmds_list.append({cmd_group.name: cmd_group.cmd.split(',')})
 
-        return render_to_response('jperm/sudo_detail.html', locals())
+        return render_to_response('jperm/sudo_detail.html', locals(), context_instance=RequestContext(request))
 
 
 def sudo_del(request):
@@ -403,7 +404,7 @@ def cmd_add(request):
 
         return HttpResponseRedirect('/jperm/cmd_list/')
 
-    return render_to_response('jperm/sudo_cmd_add.html', locals())
+    return render_to_response('jperm/sudo_cmd_add.html', locals(), context_instance=RequestContext(request))
 
 
 def cmd_edit(request):
@@ -429,7 +430,7 @@ def cmd_edit(request):
         if cmd_group:
             cmd_group.update(name=name, cmd=cmd, comment=comment)
             return HttpResponseRedirect('/jperm/cmd_list/')
-    return render_to_response('jperm/sudo_cmd_add.html', locals())
+    return render_to_response('jperm/sudo_cmd_add.html', locals(), context_instance=RequestContext(request))
 
 
 def cmd_list(request):
@@ -447,7 +448,7 @@ def cmd_list(request):
         contacts = paginator.page(page)
     except (EmptyPage, InvalidPage):
         contacts = paginator.page(paginator.num_pages)
-    return render_to_response('jperm/sudo_cmd_list.html', locals())
+    return render_to_response('jperm/sudo_cmd_list.html', locals(), context_instance=RequestContext(request))
 
 
 def cmd_del(request):
