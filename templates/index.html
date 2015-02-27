@@ -58,11 +58,13 @@
                 </div>
             </div>
         </div>
+        <div>{{ li_str }}</div>
         <div id="high" style="width:100%;height:400px;"></div>
     </div>
 </div>
 
 <script>
+var cate = {{ li_str }};
 $(function () {
     $('#high').highcharts({
         title: {
@@ -74,7 +76,8 @@ $(function () {
             x: -20
         },
         xAxis: {
-            categories: ['星期一', '星期二', '星期三', '星期四', '星期五', '星期六','星期日']
+            type: 'datetime',
+            categories: cate
         },
         yAxis: {
             title: {
@@ -95,19 +98,6 @@ $(function () {
             verticalAlign: 'middle',
             borderWidth: 0
         },
-{#        series: [{#}
-{#            name: '{{ user }}',#}
-{#            data: [5, 10, 20, 10, 8, 1, 0]#}
-{#        }, {#}
-{#            name: '广宏伟',#}
-{#            data: [10, 11, 13, 12, 18, 11, 6]#}
-{#        }, {#}
-{#            name: '刘德华',#}
-{#            data: [2, 2, 5, 6, 4, 7, 3]#}
-{#        }, {#}
-{#            name: '梁朝伟',#}
-{#            data: [3, 4, 5, 8, 11, 15, 8]#}
-{#        }]#}
         series: [
             {% for k,v in dic.items %}
                 {name: '{{ k }}',

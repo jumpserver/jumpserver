@@ -2,8 +2,8 @@
 
 import hashlib
 import datetime
+import json
 
-from django.db.models import Q
 from django.db.models import Count
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect
@@ -21,17 +21,23 @@ def md5_crypt(string):
 def getDaysByNum(num):
     today = datetime.date.today()
     oneday = datetime.timedelta(days=1)
-    li = []
+    li_date, li_str = [], []
     for i in range(0, num):
         today = today-oneday
-        li.append(str(today)[0:10])
-    li.reverse()
-    return li
+        li_date.append(today)
+        li_str.append(str(today)[0:10])
+    li_date.reverse()
+    li_str.reverse()
+    t = (li_date, li_str)
+    return t
 
 
 def index(request):
     path1, path2 = u'仪表盘', 'Dashboard'
     dic = {}
+    li_date, li_str = getDaysByNum(7)
+    li_str = json.dumps(li_str)
+    print li_str
     today = datetime.datetime.now().day
     from_week = datetime.datetime.now() - datetime.timedelta(days=7)
     week_data = Log.objects.filter(start_time__range=[from_week, datetime.datetime.now()])
@@ -39,8 +45,10 @@ def index(request):
     for user in top_ten:
         username = user['user']
         li = []
-        for t in getDaysByNum(7):
-            times = week_data.filter(user=user).filter(start_time__gt=t).count()
+        user_data = week_data.filter(user=username)
+        for t in li_date:
+            year, month, day = t.year, t.month, t.day
+            times = user_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).count()
             li.append(times)
         dic[username] = li
     print dic
