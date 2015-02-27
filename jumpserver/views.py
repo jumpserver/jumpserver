@@ -36,8 +36,8 @@ def index(request):
     path1, path2 = u'仪表盘', 'Dashboard'
     dic = {}
     li_date, li_str = getDaysByNum(7)
-    li_str = json.dumps(li_str)
-    print li_str
+    # li_str = json.dumps(li_str)
+    # print li_str, type(li_str)
     today = datetime.datetime.now().day
     from_week = datetime.datetime.now() - datetime.timedelta(days=7)
     week_data = Log.objects.filter(start_time__range=[from_week, datetime.datetime.now()])
