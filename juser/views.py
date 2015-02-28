@@ -501,7 +501,6 @@ def user_add(request):
                         ldap_del_user(username)
                 except Exception:
                     pass
-
     return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
 
 
