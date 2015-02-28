@@ -111,11 +111,11 @@ def login(request):
             if md5_crypt(password) == user.password:
                 request.session['user_id'] = user.id
                 if user.role == 'SU':
-                    request.session['role'] = 2
+                    request.session['role_id'] = 2
                 elif user.role == 'GA':
-                    request.session['role'] = 1
+                    request.session['role_id'] = 1
                 else:
-                    request.session['role'] = 0
+                    request.session['role_id'] = 0
                 return HttpResponseRedirect('/')
             else:
                 error = '密码错误，请重新输入。'

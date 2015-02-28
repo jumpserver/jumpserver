@@ -505,7 +505,18 @@ def user_add(request):
     return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
 
 
+def profile(request):
+    user_id = request.session.get('user_id')
+    if not user_id:
+        return HttpResponseRedirect('/')
+    user = User.objects.get(id=user_id)
+    return render_to_response('juser/user_detail.html', locals(), context_instance=RequestContext(request))
 
+
+def chg_pass(request):
+    header_title, path1, path2 = '修改信息 | Edit Info', '用户管理', '修改个人信息'
+
+    return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
 
 
 
