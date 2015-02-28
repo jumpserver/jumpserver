@@ -52,6 +52,14 @@ class ServerError(Exception):
     pass
 
 
+def page_list_return(total, current=1):
+    min_page = current - 2 if current - 4 > 0 else 1
+    max_page = min_page + 4 if min_page + 4 < total else total
+
+    return range(min_page, max_page+1)
+
+
+
 def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment):
     groups = []
     is_active = {u'是': '1', u'否': '2'}

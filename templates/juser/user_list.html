@@ -89,8 +89,8 @@
                                              <a href="#">Previous</a>
                                         </li>
                                     {% endif %}
-                                    {% for page in p.page_range %}
-                                        {% ifequal offset1 page %}
+                                    {% for page in page_range %}
+                                        {% ifequal current_page page %}
                                             <li class="paginate_button active"  aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
                                         {% else %}
                                             <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
