@@ -60,7 +60,7 @@
         </div>
         <div id="high" style="width:100%;height:400px;"></div>
         </br>
-        <div id="dynamic" style="width:100%;height:400px;"></div>
+        <div id="dynamic" style="width:100%;height:400px; margin-top:170px"></div>
     </div>
 </div>
 
@@ -102,8 +102,10 @@ $(function () {
         },
         series: [
             {% for k,v in dic.items %}
-                {name: '{{ k }}',
-                data: {{ v }}},
+                {
+                    name: '{{ k }}',
+                    data: {{ v }}
+                },
             {% endfor %}
         ]
     });
@@ -122,28 +124,31 @@ $(function () {
                 animation: Highcharts.svg, // don't animate in old IE
                 marginRight: 10,
                 events: {
-                    load: function() {
-
-                        // set up the updating of the chart each second
+                    load: function () {
                         var series = this.series[0];
-                        setInterval(function() {
-                            var x = (new Date()).getTime(), // current time
-                                y = Math.random();
-                            series.addPoint([x, y], true, true);
-                        }, 1000);
+                        setInterval(function () {
+                            jQuery.getJSON('api/user/', function (data) {
+                                var users = data.users;
+                                var x = (new Date()).getTime(), // current time
+                                        y = users;
+                                console.log(users)
+                                series.addPoint([x, y], true, true);
+                            });
+                        }, 3000);
                     }
                 }
             },
             title: {
-                text: 'Live random data'
+                text: '实时在线用户统计'
             },
             xAxis: {
                 type: 'datetime',
                 tickPixelInterval: 150
             },
             yAxis: {
+                min: 0,
                 title: {
-                    text: 'Value'
+                    text: '用户数量'
                 },
                 plotLines: [{
                     value: 0,
@@ -155,7 +160,7 @@ $(function () {
                 formatter: function() {
                         return '<b>'+ this.series.name +'</b><br/>'+
                         Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
-                        Highcharts.numberFormat(this.y, 2);
+                        Highcharts.numberFormat(this.y);
                 }
             },
             legend: {
@@ -165,7 +170,7 @@ $(function () {
                 enabled: false
             },
             series: [{
-                name: 'Random data',
+                name: '实时在线用户数量',
                 data: (function() {
                     // generate an array of random data
                     var data = [],
@@ -175,7 +180,7 @@ $(function () {
                     for (i = -19; i <= 0; i++) {
                         data.push({
                             x: time + i * 1000,
-                            y: Math.random()
+                            y: 0
                         });
                     }
                     return data;

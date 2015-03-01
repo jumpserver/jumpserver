@@ -6,7 +6,9 @@ import json
 
 from django.db.models import Count
 from django.shortcuts import render_to_response
+from django.http import HttpResponse
 from django.http import HttpResponseRedirect
+from django.template import RequestContext
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 from juser.models import User
@@ -36,8 +38,6 @@ def index(request):
     path1, path2 = u'仪表盘', 'Dashboard'
     dic = {}
     li_date, li_str = getDaysByNum(7)
-    # li_str = json.dumps(li_str)
-    # print li_str, type(li_str)
     today = datetime.datetime.now().day
     from_week = datetime.datetime.now() - datetime.timedelta(days=7)
     week_data = Log.objects.filter(start_time__range=[from_week, datetime.datetime.now()])
@@ -51,12 +51,17 @@ def index(request):
             times = user_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).count()
             li.append(times)
         dic[username] = li
-    print dic
     users = User.objects.all()
     hosts = Asset.objects.all()
     online_host = Log.objects.filter(is_finished=0)
     online_user = online_host.distinct()
-    return render_to_response('index.html', locals())
+    return render_to_response('index.html', locals(), context_instance=RequestContext(request))
+
+
+def api_user(request):
+    users = Log.objects.filter(is_finished=0).count()
+    ret = {'users': users}
+    return HttpResponse(json.dumps(ret))
 
 
 def skin_config(request):
@@ -76,14 +81,10 @@ def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_com
     is_active = {u'是': '1', u'否': '2'}
     login_types = {'LDAP': 'L', 'SSH_KEY': 'S', 'PASSWORD': 'P', 'MAP': 'M'}
     for group in j_group[0].split():
-        print group.strip()
         c = BisGroup.objects.get(name=group.strip())
         groups.append(c)
     j_type = login_types[j_type]
-    print j_type
     j_idc = IDC.objects.get(name=j_idc)
-    print j_idc
-    print
     a = Asset.objects.get(id=j_id)
     if j_type == 'M':
         a.ip = j_ip
