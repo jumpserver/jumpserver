@@ -1,32 +1,25 @@
 #coding: utf-8
 
 import hashlib
-<<<<<<< HEAD
 import ldap
 from ldap import modlist
 from Crypto.Cipher import AES
 from binascii import b2a_hex, a2b_hex
 from ConfigParser import ConfigParser
 import os
-=======
 import datetime
 import json
->>>>>>> wangyong
 
 from django.db.models import Count
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
-<<<<<<< HEAD
-
-from juser.models import User
-=======
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
+from django.template import RequestContext
 
 from juser.models import User
 from jlog.models import Log
->>>>>>> wangyong
 from jasset.models import Asset, BisGroup, IDC
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -45,10 +38,6 @@ def md5_crypt(string):
     return hashlib.new("md5", string).hexdigest()
 
 
-<<<<<<< HEAD
-def base(request):
-    return render_to_response('base.html', context_instance=RequestContext(request))
-=======
 def getDaysByNum(num):
     today = datetime.date.today()
     oneday = datetime.timedelta(days=1)
@@ -61,6 +50,8 @@ def getDaysByNum(num):
     li_str.reverse()
     t = (li_date, li_str)
     return t
+def base(request):
+    return render_to_response('base.html', context_instance=RequestContext(request))
 
 
 def index(request):
@@ -91,7 +82,6 @@ def api_user(request):
     users = Log.objects.filter(is_finished=0).count()
     ret = {'users': users}
     return HttpResponse(json.dumps(ret))
->>>>>>> wangyong
 
 
 def skin_config(request):
@@ -102,9 +92,10 @@ def jasset_group_add(name, comment, jtype):
     if BisGroup.objects.filter(name=name):
         emg = u'该业务组已存在!'
     else:
-<<<<<<< HEAD
         BisGroup.objects.create(name=name, comment=comment, type=type)
         smg = u'业务组%s添加成功' % name
+        BisGroup.objects.create(name=name, comment=comment, type=jtype)
+        smg = u'业务组%s添加成功' %name
 
 
 class ServerError(Exception):
@@ -117,10 +108,6 @@ def page_list_return(total, current=1):
 
     return range(min_page, max_page+1)
 
-=======
-        BisGroup.objects.create(name=name, comment=comment, type=jtype)
-        smg = u'业务组%s添加成功' %name
->>>>>>> wangyong
 
 
 def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment):

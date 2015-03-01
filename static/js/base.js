@@ -59,8 +59,6 @@ function GetTableDataBox() {
     return returnData;
 }
 
-<<<<<<< HEAD
-=======
 function move(from, to) {
     $("#" + from + " option").each(function () {
         if ($(this).prop("selected") == true) {
@@ -83,7 +81,7 @@ function move_all(from, to) {
         $("#" + to).append(this);
     });
 }
->>>>>>> wangyong
+
 
 function selectAll(){
          var checklist = document.getElementsByName ("selected");
@@ -102,4 +100,10 @@ function selectAll(){
 
         }
 
+
+function move_all(from, to){
+    $("#"+from).children().each(function(){
+        $("#"+to).append(this);
+    });
+}
 
