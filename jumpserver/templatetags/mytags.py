@@ -111,11 +111,12 @@ def filter_private(group):
 
 @register.filter(name='to_name')
 def to_name(user_id):
-    user = User.objects.filter(id=user_id)
-    if user:
-        user = user[0]
-        return user.name
-    else:
+    try:
+        user = User.objects.filter(id=int(user_id))
+        if user:
+            user = user[0]
+            return user.name
+    except:
         return '非法用户'
 
 @register.filter(name='to_role_name')

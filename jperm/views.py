@@ -51,7 +51,7 @@ def perm_list(request):
         contacts = paginator.page(current_page)
     except (EmptyPage, InvalidPage):
         contacts = paginator.page(paginator.num_pages)
-    return render_to_response('jperm/perm_list.html', locals())
+    return render_to_response('jperm/perm_list.html', locals(), context_instance=RequestContext(request))
 
 
 def user_asset_cmd_groups_get(user_groups_select='', asset_groups_select='', cmd_groups_select=''):

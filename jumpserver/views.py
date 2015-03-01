@@ -50,6 +50,8 @@ def getDaysByNum(num):
     li_str.reverse()
     t = (li_date, li_str)
     return t
+
+
 def base(request):
     return render_to_response('base.html', context_instance=RequestContext(request))
 
