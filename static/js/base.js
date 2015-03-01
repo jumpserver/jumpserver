@@ -59,6 +59,31 @@ function GetTableDataBox() {
     return returnData;
 }
 
+<<<<<<< HEAD
+=======
+function move(from, to) {
+    $("#" + from + " option").each(function () {
+        if ($(this).prop("selected") == true) {
+            $("#" + to).append(this);
+        }
+    });
+}
+
+function move_left(from, to) {
+    $("#" + from + " option").each(function () {
+        if ($(this).prop("selected") == true) {
+            $("#" + to).append(this);
+        }
+        $(this).attr("selected",'true');
+    });
+}
+
+function move_all(from, to) {
+    $("#" + from).children().each(function () {
+        $("#" + to).append(this);
+    });
+}
+>>>>>>> wangyong
 
 function selectAll(){
          var checklist = document.getElementsByName ("selected");
@@ -77,17 +102,4 @@ function selectAll(){
 
         }
 
-function move(from, to) {
-    $("#"+from+" option").each(function(){
-        if ( $(this).prop("selected") == true ) {
-            $("#"+to).append(this);
-            }
-    });
-}
-
-function move_all(from, to){
-    $("#"+from).children().each(function(){
-        $("#"+to).append(this);
-    });
-}
 

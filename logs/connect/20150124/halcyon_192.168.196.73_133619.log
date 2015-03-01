@@ -1,8 +1,0 @@
-PS1='[\u@192.168.196.73 \W]\$ '
-Last login: Sun Jan  4 13:30:11 2015 from 192.168.199.162
-clear;echo -e '\033[32mLogin 192.168.196.73 done. Enjoy it.\033[0m'
-[halcyon@localhost ~]$ PS1='[\u@192.168.196.73 \W]\$ '
-[halcyon@192.168.196.73 ~]$ clear;echo -e '\033[32mLogin 192.168.196.73 done. Enjoy it.\033[0m'
-[H[J[32mLogin 192.168.196.73 done. Enjoy it.[0m
-[halcyon@192.168.196.73 ~]$ ls
-[halcyon@192.168.196.73 ~]$ 

@@ -1,6 +1,8 @@
 # coding: utf-8
 
+import re
 import time
+
 from django import template
 from juser.models import User, UserGroup
 from jasset.models import BisGroup
@@ -94,8 +96,16 @@ def perm_asset_count(user_id):
 @register.filter(name='filter_private')
 def filter_private(group):
     agroup = []
+    pattern = re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}')
     p = BisGroup.objects.get(name='ALL')
-    [agroup.append(g) for g in group if g != p]
+    for g in group:
+        if not pattern.match(g.name):
+            agroup.append(g)
+    try:
+        agroup.remove(p)
+    except ValueError:
+        pass
+
     return agroup
 
 

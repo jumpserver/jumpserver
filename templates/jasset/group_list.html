@@ -32,11 +32,11 @@
                             <tr class="gradeX">
                                 <td class="text-center"> {{ post.id }} </td>
                                 <td class="text-center"> {{ post.name }} </td>
-                                <td class="text-center"> <a href="/jasset/group_detail/{{ post.id }}">{{ post.asset_set.count }}</a> </td>
+                                <td class="text-center"> <a href="/jasset/group_detail/?id={{ post.id }}">{{ post.asset_set.count }}</a> </td>
                                 <td class="text-center"> {{ post.comment }} </td>
                                 <td class="text-center">
-                                    <a href="/jasset/group_detail/{{ post.id }}" class="btn btn-xs btn-info">详情</a>
-                                    <a href="/jasset/group_edit/{{ post.id }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a href="/jasset/group_detail/?id={{ post.id }}" class="btn btn-xs btn-info">详情</a>
+                                    <a href="/jasset/group_edit/?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a href="/jasset/group_del/{{ post.id }}" class="btn btn-xs btn-danger">删除</a>
                                 </td>
                             </tr>
