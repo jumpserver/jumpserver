@@ -7,13 +7,19 @@ from Crypto.Cipher import AES
 from binascii import b2a_hex, a2b_hex
 from ConfigParser import ConfigParser
 import os
+import datetime
+import json
 
-from django.http import HttpResponse
+from django.db.models import Count
 from django.shortcuts import render_to_response
+from django.http import HttpResponse
 from django.http import HttpResponseRedirect
+from django.template import RequestContext
+from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.template import RequestContext
 
 from juser.models import User
+from jlog.models import Log
 from jasset.models import Asset, BisGroup, IDC
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -32,20 +38,64 @@ def md5_crypt(string):
     return hashlib.new("md5", string).hexdigest()
 
 
+def getDaysByNum(num):
+    today = datetime.date.today()
+    oneday = datetime.timedelta(days=1)
+    li_date, li_str = [], []
+    for i in range(0, num):
+        today = today-oneday
+        li_date.append(today)
+        li_str.append(str(today)[0:10])
+    li_date.reverse()
+    li_str.reverse()
+    t = (li_date, li_str)
+    return t
 def base(request):
     return render_to_response('base.html', context_instance=RequestContext(request))
+
+
+def index(request):
+    path1, path2 = u'仪表盘', 'Dashboard'
+    dic = {}
+    li_date, li_str = getDaysByNum(7)
+    today = datetime.datetime.now().day
+    from_week = datetime.datetime.now() - datetime.timedelta(days=7)
+    week_data = Log.objects.filter(start_time__range=[from_week, datetime.datetime.now()])
+    top_ten = week_data.values('user').annotate(times=Count('user')).order_by('-times')[:10]
+    for user in top_ten:
+        username = user['user']
+        li = []
+        user_data = week_data.filter(user=username)
+        for t in li_date:
+            year, month, day = t.year, t.month, t.day
+            times = user_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).count()
+            li.append(times)
+        dic[username] = li
+    users = User.objects.all()
+    hosts = Asset.objects.all()
+    online_host = Log.objects.filter(is_finished=0)
+    online_user = online_host.distinct()
+    return render_to_response('index.html', locals(), context_instance=RequestContext(request))
+
+
+def api_user(request):
+    users = Log.objects.filter(is_finished=0).count()
+    ret = {'users': users}
+    return HttpResponse(json.dumps(ret))
 
 
 def skin_config(request):
     return render_to_response('skin_config.html')
 
 
-def jasset_group_add(name, comment, type):
+def jasset_group_add(name, comment, jtype):
     if BisGroup.objects.filter(name=name):
         emg = u'该业务组已存在!'
     else:
         BisGroup.objects.create(name=name, comment=comment, type=type)
         smg = u'业务组%s添加成功' % name
+        BisGroup.objects.create(name=name, comment=comment, type=jtype)
+        smg = u'业务组%s添加成功' %name
 
 
 class ServerError(Exception):
@@ -65,16 +115,11 @@ def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_com
     is_active = {u'是': '1', u'否': '2'}
     login_types = {'LDAP': 'L', 'SSH_KEY': 'S', 'PASSWORD': 'P', 'MAP': 'M'}
     for group in j_group[0].split():
-        print group.strip()
         c = BisGroup.objects.get(name=group.strip())
         groups.append(c)
     j_type = login_types[j_type]
-    print j_type
     j_idc = IDC.objects.get(name=j_idc)
-    print j_idc
-    print
     a = Asset.objects.get(id=j_id)
-    print '123'
     if j_type == 'M':
         a.ip = j_ip
         a.port = j_port
@@ -94,6 +139,22 @@ def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_com
     a.save()
     a.bis_group = groups
     a.save()
+
+
+def pages(posts, r):
+    contact_list = posts
+    p = paginator = Paginator(contact_list, 10)
+    try:
+        page = int(r.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    try:
+        contacts = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        contacts = paginator.page(paginator.num_pages)
+
+    return contact_list, p, contacts
 
 
 def login(request):

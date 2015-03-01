@@ -45,7 +45,8 @@ SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
 # The key of decryptor.
 KEY = CONF.get('web', 'key')
 # Login user.
-LOGIN_NAME = getpass.getuser()
+#LOGIN_NAME = getpass.getuser()
+LOGIN_NAME = 'halcyon'
 #LOGIN_NAME = os.getlogin()
 USER_KEY_FILE = os.path.join(SERVER_KEY_DIR, LOGIN_NAME)
 
@@ -112,9 +113,6 @@ def log_record(username, host):
     log_file_path = os.path.join(today_connect_log_dir, log_filename)
     pid = os.getpid()
 
-    user = get_object(User, username=username)
-    asset = get_object(Asset, ip=host)
-
     if not os.path.isdir(today_connect_log_dir):
         try:
             os.makedirs(today_connect_log_dir)
@@ -127,7 +125,7 @@ def log_record(username, host):
     except IOError:
         raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 
-    log = Log(user=user, asset=asset, log_path=log_file_path, start_time=datetime.now(), pid=pid)
+    log = Log(user=username, host=host, log_path=log_file_path, start_time=datetime.now(), pid=pid)
     log.save()
     return log_file, log
 
@@ -172,6 +170,7 @@ def posix_shell(chan, username, host):
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)
         log_file.close()
         log.is_finished = True
+        log.log_finished = False
         log.end_time = datetime.now()
         log.save()
 

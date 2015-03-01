@@ -1,17 +1,8 @@
+{% load mytags %}
 <html>
     <head>
-        <link href="/static/css/bootstrap.min.css" rel="stylesheet">
-        <link href="/static/font-awesome/css/font-awesome.css" rel="stylesheet">
-        <link href="/static/css/plugins/iCheck/custom.css" rel="stylesheet">
-        <link href="/static/css/animate.css" rel="stylesheet">
-        <link href="/static/css/style.css" rel="stylesheet">
-        <link href="/static/css/colorbox.css" rel="stylesheet">
-
-        <!-- Mainly scripts -->
-        <script src="/static/js/jquery-2.1.1.js"></script>
-        <script src="/static/js/bootstrap.min.js"></script>
-        <script src="/static/js/plugins/metisMenu/jquery.metisMenu.js"></script>
-        <script src="/static/js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+        {% include 'link_css.html' %}
+        {% include 'head_script.html' %}
 
         <style type="text/css">
         body
@@ -24,7 +15,7 @@
     <body>
         <div class="row">
             <div class="contact-box">
-                <h2 class="text-center">{{ offset }}主机详情</h2>
+                <h3 class="text-center">{{ offset }}主机详情</h3>
                 <table class="table table-striped table-bordered table-hover " id="editable" >
                     <thead>
                         <tr>
@@ -39,22 +30,60 @@
                     </thead>
                     <tbody>
                         <tr class="gradeX">
-                            <td> <a class="iframe" href="/jasset/{{ post.ip }}/">{{ post.ip }}</a></td>
+                            <td> <a id="ip" class="iframe" href="/jasset/{{ post.ip }}/">{{ post.ip }}</a></td>
                             <td> {{ post.port }} </td>
-                            <td> {{ post.get_login_type}} </td>
-                            <td class="center"> {{ post.idc.name }} </td>
-                            <td class="center">
-                                {% for group in post.bis_group.all %}
-                                    {{ group }}
-                                {% endfor %}
-                            </td>
-                            <td class="center"> {{ post.date_added }} </td>
-                            <td class="center"> {{ post.comment }} </td>
+                            <td> {{ login_types|get_item:post.login_type }} </td>
+                            <td class="text-center"> {{ post.idc.name }} </td>
+                            <td class="text-center">{% for group in post.bis_group.all|filter_private %} {{ group }} {% endfor %}</td>
+                            <td class="text-center"> {{ post.date_added|date:"Y-m-d H:i:s" }} </td>
+                            <td class="text-center"> {{ post.comment }} </td>
                         </tr>
                     </tbody>
                 </table>
-                <a> 是否激活: {{ post.is_active }}</a>
+                <!--<a> 是否 激活: {{ post.is_active }}</a>-->
+                <h3 class="text-center">最近一周登录详情</h3>
+                <table class="table table-striped table-bordered table-hover ">
+                    <thead>
+                        <tr>
+                            <th class="text-center"> 用户名 </th>
+                            <th class="text-center"> 登录时间 </th>
+                            <th class="text-center"> 退出时间 </th>
+                            <th class="text-center"> 详情 </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for l in log %}
+                            <tr class="gradeX">
+                                <td class="text-center" id="username"> {{ l.user }} </td>
+                                <td class="text-center" id="start_time">{{ l.start_time|date:"Y-m-d H:i:s" }}</td>
+                                <td class="text-center" id="end_time"> {{ l.end_time|date:"Y-m-d H:i:s" }} </td>
+                                <td class="text-center">
+                                    <a class="log_command text-success" href="/jlog/history/?id={{ l.id }}">命令统计</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     </body>
+
+    <script src="/static/js/bootstrap-dialog.js"></script>
+    <script>
+       $('.log_command').on('click',function(){
+           var url = $(this).attr('href');
+           var username = $('#username')[0].innerText;
+           var ip = $('#ip')[0].innerText;
+           var start_time = $('#start_time')[0].innerText;
+           var end_time = $('#end_time')[0].innerText;
+           var div_username = ' 登录用户名: '+'<span class="text-info">'+username+'' + '</span>';
+           var div_ip = ' 登录主机: '+'<span class="text-info">' + ip + '</span>';
+           var div_time = ' 开始时间: ' + '<span class="text-info">'+start_time +'</span>' + ' 结束时间: ' +'<span class="text-info">' + end_time + '</span>'
+           var title = div_username + div_ip + div_time
+            $.ajax({url:url,success:function(data){
+            BootstrapDialog.show({title: title, message:data});
+            }});
+           return false;
+        })
+    </script>
 </html>

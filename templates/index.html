@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'nav_cat_bar.html' %}
+
+<div class="wrapper wrapper-content">
+    <div class="row">
+        <div class="col-lg-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-success pull-right">Monthly</span>
+                    <h5>用户总数</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins"><a href="/juser/user_list/">{{ users.count}}</a></h1>
+                    <div class="stat-percent font-bold text-success">98% <i class="fa fa-bolt"></i></div>
+                    <small>All user</small>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-info pull-right">Annual</span>
+                    <h5>主机总数</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins"><a href="/jasset/host_list/">{{ hosts.count }}</a></h1>
+                    <div class="stat-percent font-bold text-info">20% <i class="fa fa-level-up"></i></div>
+                    <small>All host</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-primary pull-right">Today</span>
+                    <h5>在线用户</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins"><a href="/jlog/log_list/online/">{{ online_user.count }}</a></h1>
+                    <div class="stat-percent font-bold text-navy">44% <i class="fa fa-level-up"></i></div>
+                    <small>Online user</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-danger pull-right">Low value</span>
+                    <h5>已连接服务器</h5>
+                </div>
+                <div class="ibox-content">
+                    <h1 class="no-margins"><a href="/jlog/log_list/online/">{{ online_host.count }}</a></h1>
+                    <div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>
+                    <small>Connect host</small>
+                </div>
+            </div>
+        </div>
+        <div id="high" style="width:100%;height:400px;"></div>
+        </br>
+        <div id="dynamic" style="width:100%;height:400px; margin-top:170px"></div>
+    </div>
+</div>
+
+<script>
+var cate = {{ li_str|safe }};
+$(function () {
+    $('#high').highcharts({
+        title: {
+            text: '一周用户登录TOP10',
+            x: -20 //center
+        },
+        subtitle: {
+            text: 'Source: JumpServer',
+            x: -20
+        },
+        xAxis: {
+            type: 'datetime',
+            categories: cate
+        },
+        yAxis:{
+            min: 0,
+            title: {
+                text: '登录次数'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            valueSuffix: '次'
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+        series: [
+            {% for k,v in dic.items %}
+                {
+                    name: '{{ k }}',
+                    data: {{ v }}
+                },
+            {% endfor %}
+        ]
+    });
+
+    $(document).ready(function() {
+        Highcharts.setOptions({
+            global: {
+                useUTC: false
+            }
+        });
+
+        var chart;
+        $('#dynamic').highcharts({
+            chart: {
+                type: 'spline',
+                animation: Highcharts.svg, // don't animate in old IE
+                marginRight: 10,
+                events: {
+                    load: function () {
+                        var series = this.series[0];
+                        setInterval(function () {
+                            jQuery.getJSON('api/user/', function (data) {
+                                var users = data.users;
+                                var x = (new Date()).getTime(), // current time
+                                        y = users;
+                                console.log(users)
+                                series.addPoint([x, y], true, true);
+                            });
+                        }, 3000);
+                    }
+                }
+            },
+            title: {
+                text: '实时在线用户统计'
+            },
+            xAxis: {
+                type: 'datetime',
+                tickPixelInterval: 150
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: '用户数量'
+                },
+                plotLines: [{
+                    value: 0,
+                    width: 1,
+                    color: '#808080'
+                }]
+            },
+            tooltip: {
+                formatter: function() {
+                        return '<b>'+ this.series.name +'</b><br/>'+
+                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
+                        Highcharts.numberFormat(this.y);
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            exporting: {
+                enabled: false
+            },
+            series: [{
+                name: '实时在线用户数量',
+                data: (function() {
+                    // generate an array of random data
+                    var data = [],
+                        time = (new Date()).getTime(),
+                        i;
+
+                    for (i = -19; i <= 0; i++) {
+                        data.push({
+                            x: time + i * 1000,
+                            y: 0
+                        });
+                    }
+                    return data;
+                })()
+            }]
+        });
+    });
+
+});
+</script>
+
+{% endblock %}
