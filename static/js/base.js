@@ -107,3 +107,9 @@ function move_all(from, to){
     });
 }
 
+//function commit_select(form_array){
+//    $('#{0} option'.format(form_array)).each(function(){
+//        $(this).prop('selected', true)
+//        })
+//}
+

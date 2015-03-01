@@ -87,7 +87,7 @@
                             <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-2">
                                     <button class="btn btn-white" type="reset">取消</button>
-                                    <button id="submit_button" class="btn btn-primary" type="submit">确认保存</button>
+                                    <button id="submit_button" class="btn btn-primary"  type="submit">确认保存</button>
                                 </div>
                             </div>
                         </form>
@@ -120,9 +120,9 @@ $('#groupForm').validator({
     }
 });
 
-$(document).ready(function(){
-    $("#submit_button").click(function(){
-        $('#users_selected option').each(function(){
+$(document).ready(function() {
+    $("#submit_button").click(function () {
+        $('#users_selected option').each(function () {
             $(this).prop('selected', true)
         })
     })
