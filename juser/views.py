@@ -9,6 +9,7 @@ import subprocess
 from Crypto.PublicKey import RSA
 import crypt
 from django.http import HttpResponseRedirect
+import datetime
 
 from django.shortcuts import render_to_response
 from django.core.exceptions import ObjectDoesNotExist
@@ -93,12 +94,13 @@ def group_update_user(group_id, users_id):
 def db_add_user(**kwargs):
     groups_post = kwargs.pop('groups')
     user = User(**kwargs)
-    group_select = []
-    for group_id in groups_post:
-        group = UserGroup.objects.filter(id=group_id)
-        group_select.extend(group)
     user.save()
-    user.user_group = group_select
+    if groups_post:
+        group_select = []
+        for group_id in groups_post:
+            group = UserGroup.objects.filter(id=group_id)
+            group_select.extend(group)
+        user.group = group_select
 
 
 def db_update_user(**kwargs):
@@ -155,7 +157,11 @@ def server_del_user(username):
 def ldap_add_user(username, ldap_pwd):
     user_dn = "uid=%s,ou=People,%s" % (username, LDAP_BASE_DN)
     password_sha512 = gen_sha512(gen_rand_pwd(6), ldap_pwd)
-    user = User.objects.get(username=username)
+    user = User.objects.filter(username=username)
+    if user:
+        user = user[0]
+    else:
+        raise AddError(u'用户 %s 不存在' % username)
 
     user_attr = {'uid': [str(username)],
                  'cn': [str(username)],
@@ -278,14 +284,17 @@ def group_add(request, group_type_select='A'):
                 error = u'组名 或 部门 不能为空'
                 raise AddError(error)
 
-            group_db_add(name=group_name, comment=comment)
-            for user_id in users_selected:
-                group_add_user(group_name, user_id=user_id)
+            dept = DEPT.objects.filter(id=dept_id)
+            if dept:
+                dept = dept[0]
+            else:
+                AddError(u'部门不存在')
 
+            db_add_group(name=group_name, dept=dept, comment=comment)
         except AddError:
             pass
         except TypeError:
-            error = u'保存用户组失败'
+            error = u'保存小组失败'
         else:
             msg = u'添加组 %s 成功' % group_name
 
@@ -294,7 +303,7 @@ def group_add(request, group_type_select='A'):
 
 def group_list(request):
     header_title, path1, path2 = '查看属组 | Show Group', '用户管理', '查看用户组'
-    groups = contact_list = UserGroup.objects.filter(Q(type='M') | Q(type='A')).order_by('type')
+    contact_list = UserGroup.objects.all()
     p = paginator = Paginator(contact_list, 10)
 
     try:
@@ -476,14 +485,15 @@ def user_add(request):
     header_title, path1, path2 = '添加用户 | User Add', '用户管理', '添加用户'
     user_role = {'SU': u'超级管理员', 'DA': u'部门管理员', 'CU': u'普通用户'}
     dept_all = DEPT.objects.all()
+    group_all = UserGroup.objects.all()
 
     if request.method == 'POST':
-        username = request.POST.get('username', None)
+        username = request.POST.get('username', '')
         password = request.POST.get('password', '')
-        name = request.POST.get('name', None)
+        name = request.POST.get('name', '')
         email = request.POST.get('email', '')
         dept_id = request.POST.get('dept_id')
-        auth_groups = request.POST.getlist('groups', None)
+        groups = request.POST.getlist('groups', [])
         role_post = request.POST.get('role', 'CU')
         ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
         is_active = request.POST.get('is_active', '1')
@@ -498,24 +508,27 @@ def user_add(request):
                 error = u'用户 %s 已存在' % username
                 raise AddError
 
+            dept = DEPT.objects.filter(id=dept_id)
+            if dept:
+                dept = dept[0]
+            else:
+                error = u'部门不存在'
+                raise AddError(error)
+
         except AddError:
             pass
         else:
-            time_now = time.time()
             try:
                 db_add_user(username=username,
                             password=md5_crypt(password),
-                            name=name, email=email,
+                            name=name, email=email, dept=dept,
                             groups=groups, role=role_post,
-                            ssh_pwd=CRYPTOR.encrypt(ssh_pwd) if ssh_pwd else '',
                             ssh_key_pwd=CRYPTOR.encrypt(ssh_key_pwd),
                             ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
                             is_active=is_active,
-                            date_joined=time_now)
+                            date_joined=datetime.datetime.now())
 
                 server_add_user(username, password, ssh_key_pwd)
-                group_db_add(name=username, comment=username, type='P')
-                group_add_user(group_name=username, username=username)
                 if LDAP_ENABLE:
                     ldap_add_user(username, ldap_pwd)
                 msg = u'添加用户 %s 成功！' % username

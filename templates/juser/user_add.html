@@ -39,14 +39,14 @@
                             <div class="form-group">
                                 <label for="username" class="col-sm-2 control-label">用户名<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <input id="username" name="username" placeholder="Username" type="text" class="form-control" value={{ username }} {{ readonly }}>
+                                    <input id="username" name="username" placeholder="Username" type="text" class="form-control" {% if error %}value="{{ username }}" {% endif %}>
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
                                 <label for="password" class="col-sm-2 control-label">密码<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <input id="password" name="password" placeholder="Password" type="password" class="form-control" value={{ password }}>
+                                    <input id="password" name="password" placeholder="Password" type="password" class="form-control" {% if error %}value="{{ password }}" {% endif %}>
                                     <span class="help-block m-b-none">
                                         登陆web的密码
                                     </span>
@@ -56,7 +56,7 @@
                             <div class="form-group">
                                 <label for="ssh_key_pwd" class="col-sm-2 control-label">密钥密码<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <input id="ssh_key_pwd" name="ssh_key_pwd" placeholder="SSH Key Password" type="password" class="form-control" value="{{ ssh_key_pwd }}">
+                                    <input id="ssh_key_pwd" name="ssh_key_pwd" placeholder="SSH Key Password" type="password" class="form-control" {% if error %}value="{{ ssh_key_pwd }}" {% endif %}>
                                     <span class="help-block m-b-none">
                                         登陆 Jumpserver 使用的SSH密钥的密码
                                     </span>
@@ -66,14 +66,14 @@
                             <div class="form-group">
                                 <label for="name" class="col-sm-2 control-label">姓名<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <input id="name" name="name" placeholder="Name" type="text" class="form-control" value={{ name }} >
+                                    <input id="name" name="name" placeholder="Name" type="text" class="form-control" {% if error %}value="{{ name }}" {% endif %} >
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
-                                <label for="manage_group" class="col-lg-2 control-label">部门<span class="red-fonts">*</span></label>
+                                <label for="dept_id" class="col-lg-2 control-label">部门<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <select id="manage_group" name="manage_group" class="form-control m-b">
+                                    <select id="dept_id" name="dept_id" class="form-control m-b">
                                         {% for dept in dept_all %}
                                             <option value="{{ dept.id }}">{{ dept.name }}</option>
                                         {% endfor %}
@@ -85,19 +85,11 @@
                                 <label for="groups" class="col-lg-2 control-label">小组</label>
                                 <div class="col-sm-8">
                                     <select id="groups" name="groups" class="form-control m-b" multiple size="12">
-                                        {% for group in groups %}
-                                            {% if groups_str %}
-                                                {% if group.id|int2str in groups_str %}
-                                                    <option value="{{ group.id }}" selected>{{ group.name }}</option>
-                                                {% else %}
-                                                    <option value="{{ group.id }}">{{ group.name }}</option>
-                                                {% endif %}
+                                        {% for group in group_all %}
+                                            {% if forloop.first %}
+                                                <option value="{{ group.id }}" selected>{{ group.name }}</option>
                                             {% else %}
-                                                {% if forloop.first %}
-                                                    <option value="{{ group.id }}" selected>{{ group.name }}</option>
-                                                {% else %}
-                                                    <option value="{{ group.id }}">{{ group.name }}</option>
-                                                {% endif %}
+                                                <option value="{{ group.id }}">{{ group.name }}</option>
                                             {% endif %}
                                         {% endfor %}
                                     </select>
@@ -122,7 +114,7 @@
                             <div class="form-group">
                                 <label for="email" class="col-sm-2 control-label">Email<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <input id="email" name="email" type="email" placeholder="Email" class="form-control" value="{{ email }}">
+                                    <input id="email" name="email" type="email" placeholder="Email" class="form-control" {% if error %}value="{{ email }}" {% endif %}>
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
@@ -180,7 +172,7 @@ $('#userForm').validator({
             ok: "",
             msg: {required: "必须填写"}
         },
-        "manage_group": {
+        "dept_id": {
             rule: "checked",
             tip: "选择部门",
             ok: "",
