@@ -17,7 +17,7 @@ from django.template import RequestContext
 from django.http import HttpResponse
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
-from juser.models import UserGroup, User
+from juser.models import UserGroup, User, DEPT
 from connect import PyCrypt, KEY
 from connect import BASE_DIR
 from connect import CONF
@@ -61,12 +61,12 @@ def gen_sha512(salt, password):
     return crypt.crypt(password, '$6$%s$' % salt)
 
 
-def group_db_add(**kwargs):
-    group_name = kwargs.get('name')
-    group = UserGroup.objects.filter(name=group_name)
+def db_add_group(**kwargs):
+    name = kwargs.get('name')
+    group = UserGroup.objects.filter(name=name)
     if group:
-        raise AddError('Group %s have been exist .' % group_name)
-    UserGroup.objects.create(**kwargs)
+        raise AddError(u'用户组 %s 已经存在' % name)
+    UserGroup(**kwargs).save()
 
 
 def group_add_user(group_name, user_id=None, username=None):
@@ -210,32 +210,75 @@ def ldap_del_user(username):
 #     ldap_conn.add(group_dn, group_attr)
 
 
+# def group_add_ajax(request):
+#     group_type = request.POST.get('type', 'A')
+#     users_all = User.objects.all()
+#     if group_type == 'A':
+#         users = users_all
+#     else:
+#         users = [user for user in users_all if not user.user_group.filter(type='M')]
+#
+#     return render_to_response('juser/group_add_ajax.html', locals(), context_instance=RequestContext(request))
+
+
+def dept_add(request):
+    header_title, path1, path2 = '添加部门', '用户管理', '添加部门'
+    if request.method == 'POST':
+        name = request.POST.get('name', '')
+        comment = request.POST.get('comment', '')
+
+        try:
+            if not name:
+                raise AddError('部门名称不能为空')
+            if DEPT.objects.filter(name=name):
+                raise AddError(u'部门名称 %s 已存在' % name)
+        except AddError, e:
+            error = e
+        else:
+            DEPT(name=name, comment=comment).save()
+            msg = u'添加部门 %s 成功' % name
+
+    return render_to_response('juser/dept_add.html', locals(), context_instance=RequestContext(request))
+
+
+def dept_list(request):
+    header_title, path1, path2 = '查看部门', '用户管理', '查看部门'
+    contact_list = DEPT.objects.all()
+    p = paginator = Paginator(contact_list, 10)
+
+    try:
+        current_page = int(request.GET.get('page', '1'))
+    except ValueError:
+        current_page = 1
+
+    page_range = page_list_return(len(p.page_range), current_page)
+
+    try:
+        contacts = paginator.page(current_page)
+    except (EmptyPage, InvalidPage):
+        contacts = paginator.page(paginator.num_pages)
+    return render_to_response('juser/dept_list.html', locals(), context_instance=RequestContext(request))
+
+
 def group_add(request, group_type_select='A'):
     error = ''
     msg = ''
-    header_title, path1, path2 = '添加属组 | Group Add', '用户管理', '添加用户组'
-    group_types = {
-        'M': '部门',
-        'A': '用户组',
-    }
-
-    users_all = User.objects.all()
-    if group_type_select == 'M':
-        users = [user for user in users_all if not user.user_group.filter(type='M')]
-    else:
-        users = users_all
+    header_title, path1, path2 = '添加属组', '用户管理', '添加用户组'
+    user_all = User.objects.all()
+    dept_all = DEPT.objects.all()
 
     if request.method == 'POST':
         group_name = request.POST.get('group_name', '')
-        group_type = request.POST.get('group_type', 'A')
+        dept_id = request.POST.get('dept_id', '')
         users_selected = request.POST.getlist('users_selected', '')
         comment = request.POST.get('comment', '')
 
         try:
-            if not group_name:
-                error = u'组名不能为空'
-                raise AddError
-            group_db_add(name=group_name, comment=comment, type=group_type)
+            if '' in [group_name, dept_id]:
+                error = u'组名 或 部门 不能为空'
+                raise AddError(error)
+
+            group_db_add(name=group_name, comment=comment)
             for user_id in users_selected:
                 group_add_user(group_name, user_id=user_id)
 
@@ -247,17 +290,6 @@ def group_add(request, group_type_select='A'):
             msg = u'添加组 %s 成功' % group_name
 
     return render_to_response('juser/group_add.html', locals(), context_instance=RequestContext(request))
-
-
-def group_add_ajax(request):
-    group_type = request.POST.get('type', 'A')
-    users_all = User.objects.all()
-    if group_type == 'A':
-        users = users_all
-    else:
-        users = [user for user in users_all if not user.user_group.filter(type='M')]
-
-    return render_to_response('juser/group_add_ajax.html', locals(), context_instance=RequestContext(request))
 
 
 def group_list(request):
@@ -442,21 +474,17 @@ def user_add(request):
     error = ''
     msg = ''
     header_title, path1, path2 = '添加用户 | User Add', '用户管理', '添加用户'
-    user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
-    manage_groups = UserGroup.objects.filter(type='M')
-    auth_groups = UserGroup.objects.filter(type='A')
+    user_role = {'SU': u'超级管理员', 'DA': u'部门管理员', 'CU': u'普通用户'}
+    dept_all = DEPT.objects.all()
+
     if request.method == 'POST':
         username = request.POST.get('username', None)
         password = request.POST.get('password', '')
         name = request.POST.get('name', None)
         email = request.POST.get('email', '')
-        manage_group_id = request.POST.get('manage_group')
+        dept_id = request.POST.get('dept_id')
         auth_groups = request.POST.getlist('groups', None)
-        groups = auth_groups
-        groups.append(manage_group_id)
-        groups_str = ' '.join(auth_groups)
         role_post = request.POST.get('role', 'CU')
-        ssh_pwd = request.POST.get('ssh_pwd', '')
         ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
         is_active = request.POST.get('is_active', '1')
         ldap_pwd = gen_rand_pwd(16)
