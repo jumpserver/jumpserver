@@ -82,9 +82,9 @@ def test_add_asset():
 
 
 if __name__ == '__main__':
-    #test_add_dept()
-    #test_add_group()
-    test_add_user()
+    test_add_dept()
+    test_add_group()
+    #test_add_user()
 
 
 

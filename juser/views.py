@@ -300,6 +300,43 @@ def dept_del(request):
     return HttpResponseRedirect('/juser/dept_list/')
 
 
+def dept_member(dept_id):
+    dept = DEPT.objects.filter(id=dept_id)
+    if dept:
+        dept = dept[0]
+        return dept.user_set.all()
+
+
+def dept_edit(request):
+    header_title, path1, path2 = '部门编辑', '用户管理', '部门编辑'
+    if request.method == 'GET':
+        dept_id = request.GET.get('id', '')
+        if dept_id:
+            dept = DEPT.objects.filter(id=dept_id)
+            if dept:
+                dept = dept[0]
+                users = dept_member(dept_id)
+                users_all = User.objects.all()
+                users_other = [user for user in users_all if user not in users]
+            else:
+                error = 'id 错误'
+        else:
+            error = u'部门不存在'
+    else:
+        dept_id = request.POST.get('id', '')
+        name = request.POST.get('name', '')
+        users = request.POST.get('users_selected', [])
+        comment = request.POST.get('comment', '')
+
+        dept = DEPT.objects.filter(id=dept_id)
+        if dept:
+            dept.update(name=name, comment=comment)
+        else:
+            error = '部门不存在'
+
+    return render_to_response('juser/dept_edit.html', locals(), context_instance=RequestContext(request))
+
+
 def group_add(request):
     error = ''
     msg = ''

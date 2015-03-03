@@ -75,7 +75,7 @@ def perm_add(request):
     header_title, path1, path2 = u'主机授权添加 | Perm Add Detail.', u'授权管理', u'授权添加'
 
     if request.method == 'GET':
-        user_groups = UserGroup.objects.filter(Q(type='A') | Q(type='M')).order_by('type')
+        user_groups = UserGroup.objects.all()
         asset_groups = BisGroup.objects.all()
 
     else:
@@ -269,8 +269,8 @@ def sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select,
 
 def sudo_add(request):
     header_title, path1, path2 = u'Sudo授权 | Perm Sudo Add.', u'权限管理', u'添加Sudo权限'
-    user_groups = UserGroup.objects.filter(Q(type='A') | Q(type='P')).order_by('type')
-    asset_groups = BisGroup.objects.all().order_by('type')
+    user_groups = UserGroup.objects.all()
+    asset_groups = BisGroup.objects.all()
     cmd_groups = CmdGroup.objects.all()
 
     if request.method == 'POST':
