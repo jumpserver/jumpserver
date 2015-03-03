@@ -62,15 +62,7 @@ def gen_sha512(salt, password):
     return crypt.crypt(password, '$6$%s$' % salt)
 
 
-def db_add_group(**kwargs):
-    name = kwargs.get('name')
-    group = UserGroup.objects.filter(name=name)
-    if group:
-        raise AddError(u'用户组 %s 已经存在' % name)
-    UserGroup(**kwargs).save()
-
-
-def group_add_user(group_name, user_id=None, username=None):
+def group_add_user(group, user_id=None, username=None):
     try:
         if user_id:
             user = User.objects.get(id=user_id)
@@ -79,8 +71,22 @@ def group_add_user(group_name, user_id=None, username=None):
     except ObjectDoesNotExist:
         raise AddError('用户获取失败')
     else:
-        group = UserGroup.objects.get(name=group_name)
         group.user_set.add(user)
+
+
+def db_add_group(**kwargs):
+    name = kwargs.get('name')
+    group = UserGroup.objects.filter(name=name)
+    users = kwargs.pop('users')
+    if group:
+        raise AddError(u'用户组 %s 已经存在' % name)
+    group = UserGroup(**kwargs)
+    group.save()
+    for user_id in users:
+        group_add_user(group, user_id)
+
+
+
 
 
 def group_update_user(group_id, users_id):
@@ -109,12 +115,14 @@ def db_update_user(**kwargs):
     user = User.objects.filter(username=username)
     user.update(**kwargs)
     user = User.objects.get(username=username)
-    group_select = []
-    for group_id in groups_post:
-        group = UserGroup.objects.filter(id=group_id)
-        group_select.extend(group)
     user.save()
-    user.user_group = group_select
+
+    if groups_post:
+        group_select = []
+        for group_id in groups_post:
+            group = UserGroup.objects.filter(id=group_id)
+            group_select.extend(group)
+        user.user_group = group_select
 
 
 def db_del_user(username):
@@ -249,7 +257,11 @@ def dept_add(request):
 
 def dept_list(request):
     header_title, path1, path2 = '查看部门', '用户管理', '查看部门'
-    contact_list = DEPT.objects.all()
+    keyword = request.GET.get('search')
+    if keyword:
+        contact_list = DEPT.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword)).order_by('name')
+    else:
+        contact_list = DEPT.objects.all()
     p = paginator = Paginator(contact_list, 10)
 
     try:
@@ -266,10 +278,32 @@ def dept_list(request):
     return render_to_response('juser/dept_list.html', locals(), context_instance=RequestContext(request))
 
 
-def group_add(request, group_type_select='A'):
+def dept_detail(request):
+    dept_id = request.GET.get('id', None)
+    if not dept_id:
+        return HttpResponseRedirect('/juser/dept_list/')
+    dept = DEPT.objects.filter(id=dept_id)
+    if dept:
+        dept = dept[0]
+        users = dept.user_set.all()
+    return render_to_response('juser/dept_detail.html', locals(), context_instance=RequestContext(request))
+
+
+def dept_del(request):
+    dept_id = request.GET.get('id', None)
+    if not dept_id:
+        return HttpResponseRedirect('/juser/dept_list/')
+    dept = DEPT.objects.filter(id=dept_id)
+    if dept:
+        dept = dept[0]
+        dept.delete()
+    return HttpResponseRedirect('/juser/dept_list/')
+
+
+def group_add(request):
     error = ''
     msg = ''
-    header_title, path1, path2 = '添加属组', '用户管理', '添加用户组'
+    header_title, path1, path2 = '添加小组', '用户管理', '添加小组'
     user_all = User.objects.all()
     dept_all = DEPT.objects.all()
 
@@ -290,7 +324,7 @@ def group_add(request, group_type_select='A'):
             else:
                 AddError(u'部门不存在')
 
-            db_add_group(name=group_name, dept=dept, comment=comment)
+            db_add_group(name=group_name, users=users_selected, dept=dept, comment=comment)
         except AddError:
             pass
         except TypeError:
@@ -302,8 +336,12 @@ def group_add(request, group_type_select='A'):
 
 
 def group_list(request):
-    header_title, path1, path2 = '查看属组 | Show Group', '用户管理', '查看用户组'
-    contact_list = UserGroup.objects.all()
+    header_title, path1, path2 = '查看小组', '用户管理', '查看小组'
+    keyword = request.GET.get('search', '')
+    if keyword:
+        contact_list = UserGroup.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
+    else:
+        contact_list = UserGroup.objects.all().order_by('name')
     p = paginator = Paginator(contact_list, 10)
 
     try:
@@ -370,10 +408,80 @@ def group_edit(request):
         return HttpResponseRedirect('/juser/group_list/')
 
 
+def user_add(request):
+    error = ''
+    msg = ''
+    header_title, path1, path2 = '添加用户 | User Add', '用户管理', '添加用户'
+    user_role = {'SU': u'超级管理员', 'DA': u'部门管理员', 'CU': u'普通用户'}
+    dept_all = DEPT.objects.all()
+    group_all = UserGroup.objects.all()
+
+    if request.method == 'POST':
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+        name = request.POST.get('name', '')
+        email = request.POST.get('email', '')
+        dept_id = request.POST.get('dept_id')
+        groups = request.POST.getlist('groups', [])
+        role_post = request.POST.get('role', 'CU')
+        ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
+        is_active = request.POST.get('is_active', '1')
+        ldap_pwd = gen_rand_pwd(16)
+
+        try:
+            if None in [username, password, ssh_key_pwd, name, groups, role_post, is_active]:
+                error = u'带*内容不能为空'
+                raise AddError
+            user = User.objects.filter(username=username)
+            if user:
+                error = u'用户 %s 已存在' % username
+                raise AddError
+
+            dept = DEPT.objects.filter(id=dept_id)
+            if dept:
+                dept = dept[0]
+            else:
+                error = u'部门不存在'
+                raise AddError(error)
+
+        except AddError:
+            pass
+        else:
+            try:
+                db_add_user(username=username,
+                            password=md5_crypt(password),
+                            name=name, email=email, dept=dept,
+                            groups=groups, role=role_post,
+                            ssh_key_pwd=CRYPTOR.encrypt(ssh_key_pwd),
+                            ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
+                            is_active=is_active,
+                            date_joined=datetime.datetime.now())
+
+                server_add_user(username, password, ssh_key_pwd)
+                if LDAP_ENABLE:
+                    ldap_add_user(username, ldap_pwd)
+                msg = u'添加用户 %s 成功！' % username
+
+            except Exception, e:
+                error = u'添加用户 %s 失败 %s ' % (username, e)
+                try:
+                    db_del_user(username)
+                    server_del_user(username)
+                    if LDAP_ENABLE:
+                        ldap_del_user(username)
+                except Exception:
+                    pass
+    return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
+
+
 def user_list(request):
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
-    header_title, path1, path2 = '查看用户 | Show User', '用户管理', '用户列表'
-    users = contact_list = User.objects.all().order_by('id')
+    header_title, path1, path2 = '查看用户', '用户管理', '用户列表'
+    keyword = request.GET.get('search', '')
+    if keyword:
+        contact_list = User.objects.filter(Q(username__icontains=keyword) | Q(name__icontains=keyword)).order_by('name')
+    else:
+        contact_list = User.objects.all().order_by('id')
     p = paginator = Paginator(contact_list, 10)
 
     try:
@@ -479,72 +587,6 @@ def user_edit(request):
     return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
 
 
-def user_add(request):
-    error = ''
-    msg = ''
-    header_title, path1, path2 = '添加用户 | User Add', '用户管理', '添加用户'
-    user_role = {'SU': u'超级管理员', 'DA': u'部门管理员', 'CU': u'普通用户'}
-    dept_all = DEPT.objects.all()
-    group_all = UserGroup.objects.all()
-
-    if request.method == 'POST':
-        username = request.POST.get('username', '')
-        password = request.POST.get('password', '')
-        name = request.POST.get('name', '')
-        email = request.POST.get('email', '')
-        dept_id = request.POST.get('dept_id')
-        groups = request.POST.getlist('groups', [])
-        role_post = request.POST.get('role', 'CU')
-        ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
-        is_active = request.POST.get('is_active', '1')
-        ldap_pwd = gen_rand_pwd(16)
-
-        try:
-            if None in [username, password, ssh_key_pwd, name, groups, role_post, is_active]:
-                error = u'带*内容不能为空'
-                raise AddError
-            user = User.objects.filter(username=username)
-            if user:
-                error = u'用户 %s 已存在' % username
-                raise AddError
-
-            dept = DEPT.objects.filter(id=dept_id)
-            if dept:
-                dept = dept[0]
-            else:
-                error = u'部门不存在'
-                raise AddError(error)
-
-        except AddError:
-            pass
-        else:
-            try:
-                db_add_user(username=username,
-                            password=md5_crypt(password),
-                            name=name, email=email, dept=dept,
-                            groups=groups, role=role_post,
-                            ssh_key_pwd=CRYPTOR.encrypt(ssh_key_pwd),
-                            ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
-                            is_active=is_active,
-                            date_joined=datetime.datetime.now())
-
-                server_add_user(username, password, ssh_key_pwd)
-                if LDAP_ENABLE:
-                    ldap_add_user(username, ldap_pwd)
-                msg = u'添加用户 %s 成功！' % username
-
-            except Exception, e:
-                error = u'添加用户 %s 失败 %s ' % (username, e)
-                try:
-                    db_del_user(username)
-                    server_del_user(username)
-                    if LDAP_ENABLE:
-                        ldap_del_user(username)
-                except Exception:
-                    pass
-    return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
-
-
 def profile(request):
     user_id = request.session.get('user_id')
     if not user_id:
@@ -557,7 +599,4 @@ def chg_pass(request):
     header_title, path1, path2 = '修改信息 | Edit Info', '用户管理', '修改个人信息'
 
     return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
-
-
-
 

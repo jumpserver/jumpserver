@@ -4,7 +4,7 @@ import re
 import time
 
 from django import template
-from juser.models import User, UserGroup
+from juser.models import User, UserGroup, DEPT
 from jasset.models import BisGroup
 from jumpserver.views import perm_user_asset
 
@@ -26,16 +26,16 @@ def int2str(value):
 
 @register.filter(name='get_role')
 def get_role(user_id):
-    user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
+    user_role = {'SU': u'超级管理员', 'DA': u'部门管理员', 'CU': u'普通用户'}
     user = User.objects.get(id=user_id)
     return user_role.get(str(user.role))
 
 
 @register.filter(name='groups_str')
-def groups_str(username):
+def groups_str(user_id):
     groups = []
-    user = User.objects.get(username=username)
-    for group in user.user_group.filter(type='A'):
+    user = User.objects.get(id=user_id)
+    for group in user.group.all():
         groups.append(group.name)
     if len(groups) < 4:
         return ' '.join(groups)
@@ -70,6 +70,15 @@ def bool2str(value):
 def member_count(group_id):
     group = UserGroup.objects.get(id=group_id)
     return group.user_set.count()
+
+@register.filter(name='dept_member')
+def dept_member(dept_id):
+    dept = DEPT.objects.filter(id=dept_id)
+    if dept:
+        dept = dept[0]
+        return dept.user_set.count()
+    else:
+        return 0
 
 
 @register.filter(name='perm_count')

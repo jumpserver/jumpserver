@@ -31,11 +31,26 @@
                 <div class="ibox-content">
                     <div class="">
                     <a target="_blank" href="/juser/group_add/" class="btn btn-sm btn-primary "> 添加 </a>
+
+                    <a target="_blank" href="/juser/group_add/" class="btn btn-sm btn-danger "> 删除所选 </a>
+                    <form id="search_form" method="get" action="" class="pull-right mail-search">
+                        <div class="input-group">
+                            <input type="text" class="form-control input-sm" id="search_input" name="search" placeholder="Search">
+                            <div class="input-group-btn">
+                                <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                                    Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                     </div>
 
                     <table class="table table-striped table-bordered table-hover " id="editable" >
                         <thead>
                             <tr>
+                                <th class="text-center">
+                                    <input type="checkbox" id="select_all" onclick="selectAll()"  name="select_all">
+                                </th>
                                 <th class="text-center">组名</th>
                                 <th class="text-center">所属部门</th>
                                 <th class="text-center">成员数量</th>
@@ -46,9 +61,12 @@
                         <tbody>
                         {% for group in contacts.object_list %}
                             <tr class="gradeX">
+                                <td class="text-center">
+                                    <input type="checkbox"  name="selected" value="{{ group.id }}">
+                                </td>
                                 <td class="text-center"> {{ group.name }} </td>
                                 <td class="text-center"> {{ group.dept.name }} </td>
-                                <td class="text-center"> {{ group.name }} </td>
+                                <td class="text-center"> {{ group.id | member_count }} </td>
                                 <td class="text-center"> {{ group.comment }} </td>
                                 <td class="text-center">
                                     <a title="[ {{ group.name }} ] 成员信息" href="../group_detail/?id={{ group.id }}" class="iframe btn btn-xs btn-primary">成员</a>
@@ -77,8 +95,8 @@
                                              <a href="#">Previous</a>
                                         </li>
                                     {% endif %}
-                                    {% for page in p.page_range %}
-                                        {% ifequal offset1 page %}
+                                    {% for page in page_range %}
+                                        {% ifequal current_page page %}
                                             <li class="paginate_button active"  aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
                                         {% else %}
                                             <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
@@ -107,6 +125,17 @@
     $(document).ready(function(){
         $(".iframe").colorbox({iframe:true, width:"70%", height:"70%"});
     });
+
+{#    function user_group_search(){#}
+{#        $.ajax({#}
+{#            type: "GET",#}
+{#            url: "/juser/group_search/",#}
+{#            data: $("#search_form").serialize(),#}
+{#            success: function (data) {#}
+{#                $("#contents_form").html(data);#}
+{#            }#}
+{#        });#}
+{#    }#}
 </script>
 
 {% endblock %}

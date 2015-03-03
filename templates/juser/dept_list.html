@@ -31,11 +31,25 @@
                 <div class="ibox-content">
                     <div class="">
                     <a target="_blank" href="/juser/dept_add/" class="btn btn-sm btn-primary "> 添加 </a>
+                    <a target="_blank" href="/juser/group_add/" class="btn btn-sm btn-danger "> 删除所选 </a>
+                    <form id="search_form" method="get" action="" class="pull-right mail-search">
+                        <div class="input-group">
+                            <input type="text" class="form-control input-sm" id="search_input" name="search" placeholder="Search">
+                            <div class="input-group-btn">
+                                <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                                    Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                     </div>
 
                     <table class="table table-striped table-bordered table-hover " id="editable" >
                         <thead>
                             <tr>
+                                <th class="text-center">
+                                    <input type="checkbox" id="select_all" onclick="selectAll()"  name="select_all">
+                                </th>
                                 <th class="text-center">部门名称</th>
                                 <th class="text-center">成员数量</th>
                                 <th class="text-center">备注</th>
@@ -45,13 +59,16 @@
                         <tbody>
                         {% for dept in contacts.object_list %}
                             <tr class="gradeX">
+                                <td class="text-center">
+                                    <input type="checkbox"  name="selected" value="{{ dept.id }}">
+                                </td>
                                 <td class="text-center"> {{ dept.name }} </td>
-                                <td class="text-center"> {{ dept.name }} </td>
+                                <td class="text-center"> {{ dept.id | dept_member }} </td>
                                 <td class="text-center"> {{ dept.comment }} </td>
                                 <td class="text-center">
-                                    <a title="[ {{ dept.name }} ] 成员信息" href="../dept_detail/?id={{ group.id }}" class="iframe btn btn-xs btn-primary">成员</a>
-                                    <a href="../dept_edit/?id={{ group.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <a href="../dept_del/?id={{ group.id }}" class="btn btn-xs btn-danger">删除</a>
+                                    <a title="[ {{ dept.name }} ] 成员信息" href="../dept_detail/?id={{ dept.id }}" class="iframe btn btn-xs btn-primary">成员</a>
+                                    <a href="../dept_edit/?id={{ dept.id }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a href="../dept_del/?id={{ dept.id }}" class="btn btn-xs btn-danger">删除</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -75,8 +92,8 @@
                                              <a href="#">Previous</a>
                                         </li>
                                     {% endif %}
-                                    {% for page in p.page_range %}
-                                        {% ifequal offset1 page %}
+                                    {% for page in page_range %}
+                                        {% ifequal current_page page %}
                                             <li class="paginate_button active"  aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
                                         {% else %}
                                             <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>

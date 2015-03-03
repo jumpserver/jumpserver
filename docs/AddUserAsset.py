@@ -2,14 +2,17 @@
 import django
 import os
 import sys
+import random
+import datetime
 
 sys.path.append('../')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 django.setup()
 
-from juser.views import db_add_user, md5_crypt, CRYPTOR
+
+from juser.views import db_add_user, md5_crypt, CRYPTOR, db_add_group
 from jasset.models import Asset, IDC, BisGroup
-from juser.models import UserGroup
+from juser.models import UserGroup, DEPT
 from jasset.views import jasset_group_add
 from jperm.models import CmdGroup
 
@@ -29,15 +32,18 @@ def test_add_asset_group():
         print 'Add: %s' % name
 
 
-def test_add_user_group():
-    for i in range(1, 20):
-        name = 'DepartGroup' + str(i)
-        UserGroup.objects.create(name=name, type='M', comment=name)
-        print 'Add: %s' % name
+def test_add_dept():
+    for i in range(1, 100):
+        name = 'DEPT' + str(i)
+        print "Add: %s" % name
+        DEPT.objects.create(name=name, comment=name)
 
-    for i in range(1, 20):
+
+def test_add_group():
+    dept_all = DEPT.objects.all()
+    for i in range(1, 100):
         name = 'UserGroup' + str(i)
-        UserGroup.objects.create(name=name, type='A', comment=name)
+        UserGroup.objects.create(name=name, dept=random.choice(dept_all), comment=name)
         print 'Add: %s' % name
 
 
@@ -52,15 +58,18 @@ def test_add_cmd_group():
 def test_add_user():
     for i in range(1, 500):
         username = "test" + str(i)
+        dept_all = DEPT.objects.all()
+        group_all = UserGroup.objects.all()
+        group_all_id = [group.id for group in group_all]
         db_add_user(username=username,
                     password=md5_crypt(username),
+                    dept=random.choice(dept_all),
                     name=username, email='%s@jumpserver.org' % username,
-                    groups=[1,3], role='CU',
-                    ssh_pwd=CRYPTOR.encrypt(username),
+                    groups=[random.choice(group_all_id) for i in range(1, 4)], role='CU',
                     ssh_key_pwd=CRYPTOR.encrypt(username),
                     ldap_pwd=CRYPTOR.encrypt(username),
                     is_active=True,
-                    date_joined=0)
+                    date_joined=datetime.datetime.now())
         print "Add: %s" % username
 
 
@@ -73,11 +82,8 @@ def test_add_asset():
 
 
 if __name__ == '__main__':
-    test_add_idc()
-    test_add_asset_group()
-    test_add_user_group()
-    test_add_cmd_group()
-    test_add_asset()
+    #test_add_dept()
+    #test_add_group()
     test_add_user()
 
 
