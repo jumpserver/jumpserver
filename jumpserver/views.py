@@ -297,4 +297,9 @@ else:
     ldap_conn = None
 
 
+def install(request):
+    from juser.models import DEPT
+    DEPT(id=1, name="跨部门", comment="添加跨部门小组使用").save()
+    DEPT(id=2, name="默认", comment="默认部门，作为中间，可以用来初始化").save()
+    return HttpResponse('Ok')
 

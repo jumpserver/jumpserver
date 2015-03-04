@@ -86,17 +86,6 @@ def db_add_group(**kwargs):
         group_add_user(group, user_id)
 
 
-
-
-
-def group_update_user(group_id, users_id):
-    group = UserGroup.objects.get(id=group_id)
-    group.user_set.clear()
-    for user_id in users_id:
-        user = User.objects.get(id=user_id)
-        group.user_set.add(user)
-
-
 def db_add_user(**kwargs):
     groups_post = kwargs.pop('groups')
     user = User(**kwargs)
@@ -261,7 +250,7 @@ def dept_list(request):
     if keyword:
         contact_list = DEPT.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword)).order_by('name')
     else:
-        contact_list = DEPT.objects.all()
+        contact_list = DEPT.objects.filter(id__gt=1)
     p = paginator = Paginator(contact_list, 10)
 
     try:
@@ -291,7 +280,7 @@ def dept_detail(request):
 
 def dept_del(request):
     dept_id = request.GET.get('id', None)
-    if not dept_id:
+    if not dept_id or dept_id in ['1', '2']:
         return HttpResponseRedirect('/juser/dept_list/')
     dept = DEPT.objects.filter(id=dept_id)
     if dept:
@@ -305,6 +294,32 @@ def dept_member(dept_id):
     if dept:
         dept = dept[0]
         return dept.user_set.all()
+
+
+def dept_member_update(dept, users_id_list):
+    old_users = dept.user_set.all()
+    new_users = []
+    for user_id in users_id_list:
+        new_users.extend(User.objects.filter(id=user_id))
+
+    remove_user = [user for user in old_users if user not in new_users]
+    add_user = [user for user in new_users if user not in old_users]
+
+    for user in add_user:
+        user.dept = dept
+        user.save()
+
+    dept_default = DEPT.objects.get(id=2)
+    for user in remove_user:
+        user.dept = dept_default
+        user.save()
+
+
+def dept_del_ajax(request):
+    dept_ids = request.POST.get('dept_ids')
+    for dept_id in dept_ids.split(','):
+        DEPT.objects.filter(id=dept_id).delete()
+    return HttpResponse("删除成功")
 
 
 def dept_edit(request):
@@ -325,15 +340,16 @@ def dept_edit(request):
     else:
         dept_id = request.POST.get('id', '')
         name = request.POST.get('name', '')
-        users = request.POST.get('users_selected', [])
+        users = request.POST.getlist('users_selected', [])
         comment = request.POST.get('comment', '')
 
         dept = DEPT.objects.filter(id=dept_id)
         if dept:
             dept.update(name=name, comment=comment)
+            dept_member_update(dept[0], users)
         else:
             error = '部门不存在'
-
+        return HttpResponseRedirect('/juser/dept_list/')
     return render_to_response('juser/dept_edit.html', locals(), context_instance=RequestContext(request))
 
 
@@ -405,42 +421,58 @@ def group_detail(request):
 
 
 def group_del(request):
-    group_id = request.GET.get('id', None)
+    group_id = request.GET.get('id', '')
     if not group_id:
         return HttpResponseRedirect('/')
-    group = UserGroup.objects.get(id=group_id)
-    group.delete()
-    return HttpResponseRedirect('/juser/group_list/', locals(), context_instance=RequestContext(request))
+    UserGroup.objects.filter(id=group_id).delete()
+    return HttpResponseRedirect('/juser/group_list/')
+
+
+def group_del_ajax(request):
+    group_ids = request.POST.get('group_ids')
+    for group_id in group_ids.split(','):
+        UserGroup.objects.filter(id=group_id).delete()
+    return HttpResponse('删除成功')
+
+
+def group_update_member(group_id, users_id_list):
+    group = UserGroup.objects.filter(id=group_id)
+    if group:
+        group = group[0]
+        group.user_set.clear()
+        for user_id in users_id_list:
+            user = User.objects.get(id=user_id)
+            group.user_set.add(user)
 
 
 def group_edit(request):
     error = ''
     msg = ''
     header_title, path1, path2 = '修改属组 | Edit Group', 'juser', 'group_edit'
-    group_types = {
-        'M': '部门',
-        'A': '用户组',
-    }
     if request.method == 'GET':
-        group_id = request.GET.get('id', None)
-        group = UserGroup.objects.get(id=group_id)
-        group_name = group.name
-        comment = group.comment
-        group_type = group.type
-        users_all = User.objects.all()
-        users_selected = group.user_set.all()
-        users = [user for user in users_all if user not in users_selected]
+        group_id = request.GET.get('id', '')
+        group = UserGroup.objects.filter(id=group_id)
+        if group:
+            group = group[0]
+            dept_all = DEPT.objects.all()
+            users_all = User.objects.all()
+            users_selected = group.user_set.all()
+            users = [user for user in users_all if user not in users_selected]
 
         return render_to_response('juser/group_edit.html', locals(), context_instance=RequestContext(request))
     else:
-        group_id = request.POST.get('group_id', None)
-        group_name = request.POST.get('group_name', None)
+        group_id = request.POST.get('group_id', '')
+        group_name = request.POST.get('group_name', '')
         comment = request.POST.get('comment', '')
         users_selected = request.POST.getlist('users_selected')
-        group_type = request.POST.get('group_type')
-        group = UserGroup.objects.filter(id=group_id)
-        group.update(name=group_name, comment=comment, type=group_type)
-        group_update_user(group_id, users_selected)
+
+        try:
+            if '' in [group_id, group_name]:
+                raise AddError('组名不能为空')
+            UserGroup.objects.filter(id=group_id).update(name=group_name, comment=comment)
+
+        except AddError, e:
+            error = e
 
         return HttpResponseRedirect('/juser/group_list/')
 

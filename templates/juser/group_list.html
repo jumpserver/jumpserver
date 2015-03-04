@@ -30,9 +30,8 @@
 
                 <div class="ibox-content">
                     <div class="">
-                    <a target="_blank" href="/juser/group_add/" class="btn btn-sm btn-primary "> 添加 </a>
-
-                    <a target="_blank" href="/juser/group_add/" class="btn btn-sm btn-danger "> 删除所选 </a>
+                    <a target="_blank" href="/juser/group_add/" class="btn btn-sm btn-primary "> 添加小组 </a>
+                    <a id="del_btn" class="btn btn-sm btn-danger "> 删除所选 </a>
                     <form id="search_form" method="get" action="" class="pull-right mail-search">
                         <div class="input-group">
                             <input type="text" class="form-control input-sm" id="search_input" name="search" placeholder="Search">
@@ -124,18 +123,20 @@
 <script>
     $(document).ready(function(){
         $(".iframe").colorbox({iframe:true, width:"70%", height:"70%"});
+        var check_array = []
+        $('#del_btn').click(function(){
+            $(".gradeX input:checked").each(function() {check_array.push($(this).attr("value")) })
+            $(".gradeX input:checked").closest("tr").remove()
+            $.post("/juser/group_del_ajax/",
+                    {group_ids: check_array.join(",")},
+                    function(data){
+                        alert(data)
+                    }
+            )
+        })
     });
 
-{#    function user_group_search(){#}
-{#        $.ajax({#}
-{#            type: "GET",#}
-{#            url: "/juser/group_search/",#}
-{#            data: $("#search_form").serialize(),#}
-{#            success: function (data) {#}
-{#                $("#contents_form").html(data);#}
-{#            }#}
-{#        });#}
-{#    }#}
+
 </script>
 
 {% endblock %}
