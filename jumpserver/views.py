@@ -94,10 +94,8 @@ def jasset_group_add(name, comment, jtype):
     if BisGroup.objects.filter(name=name):
         emg = u'该业务组已存在!'
     else:
-        BisGroup.objects.create(name=name, comment=comment, type=type)
-        smg = u'业务组%s添加成功' % name
         BisGroup.objects.create(name=name, comment=comment, type=jtype)
-        smg = u'业务组%s添加成功' %name
+        smg = u'业务组%s添加成功' % name
 
 
 class ServerError(Exception):

@@ -10,7 +10,7 @@ from models import IDC, Asset, BisGroup
 from juser.models import UserGroup
 from connect import PyCrypt, KEY
 from jlog.models import Log
-from jumpserver.views import jasset_group_add, jasset_host_edit, pages
+from jumpserver.views import jasset_group_add, jasset_host_edit, pages, page_list_return
 
 cryptor = PyCrypt(KEY)
 
@@ -65,7 +65,7 @@ def add_host(request):
         j_comment = request.POST.get('j_comment')
 
         if Asset.objects.filter(ip=str(j_ip)):
-            emg = u'该IP %s 已存在!' %j_ip
+            emg = u'该IP %s 已存在!' % j_ip
             return render_to_response('jasset/host_add.html', locals(), context_instance=RequestContext(request))
 
         if j_type == 'M':
@@ -74,8 +74,7 @@ def add_host(request):
             f_add_host(j_ip, j_port, j_idc, j_type, j_group, j_active, j_comment, j_user, j_password)
         else:
             f_add_host(j_ip, j_port, j_idc, j_type, j_group, j_active, j_comment)
-
-        smg = u'主机 %s 添加成功' %j_ip
+        smg = u'主机 %s 添加成功' % j_ip
 
     return render_to_response('jasset/host_add.html', locals(), context_instance=RequestContext(request))
 
@@ -97,8 +96,9 @@ def add_host_multi(request):
                 j_group.append(g)
 
             if Asset.objects.filter(ip=str(j_ip)):
-                emg = u'该IP %s 已存在!' %j_ip
-                return render_to_response('jasset/host_add_multi.html', locals(), context_instance=RequestContext(request))
+                emg = u'该IP %s 已存在!' % j_ip
+                return render_to_response('jasset/host_add_multi.html', locals(),
+                                          context_instance=RequestContext(request))
 
             if j_type == 'M':
                 j_user = request.POST.get('j_user')
@@ -117,14 +117,14 @@ def batch_host_edit(request):
     if request.method == 'POST':
         len_table = request.POST.get('len_table')
         for i in range(int(len_table)):
-            j_id = "editable["+str(i)+"][j_id]"
-            j_ip = "editable["+str(i)+"][j_ip]"
-            j_port = "editable["+str(i)+"][j_port]"
-            j_idc = "editable["+str(i)+"][j_idc]"
-            j_type = "editable["+str(i)+"][j_type]"
-            j_group = "editable["+str(i)+"][j_group]"
-            j_active = "editable["+str(i)+"][j_active]"
-            j_comment = "editable["+str(i)+"][j_comment]"
+            j_id = "editable[" + str(i) + "][j_id]"
+            j_ip = "editable[" + str(i) + "][j_ip]"
+            j_port = "editable[" + str(i) + "][j_port]"
+            j_idc = "editable[" + str(i) + "][j_idc]"
+            j_type = "editable[" + str(i) + "][j_type]"
+            j_group = "editable[" + str(i) + "][j_group]"
+            j_active = "editable[" + str(i) + "][j_active]"
+            j_comment = "editable[" + str(i) + "][j_comment]"
 
             j_id = request.POST.get(j_id).strip()
             j_ip = request.POST.get(j_ip).strip()
@@ -144,14 +144,17 @@ def list_host(request):
     header_title, path1, path2 = u'查看主机 | List Host', u'资产管理', u'查看主机'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
     posts = contact_list = Asset.objects.all().order_by('ip')
-    p = paginator = Paginator(contact_list, 20)
-    try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
+    p = paginator = Paginator(contact_list, 10)
 
     try:
-        contacts = paginator.page(page)
+        current_page = int(request.GET.get('page', '1'))
+    except ValueError:
+        current_page = 1
+
+    page_range = page_list_return(len(p.page_range), current_page)
+
+    try:
+        contacts = paginator.page(current_page)
     except (EmptyPage, InvalidPage):
         contacts = paginator.page(paginator.num_pages)
 
@@ -162,7 +165,7 @@ def host_del(request, offset):
     if offset == 'multi':
         len_list = request.POST.get("len_list")
         for i in range(int(len_list)):
-            key = "id_list["+str(i)+"]"
+            key = "id_list[" + str(i) + "]"
             jid = request.POST.get(key)
             a = Asset.objects.get(id=jid).ip
             Asset.objects.filter(id=jid).delete()
@@ -222,7 +225,7 @@ def host_edit(request):
         a.save()
         a.bis_group = groups
         a.save()
-        smg = u'主机 %s 修改成功' %j_ip
+        smg = u'主机 %s 修改成功' % j_ip
         return HttpResponseRedirect('/jasset/host_list')
 
     return render_to_response('jasset/host_edit.html', locals(), context_instance=RequestContext(request))
@@ -245,7 +248,7 @@ def add_idc(request):
             emg = u'该IDC已存在!'
             return render_to_response('jasset/idc_add.html', locals(), context_instance=RequestContext(request))
         else:
-            smg = u'IDC:%s添加成功' %j_idc
+            smg = u'IDC:%s添加成功' % j_idc
             IDC.objects.create(name=j_idc, comment=j_comment)
 
     return render_to_response('jasset/idc_add.html', locals(), context_instance=RequestContext(request))
@@ -279,7 +282,7 @@ def add_group(request):
             for host in j_hosts:
                 g = Asset.objects.get(id=host)
                 group.asset_set.add(g)
-            smg = u'主机组%s添加成功' %j_group
+            smg = u'主机组%s添加成功' % j_group
 
     return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
 
@@ -307,7 +310,7 @@ def edit_group(request):
             g = Asset.objects.get(id=host)
             group.asset_set.add(g)
         BisGroup.objects.filter(id=group_id).update(name=j_group, comment=j_comment)
-        smg = u'主机组%s修改成功' %j_group
+        smg = u'主机组%s修改成功' % j_group
         return HttpResponseRedirect('/jasset/group_detail/%s' % group_id)
 
     return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
@@ -363,7 +366,7 @@ def group_del_host(request, offset):
             group = IDC.objects.get(name=group_name)
         len_list = request.POST.get("len_list")
         for i in range(int(len_list)):
-            key = "id_list["+str(i)+"]"
+            key = "id_list[" + str(i) + "]"
             print key
             jid = request.POST.get(key)
             print jid
@@ -371,7 +374,7 @@ def group_del_host(request, offset):
             print g
             group.asset_set.remove(g)
             print 'ok'
-        return HttpResponseRedirect('/jasset/%s_detail/%s' %(offset, group.id))
+        return HttpResponseRedirect('/jasset/%s_detail/%s' % (offset, group.id))
 
 
 def group_del(request, offset):
@@ -383,7 +386,8 @@ def host_search(request):
     keyword = request.GET.get('keyword')
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
     posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
-                                 Q(bis_group__name__contains=keyword) | Q(comment__contains=keyword)).distinct().order_by('ip')
+                                 Q(bis_group__name__contains=keyword) | Q(
+        comment__contains=keyword)).distinct().order_by('ip')
     print posts
     contact_list, p, contacts = pages(posts, request)
     print contact_list, p, contacts
