@@ -39,3 +39,4 @@ nosetests.xml
 node_modules
 logs
 keys
+jumpserver.conf

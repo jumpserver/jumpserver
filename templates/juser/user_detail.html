@@ -39,10 +39,16 @@
                         </tr>
                         <tr class="gradeX">
                             <td class="text-center">角色</td>
-                            <td class="text-center">{{ user.id|get_role }}</td>
+                            <td class="text-center">{{ user.id }}</td>
                         </tr>
                         <tr class="gradeX">
-                            <td class="text-center">属组</td>
+                            <td class="text-center">部门</td>
+                            <td class="text-center">
+                                {{ user.dept.name }}
+                            </td>
+                        </tr>
+                        <tr class="gradeX">
+                            <td class="text-center">小组</td>
                             <td class="text-center">
                                 {% for group in user.user_group.all %}
                                     {{ group.name }}
@@ -59,7 +65,7 @@
                         </tr>
                         <tr class="gradeX">
                             <td class="text-center">添加时间</td>
-                            <td class="text-center">{{ user.date_joined|stamp2str }}</td>
+                            <td class="text-center">{{ user.date_joined }}</td>
                         </tr>
                         <tr class="gradeX">
                             <td class="text-center">最后登录</td>

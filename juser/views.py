@@ -111,7 +111,7 @@ def db_update_user(**kwargs):
         for group_id in groups_post:
             group = UserGroup.objects.filter(id=group_id)
             group_select.extend(group)
-        user.user_group = group_select
+        user.group = group_select
 
 
 def db_del_user(username):
@@ -201,27 +201,6 @@ def ldap_del_user(username):
     ldap_conn.delete(user_dn)
     ldap_conn.delete(group_dn)
     ldap_conn.delete(sudo_dn)
-
-
-# def ldap_group_add(group_name, username_list, gid):
-#     group_dn = "cn=%s,ou=Group,%s" % (group_name, LDAP_BASE_DN)
-#     group_attr = {'objectClass': ['posixGroup', 'top'],
-#                   'cn': [str(group_name)],
-#                   'userPassword': ['{crypt}x'],
-#                   'gidNumber': [gid],
-#                   'memberUid': username_list}
-#     ldap_conn.add(group_dn, group_attr)
-
-
-# def group_add_ajax(request):
-#     group_type = request.POST.get('type', 'A')
-#     users_all = User.objects.all()
-#     if group_type == 'A':
-#         users = users_all
-#     else:
-#         users = [user for user in users_all if not user.user_group.filter(type='M')]
-#
-#     return render_to_response('juser/group_add_ajax.html', locals(), context_instance=RequestContext(request))
 
 
 def dept_add(request):
@@ -494,11 +473,11 @@ def user_add(request):
         groups = request.POST.getlist('groups', [])
         role_post = request.POST.get('role', 'CU')
         ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
-        is_active = request.POST.get('is_active', '1')
+        is_active = True if request.POST.get('is_active', '1') == '1' else False
         ldap_pwd = gen_rand_pwd(16)
 
         try:
-            if None in [username, password, ssh_key_pwd, name, groups, role_post, is_active]:
+            if '' in [username, password, ssh_key_pwd, name, groups, role_post, is_active]:
                 error = u'带*内容不能为空'
                 raise AddError
             user = User.objects.filter(username=username)
@@ -568,75 +547,86 @@ def user_list(request):
 
 
 def user_detail(request):
-    user_id = request.GET.get('id', None)
+    user_id = request.GET.get('id', '')
     if not user_id:
-        return HttpResponseRedirect('/')
-    user = User.objects.get(id=user_id)
+        return HttpResponseRedirect('/juser/user_list/')
+    user = User.objects.filter(id=user_id)
+    if user:
+        user = user[0]
+
     return render_to_response('juser/user_detail.html', locals(), context_instance=RequestContext(request))
 
 
 def user_del(request):
-    user_id = request.GET.get('id', None)
+    user_id = request.GET.get('id', '')
     if not user_id:
         return HttpResponseRedirect('/')
-    user = User.objects.get(id=user_id)
-    user.delete()
-    group = UserGroup.objects.get(name=user.username)
-    group.delete()
-    server_del_user(user.username)
-    ldap_del_user(user.username)
-    return HttpResponseRedirect('/juser/user_list/', locals(), context_instance=RequestContext(request))
+    user = User.objects.filter(id=user_id)
+    if user:
+        user = user[0]
+        user.delete()
+        server_del_user(user.username)
+        if LDAP_ENABLE:
+            ldap_del_user(user.username)
+    return HttpResponseRedirect('/juser/user_list/')
+
+
+def user_del_ajax(request):
+    user_ids = request.POST.get('ids')
+    for user_id in user_ids.split(','):
+        user = User.objects.filter(id=user_id)
+        if user:
+            user = user[0]
+            user.delete()
+            server_del_user(user.username)
+            if LDAP_ENABLE:
+                ldap_del_user(user.username)
+
+    return HttpResponse('删除成功')
 
 
 def user_edit(request):
-    header_title, path1, path2 = '编辑用户 | Edit User', 'juser', 'user_edit'
-    readonly = "readonly"
+    header_title, path1, path2 = '编辑用户', '用户管理', '用户编辑'
     if request.method == 'GET':
-        user_id = request.GET.get('id', None)
+        user_id = request.GET.get('id', '')
         if not user_id:
             return HttpResponseRedirect('/')
-        user = User.objects.get(id=user_id)
-        username = user.username
-        password = user.password
-        ssh_key_pwd = user.ssh_key_pwd
-        name = user.name
-        manage_groups = UserGroup.objects.filter(type='M')
-        auth_groups = UserGroup.objects.filter(type='A')
-        manage_group_id = user.user_group.get(type='M').id
-        groups_str = ' '.join([str(group.id) for group in auth_groups])
-        user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
-        role_post = user.role
-        ssh_pwd = user.ssh_pwd
-        email = user.email
+
+        user_role = {'SU': u'超级管理员', 'DA': u'部门管理员', 'CU': u'普通用户'}
+        user = User.objects.filter(id=user_id)
+        dept_all = DEPT.objects.all()
+        group_all = UserGroup.objects.all()
+        if user:
+            user = user[0]
+            groups_str = ' '.join([str(group.id) for group in user.group.all()])
 
     else:
-        username = request.POST.get('username', None)
-        password = request.POST.get('password', None)
-        name = request.POST.get('name', None)
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+        name = request.POST.get('name', '')
         email = request.POST.get('email', '')
-        manage_group_id = request.POST.get('manage_group', '')
-        auth_groups = request.POST.getlist('groups', None)
-        groups = auth_groups
-        groups.append(manage_group_id)
-        groups_str = ' '.join(auth_groups)
-        role_post = request.POST.get('role', None)
-        ssh_pwd = request.POST.get('ssh_pwd', None)
-        ssh_key_pwd = request.POST.get('ssh_key_pwd', None)
-        is_active = request.POST.get('is_active', '1')
-        ldap_pwd = gen_rand_pwd(16)
-        all_group = UserGroup.objects.filter(Q(type='M') | Q(type='A'))
-        user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
+        dept_id = request.POST.get('dept_id')
+        groups = request.POST.getlist('groups', [])
+        role_post = request.POST.get('role', 'CU')
+        ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
+        is_active = True if request.POST.get('is_active', '1') == '1' else False
+
+        user_role = {'SU': u'超级管理员', 'DA': u'部门管理员', 'CU': u'普通用户'}
+        dept = DEPT.objects.filter(id=dept_id)
+        if dept:
+            dept = dept[0]
+        else:
+            dept = DEPT.objects.get(id='1')
 
         if username:
-            user = User.objects.get(username=username)
+            user = User.objects.filter(username=username)
+            if user:
+                user = user[0]
         else:
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect('/juser/user_list/')
 
         if password != user.password:
             password = md5_crypt(password)
-
-        if ssh_pwd != user.ssh_pwd:
-            ssh_pwd = CRYPTOR.encrypt(ssh_pwd)
 
         if ssh_key_pwd != user.ssh_key_pwd:
             ssh_key_pwd = CRYPTOR.encrypt(ssh_key_pwd)
@@ -646,14 +636,14 @@ def user_edit(request):
                        name=name,
                        email=email,
                        groups=groups,
+                       dept=dept,
                        role=role_post,
-                       ssh_pwd=ssh_pwd,
+                       is_active=is_active,
                        ssh_key_pwd=ssh_key_pwd)
-        msg = u'修改用户成功'
 
         return HttpResponseRedirect('/juser/user_list/')
 
-    return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
+    return render_to_response('juser/user_edit.html', locals(), context_instance=RequestContext(request))
 
 
 def profile(request):
