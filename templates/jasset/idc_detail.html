@@ -62,7 +62,7 @@
                                 <td class="text-center"> {{ post.date_added|date:"Y-m-d H:i:s" }} </td>
                                 <td class="text-center" name="j_comment"> {{ post.comment }} </td>
                                 <td class="text-center" data-editable='false'>
-                                    <a href="/jasset/?id={{ post.ip }}/" class="iframe btn btn-xs btn-primary">详情</a>
+                                    <a value="/jasset/{{ post.ip }}/" class="iframe btn btn-xs btn-primary">详情</a>
                                     <a href="/jasset/host_del/{{ post.id }}" class="btn btn-xs btn-danger">删除</a>
                                 </td>
                             </tr>
@@ -117,6 +117,21 @@
 <script>
     $(document).ready(function(){
         $('#editable').editableTableWidget();
+    });
+
+     $(".iframe").on('click', function(){
+        var url= $(this).attr("value");
+        $.layer({
+            type: 2,
+            title: 'JumpServer主机详情',
+            maxmin: true,
+            shift: 'top',
+            border: [2, 0.3, '#1AB394'],
+            shade: [0.5, '#000000'],
+            shadeClose: true,
+            area : ['800px' , '600px'],
+            iframe: {src: url}
+        });
     });
 
     function alter(form) {

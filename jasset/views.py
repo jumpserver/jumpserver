@@ -50,7 +50,7 @@ def f_add_host(ip, port, idc, jtype, group, active, comment, username='', passwo
 
 def add_host(request):
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
-    header_title, path1, path2 = u'添加主机 | Add Host', u'资产管理', u'添加主机'
+    header_title, path1, path2 = u'添加主机', u'资产管理', u'添加主机'
     eidc = IDC.objects.all()
     egroup = BisGroup.objects.filter(type='A')
     eusergroup = UserGroup.objects.all()
@@ -80,7 +80,7 @@ def add_host(request):
 
 
 def add_host_multi(request):
-    header_title, path1, path2 = u'批量添加主机 | Add Hosts', u'资产管理', u'批量添加主机'
+    header_title, path1, path2 = u'批量添加主机', u'资产管理', u'批量添加主机'
     login_types = {'LDAP': 'L', 'SSH_KEY': 'S', 'PASSWORD': 'P', 'MAP': 'M'}
     j_group = []
     if request.method == 'POST':
@@ -141,7 +141,7 @@ def batch_host_edit(request):
 
 
 def list_host(request):
-    header_title, path1, path2 = u'查看主机 | List Host', u'资产管理', u'查看主机'
+    header_title, path1, path2 = u'查看主机', u'资产管理', u'查看主机'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
     posts = contact_list = Asset.objects.all().order_by('ip')
     p = paginator = Paginator(contact_list, 10)
@@ -181,7 +181,7 @@ def host_del(request, offset):
 def host_edit(request):
     actives = {1: u'激活', 0: u'禁用'}
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
-    header_title, path1, path2 = u'修改主机 | Edit Host', u'资产管理', u'修改主机'
+    header_title, path1, path2 = u'修改主机', u'资产管理', u'修改主机'
     groups, e_group = [], []
     eidc = IDC.objects.all()
     egroup = BisGroup.objects.filter(type='A')
@@ -232,7 +232,7 @@ def host_edit(request):
 
 
 def jlist_ip(request, offset):
-    header_title, path1, path2 = u'主机详细信息 | Host Detail.', u'资产管理', u'主机详情'
+    header_title, path1, path2 = u'主机详细信息', u'资产管理', u'主机详情'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
     post = contact_list = Asset.objects.get(ip=str(offset))
     log = Log.objects.filter(host=str(offset))
@@ -240,7 +240,7 @@ def jlist_ip(request, offset):
 
 
 def add_idc(request):
-    header_title, path1, path2 = u'添加IDC | Add IDC', u'资产管理', u'添加IDC'
+    header_title, path1, path2 = u'添加IDC', u'资产管理', u'添加IDC'
     if request.method == 'POST':
         j_idc = request.POST.get('j_idc')
         j_comment = request.POST.get('j_comment')
@@ -255,7 +255,7 @@ def add_idc(request):
 
 
 def list_idc(request):
-    header_title, path1, path2 = u'查看IDC | List IDC', u'资产管理', u'查看IDC'
+    header_title, path1, path2 = u'查看IDC', u'资产管理', u'查看IDC'
     posts = IDC.objects.all().order_by('id')
     return render_to_response('jasset/idc_list.html', locals(), context_instance=RequestContext(request))
 
@@ -266,7 +266,7 @@ def del_idc(request, offset):
 
 
 def add_group(request):
-    header_title, path1, path2 = u'添加主机组 | Add Group', u'资产管理', u'添加主机组'
+    header_title, path1, path2 = u'添加主机组', u'资产管理', u'添加主机组'
     posts = Asset.objects.all()
     if request.method == 'POST':
         j_group = request.POST.get('j_group')
@@ -288,13 +288,13 @@ def add_group(request):
 
 
 def list_group(request):
-    header_title, path1, path2 = u'查看主机组 | List Group', u'资产管理', u'查看主机组'
+    header_title, path1, path2 = u'查看主机组', u'资产管理', u'查看主机组'
     posts = BisGroup.objects.filter(type='A').order_by('id')
     return render_to_response('jasset/group_list.html', locals(), context_instance=RequestContext(request))
 
 
 def edit_group(request):
-    header_title, path1, path2 = u'编辑主机组 | Edit Group', u'资产管理', u'编辑主机组'
+    header_title, path1, path2 = u'编辑主机组', u'资产管理', u'编辑主机组'
     group_id = request.GET.get('id')
     group = BisGroup.objects.get(id=group_id)
     all = Asset.objects.all()
@@ -317,7 +317,7 @@ def edit_group(request):
 
 
 def detail_group(request):
-    header_title, path1, path2 = u'主机组详情 | Group Detail', u'资产管理', u'主机组详情'
+    header_title, path1, path2 = u'主机组详情', u'资产管理', u'主机组详情'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
     offset = request.GET.get('id')
     group_name = BisGroup.objects.get(id=offset).name
@@ -337,7 +337,7 @@ def detail_group(request):
 
 
 def detail_idc(request):
-    header_title, path1, path2 = u'主机组详情 | Group Detail', u'资产管理', u'主机组详情'
+    header_title, path1, path2 = u'主机组详情', u'资产管理', u'主机组详情'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
     offset = request.GET.get('id')
     idc_name = IDC.objects.get(id=offset).name

@@ -58,21 +58,33 @@ def base(request):
 
 def index(request):
     path1, path2 = u'仪表盘', 'Dashboard'
-    dic = {}
+    user_dic, host_dic = {}, {}
     li_date, li_str = getDaysByNum(7)
     today = datetime.datetime.now().day
     from_week = datetime.datetime.now() - datetime.timedelta(days=7)
     week_data = Log.objects.filter(start_time__range=[from_week, datetime.datetime.now()])
-    top_ten = week_data.values('user').annotate(times=Count('user')).order_by('-times')[:10]
-    for user in top_ten:
+    user_top_ten = week_data.values('user').annotate(times=Count('user')).order_by('-times')[:10]
+    host_top_ten = week_data.values('host').annotate(times=Count('host')).order_by('-times')[:10]
+    for user in user_top_ten:
         username = user['user']
-        li = []
+        li_user = []
         user_data = week_data.filter(user=username)
         for t in li_date:
             year, month, day = t.year, t.month, t.day
             times = user_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).count()
-            li.append(times)
-        dic[username] = li
+            li_user.append(times)
+        user_dic[username] = li_user
+
+    for host in host_top_ten:
+        ip = host['host']
+        li_host = []
+        host_data = week_data.filter(host=ip)
+        for t in li_date:
+            year, month, day = t.year, t.month, t.day
+            times = host_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).count()
+            li_host.append(times)
+        host_dic[ip] = li_host
+
     users = User.objects.all()
     hosts = Asset.objects.all()
     online_host = Log.objects.filter(is_finished=0)
