@@ -24,14 +24,6 @@ def test_add_idc():
         print 'Add: %s' % name
 
 
-def test_add_asset_group():
-    BisGroup.objects.create(name='ALL', type='A', comment='ALL')
-    for i in range(1, 20):
-        name = 'AssetGroup' + str(i)
-        BisGroup.objects.create(name=name, type='A', comment=name)
-        print 'Add: %s' % name
-
-
 def test_add_dept():
     for i in range(1, 100):
         name = 'DEPT' + str(i)
@@ -73,18 +65,36 @@ def test_add_user():
         print "Add: %s" % username
 
 
+def test_add_asset_group():
+    BisGroup.objects.create(name='ALL', type='A', comment='ALL')
+    user_all = Asset.objects.all()
+    for i in range(1, 20):
+        name = 'AssetGroup' + str(i)
+        group = BisGroup(name=name, type='A', comment=name)
+        group.save()
+        print 'Add: %s' % name
+
+
 def test_add_asset():
-    test_idc = IDC.objects.get(id=1)
+    idc_all = IDC.objects.all()
+    test_idc = random.choice(idc_all)
+    bis_group_all = BisGroup.objects.all()
     for i in range(1, 500):
         ip = '192.168.1.' + str(i)
-        Asset.objects.create(ip=ip, port=22, login_type='L', idc=test_idc, is_active=True, comment='test')
+        asset = Asset(ip=ip, port=22, login_type='L', idc=test_idc, is_active=True, comment='test')
+        asset.save()
+        asset.bis_group = [random.choice(bis_group_all) for i in range(2)]
         print "Add: %s" % ip
 
 
 if __name__ == '__main__':
-    test_add_dept()
-    test_add_group()
+    #test_add_dept()
+    #test_add_group()
     #test_add_user()
+    #test_add_idc()
+    #test_add_asset_group()
+    test_add_asset()
+
 
 
 

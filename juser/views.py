@@ -427,7 +427,7 @@ def group_update_member(group_id, users_id_list):
 def group_edit(request):
     error = ''
     msg = ''
-    header_title, path1, path2 = '修改属组 | Edit Group', 'juser', 'group_edit'
+    header_title, path1, path2 = '修改小组信息', '用户管理', '编辑小组'
     if request.method == 'GET':
         group_id = request.GET.get('id', '')
         group = UserGroup.objects.filter(id=group_id)

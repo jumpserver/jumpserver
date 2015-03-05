@@ -35,25 +35,6 @@ def perm_group_update(user_group_name='', user_group_id='', asset_groups_name=''
             Perm(user_group=user_group, asset_group=asset_group).save()
 
 
-def perm_list(request):
-    header_title, path1, path2 = u'主机授权 | Perm Host Detail.', u'授权管理', u'授权详情'
-    groups = contact_list = Perm.objects.all()
-    users = contact_list2 = User.objects.all().order_by('id')
-    p = paginator = Paginator(contact_list, 10)
-    try:
-        current_page = int(request.GET.get('page', '1'))
-    except ValueError:
-        current_page = 1
-
-    page_range = page_list_return(len(p.page_range), current_page)
-
-    try:
-        contacts = paginator.page(current_page)
-    except (EmptyPage, InvalidPage):
-        contacts = paginator.page(paginator.num_pages)
-    return render_to_response('jperm/perm_list.html', locals(), context_instance=RequestContext(request))
-
-
 def user_asset_cmd_groups_get(user_groups_select='', asset_groups_select='', cmd_groups_select=''):
     user_groups_select_list = []
     asset_groups_select_list = []
@@ -72,10 +53,10 @@ def user_asset_cmd_groups_get(user_groups_select='', asset_groups_select='', cmd
 
 
 def perm_add(request):
-    header_title, path1, path2 = u'主机授权添加 | Perm Add Detail.', u'授权管理', u'授权添加'
+    header_title, path1, path2 = u'主机授权添加.', u'授权管理', u'授权添加'
 
     if request.method == 'GET':
-        user_groups = UserGroup.objects.all()
+        user_groups = UserGroup.objects.filter(id__gt=2)
         asset_groups = BisGroup.objects.all()
 
     else:
@@ -93,6 +74,25 @@ def perm_add(request):
         perm.asset_group = asset_groups
         msg = '添加成功'
     return render_to_response('jperm/perm_add.html', locals(), context_instance=RequestContext(request))
+
+
+def perm_list(request):
+    header_title, path1, path2 = u'主机授权', u'授权管理', u'授权详情'
+    contact_list = Perm.objects.all()
+    contact_list2 = User.objects.all().order_by('id')
+    p = paginator = Paginator(contact_list, 10)
+    try:
+        current_page = int(request.GET.get('page', '1'))
+    except ValueError:
+        current_page = 1
+
+    page_range = page_list_return(len(p.page_range), current_page)
+
+    try:
+        contacts = paginator.page(current_page)
+    except (EmptyPage, InvalidPage):
+        contacts = paginator.page(paginator.num_pages)
+    return render_to_response('jperm/perm_list.html', locals(), context_instance=RequestContext(request))
 
 
 def perm_list_ajax(request):
@@ -132,7 +132,7 @@ def perm_list_ajax(request):
 
 def perm_edit(request):
     if request.method == 'GET':
-        header_title, path1, path2 = u'编辑授权 | Perm Host Edit.', u'授权管理', u'授权编辑'
+        header_title, path1, path2 = u'编辑授权', u'授权管理', u'授权编辑'
         perm_id = request.GET.get('id')
         perm = Perm.objects.filter(id=perm_id)
         if perm:
@@ -156,7 +156,7 @@ def perm_edit(request):
 
 
 def perm_detail(request):
-    header_title, path1, path2 = u'编辑授权 | Perm Host Edit.', u'授权管理', u'授权详情'
+    header_title, path1, path2 = u'编辑授权', u'授权管理', u'授权详情'
     perm_id = request.GET.get('id')
     perm = Perm.objects.filter(id=perm_id)
     if perm:
@@ -185,7 +185,7 @@ def perm_del(request):
 
 
 def perm_asset_detail(request):
-    header_title, path1, path2 = u'用户授权主机 | User Perm Asset.', u'权限管理', u'用户主机详情'
+    header_title, path1, path2 = u'用户授权主机', u'权限管理', u'用户主机详情'
     user_id = request.GET.get('id')
     user = User.objects.filter(id=user_id)
     if user:
@@ -268,7 +268,7 @@ def sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select,
 
 
 def sudo_add(request):
-    header_title, path1, path2 = u'Sudo授权 | Perm Sudo Add.', u'权限管理', u'添加Sudo权限'
+    header_title, path1, path2 = u'Sudo授权', u'权限管理', u'添加Sudo权限'
     user_groups = UserGroup.objects.all()
     asset_groups = BisGroup.objects.all()
     cmd_groups = CmdGroup.objects.all()
@@ -290,7 +290,7 @@ def sudo_add(request):
 
 
 def sudo_list(request):
-    header_title, path1, path2 = u'Sudo授权 | Perm Sudo Detail.', u'权限管理', u'Sudo权限详情'
+    header_title, path1, path2 = u'Sudo授权', u'权限管理', u'Sudo权限详情'
     sudo_perms = contact_list = SudoPerm.objects.all()
     p1 = paginator1 = Paginator(contact_list, 10)
     user_groups = UserGroup.objects.filter(Q(type='A') | Q(type='P'))
@@ -310,7 +310,7 @@ def sudo_list(request):
 
 
 def sudo_edit(request):
-    header_title, path1, path2 = u'Sudo授权 | Perm Sudo Detail.', u'授权管理', u'Sudo修改'
+    header_title, path1, path2 = u'Sudo授权', u'授权管理', u'Sudo修改'
 
     if request.method == 'GET':
         sudo_perm_id = request.GET.get('id', '0')
@@ -356,7 +356,7 @@ def sudo_edit(request):
 
 
 def sudo_detail(request):
-    header_title, path1, path2 = u'Sudo授权详情 | Perm Sudo Detail.', u'授权管理', u'授权详情'
+    header_title, path1, path2 = u'Sudo授权详情', u'授权管理', u'授权详情'
     sudo_perm_id = request.GET.get('id')
     sudo_perm = SudoPerm.objects.filter(id=sudo_perm_id)
     if sudo_perm:
@@ -391,7 +391,7 @@ def sudo_del(request):
 
 
 def cmd_add(request):
-    header_title, path1, path2 = u'sudo命令添加 | Sudo Cmd Add.', u'授权管理管理', u'命令组添加'
+    header_title, path1, path2 = u'sudo命令添加', u'授权管理', u'命令组添加'
 
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -407,7 +407,7 @@ def cmd_add(request):
 
 
 def cmd_edit(request):
-    header_title, path1, path2 = u'sudo命令修改 | Sudo Cmd Edit.', u'授权管理管理', u'命令组修改'
+    header_title, path1, path2 = u'sudo命令修改', u'授权管理管理', u'命令组修改'
 
     cmd_group_id = request.GET.get('id')
     cmd_group = CmdGroup.objects.filter(id=cmd_group_id)
@@ -433,7 +433,7 @@ def cmd_edit(request):
 
 
 def cmd_list(request):
-    header_title, path1, path2 = u'sudo命令查看 | Sudo Cmd List.', u'权限管理', u'Sudo命令添加'
+    header_title, path1, path2 = u'sudo命令查看', u'权限管理', u'Sudo命令添加'
 
     cmd_groups = contact_list = CmdGroup.objects.all()
     p = paginator = Paginator(contact_list, 10)

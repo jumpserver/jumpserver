@@ -41,10 +41,10 @@ def groups_str(user_id):
     user = User.objects.get(id=user_id)
     for group in user.group.all():
         groups.append(group.name)
-    if len(groups) < 4:
+    if len(groups) < 3:
         return ' '.join(groups)
     else:
-        return "%s ..." % ' '.join(groups[0:3])
+        return "%s ..." % ' '.join(groups[0:2])
 
 
 @register.filter(name='group_manage_str')
