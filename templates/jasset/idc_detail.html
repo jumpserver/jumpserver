@@ -80,7 +80,7 @@
 
                                     {% if contacts.has_previous %}
                                         <li class="paginate_button previous" aria-controls="editable" tabindex="0" id="editable_previous">
-                                            <a href="?page={{ contacts.previous_page_number }}">Previous</a>
+                                            <a href="?id={{ idc_id }}&page={{ contacts.previous_page_number }}">Previous</a>
                                         </li>
                                     {% else %}
                                         <li class="paginate_button previous disabled" aria-controls="editable" tabindex="0" id="editable_previous">
@@ -89,14 +89,14 @@
                                     {% endif %}
                                     {% for page in page_range %}
                                         {% ifequal current_page page %}
-                                            <li class="paginate_button active"  aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
+                                            <li class="paginate_button active"  aria-controls="editable" tabindex="0"><a href="?id={{ idc_id }}&page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
                                         {% else %}
-                                            <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
+                                            <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?id={{ idc_id }}&page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
                                         {% endifequal %}
                                     {% endfor %}
                                     {% if contacts.has_next %}
                                         <li class="paginate_button next" aria-controls="editable" tabindex="0" id="editable_next">
-                                            <a href="?page={{ contacts.next_page_number }}">Next</a>
+                                            <a href="?id={{ idc_id }}&page={{ contacts.next_page_number }}">Next</a>
                                         </li>
                                     {% else %}
                                         <li class="paginate_button next disabled" aria-controls="editable" tabindex="0" id="editable_next">
@@ -167,7 +167,7 @@
                 url: "/jasset/group_del_host/idc/",
                 data: {"id_list": id_list, "len_list": j, "group_name": group_name},
                 success: function (data) {
-                    window.open(window.location.pathname, "_self");
+                    window.open(window.location.href, "_self");
                 }
             });
         }

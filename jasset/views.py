@@ -4,13 +4,12 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 from models import IDC, Asset, BisGroup
 from juser.models import UserGroup
 from connect import PyCrypt, KEY
 from jlog.models import Log
-from jumpserver.views import jasset_group_add, jasset_host_edit, pages, page_list_return
+from jumpserver.views import jasset_group_add, jasset_host_edit, pages
 
 cryptor = PyCrypt(KEY)
 
@@ -143,20 +142,8 @@ def batch_host_edit(request):
 def list_host(request):
     header_title, path1, path2 = u'查看主机', u'资产管理', u'查看主机'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
-    posts = contact_list = Asset.objects.all().order_by('ip')
-    p = paginator = Paginator(contact_list, 10)
-
-    try:
-        current_page = int(request.GET.get('page', '1'))
-    except ValueError:
-        current_page = 1
-
-    page_range = page_list_return(len(p.page_range), current_page)
-
-    try:
-        contacts = paginator.page(current_page)
-    except (EmptyPage, InvalidPage):
-        contacts = paginator.page(paginator.num_pages)
+    posts = Asset.objects.all().order_by('ip')
+    contact_list, p, contacts, page_range, current_page = pages(posts, request)
 
     return render_to_response('jasset/host_list.html', locals(), context_instance=RequestContext(request))
 
@@ -311,7 +298,7 @@ def edit_group(request):
             group.asset_set.add(g)
         BisGroup.objects.filter(id=group_id).update(name=j_group, comment=j_comment)
         smg = u'主机组%s修改成功' % j_group
-        return HttpResponseRedirect('/jasset/group_detail/%s' % group_id)
+        return HttpResponseRedirect('/jasset/group_detail/?id=%s' % group_id)
 
     return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
 
@@ -319,47 +306,30 @@ def edit_group(request):
 def detail_group(request):
     header_title, path1, path2 = u'主机组详情', u'资产管理', u'主机组详情'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
-    offset = request.GET.get('id')
-    group_name = BisGroup.objects.get(id=offset).name
-    b = BisGroup.objects.get(id=offset)
-    posts = contact_list = Asset.objects.filter(bis_group=b).order_by('ip')
-    p = paginator = Paginator(contact_list, 5)
-    try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
+    group_id = request.GET.get('id')
+    group_name = BisGroup.objects.get(id=group_id).name
+    b = BisGroup.objects.get(id=group_id)
+    posts = Asset.objects.filter(bis_group=b).order_by('ip')
+    contact_list, p, contacts, page_range, current_page = pages(posts, request)
 
-    try:
-        contacts = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        contacts = paginator.page(paginator.num_pages)
     return render_to_response('jasset/group_detail.html', locals(), context_instance=RequestContext(request))
 
 
 def detail_idc(request):
-    header_title, path1, path2 = u'主机组详情', u'资产管理', u'主机组详情'
+    header_title, path1, path2 = u'IDC详情', u'资产管理', u'IDC详情'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
-    offset = request.GET.get('id')
-    idc_name = IDC.objects.get(id=offset).name
-    b = IDC.objects.get(id=offset)
-    posts = contact_list = Asset.objects.filter(idc=b).order_by('ip')
-    p = paginator = Paginator(contact_list, 5)
-    try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
+    idc_id = request.GET.get('id')
+    idc_name = IDC.objects.get(id=idc_id).name
+    b = IDC.objects.get(id=idc_id)
+    posts = Asset.objects.filter(idc=b).order_by('ip')
+    contact_list, p, contacts, page_range, current_page = pages(posts, request)
 
-    try:
-        contacts = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        contacts = paginator.page(paginator.num_pages)
     return render_to_response('jasset/idc_detail.html', locals(), context_instance=RequestContext(request))
 
 
 def group_del_host(request, offset):
     if request.method == 'POST':
         group_name = request.POST.get('group_name')
-        print group_name
         if offset == 'group':
             group = BisGroup.objects.get(name=group_name)
         elif offset == 'idc':
@@ -367,14 +337,15 @@ def group_del_host(request, offset):
         len_list = request.POST.get("len_list")
         for i in range(int(len_list)):
             key = "id_list[" + str(i) + "]"
-            print key
             jid = request.POST.get(key)
-            print jid
             g = Asset.objects.get(id=jid)
-            print g
-            group.asset_set.remove(g)
-            print 'ok'
-        return HttpResponseRedirect('/jasset/%s_detail/%s' % (offset, group.id))
+            if offset == 'group':
+                group.asset_set.remove(g)
+            elif offset == 'idc':
+                Asset.objects.filter(id=jid).delete()
+                BisGroup.objects.filter(name=g.ip).delete()
+
+        return HttpResponseRedirect('/jasset/%s_detail/?id=%s' % (offset, group.id))
 
 
 def group_del(request, offset):
@@ -388,9 +359,7 @@ def host_search(request):
     posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
                                  Q(bis_group__name__contains=keyword) | Q(
         comment__contains=keyword)).distinct().order_by('ip')
-    print posts
-    contact_list, p, contacts = pages(posts, request)
-    print contact_list, p, contacts
+    contact_list, p, contacts, page_range, current_page = pages(posts, request)
 
     return render_to_response('jasset/host_search.html', locals(), context_instance=RequestContext(request))
 

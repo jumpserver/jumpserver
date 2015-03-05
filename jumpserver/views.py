@@ -89,6 +89,7 @@ def index(request):
     hosts = Asset.objects.all()
     online_host = Log.objects.filter(is_finished=0)
     online_user = online_host.distinct()
+    top_dic = {'活跃用户数': [8, 10, 5, 9, 8, 12, 3], '活跃主机数': [10, 16, 20, 8, 9, 5, 9], '登录次数': [20, 30, 35, 18, 40, 38, 65]}
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
 
@@ -119,7 +120,6 @@ def page_list_return(total, current=1):
     max_page = min_page + 4 if min_page + 4 < total else total
 
     return range(min_page, max_page+1)
-
 
 
 def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment):
@@ -154,19 +154,22 @@ def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_com
 
 
 def pages(posts, r):
+    """分页公用函数"""
     contact_list = posts
-    p = paginator = Paginator(contact_list, 10)
+    p = paginator = Paginator(contact_list, 20)
     try:
-        page = int(r.GET.get('page', '1'))
+        current_page = int(r.GET.get('page', '1'))
     except ValueError:
-        page = 1
+        current_page = 1
+
+    page_range = page_list_return(len(p.page_range), current_page)
 
     try:
-        contacts = paginator.page(page)
+        contacts = paginator.page(current_page)
     except (EmptyPage, InvalidPage):
         contacts = paginator.page(paginator.num_pages)
 
-    return contact_list, p, contacts
+    return contact_list, p, contacts, page_range, current_page
 
 
 def login(request):
