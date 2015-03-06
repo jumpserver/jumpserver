@@ -68,7 +68,7 @@
                                 <td class="text-center"> {{ user.username }} </td>
                                 <td class="text-center"> {{ user.name }} </td>
                                 <td class="text-center"> {{ user.dept.name }} </td>
-                                <td class="text-center"> {{ user.id | groups_str }} </td>
+                                <td class="text-center"> {{ user.group.all | group_str2  }} </td>
                                 <td class="text-center"> {{ user.id | get_role }}</td>
                                 <td class="text-center">{{ user.is_active|bool2str }}</td>
                                 <td class="text-center">

@@ -23,6 +23,7 @@ from connect import PyCrypt, KEY
 from connect import BASE_DIR
 from connect import CONF
 from jumpserver.views import md5_crypt, LDAPMgmt, LDAP_ENABLE, ldap_conn, page_list_return
+from jumpserver.api import user_perm_group_api
 
 if LDAP_ENABLE:
     LDAP_HOST_URL = CONF.get('ldap', 'host_url')
@@ -553,6 +554,7 @@ def user_detail(request):
     user = User.objects.filter(id=user_id)
     if user:
         user = user[0]
+        asset_group_permed = user_perm_group_api(user)
 
     return render_to_response('juser/user_detail.html', locals(), context_instance=RequestContext(request))
 

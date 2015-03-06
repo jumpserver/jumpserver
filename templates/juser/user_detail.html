@@ -71,6 +71,14 @@
                             <td class="text-center">最后登录</td>
                             <td class="text-center">{{ user.last_login }}</td>
                         </tr>
+                        <tr class="gradeX">
+                            <td class="text-center">授权主机组</td>
+                            <td class="text-center">
+                                {% for asset_group in asset_group_permed %}
+                                    {{ asset_group.name }}
+                                {% endfor %}
+                            </td>
+                        </tr>
                     </table>
             </div>
         </div>

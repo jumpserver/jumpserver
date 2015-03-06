@@ -47,6 +47,14 @@ def groups_str(user_id):
         return "%s ..." % ' '.join(groups[0:2])
 
 
+@register.filter(name='group_str2')
+def groups_str2(group_list):
+    if len(group_list) < 3:
+        return ' '.join([group.name for group in group_list])
+    else:
+        return '%s ...' % ' '.join([group.name for group in group_list[0:2]])
+
+
 @register.filter(name='group_manage_str')
 def group_manage_str(username):
     user = User.objects.get(username=username)

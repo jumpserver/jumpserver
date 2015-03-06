@@ -49,6 +49,7 @@
                             <th class="text-center"> 登录时间 </th>
                             <th class="text-center"> 退出时间 </th>
                             <th class="text-center"> 详情 </th>
+                            <th class="text-center"> 有权限用户</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -59,6 +60,11 @@
                                 <td class="text-center" id="end_time"> {{ l.end_time|date:"Y-m-d H:i:s" }} </td>
                                 <td class="text-center">
                                     <a class="log_command text-success" href="/jlog/history/?id={{ l.id }}">命令统计</a>
+                                </td>
+                                <td>
+                                    {% for user in user_permed_list %}
+                                        {{ user.name }}
+                                    {% endfor %}
                                 </td>
                             </tr>
                         {% endfor %}

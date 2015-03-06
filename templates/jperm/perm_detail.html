@@ -34,7 +34,7 @@
                                 <th>用户名</th>
                                 <th>姓名</th>
                                 <th>部门</th>
-                                <th>属组</th>
+                                <th>小组</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -42,8 +42,8 @@
                                     <tr>
                                         <td>{{ user.username }}</td>
                                         <td>{{ user.name }}</td>
-                                        <td>{{ user.username|group_manage_str }}</td>
-                                        <td>{{ user.username|groups_str }}</td>
+                                        <td>{{ user.dept.name }}</td>
+                                        <td>{{ user.group.all | group_str2 }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
