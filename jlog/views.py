@@ -20,7 +20,7 @@ def log_list_online(request):
     header_title, path1, path2 = u'查看日志', u'查看日志', u'在线用户'
     web_socket_host = CONF.get('websocket', 'web_socket_host')
     posts = Log.objects.filter(is_finished=0).order_by('-start_time')
-    contact_list, p, contacts = pages(posts, request)
+    contact_list, p, contacts, page_range, current_page = pages(posts, request)
 
     return render_to_response('jlog/log_online.html', locals())
 
@@ -29,7 +29,7 @@ def log_list_offline(request):
     header_title, path1, path2 = u'查看日志', u'查看日志', u'历史记录'
     web_socket_host = CONF.get('websocket', 'web_socket_host')
     posts = Log.objects.filter(is_finished=1).order_by('-start_time')
-    contact_list, p, contacts = pages(posts, request)
+    contact_list, p, contacts, page_range, current_page = pages(posts, request)
 
     return render_to_response('jlog/log_offline.html', locals())
 
@@ -60,10 +60,10 @@ def log_search(request):
     if env == 'online':
         posts = contact_list = Log.objects.filter(Q(user__contains=keyword) | Q(host__contains=keyword)) \
             .filter(is_finished=0).order_by('-start_time')
-        contact_list, p, contacts = pages(posts, request)
+        contact_list, p, contacts, page_range, current_page = pages(posts, request)
     elif env == 'offline':
         posts = contact_list = Log.objects.filter(Q(user__contains=keyword) | Q(host__contains=keyword)) \
             .filter(is_finished=1).order_by('-start_time')
-        contact_list, p, contacts = pages(posts, request)
+        contact_list, p, contacts, page_range, current_page = pages(posts, request)
 
     return render_to_response('jlog/log_search.html', locals())

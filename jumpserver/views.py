@@ -56,40 +56,50 @@ def base(request):
     return render_to_response('base.html', context_instance=RequestContext(request))
 
 
+def get_data(data, items, option):
+    dic = {}
+    li_date, li_str = getDaysByNum(7)
+    for item in items:
+        li = []
+        name = item[option]
+        if option == 'user':
+            option_data = data.filter(user=name)
+        elif option == 'host':
+            option_data = data.filter(host=name)
+        for t in li_date:
+            year, month, day = t.year, t.month, t.day
+            times = option_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).count()
+            li.append(times)
+        dic[name] = li
+    return dic
+
+
 def index(request):
     path1, path2 = u'仪表盘', 'Dashboard'
-    user_dic, host_dic = {}, {}
+    users = User.objects.all()
+    hosts = Asset.objects.all()
+    online_host = Log.objects.filter(is_finished=0)
+    online_user = online_host.distinct()
     li_date, li_str = getDaysByNum(7)
     today = datetime.datetime.now().day
     from_week = datetime.datetime.now() - datetime.timedelta(days=7)
     week_data = Log.objects.filter(start_time__range=[from_week, datetime.datetime.now()])
     user_top_ten = week_data.values('user').annotate(times=Count('user')).order_by('-times')[:10]
     host_top_ten = week_data.values('host').annotate(times=Count('host')).order_by('-times')[:10]
-    for user in user_top_ten:
-        username = user['user']
-        li_user = []
-        user_data = week_data.filter(user=username)
+    user_dic, host_dic = get_data(week_data, user_top_ten, 'user'), get_data(week_data, host_top_ten, 'host')
+
+    top = {'user': '活跃用户数', 'host': '活跃主机数', 'times': '登录次数'}
+    top_dic = {}
+    for key, value in top.items():
+        li = []
         for t in li_date:
             year, month, day = t.year, t.month, t.day
-            times = user_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).count()
-            li_user.append(times)
-        user_dic[username] = li_user
-
-    for host in host_top_ten:
-        ip = host['host']
-        li_host = []
-        host_data = week_data.filter(host=ip)
-        for t in li_date:
-            year, month, day = t.year, t.month, t.day
-            times = host_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).count()
-            li_host.append(times)
-        host_dic[ip] = li_host
-
-    users = User.objects.all()
-    hosts = Asset.objects.all()
-    online_host = Log.objects.filter(is_finished=0)
-    online_user = online_host.distinct()
-    top_dic = {'活跃用户数': [8, 10, 5, 9, 8, 12, 3], '活跃主机数': [10, 16, 20, 8, 9, 5, 9], '登录次数': [20, 30, 35, 18, 40, 38, 65]}
+            if key != 'times':
+                times = week_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).values(key).distinct().count()
+            else:
+                times = week_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).count()
+            li.append(times)
+        top_dic[value] = li
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
 

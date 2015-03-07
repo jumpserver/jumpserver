@@ -26,19 +26,29 @@ io.on('connection', function(socket){
         socket.name = obj.userid;
         socket.fileName = obj.filename;
         var  tail = new Tail(obj.filename);
-	//console.log(obj.filename);
+
+        //2015-03-06 当用户打开监控窗口时，会把已存在的文件内容打印出来
+        var fs = require('fs');
+        fs.readFile(obj.filename, 'utf8', function (err,data) {
+            if (err) {
+            return console.log(err);
+            }
+            var existData = {userid:obj.userid,username:obj.username,content:data,option:'exist'};
+            socket.emit('message',existData);
+        });
+
         tail.on('line',function(data) {
             //console.log(data);
-           var newData = {userid:obj.userid,username:obj.username,content:data};
+           var newData = {userid:obj.userid,username:obj.username,content:data,option:'new'};
             socket.emit('message',newData);
         });
-//        var tail = spawn("tail", ['-f', obj.filename]);
-//        tail.stdout.on('data',function(data){
-//            var content = data.toString();
-//            //console.log(content);
-//            var newData = {userid:obj.userid,username:obj.username,content:content};
-//            socket.emit('message',newData);
-//        });
+        //var tail = spawn("tail", ['-f', obj.filename]);
+        //tail.stdout.on('data',function(data){
+        //    var content = data.toString();
+        //    //console.log(content);
+        //    var newData = {userid:obj.userid,username:obj.username,content:content};
+        //    socket.emit('message',newData);
+        //});
 
 
         socket.tail = tail;
