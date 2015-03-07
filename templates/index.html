@@ -58,16 +58,71 @@
                 </div>
             </div>
         </div>
-        <div id="high" style="width:100%;height:400px;"></div>
-        </br>
-        <div id="dynamic" style="width:100%;height:400px; margin-top:170px"></div>
+        <div id="top10" style="width:100%;height:400px;"></div>
+        <div id="usertop10" style="width:100%;height:400px;margin-top:170px"></div>
+        <br/>
+        <div id="hosttop10" style="width:100%;height:400px;"></div>
+        <br/>
+        <div id="dynamic" style="width:100%;height:400px;"></div>
     </div>
 </div>
 
 <script>
 var cate = {{ li_str|safe }};
 $(function () {
-    $('#high').highcharts({
+    $('#top10').highcharts({
+        title: {
+            text: '数据总览',
+            x: -20 //center
+        },
+        subtitle: {
+            text: 'Source: JumpServer',
+            x: -20
+        },
+        rangeSelector: {
+            allButtonsEnabled: true,
+            selected: 2
+        },
+        xAxis: {
+            type: 'datetime',
+            categories: cate
+        },
+        yAxis:{
+            min: 0,
+            title: {
+                text: '登录次数'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            valueSuffix: '次'
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+        navigation: {
+            buttonOptions: {
+                align: 'right'
+            }
+        },
+        series: [
+            {% for k,v in top_dic.items %}
+                {
+                    name: '{{ k }}',
+                    data: {{ v }}
+                },
+            {% endfor %}
+        ]
+    });
+
+    $('#usertop10').highcharts({
         title: {
             text: '一周用户登录TOP10',
             x: -20 //center
@@ -101,7 +156,7 @@ $(function () {
             borderWidth: 0
         },
         series: [
-            {% for k,v in dic.items %}
+            {% for k,v in user_dic.items %}
                 {
                     name: '{{ k }}',
                     data: {{ v }}
@@ -109,6 +164,50 @@ $(function () {
             {% endfor %}
         ]
     });
+
+        $('#hosttop10').highcharts({
+        title: {
+            text: '一周主机登录TOP10',
+            x: -20 //center
+        },
+        subtitle: {
+            text: 'Source: JumpServer',
+            x: -20
+        },
+        xAxis: {
+            type: 'datetime',
+            categories: cate
+        },
+        yAxis:{
+            min: 0,
+            title: {
+                text: '登录次数'
+            },
+            plotLines: [{
+                value: 0,
+                width: 1,
+                color: '#808080'
+            }]
+        },
+        tooltip: {
+            valueSuffix: '次'
+        },
+        legend: {
+            layout: 'vertical',
+            align: 'right',
+            verticalAlign: 'middle',
+            borderWidth: 0
+        },
+        series: [
+            {% for k,v in host_dic.items %}
+                {
+                    name: '{{ k }}',
+                    data: {{ v }}
+                },
+            {% endfor %}
+        ]
+    });
+
 
     $(document).ready(function() {
         Highcharts.setOptions({

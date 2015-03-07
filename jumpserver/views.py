@@ -56,27 +56,50 @@ def base(request):
     return render_to_response('base.html', context_instance=RequestContext(request))
 
 
-def index(request):
-    path1, path2 = u'仪表盘', 'Dashboard'
+def get_data(data, items, option):
     dic = {}
     li_date, li_str = getDaysByNum(7)
-    today = datetime.datetime.now().day
-    from_week = datetime.datetime.now() - datetime.timedelta(days=7)
-    week_data = Log.objects.filter(start_time__range=[from_week, datetime.datetime.now()])
-    top_ten = week_data.values('user').annotate(times=Count('user')).order_by('-times')[:10]
-    for user in top_ten:
-        username = user['user']
+    for item in items:
         li = []
-        user_data = week_data.filter(user=username)
+        name = item[option]
+        if option == 'user':
+            option_data = data.filter(user=name)
+        elif option == 'host':
+            option_data = data.filter(host=name)
         for t in li_date:
             year, month, day = t.year, t.month, t.day
-            times = user_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).count()
+            times = option_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).count()
             li.append(times)
-        dic[username] = li
+        dic[name] = li
+    return dic
+
+
+def index(request):
+    path1, path2 = u'仪表盘', 'Dashboard'
     users = User.objects.all()
     hosts = Asset.objects.all()
     online_host = Log.objects.filter(is_finished=0)
     online_user = online_host.distinct()
+    li_date, li_str = getDaysByNum(7)
+    today = datetime.datetime.now().day
+    from_week = datetime.datetime.now() - datetime.timedelta(days=7)
+    week_data = Log.objects.filter(start_time__range=[from_week, datetime.datetime.now()])
+    user_top_ten = week_data.values('user').annotate(times=Count('user')).order_by('-times')[:10]
+    host_top_ten = week_data.values('host').annotate(times=Count('host')).order_by('-times')[:10]
+    user_dic, host_dic = get_data(week_data, user_top_ten, 'user'), get_data(week_data, host_top_ten, 'host')
+
+    top = {'user': '活跃用户数', 'host': '活跃主机数', 'times': '登录次数'}
+    top_dic = {}
+    for key, value in top.items():
+        li = []
+        for t in li_date:
+            year, month, day = t.year, t.month, t.day
+            if key != 'times':
+                times = week_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).values(key).distinct().count()
+            else:
+                times = week_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).count()
+            li.append(times)
+        top_dic[value] = li
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
 
@@ -94,10 +117,8 @@ def jasset_group_add(name, comment, jtype):
     if BisGroup.objects.filter(name=name):
         emg = u'该业务组已存在!'
     else:
-        BisGroup.objects.create(name=name, comment=comment, type=type)
-        smg = u'业务组%s添加成功' % name
         BisGroup.objects.create(name=name, comment=comment, type=jtype)
-        smg = u'业务组%s添加成功' %name
+        smg = u'业务组%s添加成功' % name
 
 
 class ServerError(Exception):
@@ -109,7 +130,6 @@ def page_list_return(total, current=1):
     max_page = min_page + 4 if min_page + 4 < total else total
 
     return range(min_page, max_page+1)
-
 
 
 def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment):
@@ -144,19 +164,22 @@ def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_com
 
 
 def pages(posts, r):
+    """分页公用函数"""
     contact_list = posts
-    p = paginator = Paginator(contact_list, 10)
+    p = paginator = Paginator(contact_list, 20)
     try:
-        page = int(r.GET.get('page', '1'))
+        current_page = int(r.GET.get('page', '1'))
     except ValueError:
-        page = 1
+        current_page = 1
+
+    page_range = page_list_return(len(p.page_range), current_page)
 
     try:
-        contacts = paginator.page(page)
+        contacts = paginator.page(current_page)
     except (EmptyPage, InvalidPage):
         contacts = paginator.page(paginator.num_pages)
 
-    return contact_list, p, contacts
+    return contact_list, p, contacts, page_range, current_page
 
 
 def login(request):

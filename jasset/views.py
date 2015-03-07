@@ -4,7 +4,6 @@ from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response
-from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 from models import IDC, Asset, BisGroup
 from juser.models import UserGroup
@@ -50,7 +49,7 @@ def f_add_host(ip, port, idc, jtype, group, active, comment, username='', passwo
 
 def add_host(request):
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
-    header_title, path1, path2 = u'添加主机 | Add Host', u'资产管理', u'添加主机'
+    header_title, path1, path2 = u'添加主机', u'资产管理', u'添加主机'
     eidc = IDC.objects.all()
     egroup = BisGroup.objects.filter(type='A')
     eusergroup = UserGroup.objects.all()
@@ -65,7 +64,7 @@ def add_host(request):
         j_comment = request.POST.get('j_comment')
 
         if Asset.objects.filter(ip=str(j_ip)):
-            emg = u'该IP %s 已存在!' %j_ip
+            emg = u'该IP %s 已存在!' % j_ip
             return render_to_response('jasset/host_add.html', locals(), context_instance=RequestContext(request))
 
         if j_type == 'M':
@@ -74,14 +73,13 @@ def add_host(request):
             f_add_host(j_ip, j_port, j_idc, j_type, j_group, j_active, j_comment, j_user, j_password)
         else:
             f_add_host(j_ip, j_port, j_idc, j_type, j_group, j_active, j_comment)
-
-        smg = u'主机 %s 添加成功' %j_ip
+        smg = u'主机 %s 添加成功' % j_ip
 
     return render_to_response('jasset/host_add.html', locals(), context_instance=RequestContext(request))
 
 
 def add_host_multi(request):
-    header_title, path1, path2 = u'批量添加主机 | Add Hosts', u'资产管理', u'批量添加主机'
+    header_title, path1, path2 = u'批量添加主机', u'资产管理', u'批量添加主机'
     login_types = {'LDAP': 'L', 'SSH_KEY': 'S', 'PASSWORD': 'P', 'MAP': 'M'}
     j_group = []
     if request.method == 'POST':
@@ -97,8 +95,9 @@ def add_host_multi(request):
                 j_group.append(g)
 
             if Asset.objects.filter(ip=str(j_ip)):
-                emg = u'该IP %s 已存在!' %j_ip
-                return render_to_response('jasset/host_add_multi.html', locals(), context_instance=RequestContext(request))
+                emg = u'该IP %s 已存在!' % j_ip
+                return render_to_response('jasset/host_add_multi.html', locals(),
+                                          context_instance=RequestContext(request))
 
             if j_type == 'M':
                 j_user = request.POST.get('j_user')
@@ -117,14 +116,14 @@ def batch_host_edit(request):
     if request.method == 'POST':
         len_table = request.POST.get('len_table')
         for i in range(int(len_table)):
-            j_id = "editable["+str(i)+"][j_id]"
-            j_ip = "editable["+str(i)+"][j_ip]"
-            j_port = "editable["+str(i)+"][j_port]"
-            j_idc = "editable["+str(i)+"][j_idc]"
-            j_type = "editable["+str(i)+"][j_type]"
-            j_group = "editable["+str(i)+"][j_group]"
-            j_active = "editable["+str(i)+"][j_active]"
-            j_comment = "editable["+str(i)+"][j_comment]"
+            j_id = "editable[" + str(i) + "][j_id]"
+            j_ip = "editable[" + str(i) + "][j_ip]"
+            j_port = "editable[" + str(i) + "][j_port]"
+            j_idc = "editable[" + str(i) + "][j_idc]"
+            j_type = "editable[" + str(i) + "][j_type]"
+            j_group = "editable[" + str(i) + "][j_group]"
+            j_active = "editable[" + str(i) + "][j_active]"
+            j_comment = "editable[" + str(i) + "][j_comment]"
 
             j_id = request.POST.get(j_id).strip()
             j_ip = request.POST.get(j_ip).strip()
@@ -141,19 +140,10 @@ def batch_host_edit(request):
 
 
 def list_host(request):
-    header_title, path1, path2 = u'查看主机 | List Host', u'资产管理', u'查看主机'
+    header_title, path1, path2 = u'查看主机', u'资产管理', u'查看主机'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
-    posts = contact_list = Asset.objects.all().order_by('ip')
-    p = paginator = Paginator(contact_list, 20)
-    try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
-
-    try:
-        contacts = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        contacts = paginator.page(paginator.num_pages)
+    posts = Asset.objects.all().order_by('ip')
+    contact_list, p, contacts, page_range, current_page = pages(posts, request)
 
     return render_to_response('jasset/host_list.html', locals(), context_instance=RequestContext(request))
 
@@ -162,7 +152,7 @@ def host_del(request, offset):
     if offset == 'multi':
         len_list = request.POST.get("len_list")
         for i in range(int(len_list)):
-            key = "id_list["+str(i)+"]"
+            key = "id_list[" + str(i) + "]"
             jid = request.POST.get(key)
             a = Asset.objects.get(id=jid).ip
             Asset.objects.filter(id=jid).delete()
@@ -178,7 +168,7 @@ def host_del(request, offset):
 def host_edit(request):
     actives = {1: u'激活', 0: u'禁用'}
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
-    header_title, path1, path2 = u'修改主机 | Edit Host', u'资产管理', u'修改主机'
+    header_title, path1, path2 = u'修改主机', u'资产管理', u'修改主机'
     groups, e_group = [], []
     eidc = IDC.objects.all()
     egroup = BisGroup.objects.filter(type='A')
@@ -222,14 +212,14 @@ def host_edit(request):
         a.save()
         a.bis_group = groups
         a.save()
-        smg = u'主机 %s 修改成功' %j_ip
+        smg = u'主机 %s 修改成功' % j_ip
         return HttpResponseRedirect('/jasset/host_list')
 
     return render_to_response('jasset/host_edit.html', locals(), context_instance=RequestContext(request))
 
 
 def jlist_ip(request, offset):
-    header_title, path1, path2 = u'主机详细信息 | Host Detail.', u'资产管理', u'主机详情'
+    header_title, path1, path2 = u'主机详细信息', u'资产管理', u'主机详情'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
     post = contact_list = Asset.objects.get(ip=str(offset))
     log = Log.objects.filter(host=str(offset))
@@ -237,7 +227,7 @@ def jlist_ip(request, offset):
 
 
 def add_idc(request):
-    header_title, path1, path2 = u'添加IDC | Add IDC', u'资产管理', u'添加IDC'
+    header_title, path1, path2 = u'添加IDC', u'资产管理', u'添加IDC'
     if request.method == 'POST':
         j_idc = request.POST.get('j_idc')
         j_comment = request.POST.get('j_comment')
@@ -245,14 +235,14 @@ def add_idc(request):
             emg = u'该IDC已存在!'
             return render_to_response('jasset/idc_add.html', locals(), context_instance=RequestContext(request))
         else:
-            smg = u'IDC:%s添加成功' %j_idc
+            smg = u'IDC:%s添加成功' % j_idc
             IDC.objects.create(name=j_idc, comment=j_comment)
 
     return render_to_response('jasset/idc_add.html', locals(), context_instance=RequestContext(request))
 
 
 def list_idc(request):
-    header_title, path1, path2 = u'查看IDC | List IDC', u'资产管理', u'查看IDC'
+    header_title, path1, path2 = u'查看IDC', u'资产管理', u'查看IDC'
     posts = IDC.objects.all().order_by('id')
     return render_to_response('jasset/idc_list.html', locals(), context_instance=RequestContext(request))
 
@@ -263,7 +253,7 @@ def del_idc(request, offset):
 
 
 def add_group(request):
-    header_title, path1, path2 = u'添加主机组 | Add Group', u'资产管理', u'添加主机组'
+    header_title, path1, path2 = u'添加主机组', u'资产管理', u'添加主机组'
     posts = Asset.objects.all()
     if request.method == 'POST':
         j_group = request.POST.get('j_group')
@@ -279,19 +269,19 @@ def add_group(request):
             for host in j_hosts:
                 g = Asset.objects.get(id=host)
                 group.asset_set.add(g)
-            smg = u'主机组%s添加成功' %j_group
+            smg = u'主机组%s添加成功' % j_group
 
     return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
 
 
 def list_group(request):
-    header_title, path1, path2 = u'查看主机组 | List Group', u'资产管理', u'查看主机组'
+    header_title, path1, path2 = u'查看主机组', u'资产管理', u'查看主机组'
     posts = BisGroup.objects.filter(type='A').order_by('id')
     return render_to_response('jasset/group_list.html', locals(), context_instance=RequestContext(request))
 
 
 def edit_group(request):
-    header_title, path1, path2 = u'编辑主机组 | Edit Group', u'资产管理', u'编辑主机组'
+    header_title, path1, path2 = u'编辑主机组', u'资产管理', u'编辑主机组'
     group_id = request.GET.get('id')
     group = BisGroup.objects.get(id=group_id)
     all = Asset.objects.all()
@@ -307,71 +297,55 @@ def edit_group(request):
             g = Asset.objects.get(id=host)
             group.asset_set.add(g)
         BisGroup.objects.filter(id=group_id).update(name=j_group, comment=j_comment)
-        smg = u'主机组%s修改成功' %j_group
-        return HttpResponseRedirect('/jasset/group_detail/%s' % group_id)
+        smg = u'主机组%s修改成功' % j_group
+        return HttpResponseRedirect('/jasset/group_detail/?id=%s' % group_id)
 
     return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
 
 
 def detail_group(request):
-    header_title, path1, path2 = u'主机组详情 | Group Detail', u'资产管理', u'主机组详情'
+    header_title, path1, path2 = u'主机组详情', u'资产管理', u'主机组详情'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
-    offset = request.GET.get('id')
-    group_name = BisGroup.objects.get(id=offset).name
-    b = BisGroup.objects.get(id=offset)
-    posts = contact_list = Asset.objects.filter(bis_group=b).order_by('ip')
-    p = paginator = Paginator(contact_list, 5)
-    try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
+    group_id = request.GET.get('id')
+    group_name = BisGroup.objects.get(id=group_id).name
+    b = BisGroup.objects.get(id=group_id)
+    posts = Asset.objects.filter(bis_group=b).order_by('ip')
+    contact_list, p, contacts, page_range, current_page = pages(posts, request)
 
-    try:
-        contacts = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        contacts = paginator.page(paginator.num_pages)
     return render_to_response('jasset/group_detail.html', locals(), context_instance=RequestContext(request))
 
 
 def detail_idc(request):
-    header_title, path1, path2 = u'主机组详情 | Group Detail', u'资产管理', u'主机组详情'
+    header_title, path1, path2 = u'IDC详情', u'资产管理', u'IDC详情'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
-    offset = request.GET.get('id')
-    idc_name = IDC.objects.get(id=offset).name
-    b = IDC.objects.get(id=offset)
-    posts = contact_list = Asset.objects.filter(idc=b).order_by('ip')
-    p = paginator = Paginator(contact_list, 5)
-    try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
+    idc_id = request.GET.get('id')
+    idc_name = IDC.objects.get(id=idc_id).name
+    b = IDC.objects.get(id=idc_id)
+    posts = Asset.objects.filter(idc=b).order_by('ip')
+    contact_list, p, contacts, page_range, current_page = pages(posts, request)
 
-    try:
-        contacts = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        contacts = paginator.page(paginator.num_pages)
     return render_to_response('jasset/idc_detail.html', locals(), context_instance=RequestContext(request))
 
 
 def group_del_host(request, offset):
     if request.method == 'POST':
         group_name = request.POST.get('group_name')
-        print group_name
         if offset == 'group':
             group = BisGroup.objects.get(name=group_name)
         elif offset == 'idc':
             group = IDC.objects.get(name=group_name)
         len_list = request.POST.get("len_list")
         for i in range(int(len_list)):
-            key = "id_list["+str(i)+"]"
-            print key
+            key = "id_list[" + str(i) + "]"
             jid = request.POST.get(key)
-            print jid
             g = Asset.objects.get(id=jid)
-            print g
-            group.asset_set.remove(g)
-            print 'ok'
-        return HttpResponseRedirect('/jasset/%s_detail/%s' %(offset, group.id))
+            if offset == 'group':
+                group.asset_set.remove(g)
+            elif offset == 'idc':
+                Asset.objects.filter(id=jid).delete()
+                BisGroup.objects.filter(name=g.ip).delete()
+
+        return HttpResponseRedirect('/jasset/%s_detail/?id=%s' % (offset, group.id))
 
 
 def group_del(request, offset):
@@ -383,10 +357,9 @@ def host_search(request):
     keyword = request.GET.get('keyword')
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
     posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
-                                 Q(bis_group__name__contains=keyword) | Q(comment__contains=keyword)).distinct().order_by('ip')
-    print posts
-    contact_list, p, contacts = pages(posts, request)
-    print contact_list, p, contacts
+                                 Q(bis_group__name__contains=keyword) | Q(
+        comment__contains=keyword)).distinct().order_by('ip')
+    contact_list, p, contacts, page_range, current_page = pages(posts, request)
 
     return render_to_response('jasset/host_search.html', locals(), context_instance=RequestContext(request))
 
