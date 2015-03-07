@@ -22,7 +22,7 @@ from juser.models import UserGroup, User, DEPT
 from connect import PyCrypt, KEY
 from connect import BASE_DIR
 from connect import CONF
-from jumpserver.views import md5_crypt, LDAPMgmt, LDAP_ENABLE, ldap_conn, page_list_return
+from jumpserver.views import md5_crypt, LDAPMgmt, LDAP_ENABLE, ldap_conn, page_list_return, pages
 from jumpserver.api import user_perm_group_api
 
 if LDAP_ENABLE:
@@ -231,19 +231,9 @@ def dept_list(request):
         contact_list = DEPT.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword)).order_by('name')
     else:
         contact_list = DEPT.objects.filter(id__gt=1)
-    p = paginator = Paginator(contact_list, 10)
 
-    try:
-        current_page = int(request.GET.get('page', '1'))
-    except ValueError:
-        current_page = 1
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
 
-    page_range = page_list_return(len(p.page_range), current_page)
-
-    try:
-        contacts = paginator.page(current_page)
-    except (EmptyPage, InvalidPage):
-        contacts = paginator.page(paginator.num_pages)
     return render_to_response('juser/dept_list.html', locals(), context_instance=RequestContext(request))
 
 
@@ -375,19 +365,8 @@ def group_list(request):
         contact_list = UserGroup.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
     else:
         contact_list = UserGroup.objects.all().order_by('name')
-    p = paginator = Paginator(contact_list, 10)
 
-    try:
-        current_page = int(request.GET.get('page', '1'))
-    except ValueError:
-        current_page = 1
-
-    page_range = page_list_return(len(p.page_range), current_page)
-
-    try:
-        contacts = paginator.page(current_page)
-    except (EmptyPage, InvalidPage):
-        contacts = paginator.page(paginator.num_pages)
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
     return render_to_response('juser/group_list.html', locals(), context_instance=RequestContext(request))
 
 
@@ -531,19 +510,9 @@ def user_list(request):
         contact_list = User.objects.filter(Q(username__icontains=keyword) | Q(name__icontains=keyword)).order_by('name')
     else:
         contact_list = User.objects.all().order_by('id')
-    p = paginator = Paginator(contact_list, 10)
 
-    try:
-        current_page = int(request.GET.get('page', '1'))
-    except ValueError:
-        current_page = 1
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
 
-    page_range = page_list_return(len(p.page_range), current_page)
-
-    try:
-        contacts = paginator.page(current_page)
-    except (EmptyPage, InvalidPage):
-        contacts = paginator.page(paginator.num_pages)
     return render_to_response('juser/user_list.html', locals(), context_instance=RequestContext(request))
 
 
