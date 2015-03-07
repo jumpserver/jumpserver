@@ -8,7 +8,7 @@ from jasset.models import Asset, BisGroup
 from jperm.models import Perm, SudoPerm, CmdGroup
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.db.models import Q
-from jumpserver.views import LDAP_ENABLE, ldap_conn, CONF, page_list_return
+from jumpserver.views import LDAP_ENABLE, ldap_conn, CONF, page_list_return, pages
 from jumpserver.api import user_perm_asset_api
 
 
@@ -67,18 +67,7 @@ def perm_list(request):
         contact_list = Perm.objects.filter(name__icontains=keyword)
     else:
         contact_list = Perm.objects.all()
-    p = paginator = Paginator(contact_list, 10)
-    try:
-        current_page = int(request.GET.get('page', '1'))
-    except ValueError:
-        current_page = 1
-
-    page_range = page_list_return(len(p.page_range), current_page)
-
-    try:
-        contacts = paginator.page(current_page)
-    except (EmptyPage, InvalidPage):
-        contacts = paginator.page(paginator.num_pages)
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
     return render_to_response('jperm/perm_list.html', locals(), context_instance=RequestContext(request))
 
 
@@ -299,21 +288,9 @@ def sudo_add(request):
 
 def sudo_list(request):
     header_title, path1, path2 = u'Sudo授权', u'权限管理', u'Sudo权限详情'
-    sudo_perms = contact_list = SudoPerm.objects.all()
-    p1 = paginator1 = Paginator(contact_list, 10)
-    user_groups = UserGroup.objects.filter(id__gt=2)
-    asset_groups = BisGroup.objects.all()
-    cmd_groups = CmdGroup.objects.all()
+    contact_list = SudoPerm.objects.all()
 
-    try:
-        page1 = int(request.GET.get('page', '1'))
-    except ValueError:
-        page1 = 1
-
-    try:
-        contacts1 = paginator1.page(page1)
-    except (EmptyPage, InvalidPage):
-        contacts1 = paginator1.page(paginator1.num_pages)
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
     return render_to_response('jperm/sudo_list.html', locals(), context_instance=RequestContext(request))
 
 

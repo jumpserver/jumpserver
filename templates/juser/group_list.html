@@ -76,7 +76,14 @@
                         {% endfor %}
                         </tbody>
                     </table>
-                    {% include 'paginator.html' %}
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="dataTables_info" id="editable_info" role="status" aria-live="polite">
+                                Showing {{ contacts.start_index }} to {{ contacts.end_index }} of {{ p.count }} entries
+                            </div>
+                        </div>
+                        {% include 'paginator.html' %}
+                    </div>
                 </div>
             </div>
         </div>
