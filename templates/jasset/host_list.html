@@ -81,50 +81,7 @@
                         {% endfor %}
                         </tbody>
                     </table>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <input type="button" id="del_button" class="btn btn-danger btn-sm"  name="del_button" value="删除" onclick="del('contents_form')" />
-                            <input type="button" id="alter_button" class="btn btn-warning btn-sm" name="alter_button" value="修改" onclick="alter('contents_form')" />
-                        </div>
-                        <div class="col-sm-6">
-                            <div class="dataTables_paginate paging_simple_numbers" id="editable_paginate">
-                                <ul class="pagination" style="margin-top: 0; float: right">
-
-                                    {% if contacts.has_previous %}
-                                        <li class="paginate_button previous" aria-controls="editable" tabindex="0" id="editable_previous">
-                                            <a href="?page={{ contacts.previous_page_number }}">Previous</a>
-                                        </li>
-                                    {% else %}
-                                        <li class="paginate_button previous disabled" aria-controls="editable" tabindex="0" id="editable_previous">
-                                             <a href="#">Previous</a>
-                                        </li>
-                                    {% endif %}
-                                    {% ifequal show_first 1 %}
-                                        <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?page=1"  title="第1页">1...</a></li>
-                                    {% endifequal %}
-                                    {% for page in page_range %}
-                                        {% ifequal current_page page %}
-                                            <li class="paginate_button active"  aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
-                                        {% else %}
-                                            <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
-                                        {% endifequal %}
-                                    {% endfor %}
-                                    {% ifequal show_end 1 %}
-                                        <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?page={{ p.num_pages }}"  title="第{{ page }}页">...{{ p.num_pages }}</a></li>
-                                    {% endifequal %}
-                                    {% if contacts.has_next %}
-                                        <li class="paginate_button next" aria-controls="editable" tabindex="0" id="editable_next">
-                                            <a href="?page={{ contacts.next_page_number }}">Next</a>
-                                        </li>
-                                    {% else %}
-                                        <li class="paginate_button next disabled" aria-controls="editable" tabindex="0" id="editable_next">
-                                            <a href="#">Next</a>
-                                        </li>
-                                    {% endif %}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+                    {% include 'paginator.html' %}
                     </form>
                 </div>
             </div>

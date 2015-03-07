@@ -247,7 +247,6 @@ def list_idc(request):
     header_title, path1, path2 = u'查看IDC', u'资产管理', u'查看IDC'
     posts = IDC.objects.all().order_by('id')
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-    print contact_list, p, contacts, page_range, current_page, show_first, show_end
     return render_to_response('jasset/idc_list.html', locals(), context_instance=RequestContext(request))
 
 

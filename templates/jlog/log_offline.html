@@ -96,30 +96,8 @@
                             {% endfor %}
                             </tbody>
                         </table>
-                        <div class="row">
-                        <div class="col-sm-6 col-sm-offset-6">
-                            <div class="dataTables_paginate paging_simple_numbers" id="editable_paginate">
-                                <ul class="pagination" style="margin-top: 0; float: right">
-
-                                    {% if contacts.has_previous %}
-                                        <li><a href="?page={{ contacts.previous_page_number }}">&laquo;</a></li>
-                                    {% endif %}
-
-                                    {% for page in p.page_range %}
-                                        {% ifequal offset1 page %}
-                                            <li class="active"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
-                                        {% else %}
-                                          <li><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
-                                        {% endifequal %}
-                                    {% endfor %}
-                                    {% if contacts.has_next %}
-                                        <li><a href="?page={{ contacts.next_page_number }}">&raquo;</a></li>
-                                    {% endif %}
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    </div>
+                        {% include 'paginator.html' %}
+                    </div>    
                 </div>
             </div>
         </div>
