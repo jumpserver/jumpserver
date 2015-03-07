@@ -166,7 +166,7 @@ def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_com
 def pages(posts, r):
     """分页公用函数"""
     contact_list = posts
-    p = paginator = Paginator(contact_list, 20)
+    p = paginator = Paginator(contact_list, 10)
     try:
         current_page = int(r.GET.get('page', '1'))
     except ValueError:
@@ -179,7 +179,16 @@ def pages(posts, r):
     except (EmptyPage, InvalidPage):
         contacts = paginator.page(paginator.num_pages)
 
-    return contact_list, p, contacts, page_range, current_page
+    if current_page >= 5:
+        show_first = 1
+    else:
+        show_first = 0
+    if current_page <= (len(p.page_range) - 3):
+        show_end = 1
+    else:
+        show_end = 0
+
+    return contact_list, p, contacts, page_range, current_page, show_first, show_end
 
 
 def login(request):

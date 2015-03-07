@@ -10,6 +10,7 @@ from juser.models import UserGroup
 from connect import PyCrypt, KEY
 from jlog.models import Log
 from jumpserver.views import jasset_group_add, jasset_host_edit, pages
+from jumpserver.api import asset_perm_api
 
 cryptor = PyCrypt(KEY)
 
@@ -143,7 +144,7 @@ def list_host(request):
     header_title, path1, path2 = u'查看主机', u'资产管理', u'查看主机'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
     posts = Asset.objects.all().order_by('ip')
-    contact_list, p, contacts, page_range, current_page = pages(posts, request)
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     return render_to_response('jasset/host_list.html', locals(), context_instance=RequestContext(request))
 
@@ -223,6 +224,7 @@ def jlist_ip(request, offset):
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
     post = contact_list = Asset.objects.get(ip=str(offset))
     log = Log.objects.filter(host=str(offset))
+    user_permed_list = asset_perm_api(Asset.objects.get(ip=str(offset)))
     return render_to_response('jasset/jlist_ip.html', locals(), context_instance=RequestContext(request))
 
 
@@ -244,6 +246,8 @@ def add_idc(request):
 def list_idc(request):
     header_title, path1, path2 = u'查看IDC', u'资产管理', u'查看IDC'
     posts = IDC.objects.all().order_by('id')
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+    print contact_list, p, contacts, page_range, current_page, show_first, show_end
     return render_to_response('jasset/idc_list.html', locals(), context_instance=RequestContext(request))
 
 
@@ -277,6 +281,8 @@ def add_group(request):
 def list_group(request):
     header_title, path1, path2 = u'查看主机组', u'资产管理', u'查看主机组'
     posts = BisGroup.objects.filter(type='A').order_by('id')
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+
     return render_to_response('jasset/group_list.html', locals(), context_instance=RequestContext(request))
 
 
@@ -310,7 +316,7 @@ def detail_group(request):
     group_name = BisGroup.objects.get(id=group_id).name
     b = BisGroup.objects.get(id=group_id)
     posts = Asset.objects.filter(bis_group=b).order_by('ip')
-    contact_list, p, contacts, page_range, current_page = pages(posts, request)
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     return render_to_response('jasset/group_detail.html', locals(), context_instance=RequestContext(request))
 
@@ -322,7 +328,7 @@ def detail_idc(request):
     idc_name = IDC.objects.get(id=idc_id).name
     b = IDC.objects.get(id=idc_id)
     posts = Asset.objects.filter(idc=b).order_by('ip')
-    contact_list, p, contacts, page_range, current_page = pages(posts, request)
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     return render_to_response('jasset/idc_detail.html', locals(), context_instance=RequestContext(request))
 
@@ -359,7 +365,7 @@ def host_search(request):
     posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
                                  Q(bis_group__name__contains=keyword) | Q(
         comment__contains=keyword)).distinct().order_by('ip')
-    contact_list, p, contacts, page_range, current_page = pages(posts, request)
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     return render_to_response('jasset/host_search.html', locals(), context_instance=RequestContext(request))
 
