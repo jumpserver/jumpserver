@@ -251,7 +251,15 @@ def list_idc(request):
 
 
 def del_idc(request, offset):
-    IDC.objects.filter(id=offset).delete()
+    if offset == 'multi':
+        len_list = request.POST.get("len_list")
+        for i in range(int(len_list)):
+            key = "id_list[" + str(i) + "]"
+            gid = request.POST.get(key)
+            IDC.objects.filter(id=gid).delete()
+    else:
+        gid = int(offset)
+        IDC.objects.filter(id=gid).delete()
     return HttpResponseRedirect('/jasset/idc_list/')
 
 
@@ -354,8 +362,18 @@ def group_del_host(request, offset):
 
 
 def group_del(request, offset):
-    BisGroup.objects.filter(id=offset).delete()
-    return HttpResponseRedirect('/jasset/group_list/')
+    if offset == 'multi':
+        len_list = request.POST.get("len_list")
+        for i in range(int(len_list)):
+            key = "id_list[" + str(i) + "]"
+            gid = request.POST.get(key)
+            BisGroup.objects.filter(id=gid).delete()
+    else:
+        gid = int(offset)
+        BisGroup.objects.filter(id=gid).delete()
+    return HttpResponseRedirect('/jasset/jgroup_list/')
+
+
 
 
 def host_search(request):
