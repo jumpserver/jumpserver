@@ -6,7 +6,7 @@ import time
 from django import template
 from juser.models import User, UserGroup, DEPT
 from jasset.models import BisGroup
-from jumpserver.views import perm_user_asset
+from jumpserver.api import user_perm_asset_api
 
 register = template.Library()
 
@@ -109,9 +109,13 @@ def group_type_to_str(type_name):
     return group_types.get(type_name)
 
 
-@register.filter(name='perm_asset_count')
-def perm_asset_count(user_id):
-    return len(perm_user_asset(user_id))
+# @register.filter(name='perm_asset_count')
+# def perm_asset_count(user_id):
+#     return len(perm_user_asset(user_id))
+
+@register.filter(name='string_length')
+def string_length(string, length):
+    return '%s ...' % string[0:length]
 
 
 @register.filter(name='filter_private')

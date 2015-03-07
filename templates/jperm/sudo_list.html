@@ -5,7 +5,7 @@
 
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
-        <div class="col-lg-10">
+        <div class="col-lg-12">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
                     <h5> Sudo授权列表 </h5>
@@ -29,11 +29,11 @@
                 </div>
 
                 <div class="ibox-content">
-                    <div class="" style="margin-left: 15px;">
-                        <a target="_blank" href="/jperm/cmd_add/" class="btn btn-sm btn-primary "> 添加命令组 </a>
-                        <a target="_blank" href="/jperm/cmd_list/" class="btn btn-sm btn-warning "> 查看命令组 </a>
-                        <a target="_blank" href="/jperm/sudo_add/" class="btn btn-sm btn-danger "> Sudo授权添加 </a>
-                    </div>
+{#                    <div class="" style="margin-left: 15px;">#}
+{#                        <a target="_blank" href="/jperm/cmd_add/" class="btn btn-sm btn-primary "> 添加命令组 </a>#}
+{#                        <a target="_blank" href="/jperm/cmd_list/" class="btn btn-sm btn-warning "> 查看命令组 </a>#}
+{#                        <a target="_blank" href="/jperm/sudo_add/" class="btn btn-sm btn-danger "> Sudo授权添加 </a>#}
+{#                    </div>#}
 
                     <div class="panel blank-panel">
                         <div class="panel-heading">
@@ -78,21 +78,15 @@
                                                 <td class="text-center"> {{ sudo_perm.name }} </td>
                                                 <td class="text-center"> {{ sudo_perm.user_runas }} </td>
                                                 <td class="text-center">
-                                                    {% for user_group in sudo_perm.user_group.all %}
-                                                        {{ user_group.name }}
-                                                    {% endfor %}
+                                                    {{ sudo_perm.user_group.all | group_str2 }}
                                                 </td>
 
                                                 <td class="text-center">
-                                                    {% for asset_group in sudo_perm.asset_group.all %}
-                                                        {{ asset_group.name }}
-                                                    {% endfor %}
+                                                    {{ sudo_perm.asset_group.all | group_str2 }}
                                                 </td>
 
                                                 <td class="text-center">
-                                                    {% for cmd_group in sudo_perm.cmd_group.all %}
-                                                        {{ cmd_group.name }}
-                                                    {% endfor %}
+                                                    {{ sudo_perm.cmd_group.all | group_str2 }}
                                                 </td>
                                                 <td class="text-center">
                                                     <a title="[ {{ sudo_perm.name }} 授权详情 ]" href="../sudo_detail/?id={{ sudo_perm.id }}" class="btn btn-xs btn-primary">详情</a>
@@ -161,7 +155,7 @@
                                                 <td class="text-center"> {{ user.name }} </td>
                                                 <td class="text-center"> {{ user.id | get_role }} </td>
                                                 <td class="text-center"> {{ user.username }} </td>
-                                                <td class="text-center"> {{ user.id | perm_asset_count }} </td>
+                                                <td class="text-center"> {{ user.id }} </td>
                                                 <td class="text-center">
                                                     <a title="[ {{ user.name }} ] 授权详情" href="../perm_asset_detail/?id={{ user.id }}" class="iframe btn btn-xs btn-primary">详情</a>
                                                 </td>

@@ -46,9 +46,10 @@
                         {% for group in contacts.object_list %}
                             <tr class="gradeX">
                                 <td class="text-center"> {{ group.name }} </td>
-                                <td class="text-center"> {{ group.cmd }} </td>
+                                <td class="text-center"> {{ group.cmd | string_length:50 }} </td>
                                 <td class="text-center"> {{ group.comment }} </td>
                                 <td class="text-center">
+                                    <a href="../cmd_detail/?id={{ group.id }}" class="btn btn-xs btn-info">详情</a>
                                     <a href="../cmd_edit/?id={{ group.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a href="../cmd_del/?id={{ group.id }}" class="btn btn-xs btn-danger">删除</a>
                                 </td>

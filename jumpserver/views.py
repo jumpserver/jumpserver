@@ -292,26 +292,26 @@ class PyCrypt(object):
         return plain_text.rstrip('\0')
 
 
-def perm_user_asset(user_id=None, username=None):
-    if user_id:
-        user = User.objects.get(id=user_id)
-    else:
-        user = User.objects.get(username=username)
-    user_groups = user.user_group.all()
-    perms = []
-    assets = []
-    asset_groups = []
-    for user_group in user_groups:
-        perm = user_group.perm_set.all()
-        perms.extend(perm)
-
-    for perm in perms:
-        asset_groups.extend(perm.asset_group.all())
-
-    for asset_group in asset_groups:
-        assets.extend(list(asset_group.asset_set.all()))
-
-    return assets
+# def perm_user_asset(user_id=None, username=None):
+#     if user_id:
+#         user = User.objects.get(id=user_id)
+#     else:
+#         user = User.objects.get(username=username)
+#     user_groups = user.user_group.all()
+#     perms = []
+#     assets = []
+#     asset_groups = []
+#     for user_group in user_groups:
+#         perm = user_group.perm_set.all()
+#         perms.extend(perm)
+#
+#     for perm in perms:
+#         asset_groups.extend(perm.asset_group.all())
+#
+#     for asset_group in asset_groups:
+#         assets.extend(list(asset_group.asset_set.all()))
+#
+#     return assets
 
 
 if LDAP_ENABLE:
@@ -322,7 +322,7 @@ else:
 
 def install(request):
     from juser.models import DEPT
-    DEPT(id=1, name="跨部门", comment="添加跨部门小组使用").save()
-    DEPT(id=2, name="默认", comment="默认部门，作为中间，可以用来初始化").save()
+    DEPT(id=1, name="跨部门", comment="跨部门小组使用").save()
+    DEPT(id=2, name="默认", comment="默认部门").save()
     return HttpResponse('Ok')
 

@@ -18,6 +18,18 @@ def user_perm_group_api(user):
         return asset_group_list
 
 
+def user_perm_asset_api(username):
+    user = User.objects.filter(username=username)
+    if user:
+        user = user[0]
+        asset_list = []
+        asset_group_list = user_perm_group_api(user)
+        for asset_group in asset_group_list:
+            asset_list.extend(asset_group.asset_set.all())
+
+        return asset_list
+
+
 def asset_perm_api(asset):
     if asset:
         perm_list = []

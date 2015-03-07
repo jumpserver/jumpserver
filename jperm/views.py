@@ -8,7 +8,8 @@ from jasset.models import Asset, BisGroup
 from jperm.models import Perm, SudoPerm, CmdGroup
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.db.models import Q
-from jumpserver.views import LDAP_ENABLE, ldap_conn, CONF, perm_user_asset, page_list_return
+from jumpserver.views import LDAP_ENABLE, ldap_conn, CONF, page_list_return
+from jumpserver.api import user_perm_asset_api
 
 
 if LDAP_ENABLE:
@@ -198,7 +199,7 @@ def perm_asset_detail(request):
     user = User.objects.filter(id=user_id)
     if user:
         user = user[0]
-        assets_list = perm_user_asset(user_id)
+        assets_list = user_perm_asset_api(user.username)
     return render_to_response('jperm/perm_asset_detail.html', locals(), context_instance=RequestContext(request))
 
 
@@ -277,7 +278,7 @@ def sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select,
 
 def sudo_add(request):
     header_title, path1, path2 = u'Sudo授权', u'权限管理', u'添加Sudo权限'
-    user_groups = UserGroup.objects.all()
+    user_groups = UserGroup.objects.filter(id__gt=2)
     asset_groups = BisGroup.objects.all()
     cmd_groups = CmdGroup.objects.all()
 
@@ -293,7 +294,6 @@ def sudo_add(request):
         sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select, cmd_groups_select)
 
         msg = '添加成功'
-        return HttpResponseRedirect('/jperm/sudo_list/')
     return render_to_response('jperm/sudo_add.html', locals(), context_instance=RequestContext(request))
 
 
@@ -301,7 +301,7 @@ def sudo_list(request):
     header_title, path1, path2 = u'Sudo授权', u'权限管理', u'Sudo权限详情'
     sudo_perms = contact_list = SudoPerm.objects.all()
     p1 = paginator1 = Paginator(contact_list, 10)
-    user_groups = UserGroup.objects.filter(Q(type='A') | Q(type='P'))
+    user_groups = UserGroup.objects.filter(id__gt=2)
     asset_groups = BisGroup.objects.all()
     cmd_groups = CmdGroup.objects.all()
 
@@ -324,7 +324,7 @@ def sudo_edit(request):
         sudo_perm_id = request.GET.get('id', '0')
         sudo_perm = SudoPerm.objects.filter(id=int(sudo_perm_id))
         if sudo_perm:
-            user_group_all = UserGroup.objects.filter(Q(type='A') | Q(type='P'))
+            user_group_all = UserGroup.objects.filter(id__gt=2)
             asset_group_all = BisGroup.objects.filter()
             cmd_group_all = CmdGroup.objects.all()
 
@@ -424,7 +424,7 @@ def cmd_edit(request):
         cmd_group = cmd_group[0]
         cmd_group_id = cmd_group.id
         name = cmd_group.name
-        cmd = cmd_group.cmd
+        cmd = '\n'.join(cmd_group.cmd.split(','))
         comment = cmd_group.comment
 
     if request.method == 'POST':

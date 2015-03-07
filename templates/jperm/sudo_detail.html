@@ -42,8 +42,8 @@
                                     <tr>
                                         <td>{{ user.username }}</td>
                                         <td>{{ user.name }}</td>
-                                        <td>{{ user.username|group_manage_str }}</td>
-                                        <td>{{ user.username|groups_str }}</td>
+                                        <td>{{ user.dept.name }}</td>
+                                        <td>{{ user.group.all | group_str2}}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

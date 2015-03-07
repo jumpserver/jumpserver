@@ -24,7 +24,8 @@ django.setup()
 from juser.models import User
 from jasset.models import Asset
 from jlog.models import Log
-from jumpserver.views import PyCrypt, perm_user_asset
+from jumpserver.views import PyCrypt
+from jumpserver.api import user_perm_asset_api
 
 try:
     import termios
@@ -45,8 +46,7 @@ SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
 # The key of decryptor.
 KEY = CONF.get('web', 'key')
 # Login user.
-#LOGIN_NAME = getpass.getuser()
-LOGIN_NAME = 'halcyon'
+LOGIN_NAME = getpass.getuser()
 #LOGIN_NAME = os.getlogin()
 USER_KEY_FILE = os.path.join(SERVER_KEY_DIR, LOGIN_NAME)
 
@@ -178,7 +178,7 @@ def posix_shell(chan, username, host):
 def get_user_host(username):
     """Get the hosts of under the user control."""
     hosts_attr = {}
-    asset_all = perm_user_asset(username=username)
+    asset_all = user_perm_asset_api(username)
     for asset in asset_all:
         hosts_attr[asset.ip] = [asset.id, asset.comment]
     return hosts_attr
@@ -200,7 +200,6 @@ def get_connect_item(username, ip):
 
     login_type_dict = {
         'L': user.ldap_pwd,
-        'P': user.ssh_pwd,
     }
 
     if asset.login_type in login_type_dict:
@@ -247,7 +246,7 @@ def print_user_host(username):
     hosts = hosts_attr.keys()
     hosts.sort()
     for ip in hosts:
-        print '[%s] %s -- %s' % (hosts_attr[ip][0], ip, hosts_attr[ip][1])
+        print '%s -- %s' % (ip, hosts_attr[ip][1])
 
 
 def connect(username, password, host, port, login_name):
