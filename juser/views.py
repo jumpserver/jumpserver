@@ -460,7 +460,7 @@ def group_edit(request):
 def user_add(request):
     error = ''
     msg = ''
-    header_title, path1, path2 = '添加用户 | User Add', '用户管理', '添加用户'
+    header_title, path1, path2 = '添加用户', '用户管理', '添加用户'
     user_role = {'SU': u'超级管理员', 'DA': u'部门管理员', 'CU': u'普通用户'}
     dept_all = DEPT.objects.all()
     group_all = UserGroup.objects.all()
