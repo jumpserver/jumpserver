@@ -8,7 +8,7 @@
         <div class="col-lg-12">
             <div class="ibox float-e-margins" id="all">
                 <div class="ibox-title">
-                    <h5> 主机详细信息列表 </h5>
+                    <h5> 主机详细信息列表</h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -99,6 +99,9 @@
                                              <a href="#">Previous</a>
                                         </li>
                                     {% endif %}
+                                    {% ifequal show_first 1 %}
+                                        <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?page=1"  title="第1页">1...</a></li>
+                                    {% endifequal %}
                                     {% for page in page_range %}
                                         {% ifequal current_page page %}
                                             <li class="paginate_button active"  aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
@@ -106,7 +109,9 @@
                                             <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
                                         {% endifequal %}
                                     {% endfor %}
-                                    <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?page={{ p.num_pages }}"  title="第{{ page }}页">...{{ p.num_pages }}</a></li>
+                                    {% ifequal show_end 1 %}
+                                        <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?page={{ p.num_pages }}"  title="第{{ page }}页">...{{ p.num_pages }}</a></li>
+                                    {% endifequal %}
                                     {% if contacts.has_next %}
                                         <li class="paginate_button next" aria-controls="editable" tabindex="0" id="editable_next">
                                             <a href="?page={{ contacts.next_page_number }}">Next</a>
