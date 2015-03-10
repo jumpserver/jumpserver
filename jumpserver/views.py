@@ -103,10 +103,6 @@ def index(request):
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
 
-def api_user(request):
-    users = Log.objects.filter(is_finished=0).count()
-    ret = {'users': users}
-    return HttpResponse(json.dumps(ret))
 
 
 def skin_config(request):

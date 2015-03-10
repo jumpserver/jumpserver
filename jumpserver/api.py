@@ -1,7 +1,12 @@
 __author__ = 'guanghongwei'
 
+import json
+
+from django.http import HttpResponse
+
 from juser.models import User, UserGroup
 from jasset.models import Asset, BisGroup
+from jlog.models import Log
 
 
 def user_perm_group_api(user):
@@ -46,3 +51,10 @@ def asset_perm_api(asset):
             user_permed_list.extend(user_group.user_set.all())
         return user_permed_list
 
+
+def api_user(request):
+    hosts = Log.objects.filter(is_finished=0).count()
+    users = Log.objects.filter(is_finished=0).values('user').distinct().count()
+    ret = {'users': users, 'hosts': hosts}
+    json_data = json.dumps(ret)
+    return HttpResponse(json_data)
