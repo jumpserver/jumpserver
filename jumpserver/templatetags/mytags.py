@@ -99,6 +99,15 @@ def perm_count(group_id):
     return group.perm_set.count()
 
 
+@register.filter(name='dept_perm_count')
+def dept_perm_count(dept_id):
+    dept = DEPT.objects.filter(id=dept_id)
+    if dept:
+        dept = dept[0]
+        return dept.deptperm_set.all().count()
+    return 0
+
+
 @register.filter(name='group_type_to_str')
 def group_type_to_str(type_name):
     group_types = {

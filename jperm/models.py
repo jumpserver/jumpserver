@@ -4,8 +4,7 @@ from jasset.models import Asset, BisGroup
 
 
 class Perm(models.Model):
-    name = models.CharField(max_length=100)
-    user_group = models.ManyToManyField(UserGroup)
+    user_group = models.ForeignKey(UserGroup)
     asset_group = models.ManyToManyField(BisGroup)
     comment = models.CharField(max_length=100)
 

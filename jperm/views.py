@@ -42,8 +42,6 @@ def perm_add(request):
     if request.method == 'GET':
         user_groups = UserGroup.objects.filter(id__gt=2)
         asset_groups = BisGroup.objects.all()
-        users = User.objects.all()
-        assets = Asset.objects.all()
 
     else:
         name = request.POST.get('name', '')
@@ -62,39 +60,51 @@ def perm_add(request):
     return render_to_response('jperm/perm_add.html', locals(), context_instance=RequestContext(request))
 
 
-def dept_add_asset(dept_list, asset_list):
-    for dept_id in dept_list:
-        dept = DEPT.objects.filter(id=dept_id)
-        if dept:
-            dept = dept[0]
-            for asset_id in asset_list:
-                asset = Asset.objects.filter(id=asset_id)
-                if asset:
-                    asset = asset[0]
-                    DeptPerm(dept=dept, asset=asset).save()
+def dept_add_asset(dept_id, asset_list):
+    dept = DEPT.objects.filter(id=dept_id)
+    if dept:
+        dept = dept[0]
+        old_perm_asset = [perm.asset for perm in dept.deptperm_set.all()]
+        new_perm_asset = []
+        for asset_id in asset_list:
+            asset = Asset.objects.filter(id=asset_id)
+            new_perm_asset.extend(asset)
+
+        asset_add = [asset for asset in new_perm_asset if asset not in old_perm_asset]
+        asset_del = [asset for asset in old_perm_asset if asset not in new_perm_asset]
+
+        for asset in asset_del:
+            DeptPerm.objects.filter(dept=dept, asset=asset).delete()
+        for asset in asset_add:
+            DeptPerm(dept=dept, asset=asset).save()
 
 
 def dept_perm_edit(request):
     header_title, path1, path2 = u'部门授权添加', u'授权管理', u'部门授权添加'
-
-    depts = DEPT.objects.all()
-    assets = Asset.objects.all()
-    if request.method == 'POST':
-        dept_select = request.POST.getlist('dept_select')
+    if request.method == 'GET':
+        dept_id = request.GET.get('id', '')
+        dept = DEPT.objects.filter(id=dept_id)
+        if dept:
+            dept = dept[0]
+            asset_all = Asset.objects.all()
+            asset_select = [perm.asset for perm in dept.deptperm_set.all()]
+            assets = [asset for asset in asset_all if asset not in asset_select]
+    else:
+        dept_id = request.POST.get('dept_id')
         asset_select = request.POST.getlist('asset_select')
-
-        dept_add_asset(dept_select, asset_select)
-        msg = '添加成功'
+        dept_add_asset(dept_id, asset_select)
+        return HttpResponseRedirect('/jperm/dept_perm_list/')
     return render_to_response('jperm/dept_perm_edit.html', locals(), context_instance=RequestContext(request))
 
 
 def perm_list(request):
-    header_title, path1, path2 = u'主机授权', u'授权管理', u'授权详情'
+    header_title, path1, path2 = u'小组授权', u'授权管理', u'授权详情'
     keyword = request.GET.get('search', '')
     if keyword:
-        contact_list = Perm.objects.filter(name__icontains=keyword)
+        contact_list = UserGroup.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
     else:
-        contact_list = Perm.objects.all()
+        contact_list = UserGroup.objects.all().order_by('name')
+
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
     return render_to_response('jperm/perm_list.html', locals(), context_instance=RequestContext(request))
 

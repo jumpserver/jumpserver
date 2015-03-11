@@ -48,7 +48,7 @@
                             <tr>
 
                                 <th class="text-center">部门名称</th>
-                                <th class="text-center">成员数量</th>
+                                <th class="text-center">部门成员数量</th>
                                 <th class="text-center">授权主机数量</th>
                                 <th class="text-center">备注</th>
                                 <th class="text-center">操作</th>
@@ -59,7 +59,7 @@
                             <tr class="gradeX">
                                 <td class="text-center"> {{ dept.name }} </td>
                                 <td class="text-center"> {{ dept.id | dept_member }} </td>
-                                <td class="text-center"> {{ dept.id | dept_member }} </td>
+                                <td class="text-center"> {{ dept.id | dept_perm_count }} </td>
                                 <td class="text-center"> {{ dept.comment }} </td>
                                 <td class="text-center">
                                     <a title="[ {{ dept.name }} ] 成员信息" href="../dept_detail/?id={{ dept.id }}" class="iframe btn btn-xs btn-primary">主机</a>
