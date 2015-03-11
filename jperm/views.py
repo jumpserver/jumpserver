@@ -42,6 +42,8 @@ def perm_add(request):
     if request.method == 'GET':
         user_groups = UserGroup.objects.filter(id__gt=2)
         asset_groups = BisGroup.objects.all()
+        users = User.objects.all()
+        assets = Asset.objects.all()
 
     else:
         name = request.POST.get('name', '')

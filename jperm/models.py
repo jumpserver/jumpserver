@@ -1,16 +1,31 @@
 from django.db import models
-from juser.models import UserGroup
-from jasset.models import BisGroup
+from juser.models import User, UserGroup, DEPT
+from jasset.models import Asset, BisGroup
 
 
 class Perm(models.Model):
-    name = models.CharField(max_length=100)
-    user_group = models.ManyToManyField(UserGroup)
-    asset_group = models.ManyToManyField(BisGroup)
-    comment = models.CharField(max_length=100)
+    user = models.ForeignKey(User)
+    asset = models.ForeignKey(Asset)
 
     def __unicode__(self):
-        return '%s_%s' % (self.user_group.name, self.asset_group.name)
+        return '%s_%s' % (self.user.name, self.asset.ip)
+
+
+class DeptPerm(models.Model):
+    dept = models.ForeignKey(DEPT)
+    asset = models.ForeignKey(Asset)
+
+    def __unicode__(self):
+        return '%s_%s' % (self.dept.name, self.asset.ip)
+
+
+class ShowPerm(models.Model):
+    uid = models.CharField(max_length=500, blank=True, null=True)
+    gid = models.CharField(max_length=500, blank=True, null=True)
+    did = models.CharField(max_length=500, blank=True, null=True)
+    aid = models.CharField(max_length=500, blank=True, null=True)
+    bid = models.CharField(max_length=500, blank=True, null=True)
+    comment = models.CharField(max_length=200, blank=True, null=True)
 
 
 class CmdGroup(models.Model):
