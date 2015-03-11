@@ -18,7 +18,7 @@ from django.template import RequestContext
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.template import RequestContext
 
-from juser.models import User
+from juser.models import User, UserGroup
 from jlog.models import Log
 from jasset.models import Asset, BisGroup, IDC
 
@@ -299,6 +299,21 @@ class PyCrypt(object):
         except TypeError:
             raise ServerError('Decrypt password error, TYpe error.')
         return plain_text.rstrip('\0')
+
+
+def filter_ajax_api(request):
+    attr = request.GET.get('attr', 'user')
+    value = request.GET.get('value', '')
+    if attr == 'user':
+        contact_list = User.objects.filter(name__icontains=value)
+    elif attr == "user_group":
+        contact_list = UserGroup.objects.filter(name__icontains=value)
+    elif attr == "asset":
+        contact_list = Asset.objects.filter(ip__icontains=value)
+    elif attr == "asset":
+        contact_list = BisGroup.objects.filter(name__icontains=value)
+
+    return render_to_response('filter_ajax_api.html', locals())
 
 
 # def perm_user_asset(user_id=None, username=None):

@@ -1,0 +1,9 @@
+{% for object in contact_list %}
+    {% ifequal attr "asset" %}
+        <option value="{{ contact_list.id }}">{{ contact_list.ip }}</option>
+    {% else %}
+        <option value="{{ contact_list.id }}">{{ contact_list.name }}</option>
+    {% endifequal %}
+
+
+{% endfor %}
