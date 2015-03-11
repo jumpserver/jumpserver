@@ -3,9 +3,9 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
-from juser.models import User, UserGroup
+from juser.models import User, UserGroup, DEPT
 from jasset.models import Asset, BisGroup
-from jperm.models import Perm, SudoPerm, CmdGroup
+from jperm.models import Perm, SudoPerm, CmdGroup, DeptPerm
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.db.models import Q
 from jumpserver.views import LDAP_ENABLE, ldap_conn, CONF, page_list_return, pages
@@ -37,7 +37,7 @@ def user_asset_cmd_groups_get(user_groups_select='', asset_groups_select='', cmd
 
 
 def perm_add(request):
-    header_title, path1, path2 = u'主机授权添加.', u'授权管理', u'授权添加'
+    header_title, path1, path2 = u'主机授权添加', u'授权管理', u'授权添加'
 
     if request.method == 'GET':
         user_groups = UserGroup.objects.filter(id__gt=2)
@@ -60,6 +60,32 @@ def perm_add(request):
     return render_to_response('jperm/perm_add.html', locals(), context_instance=RequestContext(request))
 
 
+def dept_add_asset(dept_list, asset_list):
+    for dept_id in dept_list:
+        dept = DEPT.objects.filter(id=dept_id)
+        if dept:
+            dept = dept[0]
+            for asset_id in asset_list:
+                asset = Asset.objects.filter(id=asset_id)
+                if asset:
+                    asset = asset[0]
+                    DeptPerm(dept=dept, asset=asset).save()
+
+
+def dept_perm_edit(request):
+    header_title, path1, path2 = u'部门授权添加', u'授权管理', u'部门授权添加'
+
+    depts = DEPT.objects.all()
+    assets = Asset.objects.all()
+    if request.method == 'POST':
+        dept_select = request.POST.getlist('dept_select')
+        asset_select = request.POST.getlist('asset_select')
+
+        dept_add_asset(dept_select, asset_select)
+        msg = '添加成功'
+    return render_to_response('jperm/dept_perm_edit.html', locals(), context_instance=RequestContext(request))
+
+
 def perm_list(request):
     header_title, path1, path2 = u'主机授权', u'授权管理', u'授权详情'
     keyword = request.GET.get('search', '')
@@ -71,39 +97,18 @@ def perm_list(request):
     return render_to_response('jperm/perm_list.html', locals(), context_instance=RequestContext(request))
 
 
-# def perm_list_ajax(request):
-#     tab = request.POST.get('tab', 'tab1')
-#     search = request.POST.get('search', '')
-#
-#     if tab == 'tab1':
-#         groups = contact_list = UserGroup.objects.filter(name__icontains=search).order_by('type')
-#         p = paginator = Paginator(contact_list, 10)
-#
-#         try:
-#             page = int(request.GET.get('page', '1'))
-#         except ValueError:
-#             page = 1
-#
-#         try:
-#             contacts = paginator.page(page)
-#         except (EmptyPage, InvalidPage):
-#             contacts = paginator.page(paginator.num_pages)
-#
-#     else:
-#         users = contact_list2 = User.objects.filter(name__icontains=search).order_by('id')
-#         p2 = paginator2 = Paginator(contact_list2, 10)
-#
-#         try:
-#             page = int(request.GET.get('page', '1'))
-#         except ValueError:
-#             page = 1
-#
-#         try:
-#             contacts2 = paginator2.page(page)
-#         except (EmptyPage, InvalidPage):
-#             contacts2 = paginator2.page(paginator2.num_pages)
-#
-#     return render_to_response('jperm/perm_list_ajax.html', locals())
+def dept_perm_list(request):
+    header_title, path1, path2 = '查看部门', '授权管理', '部门授权'
+    keyword = request.GET.get('search')
+    if keyword:
+        contact_list = DEPT.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword)).order_by('name')
+    else:
+        contact_list = DEPT.objects.filter(id__gt=1)
+
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
+
+    return render_to_response('jperm/dept_perm_list.html', locals(), context_instance=RequestContext(request))
+
 
 def perm_group_update(perm_id, user_group_id_list, asset_groups_id_list):
     perm = Perm.objects.filter(id=perm_id)
@@ -145,8 +150,6 @@ def perm_edit(request):
         perm_id = request.POST.get('perm_id', '')
         user_group_id_list = request.POST.getlist('user_groups_select')
         asset_group_id_list = request.POST.getlist('asset_groups_select')
-        # return HttpResponse("perm_id: %s user_group: %s asset_group: %s" % (perm_id, repr(user_group_id_list), repr(asset_group_id_list) ))
-        # return HttpResponse(perm_group_update(perm_id, user_group_id_list, asset_group_id_list))
         perm_group_update(perm_id, user_group_id_list, asset_group_id_list)
 
         return HttpResponseRedirect('/jperm/perm_list/')

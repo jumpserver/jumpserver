@@ -1,6 +1,6 @@
 from django.db import models
-from juser.models import UserGroup
-from jasset.models import BisGroup
+from juser.models import UserGroup, DEPT
+from jasset.models import Asset, BisGroup
 
 
 class Perm(models.Model):
@@ -11,6 +11,14 @@ class Perm(models.Model):
 
     def __unicode__(self):
         return '%s_%s' % (self.user_group.name, self.asset_group.name)
+
+
+class DeptPerm(models.Model):
+    dept = models.ForeignKey(DEPT)
+    asset = models.ForeignKey(Asset)
+
+    def __unicode__(self):
+        return '%s_%s' % (self.dept.name, self.asset.ip)
 
 
 class CmdGroup(models.Model):
