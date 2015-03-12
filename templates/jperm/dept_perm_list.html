@@ -48,8 +48,8 @@
                             <tr>
 
                                 <th class="text-center">部门名称</th>
-                                <th class="text-center">部门成员数量</th>
-                                <th class="text-center">授权主机数量</th>
+                                <th class="text-center">部门成员数目</th>
+                                <th class="text-center">授权主机数目</th>
                                 <th class="text-center">备注</th>
                                 <th class="text-center">操作</th>
                             </tr>
@@ -63,7 +63,7 @@
                                 <td class="text-center"> {{ dept.comment }} </td>
                                 <td class="text-center">
                                     <a title="[ {{ dept.name }} ] 成员信息" href="../dept_detail/?id={{ dept.id }}" class="iframe btn btn-xs btn-primary">主机</a>
-                                    <a href="../dept_perm_edit/?id={{ dept.id }}" class="btn btn-xs btn-info">授权编辑</a>
+                                    <a href="../dept_perm_edit/?id={{ dept.id }}" class="btn btn-xs btn-danger">授权编辑</a>
                                 </td>
                             </tr>
                         {% endfor %}

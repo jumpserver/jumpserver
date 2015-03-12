@@ -108,6 +108,27 @@ def dept_perm_count(dept_id):
     return 0
 
 
+@register.filter(name='ugrp_perm_agrp_count')
+def ugrp_perm_agrp_count(user_group_id):
+    user_group = UserGroup.objects.filter(id=user_group_id)
+    if user_group:
+        user_group = user_group[0]
+        return user_group.perm_set.all().count()
+    return 0
+
+
+@register.filter(name='ugrp_perm_asset_count')
+def ugrp_perm_asset_count(user_group_id):
+    user_group = UserGroup.objects.filter(id=user_group_id)
+    assets = []
+    if user_group:
+        user_group = user_group[0]
+        asset_groups = [perm.asset_group for perm in user_group.perm_set.all()]
+        for asset_group in asset_groups:
+            assets.extend(asset_group.asset_set.all())
+    return len(set(assets))
+
+
 @register.filter(name='group_type_to_str')
 def group_type_to_str(type_name):
     group_types = {

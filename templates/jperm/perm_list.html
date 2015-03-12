@@ -48,9 +48,9 @@
                             <tr>
                                 <th class="text-center">组名</th>
                                 <th class="text-center">所属部门</th>
-                                <th class="text-center">成员数量</th>
-                                <th class="text-center">授权组数量</th>
-                                <th class="text-center">授权主机数量</th>
+                                <th class="text-center">成员数目</th>
+                                <th class="text-center">授权主机组数目</th>
+                                <th class="text-center">授权主机数目</th>
                                 <th class="text-center">备注</th>
                                 <th class="text-center">操作</th>
                             </tr>
@@ -61,12 +61,13 @@
                                 <td class="text-center"> {{ group.name }} </td>
                                 <td class="text-center"> {{ group.dept.name }} </td>
                                 <td class="text-center"> {{ group.id | member_count }} </td>
-                                <td class="text-center"> {{ group.id | member_count }} </td>
-                                <td class="text-center"> {{ group.id | member_count }} </td>
+                                <td class="text-center"> {{ group.id | ugrp_perm_agrp_count }} </td>
+                                <td class="text-center"> {{ group.id | ugrp_perm_asset_count }} </td>
                                 <td class="text-center"> {{ group.comment }} </td>
                                 <td class="text-center">
-                                    <a href="../perm_edit/?id={{ group.id }}" class="btn btn-xs btn-info">授权编辑</a>
-{#                                    <a href="../group_del/?id={{ group.id }}" class="btn btn-xs btn-danger">删除</a>#}
+                                    <a href="../perm_edit/?id={{ group.id }}" class="btn btn-xs btn-primary">主机组</a>
+                                    <a href="../perm_edit/?id={{ group.id }}" class="btn btn-xs btn-info">主机</a>
+                                    <a href="../perm_edit/?id={{ group.id }}" class="btn btn-xs btn-danger">授权编辑</a>
                                 </td>
                             </tr>
                         {% endfor %}

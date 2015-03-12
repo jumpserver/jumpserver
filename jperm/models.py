@@ -5,8 +5,7 @@ from jasset.models import Asset, BisGroup
 
 class Perm(models.Model):
     user_group = models.ForeignKey(UserGroup)
-    asset_group = models.ManyToManyField(BisGroup)
-    comment = models.CharField(max_length=100)
+    asset_group = models.ForeignKey(BisGroup)
 
     def __unicode__(self):
         return '%s_%s' % (self.user_group.name, self.asset_group.name)

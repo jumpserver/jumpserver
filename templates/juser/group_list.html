@@ -52,7 +52,7 @@
                                 </th>
                                 <th class="text-center">组名</th>
                                 <th class="text-center">所属部门</th>
-                                <th class="text-center">成员数量</th>
+                                <th class="text-center">成员数目</th>
                                 <th class="text-center">备注</th>
                                 <th class="text-center">操作</th>
                             </tr>
@@ -68,7 +68,7 @@
                                 <td class="text-center"> {{ group.id | member_count }} </td>
                                 <td class="text-center"> {{ group.comment }} </td>
                                 <td class="text-center">
-                                    <a title="[ {{ group.name }} ] 成员信息" href="../group_detail/?id={{ group.id }}" class="iframe btn btn-xs btn-primary">成员</a>
+                                    <a href="../user_list/group/?gid={{ group.id }}" class="btn btn-xs btn-primary">成员</a>
                                     <a href="../group_edit/?id={{ group.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a href="../group_del/?id={{ group.id }}" class="btn btn-xs btn-danger">删除</a>
                                 </td>

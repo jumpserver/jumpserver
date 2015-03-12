@@ -122,47 +122,40 @@ def dept_perm_list(request):
     return render_to_response('jperm/dept_perm_list.html', locals(), context_instance=RequestContext(request))
 
 
-def perm_group_update(perm_id, user_group_id_list, asset_groups_id_list):
-    perm = Perm.objects.filter(id=perm_id)
-    if perm:
-        perm = perm[0]
-        user_group_list = []
-        asset_group_list = []
-
-        for user_group_id in user_group_id_list:
-            user_group_list.extend(UserGroup.objects.filter(id=user_group_id))
+def perm_group_update(user_group_id, asset_groups_id_list):
+    user_group = UserGroup.objects.filter(id=user_group_id)
+    if user_group:
+        user_group = user_group[0]
+        old_asset_group = [perm.asset_group for perm in user_group.perm_set.all()]
+        new_asset_group = []
 
         for asset_group_id in asset_groups_id_list:
-            asset_group_list.extend(BisGroup.objects.filter(id=asset_group_id))
+            new_asset_group.extend(BisGroup.objects.filter(id=asset_group_id))
 
-        perm.user_group.clear()
-        perm.asset_group.clear()
-        perm.user_group = user_group_list
-        perm.asset_group = asset_group_list
+        del_asset_group = [asset_group for asset_group in old_asset_group if asset_group not in new_asset_group]
+        add_asset_group = [asset_group for asset_group in new_asset_group if asset_group not in old_asset_group]
+
+        for asset_group in del_asset_group:
+            Perm.objects.filter(user_group=user_group, asset_group=asset_group).delete()
+
+        for asset_group in add_asset_group:
+            Perm(user_group=user_group, asset_group=asset_group).save()
 
 
 def perm_edit(request):
     if request.method == 'GET':
         header_title, path1, path2 = u'编辑授权', u'授权管理', u'授权编辑'
-        perm_id = request.GET.get('id', '')
-        perm = Perm.objects.filter(id=perm_id)
-        if perm:
-            perm = perm[0]
-            name = perm.name
-            comment = perm.comment
-            user_groups_select = perm.user_group.all()
-            asset_groups_select = perm.asset_group.all()
-
-            user_groups_all = UserGroup.objects.all()
+        user_group_id = request.GET.get('id', '')
+        user_group = UserGroup.objects.filter(id=user_group_id)
+        if user_group:
+            user_group = user_group[0]
             asset_groups_all = BisGroup.objects.all()
-
-            user_groups = [user_group for user_group in user_groups_all if user_group not in user_groups_select]
+            asset_groups_select = [perm.asset_group for perm in user_group.perm_set.all()]
             asset_groups = [asset_group for asset_group in asset_groups_all if asset_group not in asset_groups_select]
     else:
-        perm_id = request.POST.get('perm_id', '')
-        user_group_id_list = request.POST.getlist('user_groups_select')
+        user_group_id = request.POST.get('user_group_id')
         asset_group_id_list = request.POST.getlist('asset_groups_select')
-        perm_group_update(perm_id, user_group_id_list, asset_group_id_list)
+        perm_group_update(user_group_id, asset_group_id_list)
 
         return HttpResponseRedirect('/jperm/perm_list/')
     return render_to_response('jperm/perm_edit.html', locals(), context_instance=RequestContext(request))
