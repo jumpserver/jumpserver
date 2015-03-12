@@ -6,7 +6,7 @@
          </span>
         <a data-toggle="dropdown" class="dropdown-toggle" href="#">
         <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">{{ session_user_id | to_name}}</strong>
-         </span> <span class="text-muted text-xs block">{{ role_id | to_role_name }} <b class="caret"></b></span> </span> </a>
+         </span> <span class="text-muted text-xs block">{{ session_role_id | to_role_name }} <b class="caret"></b></span> </span> </a>
         <ul class="dropdown-menu animated fadeInRight m-t-xs">
             <li><a href="/juser/profile/">个人信息</a></li>
             <li><a href="/juser/chg_pass/">修改密码</a></li>

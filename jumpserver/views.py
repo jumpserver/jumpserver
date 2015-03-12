@@ -21,6 +21,7 @@ from django.template import RequestContext
 from juser.models import User, UserGroup
 from jlog.models import Log
 from jasset.models import Asset, BisGroup, IDC
+from jumpserver.api import require_admin, require_super_user, require_login
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 CONF = ConfigParser()
@@ -52,10 +53,6 @@ def getDaysByNum(num):
     return t
 
 
-def base(request):
-    return render_to_response('base.html', context_instance=RequestContext(request))
-
-
 def get_data(data, items, option):
     dic = {}
     li_date, li_str = getDaysByNum(7)
@@ -74,6 +71,7 @@ def get_data(data, items, option):
     return dic
 
 
+@require_login
 def index(request):
     path1, path2 = u'仪表盘', 'Dashboard'
     users = User.objects.all()
@@ -87,6 +85,7 @@ def index(request):
     user_top_ten = week_data.values('user').annotate(times=Count('user')).order_by('-times')[:10]
     host_top_ten = week_data.values('host').annotate(times=Count('host')).order_by('-times')[:10]
     user_dic, host_dic = get_data(week_data, user_top_ten, 'user'), get_data(week_data, host_top_ten, 'host')
+    print "##############%s" % request.session.get('role_id')
 
     top = {'user': '活跃用户数', 'host': '活跃主机数', 'times': '登录次数'}
     top_dic = {}
@@ -207,7 +206,7 @@ def login(request):
                 request.session['user_id'] = user.id
                 if user.role == 'SU':
                     request.session['role_id'] = 2
-                elif user.role == 'GA':
+                elif user.role == 'DA':
                     request.session['role_id'] = 1
                 else:
                     request.session['role_id'] = 0

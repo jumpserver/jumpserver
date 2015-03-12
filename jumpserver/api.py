@@ -1,5 +1,6 @@
-__author__ = 'guanghongwei'
+#coding: utf-8
 
+from django.http import HttpResponseRedirect
 from juser.models import User, UserGroup
 from jasset.models import Asset, BisGroup
 
@@ -46,3 +47,28 @@ def asset_perm_api(asset):
             user_permed_list.extend(user_group.user_set.all())
         return user_permed_list
 
+
+def require_login(func):
+    """要求登录的装饰器"""
+    def _deco(request, *args, **kwargs):
+        if not request.session.get('user_id'):
+            return HttpResponseRedirect('/login/')
+        return func(request, *args, **kwargs)
+    return _deco
+
+
+def require_super_user(func):
+    def _deco(request, *args, **kwargs):
+        if request.session.get('role_id', 0) != 2:
+            print "##########%s" % request.session.get('role_id', 0)
+            return HttpResponseRedirect('/')
+        return func(request, *args, **kwargs)
+    return _deco
+
+
+def require_admin(func):
+    def _deco(request, *args, **kwargs):
+        if request.session.get('role_id', 0) < 1:
+            return HttpResponseRedirect('/')
+        return func(request, *args, **kwargs)
+    return _deco

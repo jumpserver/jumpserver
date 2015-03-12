@@ -121,4 +121,3 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 
-SESSION_COOKIE_AGE = 3600

@@ -23,7 +23,7 @@ from connect import PyCrypt, KEY
 from connect import BASE_DIR
 from connect import CONF
 from jumpserver.views import md5_crypt, LDAPMgmt, LDAP_ENABLE, ldap_conn, page_list_return, pages
-from jumpserver.api import user_perm_group_api
+from jumpserver.api import user_perm_group_api, require_login, require_super_user, require_admin
 
 if LDAP_ENABLE:
     LDAP_HOST_URL = CONF.get('ldap', 'host_url')
@@ -204,6 +204,7 @@ def ldap_del_user(username):
     ldap_conn.delete(sudo_dn)
 
 
+@require_super_user
 def dept_add(request):
     header_title, path1, path2 = '添加部门', '用户管理', '添加部门'
     if request.method == 'POST':
@@ -224,6 +225,7 @@ def dept_add(request):
     return render_to_response('juser/dept_add.html', locals(), context_instance=RequestContext(request))
 
 
+@require_super_user
 def dept_list(request):
     header_title, path1, path2 = '查看部门', '用户管理', '查看部门'
     keyword = request.GET.get('search')
@@ -237,6 +239,7 @@ def dept_list(request):
     return render_to_response('juser/dept_list.html', locals(), context_instance=RequestContext(request))
 
 
+@require_super_user
 def dept_detail(request):
     dept_id = request.GET.get('id', None)
     if not dept_id:
@@ -248,6 +251,7 @@ def dept_detail(request):
     return render_to_response('juser/dept_detail.html', locals(), context_instance=RequestContext(request))
 
 
+@require_super_user
 def dept_del(request):
     dept_id = request.GET.get('id', None)
     if not dept_id or dept_id in ['1', '2']:
@@ -285,6 +289,7 @@ def dept_member_update(dept, users_id_list):
         user.save()
 
 
+@require_super_user
 def dept_del_ajax(request):
     dept_ids = request.POST.get('dept_ids')
     for dept_id in dept_ids.split(','):
@@ -292,6 +297,7 @@ def dept_del_ajax(request):
     return HttpResponse("删除成功")
 
 
+@require_super_user
 def dept_edit(request):
     header_title, path1, path2 = '部门编辑', '用户管理', '部门编辑'
     if request.method == 'GET':
@@ -323,6 +329,7 @@ def dept_edit(request):
     return render_to_response('juser/dept_edit.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def group_add(request):
     error = ''
     msg = ''
@@ -358,6 +365,7 @@ def group_add(request):
     return render_to_response('juser/group_add.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def group_list(request):
     header_title, path1, path2 = '查看小组', '用户管理', '查看小组'
     keyword = request.GET.get('search', '')
@@ -370,6 +378,7 @@ def group_list(request):
     return render_to_response('juser/group_list.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def group_detail(request):
     group_id = request.GET.get('id', None)
     if not group_id:
@@ -379,6 +388,7 @@ def group_detail(request):
     return render_to_response('juser/group_detail.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def group_del(request):
     group_id = request.GET.get('id', '')
     if not group_id:
@@ -387,6 +397,7 @@ def group_del(request):
     return HttpResponseRedirect('/juser/group_list/')
 
 
+@require_admin
 def group_del_ajax(request):
     group_ids = request.POST.get('group_ids')
     for group_id in group_ids.split(','):
@@ -404,6 +415,7 @@ def group_update_member(group_id, users_id_list):
             group.user_set.add(user)
 
 
+@require_admin
 def group_edit(request):
     error = ''
     msg = ''
@@ -436,6 +448,7 @@ def group_edit(request):
         return HttpResponseRedirect('/juser/group_list/')
 
 
+@require_admin
 def user_add(request):
     error = ''
     msg = ''
@@ -502,6 +515,7 @@ def user_add(request):
     return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def user_list(request, option=""):
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
     header_title, path1, path2 = '查看用户', '用户管理', '用户列表'
@@ -533,6 +547,7 @@ def user_list(request, option=""):
     return render_to_response('juser/user_list.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def user_detail(request):
     user_id = request.GET.get('id', '')
     if not user_id:
@@ -545,6 +560,7 @@ def user_detail(request):
     return render_to_response('juser/user_detail.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def user_del(request):
     user_id = request.GET.get('id', '')
     if not user_id:
@@ -559,6 +575,7 @@ def user_del(request):
     return HttpResponseRedirect('/juser/user_list/')
 
 
+@require_admin
 def user_del_ajax(request):
     user_ids = request.POST.get('ids')
     for user_id in user_ids.split(','):
@@ -573,6 +590,7 @@ def user_del_ajax(request):
     return HttpResponse('删除成功')
 
 
+@require_admin
 def user_edit(request):
     header_title, path1, path2 = '编辑用户', '用户管理', '用户编辑'
     if request.method == 'GET':

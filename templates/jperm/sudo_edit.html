@@ -29,6 +29,19 @@
                 </div>
 
                 <div class="ibox-content">
+                    <div class="panel blank-panel">
+                        <div class="panel-heading">
+                            <div class="panel-options">
+                                <ul class="nav nav-tabs">
+                                    <li id="tab1" class="active"><a href="/jperm/sudo_list/">查看Sudo授权</a></li>
+                                    <li id="tab2" class=""><a href="/jperm/sudo_add/">Sudo授权添加</a></li>
+                                    <li id="tab3" class=""><a href="/jperm/cmd_list/">查看命令组</a></li>
+                                    <li id="tab4" class=""><a href="/jperm/cmd_add/">添加命令组</a></li>
+                                </ul>
+                            </div>
+                        </div>
+
+                    <div class="panel-body">
                     <form id="sudoPerm" method="post" class="form-horizontal" action="">
                         {% if error %}
                             <div class="alert alert-warning text-center">{{ error }}</div>
@@ -173,6 +186,7 @@
                             </div>
                         </div>
                     </form>
+                    </div>
 
                 </div>
             </div>
@@ -180,5 +194,3 @@
     </div>
 </div>
 
-
-{% endblock %}

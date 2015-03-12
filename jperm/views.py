@@ -9,7 +9,7 @@ from jperm.models import Perm, SudoPerm, CmdGroup, DeptPerm
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.db.models import Q
 from jumpserver.views import LDAP_ENABLE, ldap_conn, CONF, page_list_return, pages
-from jumpserver.api import user_perm_asset_api
+from jumpserver.api import user_perm_asset_api, require_admin, require_super_user, require_login
 
 
 if LDAP_ENABLE:
@@ -36,6 +36,7 @@ def user_asset_cmd_groups_get(user_groups_select='', asset_groups_select='', cmd
     return user_groups_select_list, asset_groups_select_list, cmd_groups_select_list
 
 
+@require_admin
 def perm_add(request):
     header_title, path1, path2 = u'主机授权添加', u'授权管理', u'授权添加'
 
@@ -79,6 +80,7 @@ def dept_add_asset(dept_id, asset_list):
             DeptPerm(dept=dept, asset=asset).save()
 
 
+@require_super_user
 def dept_perm_edit(request):
     header_title, path1, path2 = u'部门授权添加', u'授权管理', u'部门授权添加'
     if request.method == 'GET':
@@ -97,6 +99,7 @@ def dept_perm_edit(request):
     return render_to_response('jperm/dept_perm_edit.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def perm_list(request):
     header_title, path1, path2 = u'小组授权', u'授权管理', u'授权详情'
     keyword = request.GET.get('search', '')
@@ -109,6 +112,7 @@ def perm_list(request):
     return render_to_response('jperm/perm_list.html', locals(), context_instance=RequestContext(request))
 
 
+@require_super_user
 def dept_perm_list(request):
     header_title, path1, path2 = '查看部门', '授权管理', '部门授权'
     keyword = request.GET.get('search')
@@ -142,6 +146,7 @@ def perm_group_update(user_group_id, asset_groups_id_list):
             Perm(user_group=user_group, asset_group=asset_group).save()
 
 
+@require_super_user
 def perm_edit(request):
     if request.method == 'GET':
         header_title, path1, path2 = u'编辑授权', u'授权管理', u'授权编辑'
@@ -161,6 +166,7 @@ def perm_edit(request):
     return render_to_response('jperm/perm_edit.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def perm_detail(request):
     header_title, path1, path2 = u'编辑授权', u'授权管理', u'授权详情'
     perm_id = request.GET.get('id')
@@ -181,6 +187,7 @@ def perm_detail(request):
     return render_to_response('jperm/perm_detail.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def perm_del(request):
     perm_id = request.GET.get('id')
     perm = Perm.objects.filter(id=perm_id)
@@ -190,6 +197,7 @@ def perm_del(request):
     return HttpResponseRedirect('/jperm/perm_list/')
 
 
+@require_admin
 def perm_asset_detail(request):
     header_title, path1, path2 = u'用户授权主机', u'权限管理', u'用户主机详情'
     user_id = request.GET.get('id')
@@ -273,6 +281,7 @@ def sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select,
     ldap_conn.add(sudo_dn, sudo_attr)
 
 
+@require_admin
 def sudo_add(request):
     header_title, path1, path2 = u'Sudo授权', u'权限管理', u'添加Sudo权限'
     user_groups = UserGroup.objects.filter(id__gt=2)
@@ -294,6 +303,7 @@ def sudo_add(request):
     return render_to_response('jperm/sudo_add.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def sudo_list(request):
     header_title, path1, path2 = u'Sudo授权', u'权限管理', u'Sudo权限详情'
     contact_list = SudoPerm.objects.all()
@@ -302,6 +312,7 @@ def sudo_list(request):
     return render_to_response('jperm/sudo_list.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def sudo_edit(request):
     header_title, path1, path2 = u'Sudo授权', u'授权管理', u'Sudo修改'
 
@@ -348,6 +359,7 @@ def sudo_edit(request):
     return render_to_response('jperm/sudo_edit.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def sudo_detail(request):
     header_title, path1, path2 = u'Sudo授权详情', u'授权管理', u'授权详情'
     sudo_perm_id = request.GET.get('id')
@@ -372,6 +384,7 @@ def sudo_detail(request):
         return render_to_response('jperm/sudo_detail.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def sudo_del(request):
     sudo_perm_id = request.GET.get('id', '0')
     sudo_perm = SudoPerm.objects.filter(id=int(sudo_perm_id))
@@ -383,6 +396,7 @@ def sudo_del(request):
     return HttpResponseRedirect('/jperm/sudo_list/')
 
 
+@require_admin
 def cmd_add(request):
     header_title, path1, path2 = u'sudo命令添加', u'授权管理', u'命令组添加'
 
@@ -399,6 +413,7 @@ def cmd_add(request):
     return render_to_response('jperm/sudo_cmd_add.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def cmd_edit(request):
     header_title, path1, path2 = u'sudo命令修改', u'授权管理管理', u'命令组修改'
 
@@ -425,6 +440,7 @@ def cmd_edit(request):
     return render_to_response('jperm/sudo_cmd_add.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def cmd_list(request):
     header_title, path1, path2 = u'sudo命令查看', u'权限管理', u'Sudo命令添加'
 
@@ -443,6 +459,7 @@ def cmd_list(request):
     return render_to_response('jperm/sudo_cmd_list.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def cmd_del(request):
     cmd_group_id = request.GET.get('id')
     cmd_group = CmdGroup.objects.filter(id=cmd_group_id)
