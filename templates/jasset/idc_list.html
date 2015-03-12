@@ -9,6 +9,17 @@
                 <div class="ibox-content">
                     <div class="">
                     <a target="_blank" href="/jasset/idc_add" class="btn btn-sm btn-primary "> 添加IDC </a>
+                    <form id="search_form" method="get" action="" class="pull-right mail-search">
+                        <div class="input-group">
+                            <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
+                            <input type="text" style="display: none">
+                            <div class="input-group-btn">
+                                <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                                    Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                     </div>
 
                     <form id="contents_form" name="contents_form">

@@ -149,12 +149,11 @@ def list_host(request):
                      Q(bis_group__name__contains=keyword) | Q(comment__contains=keyword)).distinct().order_by('ip')
         contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
-        return render_to_response('jasset/host_list.html', locals(), context_instance=RequestContext(request))
     else:
         posts = Asset.objects.all().order_by('ip')
         contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
-        return render_to_response('jasset/host_list.html', locals(), context_instance=RequestContext(request))
+    return render_to_response('jasset/host_list.html', locals(), context_instance=RequestContext(request))
 
 
 def host_del(request, offset):
@@ -253,7 +252,11 @@ def add_idc(request):
 
 def list_idc(request):
     header_title, path1, path2 = u'查看IDC', u'资产管理', u'查看IDC'
-    posts = IDC.objects.all().order_by('id')
+    keyword = request.GET.get('keyword', '')
+    if keyword:
+        posts = IDC.objects.filter(Q(name__contains=keyword) | Q(comment__contains=keyword))
+    else:
+        posts = IDC.objects.all().order_by('id')
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
     return render_to_response('jasset/idc_list.html', locals(), context_instance=RequestContext(request))
 
@@ -323,7 +326,11 @@ def add_group(request):
 
 def list_group(request):
     header_title, path1, path2 = u'查看主机组', u'资产管理', u'查看主机组'
-    posts = BisGroup.objects.filter(type='A').order_by('id')
+    keyword = request.GET.get('keyword', '')
+    if keyword:
+        posts = BisGroup.objects.filter(Q(name__contains=keyword) | Q(comment__contains=keyword))
+    else:
+        posts = BisGroup.objects.filter(type='A').order_by('id')
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     return render_to_response('jasset/group_list.html', locals(), context_instance=RequestContext(request))
