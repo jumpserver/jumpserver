@@ -58,12 +58,13 @@
                 </div>
             </div>
         </div>
-        <div id="top10" style="width:100%;height:400px;"></div>
-        <div id="usertop10" style="width:100%;height:400px;margin-top:170px"></div>
-        <br/>
-        <div id="hosttop10" style="width:100%;height:400px;"></div>
-        <br/>
-        <div id="dynamic" style="width:100%;height:400px;"></div>
+        <div class="row">
+            <div class="col-lg-6" id="top10" style="width:50%;height:400px;"></div>
+            <div class="col-lg-6" id="usertop10" style="width:50%;height:400px;"></div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6" id="hosttop10" style="width:50%;height:400px; margin-top: 20px"></div>
+        </div>
     </div>
 </div>
 
@@ -71,8 +72,11 @@
 var cate = {{ li_str|safe }};
 $(function () {
     $('#top10').highcharts({
+        chart: {
+            type: 'column'
+        },
         title: {
-            text: '数据总览',
+            text: '一周数据总览',
             x: -20 //center
         },
         subtitle: {
@@ -100,12 +104,6 @@ $(function () {
         },
         tooltip: {
             valueSuffix: '次'
-        },
-        legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle',
-            borderWidth: 0
         },
         navigation: {
             buttonOptions: {
@@ -149,12 +147,6 @@ $(function () {
         tooltip: {
             valueSuffix: '次'
         },
-        legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle',
-            borderWidth: 0
-        },
         series: [
             {% for k,v in user_dic.items %}
                 {
@@ -192,12 +184,6 @@ $(function () {
         tooltip: {
             valueSuffix: '次'
         },
-        legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle',
-            borderWidth: 0
-        },
         series: [
             {% for k,v in host_dic.items %}
                 {
@@ -227,7 +213,7 @@ $(function () {
         });
     };
 
-    setInterval(update, 1000); //5秒钟执行一次
+    setInterval(update, 5000); //5秒钟执行一次
     update();
 
 });

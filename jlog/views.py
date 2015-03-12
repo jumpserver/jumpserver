@@ -18,6 +18,7 @@ CONF.read('%s/jumpserver.conf' % BASE_DIR)
 
 def log_list_online(request):
     header_title, path1, path2 = u'查看日志', u'查看日志', u'在线用户'
+    keyword = request.GET.get('keyword')
     web_socket_host = CONF.get('websocket', 'web_socket_host')
     posts = Log.objects.filter(is_finished=0).order_by('-start_time')
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
@@ -27,6 +28,7 @@ def log_list_online(request):
 
 def log_list_offline(request):
     header_title, path1, path2 = u'查看日志', u'查看日志', u'历史记录'
+    keyword = request.GET.get('keyword')
     web_socket_host = CONF.get('websocket', 'web_socket_host')
     posts = Log.objects.filter(is_finished=1).order_by('-start_time')
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)

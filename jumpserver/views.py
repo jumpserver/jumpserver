@@ -45,7 +45,7 @@ def getDaysByNum(num):
     for i in range(0, num):
         today = today-oneday
         li_date.append(today)
-        li_str.append(str(today)[0:10])
+        li_str.append(str(today)[5:10])
     li_date.reverse()
     li_str.reverse()
     t = (li_date, li_str)
@@ -101,8 +101,6 @@ def index(request):
             li.append(times)
         top_dic[value] = li
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
-
-
 
 
 def skin_config(request):

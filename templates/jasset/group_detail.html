@@ -88,6 +88,9 @@
                                              <a href="#">Previous</a>
                                         </li>
                                     {% endif %}
+                                    {% ifequal show_first 1 %}
+                                        <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?id={{ group_id }}&page=1"  title="第1页">1...</a></li>
+                                    {% endifequal %}
                                     {% for page in page_range %}
                                         {% ifequal current_page page %}
                                             <li class="paginate_button active"  aria-controls="editable" tabindex="0"><a href="?id={{ group_id }}&page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
@@ -95,6 +98,9 @@
                                             <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?id={{ group_id }}&page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
                                         {% endifequal %}
                                     {% endfor %}
+                                    {% ifequal show_end 1 %}
+                                        <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?id={{ group_id }}&page={{ p.num_pages }}"  title="第{{ page }}页">...{{ p.num_pages }}</a></li>
+                                    {% endifequal %}
                                     {% if contacts.has_next %}
                                         <li class="paginate_button next" aria-controls="editable" tabindex="0" id="editable_next">
                                             <a href="?id={{ group_id }}&page={{ contacts.next_page_number }}">Next</a>
