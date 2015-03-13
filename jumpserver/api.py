@@ -71,3 +71,17 @@ def require_admin(func):
             return HttpResponseRedirect('/')
         return func(request, *args, **kwargs)
     return _deco
+
+
+def is_super_user(request):
+    if request.session.get('role_id') == '2':
+        return True
+    else:
+        return False
+
+
+def is_group_admin(request):
+    if request.session.get('role_id') == '1':
+        return True
+    else:
+        return False
