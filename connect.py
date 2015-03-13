@@ -39,19 +39,10 @@ BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 CONF = ConfigParser()
 CONF.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
-# Web generate user ssh_key dir.
 SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys')
-# User upload the server key to this dir.
 SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
-# The key of decryptor.
 KEY = CONF.get('web', 'key')
-# Login user.
 LOGIN_NAME = getpass.getuser()
-#LOGIN_NAME = os.getlogin()
-USER_KEY_FILE = os.path.join(SERVER_KEY_DIR, LOGIN_NAME)
-
-if not os.path.isfile(USER_KEY_FILE):
-    USER_KEY_FILE = None
 
 
 def color_print(msg, color='blue'):
@@ -212,7 +203,7 @@ def get_connect_item(username, ip):
         return username, password, ip, port
 
     else:
-        raise ServerError('Login type is not in ["L", "S", "P", "M"]')
+        raise ServerError('Login type is not in ["L", "M"]')
 
 
 def verify_connect(username, part_ip):
@@ -222,12 +213,11 @@ def verify_connect(username, part_ip):
 
     if len(ip_matched) > 1:
         for ip in ip_matched:
-            print '[%s] %s -- %s' % (hosts_attr[ip][0], ip, hosts_attr[ip][1])
+            print '%s -- %s' % (ip, hosts_attr[ip][1])
     elif len(ip_matched) < 1:
         color_print('No Permission or No host.', 'red')
     else:
         username, password, host, port = get_connect_item(username, ip_matched[0])
-        print username, password, host, port
         connect(username, password, host, port, LOGIN_NAME)
 
 
@@ -261,7 +251,7 @@ def connect(username, password, host, port, login_name):
     ssh.load_system_host_keys()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
-        ssh.connect(host, port=port, username=username, password=password, key_filename=USER_KEY_FILE, compress=True)
+        ssh.connect(host, port=port, username=username, password=password, compress=True)
     except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
         raise ServerError('Authentication Error.')
     except socket.error:
@@ -294,7 +284,7 @@ def remote_exec_cmd(ip, port, username, password, cmd):
         time.sleep(5)
         ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(ip, port, username, password, key_filename=USER_KEY_FILE, timeout=5)
+        ssh.connect(ip, port, username, password, timeout=5)
         stdin, stdout, stderr = ssh.exec_command("bash -l -c '%s'" % cmd)
         out = stdout.readlines()
         err = stderr.readlines()

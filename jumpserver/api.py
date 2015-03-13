@@ -14,8 +14,7 @@ def user_perm_group_api(user):
 
         asset_group_list = []
         for perm in perm_list:
-            asset_group_list.extend(perm.asset_group.all())
-
+            asset_group_list.append(perm.asset_group)
         return asset_group_list
 
 
