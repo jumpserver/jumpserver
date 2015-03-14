@@ -95,6 +95,22 @@
 
                         <div class="hr-line-dashed"></div>
                         <div class="form-group">
+                            <label for="j_dept" class="col-lg-2 control-label"> 所属部门<span class="red-fonts">*</span> </label>
+                            <div class="col-sm-8">
+                                <select id="j_dept" name="j_dept" class="form-control m-b" multiple size="10">
+                                    {% for g in edept %}
+                                        {% if g in e_dept %}
+                                            <option type="checkbox" value="{{ g.name }}" selected>{{ g.name }} --- {{ g.comment }}</option>
+                                        {% else %}
+                                            <option type="checkbox" value="{{ g.name }}" >{{ g.name }} --- {{ g.comment }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
                             <label for="j_group" class="col-lg-2 control-label"> 所属主机组<span class="red-fonts">*</span> </label>
                             <div class="col-sm-8">
                                 <select id="j_group" name="j_group" class="form-control m-b" multiple size="10">
