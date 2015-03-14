@@ -1,6 +1,6 @@
 import datetime
 from django.db import models
-from juser.models import UserGroup
+from juser.models import UserGroup, DEPT
 
 
 class IDC(models.Model):
@@ -34,8 +34,8 @@ class Asset(models.Model):
     ip = models.IPAddressField(unique=True)
     port = models.SmallIntegerField(max_length=5)
     idc = models.ForeignKey(IDC)
-    user_group = models.ManyToManyField(UserGroup)
     bis_group = models.ManyToManyField(BisGroup)
+    dept = models.ManyToManyField(DEPT)
     login_type = models.CharField(max_length=1, choices=LOGIN_TYPE_CHOICES, default='L')
     username = models.CharField(max_length=20, blank=True, null=True)
     password = models.CharField(max_length=80, blank=True, null=True)

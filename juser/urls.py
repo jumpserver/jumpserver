@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
-
+from jumpserver.api import view_splitter
+from juser.views import *
 
 urlpatterns = patterns('juser.views',
     # Examples:
@@ -14,7 +15,7 @@ urlpatterns = patterns('juser.views',
     (r'^dept_del_ajax/$', 'dept_del_ajax'),
     (r'^dept_edit/$', 'dept_edit'),
     (r'^group_add/$', 'group_add'),
-    (r'^group_list/$', 'group_list'),
+    (r'^group_list/$', view_splitter, {'su': group_list_su, 'adm': group_list_adm}),
     (r'^group_detail/$', 'group_detail'),
     (r'^group_del/$', 'group_del'),
     (r'^group_del_ajax/$', 'group_del_ajax'),

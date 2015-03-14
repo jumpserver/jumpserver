@@ -11,14 +11,6 @@ class Perm(models.Model):
         return '%s_%s' % (self.user_group.name, self.asset_group.name)
 
 
-class DeptPerm(models.Model):
-    dept = models.ForeignKey(DEPT)
-    asset = models.ForeignKey(Asset)
-
-    def __unicode__(self):
-        return '%s_%s' % (self.dept.name, self.asset.ip)
-
-
 class CmdGroup(models.Model):
     name = models.CharField(max_length=50)
     cmd = models.CharField(max_length=999)

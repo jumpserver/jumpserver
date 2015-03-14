@@ -115,7 +115,7 @@ def dept_asset_num(dept_id):
     dept = DEPT.objects.filter(id=dept_id)
     if dept:
         dept = dept[0]
-        return dept.deptperm_set.all().count()
+        return dept.asset_set.all().count()
     return 0
 
 

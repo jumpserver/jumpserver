@@ -1,10 +1,6 @@
 #coding: utf-8
 
 import hashlib
-import ldap
-from ldap import modlist
-from Crypto.Cipher import AES
-from binascii import b2a_hex, a2b_hex
 from ConfigParser import ConfigParser
 import os
 import datetime
@@ -21,18 +17,23 @@ from django.template import RequestContext
 from juser.models import User, UserGroup
 from jlog.models import Log
 from jasset.models import Asset, BisGroup, IDC
-from jumpserver.api import require_admin, require_super_user, require_login
+from jumpserver.api import require_admin, require_super_user, require_login, CRYPTOR, LDAPMgmt
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 CONF = ConfigParser()
 CONF.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
 
 LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
+
+
 if LDAP_ENABLE:
     LDAP_HOST_URL = CONF.get('ldap', 'host_url')
     LDAP_BASE_DN = CONF.get('ldap', 'base_dn')
     LDAP_ROOT_DN = CONF.get('ldap', 'root_dn')
     LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
+    ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
+else:
+    ldap_conn = None
 
 
 def md5_crypt(string):
@@ -112,10 +113,6 @@ def jasset_group_add(name, comment, jtype):
     else:
         BisGroup.objects.create(name=name, comment=comment, type=jtype)
         smg = u'业务组%s添加成功' % name
-
-
-class ServerError(Exception):
-    pass
 
 
 def page_list_return(total, current=1):
@@ -217,83 +214,6 @@ def logout(request):
     return HttpResponseRedirect('/login/')
 
 
-class LDAPMgmt():
-    def __init__(self,
-                 host_url,
-                 base_dn,
-                 root_cn,
-                 root_pw):
-        self.ldap_host = host_url
-        self.ldap_base_dn = base_dn
-        self.conn = ldap.initialize(host_url)
-        self.conn.set_option(ldap.OPT_REFERRALS, 0)
-        self.conn.protocol_version = ldap.VERSION3
-        self.conn.simple_bind_s(root_cn, root_pw)
-
-    def list(self, filter, scope=ldap.SCOPE_SUBTREE, attr=None):
-        result = {}
-        try:
-            ldap_result = self.conn.search_s(self.ldap_base_dn, scope, filter, attr)
-            for entry in ldap_result:
-                name, data = entry
-                for k, v in data.items():
-                    print '%s: %s' % (k, v)
-                    result[k] = v
-            return result
-        except ldap.LDAPError, e:
-            print e
-
-    def add(self, dn, attrs):
-        try:
-            ldif = modlist.addModlist(attrs)
-            self.conn.add_s(dn, ldif)
-        except ldap.LDAPError, e:
-            print e
-
-    def modify(self, dn, attrs):
-        try:
-            attr_s = []
-            for k, v in attrs.items():
-                attr_s.append((2, k, v))
-            self.conn.modify_s(dn, attr_s)
-        except ldap.LDAPError, e:
-            print e
-
-    def delete(self, dn):
-        try:
-            self.conn.delete_s(dn)
-        except ldap.LDAPError, e:
-            print e
-
-
-class PyCrypt(object):
-    """This class used to encrypt and decrypt password."""
-
-    def __init__(self, key):
-        self.key = key
-        self.mode = AES.MODE_CBC
-
-    def encrypt(self, text):
-        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
-        length = 16
-        try:
-            count = len(text)
-        except TypeError:
-            raise ServerError('Encrypt password error, TYpe error.')
-        add = (length - (count % length))
-        text += ('\0' * add)
-        ciphertext = cryptor.encrypt(text)
-        return b2a_hex(ciphertext)
-
-    def decrypt(self, text):
-        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
-        try:
-            plain_text = cryptor.decrypt(a2b_hex(text))
-        except TypeError:
-            raise ServerError('Decrypt password error, TYpe error.')
-        return plain_text.rstrip('\0')
-
-
 def filter_ajax_api(request):
     attr = request.GET.get('attr', 'user')
     value = request.GET.get('value', '')
@@ -331,15 +251,15 @@ def filter_ajax_api(request):
 #     return assets
 
 
-if LDAP_ENABLE:
-    ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
-else:
-    ldap_conn = None
-
-
 def install(request):
-    from juser.models import DEPT
-    DEPT(id=1, name="跨部门", comment="跨部门小组使用").save()
-    DEPT(id=2, name="默认", comment="默认部门").save()
+    from juser.models import DEPT, User
+    dept = DEPT(id=1, name="超管部", comment="超级管理员部门")
+    dept.save()
+    dept2 = DEPT(id=2, name="默认", comment="默认部门")
+    dept2.save()
+    User(id=5000, username="admin", password=md5_crypt('admin'),
+         name='admin', email='admin@jumpserver.org', role='SU', is_active=True, dept=dept).save()
+    User(id=5001, username="group_admin", password=md5_crypt('group_admin'),
+         name='group_admin', email='group_admin@jumpserver.org', role='DA', is_active=True, dept=dept2).save()
     return HttpResponse('Ok')
 

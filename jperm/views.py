@@ -5,18 +5,11 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from juser.models import User, UserGroup, DEPT
 from jasset.models import Asset, BisGroup
-from jperm.models import Perm, SudoPerm, CmdGroup, DeptPerm
+from jperm.models import Perm, SudoPerm, CmdGroup
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.db.models import Q
 from jumpserver.views import LDAP_ENABLE, ldap_conn, CONF, page_list_return, pages
-from jumpserver.api import user_perm_asset_api, require_admin, require_super_user, require_login
-
-
-if LDAP_ENABLE:
-    LDAP_HOST_URL = CONF.get('ldap', 'host_url')
-    LDAP_BASE_DN = CONF.get('ldap', 'base_dn')
-    LDAP_ROOT_DN = CONF.get('ldap', 'root_dn')
-    LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
+from jumpserver.api import *
 
 
 def user_asset_cmd_groups_get(user_groups_select='', asset_groups_select='', cmd_groups_select=''):
@@ -65,19 +58,13 @@ def dept_add_asset(dept_id, asset_list):
     dept = DEPT.objects.filter(id=dept_id)
     if dept:
         dept = dept[0]
-        old_perm_asset = [perm.asset for perm in dept.deptperm_set.all()]
         new_perm_asset = []
         for asset_id in asset_list:
             asset = Asset.objects.filter(id=asset_id)
             new_perm_asset.extend(asset)
 
-        asset_add = [asset for asset in new_perm_asset if asset not in old_perm_asset]
-        asset_del = [asset for asset in old_perm_asset if asset not in new_perm_asset]
-
-        for asset in asset_del:
-            DeptPerm.objects.filter(dept=dept, asset=asset).delete()
-        for asset in asset_add:
-            DeptPerm(dept=dept, asset=asset).save()
+        dept.asset_set.clear()
+        dept.asset_set = new_perm_asset
 
 
 @require_super_user
@@ -89,7 +76,7 @@ def dept_perm_edit(request):
         if dept:
             dept = dept[0]
             asset_all = Asset.objects.all()
-            asset_select = [perm.asset for perm in dept.deptperm_set.all()]
+            asset_select = dept.asset_set.all()
             assets = [asset for asset in asset_all if asset not in asset_select]
     else:
         dept_id = request.POST.get('dept_id')

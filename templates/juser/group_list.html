@@ -95,14 +95,16 @@
         $(".iframe").colorbox({iframe:true, width:"70%", height:"70%"});
         var check_array = []
         $('#del_btn').click(function(){
-            $(".gradeX input:checked").each(function() {check_array.push($(this).attr("value")) })
-            $(".gradeX input:checked").closest("tr").remove()
-            $.post("/juser/group_del_ajax/",
+            if (confirm("确定删除")) {
+                $(".gradeX input:checked").each(function() {check_array.push($(this).attr("value")) })
+                $(".gradeX input:checked").closest("tr").remove()
+                $.post("/juser/group_del_ajax/",
                     {group_ids: check_array.join(",")},
                     function(data){
-                        alert(data)
                     }
-            )
+                )
+            }
+
         })
     });
 

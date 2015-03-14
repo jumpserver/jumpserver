@@ -16,15 +16,13 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.template import RequestContext
 from django.http import HttpResponse
-from django.core.paginator import Paginator, EmptyPage, InvalidPage
 
 from juser.models import UserGroup, User, DEPT
-from connect import PyCrypt, KEY
 from connect import BASE_DIR
 from connect import CONF
 from jumpserver.views import md5_crypt, LDAPMgmt, LDAP_ENABLE, ldap_conn, page_list_return, pages
 from jumpserver.api import user_perm_group_api, require_login, require_super_user, \
-    require_admin, is_group_admin, is_super_user
+    require_admin, is_group_admin, is_super_user, CRYPTOR
 
 if LDAP_ENABLE:
     LDAP_HOST_URL = CONF.get('ldap', 'host_url')
@@ -32,10 +30,8 @@ if LDAP_ENABLE:
     LDAP_ROOT_DN = CONF.get('ldap', 'root_dn')
     LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
 
-CRYPTOR = PyCrypt(KEY)
 
-
-def gen_rand_pwd(num):
+def gen_rand_wd(num):
     """生成随机密码"""
     seed = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     salt_list = []
@@ -366,25 +362,28 @@ def group_add(request):
     return render_to_response('juser/group_add.html', locals(), context_instance=RequestContext(request))
 
 
-@require_admin
-def group_list(request):
+@require_super_user
+def group_list_su(request):
     header_title, path1, path2 = '查看小组', '用户管理', '查看小组'
     keyword = request.GET.get('search', '')
-    contact_list = []
-    if is_super_user(request):
-        if keyword:
-            contact_list = UserGroup.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
-        else:
-            contact_list = UserGroup.objects.all().order_by('name')
-    elif is_group_admin(request):
-        user_id = request.session.get('user_id', '')
-        user = User.objects.filter(id=user_id)
-        if user:
-            user = user[0]
-            if keyword:
-                contact_list = UserGroup.objects.filter(Q(dept=user.dept) & Q(name__icontains=keyword) | Q(comment__icontains=keyword))
-            else:
-                contact_list = UserGroup.objects.filter(dept=user.dept).order_by('name')
+    if keyword:
+        contact_list = UserGroup.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
+    else:
+        contact_list = UserGroup.objects.all().order_by('name')
+
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
+    return render_to_response('juser/group_list.html', locals(), context_instance=RequestContext(request))
+
+
+@require_admin
+def group_list_adm(request):
+    header_title, path1, path2 = '查看部门小组', '用户管理', '查看小组'
+    keyword = request.GET.get('search', '')
+    user_id = request.session.get('user_id')
+    if keyword:
+        contact_list = UserGroup.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
+    else:
+        contact_list = UserGroup.objects.all().order_by('name')
 
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
     return render_to_response('juser/group_list.html', locals(), context_instance=RequestContext(request))

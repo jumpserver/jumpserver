@@ -12,7 +12,7 @@
                 </li>
             {% endif %}
             {% ifequal show_first 1 %}
-                <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?keyword={{ keyword }}&ppage=1"  title="第1页">1...</a></li>
+                <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?keyword={{ keyword }}&page=1"  title="第1页">1...</a></li>
             {% endifequal %}
             {% for page in page_range %}
                 {% ifequal current_page page %}

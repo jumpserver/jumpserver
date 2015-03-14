@@ -24,8 +24,7 @@ django.setup()
 from juser.models import User
 from jasset.models import Asset
 from jlog.models import Log
-from jumpserver.views import PyCrypt
-from jumpserver.api import user_perm_asset_api
+from jumpserver.api import user_perm_asset_api, PyCrypt, BASE_DIR, CONF, CRYPTOR, KEY
 
 try:
     import termios
@@ -35,13 +34,10 @@ except ImportError:
     time.sleep(3)
     sys.exit()
 
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-CONF = ConfigParser()
 CONF.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
 SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys')
 SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
-KEY = CONF.get('web', 'key')
 LOGIN_NAME = getpass.getuser()
 
 
