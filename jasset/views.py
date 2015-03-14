@@ -22,7 +22,8 @@ def index(request):
 def f_add_host(ip, port, idc, jtype, group, active, comment, username='', password=''):
     groups = []
     idc = IDC.objects.get(name=idc)
-    if type == 'M':
+    if jtype == 'M':
+        print username, password
         a = Asset(ip=ip, port=port,
                   login_type=jtype, idc=idc,
                   is_active=int(active),
@@ -135,7 +136,15 @@ def batch_host_edit(request):
             j_active = request.POST.get(j_active).strip()
             j_comment = request.POST.get(j_comment).strip()
 
-            jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment)
+            if j_type == 'M':
+                j_user = "editable[" + str(i) + "][j_user]"
+                j_password = "editable[" + str(i) + "][j_password]"
+                j_user = request.POST.get(j_user).strip()
+                password = request.POST.get(j_password).strip()
+                j_password = cryptor.encrypt(password)
+                jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment, j_user, j_password)
+            else:
+                jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment)
 
         return render_to_response('jasset/host_list.html')
 
@@ -199,8 +208,11 @@ def host_edit(request):
 
         a = Asset.objects.get(id=int(offset))
         if j_type == 'M':
+            if post.password == request.POST.get('j_password'):
+                j_password = post.password
+            else:
+                j_password = cryptor.encrypt(request.POST.get('j_password'))
             j_user = request.POST.get('j_user')
-            j_password = cryptor.encrypt(request.POST.get('j_password'))
             a.ip = j_ip
             a.port = j_port
             a.login_type = j_type
