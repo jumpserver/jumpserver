@@ -527,31 +527,28 @@ def user_add(request):
 
 
 @require_admin
-def user_list(request, option=""):
+def user_list(request):
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
     header_title, path1, path2 = '查看用户', '用户管理', '用户列表'
     keyword = request.GET.get('keyword', '')
     gid = request.GET.get('gid', '')
     did = request.GET.get('did', '')
-    if option == "search":
-        contact_list = User.objects.filter(Q(username__icontains=keyword) | Q(name__icontains=keyword)).order_by('name')
-    elif option == "group":
+    contact_list = User.objects.all().order_by('name')
+
+    if gid:
         user_group = UserGroup.objects.filter(id=gid)
         if user_group:
             user_group = user_group[0]
-            contact_list = user_group.user_set.all().order_by('name')
-        else:
-            contact_list = []
-    elif option == "dept":
+            contact_list = user_group.user_set.all()
+
+    if did:
         dept = DEPT.objects.filter(id=did)
         if dept:
             dept = dept[0]
             contact_list = dept.user_set.all().order_by('name')
-        else:
-            contact_list = []
-    else:
-        print option
-        contact_list = User.objects.all().order_by('name')
+
+    if keyword:
+        contact_list = contact_list.filter(Q(username__icontains=keyword) | Q(name__icontains=keyword)).order_by('name')
 
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
 

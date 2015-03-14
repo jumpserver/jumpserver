@@ -65,7 +65,7 @@
                                     <input type="checkbox"  name="selected" value="{{ dept.id }}">
                                 </td>
                                 <td class="text-center"> {{ dept.name }} </td>
-                                <td class="text-center"> {{ dept.id | dept_group_num}} </td>
+                                <td class="text-center"> <a href="/juser/">{{ dept.id | dept_group_num}}</a> </td>
                                 <td class="text-center"> {{ dept.id | dept_user_num}} </td>
                                 <td class="text-center"> {{ dept.id | dept_asset_num}} </td>
                                 <td class="text-center"> {{ dept.comment }} </td>
