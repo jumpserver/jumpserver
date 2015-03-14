@@ -83,12 +83,23 @@ def member_count(group_id):
     group = UserGroup.objects.get(id=group_id)
     return group.user_set.count()
 
-@register.filter(name='dept_member')
-def dept_member(dept_id):
+
+@register.filter(name='dept_user_num')
+def dept_user_num(dept_id):
     dept = DEPT.objects.filter(id=dept_id)
     if dept:
         dept = dept[0]
         return dept.user_set.count()
+    else:
+        return 0
+
+
+@register.filter(name='dept_group_num')
+def dept_group_num(dept_id):
+    dept = DEPT.objects.filter(id=dept_id)
+    if dept:
+        dept = dept[0]
+        return dept.usergroup_set.all().count()
     else:
         return 0
 
@@ -99,8 +110,8 @@ def perm_count(group_id):
     return group.perm_set.count()
 
 
-@register.filter(name='dept_perm_count')
-def dept_perm_count(dept_id):
+@register.filter(name='dept_asset_num')
+def dept_asset_num(dept_id):
     dept = DEPT.objects.filter(id=dept_id)
     if dept:
         dept = dept[0]

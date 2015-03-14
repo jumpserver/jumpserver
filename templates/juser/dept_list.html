@@ -51,7 +51,9 @@
                                     <input type="checkbox" id="select_all" onclick="selectAll()"  name="select_all">
                                 </th>
                                 <th class="text-center">部门名称</th>
+                                <th class="text-center">小组数目</th>
                                 <th class="text-center">成员数目</th>
+                                <th class="text-center">主机数目</th>
                                 <th class="text-center">备注</th>
                                 <th class="text-center">操作</th>
                             </tr>
@@ -63,10 +65,11 @@
                                     <input type="checkbox"  name="selected" value="{{ dept.id }}">
                                 </td>
                                 <td class="text-center"> {{ dept.name }} </td>
-                                <td class="text-center"> {{ dept.id | dept_member }} </td>
+                                <td class="text-center"> {{ dept.id | dept_group_num}} </td>
+                                <td class="text-center"> {{ dept.id | dept_user_num}} </td>
+                                <td class="text-center"> {{ dept.id | dept_asset_num}} </td>
                                 <td class="text-center"> {{ dept.comment }} </td>
                                 <td class="text-center">
-                                    <a href="../user_list/dept/?did={{ dept.id }}" class="btn btn-xs btn-primary">成员</a>
                                     <a href="../dept_edit/?id={{ dept.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a href="../dept_del/?id={{ dept.id }}" class="btn btn-xs btn-danger">删除</a>
                                 </td>
