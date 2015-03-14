@@ -1,6 +1,6 @@
 import datetime
 from django.db import models
-from juser.models import UserGroup
+from juser.models import UserGroup, DEPT
 
 
 class IDC(models.Model):
@@ -17,6 +17,7 @@ class BisGroup(models.Model):
         ('A', 'ASSET'),
     )
     name = models.CharField(max_length=80, unique=True)
+    dept = models.ForeignKey(DEPT)
     comment = models.CharField(max_length=160, blank=True, null=True)
     type = models.CharField(max_length=1, choices=GROUP_TYPE, default='P')
 
@@ -27,14 +28,12 @@ class BisGroup(models.Model):
 class Asset(models.Model):
     LOGIN_TYPE_CHOICES = (
         ('L', 'LDAP'),
-        ('S', 'SSH_KEY'),
-        ('P', 'PASSWORD'),
         ('M', 'MAP'),
     )
     ip = models.IPAddressField(unique=True)
     port = models.SmallIntegerField(max_length=5)
     idc = models.ForeignKey(IDC)
-    user_group = models.ManyToManyField(UserGroup)
+    dept = models.ManyToManyField(DEPT)
     bis_group = models.ManyToManyField(BisGroup)
     login_type = models.CharField(max_length=1, choices=LOGIN_TYPE_CHOICES, default='L')
     username = models.CharField(max_length=20, blank=True, null=True)

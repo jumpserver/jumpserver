@@ -28,6 +28,7 @@
                             <tr>
                                 <th class="text-center"><input id="checkall" type="checkbox" class="i-checks" name="checkall" value="checkall" data-editable='false' onclick="check_all('contents_form')"></th>
                                 <th class="text-center"> 主机组名 </th>
+                                <th class="text-center"> 所属部门 </th>
                                 <th class="text-center"> 主机数量 </th>
                                 <th class="text-center"> 备注 </th>
                                 <th class="text-center"> 操作 </th>
@@ -38,6 +39,7 @@
                             <tr class="gradeX">
                                 <td class="text-center" name="j_id" value="{{ post.id }}" data-editable='false'><input name="id" value="{{ post.id }}" type="checkbox" class="i-checks"></td>
                                 <td class="text-center"> {{ post.name }} </td>
+                                <td class="text-center"> {{ post.dept.name }} </td>
                                 <td class="text-center"> <a href="/jasset/group_detail/?id={{ post.id }}">{{ post.asset_set.count }}</a> </td>
                                 <td class="text-center"> {{ post.comment }} </td>
                                 <td class="text-center">

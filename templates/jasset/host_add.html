@@ -57,8 +57,6 @@
                                         <div class="form-group"><label class="col-sm-2 control-label"> 登录方式<span class="red-fonts">*</span> </label>
                                             <div class="col-sm-8">
                                                 <div class="radio i-checks"><label> <input type="radio" id="L" checked="" value="L" name="j_type" onclick="show(this)"> <i> LDAP </i></label></div>
-                                                <div class="radio i-checks"><label> <input type="radio" id="S" value="S" name="j_type" onclick="show(this)"> <i> SSH_KEY </i></label></div>
-                                                <div class="radio i-checks"><label> <input type="radio" id="P" value="P" name="j_type" onclick="show(this)"> <i> PASSWORD </i></label></div>
                                                 <div class="radio i-checks"><label> <input type="radio" id="M" value="M" name="j_type" onclick="show(this)"> <i> MAP </i></label></div>
                                             </div>
 
@@ -81,6 +79,18 @@
                                                 <select id="j_idc" name="j_idc" class="form-control m-b">
                                                     {% for i in eidc %}
                                                         <option> {{ i }} </option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label for="j_dept" class="col-lg-2 control-label">所属部门<span class="red-fonts">*</span></label>
+                                            <div class="col-sm-8">
+                                                <select id="j_dept" name="j_dept" class="form-control m-b" multiple size="10">
+                                                    {% for d in edept %}
+                                                        <option type="checkbox" value="{{ d.name }}">{{ d.name }} {% if d.comment %} --- {{ d.comment }} {% endif %}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>

@@ -16,13 +16,25 @@
                         <div class="alert alert-success text-center">{{ smg }}</div>
                     {% endif %}
                     <form id="assetForm" method="post" class="form-horizontal">
-                        <div class="form-group"><label class="col-sm-2 control-label"> 主机组名 </label>
+                        <div class="form-group"><label class="col-sm-2 control-label"> 主机组名<span class="red-fonts">*</span></label>
                             <div class="col-sm-8" name="group_id" value="{{ post.id }}"><input type="text" value="{{ group.name }}" placeholder="网站" name="j_group" class="form-control"></div>
                         </div>
 
                         <div class="hr-line-dashed"></div>
                         <div class="form-group">
-                            <label for="groups" class="col-lg-2 control-label">主机</label>
+                            <label for="j_dept" class="col-lg-2 control-label">所属部门<span class="red-fonts">*</span></label>
+                            <div class="col-sm-8">
+                                <select id="j_dept" name="j_dept" class="form-control m-b">
+                                    {% for d in edept %}
+                                        <option type="checkbox" value="{{ d.name }}">{{ d.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="groups" class="col-lg-2 control-label">主机<span class="red-fonts">*</span></label>
                             <div class="col-sm-3">
                                 <select id="groups" size="12" class="form-control m-b" multiple>
                                     {% for post in posts %}

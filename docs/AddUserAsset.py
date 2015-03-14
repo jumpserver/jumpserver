@@ -12,10 +12,29 @@ django.setup()
 
 from juser.views import db_add_user, md5_crypt, CRYPTOR, db_add_group
 from jasset.models import Asset, IDC, BisGroup
-from juser.models import UserGroup, DEPT
+from juser.models import UserGroup, DEPT, User
 from jasset.views import jasset_group_add
 from jperm.models import CmdGroup
 from jlog.models import Log
+
+
+def install():
+    IDC.objects.create(name='ALL', comment='ALL')
+    IDC.objects.create(name='默认', comment='默认')
+    DEPT.objects.create(name="默认", comment="默认部门")
+    DEPT.objects.create(name="超管部", comment="超级管理员部门")
+    dept = DEPT.objects.get(name='超管部')
+    dept2 = DEPT.objects.get(name='默认')
+    UserGroup.objects.create(name='ALL', dept=dept, comment='ALL')
+    UserGroup.objects.create(name='默认', dept=dept, comment='默认')
+
+    BisGroup.objects.create(name='ALL', dept=dept, comment='ALL')
+    BisGroup.objects.create(name='默认', dept=dept, comment='默认')
+
+    User(id=5000, username="admin", password=md5_crypt('admin'),
+         name='admin', email='admin@jumpserver.org', role='SU', is_active=True, dept=dept).save()
+    User(id=5001, username="group_admin", password=md5_crypt('group_admin'),
+         name='group_admin', email='group_admin@jumpserver.org', role='DA', is_active=True, dept=dept2).save()
 
 
 def test_add_idc():
@@ -67,11 +86,10 @@ def test_add_user():
 
 
 def test_add_asset_group():
-    BisGroup.objects.create(name='ALL', type='A', comment='ALL')
-    user_all = Asset.objects.all()
+    dept = DEPT.objects.get(name='默认')
     for i in range(1, 20):
         name = 'AssetGroup' + str(i)
-        group = BisGroup(name=name, type='A', comment=name)
+        group = BisGroup(name=name, dept=dept, comment=name)
         group.save()
         print 'Add: %s' % name
 
@@ -80,11 +98,13 @@ def test_add_asset():
     idc_all = IDC.objects.all()
     test_idc = random.choice(idc_all)
     bis_group_all = BisGroup.objects.all()
+    dept_all = DEPT.objects.all()
     for i in range(1, 500):
         ip = '192.168.1.' + str(i)
         asset = Asset(ip=ip, port=22, login_type='L', idc=test_idc, is_active=True, comment='test')
         asset.save()
         asset.bis_group = [random.choice(bis_group_all) for i in range(2)]
+        asset.dept = [random.choice(dept_all) for i in range(2)]
         print "Add: %s" % ip
 
 
@@ -108,6 +128,7 @@ def test_add_log():
 
 
 if __name__ == '__main__':
+    install()
     test_add_dept()
     test_add_group()
     test_add_user()
