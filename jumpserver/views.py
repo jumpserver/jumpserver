@@ -46,7 +46,7 @@ def getDaysByNum(num):
     for i in range(0, num):
         today = today-oneday
         li_date.append(today)
-        li_str.append(str(today)[0:10])
+        li_str.append(str(today)[5:10])
     li_date.reverse()
     li_str.reverse()
     t = (li_date, li_str)
@@ -102,12 +102,6 @@ def index(request):
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
 
-def api_user(request):
-    users = Log.objects.filter(is_finished=0).count()
-    ret = {'users': users}
-    return HttpResponse(json.dumps(ret))
-
-
 def skin_config(request):
     return render_to_response('skin_config.html')
 
@@ -131,7 +125,7 @@ def page_list_return(total, current=1):
     return range(min_page, max_page+1)
 
 
-def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment):
+def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment, j_user='', j_password=''):
     groups = []
     is_active = {u'是': '1', u'否': '2'}
     login_types = {'LDAP': 'L', 'SSH_KEY': 'S', 'PASSWORD': 'P', 'MAP': 'M'}

@@ -117,6 +117,7 @@ def log_record(username, host):
         raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 
     log = Log(user=username, host=host, log_path=log_file_path, start_time=datetime.now(), pid=pid)
+    log_file.write('Starttime is %s\n' % datetime.now())
     log.save()
     return log_file, log
 
@@ -159,6 +160,7 @@ def posix_shell(chan, username, host):
     finally:
         timestamp_end = time.time()
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)
+        log_file.write('Endtime is %s' % datetime.now())
         log_file.close()
         log.is_finished = True
         log.log_finished = False

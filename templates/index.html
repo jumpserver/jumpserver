@@ -35,10 +35,10 @@
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
                     <span class="label label-primary pull-right">Today</span>
-                    <h5>在线用户</h5>
+                    <h5>实时在线用户</h5>
                 </div>
                 <div class="ibox-content">
-                    <h1 class="no-margins"><a href="/jlog/log_list/online/">{{ online_user.count }}</a></h1>
+                    <h1 class="no-margins"><a href="/jlog/log_list/online/"> <span id="online_users"></span></a></h1>
                     <div class="stat-percent font-bold text-navy">44% <i class="fa fa-level-up"></i></div>
                     <small>Online user</small>
                 </div>
@@ -52,18 +52,19 @@
                     <h5>已连接服务器</h5>
                 </div>
                 <div class="ibox-content">
-                    <h1 class="no-margins"><a href="/jlog/log_list/online/">{{ online_host.count }}</a></h1>
+                        <h1 class="no-margins"><a href="/jlog/log_list/online/"> <span id="online_hosts"></span></a></h1>
                     <div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>
                     <small>Connect host</small>
                 </div>
             </div>
         </div>
-        <div id="top10" style="width:100%;height:400px;"></div>
-        <div id="usertop10" style="width:100%;height:400px;margin-top:170px"></div>
-        <br/>
-        <div id="hosttop10" style="width:100%;height:400px;"></div>
-        <br/>
-        <div id="dynamic" style="width:100%;height:400px;"></div>
+        <div class="row">
+            <div class="col-lg-6" id="top10" style="width:50%;height:400px;"></div>
+            <div class="col-lg-6" id="usertop10" style="width:50%;height:400px;"></div>
+        </div>
+        <div class="row">
+            <div class="col-lg-6" id="hosttop10" style="width:50%;height:400px; margin-top: 20px"></div>
+        </div>
     </div>
 </div>
 
@@ -71,8 +72,11 @@
 var cate = {{ li_str|safe }};
 $(function () {
     $('#top10').highcharts({
+        chart: {
+            type: 'column'
+        },
         title: {
-            text: '数据总览',
+            text: '一周数据总览',
             x: -20 //center
         },
         subtitle: {
@@ -100,12 +104,6 @@ $(function () {
         },
         tooltip: {
             valueSuffix: '次'
-        },
-        legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle',
-            borderWidth: 0
         },
         navigation: {
             buttonOptions: {
@@ -149,12 +147,6 @@ $(function () {
         tooltip: {
             valueSuffix: '次'
         },
-        legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle',
-            borderWidth: 0
-        },
         series: [
             {% for k,v in user_dic.items %}
                 {
@@ -192,12 +184,6 @@ $(function () {
         tooltip: {
             valueSuffix: '次'
         },
-        legend: {
-            layout: 'vertical',
-            align: 'right',
-            verticalAlign: 'middle',
-            borderWidth: 0
-        },
         series: [
             {% for k,v in host_dic.items %}
                 {
@@ -208,85 +194,27 @@ $(function () {
         ]
     });
 
-
-    $(document).ready(function() {
-        Highcharts.setOptions({
-            global: {
-                useUTC: false
+    function magic_number(value, id) {
+        var num = $("#"+id);
+        num.animate({count: value}, {
+            duration: 500,
+            step: function() {
+                num.text(String(parseInt(this.count)));
             }
         });
+    };
 
-        var chart;
-        $('#dynamic').highcharts({
-            chart: {
-                type: 'spline',
-                animation: Highcharts.svg, // don't animate in old IE
-                marginRight: 10,
-                events: {
-                    load: function () {
-                        var series = this.series[0];
-                        setInterval(function () {
-                            jQuery.getJSON('api/user/', function (data) {
-                                var users = data.users;
-                                var x = (new Date()).getTime(), // current time
-                                        y = users;
-                                console.log(users)
-                                series.addPoint([x, y], true, true);
-                            });
-                        }, 3000);
-                    }
-                }
-            },
-            title: {
-                text: '实时在线用户统计'
-            },
-            xAxis: {
-                type: 'datetime',
-                tickPixelInterval: 150
-            },
-            yAxis: {
-                min: 0,
-                title: {
-                    text: '用户数量'
-                },
-                plotLines: [{
-                    value: 0,
-                    width: 1,
-                    color: '#808080'
-                }]
-            },
-            tooltip: {
-                formatter: function() {
-                        return '<b>'+ this.series.name +'</b><br/>'+
-                        Highcharts.dateFormat('%Y-%m-%d %H:%M:%S', this.x) +'<br/>'+
-                        Highcharts.numberFormat(this.y);
-                }
-            },
-            legend: {
-                enabled: false
-            },
-            exporting: {
-                enabled: false
-            },
-            series: [{
-                name: '实时在线用户数量',
-                data: (function() {
-                    // generate an array of random data
-                    var data = [],
-                        time = (new Date()).getTime(),
-                        i;
-
-                    for (i = -19; i <= 0; i++) {
-                        data.push({
-                            x: time + i * 1000,
-                            y: 0
-                        });
-                    }
-                    return data;
-                })()
-            }]
+    function update() {
+        $.getJSON('api/user/',  function(data) {
+            var users = data.users;
+            var hosts = data.hosts;
+            magic_number(users, 'online_users');
+            magic_number(hosts, 'online_hosts')
         });
-    });
+    };
+
+    setInterval(update, 5000); //5秒钟执行一次
+    update();
 
 });
 </script>

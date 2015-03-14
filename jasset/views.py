@@ -22,7 +22,8 @@ def index(request):
 def f_add_host(ip, port, idc, jtype, group, active, comment, username='', password=''):
     groups = []
     idc = IDC.objects.get(name=idc)
-    if type == 'M':
+    if jtype == 'M':
+        print username, password
         a = Asset(ip=ip, port=port,
                   login_type=jtype, idc=idc,
                   is_active=int(active),
@@ -135,7 +136,15 @@ def batch_host_edit(request):
             j_active = request.POST.get(j_active).strip()
             j_comment = request.POST.get(j_comment).strip()
 
-            jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment)
+            if j_type == 'M':
+                j_user = "editable[" + str(i) + "][j_user]"
+                j_password = "editable[" + str(i) + "][j_password]"
+                j_user = request.POST.get(j_user).strip()
+                password = request.POST.get(j_password).strip()
+                j_password = cryptor.encrypt(password)
+                jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment, j_user, j_password)
+            else:
+                jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment)
 
         return render_to_response('jasset/host_list.html')
 
@@ -143,8 +152,15 @@ def batch_host_edit(request):
 def list_host(request):
     header_title, path1, path2 = u'查看主机', u'资产管理', u'查看主机'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
-    posts = Asset.objects.all().order_by('ip')
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+    keyword = request.GET.get('keyword', '')
+    if keyword:
+        posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
+                     Q(bis_group__name__contains=keyword) | Q(comment__contains=keyword)).distinct().order_by('ip')
+        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+
+    else:
+        posts = Asset.objects.all().order_by('ip')
+        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     return render_to_response('jasset/host_list.html', locals(), context_instance=RequestContext(request))
 
@@ -192,8 +208,11 @@ def host_edit(request):
 
         a = Asset.objects.get(id=int(offset))
         if j_type == 'M':
+            if post.password == request.POST.get('j_password'):
+                j_password = post.password
+            else:
+                j_password = cryptor.encrypt(request.POST.get('j_password'))
             j_user = request.POST.get('j_user')
-            j_password = cryptor.encrypt(request.POST.get('j_password'))
             a.ip = j_ip
             a.port = j_port
             a.login_type = j_type
@@ -245,9 +264,41 @@ def add_idc(request):
 
 def list_idc(request):
     header_title, path1, path2 = u'查看IDC', u'资产管理', u'查看IDC'
-    posts = IDC.objects.all().order_by('id')
+    keyword = request.GET.get('keyword', '')
+    if keyword:
+        posts = IDC.objects.filter(Q(name__contains=keyword) | Q(comment__contains=keyword))
+    else:
+        posts = IDC.objects.all().order_by('id')
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
     return render_to_response('jasset/idc_list.html', locals(), context_instance=RequestContext(request))
+
+
+def edit_idc(request):
+    header_title, path1, path2 = u'编辑IDC', u'资产管理', u'编辑IDC'
+    edit = 1
+    idc_id = request.GET.get('id')
+    j_idc = IDC.objects.get(id=idc_id)
+    default = IDC.objects.get(name='默认').asset_set.all()
+    eposts = contact_list = Asset.objects.filter(idc=j_idc).order_by('ip')
+    posts = [g for g in default if g not in eposts]
+    if request.method == 'POST':
+        j_group = request.POST.get('j_idc')
+        j_hosts = request.POST.getlist('j_hosts')
+        j_comment = request.POST.get('j_comment')
+        idc_default = request.POST.getlist('idc_default')
+
+        for host in j_hosts:
+            g = Asset.objects.get(id=host)
+            Asset.objects.filter(id=host).update(idc=j_idc)
+
+        for host in idc_default:
+            g = Asset.objects.get(id=host)
+            i = IDC.objects.get(name='默认')
+            Asset.objects.filter(id=host).update(idc=i)
+
+        return HttpResponseRedirect('/jasset/idc_detail/?id=%s' % idc_id)
+
+    return render_to_response('jasset/idc_add.html', locals(), context_instance=RequestContext(request))
 
 
 def del_idc(request, offset):
@@ -287,7 +338,11 @@ def add_group(request):
 
 def list_group(request):
     header_title, path1, path2 = u'查看主机组', u'资产管理', u'查看主机组'
-    posts = BisGroup.objects.filter(type='A').order_by('id')
+    keyword = request.GET.get('keyword', '')
+    if keyword:
+        posts = BisGroup.objects.filter(Q(name__contains=keyword) | Q(comment__contains=keyword))
+    else:
+        posts = BisGroup.objects.filter(type='A').order_by('id')
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     return render_to_response('jasset/group_list.html', locals(), context_instance=RequestContext(request))
@@ -372,8 +427,6 @@ def group_del(request, offset):
         gid = int(offset)
         BisGroup.objects.filter(id=gid).delete()
     return HttpResponseRedirect('/jasset/jgroup_list/')
-
-
 
 
 def host_search(request):

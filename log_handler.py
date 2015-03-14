@@ -2,6 +2,7 @@
 #coding: utf-8
 
 import os
+import re
 import time
 import psutil
 from datetime import datetime
@@ -15,14 +16,21 @@ from jlog.models import Log
 
 def log_hanler(id):
     log = Log.objects.get(id=id)
+    pattern = re.compile(r'\[.*@.*\][\$#].*')
     if log:
         filename = log.log_path
         if os.path.isfile(filename):
-            ret1 = os.system('cat %s | grep "DateTime" > %s.his' % (filename, filename))
-            ret2 = os.system('cat %s | grep "\[.*@.*\][\$\#]" >> %s.his' % (filename, filename))
-            ret3 = os.system('cat %s | grep "EndTime" >> %s.his' % (filename, filename))
-            if (ret1 + ret2 + ret3) == 0:
-                print 'Handler %s ok.' % filename
+            f_his = filename + '.his'
+            f1 = open(filename)
+            f2 = open(f_his, 'a')
+            lines = f1.readlines()
+            for line in lines[7:]:
+                match = pattern.match(line)
+                if match:
+                    newline = re.sub('\[[A-Z]', '', line)
+                    f2.write(newline)
+            f1.close()
+            f2.close()
             log.log_finished = True
             log.save()
 

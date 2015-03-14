@@ -114,7 +114,7 @@ if __name__ == '__main__':
     test_add_idc()
     test_add_asset_group()
     test_add_asset()
-   # test_add_log()
+    test_add_log()
 
 
 

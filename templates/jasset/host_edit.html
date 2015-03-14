@@ -56,15 +56,25 @@
                                 {% endfor %}
                             </div>
 
-                            <div name="a1" id=a1 style="display:none;">
+                            {% ifequal post.login_type M %}
                                 <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 普通用户名 </label>
-                                    <div class="col-sm-6"><input type="text" name="j_user" placeholder="lilei" class="form-control"></div>
+                                    <div class="col-sm-6"><input type="text" name="j_user" value="{{ post.username }}" class="form-control"></div>
                                 </div>
 
                                 <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 普通用户密码 </label>
-                                    <div class="col-sm-6"><input type="password" name="j_password" placeholder="Password" class="form-control"></div>
+                                    <div class="col-sm-6"><input type="password" name="j_password" value="{{ post.password }}" class="form-control"></div>
                                 </div>
-                            </div>
+                            {% else %}
+                                <div name="a1" id=a1 style="display:none;">
+                                    <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 普通用户名 </label>
+                                        <div class="col-sm-6"><input type="text" name="j_user" placeholder="lilei" class="form-control"></div>
+                                    </div>
+
+                                    <div class="form-group"><label class="col-sm-2 col-sm-offset-1 control-label"> 普通用户密码 </label>
+                                        <div class="col-sm-6"><input type="password" name="j_password" placeholder="Password" class="form-control"></div>
+                                    </div>
+                                </div>
+                            {% endifequal %}
                         </div>
 
                         <div class="hr-line-dashed"></div>
@@ -177,19 +187,7 @@ $('#assetForm').validator({
             msg: {required: "请填写用户名"}
         },
         "j_password": {
-            rule: "required(type_m);length[6~16]",
-            tip: "密码6-16位",
-            ok: "",
-            msg: {required: "6-16位"}
-        },
-        "j_root": {
-            rule: "required(type_m)",
-            tip: "超管用户名",
-            ok: "",
-            msg: {required: "请填写用户名"}
-        },
-        "j_passwd": {
-            rule: "required(type_m);length[6~16]",
+            rule: "required(type_m);length[6~100]",
             tip: "密码6-16位",
             ok: "",
             msg: {required: "6-16位"}

@@ -1,8 +1,13 @@
 #coding: utf-8
 
 from django.http import HttpResponseRedirect
+import json
+
+from django.http import HttpResponse
+
 from juser.models import User, UserGroup
 from jasset.models import Asset, BisGroup
+from jlog.models import Log
 
 
 def user_perm_group_api(user):
@@ -85,3 +90,10 @@ def is_group_admin(request):
         return True
     else:
         return False
+
+def api_user(request):
+    hosts = Log.objects.filter(is_finished=0).count()
+    users = Log.objects.filter(is_finished=0).values('user').distinct().count()
+    ret = {'users': users, 'hosts': hosts}
+    json_data = json.dumps(ret)
+    return HttpResponse(json_data)
