@@ -21,8 +21,7 @@ from juser.models import UserGroup, User, DEPT
 from connect import BASE_DIR
 from connect import CONF
 from jumpserver.views import md5_crypt, LDAPMgmt, LDAP_ENABLE, ldap_conn, page_list_return, pages
-from jumpserver.api import user_perm_group_api, require_login, require_super_user, \
-    require_admin, is_group_admin, is_super_user, CRYPTOR
+from jumpserver.api import *
 
 if LDAP_ENABLE:
     LDAP_HOST_URL = CONF.get('ldap', 'host_url')
@@ -31,7 +30,7 @@ if LDAP_ENABLE:
     LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
 
 
-def gen_rand_wd(num):
+def gen_rand_pwd(num):
     """生成随机密码"""
     seed = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     salt_list = []
@@ -236,6 +235,17 @@ def dept_list(request):
     return render_to_response('juser/dept_list.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
+def dept_list_adm(request):
+    header_title, path1, path2 = '查看部门', '用户管理', '查看部门'
+    user, dept = get_session_user_dept(request)
+    contact_list = [dept]
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
+
+    return render_to_response('juser/dept_list.html', locals(), context_instance=RequestContext(request))
+
+
+
 @require_super_user
 def dept_detail(request):
     dept_id = request.GET.get('id', None)
@@ -363,13 +373,20 @@ def group_add(request):
 
 
 @require_super_user
-def group_list_su(request):
+def group_list(request):
     header_title, path1, path2 = '查看小组', '用户管理', '查看小组'
     keyword = request.GET.get('search', '')
+    did = request.GET.get('did', '')
+    contact_list = UserGroup.objects.all().order_by('name')
+
+    if did:
+        dept = DEPT.objects.filter(id=did)
+        if dept:
+            dept = dept[0]
+            contact_list = dept.usergroup_set.all()
+
     if keyword:
-        contact_list = UserGroup.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
-    else:
-        contact_list = UserGroup.objects.all().order_by('name')
+        contact_list = contact_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
 
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
     return render_to_response('juser/group_list.html', locals(), context_instance=RequestContext(request))
@@ -379,11 +396,12 @@ def group_list_su(request):
 def group_list_adm(request):
     header_title, path1, path2 = '查看部门小组', '用户管理', '查看小组'
     keyword = request.GET.get('search', '')
-    user_id = request.session.get('user_id')
+    did = request.GET.get('did', '')
+    user, dept = get_session_user_dept(request)
+    contact_list = dept.usergroup_set.all().order_by('name')
+
     if keyword:
-        contact_list = UserGroup.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
-    else:
-        contact_list = UserGroup.objects.all().order_by('name')
+        contact_list = contact_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
 
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
     return render_to_response('juser/group_list.html', locals(), context_instance=RequestContext(request))
@@ -445,13 +463,28 @@ def group_edit(request):
     else:
         group_id = request.POST.get('group_id', '')
         group_name = request.POST.get('group_name', '')
+        dept_id = request.POST.get('dept_id', '')
         comment = request.POST.get('comment', '')
         users_selected = request.POST.getlist('users_selected')
 
+        users = []
         try:
             if '' in [group_id, group_name]:
                 raise AddError('组名不能为空')
-            UserGroup.objects.filter(id=group_id).update(name=group_name, comment=comment)
+            dept = DEPT.objects.filter(id=dept_id)
+            if dept:
+                dept = dept[0]
+            else:
+                raise AddError('部门不存在')
+            for user_id in users_selected:
+                users.extend(User.objects.filter(id=user_id))
+
+            user_group = UserGroup.objects.filter(id=group_id)
+            if user_group:
+                user_group.update(name=group_name, comment=comment, dept=dept)
+                user_group = user_group[0]
+                user_group.user_set.clear()
+                user_group.user_set = users
 
         except AddError, e:
             error = e

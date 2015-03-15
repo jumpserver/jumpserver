@@ -9,6 +9,7 @@ from Crypto.Cipher import AES
 from binascii import b2a_hex, a2b_hex
 import ldap
 from ldap import modlist
+import hashlib
 
 from django.http import HttpResponse, Http404
 
@@ -25,33 +26,7 @@ SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys')
 SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
 KEY = CONF.get('web', 'key')
 LOGIN_NAME = getpass.getuser()
-
-
-class PyCrypt(object):
-    """This class used to encrypt and decrypt password."""
-
-    def __init__(self, key):
-        self.key = key
-        self.mode = AES.MODE_CBC
-
-    def encrypt(self, text):
-        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
-        length = 16
-        try:
-            count = len(text)
-        except TypeError:
-            raise ServerError('Encrypt password error, TYpe error.')
-        add = (length - (count % length))
-        text += ('\0' * add)
-        ciphertext = cryptor.encrypt(text)
-        return b2a_hex(ciphertext)
-
-
-CRYPTOR = PyCrypt(KEY)
-
-
-class ServerError(Exception):
-    pass
+LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
 
 
 class LDAPMgmt():
@@ -111,8 +86,54 @@ class LDAPMgmt():
         return plain_text.rstrip('\0')
 
 
+if LDAP_ENABLE:
+    LDAP_HOST_URL = CONF.get('ldap', 'host_url')
+    LDAP_BASE_DN = CONF.get('ldap', 'base_dn')
+    LDAP_ROOT_DN = CONF.get('ldap', 'root_dn')
+    LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
+    ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
+else:
+    ldap_conn = None
 
 
+def md5_crypt(string):
+    return hashlib.new("md5", string).hexdigest()
+
+
+def get_session_user_dept(request):
+    user_id = request.session.get('user_id', '')
+    user = User.objects.filter(id=user_id)
+    if user:
+        user = user[0]
+        dept = user.dept
+        return user, dept
+
+
+class PyCrypt(object):
+    """This class used to encrypt and decrypt password."""
+
+    def __init__(self, key):
+        self.key = key
+        self.mode = AES.MODE_CBC
+
+    def encrypt(self, text):
+        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
+        length = 16
+        try:
+            count = len(text)
+        except TypeError:
+            raise ServerError('Encrypt password error, TYpe error.')
+        add = (length - (count % length))
+        text += ('\0' * add)
+        ciphertext = cryptor.encrypt(text)
+        return b2a_hex(ciphertext)
+
+
+CRYPTOR = PyCrypt(KEY)
+
+
+class ServerError(Exception):
+    pass
 
 
 def require_login(func):

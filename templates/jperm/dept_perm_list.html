@@ -58,11 +58,11 @@
                         {% for dept in contacts.object_list %}
                             <tr class="gradeX">
                                 <td class="text-center"> {{ dept.name }} </td>
-                                <td class="text-center"> {{ dept.id | dept_user_num }} </td>
+                                <td class="text-center"><a href="/juser/user_list/?did={{ dept.id }}">{{ dept.id | dept_user_num }} </a> </td>
                                 <td class="text-center"> {{ dept.id | dept_asset_num }} </td>
                                 <td class="text-center"> {{ dept.comment }} </td>
                                 <td class="text-center">
-                                    <a title="[ {{ dept.name }} ] 成员信息" href="../dept_detail/?id={{ dept.id }}" class="iframe btn btn-xs btn-primary">主机</a>
+{#                                    <a title="[ {{ dept.name }} ] 成员信息" href="../dept_detail/?id={{ dept.id }}" class="iframe btn btn-xs btn-primary">主机</a>#}
                                     <a href="../dept_perm_edit/?id={{ dept.id }}" class="btn btn-xs btn-danger">授权编辑</a>
                                 </td>
                             </tr>

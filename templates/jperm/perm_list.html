@@ -60,7 +60,7 @@
                             <tr class="gradeX">
                                 <td class="text-center"> {{ group.name }} </td>
                                 <td class="text-center"> {{ group.dept.name }} </td>
-                                <td class="text-center"> {{ group.id | member_count }} </td>
+                                <td class="text-center"><a href="/juser/user_list/?did={{ group.id }}">{{ group.id | member_count }} </a> </td>
                                 <td class="text-center"> {{ group.id | ugrp_perm_agrp_count }} </td>
                                 <td class="text-center"> {{ group.id | ugrp_perm_asset_count }} </td>
                                 <td class="text-center"> {{ group.comment }} </td>

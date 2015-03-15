@@ -1,4 +1,4 @@
-#coding: utf-8
+# coding: utf-8
 
 import hashlib
 from ConfigParser import ConfigParser
@@ -17,27 +17,7 @@ from django.template import RequestContext
 from juser.models import User, UserGroup
 from jlog.models import Log
 from jasset.models import Asset, BisGroup, IDC
-from jumpserver.api import require_admin, require_super_user, require_login, CRYPTOR, LDAPMgmt
-
-BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-CONF = ConfigParser()
-CONF.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
-
-LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
-
-
-if LDAP_ENABLE:
-    LDAP_HOST_URL = CONF.get('ldap', 'host_url')
-    LDAP_BASE_DN = CONF.get('ldap', 'base_dn')
-    LDAP_ROOT_DN = CONF.get('ldap', 'root_dn')
-    LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
-    ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
-else:
-    ldap_conn = None
-
-
-def md5_crypt(string):
-    return hashlib.new("md5", string).hexdigest()
+from jumpserver.api import *
 
 
 def getDaysByNum(num):

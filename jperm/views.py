@@ -227,6 +227,9 @@ def sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select,
     user_groups_select_list, asset_groups_select_list, cmd_groups_select_list = \
         user_asset_cmd_groups_get(user_groups_select, asset_groups_select, cmd_groups_select)
 
+    if not LDAP_ENABLE:
+        return True
+
     users = []
     assets = []
     cmds = []
@@ -283,8 +286,9 @@ def sudo_add(request):
         cmd_groups_select = request.POST.getlist('cmd_groups_select')
         comment = request.POST.get('comment', '')
 
-        sudo_db_add(name, users_runas, user_groups_select, asset_groups_select, cmd_groups_select, comment)
-        sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select, cmd_groups_select)
+        if LDAP_ENABLE:
+            sudo_db_add(name, users_runas, user_groups_select, asset_groups_select, cmd_groups_select, comment)
+            sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select, cmd_groups_select)
 
         msg = '添加成功'
     return render_to_response('jperm/sudo_add.html', locals(), context_instance=RequestContext(request))
@@ -335,10 +339,11 @@ def sudo_edit(request):
 
         sudo_perm = SudoPerm.objects.get(id=sudo_perm_id)
         old_name = sudo_perm.name
-        sudo_db_update(sudo_perm_id, name, users_runas, user_groups_select,
-                       asset_groups_select, cmd_groups_select, comment)
-        sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select,
-                      cmd_groups_select, update=True, old_name=str(old_name))
+        if LDAP_ENABLE:
+            sudo_db_update(sudo_perm_id, name, users_runas, user_groups_select,
+                           asset_groups_select, cmd_groups_select, comment)
+            sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select,
+                          cmd_groups_select, update=True, old_name=str(old_name))
         msg = '修改成功'
 
         return HttpResponseRedirect('/jperm/sudo_list/')
