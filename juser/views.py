@@ -444,13 +444,63 @@ def group_update_member(group_id, users_id_list):
             group.user_set.add(user)
 
 
-@require_admin
+@require_super_user
 def group_edit(request):
     error = ''
     msg = ''
     header_title, path1, path2 = '修改小组信息', '用户管理', '编辑小组'
     if request.method == 'GET':
         group_id = request.GET.get('id', '')
+        group = UserGroup.objects.filter(id=group_id)
+        if group:
+            group = group[0]
+            dept_all = DEPT.objects.all()
+            users_all = User.objects.all()
+            users_selected = group.user_set.all()
+            users = [user for user in users_all if user not in users_selected]
+
+        return render_to_response('juser/group_edit.html', locals(), context_instance=RequestContext(request))
+    else:
+        group_id = request.POST.get('group_id', '')
+        group_name = request.POST.get('group_name', '')
+        dept_id = request.POST.get('dept_id', '')
+        comment = request.POST.get('comment', '')
+        users_selected = request.POST.getlist('users_selected')
+
+        users = []
+        try:
+            if '' in [group_id, group_name]:
+                raise AddError('组名不能为空')
+            dept = DEPT.objects.filter(id=dept_id)
+            if dept:
+                dept = dept[0]
+            else:
+                raise AddError('部门不存在')
+            for user_id in users_selected:
+                users.extend(User.objects.filter(id=user_id))
+
+            user_group = UserGroup.objects.filter(id=group_id)
+            if user_group:
+                user_group.update(name=group_name, comment=comment, dept=dept)
+                user_group = user_group[0]
+                user_group.user_set.clear()
+                user_group.user_set = users
+
+        except AddError, e:
+            error = e
+
+        return HttpResponseRedirect('/juser/group_list/')
+
+
+@require_admin
+def group_edit_adm(request):
+    error = ''
+    msg = ''
+    header_title, path1, path2 = '修改小组信息', '用户管理', '编辑小组'
+    if request.method == 'GET':
+        group_id = request.GET.get('id', '')
+        if not validate(request, user_group=[group_id]):
+            return HttpResponseRedirect('/juser/group_list/')
         group = UserGroup.objects.filter(id=group_id)
         if group:
             group = group[0]

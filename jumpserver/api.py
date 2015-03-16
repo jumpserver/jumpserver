@@ -192,7 +192,6 @@ def view_splitter(request, su=None, adm=None):
     raise Http404
 
 
-
 def user_perm_group_api(user):
     if user:
         perm_list = []
@@ -233,3 +232,43 @@ def asset_perm_api(asset):
         for user_group in user_group_list:
             user_permed_list.extend(user_group.user_set.all())
         return user_permed_list
+
+
+def validate(request, user_group=None, user=None, asset_group=None, asset=None):
+    dept = get_session_user_dept(request)[1]
+    if user_group:
+        dept_user_groups = dept.usergroup_set.all()
+        user_groups = []
+        for user_group_id in user_group:
+            user_groups.extend(UserGroup.objects.filter(id=user_group_id))
+        if not set(user_groups).issubset(set(dept_user_groups)):
+            return False
+
+    if user:
+        dept_users = dept.user_set.all()
+        users = []
+        for user_id in user:
+            users.extend(User.objects.filter(id=user_id))
+
+        if not set(users).issubset(set(dept_users)):
+            return False
+
+    if asset_group:
+        dept_asset_groups = dept.bisgroup_set.all()
+        asset_groups = []
+        for asset_group_id in asset_group:
+            asset_groups.extend(BisGroup.objects.filter(id=asset_group_id))
+
+        if not set(asset_groups).issubset(set(dept_asset_groups)):
+            return False
+
+    if asset:
+        dept_assets = dept.asset_set.all()
+        assets = []
+        for asset_id in asset:
+            assets.extend(asset_id)
+
+        if not set(assets).issubset(dept_assets):
+            return False
+
+    return True
