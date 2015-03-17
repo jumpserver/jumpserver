@@ -41,7 +41,7 @@ def f_add_host(ip, port, idc, jtype, group, dept, active, comment, username='', 
     for g in group:
         c = BisGroup.objects.get(name=g)
         groups.append(c)
-    groups.extend(all_group)
+    groups.append(all_group)
 
     for d in dept:
         p = DEPT.objects.get(name=d)
