@@ -4,6 +4,7 @@ from django.db import models
 class Log(models.Model):
     user = models.CharField(max_length=20, null=True)
     host = models.CharField(max_length=20, null=True)
+    remote_ip = models.CharField(max_length=100)
     log_path = models.CharField(max_length=100)
     start_time = models.DateTimeField(null=True)
     pid = models.IntegerField(max_length=10)

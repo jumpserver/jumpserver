@@ -37,7 +37,6 @@ def f_add_host(ip, port, idc, jtype, group, dept, active, comment, username='', 
                   comment=comment)
     a.save()
 
-    jasset_group_add(ip, ip, 'P')
     all_group = BisGroup.objects.get(name='ALL')
     private_group = BisGroup.objects.get(name=ip.strip())
     for g in group:
@@ -45,9 +44,7 @@ def f_add_host(ip, port, idc, jtype, group, dept, active, comment, username='', 
         groups.append(c)
     groups.extend([all_group, private_group])
 
-    print dept
     for d in dept:
-        print d
         p = DEPT.objects.get(name=d)
         depts.append(p)
 
@@ -61,7 +58,7 @@ def add_host(request):
     header_title, path1, path2 = u'添加主机', u'资产管理', u'添加主机'
     eidc = IDC.objects.all()
     edept = DEPT.objects.all()
-    egroup = BisGroup.objects.filter(type='A')
+    egroup = BisGroup.objects.all()
     eusergroup = UserGroup.objects.all()
 
     if request.method == 'POST':
@@ -197,7 +194,7 @@ def host_edit(request):
     header_title, path1, path2 = u'修改主机', u'资产管理', u'修改主机'
     groups, e_group, e_dept, depts = [], [], [], []
     eidc = IDC.objects.all()
-    egroup = BisGroup.objects.filter(type='A')
+    egroup = BisGroup.objects.all()
     edept = DEPT.objects.all()
     offset = request.GET.get('id')
     for g in Asset.objects.get(id=int(offset)).bis_group.all():

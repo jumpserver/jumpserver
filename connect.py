@@ -3,6 +3,7 @@
 import socket
 import sys
 import os
+import ast
 import select
 import time
 from datetime import datetime
@@ -103,6 +104,12 @@ def log_record(username, host):
     log_filename = '%s_%s_%s.log' % (username, host, time_now)
     log_file_path = os.path.join(today_connect_log_dir, log_filename)
     pid = os.getpid()
+    ip_list = []
+    remote_ip = os.popen("who |grep `ps aux |gawk '{if ($2==%s) print $1}'` |gawk '{print $5}'|tr -d '()'" % pid).readlines()
+    for ip in remote_ip:
+        ip_list.append(ip.strip('\n'))
+    print ip_list
+    ip_list = list(set(ip_list))
 
     if not os.path.isdir(today_connect_log_dir):
         try:
@@ -116,7 +123,7 @@ def log_record(username, host):
     except IOError:
         raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 
-    log = Log(user=username, host=host, log_path=log_file_path, start_time=datetime.now(), pid=pid)
+    log = Log(user=username, host=host, remote_ip=ip_list, log_path=log_file_path, start_time=datetime.now(), pid=pid)
     log_file.write('Starttime is %s\n' % datetime.now())
     log.save()
     return log_file, log
