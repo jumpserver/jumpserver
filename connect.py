@@ -108,8 +108,7 @@ def log_record(username, host):
     remote_ip = os.popen("who |grep `ps aux |gawk '{if ($2==%s) print $1}'` |gawk '{print $5}'|tr -d '()'" % pid).readlines()
     for ip in remote_ip:
         ip_list.append(ip.strip('\n'))
-    print ip_list
-    ip_list = list(set(ip_list))
+    ip_list = ','.join(list(set(ip_list)))
 
     if not os.path.isdir(today_connect_log_dir):
         try:
