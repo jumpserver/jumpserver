@@ -344,9 +344,8 @@ def add_group(request):
             emg = u'该主机组已存在!'
             return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
         else:
-            BisGroup.objects.create(name=j_group, comment=j_comment)
+            BisGroup.objects.create(name=j_group, dept=j_dept, comment=j_comment)
             group = BisGroup.objects.get(name=j_group)
-            group.dept = j_dept
             for host in j_hosts:
                 g = Asset.objects.get(id=host)
                 group.asset_set.add(g)
