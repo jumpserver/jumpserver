@@ -26,7 +26,7 @@ from juser.models import User
 from jasset.models import Asset
 from jlog.models import Log
 from jumpserver.views import PyCrypt
-from jumpserver.api import user_perm_asset_api
+from jumpserver.api import user_perm_asset_api, user_perm_group_api
 
 try:
     import termios
@@ -183,6 +183,15 @@ def get_user_host(username):
     return hosts_attr
 
 
+def get_user_hostgroup(username):
+    """Get the hostgroups of under the user control."""
+    groups_attr = {}
+    group_all = user_perm_group_api(username)
+    for group in group_all:
+        groups_attr[group.name] = [group.id, group.comment]
+    return groups_attr
+
+
 def get_connect_item(username, ip):
     cryptor = PyCrypt(KEY)
 
@@ -233,8 +242,9 @@ def print_prompt():
     msg = """\033[1;32m###  Welcome Use JumpServer To Login. ### \033[0m
           1) Type \033[32mIP ADDRESS\033[0m To Login.
           2) Type \033[32mP/p\033[0m To Print The Servers You Available.
-          3) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
-          4) Type \033[32mQ/q\033[0m To Quit.
+          3) Type \033[32mG/g\033[0m To Print The Server Groups You Available.
+          4) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
+          5) Type \033[32mQ/q\033[0m To Quit.
           """
     print textwrap.dedent(msg)
 
@@ -245,6 +255,13 @@ def print_user_host(username):
     hosts.sort()
     for ip in hosts:
         print '%s -- %s' % (ip, hosts_attr[ip][1])
+
+
+def print_user_hostgroup(username):
+    group_attr = get_user_hostgroup(username)
+    groups = group_attr.keys()
+    for g in groups:
+        print '%s -- %s' % (g, group_attr[g][1])
 
 
 def connect(username, password, host, port, login_name):
@@ -361,6 +378,9 @@ if __name__ == '__main__':
                 continue
             if option in ['P', 'p']:
                 print_user_host(LOGIN_NAME)
+                continue
+            elif option in ['G', 'g']:
+                print_user_hostgroup(LOGIN_NAME)
                 continue
             elif option in ['E', 'e']:
                 exec_cmd_servers(LOGIN_NAME)

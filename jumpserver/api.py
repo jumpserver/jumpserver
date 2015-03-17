@@ -10,7 +10,8 @@ from jasset.models import Asset, BisGroup
 from jlog.models import Log
 
 
-def user_perm_group_api(user):
+def user_perm_group_api(username):
+    user = User.objects.get(username=username)
     if user:
         perm_list = []
         user_group_all = user.group.all()
