@@ -80,17 +80,26 @@ def require_admin(func):
 
 
 def is_super_user(request):
-    if request.session.get('role_id') == '2':
+    if request.session.get('role_id') == 2:
         return True
     else:
         return False
 
 
 def is_group_admin(request):
-    if request.session.get('role_id') == '1':
+    print request.session.get('role_id'), type(request.session.get('role_id'))
+    if request.session.get('role_id') == 1:
         return True
     else:
         return False
+
+
+def get_user_dept(request):
+    user_id = request.session.get('user_id')
+    if user_id:
+        user_dept = User.objects.get(id=user_id).dept
+        return user_dept.id
+
 
 def api_user(request):
     hosts = Log.objects.filter(is_finished=0).count()
