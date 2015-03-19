@@ -43,7 +43,8 @@ LOG_DIR = os.path.join(BASE_DIR, 'logs')
 SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys')
 SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
 KEY = CONF.get('web', 'key')
-LOGIN_NAME = getpass.getuser()
+#LOGIN_NAME = getpass.getuser()
+LOGIN_NAME = 'wy01'
 
 
 def color_print(msg, color='blue'):
@@ -103,6 +104,7 @@ def log_record(username, host):
     today_connect_log_dir = os.path.join(connect_log_dir, today)
     log_filename = '%s_%s_%s.log' % (username, host, time_now)
     log_file_path = os.path.join(today_connect_log_dir, log_filename)
+    dept_name = User.objects.get(username=username).dept
     pid = os.getpid()
     ip_list = []
     remote_ip = os.popen("who |grep `ps aux |gawk '{if ($2==%s) print $1}'` |gawk '{print $5}'|tr -d '()'" % pid).readlines()
@@ -122,7 +124,7 @@ def log_record(username, host):
     except IOError:
         raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 
-    log = Log(user=username, host=host, remote_ip=ip_list, log_path=log_file_path, start_time=datetime.now(), pid=pid)
+    log = Log(user=username, host=host, remote_ip=ip_list, dept_name=dept_name, log_path=log_file_path, start_time=datetime.now(), pid=pid)
     log_file.write('Starttime is %s\n' % datetime.now())
     log.save()
     return log_file, log

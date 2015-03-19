@@ -94,6 +94,13 @@ def is_group_admin(request):
         return False
 
 
+def is_common_user(request):
+    if request.session.get('role_id') == 0:
+        return True
+    else:
+        return False
+
+
 def get_user_dept(request):
     user_id = request.session.get('user_id')
     if user_id:

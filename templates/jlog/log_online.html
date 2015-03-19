@@ -77,6 +77,7 @@
                             <thead>
                                 <tr>
                                     <th class="text-center"> 用户名 </th>
+                                    <th class="text-center"> 所属部门 </th>
                                     <th class="text-center"> 登录主机 </th>
                                     <th class="text-center"> 来源IP </th>
                                     <th class="text-center"> 实时监控 </th>
@@ -89,6 +90,7 @@
                             {% for post in contacts.object_list %}
                                 <tr class="gradeX">
                                     <td id="username" class="text-center"> {{ post.user }} </td>
+                                    <td id="ip" class="text-center"> {{ post.dept_name }} </td>
                                     <td id="ip" class="text-center"> {{ post.host }} </td>
                                     <td id="ip" class="text-center"> {{ post.remote_ip }} </td>
                                     <td class="text-center"><a class="monitor" filename="{{ post.log_path }}"> 监控 </a></td>

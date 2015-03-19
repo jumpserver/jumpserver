@@ -1,18 +1,20 @@
 # coding:utf-8
 
+import ast
+
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 
 from models import IDC, Asset, BisGroup
-from juser.models import UserGroup, DEPT, User
+from juser.models import UserGroup, DEPT
 from connect import PyCrypt, KEY
 from jlog.models import Log
 from jumpserver.views import jasset_host_edit, pages
 from jumpserver.api import asset_perm_api
 from jumpserver.api import user_perm_group_api, require_login, require_super_user, \
-    require_admin, is_group_admin, is_super_user, get_user_dept
+    require_admin, is_group_admin, is_super_user, is_common_user, get_user_dept
 
 cryptor = PyCrypt(KEY)
 
@@ -61,7 +63,7 @@ def add_host(request):
     eidc = IDC.objects.all()
     if is_super_user(request):
         edept = DEPT.objects.all()
-        egroup = BisGroup.objects.all()
+        egroup = BisGroup.objects.exclude(name='ALL')
         eusergroup = UserGroup.objects.all()
     elif is_group_admin(request):
         dept_id = get_user_dept(request)
@@ -93,21 +95,20 @@ def add_host(request):
     return render_to_response('jasset/host_add.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def add_host_multi(request):
     header_title, path1, path2 = u'批量添加主机', u'资产管理', u'批量添加主机'
-    login_types = {'LDAP': 'L', 'SSH_KEY': 'S', 'PASSWORD': 'P', 'MAP': 'M'}
-    j_group = []
+    login_types = {'LDAP': 'L', 'MAP': 'M'}
+    dept_id = get_user_dept(request)
     if request.method == 'POST':
         multi_hosts = request.POST.get('j_multi').split('\n')
         for host in multi_hosts:
             if host == '':
                 break
-            j_ip, j_port, j_type, j_idc, j_groups, j_active, j_comment = host.split()
+            j_ip, j_port, j_type, j_idc, j_groups, j_depts, j_active, j_comment = host.split()
             j_type = login_types[j_type]
-            j_groups = j_groups.split(',')
-            for group in j_groups:
-                g = group.strip('[]').encode('utf-8').strip()
-                j_group.append(g)
+            j_group = ast.literal_eval(j_groups)
+            j_dept = ast.literal_eval(j_depts)
 
             if Asset.objects.filter(ip=str(j_ip)):
                 emg = u'该IP %s 已存在!' % j_ip
@@ -117,9 +118,9 @@ def add_host_multi(request):
             if j_type == 'M':
                 j_user = request.POST.get('j_user')
                 j_password = cryptor.encrypt(request.POST.get('j_password'))
-                f_add_host(j_ip, j_port, j_idc, j_type, j_group, j_active, j_comment, j_user, j_password)
+                f_add_host(j_ip, j_port, j_idc, j_type, j_group, j_dept, j_active, j_comment, j_user, j_password)
             else:
-                f_add_host(j_ip, j_port, j_idc, j_type, j_group, j_active, j_comment)
+                f_add_host(j_ip, j_port, j_idc, j_type, j_group, j_dept, j_active, j_comment)
 
         smg = u'批量添加添加成功'
         return HttpResponseRedirect('/jasset/host_list/')
@@ -127,6 +128,7 @@ def add_host_multi(request):
     return render_to_response('jasset/host_add_multi.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def batch_host_edit(request):
     if request.method == 'POST':
         len_table = request.POST.get('len_table')
@@ -161,7 +163,8 @@ def batch_host_edit(request):
 
         return render_to_response('jasset/host_list.html')
 
-@require_admin
+
+@require_login
 def list_host(request):
     header_title, path1, path2 = u'查看主机', u'资产管理', u'查看主机'
     login_types = {'L': 'LDAP', 'M': 'MAP'}
@@ -172,22 +175,23 @@ def list_host(request):
         if keyword:
             posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
                          Q(bis_group__name__contains=keyword) | Q(comment__contains=keyword)).distinct().order_by('ip')
-            contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-
         else:
             posts = Asset.objects.all().order_by('ip')
-            contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
     elif is_group_admin(request):
         if keyword:
             posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
                          Q(bis_group__name__contains=keyword) | Q(comment__contains=keyword)).filter(dept=dept).distinct().order_by('ip')
-            contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
         else:
             posts = Asset.objects.all().filter(dept=dept).order_by('ip')
-            contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+
+    elif is_common_user(request):
+        pass
     return render_to_response('jasset/host_list.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def host_del(request, offset):
     if offset == 'multi':
         len_list = request.POST.get("len_list")
@@ -205,6 +209,7 @@ def host_del(request, offset):
     return HttpResponseRedirect('/jasset/host_list/')
 
 
+@require_admin
 def host_edit(request):
     actives = {1: u'激活', 0: u'禁用'}
     login_types = {'L': 'LDAP', 'M': 'MAP'}
@@ -271,6 +276,7 @@ def host_edit(request):
     return render_to_response('jasset/host_edit.html', locals(), context_instance=RequestContext(request))
 
 
+@require_login
 def jlist_ip(request, offset):
     header_title, path1, path2 = u'主机详细信息', u'资产管理', u'主机详情'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
@@ -280,6 +286,7 @@ def jlist_ip(request, offset):
     return render_to_response('jasset/jlist_ip.html', locals(), context_instance=RequestContext(request))
 
 
+@require_super_user
 def add_idc(request):
     header_title, path1, path2 = u'添加IDC', u'资产管理', u'添加IDC'
     if request.method == 'POST':
@@ -295,6 +302,7 @@ def add_idc(request):
     return render_to_response('jasset/idc_add.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def list_idc(request):
     header_title, path1, path2 = u'查看IDC', u'资产管理', u'查看IDC'
     keyword = request.GET.get('keyword', '')
@@ -306,6 +314,7 @@ def list_idc(request):
     return render_to_response('jasset/idc_list.html', locals(), context_instance=RequestContext(request))
 
 
+@require_super_user
 def edit_idc(request):
     header_title, path1, path2 = u'编辑IDC', u'资产管理', u'编辑IDC'
     edit = 1
@@ -334,6 +343,7 @@ def edit_idc(request):
     return render_to_response('jasset/idc_add.html', locals(), context_instance=RequestContext(request))
 
 
+@require_super_user
 def del_idc(request, offset):
     if offset == 'multi':
         len_list = request.POST.get("len_list")
@@ -387,14 +397,14 @@ def list_group(request):
     keyword = request.GET.get('keyword', '')
     if is_super_user(request):
         if keyword:
-            posts = BisGroup.objects.filter(Q(name__contains=keyword) | Q(comment__contains=keyword))
+            posts = BisGroup.objects.exclude(name='ALL').filter(Q(name__contains=keyword) | Q(comment__contains=keyword))
         else:
-            posts = BisGroup.objects.all().order_by('id')
+            posts = BisGroup.objects.exclude(name='ALL').order_by('id')
     elif is_group_admin(request):
         if keyword:
             posts = BisGroup.objects.filter(Q(name__contains=keyword) | Q(comment__contains=keyword)).filter(dept=dept)
         else:
-            posts = BisGroup.objects.all().filter(dept=dept).order_by('id')
+            posts = BisGroup.objects.filter(dept=dept).order_by('id')
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
     return render_to_response('jasset/group_list.html', locals(), context_instance=RequestContext(request))
 
@@ -406,14 +416,17 @@ def edit_group(request):
     group = BisGroup.objects.get(id=group_id)
     all = Asset.objects.all()
     dept_id = get_user_dept(request)
-    edept = DEPT.objects.get(id=dept_id)
     eposts = contact_list = Asset.objects.filter(bis_group=group).order_by('ip')
+
     if is_super_user(request):
+        edept = DEPT.objects.all()
         posts = [g for g in all if g not in eposts]
+
     elif is_group_admin(request):
         dept = DEPT.objects.get(id=dept_id)
         all_dept = Asset.objects.filter(dept=dept)
         posts = [g for g in all_dept if g not in eposts]
+
     if request.method == 'POST':
         j_group = request.POST.get('j_group')
         j_hosts = request.POST.getlist('j_hosts')
@@ -430,30 +443,43 @@ def edit_group(request):
     return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def detail_group(request):
     header_title, path1, path2 = u'主机组详情', u'资产管理', u'主机组详情'
     login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
+    dept_id = get_user_dept(request)
+    dept = DEPT.objects.get(id=dept_id)
     group_id = request.GET.get('id')
     group_name = BisGroup.objects.get(id=group_id).name
     b = BisGroup.objects.get(id=group_id)
-    posts = Asset.objects.filter(bis_group=b).order_by('ip')
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+    if is_super_user(request):
+        posts = Asset.objects.filter(bis_group=b).order_by('ip')
+        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
+    elif is_group_admin(request):
+        posts = Asset.objects.filter(bis_group=b).filter(dept=dept).order_by('ip')
+        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
     return render_to_response('jasset/group_detail.html', locals(), context_instance=RequestContext(request))
 
 
 def detail_idc(request):
     header_title, path1, path2 = u'IDC详情', u'资产管理', u'IDC详情'
-    login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
+    login_types = {'L': 'LDAP', 'M': 'MAP'}
     idc_id = request.GET.get('id')
     idc_name = IDC.objects.get(id=idc_id).name
     b = IDC.objects.get(id=idc_id)
-    posts = Asset.objects.filter(idc=b).order_by('ip')
+    dept_id = get_user_dept(request)
+    dept = DEPT.objects.get(id=dept_id)
+    if is_super_user(request):
+        posts = Asset.objects.filter(idc=b).order_by('ip')
+    elif is_group_admin(request):
+        posts = Asset.objects.filter(idc=b).filter(dept=dept).order_by('ip')
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     return render_to_response('jasset/idc_detail.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def group_del_host(request, offset):
     if request.method == 'POST':
         group_name = request.POST.get('group_name')
@@ -475,6 +501,7 @@ def group_del_host(request, offset):
         return HttpResponseRedirect('/jasset/%s_detail/?id=%s' % (offset, group.id))
 
 
+@require_admin
 def group_del(request, offset):
     if offset == 'multi':
         len_list = request.POST.get("len_list")
@@ -490,10 +517,17 @@ def group_del(request, offset):
 
 def host_search(request):
     keyword = request.GET.get('keyword')
-    login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
-    posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
-                                 Q(bis_group__name__contains=keyword) | Q(
-        comment__contains=keyword)).distinct().order_by('ip')
+    login_types = {'L': 'LDAP', 'M': 'MAP'}
+    dept_id = get_user_dept(request)
+    dept = DEPT.objects.get(id=dept_id)
+    if is_super_user(request):
+        posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
+                                     Q(bis_group__name__contains=keyword) | Q(
+            comment__contains=keyword)).distinct().order_by('ip')
+    elif is_group_admin(request):
+        posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
+                                     Q(bis_group__name__contains=keyword) | Q(
+            comment__contains=keyword)).filter(dept=dept).distinct().order_by('ip')
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     return render_to_response('jasset/host_search.html', locals(), context_instance=RequestContext(request))

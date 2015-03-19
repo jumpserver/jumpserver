@@ -77,6 +77,7 @@
                             <thead>
                                 <tr>
                                     <th class="text-center"> 用户名 </th>
+                                    <th class="text-center"> 所属部门 </th>
                                     <th class="text-center"> 登录主机 </th>
                                     <th class="text-center"> 来源IP </th>
                                     <th class="text-center"> 命令统计 </th>
@@ -89,8 +90,9 @@
                             {% for post in contacts.object_list %}
                                 <tr class="gradeX">
                                     <td class="text-center" id="username"> {{ post.user }} </td>
+                                    <td class="text-center" id="dept"> {{ post.dept_name }} </td>
                                     <td class="text-center" id="ip"> {{ post.host }} </td>
-                                    <td class="text-center" id="ip"> {{ post.remote_ip }} </td>
+                                    <td class="text-center" id="remote_ip"> {{ post.remote_ip }} </td>
                                     <td class="text-center"><a href="/jlog/history/?id={{ post.id }}" class="log_command"> 命令统计 </td>
                                     <td class="text-center" id="start_time"> {{ post.start_time|date:"Y-m-d H:i:s"}} </td>
                                     <td class="text-center" id="end_time"> {{ post.end_time|date:"Y-m-d H:i:s" }} </td>
