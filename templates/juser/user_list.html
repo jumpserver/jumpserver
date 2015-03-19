@@ -73,8 +73,14 @@
                                 <td class="text-center">{{ user.is_active|bool2str }}</td>
                                 <td class="text-center">
                                     <a title="[ {{ user.name }} ] 详情" href="../user_detail/?id={{ user.id }}" class="iframe btn btn-xs btn-primary">详情</a>
+                                    {% ifequal session_role_id 2 %}
                                     <a href="../user_edit/?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a href="../user_del/?id={{ user.id }}" class="btn btn-xs btn-danger">删除</a>
+                                    {% else %}
+                                    <a href="../user_edit/?id={{ user.id }}" class="btn btn-xs btn-info {% if user.id|user_readonly %} disabled {% endif %}">编辑</a>
+                                    <a href="../user_del/?id={{ user.id }}" class="btn btn-xs btn-danger {% if user.id|user_readonly %} disabled {% endif %}">删除</a>
+                                    {% endifequal %}
+
                                 </td>
                             </tr>
                         {% endfor %}

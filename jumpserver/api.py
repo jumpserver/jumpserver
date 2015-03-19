@@ -128,6 +128,14 @@ class PyCrypt(object):
         ciphertext = cryptor.encrypt(text)
         return b2a_hex(ciphertext)
 
+    def decrypt(self, text):
+        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
+        try:
+            plain_text = cryptor.decrypt(a2b_hex(text))
+        except TypeError:
+            raise ServerError('Decrypt password error, TYpe error.')
+        return plain_text.rstrip('\0')
+
 
 CRYPTOR = PyCrypt(KEY)
 

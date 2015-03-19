@@ -46,7 +46,7 @@
                             <div class="form-group">
                                 <label for="dept_id" class="col-sm-2 control-label">部门<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <select id="dept_id" name="dept_id" class="form-control m-b">
+                                    <select id="dept_id" name="dept_id" class="form-control m-b" onchange="change_dept(this.value)">
                                         {% for dept in dept_all %}
                                             {% ifequal group.dept.id dept.id %}
                                             <option value="{{ dept.id }}" selected>{{ dept.name }}</option>
@@ -88,7 +88,7 @@
                             <div class="form-group">
                                 <label for="comment" class="col-sm-2 control-label">备注</label>
                                 <div class="col-sm-8">
-                                    <input id="comment" name="comment" placeholder="Comment" type="text" class="form-control" value="{{ comment }}">
+                                    <input id="comment" name="comment" placeholder="Comment" type="text" class="form-control" value="{{ group.comment }}">
                                 </div>
                             </div>
 
@@ -144,6 +144,16 @@ $(document).ready(function(){
         })
     })
 })
+
+function change_dept(dept_id){
+    $.get('/juser/dept_user_ajax/',
+            {'id': dept_id},
+            function(data){
+                $('#users').html(data);
+                $('#users_selected').html('')
+
+            })
+}
 
 
 </script>

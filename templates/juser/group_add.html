@@ -40,17 +40,19 @@
                                     <input id="group_name" name="group_name" placeholder="Group name" type="text" class="form-control" value="{{ group_name }}">
                                 </div>
                             </div>
+                            {% ifequal session_role_id 2 %}
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
                                 <label for="dept_id" class="col-sm-2 control-label">部门<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <select id="dept_id" name="dept_id" class="form-control m-b">
+                                    <select id="dept_id" name="dept_id" class="form-control m-b" onchange="change_dept(this.value)">
                                         {% for dept in dept_all %}
                                             <option value="{{ dept.id }}" selected>{{ dept.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
                             </div>
+                            {% endifequal %}
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
                                 <label for="users" class="col-lg-2 control-label">用户</label>
@@ -126,6 +128,16 @@ function change_type(type){
                $('#users').html(data)
            })
 }
+
+
+function change_dept(dept_id){
+    $.get('/juser/dept_user_ajax/',
+            {'id': dept_id},
+            function(data){
+                $('#users').html(data)
+            })
+}
+
 
 $(document).ready(function(){
     $("#submit_button").click(function(){

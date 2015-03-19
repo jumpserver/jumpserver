@@ -6,7 +6,7 @@ import time
 from django import template
 from juser.models import User, UserGroup, DEPT
 from jasset.models import BisGroup
-from jumpserver.api import user_perm_asset_api
+from jumpserver.api import *
 
 register = template.Library()
 
@@ -76,6 +76,16 @@ def bool2str(value):
         return u'是'
     else:
         return u'否'
+
+
+@register.filter(name='user_readonly')
+def user_readonly(user_id):
+    user = User.objects.filter(id=user_id)
+    if user:
+        user = user[0]
+        if user.role == 'CU':
+            return False
+    return True
 
 
 @register.filter(name='member_count')

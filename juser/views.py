@@ -97,11 +97,12 @@ def db_add_user(**kwargs):
 
 def db_update_user(**kwargs):
     groups_post = kwargs.pop('groups')
-    username = kwargs.get('username')
-    user = User.objects.filter(username=username)
-    user.update(**kwargs)
-    user = User.objects.get(username=username)
-    user.save()
+    user_id = kwargs.pop('user_id')
+    user = User.objects.filter(id=user_id)
+    if user:
+        user.update(**kwargs)
+        user = User.objects.get(id=user_id)
+        user.save()
 
     if groups_post:
         group_select = []
@@ -336,7 +337,21 @@ def dept_edit(request):
     return render_to_response('juser/dept_edit.html', locals(), context_instance=RequestContext(request))
 
 
-@require_admin
+def dept_user_ajax(request):
+    dept_id = request.GET.get('id', '4')
+    if dept_id not in ['1', '2']:
+        dept = DEPT.objects.filter(id=dept_id)
+        if dept:
+            dept = dept[0]
+            users = dept.user_set.all()
+    else:
+        users = User.objects.all()
+
+    return render_to_response('juser/dept_user_ajax.html', locals())
+
+
+
+@require_super_user
 def group_add(request):
     error = ''
     msg = ''
@@ -360,6 +375,37 @@ def group_add(request):
                 dept = dept[0]
             else:
                 AddError(u'部门不存在')
+
+            db_add_group(name=group_name, users=users_selected, dept=dept, comment=comment)
+        except AddError:
+            pass
+        except TypeError:
+            error = u'保存小组失败'
+        else:
+            msg = u'添加组 %s 成功' % group_name
+
+    return render_to_response('juser/group_add.html', locals(), context_instance=RequestContext(request))
+
+
+@require_admin
+def group_add_adm(request):
+    error = ''
+    msg = ''
+    header_title, path1, path2 = '添加小组', '用户管理', '添加小组'
+    user, dept = get_session_user_dept(request)
+    user_all = dept.user_set.all()
+
+    if request.method == 'POST':
+        group_name = request.POST.get('group_name', '')
+        users_selected = request.POST.getlist('users_selected', '')
+        comment = request.POST.get('comment', '')
+
+        try:
+            if not validate(request, user=users_selected):
+                raise AddError('没有某用户权限')
+            if '' in [group_name]:
+                error = u'组名不能为空'
+                raise AddError(error)
 
             db_add_group(name=group_name, users=users_selected, dept=dept, comment=comment)
         except AddError:
@@ -417,7 +463,7 @@ def group_detail(request):
     return render_to_response('juser/group_detail.html', locals(), context_instance=RequestContext(request))
 
 
-@require_admin
+@require_super_user
 def group_del(request):
     group_id = request.GET.get('id', '')
     if not group_id:
@@ -427,9 +473,24 @@ def group_del(request):
 
 
 @require_admin
+def group_del_adm(request):
+    group_id = request.GET.get('id', '')
+    if not validate(request, user_group=[group_id]):
+        return HttpResponseRedirect('/juser/group_list/')
+    if not group_id:
+        return HttpResponseRedirect('/')
+    UserGroup.objects.filter(id=group_id).delete()
+    return HttpResponseRedirect('/juser/group_list/')
+
+
+@require_admin
 def group_del_ajax(request):
     group_ids = request.POST.get('group_ids')
-    for group_id in group_ids.split(','):
+    group_ids = group_ids.split(',')
+    if request.session.get('role_id') == 1:
+        if not validate(request, user_group=group_ids):
+            return "error"
+    for group_id in group_ids:
         UserGroup.objects.filter(id=group_id).delete()
     return HttpResponse('删除成功')
 
@@ -497,6 +558,7 @@ def group_edit_adm(request):
     error = ''
     msg = ''
     header_title, path1, path2 = '修改小组信息', '用户管理', '编辑小组'
+    user, dept = get_session_user_dept(request)
     if request.method == 'GET':
         group_id = request.GET.get('id', '')
         if not validate(request, user_group=[group_id]):
@@ -504,8 +566,7 @@ def group_edit_adm(request):
         group = UserGroup.objects.filter(id=group_id)
         if group:
             group = group[0]
-            dept_all = DEPT.objects.all()
-            users_all = User.objects.all()
+            users_all = dept.user_set.all()
             users_selected = group.user_set.all()
             users = [user for user in users_all if user not in users_selected]
 
@@ -513,19 +574,17 @@ def group_edit_adm(request):
     else:
         group_id = request.POST.get('group_id', '')
         group_name = request.POST.get('group_name', '')
-        dept_id = request.POST.get('dept_id', '')
         comment = request.POST.get('comment', '')
         users_selected = request.POST.getlist('users_selected')
 
         users = []
         try:
-            if '' in [group_id, group_name]:
-                raise AddError('组名不能为空')
-            dept = DEPT.objects.filter(id=dept_id)
-            if dept:
-                dept = dept[0]
-            else:
-                raise AddError('部门不存在')
+            if not validate(request, user=users_selected):
+                raise AddError(u'右侧非部门用户')
+
+            if not validate(request, user_group=[group_id]):
+                raise AddError(u'没有权限修改本组')
+
             for user_id in users_selected:
                 users.extend(User.objects.filter(id=user_id))
 
@@ -609,7 +668,7 @@ def user_add(request):
     return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
 
 
-@require_admin
+@require_super_user
 def user_list(request):
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
     header_title, path1, path2 = '查看用户', '用户管理', '用户列表'
@@ -639,10 +698,38 @@ def user_list(request):
 
 
 @require_admin
+def user_list_adm(request):
+    user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
+    header_title, path1, path2 = '查看用户', '用户管理', '用户列表'
+    keyword = request.GET.get('keyword', '')
+    user, dept = get_session_user_dept(request)
+    gid = request.GET.get('gid', '')
+    contact_list = dept.user_set.all().order_by('name')
+
+    if gid:
+        if not validate(request, user_group=[gid]):
+            return HttpResponseRedirect('/juser/user_list/')
+        user_group = UserGroup.objects.filter(id=gid)
+        if user_group:
+            user_group = user_group[0]
+            contact_list = user_group.user_set.all()
+
+    if keyword:
+        contact_list = contact_list.filter(Q(username__icontains=keyword) | Q(name__icontains=keyword)).order_by('name')
+
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
+
+    return render_to_response('juser/user_list.html', locals(), context_instance=RequestContext(request))
+
+
+@require_admin
 def user_detail(request):
     user_id = request.GET.get('id', '')
     if not user_id:
         return HttpResponseRedirect('/juser/user_list/')
+    if request.session.get('role_id', '') == '1':
+        if not validate(request, user=[user_id]):
+            return HttpResponseRedirect('/juser/user_list/')
     user = User.objects.filter(id=user_id)
     if user:
         user = user[0]
@@ -655,7 +742,12 @@ def user_detail(request):
 def user_del(request):
     user_id = request.GET.get('id', '')
     if not user_id:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect('/juser/user_list/')
+
+    if request.session.get('role_id', '') == '1':
+        if not validate(request, user=[user_id]):
+            return HttpResponseRedirect('/juser/user_list/')
+
     user = User.objects.filter(id=user_id)
     if user:
         user = user[0]
@@ -669,7 +761,11 @@ def user_del(request):
 @require_admin
 def user_del_ajax(request):
     user_ids = request.POST.get('ids')
-    for user_id in user_ids.split(','):
+    user_ids = user_ids.split(',')
+    if request.session.get('role_id', '') == 1:
+        if not validate(request, user=user_ids):
+            return "error"
+    for user_id in user_ids:
         user = User.objects.filter(id=user_id)
         if user:
             user = user[0]
@@ -681,7 +777,7 @@ def user_del_ajax(request):
     return HttpResponse('删除成功')
 
 
-@require_admin
+@require_super_user
 def user_edit(request):
     header_title, path1, path2 = '编辑用户', '用户管理', '用户编辑'
     if request.method == 'GET':
@@ -698,7 +794,7 @@ def user_edit(request):
             groups_str = ' '.join([str(group.id) for group in user.group.all()])
 
     else:
-        username = request.POST.get('username', '')
+        user_id = request.GET.get('user_id', '')
         password = request.POST.get('password', '')
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
@@ -715,8 +811,8 @@ def user_edit(request):
         else:
             dept = DEPT.objects.get(id='1')
 
-        if username:
-            user = User.objects.filter(username=username)
+        if user_id:
+            user = User.objects.filter(id=user_id)
             if user:
                 user = user[0]
         else:
@@ -728,13 +824,69 @@ def user_edit(request):
         if ssh_key_pwd != user.ssh_key_pwd:
             ssh_key_pwd = CRYPTOR.encrypt(ssh_key_pwd)
 
-        db_update_user(username=username,
+        db_update_user(user_id=user_id,
                        password=password,
                        name=name,
                        email=email,
                        groups=groups,
                        dept=dept,
                        role=role_post,
+                       is_active=is_active,
+                       ssh_key_pwd=ssh_key_pwd)
+
+        return HttpResponseRedirect('/juser/user_list/')
+
+    return render_to_response('juser/user_edit.html', locals(), context_instance=RequestContext(request))
+
+
+@require_admin
+def user_edit_adm(request):
+    header_title, path1, path2 = '编辑用户', '用户管理', '用户编辑'
+    user, dept = get_session_user_dept(request)
+    if request.method == 'GET':
+        user_id = request.GET.get('id', '')
+        if not user_id:
+            return HttpResponseRedirect('/juser/user_list/')
+
+        if not validate(request, user=[user_id]):
+            return HttpResponseRedirect('/juser/user_list/')
+
+        user = User.objects.filter(id=user_id)
+        dept_all = DEPT.objects.all()
+        group_all = dept.usergroup_set.all()
+        if user:
+            user = user[0]
+            groups_str = ' '.join([str(group.id) for group in user.group.all()])
+
+    else:
+        user_id = request.POST.get('user_id', '')
+        password = request.POST.get('password', '')
+        name = request.POST.get('name', '')
+        email = request.POST.get('email', '')
+        groups = request.POST.getlist('groups', [])
+        ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
+        is_active = True if request.POST.get('is_active', '1') == '1' else False
+
+        if not validate(request, user=[user_id], user_group=groups):
+            return HttpResponseRedirect('/juser/user_edit/')
+        if user_id:
+            user = User.objects.filter(id=user_id)
+            if user:
+                user = user[0]
+        else:
+            return HttpResponseRedirect('/juser/user_list/')
+
+        if password != user.password:
+            password = md5_crypt(password)
+
+        if ssh_key_pwd != user.ssh_key_pwd:
+            ssh_key_pwd = CRYPTOR.encrypt(ssh_key_pwd)
+
+        db_update_user(user_id=user_id,
+                       password=password,
+                       name=name,
+                       email=email,
+                       groups=groups,
                        is_active=is_active,
                        ssh_key_pwd=ssh_key_pwd)
 

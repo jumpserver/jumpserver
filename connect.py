@@ -174,7 +174,6 @@ def get_user_host(username):
 
 
 def get_connect_item(username, ip):
-    cryptor = PyCrypt(KEY)
 
     asset = get_object(Asset, ip=ip)
     port = asset.port
@@ -192,12 +191,12 @@ def get_connect_item(username, ip):
     }
 
     if asset.login_type in login_type_dict:
-        password = cryptor.decrypt(login_type_dict[asset.login_type])
+        password = CRYPTOR.decrypt(login_type_dict[asset.login_type])
         return username, password, ip, port
 
     elif asset.login_type == 'M':
         username = asset.username
-        password = cryptor.decrypt(asset.password)
+        password = CRYPTOR.decrypt(asset.password)
         return username, password, ip, port
 
     else:
@@ -286,7 +285,7 @@ def remote_exec_cmd(ip, port, username, password, cmd):
         stdin, stdout, stderr = ssh.exec_command("bash -l -c '%s'" % cmd)
         out = stdout.readlines()
         err = stderr.readlines()
-        color_print('%s:' %ip, 'blue')
+        color_print('%s:' % ip, 'blue')
         for i in out:
             color_print(" " * 4 + i.strip(), 'green')
         for j in err:
