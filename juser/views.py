@@ -2,24 +2,18 @@
 # Author: Guanghongwei
 # Email: ibuler@qq.com
 
-import time
-import os
 import random
 import subprocess
 from Crypto.PublicKey import RSA
 import crypt
-from django.http import HttpResponseRedirect
 import datetime
 
 from django.shortcuts import render_to_response
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.template import RequestContext
-from django.http import HttpResponse
 
 from juser.models import UserGroup, User, DEPT
-from connect import BASE_DIR
-from connect import CONF
 from jumpserver.views import md5_crypt, LDAPMgmt, LDAP_ENABLE, ldap_conn, page_list_return, pages
 from jumpserver.api import *
 
