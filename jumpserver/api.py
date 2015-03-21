@@ -156,7 +156,6 @@ def require_login(func):
 def require_super_user(func):
     def _deco(request, *args, **kwargs):
         if request.session.get('role_id', 0) != 2:
-            print "##########%s" % request.session.get('role_id', 0)
             return HttpResponseRedirect('/')
         return func(request, *args, **kwargs)
     return _deco
