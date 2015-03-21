@@ -60,7 +60,7 @@ def f_add_host(ip, port, idc, jtype, group, dept, active, comment, username='', 
 def add_host(request):
     login_types = {'L': 'LDAP', 'M': 'MAP'}
     header_title, path1, path2 = u'添加主机', u'资产管理', u'添加主机'
-    eidc = IDC.objects.all()
+    eidc = IDC.objects.exclude(name='ALL')
     if is_super_user(request):
         edept = DEPT.objects.all()
         egroup = BisGroup.objects.exclude(name='ALL')
