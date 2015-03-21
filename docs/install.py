@@ -13,6 +13,7 @@ django.setup()
 from juser.views import db_add_user, md5_crypt, CRYPTOR, db_add_group
 from jasset.models import Asset, IDC, BisGroup
 from juser.models import UserGroup, DEPT, User
+from jasset.views import jasset_group_add
 from jperm.models import CmdGroup
 from jlog.models import Log
 
@@ -122,19 +123,12 @@ def test_add_log():
         end_time = datetime.datetime.now()
         log_path = '/var/log/jumpserver/test.log'
         host = '192.168.1.' + str(ip)
-        Log.objects.create(user=user, host=host, remote_ip='8.8.8.8', dept_name='运维部', log_path=log_path, pid=168, start_time=start_time,
+        Log.objects.create(user=user, host=host, log_path=log_path, pid=168, start_time=start_time,
                            is_finished=1, log_finished=1, end_time=end_time)
 
 
 if __name__ == '__main__':
-    #install()
-    #test_add_dept()
-    #test_add_group()
-    #test_add_user()
-    #test_add_idc()
-    #test_add_asset_group()
-    #test_add_asset()
-    test_add_log()
+    install()
 
 
 

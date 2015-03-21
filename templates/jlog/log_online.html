@@ -77,7 +77,9 @@
                             <thead>
                                 <tr>
                                     <th class="text-center"> 用户名 </th>
+                                    <th class="text-center"> 所属部门 </th>
                                     <th class="text-center"> 登录主机 </th>
+                                    <th class="text-center"> 来源IP </th>
                                     <th class="text-center"> 实时监控 </th>
                                     <th class="text-center"> 阻断 </th>
                                     <th class="text-center"> 登录时间 </th>
@@ -88,7 +90,9 @@
                             {% for post in contacts.object_list %}
                                 <tr class="gradeX">
                                     <td id="username" class="text-center"> {{ post.user }} </td>
+                                    <td id="ip" class="text-center"> {{ post.dept_name }} </td>
                                     <td id="ip" class="text-center"> {{ post.host }} </td>
+                                    <td id="ip" class="text-center"> {{ post.remote_ip }} </td>
                                     <td class="text-center"><a class="monitor" filename="{{ post.log_path }}"> 监控 </a></td>
                                     <td class="text-center"><input type="button" id="cut" class="btn btn-danger btn-xs"  name="cut" value="阻断" onclick='cut("{{ post.pid }}")' /></td>
                                     <td class="text-center"> {{ post.start_time|date:"Y-m-d H:i:s" }} </td>
@@ -145,9 +149,9 @@
                 var regx =  /\x1B\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[m|K]/g;
 //                tag.append('<p>'+escapeString(obj.content.replace(regx,''))+'</p>');
                 if (option == 'new') {
-                    tag.append('<p>' + escapeString(obj.content) + '</p>');
+                    tag.append('<p style="margin: 2px">' + escapeString(obj.content) + '</p>');
                 } else if (option == 'exist') {
-                    tag.append('<p>' + exsit_message + '</p>');
+                    tag.append('<p style="margin: 0">' + exsit_message + '</p>');
                 }
                 tag.animate({ scrollTop: tag[0].scrollHeight}, 1);
             });

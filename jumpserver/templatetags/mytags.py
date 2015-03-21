@@ -169,22 +169,6 @@ def string_length(string, length):
     return '%s ...' % string[0:length]
 
 
-@register.filter(name='filter_private')
-def filter_private(group):
-    agroup = []
-    pattern = re.compile(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}')
-    p = BisGroup.objects.get(name='ALL')
-    for g in group:
-        if not pattern.match(g.name):
-            agroup.append(g)
-    try:
-        agroup.remove(p)
-    except ValueError:
-        pass
-
-    return agroup
-
-
 @register.filter(name='to_name')
 def to_name(user_id):
     try:

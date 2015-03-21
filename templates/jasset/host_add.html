@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load mytags %}
 {% block content %}
 {% include 'nav_cat_bar.html' %}
 <div class="wrapper wrapper-content animated fadeInRight">
@@ -84,17 +85,26 @@
                                             </div>
                                         </div>
 
-                                        <div class="hr-line-dashed"></div>
-                                        <div class="form-group">
-                                            <label for="j_dept" class="col-lg-2 control-label">所属部门<span class="red-fonts">*</span></label>
-                                            <div class="col-sm-8">
-                                                <select id="j_dept" name="j_dept" class="form-control m-b" multiple size="10">
-                                                    {% for d in edept %}
-                                                        <option type="checkbox" value="{{ d.name }}">{{ d.name }} {% if d.comment %} --- {{ d.comment }} {% endif %}</option>
-                                                    {% endfor %}
-                                                </select>
+                                        {% ifequal session_role_id 2 %}
+                                            <div class="hr-line-dashed"></div>
+                                            <div class="form-group">
+                                                <label for="j_dept" class="col-lg-2 control-label">所属部门<span class="red-fonts">*</span></label>
+                                                <div class="col-sm-8">
+                                                    <select id="j_dept" name="j_dept" class="form-control m-b" multiple size="10">
+                                                        {% for d in edept %}
+                                                            <option type="checkbox" value="{{ d.name }}">{{ d.name }} {% if d.comment %} --- {{ d.comment }} {% endif %}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
                                             </div>
-                                        </div>
+                                        {% endifequal %}
+
+                                        {% ifequal session_role_id 1 %}
+                                            <div class="hr-line-dashed"></div>
+                                            <div class="form-group"><label class="col-sm-2 control-label"> 所属部门 </label>
+                                                <div class="col-sm-8"><input type="text" name="j_dept" value="{{  edept.name }}" class="form-control" readonly="readonly"></div>
+                                            </div>
+                                        {% endifequal %}
 
                                         <div class="hr-line-dashed"></div>
                                         <div class="form-group">
@@ -107,16 +117,6 @@
                                                 </select>
                                             </div>
                                         </div>
-
-                                        <!--<div class="hr-line-dashed"></div>-->
-                                        <!--<div class="form-group">-->
-                                            <!--<label for="j_group" class="col-sm-2 control-label"> 所属用户组<span class="red-fonts">*</span> </label>-->
-                                            <!--<div class="col-sm-8">-->
-                                                <!--{% for g in eusergroup %}-->
-                                                    <!--<label class="checkbox-inline"><input type="checkbox" id="j_usergroup" value="{{ g }}" name="j_usergroup"> {{ g }} </label>-->
-                                                <!--{% endfor %}-->
-                                            <!--</div>-->
-                                        <!--</div>-->
 
                                         <div class="hr-line-dashed"></div>
                                         <div class="form-group"><label class="col-sm-2 control-label"> 是否激活<span class="red-fonts">*</span> </label>

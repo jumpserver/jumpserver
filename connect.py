@@ -3,6 +3,7 @@
 import socket
 import sys
 import os
+import ast
 import select
 import time
 from datetime import datetime
@@ -24,8 +25,7 @@ django.setup()
 from juser.models import User
 from jasset.models import Asset
 from jlog.models import Log
-from jumpserver.api import user_perm_asset_api, PyCrypt, BASE_DIR, CONF, CRYPTOR, KEY
-
+from jumpserver.api import *
 try:
     import termios
     import tty
@@ -98,7 +98,13 @@ def log_record(username, host):
     today_connect_log_dir = os.path.join(connect_log_dir, today)
     log_filename = '%s_%s_%s.log' % (username, host, time_now)
     log_file_path = os.path.join(today_connect_log_dir, log_filename)
+    dept_name = User.objects.get(username=username).dept
     pid = os.getpid()
+    ip_list = []
+    remote_ip = os.popen("who |grep `ps aux |gawk '{if ($2==%s) print $1}'` |gawk '{print $5}'|tr -d '()'" % pid).readlines()
+    for ip in remote_ip:
+        ip_list.append(ip.strip('\n'))
+    ip_list = ','.join(list(set(ip_list)))
 
     if not os.path.isdir(today_connect_log_dir):
         try:
@@ -112,7 +118,7 @@ def log_record(username, host):
     except IOError:
         raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 
-    log = Log(user=username, host=host, log_path=log_file_path, start_time=datetime.now(), pid=pid)
+    log = Log(user=username, host=host, remote_ip=ip_list, dept_name=dept_name, log_path=log_file_path, start_time=datetime.now(), pid=pid)
     log_file.write('Starttime is %s\n' % datetime.now())
     log.save()
     return log_file, log
@@ -173,6 +179,15 @@ def get_user_host(username):
     return hosts_attr
 
 
+def get_user_hostgroup(username):
+    """Get the hostgroups of under the user control."""
+    groups_attr = {}
+    group_all = user_perm_group_api(username)
+    for group in group_all:
+        groups_attr[group.name] = [group.id, group.comment]
+    return groups_attr
+
+
 def get_connect_item(username, ip):
 
     asset = get_object(Asset, ip=ip)
@@ -222,8 +237,9 @@ def print_prompt():
     msg = """\033[1;32m###  Welcome Use JumpServer To Login. ### \033[0m
           1) Type \033[32mIP ADDRESS\033[0m To Login.
           2) Type \033[32mP/p\033[0m To Print The Servers You Available.
-          3) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
-          4) Type \033[32mQ/q\033[0m To Quit.
+          3) Type \033[32mG/g\033[0m To Print The Server Groups You Available.
+          4) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
+          5) Type \033[32mQ/q\033[0m To Quit.
           """
     print textwrap.dedent(msg)
 
@@ -234,6 +250,13 @@ def print_user_host(username):
     hosts.sort()
     for ip in hosts:
         print '%s -- %s' % (ip, hosts_attr[ip][1])
+
+
+def print_user_hostgroup(username):
+    group_attr = get_user_hostgroup(username)
+    groups = group_attr.keys()
+    for g in groups:
+        print '%s -- %s' % (g, group_attr[g][1])
 
 
 def connect(username, password, host, port, login_name):
@@ -350,6 +373,9 @@ if __name__ == '__main__':
                 continue
             if option in ['P', 'p']:
                 print_user_host(LOGIN_NAME)
+                continue
+            elif option in ['G', 'g']:
+                print_user_hostgroup(LOGIN_NAME)
                 continue
             elif option in ['E', 'e']:
                 exec_cmd_servers(LOGIN_NAME)

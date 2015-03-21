@@ -29,6 +29,15 @@ LOGIN_NAME = getpass.getuser()
 LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
 
 
+# def user_perm_group_api(username):
+#     user = User.objects.get(username=username)
+#     if user:
+#         perm_list = []
+#         user_group_all = user.group.all()
+#         for user_group in user_group_all:
+#             perm_list.extend(user_group.perm_set.all())
+
+
 class LDAPMgmt():
     def __init__(self,
                  host_url,
@@ -177,10 +186,25 @@ def is_super_user(request):
 
 
 def is_group_admin(request):
+    print request.session.get('role_id'), type(request.session.get('role_id'))
     if request.session.get('role_id') == 1:
         return True
     else:
         return False
+
+
+def is_common_user(request):
+    if request.session.get('role_id') == 0:
+        return True
+    else:
+        return False
+
+
+def get_user_dept(request):
+    user_id = request.session.get('user_id')
+    if user_id:
+        user_dept = User.objects.get(id=user_id).dept
+        return user_dept.id
 
 
 def api_user(request):
