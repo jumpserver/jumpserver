@@ -86,7 +86,7 @@ def dept_perm_edit(request):
     return render_to_response('jperm/dept_perm_edit.html', locals(), context_instance=RequestContext(request))
 
 
-@require_admin
+@require_super_user
 def perm_list(request):
     header_title, path1, path2 = u'小组授权', u'授权管理', u'授权详情'
     keyword = request.GET.get('search', '')
@@ -94,6 +94,19 @@ def perm_list(request):
         contact_list = UserGroup.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
     else:
         contact_list = UserGroup.objects.all().order_by('name')
+
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
+    return render_to_response('jperm/perm_list.html', locals(), context_instance=RequestContext(request))
+
+
+@require_admin
+def perm_list_adm(request):
+    header_title, path1, path2 = u'小组授权', u'授权管理', u'授权详情'
+    keyword = request.GET.get('search', '')
+    user, dept = get_session_user_dept(request)
+    contact_list = dept.usergroup_set.all().order_by('name')
+    if keyword:
+        contact_list = contact_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
 
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
     return render_to_response('jperm/perm_list.html', locals(), context_instance=RequestContext(request))
@@ -152,6 +165,28 @@ def perm_edit(request):
         return HttpResponseRedirect('/jperm/perm_list/')
     return render_to_response('jperm/perm_edit.html', locals(), context_instance=RequestContext(request))
 
+
+@require_admin
+def perm_edit_adm(request):
+    if request.method == 'GET':
+        header_title, path1, path2 = u'编辑授权', u'授权管理', u'授权编辑'
+        user_group_id = request.GET.get('id', '')
+        user_group = UserGroup.objects.filter(id=user_group_id)
+        user, dept = get_session_user_dept(request)
+        if user_group:
+            user_group = user_group[0]
+            asset_groups_all = dept.bisgroup_set.all()
+            asset_groups_select = [perm.asset_group for perm in user_group.perm_set.all()]
+            asset_groups = [asset_group for asset_group in asset_groups_all if asset_group not in asset_groups_select]
+    else:
+        user_group_id = request.POST.get('user_group_id')
+        asset_group_id_list = request.POST.getlist('asset_groups_select')
+        if not validate(request, user_group=[user_group_id], asset_group=asset_group_id_list):
+            return HttpResponseRedirect('/jperm/perm_list/')
+        perm_group_update(user_group_id, asset_group_id_list)
+
+        return HttpResponseRedirect('/jperm/perm_list/')
+    return render_to_response('jperm/perm_edit.html', locals(), context_instance=RequestContext(request))
 
 @require_admin
 def perm_detail(request):
@@ -271,11 +306,35 @@ def sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select,
     ldap_conn.add(sudo_dn, sudo_attr)
 
 
-@require_admin
+@require_super_user
 def sudo_add(request):
     header_title, path1, path2 = u'Sudo授权', u'权限管理', u'添加Sudo权限'
     user_groups = UserGroup.objects.filter(id__gt=2)
     asset_groups = BisGroup.objects.all()
+    cmd_groups = CmdGroup.objects.all()
+
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        users_runas = request.POST.get('runas', 'root')
+        user_groups_select = request.POST.getlist('user_groups_select')
+        asset_groups_select = request.POST.getlist('asset_groups_select')
+        cmd_groups_select = request.POST.getlist('cmd_groups_select')
+        comment = request.POST.get('comment', '')
+
+        if LDAP_ENABLE:
+            sudo_db_add(name, users_runas, user_groups_select, asset_groups_select, cmd_groups_select, comment)
+            sudo_ldap_add(name, users_runas, user_groups_select, asset_groups_select, cmd_groups_select)
+
+        msg = '添加成功'
+    return render_to_response('jperm/sudo_add.html', locals(), context_instance=RequestContext(request))
+
+
+@require_admin
+def sudo_add_adm(request):
+    header_title, path1, path2 = u'Sudo授权', u'权限管理', u'添加Sudo权限'
+    user, dept = get_session_user_dept(request)
+    user_groups = dept.usergroup_set.filter(id__gt=2)
+    asset_groups = dept.bisgroup_set.all()
     cmd_groups = CmdGroup.objects.all()
 
     if request.method == 'POST':
@@ -391,13 +450,20 @@ def sudo_del(request):
 @require_admin
 def cmd_add(request):
     header_title, path1, path2 = u'sudo命令添加', u'授权管理', u'命令组添加'
+    dept_all = DEPT.objects.all()
 
     if request.method == 'POST':
         name = request.POST.get('name')
+        dept_id = request.POST.get('dept_id')
         cmd = ','.join(request.POST.get('cmd').split())
         comment = request.POST.get('comment')
 
-        CmdGroup.objects.create(name=name, cmd=cmd, comment=comment)
+        dept = DEPT.objects.filter(id=dept_id)
+        if dept:
+            dept = dept[0]
+            CmdGroup.objects.create(name=name, dept=dept, cmd=cmd, comment=comment)
+        else:
+            error = u"部门不能为空"
         msg = u'命令组添加成功'
 
         return HttpResponseRedirect('/jperm/cmd_list/')

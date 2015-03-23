@@ -181,7 +181,7 @@ def to_name(user_id):
 
 @register.filter(name='to_role_name')
 def to_role_name(role_id):
-    role_dict = {'0': '普通用户', '1': '组管理员', '2': '超级管理员'}
+    role_dict = {'0': '普通用户', '1': '部门管理员', '2': '超级管理员'}
     return role_dict.get(str(role_id), '未知')
 
 @register.filter(name='to_avatar')
