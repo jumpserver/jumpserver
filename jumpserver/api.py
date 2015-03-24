@@ -321,10 +321,15 @@ def validate(request, user_group=None, user=None, asset_group=None, asset=None):
     if asset_group:
         dept_asset_groups = dept.bisgroup_set.all()
         asset_groups = []
-        for asset_group_id in asset_group:
-            asset_groups.extend(BisGroup.objects.filter(id=asset_group_id))
+        for asset_group_name in asset_group:
+            asset_groups.extend(BisGroup.objects.filter(name=asset_group_name))
+
+        if len(asset_groups) == 0:
+            print 'hehe'
+            return False     
 
         if not set(asset_groups).issubset(set(dept_asset_groups)):
+            print 'not in'
             return False
 
     if asset:

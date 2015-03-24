@@ -3,7 +3,6 @@ from django.conf.urls import patterns, include, url
 from jasset.views import *
 
 urlpatterns = patterns('',
-    url(r'^$', index),
     url(r'^host_add/$', add_host),
     url(r"^host_add_multi/$", add_host_multi),
     url(r'^host_list/$', list_host),

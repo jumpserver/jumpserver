@@ -8,19 +8,19 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 
 from models import IDC, Asset, BisGroup
-from juser.models import UserGroup, DEPT
+from juser.models import UserGroup, DEPT, User
 from connect import PyCrypt, KEY
 from jlog.models import Log
 from jumpserver.views import jasset_host_edit, pages
-from jumpserver.api import asset_perm_api
-from jumpserver.api import user_perm_group_api, require_login, require_super_user, \
+from jumpserver.api import asset_perm_api, validate
+from jumpserver.api import require_login, require_super_user, \
     require_admin, is_group_admin, is_super_user, is_common_user, get_user_dept
 
 cryptor = PyCrypt(KEY)
 
 
-def index(request):
-    return render_to_response('jasset/jasset.html', )
+class RaiseError(Exception):
+    pass
 
 
 def f_add_host(ip, port, idc, jtype, group, dept, active, comment, username='', password=''):
@@ -70,6 +70,7 @@ def add_host(request):
         user_id = request.session.get('user_id')
         edept = DEPT.objects.get(id=dept_id)
         egroup = edept.bisgroup_set.all()
+
     if request.method == 'POST':
         j_ip = request.POST.get('j_ip')
         j_idc = request.POST.get('j_idc')
@@ -79,6 +80,14 @@ def add_host(request):
         j_active = request.POST.get('j_active')
         j_comment = request.POST.get('j_comment')
         j_dept = request.POST.getlist('j_dept')
+
+        try:
+            if is_group_admin(request) and not validate(request, asset_group=j_group):
+                print validate(request, asset_group=j_group), 'hello'
+                emg = u'滚Y'
+                raise RaiseError(emg)
+        except RaiseError:
+            pass
 
         if Asset.objects.filter(ip=str(j_ip)):
             emg = u'该IP %s 已存在!' % j_ip
