@@ -14,6 +14,7 @@ class Perm(models.Model):
 class CmdGroup(models.Model):
     name = models.CharField(max_length=50)
     cmd = models.CharField(max_length=999)
+    dept = models.ForeignKey(DEPT)
     comment = models.CharField(blank=True, null=True, max_length=50)
 
     def __unicode__(self):

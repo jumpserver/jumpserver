@@ -1,22 +1,11 @@
 # coding: utf-8
 
-import hashlib
-from ConfigParser import ConfigParser
-import os
 import datetime
-import json
 
 from django.db.models import Count
 from django.shortcuts import render_to_response
-from django.http import HttpResponse
-from django.http import HttpResponseRedirect
 from django.template import RequestContext
-from django.core.paginator import Paginator, EmptyPage, InvalidPage
-from django.template import RequestContext
-
-from juser.models import User, UserGroup
-from jlog.models import Log
-from jasset.models import Asset, BisGroup, IDC
+from jasset.models import IDC
 from jumpserver.api import *
 
 
@@ -93,13 +82,6 @@ def jasset_group_add(name, comment, jtype):
     else:
         BisGroup.objects.create(name=name, comment=comment, type=jtype)
         smg = u'业务组%s添加成功' % name
-
-
-def page_list_return(total, current=1):
-    min_page = current - 2 if current - 4 > 0 else 1
-    max_page = min_page + 4 if min_page + 4 < total else total
-
-    return range(min_page, max_page+1)
 
 
 def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment, j_user='', j_password=''):

@@ -57,6 +57,19 @@
                                     <input id="cmd_group_id" name="cmd_group_id"  type="text" class="form-control" value="{{ cmd_group_id }}" style="display: none">
                                 </div>
                             </div>
+                            {% ifequal session_role_id 2 %}
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label for="dept_id" class="col-sm-2 control-label">部门<span class="red-fonts">*</span></label>
+                                <div class="col-sm-8">
+                                    <select id="dept_id" name="dept_id" class="form-control m-b">
+                                        {% for dept in dept_all %}
+                                            <option value="{{ dept.id }}" selected>{{ dept.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            {% endifequal %}
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
                                 <label for="group_type" class="col-sm-2 control-label">命令<span class="red-fonts">*</span></label>

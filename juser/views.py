@@ -2,32 +2,19 @@
 # Author: Guanghongwei
 # Email: ibuler@qq.com
 
-import time
-import os
 import random
 import subprocess
 from Crypto.PublicKey import RSA
 import crypt
-from django.http import HttpResponseRedirect
 import datetime
 
 from django.shortcuts import render_to_response
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.template import RequestContext
-from django.http import HttpResponse
 
-from juser.models import UserGroup, User, DEPT
-from connect import BASE_DIR
-from connect import CONF
-from jumpserver.views import md5_crypt, LDAPMgmt, LDAP_ENABLE, ldap_conn, page_list_return, pages
+from juser.models import DEPT
 from jumpserver.api import *
-
-if LDAP_ENABLE:
-    LDAP_HOST_URL = CONF.get('ldap', 'host_url')
-    LDAP_BASE_DN = CONF.get('ldap', 'base_dn')
-    LDAP_ROOT_DN = CONF.get('ldap', 'root_dn')
-    LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
 
 
 def gen_rand_pwd(num):
@@ -601,7 +588,7 @@ def group_edit_adm(request):
         return HttpResponseRedirect('/juser/group_list/')
 
 
-@require_admin
+@require_super_user
 def user_add(request):
     error = ''
     msg = ''
@@ -646,6 +633,63 @@ def user_add(request):
                             password=md5_crypt(password),
                             name=name, email=email, dept=dept,
                             groups=groups, role=role_post,
+                            ssh_key_pwd=CRYPTOR.encrypt(ssh_key_pwd),
+                            ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
+                            is_active=is_active,
+                            date_joined=datetime.datetime.now())
+
+                server_add_user(username, password, ssh_key_pwd)
+                if LDAP_ENABLE:
+                    ldap_add_user(username, ldap_pwd)
+                msg = u'添加用户 %s 成功！' % username
+
+            except Exception, e:
+                error = u'添加用户 %s 失败 %s ' % (username, e)
+                try:
+                    db_del_user(username)
+                    server_del_user(username)
+                    if LDAP_ENABLE:
+                        ldap_del_user(username)
+                except Exception:
+                    pass
+    return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
+
+
+@require_admin
+def user_add_adm(request):
+    error = ''
+    msg = ''
+    header_title, path1, path2 = '添加用户', '用户管理', '添加用户'
+    user, dept = get_session_user_dept(request)
+    group_all = dept.usergroup_set.all()
+
+    if request.method == 'POST':
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+        name = request.POST.get('name', '')
+        email = request.POST.get('email', '')
+        groups = request.POST.getlist('groups', [])
+        ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
+        is_active = True if request.POST.get('is_active', '1') == '1' else False
+        ldap_pwd = gen_rand_pwd(16)
+
+        try:
+            if '' in [username, password, ssh_key_pwd, name, groups, is_active]:
+                error = u'带*内容不能为空'
+                raise AddError
+            user = User.objects.filter(username=username)
+            if user:
+                error = u'用户 %s 已存在' % username
+                raise AddError
+
+        except AddError:
+            pass
+        else:
+            try:
+                db_add_user(username=username,
+                            password=md5_crypt(password),
+                            name=name, email=email, dept=dept,
+                            groups=groups, role='CU',
                             ssh_key_pwd=CRYPTOR.encrypt(ssh_key_pwd),
                             ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
                             is_active=is_active,

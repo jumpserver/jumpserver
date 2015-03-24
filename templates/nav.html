@@ -50,21 +50,16 @@
                     </li>
                 </ul>
             </li>
+{#            <li id="jlog">#}
+{#                <a href="#"><i class="fa fa-files-o"></i> <span class="nav-label">日志审计</span><span class="fa arrow"></span></a>#}
+{#                <ul class="nav nav-second-level">#}
+{#                    <li id="log_list"><a href="/jlog/log_list/online/">查看日志</a></li>#}
+{#                    <li id="log_detail"><a href="/jlog/log_detail/">日志分析</a></li>#}
+{#                </ul>#}
+{#            </li>#}
             <li id="jlog">
-                <a href="#"><i class="fa fa-files-o"></i> <span class="nav-label">日志审计</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level">
-                    <li id="log_list"><a href="/jlog/log_list/online/">查看日志</a></li>
-                    <li id="log_detail"><a href="/jlog/log_detail/">日志分析</a></li>
-                </ul>
+               <a href="/jlog/log_list/online/"><i class="fa fa-files-o"></i> <span class="nav-label">日志审计</span><span class="label label-info pull-right"></span></a>
             </li>
-            <li>
-                <a href="#"><i class="fa fa-download"></i> <span class="nav-label">上传下载</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level">
-                    <li><a href="/file/upload/">文件上传</a></li>
-                    <li><a href="/file/download/">文件下载</a></li>
-                </ul>
-            </li>
-
             <li class="special_link">
                 <a href="http://www.jumpserver.org" target="_blank"><i class="fa fa-database"></i> <span class="nav-label">访问官网</span></a>
             </li>
@@ -120,18 +115,7 @@
                 </ul>
             </li>
             <li id="jlog">
-                <a href="#"><i class="fa fa-files-o"></i> <span class="nav-label">日志审计</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level">
-                    <li id="log_list"><a href="/jlog/log_list/online/">查看日志</a></li>
-                    <li id="log_detail"><a href="/jlog/log_detail/">日志分析</a></li>
-                </ul>
-            </li>
-            <li>
-                <a href="#"><i class="fa fa-download"></i> <span class="nav-label">上传下载</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level">
-                    <li><a href="/file/upload/">文件上传</a></li>
-                    <li><a href="/file/download/">文件下载</a></li>
-                </ul>
+               <a href="/jlog/log_list/online/"><i class="fa fa-files-o"></i> <span class="nav-label">日志审计</span><span class="label label-info pull-right"></span></a>
             </li>
 
             <li class="special_link">
@@ -150,33 +134,28 @@
             <li>
                <a href="/"><i class="fa fa-th-large"></i> <span class="nav-label">仪表盘</span><span class="label label-info pull-right"></span></a>
             </li>
-            <li id="juser">
-                <a href="#"><i class="fa fa-rebel"></i> <span class="nav-label">用户管理</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level">
-                    <li id="user_list"><a href="/juser/user_list/">查看用户<span class="label {% ifequal user_active_num user_total_num %}label-primary {% else %}label-warning {% endifequal %}pull-right">{{ user_active_num }}/{{ user_total_num }}</span></a></li>
-                </ul>
+            <li>
+               <a href="/"><i class="fa fa-rebel"></i> <span class="nav-label">个人信息</span><span class="label label-info pull-right"></span></a>
             </li>
-            <li id="jasset">
-                <a><i class="fa fa-cube"></i> <span class="nav-label">资产管理</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level">
-                    <li class="host_list"><a href="/jasset/host_list/">查看资产&nbsp&nbsp</span><span class="label label-info pull-right">16/18</span></a></li>
-                    <li class="jgroup_list group_detail"><a href="/jasset/jgroup_list/">查看主机组</a></li>
-                    <li class="idc_list idc_detail"><a href="/jasset/idc_list/">查看IDC</a></li>
-                </ul>
+            <li>
+               <a href="/"><i class="fa fa-cube"></i> <span class="nav-label">查看主机</span><span class="label label-info pull-right"></span></a>
             </li>
-            <li id="jlog">
-                <a href="#"><i class="fa fa-files-o"></i> <span class="nav-label">日志审计</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level">
-                    <li id="log_list"><a href="/jlog/log_list/online/">查看日志</a></li>
-                    <li id="log_detail"><a href="/jlog/log_detail/">日志分析</a></li>
-                </ul>
+            <li>
+               <a href="/"><i class="fa fa-cube"></i> <span class="nav-label">申请主机</span><span class="label label-info pull-right"></span></a>
             </li>
+            <li>
+               <a href="/"><i class="fa fa-files-o"></i> <span class="nav-label">登录历史</span><span class="label label-info pull-right"></span></a>
+            </li>
+
             <li>
                 <a href="#"><i class="fa fa-download"></i> <span class="nav-label">上传下载</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
                     <li><a href="/file/upload/">文件上传</a></li>
                     <li><a href="/file/download/">文件下载</a></li>
                 </ul>
+            </li>
+            <li>
+               <a href="/"><i class="fa fa-files-o"></i> <span class="nav-label">使用说明</span><span class="label label-info pull-right"></span></a>
             </li>
 
             <li class="special_link">
