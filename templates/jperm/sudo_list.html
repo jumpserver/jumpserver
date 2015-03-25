@@ -35,9 +35,11 @@
                             <div class="panel-options">
                                 <ul class="nav nav-tabs">
                                     <li id="tab1" class="active"><a href="/jperm/sudo_list/">查看Sudo授权</a></li>
-                                    <li id="tab2" class=""><a href="/jperm/sudo_add/">Sudo授权添加</a></li>
-                                    <li id="tab3" class=""><a href="/jperm/cmd_list/">查看命令组</a></li>
-                                    <li id="tab4" class=""><a href="/jperm/cmd_add/">添加命令组</a></li>
+                                    <li id="tab2" class=""><a href="/jperm/cmd_list/">查看命令组</a></li>
+                                    <li id="tab3" class=""><a href="/jperm/cmd_add/">添加命令组</a></li>
+                                    <button class="btn btn-primary btn-sm pull-right" style="margin-right: 20px;" data-toggle="tooltip" data-placement="left" title="" data-original-title="Refresh inbox">
+                                        <i class="fa fa-refresh"></i> 刷新
+                                    </button>
                                 </ul>
                             </div>
                         </div>
@@ -49,47 +51,40 @@
                                     <table class="table table-striped table-bordered table-hover " id="editable" >
                                         <thead>
                                             <tr>
-                                                <th class="text-center">授权名</th>
-                                                <th class="text-center">UserRunAs</th>
-                                                <th class="text-center">用户组</th>
-                                                <th class="text-center">主机组</th>
-                                                <th class="text-center">命令组</th>
+                                                <th class="text-center">组名</th>
+                                                <th class="text-center">所属部门</th>
+                                                <th class="text-center">成员数目</th>
+                                                <th class="text-center">授权主机组数目</th>
+                                                <th class="text-center">授权主机数目</th>
+                                                <th class="text-center">sudo命令</th>
+                                                <th class="text-center">备注</th>
                                                 <th class="text-center">操作</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="perm_list">
-                                    {% for sudo_perm in contacts.object_list %}
-                                        <tr class="gradeX">
-                                            <td class="text-center"> {{ sudo_perm.name }} </td>
-                                            <td class="text-center"> {{ sudo_perm.user_runas }} </td>
-                                            <td class="text-center">
-                                                {{ sudo_perm.user_group.all | group_str2 }}
-                                            </td>
-
-                                            <td class="text-center">
-                                                {{ sudo_perm.asset_group.all | group_str2 }}
-                                            </td>
-
-                                            <td class="text-center">
-                                                {{ sudo_perm.cmd_group.all | group_str2 }}
-                                            </td>
-                                            <td class="text-center">
-                                                <a title="[ {{ sudo_perm.name }} 授权详情 ]" href="../sudo_detail/?id={{ sudo_perm.id }}" class="btn btn-xs btn-primary">详情</a>
-                                                <a href="../sudo_edit/?id={{ sudo_perm.id }}" class="btn btn-xs btn-info">编辑</a>
-                                                <a href="../sudo_del/?id={{ sudo_perm.id }}" class="btn btn-xs btn-danger">删除</a>
-                                            </td>
-                                        </tr>
+                                        <tbody>
+                                        {% for group in contacts.object_list %}
+                                            <tr class="gradeX">
+                                                <td class="text-center"> {{ group.name }} </td>
+                                                <td class="text-center"> {{ group.dept.name }} </td>
+                                                <td class="text-center"><a href="/juser/user_list/?did={{ group.id }}">{{ group.id | member_count }} </a> </td>
+                                                <td class="text-center"> {{ group.id | ugrp_perm_agrp_count }} </td>
+                                                <td class="text-center"> {{ group.id | ugrp_perm_asset_count }} </td>
+                                                <td class="text-center"> {{ group.id | ugrp_perm_asset_count }} </td>
+                                                <td class="text-center"> {{ group.comment }} </td>
+                                                <td class="text-center">
+                                                    <a href="../sudo_edit/?id={{ group.id }}" class="btn btn-xs btn-danger">sudo授权</a>
+                                                </td>
+                                            </tr>
                                         {% endfor %}
                                         </tbody>
                                     </table>
                                     <div class="row">
                                         <div class="col-sm-6">
                                             <div class="dataTables_info" id="editable_info" role="status" aria-live="polite">
-                                                Showing {{ contacts1.start_index }} to {{ contacts1.end_index }} of {{ p1.count }} entries
+                                                Showing {{ contacts.start_index }} to {{ contacts.end_index }} of {{ p.count }} entries
                                             </div>
                                         </div>
                                         {% include 'paginator.html' %}
-                                        </div>
                                     </div>
                                 </div>
 
