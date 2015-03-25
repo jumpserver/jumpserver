@@ -69,7 +69,7 @@
                                 <td class="text-center" name="j_port"> {{ post.port }} </td>
                                 <td class="text-center" name="j_type"> {{ login_types|get_item:post.login_type }} </td>
                                 <td class="text-center" name="j_idc"> {{ post.idc.name }} </td>
-                                <td class="text-center" name="j_group">{{ post.dept.all | group_str2 }}</td>
+                                <td class="text-center" name="j_dept">{{ post.dept.all | group_str2 }}</td>
                                 <td class="text-center" name="j_group">{{ post.bis_group.all | group_str2 }}</td>
                                 <td class="text-center" name="j_active"> {{ post.is_active|bool2str }} </td>
                                 <!--<td class="text-center"> {{ post.date_added|date:"Y-m-d H:i:s" }} </td>-->

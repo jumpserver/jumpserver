@@ -6,6 +6,7 @@ from django.db.models import Count
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from jasset.models import IDC
+from juser.models import DEPT
 from jumpserver.api import *
 
 
@@ -84,13 +85,18 @@ def jasset_group_add(name, comment, jtype):
         smg = u'业务组%s添加成功' % name
 
 
-def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment, j_user='', j_password=''):
-    groups = []
+def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_dept, j_active, j_comment, j_user='', j_password=''):
+    groups, depts = [], []
     is_active = {u'是': '1', u'否': '2'}
-    login_types = {'LDAP': 'L', 'SSH_KEY': 'S', 'PASSWORD': 'P', 'MAP': 'M'}
+    login_types = {'LDAP': 'L', 'MAP': 'M'}
     for group in j_group[0].split():
         c = BisGroup.objects.get(name=group.strip())
         groups.append(c)
+    print j_dept
+    for d in j_dept[0].split():
+        p = DEPT.objects.get(name=d.strip())
+        depts.append(p)
+
     j_type = login_types[j_type]
     j_idc = IDC.objects.get(name=j_idc)
     a = Asset.objects.get(id=j_id)
@@ -112,6 +118,7 @@ def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_com
         a.comment = j_comment
     a.save()
     a.bis_group = groups
+    a.dept = depts
     a.save()
 
 
