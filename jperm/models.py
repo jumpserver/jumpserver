@@ -1,3 +1,5 @@
+import datetime
+
 from django.db import models
 from juser.models import UserGroup, DEPT
 from jasset.models import Asset, BisGroup
@@ -31,3 +33,17 @@ class SudoPerm(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class Apply(models.Model):
+    applyer = models.CharField(max_length=20)
+    approver = models.CharField(max_length=20)
+    dept = models.CharField(max_length=20)
+    bisgroup = models.CharField(max_length=500)
+    asset = models.CharField(max_length=500)
+    comment = models.TextField(blank=True, null=True)
+    date_add = models.DateTimeField(default=datetime.datetime.now(), null=True)
+    date_end = models.DateTimeField(null=True)
+
+    def __unicode__(self):
+        return self.applyer

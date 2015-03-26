@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
 from juser.models import User, UserGroup, DEPT
 from jasset.models import Asset, BisGroup
-from jperm.models import Perm, SudoPerm, CmdGroup
+from jperm.models import Perm, SudoPerm, CmdGroup, Apply
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.db.models import Q
 from jumpserver.views import LDAP_ENABLE, ldap_conn, CONF, page_list_return, pages
@@ -525,3 +525,60 @@ def cmd_del(request):
     if cmd_group:
         cmd_group[0].delete()
     return HttpResponseRedirect('/jperm/cmd_list/')
+
+
+@require_login
+def perm_apply(request):
+    header_title, path1, path2 = u'主机权限申请', u'权限管理', u'申请主机'
+    user_id = request.session.get('user_id')
+    username = User.objects.get(id=user_id).username
+    dept_id = get_user_dept(request)
+    deptname = DEPT.objects.get(id=dept_id).name
+    dept = DEPT.objects.get(id=dept_id)
+    posts = Asset.objects.filter(dept=dept)
+    egroup = dept.bisgroup_set.all()
+
+    if request.method == 'POST':
+        applyer = request.POST.get('applyer')
+        dept = request.POST.get('dept')
+        group = request.POST.getlist('group')
+        hosts = request.POST.getlist('hosts')
+        comment = request.POST.get('comment')
+
+        Apply.objects.create(applyer=applyer, dept=dept, bisgroup=group, asset=hosts, comment=comment)
+        print applyer, dept, group, hosts, comment
+        return render_to_response('jperm/perm_apply.html', locals(), context_instance=RequestContext(request))
+    return render_to_response('jperm/perm_apply.html', locals(), context_instance=RequestContext(request))
+
+
+def perm_apply_log(request):
+    header_title, path1, path2 = u'权限申请记录', u'权限管理', u'申请记录'
+    keyword = request.GET.get('keyword')
+    dept_id = get_user_dept(request)
+    dept_name = DEPT.objects.get(id=dept_id).name
+    user_id = request.session.get('user_id')
+    username = User.objects.get(id=user_id).username
+    if is_super_user(request):
+        if keyword:
+            posts = Log.objects.filter(Q(user__contains=keyword) | Q(host__contains=keyword)) \
+                .filter(is_finished=1).order_by('-start_time')
+        else:
+            posts = Log.objects.filter(is_finished=1).order_by('-start_time')
+        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+
+    elif is_group_admin(request):
+        if keyword:
+            posts = Log.objects.filter(Q(user__contains=keyword) | Q(host__contains=keyword)) \
+                .filter(is_finished=1).filter(dept_name=dept_name).order_by('-start_time')
+        else:
+            posts = Log.objects.filter(is_finished=1).filter(dept_name=dept_name).order_by('-start_time')
+        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+
+    elif is_common_user(request):
+        if keyword:
+            posts = Apply.objects.filter(applyer=username).filter(Q(applyer__contains=keyword) | Q(asset__contains=keyword))\
+                .order_by('-date_add')
+        else:
+            posts = Apply.objects.filter(applyer=username).order_by('-date_add')
+        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+    return render_to_response('jperm/perm_log.html', locals(), context_instance=RequestContext(request))

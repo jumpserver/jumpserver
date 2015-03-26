@@ -13,9 +13,7 @@ from juser.models import UserGroup, DEPT
 from connect import PyCrypt, KEY
 from jlog.models import Log
 from jumpserver.views import jasset_host_edit, pages
-from jumpserver.api import asset_perm_api, validate
-from jumpserver.api import require_login, require_super_user, \
-    require_admin, is_group_admin, is_super_user, is_common_user, get_user_dept
+from jumpserver.api import *
 
 cryptor = PyCrypt(KEY)
 
@@ -201,7 +199,11 @@ def list_host(request):
         contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     elif is_common_user(request):
-        pass
+        user_id = request.session.get('user_id')
+        username = User.objects.get(id=user_id).name
+        posts = user_perm_asset_api(username)
+        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+        print posts, username
     return render_to_response('jasset/host_list.html', locals(), context_instance=RequestContext(request))
 
 
@@ -212,6 +214,7 @@ def host_del(request, offset):
         for i in range(int(len_list)):
             key = "id_list[" + str(i) + "]"
             jid = request.POST.get(key)
+            print jid
             if is_group_admin(request) and not validate(request, asset=[jid]):
                 emg = u'删除失败,您无权操作!'
                 return HttpResponseRedirect('/jasset/host_list/')

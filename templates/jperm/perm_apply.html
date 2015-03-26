@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block content %}
+{% include 'nav_cat_bar.html' %}
+<!--<h3 class="text-center">项目发布申请</h3>-->
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-10">
+            <div id="add_asset" class="ibox float-e-margins">
+                <div id="ibox-content" class="ibox-title">
+                    <h5> 填写要申请主机的基本信息 </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li><a href="#">未启用 1</a>
+                            </li>
+                            <li><a href="#">未启用 2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="ibox-content">
+                    {% if emg %}
+                        <div class="alert alert-warning text-center">{{ emg }}</div>
+                    {% endif %}
+                    {% if smg %}
+                        <div class="alert alert-success text-center">{{ smg }}</div>
+                    {% endif %}
+                    <form id="assetForm" method="post" class="form-horizontal">
+                        {% csrf_token %}
+                        <div class="form-group"><label class="col-sm-2 control-label"> 申请人 </label>
+                            <div class="col-sm-8"><input type="text" name="applyer" value="{{  username }}" class="form-control" readonly="readonly"></div>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group"><label class="col-sm-2 control-label"> 所在部门 </label>
+                            <div class="col-sm-8"><input type="text" name="dept" value="{{  deptname }}" class="form-control" readonly="readonly"></div>
+                        </div>
+
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label for="group" class="col-lg-2 control-label">主机组<span class="red-fonts">*</span></label>
+                            <div class="col-sm-8">
+                                <select id="group" name="group" class="form-control m-b" multiple size="10">
+                                    {% for g in egroup %}
+                                        <option type="checkbox" value="{{ g.name }}">{{ g.name }} {% if g.comment %} --- {{ g.comment }} {% endif %}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div>
+                                <label for="groups" class="col-lg-2 control-label">主机<span class="red-fonts">*</span></label>
+                                <div class="col-sm-3">
+                                    <select multiple="multiple" id="id_domains_filter" name="domains_filter" style="display: none;">
+                                    </select>
+                                    <div class="input-group" style="padding-bottom: 5px">
+                                        <input type="text" size="19"  class="form-control input-sm" id="search_input" name="keyword" placeholder="过滤" oninput="search_domain(this.value)">
+                                    </div>
+                                    <select id="groups" size="12" class="form-control m-b" multiple>
+                                        {% for post in posts %}
+                                            <option value="{{ post.ip }}">{{ post.ip }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-sm-1">
+                                    <div class="btn-group" style="margin-top: 50px;">
+                                        <button type="button" class="btn btn-xm btn-white" onclick="move('groups', 'groups_selected')"><i class="fa fa-chevron-right"></i></button>
+                                        <button type="button" class="btn btn-xm btn-white" onclick="move_left('groups_selected', 'groups')"><i class="fa fa-chevron-left"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <h4 style="padding-bottom: 5px">已选中主机</h4>
+                                    <div>
+                                        <select id="groups_selected" name="hosts" class="form-control m-b" size="12"  multiple>
+                                            {% for post in eposts %}
+                                                <option value="{{ post.ip }}">{{ post.ip }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group"><label class="col-sm-2 control-label"> 申请说明 </label>
+                            <div class="col-sm-8"><textarea type="text" placeholder="" name="comment" class="form-control" rows="5" cols="20"></textarea></div>
+                        </div>
+
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-4 col-sm-offset-5">
+                                <button class="btn btn-primary" type="submit"> 提交 </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+   function search_domain(text){
+       console.log(text)
+      $("#groups").children().each(function(){$(this).remove();});
+      $("#id_domains_filter").children().each(function(){
+        if ($(this).text().search(text) != -1) {
+            console.log(text);
+          $("#groups").append($(this).clone())
+        }
+      });
+    }
+
+</script>
+{% endblock content %}
