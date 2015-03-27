@@ -1,5 +1,4 @@
 from django.conf.urls import patterns, include, url
-from jumpserver.api import view_splitter
 from jperm.views import *
 
 urlpatterns = patterns('jperm.views',

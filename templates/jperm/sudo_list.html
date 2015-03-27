@@ -37,7 +37,7 @@
                                     <li id="tab1" class="active"><a href="/jperm/sudo_list/">查看Sudo授权</a></li>
                                     <li id="tab2" class=""><a href="/jperm/cmd_list/">查看命令组</a></li>
                                     <li id="tab3" class=""><a href="/jperm/cmd_add/">添加命令组</a></li>
-                                    <button class="btn btn-primary btn-sm pull-right" style="margin-right: 20px;" data-toggle="tooltip" data-placement="left" title="" data-original-title="Refresh inbox">
+                                    <button id="refresh" class="btn btn-primary btn-sm pull-right" style="margin-right: 20px;" data-toggle="tooltip" data-placement="left" title="" data-original-title="Refresh inbox">
                                         <i class="fa fa-refresh"></i> 刷新
                                     </button>
                                 </ul>
@@ -105,30 +105,39 @@
 <script>
     $(document).ready(function(){
         $(".iframe").colorbox({iframe:true, width:"70%", height:"70%"});
+        $("#refresh").click(function(){
+            $.get('/jperm/sudo_refresh/',
+                    {'test':''},
+                    function(data){
+                        alert(data)
+                    }
+            )
+        })
+
     });
 
-    $(document).ready(function(){
-        $('#search_btn').click(function(){
-            if ($('#tab2').attr('class') == 'active'){
-                var tab='tab2'
-            } else {
-                var tab='tab1'
-            }
-
-            var search=$('#search_input').val()
-
-            $.post('/jperm/perm_list_ajax/',
-                    {'tab': tab, 'search': search},
-                    function(data){
-                        if ($('#tab2').attr('class') == 'active'){
-                            $('#tab-2').html(data)
-                        } else {
-                            $('#tab-1').html(data)
-                        }
-                    })
-
-        })
-    })
+{#    $(document).ready(function(){#}
+{#        $('#search_btn').click(function(){#}
+{#            if ($('#tab2').attr('class') == 'active'){#}
+{#                var tab='tab2'#}
+{#            } else {#}
+{#                var tab='tab1'#}
+{#            }#}
+{##}
+{#            var search=$('#search_input').val()#}
+{##}
+{#            $.post('/jperm/perm_list_ajax/',#}
+{#                    {'tab': tab, 'search': search},#}
+{#                    function(data){#}
+{#                        if ($('#tab2').attr('class') == 'active'){#}
+{#                            $('#tab-2').html(data)#}
+{#                        } else {#}
+{#                            $('#tab-1').html(data)#}
+{#                        }#}
+{#                    })#}
+{##}
+{#        })#}
+{#    })#}
 </script>
 
 {% endblock %}
