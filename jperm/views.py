@@ -356,14 +356,26 @@ def sudo_update(user_group, user_runas, asset_groups_select, cmd_groups_select, 
 #     return render_to_response('jperm/sudo_add.html', locals(), context_instance=RequestContext(request))
 
 
-@require_admin
+@require_super_user
 def sudo_list(request):
     header_title, path1, path2 = u'Sudo授权', u'权限管理', u'Sudo权限详情'
     keyword = request.GET.get('search', '')
+    contact_list = UserGroup.objects.all().order_by('name')
     if keyword:
-        contact_list = UserGroup.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
-    else:
-        contact_list = UserGroup.objects.all().order_by('name')
+        contact_list = contact_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
+
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
+    return render_to_response('jperm/sudo_list.html', locals(), context_instance=RequestContext(request))
+
+
+@require_admin
+def sudo_list_adm(request):
+    header_title, path1, path2 = u'Sudo授权', u'权限管理', u'Sudo权限详情'
+    keyword = request.GET.get('search', '')
+    user, dept = get_session_user_dept(request)
+    contact_list = dept.usergroup_set.all().order_by('name')
+    if keyword:
+        contact_list = contact_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
 
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
     return render_to_response('jperm/sudo_list.html', locals(), context_instance=RequestContext(request))
@@ -409,6 +421,52 @@ def sudo_edit(request):
 
         return HttpResponseRedirect('/jperm/sudo_list/')
 
+    return render_to_response('jperm/sudo_edit.html', locals(), context_instance=RequestContext(request))
+
+
+@require_admin
+def sudo_edit_adm(request):
+    header_title, path1, path2 = u'Sudo授权', u'授权管理', u'Sudo授权'
+    user, dept = get_session_user_dept(request)
+    if request.method == 'GET':
+        user_group_id = request.GET.get('id', '0')
+        if not validate(request, user_group=[user_group_id]):
+            return render_to_response('/jperm/sudo_list/')
+        user_group = UserGroup.objects.filter(id=user_group_id)
+        asset_group_all = dept.bisgroup_set.all()
+        cmd_group_all = dept.cmdgroup_set.all()
+        if user_group:
+            user_group = user_group[0]
+            sudo_perm = user_group.sudoperm_set.all()
+            if sudo_perm:
+                sudo_perm = sudo_perm[0]
+                asset_group_permed = sudo_perm.asset_group.all()
+                cmd_group_permed = sudo_perm.cmd_group.all()
+                user_runas = sudo_perm.user_runas
+                comment = sudo_perm.comment
+            else:
+                asset_group_permed = []
+                cmd_group_permed = []
+
+            asset_groups = [asset_group for asset_group in asset_group_all if asset_group not in asset_group_permed]
+            cmd_groups = [cmd_group for cmd_group in cmd_group_all if cmd_group not in cmd_group_permed]
+
+    else:
+        user_group_id = request.POST.get('user_group_id', '')
+        users_runas = request.POST.get('runas', 'root')
+        asset_groups_select = request.POST.getlist('asset_groups_select')
+        cmd_groups_select = request.POST.getlist('cmd_groups_select')
+        comment = request.POST.get('comment', '')
+        user_group = UserGroup.objects.filter(id=user_group_id)
+        if not validate(request, user_group=[user_group_id], asset_group=asset_groups_select):
+            return render_to_response('/jperm/sudo_list/')
+        if user_group:
+            user_group = user_group[0]
+            if LDAP_ENABLE:
+                sudo_update(user_group, users_runas, asset_groups_select, cmd_groups_select, comment)
+                msg = '修改成功'
+
+        return HttpResponseRedirect('/jperm/sudo_list/')
     return render_to_response('jperm/sudo_edit.html', locals(), context_instance=RequestContext(request))
 
 
@@ -460,7 +518,7 @@ def sudo_refresh(request):
 #     return HttpResponseRedirect('/jperm/sudo_list/')
 
 
-@require_admin
+@require_super_user
 def cmd_add(request):
     header_title, path1, path2 = u'sudo命令添加', u'授权管理', u'命令组添加'
     dept_all = DEPT.objects.all()
@@ -479,6 +537,23 @@ def cmd_add(request):
             error = u"部门不能为空"
         msg = u'命令组添加成功'
 
+        return HttpResponseRedirect('/jperm/cmd_list/')
+
+    return render_to_response('jperm/sudo_cmd_add.html', locals(), context_instance=RequestContext(request))
+
+
+@require_admin
+def cmd_add_adm(request):
+    header_title, path1, path2 = u'sudo命令添加', u'授权管理', u'命令组添加'
+    user, dept = get_session_user_dept(request)
+
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        cmd = ','.join(request.POST.get('cmd').split())
+        comment = request.POST.get('comment')
+
+        CmdGroup.objects.create(name=name, dept=dept, cmd=cmd, comment=comment)
+        msg = u'命令组添加成功'
         return HttpResponseRedirect('/jperm/cmd_list/')
 
     return render_to_response('jperm/sudo_cmd_add.html', locals(), context_instance=RequestContext(request))
@@ -515,7 +590,11 @@ def cmd_edit(request):
 def cmd_list(request):
     header_title, path1, path2 = u'sudo命令查看', u'权限管理', u'Sudo命令添加'
 
-    cmd_groups = contact_list = CmdGroup.objects.all()
+    if request.session.get('role_id', '0') == '2':
+        cmd_groups = contact_list = CmdGroup.objects.all()
+    else:
+        user, dept = get_session_user_dept(request)
+        cmd_groups = contact_list = dept.cmdgroup_set.all()
     p = paginator = Paginator(contact_list, 10)
 
     try:
