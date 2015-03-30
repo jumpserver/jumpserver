@@ -43,7 +43,6 @@ def get_data(data, items, option):
 
 @require_login
 def index(request):
-    path1, path2 = u'仪表盘', 'Dashboard'
     users = User.objects.all()
     hosts = Asset.objects.all()
     online_host = Log.objects.filter(is_finished=0)
@@ -55,7 +54,6 @@ def index(request):
     user_top_ten = week_data.values('user').annotate(times=Count('user')).order_by('-times')[:10]
     host_top_ten = week_data.values('host').annotate(times=Count('host')).order_by('-times')[:10]
     user_dic, host_dic = get_data(week_data, user_top_ten, 'user'), get_data(week_data, host_top_ten, 'host')
-    print "##############%s" % request.session.get('role_id')
 
     top = {'user': '活跃用户数', 'host': '活跃主机数', 'times': '登录次数'}
     top_dic = {}

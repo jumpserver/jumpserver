@@ -234,6 +234,12 @@ def dept_list_adm(request):
 
 
 
+@require_admin
+def chg_role(request):
+    request.session['role_id'] = 0
+    return HttpResponseRedirect('/')
+
+
 @require_super_user
 def dept_detail(request):
     dept_id = request.GET.get('id', None)
