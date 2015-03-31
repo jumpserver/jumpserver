@@ -824,21 +824,9 @@ def addAssets(request):
 def showPerm(request):
     """查看权限"""
     if is_super_user(request):
-        users_all = User.objects.all()
+        users = User.objects.all()
     else:
-        users_all = group_member(request.session.get('username'))
-
-    paginator = Paginator(users_all, 20)
-
-    try:
-        page = int(request.GET.get('page', 1))
-    except ValueError:
-        page = 1
-
-    try:
-        users = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        users = paginator.page(paginator.num_pages)
+        users = group_member(request.session.get('username'))
 
     if request.method == 'POST':
         assets_del = request.REQUEST.getlist('selected')
