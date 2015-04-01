@@ -1,11 +1,9 @@
 # coding: utf-8
 
-import re
 import time
 
 from django import template
 from juser.models import User, UserGroup, DEPT
-from jasset.models import BisGroup
 from jumpserver.api import *
 
 register = template.Library()
@@ -179,12 +177,19 @@ def to_name(user_id):
     except:
         return '非法用户'
 
+
 @register.filter(name='to_role_name')
 def to_role_name(role_id):
     role_dict = {'0': '普通用户', '1': '部门管理员', '2': '超级管理员'}
     return role_dict.get(str(role_id), '未知')
 
+
 @register.filter(name='to_avatar')
 def to_avatar(role_id='0'):
     role_dict = {'0': 'user', '1': 'admin', '2': 'root'}
     return role_dict.get(str(role_id), 'user')
+
+
+@register.filter(name='get_user_asset_group')
+def get_user_asset_group(user):
+    return user_perm_group_api(user)

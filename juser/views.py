@@ -233,10 +233,13 @@ def dept_list_adm(request):
     return render_to_response('juser/dept_list.html', locals(), context_instance=RequestContext(request))
 
 
-
-@require_admin
 def chg_role(request):
-    request.session['role_id'] = 0
+    role = {'SU': 2, 'DA': 1, 'CU': 0}
+    user, dept = get_session_user_dept(request)
+    if request.session['role_id'] > 0:
+        request.session['role_id'] = 0
+    elif request.session['role_id'] == 0:
+        request.session['role_id'] = role.get(user.role, 0)
     return HttpResponseRedirect('/')
 
 
@@ -953,8 +956,36 @@ def profile(request):
     return render_to_response('juser/user_detail.html', locals(), context_instance=RequestContext(request))
 
 
-def chg_pass(request):
+def chg_info(request):
     header_title, path1, path2 = '修改信息 | Edit Info', '用户管理', '修改个人信息'
+    user_id = request.session.get('user_id')
+    user_set = User.objects.filter(id=user_id)
+    error = ''
+    if user_set:
+        user = user_set[0]
+    else:
+        return HttpResponseRedirect('/')
 
-    return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
+    if request.method == 'POST':
+        name = request.POST.get('name', '')
+        password = request.POST.get('password', '')
+        ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
+        email = request.POST.get('email', '')
+
+        if '' in [name, password, ssh_key_pwd, email]:
+            error = '不能为空'
+
+        if len(password) < 6 or len(ssh_key_pwd) < 6:
+            error = '密码须大于6位'
+
+        if not error:
+            if password != user.password:
+                password = md5_crypt(password)
+
+            if ssh_key_pwd != user.ssh_key_pwd:
+                ssh_key_pwd = md5_crypt(ssh_key_pwd)
+            user_set.update(name=name, password=password, ssh_key_pwd=ssh_key_pwd, email=email)
+            msg = '修改成功'
+
+    return render_to_response('juser/chg_info.html', locals(), context_instance=RequestContext(request))
 

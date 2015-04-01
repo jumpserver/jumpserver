@@ -66,7 +66,7 @@
                                             <tr class="gradeX">
                                                 <td class="text-center"> {{ group.name }} </td>
                                                 <td class="text-center"> {{ group.dept.name }} </td>
-                                                <td class="text-center"><a href="/juser/user_list/?did={{ group.id }}">{{ group.id | member_count }} </a> </td>
+                                                <td class="text-center"><a href="/juser/user_list/?gid={{ group.id }}">{{ group.id | member_count }} </a> </td>
                                                 <td class="text-center"> {{ group.id | ugrp_perm_agrp_count }} </td>
                                                 <td class="text-center"> {{ group.id | ugrp_perm_asset_count }} </td>
                                                 <td class="text-center"> {{ group.id | ugrp_perm_asset_count }} </td>
@@ -116,28 +116,7 @@
 
     });
 
-{#    $(document).ready(function(){#}
-{#        $('#search_btn').click(function(){#}
-{#            if ($('#tab2').attr('class') == 'active'){#}
-{#                var tab='tab2'#}
-{#            } else {#}
-{#                var tab='tab1'#}
-{#            }#}
-{##}
-{#            var search=$('#search_input').val()#}
-{##}
-{#            $.post('/jperm/perm_list_ajax/',#}
-{#                    {'tab': tab, 'search': search},#}
-{#                    function(data){#}
-{#                        if ($('#tab2').attr('class') == 'active'){#}
-{#                            $('#tab-2').html(data)#}
-{#                        } else {#}
-{#                            $('#tab-1').html(data)#}
-{#                        }#}
-{#                    })#}
-{##}
-{#        })#}
-{#    })#}
+
 </script>
 
 {% endblock %}

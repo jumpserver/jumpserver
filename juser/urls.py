@@ -27,6 +27,6 @@ urlpatterns = patterns('juser.views',
     (r'^user_del_ajax/$', 'user_del_ajax'),
     (r'^user_edit/$', view_splitter, {'su': user_edit, 'adm': user_edit_adm}),
     (r'^profile/$', 'profile'),
-    (r'^chg_pass/$', 'chg_pass'),
+    (r'^chg_info/$', 'chg_info'),
     (r'^chg_role/$', 'chg_role'),
 )
