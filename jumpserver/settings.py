@@ -121,3 +121,10 @@ USE_TZ = False
 
 STATIC_URL = '/static/'
 
+# mail config
+EMAIL_HOST = config.get('mail', 'email_host')
+EMAIL_PORT = config.get('mail', 'email_port')
+EMAIL_HOST_USER = config.get('mail', 'email_host_user')
+EMAIL_HOST_PASSWORD = config.get('mail', 'email_host_password')
+EMAIL_USE_TLS = config.get('mail', 'email_use_tls')
+

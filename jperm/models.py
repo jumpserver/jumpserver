@@ -42,6 +42,7 @@ class Apply(models.Model):
     bisgroup = models.CharField(max_length=500)
     asset = models.CharField(max_length=500)
     comment = models.TextField(blank=True, null=True)
+    status = models.IntegerField(max_length=2)
     date_add = models.DateTimeField(default=datetime.datetime.now(), null=True)
     date_end = models.DateTimeField(null=True)
 
