@@ -1,5 +1,7 @@
 # coding: utf-8
 
+import re
+import ast
 import time
 
 from django import template
@@ -156,6 +158,11 @@ def group_type_to_str(type_name):
         'A': '用户组',
     }
     return group_types.get(type_name)
+
+
+@register.filter(name='ast_to_list')
+def ast_to_list(lis):
+    return ast.literal_eval(lis)
 
 
 # @register.filter(name='perm_asset_count')

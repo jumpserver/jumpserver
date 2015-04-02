@@ -23,6 +23,13 @@ DB_USER = config.get('db', 'user')
 DB_PASSWORD = config.get('db', 'password')
 DB_DATABASE = config.get('db', 'database')
 
+# mail config
+EMAIL_HOST = 'mail.funshion.com'
+EMAIL_PORT = '25'
+EMAIL_HOST_USER = 'jkfunshion'
+EMAIL_HOST_PASSWORD = 'jkmail%'
+EMAIL_USE_TLS = False
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
@@ -120,4 +127,5 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
 

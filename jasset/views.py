@@ -3,6 +3,7 @@
 import ast
 
 from django.db.models import Q
+from django.http import Http404
 from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response
@@ -12,15 +13,13 @@ from juser.models import UserGroup, DEPT
 from connect import PyCrypt, KEY
 from jlog.models import Log
 from jumpserver.views import jasset_host_edit, pages
-from jumpserver.api import asset_perm_api
-from jumpserver.api import user_perm_group_api, require_login, require_super_user, \
-    require_admin, is_group_admin, is_super_user, is_common_user, get_user_dept
+from jumpserver.api import *
 
 cryptor = PyCrypt(KEY)
 
 
-def index(request):
-    return render_to_response('jasset/jasset.html', )
+class RaiseError(Exception):
+    pass
 
 
 def f_add_host(ip, port, idc, jtype, group, dept, active, comment, username='', password=''):
@@ -70,6 +69,7 @@ def add_host(request):
         user_id = request.session.get('user_id')
         edept = DEPT.objects.get(id=dept_id)
         egroup = edept.bisgroup_set.all()
+
     if request.method == 'POST':
         j_ip = request.POST.get('j_ip')
         j_idc = request.POST.get('j_idc')
@@ -79,6 +79,10 @@ def add_host(request):
         j_active = request.POST.get('j_active')
         j_comment = request.POST.get('j_comment')
         j_dept = request.POST.getlist('j_dept')
+
+        if is_group_admin(request) and not validate(request, asset_group=j_group, edept=j_dept):
+            emg = u'添加失败,您无权操作!'
+            return render_to_response('jasset/host_add.html', locals(), context_instance=RequestContext(request))
 
         if Asset.objects.filter(ip=str(j_ip)):
             emg = u'该IP %s 已存在!' % j_ip
@@ -136,6 +140,7 @@ def batch_host_edit(request):
             j_id = "editable[" + str(i) + "][j_id]"
             j_ip = "editable[" + str(i) + "][j_ip]"
             j_port = "editable[" + str(i) + "][j_port]"
+            j_dept = "editable[" + str(i) + "][j_dept]"
             j_idc = "editable[" + str(i) + "][j_idc]"
             j_type = "editable[" + str(i) + "][j_type]"
             j_group = "editable[" + str(i) + "][j_group]"
@@ -145,11 +150,18 @@ def batch_host_edit(request):
             j_id = request.POST.get(j_id).strip()
             j_ip = request.POST.get(j_ip).strip()
             j_port = request.POST.get(j_port).strip()
+            j_dept = request.POST.getlist(j_dept).strip()
             j_idc = request.POST.get(j_idc).strip()
             j_type = request.POST.get(j_type).strip()
             j_group = request.POST.getlist(j_group)
             j_active = request.POST.get(j_active).strip()
             j_comment = request.POST.get(j_comment).strip()
+            print j_dept, j_group
+            #
+            # if is_group_admin(request) and not validate(request, asset=[j_id]):
+            #     emg = u'删除失败,您无权操作!'
+            #     print 'hehe'
+            #     return HttpResponseRedirect('/jasset/host_list/')
 
             if j_type == 'M':
                 j_user = "editable[" + str(i) + "][j_user]"
@@ -157,9 +169,9 @@ def batch_host_edit(request):
                 j_user = request.POST.get(j_user).strip()
                 password = request.POST.get(j_password).strip()
                 j_password = cryptor.encrypt(password)
-                jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment, j_user, j_password)
+                jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_dept, j_active, j_comment, j_user, j_password)
             else:
-                jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_active, j_comment)
+                jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_dept, j_active, j_comment)
 
         return render_to_response('jasset/host_list.html')
 
@@ -187,7 +199,11 @@ def list_host(request):
         contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     elif is_common_user(request):
-        pass
+        user_id = request.session.get('user_id')
+        username = User.objects.get(id=user_id).name
+        posts = user_perm_asset_api(username)
+        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+        print posts, username
     return render_to_response('jasset/host_list.html', locals(), context_instance=RequestContext(request))
 
 
@@ -198,11 +214,18 @@ def host_del(request, offset):
         for i in range(int(len_list)):
             key = "id_list[" + str(i) + "]"
             jid = request.POST.get(key)
+            print jid
+            if is_group_admin(request) and not validate(request, asset=[jid]):
+                emg = u'删除失败,您无权操作!'
+                return HttpResponseRedirect('/jasset/host_list/')
             a = Asset.objects.get(id=jid).ip
             Asset.objects.filter(id=jid).delete()
             BisGroup.objects.filter(name=a).delete()
     else:
         jid = int(offset)
+        if is_group_admin(request) and not validate(request, asset=[jid]):
+            emg = u'删除失败,您无权操作!'
+            return HttpResponseRedirect('/jasset/host_list/')
         a = Asset.objects.get(id=jid).ip
         BisGroup.objects.filter(name=a).delete()
         Asset.objects.filter(id=jid).delete()
@@ -234,8 +257,12 @@ def host_edit(request):
         j_active = request.POST.get('j_active')
         j_comment = request.POST.get('j_comment')
         j_idc = IDC.objects.get(name=j_idc)
+
+        if is_group_admin(request) and not validate(request, asset_group=j_group, edept=j_dept):
+            emg = u'修改失败,您无权操作!'
+            return render_to_response('jasset/host_edit.html', locals(), context_instance=RequestContext(request))
+
         for group in j_group:
-            print group
             c = BisGroup.objects.get(name=group)
             groups.append(c)
 
@@ -373,8 +400,12 @@ def add_group(request):
         j_dept = request.POST.get('j_dept')
         j_hosts = request.POST.getlist('j_hosts')
         j_comment = request.POST.get('j_comment')
-        j_dept = DEPT.objects.get(name=j_dept)
 
+        if is_group_admin(request) and not validate(request, asset=j_hosts, edept=[j_dept]):
+            emg = u'添加失败,您无权操作!'
+            return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
+
+        j_dept = DEPT.objects.get(name=j_dept)
         if BisGroup.objects.filter(name=j_group):
             emg = u'该主机组已存在!'
             return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
@@ -531,7 +562,3 @@ def host_search(request):
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     return render_to_response('jasset/host_search.html', locals(), context_instance=RequestContext(request))
-
-
-def test(request):
-    return render_to_response('jasset/test.html', locals())

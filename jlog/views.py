@@ -45,7 +45,12 @@ def log_list_online(request):
         contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     elif is_common_user(request):
-        posts = Log.objects.filter(is_finished=0).filter(user=username).order_by('-start_time')
+        if keyword:
+            posts = Log.objects.filter(user=username).filter(Q(user__contains=keyword) | Q(host__contains=keyword))\
+                .filter(is_finished=0).order_by('-start_time')
+        else:
+            posts = Log.objects.filter(is_finished=0).filter(user=username).order_by('-start_time')
+        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     return render_to_response('jlog/log_online.html', locals(), context_instance=RequestContext(request))
 
@@ -75,8 +80,12 @@ def log_list_offline(request):
         contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     elif is_common_user(request):
-        posts = Log.objects.filter(is_finished=1).filter(user=username).order_by('-start_time')
-
+        if keyword:
+            posts = Log.objects.filter(user=username).filter(Q(user__contains=keyword) | Q(host__contains=keyword))\
+                .filter(is_finished=1).order_by('-start_time')
+        else:
+            posts = Log.objects.filter(is_finished=1).filter(user=username).order_by('-start_time')
+        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
     return render_to_response('jlog/log_offline.html', locals(), context_instance=RequestContext(request))
 
 
@@ -105,6 +114,8 @@ def log_search(request):
     env = request.GET.get('env')
     dept_id = get_user_dept(request)
     dept_name = DEPT.objects.get(id=dept_id).name
+    user_id = request.session.get('user_id')
+    username = User.objects.get(id=user_id).username
     if is_super_user(request):
         if env == 'online':
             posts = contact_list = Log.objects.filter(Q(user__contains=keyword) | Q(host__contains=keyword)) \
@@ -121,5 +132,14 @@ def log_search(request):
         elif env == 'offline':
             posts = contact_list = Log.objects.filter(Q(user__contains=keyword) | Q(host__contains=keyword)) \
                 .filter(is_finished=1).filter(dept_name=dept_name).order_by('-start_time')
+        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+
+    elif is_common_user(request):
+        if env == 'online':
+            posts = contact_list = Log.objects.filter(Q(user__contains=keyword) | Q(host__contains=keyword)) \
+                .filter(is_finished=0).filter(user=username).order_by('-start_time')
+        elif env == 'offline':
+            posts = contact_list = Log.objects.filter(Q(user__contains=keyword) | Q(host__contains=keyword)) \
+                .filter(is_finished=1).filter(user=username).order_by('-start_time')
         contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
     return render_to_response('jlog/log_search.html', locals(), context_instance=RequestContext(request))

@@ -299,8 +299,12 @@ def asset_perm_api(asset):
         return user_permed_list
 
 
-def validate(request, user_group=None, user=None, asset_group=None, asset=None):
+def validate(request, user_group=None, user=None, asset_group=None, asset=None, edept=None):
     dept = get_session_user_dept(request)[1]
+    if edept:
+        if dept.name != edept[0]:
+            return False
+
     if user_group:
         dept_user_groups = dept.usergroup_set.all()
         user_groups = []
@@ -321,19 +325,24 @@ def validate(request, user_group=None, user=None, asset_group=None, asset=None):
     if asset_group:
         dept_asset_groups = dept.bisgroup_set.all()
         asset_groups = []
-        for asset_group_id in asset_group:
-            asset_groups.extend(BisGroup.objects.filter(id=asset_group_id))
+        for asset_group_name in dept_asset_groups:
+            asset_groups.extend(asset_group_name.name)
 
-        if not set(asset_groups).issubset(set(dept_asset_groups)):
+        if len(asset_groups) == 0:
+            return False     
+
+        if not set(asset_group).issubset(set(asset_groups)):
             return False
 
     if asset:
         dept_assets = dept.asset_set.all()
-        assets = []
-        for asset_id in asset:
-            assets.extend(asset_id)
+        assets, eassets = [], []
+        for asset_id in dept_assets:
+            eassets.append(int(asset_id.id))
+        for i in asset:
+            assets.append(int(i)) 
 
-        if not set(assets).issubset(dept_assets):
+        if not set(assets).issubset(eassets):
             return False
 
     return True

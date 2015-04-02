@@ -69,15 +69,17 @@
                                 <td class="text-center" name="j_port"> {{ post.port }} </td>
                                 <td class="text-center" name="j_type"> {{ login_types|get_item:post.login_type }} </td>
                                 <td class="text-center" name="j_idc"> {{ post.idc.name }} </td>
-                                <td class="text-center" name="j_group">{{ post.dept.all | group_str2 }}</td>
+                                <td class="text-center" name="j_dept">{{ post.dept.all | group_str2 }}</td>
                                 <td class="text-center" name="j_group">{{ post.bis_group.all | group_str2 }}</td>
                                 <td class="text-center" name="j_active"> {{ post.is_active|bool2str }} </td>
                                 <!--<td class="text-center"> {{ post.date_added|date:"Y-m-d H:i:s" }} </td>-->
                                 <td class="text-center" name="j_comment"> {{ post.comment }} </td>
                                 <td class="text-center" data-editable='false'>
                                     <a value="/jasset/{{ post.ip }}/" class="iframe btn btn-xs btn-primary">详情</a>
-                                    <a href="/jasset/host_edit/?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <a href="/jasset/host_del/{{ post.id }}" class="btn btn-xs btn-danger">删除</a>
+                                    {% ifnotequal session_role_id 0 %}
+                                        <a href="/jasset/host_edit/?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>
+                                        <a href="/jasset/host_del/{{ post.id }}" class="btn btn-xs btn-danger">删除</a>
+                                    {% endifnotequal %}
                                 </td>
                             </tr>
                         {% endfor %}
