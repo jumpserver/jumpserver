@@ -1,5 +1,7 @@
 import datetime
 
+from uuidfield import UUIDField
+
 from django.db import models
 from juser.models import UserGroup, DEPT
 from jasset.models import Asset, BisGroup
@@ -36,6 +38,7 @@ class SudoPerm(models.Model):
 
 
 class Apply(models.Model):
+    uuid = UUIDField(auto=True)
     applyer = models.CharField(max_length=20)
     approver = models.CharField(max_length=20)
     dept = models.CharField(max_length=20)

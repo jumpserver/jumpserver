@@ -1,6 +1,8 @@
 # coding: utf-8
 
-import ast
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 import datetime
 
 
@@ -542,17 +544,25 @@ def perm_apply(request):
     dept = DEPT.objects.get(id=dept_id)
     posts = Asset.objects.filter(dept=dept)
     egroup = dept.bisgroup_set.all()
-    mail_address = 'wangyong@fun.tv'
+    dept_da = User.objects.filter(dept_id=dept_id, role='DA')
 
     if request.method == 'POST':
         applyer = request.POST.get('applyer')
         dept = request.POST.get('dept')
+        da = request.POST.get('da')
         group = request.POST.getlist('group')
         hosts = request.POST.getlist('hosts')
         comment = request.POST.get('comment')
-        print applyer, dept, group, hosts, comment
-        url = 'http://127.0.0.1:8000/jperm/apply/exec/?id='
-        mail_title = '权限申请'
+        da = User.objects.get(id=da)
+        mail_address = da.email
+        mail_title = '%s - 权限申请' % username
+        # print da.username, applyer, group, hosts, datetime.datetime.now(), comment, url
+        group_lis = ', '.join(group)
+        hosts_lis = ', '.join(hosts)
+        time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        Apply.objects.create(applyer=applyer, dept=dept, bisgroup=group, asset=hosts, status=0, comment=comment)
+        uuid = Apply.objects.get(applyer=applyer, asset=hosts, comment=comment).uuid
+        url = "http://127.0.0.1:8000/jperm/apply_exec/?uuid=%s" % uuid
         mail_msg = """
         Hi,%s:
             有新的权限申请, 详情如下:
@@ -563,13 +573,30 @@ def perm_apply(request):
                 申请说明: %s
             请及时审批, 审批完成后点击以下链接,告知各位。
             %s
-        """ % (u'123', applyer, group, hosts, datetime.datetime.now(), comment, url)
-        send_mail(mail_title, mail_msg, 'jkfunshion@fun.tv', [mail_address], fail_silently=False)
-        smg = "提交成功,已转交运维上线。"
+        """ % (da.username, applyer, group_lis, hosts_lis, time_now, comment, url)
 
-        Apply.objects.create(applyer=applyer, dept=dept, bisgroup=group, asset=hosts, status=0, comment=comment)
+        send_mail(mail_title, mail_msg, 'jkfunshion@fun.tv', [mail_address], fail_silently=False)
+        smg = "提交成功,已发邮件通知部门管理员。"
         return render_to_response('jperm/perm_apply.html', locals(), context_instance=RequestContext(request))
     return render_to_response('jperm/perm_apply.html', locals(), context_instance=RequestContext(request))
+
+
+def perm_apply_exec(request):
+    uuid = request.GET.get('uuid')
+    p_apply = Apply.objects.filter(uuid=str(uuid))
+    q_apply = Apply.objects.get(uuid=str(uuid))
+    if p_apply:
+        user = User.objects.get(username=q_apply.applyer)
+        mail_address = user.email
+        time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        p_apply.update(status=1, date_end=time_now)
+        mail_title = '%s - 权限审批完成' % q_apply.applyer
+        mail_msg = """
+        Hi,%s:
+            您所申请的权限已由 %s 在 %s 审批完成, 请登录验证。
+        """ % (q_apply.applyer, q_apply.approver, time_now)
+        send_mail(mail_title, mail_msg, 'jkfunshion@fun.tv', [mail_address], fail_silently=False)
+        return render_to_response('jperm/perm_apply_exec.html', locals(), context_instance=RequestContext(request))
 
 
 def get_apply_posts(request, status, username, dept_name, keyword=None):

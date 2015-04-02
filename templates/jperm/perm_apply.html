@@ -45,6 +45,14 @@
                             <div class="col-sm-8"><input type="text" name="dept" value="{{  deptname }}" class="form-control" readonly="readonly"></div>
                         </div>
 
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group"><label class="col-sm-2 control-label"> 部门管理员 </label>
+                            <div class="radio">
+                                {% for da in dept_da %}
+                                    <label><input type="radio" value="{{ da.id }}" id="da" name="da"> {{ da }}</label>
+                                {% endfor %}
+                            </div>
+                        </div>
 
                         <div class="hr-line-dashed"></div>
                         <div class="form-group">
