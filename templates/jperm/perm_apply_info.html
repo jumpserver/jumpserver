@@ -1,0 +1,55 @@
+{% load mytags %}
+<html>
+    <head>
+        <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+        <script src="/static/js/jquery-2.1.1.js"></script>
+        <script src="/static/js/bootstrap.min.js"></script>
+        <!--<link href="/static/css/style.css" rel="stylesheet">
+        <!--{% include 'head_script.html' %}
+
+        <!--<style type="text/css">-->
+        <!--body-->
+        <!--{-->
+        <!--background: #FFFFFF;-->
+        <!--}-->
+        <!--</style>-->
+    </head>
+
+    <body>
+        <div class="container">
+            <h3 class="text-center"><span class="text-success">{{ post.applyer }}</span>权限申请详情</h3>
+            <br/>
+            <div class="row">
+                <div class="col-xs-5">
+                    <h6 class="text-right">申请人</h6>
+                    <h6 class="text-right">所属部门</h6>
+                    <h6 class="text-right">申请主机组</h6>
+                    <h6 class="text-right">申请主机</h6>
+                    {% for i in post.asset|ast_to_list_1 %}
+                        <h6 class="text-right" style="color: #ffffff">Null</h6>
+                    {% endfor %}
+                    <h6 class="text-right">批准人</h6>
+                    <h6 class="text-right">申请时间</h6>
+                    <h6 class="text-right">批准时间</h6>
+                    <h6 class="text-right">备注</h6>
+                </div>
+                <div class="col-xs-2">
+                    <div class="col-sm-offset-6" style="width: 2; height: 70%; background-color: #1AB394; padding-top: 200px"></div>
+                </div>
+                <div class="col-xs-5">
+                    <h6 class="text-left">{{ post.applyer }}</h6>
+                    <h6 class="text-left">{{ post.dept }}</h6>
+                    <h6 class="text-left">{% for i in post.bisgroup|ast_to_list_1 %} {{ i }} {% endfor %}</h6>
+                    {% for i in post.asset|ast_to_list_1 %}
+                        <h6 class="text-left">{{ i }}</h6>
+                    {% endfor %}
+                    <h6 class="text-right" style="color: #ffffff">Null</h6>
+                    <h6 class="text-left">{{ post.approver }}1</h6>
+                    <h6 class="text-left">{{ post.date_add|date:"Y-m-d H:i:s"}}</h6>
+                    <h6 class="text-left"> {{ post.date_end|date:"Y-m-d H:i:s" }}1 </h6>
+                    <h6 class="text-left"> {{ post.comment }} </h6>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

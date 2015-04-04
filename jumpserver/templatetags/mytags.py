@@ -56,6 +56,18 @@ def groups_str2(group_list):
         return '%s ...' % ' '.join([group.name for group in group_list[0:2]])
 
 
+@register.filter(name='group_str2_all')
+def groups_str2(group_list):
+    group_lis = []
+    for i in group_list:
+        if str(i) != 'ALL':
+            group_lis.append(i)
+    if len(group_lis) < 3:
+        return ' '.join([group.name for group in group_lis])
+    else:
+        return '%s ...' % ' '.join([group.name for group in group_lis[0:2]])
+
+
 @register.filter(name='group_manage_str')
 def group_manage_str(username):
     user = User.objects.get(username=username)
@@ -163,6 +175,11 @@ def group_type_to_str(type_name):
 
 @register.filter(name='ast_to_list')
 def ast_to_list(lis):
+    return ast.literal_eval(lis)[0:2]
+
+
+@register.filter(name='ast_to_list_1')
+def ast_to_list_1(lis):
     return ast.literal_eval(lis)
 
 

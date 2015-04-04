@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load mytags %}
 {% block content %}
 {% include 'nav_cat_bar.html' %}
 <div class="wrapper wrapper-content animated fadeInRight">
@@ -37,7 +38,7 @@
                                         <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
                                         <input type="text" style="display: none">
                                         <div class="input-group-btn">
-                                            <button id='search_btn' type="button" class="btn btn-sm btn-primary" onclick="log_search()">
+                                            <button id='search_btn' type="button" class="btn btn-sm btn-primary" onclick="apply_search()">
                                                 Search
                                             </button>
                                         </div>
@@ -56,8 +57,8 @@
                                     <th class="text-center"> 申请主机组 </th>
                                     <th class="text-center"> 申请主机 </th>
                                     <th class="text-center"> 申请时间 </th>
-                                    <th class="text-center"> 批准时间 </th>
                                     <th class="text-center"> 备注 </th>
+                                    <th class="text-center"> 操作 </th>
 
                                 </tr>
                             </thead>
@@ -66,14 +67,13 @@
                                 <tr class="gradeX">
                                     <td class="text-center" id="username"> {{ post.applyer }} </td>
                                     <td class="text-center" id="dept"> {{ post.dept }} </td>
-                                    <td class="text-center" id="ip"> {{ post.bisgroup }} </td>
-                                    <td class="text-center" id="remote_ip"> {{ post.asset }} </td>
-                                    <!--{% ifnotequal session_role_id 0 %}-->
-                                        <!--<td class="text-center"><a href="/jlog/history/?id={{ post.id }}" class="log_command"> 命令统计 </td>-->
-                                    <!--{% endifnotequal %}-->
+                                    <td class="text-center" id="ip"> {% for i in post.bisgroup|ast_to_list %} {{ i }} {% endfor %}... </td>
+                                    <td class="text-center" id="remote_ip"> {% for i in post.asset|ast_to_list %} {{ i }} {% endfor %}... </td>
                                     <td class="text-center" id="start_time"> {{ post.date_add|date:"Y-m-d H:i:s"}} </td>
-                                    <td class="text-center" id="end_time"> {{ post.date_end|date:"Y-m-d H:i:s" }} </td>
                                     <td class="text-center" id=""> {{ post.comment }} </td>
+                                    <td class="text-center" data-editable='false'>
+                                        <a value="/jperm/apply_info/?uuid={{ post.uuid }}" class="iframe btn btn-xs btn-primary">详情</a>
+                                    </td>
                                 </tr>
                             {% endfor %}
                             </tbody>
@@ -89,5 +89,36 @@
         </div>
     </div>
 </div>
+<script>
+    $(".iframe").on('click', function(){
+        var url= $(this).attr("value");
+        $.layer({
+            type: 2,
+            title: '权限申请详情',
+            maxmin: true,
+            shift: 'top',
+            border: [2, 0.3, '#1AB394'],
+            shade: [0.5, '#000000'],
+            shadeClose: true,
+            area : ['800px' , '600px'],
+            iframe: {src: url}
+        });
+    });
+    function apply_search(){
+        $.ajax({
+            type: "GET",
+            url: "/jperm/apply_search/?env=online",
+            data: $("#search_form").serialize(),
+            success: function (data) {
+                $(".tab-content").html(data);
+            }
+        });
+    }
+    $("#search_input").keydown(function(e){
+        if(e.keyCode==13){
+            apply_search()
+            }
+    })
+</script>
 
 {% endblock %}

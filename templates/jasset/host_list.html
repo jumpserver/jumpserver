@@ -56,7 +56,6 @@
                                 <th class="text-center"> 所属部门 </th>
                                 <th class="text-center"> 所属主机组 </th>
                                  <th class="text-center"> 是否激活 </th>
-                                <!--<th class="text-center" name="j_time"> 添加时间 </th>-->
                                 <th class="text-center" name="j_comment"> 备注 </th>
                                 <th class="text-center"> 操作 </th>
                             </tr>
@@ -70,9 +69,8 @@
                                 <td class="text-center" name="j_type"> {{ login_types|get_item:post.login_type }} </td>
                                 <td class="text-center" name="j_idc"> {{ post.idc.name }} </td>
                                 <td class="text-center" name="j_dept">{{ post.dept.all | group_str2 }}</td>
-                                <td class="text-center" name="j_group">{{ post.bis_group.all | group_str2 }}</td>
+                                <td class="text-center" name="j_group">{{ post.bis_group.all | group_str2_all }}</td>
                                 <td class="text-center" name="j_active"> {{ post.is_active|bool2str }} </td>
-                                <!--<td class="text-center"> {{ post.date_added|date:"Y-m-d H:i:s" }} </td>-->
                                 <td class="text-center" name="j_comment"> {{ post.comment }} </td>
                                 <td class="text-center" data-editable='false'>
                                     <a value="/jasset/{{ post.ip }}/" class="iframe btn btn-xs btn-primary">详情</a>
