@@ -33,7 +33,7 @@ class SudoPerm(models.Model):
     comment = models.CharField(max_length=30, null=True, blank=True)
 
     def __unicode__(self):
-        return self.user_group.name        return self.name
+        return self.user_group.name
 
 
 class Apply(models.Model):

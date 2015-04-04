@@ -2,6 +2,21 @@
 {% load mytags %}
 {% block content %}
 {% include 'nav_cat_bar.html' %}
+<script>
+function filter_ip(text, noselect, total){
+    alert(text);
+    $("#" + noselect).children().each(
+        function(){
+            $(this).remove();
+        });
+
+    $("#" + total).children().each(function{
+        if  ($(this).text().search(text) != -1){
+            $("#" + noselect).append($(this).clone())
+        }
+        })
+}
+</script>
 
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
@@ -28,6 +43,18 @@
                     </div>
                 </div>
 
+                <select id="assets_total" name="assets" class="form-control m-b" size="12" multiple style="display: none">
+                    {% for asset in assets %}
+                        <option value="{{ asset.id }}">{{ asset.ip }}</option>
+                    {% endfor %}
+                </select>
+
+                <select id="asset_select_total" name="asset_select" class="form-control m-b" size="12"  multiple style="display: none">
+                    {% for asset in asset_select %}
+                    <option value="{{ asset.id }}">{{ asset.ip }}</option>
+                    {% endfor %}
+                </select>
+
                 <div class="ibox-content">
                     <form id="sudoPerm" method="post" class="form-horizontal" action="">
                         {% if error %}
@@ -37,7 +64,6 @@
                             <div class="alert alert-success text-center">{{ msg }}</div>
                         {% endif %}
                         <div class="row">
-
                             <div class="form-group">
                                 <label for="group_name" class="col-sm-2 control-label">部门</label>
                                 <div class="col-sm-8">
@@ -47,6 +73,19 @@
                             </div>
 
                             <div class="hr-line-dashed"></div>
+
+                            <div class="form-group">
+                                <label for="group_name" class="col-sm-2 control-label">过滤</label>
+                                <div class="col-sm-4">
+                                    <input id="noselect" class="form-control" onchange="filter_ip(this.value, 'assets', 'assets_total')">
+                                </div>
+                                <div class="col-sm-1">
+                                </div>
+                                <div id="select" class="col-sm-3">
+                                    <input class="form-control">
+                                </div>
+                            </div>
+
 
                             <div class="form-group">
                                 <label for="" class="col-sm-2 control-label">主机<span class="red-fonts">*</span></label>
@@ -134,7 +173,11 @@ $(document).ready(function(){
         $('#users_selected option').each(function(){
             $(this).prop('selected', true)
         })
-    })
+    });
+
+
+
+
 })
 </script>
 
