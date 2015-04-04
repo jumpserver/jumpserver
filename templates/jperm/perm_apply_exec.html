@@ -6,35 +6,26 @@
     <div class="row">
         <div class="col-lg-10">
             <div id="add_asset" class="ibox float-e-margins">
-                <div id="ibox-content" class="ibox-title">
-                    <h5> 填写要申请主机的基本信息 </h5>
-                    <div class="ibox-tools">
-                        <a class="collapse-link">
-                            <i class="fa fa-chevron-up"></i>
-                        </a>
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="fa fa-wrench"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">未启用 1</a>
-                            </li>
-                            <li><a href="#">未启用 2</a>
-                            </li>
-                        </ul>
-                        <a class="close-link">
-                            <i class="fa fa-times"></i>
-                        </a>
-                    </div>
-                </div>
-
                 <div class="ibox-content">
-                    <h3>授权完成, 已邮件通知申请人, 五秒钟后关闭页面</h3>
+                    <h2 id="jumpTo" class="text-center text-info"></h2>
                 </div>
             </div>
         </div>
     </div>
 </div>
-<script>
 
+<script>
+    function countDown(secs,surl){
+         var jumpTo = document.getElementById('jumpTo');
+         jumpTo.innerHTML='{{ smg }}......' + secs + '秒';
+         if(--secs>0){
+             setTimeout("countDown("+secs+",'"+surl+"')",1000);
+             }
+         else{
+             location.href=surl;
+             }
+         }
+    countDown(10,'/');
 </script>
+
 {% endblock content %}

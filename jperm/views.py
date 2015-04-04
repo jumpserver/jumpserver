@@ -648,7 +648,6 @@ def perm_apply(request):
         da = User.objects.get(id=da)
         mail_address = da.email
         mail_title = '%s - 权限申请' % username
-        # print da.username, applyer, group, hosts, datetime.datetime.now(), comment, url
         group_lis = ', '.join(group)
         hosts_lis = ', '.join(hosts)
         time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -663,31 +662,42 @@ def perm_apply(request):
                 申请的主机: %s
                 申请时间: %s
                 申请说明: %s
-            请及时审批, 审批完成后点击以下链接,告知各位。
+            请及时审批, 审批完成后点击以下链接,告知申请人。
+
             %s
         """ % (da.username, applyer, group_lis, hosts_lis, time_now, comment, url)
 
-        send_mail(mail_title, mail_msg, 'jkfunshion@fun.tv', [mail_address], fail_silently=False)
+        send_mail(mail_title, mail_msg, 'jumpserver@163.com', [mail_address], fail_silently=False)
         smg = "提交成功,已发邮件通知部门管理员。"
         return render_to_response('jperm/perm_apply.html', locals(), context_instance=RequestContext(request))
     return render_to_response('jperm/perm_apply.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def perm_apply_exec(request):
+    header_title, path1, path2 = u'主机权限申请', u'权限管理', u'审批完成'
     uuid = request.GET.get('uuid')
-    p_apply = Apply.objects.filter(uuid=str(uuid))
-    q_apply = Apply.objects.get(uuid=str(uuid))
-    if p_apply:
-        user = User.objects.get(username=q_apply.applyer)
-        mail_address = user.email
-        time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        p_apply.update(status=1, date_end=time_now)
-        mail_title = '%s - 权限审批完成' % q_apply.applyer
-        mail_msg = """
-        Hi,%s:
-            您所申请的权限已由 %s 在 %s 审批完成, 请登录验证。
-        """ % (q_apply.applyer, q_apply.approver, time_now)
-        send_mail(mail_title, mail_msg, 'jkfunshion@fun.tv', [mail_address], fail_silently=False)
+    if uuid:
+        p_apply = Apply.objects.filter(uuid=str(uuid))
+        q_apply = Apply.objects.get(uuid=str(uuid))
+        if q_apply.status == 1:
+            smg = '此权限已经审批完成, 请勿重复审批, 十秒钟后返回首页'
+            return render_to_response('jperm/perm_apply_exec.html', locals(), context_instance=RequestContext(request))
+        else:
+            user = User.objects.get(username=q_apply.applyer)
+            mail_address = user.email
+            time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            p_apply.update(status=1, date_end=time_now)
+            mail_title = '%s - 权限审批完成' % q_apply.applyer
+            mail_msg = """
+            Hi,%s:
+                您所申请的权限已由 %s 在 %s 审批完成, 请登录验证。
+            """ % (q_apply.applyer, q_apply.approver, time_now)
+            send_mail(mail_title, mail_msg, 'jkfunshion@fun.tv', [mail_address], fail_silently=False)
+            smg = '授权完成, 已邮件通知申请人, 十秒钟后返回首页'
+            return render_to_response('jperm/perm_apply_exec.html', locals(), context_instance=RequestContext(request))
+    else:
+        smg = '没有此授权, 十秒钟后返回首页'
         return render_to_response('jperm/perm_apply_exec.html', locals(), context_instance=RequestContext(request))
 
 
@@ -715,6 +725,7 @@ def get_apply_posts(request, status, username, dept_name, keyword=None):
     return posts
 
 
+@require_login
 def perm_apply_log(request, offset):
     header_title, path1, path2 = u'权限申请记录', u'权限管理', u'申请记录'
     keyword = request.GET.get('keyword')
@@ -731,3 +742,59 @@ def perm_apply_log(request, offset):
         posts = get_apply_posts(request, 1, username, dept_name, keyword)
         contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
         return render_to_response('jperm/perm_log_offline.html', locals(), context_instance=RequestContext(request))
+
+
+def perm_apply_info(request):
+    uuid = request.GET.get('uuid')
+    post = Apply.objects.get(uuid=uuid)
+    return render_to_response('jperm/perm_apply_info.html', locals(), context_instance=RequestContext(request))
+
+
+def perm_apply_search(request):
+    keyword = request.GET.get('keyword')
+    env = request.GET.get('env')
+    dept_id = get_user_dept(request)
+    dept_name = DEPT.objects.get(id=dept_id).name
+    user_id = request.session.get('user_id')
+    username = User.objects.get(id=user_id).username
+    if is_super_user(request):
+        if env == 'online':
+            posts = Apply.objects.filter(Q(applyer__contains=keyword) | Q(approver__contains=keyword)) \
+                .filter(status=0).order_by('-date_add')
+        elif env == 'offline':
+            posts = Apply.objects.filter(Q(applyer__contains=keyword) | Q(approver__contains=keyword)) \
+                .filter(status=1).order_by('-date_add')
+        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+
+    elif is_group_admin(request):
+        if env == 'online':
+            posts = Apply.objects.filter(Q(applyer__contains=keyword) | Q(approver__contains=keyword)) \
+                .filter(status=0).filter(dept_name=dept_name).order_by('-date_add')
+        elif env == 'offline':
+            posts = Apply.objects.filter(Q(applyer__contains=keyword) | Q(approver__contains=keyword)) \
+                .filter(status=1).filter(dept_name=dept_name).order_by('-date_add')
+        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+
+    elif is_common_user(request):
+        if env == 'online':
+            posts = Apply.objects.filter(Q(applyer__contains=keyword) | Q(approver__contains=keyword)) \
+                .filter(status=0).filter(user=username).order_by('-date_add')
+        elif env == 'offline':
+            posts = Apply.objects.filter(Q(applyer__contains=keyword) | Q(approver__contains=keyword)) \
+                .filter(status=1).filter(applyer=username).order_by('-date_add')
+        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+    return render_to_response('jperm/perm_apply_search.html', locals(), context_instance=RequestContext(request))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
