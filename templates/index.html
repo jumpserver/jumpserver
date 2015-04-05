@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load mytags %}
+{% load humanize %}
 {% block content %}
 {% include 'nav_cat_bar.html' %}
 
@@ -12,7 +14,7 @@
                 </div>
                 <div class="ibox-content">
                     <h1 class="no-margins"><a href="/juser/user_list/">{{ users.count}}</a></h1>
-                    <div class="stat-percent font-bold text-success">98% <i class="fa fa-bolt"></i></div>
+                    <div class="stat-percent font-bold text-success">{{ percent_user }} <i class="fa fa-bolt"></i></div>
                     <small>All user</small>
                 </div>
             </div>
@@ -25,7 +27,7 @@
                 </div>
                 <div class="ibox-content">
                     <h1 class="no-margins"><a href="/jasset/host_list/">{{ hosts.count }}</a></h1>
-                    <div class="stat-percent font-bold text-info">20% <i class="fa fa-level-up"></i></div>
+                    <div class="stat-percent font-bold text-info">{{ percent_host }} <i class="fa fa-level-up"></i></div>
                     <small>All host</small>
                 </div>
             </div>
@@ -39,7 +41,7 @@
                 </div>
                 <div class="ibox-content">
                     <h1 class="no-margins"><a href="/jlog/log_list/online/"> <span id="online_users"></span></a></h1>
-                    <div class="stat-percent font-bold text-navy">44% <i class="fa fa-level-up"></i></div>
+                    <div class="stat-percent font-bold text-navy">{{ percent_online_user }} <i class="fa fa-level-up"></i></div>
                     <small>Online user</small>
                 </div>
             </div>
@@ -53,28 +55,172 @@
                 </div>
                 <div class="ibox-content">
                         <h1 class="no-margins"><a href="/jlog/log_list/online/"> <span id="online_hosts"></span></a></h1>
-                    <div class="stat-percent font-bold text-danger">38% <i class="fa fa-level-down"></i></div>
+                    <div class="stat-percent font-bold text-danger">{{ percent_online_host }} <i class="fa fa-level-down"></i></div>
                     <small>Connected host</small>
                 </div>
             </div>
         </div>
-        <div class="row">
-            <div class="col-lg-6" id="top10" style="width:50%;height:400px;"></div>
-            <div class="col-lg-6" id="usertop10" style="width:50%;height:400px;"></div>
-        </div>
-        <div class="row">
-            <div class="col-lg-6" id="hosttop10" style="width:50%;height:400px; margin-top: 20px"></div>
-        </div>
     </div>
+    <div class="row">
+        <div class="col-lg-3 border-bottom white-bg dashboard-header" style="margin-left:15px;">
+            <h2>活跃用户TOP5</h2>
+            <small>过去一周共有<span class="text-info">{{ week_users }}</span>位用户登录<span class="text-success">{{ week_hosts }}</span>次服务器.</small>
+            <ul class="list-group clear-list m-t">
+                {% for data in user_top_five %}
+                    <li class="list-group-item fist-item">
+                        <span class="pull-right">
+                            {{ data|get_dic_times }}次/周
+                        </span>
+                        <span class="label {{ color|random }}">{{ forloop.counter }}</span> {{ data|get_dic_user }}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-lg-9" id="top10" style="margin-left: -15px;height: 345px"></div>
+    </div>
+    <br/>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>权限申请</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content ibox-heading">
+                    <h3><i class="fa fa-envelope-o"></i> New messages</h3>
+                    <small><i class="fa fa-tim"></i> You have 22 new messages and 16 waiting in draft folder.</small>
+                </div>
+                <div class="ibox-content">
+                    <div class="feed-activity-list">
+                        {% for perm in perm_apply_10 %}
+                            <div class="feed-element">
+                                <div>
+                                    {% ifequal perm.status 0 %}
+                                        <small class="pull-right text-navy">{{ perm.date_add|naturaltime }}</small>
+                                    {% else %}
+                                         <small class="pull-right">{{ perm.date_add|naturaltime }}</small>
+                                    {% endifequal %}
+                                    <strong>{{ perm.applyer }}</strong>
+                                    <div>申请 {{ perm.bisgroup|ast_to_list }} 主机组权限</div>
+                                    <div>申请 {{ perm.asset|ast_to_list }} 主机权限</div>
+                                    <small class="text-muted">{{ perm.date_add }}</small>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>最近十次登录</h5>
+                    <div class="ibox-tools">
+                        <span class="label label-warning-light">10 Messages</span>
+                       </div>
+                </div>
+                <div class="ibox-content">
+
+                    <div>
+                        <div class="feed-activity-list">
+                            {% for login in login_10 %}
+                                <div class="feed-element">
+                                    <a href="profile.html" class="pull-left">
+                                        <img alt="image" class="img-circle" src="/static/img/root.png">
+                                    </a>
+                                    <div class="media-body ">
+                                        {% ifequal login.is_finished 0 %}
+                                            <small class="pull-right text-navy">{{ login.start_time|naturaltime }}</small>
+                                        {% else %}
+                                            <small class="pull-right">{{ login.start_time|naturaltime }}</small>
+                                        {% endifequal %}
+                                        <strong>{{ login.user }}</strong> 登录了{{ login.host }} <br>
+                                        <small class="text-muted">{{ login.start_time }}</small>
+
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+
+                        <button class="btn btn-primary btn-block m-t"><i class="fa fa-arrow-down"></i> Show More</button>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>一周Top10用户</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li><a href="#">Config option 1</a>
+                            </li>
+                            <li><a href="#">Config option 2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content ibox-heading">
+                    <h3>You have meeting today!</h3>
+                    <small><i class="fa fa-map-marker"></i> Meeting is on 6:00am. Check your schedule to see detail.</small>
+                </div>
+                <div class="ibox-content inspinia-timeline">
+                    {% for data in user_top_ten %}
+                        <div class="timeline-item">
+                            <div class="row">
+                                <div class="col-xs-5 date">
+                                    <i class="fa fa-info-circle"></i>
+                                    <strong>{{ data|get_dic_user }}</strong>
+                                    <br/>
+                                    <small class="text-navy">{{ data|get_dic_times }}次</small>
+                                </div>
+                                <div class="col-xs-7 content no-top-border">
+                                    <p class="m-b-xs">最近一次登录</p>
+                                    <p>{{ data.last.host }}</p>
+                                    <p>于{{ data.last.start_time |date:"Y-m-d H:i:s" }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    <!--</div>-->
+            <!--<div class="col-xm-6" id="top10" style="width:50%;height:400px;"></div>-->
+            <!--<div class="col-xm-6" id="usertop10" style="width:50%;height:400px;"></div>-->
+        <!--<div class="row">-->
+            <!--<div class="col-lg-6" id="hosttop10" style="width:50%;height:400px; margin-top: 20px"></div>-->
+        <!--</div>-->
 </div>
 
 <script>
 var cate = {{ li_str|safe }};
 $(function () {
     $('#top10').highcharts({
-        chart: {
-            type: 'column'
-        },
+//        chart: {
+//            type: 'column'
+//        },
         title: {
             text: '一周数据总览',
             x: -20 //center
@@ -94,7 +240,7 @@ $(function () {
         yAxis:{
             min: 0,
             title: {
-                text: '登录次数'
+                text: ''
             },
             plotLines: [{
                 value: 0,

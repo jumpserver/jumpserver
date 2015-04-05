@@ -3,16 +3,13 @@
 import ast
 
 from django.db.models import Q
-from django.http import Http404
-from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 
-from models import IDC, Asset, BisGroup
+from jasset.models import IDC, Asset, BisGroup
 from juser.models import UserGroup, DEPT
-from connect import PyCrypt, KEY
-from jlog.models import Log
-from jumpserver.views import jasset_host_edit, pages
+from jperm.models import Perm
+from jumpserver.views import pages
 from jumpserver.api import *
 
 cryptor = PyCrypt(KEY)
@@ -54,6 +51,42 @@ def f_add_host(ip, port, idc, jtype, group, dept, active, comment, username='', 
     a.dept = depts
     a.save()
 
+
+def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_dept, j_active, j_comment, j_user='', j_password=''):
+    groups, depts = [], []
+    is_active = {u'是': '1', u'否': '2'}
+    login_types = {'LDAP': 'L', 'MAP': 'M'}
+    for group in j_group[0].split():
+        c = BisGroup.objects.get(name=group.strip())
+        groups.append(c)
+    print j_dept
+    for d in j_dept[0].split():
+        p = DEPT.objects.get(name=d.strip())
+        depts.append(p)
+
+    j_type = login_types[j_type]
+    j_idc = IDC.objects.get(name=j_idc)
+    a = Asset.objects.get(id=j_id)
+    if j_type == 'M':
+        a.ip = j_ip
+        a.port = j_port
+        a.login_type = j_type
+        a.idc = j_idc
+        a.is_active = j_active
+        a.comment = j_comment
+        a.username = j_user
+        a.password = j_password
+    else:
+        a.ip = j_ip
+        a.port = j_port
+        a.idc = j_idc
+        a.login_type = j_type
+        a.is_active = is_active[j_active]
+        a.comment = j_comment
+    a.save()
+    a.bis_group = groups
+    a.dept = depts
+    a.save()
 
 @require_admin
 def add_host(request):
@@ -183,27 +216,45 @@ def list_host(request):
     keyword = request.GET.get('keyword', '')
     dept_id = get_user_dept(request)
     dept = DEPT.objects.get(id=dept_id)
-    if is_super_user(request):
-        if keyword:
-            posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
-                         Q(bis_group__name__contains=keyword) | Q(comment__contains=keyword)).distinct().order_by('ip')
-        else:
-            posts = Asset.objects.all().order_by('ip')
-        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-    elif is_group_admin(request):
-        if keyword:
-            posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
-                         Q(bis_group__name__contains=keyword) | Q(comment__contains=keyword)).filter(dept=dept).distinct().order_by('ip')
-        else:
-            posts = Asset.objects.all().filter(dept=dept).order_by('ip')
-        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+    did = request.GET.get('did')
+    gid = request.GET.get('gid')
+    sid = request.GET.get('sid')
+    if did:
+        dept = DEPT.objects.get(id=did)
+        posts = dept.asset_set.all()
+    elif gid:
+        posts = []
+        user_group = UserGroup.objects.get(id=gid)
+        perms = Perm.objects.filter(user_group=user_group)
+        for perm in perms:
+            for post in perm.asset_group.asset_set.all():
+                posts.append(post)
+        posts = list(set(posts))
+    elif sid:
+        pass
 
-    elif is_common_user(request):
-        user_id = request.session.get('user_id')
-        username = User.objects.get(id=user_id).name
-        posts = user_perm_asset_api(username)
-        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-        print posts, username
+    else:
+        if is_super_user(request):
+            if keyword:
+                posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
+                             Q(bis_group__name__contains=keyword) | Q(comment__contains=keyword)).distinct().order_by('ip')
+            else:
+                posts = Asset.objects.all().order_by('ip')
+
+        elif is_group_admin(request):
+            if keyword:
+                posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
+                             Q(bis_group__name__contains=keyword) | Q(comment__contains=keyword)).filter(dept=dept).distinct().order_by('ip')
+            else:
+                posts = Asset.objects.all().filter(dept=dept).order_by('ip')
+
+        elif is_common_user(request):
+            user_id = request.session.get('user_id')
+            username = User.objects.get(id=user_id).name
+            posts = user_perm_asset_api(username)
+
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+
     return render_to_response('jasset/host_list.html', locals(), context_instance=RequestContext(request))
 
 
@@ -426,16 +477,24 @@ def list_group(request):
     dept_id = get_user_dept(request)
     dept = DEPT.objects.get(id=dept_id)
     keyword = request.GET.get('keyword', '')
-    if is_super_user(request):
-        if keyword:
-            posts = BisGroup.objects.exclude(name='ALL').filter(Q(name__contains=keyword) | Q(comment__contains=keyword))
-        else:
-            posts = BisGroup.objects.exclude(name='ALL').order_by('id')
-    elif is_group_admin(request):
-        if keyword:
-            posts = BisGroup.objects.filter(Q(name__contains=keyword) | Q(comment__contains=keyword)).filter(dept=dept)
-        else:
-            posts = BisGroup.objects.filter(dept=dept).order_by('id')
+    gid = request.GET.get('gid')
+    if gid:
+        posts = []
+        user_group = UserGroup.objects.get(id=gid)
+        perms = Perm.objects.filter(user_group=user_group)
+        for perm in perms:
+            posts.append(perm.asset_group)
+    else:
+        if is_super_user(request):
+            if keyword:
+                posts = BisGroup.objects.exclude(name='ALL').filter(Q(name__contains=keyword) | Q(comment__contains=keyword))
+            else:
+                posts = BisGroup.objects.exclude(name='ALL').order_by('id')
+        elif is_group_admin(request):
+            if keyword:
+                posts = BisGroup.objects.filter(Q(name__contains=keyword) | Q(comment__contains=keyword)).filter(dept=dept)
+            else:
+                posts = BisGroup.objects.filter(dept=dept).order_by('id')
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
     return render_to_response('jasset/group_list.html', locals(), context_instance=RequestContext(request))
 

@@ -174,7 +174,12 @@ def group_type_to_str(type_name):
 
 @register.filter(name='ast_to_list')
 def ast_to_list(lis):
-    return ast.literal_eval(lis)[0:2]
+    ast_lis = ast.literal_eval(lis)
+    if len(ast_lis) <= 2:
+        return ','.join([i for i in ast_lis])
+    else:
+        restr = ','.join([i for i in ast_lis[0:2]]) + '...'
+        return restr
 
 
 @register.filter(name='ast_to_list_1')
@@ -189,6 +194,16 @@ def ast_to_list_1(lis):
 @register.filter(name='string_length')
 def string_length(string, length):
     return '%s ...' % string[0:length]
+
+
+@register.filter(name='get_dic_user')
+def get_dic_user(dic):
+    return dic.get('user')
+
+
+@register.filter(name='get_dic_times')
+def get_dic_times(dic):
+    return dic.get('times')
 
 
 @register.filter(name='to_name')
