@@ -43,7 +43,14 @@ def get_data(data, items, option):
 
 
 @require_login
+def index_cu(request):
+    return render_to_response('index_cu.html', locals(), context_instance=RequestContext(request))
+
+
+@require_login
 def index(request):
+    if request.session.get('role_id') == 0:
+        return index_cu(request)
     users = User.objects.all()
     hosts = Asset.objects.all()
     online_host = Log.objects.filter(is_finished=0)

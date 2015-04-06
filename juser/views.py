@@ -109,7 +109,7 @@ def db_del_user(username):
 
 def gen_ssh_key(username, password=None, length=2048):
     private_key_dir = os.path.join(BASE_DIR, 'keys/jumpserver/')
-    private_key_file = os.path.join(private_key_dir, username)
+    private_key_file = os.path.join(private_key_dir, username+".pem")
     public_key_dir = '/home/%s/.ssh/' % username
     public_key_file = os.path.join(public_key_dir, 'authorized_keys')
     is_dir(private_key_dir)
@@ -775,18 +775,26 @@ def user_list_adm(request):
     return render_to_response('juser/user_list.html', locals(), context_instance=RequestContext(request))
 
 
-@require_admin
+@require_login
 def user_detail(request):
-    user_id = request.GET.get('id', '')
+    header_title, path1, path2 = '查看用户', '用户管理', '用户详情'
+    if request.session.get('role_id') == 0:
+        user_id = request.session.get('user_id')
+    else:
+        user_id = request.GET.get('id', '')
+        if request.session.get('role_id') == 1:
+            user, dept = get_session_user_dept(request)
+            if not validate(request, user=[user_id]):
+                return HttpResponseRedirect('/')
     if not user_id:
         return HttpResponseRedirect('/juser/user_list/')
-    if request.session.get('role_id', '') == '1':
-        if not validate(request, user=[user_id]):
-            return HttpResponseRedirect('/juser/user_list/')
+
     user = User.objects.filter(id=user_id)
     if user:
         user = user[0]
         asset_group_permed = user_perm_group_api(user)
+        logs_last = Log.objects.filter(user=user.name).order_by('-start_time')[0:10]
+        logs_all = Log.objects.filter(user=user.name).order_by('-start_time')
 
     return render_to_response('juser/user_detail.html', locals(), context_instance=RequestContext(request))
 
@@ -953,11 +961,11 @@ def profile(request):
     if not user_id:
         return HttpResponseRedirect('/')
     user = User.objects.get(id=user_id)
-    return render_to_response('juser/user_detail.html', locals(), context_instance=RequestContext(request))
+    return render_to_response('juser/profile.html', locals(), context_instance=RequestContext(request))
 
 
 def chg_info(request):
-    header_title, path1, path2 = '修改信息 | Edit Info', '用户管理', '修改个人信息'
+    header_title, path1, path2 = '修改信息', '用户管理', '修改个人信息'
     user_id = request.session.get('user_id')
     user_set = User.objects.filter(id=user_id)
     error = ''

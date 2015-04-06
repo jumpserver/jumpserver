@@ -8,7 +8,7 @@
         <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">{{ session_user_id | to_name}}</strong>
          </span> <span class="text-muted text-xs block">{{ session_role_id | to_role_name }} <b class="caret"></b></span> </span> </a>
         <ul class="dropdown-menu animated fadeInRight m-t-xs">
-            <li><a value="/juser/user_detail/?id={{ session_user_id }}" class="iframe">个人信息</a></li>
+            <li><a value="/juser/profile/?id={{ session_user_id }}" class="iframe">个人信息</a></li>
             <li><a href="/juser/chg_info/">修改信息</a></li>
             <li><a href="/juser/chg_role/">切换角色</a></li>
 
