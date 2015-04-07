@@ -69,9 +69,9 @@
                 {% for data in user_top_five %}
                     <li class="list-group-item fist-item">
                         <span class="pull-right">
-                            {{ data|get_dic_times }}次/周
+                            {{ data.times }}次/周
                         </span>
-                        <span class="label {{ color|random }}">{{ forloop.counter }}</span> {{ data|get_dic_user }}
+                        <span class="label {{ color|random }}">{{ forloop.counter }}</span> {{ data.user }}
                     </li>
                 {% endfor %}
             </ul>
@@ -95,8 +95,8 @@
                     </div>
                 </div>
                 <div class="ibox-content ibox-heading">
-                    <h3><i class="fa fa-envelope-o"></i> New messages</h3>
-                    <small><i class="fa fa-tim"></i> You have 22 new messages and 16 waiting in draft folder.</small>
+                    <h3><i class="fa fa-envelope-o"></i> 权限申请记录 </h3>
+                    <small><i class="fa fa-map-marker"></i> 最近十条权限申请记录信息.</small>
                 </div>
                 <div class="ibox-content">
                     <div class="feed-activity-list">
@@ -124,11 +124,14 @@
                 <div class="ibox-title">
                     <h5>最近十次登录</h5>
                     <div class="ibox-tools">
-                        <span class="label label-warning-light">10 Messages</span>
+                        <span class="label label-info-light">10 Messages</span>
                        </div>
                 </div>
+                <div class="ibox-content ibox-heading">
+                    <h3><i class="fa fa-paper-plane-o"></i> 登录记录 </h3>
+                    <small<i class="fa fa-map-marker"></i> 最近十次登录记录. </small>
+                </div>
                 <div class="ibox-content">
-
                     <div>
                         <div class="feed-activity-list">
                             {% for login in login_10 %}
@@ -150,7 +153,7 @@
                             {% endfor %}
                         </div>
 
-                        <button class="btn btn-primary btn-block m-t"><i class="fa fa-arrow-down"></i> Show More</button>
+                        <button class="btn btn-primary btn-block m-t"><i class="fa fa-arrow-down"></i> 更多 </button>
 
                     </div>
 
@@ -181,8 +184,8 @@
                     </div>
                 </div>
                 <div class="ibox-content ibox-heading">
-                    <h3>You have meeting today!</h3>
-                    <small><i class="fa fa-map-marker"></i> Meeting is on 6:00am. Check your schedule to see detail.</small>
+                    <h3><i class="fa fa-user"></i> 一周Top10用户 </h3>
+                    <small><i class="fa fa-map-marker"></i> 一周Top10用户登录次数及最近一次登录记录. </small>
                 </div>
                 <div class="ibox-content inspinia-timeline">
                     {% for data in user_top_ten %}
@@ -190,9 +193,9 @@
                             <div class="row">
                                 <div class="col-xs-5 date">
                                     <i class="fa fa-info-circle"></i>
-                                    <strong>{{ data|get_dic_user }}</strong>
+                                    <strong>{{ data.user }}</strong>
                                     <br/>
-                                    <small class="text-navy">{{ data|get_dic_times }}次</small>
+                                    <small class="text-navy">{{ data.times }}次</small>
                                 </div>
                                 <div class="col-xs-7 content no-top-border">
                                     <p class="m-b-xs">最近一次登录</p>

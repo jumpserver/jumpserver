@@ -67,8 +67,8 @@
                                 <tr class="gradeX">
                                     <td class="text-center" id="username"> {{ post.applyer }} </td>
                                     <td class="text-center" id="dept"> {{ post.dept }} </td>
-                                    <td class="text-center" id="ip"> {% for i in post.bisgroup|ast_to_list %} {{ i }} {% endfor %}... </td>
-                                    <td class="text-center" id="remote_ip"> {% for i in post.asset|ast_to_list %} {{ i }} {% endfor %}... </td>
+                                    <td class="text-center" id="ip"> {{ post.bisgroup|ast_to_list }}</td>
+                                    <td class="text-center" id="remote_ip"> {{ post.asset|ast_to_list }} </td>
                                     <td class="text-center" id="start_time"> {{ post.date_add|date:"Y-m-d H:i:s"}} </td>
                                     <td class="text-center" id=""> {{ post.comment }} </td>
                                     <td class="text-center" data-editable='false'>

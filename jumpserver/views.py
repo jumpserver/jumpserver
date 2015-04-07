@@ -83,7 +83,6 @@ def index(request):
     login_10 = Log.objects.order_by('-start_time')[:10]
 
     # a week top 10
-    # user_top_ten_more = []
     for user_info in user_top_ten:
         username = user_info.get('user')
         last = Log.objects.filter(user=username).latest('start_time')

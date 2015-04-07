@@ -6,9 +6,9 @@ from django.db.models import Q
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 
-from jasset.models import IDC, Asset, BisGroup
+from jasset.models import IDC, Asset, BisGroup, AssetAlias
 from juser.models import UserGroup, DEPT
-from jperm.models import Perm
+from jperm.models import Perm, SudoPerm
 from jumpserver.views import pages
 from jumpserver.api import *
 
@@ -87,6 +87,7 @@ def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_dept, j_activ
     a.bis_group = groups
     a.dept = depts
     a.save()
+
 
 @require_admin
 def add_host(request):
@@ -189,12 +190,6 @@ def batch_host_edit(request):
             j_group = request.POST.getlist(j_group)
             j_active = request.POST.get(j_active).strip()
             j_comment = request.POST.get(j_comment).strip()
-            print j_dept, j_group
-            #
-            # if is_group_admin(request) and not validate(request, asset=[j_id]):
-            #     emg = u'删除失败,您无权操作!'
-            #     print 'hehe'
-            #     return HttpResponseRedirect('/jasset/host_list/')
 
             if j_type == 'M':
                 j_user = "editable[" + str(i) + "][j_user]"
@@ -202,11 +197,34 @@ def batch_host_edit(request):
                 j_user = request.POST.get(j_user).strip()
                 password = request.POST.get(j_password).strip()
                 j_password = cryptor.encrypt(password)
-                jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_dept, j_active, j_comment, j_user, j_password)
+                jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_dept, j_active, j_comment, j_user,
+                                 j_password)
             else:
                 jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_dept, j_active, j_comment)
 
         return render_to_response('jasset/host_list.html')
+
+
+@require_login
+def batch_host_edit_common(request):
+    user_id = request.session.get('user_id', '')
+    u = User.objects.get(id=user_id)
+    if request.method == 'POST':
+        len_table = request.POST.get('len_table')
+        for i in range(int(len_table)):
+            j_id = "editable[" + str(i) + "][j_id]"
+            j_alias = "editable[" + str(i) + "][j_alias]"
+            j_id = request.POST.get(j_id).strip()
+            j_alias = request.POST.get(j_alias).strip()
+            a = Asset.objects.get(id=j_id)
+            asset_alias = AssetAlias.objects.filter(user=u, host=a)
+            if asset_alias:
+                asset_alias = asset_alias[0]
+                asset_alias.alias = j_alias
+                asset_alias.save()
+            else:
+                AssetAlias.objects.create(user=u, host=a, alias=j_alias)
+    return render_to_response('jasset/host_list_common.html')
 
 
 @require_login
@@ -222,6 +240,8 @@ def list_host(request):
     if did:
         dept = DEPT.objects.get(id=did)
         posts = dept.asset_set.all()
+        return render_to_response('jasset/host_list_nop.html', locals(), context_instance=RequestContext(request))
+
     elif gid:
         posts = []
         user_group = UserGroup.objects.get(id=gid)
@@ -230,32 +250,47 @@ def list_host(request):
             for post in perm.asset_group.asset_set.all():
                 posts.append(post)
         posts = list(set(posts))
+        return render_to_response('jasset/host_list_nop.html', locals(), context_instance=RequestContext(request))
+
     elif sid:
-        pass
+        posts = []
+        user_group = UserGroup.objects.get(id=sid)
+        perms = Perm.objects.filter(user_group=user_group)
+        for perm in perms:
+            for post in perm.asset_group.asset_set.all():
+                posts.append(post)
+        posts = list(set(posts))
+        return render_to_response('jasset/host_list_nop.html', locals(), context_instance=RequestContext(request))
 
     else:
         if is_super_user(request):
             if keyword:
                 posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
-                             Q(bis_group__name__contains=keyword) | Q(comment__contains=keyword)).distinct().order_by('ip')
+                                             Q(bis_group__name__contains=keyword) | Q(
+                    comment__contains=keyword)).distinct().order_by('ip')
             else:
                 posts = Asset.objects.all().order_by('ip')
+            contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+            return render_to_response('jasset/host_list.html', locals(), context_instance=RequestContext(request))
 
         elif is_group_admin(request):
             if keyword:
                 posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
-                             Q(bis_group__name__contains=keyword) | Q(comment__contains=keyword)).filter(dept=dept).distinct().order_by('ip')
+                                             Q(bis_group__name__contains=keyword) | Q(
+                    comment__contains=keyword)).filter(dept=dept).distinct().order_by('ip')
             else:
                 posts = Asset.objects.all().filter(dept=dept).order_by('ip')
+
+            contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+            return render_to_response('jasset/host_list.html', locals(), context_instance=RequestContext(request))
 
         elif is_common_user(request):
             user_id = request.session.get('user_id')
             username = User.objects.get(id=user_id).name
             posts = user_perm_asset_api(username)
-
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-
-    return render_to_response('jasset/host_list.html', locals(), context_instance=RequestContext(request))
+            contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+            return render_to_response('jasset/host_list_common.html', locals(),
+                                      context_instance=RequestContext(request))
 
 
 @require_admin
@@ -478,21 +513,32 @@ def list_group(request):
     dept = DEPT.objects.get(id=dept_id)
     keyword = request.GET.get('keyword', '')
     gid = request.GET.get('gid')
+    sid = request.GET.get('sid')
     if gid:
         posts = []
         user_group = UserGroup.objects.get(id=gid)
         perms = Perm.objects.filter(user_group=user_group)
         for perm in perms:
             posts.append(perm.asset_group)
+
+    elif sid:
+        posts = []
+        user_group = UserGroup.objects.get(id=sid)
+        perms = Perm.objects.filter(user_group=user_group)
+        for perm in perms:
+            posts.append(perm.asset_group)
+
     else:
         if is_super_user(request):
             if keyword:
-                posts = BisGroup.objects.exclude(name='ALL').filter(Q(name__contains=keyword) | Q(comment__contains=keyword))
+                posts = BisGroup.objects.exclude(name='ALL').filter(
+                    Q(name__contains=keyword) | Q(comment__contains=keyword))
             else:
                 posts = BisGroup.objects.exclude(name='ALL').order_by('id')
         elif is_group_admin(request):
             if keyword:
-                posts = BisGroup.objects.filter(Q(name__contains=keyword) | Q(comment__contains=keyword)).filter(dept=dept)
+                posts = BisGroup.objects.filter(Q(name__contains=keyword) | Q(comment__contains=keyword)).filter(
+                    dept=dept)
             else:
                 posts = BisGroup.objects.filter(dept=dept).order_by('id')
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
@@ -506,7 +552,7 @@ def edit_group(request):
     group = BisGroup.objects.get(id=group_id)
     all = Asset.objects.all()
     dept_id = get_user_dept(request)
-    eposts = contact_list = Asset.objects.filter(bis_group=group).order_by('ip')
+    eposts = Asset.objects.filter(bis_group=group).order_by('ip')
 
     if is_super_user(request):
         edept = DEPT.objects.all()
@@ -552,6 +598,7 @@ def detail_group(request):
     return render_to_response('jasset/group_detail.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
 def detail_idc(request):
     header_title, path1, path2 = u'IDC详情', u'资产管理', u'IDC详情'
     login_types = {'L': 'LDAP', 'M': 'MAP'}
@@ -605,6 +652,7 @@ def group_del(request, offset):
     return HttpResponseRedirect('/jasset/jgroup_list/')
 
 
+@require_login
 def host_search(request):
     keyword = request.GET.get('keyword')
     login_types = {'L': 'LDAP', 'M': 'MAP'}
@@ -618,6 +666,15 @@ def host_search(request):
         posts = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
                                      Q(bis_group__name__contains=keyword) | Q(
             comment__contains=keyword)).filter(dept=dept).distinct().order_by('ip')
+    elif is_common_user(request):
+        user_id = request.session.get('user_id')
+        username = User.objects.get(id=user_id).name
+        post_perm = user_perm_asset_api(username)
+        post_all = Asset.objects.filter(Q(ip__contains=keyword) | Q(idc__name__contains=keyword) |
+                                        Q(bis_group__name__contains=keyword) | Q(comment__contains=keyword)) \
+            .distinct().order_by('ip')
+        posts = list(set(post_all) & set(post_perm))
+        print posts
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     return render_to_response('jasset/host_search.html', locals(), context_instance=RequestContext(request))

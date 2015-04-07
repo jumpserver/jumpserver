@@ -22,4 +22,5 @@ urlpatterns = patterns('',
     url(r'^host_del/(\w+)/$', host_del),
     url(r'^host_edit/$', host_edit),
     url(r'^host_edit/batch/$', batch_host_edit),
+    url(r'^host_edit_common/batch/$', batch_host_edit_common),
 )

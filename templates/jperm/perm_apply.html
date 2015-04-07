@@ -74,7 +74,7 @@
                                     <select multiple="multiple" id="id_domains_filter" name="domains_filter" style="display: none;">
                                     </select>
                                     <div class="input-group" style="padding-bottom: 5px">
-                                        <input type="text" size="19"  class="form-control input-sm" id="search_input" name="keyword" placeholder="过滤" oninput="search_domain(this.value)">
+                                        <input type="text" size="19"  class="form-control input-sm" id="search" name="keyword" placeholder="过滤">
                                     </div>
                                     <select id="groups" size="12" class="form-control m-b" multiple>
                                         {% for post in posts %}
@@ -119,17 +119,16 @@
         </div>
     </div>
 </div>
-<script>
-   function search_domain(text){
-       console.log(text)
-      $("#groups").children().each(function(){$(this).remove();});
-      $("#id_domains_filter").children().each(function(){
-        if ($(this).text().search(text) != -1) {
-            console.log(text);
-          $("#groups").append($(this).clone())
-        }
-      });
-    }
 
+<script>
+    var $rows = $('#groups option');
+    $('#search').keyup(function() {
+        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+
+        $rows.show().filter(function() {
+            var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+            return !~text.indexOf(val);
+        }).hide();
+    });
 </script>
 {% endblock content %}
