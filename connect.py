@@ -3,6 +3,7 @@
 import socket
 import sys
 import os
+import re
 import ast
 import select
 import time
@@ -23,7 +24,7 @@ from django.core.exceptions import ObjectDoesNotExist
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 django.setup()
 from juser.models import User
-from jasset.models import Asset
+from jasset.models import AssetAlias
 from jlog.models import Log
 from jumpserver.api import *
 try:
@@ -98,7 +99,7 @@ def log_record(username, host):
     today_connect_log_dir = os.path.join(connect_log_dir, today)
     log_filename = '%s_%s_%s.log' % (username, host, time_now)
     log_file_path = os.path.join(today_connect_log_dir, log_filename)
-    dept_name = User.objects.get(username=username).dept
+    dept_name = User.objects.get(username=username).dept.name
     pid = os.getpid()
     ip_list = []
     remote_ip = os.popen("who |grep `ps aux |gawk '{if ($2==%s) print $1}'` |gawk '{print $5}'|tr -d '()'" % pid).readlines()
@@ -160,7 +161,6 @@ def posix_shell(chan, username, host):
                 chan.send(x)
 
     finally:
-        timestamp_end = time.time()
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)
         log_file.write('Endtime is %s' % datetime.now())
         log_file.close()
@@ -168,14 +168,20 @@ def posix_shell(chan, username, host):
         log.log_finished = False
         log.end_time = datetime.now()
         log.save()
+        print_prompt()
 
 
 def get_user_host(username):
     """Get the hosts of under the user control."""
     hosts_attr = {}
     asset_all = user_perm_asset_api(username)
+    user = User.objects.get(username=username)
     for asset in asset_all:
-        hosts_attr[asset.ip] = [asset.id, asset.comment]
+        alias = AssetAlias.objects.filter(user=user, host=asset)
+        if alias and alias[0].alias != '':
+            hosts_attr[asset.ip] = [asset.id, asset.ip, alias[0].alias]
+        else:
+            hosts_attr[asset.ip] = [asset.id, asset.ip, asset.comment]
     return hosts_attr
 
 
@@ -186,6 +192,20 @@ def get_user_hostgroup(username):
     for group in group_all:
         groups_attr[group.name] = [group.id, group.comment]
     return groups_attr
+
+
+def get_user_hostgroup_host(username, gid):
+    """Get the hostgroup hosts of under the user control."""
+    hosts_attr = {}
+    user = User.objects.get(username=username)
+    hosts = user_perm_group_hosts_api(gid)
+    for host in hosts:
+        alias = AssetAlias.objects.filter(user=user, host=host)
+        if alias and alias[0].alias != '':
+            hosts_attr[host.ip] = [host.id, host.ip, alias[0].alias]
+        else:
+            hosts_attr[host.ip] = [host.id, host.ip, host.comment]
+    return hosts_attr
 
 
 def get_connect_item(username, ip):
@@ -219,13 +239,16 @@ def get_connect_item(username, ip):
 
 
 def verify_connect(username, part_ip):
+    ip_matched = []
     hosts_attr = get_user_host(username)
-    hosts = hosts_attr.keys()
-    ip_matched = [ip for ip in hosts if part_ip in ip]
-
+    hosts = hosts_attr.values()
+    for ip_info in hosts:
+        for info in ip_info[1:]:
+            if part_ip in info:
+                ip_matched.append(ip_info[1])
     if len(ip_matched) > 1:
         for ip in ip_matched:
-            print '%s -- %s' % (ip, hosts_attr[ip][1])
+            print '%s -- %s' % (ip, hosts_attr[ip][2])
     elif len(ip_matched) < 1:
         color_print('No Permission or No host.', 'red')
     else:
@@ -238,8 +261,9 @@ def print_prompt():
           1) Type \033[32mIP ADDRESS\033[0m To Login.
           2) Type \033[32mP/p\033[0m To Print The Servers You Available.
           3) Type \033[32mG/g\033[0m To Print The Server Groups You Available.
-          4) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
-          5) Type \033[32mQ/q\033[0m To Quit.
+          4) Type \033[32mG/g+gid\033[0m To Print The Server Group Hosts You Available.
+          5) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
+          6) Type \033[32mQ/q\033[0m To Quit.
           """
     print textwrap.dedent(msg)
 
@@ -249,14 +273,27 @@ def print_user_host(username):
     hosts = hosts_attr.keys()
     hosts.sort()
     for ip in hosts:
-        print '%s -- %s' % (ip, hosts_attr[ip][1])
+        print '%-15s -- %s' % (ip, hosts_attr[ip][2])
 
 
 def print_user_hostgroup(username):
     group_attr = get_user_hostgroup(username)
     groups = group_attr.keys()
     for g in groups:
-        print '%s -- %s' % (g, group_attr[g][1])
+        print "[%3s]%s -- %s" % (group_attr[g][0], g, group_attr[g][1])
+
+
+def print_user_hostgroup_host(username, gid):
+    pattern = re.compile(r'\d+')
+    match = pattern.match(gid)
+    if match:
+        hosts_attr = get_user_hostgroup_host(username, gid)
+        hosts = hosts_attr.keys()
+        hosts.sort()
+        for ip in hosts:
+            print '%-15s -- %s' % (ip, hosts_attr[ip][2])
+    else:
+        color_print('No such group id, Please check it.', 'red')
 
 
 def connect(username, password, host, port, login_name):
@@ -377,9 +414,13 @@ if __name__ == '__main__':
             elif option in ['G', 'g']:
                 print_user_hostgroup(LOGIN_NAME)
                 continue
+            elif option.startswith('g') or option.startswith('G'):
+                gid = option[1:].strip()
+                print_user_hostgroup_host(LOGIN_NAME, gid)
+                continue
             elif option in ['E', 'e']:
                 exec_cmd_servers(LOGIN_NAME)
-            elif option in ['Q', 'q']:
+            elif option in ['Q', 'q', 'exit']:
                 sys.exit()
             else:
                 try:
