@@ -1,5 +1,7 @@
 # coding: utf-8
 
+from __future__ import division
+
 import datetime
 
 from django.db.models import Count
@@ -7,6 +9,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from jasset.models import IDC
 from juser.models import DEPT
+from jperm.models import Apply
 from jumpserver.api import *
 
 
@@ -67,13 +70,24 @@ def index_cu(request):
 
 
 @require_login
+@require_super_user
 def index(request):
     if request.session.get('role_id') == 0:
         return index_cu(request)
     users = User.objects.all()
     hosts = Asset.objects.all()
-    online_host = Log.objects.filter(is_finished=0)
-    online_user = online_host.distinct()
+    online = Log.objects.filter(is_finished=0)
+    online_host = online.values('host').distinct()
+    online_user = online.values('user').distinct()
+    active_users = User.objects.filter(is_active=1)
+    active_hosts = Asset.objects.filter(is_active=1)
+
+    # percent of dashboard
+    percent_user = format(active_users.count() / users.count(), '.0%')
+    percent_host = format(active_hosts.count() / hosts.count(), '.0%')
+    percent_online_user = format(online_user.count() / users.count(), '.0%')
+    percent_online_host = format(online_host.count() / hosts.count(), '.0%')
+
     li_date, li_str = getDaysByNum(7)
     today = datetime.datetime.now().day
     from_week = datetime.datetime.now() - datetime.timedelta(days=7)
@@ -81,6 +95,89 @@ def index(request):
     user_top_ten = week_data.values('user').annotate(times=Count('user')).order_by('-times')[:10]
     host_top_ten = week_data.values('host').annotate(times=Count('host')).order_by('-times')[:10]
     user_dic, host_dic = get_data(week_data, user_top_ten, 'user'), get_data(week_data, host_top_ten, 'host')
+
+    # a week data
+    week_users = week_data.values('user').distinct().count()
+    week_hosts = week_data.count()
+
+    user_top_five = week_data.values('user').annotate(times=Count('user')).order_by('-times')[:5]
+    color = ['label-success', 'label-info', 'label-primary', 'label-default', 'label-warnning']
+
+    # perm apply latest 10
+    perm_apply_10 = Apply.objects.order_by('-date_add')[:10]
+
+    # latest 10 login
+    login_10 = Log.objects.order_by('-start_time')[:10]
+
+    # a week top 10
+    for user_info in user_top_ten:
+        username = user_info.get('user')
+        last = Log.objects.filter(user=username).latest('start_time')
+        user_info['last'] = last
+    print user_top_ten
+
+    top = {'user': '活跃用户数', 'host': '活跃主机数', 'times': '登录次数'}
+    top_dic = {}
+    for key, value in top.items():
+        li = []
+        for t in li_date:
+            year, month, day = t.year, t.month, t.day
+            if key != 'times':
+                times = week_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).values(key).distinct().count()
+            else:
+                times = week_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).count()
+            li.append(times)
+        top_dic[value] = li
+    return render_to_response('index.html', locals(), context_instance=RequestContext(request))
+
+
+@require_admin
+def admin_index(request):
+    user_id = request.session.get('user_id', '')
+    user = User.objects.get(id=user_id)
+    dept = user.dept
+    dept_name = user.dept.name
+    users = User.objects.filter(dept=dept)
+    hosts = Asset.objects.filter(dept=dept)
+    online = Log.objects.filter(dept_name=dept_name, is_finished=0)
+    online_host = online.values('host').distinct()
+    online_user = online.values('user').distinct()
+    active_users = users.filter(is_active=1)
+    active_hosts = hosts.filter(is_active=1)
+
+    # percent of dashboard
+    percent_user = format(active_users.count() / users.count(), '.0%')
+    percent_host = format(active_hosts.count() / hosts.count(), '.0%')
+    percent_online_user = format(online_user.count() / users.count(), '.0%')
+    percent_online_host = format(online_host.count() / hosts.count(), '.0%')
+
+    li_date, li_str = getDaysByNum(7)
+    today = datetime.datetime.now().day
+    from_week = datetime.datetime.now() - datetime.timedelta(days=7)
+    week_data = Log.objects.filter(dept_name=dept_name, start_time__range=[from_week, datetime.datetime.now()])
+    user_top_ten = week_data.values('user').annotate(times=Count('user')).order_by('-times')[:10]
+    host_top_ten = week_data.values('host').annotate(times=Count('host')).order_by('-times')[:10]
+    user_dic, host_dic = get_data(week_data, user_top_ten, 'user'), get_data(week_data, host_top_ten, 'host')
+
+    # a week data
+    week_users = week_data.values('user').distinct().count()
+    week_hosts = week_data.count()
+
+    user_top_five = week_data.values('user').annotate(times=Count('user')).order_by('-times')[:5]
+    color = ['label-success', 'label-info', 'label-primary', 'label-default', 'label-warnning']
+
+    # perm apply latest 10
+    perm_apply_10 = Apply.objects.order_by('-date_add')[:10]
+
+    # latest 10 login
+    login_10 = Log.objects.order_by('-start_time')[:10]
+
+    # a week top 10
+    for user_info in user_top_ten:
+        username = user_info.get('user')
+        last = Log.objects.filter(user=username).latest('start_time')
+        user_info['last'] = last
+    print user_top_ten
 
     top = {'user': '活跃用户数', 'host': '活跃主机数', 'times': '登录次数'}
     top_dic = {}
@@ -99,51 +196,6 @@ def index(request):
 
 def skin_config(request):
     return render_to_response('skin_config.html')
-
-
-def jasset_group_add(name, comment, jtype):
-    if BisGroup.objects.filter(name=name):
-        emg = u'该业务组已存在!'
-    else:
-        BisGroup.objects.create(name=name, comment=comment, type=jtype)
-        smg = u'业务组%s添加成功' % name
-
-
-def jasset_host_edit(j_id, j_ip, j_idc, j_port, j_type, j_group, j_dept, j_active, j_comment, j_user='', j_password=''):
-    groups, depts = [], []
-    is_active = {u'是': '1', u'否': '2'}
-    login_types = {'LDAP': 'L', 'MAP': 'M'}
-    for group in j_group[0].split():
-        c = BisGroup.objects.get(name=group.strip())
-        groups.append(c)
-    print j_dept
-    for d in j_dept[0].split():
-        p = DEPT.objects.get(name=d.strip())
-        depts.append(p)
-
-    j_type = login_types[j_type]
-    j_idc = IDC.objects.get(name=j_idc)
-    a = Asset.objects.get(id=j_id)
-    if j_type == 'M':
-        a.ip = j_ip
-        a.port = j_port
-        a.login_type = j_type
-        a.idc = j_idc
-        a.is_active = j_active
-        a.comment = j_comment
-        a.username = j_user
-        a.password = j_password
-    else:
-        a.ip = j_ip
-        a.port = j_port
-        a.idc = j_idc
-        a.login_type = j_type
-        a.is_active = is_active[j_active]
-        a.comment = j_comment
-    a.save()
-    a.bis_group = groups
-    a.dept = depts
-    a.save()
 
 
 def pages(posts, r):
@@ -220,28 +272,6 @@ def filter_ajax_api(request):
         contact_list = BisGroup.objects.filter(name__icontains=value)
 
     return render_to_response('filter_ajax_api.html', locals())
-
-
-# def perm_user_asset(user_id=None, username=None):
-#     if user_id:
-#         user = User.objects.get(id=user_id)
-#     else:
-#         user = User.objects.get(username=username)
-#     user_groups = user.user_group.all()
-#     perms = []
-#     assets = []
-#     asset_groups = []
-#     for user_group in user_groups:
-#         perm = user_group.perm_set.all()
-#         perms.extend(perm)
-#
-#     for perm in perms:
-#         asset_groups.extend(perm.asset_group.all())
-#
-#     for asset_group in asset_groups:
-#         assets.extend(list(asset_group.asset_set.all()))
-#
-#     return assets
 
 
 def install(request):

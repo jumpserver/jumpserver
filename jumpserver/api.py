@@ -13,7 +13,7 @@ import hashlib
 import datetime
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
-from juser.models import User, UserGroup
+from juser.models import User, UserGroup, DEPT
 from jasset.models import Asset, BisGroup
 from jlog.models import Log
 
@@ -258,8 +258,9 @@ def view_splitter(request, su=None, adm=None):
     raise Http404
 
 
-def user_perm_group_api(user):
-    if user:
+def user_perm_group_api(username):
+    if username:
+        user = User.objects.get(username=username)
         perm_list = []
         user_group_all = user.group.all()
         for user_group in user_group_all:
@@ -269,6 +270,14 @@ def user_perm_group_api(user):
         for perm in perm_list:
             asset_group_list.append(perm.asset_group)
         return asset_group_list
+
+
+def user_perm_group_hosts_api(gid):
+    hostgroup = BisGroup.objects.filter(id=gid)
+    if hostgroup:
+        return hostgroup[0].asset_set.all()
+    else:
+        return []
 
 
 def user_perm_asset_api(username):
@@ -348,3 +357,8 @@ def validate(request, user_group=None, user=None, asset_group=None, asset=None, 
             return False
 
     return True
+
+
+def get_dept_asset(request):
+    dept_id = get_user_dept(request)
+    dept_asset = DEPT.objects.get(id=dept_id).asset_set.all()

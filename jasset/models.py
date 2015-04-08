@@ -1,6 +1,6 @@
 import datetime
 from django.db import models
-from juser.models import UserGroup, DEPT
+from juser.models import User, UserGroup, DEPT
 
 
 class IDC(models.Model):
@@ -44,3 +44,12 @@ class Asset(models.Model):
 
     def __unicode__(self):
         return self.ip
+
+
+class AssetAlias(models.Model):
+    user = models.ForeignKey(User)
+    host = models.ForeignKey(Asset)
+    alias = models.CharField(max_length=100, blank=True, null=True)
+
+    def __unicode__(self):
+        return self.comment

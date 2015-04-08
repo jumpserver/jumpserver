@@ -45,27 +45,35 @@
 
                         <div class="hr-line-dashed"></div>
                         <div class="form-group">
-                            <label for="groups" class="col-lg-2 control-label">主机<span class="red-fonts">*</span></label>
-                            <div class="col-sm-3">
-                                <select id="groups" size="12" class="form-control m-b" multiple>
-                                    {% for post in posts %}
-                                        <option value="{{ post.id }}">{{ post.ip }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-sm-1">
-                                <div class="btn-group" style="margin-top: 50px;">
-                                    <button type="button" class="btn btn-xm btn-white" onclick="move('groups', 'groups_selected')"><i class="fa fa-chevron-right"></i></button>
-                                    <button type="button" class="btn btn-xm btn-white" onclick="move_left('groups_selected', 'groups')"><i class="fa fa-chevron-left"></i></button>
-                                </div>
-                            </div>
-                            <div class="col-sm-3">
-                                <div>
-                                    <select id="groups_selected" name="j_hosts" class="form-control m-b" size="12"  multiple>
-                                        {% for post in eposts %}
+                            <div>
+                                <label for="groups" class="col-lg-2 control-label">主机<span class="red-fonts">*</span></label>
+                                <div class="col-sm-3">
+                                    <select multiple="multiple" id="id_domains_filter" name="domains_filter" style="display: none;">
+                                    </select>
+                                    <div class="input-group" style="padding-bottom: 5px">
+                                        <input type="text" size="19"  class="form-control input-sm" id="search" name="keyword" placeholder="过滤">
+                                    </div>
+                                    <select id="groups" size="12" class="form-control m-b" multiple>
+                                        {% for post in posts %}
                                             <option value="{{ post.id }}">{{ post.ip }}</option>
                                         {% endfor %}
                                     </select>
+                                </div>
+                                <div class="col-sm-1">
+                                    <div class="btn-group" style="margin-top: 50px;">
+                                        <button type="button" class="btn btn-xm btn-white" onclick="move('groups', 'groups_selected')"><i class="fa fa-chevron-right"></i></button>
+                                        <button type="button" class="btn btn-xm btn-white" onclick="move_left('groups_selected', 'groups')"><i class="fa fa-chevron-left"></i></button>
+                                    </div>
+                                </div>
+                                <div class="col-sm-3">
+                                    <h4 style="padding-bottom: 5px">已选中主机</h4>
+                                    <div>
+                                        <select id="groups_selected" name="j_hosts" class="form-control m-b" size="12"  multiple>
+                                            {% for post in eposts %}
+                                                <option value="{{ post.id }}">{{ post.ip }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -113,6 +121,17 @@
                 $(this).prop('selected', true)
             })
         }
+
+
+    $('#search').keyup(function() {
+        var $rows = $('#groups option');
+        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+
+        $rows.show().filter(function() {
+            var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+            return !~text.indexOf(val);
+        }).hide();
+    });
 </script>
 
 {% endblock %}

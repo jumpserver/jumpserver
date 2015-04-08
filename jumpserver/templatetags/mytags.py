@@ -7,6 +7,7 @@ import time
 from django import template
 from juser.models import User, UserGroup, DEPT
 from jumpserver.api import *
+from jasset.models import AssetAlias
 
 register = template.Library()
 
@@ -168,6 +169,17 @@ def ugrp_perm_asset_count(user_group_id):
     return len(set(assets))
 
 
+@register.filter(name='get_user_alias')
+def get_user_alias(post, user_id):
+    user = User.objects.get(id=user_id)
+    host = Asset.objects.get(id=post.id)
+    alias = AssetAlias.objects.filter(user=user, host=host)
+    if alias:
+        return alias[0].alias
+    else:
+        return ''
+
+
 @register.filter(name='group_type_to_str')
 def group_type_to_str(type_name):
     group_types = {
@@ -180,17 +192,18 @@ def group_type_to_str(type_name):
 
 @register.filter(name='ast_to_list')
 def ast_to_list(lis):
-    return ast.literal_eval(lis)[0:2]
+    ast_lis = ast.literal_eval(lis)
+    if len(ast_lis) <= 2:
+        return ','.join([i for i in ast_lis])
+    else:
+        restr = ','.join([i for i in ast_lis[0:2]]) + '...'
+        return restr
 
 
 @register.filter(name='ast_to_list_1')
 def ast_to_list_1(lis):
     return ast.literal_eval(lis)
 
-
-# @register.filter(name='perm_asset_count')
-# def perm_asset_count(user_id):
-#     return len(perm_user_asset(user_id))
 
 @register.filter(name='string_length')
 def string_length(string, length):
