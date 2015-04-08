@@ -136,6 +136,9 @@
                                 </div>
                             </div>
                         {% endfor %}
+                        {% if not user|get_user_asset_group %}
+                            (无)
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -164,6 +167,9 @@
                                             </div>
                                         </div>
                                     {% endfor %}
+                                    {% if not logs_last %}
+                                        (无)
+                                    {% endif %}
                                 </div>
 
                                 <button id="show" class="btn btn-primary btn-block m-t"><i class="fa fa-arrow-down"></i> Show All</button>

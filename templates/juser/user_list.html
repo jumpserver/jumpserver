@@ -72,7 +72,7 @@
                                 <td class="text-center" title="{% for user_group in user.group.all %} {{ user_group.name }} {% endfor %}"> {{ user.group.all | group_str2  }} </td>
                                 <td class="text-center"> {{ user.id | get_role }}</td>
                                 <td class="text-center">{{ user.is_active|bool2str }}</td>
-                                <td class="text-center"><a href="/static/jumpserver/{{ user.username }}.pem">下载</a></td>
+                                <td class="text-center"><a href="/juser/down_key/?id={{ user.id }}">下载</a></td>
                                 <td class="text-center">
                                     <a href="../user_detail/?id={{ user.id }}" class="btn btn-xs btn-primary">详情</a>
                                     {% ifequal session_role_id 2 %}

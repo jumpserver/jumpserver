@@ -44,6 +44,25 @@ def get_data(data, items, option):
 
 @require_login
 def index_cu(request):
+    user_id = request.session.get('user_id')
+    user = User.objects.filter(id=user_id)
+    if user:
+        user = user[0]
+    login_types = {'L': 'LDAP', 'M': 'MAP'}
+    user_id = request.session.get('user_id')
+    username = User.objects.get(id=user_id).name
+    posts = user_perm_asset_api(username)
+    host_count = len(posts)
+    new_posts = []
+    post_five = []
+    for post in posts:
+        if len(post_five) < 5:
+            post_five.append(post)
+        else:
+            new_posts.append(post_five)
+            post_five = []
+    new_posts.append(post_five)
+
     return render_to_response('index_cu.html', locals(), context_instance=RequestContext(request))
 
 
@@ -237,3 +256,6 @@ def install(request):
          name='group_admin', email='group_admin@jumpserver.org', role='DA', is_active=True, dept=dept2).save()
     return HttpResponse('Ok')
 
+
+def upload(request):
+    pass

@@ -3,15 +3,11 @@
 import ast
 
 from django.db.models import Q
-from django.http import Http404
-from django.http import HttpResponseRedirect
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 
 from models import IDC, Asset, BisGroup
 from juser.models import UserGroup, DEPT
-from connect import PyCrypt, KEY
-from jlog.models import Log
 from jumpserver.views import jasset_host_edit, pages
 from jumpserver.api import *
 

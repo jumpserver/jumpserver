@@ -281,6 +281,7 @@ def user_perm_asset_api(username):
             asset_list.extend(asset_group.asset_set.all())
 
         return asset_list
+    return []
 
 
 def asset_perm_api(asset):

@@ -29,4 +29,5 @@ urlpatterns = patterns('juser.views',
     (r'^profile/$', 'profile'),
     (r'^chg_info/$', 'chg_info'),
     (r'^chg_role/$', 'chg_role'),
+    (r'^down_key/$', 'down_key'),
 )
