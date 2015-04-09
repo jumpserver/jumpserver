@@ -2,9 +2,13 @@
 
 from __future__ import division
 
+import datetime
+
 from django.db.models import Count
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from jasset.models import IDC
+from juser.models import DEPT
 from jperm.models import Apply
 from jumpserver.api import *
 
@@ -65,11 +69,15 @@ def index_cu(request):
     return render_to_response('index_cu.html', locals(), context_instance=RequestContext(request))
 
 
-@require_login
-def index(request):
-    users = User.objects.all()
-    hosts = Asset.objects.all()
-    online = Log.objects.filter(is_finished=0)
+@require_admin
+def admin_index(request):
+    user_id = request.session.get('user_id', '')
+    user = User.objects.get(id=user_id)
+    dept = user.dept
+    dept_name = user.dept.name
+    users = User.objects.filter(dept=dept)
+    hosts = Asset.objects.filter(dept=dept)
+    online = Log.objects.filter(dept_name=dept_name, is_finished=0)
     online_host = online.values('host').distinct()
     online_user = online.values('user').distinct()
     active_users = users.filter(is_active=1)
@@ -131,7 +139,6 @@ def index(request):
 
     if is_group_admin(request):
         return admin_index(request)
-
     users = User.objects.all()
     hosts = Asset.objects.all()
     online = Log.objects.filter(is_finished=0)
@@ -140,14 +147,11 @@ def index(request):
     active_users = User.objects.filter(is_active=1)
     active_hosts = Asset.objects.filter(is_active=1)
 
-    users_total = users.count() if users.count() else 1
-    hosts_total = hosts.count() if hosts.count() else 1
-
     # percent of dashboard
-    percent_user = format(active_users.count() / users_total, '.0%')
-    percent_host = format(active_hosts.count() / hosts_total, '.0%')
-    percent_online_user = format(online_user.count() / users_total, '.0%')
-    percent_online_host = format(online_host.count() / hosts_total, '.0%')
+    percent_user = format(active_users.count() / users.count(), '.0%')
+    percent_host = format(active_hosts.count() / hosts.count(), '.0%')
+    percent_online_user = format(online_user.count() / users.count(), '.0%')
+    percent_online_host = format(online_host.count() / hosts.count(), '.0%')
 
     li_date, li_str = getDaysByNum(7)
     today = datetime.datetime.now().day
@@ -286,12 +290,4 @@ def install(request):
 
 
 def upload(request):
-    if request.method == 'POST':
-        host = request.POST.get('host')
-        path = request.POST.get('path')
-        upload_file = request.FILES.getlist('file', None)
-
-        if upload_file:
-            return HttpResponse(upload_file)
-
-    return render_to_response('upload.html', locals(), context_instance=RequestContext(request))
+    pass
