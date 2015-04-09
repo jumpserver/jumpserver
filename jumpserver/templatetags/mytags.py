@@ -57,7 +57,7 @@ def groups_str2(group_list):
 
 
 @register.filter(name='group_str2_all')
-def groups_str2(group_list):
+def group_str2_all(group_list):
     group_lis = []
     for i in group_list:
         if str(i) != 'ALL':
@@ -103,6 +103,12 @@ def user_readonly(user_id):
 
 @register.filter(name='member_count')
 def member_count(group_id):
+    group = UserGroup.objects.get(id=group_id)
+    return group.user_set.count()
+
+
+@register.filter(name='group_user_count')
+def group_user_count(group_id):
     group = UserGroup.objects.get(id=group_id)
     return group.user_set.count()
 
@@ -230,3 +236,31 @@ def to_avatar(role_id='0'):
 @register.filter(name='get_user_asset_group')
 def get_user_asset_group(user):
     return user_perm_group_api(user)
+
+
+@register.filter(name='group_asset_list')
+def group_asset_list(group):
+    return group.asset_set.all()
+
+
+@register.filter(name='group_asset_list_count')
+def group_asset_list_count(group):
+    return group.asset_set.all().count()
+
+
+@register.filter(name='time_delta')
+def time_delta(time_before):
+    delta = datetime.datetime.now() - time_before
+    days = delta.days
+    if days:
+        return "%s 天前" % days
+    else:
+        hours = delta.seconds/3600
+        if hours:
+            return "%s 小时前" % hours
+        else:
+            mins = delta.seconds/60
+            if mins:
+                return '%s 分钟前' % mins
+            else:
+                return '%s 秒前' % delta.seconds

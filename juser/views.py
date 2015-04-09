@@ -6,7 +6,6 @@ import random
 import subprocess
 from Crypto.PublicKey import RSA
 import crypt
-import datetime
 
 from django.shortcuts import render_to_response
 from django.core.exceptions import ObjectDoesNotExist
@@ -32,9 +31,10 @@ def bash(cmd):
     return subprocess.call(cmd, shell=True)
 
 
-def is_dir(dir_name, mode=0755):
+def is_dir(dir_name, username='root', mode=0755):
     if not os.path.isdir(dir_name):
         os.makedirs(dir_name)
+        bash("chown %s:%s '%s'" % (username, username, dir_name))
     os.chmod(dir_name, mode)
 
 
@@ -109,11 +109,11 @@ def db_del_user(username):
 
 def gen_ssh_key(username, password=None, length=2048):
     private_key_dir = os.path.join(BASE_DIR, 'keys/jumpserver/')
-    private_key_file = os.path.join(private_key_dir, username)
+    private_key_file = os.path.join(private_key_dir, username+".pem")
     public_key_dir = '/home/%s/.ssh/' % username
     public_key_file = os.path.join(public_key_dir, 'authorized_keys')
     is_dir(private_key_dir)
-    is_dir(public_key_dir, mode=0700)
+    is_dir(public_key_dir, username, mode=0700)
 
     key = RSA.generate(length)
     with open(private_key_file, 'w') as pri_f:
@@ -128,7 +128,7 @@ def gen_ssh_key(username, password=None, length=2048):
 
 
 def server_add_user(username, password, ssh_key_pwd):
-    bash('useradd %s; echo %s | passwd --stdin %s' % (username, password, username))
+    bash("useradd '%s'; echo '%s' | passwd --stdin '%s'" % (username, password, username))
     gen_ssh_key(username, ssh_key_pwd)
 
 
@@ -775,18 +775,26 @@ def user_list_adm(request):
     return render_to_response('juser/user_list.html', locals(), context_instance=RequestContext(request))
 
 
-@require_admin
+@require_login
 def user_detail(request):
-    user_id = request.GET.get('id', '')
+    header_title, path1, path2 = '查看用户', '用户管理', '用户详情'
+    if request.session.get('role_id') == 0:
+        user_id = request.session.get('user_id')
+    else:
+        user_id = request.GET.get('id', '')
+        if request.session.get('role_id') == 1:
+            user, dept = get_session_user_dept(request)
+            if not validate(request, user=[user_id]):
+                return HttpResponseRedirect('/')
     if not user_id:
         return HttpResponseRedirect('/juser/user_list/')
-    if request.session.get('role_id', '') == '1':
-        if not validate(request, user=[user_id]):
-            return HttpResponseRedirect('/juser/user_list/')
+
     user = User.objects.filter(id=user_id)
     if user:
         user = user[0]
         asset_group_permed = user_perm_group_api(user)
+        logs_last = Log.objects.filter(user=user.name).order_by('-start_time')[0:10]
+        logs_all = Log.objects.filter(user=user.name).order_by('-start_time')
 
     return render_to_response('juser/user_detail.html', locals(), context_instance=RequestContext(request))
 
@@ -875,6 +883,7 @@ def user_edit(request):
             password = md5_crypt(password)
 
         if ssh_key_pwd != user.ssh_key_pwd:
+            gen_ssh_key(user.username, ssh_key_pwd)
             ssh_key_pwd = CRYPTOR.encrypt(ssh_key_pwd)
 
         db_update_user(user_id=user_id,
@@ -953,11 +962,11 @@ def profile(request):
     if not user_id:
         return HttpResponseRedirect('/')
     user = User.objects.get(id=user_id)
-    return render_to_response('juser/user_detail.html', locals(), context_instance=RequestContext(request))
+    return render_to_response('juser/profile.html', locals(), context_instance=RequestContext(request))
 
 
 def chg_info(request):
-    header_title, path1, path2 = '修改信息 | Edit Info', '用户管理', '修改个人信息'
+    header_title, path1, path2 = '修改信息', '用户管理', '修改个人信息'
     user_id = request.session.get('user_id')
     user_set = User.objects.filter(id=user_id)
     error = ''
@@ -983,9 +992,42 @@ def chg_info(request):
                 password = md5_crypt(password)
 
             if ssh_key_pwd != user.ssh_key_pwd:
+                gen_ssh_key(user.username, ssh_key_pwd)
                 ssh_key_pwd = md5_crypt(ssh_key_pwd)
+
             user_set.update(name=name, password=password, ssh_key_pwd=ssh_key_pwd, email=email)
             msg = '修改成功'
 
     return render_to_response('juser/chg_info.html', locals(), context_instance=RequestContext(request))
 
+
+@require_login
+def down_key(request):
+    user_id = ''
+    if is_super_user(request):
+        user_id = request.GET.get('id')
+
+    if is_group_admin(request):
+        user_id = request.GET.get('id')
+        if not validate(request, user=[user_id]):
+            user_id = request.session.get('user_id')
+
+    if is_common_user(request):
+        user_id = request.session.get('user_id')
+
+    if user_id:
+        user = User.objects.filter(id=user_id)
+        if user:
+            user = user[0]
+            username = user.username
+            private_key_dir = os.path.join(BASE_DIR, 'keys/jumpserver/')
+            private_key_file = os.path.join(private_key_dir, username+".pem")
+            if os.path.isfile(private_key_file):
+                f = open(private_key_file)
+                data = f.read()
+                f.close()
+                response = HttpResponse(data, content_type='application/octet-stream')
+                response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(private_key_file)
+                return response
+
+    return HttpResponse('No Key File. Contact Admin.')

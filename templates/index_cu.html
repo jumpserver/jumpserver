@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load mytags %}
+{% block content %}
+{% include 'nav_cat_bar.html' %}
+
+<div class="wrapper wrapper-content" xmlns="http://www.w3.org/1999/html">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5> 使用说明 </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li><a href="#">未启用 1</a>
+                            </li>
+                            <li><a href="#">未启用 2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="ibox-content" style="line-height: 26px">
+                    <span style="font-size: large">欢</span>迎使用<span class="text-navy"><b>Jumpserver</b></span>跳板机系统，
+                    首先需要 <b><a href="/juser/down_key/?id={{ user.id }}">下载</a></b> 登录跳板机的SSH密钥文件，然后导入到工具或者ssh命令指定密钥文件(确保密钥文件权限600)，输入收到的密钥密码，登录跳板机。
+                    登录后根据提示进行操作。跳板机web界面支持修改密码、个人信息和上传下载文件等功能，可以向管理员申请权限。
+                </div>
+            </div>
+
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5> 已授权主机 </h5>
+                    <div class="ibox-tools">
+                        <div class="label label-primary float-left"><b>总共：{{ host_count }}</b></div>
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li><a href="#">未启用 1</a>
+                            </li>
+                            <li><a href="#">未启用 2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="ibox-content">
+                    <table class="table table-striped">
+                        {% for host_five in new_posts %}
+                        <tr>
+                            {% for host in host_five %}
+                            <td>{{ host.ip }}</td>
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                    {% ifequal host_count 0 %}
+                        (空)
+                    {% endifequal %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <span class="label label-primary"><b>{{ user.name }}</b></span>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li><a href="#"></a>
+                            </li>
+                            <li><a href="#"></a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div>
+                        <div class="text-left">
+                            <table class="table">
+                                <tr>
+                                    <td class="text-navy">ID</td>
+                                    <td>{{ user.id }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">用户名</td>
+                                    <td>{{ user.username }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">姓名</td>
+                                    <td>{{ user.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">角色</td>
+                                    <td>{{ user.id | get_role }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">部门</td>
+                                    <td>{{ user.dept.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">Email</td>
+                                    <td>{{ user.email }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">激活</td>
+                                    <td>{{ user.is_active|bool2str }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">添加日期</td>
+                                    <td>{{ user.date_joined|date:"Y-m-d H:i:s" }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">最后登录</td>
+                                    <td>{{ user.last_login|date:"Y-m-d H:i:s" }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">所在用户组</td>
+                                    <td>
+                                         <table class="table">
+                                             {% for group in user.group.all %}
+                                                <tr>
+                                                    <td>{{ group.name }}</td>
+                                                </tr>
+                                             {% endfor %}
+                                         </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

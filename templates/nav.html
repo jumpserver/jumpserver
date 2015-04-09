@@ -19,7 +19,7 @@
                     <li class="dept_add"><a href="/juser/dept_add/">添加部门</a></li>
                     <li class="group_list group_edit"><a href="/juser/group_list/">查看小组</a></li>
                     <li class="group_add"><a href="/juser/group_add/">添加小组</a></li>
-                    <li class="user_list user_edit"><a href="/juser/user_list/">查看用户<span class="label {% ifequal user_active_num user_total_num %}label-primary {% else %}label-warning {% endifequal %}pull-right">{{ user_active_num }}/{{ user_total_num }}</span></a></li>
+                    <li class="user_list user_edit user_detail"><a href="/juser/user_list/">查看用户<span class="label {% ifequal user_active_num user_total_num %}label-primary {% else %}label-warning {% endifequal %}pull-right">{{ user_active_num }}/{{ user_total_num }}</span></a></li>
                     <li class="user_add"><a href="/juser/user_add/">添加用户</a></li>
                 </ul>
             </li>
@@ -136,8 +136,8 @@
             <li>
                <a href="/"><i class="fa fa-th-large"></i> <span class="nav-label">仪表盘</span><span class="label label-info pull-right"></span></a>
             </li>
-            <li>
-               <a href="/"><i class="fa fa-rebel"></i> <span class="nav-label">个人信息</span><span class="label label-info pull-right"></span></a>
+            <li class="user_detail">
+               <a href="/juser/user_detail/?id={{ session_user_id }}"><i class="fa fa-rebel"></i> <span class="nav-label">个人信息</span><span class="label label-info pull-right"></span></a>
             </li>
             <li id="jasset">
                <a href="/jasset/host_list/"><i class="fa fa-cube"></i> <span class="nav-label">查看主机</span><span class="label label-info pull-right"></span></a>
@@ -156,12 +156,9 @@
             <li>
                 <a href="#"><i class="fa fa-download"></i> <span class="nav-label">上传下载</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
-                    <li><a href="/file/upload/">文件上传</a></li>
-                    <li><a href="/file/download/">文件下载</a></li>
+                    <li><a href="/upload/">文件上传</a></li>
+                    <li><a href="/download/">文件下载</a></li>
                 </ul>
-            </li>
-            <li>
-               <a href="/"><i class="fa fa-files-o"></i> <span class="nav-label">使用说明</span><span class="label label-info pull-right"></span></a>
             </li>
 
             <li class="special_link">

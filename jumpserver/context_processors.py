@@ -2,6 +2,7 @@ from juser.models import User
 from jasset.models import Asset
 from jumpserver.api import *
 
+
 def name_proc(request):
     user_id = request.session.get('user_id')
     role_id = request.session.get('role_id')

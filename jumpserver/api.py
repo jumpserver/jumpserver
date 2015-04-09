@@ -10,6 +10,7 @@ from binascii import b2a_hex, a2b_hex
 import ldap
 from ldap import modlist
 import hashlib
+import datetime
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
 from juser.models import User, UserGroup, DEPT
@@ -289,6 +290,7 @@ def user_perm_asset_api(username):
             asset_list.extend(asset_group.asset_set.all())
 
         return asset_list
+    return []
 
 
 def asset_perm_api(asset):

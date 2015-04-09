@@ -7,9 +7,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 
 from jasset.models import IDC, Asset, BisGroup, AssetAlias
-from juser.models import UserGroup, DEPT
 from jperm.models import Perm, SudoPerm
-from jumpserver.views import pages
 from jumpserver.api import *
 
 cryptor = PyCrypt(KEY)
