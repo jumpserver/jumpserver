@@ -45,7 +45,7 @@ def get_data(data, items, option):
     return dic
 
 
-@require_super_user
+@require_login
 def index(request):
     users = User.objects.all()
     hosts = Asset.objects.all()

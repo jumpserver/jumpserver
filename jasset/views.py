@@ -422,7 +422,7 @@ def list_idc(request):
     if keyword:
         posts = IDC.objects.filter(Q(name__contains=keyword) | Q(comment__contains=keyword))
     else:
-        posts = IDC.objects.all().order_by('id')
+        posts = IDC.objects.exclude(name='ALL').order_by('id')
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
     return render_to_response('jasset/idc_list.html', locals(), context_instance=RequestContext(request))
 
