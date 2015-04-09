@@ -184,40 +184,22 @@ $('#assetForm').validator({
             msg: {required: "必须填写!"}
         },
         "j_group": {
-            rule: "checked",
-            tip: "选择业务组",
+            rule: "required",
+            tip: "选择主机组",
             ok: "",
             msg: {checked: "至少选择一个组"}
         },
-        "j_usergroup": {
-            rule: "checked",
-            tip: "选择用户组",
+        "j_idc": {
+            rule: "required",
+            tip: "选择IDC",
             ok: "",
-            msg: {checked: "至少选择一个组"}
+            msg: {checked: "必须填写!"}
         },
-        "j_user": {
-            rule: "required(type_m)",
-            tip: "普通用户名",
+        "j_dept": {
+            rule: "required",
+            tip: "选择部门",
             ok: "",
-            msg: {required: "请填写用户名"}
-        },
-        "j_password": {
-            rule: "required(type_m);length[6~16]",
-            tip: "密码6-16位",
-            ok: "",
-            msg: {required: "6-16位"}
-        },
-        "j_root": {
-            rule: "required(type_m)",
-            tip: "超管用户名",
-            ok: "",
-            msg: {required: "请填写用户名"}
-        },
-        "j_passwd": {
-            rule: "required(type_m);length[6~16]",
-            tip: "密码6-16位",
-            ok: "",
-            msg: {required: "6-16位"}
+            msg: {checked: "至少选择一个部门"}
         }
     },
     valid: function(form) {

@@ -65,15 +65,11 @@ def index_cu(request):
     return render_to_response('index_cu.html', locals(), context_instance=RequestContext(request))
 
 
-@require_admin
-def admin_index(request):
-    user_id = request.session.get('user_id', '')
-    user = User.objects.get(id=user_id)
-    dept = user.dept
-    dept_name = user.dept.name
-    users = User.objects.filter(dept=dept)
-    hosts = Asset.objects.filter(dept=dept)
-    online = Log.objects.filter(dept_name=dept_name, is_finished=0)
+@require_login
+def index(request):
+    users = User.objects.all()
+    hosts = Asset.objects.all()
+    online = Log.objects.filter(is_finished=0)
     online_host = online.values('host').distinct()
     online_user = online.values('user').distinct()
     active_users = users.filter(is_active=1)
@@ -194,9 +190,6 @@ def index(request):
             li.append(times)
         top_dic[value] = li
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
-
-
-
 
 
 def skin_config(request):

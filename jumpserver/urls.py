@@ -1,12 +1,9 @@
 from django.conf.urls import patterns, include, url
-from views import index
 
 
 urlpatterns = patterns('',
     # Examples:
-    # url(r'^$', 'jumpserver.views.home', name='home'),
-    # url(r'^blog/', include('blog.urls')),
-    (r'^$', index),
+    (r'^$', 'jumpserver.views.index'),
     (r'^api/user/$', 'jumpserver.api.api_user'),
     (r'^skin_config/$', 'jumpserver.views.skin_config'),
     (r'^install/$', 'jumpserver.views.install'),
