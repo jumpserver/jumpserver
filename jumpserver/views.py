@@ -144,11 +144,14 @@ def index(request):
     active_users = User.objects.filter(is_active=1)
     active_hosts = Asset.objects.filter(is_active=1)
 
+    users_total = users.count() if users.count() else 1
+    hosts_total = hosts.count() if hosts.count() else 1
+
     # percent of dashboard
-    percent_user = format(active_users.count() / users.count(), '.0%')
-    percent_host = format(active_hosts.count() / hosts.count(), '.0%')
-    percent_online_user = format(online_user.count() / users.count(), '.0%')
-    percent_online_host = format(online_host.count() / hosts.count(), '.0%')
+    percent_user = format(active_users.count() / users_total, '.0%')
+    percent_host = format(active_hosts.count() / hosts_total, '.0%')
+    percent_online_user = format(online_user.count() / users_total, '.0%')
+    percent_online_host = format(online_host.count() / hosts_total, '.0%')
 
     li_date, li_str = getDaysByNum(7)
     today = datetime.datetime.now().day
@@ -290,4 +293,12 @@ def install(request):
 
 
 def upload(request):
-    pass
+    if request.method == 'POST':
+        host = request.POST.get('host')
+        path = request.POST.get('path')
+        upload_file = request.FILES.getlist('file', None)
+
+        if upload_file:
+            return HttpResponse(upload_file)
+
+    return render_to_response('upload.html', locals(), context_instance=RequestContext(request))

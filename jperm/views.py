@@ -3,19 +3,13 @@
 import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
-import datetime
 
 
 from django.core.mail import send_mail
 from django.shortcuts import render_to_response
-from django.http import HttpResponseRedirect, HttpResponse
 from django.template import RequestContext
-from juser.models import User, UserGroup, DEPT
-from jasset.models import Asset, BisGroup
 from jperm.models import Perm, SudoPerm, CmdGroup, Apply
-from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.db.models import Q
-from jumpserver.views import LDAP_ENABLE, ldap_conn, CONF, page_list_return, pages
 from jumpserver.api import *
 
 
@@ -544,8 +538,6 @@ def cmd_add(request):
             error = u"部门不能为空"
         msg = u'命令组添加成功'
 
-        return HttpResponseRedirect('/jperm/cmd_list/')
-
     return render_to_response('jperm/sudo_cmd_add.html', locals(), context_instance=RequestContext(request))
 
 
@@ -597,7 +589,7 @@ def cmd_edit(request):
 def cmd_list(request):
     header_title, path1, path2 = u'sudo命令查看', u'权限管理', u'Sudo命令添加'
 
-    if request.session.get('role_id', '0') == '2':
+    if is_super_user(request):
         cmd_groups = contact_list = CmdGroup.objects.all()
     else:
         user, dept = get_session_user_dept(request)
@@ -624,6 +616,16 @@ def cmd_del(request):
     if cmd_group:
         cmd_group[0].delete()
     return HttpResponseRedirect('/jperm/cmd_list/')
+
+
+@require_admin
+def cmd_detail(request):
+    cmd_id = request.GET.get('id')
+    cmd_group = CmdGroup.objects.filter(id=cmd_id)
+    if cmd_group:
+        cmd_group = cmd_group[0]
+
+    return render_to_response('jperm/sudo_cmd_detail.html', locals(), context_instance=RequestContext(request))
 
 
 @require_login

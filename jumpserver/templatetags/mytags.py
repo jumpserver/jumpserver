@@ -5,7 +5,7 @@ import ast
 import time
 
 from django import template
-from juser.models import User, UserGroup, DEPT
+from jperm.models import CmdGroup
 from jumpserver.api import *
 from jasset.models import AssetAlias
 
@@ -264,3 +264,19 @@ def time_delta(time_before):
                 return '%s 分钟前' % mins
             else:
                 return '%s 秒前' % delta.seconds
+
+
+@register.filter(name='sudo_cmd_list')
+def sudo_cmd_list(cmd_group_id):
+    cmd_group = CmdGroup.objects.filter(id=cmd_group_id)
+    if cmd_group:
+        cmd_group = cmd_group[0]
+        return cmd_group.cmd.split(',')
+
+
+@register.filter(name='sudo_cmd_count')
+def sudo_cmd_count(cmd_group_id):
+    cmd_group = CmdGroup.objects.filter(id=cmd_group_id)
+    if cmd_group:
+        cmd_group = cmd_group[0]
+        return len(cmd_group.cmd.split(','))

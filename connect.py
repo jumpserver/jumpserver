@@ -7,7 +7,6 @@ import re
 import ast
 import select
 import time
-from datetime import datetime
 import paramiko
 import struct
 import fcntl
@@ -119,8 +118,9 @@ def log_record(username, host):
     except IOError:
         raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 
-    log = Log(user=username, host=host, remote_ip=ip_list, dept_name=dept_name, log_path=log_file_path, start_time=datetime.now(), pid=pid)
-    log_file.write('Starttime is %s\n' % datetime.now())
+    log = Log(user=username, host=host, remote_ip=ip_list, dept_name=dept_name,
+              log_path=log_file_path, start_time=datetime.datetime.now(), pid=pid)
+    log_file.write('Starttime is %s\n' % datetime.datetime.now())
     log.save()
     return log_file, log
 
@@ -162,11 +162,11 @@ def posix_shell(chan, username, host):
 
     finally:
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)
-        log_file.write('Endtime is %s' % datetime.now())
+        log_file.write('Endtime is %s' % datetime.datetime.now())
         log_file.close()
         log.is_finished = True
         log.log_finished = False
-        log.end_time = datetime.now()
+        log.end_time = datetime.datetime.now()
         log.save()
         print_prompt()
 
@@ -280,7 +280,7 @@ def print_user_hostgroup(username):
     group_attr = get_user_hostgroup(username)
     groups = group_attr.keys()
     for g in groups:
-        print "[%3s]%s -- %s" % (group_attr[g][0], g, group_attr[g][1])
+        print "[%3s] %s -- %s" % (group_attr[g][0], g, group_attr[g][1])
 
 
 def print_user_hostgroup_host(username, gid):
