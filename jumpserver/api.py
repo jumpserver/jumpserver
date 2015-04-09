@@ -11,11 +11,14 @@ import ldap
 from ldap import modlist
 import hashlib
 import datetime
+import subprocess
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
 from juser.models import User, UserGroup, DEPT
 from jasset.models import Asset, BisGroup
 from jlog.models import Log
+from jasset.models import AssetAlias
+from django.core.exceptions import ObjectDoesNotExist
 
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -144,15 +147,6 @@ def pages(posts, r):
     return contact_list, p, contacts, page_range, current_page, show_first, show_end
 
 
-def get_session_user_dept(request):
-    user_id = request.session.get('user_id', '')
-    user = User.objects.filter(id=user_id)
-    if user:
-        user = user[0]
-        dept = user.dept
-        return user, dept
-
-
 class PyCrypt(object):
     """This class used to encrypt and decrypt password."""
 
@@ -186,6 +180,14 @@ CRYPTOR = PyCrypt(KEY)
 
 class ServerError(Exception):
     pass
+
+
+def get_object(model, **kwargs):
+    try:
+        the_object = model.objects.get(**kwargs)
+    except ObjectDoesNotExist:
+        raise ServerError('Object get %s failed.' % str(kwargs.values()))
+    return the_object
 
 
 def require_login(func):
@@ -233,6 +235,16 @@ def is_common_user(request):
         return True
     else:
         return False
+
+
+@require_login
+def get_session_user_dept(request):
+    user_id = request.session.get('user_id', 0)
+    user = User.objects.filter(id=user_id)
+    if user:
+        user = user[0]
+        dept = user.dept
+        return user, dept
 
 
 def get_user_dept(request):
@@ -310,6 +322,49 @@ def asset_perm_api(asset):
         return user_permed_list
 
 
+def get_user_host(username):
+    """Get the hosts of under the user control."""
+    hosts_attr = {}
+    asset_all = user_perm_asset_api(username)
+    user = User.objects.get(username=username)
+    for asset in asset_all:
+        alias = AssetAlias.objects.filter(user=user, host=asset)
+        if alias and alias[0].alias != '':
+            hosts_attr[asset.ip] = [asset.id, asset.ip, alias[0].alias]
+        else:
+            hosts_attr[asset.ip] = [asset.id, asset.ip, asset.comment]
+    return hosts_attr
+
+
+def get_connect_item(username, ip):
+    asset = get_object(Asset, ip=ip)
+    port = asset.port
+
+    if not asset.is_active:
+        raise ServerError('Host %s is not active.' % ip)
+
+    user = get_object(User, username=username)
+
+    if not user.is_active:
+        raise ServerError('User %s is not active.' % username)
+
+    login_type_dict = {
+        'L': user.ldap_pwd,
+    }
+
+    if asset.login_type in login_type_dict:
+        password = CRYPTOR.decrypt(login_type_dict[asset.login_type])
+        return username, password, ip, port
+
+    elif asset.login_type == 'M':
+        username = asset.username
+        password = CRYPTOR.decrypt(asset.password)
+        return username, password, ip, port
+
+    else:
+        raise ServerError('Login type is not in ["L", "M"]')
+
+
 def validate(request, user_group=None, user=None, asset_group=None, asset=None, edept=None):
     dept = get_session_user_dept(request)[1]
     if edept:
@@ -362,3 +417,16 @@ def validate(request, user_group=None, user=None, asset_group=None, asset=None, 
 def get_dept_asset(request):
     dept_id = get_user_dept(request)
     dept_asset = DEPT.objects.get(id=dept_id).asset_set.all()
+
+
+def bash(cmd):
+    """执行bash命令"""
+    return subprocess.call(cmd, shell=True)
+
+
+def is_dir(dir_name, username='root', mode=0755):
+    if not os.path.isdir(dir_name):
+        os.makedirs(dir_name)
+        bash("chown %s:%s '%s'" % (username, username, dir_name))
+    os.chmod(dir_name, mode)
+

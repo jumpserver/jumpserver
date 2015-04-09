@@ -17,15 +17,15 @@ import getpass
 import fnmatch
 import readline
 from multiprocessing import Pool
-from ConfigParser import ConfigParser
-from django.core.exceptions import ObjectDoesNotExist
+
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 django.setup()
 from juser.models import User
-from jasset.models import AssetAlias
+
 from jlog.models import Log
 from jumpserver.api import *
+
 try:
     import termios
     import tty
@@ -57,10 +57,6 @@ def color_print_exit(msg, color='red'):
     sys.exit()
 
 
-class ServerError(Exception):
-    pass
-
-
 def get_win_size():
     """This function use to get the size of the windows!"""
     if 'TIOCGWINSZ' in dir(termios):
@@ -79,14 +75,6 @@ def set_win_size(sig, data):
         channel.resize_pty(height=win_size[0], width=win_size[1])
     except:
         pass
-
-
-def get_object(model, **kwargs):
-    try:
-        the_object = model.objects.get(**kwargs)
-    except ObjectDoesNotExist:
-        raise ServerError('Object get %s failed.' % str(kwargs.values()))
-    return the_object
 
 
 def log_record(username, host):
@@ -171,20 +159,6 @@ def posix_shell(chan, username, host):
         print_prompt()
 
 
-def get_user_host(username):
-    """Get the hosts of under the user control."""
-    hosts_attr = {}
-    asset_all = user_perm_asset_api(username)
-    user = User.objects.get(username=username)
-    for asset in asset_all:
-        alias = AssetAlias.objects.filter(user=user, host=asset)
-        if alias and alias[0].alias != '':
-            hosts_attr[asset.ip] = [asset.id, asset.ip, alias[0].alias]
-        else:
-            hosts_attr[asset.ip] = [asset.id, asset.ip, asset.comment]
-    return hosts_attr
-
-
 def get_user_hostgroup(username):
     """Get the hostgroups of under the user control."""
     groups_attr = {}
@@ -206,36 +180,6 @@ def get_user_hostgroup_host(username, gid):
         else:
             hosts_attr[host.ip] = [host.id, host.ip, host.comment]
     return hosts_attr
-
-
-def get_connect_item(username, ip):
-
-    asset = get_object(Asset, ip=ip)
-    port = asset.port
-
-    if not asset.is_active:
-        raise ServerError('Host %s is not active.' % ip)
-
-    user = get_object(User, username=username)
-
-    if not user.is_active:
-        raise ServerError('User %s is not active.' % username)
-
-    login_type_dict = {
-        'L': user.ldap_pwd,
-    }
-
-    if asset.login_type in login_type_dict:
-        password = CRYPTOR.decrypt(login_type_dict[asset.login_type])
-        return username, password, ip, port
-
-    elif asset.login_type == 'M':
-        username = asset.username
-        password = CRYPTOR.decrypt(asset.password)
-        return username, password, ip, port
-
-    else:
-        raise ServerError('Login type is not in ["L", "M"]')
 
 
 def verify_connect(username, part_ip):

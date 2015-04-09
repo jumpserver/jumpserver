@@ -26,18 +26,6 @@ def gen_rand_pwd(num):
     return salt
 
 
-def bash(cmd):
-    """执行bash命令"""
-    return subprocess.call(cmd, shell=True)
-
-
-def is_dir(dir_name, username='root', mode=0755):
-    if not os.path.isdir(dir_name):
-        os.makedirs(dir_name)
-        bash("chown %s:%s '%s'" % (username, username, dir_name))
-    os.chmod(dir_name, mode)
-
-
 class AddError(Exception):
     pass
 
@@ -999,6 +987,9 @@ def chg_info(request):
             msg = '修改成功'
 
     return render_to_response('juser/chg_info.html', locals(), context_instance=RequestContext(request))
+
+
+
 
 
 @require_login

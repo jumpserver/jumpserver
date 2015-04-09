@@ -1,15 +1,13 @@
 # coding: utf-8
 
 from __future__ import division
-
-import datetime
-
 from django.db.models import Count
 from django.shortcuts import render_to_response
 from django.template import RequestContext
-from jasset.models import IDC
-from juser.models import DEPT
+from django.http import HttpResponseNotFound
 from jperm.models import Apply
+from multiprocessing import Pool
+import paramiko
 from jumpserver.api import *
 
 
@@ -289,5 +287,64 @@ def install(request):
     return HttpResponse('Ok')
 
 
+def transfer(sftp, filenames):
+    # pool = Pool(processes=5)
+    for filename, file_path in filenames.items():
+        print filename, file_path
+        sftp.put(file_path, '/tmp/%s' % filename)
+        # pool.apply_async(transfer, (sftp, file_path, '/tmp/%s' % filename))
+    sftp.close()
+    # pool.close()
+    # pool.join()
+
+
 def upload(request):
-    pass
+    user, dept = get_session_user_dept(request)
+    if request.method == 'POST':
+        hosts = request.POST.get('hosts')
+        upload_files = request.FILES.getlist('file[]', None)
+        upload_dir = "/tmp/%s" % user.username
+        is_dir(upload_dir)
+        date_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        hosts_list = hosts.split(',')
+        user_hosts = get_user_host(user.username).keys()
+        unperm_hosts = []
+        filenames = {}
+        for ip in hosts_list:
+            if ip not in user_hosts:
+                unperm_hosts.append(ip)
+
+        if not hosts:
+            return HttpResponseNotFound(u'地址不能为空')
+
+        if unperm_hosts:
+            print hosts_list
+            return HttpResponseNotFound(u'%s 没有权限.' % ', '.join(unperm_hosts))
+
+        for upload_file in upload_files:
+            file_path = '%s/%s.%s' % (upload_dir, upload_file.name, date_now)
+            filenames[upload_file.name] = file_path
+            f = open(file_path, 'w')
+            for chunk in upload_file.chunks():
+                f.write(chunk)
+            f.close()
+
+        sftps = []
+        for host in hosts_list:
+            username, password, host, port = get_connect_item(user.username, host)
+            try:
+                t = paramiko.Transport((host, port))
+                t.connect(username=username, password=password)
+                sftp = paramiko.SFTPClient.from_transport(t)
+                sftps.append(sftp)
+            except paramiko.AuthenticationException:
+                return HttpResponseNotFound(u'%s 连接失败.' % host)
+
+        # pool = Pool(processes=5)
+        for sftp in sftps:
+            transfer(sftp, filenames)
+        # pool.close()
+        # pool.join()
+        return HttpResponse('传送成功')
+
+    return render_to_response('upload.html', locals(), context_instance=RequestContext(request))
