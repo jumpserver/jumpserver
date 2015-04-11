@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load mytags %}
 {% block content %}
 {% include 'nav_cat_bar.html' %}
 
@@ -40,12 +41,16 @@
                                 <td class="text-center" name="j_id" value="{{ post.id }}" data-editable='false'><input name="id" value="{{ post.id }}" type="checkbox" class="i-checks"></td>
                                 <td class="text-center"> {{ post.name }} </td>
                                 <td class="text-center"> {{ post.dept.name }} </td>
-                                <td class="text-center"> <a href="/jasset/group_detail/?id={{ post.id }}">{{ post.asset_set.count }}</a> </td>
+                                {% ifequal session_role_id 2 %}
+                                    <td class="text-center"> <a href="/jasset/group_detail/?id={{ post.id }}">{{ post.asset_set.count }}</a> </td>
+                                {% else %}
+                                    <td class="text-center"> <a href="/jasset/group_detail/?id={{ post.id }}">{{ post|get_group_count:dept }}</a> </td>
+                                {% endifequal %}
                                 <td class="text-center"> {{ post.comment }} </td>
                                 <td class="text-center">
                                     <a href="/jasset/group_detail/?id={{ post.id }}" class="btn btn-xs btn-info">详情</a>
                                     <a href="/jasset/group_edit/?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <a href="/jasset/group_del/{{ post.id }}" class="btn btn-xs btn-danger">删除</a>
+                                    <a href="/jasset/group_del/{{ post.id }}/" class="btn btn-xs btn-danger">删除</a>
                                 </td>
                             </tr>
                         {% endfor %}

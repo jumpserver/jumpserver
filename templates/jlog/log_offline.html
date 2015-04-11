@@ -125,8 +125,8 @@
        var ip = $('#ip')[0].innerText;
        var start_time = $('#start_time')[0].innerText;
        var end_time = $('#end_time')[0].innerText;
-       var div_username = ' 登录用户名: '+'<span class="text-info">'+username+'' + '</span>';
-       var div_ip = ' 登录主机: '+'<span class="text-info">' + ip + '</span>';
+       var div_username = ' 用户名: '+'<span class="text-info">'+username+'' + '</span>';
+       var div_ip = ' 主机: '+'<span class="text-info">' + ip + '</span>';
        var div_time = ' 开始时间: ' + '<span class="text-info">'+start_time +'</span>' + ' 结束时间: ' +'<span class="text-info">' + end_time + '</span'
        var title = 'JumpServer命令统计 '+ div_username + div_ip + div_time
         $.ajax({url:url,success:function(data){
@@ -137,16 +137,6 @@
     globalConfig = {
         SOCKET_HOST: "{{ web_socket_host }}"
     }
-
-   function cut(num){
-      var g_url = "/jlog/log_kill/"+num;
-       console.log(g_url);
-       $.ajax({
-           type: "GET",
-           url: g_url,
-           success: window.open("/jlog/","_self")
-       });
-   }
 
     function log_search(){
         $.ajax({

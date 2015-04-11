@@ -1,9 +1,7 @@
 # coding: utf-8
-
 import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
-
 
 from django.core.mail import send_mail
 from django.shortcuts import render_to_response
@@ -11,6 +9,12 @@ from django.template import RequestContext
 from jperm.models import Perm, SudoPerm, CmdGroup, Apply
 from django.db.models import Q
 from jumpserver.api import *
+
+
+CONF = ConfigParser()
+CONF.read('%s/jumpserver.conf' % BASE_DIR)
+send_ip = CONF.get('base', 'ip')
+send_port = CONF.get('base', 'port')
 
 
 def asset_cmd_groups_get(asset_groups_select='', cmd_groups_select=''):
@@ -653,9 +657,9 @@ def perm_apply(request):
         group_lis = ', '.join(group)
         hosts_lis = ', '.join(hosts)
         time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        Apply.objects.create(applyer=applyer, dept=dept, bisgroup=group, asset=hosts, status=0, comment=comment)
-        uuid = Apply.objects.get(applyer=applyer, asset=hosts, comment=comment).uuid
-        url = "http://127.0.0.1:8000/jperm/apply_exec/?uuid=%s" % uuid
+        a = Apply.objects.create(applyer=applyer, dept=dept, bisgroup=group, date_add=datetime.datetime.now(), asset=hosts, status=0, comment=comment)
+        uuid = a.uuid
+        url = "http://%s:%s/jperm/apply_exec/?uuid=%s" % (send_ip, send_port, uuid)
         mail_msg = """
         Hi,%s:
             有新的权限申请, 详情如下:
@@ -664,12 +668,12 @@ def perm_apply(request):
                 申请的主机: %s
                 申请时间: %s
                 申请说明: %s
-            请及时审批, 审批完成后点击以下链接,告知申请人。
+            请及时审批, 审批完成后, 点击以下链接或登录授权管理-权限审批页面点击确认键,告知申请人。
 
             %s
         """ % (da.username, applyer, group_lis, hosts_lis, time_now, comment, url)
 
-        send_mail(mail_title, mail_msg, 'jumpserver@163.com', [mail_address], fail_silently=False)
+        send_mail(mail_title, mail_msg, 'jkfunshion@fun.tv', [mail_address], fail_silently=False)
         smg = "提交成功,已发邮件通知部门管理员。"
         return render_to_response('jperm/perm_apply.html', locals(), context_instance=RequestContext(request))
     return render_to_response('jperm/perm_apply.html', locals(), context_instance=RequestContext(request))
@@ -679,6 +683,8 @@ def perm_apply(request):
 def perm_apply_exec(request):
     header_title, path1, path2 = u'主机权限申请', u'权限管理', u'审批完成'
     uuid = request.GET.get('uuid')
+    user_id = request.session.get('user_id')
+    approver = User.objects.get(id=user_id).name
     if uuid:
         p_apply = Apply.objects.filter(uuid=str(uuid))
         q_apply = Apply.objects.get(uuid=str(uuid))
@@ -689,7 +695,7 @@ def perm_apply_exec(request):
             user = User.objects.get(username=q_apply.applyer)
             mail_address = user.email
             time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            p_apply.update(status=1, date_end=time_now)
+            p_apply.update(status=1, approver=approver, date_end=time_now)
             mail_title = '%s - 权限审批完成' % q_apply.applyer
             mail_msg = """
             Hi,%s:
@@ -699,7 +705,7 @@ def perm_apply_exec(request):
             smg = '授权完成, 已邮件通知申请人, 十秒钟后返回首页'
             return render_to_response('jperm/perm_apply_exec.html', locals(), context_instance=RequestContext(request))
     else:
-        smg = '没有此授权, 十秒钟后返回首页'
+        smg = '没有此授权记录, 十秒钟后返回首页'
         return render_to_response('jperm/perm_apply_exec.html', locals(), context_instance=RequestContext(request))
 
 
@@ -735,56 +741,41 @@ def perm_apply_log(request, offset):
     dept_name = DEPT.objects.get(id=dept_id).name
     user_id = request.session.get('user_id')
     username = User.objects.get(id=user_id).username
-    if offset == 'online':
-        posts = get_apply_posts(request, 0, username, dept_name, keyword)
-        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-        return render_to_response('jperm/perm_log_online.html', locals(), context_instance=RequestContext(request))
-
-    elif offset == 'offline':
-        posts = get_apply_posts(request, 1, username, dept_name, keyword)
-        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-        return render_to_response('jperm/perm_log_offline.html', locals(), context_instance=RequestContext(request))
+    status_dic = {'online': 0, 'offline': 1}
+    status = status_dic[offset]
+    posts = get_apply_posts(request, status, username, dept_name, keyword)
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+    return render_to_response('jperm/perm_log_%s.html' % offset, locals(), context_instance=RequestContext(request))
 
 
+@require_login
 def perm_apply_info(request):
     uuid = request.GET.get('uuid')
     post = Apply.objects.get(uuid=uuid)
     return render_to_response('jperm/perm_apply_info.html', locals(), context_instance=RequestContext(request))
 
 
+@require_admin
+def perm_apply_del(request):
+    uuid = request.GET.get('uuid')
+    u_apply = Apply.objects.filter(uuid=uuid)
+    if u_apply:
+        u_apply.delete()
+    return HttpResponseRedirect('/jperm/apply_show/online/')
+
+
+@require_login
 def perm_apply_search(request):
     keyword = request.GET.get('keyword')
-    env = request.GET.get('env')
+    offset = request.GET.get('env')
     dept_id = get_user_dept(request)
     dept_name = DEPT.objects.get(id=dept_id).name
     user_id = request.session.get('user_id')
     username = User.objects.get(id=user_id).username
-    if is_super_user(request):
-        if env == 'online':
-            posts = Apply.objects.filter(Q(applyer__contains=keyword) | Q(approver__contains=keyword)) \
-                .filter(status=0).order_by('-date_add')
-        elif env == 'offline':
-            posts = Apply.objects.filter(Q(applyer__contains=keyword) | Q(approver__contains=keyword)) \
-                .filter(status=1).order_by('-date_add')
-        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-
-    elif is_group_admin(request):
-        if env == 'online':
-            posts = Apply.objects.filter(Q(applyer__contains=keyword) | Q(approver__contains=keyword)) \
-                .filter(status=0).filter(dept_name=dept_name).order_by('-date_add')
-        elif env == 'offline':
-            posts = Apply.objects.filter(Q(applyer__contains=keyword) | Q(approver__contains=keyword)) \
-                .filter(status=1).filter(dept_name=dept_name).order_by('-date_add')
-        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-
-    elif is_common_user(request):
-        if env == 'online':
-            posts = Apply.objects.filter(Q(applyer__contains=keyword) | Q(approver__contains=keyword)) \
-                .filter(status=0).filter(user=username).order_by('-date_add')
-        elif env == 'offline':
-            posts = Apply.objects.filter(Q(applyer__contains=keyword) | Q(approver__contains=keyword)) \
-                .filter(status=1).filter(applyer=username).order_by('-date_add')
-        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+    status_dic = {'online': 0, 'offline': 1}
+    status = status_dic[offset]
+    posts = get_apply_posts(request, status, username, dept_name, keyword)
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
     return render_to_response('jperm/perm_apply_search.html', locals(), context_instance=RequestContext(request))
 
 

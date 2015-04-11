@@ -72,7 +72,11 @@
                                     <td class="text-center" id="start_time"> {{ post.date_add|date:"Y-m-d H:i:s"}} </td>
                                     <td class="text-center" id=""> {{ post.comment }} </td>
                                     <td class="text-center" data-editable='false'>
-                                        <a value="/jperm/apply_info/?uuid={{ post.uuid }}" class="iframe btn btn-xs btn-primary">详情</a>
+                                    <a value="/jperm/apply_info/?uuid={{ post.uuid }}" class="iframe btn btn-xs btn-primary">详情</a>
+                                        {% ifnotequal session_role_id 0 %}
+                                            <a href="/jperm/apply_exec/?uuid={{ post.uuid }}" class="btn btn-xs btn-info">确认</a>
+                                            <a href="/jperm/apply_del/?uuid={{ post.uuid }}" class="btn btn-xs btn-danger">删除</a>
+                                        {% endifnotequal %}
                                     </td>
                                 </tr>
                             {% endfor %}

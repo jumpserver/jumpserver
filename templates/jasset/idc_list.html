@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load mytags %}
 {% block content %}
 {% include 'nav_cat_bar.html' %}
 
@@ -8,7 +9,9 @@
             <div class="ibox float-e-margins">
                 <div class="ibox-content">
                     <div class="">
-                    <a target="_blank" href="/jasset/idc_add" class="btn btn-sm btn-primary "> 添加IDC </a>
+                    {% ifequal session_role_id 2 %}
+                        <a target="_blank" href="/jasset/idc_add" class="btn btn-sm btn-primary "> 添加IDC </a>
+                    {% endifequal %}
                     <form id="search_form" method="get" action="" class="pull-right mail-search">
                         <div class="input-group">
                             <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
@@ -26,7 +29,9 @@
                     <table class="table table-striped table-bordered table-hover " id="editable" >
                         <thead>
                             <tr>
-                                <th class="text-center"><input id="checkall" type="checkbox" class="i-checks" name="checkall" value="checkall" data-editable='false' onclick="check_all('contents_form')"></th>
+                                {% ifequal session_role_id 2 %}
+                                    <th class="text-center"><input id="checkall" type="checkbox" class="i-checks" name="checkall" value="checkall" data-editable='false' onclick="check_all('contents_form')"></th>
+                                {% endifequal %}
                                 <th class="text-center"> 机房名 </th>
                                 <th class="text-center"> 主机数量 </th>
                                 <th class="text-center"> 备注 </th>
@@ -36,14 +41,22 @@
                         <tbody>
                         {% for post in contacts.object_list  %}
                             <tr class="gradeX">
-                                <td class="text-center" name="j_id" value="{{ post.id }}" data-editable='false'><input name="id" value="{{ post.id }}" type="checkbox" class="i-checks"></td>
+                                {% ifequal session_role_id 2 %}
+                                    <td class="text-center" name="j_id" value="{{ post.id }}" data-editable='false'><input name="id" value="{{ post.id }}" type="checkbox" class="i-checks"></td>
+                                {% endifequal %}
                                 <td class="text-center"> {{ post.name }} </td>
-                                <td class="text-center"> <a href="/jasset/idc_detail/?id={{ post.id }}">{{ post.asset_set.count }}</a> </td>
+                                {% ifequal session_role_id 2 %}
+                                    <td class="text-center"> <a href="/jasset/idc_detail/?id={{ post.id }}">{{ post.asset_set.count }}</a> </td>
+                                {% else %}
+                                    <td class="text-center"> <a href="/jasset/idc_detail/?id={{ post.id }}">{{ post|get_idc_count:dept }}</a> </td>
+                                {% endifequal %}
                                 <td class="text-center"> {{ post.comment }} </td>
                                 <td class="text-center">
                                     <a href="/jasset/idc_detail/?id={{ post.id }}" class="iframe btn btn-xs btn-primary">详情</a>
-                                    <a href="/jasset/idc_edit/?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <a href="/jasset/idc_del/{{ post.id }}" class="btn btn-xs btn-danger">删除</a>
+                                    {% ifequal session_role_id 2 %}
+                                        <a href="/jasset/idc_edit/?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>
+                                        <a href="/jasset/idc_del/{{ post.id }}" class="btn btn-xs btn-danger">删除</a>
+                                    {% endifequal %}
                                 </td>
                             </tr>
                         {% endfor %}
@@ -51,8 +64,10 @@
                     </table>
                    <div class="row">
                         <div class="col-sm-6">
-                            <input type="button" id="del_button" class="btn btn-danger btn-sm"  name="del_button" value="删除" onclick="del('contents_form')" />
-                            <input type="button" id="alter_button" class="btn btn-warning btn-sm" name="alter_button" value="修改" onclick="alter('contents_form')" />
+                            {% ifequal session_role_id 2 %}
+                                <input type="button" id="del_button" class="btn btn-danger btn-sm"  name="del_button" value="删除" onclick="del('contents_form')" />
+                                <input type="button" id="alter_button" class="btn btn-warning btn-sm" name="alter_button" value="修改" onclick="alter('contents_form')" />
+                            {% endifequal %}
                         </div>
                         {% include 'paginator.html' %}
                     </div>

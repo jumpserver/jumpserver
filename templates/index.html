@@ -89,6 +89,10 @@
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
                         </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user"></ul>
                         <a class="close-link">
                             <i class="fa fa-times"></i>
                         </a>
@@ -153,7 +157,29 @@
                             {% endfor %}
                         </div>
 
-                        <button class="btn btn-primary btn-block m-t"><i class="fa fa-arrow-down"></i> 更多 </button>
+                        <button id="show" class="btn btn-primary btn-block m-t"><i class="fa fa-arrow-down"></i> 更多 </button>
+                        <div id='more' style="display: none">
+                            <br/>
+                            <div class="feed-activity-list">
+                                {% for login in login_more_10 %}
+                                    <div class="feed-element">
+                                        <a href="profile.html" class="pull-left">
+                                            <img alt="image" class="img-circle" src="/static/img/root.png">
+                                        </a>
+                                        <div class="media-body ">
+                                            {% ifequal login.is_finished 0 %}
+                                                <small class="pull-right text-navy">{{ login.start_time|naturaltime }}</small>
+                                            {% else %}
+                                                <small class="pull-right">{{ login.start_time|naturaltime }}</small>
+                                            {% endifequal %}
+                                            <strong>{{ login.user }}</strong> 登录了{{ login.host }} <br>
+                                            <small class="text-muted">{{ login.start_time }}</small>
+
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
 
                     </div>
 
@@ -172,12 +198,7 @@
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                             <i class="fa fa-wrench"></i>
                         </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">Config option 1</a>
-                            </li>
-                            <li><a href="#">Config option 2</a>
-                            </li>
-                        </ul>
+                        <ul class="dropdown-menu dropdown-user"></ul>
                         <a class="close-link">
                             <i class="fa fa-times"></i>
                         </a>
@@ -218,6 +239,12 @@
 </div>
 
 <script>
+$(document).ready(function(){
+    $('#show').click(function(){
+        $('#show').css('display', 'none');
+        $('#more').css('display', 'block');
+    })
+})
 var cate = {{ li_str|safe }};
 $(function () {
     $('#top10').highcharts({

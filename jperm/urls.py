@@ -28,5 +28,6 @@ urlpatterns = patterns('jperm.views',
     (r'^apply_show/(\w+)/$', 'perm_apply_log'),
     (r'^apply_exec/$', 'perm_apply_exec'),
     (r'^apply_info/$', 'perm_apply_info'),
+    (r'^apply_del/$', 'perm_apply_del'),
     (r'^apply_search/$', 'perm_apply_search'),
 )
