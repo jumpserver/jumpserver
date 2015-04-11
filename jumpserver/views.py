@@ -6,7 +6,6 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseNotFound
 from jperm.models import Apply
-from multiprocessing import Pool
 import paramiko
 from jumpserver.api import *
 
@@ -284,10 +283,13 @@ def filter_ajax_api(request):
 
 def install(request):
     from juser.models import DEPT, User
-    dept = DEPT(id=1, name="超管部", comment="超级管理员部门")
+    dept = DEPT(id=1, name="超管部", comment="SUPER DEPT")
     dept.save()
-    dept2 = DEPT(id=2, name="默认", comment="默认部门")
+    dept2 = DEPT(id=2, name="默认", comment="DEFAULT DEPT")
     dept2.save()
+    IDC(id=1, name="默认", comment="DEFAULT IDC").save()
+    BisGroup(id=1, name="ALL", dept=dept, comment="ALL USER GROUP").save()
+
     User(id=5000, username="admin", password=md5_crypt('admin'),
          name='admin', email='admin@jumpserver.org', role='SU', is_active=True, dept=dept).save()
     User(id=5001, username="group_admin", password=md5_crypt('group_admin'),

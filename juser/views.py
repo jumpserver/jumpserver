@@ -204,7 +204,7 @@ def dept_list(request):
     if keyword:
         contact_list = DEPT.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword)).order_by('name')
     else:
-        contact_list = DEPT.objects.filter(id__gt=1)
+        contact_list = DEPT.objects.all().order_by('id')
 
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
 

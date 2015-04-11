@@ -15,7 +15,7 @@ import subprocess
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
 from juser.models import User, UserGroup, DEPT
-from jasset.models import Asset, BisGroup
+from jasset.models import Asset, BisGroup, IDC
 from jlog.models import Log
 from jasset.models import AssetAlias
 from django.core.exceptions import ObjectDoesNotExist
@@ -393,13 +393,10 @@ def validate(request, user_group=None, user=None, asset_group=None, asset=None, 
     if asset_group:
         dept_asset_groups = dept.bisgroup_set.all()
         asset_groups = []
-        for asset_group_name in dept_asset_groups:
-            asset_groups.extend(asset_group_name.name)
+        for group_id in asset_group:
+            asset_groups.extend(BisGroup.objects.filter(id=int(group_id)))
 
-        if len(asset_groups) == 0:
-            return False     
-
-        if not set(asset_group).issubset(set(asset_groups)):
+        if not set(asset_groups).issubset(set(dept_asset_groups)):
             return False
 
     if asset:
