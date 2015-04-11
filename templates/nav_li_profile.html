@@ -15,7 +15,7 @@
             </span>
         </a>
         <ul class="dropdown-menu animated fadeInRight m-t-xs">
-            <li><a value="/juser/profile/?id={{ session_user_id }}" class="iframe">个人信息</a></li>
+            <li><a value="/juser/profile/?id={{ session_user_id }}" class="iframe_user">个人信息</a></li>
             <li><a href="/juser/chg_info/">修改信息</a></li>
             <li><a href="/juser/chg_role/">切换角色</a></li>
 
@@ -29,7 +29,7 @@
     </div>
 </li>
 <script>
-    $(".iframe").on('click', function(){
+    $(".iframe_user").on('click', function(){
         var url= $(this).attr("value");
         $.layer({
             type: 2,

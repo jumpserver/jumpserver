@@ -125,6 +125,7 @@
 
     $('#search').keyup(function() {
         var $rows = $('#groups option');
+        console.log($rows);
         var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
 
         $rows.show().filter(function() {

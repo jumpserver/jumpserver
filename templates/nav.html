@@ -27,11 +27,11 @@
                 <a><i class="fa fa-cube"></i> <span class="nav-label">资产管理</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
                     <li class="host_add host_add_multi"><a href="/jasset/host_add/">添加资产</a></li>
-                    <li class="host_list host_detail"><a href="/jasset/host_list/">查看资产&nbsp&nbsp</span><span class="label label-info pull-right">{{ host_active_num }}/{{ host_total_num}}</span></a></li>
+                    <li class="host_list host_detail"><a href="/jasset/host_list/">查看资产<span class="label label-info pull-right">{{ host_active_num }}/{{ host_total_num}}</span></a></li>
+                    <li class="idc_add"><a href="/jasset/idc_add/">添加IDC</a></li>
+                    <li class="idc_list idc_detail idc_edit"><a href="/jasset/idc_list/">查看IDC</a></li>
                     <li class="group_add"><a href="/jasset/group_add/">添加主机组</a></li>
                     <li class="group_list group_detail"><a href="/jasset/group_list/">查看主机组</a></li>
-                    <li class="idc_add"><a href="/jasset/idc_add/">添加IDC</a></li>
-                    <li class="idc_list idc_detail"><a href="/jasset/idc_list/">查看IDC</a></li>
                 </ul>
             </li>
             <li id="jperm">
@@ -41,11 +41,11 @@
                         <a href="/jperm/dept_perm_list/">部门授权</a>
                     </li>
 
-                    <li class="perm_list perm_edit">
+                    <li class="perm_list perm_edit ">
                         <a href="/jperm/perm_list/">小组授权</a>
                     </li>
 
-                    <li class="sudo_list sudo_edit sudo_add cmd_list cmd_edit">
+                    <li class="sudo_list sudo_edit sudo_add cmd_list cmd_edit cmd_add">
                         <a href="/jperm/sudo_list/">Sudo授权</a>
                     </li>
                     <li class="apply_show online"><a href="/jperm/apply_show/online/">权限审批</a></li>
@@ -89,7 +89,7 @@
                     <li class="dept_list dept_edit"><a href="/juser/dept_list/">查看部门</a></li>
                     <li class="group_list group_edit"><a href="/juser/group_list/">查看小组</a></li>
                     <li class="group_add"><a href="/juser/group_add/">添加小组</a></li>
-                    <li class="user_list"><a href="/juser/user_list/">查看用户<span class="label {% ifequal user_active_num user_total_num %}label-primary {% else %}label-warning {% endifequal %}pull-right">{{ user_active_num }}/{{ user_total_num }}</span></a></li>
+                    <li class="user_list user_detail"><a href="/juser/user_list/">查看用户<span class="label {% ifequal user_active_num user_total_num %}label-primary {% else %}label-warning {% endifequal %}pull-right">{{ user_active_num }}/{{ user_total_num }}</span></a></li>
                     <li class="user_add"><a href="/juser/user_add/">添加用户</a></li>
                 </ul>
             </li>
@@ -97,20 +97,20 @@
                 <a><i class="fa fa-cube"></i> <span class="nav-label">资产管理</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
                     <li class="host_add host_add_multi"><a href="/jasset/host_add/">添加资产</a></li>
-                    <li class="host_list host_detail"><a href="/jasset/host_list/">查看资产&nbsp&nbsp</span><span class="label label-info pull-right">{{ host_active_num }}/{{ host_total_num}}</span></a></li>
+                    <li class="host_list host_detail host_edit"><a href="/jasset/host_list/">查看资产<span class="label label-info pull-right">{{ host_active_num }}/{{ host_total_num}}</span></a></li>
+                    <li class="idc_list idc_detail idc_edit"><a href="/jasset/idc_list/">查看IDC</a></li>
                     <li class="group_add"><a href="/jasset/group_add/">添加主机组</a></li>
                     <li class="group_list group_detail"><a href="/jasset/group_list/">查看主机组</a></li>
-                    <li class="idc_list idc_detail"><a href="/jasset/idc_list/">查看IDC</a></li>
                 </ul>
             </li>
             <li id="jperm">
                 <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">授权管理</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
-                    <li id="perm_list">
+                    <li class="perm_list perm_edit">
                         <a href="/jperm/perm_list/">小组授权</a>
                     </li>
 
-                    <li id="sudo_add">
+                    <li class="sudo_list sudo_edit sudo_add cmd_list cmd_edit cmd_add">
                         <a href="/jperm/sudo_list/">Sudo授权</a>
                     </li>
                     <li class="apply_show online"><a href="/jperm/apply_show/online/">权限审批</a></li>
