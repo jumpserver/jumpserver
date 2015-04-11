@@ -370,6 +370,7 @@ def get_connect_item(username, ip):
 def validate(request, user_group=None, user=None, asset_group=None, asset=None, edept=None):
     dept = get_session_user_dept(request)[1]
     if edept:
+        print dept.name, edept[0], type(dept.name), type(edept[0])
         if dept.name != edept[0]:
             return False
 
@@ -394,11 +395,11 @@ def validate(request, user_group=None, user=None, asset_group=None, asset=None, 
         dept_asset_groups = dept.bisgroup_set.all()
         asset_groups = []
         for asset_group_name in dept_asset_groups:
-            asset_groups.extend(asset_group_name.name)
+            asset_groups.append(asset_group_name.name)
 
         if len(asset_groups) == 0:
             return False     
-
+        print asset_group, asset_groups
         if not set(asset_group).issubset(set(asset_groups)):
             return False
 

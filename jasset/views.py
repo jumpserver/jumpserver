@@ -448,7 +448,7 @@ def idc_edit(request):
             i = IDC.objects.get(name='默认')
             Asset.objects.filter(id=host).update(idc=i)
 
-        return HttpResponseRedirect('/jasset/idc_detail/?id=%s' % idc_id)
+        return HttpResponseRedirect('/jasset/idc_list/' % idc_id)
 
     return render_to_response('jasset/idc_add.html', locals(), context_instance=RequestContext(request))
 
