@@ -427,34 +427,46 @@ def idc_list(request):
 @require_super_user
 def idc_edit(request):
     header_title, path1, path2 = u'编辑IDC', u'资产管理', u'编辑IDC'
-    edit = 1
     idc_id = request.GET.get('id')
-    j_idc = IDC.objects.get(id=idc_id)
-    default = IDC.objects.get(name='默认').asset_set.all()
-    eposts = contact_list = Asset.objects.filter(idc=j_idc).order_by('ip')
-    posts = [g for g in default if g not in eposts]
+    idc = IDC.objects.filter(id=idc_id)
+    if idc:
+        idc = idc[0]
+        default = IDC.objects.get(name='默认').asset_set.all()
+        eposts = Asset.objects.filter(idc=idc).order_by('ip')
+        posts = [g for g in default if g not in eposts]
+    else:
+        emg = '此IDC不存在'
+
     if request.method == 'POST':
-        j_group = request.POST.get('j_idc')
+        idc_id = request.POST.get('id')
+        j_idc = request.POST.get('j_idc')
         j_hosts = request.POST.getlist('j_hosts')
         j_comment = request.POST.get('j_comment')
         idc_default = request.POST.getlist('idc_default')
 
-        for host in j_hosts:
-            g = Asset.objects.get(id=host)
-            Asset.objects.filter(id=host).update(idc=j_idc)
+        idc = IDC.objects.filter(id=idc_id)
+        if idc:
+            idc.update(name=j_idc, comment=j_comment)
+            for host in j_hosts:
+                g = Asset.objects.get(id=host)
+                Asset.objects.filter(id=host).update(idc=idc)
 
-        for host in idc_default:
-            g = Asset.objects.get(id=host)
-            i = IDC.objects.get(name='默认')
-            Asset.objects.filter(id=host).update(idc=i)
+            for host in idc_default:
+                g = Asset.objects.get(id=host)
+                i = IDC.objects.get(name='默认')
+                Asset.objects.filter(id=host).update(idc=i)
+        else:
+            emg = '此IDC不存在'
+            return render_to_response('jasset/idc_edit.html', locals(), context_instance=RequestContext(request))
 
-        return HttpResponseRedirect('/jasset/idc_list/' % idc_id)
+        return HttpResponseRedirect('/jasset/idc_list/?id=%s' % idc_id)
 
-    return render_to_response('jasset/idc_add.html', locals(), context_instance=RequestContext(request))
+    return render_to_response('jasset/idc_edit.html', locals(), context_instance=RequestContext(request))
 
 
 @require_super_user
-def idc_del(request, offset):
+def idc_del(request):
+    offset = request.GET.get('id', '')
     if offset == 'multi':
         len_list = request.POST.get("len_list")
         for i in range(int(len_list)):

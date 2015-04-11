@@ -55,7 +55,7 @@
                                     <a href="/jasset/idc_detail/?id={{ post.id }}" class="iframe btn btn-xs btn-primary">详情</a>
                                     {% ifequal session_role_id 2 %}
                                         <a href="/jasset/idc_edit/?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>
-                                        <a href="/jasset/idc_del/{{ post.id }}" class="btn btn-xs btn-danger">删除</a>
+                                        <a href="/jasset/idc_del/?id={{ post.id }}" class="btn btn-xs btn-danger">删除</a>
                                     {% endifequal %}
                                 </td>
                             </tr>
@@ -92,7 +92,7 @@
     if (confirm("确定删除")) {
         $.ajax({
             type: "POST",
-            url: "/jasset/idc_del/multi/",
+            url: "/jasset/idc_del/?id=multi",
             data: {"id_list": id_list, "len_list": j},
             success: function (data) {
                 window.open("/jasset/idc_list/", "_self");
