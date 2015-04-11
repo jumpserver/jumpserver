@@ -92,9 +92,9 @@
                             {% for post in contacts.object_list %}
                                 <tr class="gradeX">
                                     <td id="username" class="text-center"> {{ post.user }} </td>
-                                    <td id="ip" class="text-center"> {{ post.dept_name }} </td>
+                                    <td id="deptname" class="text-center"> {{ post.dept_name }} </td>
                                     <td id="ip" class="text-center"> {{ post.host }} </td>
-                                    <td id="ip" class="text-center"> {{ post.remote_ip }} </td>
+                                    <td id="remote_ip" class="text-center"> {{ post.remote_ip }} </td>
                                     {% ifnotequal session_role_id 0 %}
                                         <td class="text-center"><a class="monitor" filename="{{ post.log_path }}"> 监控 </a></td>
                                         <td class="text-center"><input type="button" id="cut" class="btn btn-danger btn-xs"  name="cut" value="阻断" onclick='cut("{{ post.pid }}")' /></td>
@@ -187,7 +187,6 @@
 
 
    function log_search(){
-        console.log('hell0')
         $.ajax({
             type: "GET",
             url: "/jlog/search/?env=online",
@@ -210,7 +209,7 @@
        $.ajax({
            type: "GET",
            url: g_url,
-           success: window.open("/jlog/","_self")
+           success: window.open("/jlog/log_list/online/","_self")
        });
 
 }

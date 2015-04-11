@@ -200,6 +200,18 @@ def ast_to_list(lis):
         return restr
 
 
+@register.filter(name='get_group_count')
+def get_group_count(post, dept):
+    count = post.asset_set.filter(dept=dept).count()
+    return count
+
+
+@register.filter(name='get_idc_count')
+def get_idc_count(post, dept):
+    count = post.asset_set.filter(dept=dept).count()
+    return count
+
+
 @register.filter(name='ast_to_list_1')
 def ast_to_list_1(lis):
     return ast.literal_eval(lis)

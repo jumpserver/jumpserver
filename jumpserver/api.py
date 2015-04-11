@@ -288,9 +288,10 @@ def user_perm_asset_api(username):
         asset_group_list = user_perm_group_api(user)
         for asset_group in asset_group_list:
             asset_list.extend(asset_group.asset_set.all())
-
+        asset_list = list(set(asset_list))
         return asset_list
-    return []
+    else:
+        return []
 
 
 def asset_perm_api(asset):
@@ -307,6 +308,7 @@ def asset_perm_api(asset):
         user_permed_list = []
         for user_group in user_group_list:
             user_permed_list.extend(user_group.user_set.all())
+        user_permed_list = list(set(user_permed_list))
         return user_permed_list
 
 

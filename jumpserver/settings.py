@@ -24,11 +24,11 @@ DB_PASSWORD = config.get('db', 'password')
 DB_DATABASE = config.get('db', 'database')
 
 # mail config
-EMAIL_HOST = 'mail.funshion.com'
-EMAIL_PORT = '25'
-EMAIL_HOST_USER = 'jkfunshion'
-EMAIL_HOST_PASSWORD = 'jkmail%'
-EMAIL_USE_TLS = False
+EMAIL_HOST = config.get('mail', 'email_host')
+EMAIL_PORT = config.get('mail', 'email_port')
+EMAIL_HOST_USER = config.get('mail', 'email_host_user')
+EMAIL_HOST_PASSWORD = config.get('mail', 'email_host_password')
+EMAIL_USE_TLS = config.getboolean('mail', 'email_use_tls')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
