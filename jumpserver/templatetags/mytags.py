@@ -221,6 +221,17 @@ def to_name(user_id):
         return '非法用户'
 
 
+@register.filter(name='to_dept_name')
+def to_dept_name(user_id):
+    try:
+        user = User.objects.filter(id=int(user_id))
+        if user:
+            user = user[0]
+            return user.dept.name
+    except:
+        return '非法部门'
+
+
 @register.filter(name='to_role_name')
 def to_role_name(role_id):
     role_dict = {'0': '普通用户', '1': '部门管理员', '2': '超级管理员'}

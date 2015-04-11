@@ -287,6 +287,10 @@ def install(request):
     return HttpResponse('Ok')
 
 
+def download(request):
+    return render_to_response('download.html', locals(), context_instance=RequestContext(request))
+
+
 def transfer(sftp, filenames):
     # pool = Pool(processes=5)
     for filename, file_path in filenames.items():

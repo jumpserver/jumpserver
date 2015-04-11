@@ -2,20 +2,22 @@
 {% load mytags %}
 {% block content %}
 {% include 'nav_cat_bar.html' %}
-<script>
-function filter_ip(text, noselect, total){
-    alert(text);
+<script type="text/javascript">
+function search_ip(text, noselect, total){
     $("#" + noselect).children().each(
         function(){
             $(this).remove();
         });
 
-    $("#" + total).children().each(function{
-        if  ($(this).text().search(text) != -1){
+    $("#" + total).children().each(function(){
+        if($(this).text().search(text) != -1){
             $("#" + noselect).append($(this).clone())
         }
         })
 }
+
+
+
 </script>
 
 <div class="wrapper wrapper-content animated fadeInRight">
@@ -23,7 +25,7 @@ function filter_ip(text, noselect, total){
         <div class="col-lg-10">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5> 部门授权添加 </h5>
+                    <h5> 部门授权编辑 </h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -77,12 +79,12 @@ function filter_ip(text, noselect, total){
                             <div class="form-group">
                                 <label for="group_name" class="col-sm-2 control-label">过滤</label>
                                 <div class="col-sm-4">
-                                    <input id="noselect" class="form-control" onchange="filter_ip(this.value, 'assets', 'assets_total')">
+                                    <input id="noselect" class="form-control" oninput="search_ip(this.value, 'assets', 'assets_total')">
                                 </div>
                                 <div class="col-sm-1">
                                 </div>
                                 <div id="select" class="col-sm-3">
-                                    <input class="form-control">
+                                    <input  class="form-control" oninput="search_ip(this.value, 'asset_select', 'asset_select_total')">
                                 </div>
                             </div>
 
@@ -101,7 +103,7 @@ function filter_ip(text, noselect, total){
 
                                 <div class="col-sm-1">
                                     <div class="btn-group" style="margin-top: 60px;">
-                                        <button type="button" class="btn btn-white" onclick="move('assets', 'asset_select')"><i class="fa fa-chevron-right"></i></button>
+                                        <button type="button" class="btn btn-white" onclick="move('assets', 'asset_select'  )"><i class="fa fa-chevron-right"></i></button>
                                         <button type="button" class="btn btn-white" onclick="move('asset_select', 'assets')"><i class="fa fa-chevron-left"></i> </button>
                                     </div>
                                 </div>
