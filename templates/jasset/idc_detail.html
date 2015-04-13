@@ -8,7 +8,7 @@
         <div class="col-lg-12">
             <div class="ibox float-e-margins" id="all">
                 <div class="ibox-title">
-                    <h5> IDC<span class="text-info"> {{ idc_name }} </span>详细信息列表 </h5>
+                    <h5> IDC<span class="text-info"> {{ idc.name }} </span>详细信息列表 </h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -29,8 +29,14 @@
                 </div>
 
                 <div class="ibox-content">
+                    {% if emg %}
+                        <div class="alert alert-warning text-center">{{ emg }}</div>
+                    {% endif %}
+                    {% if smg %}
+                        <div class="alert alert-success text-center">{{ smg }}</div>
+                    {% endif %}
                     <div class="">
-                    <a target="_blank" href="/jasset/host_add" class="btn btn-sm btn-primary "> 添加 </a>
+                    <a target="_blank" href="/jasset/host_add" class="btn btn-sm btn-primary "> 添加主机 </a>
                     </div>
 
                     <form id="contents_form" name="contents_form">
@@ -55,7 +61,7 @@
                                 <td class="text-center" name="j_id" value="{{ post.id }}" data-editable='false'><input name="id" value="{{ post.id }}" type="checkbox" class="i-checks"></td>
                                 <td class="text-center" name="j_ip"> {{ post.ip }} </td>
                                 <td class="text-center" name="j_port"> {{ post.port }} </td>
-                                <td class="text-center" name="j_type"> {{ login_types|get_item:post.login_type }} </td>
+                                <td class="text-center" name="j_type"> {{ post.login_type|get_login_type }} </td>
                                 <td class="text-center" name="j_idc"> {{ post.idc.name }} </td>
                                 <td class="text-center" name="j_group">{{ post.bis_group.all | group_str2 }}</td>
                                 <td class="text-center" name="j_active"> {{ post.is_active|bool2str }} </td>

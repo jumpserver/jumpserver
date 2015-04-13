@@ -83,6 +83,12 @@ def get_item(dictionary, key):
     return dictionary.get(key)
 
 
+@register.filter(name='get_login_type')
+def get_login_type(login):
+    login_types = {'L': 'LDAP', 'M': 'MAP'}
+    return login_types[login]
+
+
 @register.filter(name='bool2str')
 def bool2str(value):
     if value:
