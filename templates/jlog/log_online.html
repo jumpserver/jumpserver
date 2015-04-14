@@ -155,7 +155,7 @@
                 if (option == 'new') {
                     tag.append('<p style="margin: 2px">' + escapeString(obj.content) + '</p>');
                 } else if (option == 'exist') {
-                    tag.append('<p style="margin: 0">' + exsit_message + '</p>');
+                    tag.append('<span style="margin: 0">' + exsit_message + '</span>');
                 }
                 tag.animate({ scrollTop: tag[0].scrollHeight}, 1);
             });
