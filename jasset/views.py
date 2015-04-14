@@ -184,31 +184,54 @@ def host_add(request):
 def host_add_batch(request):
     header_title, path1, path2 = u'批量添加主机', u'资产管理', u'批量添加主机'
     login_types = {'LDAP': 'L', 'MAP': 'M'}
+    active_types = {'激活': 1, '禁用': 0}
     dept_id = get_user_dept(request)
     if request.method == 'POST':
         multi_hosts = request.POST.get('j_multi').split('\n')
+        print multi_hosts
         for host in multi_hosts:
             if host == '':
                 break
             j_ip, j_port, j_type, j_idc, j_groups, j_depts, j_active, j_comment = host.split()
             j_type = login_types[j_type]
+            j_active = active_types[str(j_active)]
             j_group = ast.literal_eval(j_groups)
             j_dept = ast.literal_eval(j_depts)
+
+            idc = IDC.objects.filter(name=j_idc)
+            if idc:
+                j_idc = idc[0].id
+
+            group_ids, dept_ids = [], []
+            for group_name in j_group:
+                group = BisGroup.objects.filter(name=group_name)
+                if group:
+                    group_id = group[0].id
+                group_ids.append(group_id)
+
+            for dept_name in j_dept:
+                dept = DEPT.objects.filter(name=dept_name)
+                if dept:
+                    dept_id = dept[0].id
+                dept_ids.append(dept_id)
+
+            if is_group_admin(request) and not verify(request, asset_group=group_ids, edept=dept_ids):
+                return httperror(request, '添加失败, 您无权添加!')
 
             if Asset.objects.filter(ip=str(j_ip)):
                 emg = u'该IP %s 已存在!' % j_ip
                 return render_to_response('jasset/host_add_multi.html', locals(),
                                           context_instance=RequestContext(request))
 
-            if j_type == 'M':
-                j_user = request.POST.get('j_user')
-                j_password = cryptor.encrypt(request.POST.get('j_password'))
-                db_host_insert(j_ip, j_port, j_idc, j_type, j_group, j_dept, j_active, j_comment, j_user, j_password)
-            else:
-                db_host_insert(j_ip, j_port, j_idc, j_type, j_group, j_dept, j_active, j_comment)
+            # if j_type == 'M':
+            #     j_user = request.POST.get('j_user')
+            #     j_password = request.POST.get('j_password')
+            #     db_host_insert(j_ip, j_port, j_idc, j_type, group_ids, dept_ids, j_active, j_comment)
+            # else:
+            db_host_insert(j_ip, j_port, j_idc, j_type, group_ids, dept_ids, j_active, j_comment)
 
         smg = u'批量添加添加成功'
-        return HttpResponseRedirect('/jasset/host_list/')
+        return render_to_response('jasset/host_add_multi.html', locals(), context_instance=RequestContext(request))
 
     return render_to_response('jasset/host_add_multi.html', locals(), context_instance=RequestContext(request))
 
@@ -450,7 +473,7 @@ def host_detail(request):
         return httperror(request, '您无权查看!')
 
     elif is_common_user(request):
-        username = get_session_user_info[1]
+        username = get_session_user_info(request)[1]
         user_permed_hosts = user_perm_asset_api(username)
         if post not in user_permed_hosts:
             return httperror(request, '您无权查看!')
@@ -576,7 +599,7 @@ def group_add(request):
         dept_id = get_user_dept(request)
         dept = DEPT.objects.get(id=dept_id)
         posts = Asset.objects.filter(dept=dept)
-        edept = DEPT.objects.get(id=dept_id)
+        edept = get_session_user_info(request)[5]
 
     if request.method == 'POST':
         j_group = request.POST.get('j_group', '')
@@ -652,15 +675,17 @@ def group_edit(request):
     header_title, path1, path2 = u'编辑主机组', u'资产管理', u'编辑主机组'
     group_id = request.GET.get('id', '')
     group = BisGroup.objects.get(id=group_id)
-    all = Asset.objects.all()
+    host_all = Asset.objects.all()
     dept_id = get_user_dept(request)
-    eposts = Asset.objects.filter(bis_group=group).order_by('ip')
+    eposts = Asset.objects.filter(bis_group=group)
 
     if is_super_user(request):
         edept = DEPT.objects.all()
-        posts = [g for g in all if g not in eposts]
+        posts = [g for g in host_all if g not in eposts]
 
     elif is_group_admin(request):
+        if not verify(request, asset_group=[group_id]):
+            return httperror(request, '编辑失败, 您无权操作!')
         dept = DEPT.objects.get(id=dept_id)
         all_dept = Asset.objects.filter(dept=dept)
         posts = [g for g in all_dept if g not in eposts]
@@ -688,42 +713,44 @@ def group_edit(request):
 @require_admin
 def group_detail(request):
     header_title, path1, path2 = u'主机组详情', u'资产管理', u'主机组详情'
-    login_types = {'L': 'LDAP', 'S': 'SSH_KEY', 'P': 'PASSWORD', 'M': 'MAP'}
-    dept_id = get_user_dept(request)
-    dept = DEPT.objects.get(id=dept_id)
-    group_id = request.GET.get('id')
-    group_name = BisGroup.objects.get(id=group_id).name
-    b = BisGroup.objects.get(id=group_id)
+    login_types = {'L': 'LDAP', 'M': 'MAP'}
+    dept = get_session_user_info(request)[5]
+    group_id = request.GET.get('id', '')
+    group = BisGroup.objects.get(id=group_id)
     if is_super_user(request):
-        posts = Asset.objects.filter(bis_group=b).order_by('ip')
-        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+        posts = Asset.objects.filter(bis_group=group).order_by('ip')
 
     elif is_group_admin(request):
-        posts = Asset.objects.filter(bis_group=b).filter(dept=dept).order_by('ip')
-        contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+        if not verify(request, asset_group=[group_id]):
+            return httperror(request, '您无权查看!')
+        posts = Asset.objects.filter(bis_group=group).filter(dept=dept).order_by('ip')
+
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
     return render_to_response('jasset/group_detail.html', locals(), context_instance=RequestContext(request))
 
 
 @require_admin
-def group_del_host(request, offset):
+def group_del_host(request):
     if request.method == 'POST':
-        group_name = request.POST.get('group_name')
+        group_id = request.POST.get('group_id')
+        offset = request.GET.get('id', '')
+        group = BisGroup.objects.get(id=group_id)
         if offset == 'group':
-            group = BisGroup.objects.get(name=group_name)
-        elif offset == 'idc':
-            group = IDC.objects.get(name=group_name)
-        len_list = request.POST.get("len_list")
-        for i in range(int(len_list)):
-            key = "id_list[" + str(i) + "]"
-            jid = request.POST.get(key)
-            g = Asset.objects.get(id=jid)
-            if offset == 'group':
+            len_list = request.POST.get("len_list")
+            for i in range(int(len_list)):
+                key = "id_list[" + str(i) + "]"
+                jid = request.POST.get(key)
+                g = Asset.objects.get(id=jid)
                 group.asset_set.remove(g)
-            elif offset == 'idc':
-                Asset.objects.filter(id=jid).delete()
-                BisGroup.objects.filter(name=g.ip).delete()
 
-        return HttpResponseRedirect('/jasset/%s_detail/?id=%s' % (offset, group.id))
+    else:
+        offset = request.GET.get('id', '')
+        group_id = request.GET.get('gid', '')
+        group = BisGroup.objects.get(id=group_id)
+        g = Asset.objects.get(id=offset)
+        group.asset_set.remove(g)
+
+    return HttpResponseRedirect('/jasset/group_detail/?id=%s' % group.id)
 
 
 @require_admin
@@ -734,9 +761,13 @@ def group_del(request):
         for i in range(int(len_list)):
             key = "id_list[" + str(i) + "]"
             gid = request.POST.get(key)
+            if not verify(request, asset_group=[gid]):
+                return httperror(request, '删除失败, 您无权删除!')
             BisGroup.objects.filter(id=gid).delete()
     else:
         gid = int(offset)
+        if not verify(request, asset_group=[gid]):
+            return httperror(request, '删除失败, 您无权删除!')
         BisGroup.objects.filter(id=gid).delete()
     return HttpResponseRedirect('/jasset/group_list/')
 

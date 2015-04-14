@@ -722,7 +722,7 @@ def get_apply_posts(request, status, username, dept_name, keyword=None):
             posts = Apply.objects.filter(Q(applyer__contains=keyword) | Q(approver__contains=keyword)) \
                 .filter(status=status).filter(dept=dept_name).order_by('-date_add')
         else:
-            posts = Log.objects.filter(status=status).filter(dept=dept_name).order_by('-date_add')
+            posts = Apply.objects.filter(status=status).filter(dept=dept_name).order_by('-date_add')
 
     elif is_common_user(request):
         if keyword:

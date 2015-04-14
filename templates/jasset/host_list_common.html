@@ -73,7 +73,7 @@
                                 <td class="text-center" name="j_alias"> {{  post|get_user_alias:user_id }} </td>
                                 <td class="text-center" data-editable='false' name="j_comment"> {{ post.comment }} </td>
                                 <td class="text-center" data-editable='false'>
-                                    <a value="/jasset/{{ post.ip }}/" class="iframe btn btn-xs btn-primary">详情</a>
+                                    <a href="/jasset/host_detail/?id={{ post.id }}" class="iframe btn btn-xs btn-primary">详情</a>
                                 </td>
                             </tr>
                         {% endfor %}

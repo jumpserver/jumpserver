@@ -42,9 +42,10 @@
                                 {% if smg %}
                                     <div class="alert alert-success text-center">{{ smg }}</div>
                                 {% endif %}
-                                <h4>按照文本框内主机信息格式填写, 多台主机回车换行</h4>
+                                <p>请严格按照文本框内主机信息格式填写, 多台主机回车换行, 具体格式如下: </p>
+                                <p class="text-info">IP地址  端口号  登录方式  IDC名  所属主机组  所属部门  激活/禁用  备注 </p>
                                     <form id="assetMulti" method="post" class="form-horizontal">
-                                        <div><textarea id="j_multi" name="j_multi" type="text" placeholder="192.168.1.1 22 LDAP 北京联通 [网站,数据库] 运维部 1 网站服务器" class="form-control" style="width:700px;height:500px">192.168.1.1 22 LDAP 北京联通 ['网站','数据库'] ['运维部'] 1 网站服务器</textarea></div>
+                                        <div><textarea id="j_multi" name="j_multi" type="text" placeholder="192.168.1.1 22 LDAP 北京联通 [网站,数据库] 运维部 激活 网站服务器" class="form-control" style="width:700px;height:500px">192.168.1.1 22 LDAP 北京联通 ['网站','数据库'] ['运维部','测试部'] 激活 网站服务器</textarea></div>
                                         <div class="hr-line-dashed"></div>
                                         <div class="form-group">
                                             <div class="col-sm-4 col-sm-offset-4">

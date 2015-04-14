@@ -21,8 +21,8 @@
 
     <div class="middle-box text-center animated fadeInDown">
         <h1>Error</h1>
-        <h3 class="font-bold">{{ message }}</h3>
-
+        <h3 class="font-bold text-danger">{{ message }}</h3>
+        <h3 id="jumpTo" class="font-bold text-info"></h3>
         <div class="error-desc">
             The server encountered something unexpected that didn't allow it to complete the request. We apologize.<br/>
             You can go back to main page: <br/><a href="/" class="btn btn-primary m-t">Dashboard</a>
@@ -34,6 +34,18 @@
     <script src="/static/js/bootstrap.min.js"></script>
 
 </body>
-
+<script>
+    function countDown(secs,surl){
+         var jumpTo = document.getElementById('jumpTo');
+         jumpTo.innerHTML= secs + '秒' + '后返回上一页';
+         if(--secs>0){
+             setTimeout("countDown("+secs+",'"+surl+"')",1000);
+             }
+         else{
+             location.href=surl;
+             }
+         }
+    countDown(5,document.referrer);
+</script>
 </html>
 
