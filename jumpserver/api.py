@@ -253,7 +253,7 @@ def get_session_user_info(request):
     if user:
         user = user.first()
         dept = user.dept
-        return [user.id, user.name, user, dept.id, dept.name, dept]
+        return [user.id, user.username, user, dept.id, dept.name, dept]
 
 
 def get_user_dept(request):
