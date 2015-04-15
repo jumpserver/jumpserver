@@ -242,11 +242,12 @@ def login(request):
     else:
         username = request.POST.get('username')
         password = request.POST.get('password')
-        user = User.objects.filter(username=username)
-        if user:
-            user = user[0]
+        user_filter = User.objects.filter(username=username)
+        if user_filter:
+            user = user_filter[0]
             if md5_crypt(password) == user.password:
                 request.session['user_id'] = user.id
+                user_filter.update(last_login=datetime.datetime.now())
                 if user.role == 'SU':
                     request.session['role_id'] = 2
                 elif user.role == 'DA':

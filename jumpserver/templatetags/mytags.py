@@ -157,6 +157,18 @@ def ugrp_perm_agrp_count(user_group_id):
     return 0
 
 
+@register.filter(name='ugrp_sudo_agrp_count')
+def ugrp_sudo_agrp_count(user_group_id):
+    user_group = UserGroup.objects.filter(id=user_group_id)
+    asset_groups = []
+    if user_group:
+        user_group = user_group[0]
+        for perm in user_group.sudoperm_set.all():
+            asset_groups.extend(perm.asset_group.all())
+        return len(set(asset_groups))
+    return 0
+
+
 @register.filter(name='ugrp_perm_asset_count')
 def ugrp_perm_asset_count(user_group_id):
     user_group = UserGroup.objects.filter(id=user_group_id)
@@ -164,6 +176,21 @@ def ugrp_perm_asset_count(user_group_id):
     if user_group:
         user_group = user_group[0]
         asset_groups = [perm.asset_group for perm in user_group.perm_set.all()]
+        for asset_group in asset_groups:
+            assets.extend(asset_group.asset_set.all())
+    return len(set(assets))
+
+
+@register.filter(name='ugrp_sudo_asset_count')
+def ugrp_sudo_asset_count(user_group_id):
+    user_group = UserGroup.objects.filter(id=user_group_id)
+    asset_groups = []
+    assets = []
+    if user_group:
+        user_group = user_group[0]
+        for perm in user_group.sudoperm_set.all():
+            asset_groups.extend(perm.asset_group.all())
+
         for asset_group in asset_groups:
             assets.extend(asset_group.asset_set.all())
     return len(set(assets))
@@ -298,8 +325,52 @@ def sudo_cmd_list(cmd_group_id):
 
 
 @register.filter(name='sudo_cmd_count')
-def sudo_cmd_count(cmd_group_id):
-    cmd_group = CmdGroup.objects.filter(id=cmd_group_id)
-    if cmd_group:
-        cmd_group = cmd_group[0]
-        return len(cmd_group.cmd.split(','))
+def sudo_cmd_count(user_group_id):
+    user_group = UserGroup.objects.filter(id=user_group_id)
+    cmds = []
+    if user_group:
+        user_group = user_group[0]
+        cmd_groups = []
+
+        for perm in user_group.sudoperm_set.all():
+            cmd_groups.extend(perm.cmd_group.all())
+
+        for cmd_group in cmd_groups:
+            cmds.extend(cmd_group.cmd.split(','))
+        return len(set(cmds))
+
+    else:
+        return 0
+
+
+@register.filter(name='sudo_cmd_count')
+def sudo_cmd_count(user_group_id):
+    user_group = UserGroup.objects.filter(id=user_group_id)
+    cmds = []
+    if user_group:
+        user_group = user_group[0]
+        cmd_groups = []
+        for perm in user_group.sudoperm_set.all():
+            cmd_groups.extend(perm.cmd_group.all())
+
+        for cmd_group in cmd_groups:
+            cmds.extend(cmd_group.cmd.split(','))
+        return len(set(cmds))
+    else:
+        return 0
+
+
+@register.filter(name='sudo_cmd_ids')
+def sudo_cmd_ids(user_group_id):
+    user_group = UserGroup.objects.filter(id=user_group_id)
+    if user_group:
+        user_group = user_group[0]
+        cmd_groups = []
+        for perm in user_group.sudoperm_set.all():
+            cmd_groups.extend(perm.cmd_group.all())
+        cmd_ids = [str(cmd_group.id) for cmd_group in cmd_groups]
+        return ','.join(cmd_ids)
+    else:
+        return '0'
+
+

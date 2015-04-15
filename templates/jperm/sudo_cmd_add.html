@@ -63,7 +63,12 @@
                                 <div class="col-sm-8">
                                     <select id="dept_id" name="dept_id" class="form-control m-b">
                                         {% for dept in dept_all %}
-                                            <option value="{{ dept.id }}" selected>{{ dept.name }}</option>
+                                            {% ifequal dept_id dept.id %}
+                                                <option value="{{ dept.id }}" selected>{{ dept.name }}</option>
+                                            {% else %}
+                                                <option value="{{ dept.id }}">{{ dept.name }}</option>
+                                            {% endifequal %}
+
                                         {% endfor %}
                                     </select>
                                 </div>

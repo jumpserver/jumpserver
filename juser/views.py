@@ -71,6 +71,7 @@ def db_add_user(**kwargs):
 
 
 def db_update_user(**kwargs):
+    print kwargs
     groups_post = kwargs.pop('groups')
     user_id = kwargs.pop('user_id')
     user = User.objects.filter(id=user_id)
@@ -354,11 +355,16 @@ def group_add(request):
                 error = u'组名 或 部门 不能为空'
                 raise AddError(error)
 
+            if UserGroup.objects.filter(name=group_name):
+                error = u'组名已存在'
+                raise AddError(error)
+
             dept = DEPT.objects.filter(id=dept_id)
             if dept:
                 dept = dept[0]
             else:
-                AddError(u'部门不存在')
+                error = u'部门不存在'
+                raise AddError(error)
 
             db_add_group(name=group_name, users=users_selected, dept=dept, comment=comment)
         except AddError:
@@ -843,7 +849,7 @@ def user_edit(request):
             groups_str = ' '.join([str(group.id) for group in user.group.all()])
 
     else:
-        user_id = request.GET.get('user_id', '')
+        user_id = request.POST.get('user_id', '')
         password = request.POST.get('password', '')
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
@@ -858,7 +864,7 @@ def user_edit(request):
         if dept:
             dept = dept[0]
         else:
-            dept = DEPT.objects.get(id='1')
+            dept = DEPT.objects.get(id='2')
 
         if user_id:
             user = User.objects.filter(id=user_id)

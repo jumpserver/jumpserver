@@ -375,39 +375,38 @@ def validate(request, user_group=None, user=None, asset_group=None, asset=None, 
 
     if user_group:
         dept_user_groups = dept.usergroup_set.all()
-        user_groups = []
-        for user_group_id in user_group:
-            user_groups.extend(UserGroup.objects.filter(id=user_group_id))
-        if not set(user_groups).issubset(set(dept_user_groups)):
+        user_group_ids = []
+        for group in dept_user_groups:
+            user_group_ids.append(str(group.id))
+
+        if not set(user_group).issubset(set(user_group_ids)):
             return False
 
     if user:
         dept_users = dept.user_set.all()
-        users = []
-        for user_id in user:
-            users.extend(User.objects.filter(id=user_id))
+        user_ids = []
+        for user in dept_users:
+            user_ids.append(str(user.id))
 
-        if not set(users).issubset(set(dept_users)):
+        if not set(user).issubset(set(user_ids)):
             return False
 
     if asset_group:
         dept_asset_groups = dept.bisgroup_set.all()
-        asset_groups = []
-        for group_id in asset_group:
-            asset_groups.extend(BisGroup.objects.filter(id=int(group_id)))
+        asset_group_ids = []
+        for group in dept_asset_groups:
+            asset_group_ids.append(group.id)
 
-        if not set(asset_groups).issubset(set(dept_asset_groups)):
+        if not set(asset_group).issubset(set(asset_group_ids)):
             return False
 
     if asset:
         dept_assets = dept.asset_set.all()
-        assets, eassets = [], []
-        for asset_id in dept_assets:
-            eassets.append(int(asset_id.id))
-        for i in asset:
-            assets.append(int(i)) 
+        asset_ids = []
+        for asset in dept_assets:
+            asset_ids.append(str(asset.id))
 
-        if not set(assets).issubset(eassets):
+        if not set(asset).issubset(set(asset_ids)):
             return False
 
     return True

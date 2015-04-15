@@ -49,6 +49,7 @@
                             <tr>
                                 <th class="text-center">组名</th>
                                 <th class="text-center">命令</th>
+                                <th class="text-center">部门</th>
                                 <th class="text-center">备注</th>
                                 <th class="text-center">操作</th>
                             </tr>
@@ -58,9 +59,10 @@
                             <tr class="gradeX">
                                 <td class="text-center"> {{ group.name }} </td>
                                 <td class="text-center" title="{{ group.cmd }}"> {{ group.cmd | string_length:50 }} </td>
+                                <td class="text-center"> {{ group.dept.name }} </td>
                                 <td class="text-center"> {{ group.comment }} </td>
                                 <td class="text-center">
-{#                                    <a href="../cmd_detail/?id={{ group.id }}" class="btn btn-xs btn-info">详情</a>#}
+                                    <a value="../cmd_detail/?id={{ group.id }}" class="btn btn-xs btn-primary iframe">详情</a>
                                     <a href="../cmd_edit/?id={{ group.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a href="../cmd_del/?id={{ group.id }}" class="btn btn-xs btn-danger">删除</a>
                                 </td>
@@ -117,8 +119,21 @@
 </div>
 
 <script>
-    $(document).ready(function(){
-        $(".iframe").colorbox({iframe:true, width:"70%", height:"70%"});
+    $(document).ready(function() {
+        $(".iframe").on('click', function () {
+            var url = $(this).attr("value");
+            $.layer({
+                type: 2,
+                title: '命令详情',
+                maxmin: true,
+                shift: 'top',
+                border: [2, 0.3, '#1AB394'],
+                shade: [0.5, '#000000'],
+                shadeClose: true,
+                area: ['800px', '600px'],
+                iframe: {src: url}
+            });
+        });
     });
 </script>
 
