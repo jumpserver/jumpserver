@@ -50,7 +50,7 @@ def index_cu(request):
         user = user[0]
     login_types = {'L': 'LDAP', 'M': 'MAP'}
     user_id = request.session.get('user_id')
-    username = User.objects.get(id=user_id).name
+    username = User.objects.get(id=user_id).username
     posts = user_perm_asset_api(username)
     host_count = len(posts)
     new_posts = []

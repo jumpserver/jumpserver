@@ -19,6 +19,7 @@ from jasset.models import Asset, BisGroup, IDC
 from jlog.models import Log
 from jasset.models import AssetAlias
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
 
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -27,18 +28,12 @@ CONF.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
 SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys')
 SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
-KEY = CONF.get('web', 'key')
+KEY = CONF.get('base', 'key')
 LOGIN_NAME = getpass.getuser()
 LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
-
-
-# def user_perm_group_api(username):
-#     user = User.objects.get(username=username)
-#     if user:
-#         perm_list = []
-#         user_group_all = user.group.all()
-#         for user_group in user_group_all:
-#             perm_list.extend(user_group.perm_set.all())
+SEND_IP = CONF.get('base', 'ip')
+SEND_PORT = CONF.get('base', 'port')
+MAIL_FROM = CONF.get('mail', 'email_host_user')
 
 
 class LDAPMgmt():
@@ -201,6 +196,9 @@ def require_login(func):
 
 def require_super_user(func):
     def _deco(request, *args, **kwargs):
+        if not request.session.get('user_id'):
+            return HttpResponseRedirect('/login/')
+
         if request.session.get('role_id', 0) != 2:
             return HttpResponseRedirect('/')
         return func(request, *args, **kwargs)
@@ -209,6 +207,9 @@ def require_super_user(func):
 
 def require_admin(func):
     def _deco(request, *args, **kwargs):
+        if not request.session.get('user_id'):
+            return HttpResponseRedirect('/login/')
+
         if request.session.get('role_id', 0) < 1:
             return HttpResponseRedirect('/')
         return func(request, *args, **kwargs)
@@ -267,7 +268,8 @@ def view_splitter(request, su=None, adm=None):
         return su(request)
     elif is_group_admin(request):
         return adm(request)
-    raise Http404
+    else:
+        return HttpResponseRedirect('/login/')
 
 
 def user_perm_group_api(username):

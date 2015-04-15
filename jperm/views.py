@@ -3,18 +3,11 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-from django.core.mail import send_mail
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from jperm.models import Perm, SudoPerm, CmdGroup, Apply
 from django.db.models import Q
 from jumpserver.api import *
-
-
-CONF = ConfigParser()
-CONF.read('%s/jumpserver.conf' % BASE_DIR)
-send_ip = CONF.get('base', 'ip')
-send_port = CONF.get('base', 'port')
 
 
 def asset_cmd_groups_get(asset_groups_select='', cmd_groups_select=''):
@@ -701,7 +694,7 @@ def perm_apply(request):
         time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         a = Apply.objects.create(applyer=applyer, dept=dept, bisgroup=group, date_add=datetime.datetime.now(), asset=hosts, status=0, comment=comment)
         uuid = a.uuid
-        url = "http://%s:%s/jperm/apply_exec/?uuid=%s" % (send_ip, send_port, uuid)
+        url = "http://%s:%s/jperm/apply_exec/?uuid=%s" % (SEND_IP, SEND_PORT, uuid)
         mail_msg = """
         Hi,%s:
             有新的权限申请, 详情如下:
@@ -715,7 +708,7 @@ def perm_apply(request):
             %s
         """ % (da.username, applyer, group_lis, hosts_lis, time_now, comment, url)
 
-        send_mail(mail_title, mail_msg, 'jkfunshion@fun.tv', [mail_address], fail_silently=False)
+        send_mail(mail_title, mail_msg, MAIL_FROM, [mail_address], fail_silently=False)
         smg = "提交成功,已发邮件通知部门管理员。"
         return render_to_response('jperm/perm_apply.html', locals(), context_instance=RequestContext(request))
     return render_to_response('jperm/perm_apply.html', locals(), context_instance=RequestContext(request))
