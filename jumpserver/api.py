@@ -19,6 +19,7 @@ from jasset.models import Asset, BisGroup, IDC
 from jlog.models import Log
 from jasset.models import AssetAlias
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.mail import send_mail
 
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -27,18 +28,12 @@ CONF.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
 SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys')
 SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
-KEY = CONF.get('web', 'key')
+KEY = CONF.get('base', 'key')
 LOGIN_NAME = getpass.getuser()
 LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
-
-
-# def user_perm_group_api(username):
-#     user = User.objects.get(username=username)
-#     if user:
-#         perm_list = []
-#         user_group_all = user.group.all()
-#         for user_group in user_group_all:
-#             perm_list.extend(user_group.perm_set.all())
+SEND_IP = CONF.get('base', 'ip')
+SEND_PORT = CONF.get('base', 'port')
+MAIL_FROM = CONF.get('mail', 'email_host_user')
 
 
 class LDAPMgmt():
@@ -201,6 +196,9 @@ def require_login(func):
 
 def require_super_user(func):
     def _deco(request, *args, **kwargs):
+        if not request.session.get('user_id'):
+            return HttpResponseRedirect('/login/')
+
         if request.session.get('role_id', 0) != 2:
             return HttpResponseRedirect('/')
         return func(request, *args, **kwargs)
@@ -209,6 +207,9 @@ def require_super_user(func):
 
 def require_admin(func):
     def _deco(request, *args, **kwargs):
+        if not request.session.get('user_id'):
+            return HttpResponseRedirect('/login/')
+
         if request.session.get('role_id', 0) < 1:
             return HttpResponseRedirect('/')
         return func(request, *args, **kwargs)
@@ -276,7 +277,8 @@ def view_splitter(request, su=None, adm=None):
         return su(request)
     elif is_group_admin(request):
         return adm(request)
-    raise Http404
+    else:
+        return HttpResponseRedirect('/login/')
 
 
 def user_perm_group_api(username):
@@ -384,39 +386,38 @@ def validate(request, user_group=None, user=None, asset_group=None, asset=None, 
 
     if user_group:
         dept_user_groups = dept.usergroup_set.all()
-        user_groups = []
-        for user_group_id in user_group:
-            user_groups.extend(UserGroup.objects.filter(id=user_group_id))
-        if not set(user_groups).issubset(set(dept_user_groups)):
+        user_group_ids = []
+        for group in dept_user_groups:
+            user_group_ids.append(str(group.id))
+
+        if not set(user_group).issubset(set(user_group_ids)):
             return False
 
     if user:
         dept_users = dept.user_set.all()
-        users = []
-        for user_id in user:
-            users.extend(User.objects.filter(id=user_id))
+        user_ids = []
+        for user in dept_users:
+            user_ids.append(str(user.id))
 
-        if not set(users).issubset(set(dept_users)):
+        if not set(user).issubset(set(user_ids)):
             return False
 
     if asset_group:
         dept_asset_groups = dept.bisgroup_set.all()
-        asset_groups = []
-        for group_id in asset_group:
-            asset_groups.extend(BisGroup.objects.filter(id=int(group_id)))
+        asset_group_ids = []
+        for group in dept_asset_groups:
+            asset_group_ids.append(group.id)
 
-        if not set(asset_groups).issubset(set(dept_asset_groups)):
+        if not set(asset_group).issubset(set(asset_group_ids)):
             return False
 
     if asset:
         dept_assets = dept.asset_set.all()
-        assets, eassets = [], []
-        for asset_id in dept_assets:
-            eassets.append(int(asset_id.id))
-        for i in asset:
-            assets.append(int(i)) 
+        asset_ids = []
+        for asset in dept_assets:
+            asset_ids.append(str(asset.id))
 
-        if not set(assets).issubset(eassets):
+        if not set(asset).issubset(set(asset_ids)):
             return False
 
     return True

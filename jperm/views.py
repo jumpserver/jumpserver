@@ -3,18 +3,11 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-from django.core.mail import send_mail
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from jperm.models import Perm, SudoPerm, CmdGroup, Apply
 from django.db.models import Q
 from jumpserver.api import *
-
-
-CONF = ConfigParser()
-CONF.read('%s/jumpserver.conf' % BASE_DIR)
-send_ip = CONF.get('base', 'ip')
-send_port = CONF.get('base', 'port')
 
 
 def asset_cmd_groups_get(asset_groups_select='', cmd_groups_select=''):
@@ -120,7 +113,7 @@ def dept_perm_list(request):
     if keyword:
         contact_list = DEPT.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword)).order_by('name')
     else:
-        contact_list = DEPT.objects.filter(id__gt=1)
+        contact_list = DEPT.objects.filter(id__gt=2)
 
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
 
@@ -533,14 +526,23 @@ def cmd_add(request):
         dept_id = request.POST.get('dept_id')
         cmd = ','.join(request.POST.get('cmd').split())
         comment = request.POST.get('comment')
-
         dept = DEPT.objects.filter(id=dept_id)
-        if dept:
+
+        try:
+            if CmdGroup.objects.filter(name=name):
+                error = '%s 命令组已存在'
+                raise ServerError(error)
+
+            if not dept:
+                error = u"部门不能为空"
+                raise ServerError(error)
+        except ServerError, e:
+            pass
+        else:
             dept = dept[0]
             CmdGroup.objects.create(name=name, dept=dept, cmd=cmd, comment=comment)
-        else:
-            error = u"部门不能为空"
-        msg = u'命令组添加成功'
+            msg = u'命令组添加成功'
+            return HttpResponseRedirect('/jperm/cmd_list/')
 
     return render_to_response('jperm/sudo_cmd_add.html', locals(), context_instance=RequestContext(request))
 
@@ -555,8 +557,16 @@ def cmd_add_adm(request):
         cmd = ','.join(request.POST.get('cmd').split())
         comment = request.POST.get('comment')
 
-        CmdGroup.objects.create(name=name, dept=dept, cmd=cmd, comment=comment)
-        msg = u'命令组添加成功'
+        try:
+            if CmdGroup.objects.filter(name=name):
+                error = '%s 命令组已存在'
+                raise ServerError(error)
+        except ServerError, e:
+            pass
+        else:
+            CmdGroup.objects.create(name=name, dept=dept, cmd=cmd, comment=comment)
+            return HttpResponseRedirect('/jperm/cmd_list/')
+
         return HttpResponseRedirect('/jperm/cmd_list/')
 
     return render_to_response('jperm/sudo_cmd_add.html', locals(), context_instance=RequestContext(request))
@@ -568,10 +578,12 @@ def cmd_edit(request):
 
     cmd_group_id = request.GET.get('id')
     cmd_group = CmdGroup.objects.filter(id=cmd_group_id)
+    dept_all = DEPT.objects.all()
 
     if cmd_group:
         cmd_group = cmd_group[0]
         cmd_group_id = cmd_group.id
+        dept_id = cmd_group.dept.id
         name = cmd_group.name
         cmd = '\n'.join(cmd_group.cmd.split(','))
         comment = cmd_group.comment
@@ -579,12 +591,23 @@ def cmd_edit(request):
     if request.method == 'POST':
         cmd_group_id = request.POST.get('cmd_group_id')
         name = request.POST.get('name')
+        dept_id = request.POST.get('dept_id')
         cmd = ','.join(request.POST.get('cmd').split())
         comment = request.POST.get('comment')
-
         cmd_group = CmdGroup.objects.filter(id=cmd_group_id)
-        if cmd_group:
-            cmd_group.update(name=name, cmd=cmd, comment=comment)
+
+        dept = DEPT.objects.filter(id=dept_id)
+        try:
+            if not dept:
+                error = '没有该部门'
+                raise ServerError(error)
+
+            if not cmd_group:
+                error = '没有该命令组'
+        except ServerError, e:
+            pass
+        else:
+            cmd_group.update(name=name, cmd=cmd, dept=dept[0], comment=comment)
             return HttpResponseRedirect('/jperm/cmd_list/')
     return render_to_response('jperm/sudo_cmd_add.html', locals(), context_instance=RequestContext(request))
 
@@ -624,10 +647,22 @@ def cmd_del(request):
 
 @require_admin
 def cmd_detail(request):
-    cmd_id = request.GET.get('id')
-    cmd_group = CmdGroup.objects.filter(id=cmd_id)
-    if cmd_group:
-        cmd_group = cmd_group[0]
+    cmd_ids = request.GET.get('id').split(',')
+    cmds = []
+    if len(cmd_ids) == 1:
+        cmd_group = CmdGroup.objects.filter(id=cmd_ids[0])
+        if cmd_group:
+            cmd_group = cmd_group[0]
+            cmds.extend(cmd_group.cmd.split(','))
+            cmd_group_name = cmd_group.name
+    else:
+        cmd_groups = []
+        for cmd_id in cmd_ids:
+            cmd_groups.extend(CmdGroup.objects.filter(id=cmd_id))
+        for cmd_group in cmd_groups:
+            cmds.extend(cmd_group.cmd.split(','))
+
+    cmds_str = ', '.join(cmds)
 
     return render_to_response('jperm/sudo_cmd_detail.html', locals(), context_instance=RequestContext(request))
 
@@ -660,7 +695,7 @@ def perm_apply(request):
         time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         a = Apply.objects.create(applyer=applyer, dept=dept, bisgroup=group, date_add=datetime.datetime.now(), asset=hosts, status=0, comment=comment)
         uuid = a.uuid
-        url = "http://%s:%s/jperm/apply_exec/?uuid=%s" % (send_ip, send_port, uuid)
+        url = "http://%s:%s/jperm/apply_exec/?uuid=%s" % (SEND_IP, SEND_PORT, uuid)
         mail_msg = """
         Hi,%s:
             有新的权限申请, 详情如下:
@@ -674,7 +709,7 @@ def perm_apply(request):
             %s
         """ % (da.username, applyer, group_lis, hosts_lis, time_now, comment, url)
 
-        send_mail(mail_title, mail_msg, 'jkfunshion@fun.tv', [mail_address], fail_silently=False)
+        send_mail(mail_title, mail_msg, MAIL_FROM, [mail_address], fail_silently=False)
         smg = "提交成功,已发邮件通知部门管理员。"
         return render_to_response('jperm/perm_apply.html', locals(), context_instance=RequestContext(request))
     return render_to_response('jperm/perm_apply.html', locals(), context_instance=RequestContext(request))

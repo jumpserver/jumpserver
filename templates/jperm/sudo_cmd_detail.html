@@ -14,10 +14,13 @@
     <body>
         <div class="row">
             <div class="contact-box">
+                {% if cmd_group_name %}
                 <h2 class="text-center">{{ cmd_group.name }} 命令详情</h2>
+                {% endif %}
                 <div class="ibox-content">
 
                     <table class="table table-striped table-bordered table-hover " id="editable" >
+                        {% if cmd_group_name %}
                         <thead>
                             <tr>
                                 <td class="text-center" width="120">ID</td>
@@ -31,10 +34,11 @@
                             <td class="text-center">{{ cmd_group.name }}</td>
                             <td class="text-center">{{ cmd_group.dept.name }}</td>
                         </tr>
+                        {% endif %}
                         <tr>
                             <td colspan="1" class="text-center">命令：</td>
                             <td colspan="6" class="text-center">
-                                    <b>{{ cmd_group.cmd }}</b>
+                                    <b>{{ cmds_str }}</b>
                             </td>
                         </tr>
                     </table>
