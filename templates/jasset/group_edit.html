@@ -8,23 +8,6 @@
             <div class="ibox float-e-margins">
                 <div id="ibox-content" class="ibox-title">
                     <h5> 填写主机组基本信息 </h5>
-                    <div class="ibox-tools">
-                        <a class="collapse-link">
-                            <i class="fa fa-chevron-up"></i>
-                        </a>
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="fa fa-wrench"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">未启用 1</a>
-                            </li>
-                            <li><a href="#">未启用 2</a>
-                            </li>
-                        </ul>
-                        <a class="close-link">
-                            <i class="fa fa-times"></i>
-                        </a>
-                    </div>
                 </div>
                 <div class="ibox-content">
                     {% if emg %}
@@ -45,7 +28,11 @@
                                 <div class="col-sm-8">
                                     <select id="j_dept" name="j_dept" class="form-control m-b" onchange="change_dept(this.value)">
                                         {% for d in edept %}
-                                            <option type="checkbox" value="{{ d.id }}">{{ d.name }}</option>
+                                            {% ifequal group.dept d %}
+                                                <option type="checkbox" value="{{ d.id }}" selected>{{ d.name }}</option>
+                                            {% else %}
+                                                <option type="checkbox" value="{{ d.id }}">{{ d.name }}</option>
+                                            {% endifequal %}
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -56,8 +43,8 @@
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
                                 <label for="j_dept" class="col-lg-2 control-label">所属部门<span class="red-fonts" style="">*</span></label>
-                                    <input type="text" name="j_dept" value="{{  edept.id }}" style="display: none">
-                                    <div class="col-sm-8"><input type="text" value="{{  edept.name }}" class="form-control" readonly="readonly"></div>
+                                    <input type="text" name="j_dept" value="{{  group.dept.id }}" style="display: none">
+                                    <div class="col-sm-8"><input type="text"  value="{{  group.dept.name }}" class="form-control" readonly="readonly"></div>
                             </div>
                         {% endifequal %}
 
@@ -98,7 +85,7 @@
 
                         <div class="hr-line-dashed"></div>
                         <div class="form-group"><label class="col-sm-2 control-label"> 备注 </label>
-                            <div class="col-sm-8"><input type="text" value="{{ j_comment }}" placeholder=包括web组所有主机 name="j_comment" class="form-control"></div>
+                            <div class="col-sm-8"><input type="text" value="{{ group.comment }}" placeholder=包括web组所有主机 name="j_comment" class="form-control"></div>
                         </div>
 
                         <div class="hr-line-dashed"></div>
@@ -130,8 +117,8 @@
     },
     valid: function(form) {
         form.submit();
-        }
-    });
+    }
+});
 
     function on_submit(id){
         $('#'+id+' option').each(
@@ -142,6 +129,7 @@
 
     $('#search').keyup(function() {
         var $rows = $('#hosts option');
+        console.log($rows);
         var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
 
         $rows.show().filter(function() {

@@ -670,13 +670,14 @@ def cmd_detail(request):
 @require_login
 def perm_apply(request):
     header_title, path1, path2 = u'主机权限申请', u'权限管理', u'申请主机'
-    user_id = request.session.get('user_id')
-    username = User.objects.get(id=user_id).username
-    dept_id = get_user_dept(request)
-    deptname = DEPT.objects.get(id=dept_id).name
-    dept = DEPT.objects.get(id=dept_id)
-    posts = Asset.objects.filter(dept=dept)
-    egroup = dept.bisgroup_set.all()
+    user_id, username = get_session_user_info(request)[0:2]
+    dept_id, deptname, dept = get_session_user_info(request)[3:6]
+    perm_host = user_perm_asset_api(username)
+    all_host = Asset.objects.filter(dept=dept)
+    perm_group = user_perm_group_api(username)
+    all_group = dept.bisgroup_set.all()
+    posts = [g for g in all_host if g not in perm_host]
+    egroup = [d for d in all_group if d not in perm_group]
     dept_da = User.objects.filter(dept_id=dept_id, role='DA')
 
     if request.method == 'POST':
@@ -757,7 +758,7 @@ def get_apply_posts(request, status, username, dept_name, keyword=None):
             posts = Apply.objects.filter(Q(applyer__contains=keyword) | Q(approver__contains=keyword)) \
                 .filter(status=status).filter(dept=dept_name).order_by('-date_add')
         else:
-            posts = Log.objects.filter(status=status).filter(dept=dept_name).order_by('-date_add')
+            posts = Apply.objects.filter(status=status).filter(dept=dept_name).order_by('-date_add')
 
     elif is_common_user(request):
         if keyword:

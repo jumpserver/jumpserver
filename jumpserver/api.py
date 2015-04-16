@@ -224,7 +224,6 @@ def is_super_user(request):
 
 
 def is_group_admin(request):
-    print request.session.get('role_id'), type(request.session.get('role_id'))
     if request.session.get('role_id') == 1:
         return True
     else:
@@ -246,6 +245,16 @@ def get_session_user_dept(request):
         user = user[0]
         dept = user.dept
         return user, dept
+
+
+@require_login
+def get_session_user_info(request):
+    user_id = request.session.get('user_id', 0)
+    user = User.objects.filter(id=user_id)
+    if user:
+        user = user.first()
+        dept = user.dept
+        return [user.id, user.username, user, dept.id, dept.name, dept]
 
 
 def get_user_dept(request):
@@ -409,6 +418,53 @@ def validate(request, user_group=None, user=None, asset_group=None, asset=None, 
             asset_ids.append(str(asset.id))
 
         if not set(asset).issubset(set(asset_ids)):
+            return False
+
+    return True
+
+
+def verify(request, user_group=None, user=None, asset_group=None, asset=None, edept=None):
+    dept = get_session_user_dept(request)[1]
+    if edept:
+        print dept.id, edept[0]
+        if dept.id != int(edept[0]):
+            return False
+
+    if user_group:
+        dept_user_groups = dept.usergroup_set.all()
+        user_groups = []
+        for user_group_id in user_group:
+            user_groups.extend(UserGroup.objects.filter(id=user_group_id))
+        if not set(user_groups).issubset(set(dept_user_groups)):
+            return False
+
+    if user:
+        dept_users = dept.user_set.all()
+        users = []
+        for user_id in user:
+            users.extend(User.objects.filter(id=user_id))
+
+        if not set(users).issubset(set(dept_users)):
+            return False
+
+    if asset_group:
+        dept_asset_groups = dept.bisgroup_set.all()
+        asset_groups = []
+        for group_id in asset_group:
+            asset_groups.extend(BisGroup.objects.filter(id=int(group_id)))
+
+        if not set(asset_groups).issubset(set(dept_asset_groups)):
+            return False
+
+    if asset:
+        dept_assets = dept.asset_set.all()
+        assets_id, dept_assets_id = [], []
+        for a in dept_assets:
+            dept_assets_id.append(int(a.id))
+        for i in asset:
+            assets_id.append(int(i))
+        print assets_id, dept_assets_id
+        if not set(assets_id).issubset(dept_assets_id):
             return False
 
     return True

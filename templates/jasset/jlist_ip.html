@@ -32,7 +32,7 @@
                         <tr class="gradeX">
                             <td> <a id="ip" class="iframe" href="/jasset/{{ post.ip }}/">{{ post.ip }}</a></td>
                             <td> {{ post.port }} </td>
-                            <td> {{ login_types|get_item:post.login_type }} </td>
+                            <td> {{ post.login_type|get_login_type }} </td>
                             <td class="text-center"> {{ post.idc.name }} </td>
                             <td class="text-center">{% for group in post.bis_group.all %} {{ group }} {% endfor %}</td>
                             <td class="text-center"> {{ post.date_added|date:"Y-m-d H:i:s" }} </td>

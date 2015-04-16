@@ -81,10 +81,16 @@ def admin_index(request):
     active_hosts = hosts.filter(is_active=1)
 
     # percent of dashboard
-    percent_user = format(active_users.count() / users.count(), '.0%')
-    percent_host = format(active_hosts.count() / hosts.count(), '.0%')
-    percent_online_user = format(online_user.count() / users.count(), '.0%')
-    percent_online_host = format(online_host.count() / hosts.count(), '.0%')
+    if users.count() == 0:
+        percent_user, percent_online_user = '0%', '0%'
+    else:
+        percent_user = format(active_users.count() / users.count(), '.0%')
+        percent_online_user = format(online_user.count() / users.count(), '.0%')
+    if hosts.count() == 0:
+        percent_host, percent_online_host = '0%', '0%'
+    else:
+        percent_host = format(active_hosts.count() / hosts.count(), '.0%')
+        percent_online_host = format(online_host.count() / hosts.count(), '.0%')
 
     li_date, li_str = getDaysByNum(7)
     today = datetime.datetime.now().day

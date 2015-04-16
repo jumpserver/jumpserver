@@ -8,7 +8,7 @@
         <div class="col-lg-12">
             <div class="ibox float-e-margins" id="all">
                 <div class="ibox-title">
-                    <h5> 主机组<span class="text-info">{{ group_name }}</span>详细信息列表 </h5>
+                    <h5> 主机组<span class="text-info">{{ group.name }}</span>详细信息列表</h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -30,7 +30,7 @@
 
                 <div class="ibox-content">
                     <div class="">
-                    <a target="_blank" href="/jasset/host_add" class="btn btn-sm btn-primary "> 添加 </a>
+                        <a target="_blank" href="/jasset/host_add" class="btn btn-sm btn-primary"> 添加主机 </a>
                     </div>
 
                     <form id="contents_form" name="contents_form">
@@ -42,7 +42,7 @@
                                 <th class="text-center"> 端口号 </th>
                                 <th class="text-center" name="j_type"> 登录方式 </th>
                                 <th class="text-center" name="j_idc"> 所属IDC </th>
-                                <th class="text-center" id="j_group_name" value="{{ group_name }}"> 所属业务组 </th>
+                                <th class="text-center" id="group_id" value="{{ group.id }}"> 所属业务组 </th>
                                 <th class="text-center"> 是否激活 </th>
                                 <th class="text-center" name="j_time"> 添加时间 </th>
                                 <th class="text-center" name="j_comment"> 备注 </th>
@@ -55,7 +55,7 @@
                                 <td class="text-center" name="j_id" value="{{ post.id }}" data-editable='false'><input name="id" value="{{ post.id }}" type="checkbox" class="i-checks"></td>
                                 <td class="text-center" name="j_ip"> {{ post.ip }} </td>
                                 <td class="text-center" name="j_port"> {{ post.port }} </td>
-                                <td class="text-center" name="j_type"> {{ login_types|get_item:post.login_type }} </td>
+                                <td class="text-center" name="j_type"> {{ post.login_type|get_login_type }} </td>
                                 <td class="text-center" name="j_idc"> {{ post.idc.name }} </td>
                                 <td class="text-center" name="j_group">{{ post.bis_group.all | group_str2 }}</td>
                                 <td class="text-center" name="j_active"> {{ post.is_active|bool2str }} </td>
@@ -64,7 +64,7 @@
                                 <td class="text-center" data-editable='false'>
                                     <a value="/jasset/{{ post.ip }}/" class="iframe btn btn-xs btn-primary">详情</a>
                                     <a href="/jasset/host_edit/?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <a href="/jasset/host_del/{{ post.id }}/" class="btn btn-xs btn-danger">删除</a>
+                                    <a href="/jasset/group_del_host/?id={{ post.id }}&gid={{ group.id }}" class="btn btn-xs btn-danger">删除</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -75,44 +75,7 @@
                             <input type="button" id="del_button" class="btn btn-danger btn-sm"  name="del_button" value="删除" onclick="del('contents_form')" />
                             <input type="button" id="alter_button" class="btn btn-warning btn-sm" name="alter_button" value="修改" onclick="alter('contents_form')" />
                         </div>
-                        <div class="col-sm-6">
-                            <div class="dataTables_paginate paging_simple_numbers" id="editable_paginate">
-                                <ul class="pagination" style="margin-top: 0; float: right">
-
-                                    {% if contacts.has_previous %}
-                                        <li class="paginate_button previous" aria-controls="editable" tabindex="0" id="editable_previous">
-                                            <a href="?id={{ group_id }}&page={{ contacts.previous_page_number }}">Previous</a>
-                                        </li>
-                                    {% else %}
-                                        <li class="paginate_button previous disabled" aria-controls="editable" tabindex="0" id="editable_previous">
-                                             <a href="#">Previous</a>
-                                        </li>
-                                    {% endif %}
-                                    {% ifequal show_first 1 %}
-                                        <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?id={{ group_id }}&page=1"  title="第1页">1...</a></li>
-                                    {% endifequal %}
-                                    {% for page in page_range %}
-                                        {% ifequal current_page page %}
-                                            <li class="paginate_button active"  aria-controls="editable" tabindex="0"><a href="?id={{ group_id }}&page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
-                                        {% else %}
-                                            <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?id={{ group_id }}&page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
-                                        {% endifequal %}
-                                    {% endfor %}
-                                    {% ifequal show_end 1 %}
-                                        <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?id={{ group_id }}&page={{ p.num_pages }}"  title="第{{ page }}页">...{{ p.num_pages }}</a></li>
-                                    {% endifequal %}
-                                    {% if contacts.has_next %}
-                                        <li class="paginate_button next" aria-controls="editable" tabindex="0" id="editable_next">
-                                            <a href="?id={{ group_id }}&page={{ contacts.next_page_number }}">Next</a>
-                                        </li>
-                                    {% else %}
-                                        <li class="paginate_button next disabled" aria-controls="editable" tabindex="0" id="editable_next">
-                                            <a href="#">Next</a>
-                                        </li>
-                                    {% endif %}
-                                </ul>
-                            </div>
-                        </div>
+                        {% include 'paginator.html' %}
                     </div>
                     </form>
                 </div>
@@ -124,21 +87,6 @@
 <script>
     $(document).ready(function(){
         $('#editable').editableTableWidget();
-    });
-
-    $(".iframe").on('click', function(){
-        var url= $(this).attr("value");
-        $.layer({
-            type: 2,
-            title: 'JumpServer主机详情',
-            maxmin: true,
-            shift: 'top',
-            border: [2, 0.3, '#1AB394'],
-            shade: [0.5, '#000000'],
-            shadeClose: true,
-            area : ['800px' , '600px'],
-            iframe: {src: url}
-        });
     });
 
     function alter(form) {
@@ -159,8 +107,7 @@
     function del(form) {
         var checkboxes = document.getElementById(form);
         var id_list = {};
-        var group_name = $('#j_group_name').attr("value");
-        console.log(group_name);
+        var group_id = $('#group_id').attr("value");
         var j = 0;
         for (var i = 0; i < checkboxes.elements.length; i++) {
             if (checkboxes.elements[i].type == "checkbox" && checkboxes.elements[i].checked == true && checkboxes.elements[i].value != "checkall") {
@@ -171,8 +118,8 @@
         if (confirm("确定从主机组中删除")) {
             $.ajax({
                 type: "POST",
-                url: "/jasset/group_del_host/group/",
-                data: {"id_list": id_list, "len_list": j, "group_name": group_name},
+                url: "/jasset/group_del_host/?id=group",
+                data: {"id_list": id_list, "len_list": j, "group_id": group_id},
                 success: function (data) {
                     window.open(window.location.href, "_self");
                 }

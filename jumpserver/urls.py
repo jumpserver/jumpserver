@@ -12,10 +12,10 @@ urlpatterns = patterns('',
     (r'^logout/$', 'jumpserver.views.logout'),
     (r'^file/upload/$', 'jumpserver.views.upload'),
     (r'^file/download/$', 'jumpserver.views.download'),
+    (r'^error/$', 'jumpserver.views.httperror'),
     (r'^juser/', include('juser.urls')),
     (r'^jasset/', include('jasset.urls')),
     (r'^jlog/', include('jlog.urls')),
     (r'^jperm/', include('jperm.urls')),
-
 
 )

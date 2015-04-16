@@ -66,14 +66,14 @@
                                 <td class="text-center" name="j_id" value="{{ post.id }}" data-editable='false'><input name="id" value="{{ post.id }}" type="checkbox" class="i-checks"></td>
                                 <td class="text-center" data-editable='false' name="j_ip"> {{ post.ip }} </td>
                                 <td class="text-center" data-editable='false' name="j_port"> {{ post.port }} </td>
-                                <td class="text-center" data-editable='false' name="j_type"> {{ login_types|get_item:post.login_type }} </td>
+                                <td class="text-center" data-editable='false' name="j_type"> {{ post.login_type|get_login_type }} </td>
                                 <td class="text-center" data-editable='false' name="j_idc"> {{ post.idc.name }} </td>
                                 <td class="text-center" data-editable='false' name="j_dept">{{ post.dept.all | group_str2 }}</td>
                                 <td class="text-center" data-editable='false' name="j_group">{{ post.bis_group.all | group_str2_all }}</td>
                                 <td class="text-center" name="j_alias"> {{  post|get_user_alias:user_id }} </td>
                                 <td class="text-center" data-editable='false' name="j_comment"> {{ post.comment }} </td>
                                 <td class="text-center" data-editable='false'>
-                                    <a value="/jasset/{{ post.ip }}/" class="iframe btn btn-xs btn-primary">详情</a>
+                                    <a href="/jasset/host_detail/?id={{ post.id }}" class="iframe btn btn-xs btn-primary">详情</a>
                                 </td>
                             </tr>
                         {% endfor %}

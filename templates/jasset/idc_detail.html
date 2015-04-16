@@ -8,7 +8,7 @@
         <div class="col-lg-12">
             <div class="ibox float-e-margins" id="all">
                 <div class="ibox-title">
-                    <h5> IDC<span class="text-info"> {{ idc_name }} </span>详细信息列表 </h5>
+                    <h5> IDC<span class="text-info"> {{ idc.name }} </span>详细信息列表 </h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -29,8 +29,14 @@
                 </div>
 
                 <div class="ibox-content">
+                    {% if emg %}
+                        <div class="alert alert-warning text-center">{{ emg }}</div>
+                    {% endif %}
+                    {% if smg %}
+                        <div class="alert alert-success text-center">{{ smg }}</div>
+                    {% endif %}
                     <div class="">
-                    <a target="_blank" href="/jasset/host_add" class="btn btn-sm btn-primary "> 添加 </a>
+                    <a target="_blank" href="/jasset/host_add" class="btn btn-sm btn-primary "> 添加主机 </a>
                     </div>
 
                     <form id="contents_form" name="contents_form">
@@ -55,15 +61,18 @@
                                 <td class="text-center" name="j_id" value="{{ post.id }}" data-editable='false'><input name="id" value="{{ post.id }}" type="checkbox" class="i-checks"></td>
                                 <td class="text-center" name="j_ip"> {{ post.ip }} </td>
                                 <td class="text-center" name="j_port"> {{ post.port }} </td>
-                                <td class="text-center" name="j_type"> {{ login_types|get_item:post.login_type }} </td>
+                                <td class="text-center" name="j_type"> {{ post.login_type|get_login_type }} </td>
                                 <td class="text-center" name="j_idc"> {{ post.idc.name }} </td>
-                                <td class="text-center" name="j_group">{{ post.bis_group.all | group_str2 }}</td>
+                                <td class="text-center" name="j_dept">{{ post.dept.all | group_str2 }}</td>
+                                <td class="text-center" name="j_group">{{ post.bis_group.all | group_str2_all }}</td>
                                 <td class="text-center" name="j_active"> {{ post.is_active|bool2str }} </td>
-                                <td class="text-center"> {{ post.date_added|date:"Y-m-d H:i:s" }} </td>
                                 <td class="text-center" name="j_comment"> {{ post.comment }} </td>
                                 <td class="text-center" data-editable='false'>
-                                    <a value="/jasset/{{ post.ip }}/" class="iframe btn btn-xs btn-primary">详情</a>
-                                    <a href="/jasset/host_del/{{ post.id }}" class="btn btn-xs btn-danger">删除</a>
+                                    <a href="/jasset/host_detail/?id={{ post.id }}" class="btn btn-xs btn-primary">详情</a>
+                                    {% ifnotequal session_role_id 0 %}
+                                        <a href="/jasset/host_edit/?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>
+                                        <a href="/jasset/host_del/{{ post.id }}" class="btn btn-xs btn-danger">删除</a>
+                                    {% endifnotequal %}
                                 </td>
                             </tr>
                         {% endfor %}
@@ -74,38 +83,7 @@
                             <input type="button" id="del_button" class="btn btn-danger btn-sm"  name="del_button" value="删除" onclick="del('contents_form')" />
                             <input type="button" id="alter_button" class="btn btn-warning btn-sm" name="alter_button" value="修改" onclick="alter('contents_form')" />
                         </div>
-                        <div class="col-sm-6">
-                            <div class="dataTables_paginate paging_simple_numbers" id="editable_paginate">
-                                <ul class="pagination" style="margin-top: 0; float: right">
-
-                                    {% if contacts.has_previous %}
-                                        <li class="paginate_button previous" aria-controls="editable" tabindex="0" id="editable_previous">
-                                            <a href="?id={{ idc_id }}&page={{ contacts.previous_page_number }}">Previous</a>
-                                        </li>
-                                    {% else %}
-                                        <li class="paginate_button previous disabled" aria-controls="editable" tabindex="0" id="editable_previous">
-                                             <a href="#">Previous</a>
-                                        </li>
-                                    {% endif %}
-                                    {% for page in page_range %}
-                                        {% ifequal current_page page %}
-                                            <li class="paginate_button active"  aria-controls="editable" tabindex="0"><a href="?id={{ idc_id }}&page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
-                                        {% else %}
-                                            <li class="paginate_button" aria-controls="editable" tabindex="0"><a href="?id={{ idc_id }}&page={{ page }}"  title="第{{ page }}页">{{ page }}</a></li>
-                                        {% endifequal %}
-                                    {% endfor %}
-                                    {% if contacts.has_next %}
-                                        <li class="paginate_button next" aria-controls="editable" tabindex="0" id="editable_next">
-                                            <a href="?id={{ idc_id }}&page={{ contacts.next_page_number }}">Next</a>
-                                        </li>
-                                    {% else %}
-                                        <li class="paginate_button next disabled" aria-controls="editable" tabindex="0" id="editable_next">
-                                            <a href="#">Next</a>
-                                        </li>
-                                    {% endif %}
-                                </ul>
-                            </div>
-                        </div>
+                        {% include 'paginator.html' %}
                     </div>
                     </form>
                 </div>
@@ -117,21 +95,6 @@
 <script>
     $(document).ready(function(){
         $('#editable').editableTableWidget();
-    });
-
-     $(".iframe").on('click', function(){
-        var url= $(this).attr("value");
-        $.layer({
-            type: 2,
-            title: 'JumpServer主机详情',
-            maxmin: true,
-            shift: 'top',
-            border: [2, 0.3, '#1AB394'],
-            shade: [0.5, '#000000'],
-            shadeClose: true,
-            area : ['800px' , '600px'],
-            iframe: {src: url}
-        });
     });
 
     function alter(form) {
@@ -164,7 +127,7 @@
         if (confirm("确定从该IDC中删除")) {
             $.ajax({
                 type: "POST",
-                url: "/jasset/group_del_host/idc/",
+                url: "/jasset/host_del/multi/",
                 data: {"id_list": id_list, "len_list": j, "group_name": group_name},
                 success: function (data) {
                     window.open(window.location.href, "_self");

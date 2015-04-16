@@ -42,7 +42,7 @@
                                     </tr>
                                     <tr>
                                         <td class="text-navy">登录方式</td>
-                                        <td>{{ login_types|get_item:post.login_type }}</td>
+                                        <td>{{ post.login_type|get_login_type }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">IDC</td>
@@ -74,7 +74,7 @@
                                     </tr>
                                     <tr>
                                         <td class="text-navy">激活</td>
-                                        <td>{{ user.is_active|bool2str }}</td>
+                                        <td>{{ post.is_active|bool2str }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">添加日期</td>
@@ -116,13 +116,17 @@
                         <div>
                             <div class="text-left">
                                 <table class="table">
-                                    {% for user in user_permed_list %}
-                                        <tr>
-                                            <td class="text-navy">{{ user.name }}</td>
-                                            <td>{{ user.dept.name }}</td>
-                                            <td><a href="/juser/user_detail/?id={{ user.id }}">详情</a></td>
-                                        </tr>
-                                    {% endfor %}
+                                    {% if user_permed_list %}
+                                        {% for user in user_permed_list %}
+                                            <tr>
+                                                <td class="text-navy">{{ user.name }}</td>
+                                                <td>{{ user.dept.name }}</td>
+                                                <td><a href="/juser/user_detail/?id={{ user.id }}">详情</a></td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <p class="text-center">(暂无)</p>
+                                    {% endif %}
                                 </table>
                             </div>
                         </div>
@@ -153,45 +157,50 @@
                         <small><i class="fa fa-map-marker"></i> 此主机最近一周用户登录信息.</small>
                     </div>
                     <div class="ibox-content inspinia-timeline">
-                        {% for l in log %}
-                            <div class="timeline-item">
-                                <div class="row">
-                                    <div class="col-xs-5 date">
-                                        <i class="fa fa-info-circle"></i>
-                                        <small class="text-navy">{{ l.user }}</small>
-                                        <br/>
-                                        <strong>{{l.dept_name}}</strong>
-                                    </div>
-                                    <div class="col-xs-7 content no-top-border">
-                                        <p class="m-b-xs"><strong>详细信息</strong></p>
-                                        <p>来源IP: {{ l.remote_ip }}</p>
-                                        <p>开始: {{ l.start_time |date:"Y-m-d H:i:s" }}</p>
-                                        <p>结束: {{ l.end_time |date:"Y-m-d H:i:s" }}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                        <button id="show" class="btn btn-primary btn-block m-t"><i class="fa fa-arrow-down"></i> 所有 </button>
-                        <div id='more' style="display: none">
-                        <br/>
-                        {% for l in log_more %}
-                            <div class="timeline-item">
-                                <div class="row">
-                                    <div class="col-xs-5 date">
-                                        <i class="fa fa-info-circle"></i>
-                                        <small class="text-navy">{{ l.user }}</small>
-                                        <br/>
-                                        <strong>{{l.dept_name}}</strong>
-                                    </div>
-                                    <div class="col-xs-7 content no-top-border">
-                                        <p class="m-b-xs"><strong>详细信息</strong></p>
-                                        <p>来源IP: {{ l.remote_ip }}</p>
-                                        <p>开始: {{ l.start_time |date:"Y-m-d H:i:s" }}</p>
-                                        <p>结束: {{ l.end_time |date:"Y-m-d H:i:s" }}</p>
+                        {% if log %}
+                            {% for l in log %}
+                                <div class="timeline-item">
+                                    <div class="row">
+                                        <div class="col-xs-5 date">
+                                            <i class="fa fa-info-circle"></i>
+                                            <small class="text-navy">{{ l.user }}</small>
+                                            <br/>
+                                            <strong>{{l.dept_name}}</strong>
+                                        </div>
+                                        <div class="col-xs-7 content no-top-border">
+                                            <p class="m-b-xs"><strong>详细信息</strong></p>
+                                            <p>来源IP: {{ l.remote_ip }}</p>
+                                            <p>开始: {{ l.start_time |date:"Y-m-d H:i:s" }}</p>
+                                            <p>结束: {{ l.end_time |date:"Y-m-d H:i:s" }}</p>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        {% endfor %}
+                            {% endfor %}
+                            <button id="show" class="btn btn-primary btn-block m-t"><i class="fa fa-arrow-down"></i> 所有 </button>
+                            <div id='more' style="display: none">
+                            <br/>
+                            {% for l in log_more %}
+                                <div class="timeline-item">
+                                    <div class="row">
+                                        <div class="col-xs-5 date">
+                                            <i class="fa fa-info-circle"></i>
+                                            <small class="text-navy">{{ l.user }}</small>
+                                            <br/>
+                                            <strong>{{l.dept_name}}</strong>
+                                        </div>
+                                        <div class="col-xs-7 content no-top-border">
+                                            <p class="m-b-xs"><strong>详细信息</strong></p>
+                                            <p>来源IP: {{ l.remote_ip }}</p>
+                                            <p>开始: {{ l.start_time |date:"Y-m-d H:i:s" }}</p>
+                                            <p>结束: {{ l.end_time |date:"Y-m-d H:i:s" }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-center">(暂无)</p>
+                        {% endif %}
+
                     </div>
                 </div>
             </div>

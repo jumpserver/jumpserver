@@ -19,7 +19,6 @@ class BisGroup(models.Model):
     name = models.CharField(max_length=80, unique=True)
     dept = models.ForeignKey(DEPT)
     comment = models.CharField(max_length=160, blank=True, null=True)
-    type = models.CharField(max_length=1, choices=GROUP_TYPE, default='P')
 
     def __unicode__(self):
         return self.name
