@@ -1,5 +1,6 @@
 # coding: utf-8
 import sys
+
 reload(sys)
 sys.setdefaultencoding('utf8')
 
@@ -182,6 +183,7 @@ def perm_edit_adm(request):
         return HttpResponseRedirect('/jperm/perm_list/')
     return render_to_response('jperm/perm_edit.html', locals(), context_instance=RequestContext(request))
 
+
 @require_admin
 def perm_detail(request):
     header_title, path1, path2 = u'编辑授权', u'授权管理', u'授权详情'
@@ -225,7 +227,7 @@ def perm_asset_detail(request):
 
 
 # def sudo_db_add(name, user_runas, user_groups_select, asset_groups_select, cmd_groups_select, comment):
-#     user_groups_select_list, asset_groups_select_list, cmd_groups_select_list = \
+# user_groups_select_list, asset_groups_select_list, cmd_groups_select_list = \
 #         user_asset_cmd_groups_get(user_groups_select, asset_groups_select, cmd_groups_select)
 #
 #     sudo_perm = SudoPerm(name=name, user_runas=user_runas, comment=comment)
@@ -241,7 +243,6 @@ def unicode2str(unicode_list):
 
 def sudo_ldap_add(user_group, user_runas, asset_groups_select,
                   cmd_groups_select):
-
     if not LDAP_ENABLE:
         return True
 
@@ -479,6 +480,7 @@ def sudo_refresh(request):
         sudo_ldap_add(user_group, user_runas, asset_groups_select, cmd_groups_select)
     return HttpResponse('ok')
 
+
 # @require_admin
 # def sudo_detail(request):
 #     header_title, path1, path2 = u'Sudo授权详情', u'授权管理', u'授权详情'
@@ -669,15 +671,19 @@ def cmd_detail(request):
 
 @require_login
 def perm_apply(request):
+    """ 权限申请 """
     header_title, path1, path2 = u'主机权限申请', u'权限管理', u'申请主机'
     user_id, username = get_session_user_info(request)[0:2]
     dept_id, deptname, dept = get_session_user_info(request)[3:6]
     perm_host = user_perm_asset_api(username)
     all_host = Asset.objects.filter(dept=dept)
+
     perm_group = user_perm_group_api(username)
     all_group = dept.bisgroup_set.all()
+
     posts = [g for g in all_host if g not in perm_host]
     egroup = [d for d in all_group if d not in perm_group]
+
     dept_da = User.objects.filter(dept_id=dept_id, role='DA')
 
     if request.method == 'POST':
@@ -693,7 +699,8 @@ def perm_apply(request):
         group_lis = ', '.join(group)
         hosts_lis = ', '.join(hosts)
         time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        a = Apply.objects.create(applyer=applyer, dept=dept, bisgroup=group, date_add=datetime.datetime.now(), asset=hosts, status=0, comment=comment)
+        a = Apply.objects.create(applyer=applyer, dept=dept, bisgroup=group, date_add=datetime.datetime.now(),
+                                 asset=hosts, status=0, comment=comment)
         uuid = a.uuid
         url = "http://%s:%s/jperm/apply_exec/?uuid=%s" % (SEND_IP, SEND_PORT, uuid)
         mail_msg = """
@@ -710,13 +717,14 @@ def perm_apply(request):
         """ % (da.username, applyer, group_lis, hosts_lis, time_now, comment, url)
 
         send_mail(mail_title, mail_msg, MAIL_FROM, [mail_address], fail_silently=False)
-        smg = "提交成功,已发邮件通知部门管理员。"
+        smg = "提交成功,已发邮件至 %s 通知部门管理员。" % mail_address
         return render_to_response('jperm/perm_apply.html', locals(), context_instance=RequestContext(request))
     return render_to_response('jperm/perm_apply.html', locals(), context_instance=RequestContext(request))
 
 
 @require_admin
 def perm_apply_exec(request):
+    """ 确认权限 """
     header_title, path1, path2 = u'主机权限申请', u'权限管理', u'审批完成'
     uuid = request.GET.get('uuid')
     user_id = request.session.get('user_id')
@@ -737,7 +745,7 @@ def perm_apply_exec(request):
             Hi,%s:
                 您所申请的权限已由 %s 在 %s 审批完成, 请登录验证。
             """ % (q_apply.applyer, q_apply.approver, time_now)
-            send_mail(mail_title, mail_msg, 'jkfunshion@fun.tv', [mail_address], fail_silently=False)
+            send_mail(mail_title, mail_msg, MAIL_FROM, [mail_address], fail_silently=False)
             smg = '授权完成, 已邮件通知申请人, 十秒钟后返回首页'
             return render_to_response('jperm/perm_apply_exec.html', locals(), context_instance=RequestContext(request))
     else:
@@ -746,37 +754,38 @@ def perm_apply_exec(request):
 
 
 def get_apply_posts(request, status, username, dept_name, keyword=None):
+    """ 获取申请记录 """
+    post_all = Apply.objects.filter(status=status).order_by('-date_add')
+    post_keyword_all = Apply.objects.filter(Q(applyer__contains=keyword) |
+                                            Q(approver__contains=keyword)) \
+        .filter(status=status).order_by('-date_add')
+
     if is_super_user(request):
         if keyword:
-            posts = Apply.objects.filter(Q(applyer__contains=keyword) | Q(approver__contains=keyword)) \
-                .filter(status=status).order_by('-date_add')
+            posts = post_keyword_all
         else:
-            posts = Apply.objects.filter(status=status).order_by('-date_add')
-
+            posts = post_all
     elif is_group_admin(request):
         if keyword:
-            posts = Apply.objects.filter(Q(applyer__contains=keyword) | Q(approver__contains=keyword)) \
-                .filter(status=status).filter(dept=dept_name).order_by('-date_add')
+            posts = post_keyword_all.filter(dept=dept_name)
         else:
-            posts = Apply.objects.filter(status=status).filter(dept=dept_name).order_by('-date_add')
-
+            posts = post_all.filter(dept=dept_name)
     elif is_common_user(request):
         if keyword:
-            posts = Apply.objects.filter(applyer=username).filter(status=status).filter(Q(applyer__contains=keyword) |
-                        Q(asset__contains=keyword)).order_by('-date_add')
+            posts = post_keyword_all.filter(user=username)
         else:
-            posts = Apply.objects.filter(applyer=username).filter(status=status).order_by('-date_add')
+            posts = post_all.filter(user=username)
+
     return posts
 
 
 @require_login
 def perm_apply_log(request, offset):
+    """ 申请记录 """
     header_title, path1, path2 = u'权限申请记录', u'权限管理', u'申请记录'
-    keyword = request.GET.get('keyword')
-    dept_id = get_user_dept(request)
-    dept_name = DEPT.objects.get(id=dept_id).name
-    user_id = request.session.get('user_id')
-    username = User.objects.get(id=user_id).username
+    keyword = request.GET.get('keyword', '')
+    username = get_session_user_info(request)[1]
+    dept_name = get_session_user_info(request)[4]
     status_dic = {'online': 0, 'offline': 1}
     status = status_dic[offset]
     posts = get_apply_posts(request, status, username, dept_name, keyword)
@@ -786,6 +795,7 @@ def perm_apply_log(request, offset):
 
 @require_login
 def perm_apply_info(request):
+    """ 申请信息详情 """
     uuid = request.GET.get('uuid')
     post = Apply.objects.get(uuid=uuid)
     return render_to_response('jperm/perm_apply_info.html', locals(), context_instance=RequestContext(request))
@@ -793,6 +803,7 @@ def perm_apply_info(request):
 
 @require_admin
 def perm_apply_del(request):
+    """ 删除日志记录 """
     uuid = request.GET.get('uuid')
     u_apply = Apply.objects.filter(uuid=uuid)
     if u_apply:
@@ -802,12 +813,11 @@ def perm_apply_del(request):
 
 @require_login
 def perm_apply_search(request):
+    """ 申请搜索 """
     keyword = request.GET.get('keyword')
     offset = request.GET.get('env')
-    dept_id = get_user_dept(request)
-    dept_name = DEPT.objects.get(id=dept_id).name
-    user_id = request.session.get('user_id')
-    username = User.objects.get(id=user_id).username
+    username = get_session_user_info(request)[1]
+    dept_name = get_session_user_info(request)[3]
     status_dic = {'online': 0, 'offline': 1}
     status = status_dic[offset]
     posts = get_apply_posts(request, status, username, dept_name, keyword)
