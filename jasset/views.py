@@ -577,15 +577,28 @@ def idc_detail(request):
 @require_super_user
 def idc_del(request):
     offset = request.GET.get('id', '')
+    default_idc = IDC.objects.get(id=1)
     if offset == 'multi':
         len_list = request.POST.get("len_list")
         for i in range(int(len_list)):
             key = "id_list[" + str(i) + "]"
             gid = request.POST.get(key)
-            IDC.objects.filter(id=gid).delete()
+            idc = IDC.objects.filter(id=gid)
+            if idc:
+                idc_class = idc.first()
+                idc_class.asset_set.update(idc=default_idc)
+                idc.delete()
+            else:
+                return httperror(request, '删除失败, 没有这个IDC!')
     else:
         gid = int(offset)
-        IDC.objects.filter(id=gid).delete()
+        idc = IDC.objects.filter(id=gid)
+        if idc:
+            idc_class = idc.first()
+            idc_class.asset_set.update(idc=default_idc)
+            idc.delete()
+        else:
+            return httperror(request, '删除失败, 没有这个IDC!')
     return HttpResponseRedirect('/jasset/idc_list/')
 
 
@@ -761,12 +774,12 @@ def group_del(request):
         for i in range(int(len_list)):
             key = "id_list[" + str(i) + "]"
             gid = request.POST.get(key)
-            if not verify(request, asset_group=[gid]):
+            if is_group_admin(request) and not verify(request, asset_group=[gid]):
                 return httperror(request, '删除失败, 您无权删除!')
             BisGroup.objects.filter(id=gid).delete()
     else:
         gid = int(offset)
-        if not verify(request, asset_group=[gid]):
+        if is_group_admin(request) and not verify(request, asset_group=[gid]):
             return httperror(request, '删除失败, 您无权删除!')
         BisGroup.objects.filter(id=gid).delete()
     return HttpResponseRedirect('/jasset/group_list/')
