@@ -59,10 +59,13 @@ function GetTableDataBox() {
     return returnData;
 }
 
-function move(from, to) {
+function move(from, to, from_o, to_o) {
     $("#" + from + " option").each(function () {
         if ($(this).prop("selected") == true) {
             $("#" + to).append(this);
+            if( typeof from_o !== 'undefined'){
+                $("#"+to_o).append($("#"+from_o +" option[value='"+this.value+"']"));
+            }
         }
     });
 }
@@ -76,12 +79,12 @@ function move_left(from, to) {
     });
 }
 
-function move_all(from, to) {
-    $("#" + from).children().each(function () {
-        $("#" + to).append(this);
-    });
-}
-
+//function move_all(from, to) {
+//    $("#" + from).children().each(function () {
+//        $("#" + to).append(this);
+//    });
+//}
+//
 
 function selectAll(){
          var checklist = document.getElementsByName ("selected");
@@ -100,12 +103,12 @@ function selectAll(){
 
         }
 
-
-function move_all(from, to){
-    $("#"+from).children().each(function(){
-        $("#"+to).append(this);
-    });
-}
+//
+//function move_all(from, to){
+//    $("#"+from).children().each(function(){
+//        $("#"+to).append(this);
+//    });
+//}
 
 //function commit_select(form_array){
 //    $('#{0} option'.format(form_array)).each(function(){

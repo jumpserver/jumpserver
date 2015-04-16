@@ -725,9 +725,10 @@ def user_add_adm(request):
                     您的角色： %s
                     您的web登录密码： %s
                     您的ssh登录密码： %s
-                    密钥下载地址： %s
+                    密钥下载地址： http://%s:%s/juser/down_key/?id=%s
                     说明： 请登陆后再下载密钥！
-                """ % (name, username, dept.name, '普通用户', password, ssh_key_pwd, ssh_key_pwd)
+                """ % (name, username, dept.name, '普通用户',
+                       password, ssh_key_pwd, SEND_IP, SEND_PORT, user.id)
                 print MAIL_FROM
                 send_mail(mail_title, mail_msg, MAIL_FROM, [email], fail_silently=False)
                 msg = u'添加用户 %s 成功！ 用户密码已发送到 %s 邮箱！' % (username, email)
