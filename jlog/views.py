@@ -60,6 +60,7 @@ def get_user_log(ret_list):
 @require_login
 def log_list(request, offset):
     header_title, path1, path2 = u'查看日志', u'查看日志', u'在线用户'
+    keyword = request.GET.get('keyword', '')
     web_socket_host = CONF.get('websocket', 'web_socket_host')
     posts = get_user_log(get_user_info(request, offset))
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
@@ -72,15 +73,14 @@ def log_kill(request):
     pid = request.GET.get('id', '')
     log = Log.objects.filter(pid=pid)
     if log:
-        pid = log.pid
+        log = log.first()
         dept_name = log.dept_name
         deptname = get_session_user_info(request)[4]
         if is_group_admin(request) and dept_name != deptname:
             return httperror(request, 'Kill失败, 您无权操作!')
-
         os.kill(int(pid), 9)
-        Log.objects.filter(pid=pid).update(is_finished=1, end_time=datetime.now())
-        return HttpResponseRedirect('jlog/log_offline.html', locals(), context_instance=RequestContext(request))
+        Log.objects.filter(pid=pid).update(is_finished=1, end_time=datetime.datetime.now())
+        return render_to_response('jlog/log_offline.html', locals(), context_instance=RequestContext(request))
 
 
 @require_login
@@ -109,6 +109,7 @@ def log_history(request):
 @require_login
 def log_search(request):
     offset = request.GET.get('env', '')
+    keyword = request.GET.get('keyword', '')
     posts = get_user_log(get_user_info(request, offset))
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
     return render_to_response('jlog/log_search.html', locals(), context_instance=RequestContext(request))
