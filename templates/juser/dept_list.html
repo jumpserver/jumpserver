@@ -73,7 +73,7 @@
 {#                                    <a href="../dept_detail/?id={{ dept.id }}" class="btn btn-xs btn-primary">详情</a>#}
                                     {% ifequal session_role_id 2 %}
                                         <a href="../dept_edit/?id={{ dept.id }}" class="btn btn-xs btn-info">编辑</a>
-                                        <a href="../dept_del/?id={{ dept.id }}" class="btn btn-xs btn-danger">删除</a>
+                                        <a href="../dept_del/?id={{ dept.id }}" class="btn btn-xs btn-danger {% if dept.id < 3 %} disabled {% endif %} } ">删除</a>
                                     {% else %}
                                         <a href="../dept_edit/?id={{ dept.id }}" class="btn btn-xs btn-info disabled">编辑</a>
                                         <a href="../dept_del/?id={{ dept.id }}" class="btn btn-xs btn-danger disabled">删除</a>
@@ -102,8 +102,14 @@
         var check_array = []
         $('#del_btn').click(function(){
             if (confirm("确定删除")) {
-                $(".gradeX input:checked").each(function() {check_array.push($(this).attr("value")) })
-                $(".gradeX input:checked").closest("tr").remove()
+                $(".gradeX input:checked").each(function() {
+                    var id = $(this).attr("value");
+                    if(id > 2){
+                        check_array.push(id);
+                        $(this).closest("tr").remove();
+                    }
+                });
+{#                $(".gradeX input:checked").closest("tr").remove();#}
                 $.post("/juser/dept_del_ajax/",
                     {dept_ids: check_array.join(",")},
                     function(data){

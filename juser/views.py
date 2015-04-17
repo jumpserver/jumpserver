@@ -277,7 +277,8 @@ def dept_member_update(dept, users_id_list):
 def dept_del_ajax(request):
     dept_ids = request.POST.get('dept_ids')
     for dept_id in dept_ids.split(','):
-        DEPT.objects.filter(id=dept_id).delete()
+        if int(dept_id) > 2:
+            DEPT.objects.filter(id=dept_id).delete()
     return HttpResponse("删除成功")
 
 
@@ -810,6 +811,7 @@ def user_detail(request):
         asset_group_permed = user_perm_group_api(user)
         logs_last = Log.objects.filter(user=user.name).order_by('-start_time')[0:10]
         logs_all = Log.objects.filter(user=user.name).order_by('-start_time')
+        logs_num = len(logs_all)
 
     return render_to_response('juser/user_detail.html', locals(), context_instance=RequestContext(request))
 
@@ -825,7 +827,7 @@ def user_del(request):
             return HttpResponseRedirect('/juser/user_list/')
 
     user = User.objects.filter(id=user_id)
-    if user:
+    if user and user[0].username != 'admin':
         user = user[0]
         user.delete()
         server_del_user(user.username)
@@ -843,7 +845,7 @@ def user_del_ajax(request):
             return "error"
     for user_id in user_ids:
         user = User.objects.filter(id=user_id)
-        if user:
+        if user and user[0].username != 'admin':
             user = user[0]
             user.delete()
             server_del_user(user.username)

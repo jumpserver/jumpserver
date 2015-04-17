@@ -77,10 +77,10 @@
                                     <a href="../user_detail/?id={{ user.id }}" class="btn btn-xs btn-primary">详情</a>
                                     {% ifequal session_role_id 2 %}
                                     <a href="../user_edit/?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <a href="../user_del/?id={{ user.id }}" class="btn btn-xs btn-danger">删除</a>
+                                    <a href="../user_del/?id={{ user.id }}" class="btn btn-xs btn-danger {% if user.username == 'admin' %} disabled {% endif %}">删除</a>
                                     {% else %}
-                                    <a href="../user_edit/?id={{ user.id }}" class="btn btn-xs btn-info {% if user.id|user_readonly %} disabled {% endif %}">编辑</a>
-                                    <a href="../user_del/?id={{ user.id }}" class="btn btn-xs btn-danger {% if user.id|user_readonly %} disabled {% endif %}">删除</a>
+                                    <a href="../user_edit/?id={{ user.id }}" class="btn btn-xs btn-info {% if user.role == 'CU' %} disabled {% endif %}">编辑</a>
+                                    <a href="../user_del/?id={{ user.id }}" class="btn btn-xs btn-danger {% if user.role == 'CU' %} disabled {% endif %}">删除</a>
                                     {% endifequal %}
                                 </td>
                             </tr>
@@ -120,8 +120,8 @@
         var check_array = [];
         $('#del_btn').click(function(){
             if (confirm("确定删除")) {
-                $(".gradeX input:checked").each(function() {check_array.push($(this).attr("value")) })
-                $(".gradeX input:checked").closest("tr").remove()
+                $(".gradeX input:checked").each(function() {check_array.push($(this).attr("value")) });
+                $(".gradeX input:checked").closest("tr").remove();
                 $.post("/juser/user_del_ajax/",
                         {ids: check_array.join(",")},
                         function(data){

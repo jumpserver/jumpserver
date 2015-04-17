@@ -97,15 +97,15 @@ def bool2str(value):
         return u'否'
 
 
-@register.filter(name='user_readonly')
-def user_readonly(user_id):
-    user = User.objects.filter(id=user_id)
-    if user:
-        user = user[0]
-        if user.role == 'CU':
-            return False
-    return True
-
+# @register.filter(name='user_readonly')
+# def user_readonly(user_id):
+#     user = User.objects.filter(id=user_id)
+#     if user:
+#         user = user[0]
+#         if user.role == 'CU':
+#             return False
+#     return True
+#
 
 @register.filter(name='member_count')
 def member_count(group_id):
