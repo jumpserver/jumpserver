@@ -202,13 +202,13 @@ def verify_connect(username, part_ip):
 
 def print_prompt():
     msg = """\033[1;32m###  Welcome Use JumpServer To Login. ### \033[0m
-          1) Type \033[32mIP ADDRESS\033[0m To Login.
-          2) Type \033[32mP/p\033[0m To Print The Servers You Available.
-          3) Type \033[32mG/g\033[0m To Print The Server Groups You Available.
-          4) Type \033[32mG/g+gid\033[0m To Print The Server Group Hosts You Available.
-          5) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
-          6) Type \033[32mQ/q\033[0m To Quit.
-          """
+    1) Type \033[32mIP ADDRESS\033[0m To Login.
+    2) Type \033[32mP/p\033[0m To Print The Servers You Available.
+    3) Type \033[32mG/g\033[0m To Print The Server Groups You Available.
+    4) Type \033[32mG/g(1-N)\033[0m To Print The Server Group Hosts You Available.
+    5) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
+    6) Type \033[32mQ/q\033[0m To Quit.
+    """
     print textwrap.dedent(msg)
 
 

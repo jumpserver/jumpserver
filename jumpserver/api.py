@@ -1,4 +1,5 @@
-#coding: utf-8
+# coding: utf-8
+
 
 from django.http import HttpResponseRedirect
 import json
@@ -14,6 +15,7 @@ import datetime
 import subprocess
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
+from django.shortcuts import render_to_response
 from juser.models import User, UserGroup, DEPT
 from jasset.models import Asset, BisGroup, IDC
 from jlog.models import Log
@@ -470,11 +472,6 @@ def verify(request, user_group=None, user=None, asset_group=None, asset=None, ed
     return True
 
 
-def get_dept_asset(request):
-    dept_id = get_user_dept(request)
-    dept_asset = DEPT.objects.get(id=dept_id).asset_set.all()
-
-
 def bash(cmd):
     """执行bash命令"""
     return subprocess.call(cmd, shell=True)
@@ -485,4 +482,8 @@ def is_dir(dir_name, username='root', mode=0755):
         os.makedirs(dir_name)
         bash("chown %s:%s '%s'" % (username, username, dir_name))
     os.chmod(dir_name, mode)
+
+
+def success(request, msg):
+    return render_to_response('success.html', locals())
 

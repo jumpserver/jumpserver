@@ -240,9 +240,7 @@ def install(request):
 
     User(id=5000, username="admin", password=md5_crypt('admin'),
          name='admin', email='admin@jumpserver.org', role='SU', is_active=True, dept=dept).save()
-    User(id=5001, username="group_admin", password=md5_crypt('group_admin'),
-         name='group_admin', email='group_admin@jumpserver.org', role='DA', is_active=True, dept=dept2).save()
-    return HttpResponse('Ok')
+    return success(request, u'安装成功')
 
 
 def download(request):
