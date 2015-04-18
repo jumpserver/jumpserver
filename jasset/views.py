@@ -6,8 +6,7 @@ from django.db.models import Q
 from django.template import RequestContext
 from django.shortcuts import render_to_response
 
-from jasset.models import IDC, Asset, BisGroup, AssetAlias
-from jperm.models import Perm, SudoPerm
+from jperm.models import Perm
 from jumpserver.api import *
 
 cryptor = PyCrypt(KEY)
@@ -334,36 +333,38 @@ def host_list(request):
     dept = DEPT.objects.get(id=dept_id)
     did = request.GET.get('did', '')
     gid = request.GET.get('gid', '')
-    sid = request.GET.get('sid', '')
-    post_all = Asset.objects.all().order_by('ip')
+    user_id = get_session_user_info(request)[0]
 
+    post_all = Asset.objects.all().order_by('ip')
     post_keyword_all = Asset.objects.filter(Q(ip__contains=keyword) |
                                             Q(idc__name__contains=keyword) |
                                             Q(bis_group__name__contains=keyword) |
                                             Q(comment__contains=keyword)).distinct().order_by('ip')
     if did:
+        if is_common_user(request) or is_group_admin(request):
+            return httperror(request, u'您无权查看!')
+
         dept = DEPT.objects.get(id=did)
         posts = dept.asset_set.all()
         return my_render('jasset/host_list_nop.html', locals(), request)
 
     elif gid:
-        posts = []
-        user_group = UserGroup.objects.get(id=gid)
-        perms = Perm.objects.filter(user_group=user_group)
-        for perm in perms:
-            for post in perm.asset_group.asset_set.all():
-                posts.append(post)
-        posts = list(set(posts))
-        return my_render('jasset/host_list_nop.html', locals(), request)
+        if is_common_user(request):
+            return httperror(request, u'您无权查看!')
 
-    elif sid:
+        elif is_group_admin(request) and not verify(request, user_group=[gid]):
+            return httperror(request, u'您无权查看!')
+
         posts = []
-        user_group = UserGroup.objects.get(id=sid)
-        perms = Perm.objects.filter(user_group=user_group)
-        for perm in perms:
-            for post in perm.asset_group.asset_set.all():
-                posts.append(post)
-        posts = list(set(posts))
+        user_group = UserGroup.objects.filter(id=gid)
+        if user_group:
+            perms = Perm.objects.filter(user_group=user_group)
+            for perm in perms:
+                for post in perm.asset_group.asset_set.all():
+                    posts.append(post)
+            posts = list(set(posts))
+        else:
+            return httperror(request, u'没有这个小组!')
         return my_render('jasset/host_list_nop.html', locals(), request)
 
     else:

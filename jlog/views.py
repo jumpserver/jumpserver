@@ -1,20 +1,11 @@
 # coding:utf-8
-import os
-import ConfigParser
-from datetime import datetime
-
 from django.db.models import Q
-from django.http import HttpResponse
 from django.template import RequestContext
-from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 
-from connect import BASE_DIR
-from jlog.models import Log
-from jumpserver.views import pages
-from juser.models import User, DEPT
 from jumpserver.api import *
 from jasset.views import httperror
+from django.http import HttpResponseNotFound
 
 CONF = ConfigParser()
 CONF.read('%s/jumpserver.conf' % BASE_DIR)
@@ -84,10 +75,12 @@ def log_kill(request):
         dept_name = log.dept_name
         deptname = get_session_user_info(request)[4]
         if is_group_admin(request) and dept_name != deptname:
-            return httperror(request, 'Kill失败, 您无权操作!')
+            return httperror(request, u'Kill失败, 您无权操作!')
         os.kill(int(pid), 9)
         Log.objects.filter(pid=pid).update(is_finished=1, end_time=datetime.datetime.now())
         return render_to_response('jlog/log_offline.html', locals(), context_instance=RequestContext(request))
+    else:
+        return HttpResponseNotFound(u'没有此进程!')
 
 
 @require_login
