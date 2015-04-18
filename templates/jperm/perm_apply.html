@@ -1,7 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
 {% include 'nav_cat_bar.html' %}
-<!--<h3 class="text-center">项目发布申请</h3>-->
+<script type="text/javascript">
+    function search_ip(text, noselect, total){
+        $("#" + noselect).children().each(
+            function(){
+                $(this).remove();
+            });
+
+        $("#" + total).children().each(function(){
+            if($(this).text().search(text) != -1){
+                $("#" + noselect).append($(this).clone())
+            }
+            })
+    }
+</script>
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-lg-10">
@@ -16,16 +29,24 @@
                             <i class="fa fa-wrench"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">未启用 1</a>
-                            </li>
-                            <li><a href="#">未启用 2</a>
-                            </li>
                         </ul>
                         <a class="close-link">
                             <i class="fa fa-times"></i>
                         </a>
                     </div>
                 </div>
+
+                <select id="assets_total" name="assets" class="form-control m-b" size="12" multiple style="display: none">
+                    {% for asset in posts %}
+                        <option value="{{ asset.ip }}">{{ asset.ip }}</option>
+                    {% endfor %}
+                </select>
+
+                <select id="asset_select_total" name="j_hosts" class="form-control m-b" size="12"  multiple style="display: none">
+                    {% for asset in eposts %}
+                    <option value="{{ asset.ip }}">{{ asset.ip }}</option>
+                    {% endfor %}
+                </select>
 
                 <div class="ibox-content">
                     {% if emg %}
@@ -46,10 +67,10 @@
                         </div>
 
                         <div class="hr-line-dashed"></div>
-                        <div class="form-group"><label class="col-sm-2 control-label"> 部门管理员 <span class="red-fonts">*</span></label>
+                        <div class="form-group" id="j_da"><label class="col-sm-2 control-label"> 部门管理员 <span class="red-fonts">*</span></label>
                             <div class="radio">
                                 {% for da in dept_da %}
-                                    <label><input type="radio" value="{{ da.id }}" id="da" name="da"> {{ da }}</label>
+                                    <label><input type="radio" value="{{ da.id }}" name="da"> {{ da }}</label>
                                 {% endfor %}
                             </div>
                         </div>
@@ -68,35 +89,40 @@
 
                         <div class="hr-line-dashed"></div>
                         <div class="form-group">
-                            <div>
-                                <label for="groups" class="col-lg-2 control-label">主机<span class="red-fonts">*</span></label>
-                                <div class="col-sm-3">
-                                    <select multiple="multiple" id="id_domains_filter" name="domains_filter" style="display: none;">
-                                    </select>
-                                    <div class="input-group" style="padding-bottom: 5px">
-                                        <input type="text" size="19"  class="form-control input-sm" id="search" name="keyword" placeholder="过滤">
-                                    </div>
-                                    <select id="groups" size="12" class="form-control m-b" multiple>
+                            <label for="group_name" class="col-sm-2 control-label">过滤</label>
+                            <div class="col-sm-4">
+                                <input id="noselect" class="form-control" oninput="search_ip(this.value, 'assets', 'assets_total')">
+                            </div>
+                            <div class="col-sm-1">
+                            </div>
+                            <div id="select" class="col-sm-3">
+                                <input  class="form-control" oninput="search_ip(this.value, 'asset_select', 'asset_select_total')">
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label">主机<span class="red-fonts">*</span></label>
+                            <div class="col-sm-4">
+                                <div>
+                                    <select id="assets" name="assets" class="form-control m-b" size="12" multiple>
                                         {% for post in posts %}
-                                            <option value="{{ post.ip }}">{{ post.ip }}</option>
+                                        <option value="{{ post.ip }}">{{ post.ip }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
-                                <div class="col-sm-1">
-                                    <div class="btn-group" style="margin-top: 50px;">
-                                        <button type="button" class="btn btn-xm btn-white" onclick="move('groups', 'groups_selected')"><i class="fa fa-chevron-right"></i></button>
-                                        <button type="button" class="btn btn-xm btn-white" onclick="move_left('groups_selected', 'groups')"><i class="fa fa-chevron-left"></i></button>
-                                    </div>
+                            </div>
+
+                            <div class="col-sm-1">
+                                <div class="btn-group" style="margin-top: 60px;">
+                                    <button type="button" class="btn btn-white" onclick="move('assets', 'asset_select', 'assets_total', 'asset_select_total'  )"><i class="fa fa-chevron-right"></i></button>
+                                    <button type="button" class="btn btn-white" onclick="move_left('asset_select', 'assets', 'asset_select_total', 'assets_total')"><i class="fa fa-chevron-left"></i> </button>
                                 </div>
-                                <div class="col-sm-3">
-                                    <h4 style="padding-bottom: 5px">已选中主机</h4>
-                                    <div>
-                                        <select id="groups_selected" name="hosts" class="form-control m-b" size="12"  multiple>
-                                            {% for post in eposts %}
-                                                <option value="{{ post.ip }}">{{ post.ip }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
+                            </div>
+
+                            <div class="col-sm-3">
+                                <div>
+                                    <select id="asset_select" name="hosts" class="form-control m-b" size="12"  multiple></select>
                                 </div>
                             </div>
                         </div>
@@ -110,7 +136,7 @@
                         <div class="hr-line-dashed"></div>
                         <div class="form-group">
                             <div class="col-sm-4 col-sm-offset-5">
-                                <button class="btn btn-primary" type="submit"> 提交 </button>
+                                <button class="btn btn-primary" id="submit_button" type="submit"> 提交 </button>
                             </div>
                         </div>
                     </form>
@@ -121,6 +147,32 @@
 </div>
 
 <script>
+    $(document).ready(function(){
+        $("#submit_button").click(function(){
+            $('#assetForm option').each(function(){
+                $(this).prop('selected', true)
+            })
+        });
+
+    })
+
+    $('#assetForm').validator({
+    timely: 2,
+    theme: "yellow_right_effect",
+    fields: {
+        "j_da": {
+            rule: "required",
+            tip: "选择管理员",
+            ok: "",
+            msg: {required: "管理员必须选择!"},
+            data: {'data-ok':"ok"}
+        }
+    },
+    valid: function(form) {
+        form.submit();
+        }
+    });
+
     var $rows = $('#groups option');
     $('#search').keyup(function() {
         var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();

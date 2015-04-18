@@ -21,6 +21,7 @@ CONF.read('%s/jumpserver.conf' % BASE_DIR)
 
 
 def get_user_info(request, offset):
+    """ 获取用户信息及环境 """
     env_dic = {'online': 0, 'offline': 1}
     env = env_dic[offset]
     keyword = request.GET.get('keyword', '')
@@ -33,32 +34,37 @@ def get_user_info(request, offset):
 
 
 def get_user_log(ret_list):
+    """ 获取不同类型用户日志记录 """
     request, keyword, env, username, dept_name = ret_list
+    post_all = Log.objects.filter(is_finished=env).order_by('-start_time')
+    post_keyword_all = Log.objects.filter(Q(user__contains=keyword) |
+                                          Q(host__contains=keyword)) \
+        .filter(is_finished=env).order_by('-start_time')
+
     if is_super_user(request):
         if keyword:
-            posts = Log.objects.filter(Q(user__contains=keyword) | Q(host__contains=keyword)) \
-                .filter(is_finished=env).order_by('-start_time')
+            posts = post_keyword_all
         else:
-            posts = Log.objects.filter(is_finished=env).order_by('-start_time')
+            posts = post_all
 
     elif is_group_admin(request):
         if keyword:
-            posts = Log.objects.filter(Q(user__contains=keyword) | Q(host__contains=keyword)) \
-                .filter(is_finished=env).filter(dept_name=dept_name).order_by('-start_time')
+            posts = post_keyword_all.filter(dept_name=dept_name)
         else:
-            posts = Log.objects.filter(is_finished=env).filter(dept_name=dept_name).order_by('-start_time')
+            posts = post_all.filter(dept_name=dept_name)
 
     elif is_common_user(request):
         if keyword:
-            posts = Log.objects.filter(user=username).filter(Q(user__contains=keyword) | Q(host__contains=keyword))\
-                .filter(is_finished=env).order_by('-start_time')
+            posts = post_keyword_all.filter(user=username)
         else:
-            posts = Log.objects.filter(is_finished=env).filter(user=username).order_by('-start_time')
+            posts = post_all.filter(user=username)
+
     return posts
 
 
 @require_login
 def log_list(request, offset):
+    """ 显示日志 """
     header_title, path1, path2 = u'查看日志', u'查看日志', u'在线用户'
     keyword = request.GET.get('keyword', '')
     web_socket_host = CONF.get('websocket', 'web_socket_host')
@@ -70,6 +76,7 @@ def log_list(request, offset):
 
 @require_admin
 def log_kill(request):
+    """ 杀掉connect进程 """
     pid = request.GET.get('id', '')
     log = Log.objects.filter(pid=pid)
     if log:
@@ -85,6 +92,7 @@ def log_kill(request):
 
 @require_login
 def log_history(request):
+    """ 命令历史记录 """
     log_id = request.GET.get('id', 0)
     log = Log.objects.filter(id=int(log_id))
     if log:
@@ -108,6 +116,7 @@ def log_history(request):
 
 @require_login
 def log_search(request):
+    """ 日志搜索 """
     offset = request.GET.get('env', '')
     keyword = request.GET.get('keyword', '')
     posts = get_user_log(get_user_info(request, offset))

@@ -2,13 +2,58 @@
 {% load mytags %}
 {% block content %}
 {% include 'nav_cat_bar.html' %}
+<script type="text/javascript">
+    function search_ip(text, noselect, total){
+        $("#" + noselect).children().each(
+            function(){
+                $(this).remove();
+            });
+
+        $("#" + total).children().each(function(){
+            if($(this).text().search(text) != -1){
+                $("#" + noselect).append($(this).clone())
+            }
+            })
+    }
+</script>
+
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-lg-10">
             <div class="ibox float-e-margins">
                 <div id="ibox-content" class="ibox-title">
                     <h5> 填写主机组基本信息 </h5>
-                </div>
+                    <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#">未启用 1</a>
+                                </li>
+                                <li><a href="#">未启用 2</a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                 <select id="assets_total" name="assets" class="form-control m-b" size="12" multiple style="display: none">
+                    {% for asset in posts %}
+                        <option value="{{ asset.id }}">{{ asset.ip }}</option>
+                    {% endfor %}
+                </select>
+
+                <select id="asset_select_total" name="j_hosts" class="form-control m-b" size="12"  multiple style="display: none">
+                    {% for asset in eposts %}
+                    <option value="{{ asset.id }}">{{ asset.ip }}</option>
+                    {% endfor %}
+                </select>
+
                 <div class="ibox-content">
                     {% if emg %}
                         <div class="alert alert-warning text-center">{{ emg }}</div>
@@ -48,37 +93,46 @@
                             </div>
                         {% endifequal %}
 
-                        <div class="hr-line-dashed"></div>
+                       <div class="hr-line-dashed"></div>
                         <div class="form-group">
-                            <div>
-                                <label for="hosts" class="col-lg-2 control-label">主机</label>
-                                <div class="col-sm-3">
-                                    <select multiple="multiple" id="id_domains_filter" name="domains_filter" style="display: none;">
-                                    </select>
-                                    <div class="input-group" style="padding-bottom: 5px">
-                                        <input type="text" size="19"  class="form-control input-sm" id="search" name="keyword" placeholder="过滤">
-                                    </div>
-                                    <select id="hosts" size="12" class="form-control m-b" multiple>
+                            <label for="group_name" class="col-sm-2 control-label">过滤</label>
+                            <div class="col-sm-4">
+                                <input id="noselect" class="form-control" oninput="search_ip(this.value, 'assets', 'assets_total')">
+                            </div>
+                            <div class="col-sm-1">
+                            </div>
+                            <div id="select" class="col-sm-3">
+                                <input  class="form-control" oninput="search_ip(this.value, 'asset_select', 'asset_select_total')">
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label">主机<span class="red-fonts">*</span></label>
+                            <div class="col-sm-4">
+                                <div>
+                                    <select id="assets" name="assets" class="form-control m-b" size="12" multiple>
                                         {% for post in posts %}
-                                            <option value="{{ post.id }}">{{ post.ip }}</option>
+                                        <option value="{{ post.id }}">{{ post.ip }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
-                                <div class="col-sm-1">
-                                    <div class="btn-group" style="margin-top: 50px;">
-                                        <button type="button" class="btn btn-xm btn-white" onclick="move('hosts', 'hosts_selected')"><i class="fa fa-chevron-right"></i></button>
-                                        <button type="button" class="btn btn-xm btn-white" onclick="move_left('hosts_selected', 'hosts')"><i class="fa fa-chevron-left"></i></button>
-                                    </div>
+                            </div>
+
+                            <div class="col-sm-1">
+                                <div class="btn-group" style="margin-top: 60px;">
+                                    <button type="button" class="btn btn-white" onclick="move('assets', 'asset_select', 'assets_total', 'asset_select_total'  )"><i class="fa fa-chevron-right"></i></button>
+                                    <button type="button" class="btn btn-white" onclick="move_left('asset_select', 'assets', 'asset_select_total', 'assets_total')"><i class="fa fa-chevron-left"></i> </button>
                                 </div>
-                                <div class="col-sm-3">
-                                    <h4 style="padding-bottom: 5px">已选中主机</h4>
-                                    <div>
-                                        <select id="hosts_selected" name="j_hosts" class="form-control m-b" size="12"  multiple>
-                                            {% for post in eposts %}
-                                                <option value="{{ post.id }}">{{ post.ip }}</option>
-                                            {% endfor %}
-                                        </select>
-                                    </div>
+                            </div>
+
+                            <div class="col-sm-3">
+                                <div>
+                                    <select id="asset_select" name="j_hosts" class="form-control m-b" size="12"  multiple>
+                                        {% for asset in eposts %}
+                                        <option value="{{ asset.id }}">{{ asset.ip }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -92,7 +146,7 @@
                         <div class="form-group">
                             <div class="col-sm-4 col-sm-offset-5">
                                 <button class="btn btn-white" type="submit"> 重置 </button>
-                                <button class="btn btn-primary" type="submit" onclick="on_submit('groups_selected')  "> 提交 </button>
+                                <button class="btn btn-primary" id="submit_button" type="submit" onclick="on_submit('groups_selected')  "> 提交 </button>
                             </div>
                         </div>
                     </form>
@@ -103,6 +157,15 @@
 </div>
 
 <script>
+    $(document).ready(function(){
+        $("#submit_button").click(function(){
+            $('#assetForm option').each(function(){
+                $(this).prop('selected', true)
+            })
+        });
+
+    })
+
     $('#assetForm').validator({
     timely: 2,
     theme: "yellow_right_effect",
@@ -127,16 +190,16 @@
             })
         }
 
-    $('#search').keyup(function() {
-        var $rows = $('#hosts option');
-        console.log($rows);
-        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
-
-        $rows.show().filter(function() {
-            var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
-            return !~text.indexOf(val);
-        }).hide();
-    });
+//    $('#search').keyup(function() {
+//        var $rows = $('#hosts option');
+//        console.log($rows);
+//        var val = $.trim($(this).val()).replace(/ +/g, ' ').toLowerCase();
+//
+//        $rows.show().filter(function() {
+//            var text = $(this).text().replace(/\s+/g, ' ').toLowerCase();
+//            return !~text.indexOf(val);
+//        }).hide();
+//    });
 
     function change_dept(dept_id){
     $.get('/jasset/dept_host_ajax/',
