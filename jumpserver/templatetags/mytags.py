@@ -380,3 +380,6 @@ def sudo_cmd_ids(user_group_id):
         return '0'
 
 
+@register.filter(name='cmd_group_split')
+def cmd_group_split(cmd_group):
+    return cmd_group.cmd.split(',')

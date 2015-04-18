@@ -118,20 +118,18 @@
                                 <div class="row">
                                     <div class="col-xs-3 date">
                                         <i class="fa fa-repeat"></i>
-                                        <b>{{ group.name }}</b>
+                                        <b><a href="/jperm/perm_list/?uid={{ user.id }}&agid={{ group.id }}">{{ group.name }}</a></b>
                                         <br>
                                         <small class="text-navy">共: {{ group | group_asset_list_count }}台</small>
                                     </div>
                                     <div class="col-xs-7 content no-top-border">
                                         <p class="m-b-xs"><strong>{{ group.comment }}</strong></p>
-
                                         <p>
                                             {% for asset in group|group_asset_list %}
                                                 {{ asset.ip }}<br>
                                             {% endfor %}
                                         </p>
                                         <p></p>
-
                                     </div>
                                 </div>
                             </div>

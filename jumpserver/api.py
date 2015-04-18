@@ -283,6 +283,14 @@ def view_splitter(request, su=None, adm=None):
         return HttpResponseRedirect('/login/')
 
 
+def user_group_perm_asset_group_api(user_group):
+    asset_group_list = []
+    perm_list = user_group.perm_set.all()
+    for perm in perm_list:
+        asset_group_list.append(perm.asset_group)
+    return asset_group_list
+
+
 def user_perm_group_api(username):
     if username:
         user = User.objects.get(username=username)
