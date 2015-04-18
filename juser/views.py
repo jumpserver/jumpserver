@@ -3,16 +3,13 @@
 # Email: ibuler@qq.com
 
 import random
-import subprocess
 from Crypto.PublicKey import RSA
 import crypt
 
 from django.shortcuts import render_to_response
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.template import RequestContext
 
-from juser.models import DEPT
 from jumpserver.api import *
 
 
