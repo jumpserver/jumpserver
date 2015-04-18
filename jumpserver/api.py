@@ -449,11 +449,11 @@ def verify(request, user_group=None, user=None, asset_group=None, asset=None, ed
 
     if asset_group:
         dept_asset_groups = dept.bisgroup_set.all()
-        asset_groups = []
-        for group_id in asset_group:
-            asset_groups.extend(BisGroup.objects.filter(id=int(group_id)))
+        asset_group_ids = []
+        for group in dept_asset_groups:
+            asset_group_ids.append(group.id)
 
-        if not set(asset_groups).issubset(set(dept_asset_groups)):
+        if not set(asset_group).issubset(set(asset_group_ids)):
             return False
 
     if asset:
