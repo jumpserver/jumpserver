@@ -89,7 +89,7 @@
                                         <td>{{ asset.ip }}</td>
                                         <td>{{ asset.idc.name }}</td>
                                         <td>
-                                            {% for group in asset.bis_group.all|filter_private %}
+                                            {% for group in asset.bis_group.all %}
                                                 {{ group }}
                                             {% endfor %}
                                         </td>

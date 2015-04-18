@@ -196,7 +196,8 @@
     $.get('/jasset/dept_host_ajax/',
             {'id': dept_id},
             function(data){
-                $('#hosts').html(data)
+                $('#assets').html(data)
+                $('#assets_total').html(data)
             })
     }
 

@@ -65,6 +65,7 @@
                                 <td class="text-center"> <a href="/jasset/host_list/?gid={{ group.id }}">{{ group.id | ugrp_perm_asset_count }} </a> </td>
                                 <td class="text-center"> {{ group.comment }} </td>
                                 <td class="text-center">
+                                    <a href="../perm_detail/?id={{ group.id }}" class="btn btn-xs btn-primary">详情</a>
                                     <a href="../perm_edit/?id={{ group.id }}" class="btn btn-xs btn-danger">授权编辑</a>
                                 </td>
                             </tr>

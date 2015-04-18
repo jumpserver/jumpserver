@@ -187,18 +187,15 @@ def perm_edit_adm(request):
 @require_admin
 def perm_detail(request):
     header_title, path1, path2 = u'编辑授权', u'授权管理', u'授权详情'
-    perm_id = request.GET.get('id')
-    perm = Perm.objects.filter(id=perm_id)
-    if perm:
-        perm = perm[0]
-        user_groups = perm.user_group.all()
-        asset_groups = perm.asset_group.all()
-
-        users_list = []
+    group_id = request.GET.get('id')
+    user_group = UserGroup.objects.filter(id=group_id)
+    if user_group:
+        user_group = user_group[0]
+        users_list = user_group.user_set.all()
+        perms = user_group.perm_set.all()
+        asset_groups = [perm.asset_group for perm in perms]
         assets_list = []
 
-        for user_group in user_groups:
-            users_list.extend(user_group.user_set.all())
         for asset_group in asset_groups:
             assets_list.extend(asset_group.asset_set.all())
 
@@ -478,7 +475,7 @@ def sudo_refresh(request):
         asset_groups_select = sudo_perm.asset_group.all()
         cmd_groups_select = sudo_perm.cmd_group.all()
         sudo_ldap_add(user_group, user_runas, asset_groups_select, cmd_groups_select)
-    return HttpResponse('ok')
+    return HttpResponse('刷新sudo授权成功')
 
 
 # @require_admin
@@ -652,7 +649,11 @@ def cmd_detail(request):
     cmd_ids = request.GET.get('id').split(',')
     cmds = []
     if len(cmd_ids) == 1:
-        cmd_group = CmdGroup.objects.filter(id=cmd_ids[0])
+        if cmd_ids[0]:
+            cmd_id = cmd_ids[0]
+        else:
+            cmd_id = 1
+        cmd_group = CmdGroup.objects.filter(id=cmd_id)
         if cmd_group:
             cmd_group = cmd_group[0]
             cmds.extend(cmd_group.cmd.split(','))

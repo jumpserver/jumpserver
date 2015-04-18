@@ -1,7 +1,11 @@
 # coding: utf-8
 
-import socket
 import sys
+
+reload(sys)
+sys.setdefaultencoding('utf8')
+
+import socket
 import os
 import re
 import ast
@@ -218,6 +222,7 @@ def print_user_host(username):
     hosts.sort()
     for ip in hosts:
         print '%-15s -- %s' % (ip, hosts_attr[ip][2])
+    print ''
 
 
 def print_user_hostgroup(username):

@@ -231,16 +231,19 @@ def filter_ajax_api(request):
 
 def install(request):
     from juser.models import DEPT, User
-    dept = DEPT(id=1, name="超管部", comment="SUPER DEPT")
+    if User.objects.filter(id=5000):
+        return httperror(request, 'Jumpserver已初始化，不能重复安装！')
+
+    dept = DEPT(id=1, name="超管部", comment="超级管理部门")
     dept.save()
-    dept2 = DEPT(id=2, name="默认", comment="DEFAULT DEPT")
+    dept2 = DEPT(id=2, name="默认", comment="默认部门")
     dept2.save()
-    IDC(id=1, name="默认", comment="DEFAULT IDC").save()
-    BisGroup(id=1, name="ALL", dept=dept, comment="ALL USER GROUP").save()
+    IDC(id=1, name="默认", comment="默认IDC").save()
+    BisGroup(id=1, name="ALL", dept=dept, comment="所有主机组").save()
 
     User(id=5000, username="admin", password=md5_crypt('admin'),
          name='admin', email='admin@jumpserver.org', role='SU', is_active=True, dept=dept).save()
-    return success(request, u'安装成功')
+    return success(request, u'Jumpserver初始化成功')
 
 
 def download(request):

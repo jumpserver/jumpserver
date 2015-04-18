@@ -487,3 +487,7 @@ def is_dir(dir_name, username='root', mode=0755):
 def success(request, msg):
     return render_to_response('success.html', locals())
 
+
+def httperror(request, emg):
+    message = emg
+    return render_to_response('error.html', locals())

@@ -4,8 +4,6 @@ import ast
 
 from django.db.models import Q
 from django.template import RequestContext
-from django.shortcuts import render_to_response
-
 from jperm.models import Perm
 from jumpserver.api import *
 
@@ -18,11 +16,6 @@ class RaiseError(Exception):
 
 def my_render(template, data, request):
     return render_to_response(template, data, context_instance=RequestContext(request))
-
-
-def httperror(request, emg):
-    message = emg
-    return render_to_response('error.html', locals(), context_instance=RequestContext(request))
 
 
 def get_host_groups(groups):
@@ -832,7 +825,7 @@ def dept_host_ajax(request):
     else:
         hosts = Asset.objects.all()
 
-    return my_render('jasset/dept_host_ajax.html', locals())
+    return my_render('jasset/dept_host_ajax.html', locals(), request)
 
 
 @require_login
