@@ -176,8 +176,9 @@ def perm_edit_adm(request):
     else:
         user_group_id = request.POST.get('user_group_id')
         asset_group_id_list = request.POST.getlist('asset_groups_select')
+        print user_group_id, asset_group_id_list
         if not validate(request, user_group=[user_group_id], asset_group=asset_group_id_list):
-            return HttpResponseRedirect('/jperm/perm_list/')
+            return HttpResponseRedirect('/')
         perm_group_update(user_group_id, asset_group_id_list)
 
         return HttpResponseRedirect('/jperm/perm_list/')

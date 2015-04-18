@@ -338,10 +338,13 @@ def host_list(request):
                                             Q(bis_group__name__contains=keyword) |
                                             Q(comment__contains=keyword)).distinct().order_by('ip')
     if did:
-        if is_common_user(request) or is_group_admin(request):
+        if is_common_user(request):
             return httperror(request, u'您无权查看!')
 
-        dept = DEPT.objects.get(id=did)
+        if is_group_admin(request):
+            user, dept = get_session_user_dept(request)
+        else:
+            dept = DEPT.objects.get(id=did)
         posts = dept.asset_set.all()
         return my_render('jasset/host_list_nop.html', locals(), request)
 

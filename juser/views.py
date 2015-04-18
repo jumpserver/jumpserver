@@ -692,14 +692,14 @@ def user_add_adm(request):
             pass
         else:
             try:
-                db_add_user(username=username,
-                            password=md5_crypt(password),
-                            name=name, email=email, dept=dept,
-                            groups=groups, role='CU',
-                            ssh_key_pwd=md5_crypt(ssh_key_pwd),
-                            ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
-                            is_active=is_active,
-                            date_joined=datetime.datetime.now())
+                user = db_add_user(username=username,
+                                   password=md5_crypt(password),
+                                   name=name, email=email, dept=dept,
+                                   groups=groups, role='CU',
+                                   ssh_key_pwd=md5_crypt(ssh_key_pwd),
+                                   ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
+                                   is_active=is_active,
+                                   date_joined=datetime.datetime.now())
 
                 server_add_user(username, password, ssh_key_pwd)
                 if LDAP_ENABLE:

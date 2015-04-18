@@ -383,9 +383,9 @@ def get_connect_item(username, ip):
 def validate(request, user_group=None, user=None, asset_group=None, asset=None, edept=None):
     dept = get_session_user_dept(request)[1]
     if edept:
-        if dept.name != edept[0]:
+        print dept.id, edept[0]
+        if dept.id != int(edept[0]):
             return False
-
     if user_group:
         dept_user_groups = dept.usergroup_set.all()
         user_group_ids = []
@@ -398,8 +398,8 @@ def validate(request, user_group=None, user=None, asset_group=None, asset=None, 
     if user:
         dept_users = dept.user_set.all()
         user_ids = []
-        for user in dept_users:
-            user_ids.append(str(user.id))
+        for dept_user in dept_users:
+            user_ids.append(str(dept_user.id))
 
         if not set(user).issubset(set(user_ids)):
             return False
@@ -408,7 +408,7 @@ def validate(request, user_group=None, user=None, asset_group=None, asset=None, 
         dept_asset_groups = dept.bisgroup_set.all()
         asset_group_ids = []
         for group in dept_asset_groups:
-            asset_group_ids.append(group.id)
+            asset_group_ids.append(str(group.id))
 
         if not set(asset_group).issubset(set(asset_group_ids)):
             return False
@@ -416,8 +416,8 @@ def validate(request, user_group=None, user=None, asset_group=None, asset=None, 
     if asset:
         dept_assets = dept.asset_set.all()
         asset_ids = []
-        for asset in dept_assets:
-            asset_ids.append(str(asset.id))
+        for dept_asset in dept_assets:
+            asset_ids.append(str(dept_asset.id))
 
         if not set(asset).issubset(set(asset_ids)):
             return False
@@ -453,7 +453,7 @@ def verify(request, user_group=None, user=None, asset_group=None, asset=None, ed
         dept_asset_groups = dept.bisgroup_set.all()
         asset_group_ids = []
         for group in dept_asset_groups:
-            asset_group_ids.append(group.id)
+            asset_group_ids.append(str(group.id))
 
         if not set(asset_group).issubset(set(asset_group_ids)):
             return False
@@ -465,7 +465,6 @@ def verify(request, user_group=None, user=None, asset_group=None, asset=None, ed
             dept_assets_id.append(int(a.id))
         for i in asset:
             assets_id.append(int(i))
-        print assets_id, dept_assets_id
         if not set(assets_id).issubset(dept_assets_id):
             return False
 

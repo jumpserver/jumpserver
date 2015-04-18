@@ -79,8 +79,8 @@
                                     <a href="../user_edit/?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a href="../user_del/?id={{ user.id }}" class="btn btn-xs btn-danger {% if user.username == 'admin' %} disabled {% endif %}">删除</a>
                                     {% else %}
-                                    <a href="../user_edit/?id={{ user.id }}" class="btn btn-xs btn-info {% if user.role == 'CU' %} disabled {% endif %}">编辑</a>
-                                    <a href="../user_del/?id={{ user.id }}" class="btn btn-xs btn-danger {% if user.role == 'CU' %} disabled {% endif %}">删除</a>
+                                    <a href="../user_edit/?id={{ user.id }}" class="btn btn-xs btn-info {% if user.role != 'CU' %} disabled {% endif %}">编辑</a>
+                                    <a href="../user_del/?id={{ user.id }}" class="btn btn-xs btn-danger {% if user.role != 'CU' %} disabled {% endif %}">删除</a>
                                     {% endifequal %}
                                 </td>
                             </tr>
