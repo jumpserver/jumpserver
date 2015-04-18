@@ -140,6 +140,7 @@ def batch_host_edit(host_info, j_user='', j_password=''):
 
 def db_host_delete(request, host_id):
     """ 删除主机操作 """
+    print host_id
     if is_group_admin(request) and not validate(request, asset=[host_id]):
         return httperror(request, '删除失败, 您无权删除!')
 
@@ -187,10 +188,16 @@ def host_add(request):
         j_group = request.POST.getlist('j_group')
         j_active = request.POST.get('j_active')
         j_comment = request.POST.get('j_comment')
-        j_dept = request.POST.getlist('j_dept')
 
-        host_info = [j_ip, j_port, j_idc, j_type, j_group, j_dept, j_active, j_comment]
-        if is_group_admin(request) and not verify(request, asset_group=j_group, edept=j_dept):
+        if is_super_user(request):
+            j_dept = request.POST.getlist('j_dept')
+            host_info = [j_ip, j_port, j_idc, j_type, j_group, j_dept, j_active, j_comment]
+        elif is_group_admin(request):
+            j_dept = request.POST.get('j_dept')
+            host_info = [j_ip, j_port, j_idc, j_type, j_group, [j_dept], j_active, j_comment]
+
+        if is_group_admin(request) and not validate(request, asset_group=j_group, edept=[j_dept]):
+            print j_dept
             return httperror(request, u'添加失败,您无权操作!')
 
         if Asset.objects.filter(ip=str(j_ip)):
@@ -251,7 +258,7 @@ def host_add_batch(request):
                     return httperror(request, '添加失败, 没有%s这个部门' % dept_name)
                 dept_ids.append(dept_id)
 
-            if is_group_admin(request) and not verify(request, asset_group=group_ids, edept=dept_ids):
+            if is_group_admin(request) and not validate(request, asset_group=group_ids, edept=dept_ids):
                 return httperror(request, '添加失败, 没有%s这个主机组' % group_name)
 
             if Asset.objects.filter(ip=str(j_ip)):
@@ -349,7 +356,7 @@ def host_list(request):
         if is_common_user(request):
             return httperror(request, u'您无权查看!')
 
-        elif is_group_admin(request) and not verify(request, user_group=[gid]):
+        elif is_group_admin(request) and not validate(request, user_group=[gid]):
             return httperror(request, u'您无权查看!')
 
         posts = []
@@ -368,7 +375,7 @@ def host_list(request):
         if is_common_user(request):
             return httperror(request, u'您无权查看!')
 
-        elif is_group_admin(request) and not verify(request, user_group=[sid]):
+        elif is_group_admin(request) and not validate(request, user_group=[sid]):
             return httperror(request, u'您无权查看!')
 
         posts, asset_groups = [], []
@@ -499,7 +506,7 @@ def host_edit_adm(request):
 
         host_info = [j_ip, j_port, j_idc, j_type, j_group, j_dept, j_active, j_comment]
 
-        if not verify(request, asset_group=j_group, edept=j_dept):
+        if not validate(request, asset_group=j_group, edept=j_dept):
             emg = u'修改失败,您无权操作!'
             return my_render('jasset/host_edit.html', locals(), request)
 
@@ -526,7 +533,7 @@ def host_detail(request):
         return httperror(request, '没有此主机!')
     post = post.first()
 
-    if is_group_admin(request) and not verify(request, asset=[host_id]):
+    if is_group_admin(request) and not validate(request, asset=[host_id]):
         return httperror(request, '您无权查看!')
 
     elif is_common_user(request):
@@ -670,7 +677,7 @@ def group_add(request):
         j_comment = request.POST.get('j_comment', '')
 
         try:
-            if is_group_admin(request) and not verify(request, asset=j_hosts, edept=[j_dept]):
+            if is_group_admin(request) and not validate(request, asset=j_hosts, edept=[j_dept]):
                 emg = u'添加失败, 您无权操作!'
                 raise RaiseError
 
@@ -705,7 +712,7 @@ def group_list(request):
         if is_common_user(request):
             return httperror(request, u'您无权查看!')
 
-        elif is_group_admin(request) and not verify(request, user_group=[gid]):
+        elif is_group_admin(request) and not validate(request, user_group=[gid]):
             return httperror(request, u'您无权查看!')
 
         posts = []
@@ -720,7 +727,7 @@ def group_list(request):
         if is_common_user(request):
             return httperror(request, u'您无权查看!')
 
-        elif is_group_admin(request) and not verify(request, user_group=[sid]):
+        elif is_group_admin(request) and not validate(request, user_group=[sid]):
             return httperror(request, u'您无权查看!')
 
         posts = []
@@ -765,7 +772,7 @@ def group_edit(request):
     dept_id = get_session_user_info(request)[3]
     eposts = Asset.objects.filter(bis_group=group)
 
-    if is_group_admin(request) and not verify(request, asset_group=[group_id]):
+    if is_group_admin(request) and not validate(request, asset_group=[group_id]):
         return httperror(request, '编辑失败, 您无权操作!')
     dept = DEPT.objects.filter(id=group.dept.id)
     if dept:
@@ -808,7 +815,7 @@ def group_detail(request):
         posts = Asset.objects.filter(bis_group=group).order_by('ip')
 
     elif is_group_admin(request):
-        if not verify(request, asset_group=[group_id]):
+        if not validate(request, asset_group=[group_id]):
             return httperror(request, u'您无权查看!')
         posts = Asset.objects.filter(bis_group=group).filter(dept=dept).order_by('ip')
 
@@ -850,12 +857,12 @@ def group_del(request):
         for i in range(int(len_list)):
             key = "id_list[" + str(i) + "]"
             gid = request.POST.get(key)
-            if is_group_admin(request) and not verify(request, asset_group=[gid]):
+            if is_group_admin(request) and not validate(request, asset_group=[gid]):
                 return httperror(request, '删除失败, 您无权删除!')
             BisGroup.objects.filter(id=gid).delete()
     else:
         gid = int(offset)
-        if is_group_admin(request) and not verify(request, asset_group=[gid]):
+        if is_group_admin(request) and not validate(request, asset_group=[gid]):
             return httperror(request, '删除失败, 您无权删除!')
         BisGroup.objects.filter(id=gid).delete()
     return HttpResponseRedirect('/jasset/group_list/')

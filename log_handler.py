@@ -16,7 +16,7 @@ from jlog.models import Log
 
 def log_hanler(id):
     log = Log.objects.get(id=id)
-    pattern = re.compile(r'(\[.*@.*\][\$#].*) | (mysql>.*)')
+    pattern = re.compile(r'([\[.*@.*\][\$#].* | mysql>.*])')
     if log:
         filename = log.log_path
         if os.path.isfile(filename):
