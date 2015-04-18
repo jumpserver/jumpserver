@@ -227,11 +227,14 @@ def host_add_batch(request):
             if host == '':
                 break
             j_ip, j_port, j_type, j_idc, j_groups, j_depts, j_active, j_comment = host.split()
-            j_type = login_types[j_type]
             j_active = active_types[str(j_active)]
             j_group = ast.literal_eval(j_groups)
             j_dept = ast.literal_eval(j_depts)
 
+            if j_type not in ['LDAP', 'MAP']:
+                return httperror(request, u'没有%s这种登录方式!' %j_type)
+
+            j_type = login_types[j_type]
             idc = IDC.objects.filter(name=j_idc)
             if idc:
                 j_idc = idc[0].id
@@ -333,6 +336,7 @@ def host_list(request):
     dept = DEPT.objects.get(id=dept_id)
     did = request.GET.get('did', '')
     gid = request.GET.get('gid', '')
+    sid = request.GET.get('sid', '')
     user_id = get_session_user_info(request)[0]
 
     post_all = Asset.objects.all().order_by('ip')
@@ -365,6 +369,27 @@ def host_list(request):
             posts = list(set(posts))
         else:
             return httperror(request, u'没有这个小组!')
+        return my_render('jasset/host_list_nop.html', locals(), request)
+
+    elif sid:
+        if is_common_user(request):
+            return httperror(request, u'您无权查看!')
+
+        elif is_group_admin(request) and not verify(request, user_group=[sid]):
+            return httperror(request, u'您无权查看!')
+
+        posts, asset_groups = [], []
+        user_group = UserGroup.objects.filter(id=int(sid))
+        if user_group:
+            user_group = user_group[0]
+            for perm in user_group.sudoperm_set.all():
+                asset_groups.extend(perm.asset_group.all())
+
+            for asset_group in asset_groups:
+                posts.extend(asset_group.asset_set.all())
+            posts = list(set(posts))
+        else:
+            return httperror(request, u'没有这个sudo授权!')
         return my_render('jasset/host_list_nop.html', locals(), request)
 
     else:
@@ -626,7 +651,7 @@ def idc_del(request):
         for i in range(int(len_list)):
             key = "id_list[" + str(i) + "]"
             idc_id = request.POST.get(key)
-            db_idc_delete(request, idc_id)
+            db_idc_delete(request, int(idc_id))
     else:
         db_idc_delete(request, int(offset))
     return HttpResponseRedirect('/jasset/idc_list/')
@@ -684,18 +709,36 @@ def group_list(request):
     gid = request.GET.get('gid')
     sid = request.GET.get('sid')
     if gid:
+        if is_common_user(request):
+            return httperror(request, u'您无权查看!')
+
+        elif is_group_admin(request) and not verify(request, user_group=[gid]):
+            return httperror(request, u'您无权查看!')
+
         posts = []
-        user_group = UserGroup.objects.get(id=gid)
-        perms = Perm.objects.filter(user_group=user_group)
-        for perm in perms:
-            posts.append(perm.asset_group)
+        user_group = UserGroup.objects.filter(id=gid)
+        if user_group:
+            user_group = user_group[0]
+            perms = Perm.objects.filter(user_group=user_group)
+            for perm in perms:
+                posts.append(perm.asset_group)
 
     elif sid:
+        if is_common_user(request):
+            return httperror(request, u'您无权查看!')
+
+        elif is_group_admin(request) and not verify(request, user_group=[sid]):
+            return httperror(request, u'您无权查看!')
+
         posts = []
-        user_group = UserGroup.objects.get(id=sid)
-        perms = Perm.objects.filter(user_group=user_group)
-        for perm in perms:
-            posts.append(perm.asset_group)
+        user_group = UserGroup.objects.filter(id=sid)
+        if user_group:
+            user_group = user_group[0]
+            for perm in user_group.sudoperm_set.all():
+                posts.extend(perm.asset_group.all())
+            posts = list(set(posts))
+        else:
+            return httperror(request, u'没有此sudo授权!')
 
     else:
         if is_super_user(request):
@@ -719,21 +762,26 @@ def group_edit(request):
     """ 修改主机组 """
     header_title, path1, path2 = u'编辑主机组', u'资产管理', u'编辑主机组'
     group_id = request.GET.get('id', '')
-    group = BisGroup.objects.get(id=group_id)
+    group = BisGroup.objects.filter(id=group_id)
+    if group:
+        group = group.first()
+    else:
+        httperror(request, u'没有这个主机组!')
+
     host_all = Asset.objects.all()
-    dept_id = get_user_dept(request)
+    dept_id = get_session_user_info(request)[3]
     eposts = Asset.objects.filter(bis_group=group)
 
-    if is_super_user(request):
-        edept = DEPT.objects.all()
-        posts = [g for g in host_all if g not in eposts]
+    if is_group_admin(request) and not verify(request, asset_group=[group_id]):
+        return httperror(request, '编辑失败, 您无权操作!')
+    dept = DEPT.objects.filter(id=group.dept.id)
+    if dept:
+        dept = dept[0]
+    else:
+        return httperror(request, u'没有这个部门!')
 
-    elif is_group_admin(request):
-        if not verify(request, asset_group=[group_id]):
-            return httperror(request, '编辑失败, 您无权操作!')
-        dept = DEPT.objects.get(id=dept_id)
-        all_dept = Asset.objects.filter(dept=dept)
-        posts = [g for g in all_dept if g not in eposts]
+    all_dept = dept.asset_set.all()
+    posts = [g for g in all_dept if g not in eposts]
 
     if request.method == 'POST':
         j_group = request.POST.get('j_group', '')
@@ -832,7 +880,7 @@ def dept_host_ajax(request):
     else:
         hosts = Asset.objects.all()
 
-    return my_render('jasset/dept_host_ajax.html', locals())
+    return my_render('jasset/dept_host_ajax.html', locals(), request)
 
 
 @require_login
