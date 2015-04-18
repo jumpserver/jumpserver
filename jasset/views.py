@@ -8,7 +8,6 @@ from django.shortcuts import render_to_response
 
 from jasset.models import IDC, Asset, BisGroup, AssetAlias
 from jperm.models import Perm, SudoPerm
-from django.shortcuts import redirect
 from jumpserver.api import *
 
 cryptor = PyCrypt(KEY)
@@ -16,6 +15,10 @@ cryptor = PyCrypt(KEY)
 
 class RaiseError(Exception):
     pass
+
+
+def my_render(template, data, request):
+    return render_to_response(template, data, context_instance=RequestContext(request))
 
 
 def httperror(request, emg):
@@ -156,7 +159,7 @@ def db_host_delete(request, host_id):
 
 
 def db_idc_delete(request, idc_id):
-    """ IDC删除操作数据库函数 """
+    """ 删除IDC操作 """
     if idc_id == 1:
         return httperror(request, '删除失败, 默认IDC不能删除!')
 
@@ -200,7 +203,7 @@ def host_add(request):
 
         if Asset.objects.filter(ip=str(j_ip)):
             emg = u'该IP %s 已存在!' % j_ip
-            return render_to_response('jasset/host_add.html', locals(), context_instance=RequestContext(request))
+            return my_render('jasset/host_add.html', locals(), request)
         if j_type == 'M':
             j_user = request.POST.get('j_user')
             j_password = request.POST.get('j_password', '')
@@ -209,7 +212,7 @@ def host_add(request):
             db_host_insert(host_info)
         smg = u'主机 %s 添加成功' % j_ip
 
-    return render_to_response('jasset/host_add.html', locals(), context_instance=RequestContext(request))
+    return my_render('jasset/host_add.html', locals(), request)
 
 
 @require_admin
@@ -263,9 +266,9 @@ def host_add_batch(request):
             db_host_insert(host_info)
 
         smg = u'批量添加添加成功'
-        return render_to_response('jasset/host_add_multi.html', locals(), context_instance=RequestContext(request))
+        return my_render('jasset/host_add_multi.html', locals(), request)
 
-    return render_to_response('jasset/host_add_multi.html', locals(), context_instance=RequestContext(request))
+    return my_render('jasset/host_add_multi.html', locals(), request)
 
 
 @require_admin
@@ -297,21 +300,20 @@ def host_edit_batch(request):
             host_info = [j_id, j_ip, j_idc, j_port, j_type, j_group, j_dept, j_active, j_comment]
             batch_host_edit(host_info)
 
-        return render_to_response('jasset/host_list.html')
+        return HttpResponseRedirect('/jasset/host_list/')
 
 
 @require_login
 def host_edit_common_batch(request):
     """ 普通用户批量修改主机别名 """
-    user_id = get_session_user_info(request)[0]
-    u = User.objects.get(id=user_id)
+    u = get_session_user_info(request)[2]
     if request.method == 'POST':
         len_table = request.POST.get('len_table')
         for i in range(int(len_table)):
             j_id = "editable[" + str(i) + "][j_id]"
             j_alias = "editable[" + str(i) + "][j_alias]"
-            j_id = request.POST.get(j_id).strip()
-            j_alias = request.POST.get(j_alias).strip()
+            j_id = request.POST.get(j_id, '').strip()
+            j_alias = request.POST.get(j_alias, '').strip()
             a = Asset.objects.get(id=j_id)
             asset_alias = AssetAlias.objects.filter(user=u, host=a)
             if asset_alias:
@@ -320,7 +322,7 @@ def host_edit_common_batch(request):
                 asset_alias.save()
             else:
                 AssetAlias.objects.create(user=u, host=a, alias=j_alias)
-    return render_to_response('jasset/host_list_common.html')
+    return my_render('jasset/host_list_common.html')
 
 
 @require_login
@@ -342,7 +344,7 @@ def host_list(request):
     if did:
         dept = DEPT.objects.get(id=did)
         posts = dept.asset_set.all()
-        return render_to_response('jasset/host_list_nop.html', locals(), context_instance=RequestContext(request))
+        return my_render('jasset/host_list_nop.html', locals(), request)
 
     elif gid:
         posts = []
@@ -352,7 +354,7 @@ def host_list(request):
             for post in perm.asset_group.asset_set.all():
                 posts.append(post)
         posts = list(set(posts))
-        return render_to_response('jasset/host_list_nop.html', locals(), context_instance=RequestContext(request))
+        return my_render('jasset/host_list_nop.html', locals(), request)
 
     elif sid:
         posts = []
@@ -362,7 +364,7 @@ def host_list(request):
             for post in perm.asset_group.asset_set.all():
                 posts.append(post)
         posts = list(set(posts))
-        return render_to_response('jasset/host_list_nop.html', locals(), context_instance=RequestContext(request))
+        return my_render('jasset/host_list_nop.html', locals(), request)
 
     else:
         if is_super_user(request):
@@ -371,7 +373,7 @@ def host_list(request):
             else:
                 posts = post_all
             contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-            return render_to_response('jasset/host_list.html', locals(), context_instance=RequestContext(request))
+            return my_render('jasset/host_list.html', locals(), request)
 
         elif is_group_admin(request):
             if keyword:
@@ -380,14 +382,13 @@ def host_list(request):
                 posts = post_all.filter(dept=dept)
 
             contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-            return render_to_response('jasset/host_list.html', locals(), context_instance=RequestContext(request))
+            return my_render('jasset/host_list.html', locals(), request)
 
         elif is_common_user(request):
             user_id, username = get_session_user_info(request)[0:2]
             posts = user_perm_asset_api(username)
             contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-            return render_to_response('jasset/host_list_common.html', locals(),
-                                      context_instance=RequestContext(request))
+            return my_render('jasset/host_list_common.html', locals(), request)
 
 
 @require_admin
@@ -435,18 +436,18 @@ def host_edit(request):
         j_active = request.POST.get('j_active', '')
         j_comment = request.POST.get('j_comment', '')
 
-        host_info = [j_ip, j_port, j_idc, j_type, j_group, j_dept, j_active, j_comment]
+        host_info = [j_ip, j_port, j_idc, j_type, j_group, j_dept, j_active, j_comment, post]
         if j_type == 'M':
             j_user = request.POST.get('j_user')
             j_password = request.POST.get('j_password')
-            db_host_update(host_info, j_user, j_password, post)
+            db_host_update(host_info, j_user, j_password)
         else:
-            db_host_update(host_info, post)
+            db_host_update(host_info)
 
         smg = u'主机 %s 修改成功' % j_ip
         return HttpResponseRedirect('/jasset/host_detail/?id=%s' % host_id)
 
-    return render_to_response('jasset/host_edit.html', locals(), context_instance=RequestContext(request))
+    return my_render('jasset/host_edit.html', locals(), request)
 
 
 @require_admin
@@ -481,7 +482,7 @@ def host_edit_adm(request):
 
         if not verify(request, asset_group=j_group, edept=j_dept):
             emg = u'修改失败,您无权操作!'
-            return render_to_response('jasset/host_edit.html', locals(), context_instance=RequestContext(request))
+            return my_render('jasset/host_edit.html', locals(), request)
 
         if j_type == 'M':
             j_user = request.POST.get('j_user')
@@ -493,7 +494,7 @@ def host_edit_adm(request):
         smg = u'主机 %s 修改成功' % j_ip
         return HttpResponseRedirect('/jasset/host_detail/?id=%s' % host_id)
 
-    return render_to_response('jasset/host_edit.html', locals(), context_instance=RequestContext(request))
+    return my_render('jasset/host_edit.html', locals(), request)
 
 
 @require_login
@@ -519,7 +520,7 @@ def host_detail(request):
         log, log_more = log_all[:10], log_all[10:]
         user_permed_list = asset_perm_api(post)
 
-    return render_to_response('jasset/host_detail.html', locals(), context_instance=RequestContext(request))
+    return my_render('jasset/host_detail.html', locals(), request)
 
 
 @require_super_user
@@ -531,12 +532,12 @@ def idc_add(request):
         j_comment = request.POST.get('j_comment')
         if IDC.objects.filter(name=j_idc):
             emg = u'该IDC已存在!'
-            return render_to_response('jasset/idc_add.html', locals(), context_instance=RequestContext(request))
+            return my_render('jasset/idc_add.html', locals(), request)
         else:
             smg = u'IDC:%s添加成功' % j_idc
             IDC.objects.create(name=j_idc, comment=j_comment)
 
-    return render_to_response('jasset/idc_add.html', locals(), context_instance=RequestContext(request))
+    return my_render('jasset/idc_add.html', locals(), request)
 
 
 @require_admin
@@ -551,7 +552,7 @@ def idc_list(request):
     else:
         posts = IDC.objects.exclude(name='ALL').order_by('id')
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-    return render_to_response('jasset/idc_list.html', locals(), context_instance=RequestContext(request))
+    return my_render('jasset/idc_list.html', locals(), request)
 
 
 @require_super_user
@@ -560,13 +561,15 @@ def idc_edit(request):
     header_title, path1, path2 = u'编辑IDC', u'资产管理', u'编辑IDC'
     idc_id = request.GET.get('id', '')
     idc = IDC.objects.filter(id=idc_id)
+    if int(idc_id) == 1:
+        return httperror(request, u'默认IDC不能编辑!')
     if idc:
         idc = idc[0]
-        default = IDC.objects.get(name='默认').asset_set.all()
+        default = IDC.objects.get(id=1).asset_set.all()
         eposts = Asset.objects.filter(idc=idc).order_by('ip')
         posts = [g for g in default if g not in eposts]
     else:
-        emg = '此IDC不存在'
+        return httperror(request, u'此IDC不存在')
 
     if request.method == 'POST':
         idc_id = request.POST.get('id')
@@ -581,16 +584,15 @@ def idc_edit(request):
             for host_id in j_hosts:
                 Asset.objects.filter(id=host_id).update(idc=idc[0])
 
-            i = IDC.objects.get(name='默认')
+            i = IDC.objects.get(id=1)
             for host in idc_default:
                 g = Asset.objects.filter(id=host).update(idc=i)
         else:
-            emg = '此IDC不存在'
-            return render_to_response('jasset/idc_edit.html', locals(), context_instance=RequestContext(request))
+            return httperror(request, u'此IDC不存在')
 
         return HttpResponseRedirect('/jasset/idc_list/?id=%s' % idc_id)
 
-    return render_to_response('jasset/idc_edit.html', locals(), context_instance=RequestContext(request))
+    return my_render('jasset/idc_edit.html', locals(), request)
 
 
 @require_admin
@@ -611,7 +613,7 @@ def idc_detail(request):
         posts = Asset.objects.filter(idc=idc, dept=dept).order_by('ip')
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
-    return render_to_response('jasset/idc_detail.html', locals(), context_instance=RequestContext(request))
+    return my_render('jasset/idc_detail.html', locals(), request)
 
 
 @require_super_user
@@ -668,7 +670,7 @@ def group_add(request):
                 group.asset_set.add(g)
             smg = u'主机组 %s 添加成功' % j_group
 
-    return render_to_response('jasset/group_add.html', locals(), context_instance=RequestContext(request))
+    return my_render('jasset/group_add.html', locals(), request)
 
 
 @require_admin
@@ -708,7 +710,7 @@ def group_list(request):
             else:
                 posts = BisGroup.objects.filter(dept=dept).order_by('id')
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-    return render_to_response('jasset/group_list.html', locals(), context_instance=RequestContext(request))
+    return my_render('jasset/group_list.html', locals(), request)
 
 
 @require_admin
@@ -749,7 +751,7 @@ def group_edit(request):
         smg = u'主机组%s修改成功' % j_group
         return HttpResponseRedirect('/jasset/group_list')
 
-    return render_to_response('jasset/group_edit.html', locals(), context_instance=RequestContext(request))
+    return my_render('jasset/group_edit.html', locals(), request)
 
 
 @require_admin
@@ -765,11 +767,11 @@ def group_detail(request):
 
     elif is_group_admin(request):
         if not verify(request, asset_group=[group_id]):
-            return httperror(request, '您无权查看!')
+            return httperror(request, u'您无权查看!')
         posts = Asset.objects.filter(bis_group=group).filter(dept=dept).order_by('ip')
 
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-    return render_to_response('jasset/group_detail.html', locals(), context_instance=RequestContext(request))
+    return my_render('jasset/group_detail.html', locals(), request)
 
 
 @require_admin
@@ -817,6 +819,7 @@ def group_del(request):
     return HttpResponseRedirect('/jasset/group_list/')
 
 
+@require_admin
 def dept_host_ajax(request):
     """ 添加主机组时, 部门联动主机异步 """
     dept_id = request.GET.get('id', '')
@@ -828,7 +831,7 @@ def dept_host_ajax(request):
     else:
         hosts = Asset.objects.all()
 
-    return render_to_response('jasset/dept_host_ajax.html', locals())
+    return my_render('jasset/dept_host_ajax.html', locals())
 
 
 @require_login
@@ -854,4 +857,4 @@ def host_search(request):
 
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
-    return render_to_response('jasset/host_search.html', locals(), context_instance=RequestContext(request))
+    return my_render('jasset/host_search.html', locals(), request)
