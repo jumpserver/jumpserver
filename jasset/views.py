@@ -430,8 +430,7 @@ def host_del(request, offset):
             host_id = request.POST.get(key)
             db_host_delete(request, host_id)
     else:
-        host_id = int(offset)
-        db_host_delete(request, host_id)
+        db_host_delete(request, offset)
 
     return HttpResponseRedirect('/jasset/host_list/')
 

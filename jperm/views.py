@@ -774,10 +774,9 @@ def get_apply_posts(request, status, username, dept_name, keyword=None):
             posts = post_all.filter(dept=dept_name)
     elif is_common_user(request):
         if keyword:
-            posts = post_keyword_all.filter(user=username)
+            posts = post_keyword_all.filter(applyer=username)
         else:
-            posts = post_all.filter(user=username)
-
+            posts = post_all.filter(applyer=username)
     return posts
 
 
