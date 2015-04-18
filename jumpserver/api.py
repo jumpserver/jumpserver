@@ -383,9 +383,9 @@ def get_connect_item(username, ip):
 def validate(request, user_group=None, user=None, asset_group=None, asset=None, edept=None):
     dept = get_session_user_dept(request)[1]
     if edept:
-        print dept.id, edept[0]
         if dept.id != int(edept[0]):
             return False
+        
     if user_group:
         dept_user_groups = dept.usergroup_set.all()
         user_group_ids = []
@@ -428,7 +428,6 @@ def validate(request, user_group=None, user=None, asset_group=None, asset=None, 
 def verify(request, user_group=None, user=None, asset_group=None, asset=None, edept=None):
     dept = get_session_user_dept(request)[1]
     if edept:
-        print dept.id, edept[0]
         if dept.id != int(edept[0]):
             return False
 
@@ -460,12 +459,11 @@ def verify(request, user_group=None, user=None, asset_group=None, asset=None, ed
 
     if asset:
         dept_assets = dept.asset_set.all()
-        assets_id, dept_assets_id = [], []
+        asset_ids = []
         for a in dept_assets:
-            dept_assets_id.append(int(a.id))
-        for i in asset:
-            assets_id.append(int(i))
-        if not set(assets_id).issubset(dept_assets_id):
+            asset_ids.append(str(a.id))
+        print asset, asset_ids
+        if not set(asset).issubset(set(asset_ids)):
             return False
 
     return True
