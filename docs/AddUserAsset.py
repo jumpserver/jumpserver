@@ -99,7 +99,7 @@ def test_add_asset():
     bis_group_all = BisGroup.objects.all()
     dept_all = DEPT.objects.all()
     for i in range(1, 500):
-        ip = '192.168.1.' + str(i)
+        ip = '192.168.5.' + str(i)
         asset = Asset(ip=ip, port=22, login_type='L', idc=test_idc, is_active=True, comment='test')
         asset.save()
         asset.bis_group = [random.choice(bis_group_all) for i in range(2)]
@@ -128,13 +128,13 @@ def test_add_log():
 
 if __name__ == '__main__':
     #install()
-    test_add_dept()
-    test_add_group()
-    test_add_user()
-    test_add_idc()
-    test_add_asset_group()
+    #test_add_dept()
+    #test_add_group()
+    #test_add_user()
+    #test_add_idc()
+    #test_add_asset_group()
     test_add_asset()
-    test_add_log()
+    #test_add_log()
 
 
 
