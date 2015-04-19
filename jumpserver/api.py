@@ -349,14 +349,18 @@ def get_user_host(username):
     """Get the hosts of under the user control."""
     hosts_attr = {}
     asset_all = user_perm_asset_api(username)
-    user = User.objects.get(username=username)
-    for asset in asset_all:
-        alias = AssetAlias.objects.filter(user=user, host=asset)
-        if alias and alias[0].alias != '':
-            hosts_attr[asset.ip] = [asset.id, asset.ip, alias[0].alias]
-        else:
-            hosts_attr[asset.ip] = [asset.id, asset.ip, asset.comment]
-    return hosts_attr
+    user = User.objects.filter(username=username)
+    if user:
+        user = user[0]
+        for asset in asset_all:
+            alias = AssetAlias.objects.filter(user=user, host=asset)
+            if alias and alias[0].alias != '':
+                hosts_attr[asset.ip] = [asset.id, asset.ip, alias[0].alias]
+            else:
+                hosts_attr[asset.ip] = [asset.id, asset.ip, asset.comment]
+        return hosts_attr
+    else:
+        raise ServerError('User %s does not exit!' % username)
 
 
 def get_connect_item(username, ip):

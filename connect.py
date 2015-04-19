@@ -188,8 +188,12 @@ def get_user_hostgroup_host(username, gid):
 
 def verify_connect(username, part_ip):
     ip_matched = []
-    hosts_attr = get_user_host(username)
-    hosts = hosts_attr.values()
+    try:
+        hosts_attr = get_user_host(username)
+        hosts = hosts_attr.values()
+    except ServerError, e:
+        color_print(e, 'red')
+        return False
     for ip_info in hosts:
         for info in ip_info[1:]:
             if part_ip in info:
@@ -217,7 +221,11 @@ def print_prompt():
 
 
 def print_user_host(username):
-    hosts_attr = get_user_host(username)
+    try:
+        hosts_attr = get_user_host(username)
+    except ServerError, e:
+        color_print(e, 'red')
+        return
     hosts = hosts_attr.keys()
     hosts.sort()
     for ip in hosts:
@@ -267,7 +275,6 @@ def connect(username, password, host, port, login_name):
     global channel
     win_size = get_win_size()
     channel = ssh.invoke_shell(height=win_size[0], width=win_size[1])
-    #channel.resize_pty(height=win_size[0], width=win_size[1])
     try:
         signal.signal(signal.SIGWINCH, set_win_size)
     except:
