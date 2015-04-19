@@ -62,7 +62,7 @@
                                 <td class="text-center"> {{ post.date_added|date:"Y-m-d H:i:s" }} </td>
                                 <td class="text-center" name="j_comment"> {{ post.comment }} </td>
                                 <td class="text-center" data-editable='false'>
-                                    <a value="/jasset/{{ post.ip }}/" class="iframe btn btn-xs btn-primary">详情</a>
+                                    <a href="/jasset/host_detail/?id={{ post.id }}" class="iframe btn btn-xs btn-primary">详情</a>
                                     <a href="/jasset/host_edit/?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a href="/jasset/group_del_host/?id={{ post.id }}&gid={{ group.id }}" class="btn btn-xs btn-danger">删除</a>
                                 </td>

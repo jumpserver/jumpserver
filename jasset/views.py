@@ -105,15 +105,23 @@ def batch_host_edit(host_info, j_user='', j_password=''):
     groups, depts = [], []
     is_active = {u'是': '1', u'否': '2'}
     login_types = {'LDAP': 'L', 'MAP': 'M'}
-    for group in j_group[0].split():
-        c = BisGroup.objects.get(name=group.strip())
-        groups.append(c)
-    for d in j_dept[0].split():
-        p = DEPT.objects.get(name=d.strip())
-        depts.append(p)
+    a = Asset.objects.get(id=j_id)
+    if '...' in j_group[0].split():
+        groups = a.bis_group.all()
+    else:
+        for group in j_group[0].split():
+            c = BisGroup.objects.get(name=group.strip())
+            groups.append(c)
+
+    if '...' in j_dept[0].split():
+        depts = a.dept.all()
+    else:
+        for d in j_dept[0].split():
+            p = DEPT.objects.get(name=d.strip())
+            depts.append(p)
+
     j_type = login_types[j_type]
     j_idc = IDC.objects.get(name=j_idc)
-    a = Asset.objects.get(id=j_id)
     if j_type == 'M':
         if a.password != j_password:
             j_password = cryptor.decrypt(j_password)
@@ -140,7 +148,6 @@ def batch_host_edit(host_info, j_user='', j_password=''):
 
 def db_host_delete(request, host_id):
     """ 删除主机操作 """
-    print host_id
     if is_group_admin(request) and not validate(request, asset=[host_id]):
         return httperror(request, '删除失败, 您无权删除!')
 
@@ -197,7 +204,6 @@ def host_add(request):
             host_info = [j_ip, j_port, j_idc, j_type, j_group, [j_dept], j_active, j_comment]
 
         if is_group_admin(request) and not validate(request, asset_group=j_group, edept=[j_dept]):
-            print j_dept
             return httperror(request, u'添加失败,您无权操作!')
 
         if Asset.objects.filter(ip=str(j_ip)):
@@ -430,8 +436,7 @@ def host_del(request, offset):
             host_id = request.POST.get(key)
             db_host_delete(request, host_id)
     else:
-        host_id = int(offset)
-        db_host_delete(request, host_id)
+        db_host_delete(request, offset)
 
     return HttpResponseRedirect('/jasset/host_list/')
 
@@ -884,6 +889,16 @@ def dept_host_ajax(request):
         hosts = Asset.objects.all()
 
     return my_render('jasset/dept_host_ajax.html', locals(), request)
+
+
+def show_all_ajax(request):
+    """ 批量修改主机时, 部门和组全部显示 """
+    env = request.GET.get('env', '')
+    get_id = request.GET.get('id', '')
+    host = Asset.objects.filter(id=get_id)
+    if host:
+        host = host[0]
+    return my_render('jasset/show_all_ajax.html', locals(), request)
 
 
 @require_login
