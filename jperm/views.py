@@ -266,6 +266,7 @@ def sudo_ldap_add(user_group, user_runas, asset_groups_select,
                   cmd_groups_select):
     if not LDAP_ENABLE:
         return True
+    
     assets = []
     cmds = []
     user_runas = user_runas.split(',')
@@ -391,6 +392,7 @@ def sudo_edit(request):
                 msg = '修改成功'
 
         return HttpResponseRedirect('/jperm/sudo_list/')
+
     return render_to_response('jperm/sudo_edit.html', locals(), context_instance=RequestContext(request))
 
 
@@ -499,6 +501,7 @@ def cmd_add(request):
             CmdGroup.objects.create(name=name, dept=dept, cmd=cmd, comment=comment)
             msg = u'命令组添加成功'
             return HttpResponseRedirect('/jperm/cmd_list/')
+
     return render_to_response('jperm/sudo_cmd_add.html', locals(), context_instance=RequestContext(request))
 
 
@@ -631,6 +634,7 @@ def perm_apply(request):
     """ 权限申请 """
     header_title, path1, path2 = u'主机权限申请', u'权限管理', u'申请主机'
     user_id, username = get_session_user_info(request)[0:2]
+    name = User.objects.get(id=user_id).name
     dept_id, deptname, dept = get_session_user_info(request)[3:6]
     perm_host = user_perm_asset_api(username)
     all_host = Asset.objects.filter(dept=dept)
@@ -642,6 +646,7 @@ def perm_apply(request):
     egroup = [d for d in all_group if d not in perm_group]
 
     dept_da = User.objects.filter(dept_id=dept_id, role='DA')
+    admin = User.objects.get(name='admin')
 
     if request.method == 'POST':
         applyer = request.POST.get('applyer')
@@ -650,14 +655,16 @@ def perm_apply(request):
         group = request.POST.getlist('group')
         hosts = request.POST.getlist('hosts')
         comment = request.POST.get('comment')
+        if not da:
+            return httperror(request, u'请选择管理员!')
         da = User.objects.get(id=da)
         mail_address = da.email
         mail_title = '%s - 权限申请' % username
         group_lis = ', '.join(group)
         hosts_lis = ', '.join(hosts)
         time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        a = Apply.objects.create(applyer=applyer, dept=dept, bisgroup=group, date_add=datetime.datetime.now(),
-                                 asset=hosts, status=0, comment=comment)
+        a = Apply.objects.create(applyer=applyer, admin=da, dept=dept, bisgroup=group, date_add=datetime.datetime.now(),
+                                 asset=hosts, status=0, comment=comment, read=0)
         uuid = a.uuid
         url = "http://%s:%s/jperm/apply_exec/?uuid=%s" % (SEND_IP, SEND_PORT, uuid)
         mail_msg = """
@@ -732,6 +739,7 @@ def get_apply_posts(request, status, username, dept_name, keyword=None):
             posts = post_keyword_all.filter(applyer=username)
         else:
             posts = post_all.filter(applyer=username)
+
     return posts
 
 
@@ -740,7 +748,8 @@ def perm_apply_log(request, offset):
     """ 申请记录 """
     header_title, path1, path2 = u'权限申请记录', u'权限管理', u'申请记录'
     keyword = request.GET.get('keyword', '')
-    username = get_session_user_info(request)[1]
+    user_id = get_session_user_info(request)[0]
+    username = User.objects.get(id=user_id).name
     dept_name = get_session_user_info(request)[4]
     status_dic = {'online': 0, 'offline': 1}
     status = status_dic[offset]
@@ -752,8 +761,17 @@ def perm_apply_log(request, offset):
 @require_login
 def perm_apply_info(request):
     """ 申请信息详情 """
-    uuid = request.GET.get('uuid')
-    post = Apply.objects.get(uuid=uuid)
+    uuid = request.GET.get('uuid', '')
+    post = Apply.objects.filter(uuid=uuid)
+    username = get_session_user_info(request)[1]
+    if post:
+        post = post[0]
+        if post.read == 0 and post.applyer != username:
+            post.read = 1
+            post.save()
+    else:
+        return httperror(request, u'没有这个申请记录!')
+
     return render_to_response('jperm/perm_apply_info.html', locals(), context_instance=RequestContext(request))
 
 

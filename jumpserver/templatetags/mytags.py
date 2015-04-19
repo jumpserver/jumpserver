@@ -68,6 +68,15 @@ def group_str2_all(group_list):
         return '%s ...' % ' '.join([group.name for group in group_lis[0:2]])
 
 
+@register.filter(name='group_dept_all')
+def group_dept_all(group_list):
+    group_lis = []
+    for i in group_list:
+        if str(i) != 'ALL':
+            group_lis.append(i)
+    return ' '.join([group.name for group in group_lis])
+
+
 @register.filter(name='group_manage_str')
 def group_manage_str(username):
     user = User.objects.get(username=username)

@@ -69,7 +69,9 @@
                                 <td class="text-center" name="j_type"> {{ post.login_type|get_login_type }} </td>
                                 <td class="text-center" name="j_idc"> {{ post.idc.name }} </td>
                                 <td class="text-center" name="j_dept">{{ post.dept.all | group_str2 }}</td>
+                                <!--<td class="text-center" id="j_dept_{{post.id}}" name="j_dept" onclick="show_all('dept', '{{post.id}}')">{{ post.dept.all | group_str2 }}</td>-->
                                 <td class="text-center" name="j_group">{{ post.bis_group.all | group_str2_all }}</td>
+                                <!--<td class="text-center" id="j_group_{{post.id}}" name="j_group" onclick="show_all('group', '{{post.id}}')">{{ post.bis_group.all | group_str2_all }}</td>-->
                                 <td class="text-center" name="j_active"> {{ post.is_active|bool2str }} </td>
                                 <td class="text-center" name="j_comment"> {{ post.comment }} </td>
                                 <td class="text-center" data-editable='false'>
@@ -98,13 +100,27 @@
 </div>
 
 <script>
+     $('table td').on('change', function(env, id){
+        var url = "/jasset/show_all_ajax/?env=" + env + "&id=" + id;
+        console.log(url);
+        $.ajax({
+            type: "GET",
+            url: url,
+//            data: $("#search_form").serialize(),
+            success: function (data) {
+                $("#j_dept_"+id).html(data);
+            }
+        });
+    })
+
     $(document).ready(function(){
-        $('#editable').editableTableWidget();
+        $('#editable').editableTableWidget({editor: $('<textarea>')});
     });
 
 
     function alter(form) {
         selectData = GetTableDataBox();
+        console.log(selectData[0])
         if (selectData[1] != 0) {
             $.ajax({
                 type: "post",
@@ -113,6 +129,7 @@
                 success: function (data) {
                     alert("修改成功");
                     window.open("/jasset/host_list/", "_self");
+                error: window.open("/jasset/host_list/", "_self");
                 }
             });
         }
@@ -157,7 +174,19 @@
             }
     })
 
+    function show_all(env, id) {
+        var url = "/jasset/show_all_ajax/?env=" + env + "&id=" + id;
+        console.log(url);
+        $.ajax({
+            type: "GET",
+            url: url,
+//            data: $("#search_form").serialize(),
+            success: function (data) {
+                $("#j_group_" + id).html(data);
 
+            }
+        });
+    }
 </script>
 
 {% endblock %}

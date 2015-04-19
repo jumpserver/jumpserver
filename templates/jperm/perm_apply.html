@@ -58,7 +58,7 @@
                     <form id="assetForm" method="post" class="form-horizontal">
                         {% csrf_token %}
                         <div class="form-group"><label class="col-sm-2 control-label"> 申请人 <span class="red-fonts">*</span></label>
-                            <div class="col-sm-8"><input type="text" name="applyer" value="{{  username }}" class="form-control" readonly="readonly"></div>
+                            <div class="col-sm-8"><input type="text" name="applyer" value="{{  name }}" class="form-control" readonly="readonly"></div>
                         </div>
 
                         <div class="hr-line-dashed"></div>
@@ -67,10 +67,11 @@
                         </div>
 
                         <div class="hr-line-dashed"></div>
-                        <div class="form-group" id="j_da"><label class="col-sm-2 control-label"> 部门管理员 <span class="red-fonts">*</span></label>
+                        <div class="form-group" id="j_da"><label class="col-sm-2 control-label"> 管理员 <span class="red-fonts">*</span></label>
                             <div class="radio">
+                                    <label><input type="radio" value="{{ admin.id }}" name="da"> {{ admin.name }}</label>
                                 {% for da in dept_da %}
-                                    <label><input type="radio" value="{{ da.id }}" name="da"> {{ da }}</label>
+                                    <label><input type="radio" value="{{ da.id }}" name="da"> {{ da.name }}</label>
                                 {% endfor %}
                             </div>
                         </div>

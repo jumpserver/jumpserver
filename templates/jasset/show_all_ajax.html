@@ -1,0 +1,7 @@
+{% load mytags %}
+{% ifequal env 'group' %}
+    {{ host.bis_group.all|group_dept_all }}
+{% endifequal %}
+{% ifequal env 'dept' %}
+    {{ host.dept.all|group_dept_all }}
+{% endifequal %}

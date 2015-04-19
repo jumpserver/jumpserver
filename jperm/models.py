@@ -39,6 +39,7 @@ class SudoPerm(models.Model):
 class Apply(models.Model):
     uuid = UUIDField(auto=True)
     applyer = models.CharField(max_length=20)
+    admin = models.CharField(max_length=20)
     approver = models.CharField(max_length=20)
     dept = models.CharField(max_length=20)
     bisgroup = models.CharField(max_length=500)
@@ -47,6 +48,7 @@ class Apply(models.Model):
     status = models.IntegerField(max_length=2)
     date_add = models.DateTimeField(null=True)
     date_end = models.DateTimeField(null=True)
+    read = models.IntegerField(max_length=2)
 
     def __unicode__(self):
         return self.applyer

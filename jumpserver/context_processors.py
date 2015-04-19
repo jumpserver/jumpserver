@@ -1,6 +1,7 @@
 from juser.models import User
 from jasset.models import Asset
 from jumpserver.api import *
+from jperm.models import Apply
 
 
 def name_proc(request):
@@ -17,6 +18,9 @@ def name_proc(request):
         user_active_num = dept.user_set.filter(is_active=True).count()
         host_total_num = dept.asset_set.all().count()
         host_active_num = dept.asset_set.all().filter(is_active=True).count()
+
+    username = User.objects.get(id=user_id).name
+    apply_info = Apply.objects.filter(admin=username, status=0, read=0)
     request.session.set_expiry(3600)
 
     info_dic = {'session_user_id': user_id,
@@ -24,7 +28,8 @@ def name_proc(request):
                 'user_total_num': user_total_num,
                 'user_active_num': user_active_num,
                 'host_total_num': host_total_num,
-                'host_active_num': host_active_num}
+                'host_active_num': host_active_num,
+                'apply_info': apply_info}
 
     return info_dic
 
