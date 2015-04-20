@@ -5,14 +5,13 @@
 # Author: jumpserver group
 
 . /etc/init.d/functions
-export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/node/bin
 
 base_dir=$(dirname $0)
 
 case $1 in
 start)
-    daemon $base_dir/manage.py runserver 0.0.0.0:80 &
-    daemon $base_dir/log_handler.py &
+    python $base_dir/manage.py runserver 0.0.0.0:80 &
+    python $base_dir/log_handler.py &
     cd $base_dir/websocket/; daemon node index.js &
     ;;
 
