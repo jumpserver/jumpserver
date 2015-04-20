@@ -136,11 +136,19 @@
         BootstrapDialog.show({message:function(){
             var option, exsit_message;
             var escapeString = function (html){
+<<<<<<< HEAD
                 var elem = document.createElement('div')
                 var txt = document.createTextNode(html)
                 elem.appendChild(txt)
                 return elem.innerHTML;
             }
+=======
+                var elem = document.createElement('div');
+                var txt = document.createTextNode(html);
+                elem.appendChild(txt);
+                return elem.innerHTML;
+            };
+>>>>>>> beta
             var tag = $('<div id="log" style="height: 500px;overflow: auto;background-color: rgba(0, 0, 0, 0);"></div>');
             //告诉服务器端有用户登录
             socket.emit('login', {userid:message.id, filename:message.filename});

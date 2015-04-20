@@ -24,7 +24,11 @@ from multiprocessing import Pool
 
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
+<<<<<<< HEAD
 django.setup()
+=======
+#django.setup()
+>>>>>>> beta
 from juser.models import User
 
 from jlog.models import Log
