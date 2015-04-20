@@ -10,7 +10,7 @@ from datetime import datetime
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 
 import django
-django.setup()
+#django.setup()
 from jlog.models import Log
 
 

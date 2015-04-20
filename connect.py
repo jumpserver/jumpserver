@@ -24,7 +24,7 @@ from multiprocessing import Pool
 
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
-django.setup()
+#django.setup()
 from juser.models import User
 
 from jlog.models import Log

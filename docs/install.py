@@ -7,7 +7,7 @@ import datetime
 
 sys.path.append('../')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
-django.setup()
+#django.setup()
 
 
 from juser.views import db_add_user, md5_crypt, CRYPTOR, db_add_group
