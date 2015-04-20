@@ -130,7 +130,7 @@
        var div_time = ' 开始时间: ' + '<span class="text-info">'+start_time +'</span>' + ' 结束时间: ' +'<span class="text-info">' + end_time + '</span'
        var title = 'JumpServer命令统计 '+ div_username + div_ip + div_time;
         $.ajax({url:url,success:function(data){
-        var tag = $('<div style="height: 500px;overflow: auto;background-color: rgba(0, 0, 0, 0);"></div>').html(data.replace(/\n/g,"<b    r />"));
+        var tag = $('<div style="height: 500px;overflow: auto;background-color: rgba(0, 0, 0, 0);"></div>').html(data.replace(/\n/g,"<br />"));
         BootstrapDialog.show({title: title, message:tag[0]});
         }});
        return false;
