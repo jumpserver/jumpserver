@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load mytags %}
+{% block content %}
+{% include 'nav_cat_bar.html' %}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-lg-10">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5> 查看小组</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user">
+                            <li><a href="#">未启用 1</a>
+                            </li>
+                            <li><a href="#">未启用 2</a>
+                            </li>
+                        </ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="ibox-content">
+                    <div class="">
+                    <a target="_blank" href="/juser/group_add/" class="btn btn-sm btn-primary "> 添加小组 </a>
+                    <a id="del_btn" class="btn btn-sm btn-danger "> 删除所选 </a>
+                    <form id="search_form" method="get" action="" class="pull-right mail-search">
+                        <div class="input-group">
+                            <input type="text" class="form-control input-sm" id="search_input" name="search" placeholder="Search">
+                            <div class="input-group-btn">
+                                <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                                    Search
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                    </div>
+
+                    <table class="table table-striped table-bordered table-hover " id="editable" >
+                        <thead>
+                            <tr>
+                                <th class="text-center">
+                                    <input type="checkbox" id="select_all" onclick="selectAll()"  name="select_all">
+                                </th>
+                                <th class="text-center">组名</th>
+                                <th class="text-center">所属部门</th>
+                                <th class="text-center">成员数目</th>
+                                <th class="text-center">备注</th>
+                                <th class="text-center">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for group in contacts.object_list %}
+                            <tr class="gradeX">
+                                <td class="text-center">
+                                    <input type="checkbox"  name="selected" value="{{ group.id }}">
+                                </td>
+                                <td class="text-center"> {{ group.name }} </td>
+                                <td class="text-center"> {{ group.dept.name }} </td>
+                                <td class="text-center"><a href="/juser/user_list/?gid={{ group.id }}"> {{ group.id | member_count }}</a> </td>
+                                <td class="text-center"> {{ group.comment }} </td>
+                                <td class="text-center">
+                                    <a href="../group_edit/?id={{ group.id }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a href="../group_del/?id={{ group.id }}" class="btn btn-xs btn-danger">删除</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="dataTables_info" id="editable_info" role="status" aria-live="polite">
+                                Showing {{ contacts.start_index }} to {{ contacts.end_index }} of {{ p.count }} entries
+                            </div>
+                        </div>
+                        {% include 'paginator.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        var check_array = []
+        $('#del_btn').click(function(){
+            if (confirm("确定删除")) {
+                $(".gradeX input:checked").each(function() {check_array.push($(this).attr("value")) })
+                $(".gradeX input:checked").closest("tr").remove()
+                $.post("/juser/group_del_ajax/",
+                    {group_ids: check_array.join(",")},
+                    function(data){
+                    }
+                )
+            }
+
+        })
+    });
+
+
+</script>
+
+{% endblock %}

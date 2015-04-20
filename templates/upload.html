@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+{% load mytags %}
+{% block content %}
+{% include 'nav_cat_bar.html' %}
+
+<div class="wrapper wrapper-content animated fadeIn">
+    <div class="row">
+        <div class="col-lg-12">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title">
+                <h5>上传文件</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-wrench"></i>
+                    </a>
+                    <ul class="dropdown-menu dropdown-user">
+                        <li><a href="#">Config option 1</a>
+                        </li>
+                        <li><a href="#">Config option 2</a>
+                        </li>
+                    </ul>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <div class="">
+                    <form id="my-awesome-dropzone" class="dropzone" action="#">
+                        <div class="dropzone-previews">
+                            <input id="hosts" name="hosts"  type="text" class="form-control" required="不能为空" placeholder="输入主机地址，逗号隔开，确保你有输入主机地址的权限" size="80%">
+                        </div>
+                        <button type="submit" class="btn btn-primary pull-right">全部上传</button>
+                        <div></div>
+                    </form>
+                </div>
+                <div>
+                    <div class="m text-right"><small>上传文件到后端服务器的/tmp下，请注意查看</small> </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function(){
+
+        Dropzone.options.myAwesomeDropzone = {
+
+            autoProcessQueue: false,
+            uploadMultiple: true,
+            parallelUploads: 100,
+            maxFiles: 100,
+            url: '/file/upload/',
+
+            // Dropzone settings
+            init: function() {
+                var myDropzone = this;
+
+                this.element.querySelector("button[type=submit]").addEventListener("click", function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    myDropzone.processQueue();
+                });
+                this.on("sendingmultiple", function() {
+                });
+                this.on("successmultiple", function(files, response) {
+                    alert(response)
+                });
+                this.on("errormultiple", function(files, response) {
+                });
+            }
+
+        }
+
+   });
+
+$('#my-awesome-dropzone').validator({
+    timely: 2,
+    theme: "yellow_right_effect",
+    fields: {
+        "hosts": {
+            rule: "required",
+            tip: "输入上传的Host",
+            ok: "",
+            msg: {required: "必须填写!"}
+        }
+    },
+    valid: function(form) {
+        form.submit();
+    }
+});
+</script>
+
+
+{% endblock %}

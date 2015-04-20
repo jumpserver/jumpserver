@@ -1,0 +1,106 @@
+{% load mytags %}
+<html>
+    <head>
+        {% include 'link_css.html' %}
+        {% include 'head_script.html' %}
+
+        <style type="text/css">
+        body
+        {
+        background: #FFFFFF;
+        }
+        </style>
+    </head>
+
+    <body>
+        <div class="row">
+            <div class="contact-box">
+                <h3 class="text-center">{{ offset }}主机详情</h3>
+                <table class="table table-striped table-bordered table-hover " id="editable" >
+                    <thead>
+                        <tr>
+                            <th> IP地址 </th>
+                            <th> 端口号 </th>
+                            <th> 登录方式 </th>
+                            <th> 所属IDC </th>
+                            <th> 所属业务组 </th>
+                            <th> 添加时间 </th>
+                            <th> 备注 </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="gradeX">
+                            <td> <a id="ip" class="iframe" href="/jasset/{{ post.ip }}/">{{ post.ip }}</a></td>
+                            <td> {{ post.port }} </td>
+                            <td> {{ post.login_type|get_login_type }} </td>
+                            <td class="text-center"> {{ post.idc.name }} </td>
+                            <td class="text-center">{% for group in post.bis_group.all %} {{ group }} {% endfor %}</td>
+                            <td class="text-center"> {{ post.date_added|date:"Y-m-d H:i:s" }} </td>
+                            <td class="text-center"> {{ post.comment }} </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <h3 class="text-center">{{ offset }}主机用户权限详情</h3>
+                <table class="table table-striped table-bordered table-hover " id="editable" >
+                    <thead>
+                        <tr>
+                            <th> 用户名 </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="gradeX">
+                            <td>
+                                {% for user in user_permed_list %}
+                                    <a class="btn"> {{ user.name }} </a>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!--<a> 是否 激活: {{ post.is_active }}</a>-->
+                <h3 class="text-center">最近一周登录详情</h3>
+                <table class="table table-striped table-bordered table-hover ">
+                    <thead>
+                        <tr>
+                            <th class="text-center"> 用户名 </th>
+                            <th class="text-center"> 登录时间 </th>
+                            <th class="text-center"> 退出时间 </th>
+                            <th class="text-center"> 详情 </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for l in log %}
+                            <tr class="gradeX">
+                                <td class="text-center" id="username"> {{ l.user }} </td>
+                                <td class="text-center" id="start_time">{{ l.start_time|date:"Y-m-d H:i:s" }}</td>
+                                <td class="text-center" id="end_time"> {{ l.end_time|date:"Y-m-d H:i:s" }} </td>
+                                <td class="text-center">
+                                    <a class="log_command text-success" href="/jlog/history/?id={{ l.id }}">命令统计</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </body>
+
+    <script src="/static/js/bootstrap-dialog.js"></script>
+    <script>
+       $('.log_command').on('click',function(){
+           var url = $(this).attr('href');
+           var username = $('#username')[0].innerText;
+           var ip = $('#ip')[0].innerText;
+           var start_time = $('#start_time')[0].innerText;
+           var end_time = $('#end_time')[0].innerText;
+           var div_username = ' 登录用户名: '+'<span class="text-info">'+username+'' + '</span>';
+           var div_ip = ' 登录主机: '+'<span class="text-info">' + ip + '</span>';
+           var div_time = ' 开始时间: ' + '<span class="text-info">'+start_time +'</span>' + ' 结束时间: ' +'<span class="text-info">' + end_time + '</span>'
+           var title = div_username + div_ip + div_time
+            $.ajax({url:url,success:function(data){
+            BootstrapDialog.show({title: title, message:data});
+            }});
+           return false;
+        })
+    </script>
+</html>

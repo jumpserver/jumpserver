@@ -1,0 +1,22 @@
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>{{ header_title }}</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="/">仪表盘</a>
+            </li>
+            <li>
+            {% if path1 %}
+                <a>{{ path1 }}</a>
+            {% endif %}
+            </li>
+            {% if path2 %}
+            <li class="active">
+                <strong>{{ path2 }}</strong>
+            </li>
+            {% endif %}
+        </ol>
+    </div>
+    <div class="col-lg-2">
+    </div>
+</div>

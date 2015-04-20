@@ -1,0 +1,61 @@
+{% load humanize %}
+{% load mytags %}
+<nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+    <div class="navbar-header">
+        <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+        <form role="search" class="navbar-form-custom" method="get" action="">
+            <div class="form-group">
+                <input type="text" placeholder="输入搜索..." class="form-control" name="search" id="top-search">
+            </div>
+        </form>
+    </div>
+    <ul class="nav navbar-top-links navbar-right">
+        <li>
+            <span class="m-r-sm text-muted welcome-message">欢迎使用Jumpserver开源跳板机系统</span>
+        </li>
+        <li class="dropdown">
+            <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                <i class="fa fa-envelope"></i>  <span class="label label-warning">{{ apply_info.count }}</span>
+            </a>
+            <ul class="dropdown-menu dropdown-messages">
+                {% if apply_info %}
+                    {% for apply in apply_info %}
+                        <li>
+                            <div class="dropdown-messages-box">
+                                <a href="/jperm/apply_show/online/" class="pull-left">
+                                    <img alt="image" class="img-circle" src="/static/img/a4.jpg">
+                                </a>
+                                <div class="media-body">
+                                    <small class="pull-right text-navy">{{ apply.date_add|naturaltime }}</small>
+                                    <strong>{{ apply.applyer }}</strong><br>
+                                    <small class="text-muted">主机组: {{ apply.bisgroup|ast_to_list }}</small><br/>
+                                    <small class="text-muted">主机: {{ apply.asset|ast_to_list }}</small><br/>
+                                    <small class="text-muted">申请时间: {{ apply.date_add|date:"Y-m-d H:i:s" }}</small>
+                                </div>
+                            </div>
+                        </li>
+                        <li class="divider"></li>
+                    {% endfor %}
+                        <li>
+                            <div class="text-center link-block">
+                                <a href="/jperm/apply_show/online/">
+                                    <i class="fa fa-envelope"></i> <strong>Read All Messages</strong>
+                                </a>
+                            </div>
+                        </li>
+                {% else %}
+                    <li>
+                        <div class="text-center link-block">
+                            <i class="fa fa-envelope"></i> <strong>(暂无通知)</strong>
+                        </div>
+                    </li>
+                {% endif %}
+            </ul>
+        </li>
+        <li>
+            <a href="/logout/">
+                <i class="fa fa-sign-out"></i> Log out
+            </a>
+        </li>
+    </ul>
+</nav>

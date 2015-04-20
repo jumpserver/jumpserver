@@ -1,0 +1,40 @@
+{% load mytags %}
+<div class="tab-content">
+        <table class="table table-striped table-bordered table-hover ">
+            <thead>
+                <tr>
+                    <th class="text-center"> 申请人 </th>
+                    <th class="text-center"> 所属部门 </th>
+                    <th class="text-center"> 申请主机组 </th>
+                    <th class="text-center"> 申请主机 </th>
+                    <th class="text-center"> 批准人 </th>
+                    <th class="text-center"> 申请时间 </th>
+                    <th class="text-center"> 备注 </th>
+                    <th class="text-center"> 详情 </th>
+
+                </tr>
+            </thead>
+            <tbody>
+            {% for post in contacts.object_list %}
+                <tr class="gradeX">
+                    <td class="text-center" id="username"> {{ post.applyer }} </td>
+                    <td class="text-center" id="dept"> {{ post.dept }} </td>
+                    <td class="text-center" id="ip"> {{ post.bisgroup|ast_to_list }} </td>
+                    <td class="text-center" id="remote_ip"> {{ post.asset|ast_to_list }} </td>
+                    <td class="text-center" id="approver"> {{ post.approver }} </td>
+                    <td class="text-center" id="start_time"> {{ post.date_add|date:"Y-m-d H:i:s"}} </td>
+                    <td class="text-center" id=""> {{ post.comment }} </td>
+                    <td class="text-center" data-editable='false'>
+                        <a value="/jperm/apply_info/?uuid={{ post.uuid }}" class="iframe btn btn-xs btn-primary">详情</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <div class="row">
+            <div class="col-sm-6">
+            </div>
+            {% include 'paginator.html' %}
+        </div>
+    </div>
+</div>
