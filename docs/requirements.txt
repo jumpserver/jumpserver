@@ -5,6 +5,5 @@ paramiko
 pycrypto
 ecdsa>=0.11
 MySQL-python
-readline
 django-uuidfield
 psutil
