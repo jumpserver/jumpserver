@@ -167,7 +167,7 @@ def db_idc_delete(request, idc_id):
 
     idc = IDC.objects.filter(id=idc_id)
     if idc:
-        idc_class = idc.first()
+        idc_class = idc[0]
         idc_class.asset_set.update(idc=default_idc)
         idc.delete()
     else:
@@ -330,7 +330,7 @@ def host_edit_common_batch(request):
                 asset_alias.save()
             else:
                 AssetAlias.objects.create(user=u, host=a, alias=j_alias)
-    return my_render('jasset/host_list_common.html')
+    return my_render('jasset/host_list_common.html', locals(), request)
 
 
 @require_login
@@ -539,7 +539,7 @@ def host_detail(request):
     post = Asset.objects.filter(id=host_id)
     if not post:
         return httperror(request, '没有此主机!')
-    post = post.first()
+    post = post[0]
 
     if is_group_admin(request) and not validate(request, asset=[host_id]):
         return httperror(request, '您无权查看!')
@@ -697,7 +697,7 @@ def group_add(request):
             pass
 
         else:
-            j_dept = DEPT.objects.filter(id=j_dept).first()
+            j_dept = DEPT.objects.filter(id=j_dept)[0]
             group = BisGroup.objects.create(name=j_group, dept=j_dept, comment=j_comment)
             for host in j_hosts:
                 g = Asset.objects.get(id=host)
@@ -772,7 +772,7 @@ def group_edit(request):
     group_id = request.GET.get('id', '')
     group = BisGroup.objects.filter(id=group_id)
     if group:
-        group = group.first()
+        group = group[0]
     else:
         httperror(request, u'没有这个主机组!')
 
@@ -918,10 +918,9 @@ def host_search(request):
         posts = post_all.filter(dept=dept)
 
     elif is_common_user(request):
-        username = get_session_user_info(request)[2]
+        user_id, username = get_session_user_info(request)[0:2]
         post_perm = user_perm_asset_api(username)
         posts = list(set(post_all) & set(post_perm))
-
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     return my_render('jasset/host_search.html', locals(), request)

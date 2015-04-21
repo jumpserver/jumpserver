@@ -254,7 +254,7 @@ def get_session_user_info(request):
     user_id = request.session.get('user_id', 0)
     user = User.objects.filter(id=user_id)
     if user:
-        user = user.first()
+        user = user[0]
         dept = user.dept
         return [user.id, user.username, user, dept.id, dept.name, dept]
 
