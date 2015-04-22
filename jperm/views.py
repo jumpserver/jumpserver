@@ -700,7 +700,7 @@ def perm_apply_exec(request):
             smg = '此权限已经审批完成, 请勿重复审批, 十秒钟后返回首页'
             return render_to_response('jperm/perm_apply_exec.html', locals(), context_instance=RequestContext(request))
         else:
-            user = User.objects.get(username=q_apply.applyer)
+            user = User.objects.get(name=q_apply.applyer)
             mail_address = user.email
             time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             p_apply.update(status=1, approver=approver, date_end=time_now)
