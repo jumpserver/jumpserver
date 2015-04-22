@@ -71,7 +71,7 @@ def log_kill(request):
     pid = request.GET.get('id', '')
     log = Log.objects.filter(pid=pid)
     if log:
-        log = log.first()
+        log = log[0]
         dept_name = log.dept_name
         deptname = get_session_user_info(request)[4]
         if is_group_admin(request) and dept_name != deptname:
@@ -89,7 +89,7 @@ def log_history(request):
     log_id = request.GET.get('id', 0)
     log = Log.objects.filter(id=int(log_id))
     if log:
-        log = log.first()
+        log = log[0]
         dept_name = log.dept_name
         deptname = get_session_user_info(request)[4]
         if is_group_admin(request) and dept_name != deptname:

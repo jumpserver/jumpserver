@@ -66,7 +66,6 @@ def run():
         log_hanler(pid_id)
 
     for pid_id, pid, log_path, is_finished, log_finished, start_time in pids1:
-        print pid_id, start_time, type(start_time)
         try:
             file_time = int(os.stat(log_path).st_ctime)
             now_time = int(time.time())
