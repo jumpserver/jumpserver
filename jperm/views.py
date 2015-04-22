@@ -634,7 +634,7 @@ def perm_apply(request):
     """ 权限申请 """
     header_title, path1, path2 = u'主机权限申请', u'权限管理', u'申请主机'
     user_id, username = get_session_user_info(request)[0:2]
-    name = User.objects.get(id=user_id).name
+    name = User.objects.get(id=user_id).username
     dept_id, deptname, dept = get_session_user_info(request)[3:6]
     perm_host = user_perm_asset_api(username)
     all_host = Asset.objects.filter(dept=dept)
@@ -700,7 +700,7 @@ def perm_apply_exec(request):
             smg = '此权限已经审批完成, 请勿重复审批, 十秒钟后返回首页'
             return render_to_response('jperm/perm_apply_exec.html', locals(), context_instance=RequestContext(request))
         else:
-            user = User.objects.get(name=q_apply.applyer)
+            user = User.objects.get(username=q_apply.applyer)
             mail_address = user.email
             time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             p_apply.update(status=1, approver=approver, date_end=time_now)
