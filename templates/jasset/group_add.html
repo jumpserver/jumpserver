@@ -73,7 +73,7 @@
                                 <div class="col-sm-8">
                                     <select id="j_dept" name="j_dept" class="form-control m-b" onchange="change_dept(this.value)">
                                         {% for d in edept %}
-                                            <option type="checkbox" value="{{ d.id }}">{{ d.name }}</option>
+                                            <option value="{{ d.id }}">{{ d.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -151,12 +151,12 @@
 <script>
     $(document).ready(function(){
         $("#submit_button").click(function(){
-            $('#assetForm option').each(function(){
+            $('#asset_select option').each(function(){
                 $(this).prop('selected', true)
             })
         });
 
-    })
+    });
 
     $('#assetForm').validator({
     timely: 2,
