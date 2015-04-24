@@ -8,6 +8,8 @@ from django.http import HttpResponseNotFound
 from jperm.models import Apply
 import paramiko
 from jumpserver.api import *
+import uuid
+import urllib
 
 
 def getDaysByNum(num):
@@ -178,6 +180,17 @@ def pages(posts, r):
         show_end = 0
 
     return contact_list, p, contacts, page_range, current_page, show_first, show_end
+
+
+def is_latest(request):
+    node = uuid.getnode()
+    jsn = uuid.UUID(int=node).hex[-12:]
+    with open(os.path.join(BASE_DIR, 'version')) as f:
+        current_version = f.read()
+    lastest_version = urllib.urlopen('http://www.jumpserver.org/lastest_version.html?jsn=%s' % jsn).read().strip()
+
+    if current_version != lastest_version:
+        pass
 
 
 def login(request):
