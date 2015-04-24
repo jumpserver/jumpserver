@@ -28,15 +28,15 @@ start() {
 		 daemon python $base_dir/manage.py runserver 0.0.0.0:80 &>> /tmp/jumpserver.log 2>&1 &
 		 daemon python $base_dir/log_handler.py &> /dev/null 2>&1 &
          cd $base_dir/websocket/;daemon node index.js &> /dev/null 2>&1 &
-         sleep 1
+         sleep 2
 
-		 echo "$jump_start"
+		 echo -n "$jump_start"
 		 nums=0
          for i in manage.py log_handler.py index.js;do
-             ps aux | grep "$i" | grep -v 'grep' && let nums+=1 &> /dev/null
+             ps aux | grep "$i" | grep -v 'grep' &> /dev/null && let nums+=1 
          done
 
-         if [ "x$nums" = "x4" ];then
+         if [ "x$nums" == "x3" ];then
             success "$jump_start"
             touch "$lockfile"
             echo

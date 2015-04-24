@@ -15,3 +15,9 @@ class Log(models.Model):
 
     def __unicode__(self):
         return self.log_path
+
+
+class Alert(models.Model):
+    msg = models.CharField(max_length=20)
+    time = models.DateTimeField(null=True)
+    is_finished = models.BigIntegerField(default=False)

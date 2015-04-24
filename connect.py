@@ -8,7 +8,6 @@ sys.setdefaultencoding('utf8')
 import socket
 import os
 import re
-import ast
 import select
 import time
 import paramiko
@@ -16,25 +15,24 @@ import struct
 import fcntl
 import signal
 import textwrap
-import django
 import getpass
 import fnmatch
 import readline
+import datetime
 from multiprocessing import Pool
 
-
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
-#django.setup()
 from juser.models import User
-
 from jlog.models import Log
-from jumpserver.api import *
+from jumpserver.api import CONF, BASE_DIR, ServerError, user_perm_group_api, user_perm_group_hosts_api, get_user_host
+from jumpserver.api import AssetAlias, get_connect_item
+
 
 try:
     import termios
     import tty
 except ImportError:
-    print '\033[1;31mOnly postfix supported.\033[0m'
+    print '\033[1;31mOnly UnixLike supported.\033[0m'
     time.sleep(3)
     sys.exit()
 
@@ -194,13 +192,16 @@ def verify_connect(username, part_ip):
     except ServerError, e:
         color_print(e, 'red')
         return False
+
     for ip_info in hosts:
         for info in ip_info[1:]:
             if part_ip in info:
                 ip_matched.append(ip_info[1])
+
+    ip_matched = list(set(ip_matched))
     if len(ip_matched) > 1:
         for ip in ip_matched:
-            print '%s -- %s' % (ip, hosts_attr[ip][2])
+            print '%-15s -- %s' % (ip, hosts_attr[ip][2])
     elif len(ip_matched) < 1:
         color_print('No Permission or No host.', 'red')
     else:
@@ -210,7 +211,7 @@ def verify_connect(username, part_ip):
 
 def print_prompt():
     msg = """\033[1;32m###  Welcome Use JumpServer To Login. ### \033[0m
-    1) Type \033[32mIP ADDRESS\033[0m To Login.
+    1) Type \033[32mIP or Part IP, Host Alias or Comments \033[0m To Login.
     2) Type \033[32mP/p\033[0m To Print The Servers You Available.
     3) Type \033[32mG/g\033[0m To Print The Server Groups You Available.
     4) Type \033[32mG/g(1-N)\033[0m To Print The Server Group Hosts You Available.
@@ -322,18 +323,25 @@ def multi_remote_exec_cmd(hosts, username, cmd):
 
 
 def exec_cmd_servers(username):
-    hosts = []
-    color_print("Input the Host IP(s),Separated by Commas, q/Q to Quit.\n \
-                You can choose in the following IP(s), Use Linux / Unix glob.", 'green')
+    color_print("You can choose in the following IP(s), Use glob or ips split by comma. q/Q to PreLayer.", 'green')
     print_user_host(LOGIN_NAME)
     while True:
+        hosts = []
         inputs = raw_input('\033[1;32mip(s)>: \033[0m')
         if inputs in ['q', 'Q']:
             break
         get_hosts = get_user_host(username).keys()
-        for host in get_hosts:
-            if fnmatch.fnmatch(host, inputs):
-                hosts.append(host.strip())
+
+        if ',' in inputs:
+            ips_input = inputs.split(',')
+            for host in ips_input:
+                if host in get_hosts:
+                    hosts.append(host)
+        else:
+            for host in get_hosts:
+                if fnmatch.fnmatch(host, inputs):
+                    hosts.append(host.strip())
+
         if len(hosts) == 0:
             color_print("Check again, Not matched any ip!", 'red')
             continue
