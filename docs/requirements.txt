@@ -1,8 +1,8 @@
 sphinx-me
 django==1.6
 python-ldap
+pycrypto==2.6.1
 paramiko
-pycrypto
 ecdsa>=0.11
 MySQL-python
 django-uuidfield

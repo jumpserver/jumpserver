@@ -182,7 +182,7 @@ def pages(posts, r):
     return contact_list, p, contacts, page_range, current_page, show_first, show_end
 
 
-def is_latest(request):
+def is_latest():
     node = uuid.getnode()
     jsn = uuid.UUID(int=node).hex[-12:]
     with open(os.path.join(BASE_DIR, 'version')) as f:
