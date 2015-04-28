@@ -365,6 +365,7 @@ def exec_cmd_servers(username):
 
 if __name__ == '__main__':
     print_prompt()
+    gid_pattern = re.compile(r'^g\d+$')
     try:
         while True:
             try:
@@ -378,7 +379,7 @@ if __name__ == '__main__':
             elif option in ['G', 'g']:
                 print_user_hostgroup(LOGIN_NAME)
                 continue
-            elif option.startswith('g') or option.startswith('G'):
+            elif gid_pattern.match(option):
                 gid = option[1:].strip()
                 print_user_hostgroup_host(LOGIN_NAME, gid)
                 continue
