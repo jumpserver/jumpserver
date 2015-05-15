@@ -1,9 +1,9 @@
-sphinx-me
+sphinx-me==0.3
 django==1.6
-python-ldap
+python-ldap==2.4.19
 pycrypto==2.6.1
-paramiko
-ecdsa>=0.11
-MySQL-python
-django-uuidfield
-psutil
+paramiko==1.15.2
+ecdsa==0.13
+MySQL-python==1.2.5
+django-uuidfield==0.5.0
+psutil==2.2.1
