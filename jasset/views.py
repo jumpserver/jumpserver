@@ -4,6 +4,8 @@ import ast
 
 from django.db.models import Q
 from django.template import RequestContext
+from django.shortcuts import get_object_or_404
+
 from jperm.models import Perm
 from jumpserver.api import *
 
@@ -26,6 +28,8 @@ def get_host_groups(groups):
         if group:
             group = group[0]
             ret.append(group)
+    group_all = get_object_or_404(BisGroup, name='ALL')
+    ret.append(group_all)
     return ret
 
 
