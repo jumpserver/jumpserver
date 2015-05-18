@@ -194,6 +194,9 @@ def verify_connect(username, part_ip):
         return False
 
     for ip_info in hosts:
+        if part_ip in ip_info[1:]:
+            ip_matched = [ip_info[1]]
+            break
         for info in ip_info[1:]:
             if part_ip in info:
                 ip_matched.append(ip_info[1])
