@@ -376,6 +376,8 @@ if __name__ == '__main__':
             except EOFError:
                 print
                 continue
+            except KeyboardInterrupt:
+                sys.exit(0)
             if option in ['P', 'p']:
                 print_user_host(LOGIN_NAME)
                 continue
