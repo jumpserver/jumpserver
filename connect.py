@@ -184,6 +184,27 @@ def get_user_hostgroup_host(username, gid):
     return hosts_attr
 
 
+def connect_by_index(username, index):
+    ip_matched = []
+    try:
+        hosts_attr = get_user_host(username)
+        hosts = hosts_attr.items()
+    except ServerError, e:
+        color_print(e, 'red')
+        return False
+
+    for host_ip, ip_info in hosts:
+        if index == ip_info[-1]:
+            ip_matched = [ip_info[1]]
+            break
+
+    if len(ip_matched) == 1:
+        username, password, host, port = get_connect_item(username, ip_matched[0])
+        connect(username, password, host, port, LOGIN_NAME)
+    elif len(ip_matched) < 1:
+        color_print('No Permission or No host.', 'red')
+
+
 def verify_connect(username, part_ip):
     ip_matched = []
     try:
@@ -216,10 +237,11 @@ def print_prompt():
     msg = """\033[1;32m###  Welcome Use JumpServer To Login. ### \033[0m
     1) Type \033[32mIP or Part IP, Host Alias or Comments \033[0m To Login.
     2) Type \033[32mP/p\033[0m To Print The Servers You Available.
-    3) Type \033[32mG/g\033[0m To Print The Server Groups You Available.
-    4) Type \033[32mG/g(1-N)\033[0m To Print The Server Group Hosts You Available.
-    5) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
-    6) Type \033[32mQ/q\033[0m To Quit.
+    3) Type \033[32mp(1-N)\033[0m Index of Host To Login.
+    4) Type \033[32mG/g\033[0m To Print The Server Groups You Available.
+    5) Type \033[32mG/g(1-N)\033[0m To Print The Server Group Hosts You Available.
+    6) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
+    7) Type \033[32mQ/q\033[0m To Quit.
     """
     print textwrap.dedent(msg)
 
@@ -232,8 +254,8 @@ def print_user_host(username):
         return
     hosts = hosts_attr.keys()
     hosts.sort()
-    for ip in hosts:
-        print '%-15s -- %s' % (ip, hosts_attr[ip][2])
+    for index, ip in enumerate(hosts):
+        print '%-3s)%-15s -- %s' % (index, ip, hosts_attr[ip][2])
     print ''
 
 
@@ -369,6 +391,7 @@ def exec_cmd_servers(username):
 if __name__ == '__main__':
     print_prompt()
     gid_pattern = re.compile(r'^g\d+$')
+    host_index_pattern = re.compile(r'^p\d+$')
     try:
         while True:
             try:
@@ -388,6 +411,12 @@ if __name__ == '__main__':
                 gid = option[1:].strip()
                 print_user_hostgroup_host(LOGIN_NAME, gid)
                 continue
+            elif host_index_pattern.match(option):
+                host_index = option[1:].strip()
+                try:
+                    connect_by_index(LOGIN_NAME, host_index)
+                except ServerError, e:
+                    color_print(e, 'red')
             elif option in ['E', 'e']:
                 exec_cmd_servers(LOGIN_NAME)
             elif option in ['Q', 'q', 'exit']:
