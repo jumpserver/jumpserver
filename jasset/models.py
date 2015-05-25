@@ -30,7 +30,7 @@ class Asset(models.Model):
         ('M', 'MAP'),
     )
     ip = models.IPAddressField(unique=True)
-    port = models.SmallIntegerField(max_length=5)
+    port = models.IntegerField(max_length=6)
     idc = models.ForeignKey(IDC)
     bis_group = models.ManyToManyField(BisGroup)
     dept = models.ManyToManyField(DEPT)
