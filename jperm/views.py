@@ -380,7 +380,8 @@ def sudo_edit(request):
 
     else:
         user_group_id = request.POST.get('user_group_id', '')
-        users_runas = request.POST.get('runas', 'root')
+        users_runas = request.POST.get('runas') if request.POST.get('runas') else 'root'
+        print users_runas
         asset_groups_select = request.POST.getlist('asset_groups_select')
         cmd_groups_select = request.POST.getlist('cmd_groups_select')
         comment = request.POST.get('comment', '')
