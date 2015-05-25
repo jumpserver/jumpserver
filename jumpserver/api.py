@@ -365,7 +365,7 @@ def get_user_host(username):
 
 def get_connect_item(username, ip):
     asset = get_object(Asset, ip=ip)
-    port = asset.port
+    port = int(asset.port)
 
     if not asset.is_active:
         raise ServerError('Host %s is not active.' % ip)
