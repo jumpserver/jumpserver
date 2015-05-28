@@ -22,6 +22,7 @@ from jlog.models import Log
 from jasset.models import AssetAlias
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
+import json
 
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
@@ -500,3 +501,21 @@ def success(request, msg):
 def httperror(request, emg):
     message = emg
     return render_to_response('error.html', locals())
+
+
+def node_auth(request):
+    username = request.POST.get('username', ' ')
+    seed = request.POST.get('seed', ' ')
+    filename = request.POST.get('filename', ' ')
+    user = User.objects.filter(username=username, password=seed)
+    auth = 1
+    if not user:
+        auth = 0
+    if not filename.startswith('/opt/jumpserver/logs/connect/'):
+        auth = 0
+    if auth:
+        result = {'auth': {'username': username, 'result': 'success'}}
+    else:
+        result = {'auth': {'username': username, 'result': 'failed'}}
+
+    return HttpResponse(json.dumps(result, sort_keys=True, indent=2), content_type='application/json')

@@ -214,7 +214,10 @@ def login(request):
                     request.session['role_id'] = 1
                 else:
                     request.session['role_id'] = 0
-                return HttpResponseRedirect('/')
+                response = HttpResponseRedirect('/', )
+                response.set_cookie('username', username, expires=604800)
+                response.set_cookie('seed', md5_crypt(password), expires=604800)
+                return response
             else:
                 error = '密码错误，请重新输入。'
         else:

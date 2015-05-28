@@ -2,6 +2,8 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var spawn = require('child_process').spawn;
+var request = require("request");
+var fs = require("fs");
 
 
 
@@ -22,26 +24,55 @@ io.on('connection', function(socket){
 
     //监听新用户加入
     socket.on('login', function(obj){
-        //将新加入用户的唯一标识当作socket的名称，后面退出的时候会用到
-        socket.name = obj.userid;
-        socket.fileName = obj.filename;
-        var  tail = new Tail(obj.filename);
-
-        //2015-03-06 当用户打开监控窗口时，会把已存在的文件内容打印出来
-        var fs = require('fs');
-        fs.readFile(obj.filename, 'utf8', function (err,data) {
-            if (err) {
-            return console.log(err);
+        request({
+            uri:"http://127.0.0.1/node_auth/",
+            method:"POST",
+            form:{
+                username:obj.username,
+                seed:obj.seed,
+                filename:obj.filename
             }
-            var existData = {userid:obj.userid,username:obj.username,content:data,option:'exist'};
-            socket.emit('message',existData);
-        });
+        },function(error,response,body){
+            try{
+                var result = JSON.parse(body)
+                console.log(body);
+                if(result['auth']['result'] != 'failed'){
+                    fs.exists(obj.filename, function(result) {                
+                         //将新加入用户的唯一标识当作socket的名称，后面退出的时候会用到
+                        socket.name = obj.userid;
+                        socket.fileName = obj.filename;
+                        var  tail = new Tail(obj.filename);
 
-        tail.on('line',function(data) {
-            //console.log(data);
-           var newData = {userid:obj.userid,username:obj.username,content:data,option:'new'};
-            socket.emit('message',newData);
+                        //2015-03-06 当用户打开监控窗口时，会把已存在的文件内容打印出来
+                        fs.readFile(obj.filename, 'utf8', function (err,data) {
+                            if (err) {
+                                return console.log(err);
+                            }
+                            var existData = {userid:obj.userid,username:obj.username,content:data,option:'exist'};
+                            socket.emit('message',existData);
+                        });
+
+                        tail.on('line',function(data) {
+                            //console.log(data);
+                           var newData = {userid:obj.userid,username:obj.username,content:data,option:'new'};
+                            socket.emit('message',newData);
+                        });
+                        socket.tail = tail;
+
+                        //检查在线列表，如果不在里面就加入
+                        if(!onlineUsers.hasOwnProperty(obj.userid)) {
+                            onlineUsers[obj.userid] = obj.username;
+                            //在线人数+1
+                            onlineCount++;
+                        }
+                    });
+                }
+            }catch(err){
+                console.log(err)
+            }
+            
         });
+       
         //var tail = spawn("tail", ['-f', obj.filename]);
         //tail.stdout.on('data',function(data){
         //    var content = data.toString();
@@ -51,14 +82,7 @@ io.on('connection', function(socket){
         //});
 
 
-        socket.tail = tail;
-
-        //检查在线列表，如果不在里面就加入
-        if(!onlineUsers.hasOwnProperty(obj.userid)) {
-            onlineUsers[obj.userid] = obj.username;
-            //在线人数+1
-            onlineCount++;
-        }
+        
 
         //向所有客户端广播用户加入
         //io.emit('login', {onlineUsers:onlineUsers, onlineCount:onlineCount, user:obj});

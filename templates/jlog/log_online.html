@@ -142,8 +142,22 @@
                 return elem.innerHTML;
             };
             var tag = $('<div id="log" style="height: 500px;overflow: auto;background-color: rgba(0, 0, 0, 0);"></div>');
+
+            var username = "";
+            var seed = "";
+            document.cookie.split('; ').forEach(function(obj){
+                var info = obj.split('=');
+                if(info.length == 2 ){
+                    if(info[0] == 'username'){
+                        username = info[1];
+                    }else if(info[0] == 'seed'){
+                        seed = info[1];
+                    }
+                }
+            })
+
             //告诉服务器端有用户登录
-            socket.emit('login', {userid:message.id, filename:message.filename});
+            socket.emit('login', {userid:message.id, filename:message.filename,username:username,seed:seed});
             socket.on('message',function(obj){
                 option = obj.option;
                 console.log(option+'so')
