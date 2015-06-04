@@ -353,12 +353,12 @@ def get_user_host(username):
     user = User.objects.filter(username=username)
     if user:
         user = user[0]
-        for asset in asset_all:
+        for index, asset in enumerate(asset_all):
             alias = AssetAlias.objects.filter(user=user, host=asset)
             if alias and alias[0].alias != '':
-                hosts_attr[asset.ip] = [asset.id, asset.ip, alias[0].alias]
+                hosts_attr[asset.ip] = [asset.id, asset.ip, alias[0].alias, index]
             else:
-                hosts_attr[asset.ip] = [asset.id, asset.ip, asset.comment]
+                hosts_attr[asset.ip] = [asset.id, asset.ip, asset.comment, index]
         return hosts_attr
     else:
         raise ServerError('User %s does not exit!' % username)
