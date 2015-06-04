@@ -482,7 +482,7 @@ def cmd_add(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         dept_id = request.POST.get('dept_id')
-        cmd = ','.join(request.POST.get('cmd').split())
+        cmd = ','.join(request.POST.get('cmd').split('\n'))
         comment = request.POST.get('comment')
         dept = DEPT.objects.filter(id=dept_id)
 
@@ -512,7 +512,7 @@ def cmd_add_adm(request):
 
     if request.method == 'POST':
         name = request.POST.get('name')
-        cmd = ','.join(request.POST.get('cmd').split())
+        cmd = ','.join(request.POST.get('cmd').split('\n'))
         comment = request.POST.get('comment')
 
         try:
