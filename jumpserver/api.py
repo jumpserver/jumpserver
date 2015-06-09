@@ -23,20 +23,32 @@ from jasset.models import AssetAlias
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 import json
+import logging
 
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 CONF = ConfigParser()
 CONF.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
+JLOG_FILE = os.path.join(LOG_DIR, 'jumpserver.log')
 SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys')
-SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
+# SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
 KEY = CONF.get('base', 'key')
 LOGIN_NAME = getpass.getuser()
 LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
 SEND_IP = CONF.get('base', 'ip')
 SEND_PORT = CONF.get('base', 'port')
 MAIL_FROM = CONF.get('mail', 'email_host_user')
+log_level = CONF.get('base', 'log')
+log_level_total = {'debug': logging.DEBUG, 'info': logging.INFO, 'warning': logging.WARN, 'error': logging.ERROR,
+                   'critical': logging.CRITICAL}
+logger = logging.getLogger('jumpserver')
+logger.setLevel(logging.DEBUG)
+fh = logging.FileHandler(JLOG_FILE)
+fh.setLevel(log_level_total.get(log_level, logging.DEBUG))
+formatter = logging.Formatter('%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
+fh.setFormatter(formatter)
+logger.addHandler(fh)
 
 
 class LDAPMgmt():
@@ -86,14 +98,6 @@ class LDAPMgmt():
             self.conn.delete_s(dn)
         except ldap.LDAPError, e:
             print e
-
-    def decrypt(self, text):
-        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
-        try:
-            plain_text = cryptor.decrypt(a2b_hex(text))
-        except TypeError:
-            raise ServerError('Decrypt password error, TYpe error.')
-        return plain_text.rstrip('\0')
 
 
 if LDAP_ENABLE:
@@ -292,40 +296,199 @@ def user_group_perm_asset_group_api(user_group):
     return asset_group_list
 
 
-def user_perm_group_api(username):
-    if username:
-        user = User.objects.get(username=username)
+class Juser(object):
+    def __init__(self, username=None, uid=None):
+        if username:
+            user = User.objects.filter(username=username)
+        elif uid:
+            user = User.objects.filter(id=uid)
+        else:
+            user = ''
+
+        if user:
+            user = user[0]
+            self.user = user
+            self.id = user.id
+            self.username = user.username
+            self.name = user.name
+            self.group = user.group.all()
+
+    def validate(self):
+        """
+        Validate is or not a true user
+        鉴定用户
+        """
+        if self.user:
+            return True
+        else:
+            return False
+
+    def get_asset_group(self):
+        """
+        Get user host_groups.
+        获取用户有权限的主机组
+        """
+        host_group_list = []
         perm_list = []
-        user_group_all = user.group.all()
+        user_group_all = self.user.group.all()
         for user_group in user_group_all:
             perm_list.extend(user_group.perm_set.all())
 
-        asset_group_list = []
         for perm in perm_list:
-            asset_group_list.append(perm.asset_group)
-        return asset_group_list
+            host_group_list.append(perm.asset_group)
+
+        return host_group_list
+
+    def get_asset_group_info(self, printable=False):
+        """
+        Get or print asset group info
+        获取或打印用户授权资产组
+        """
+        asset_groups_info = {}
+        asset_groups = self.get_asset_group()
+
+        for asset_group in asset_groups:
+            asset_groups_info[asset_group.id] = [asset_group.name, asset_group.comment]
+
+        if printable:
+            for group_id in asset_groups_info:
+                if asset_groups_info[group_id][1]:
+                    print "[%3s] %s -- %s" % (group_id,
+                                              asset_groups_info[group_id][0],
+                                              asset_groups_info[group_id][1])
+                else:
+                    print "[%3s] %s" % (group_id, asset_groups_info[group_id][0])
+        else:
+            return asset_groups_info
+
+    def get_asset(self):
+        """
+        Get the hosts of under the user control.
+        获取主机列表
+        """
+        hosts = []
+        host_groups = self.get_asset_group()
+
+        for host_group in host_groups:
+            hosts.extend(get_asset_group_member(host_group.id))
+
+        return hosts
+
+    def get_asset_info(self, printable=False):
+        """
+        Get or print the user asset info
+        获取或打印用户资产信息
+        """
+        assets_info = {}
+        assets = self.get_asset()
+
+        for asset in assets:
+            asset_alias = AssetAlias.objects.filter(user=self.user, asset=asset)
+            if asset_alias and asset_alias[0].alias != '':
+                assets_info[asset.ip] = [asset.id, asset.ip, asset_alias[0].alias]
+            else:
+                assets_info[asset.ip] = [asset.id, asset.ip, asset.comment]
+
+        if printable:
+            ips = assets_info.keys()
+            ips.sort()
+            for ip in ips:
+                if assets_info[ip][2]:
+                    print '%-15s -- %s' % (ip, assets_info[ip][2])
+                else:
+                    print '%-15s' % ip
+            print ''
+        else:
+            return assets_info
 
 
-def user_perm_group_hosts_api(gid):
-    hostgroup = BisGroup.objects.filter(id=gid)
-    if hostgroup:
-        return hostgroup[0].asset_set.all()
-    else:
-        return []
+class Jasset(object):
+    def __init__(self, ip=None, id=None):
+        if ip:
+            asset = Asset.objects.filter(ip=ip)
+        elif id:
+            asset = Asset.objects.filter(id=id)
+        else:
+            asset = ''
+
+        if asset:
+            asset = asset[0]
+            self.asset = asset
+            self.ip = asset.ip
+            self.id = asset.id
+            self.port = asset.port
+            self.comment = asset.comment
+
+    def validate(self):
+        if self.asset:
+            return True
+        else:
+            return False
 
 
-def user_perm_asset_api(username):
-    user = User.objects.filter(username=username)
-    if user:
-        user = user[0]
-        asset_list = []
-        asset_group_list = user_perm_group_api(user)
-        for asset_group in asset_group_list:
-            asset_list.extend(asset_group.asset_set.all())
-        asset_list = list(set(asset_list))
-        return asset_list
-    else:
-        return []
+class JassetGroup(object):
+    pass
+
+
+
+# def get_asset_group(user=None):
+#     """
+#     Get user host_groups.
+#     获取用户有权限的主机组
+#     """
+#     host_group_list = []
+#     if user:
+#         user = user[0]
+#         perm_list = []
+#         user_group_all = user.group.all()
+#         for user_group in user_group_all:
+#             perm_list.extend(user_group.perm_set.all())
+#
+#         host_group_list = []
+#         for perm in perm_list:
+#             host_group_list.append(perm.asset_group)
+#     return host_group_list
+
+
+def get_asset_group_member(gid):
+    """
+    Get host_group's member host
+    获取主机组下的主机
+    """
+    hosts = []
+    if gid:
+        host_group = BisGroup.objects.filter(id=gid)
+        if host_group:
+            host_group = host_group[0]
+            hosts = host_group.asset_set.all()
+    return hosts
+
+
+# def get_asset(user=None):
+#     """
+#     Get the hosts of under the user control.
+#     获取主机列表
+#     """
+#     hosts = []
+#     if user:
+#         host_groups = get_asset_group(user)
+#         for host_group in host_groups:
+#             hosts.extend(get_asset_group_member(host_group.id))
+#     return hosts
+
+
+# def user_perm_asset_api(username):
+#     user = User.objects.filter(username=username)
+#     if user:
+#         user = user[0]
+#         asset_list = []
+#         asset_group_list = user_perm_group_api(user)
+#         for asset_group in asset_group_list:
+#             asset_list.extend(asset_group.asset_set.all())
+#         asset_list = list(set(asset_list))
+#         return asset_list
+#     else:
+#         return []
 
 
 def asset_perm_api(asset):
@@ -344,24 +507,6 @@ def asset_perm_api(asset):
             user_permed_list.extend(user_group.user_set.all())
         user_permed_list = list(set(user_permed_list))
         return user_permed_list
-
-
-def get_user_host(username):
-    """Get the hosts of under the user control."""
-    hosts_attr = {}
-    asset_all = user_perm_asset_api(username)
-    user = User.objects.filter(username=username)
-    if user:
-        user = user[0]
-        for asset in asset_all:
-            alias = AssetAlias.objects.filter(user=user, host=asset)
-            if alias and alias[0].alias != '':
-                hosts_attr[asset.ip] = [asset.id, asset.ip, alias[0].alias]
-            else:
-                hosts_attr[asset.ip] = [asset.id, asset.ip, asset.comment]
-        return hosts_attr
-    else:
-        raise ServerError('User %s does not exit!' % username)
 
 
 def get_connect_item(username, ip):

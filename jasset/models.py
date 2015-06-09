@@ -47,7 +47,7 @@ class Asset(models.Model):
 
 class AssetAlias(models.Model):
     user = models.ForeignKey(User)
-    host = models.ForeignKey(Asset)
+    asset = models.ForeignKey(Asset)
     alias = models.CharField(max_length=100, blank=True, null=True)
 
     def __unicode__(self):

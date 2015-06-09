@@ -27,8 +27,8 @@ if django.get_version() != '1.6':
     django.setup()
 from juser.models import User
 from jlog.models import Log
-from jumpserver.api import CONF, BASE_DIR, ServerError, user_perm_group_api, user_perm_group_hosts_api, get_user_host
-from jumpserver.api import AssetAlias, get_connect_item
+from jumpserver.api import CONF, BASE_DIR, ServerError, Juser
+from jumpserver.api import AssetAlias, get_connect_item, logger
 
 try:
     import termios
@@ -41,6 +41,7 @@ except ImportError:
 CONF.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
 log_dir = os.path.join(BASE_DIR, 'logs')
 login_name = getpass.getuser()
+user = Juser(username=login_name)
 
 
 def color_print(msg, color='blue'):
@@ -177,52 +178,80 @@ def posix_shell(chan, username, host):
         log.log_finished = False
         log.end_time = datetime.datetime.now()
         log.save()
-        # print_prompt()
 
 
-def get_user_host_group(username):
-    """
-    Get the host groups of under the user control.
-    获取用户有权限的主机组
-    """
-    groups_attr = {}
-    group_all = user_perm_group_api(username)
-    for group in group_all:
-        groups_attr[group.name] = [group.id, group.comment]
-    return groups_attr
+# def get_user_host_group(username):
+#     """
+#     Get the host groups of under the user control.
+#     获取用户有权限的主机组
+#     """
+#     groups_attr = {}
+#     group_all = get_host_groups(username)
+#     for group in group_all:
+#         groups_attr[group.name] = [group.id, group.comment]
+#     return groups_attr
 
 
-def get_host_group_host(username, gid):
-    """
-    Get the host group hosts of under the user control.
-    获取用户有权限主机组下的主机
-    """
-    groups_attr = get_user_host_group(username)
-    groups_ids = [attr[0] for name, attr in groups_attr.items()]
-    hosts_attr = {}
-    if gid in groups_ids:
-        user = User.objects.filter(username=username)
-        if user:
-            user = user[0]
-            hosts = user_perm_group_hosts_api(gid)
-            for host in hosts:
-                alias = AssetAlias.objects.filter(user=user, host=host)
-                if alias and alias[0].alias != '':
-                    hosts_attr[host.ip] = [host.id, host.ip, alias[0].alias]
-                else:
-                    hosts_attr[host.ip] = [host.id, host.ip, host.comment]
-    return hosts_attr
+# def get_user_host_group_member(username, gid):
+#     """
+#     Get the host group hosts of under the user control.
+#     获取用户有权限主机组下的主机
+#     """
+#     groups_attr = get_user_host_group(username)
+#     groups_ids = [attr[0] for name, attr in groups_attr.items()]
+#     hosts_attr = {}
+#     if int(gid) in groups_ids:
+#         user = User.objects.filter(username=username)
+#         if user:
+#             user = user[0]
+#             hosts = get_host_groups(gid)
+#             for host in hosts:
+#                 alias = AssetAlias.objects.filter(user=user, host=host)
+#                 if alias and alias[0].alias != '':
+#                     hosts_attr[host.ip] = [host.id, host.ip, alias[0].alias]
+#                 else:
+#                     hosts_attr[host.ip] = [host.id, host.ip, host.comment]
+#     return hosts_attr
+
+
+# def user_asset_info(user, printable=False):
+#     """
+#     Get or Print asset info
+#     获取或打印用户资产信息
+#     """
+#     assets_info = {}
+#     try:
+#         assets = get_asset(user)
+#     except ServerError, e:
+#         color_print(e, 'red')
+#         return
+#
+#     for asset in assets:
+#         asset_alias = AssetAlias.objects.filter(user=user, asset=asset)
+#         if asset_alias and asset_alias[0].alias != '':
+#             assets_info[asset.ip] = [asset.id, asset.ip, asset_alias[0].alias]
+#         else:
+#             assets_info[asset.ip] = [asset.id, asset.ip, asset.comment]
+#
+#     if printable:
+#         ips = assets_info.keys()
+#         ips.sort()
+#         for ip in ips:
+#             print '%-15s -- %s' % (ip, assets_info[ip][2])
+#         print ''
+#     else:
+#         return assets_info
 
 
 def verify_connect(username, part_ip):
     ip_matched = []
     try:
-        hosts_attr = get_user_host(username)
-        hosts = hosts_attr.values()
+        assets = get_asset(username=username)
     except ServerError, e:
         color_print(e, 'red')
         return False
 
+    assets_info =
     for ip_info in hosts:
         if part_ip in ip_info[1:] and part_ip:
             ip_matched = [ip_info[1]]
@@ -254,29 +283,16 @@ def print_prompt():
     print textwrap.dedent(msg)
 
 
-def print_user_host(username):
-    try:
-        hosts_attr = get_user_host(username)
-    except ServerError, e:
-        color_print(e, 'red')
-        return
-    hosts = hosts_attr.keys()
-    hosts.sort()
-    for ip in hosts:
-        print '%-15s -- %s' % (ip, hosts_attr[ip][2])
-    print ''
+# def print_user_host_group(username):
+#     host_groups = get_host_groups(username)
+#     for host_group in host_groups:
+#         print "[%3s] %s -- %s" % (host_group.id, host_group.ip, host_group.comment)
 
 
-def print_user_hostgroup(username):
-    group_attr = get_user_host_group(username)
-    groups = group_attr.keys()
-    for g in groups:
-        print "[%3s] %s -- %s" % (group_attr[g][0], g, group_attr[g][1])
-
-
-def print_user_hostgroup_host(username, gid):
+def asset_group_member(username, gid):
     pattern = re.compile(r'\d+')
     match = pattern.match(gid)
+
     if match:
         hosts_attr = get_host_group_host(username, gid)
         hosts = hosts_attr.keys()
@@ -397,6 +413,9 @@ def exec_cmd_servers(username):
 
 
 if __name__ == '__main__':
+    if not user.validate():
+        color_print_exit(u'没有该用户 No that user.')
+
     print_prompt()
     gid_pattern = re.compile(r'^g\d+$')
     try:
@@ -409,10 +428,10 @@ if __name__ == '__main__':
             except KeyboardInterrupt:
                 sys.exit(0)
             if option in ['P', 'p']:
-                print_user_host(login_name)
+                user.get_asset_info(printable=True)
                 continue
             elif option in ['G', 'g']:
-                print_user_hostgroup(login_name)
+                user.get_asset_group_info(printable=True)
                 continue
             elif gid_pattern.match(option):
                 gid = option[1:].strip()
