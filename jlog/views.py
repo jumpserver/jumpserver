@@ -76,7 +76,10 @@ def log_kill(request):
         deptname = get_session_user_info(request)[4]
         if is_group_admin(request) and dept_name != deptname:
             return httperror(request, u'Kill失败, 您无权操作!')
-        os.kill(int(pid), 9)
+        try:
+            os.kill(int(pid), 9)
+        except OSError:
+            pass
         Log.objects.filter(pid=pid).update(is_finished=1, end_time=datetime.datetime.now())
         return render_to_response('jlog/log_offline.html', locals(), context_instance=RequestContext(request))
     else:
