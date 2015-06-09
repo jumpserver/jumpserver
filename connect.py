@@ -90,11 +90,8 @@ def log_record(username, host):
     log_file_path = os.path.join(today_connect_log_dir, log_filename)
     dept_name = User.objects.get(username=username).dept.name
     pid = os.getpid()
-    ip_list = []
-    remote_ip = os.popen("who |grep `ps aux |gawk '{if ($2==%s) print $1}'` |gawk '{print $5}'|tr -d '()'" % pid).readlines()
-    for ip in remote_ip:
-        ip_list.append(ip.strip('\n'))
-    ip_list = ','.join(list(set(ip_list)))
+    pts = os.popen("ps axu | grep %s | grep -v grep | awk '{ print $7 }'" % pid).read().strip()
+    ip_list = os.popen("who | grep %s | awk '{ print $5 }'" % pts).read().strip('()\n')
 
     if not os.path.isdir(today_connect_log_dir):
         try:
