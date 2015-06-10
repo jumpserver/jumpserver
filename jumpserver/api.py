@@ -297,6 +297,10 @@ def user_group_perm_asset_group_api(user_group):
 
 
 class Juser(object):
+    """
+    Jumpserver user class
+    用户类
+    """
     def __init__(self, username=None, uid=None):
         if username:
             user = User.objects.filter(username=username)
@@ -427,7 +431,37 @@ class Jasset(object):
 
 
 class JassetGroup(object):
-    pass
+    def __init__(self, id=None, name=None):
+        if id:
+            asset_group = BisGroup.objects.filter(id=int(id))
+        elif name:
+            asset_group = BisGroup.objects.filter(name=name)
+        else:
+            asset_group = ''
+
+        if asset_group:
+            asset_group = asset_group[0]
+            self.asset_group = asset_group
+            self.name = asset_group.name
+            self.id = asset_group.id
+
+    def validate(self):
+        if self.asset_group:
+            return True
+        else:
+            return False
+
+    def get_asset(self):
+        return self.asset_group.asset_set.all()
+
+    def get_asset_info(self, printable=False):
+        assets = self.get_asset()
+        for asset in assets:
+            print '%-15s -- %s' % (asset.ip, asset.comment)
+
+    def get_asset_num(self):
+        return len(self.get_asset())
+
 
 
 

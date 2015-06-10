@@ -27,7 +27,7 @@ if django.get_version() != '1.6':
     django.setup()
 from juser.models import User
 from jlog.models import Log
-from jumpserver.api import CONF, BASE_DIR, ServerError, Juser
+from jumpserver.api import CONF, BASE_DIR, ServerError, Juser, JassetGroup
 from jumpserver.api import AssetAlias, get_connect_item, logger
 
 try:
@@ -244,31 +244,32 @@ def posix_shell(chan, username, host):
 
 
 def verify_connect(username, part_ip):
-    ip_matched = []
-    try:
-        assets = get_asset(username=username)
-    except ServerError, e:
-        color_print(e, 'red')
-        return False
-
-    assets_info =
-    for ip_info in hosts:
-        if part_ip in ip_info[1:] and part_ip:
-            ip_matched = [ip_info[1]]
-            break
-        for info in ip_info[1:]:
-            if part_ip in info:
-                ip_matched.append(ip_info[1])
-
-    ip_matched = list(set(ip_matched))
-    if len(ip_matched) > 1:
-        for ip in ip_matched:
-            print '%-15s -- %s' % (ip, hosts_attr[ip][2])
-    elif len(ip_matched) < 1:
-        color_print('No Permission or No host.', 'red')
-    else:
-        username, password, host, port = get_connect_item(username, ip_matched[0])
-        connect(username, password, host, port, login_name)
+    pass
+    # ip_matched = []
+    # try:
+    #     assets = get_asset(username=username)
+    # except ServerError, e:
+    #     color_print(e, 'red')
+    #     return False
+    #
+    # assets_info =
+    # for ip_info in hosts:
+    #     if part_ip in ip_info[1:] and part_ip:
+    #         ip_matched = [ip_info[1]]
+    #         break
+    #     for info in ip_info[1:]:
+    #         if part_ip in info:
+    #             ip_matched.append(ip_info[1])
+    #
+    # ip_matched = list(set(ip_matched))
+    # if len(ip_matched) > 1:
+    #     for ip in ip_matched:
+    #         print '%-15s -- %s' % (ip, hosts_attr[ip][2])
+    # elif len(ip_matched) < 1:
+    #     color_print('No Permission or No host.', 'red')
+    # else:
+    #     username, password, host, port = get_connect_item(username, ip_matched[0])
+    #     connect(username, password, host, port, login_name)
 
 
 def print_prompt():
@@ -289,18 +290,18 @@ def print_prompt():
 #         print "[%3s] %s -- %s" % (host_group.id, host_group.ip, host_group.comment)
 
 
-def asset_group_member(username, gid):
-    pattern = re.compile(r'\d+')
-    match = pattern.match(gid)
-
-    if match:
-        hosts_attr = get_host_group_host(username, gid)
-        hosts = hosts_attr.keys()
-        hosts.sort()
-        for ip in hosts:
-            print '%-15s -- %s' % (ip, hosts_attr[ip][2])
-    else:
-        color_print('No such group id, Please check it.', 'red')
+# def asset_group_member(username, gid):
+#     pattern = re.compile(r'\d+')
+#     match = pattern.match(gid)
+#
+#     if match:
+#         hosts_attr = get_host_group_host(username, gid)
+#         hosts = hosts_attr.keys()
+#         hosts.sort()
+#         for ip in hosts:
+#             print '%-15s -- %s' % (ip, hosts_attr[ip][2])
+#     else:
+#         color_print('No such group id, Please check it.', 'red')
 
 
 def connect(username, password, host, port, login_name):
@@ -373,13 +374,13 @@ def multi_remote_exec_cmd(hosts, username, cmd):
 
 def exec_cmd_servers(username):
     color_print("You can choose in the following IP(s), Use glob or ips split by comma. q/Q to PreLayer.", 'green')
-    print_user_host(login_name)
+    user.get_asset_info(printable=True)
     while True:
         hosts = []
         inputs = raw_input('\033[1;32mip(s)>: \033[0m')
         if inputs in ['q', 'Q']:
             break
-        get_hosts = get_user_host(username).keys()
+        get_hosts = user.get_asset_info().keys()
 
         if ',' in inputs:
             ips_input = inputs.split(',')
@@ -423,7 +424,7 @@ if __name__ == '__main__':
             try:
                 option = raw_input("\033[1;32mOpt or IP>:\033[0m ")
             except EOFError:
-                print
+                print_prompt()
                 continue
             except KeyboardInterrupt:
                 sys.exit(0)
@@ -435,7 +436,8 @@ if __name__ == '__main__':
                 continue
             elif gid_pattern.match(option):
                 gid = option[1:].strip()
-                print_user_hostgroup_host(login_name, gid)
+                asset_group = JassetGroup(id=gid)
+                asset_group.get_asset_info(printable=True)
                 continue
             elif option in ['E', 'e']:
                 exec_cmd_servers(login_name)
