@@ -550,7 +550,7 @@ def cmd_edit(request):
         cmd_group_id = request.POST.get('cmd_group_id')
         name = request.POST.get('name')
         dept_id = request.POST.get('dept_id')
-        cmd = ','.join(request.POST.get('cmd').split())
+        cmd = ','.join(request.POST.get('cmd').split('\n'))
         comment = request.POST.get('comment')
         cmd_group = CmdGroup.objects.filter(id=cmd_group_id)
 
