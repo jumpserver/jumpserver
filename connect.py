@@ -244,32 +244,37 @@ def posix_shell(chan, username, host):
 
 
 def verify_connect(username, part_ip):
-    pass
-    # ip_matched = []
-    # try:
-    #     assets = get_asset(username=username)
-    # except ServerError, e:
-    #     color_print(e, 'red')
-    #     return False
-    #
-    # assets_info =
-    # for ip_info in hosts:
-    #     if part_ip in ip_info[1:] and part_ip:
-    #         ip_matched = [ip_info[1]]
-    #         break
-    #     for info in ip_info[1:]:
-    #         if part_ip in info:
-    #             ip_matched.append(ip_info[1])
-    #
-    # ip_matched = list(set(ip_matched))
-    # if len(ip_matched) > 1:
-    #     for ip in ip_matched:
-    #         print '%-15s -- %s' % (ip, hosts_attr[ip][2])
-    # elif len(ip_matched) < 1:
-    #     color_print('No Permission or No host.', 'red')
-    # else:
-    #     username, password, host, port = get_connect_item(username, ip_matched[0])
-    #     connect(username, password, host, port, login_name)
+    ip_matched = []
+    try:
+        assets_info = user.get_asset_info()
+    except ServerError, e:
+        color_print(e, 'red')
+        return False
+
+    for ip, asset_info in assets_info.items():
+        if part_ip in asset_info[1:] and part_ip:
+            ip_matched = [asset_info[1]]
+            break
+
+        for info in asset_info[1:]:
+            if part_ip in info:
+                ip_matched.append(ip)
+
+    logger.debug('%s matched input %s: %s' % (user.username, part_ip, ip_matched))
+    ip_matched = list(set(ip_matched))
+
+    if len(ip_matched) > 1:
+        for ip in ip_matched:
+            if assets_info[ip][2]:
+                print '%-15s -- %s' % (ip, assets_info[ip][2])
+            else:
+                print '%-15s' % ip
+            print ''
+    elif len(ip_matched) < 1:
+        color_print('No Permission or No host.', 'red')
+    else:
+        username, password, host, port = get_connect_item(username, ip_matched[0])
+        connect(username, password, host, port, login_name)
 
 
 def print_prompt():
@@ -437,7 +442,8 @@ if __name__ == '__main__':
             elif gid_pattern.match(option):
                 gid = option[1:].strip()
                 asset_group = JassetGroup(id=gid)
-                asset_group.get_asset_info(printable=True)
+                if asset_group.validate():
+                    asset_group.get_asset_info(printable=True)
                 continue
             elif option in ['E', 'e']:
                 exec_cmd_servers(login_name)

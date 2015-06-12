@@ -301,6 +301,7 @@ class Juser(object):
     Jumpserver user class
     用户类
     """
+
     def __init__(self, username=None, uid=None):
         if username:
             user = User.objects.filter(username=username)
@@ -313,16 +314,31 @@ class Juser(object):
             user = user[0]
             self.user = user
             self.id = user.id
-            self.username = user.username
-            self.name = user.name
+            # self.id = user.id
+            # self.username = user.username
+            # self.name = user.name
             self.group = user.group.all()
+        else:
+            self.id = None
+
+    def __repr__(self):
+        if self.id:
+            return '<%s Juser instance>' % getattr(self.user, 'username')
+        else:
+            return 'None'
+
+    def __getattr__(self, item):
+        if self.id:
+            return getattr(self.user, item)
+        else:
+            return None
 
     def validate(self):
         """
         Validate is or not a true user
         鉴定用户
         """
-        if self.user:
+        if self.id:
             return True
         else:
             return False
@@ -362,21 +378,22 @@ class Juser(object):
                                               asset_groups_info[group_id][1])
                 else:
                     print "[%3s] %s" % (group_id, asset_groups_info[group_id][0])
+                print ''
         else:
             return asset_groups_info
 
     def get_asset(self):
         """
-        Get the hosts of under the user control.
+        Get the assets of under the user control.
         获取主机列表
         """
-        hosts = []
-        host_groups = self.get_asset_group()
+        assets = []
+        asset_groups = self.get_asset_group()
 
-        for host_group in host_groups:
-            hosts.extend(get_asset_group_member(host_group.id))
+        for asset_group in asset_groups:
+            assets.extend(asset_group.asset_set.all())
 
-        return hosts
+        return assets
 
     def get_asset_info(self, printable=False):
         """
@@ -389,9 +406,9 @@ class Juser(object):
         for asset in assets:
             asset_alias = AssetAlias.objects.filter(user=self.user, asset=asset)
             if asset_alias and asset_alias[0].alias != '':
-                assets_info[asset.ip] = [asset.id, asset.ip, asset_alias[0].alias]
+                assets_info[asset.ip] = [asset.id, asset.ip, str(asset_alias[0].alias)]
             else:
-                assets_info[asset.ip] = [asset.id, asset.ip, asset.comment]
+                assets_info[asset.ip] = [asset.id, asset.ip, str(asset.comment)]
 
         if printable:
             ips = assets_info.keys()
@@ -407,6 +424,7 @@ class Juser(object):
 
 
 class Jasset(object):
+
     def __init__(self, ip=None, id=None):
         if ip:
             asset = Asset.objects.filter(ip=ip)
@@ -418,20 +436,40 @@ class Jasset(object):
         if asset:
             asset = asset[0]
             self.asset = asset
-            self.ip = asset.ip
             self.id = asset.id
-            self.port = asset.port
-            self.comment = asset.comment
+            # self.ip = asset.ip
+            # self.id = asset.id
+            # self.port = asset.port
+            # self.comment = asset.comment
+        else:
+            self.id = None
+
+    def __repr__(self):
+        if self.id:
+            return '<%s Jasset instance>' % self.asset.ip
+        else:
+            return 'None'
+
+    def __getattr__(self, item):
+        if self.id:
+            return getattr(self.asset, item)
+        else:
+            return None
 
     def validate(self):
-        if self.asset:
+        """
+        Validate is or not a true asset
+        判断是否存在
+        """
+        if self.id:
             return True
         else:
             return False
 
 
 class JassetGroup(object):
-    def __init__(self, id=None, name=None):
+
+    def __init__(self, name=None, id=None):
         if id:
             asset_group = BisGroup.objects.filter(id=int(id))
         elif name:
@@ -442,11 +480,23 @@ class JassetGroup(object):
         if asset_group:
             asset_group = asset_group[0]
             self.asset_group = asset_group
-            self.name = asset_group.name
+            # self.name = asset_group.name
             self.id = asset_group.id
+        else:
+            self.id = None
+
+    def __repr__(self):
+        if self.id:
+            return '<%s JassetGroup instance>' % self.name
+        else:
+            return 'None'
 
     def validate(self):
-        if self.asset_group:
+        """
+        Validate it is a true asset group or not
+        鉴定是否为真是存在的组
+        """
+        if self.id:
             return True
         else:
             return False
@@ -457,12 +507,14 @@ class JassetGroup(object):
     def get_asset_info(self, printable=False):
         assets = self.get_asset()
         for asset in assets:
-            print '%-15s -- %s' % (asset.ip, asset.comment)
+            if asset.comment:
+                print '%-15s -- %s' % (asset.ip, asset.comment)
+            else:
+                print '%-15s' % asset.ip
+        print ''
 
     def get_asset_num(self):
         return len(self.get_asset())
-
-
 
 
 # def get_asset_group(user=None):
@@ -484,18 +536,18 @@ class JassetGroup(object):
 #     return host_group_list
 
 
-def get_asset_group_member(gid):
-    """
-    Get host_group's member host
-    获取主机组下的主机
-    """
-    hosts = []
-    if gid:
-        host_group = BisGroup.objects.filter(id=gid)
-        if host_group:
-            host_group = host_group[0]
-            hosts = host_group.asset_set.all()
-    return hosts
+# def get_asset_group_member(gid):
+#     """
+#     Get host_group's member host
+#     获取主机组下的主机
+#     """
+#     hosts = []
+#     if gid:
+#         host_group = BisGroup.objects.filter(id=gid)
+#         if host_group:
+#             host_group = host_group[0]
+#             hosts = host_group.asset_set.all()
+#     return hosts
 
 
 # def get_asset(user=None):
