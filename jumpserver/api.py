@@ -12,6 +12,7 @@ import ldap
 from ldap import modlist
 import hashlib
 import datetime
+import random
 import subprocess
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
@@ -150,34 +151,57 @@ def pages(posts, r):
 
 
 class PyCrypt(object):
-    """This class used to encrypt and decrypt password."""
+    """
+    This class used to encrypt and decrypt password.
+    对称加密库
+    """
 
     def __init__(self, key):
         self.key = key
         self.mode = AES.MODE_CBC
 
-    def encrypt(self, text):
-        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
-        length = 16
+    def _random_pass(self):
+        """
+        random password
+        随机生成密码
+        """
+        salt_key = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@$%^&*()_'
+        symbol = '!@$%^&*()_'
+        salt_list = []
+        for i in range(60):
+            salt_list.append(random.choice(salt_key))
+        for i in range(4):
+            salt_list.append(random.choice(symbol))
+        salt = ''.join(salt_list)
+        self.salt = salt
+
+    def encrypt(self):
+        """
+        encrypt gen password
+        加密生成密码
+        """
+        cryptor = AES.new(self.key, self.mode, b'8122ca7d906ad5e1')
+        length = 64
         try:
-            count = len(text)
+            count = len(self.salt)
         except TypeError:
-            raise ServerError('Encrypt password error, TYpe error.')
+            # raise ServerError('Encrypt password error, TYpe error.')
+            pass
         add = (length - (count % length))
-        text += ('\0' * add)
-        ciphertext = cryptor.encrypt(text)
-        return b2a_hex(ciphertext)
+        self.salt += ('\0' * add)
+        cipher_text = cryptor.encrypt(self.salt)
+        return b2a_hex(cipher_text)
 
     def decrypt(self, text):
-        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
+        cryptor = AES.new(self.key, self.mode, b'8122ca7d906ad5e1')
         try:
             plain_text = cryptor.decrypt(a2b_hex(text))
         except TypeError:
-            raise ServerError('Decrypt password error, TYpe error.')
+            # raise ServerError('Decrypt password error, TYpe error.')
+            pass
         return plain_text.rstrip('\0')
 
 
-CRYPTOR = PyCrypt(KEY)
 
 
 class ServerError(Exception):
@@ -595,17 +619,15 @@ def asset_perm_api(asset):
         return user_permed_list
 
 
-def get_connect_item(username, ip):
+def get_connect_item(user, ip):
     asset = get_object(Asset, ip=ip)
     port = int(asset.port)
 
     if not asset.is_active:
         raise ServerError('Host %s is not active.' % ip)
 
-    user = get_object(User, username=username)
-
     if not user.is_active:
-        raise ServerError('User %s is not active.' % username)
+        raise ServerError('User %s is not active.' % user.username)
 
     login_type_dict = {
         'L': user.ldap_pwd,
@@ -613,7 +635,7 @@ def get_connect_item(username, ip):
 
     if asset.login_type in login_type_dict:
         password = CRYPTOR.decrypt(login_type_dict[asset.login_type])
-        return username, password, ip, port
+        return user.username, password, ip, port
 
     elif asset.login_type == 'M':
         username = asset.username
@@ -750,3 +772,6 @@ def node_auth(request):
         result = {'auth': {'username': username, 'result': 'failed'}}
 
     return HttpResponse(json.dumps(result, sort_keys=True, indent=2), content_type='application/json')
+
+
+CRYPTOR = PyCrypt(KEY)
