@@ -25,10 +25,9 @@ from multiprocessing import Pool
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
     django.setup()
-from juser.models import User
 from jlog.models import Log
-from jumpserver.api import CONF, BASE_DIR, ServerError, Juser, JassetGroup
-from jumpserver.api import AssetAlias, get_connect_item, logger
+from jumpserver.api import CONF, BASE_DIR, ServerError, Juser, Jasset, JassetGroup
+from jumpserver.api import CRYPTOR, logger, is_dir
 
 try:
     import termios
@@ -63,6 +62,8 @@ class Jtty(object):
         self.chan = chan
         self.username = user.username
         self.ip = asset.ip
+        self.user = user
+        self.asset = asset
 
     @staticmethod
     def get_win_size():
@@ -99,58 +100,51 @@ class Jtty(object):
         date_start = time.strftime('%Y%m%d', time.localtime(timestamp_start))
         time_start = time.strftime('%H%M%S', time.localtime(timestamp_start))
         today_connect_log_dir = os.path.join(tty_log_dir, date_start)
-        log_filename = '%s_%s_%s.log' % (self.username, self.host, time_start)
+        log_filename = '%s_%s_%s.log' % (self.username, self.ip, time_start)
         log_file_path = os.path.join(today_connect_log_dir, log_filename)
-        dept = User.objects.filter(username=username)
-        if dept:
-            dept = dept[0]
-            dept_name = dept.name
-        else:
-            dept_name = 'None'
+        dept_name = self.user.dept.name
 
         pid = os.getpid()
         pts = os.popen("ps axu | grep %s | grep -v grep | awk '{ print $7 }'" % pid).read().strip()
         remote_ip = os.popen("who | grep %s | awk '{ print $5 }'" % pts).read().strip('()\n')
 
-        if not os.path.isdir(today_connect_log_dir):
-            try:
-                os.makedirs(today_connect_log_dir)
-                os.chmod(today_connect_log_dir, 0777)
-            except OSError:
-                raise ServerError('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, connect_log_dir))
+        try:
+            is_dir(today_connect_log_dir)
+        except OSError:
+            raise ServerError('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, tty_log_dir))
 
         try:
             log_file = open(log_file_path, 'a')
         except IOError:
             raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 
-        log = Log(user=username, host=host, remote_ip=remote_ip, dept_name=dept_name,
+        log = Log(user=self.username, host=self.ip, remote_ip=remote_ip, dept_name=dept_name,
                   log_path=log_file_path, start_time=datetime.datetime.now(), pid=pid)
         log_file.write('Start time is %s\n' % datetime.datetime.now())
         log.save()
         return log_file, log
 
-    def posix_shell(chan, username, host):
+    def posix_shell(self):
         """
         Use paramiko channel connect server interactive.
         使用paramiko模块的channel，连接后端，进入交互式
         """
-        log_file, log = log_record(username, host)
+        log_file, log = self.log_record()
         old_tty = termios.tcgetattr(sys.stdin)
         try:
             tty.setraw(sys.stdin.fileno())
             tty.setcbreak(sys.stdin.fileno())
-            chan.settimeout(0.0)
+            self.chan.settimeout(0.0)
 
             while True:
                 try:
-                    r, w, e = select.select([chan, sys.stdin], [], [])
+                    r, w, e = select.select([self.chan, sys.stdin], [], [])
                 except Exception:
                     pass
 
-                if chan in r:
+                if self.chan in r:
                     try:
-                        x = chan.recv(1024)
+                        x = self.chan.recv(1024)
                         if len(x) == 0:
                             break
                         sys.stdout.write(x)
@@ -164,7 +158,7 @@ class Jtty(object):
                     x = os.read(sys.stdin.fileno(), 1)
                     if len(x) == 0:
                         break
-                    chan.send(x)
+                    self.chan.send(x)
 
         finally:
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)
@@ -175,8 +169,72 @@ class Jtty(object):
             log.end_time = datetime.datetime.now()
             log.save()
 
+    def get_connect_item(self):
+        port = int(self.asset.port)
 
-def verify_connect(username, part_ip):
+        if not self.asset.is_active:
+            raise ServerError('Host %s is not active.' % self.ip)
+
+        if not self.user.is_active:
+            raise ServerError('User %s is not active.' % self.username)
+
+        login_type_dict = {
+            'L': self.user.ldap_pwd,
+        }
+
+        if self.asset.login_type in login_type_dict:
+            password = CRYPTOR.decrypt(login_type_dict[self.asset.login_type])
+            return self.username, password, self.ip, port
+
+        elif self.asset.login_type == 'M':
+            username = self.asset.username
+            password = CRYPTOR.decrypt(self.asset.password)
+            return username, password, self.ip, port
+
+        else:
+            raise ServerError('Login type is not in ["L", "M"]')
+
+    def connect(self):
+        """
+        Connect server.
+        """
+        username, password, ip, port = self.get_connect_item()
+        ps1 = "PS1='[\u@%s \W]\$ '\n" % self.ip
+        login_msg = "clear;echo -e '\\033[32mLogin %s done. Enjoy it.\\033[0m'\n" % self.ip
+
+        # Make a ssh connection
+        ssh = paramiko.SSHClient()
+        ssh.load_system_host_keys()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        try:
+            ssh.connect(ip, port=port, username=username, password=password, compress=True)
+        except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
+            raise ServerError('Authentication Error.')
+        except socket.error:
+            raise ServerError('Connect SSH Socket Port Error, Please Correct it.')
+
+        # Make a channel and set windows size
+        global channel
+        win_size = self.get_win_size()
+        channel = ssh.invoke_shell(height=win_size[0], width=win_size[1])
+        try:
+            signal.signal(signal.SIGWINCH, self.set_win_size)
+        except:
+            pass
+
+        # Set PS1 and msg it
+        channel.send(ps1)
+        channel.send(login_msg)
+
+        # Make ssh interactive tunnel
+        self.posix_shell()
+
+        # Shutdown channel socket
+        channel.close()
+        ssh.close()
+
+
+def verify_connect(user, option):
     ip_matched = []
     try:
         assets_info = login_user.get_asset_info()
@@ -185,15 +243,15 @@ def verify_connect(username, part_ip):
         return False
 
     for ip, asset_info in assets_info.items():
-        if part_ip in asset_info[1:] and part_ip:
+        if option in asset_info[1:] and option:
             ip_matched = [asset_info[1]]
             break
 
         for info in asset_info[1:]:
-            if part_ip in info:
+            if option in info:
                 ip_matched.append(ip)
 
-    logger.debug('%s matched input %s: %s' % (login_user.username, part_ip, ip_matched))
+    logger.debug('%s matched input %s: %s' % (login_user.username, option, ip_matched))
     ip_matched = list(set(ip_matched))
 
     if len(ip_matched) > 1:
@@ -206,8 +264,8 @@ def verify_connect(username, part_ip):
     elif len(ip_matched) < 1:
         color_print('No Permission or No host.', 'red')
     else:
-        username, password, host, port = get_connect_item(username, ip_matched[0])
-        connect(username, password, host, port, login_name)
+        asset = Jasset(ip=ip_matched[0])
+        jtty = Jtty(chan, user, )
 
 
 def print_prompt():
@@ -242,113 +300,74 @@ def print_prompt():
 #         color_print('No such group id, Please check it.', 'red')
 
 
-def connect(username, password, host, port, login_name):
-    """
-    Connect server.
-    """
-    ps1 = "PS1='[\u@%s \W]\$ '\n" % host
-    login_msg = "clear;echo -e '\\033[32mLogin %s done. Enjoy it.\\033[0m'\n" % host
-
-    # Make a ssh connection
-    ssh = paramiko.SSHClient()
-    ssh.load_system_host_keys()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-    try:
-        ssh.connect(host, port=port, username=username, password=password, compress=True)
-    except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
-        raise ServerError('Authentication Error.')
-    except socket.error:
-        raise ServerError('Connect SSH Socket Port Error, Please Correct it.')
-
-    # Make a channel and set windows size
-    global channel
-    win_size = get_win_size()
-    channel = ssh.invoke_shell(height=win_size[0], width=win_size[1])
-    try:
-        signal.signal(signal.SIGWINCH, set_win_size)
-    except:
-        pass
-
-    # Set PS1 and msg it
-    channel.send(ps1)
-    channel.send(login_msg)
-
-    # Make ssh interactive tunnel
-    posix_shell(channel, login_name, host)
-
-    # Shutdown channel socket
-    channel.close()
-    ssh.close()
+# def remote_exec_cmd(ip, port, username, password, cmd):
+#     try:
+#         time.sleep(5)
+#         ssh = paramiko.SSHClient()
+#         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+#         ssh.connect(ip, port, username, password, timeout=5)
+#         stdin, stdout, stderr = ssh.exec_command("bash -l -c '%s'" % cmd)
+#         out = stdout.readlines()
+#         err = stderr.readlines()
+#         color_print('%s:' % ip, 'blue')
+#         for i in out:
+#             color_print(" " * 4 + i.strip(), 'green')
+#         for j in err:
+#             color_print(" " * 4 + j.strip(), 'red')
+#         ssh.close()
+#     except Exception as e:
+#         color_print(ip + ':', 'blue')
+#         color_print(str(e), 'red')
 
 
-def remote_exec_cmd(ip, port, username, password, cmd):
-    try:
-        time.sleep(5)
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(ip, port, username, password, timeout=5)
-        stdin, stdout, stderr = ssh.exec_command("bash -l -c '%s'" % cmd)
-        out = stdout.readlines()
-        err = stderr.readlines()
-        color_print('%s:' % ip, 'blue')
-        for i in out:
-            color_print(" " * 4 + i.strip(), 'green')
-        for j in err:
-            color_print(" " * 4 + j.strip(), 'red')
-        ssh.close()
-    except Exception as e:
-        color_print(ip + ':', 'blue')
-        color_print(str(e), 'red')
+# def multi_remote_exec_cmd(hosts, username, cmd):
+#     pool = Pool(processes=5)
+#     for host in hosts:
+#         username, password, ip, port = get_connect_item(username, host)
+#         pool.apply_async(remote_exec_cmd, (ip, port, username, password, cmd))
+#     pool.close()
+#     pool.join()
 
 
-def multi_remote_exec_cmd(hosts, username, cmd):
-    pool = Pool(processes=5)
-    for host in hosts:
-        username, password, ip, port = get_connect_item(username, host)
-        pool.apply_async(remote_exec_cmd, (ip, port, username, password, cmd))
-    pool.close()
-    pool.join()
-
-
-def exec_cmd_servers(username):
-    color_print("You can choose in the following IP(s), Use glob or ips split by comma. q/Q to PreLayer.", 'green')
-    user.get_asset_info(printable=True)
-    while True:
-        hosts = []
-        inputs = raw_input('\033[1;32mip(s)>: \033[0m')
-        if inputs in ['q', 'Q']:
-            break
-        get_hosts = login_user.get_asset_info().keys()
-
-        if ',' in inputs:
-            ips_input = inputs.split(',')
-            for host in ips_input:
-                if host in get_hosts:
-                    hosts.append(host)
-        else:
-            for host in get_hosts:
-                if fnmatch.fnmatch(host, inputs):
-                    hosts.append(host.strip())
-
-        if len(hosts) == 0:
-            color_print("Check again, Not matched any ip!", 'red')
-            continue
-        else:
-            print "You matched ip: %s" % hosts
-        color_print("Input the Command , The command will be Execute on servers, q/Q to quit.", 'green')
-        while True:
-            cmd = raw_input('\033[1;32mCmd(s): \033[0m')
-            if cmd in ['q', 'Q']:
-                break
-            exec_log_dir = os.path.join(log_dir, 'exec_cmds')
-            if not os.path.isdir(exec_log_dir):
-                os.mkdir(exec_log_dir)
-                os.chmod(exec_log_dir, 0777)
-            filename = "%s/%s.log" % (exec_log_dir, time.strftime('%Y%m%d'))
-            f = open(filename, 'a')
-            f.write("DateTime: %s User: %s Host: %s Cmds: %s\n" %
-                    (time.strftime('%Y/%m/%d %H:%M:%S'), username, hosts, cmd))
-            multi_remote_exec_cmd(hosts, username, cmd)
+# def exec_cmd_servers(username):
+#     color_print("You can choose in the following IP(s), Use glob or ips split by comma. q/Q to PreLayer.", 'green')
+#     user.get_asset_info(printable=True)
+#     while True:
+#         hosts = []
+#         inputs = raw_input('\033[1;32mip(s)>: \033[0m')
+#         if inputs in ['q', 'Q']:
+#             break
+#         get_hosts = login_user.get_asset_info().keys()
+#
+#         if ',' in inputs:
+#             ips_input = inputs.split(',')
+#             for host in ips_input:
+#                 if host in get_hosts:
+#                     hosts.append(host)
+#         else:
+#             for host in get_hosts:
+#                 if fnmatch.fnmatch(host, inputs):
+#                     hosts.append(host.strip())
+#
+#         if len(hosts) == 0:
+#             color_print("Check again, Not matched any ip!", 'red')
+#             continue
+#         else:
+#             print "You matched ip: %s" % hosts
+#         color_print("Input the Command , The command will be Execute on servers, q/Q to quit.", 'green')
+#         while True:
+#             cmd = raw_input('\033[1;32mCmd(s): \033[0m')
+#             if cmd in ['q', 'Q']:
+#                 break
+#             exec_log_dir = os.path.join(log_dir, 'exec_cmds')
+#             if not os.path.isdir(exec_log_dir):
+#                 os.mkdir(exec_log_dir)
+#                 os.chmod(exec_log_dir, 0777)
+#             filename = "%s/%s.log" % (exec_log_dir, time.strftime('%Y%m%d'))
+#             f = open(filename, 'a')
+#             f.write("DateTime: %s User: %s Host: %s Cmds: %s\n" %
+#                     (time.strftime('%Y/%m/%d %H:%M:%S'), username, hosts, cmd))
+#             multi_remote_exec_cmd(hosts, username, cmd)
 
 
 if __name__ == '__main__':
@@ -379,12 +398,13 @@ if __name__ == '__main__':
                     asset_group.get_asset_info(printable=True)
                 continue
             elif option in ['E', 'e']:
-                exec_cmd_servers(login_name)
+                # exec_cmd_servers(login_name)
+                pass
             elif option in ['Q', 'q', 'exit']:
                 sys.exit()
             else:
                 try:
-                    verify_connect(login_name, option)
+                    verify_connect(login_user, option)
                 except ServerError, e:
                     color_print(e, 'red')
     except IndexError:

@@ -259,7 +259,7 @@ def install(request):
 
     User(id=5000, username="admin", password=md5_crypt('admin'),
          name='admin', email='admin@jumpserver.org', role='SU', is_active=True, dept=dept).save()
-    return success(request, u'Jumpserver初始化成功')
+    return http_success(request, u'Jumpserver初始化成功')
 
 
 def download(request):
@@ -327,3 +327,21 @@ def upload(request):
         return HttpResponse('传送成功')
 
     return render_to_response('upload.html', locals(), context_instance=RequestContext(request))
+
+
+def node_auth(request):
+    username = request.POST.get('username', ' ')
+    seed = request.POST.get('seed', ' ')
+    filename = request.POST.get('filename', ' ')
+    user = User.objects.filter(username=username, password=seed)
+    auth = 1
+    if not user:
+        auth = 0
+    if not filename.startswith('/opt/jumpserver/logs/connect/'):
+        auth = 0
+    if auth:
+        result = {'auth': {'username': username, 'result': 'success'}}
+    else:
+        result = {'auth': {'username': username, 'result': 'failed'}}
+
+    return HttpResponse(json.dumps(result, sort_keys=True, indent=2), content_type='application/json')

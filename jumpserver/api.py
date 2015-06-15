@@ -101,20 +101,6 @@ class LDAPMgmt():
             print e
 
 
-if LDAP_ENABLE:
-    LDAP_HOST_URL = CONF.get('ldap', 'host_url')
-    LDAP_BASE_DN = CONF.get('ldap', 'base_dn')
-    LDAP_ROOT_DN = CONF.get('ldap', 'root_dn')
-    LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
-    ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
-else:
-    ldap_conn = None
-
-
-def md5_crypt(string):
-    return hashlib.new("md5", string).hexdigest()
-
-
 def page_list_return(total, current=1):
     min_page = current - 2 if current - 4 > 0 else 1
     max_page = min_page + 4 if min_page + 4 < total else total
@@ -160,7 +146,8 @@ class PyCrypt(object):
         self.key = key
         self.mode = AES.MODE_CBC
 
-    def _random_pass(self):
+    @staticmethod
+    def random_pass():
         """
         random password
         随机生成密码
@@ -173,23 +160,30 @@ class PyCrypt(object):
         for i in range(4):
             salt_list.append(random.choice(symbol))
         salt = ''.join(salt_list)
-        self.salt = salt
+        return salt
 
-    def encrypt(self):
+    @staticmethod
+    def md5_crypt(string):
+        return hashlib.new("md5", string).hexdigest()
+
+    def encrypt(self, passwd=None):
         """
         encrypt gen password
         加密生成密码
         """
+        if not passwd:
+            passwd = self.random_pass()
+
         cryptor = AES.new(self.key, self.mode, b'8122ca7d906ad5e1')
         length = 64
         try:
-            count = len(self.salt)
+            count = len(passwd)
         except TypeError:
-            # raise ServerError('Encrypt password error, TYpe error.')
-            pass
+            raise ServerError('Encrypt password error, TYpe error.')
+
         add = (length - (count % length))
-        self.salt += ('\0' * add)
-        cipher_text = cryptor.encrypt(self.salt)
+        passwd += ('\0' * add)
+        cipher_text = cryptor.encrypt(passwd)
         return b2a_hex(cipher_text)
 
     def decrypt(self, text):
@@ -200,8 +194,6 @@ class PyCrypt(object):
             # raise ServerError('Decrypt password error, TYpe error.')
             pass
         return plain_text.rstrip('\0')
-
-
 
 
 class ServerError(Exception):
@@ -490,6 +482,22 @@ class Jasset(object):
         else:
             return False
 
+    def get__user(self):
+        perm_list = []
+        asset_group_all = self.asset.bis_group.all()
+        for asset_group in asset_group_all:
+            perm_list.extend(asset_group.perm_set.all())
+
+        user_group_list = []
+        for perm in perm_list:
+            user_group_list.append(perm.user_group)
+
+        user_permed_list = []
+        for user_group in user_group_list:
+            user_permed_list.extend(user_group.user_set.all())
+        user_permed_list = list(set(user_permed_list))
+        return user_permed_list
+
 
 class JassetGroup(object):
 
@@ -541,109 +549,22 @@ class JassetGroup(object):
         return len(self.get_asset())
 
 
-# def get_asset_group(user=None):
-#     """
-#     Get user host_groups.
-#     获取用户有权限的主机组
-#     """
-#     host_group_list = []
-#     if user:
-#         user = user[0]
+# def asset_perm_api(asset):
+#     if asset:
 #         perm_list = []
-#         user_group_all = user.group.all()
-#         for user_group in user_group_all:
-#             perm_list.extend(user_group.perm_set.all())
+#         asset_group_all = asset.bis_group.all()
+#         for asset_group in asset_group_all:
+#             perm_list.extend(asset_group.perm_set.all())
 #
-#         host_group_list = []
+#         user_group_list = []
 #         for perm in perm_list:
-#             host_group_list.append(perm.asset_group)
-#     return host_group_list
-
-
-# def get_asset_group_member(gid):
-#     """
-#     Get host_group's member host
-#     获取主机组下的主机
-#     """
-#     hosts = []
-#     if gid:
-#         host_group = BisGroup.objects.filter(id=gid)
-#         if host_group:
-#             host_group = host_group[0]
-#             hosts = host_group.asset_set.all()
-#     return hosts
-
-
-# def get_asset(user=None):
-#     """
-#     Get the hosts of under the user control.
-#     获取主机列表
-#     """
-#     hosts = []
-#     if user:
-#         host_groups = get_asset_group(user)
-#         for host_group in host_groups:
-#             hosts.extend(get_asset_group_member(host_group.id))
-#     return hosts
-
-
-# def user_perm_asset_api(username):
-#     user = User.objects.filter(username=username)
-#     if user:
-#         user = user[0]
-#         asset_list = []
-#         asset_group_list = user_perm_group_api(user)
-#         for asset_group in asset_group_list:
-#             asset_list.extend(asset_group.asset_set.all())
-#         asset_list = list(set(asset_list))
-#         return asset_list
-#     else:
-#         return []
-
-
-def asset_perm_api(asset):
-    if asset:
-        perm_list = []
-        asset_group_all = asset.bis_group.all()
-        for asset_group in asset_group_all:
-            perm_list.extend(asset_group.perm_set.all())
-
-        user_group_list = []
-        for perm in perm_list:
-            user_group_list.append(perm.user_group)
-
-        user_permed_list = []
-        for user_group in user_group_list:
-            user_permed_list.extend(user_group.user_set.all())
-        user_permed_list = list(set(user_permed_list))
-        return user_permed_list
-
-
-def get_connect_item(user, ip):
-    asset = get_object(Asset, ip=ip)
-    port = int(asset.port)
-
-    if not asset.is_active:
-        raise ServerError('Host %s is not active.' % ip)
-
-    if not user.is_active:
-        raise ServerError('User %s is not active.' % user.username)
-
-    login_type_dict = {
-        'L': user.ldap_pwd,
-    }
-
-    if asset.login_type in login_type_dict:
-        password = CRYPTOR.decrypt(login_type_dict[asset.login_type])
-        return user.username, password, ip, port
-
-    elif asset.login_type == 'M':
-        username = asset.username
-        password = CRYPTOR.decrypt(asset.password)
-        return username, password, ip, port
-
-    else:
-        raise ServerError('Login type is not in ["L", "M"]')
+#             user_group_list.append(perm.user_group)
+#
+#         user_permed_list = []
+#         for user_group in user_group_list:
+#             user_permed_list.extend(user_group.user_set.all())
+#         user_permed_list = list(set(user_permed_list))
+#         return user_permed_list
 
 
 def validate(request, user_group=None, user=None, asset_group=None, asset=None, edept=None):
@@ -747,31 +668,23 @@ def is_dir(dir_name, username='root', mode=0755):
     os.chmod(dir_name, mode)
 
 
-def success(request, msg):
+def http_success(request, msg):
     return render_to_response('success.html', locals())
 
 
-def httperror(request, emg):
+def http_error(request, emg):
     message = emg
     return render_to_response('error.html', locals())
 
 
-def node_auth(request):
-    username = request.POST.get('username', ' ')
-    seed = request.POST.get('seed', ' ')
-    filename = request.POST.get('filename', ' ')
-    user = User.objects.filter(username=username, password=seed)
-    auth = 1
-    if not user:
-        auth = 0
-    if not filename.startswith('/opt/jumpserver/logs/connect/'):
-        auth = 0
-    if auth:
-        result = {'auth': {'username': username, 'result': 'success'}}
-    else:
-        result = {'auth': {'username': username, 'result': 'failed'}}
-
-    return HttpResponse(json.dumps(result, sort_keys=True, indent=2), content_type='application/json')
-
-
 CRYPTOR = PyCrypt(KEY)
+
+if LDAP_ENABLE:
+    LDAP_HOST_URL = CONF.get('ldap', 'host_url')
+    LDAP_BASE_DN = CONF.get('ldap', 'base_dn')
+    LDAP_ROOT_DN = CONF.get('ldap', 'root_dn')
+    LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
+    ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
+else:
+    ldap_conn = None
+
