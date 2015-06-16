@@ -58,8 +58,8 @@ def color_print(msg, color='red', exits=False):
 
 
 class Jtty(object):
-    def __init__(self, chan, user, asset):
-        self.chan = chan
+    def __init__(self, user, asset):
+        self.chan = None
         self.username = user.username
         self.ip = asset.ip
         self.user = user
@@ -86,7 +86,7 @@ class Jtty(object):
         """
         try:
             win_size = self.get_win_size()
-            self.channel.resize_pty(height=win_size[0], width=win_size[1])
+            self.chan.resize_pty(height=win_size[0], width=win_size[1])
         except Exception:
             pass
 
@@ -199,6 +199,7 @@ class Jtty(object):
         Connect server.
         """
         username, password, ip, port = self.get_connect_item()
+        logger.debug("username: %s, password: %s, ip: %s, port: %s" % (username, password, ip, port))
         ps1 = "PS1='[\u@%s \W]\$ '\n" % self.ip
         login_msg = "clear;echo -e '\\033[32mLogin %s done. Enjoy it.\\033[0m'\n" % self.ip
 
@@ -216,7 +217,7 @@ class Jtty(object):
         # Make a channel and set windows size
         global channel
         win_size = self.get_win_size()
-        channel = ssh.invoke_shell(height=win_size[0], width=win_size[1])
+        self.chan = channel = ssh.invoke_shell(height=win_size[0], width=win_size[1])
         try:
             signal.signal(signal.SIGWINCH, self.set_win_size)
         except:
@@ -264,8 +265,9 @@ def verify_connect(user, option):
     elif len(ip_matched) < 1:
         color_print('No Permission or No host.', 'red')
     else:
-        asset = Jasset(ip=ip_matched[0])
-        jtty = Jtty(chan, user, )
+        asset = Jasset(ip=ip_matched[0]).asset
+        jtty = Jtty(user, asset)
+        jtty.connect()
 
 
 def print_prompt():
@@ -278,26 +280,6 @@ def print_prompt():
     6) Type \033[32mQ/q\033[0m To Quit.
     """
     print textwrap.dedent(msg)
-
-
-# def print_user_host_group(username):
-#     host_groups = get_host_groups(username)
-#     for host_group in host_groups:
-#         print "[%3s] %s -- %s" % (host_group.id, host_group.ip, host_group.comment)
-
-
-# def asset_group_member(username, gid):
-#     pattern = re.compile(r'\d+')
-#     match = pattern.match(gid)
-#
-#     if match:
-#         hosts_attr = get_host_group_host(username, gid)
-#         hosts = hosts_attr.keys()
-#         hosts.sort()
-#         for ip in hosts:
-#             print '%-15s -- %s' % (ip, hosts_attr[ip][2])
-#     else:
-#         color_print('No such group id, Please check it.', 'red')
 
 
 # def remote_exec_cmd(ip, port, username, password, cmd):
@@ -394,7 +376,7 @@ if __name__ == '__main__':
             elif gid_pattern.match(option):
                 gid = option[1:].strip()
                 asset_group = JassetGroup(id=gid)
-                if asset_group.validate():
+                if asset_group.validate() and asset_group.is_permed(user=login_user.user):
                     asset_group.get_asset_info(printable=True)
                 continue
             elif option in ['E', 'e']:

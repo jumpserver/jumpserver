@@ -440,7 +440,10 @@ class Juser(object):
 
 
 class Jasset(object):
-
+    """
+    Jumpserver asset class
+    Jumpserver资产类
+    """
     def __init__(self, ip=None, id=None):
         if ip:
             asset = Asset.objects.filter(ip=ip)
@@ -453,10 +456,6 @@ class Jasset(object):
             asset = asset[0]
             self.asset = asset
             self.id = asset.id
-            # self.ip = asset.ip
-            # self.id = asset.id
-            # self.port = asset.port
-            # self.comment = asset.comment
         else:
             self.id = None
 
@@ -482,7 +481,7 @@ class Jasset(object):
         else:
             return False
 
-    def get__user(self):
+    def get_user(self):
         perm_list = []
         asset_group_all = self.asset.bis_group.all()
         for asset_group in asset_group_all:
@@ -500,7 +499,10 @@ class Jasset(object):
 
 
 class JassetGroup(object):
-
+    """
+    Jumpserver AssetGroup class
+    Jumpserver 资产组类
+    """
     def __init__(self, name=None, id=None):
         if id:
             asset_group = BisGroup.objects.filter(id=int(id))
@@ -547,6 +549,30 @@ class JassetGroup(object):
 
     def get_asset_num(self):
         return len(self.get_asset())
+
+    def get_user_group(self):
+        perm_list = self.asset_group.perm_set.all()
+        user_group_list = []
+        for perm in perm_list:
+            user_group_list.append(perm.user_group)
+        return user_group_list
+
+    def get_user(self):
+        user_list = []
+        user_group_list = self.get_user_group()
+        for user_group in user_group_list:
+            user_list.extend(user_group.user_set.all())
+        return user_list
+
+    def is_permed(self, user=None, user_group=None):
+        if user:
+            if user in self.get_user():
+                return True
+
+        if user_group:
+            if user_group in self.get_user_group():
+                return True
+        return False
 
 
 # def asset_perm_api(asset):
