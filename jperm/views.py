@@ -484,7 +484,7 @@ def cmd_add(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         dept_id = request.POST.get('dept_id')
-        cmd = ','.join(request.POST.get('cmd').split('\n'))
+        cmd = ','.join(request.POST.get('cmd').splitlines())
         comment = request.POST.get('comment')
         dept = DEPT.objects.filter(id=dept_id)
 
@@ -514,7 +514,7 @@ def cmd_add_adm(request):
 
     if request.method == 'POST':
         name = request.POST.get('name')
-        cmd = ','.join(request.POST.get('cmd').split('\n'))
+        cmd = ','.join(request.POST.get('cmd').splitlines())
         comment = request.POST.get('comment')
 
         try:
@@ -552,7 +552,7 @@ def cmd_edit(request):
         cmd_group_id = request.POST.get('cmd_group_id')
         name = request.POST.get('name')
         dept_id = request.POST.get('dept_id')
-        cmd = ','.join(request.POST.get('cmd').split('\n'))
+        cmd = ','.join(request.POST.get('cmd').splitlines())
         comment = request.POST.get('comment')
         cmd_group = CmdGroup.objects.filter(id=cmd_group_id)
 
