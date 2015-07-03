@@ -266,7 +266,7 @@ def sudo_ldap_add(user_group, user_runas, asset_groups_select,
                   cmd_groups_select):
     if not LDAP_ENABLE:
         return True
-    
+
     assets = []
     cmds = []
     user_runas = user_runas.split(',')
@@ -749,7 +749,7 @@ def perm_apply_log(request, offset):
     header_title, path1, path2 = u'权限申请记录', u'权限管理', u'申请记录'
     keyword = request.GET.get('keyword', '')
     user_id = get_session_user_info(request)[0]
-    username = User.objects.get(id=user_id).name
+    username = User.objects.get(id=user_id).username
     dept_name = get_session_user_info(request)[4]
     status_dic = {'online': 0, 'offline': 1}
     status = status_dic[offset]
