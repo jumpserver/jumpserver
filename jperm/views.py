@@ -264,8 +264,10 @@ def unicode2str(unicode_list):
 
 def sudo_ldap_add(user_group, user_runas, asset_groups_select,
                   cmd_groups_select):
-    if not LDAP_ENABLE:
-        return True
+    if LDAP_ENABLE:
+        ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
+    else:
+        return
     
     assets = []
     cmds = []

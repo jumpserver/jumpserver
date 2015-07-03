@@ -101,9 +101,6 @@ if LDAP_ENABLE:
     LDAP_BASE_DN = CONF.get('ldap', 'base_dn')
     LDAP_ROOT_DN = CONF.get('ldap', 'root_dn')
     LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
-    ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
-else:
-    ldap_conn = None
 
 
 def md5_crypt(string):

@@ -123,6 +123,10 @@ def server_del_user(username):
 
 
 def ldap_add_user(username, ldap_pwd):
+    if LDAP_ENABLE:
+        ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
+    else:
+        return
     user_dn = "uid=%s,ou=People,%s" % (username, LDAP_BASE_DN)
     password_sha512 = gen_sha512(gen_rand_pwd(6), ldap_pwd)
     user = User.objects.filter(username=username)
@@ -155,6 +159,10 @@ def ldap_add_user(username, ldap_pwd):
 
 
 def ldap_del_user(username):
+    if LDAP_ENABLE:
+        ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
+    else:
+        return
     user_dn = "uid=%s,ou=People,%s" % (username, LDAP_BASE_DN)
     group_dn = "cn=%s,ou=Group,%s" % (username, LDAP_BASE_DN)
     sudo_dn = 'cn=%s,ou=Sudoers,%s' % (username, LDAP_BASE_DN)
