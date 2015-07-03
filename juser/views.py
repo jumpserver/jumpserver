@@ -6,15 +6,18 @@ import random
 from Crypto.PublicKey import RSA
 import crypt
 
-from django.shortcuts import render_to_response
 from django.db.models import Q
 from django.template import RequestContext
+from django.db.models import ObjectDoesNotExist
 
 from jumpserver.api import *
 
 
 def gen_rand_pwd(num):
-    """生成随机密码"""
+    """
+    generate random password
+    生成随机密码
+    """
     seed = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     salt_list = []
     for i in range(num):
@@ -23,24 +26,24 @@ def gen_rand_pwd(num):
     return salt
 
 
-class AddError(Exception):
-    pass
-
-
 def gen_sha512(salt, password):
+    """
+    generate sha512 format password
+    生成sha512加密密码
+    """
     return crypt.crypt(password, '$6$%s$' % salt)
 
 
 def group_add_user(group, user_id=None, username=None):
-    try:
-        if user_id:
-            user = User.objects.get(id=user_id)
-        else:
-            user = User.objects.get(username=username)
-    except ObjectDoesNotExist:
-        raise AddError('用户获取失败')
+    """
+    用户组中添加用户
+    UserGroup Add a user
+    """
+    if user_id:
+        user = get_object(User, id=user_id)
     else:
-        group.user_set.add(user)
+        user = get_object(User, username=username)
+    group.user_set.add(user)
 
 
 def db_add_group(**kwargs):
@@ -48,7 +51,7 @@ def db_add_group(**kwargs):
     group = UserGroup.objects.filter(name=name)
     users = kwargs.pop('users')
     if group:
-        raise AddError(u'用户组 %s 已经存在' % name)
+        raise ServerError(u'用户组 %s 已经存在' % name)
     group = UserGroup(**kwargs)
     group.save()
     for user_id in users:
@@ -129,7 +132,7 @@ def ldap_add_user(username, ldap_pwd):
     if user:
         user = user[0]
     else:
-        raise AddError(u'用户 %s 不存在' % username)
+        raise ServerError(u'用户 %s 不存在' % username)
 
     user_attr = {'uid': [str(username)],
                  'cn': [str(username)],
@@ -173,10 +176,10 @@ def dept_add(request):
 
         try:
             if not name:
-                raise AddError('部门名称不能为空')
+                raise ServerError('部门名称不能为空')
             if DEPT.objects.filter(name=name):
-                raise AddError(u'部门名称 %s 已存在' % name)
-        except AddError, e:
+                raise ServerError(u'部门名称 %s 已存在' % name)
+        except ServerError, e:
             error = e
         else:
             DEPT(name=name, comment=comment).save()
@@ -341,21 +344,21 @@ def group_add(request):
         try:
             if '' in [group_name, dept_id]:
                 error = u'组名 或 部门 不能为空'
-                raise AddError(error)
+                raise ServerError(error)
 
             if UserGroup.objects.filter(name=group_name):
                 error = u'组名已存在'
-                raise AddError(error)
+                raise ServerError(error)
 
             dept = DEPT.objects.filter(id=dept_id)
             if dept:
                 dept = dept[0]
             else:
                 error = u'部门不存在'
-                raise AddError(error)
+                raise ServerError(error)
 
             db_add_group(name=group_name, users=users_selected, dept=dept, comment=comment)
-        except AddError:
+        except ServerError:
             pass
         except TypeError:
             error = u'保存小组失败'
@@ -380,13 +383,13 @@ def group_add_adm(request):
 
         try:
             if not validate(request, user=users_selected):
-                raise AddError('没有某用户权限')
+                raise ServerError('没有某用户权限')
             if '' in [group_name]:
                 error = u'组名不能为空'
-                raise AddError(error)
+                raise ServerError(error)
 
             db_add_group(name=group_name, users=users_selected, dept=dept, comment=comment)
-        except AddError:
+        except ServerError:
             pass
         except TypeError:
             error = u'保存小组失败'
@@ -509,12 +512,12 @@ def group_edit(request):
         users = []
         try:
             if '' in [group_id, group_name]:
-                raise AddError('组名不能为空')
+                raise ServerError('组名不能为空')
             dept = DEPT.objects.filter(id=dept_id)
             if dept:
                 dept = dept[0]
             else:
-                raise AddError('部门不存在')
+                raise ServerError('部门不存在')
             for user_id in users_selected:
                 users.extend(User.objects.filter(id=user_id))
 
@@ -525,7 +528,7 @@ def group_edit(request):
                 user_group.user_set.clear()
                 user_group.user_set = users
 
-        except AddError, e:
+        except ServerError, e:
             error = e
 
         return HttpResponseRedirect('/juser/group_list/')
@@ -558,10 +561,10 @@ def group_edit_adm(request):
         users = []
         try:
             if not validate(request, user=users_selected):
-                raise AddError(u'右侧非部门用户')
+                raise ServerError(u'右侧非部门用户')
 
             if not validate(request, user_group=[group_id]):
-                raise AddError(u'没有权限修改本组')
+                raise ServerError(u'没有权限修改本组')
 
             for user_id in users_selected:
                 users.extend(User.objects.filter(id=user_id))
@@ -573,7 +576,7 @@ def group_edit_adm(request):
                 user_group.user_set.clear()
                 user_group.user_set = users
 
-        except AddError, e:
+        except ServerError, e:
             error = e
 
         return HttpResponseRedirect('/juser/group_list/')
@@ -603,28 +606,28 @@ def user_add(request):
         try:
             if '' in [username, password, ssh_key_pwd, name, groups, role_post, is_active]:
                 error = u'带*内容不能为空'
-                raise AddError
+                raise ServerError
             user = User.objects.filter(username=username)
             if user:
                 error = u'用户 %s 已存在' % username
-                raise AddError
+                raise ServerError
 
             dept = DEPT.objects.filter(id=dept_id)
             if dept:
                 dept = dept[0]
             else:
                 error = u'部门不存在'
-                raise AddError(error)
+                raise ServerError(error)
 
-        except AddError:
+        except ServerError:
             pass
         else:
             try:
                 user = db_add_user(username=username,
-                                   password=md5_crypt(password),
+                                   password=CRYPTOR.md5_crypt(password),
                                    name=name, email=email, dept=dept,
                                    groups=groups, role=role_post,
-                                   ssh_key_pwd=md5_crypt(ssh_key_pwd),
+                                   ssh_key_pwd=CRYPTOR.md5_crypt(ssh_key_pwd),
                                    ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
                                    is_active=is_active,
                                    date_joined=datetime.datetime.now())
@@ -681,21 +684,21 @@ def user_add_adm(request):
         try:
             if '' in [username, password, ssh_key_pwd, name, groups, is_active]:
                 error = u'带*内容不能为空'
-                raise AddError
+                raise ServerError
             user = User.objects.filter(username=username)
             if user:
                 error = u'用户 %s 已存在' % username
-                raise AddError
+                raise ServerError
 
-        except AddError:
+        except ServerError:
             pass
         else:
             try:
                 user = db_add_user(username=username,
-                                   password=md5_crypt(password),
+                                   password=CRYPTOR.md5_crypt(password),
                                    name=name, email=email, dept=dept,
                                    groups=groups, role='CU',
-                                   ssh_key_pwd=md5_crypt(ssh_key_pwd),
+                                   ssh_key_pwd=CRYPTOR.md5_crypt(ssh_key_pwd),
                                    ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
                                    is_active=is_active,
                                    date_joined=datetime.datetime.now())
@@ -892,7 +895,7 @@ def user_edit(request):
             return HttpResponseRedirect('/juser/user_list/')
 
         if password != user.password:
-            password = md5_crypt(password)
+            password = CRYPTOR.md5_crypt(password)
 
         if ssh_key_pwd != user.ssh_key_pwd:
             gen_ssh_key(user.username, ssh_key_pwd)
@@ -951,7 +954,7 @@ def user_edit_adm(request):
             return HttpResponseRedirect('/juser/user_list/')
 
         if password != user.password:
-            password = md5_crypt(password)
+            password = CRYPTOR.md5_crypt(password)
 
         if ssh_key_pwd != user.ssh_key_pwd:
             ssh_key_pwd = CRYPTOR.encrypt(ssh_key_pwd)
@@ -1001,11 +1004,11 @@ def chg_info(request):
 
         if not error:
             if password != user.password:
-                password = md5_crypt(password)
+                password = CRYPTOR.md5_crypt(password)
 
             if ssh_key_pwd != user.ssh_key_pwd:
                 gen_ssh_key(user.username, ssh_key_pwd)
-                ssh_key_pwd = md5_crypt(ssh_key_pwd)
+                ssh_key_pwd = CRYPTOR.md5_crypt(ssh_key_pwd)
 
             user_set.update(name=name, password=password, ssh_key_pwd=ssh_key_pwd, email=email)
             msg = '修改成功'

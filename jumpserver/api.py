@@ -40,6 +40,7 @@ LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
 SEND_IP = CONF.get('base', 'ip')
 SEND_PORT = CONF.get('base', 'port')
 MAIL_FROM = CONF.get('mail', 'email_host_user')
+
 log_level = CONF.get('base', 'log')
 log_level_total = {'debug': logging.DEBUG, 'info': logging.INFO, 'warning': logging.WARN, 'error': logging.ERROR,
                    'critical': logging.CRITICAL}
@@ -295,21 +296,21 @@ def api_user(request):
     return HttpResponse(json_data)
 
 
-def view_splitter(request, su=None, adm=None):
-    if is_super_user(request):
-        return su(request)
-    elif is_group_admin(request):
-        return adm(request)
-    else:
-        return HttpResponseRedirect('/login/')
+# def view_splitter(request, su=None, adm=None):
+#     if is_super_user(request):
+#         return su(request)
+#     elif is_group_admin(request):
+#         return adm(request)
+#     else:
+#         return HttpResponseRedirect('/login/')
 
 
-def user_group_perm_asset_group_api(user_group):
-    asset_group_list = []
-    perm_list = user_group.perm_set.all()
-    for perm in perm_list:
-        asset_group_list.append(perm.asset_group)
-    return asset_group_list
+# def user_group_perm_asset_group_api(user_group):
+#     asset_group_list = []
+#     perm_list = user_group.perm_set.all()
+#     for perm in perm_list:
+#         asset_group_list.append(perm.asset_group)
+#     return asset_group_list
 
 
 class Juser(object):
