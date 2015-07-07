@@ -268,7 +268,7 @@ def sudo_ldap_add(user_group, user_runas, asset_groups_select,
         ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
     else:
         return
-    
+
     assets = []
     cmds = []
     user_runas = user_runas.split(',')
@@ -484,7 +484,7 @@ def cmd_add(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         dept_id = request.POST.get('dept_id')
-        cmd = ','.join(request.POST.get('cmd').split('\n'))
+        cmd = ','.join(request.POST.get('cmd').splitlines())
         comment = request.POST.get('comment')
         dept = DEPT.objects.filter(id=dept_id)
 
@@ -514,7 +514,7 @@ def cmd_add_adm(request):
 
     if request.method == 'POST':
         name = request.POST.get('name')
-        cmd = ','.join(request.POST.get('cmd').split('\n'))
+        cmd = ','.join(request.POST.get('cmd').splitlines())
         comment = request.POST.get('comment')
 
         try:
@@ -552,7 +552,7 @@ def cmd_edit(request):
         cmd_group_id = request.POST.get('cmd_group_id')
         name = request.POST.get('name')
         dept_id = request.POST.get('dept_id')
-        cmd = ','.join(request.POST.get('cmd').split('\n'))
+        cmd = ','.join(request.POST.get('cmd').splitlines())
         comment = request.POST.get('comment')
         cmd_group = CmdGroup.objects.filter(id=cmd_group_id)
 
@@ -751,7 +751,7 @@ def perm_apply_log(request, offset):
     header_title, path1, path2 = u'权限申请记录', u'权限管理', u'申请记录'
     keyword = request.GET.get('keyword', '')
     user_id = get_session_user_info(request)[0]
-    username = User.objects.get(id=user_id).name
+    username = User.objects.get(id=user_id).username
     dept_name = get_session_user_info(request)[4]
     status_dic = {'online': 0, 'offline': 1}
     status = status_dic[offset]

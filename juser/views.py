@@ -812,8 +812,8 @@ def user_detail(request):
     if user:
         user = user[0]
         asset_group_permed = user_perm_group_api(user)
-        logs_last = Log.objects.filter(user=user.name).order_by('-start_time')[0:10]
-        logs_all = Log.objects.filter(user=user.name).order_by('-start_time')
+        logs_last = Log.objects.filter(user=user.username).order_by('-start_time')[0:10]
+        logs_all = Log.objects.filter(user=user.username).order_by('-start_time')
         logs_num = len(logs_all)
 
     return render_to_response('juser/user_detail.html', locals(), context_instance=RequestContext(request))
