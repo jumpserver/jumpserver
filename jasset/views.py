@@ -232,7 +232,7 @@ def host_add_batch(request):
     active_types = {'激活': 1, '禁用': 0}
     dept_id = get_user_dept(request)
     if request.method == 'POST':
-        multi_hosts = request.POST.get('j_multi').split('\n')
+        multi_hosts = request.POST.get('j_multi').splitlines()
         for host in multi_hosts:
             if host == '':
                 break
