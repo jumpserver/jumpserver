@@ -131,7 +131,7 @@ def posix_shell(chan, username, host):
 
             if chan in r:
                 try:
-                    x = chan.recv(1024)
+                    x = chan.recv(10240)
                     if len(x) == 0:
                         break
                     sys.stdout.write(x)
