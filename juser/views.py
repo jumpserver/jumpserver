@@ -13,6 +13,10 @@ from django.db.models import ObjectDoesNotExist
 from jumpserver.api import *
 
 
+def md5_crypt(string):
+    return hashlib.new("md5", string).hexdigest()
+
+
 def gen_rand_pwd(num):
     """
     generate random password

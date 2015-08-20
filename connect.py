@@ -26,20 +26,19 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
     django.setup()
 from jlog.models import Log
-from jumpserver.api import CONF, BASE_DIR, ServerError, Juser, Jasset, JassetGroup
+from jumpserver.api import CONF, BASE_DIR, ServerError, User, UserGroup, Asset, BisGroup
 from jumpserver.api import CRYPTOR, logger, is_dir
 
 try:
     import termios
     import tty
 except ImportError:
-    print '\033[1;31mOnly unix like supported.\033[0m'
+    print '\033[1;31m仅支持类Unix系统 Only unix like supported.\033[0m'
     time.sleep(3)
     sys.exit()
 
-CONF.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
 log_dir = os.path.join(BASE_DIR, 'logs')
-login_user = Juser(username=getpass.getuser())
+login_user = User(username=getpass.getuser())
 
 
 def color_print(msg, color='red', exits=False):
@@ -265,7 +264,7 @@ def verify_connect(user, option):
     elif len(ip_matched) < 1:
         color_print('No Permission or No host.', 'red')
     else:
-        asset = Jasset(ip=ip_matched[0]).asset
+        asset = Asset(ip=ip_matched[0]).asset
         jtty = Jtty(user, asset)
         jtty.connect()
 
