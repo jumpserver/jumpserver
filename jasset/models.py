@@ -28,11 +28,15 @@ class BisGroup(models.Model):
 
     def get_asset_info(self, printable=False):
         assets = self.get_asset()
+        ip_comment = {}
         for asset in assets:
-            if asset.comment:
-                print '%-15s -- %s' % (asset.ip, asset.comment)
+            ip_comment[asset.ip] = asset.comment
+
+        for ip in sorted(ip_comment):
+            if ip_comment[ip]:
+                print '%-15s -- %s' % (ip, ip_comment[ip])
             else:
-                print '%-15s' % asset.ip
+                print '%-15s' % ip
         print ''
 
     def get_asset_num(self):

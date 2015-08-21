@@ -5,40 +5,22 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-import socket
 import os
 import re
-import select
 import time
-import paramiko
-import struct
-import fcntl
-import signal
 import textwrap
 import getpass
-import fnmatch
 import readline
 import django
-import datetime
 from multiprocessing import Pool
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
     django.setup()
-from jlog.models import Log
-from jumpserver.api import CONF, BASE_DIR, ServerError, User, UserGroup, Asset, get_object
+from jumpserver.api import BASE_DIR, ServerError, User, UserGroup, Asset, Jtty, get_object
 from jumpserver.api import CRYPTOR, logger, is_dir
 from jumpserver.api import BisGroup as AssetGroup
 
-try:
-    import termios
-    import tty
-except ImportError:
-    print '\033[1;31m仅支持类Unix系统 Only unix like supported.\033[0m'
-    time.sleep(3)
-    sys.exit()
-
-log_dir = os.path.join(BASE_DIR, 'logs')
 login_user = get_object(User, username=getpass.getuser())
 
 
@@ -55,184 +37,6 @@ def color_print(msg, color='red', exits=False):
     if exits:
         time.sleep(2)
         sys.exit()
-
-
-class Jtty(object):
-    def __init__(self, user, asset):
-        self.chan = None
-        self.username = user.username
-        self.ip = asset.ip
-        self.user = user
-        self.asset = asset
-
-    @staticmethod
-    def get_win_size():
-        """
-        This function use to get the size of the windows!
-        获得terminal窗口大小
-        """
-        if 'TIOCGWINSZ' in dir(termios):
-            TIOCGWINSZ = termios.TIOCGWINSZ
-        else:
-            TIOCGWINSZ = 1074295912L
-        s = struct.pack('HHHH', 0, 0, 0, 0)
-        x = fcntl.ioctl(sys.stdout.fileno(), TIOCGWINSZ, s)
-        return struct.unpack('HHHH', x)[0:2]
-
-    def set_win_size(self, sig, data):
-        """
-        This function use to set the window size of the terminal!
-        设置terminal窗口大小
-        """
-        try:
-            win_size = self.get_win_size()
-            self.chan.resize_pty(height=win_size[0], width=win_size[1])
-        except Exception:
-            pass
-
-    def log_record(self):
-        """
-        Logging user command and output.
-        记录用户的日志
-        """
-        tty_log_dir = os.path.join(log_dir, 'tty')
-        timestamp_start = int(time.time())
-        date_start = time.strftime('%Y%m%d', time.localtime(timestamp_start))
-        time_start = time.strftime('%H%M%S', time.localtime(timestamp_start))
-        log_filename = '%s_%s_%s.log' % (self.username, self.ip, time_start)
-        today_connect_log_dir = os.path.join(tty_log_dir, date_start)
-        log_file_path = os.path.join(today_connect_log_dir, log_filename)
-        dept_name = self.user.dept.name
-
-        pid = os.getpid()
-        pts = os.popen("ps axu | grep %s | grep -v grep | awk '{ print $7 }'" % pid).read().strip()
-        ip_list = os.popen("who | grep %s | awk '{ print $5 }'" % pts).read().strip('()\n')
-
-        try:
-            is_dir(today_connect_log_dir)
-        except OSError:
-            raise ServerError('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, tty_log_dir))
-
-        try:
-            log_file = open(log_file_path, 'a')
-        except IOError:
-            raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
-
-        log = Log(user=self.username, host=self.ip, remote_ip=ip_list, dept_name=dept_name,
-                  log_path=log_file_path, start_time=datetime.datetime.now(), pid=pid)
-        log_file.write('Start time is %s\n' % datetime.datetime.now())
-        log.save()
-        return log_file, log
-
-    def posix_shell(self):
-        """
-        Use paramiko channel connect server interactive.
-        使用paramiko模块的channel，连接后端，进入交互式
-        """
-        log_file, log = self.log_record()
-        old_tty = termios.tcgetattr(sys.stdin)
-        try:
-            tty.setraw(sys.stdin.fileno())
-            tty.setcbreak(sys.stdin.fileno())
-            self.chan.settimeout(0.0)
-
-            while True:
-                try:
-                    r, w, e = select.select([self.chan, sys.stdin], [], [])
-                except Exception:
-                    pass
-
-                if self.chan in r:
-                    try:
-                        x = self.chan.recv(1024)
-                        if len(x) == 0:
-                            break
-                        sys.stdout.write(x)
-                        sys.stdout.flush()
-                        log_file.write(x)
-                        log_file.flush()
-                    except socket.timeout:
-                        pass
-
-                if sys.stdin in r:
-                    x = os.read(sys.stdin.fileno(), 1)
-                    if len(x) == 0:
-                        break
-                    self.chan.send(x)
-
-        finally:
-            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)
-            log_file.write('End time is %s' % datetime.datetime.now())
-            log_file.close()
-            log.is_finished = True
-            log.handle_finished = False
-            log.end_time = datetime.datetime.now()
-            log.save()
-
-    def get_connect_item(self):
-        """获取连接需要的参数，也就是服务ip, 端口, 用户账号和密码"""
-        if not self.asset.is_active:
-            raise ServerError('该主机被禁用 Host %s is not active.' % self.ip)
-
-        if not self.user.is_active:
-            raise ServerError('该用户被禁用 User %s is not active.' % self.username)
-
-        login_type_dict = {
-            'L': self.user.ldap_pwd,
-        }
-
-        if self.asset.login_type in login_type_dict:
-            password = CRYPTOR.decrypt(login_type_dict[self.asset.login_type])
-            return self.username, password, self.ip, int(self.asset.port)
-
-        elif self.asset.login_type == 'M':
-            username = self.asset.username
-            password = CRYPTOR.decrypt(self.asset.password)
-            return username, password, self.ip, int(self.asset.port)
-
-        else:
-            raise ServerError('不支持的服务器登录方式 Login type is not in ["L", "M"]')
-
-    def connect(self):
-        """
-        Connect server.
-        连接服务器
-        """
-        username, password, ip, port = self.get_connect_item()
-        logger.debug("username: %s, password: %s, ip: %s, port: %s" % (username, password, ip, port))
-        ps1 = "PS1='[\u@%s \W]\$ '\n" % self.ip
-        login_msg = "clear;echo -e '\\033[32mLogin %s done. Enjoy it.\\033[0m'\n" % ip
-
-        # 发起ssh连接请求 Make a ssh connection
-        ssh = paramiko.SSHClient()
-        ssh.load_system_host_keys()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        try:
-            ssh.connect(ip, port=port, username=username, password=password, compress=True)
-        except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
-            raise ServerError('认证错误 Authentication Error.')
-        except socket.error:
-            raise ServerError('端口可能不对 Connect SSH Socket Port Error, Please Correct it.')
-
-        # 获取连接的隧道并设置窗口大小 Make a channel and set windows size
-        global channel
-        win_size = self.get_win_size()
-        self.chan = channel = ssh.invoke_shell(height=win_size[0], width=win_size[1])
-        try:
-            signal.signal(signal.SIGWINCH, self.set_win_size)
-        except:
-            pass
-
-        # 设置PS1并提示 Set PS1 and msg it
-        channel.send(ps1)
-        channel.send(login_msg)
-
-        # Make ssh interactive tunnel
-        self.posix_shell()
-
-        # Shutdown channel socket
-        channel.close()
-        ssh.close()
 
 
 def verify_connect(user, option):
