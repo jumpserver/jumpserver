@@ -26,8 +26,9 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
     django.setup()
 from jlog.models import Log
-from jumpserver.api import CONF, BASE_DIR, ServerError, User, UserGroup, Asset, BisGroup
+from jumpserver.api import CONF, BASE_DIR, ServerError, User, UserGroup, Asset, get_object
 from jumpserver.api import CRYPTOR, logger, is_dir
+from jumpserver.api import BisGroup as AssetGroup
 
 try:
     import termios
@@ -38,7 +39,7 @@ except ImportError:
     sys.exit()
 
 log_dir = os.path.join(BASE_DIR, 'logs')
-login_user = User(username=getpass.getuser())
+login_user = get_object(User, username=getpass.getuser())
 
 
 def color_print(msg, color='red', exits=False):
@@ -98,14 +99,14 @@ class Jtty(object):
         timestamp_start = int(time.time())
         date_start = time.strftime('%Y%m%d', time.localtime(timestamp_start))
         time_start = time.strftime('%H%M%S', time.localtime(timestamp_start))
-        today_connect_log_dir = os.path.join(tty_log_dir, date_start)
         log_filename = '%s_%s_%s.log' % (self.username, self.ip, time_start)
+        today_connect_log_dir = os.path.join(tty_log_dir, date_start)
         log_file_path = os.path.join(today_connect_log_dir, log_filename)
         dept_name = self.user.dept.name
 
         pid = os.getpid()
         pts = os.popen("ps axu | grep %s | grep -v grep | awk '{ print $7 }'" % pid).read().strip()
-        remote_ip = os.popen("who | grep %s | awk '{ print $5 }'" % pts).read().strip('()\n')
+        ip_list = os.popen("who | grep %s | awk '{ print $5 }'" % pts).read().strip('()\n')
 
         try:
             is_dir(today_connect_log_dir)
@@ -117,7 +118,7 @@ class Jtty(object):
         except IOError:
             raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 
-        log = Log(user=self.username, host=self.ip, remote_ip=remote_ip, dept_name=dept_name,
+        log = Log(user=self.username, host=self.ip, remote_ip=ip_list, dept_name=dept_name,
                   log_path=log_file_path, start_time=datetime.datetime.now(), pid=pid)
         log_file.write('Start time is %s\n' % datetime.datetime.now())
         log.save()
@@ -164,18 +165,17 @@ class Jtty(object):
             log_file.write('End time is %s' % datetime.datetime.now())
             log_file.close()
             log.is_finished = True
-            log.log_finished = False
+            log.handle_finished = False
             log.end_time = datetime.datetime.now()
             log.save()
 
     def get_connect_item(self):
-        port = int(self.asset.port)
-
+        """获取连接需要的参数，也就是服务ip, 端口, 用户账号和密码"""
         if not self.asset.is_active:
-            raise ServerError('Host %s is not active.' % self.ip)
+            raise ServerError('该主机被禁用 Host %s is not active.' % self.ip)
 
         if not self.user.is_active:
-            raise ServerError('User %s is not active.' % self.username)
+            raise ServerError('该用户被禁用 User %s is not active.' % self.username)
 
         login_type_dict = {
             'L': self.user.ldap_pwd,
@@ -183,37 +183,38 @@ class Jtty(object):
 
         if self.asset.login_type in login_type_dict:
             password = CRYPTOR.decrypt(login_type_dict[self.asset.login_type])
-            return self.username, password, self.ip, port
+            return self.username, password, self.ip, int(self.asset.port)
 
         elif self.asset.login_type == 'M':
             username = self.asset.username
             password = CRYPTOR.decrypt(self.asset.password)
-            return username, password, self.ip, port
+            return username, password, self.ip, int(self.asset.port)
 
         else:
-            raise ServerError('Login type is not in ["L", "M"]')
+            raise ServerError('不支持的服务器登录方式 Login type is not in ["L", "M"]')
 
     def connect(self):
         """
         Connect server.
+        连接服务器
         """
         username, password, ip, port = self.get_connect_item()
         logger.debug("username: %s, password: %s, ip: %s, port: %s" % (username, password, ip, port))
         ps1 = "PS1='[\u@%s \W]\$ '\n" % self.ip
-        login_msg = "clear;echo -e '\\033[32mLogin %s done. Enjoy it.\\033[0m'\n" % self.ip
+        login_msg = "clear;echo -e '\\033[32mLogin %s done. Enjoy it.\\033[0m'\n" % ip
 
-        # Make a ssh connection
+        # 发起ssh连接请求 Make a ssh connection
         ssh = paramiko.SSHClient()
         ssh.load_system_host_keys()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
             ssh.connect(ip, port=port, username=username, password=password, compress=True)
         except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
-            raise ServerError('Authentication Error.')
+            raise ServerError('认证错误 Authentication Error.')
         except socket.error:
-            raise ServerError('Connect SSH Socket Port Error, Please Correct it.')
+            raise ServerError('端口可能不对 Connect SSH Socket Port Error, Please Correct it.')
 
-        # Make a channel and set windows size
+        # 获取连接的隧道并设置窗口大小 Make a channel and set windows size
         global channel
         win_size = self.get_win_size()
         self.chan = channel = ssh.invoke_shell(height=win_size[0], width=win_size[1])
@@ -222,7 +223,7 @@ class Jtty(object):
         except:
             pass
 
-        # Set PS1 and msg it
+        # 设置PS1并提示 Set PS1 and msg it
         channel.send(ps1)
         channel.send(login_msg)
 
@@ -235,6 +236,7 @@ class Jtty(object):
 
 
 def verify_connect(user, option):
+    """鉴定用户是否有该主机权限 或 匹配到的ip是否唯一"""
     ip_matched = []
     try:
         assets_info = login_user.get_asset_info()
@@ -255,16 +257,20 @@ def verify_connect(user, option):
     ip_matched = list(set(ip_matched))
 
     if len(ip_matched) > 1:
+        ip_comment = {}
         for ip in ip_matched:
-            if assets_info[ip][2]:
-                print '%-15s -- %s' % (ip, assets_info[ip][2])
+            ip_comment[ip] = assets_info[ip][2]
+
+        for ip in sorted(ip_comment):
+            if ip_comment[ip]:
+                print '%-15s -- %s' % (ip, ip_comment[ip])
             else:
                 print '%-15s' % ip
-            print ''
+        print ''
     elif len(ip_matched) < 1:
-        color_print('No Permission or No host.', 'red')
+        color_print('没有该主机，或者您没有该主机的权限 No Permission or No host.', 'red')
     else:
-        asset = Asset(ip=ip_matched[0]).asset
+        asset = get_object(Asset, ip=ip_matched[0])
         jtty = Jtty(user, asset)
         jtty.connect()
 
@@ -351,12 +357,13 @@ def print_prompt():
 #             multi_remote_exec_cmd(hosts, username, cmd)
 
 
-if __name__ == '__main__':
-    if not login_user.validate():
-        color_print(u'没有该用户 No that user.', exits=True)
+def main():
+    if not login_user:  # 判断用户是否存在
+        color_print(u'没有该用户，或许你是以root运行的 No that user.', exits=True)
 
     print_prompt()
     gid_pattern = re.compile(r'^g\d+$')
+
     try:
         while True:
             try:
@@ -374,8 +381,8 @@ if __name__ == '__main__':
                 continue
             elif gid_pattern.match(option):
                 gid = option[1:].strip()
-                asset_group = JassetGroup(id=gid)
-                if asset_group.validate() and asset_group.is_permed(user=login_user.user):
+                asset_group = get_object(AssetGroup, id=gid)
+                if asset_group and asset_group.is_permed(user=login_user):
                     asset_group.get_asset_info(printable=True)
                 continue
             elif option in ['E', 'e']:
@@ -390,3 +397,8 @@ if __name__ == '__main__':
                     color_print(e, 'red')
     except IndexError:
         pass
+
+if __name__ == '__main__':
+    main()
+
+

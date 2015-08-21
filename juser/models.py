@@ -19,6 +19,9 @@ class UserGroup(models.Model):
     def __unicode__(self):
         return self.name
 
+    def get_user(self):
+        return self.user_set.all()
+
 
 class User(models.Model):
     USER_ROLE_CHOICES = (
@@ -104,7 +107,7 @@ class User(models.Model):
         assets = self.get_asset()
 
         for asset in assets:
-            asset_alias = AssetAlias.objects.filter(user=self.user, asset=asset)
+            asset_alias = AssetAlias.objects.filter(user=self, asset=asset)
             if asset_alias and asset_alias[0].alias != '':
                 assets_info[asset.ip] = [asset.id, asset.ip, str(asset_alias[0].alias)]
             else:

@@ -10,7 +10,7 @@ class Log(models.Model):
     start_time = models.DateTimeField(null=True)
     pid = models.IntegerField(max_length=10)
     is_finished = models.BooleanField(default=False)
-    log_finished = models.BooleanField(default=False)
+    handle_finished = models.BooleanField(default=False)
     end_time = models.DateTimeField(null=True)
 
     def __unicode__(self):

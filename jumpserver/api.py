@@ -41,16 +41,18 @@ SEND_IP = CONF.get('base', 'ip')
 SEND_PORT = CONF.get('base', 'port')
 MAIL_FROM = CONF.get('mail', 'email_host_user')
 
-log_level = CONF.get('base', 'log')
-log_level_total = {'debug': logging.DEBUG, 'info': logging.INFO, 'warning': logging.WARN, 'error': logging.ERROR,
-                   'critical': logging.CRITICAL}
-logger = logging.getLogger('jumpserver')
-logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler(JLOG_FILE)
-fh.setLevel(log_level_total.get(log_level, logging.DEBUG))
-formatter = logging.Formatter('%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
-fh.setFormatter(formatter)
-logger.addHandler(fh)
+
+def set_log(level):
+    log_level_total = {'debug': logging.DEBUG, 'info': logging.INFO, 'warning': logging.WARN, 'error': logging.ERROR,
+                       'critical': logging.CRITICAL}
+    logger = logging.getLogger('jumpserver')
+    logger.setLevel(logging.DEBUG)
+    fh = logging.FileHandler(JLOG_FILE)
+    fh.setLevel(log_level_total.get(level, logging.DEBUG))
+    formatter = logging.Formatter('%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+    return logger
 
 
 class LDAPMgmt():
@@ -205,68 +207,45 @@ def get_object(model, **kwargs):
     try:
         the_object = model.objects.get(**kwargs)
     except ObjectDoesNotExist:
-        raise ServerError('Object get %s failed.' % str(kwargs.values()))
+        the_object = None
     return the_object
 
 
-def require_login(func):
-    """要求登录的装饰器"""
-    def _deco(request, *args, **kwargs):
-        if not request.session.get('user_id'):
-            return HttpResponseRedirect('/login/')
-        return func(request, *args, **kwargs)
+def require_role(role='user'):
+    """
+    要求用户是某种角色 ["super", "admin", "user"]
+    """
+    def _deco(func):
+        def __deco(request, *args, **kwargs):
+            if role == 'user':
+                if not request.session.get('user_id'):
+                    return HttpResponseRedirect('/login/')
+            elif role == 'admin':
+                if request.session.get('role_id', 0) != 1:
+                    return HttpResponseRedirect('/')
+            elif role == 'super':
+                if request.session.get('role_id', 0) != 2:
+                    return HttpResponseRedirect('/')
+            return func(request, *args, **kwargs)
+        return __deco()
     return _deco
 
 
-def require_super_user(func):
-    """要求是超级管理员"""
-    def _deco(request, *args, **kwargs):
-        if not request.session.get('user_id'):
-            return HttpResponseRedirect('/login/')
-
-        if request.session.get('role_id', 0) != 2:
-            return HttpResponseRedirect('/')
-        return func(request, *args, **kwargs)
-    return _deco
-
-
-def require_admin(func):
-    """要求是管理员"""
-    def _deco(request, *args, **kwargs):
-        if not request.session.get('user_id'):
-            return HttpResponseRedirect('/login/')
-
-        if request.session.get('role_id', 0) < 1:
-            return HttpResponseRedirect('/')
-        return func(request, *args, **kwargs)
-    return _deco
-
-
-def is_super_user(request):
-    """要求请求是超级管理员"""
-    if request.session.get('role_id') == 2:
+def is_role_request(request, role='user'):
+    """
+    :param request: 请求
+    :param role: 角色
+    :return: bool
+    要求请求角色正确
+    """
+    role_all = {'user': 0, 'admin': 1, 'super': 2}
+    if request.session.get('role_id') == role_all.get(role, '0'):
         return True
     else:
         return False
 
 
-def is_group_admin(request):
-    """要求请求是组管理员"""
-    if request.session.get('role_id') == 1:
-        return True
-    else:
-        return False
-
-
-def is_common_user(request):
-    """要求用户是普通用户"""
-    if request.session.get('role_id') == 0:
-        return True
-    else:
-        return False
-
-
-@require_login
+@require_role
 def get_session_user_dept(request):
     user_id = request.session.get('user_id', 0)
     user = User.objects.filter(id=user_id)
@@ -276,7 +255,7 @@ def get_session_user_dept(request):
         return user, dept
 
 
-@require_login
+@require_role
 def get_session_user_info(request):
     user_id = request.session.get('user_id', 0)
     user = User.objects.filter(id=user_id)
@@ -308,295 +287,6 @@ def api_user(request):
 #         return adm(request)
 #     else:
 #         return HttpResponseRedirect('/login/')
-
-
-# def user_group_perm_asset_group_api(user_group):
-#     asset_group_list = []
-#     perm_list = user_group.perm_set.all()
-#     for perm in perm_list:
-#         asset_group_list.append(perm.asset_group)
-#     return asset_group_list
-
-
-# class Juser(object):
-#     """
-#     Jumpserver user class
-#     用户类
-#     """
-#
-#     def __init__(self, username=None, uid=None):
-#         if username:
-#             user = User.objects.filter(username=username)
-#         elif uid:
-#             user = User.objects.filter(id=uid)
-#         else:
-#             user = ''
-#
-#         if user:
-#             user = user[0]
-#             self.user = user
-#             self.id = user.id
-#             # self.id = user.id
-#             # self.username = user.username
-#             # self.name = user.name
-#             self.group = user.group.all()
-#         else:
-#             self.id = None
-#
-#     def __repr__(self):
-#         if self.id:
-#             return '<%s Juser instance>' % getattr(self.user, 'username')
-#         else:
-#             return 'None'
-#
-#     def __getattr__(self, item):
-#         if self.id:
-#             return getattr(self.user, item)
-#         else:
-#             return None
-#
-#     def validate(self):
-#         """
-#         Validate is or not a true user
-#         鉴定用户
-#         """
-#         if self.id:
-#             return True
-#         else:
-#             return False
-#
-#     def get_asset_group(self):
-#         """
-#         Get user host_groups.
-#         获取用户有权限的主机组
-#         """
-#         host_group_list = []
-#         perm_list = []
-#         user_group_all = self.user.group.all()
-#         for user_group in user_group_all:
-#             perm_list.extend(user_group.perm_set.all())
-#
-#         for perm in perm_list:
-#             host_group_list.append(perm.asset_group)
-#
-#         return host_group_list
-#
-#     def get_asset_group_info(self, printable=False):
-#         """
-#         Get or print asset group info
-#         获取或打印用户授权资产组
-#         """
-#         asset_groups_info = {}
-#         asset_groups = self.get_asset_group()
-#
-#         for asset_group in asset_groups:
-#             asset_groups_info[asset_group.id] = [asset_group.name, asset_group.comment]
-#
-#         if printable:
-#             for group_id in asset_groups_info:
-#                 if asset_groups_info[group_id][1]:
-#                     print "[%3s] %s -- %s" % (group_id,
-#                                               asset_groups_info[group_id][0],
-#                                               asset_groups_info[group_id][1])
-#                 else:
-#                     print "[%3s] %s" % (group_id, asset_groups_info[group_id][0])
-#                 print ''
-#         else:
-#             return asset_groups_info
-#
-#     def get_asset(self):
-#         """
-#         Get the assets of under the user control.
-#         获取主机列表
-#         """
-#         assets = []
-#         asset_groups = self.get_asset_group()
-#
-#         for asset_group in asset_groups:
-#             assets.extend(asset_group.asset_set.all())
-#
-#         return assets
-#
-#     def get_asset_info(self, printable=False):
-#         """
-#         Get or print the user asset info
-#         获取或打印用户资产信息
-#         """
-#         assets_info = {}
-#         assets = self.get_asset()
-#
-#         for asset in assets:
-#             asset_alias = AssetAlias.objects.filter(user=self.user, asset=asset)
-#             if asset_alias and asset_alias[0].alias != '':
-#                 assets_info[asset.ip] = [asset.id, asset.ip, str(asset_alias[0].alias)]
-#             else:
-#                 assets_info[asset.ip] = [asset.id, asset.ip, str(asset.comment)]
-#
-#         if printable:
-#             ips = assets_info.keys()
-#             ips.sort()
-#             for ip in ips:
-#                 if assets_info[ip][2]:
-#                     print '%-15s -- %s' % (ip, assets_info[ip][2])
-#                 else:
-#                     print '%-15s' % ip
-#             print ''
-#         else:
-#             return assets_info
-#
-
-# class Jasset(object):
-#     """
-#     Jumpserver asset class
-#     Jumpserver资产类
-#     """
-#     def __init__(self, ip=None, id=None):
-#         if ip:
-#             asset = Asset.objects.filter(ip=ip)
-#         elif id:
-#             asset = Asset.objects.filter(id=id)
-#         else:
-#             asset = ''
-#
-#         if asset:
-#             asset = asset[0]
-#             self.asset = asset
-#             self.id = asset.id
-#         else:
-#             self.id = None
-#
-#     def __repr__(self):
-#         if self.id:
-#             return '<%s Jasset instance>' % self.asset.ip
-#         else:
-#             return 'None'
-#
-#     def __getattr__(self, item):
-#         if self.id:
-#             return getattr(self.asset, item)
-#         else:
-#             return None
-#
-#     def validate(self):
-#         """
-#         Validate is or not a true asset
-#         判断是否存在
-#         """
-#         if self.id:
-#             return True
-#         else:
-#             return False
-#
-#     def get_user(self):
-#         perm_list = []
-#         asset_group_all = self.bis_group.all()
-#         for asset_group in asset_group_all:
-#             perm_list.extend(asset_group.perm_set.all())
-#
-#         user_group_list = []
-#         for perm in perm_list:
-#             user_group_list.append(perm.user_group)
-#
-#         user_permed_list = []
-#         for user_group in user_group_list:
-#             user_permed_list.extend(user_group.user_set.all())
-#         user_permed_list = list(set(user_permed_list))
-#         return user_permed_list
-
-
-# class JassetGroup(object):
-#     """
-#     Jumpserver AssetGroup class
-#     Jumpserver 资产组类
-#     """
-#     def __init__(self, name=None, id=None):
-#         if id:
-#             asset_group = BisGroup.objects.filter(id=int(id))
-#         elif name:
-#             asset_group = BisGroup.objects.filter(name=name)
-#         else:
-#             asset_group = ''
-#
-#         if asset_group:
-#             asset_group = asset_group[0]
-#             self.asset_group = asset_group
-#             # self.name = asset_group.name
-#             self.id = asset_group.id
-#         else:
-#             self.id = None
-#
-#     def __repr__(self):
-#         if self.id:
-#             return '<%s JassetGroup instance>' % self.name
-#         else:
-#             return 'None'
-#
-#     def validate(self):
-#         """
-#         Validate it is a true asset group or not
-#         鉴定是否为真是存在的组
-#         """
-#         if self.id:
-#             return True
-#         else:
-#             return False
-#
-#     def get_asset(self):
-#         return self.asset_group.asset_set.all()
-#
-#     def get_asset_info(self, printable=False):
-#         assets = self.get_asset()
-#         for asset in assets:
-#             if asset.comment:
-#                 print '%-15s -- %s' % (asset.ip, asset.comment)
-#             else:
-#                 print '%-15s' % asset.ip
-#         print ''
-#
-#     def get_asset_num(self):
-#         return len(self.get_asset())
-#
-#     def get_user_group(self):
-#         perm_list = self.asset_group.perm_set.all()
-#         user_group_list = []
-#         for perm in perm_list:
-#             user_group_list.append(perm.user_group)
-#         return user_group_list
-#
-#     def get_user(self):
-#         user_list = []
-#         user_group_list = self.get_user_group()
-#         for user_group in user_group_list:
-#             user_list.extend(user_group.user_set.all())
-#         return user_list
-#
-#     def is_permed(self, user=None, user_group=None):
-#         if user:
-#             if user in self.get_user():
-#                 return True
-#
-#         if user_group:
-#             if user_group in self.get_user_group():
-#                 return True
-#         return False
-
-
-# def asset_perm_api(asset):
-#     if asset:
-#         perm_list = []
-#         asset_group_all = asset.bis_group.all()
-#         for asset_group in asset_group_all:
-#             perm_list.extend(asset_group.perm_set.all())
-#
-#         user_group_list = []
-#         for perm in perm_list:
-#             user_group_list.append(perm.user_group)
-#
-#         user_permed_list = []
-#         for user_group in user_group_list:
-#             user_permed_list.extend(user_group.user_set.all())
-#         user_permed_list = list(set(user_permed_list))
-#         return user_permed_list
 
 
 def validate(request, user_group=None, user=None, asset_group=None, asset=None, edept=None):
@@ -694,6 +384,7 @@ def bash(cmd):
 
 
 def is_dir(dir_name, username='root', mode=0755):
+    """目录存在，如果不存在就建立，并且权限正确"""
     if not os.path.isdir(dir_name):
         os.makedirs(dir_name)
         bash("chown %s:%s '%s'" % (username, username, dir_name))
@@ -720,3 +411,5 @@ if LDAP_ENABLE:
 else:
     ldap_conn = None
 
+log_level = CONF.get('base', 'log')
+logger = set_log(log_level)
