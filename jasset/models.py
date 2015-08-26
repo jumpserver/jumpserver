@@ -1,6 +1,6 @@
 import datetime
 from django.db import models
-from juser.models import User, UserGroup, DEPT
+from juser.models import User, UserGroup
 
 
 class IDC(models.Model):
@@ -17,7 +17,6 @@ class BisGroup(models.Model):
         ('A', 'ASSET'),
     )
     name = models.CharField(max_length=80, unique=True)
-    dept = models.ForeignKey(DEPT)
     comment = models.CharField(max_length=160, blank=True, null=True)
 
     def __unicode__(self):
@@ -76,7 +75,6 @@ class Asset(models.Model):
     port = models.IntegerField(max_length=6)
     idc = models.ForeignKey(IDC)
     bis_group = models.ManyToManyField(BisGroup)
-    dept = models.ManyToManyField(DEPT)
     login_type = models.CharField(max_length=1, choices=LOGIN_TYPE_CHOICES, default='L')
     username = models.CharField(max_length=20, blank=True, null=True)
     password = models.CharField(max_length=80, blank=True, null=True)

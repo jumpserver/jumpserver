@@ -3,17 +3,8 @@
 from django.db import models
 
 
-class DEPT(models.Model):
-    name = models.CharField(max_length=80, unique=True)
-    comment = models.CharField(max_length=160, blank=True, null=True)
-
-    def __unicode__(self):
-        return self.name
-
-
 class UserGroup(models.Model):
     name = models.CharField(max_length=80, unique=True)
-    dept = models.ForeignKey(DEPT)
     comment = models.CharField(max_length=160, blank=True, null=True)
 
     def __unicode__(self):
@@ -26,7 +17,7 @@ class UserGroup(models.Model):
 class User(models.Model):
     USER_ROLE_CHOICES = (
         ('SU', 'SuperUser'),
-        ('DA', 'DeptAdmin'),
+        ('GA', 'GroupAdmin'),
         ('CU', 'CommonUser'),
     )
     username = models.CharField(max_length=80, unique=True)
@@ -34,7 +25,6 @@ class User(models.Model):
     name = models.CharField(max_length=80)
     email = models.EmailField(max_length=75)
     role = models.CharField(max_length=2, choices=USER_ROLE_CHOICES, default='CU')
-    dept = models.ForeignKey(DEPT)
     group = models.ManyToManyField(UserGroup)
     ldap_pwd = models.CharField(max_length=128)
     ssh_key_pwd = models.CharField(max_length=200)

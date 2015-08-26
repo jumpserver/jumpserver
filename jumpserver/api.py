@@ -19,7 +19,7 @@ from functools import partial
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
 from django.template import RequestContext
-from juser.models import User, UserGroup, DEPT
+from juser.models import User, UserGroup
 from jasset.models import Asset, BisGroup, IDC
 from jlog.models import Log
 from jasset.models import AssetAlias

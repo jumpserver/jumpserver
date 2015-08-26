@@ -3,7 +3,7 @@ import datetime
 from uuidfield import UUIDField
 
 from django.db import models
-from juser.models import UserGroup, DEPT
+from juser.models import UserGroup
 from jasset.models import Asset, BisGroup
 
 
@@ -18,7 +18,6 @@ class Perm(models.Model):
 class CmdGroup(models.Model):
     name = models.CharField(max_length=50, unique=True)
     cmd = models.CharField(max_length=999)
-    dept = models.ForeignKey(DEPT)
     comment = models.CharField(blank=True, null=True, max_length=50)
 
     def __unicode__(self):
@@ -41,7 +40,6 @@ class Apply(models.Model):
     applyer = models.CharField(max_length=20)
     admin = models.CharField(max_length=20)
     approver = models.CharField(max_length=20)
-    dept = models.CharField(max_length=20)
     bisgroup = models.CharField(max_length=500)
     asset = models.CharField(max_length=500)
     comment = models.TextField(blank=True, null=True)

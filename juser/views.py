@@ -12,51 +12,6 @@ from django.db.models import ObjectDoesNotExist
 from juser.user_api import *
 
 
-@require_role(role='super')
-def dept_add(request):
-    header_title, path1, path2 = '添加部门', '用户管理', '添加部门'
-    if request.method == 'POST':
-        name = request.POST.get('name', '')
-        comment = request.POST.get('comment', '')
-
-        try:
-            if not name:
-                raise ServerError('部门名称不能为空')
-            if DEPT.objects.filter(name=name):
-                raise ServerError(u'部门名称 %s 已存在' % name)
-        except ServerError, e:
-            error = e
-        else:
-            DEPT(name=name, comment=comment).save()
-            msg = u'添加部门 %s 成功' % name
-
-    return render_to_response('juser/dept_add.html', locals(), context_instance=RequestContext(request))
-
-
-@require_role(role='super')
-def dept_list(request):
-    header_title, path1, path2 = '查看部门', '用户管理', '查看部门'
-    keyword = request.GET.get('search')
-    if keyword:
-        contact_list = DEPT.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword)).order_by('name')
-    else:
-        contact_list = DEPT.objects.all().order_by('id')
-
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
-
-    return render_to_response('juser/dept_list.html', locals(), context_instance=RequestContext(request))
-
-
-@require_role(role='admin')
-def dept_list_adm(request):
-    header_title, path1, path2 = '查看部门', '用户管理', '查看部门'
-    user, dept = get_session_user_dept(request)
-    contact_list = [dept]
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
-
-    return render_to_response('juser/dept_list.html', locals(), context_instance=RequestContext(request))
-
-
 def chg_role(request):
     role = {'SU': 2, 'DA': 1, 'CU': 0}
     user, dept = get_session_user_dept(request)
@@ -68,176 +23,30 @@ def chg_role(request):
 
 
 @require_role(role='super')
-def dept_detail(request):
-    dept_id = request.GET.get('id', None)
-    if not dept_id:
-        return HttpResponseRedirect('/juser/dept_list/')
-    dept = DEPT.objects.filter(id=dept_id)
-    if dept:
-        dept = dept[0]
-        users = dept.user_set.all()
-    return render_to_response('juser/dept_detail.html', locals(), context_instance=RequestContext(request))
-
-
-@require_role(role='super')
-def dept_del(request):
-    dept_id = request.GET.get('id', None)
-    if not dept_id or dept_id in ['1', '2']:
-        return HttpResponseRedirect('/juser/dept_list/')
-    dept = DEPT.objects.filter(id=dept_id)
-    if dept:
-        dept = dept[0]
-        dept.delete()
-    return HttpResponseRedirect('/juser/dept_list/')
-
-
-def dept_member(dept_id):
-    dept = DEPT.objects.filter(id=dept_id)
-    if dept:
-        dept = dept[0]
-        return dept.user_set.all()
-
-
-def dept_member_update(dept, users_id_list):
-    old_users = dept.user_set.all()
-    new_users = []
-    for user_id in users_id_list:
-        new_users.extend(User.objects.filter(id=user_id))
-
-    remove_user = [user for user in old_users if user not in new_users]
-    add_user = [user for user in new_users if user not in old_users]
-
-    for user in add_user:
-        user.dept = dept
-        user.save()
-
-    dept_default = DEPT.objects.get(id=2)
-    for user in remove_user:
-        user.dept = dept_default
-        user.save()
-
-
-@require_role(role='super')
-def dept_del_ajax(request):
-    dept_ids = request.POST.get('dept_ids')
-    for dept_id in dept_ids.split(','):
-        if int(dept_id) > 2:
-            DEPT.objects.filter(id=dept_id).delete()
-    return HttpResponse("删除成功")
-
-
-@require_role(role='super')
-def dept_edit(request):
-    header_title, path1, path2 = '部门编辑', '用户管理', '部门编辑'
-    if request.method == 'GET':
-        dept_id = request.GET.get('id', '')
-        if dept_id:
-            dept = DEPT.objects.filter(id=dept_id)
-            if dept:
-                dept = dept[0]
-                users = dept_member(dept_id)
-                users_all = User.objects.all()
-                users_other = [user for user in users_all if user not in users]
-            else:
-                error = 'id 错误'
-        else:
-            error = u'部门不存在'
-    else:
-        dept_id = request.POST.get('id', '')
-        name = request.POST.get('name', '')
-        users = request.POST.getlist('users_selected', [])
-        comment = request.POST.get('comment', '')
-
-        dept = DEPT.objects.filter(id=dept_id)
-        if dept:
-            dept.update(name=name, comment=comment)
-            dept_member_update(dept[0], users)
-        else:
-            error = '部门不存在'
-        return HttpResponseRedirect('/juser/dept_list/')
-    return render_to_response('juser/dept_edit.html', locals(), context_instance=RequestContext(request))
-
-
-def dept_user_ajax(request):
-    dept_id = request.GET.get('id', '4')
-    if dept_id not in ['1', '2']:
-        dept = DEPT.objects.filter(id=dept_id)
-        if dept:
-            dept = dept[0]
-            users = dept.user_set.all()
-    else:
-        users = User.objects.all()
-
-    return render_to_response('juser/dept_user_ajax.html', locals())
-
-
-
-@require_role(role='super')
 def group_add(request):
     error = ''
     msg = ''
-    header_title, path1, path2 = '添加小组', '用户管理', '添加小组'
+    header_title, path1, path2 = '添加用户组', '用户管理', '添加用户组'
     user_all = User.objects.all()
-    dept_all = DEPT.objects.all()
 
     if request.method == 'POST':
         group_name = request.POST.get('group_name', '')
-        dept_id = request.POST.get('dept_id', '')
         users_selected = request.POST.getlist('users_selected', '')
         comment = request.POST.get('comment', '')
 
         try:
-            if '' in [group_name, dept_id]:
-                error = u'组名 或 部门 不能为空'
+            if not group_name:
+                error = u'组名 不能为空'
                 raise ServerError(error)
 
             if UserGroup.objects.filter(name=group_name):
                 error = u'组名已存在'
                 raise ServerError(error)
-
-            dept = DEPT.objects.filter(id=dept_id)
-            if dept:
-                dept = dept[0]
-            else:
-                error = u'部门不存在'
-                raise ServerError(error)
-
-            db_add_group(name=group_name, users=users_selected, dept=dept, comment=comment)
+            db_add_group(name=group_name, users_id=users_selected, comment=comment)
         except ServerError:
             pass
         except TypeError:
-            error = u'保存小组失败'
-        else:
-            msg = u'添加组 %s 成功' % group_name
-
-    return render_to_response('juser/group_add.html', locals(), context_instance=RequestContext(request))
-
-
-@require_role(role='admin')
-def group_add_adm(request):
-    error = ''
-    msg = ''
-    header_title, path1, path2 = '添加小组', '用户管理', '添加小组'
-    user, dept = get_session_user_dept(request)
-    user_all = dept.user_set.all()
-
-    if request.method == 'POST':
-        group_name = request.POST.get('group_name', '')
-        users_selected = request.POST.getlist('users_selected', '')
-        comment = request.POST.get('comment', '')
-
-        try:
-            if not validate(request, user=users_selected):
-                raise ServerError('没有某用户权限')
-            if '' in [group_name]:
-                error = u'组名不能为空'
-                raise ServerError(error)
-
-            db_add_group(name=group_name, users=users_selected, dept=dept, comment=comment)
-        except ServerError:
-            pass
-        except TypeError:
-            error = u'保存小组失败'
+            error = u'添加小组失败'
         else:
             msg = u'添加组 %s 成功' % group_name
 
