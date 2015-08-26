@@ -4,174 +4,15 @@
 
 import random
 from Crypto.PublicKey import RSA
-import crypt
 
 from django.db.models import Q
 from django.template import RequestContext
 from django.db.models import ObjectDoesNotExist
 
-from jumpserver.api import *
+from juser.user_api import *
 
 
-def md5_crypt(string):
-    return hashlib.new("md5", string).hexdigest()
-
-
-def gen_rand_pwd(num):
-    """
-    generate random password
-    生成随机密码
-    """
-    seed = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    salt_list = []
-    for i in range(num):
-        salt_list.append(random.choice(seed))
-    salt = ''.join(salt_list)
-    return salt
-
-
-def gen_sha512(salt, password):
-    """
-    generate sha512 format password
-    生成sha512加密密码
-    """
-    return crypt.crypt(password, '$6$%s$' % salt)
-
-
-def group_add_user(group, user_id=None, username=None):
-    """
-    用户组中添加用户
-    UserGroup Add a user
-    """
-    if user_id:
-        user = get_object(User, id=user_id)
-    else:
-        user = get_object(User, username=username)
-    group.user_set.add(user)
-
-
-def db_add_group(**kwargs):
-    name = kwargs.get('name')
-    group = UserGroup.objects.filter(name=name)
-    users = kwargs.pop('users')
-    if group:
-        raise ServerError(u'用户组 %s 已经存在' % name)
-    group = UserGroup(**kwargs)
-    group.save()
-    for user_id in users:
-        group_add_user(group, user_id)
-
-
-def db_add_user(**kwargs):
-    groups_post = kwargs.pop('groups')
-    user = User(**kwargs)
-    user.save()
-    if groups_post:
-        group_select = []
-        for group_id in groups_post:
-            group = UserGroup.objects.filter(id=group_id)
-            group_select.extend(group)
-        user.group = group_select
-    return user
-
-
-def db_update_user(**kwargs):
-    groups_post = kwargs.pop('groups')
-    user_id = kwargs.pop('user_id')
-    user = User.objects.filter(id=user_id)
-    if user:
-        user.update(**kwargs)
-        user = User.objects.get(id=user_id)
-        user.save()
-
-    if groups_post:
-        group_select = []
-        for group_id in groups_post:
-            group = UserGroup.objects.filter(id=group_id)
-            group_select.extend(group)
-        user.group = group_select
-
-
-def db_del_user(username):
-    try:
-        user = User.objects.get(username=username)
-        user.delete()
-    except ObjectDoesNotExist:
-        pass
-
-
-def gen_ssh_key(username, password=None, length=2048):
-    private_key_dir = os.path.join(BASE_DIR, 'keys/jumpserver/')
-    private_key_file = os.path.join(private_key_dir, username+".pem")
-    public_key_dir = '/home/%s/.ssh/' % username
-    public_key_file = os.path.join(public_key_dir, 'authorized_keys')
-    is_dir(private_key_dir)
-    is_dir(public_key_dir, username, mode=0700)
-
-    key = RSA.generate(length)
-    with open(private_key_file, 'w') as pri_f:
-        pri_f.write(key.exportKey('PEM', password))
-    os.chmod(private_key_file, 0600)
-
-    pub_key = key.publickey()
-    with open(public_key_file, 'w') as pub_f:
-        pub_f.write(pub_key.exportKey('OpenSSH'))
-    os.chmod(public_key_file, 0600)
-    bash('chown %s:%s %s' % (username, username, public_key_file))
-
-
-def server_add_user(username, password, ssh_key_pwd):
-    bash("useradd '%s'; echo '%s' | passwd --stdin '%s'" % (username, password, username))
-    gen_ssh_key(username, ssh_key_pwd)
-
-
-def server_del_user(username):
-    bash('userdel -r %s' % username)
-
-
-def ldap_add_user(username, ldap_pwd):
-    user_dn = "uid=%s,ou=People,%s" % (username, LDAP_BASE_DN)
-    password_sha512 = gen_sha512(gen_rand_pwd(6), ldap_pwd)
-    user = User.objects.filter(username=username)
-    if user:
-        user = user[0]
-    else:
-        raise ServerError(u'用户 %s 不存在' % username)
-
-    user_attr = {'uid': [str(username)],
-                 'cn': [str(username)],
-                 'objectClass': ['account', 'posixAccount', 'top', 'shadowAccount'],
-                 'userPassword': ['{crypt}%s' % password_sha512],
-                 'shadowLastChange': ['16328'],
-                 'shadowMin': ['0'],
-                 'shadowMax': ['99999'],
-                 'shadowWarning': ['7'],
-                 'loginShell': ['/bin/bash'],
-                 'uidNumber': [str(user.id)],
-                 'gidNumber': [str(user.id)],
-                 'homeDirectory': [str('/home/%s' % username)]}
-
-    group_dn = "cn=%s,ou=Group,%s" % (username, LDAP_BASE_DN)
-    group_attr = {'objectClass': ['posixGroup', 'top'],
-                  'cn': [str(username)],
-                  'userPassword': ['{crypt}x'],
-                  'gidNumber': [str(user.id)]}
-
-    ldap_conn.add(user_dn, user_attr)
-    ldap_conn.add(group_dn, group_attr)
-
-
-def ldap_del_user(username):
-    user_dn = "uid=%s,ou=People,%s" % (username, LDAP_BASE_DN)
-    group_dn = "cn=%s,ou=Group,%s" % (username, LDAP_BASE_DN)
-    sudo_dn = 'cn=%s,ou=Sudoers,%s' % (username, LDAP_BASE_DN)
-
-    ldap_conn.delete(user_dn)
-    ldap_conn.delete(group_dn)
-    ldap_conn.delete(sudo_dn)
-
-
-@require_super_user
+@require_role(role='super')
 def dept_add(request):
     header_title, path1, path2 = '添加部门', '用户管理', '添加部门'
     if request.method == 'POST':
@@ -192,7 +33,7 @@ def dept_add(request):
     return render_to_response('juser/dept_add.html', locals(), context_instance=RequestContext(request))
 
 
-@require_super_user
+@require_role(role='super')
 def dept_list(request):
     header_title, path1, path2 = '查看部门', '用户管理', '查看部门'
     keyword = request.GET.get('search')
@@ -206,7 +47,7 @@ def dept_list(request):
     return render_to_response('juser/dept_list.html', locals(), context_instance=RequestContext(request))
 
 
-@require_admin
+@require_role(role='admin')
 def dept_list_adm(request):
     header_title, path1, path2 = '查看部门', '用户管理', '查看部门'
     user, dept = get_session_user_dept(request)
@@ -226,7 +67,7 @@ def chg_role(request):
     return HttpResponseRedirect('/')
 
 
-@require_super_user
+@require_role(role='super')
 def dept_detail(request):
     dept_id = request.GET.get('id', None)
     if not dept_id:
@@ -238,7 +79,7 @@ def dept_detail(request):
     return render_to_response('juser/dept_detail.html', locals(), context_instance=RequestContext(request))
 
 
-@require_super_user
+@require_role(role='super')
 def dept_del(request):
     dept_id = request.GET.get('id', None)
     if not dept_id or dept_id in ['1', '2']:
@@ -276,7 +117,7 @@ def dept_member_update(dept, users_id_list):
         user.save()
 
 
-@require_super_user
+@require_role(role='super')
 def dept_del_ajax(request):
     dept_ids = request.POST.get('dept_ids')
     for dept_id in dept_ids.split(','):
@@ -285,7 +126,7 @@ def dept_del_ajax(request):
     return HttpResponse("删除成功")
 
 
-@require_super_user
+@require_role(role='super')
 def dept_edit(request):
     header_title, path1, path2 = '部门编辑', '用户管理', '部门编辑'
     if request.method == 'GET':
@@ -331,7 +172,7 @@ def dept_user_ajax(request):
 
 
 
-@require_super_user
+@require_role(role='super')
 def group_add(request):
     error = ''
     msg = ''
@@ -372,7 +213,7 @@ def group_add(request):
     return render_to_response('juser/group_add.html', locals(), context_instance=RequestContext(request))
 
 
-@require_admin
+@require_role(role='admin')
 def group_add_adm(request):
     error = ''
     msg = ''
@@ -403,7 +244,7 @@ def group_add_adm(request):
     return render_to_response('juser/group_add.html', locals(), context_instance=RequestContext(request))
 
 
-@require_super_user
+@require_role(role='super')
 def group_list(request):
     header_title, path1, path2 = '查看小组', '用户管理', '查看小组'
     keyword = request.GET.get('search', '')
@@ -423,7 +264,7 @@ def group_list(request):
     return render_to_response('juser/group_list.html', locals(), context_instance=RequestContext(request))
 
 
-@require_admin
+@require_role(role='admin')
 def group_list_adm(request):
     header_title, path1, path2 = '查看部门小组', '用户管理', '查看小组'
     keyword = request.GET.get('search', '')
@@ -438,7 +279,7 @@ def group_list_adm(request):
     return render_to_response('juser/group_list.html', locals(), context_instance=RequestContext(request))
 
 
-@require_admin
+@require_role(role='admin')
 def group_detail(request):
     group_id = request.GET.get('id', None)
     if not group_id:
@@ -448,7 +289,7 @@ def group_detail(request):
     return render_to_response('juser/group_detail.html', locals(), context_instance=RequestContext(request))
 
 
-@require_super_user
+@require_role(role='super')
 def group_del(request):
     group_id = request.GET.get('id', '')
     if not group_id:
@@ -457,7 +298,7 @@ def group_del(request):
     return HttpResponseRedirect('/juser/group_list/')
 
 
-@require_admin
+@require_role(role='admin')
 def group_del_adm(request):
     group_id = request.GET.get('id', '')
     if not validate(request, user_group=[group_id]):
@@ -468,7 +309,7 @@ def group_del_adm(request):
     return HttpResponseRedirect('/juser/group_list/')
 
 
-@require_admin
+@require_role(role='admin')
 def group_del_ajax(request):
     group_ids = request.POST.get('group_ids')
     group_ids = group_ids.split(',')
@@ -490,7 +331,7 @@ def group_update_member(group_id, users_id_list):
             group.user_set.add(user)
 
 
-@require_super_user
+@require_role(role='super')
 def group_edit(request):
     error = ''
     msg = ''
@@ -538,7 +379,7 @@ def group_edit(request):
         return HttpResponseRedirect('/juser/group_list/')
 
 
-@require_admin
+@require_role(role='admin')
 def group_edit_adm(request):
     error = ''
     msg = ''
@@ -586,7 +427,7 @@ def group_edit_adm(request):
         return HttpResponseRedirect('/juser/group_list/')
 
 
-@require_super_user
+@require_role(role='super')
 def user_add(request):
     error = ''
     msg = ''
@@ -597,15 +438,15 @@ def user_add(request):
 
     if request.method == 'POST':
         username = request.POST.get('username', '')
-        password = gen_rand_pwd(16)
+        password = PyCrypt.gen_rand_pwd(16)
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
         dept_id = request.POST.get('dept_id')
         groups = request.POST.getlist('groups', [])
         role_post = request.POST.get('role', 'CU')
-        ssh_key_pwd = gen_rand_pwd(16)
+        ssh_key_pwd = PyCrypt.gen_rand_pwd(16)
         is_active = True if request.POST.get('is_active', '1') == '1' else False
-        ldap_pwd = gen_rand_pwd(16)
+        ldap_pwd = PyCrypt.gen_rand_pwd(16)
 
         try:
             if '' in [username, password, ssh_key_pwd, name, groups, role_post, is_active]:
@@ -667,7 +508,7 @@ def user_add(request):
     return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
 
 
-@require_admin
+@require_role(role='admin')
 def user_add_adm(request):
     error = ''
     msg = ''
@@ -677,13 +518,13 @@ def user_add_adm(request):
 
     if request.method == 'POST':
         username = request.POST.get('username', '')
-        password = gen_rand_pwd(16)
+        password = PyCrypt.gen_rand_pwd(16)
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
         groups = request.POST.getlist('groups', [])
-        ssh_key_pwd = gen_rand_pwd(16)
+        ssh_key_pwd = PyCrypt.gen_rand_pwd(16)
         is_active = True if request.POST.get('is_active', '1') == '1' else False
-        ldap_pwd = gen_rand_pwd(16)
+        ldap_pwd = PyCrypt.gen_rand_pwd(16)
 
         try:
             if '' in [username, password, ssh_key_pwd, name, groups, is_active]:
@@ -739,7 +580,7 @@ def user_add_adm(request):
     return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
 
 
-@require_super_user
+@require_role(role='super')
 def user_list(request):
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
     header_title, path1, path2 = '查看用户', '用户管理', '用户列表'
@@ -768,7 +609,7 @@ def user_list(request):
     return render_to_response('juser/user_list.html', locals(), context_instance=RequestContext(request))
 
 
-@require_admin
+@require_role(role='admin')
 def user_list_adm(request):
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
     header_title, path1, path2 = '查看用户', '用户管理', '用户列表'
@@ -793,7 +634,7 @@ def user_list_adm(request):
     return render_to_response('juser/user_list.html', locals(), context_instance=RequestContext(request))
 
 
-@require_login
+@require_role(role='user')
 def user_detail(request):
     header_title, path1, path2 = '查看用户', '用户管理', '用户详情'
     if request.session.get('role_id') == 0:
@@ -810,7 +651,7 @@ def user_detail(request):
     user = User.objects.filter(id=user_id)
     if user:
         user = user[0]
-        asset_group_permed = user_perm_group_api(user)
+        asset_group_permed = user.get_asset_group()
         logs_last = Log.objects.filter(user=user.name).order_by('-start_time')[0:10]
         logs_all = Log.objects.filter(user=user.name).order_by('-start_time')
         logs_num = len(logs_all)
@@ -818,7 +659,7 @@ def user_detail(request):
     return render_to_response('juser/user_detail.html', locals(), context_instance=RequestContext(request))
 
 
-@require_admin
+@require_role(role='admin')
 def user_del(request):
     user_id = request.GET.get('id', '')
     if not user_id:
@@ -838,7 +679,7 @@ def user_del(request):
     return HttpResponseRedirect('/juser/user_list/')
 
 
-@require_admin
+@require_role(role='admin')
 def user_del_ajax(request):
     user_ids = request.POST.get('ids')
     user_ids = user_ids.split(',')
@@ -857,7 +698,7 @@ def user_del_ajax(request):
     return HttpResponse('删除成功')
 
 
-@require_super_user
+@require_role(role='super')
 def user_edit(request):
     header_title, path1, path2 = '编辑用户', '用户管理', '用户编辑'
     if request.method == 'GET':
@@ -920,7 +761,7 @@ def user_edit(request):
     return render_to_response('juser/user_edit.html', locals(), context_instance=RequestContext(request))
 
 
-@require_admin
+@require_role(role='admin')
 def user_edit_adm(request):
     header_title, path1, path2 = '编辑用户', '用户管理', '用户编辑'
     user, dept = get_session_user_dept(request)
@@ -1020,21 +861,18 @@ def chg_info(request):
     return render_to_response('juser/chg_info.html', locals(), context_instance=RequestContext(request))
 
 
-
-
-
-@require_login
+@require_role(role='user')
 def down_key(request):
     user_id = ''
-    if is_super_user(request):
+    if is_role_request(request, 'super'):
         user_id = request.GET.get('id')
 
-    if is_group_admin(request):
+    if is_role_request(request, 'admin'):
         user_id = request.GET.get('id')
         if not validate(request, user=[user_id]):
             user_id = request.session.get('user_id')
 
-    if is_common_user(request):
+    if is_role_request(request, 'user'):
         user_id = request.session.get('user_id')
 
     if user_id:

@@ -4,6 +4,7 @@ import os, sys, time
 from ConfigParser import ConfigParser
 import getpass
 from Crypto.Cipher import AES
+import crypt
 from binascii import b2a_hex, a2b_hex
 import ldap
 from ldap import modlist
@@ -13,15 +14,18 @@ import random
 import subprocess
 import paramiko
 import struct, fcntl, signal,socket, select, fnmatch
+from functools import partial
+
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response
+from django.template import RequestContext
 from juser.models import User, UserGroup, DEPT
 from jasset.models import Asset, BisGroup, IDC
 from jlog.models import Log
 from jasset.models import AssetAlias
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponseRedirect
+from django.shortcuts import render_to_response
 from django.core.mail import send_mail
 import json
 import logging
@@ -50,20 +54,29 @@ SEND_PORT = CONF.get('base', 'port')
 MAIL_FROM = CONF.get('mail', 'email_host_user')
 log_dir = os.path.join(BASE_DIR, 'logs')
 
+
 def set_log(level):
+    """
+    return a log file object
+    根据提示设置log打印
+    """
     log_level_total = {'debug': logging.DEBUG, 'info': logging.INFO, 'warning': logging.WARN, 'error': logging.ERROR,
                        'critical': logging.CRITICAL}
-    logger = logging.getLogger('jumpserver')
-    logger.setLevel(logging.DEBUG)
+    logger_f = logging.getLogger('jumpserver')
+    logger_f.setLevel(logging.DEBUG)
     fh = logging.FileHandler(JLOG_FILE)
     fh.setLevel(log_level_total.get(level, logging.DEBUG))
     formatter = logging.Formatter('%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
-    logger.addHandler(fh)
-    return logger
+    logger_f.addHandler(fh)
+    return logger_f
 
 
 class LDAPMgmt():
+    """
+    LDAP class for add, select, del, update
+    LDAP 管理类，增删改查
+    """
     def __init__(self,
                  host_url,
                  base_dn,
@@ -77,6 +90,10 @@ class LDAPMgmt():
         self.conn.simple_bind_s(root_cn, root_pw)
 
     def list(self, filter, scope=ldap.SCOPE_SUBTREE, attr=None):
+        """
+        query
+        查询
+        """
         result = {}
         try:
             ldap_result = self.conn.search_s(self.ldap_base_dn, scope, filter, attr)
@@ -90,6 +107,10 @@ class LDAPMgmt():
             print e
 
     def add(self, dn, attrs):
+        """
+        add
+        添加
+        """
         try:
             ldif = modlist.addModlist(attrs)
             self.conn.add_s(dn, ldif)
@@ -97,6 +118,10 @@ class LDAPMgmt():
             print e
 
     def modify(self, dn, attrs):
+        """
+        modify
+        更改
+        """
         try:
             attr_s = []
             for k, v in attrs.items():
@@ -106,6 +131,10 @@ class LDAPMgmt():
             print e
 
     def delete(self, dn):
+        """
+        delete
+        删除
+        """
         try:
             self.conn.delete_s(dn)
         except ldap.LDAPError, e:
@@ -113,6 +142,10 @@ class LDAPMgmt():
 
 
 def page_list_return(total, current=1):
+    """
+    page
+    分页，返回本次分页的最小页数到最大页数列表
+    """
     min_page = current - 2 if current - 4 > 0 else 1
     max_page = min_page + 4 if min_page + 4 < total else total
 
@@ -120,7 +153,10 @@ def page_list_return(total, current=1):
 
 
 def pages(posts, r):
-    """分页公用函数"""
+    """
+    page public function , return page's object tuple
+    分页公用函数，返回分页的对象元组
+    """
     contact_list = posts
     p = paginator = Paginator(contact_list, 10)
     try:
@@ -148,6 +184,10 @@ def pages(posts, r):
 
 
 class Jtty(object):
+    """
+    A virtual tty class
+    一个虚拟终端类，实现连接ssh和记录日志
+    """
     def __init__(self, user, asset):
         self.chan = None
         self.username = user.username
@@ -260,7 +300,10 @@ class Jtty(object):
             log.save()
 
     def get_connect_item(self):
-        """获取连接需要的参数，也就是服务ip, 端口, 用户账号和密码"""
+        """
+        get args for connect: ip, port, username, passwd
+        获取连接需要的参数，也就是服务ip, 端口, 用户账号和密码
+        """
         if not self.asset.is_active:
             raise ServerError('该主机被禁用 Host %s is not active.' % self.ip)
 
@@ -283,15 +326,13 @@ class Jtty(object):
         else:
             raise ServerError('不支持的服务器登录方式 Login type is not in ["L", "M"]')
 
-    def connect(self):
+    def get_connection(self):
         """
-        Connect server.
-        连接服务器
+        Get the ssh connection for reuse
+        获取连接套接字
         """
         username, password, ip, port = self.get_connect_item()
         logger.debug("username: %s, password: %s, ip: %s, port: %s" % (username, password, ip, port))
-        ps1 = "PS1='[\u@%s \W]\$ '\n" % self.ip
-        login_msg = "clear;echo -e '\\033[32mLogin %s done. Enjoy it.\\033[0m'\n" % ip
 
         # 发起ssh连接请求 Make a ssh connection
         ssh = paramiko.SSHClient()
@@ -303,6 +344,19 @@ class Jtty(object):
             raise ServerError('认证错误 Authentication Error.')
         except socket.error:
             raise ServerError('端口可能不对 Connect SSH Socket Port Error, Please Correct it.')
+        else:
+            return ssh
+
+    def connect(self):
+        """
+        Connect server.
+        连接服务器
+        """
+        ps1 = "PS1='[\u@%s \W]\$ '\n" % self.ip
+        login_msg = "clear;echo -e '\\033[32mLogin %s done. Enjoy it.\\033[0m'\n" % self.asset.ip
+
+        # 发起ssh连接请求 Make a ssh connection
+        ssh = self.get_connection()
 
         # 获取连接的隧道并设置窗口大小 Make a channel and set windows size
         global channel
@@ -324,11 +378,18 @@ class Jtty(object):
         channel.close()
         ssh.close()
 
+    def execute(self, cmd):
+        """
+        execute cmd on the asset
+        执行命令
+        """
+        pass
+
 
 class PyCrypt(object):
     """
     This class used to encrypt and decrypt password.
-    对称加密库
+    加密类
     """
 
     def __init__(self, key):
@@ -353,12 +414,24 @@ class PyCrypt(object):
 
     @staticmethod
     def md5_crypt(string):
+        """
+        md5 encrypt method
+        md5非对称加密方法
+        """
         return hashlib.new("md5", string).hexdigest()
+
+    @staticmethod
+    def gen_sha512(salt, password):
+        """
+        generate sha512 format password
+        生成sha512加密密码
+        """
+        return crypt.crypt(password, '$6$%s$' % salt)
 
     def encrypt(self, passwd=None):
         """
         encrypt gen password
-        加密生成密码
+        对称加密之加密生成密码
         """
         if not passwd:
             passwd = self.random_pass()
@@ -376,6 +449,10 @@ class PyCrypt(object):
         return b2a_hex(cipher_text)
 
     def decrypt(self, text):
+        """
+        decrypt pass base the same key
+        对称加密之解密，同一个加密随机数
+        """
         cryptor = AES.new(self.key, self.mode, b'8122ca7d906ad5e1')
         try:
             plain_text = cryptor.decrypt(a2b_hex(text))
@@ -386,10 +463,18 @@ class PyCrypt(object):
 
 
 class ServerError(Exception):
+    """
+    self define exception
+    自定义异常
+    """
     pass
 
 
 def get_object(model, **kwargs):
+    """
+    use this function for query
+    使用改封装函数查询数据库
+    """
     try:
         the_object = model.objects.get(**kwargs)
     except ObjectDoesNotExist:
@@ -399,7 +484,8 @@ def get_object(model, **kwargs):
 
 def require_role(role='user'):
     """
-    要求用户是某种角色 ["super", "admin", "user"]
+    decorator for require user role in ["super", "admin", "user"]
+    要求用户是某种角色 ["super", "admin", "user"]的装饰器
     """
     def _deco(func):
         def __deco(request, *args, **kwargs):
@@ -413,27 +499,30 @@ def require_role(role='user'):
                 if request.session.get('role_id', 0) != 2:
                     return HttpResponseRedirect('/')
             return func(request, *args, **kwargs)
-        return __deco()
+        return __deco
     return _deco
 
 
 def is_role_request(request, role='user'):
     """
-    :param request: 请求
-    :param role: 角色
-    :return: bool
+    require this request of user is right
     要求请求角色正确
     """
     role_all = {'user': 0, 'admin': 1, 'super': 2}
-    if request.session.get('role_id') == role_all.get(role, '0'):
+    if request.session.get('role_id') == role_all.get(role, 0):
         return True
     else:
         return False
 
 
-@require_role
 def get_session_user_dept(request):
+    """
+    get department of the user in session
+    获取session中用户的部门
+    """
     user_id = request.session.get('user_id', 0)
+    print '#' * 20
+    print user_id
     user = User.objects.filter(id=user_id)
     if user:
         user = user[0]
@@ -443,6 +532,10 @@ def get_session_user_dept(request):
 
 @require_role
 def get_session_user_info(request):
+    """
+    get the user info of the user in session, for example id, username etc.
+    获取用户的信息
+    """
     user_id = request.session.get('user_id', 0)
     user = User.objects.filter(id=user_id)
     if user:
@@ -452,6 +545,10 @@ def get_session_user_info(request):
 
 
 def get_user_dept(request):
+    """
+    get the user dept id
+    获取用户的部门id
+    """
     user_id = request.session.get('user_id')
     if user_id:
         user_dept = User.objects.get(id=user_id).dept
@@ -466,16 +563,24 @@ def api_user(request):
     return HttpResponse(json_data)
 
 
-# def view_splitter(request, su=None, adm=None):
-#     if is_super_user(request):
-#         return su(request)
-#     elif is_group_admin(request):
-#         return adm(request)
-#     else:
-#         return HttpResponseRedirect('/login/')
+def view_splitter(request, su=None, adm=None):
+    """
+    for different user use different view
+    视图分页器
+    """
+    if is_role_request(request, 'super'):
+        return su(request)
+    elif is_role_request(request, 'admin'):
+        return adm(request)
+    else:
+        return HttpResponseRedirect('/login/')
 
 
 def validate(request, user_group=None, user=None, asset_group=None, asset=None, edept=None):
+    """
+    validate the user request
+    判定用户请求是否合法
+    """
     dept = get_session_user_dept(request)[1]
     if edept:
         if dept.id != int(edept[0]):
@@ -565,12 +670,18 @@ def verify(request, user_group=None, user=None, asset_group=None, asset=None, ed
 
 
 def bash(cmd):
-    """执行bash命令"""
+    """
+    run a bash shell command
+    执行bash命令
+    """
     return subprocess.call(cmd, shell=True)
 
 
 def is_dir(dir_name, username='root', mode=0755):
-    """目录存在，如果不存在就建立，并且权限正确"""
+    """
+    insure the dir exist and mode ok
+    目录存在，如果不存在就建立，并且权限正确
+    """
     if not os.path.isdir(dir_name):
         os.makedirs(dir_name)
         bash("chown %s:%s '%s'" % (username, username, dir_name))

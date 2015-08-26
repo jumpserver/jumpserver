@@ -1,15 +1,18 @@
 # coding: utf-8
 
 from __future__ import division
+import uuid
+import urllib
+
 from django.db.models import Count
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import HttpResponseNotFound
+from django.http import HttpResponse
 from jperm.models import Apply
 import paramiko
 from jumpserver.api import *
-import uuid
-import urllib
+
 
 
 def getDaysByNum(num):
@@ -44,7 +47,7 @@ def get_data(data, items, option):
     return dic
 
 
-@require_login
+@require_role(role='user')
 def index_cu(request):
     user_id = request.session.get('user_id')
     user = User.objects.filter(id=user_id)
@@ -53,7 +56,7 @@ def index_cu(request):
     login_types = {'L': 'LDAP', 'M': 'MAP'}
     user_id = request.session.get('user_id')
     username = User.objects.get(id=user_id).username
-    posts = user_perm_asset_api(username)
+    posts = user.get_asset()
     host_count = len(posts)
     new_posts = []
     post_five = []
@@ -68,16 +71,16 @@ def index_cu(request):
     return render_to_response('index_cu.html', locals(), context_instance=RequestContext(request))
 
 
-@require_login
+@require_role(role='user')
 def index(request):
     li_date, li_str = getDaysByNum(7)
     today = datetime.datetime.now().day
     from_week = datetime.datetime.now() - datetime.timedelta(days=7)
 
-    if is_common_user(request):
+    if is_role_request(request, 'user'):
         return index_cu(request)
 
-    elif is_super_user(request):
+    elif is_role_request(request, 'super'):
         users = User.objects.all()
         hosts = Asset.objects.all()
         online = Log.objects.filter(is_finished=0)
@@ -87,7 +90,7 @@ def index(request):
         active_hosts = Asset.objects.filter(is_active=1)
         week_data = Log.objects.filter(start_time__range=[from_week, datetime.datetime.now()])
 
-    elif is_group_admin(request):
+    elif is_role_request(request, 'admin'):
         user = get_session_user_info(request)[2]
         dept_name, dept = get_session_user_info(request)[4:]
         users = User.objects.filter(dept=dept)
@@ -205,7 +208,7 @@ def login(request):
         user_filter = User.objects.filter(username=username)
         if user_filter:
             user = user_filter[0]
-            if md5_crypt(password) == user.password:
+            if PyCrypt.md5_crypt(password) == user.password:
                 request.session['user_id'] = user.id
                 user_filter.update(last_login=datetime.datetime.now())
                 if user.role == 'SU':
@@ -216,7 +219,7 @@ def login(request):
                     request.session['role_id'] = 0
                 response = HttpResponseRedirect('/', )
                 response.set_cookie('username', username, expires=604800)
-                response.set_cookie('seed', md5_crypt(password), expires=604800)
+                response.set_cookie('seed', PyCrypt.md5_crypt(password), expires=604800)
                 return response
             else:
                 error = '密码错误，请重新输入。'
@@ -248,7 +251,7 @@ def filter_ajax_api(request):
 def install(request):
     from juser.models import DEPT, User
     if User.objects.filter(id=5000):
-        return httperror(request, 'Jumpserver已初始化，不能重复安装！')
+        return http_error(request, 'Jumpserver已初始化，不能重复安装！')
 
     dept = DEPT(id=1, name="超管部", comment="超级管理部门")
     dept.save()
@@ -257,7 +260,7 @@ def install(request):
     IDC(id=1, name="默认", comment="默认IDC").save()
     BisGroup(id=1, name="ALL", dept=dept, comment="所有主机组").save()
 
-    User(id=5000, username="admin", password=md5_crypt('admin'),
+    User(id=5000, username="admin", password=PyCrypt.md5_crypt('admin'),
          name='admin', email='admin@jumpserver.org', role='SU', is_active=True, dept=dept).save()
     return http_success(request, u'Jumpserver初始化成功')
 
@@ -278,55 +281,56 @@ def transfer(sftp, filenames):
 
 
 def upload(request):
-    user, dept = get_session_user_dept(request)
-    if request.method == 'POST':
-        hosts = request.POST.get('hosts')
-        upload_files = request.FILES.getlist('file[]', None)
-        upload_dir = "/tmp/%s" % user.username
-        is_dir(upload_dir)
-        date_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-        hosts_list = hosts.split(',')
-        user_hosts = get_user_host(user.username).keys()
-        unperm_hosts = []
-        filenames = {}
-        for ip in hosts_list:
-            if ip not in user_hosts:
-                unperm_hosts.append(ip)
-
-        if not hosts:
-            return HttpResponseNotFound(u'地址不能为空')
-
-        if unperm_hosts:
-            print hosts_list
-            return HttpResponseNotFound(u'%s 没有权限.' % ', '.join(unperm_hosts))
-
-        for upload_file in upload_files:
-            file_path = '%s/%s.%s' % (upload_dir, upload_file.name, date_now)
-            filenames[upload_file.name] = file_path
-            f = open(file_path, 'w')
-            for chunk in upload_file.chunks():
-                f.write(chunk)
-            f.close()
-
-        sftps = []
-        for host in hosts_list:
-            username, password, host, port = get_connect_item(user.username, host)
-            try:
-                t = paramiko.Transport((host, port))
-                t.connect(username=username, password=password)
-                sftp = paramiko.SFTPClient.from_transport(t)
-                sftps.append(sftp)
-            except paramiko.AuthenticationException:
-                return HttpResponseNotFound(u'%s 连接失败.' % host)
-
-        # pool = Pool(processes=5)
-        for sftp in sftps:
-            transfer(sftp, filenames)
-        # pool.close()
-        # pool.join()
-        return HttpResponse('传送成功')
-
-    return render_to_response('upload.html', locals(), context_instance=RequestContext(request))
+    pass
+#     user, dept = get_session_user_dept(request)
+#     if request.method == 'POST':
+#         hosts = request.POST.get('hosts')
+#         upload_files = request.FILES.getlist('file[]', None)
+#         upload_dir = "/tmp/%s" % user.username
+#         is_dir(upload_dir)
+#         date_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+#         hosts_list = hosts.split(',')
+#         user_hosts = [asset.ip for asset in user.get_asset()]
+#         unperm_hosts = []
+#         filenames = {}
+#         for ip in hosts_list:
+#             if ip not in user_hosts:
+#                 unperm_hosts.append(ip)
+#
+#         if not hosts:
+#             return HttpResponseNotFound(u'地址不能为空')
+#
+#         if unperm_hosts:
+#             print hosts_list
+#             return HttpResponseNotFound(u'%s 没有权限.' % ', '.join(unperm_hosts))
+#
+#         for upload_file in upload_files:
+#             file_path = '%s/%s.%s' % (upload_dir, upload_file.name, date_now)
+#             filenames[upload_file.name] = file_path
+#             f = open(file_path, 'w')
+#             for chunk in upload_file.chunks():
+#                 f.write(chunk)
+#             f.close()
+#
+#         sftps = []
+#         for host in hosts_list:
+#             username, password, host, port = get_connect_item(user.username, host)
+#             try:
+#                 t = paramiko.Transport((host, port))
+#                 t.connect(username=username, password=password)
+#                 sftp = paramiko.SFTPClient.from_transport(t)
+#                 sftps.append(sftp)
+#             except paramiko.AuthenticationException:
+#                 return HttpResponseNotFound(u'%s 连接失败.' % host)
+#
+#         # pool = Pool(processes=5)
+#         for sftp in sftps:
+#             transfer(sftp, filenames)
+#         # pool.close()
+#         # pool.join()
+#         return HttpResponse('传送成功')
+#
+#     return render_to_response('upload.html', locals(), context_instance=RequestContext(request))
 
 
 def node_auth(request):

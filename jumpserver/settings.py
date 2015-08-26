@@ -56,9 +56,9 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'jumpserver',
     'juser',
-    'jasset',
-    'jperm',
-    'jlog',
+    # 'jasset',
+    # 'jperm',
+    # 'jlog',
 )
 
 MIDDLEWARE_CLASSES = (

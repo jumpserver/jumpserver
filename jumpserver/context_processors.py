@@ -14,10 +14,12 @@ def name_proc(request):
         host_active_num = Asset.objects.filter(is_active=True).count()
     else:
         user, dept = get_session_user_dept(request)
+        print user, dept
         user_total_num = dept.user_set.all().count()
         user_active_num = dept.user_set.filter(is_active=True).count()
         host_total_num = dept.asset_set.all().count()
         host_active_num = dept.asset_set.all().filter(is_active=True).count()
+        pass
 
     username = User.objects.get(id=user_id).name
     apply_info = Apply.objects.filter(admin=username, status=0, read=0)

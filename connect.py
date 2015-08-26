@@ -17,8 +17,8 @@ from multiprocessing import Pool
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
     django.setup()
-from jumpserver.api import BASE_DIR, ServerError, User, UserGroup, Asset, Jtty, get_object
-from jumpserver.api import CRYPTOR, logger, is_dir
+from jumpserver.api import ServerError, User, Asset, Jtty, get_object
+from jumpserver.api import logger
 from jumpserver.api import BisGroup as AssetGroup
 
 login_user = get_object(User, username=getpass.getuser())
@@ -27,7 +27,7 @@ login_user = get_object(User, username=getpass.getuser())
 def color_print(msg, color='red', exits=False):
     """
     Print colorful string.
-    颜色打印
+    颜色打印字符或者退出
     """
     color_msg = {'blue': '\033[1;36m%s\033[0m',
                  'green': '\033[1;32m%s\033[0m',
@@ -40,7 +40,10 @@ def color_print(msg, color='red', exits=False):
 
 
 def verify_connect(user, option):
-    """鉴定用户是否有该主机权限 或 匹配到的ip是否唯一"""
+    """
+    Check user was permed or not . Check ip is unique or not.
+    鉴定用户是否有该主机权限 或 匹配到的ip是否唯一
+    """
     ip_matched = []
     try:
         assets_info = login_user.get_asset_info()
@@ -60,7 +63,7 @@ def verify_connect(user, option):
     logger.debug('%s matched input %s: %s' % (login_user.username, option, ip_matched))
     ip_matched = list(set(ip_matched))
 
-    if len(ip_matched) > 1:
+    if len(ip_matched) > 1:  # 如果匹配ip不唯一
         ip_comment = {}
         for ip in ip_matched:
             ip_comment[ip] = assets_info[ip][2]
@@ -71,15 +74,19 @@ def verify_connect(user, option):
             else:
                 print '%-15s' % ip
         print ''
-    elif len(ip_matched) < 1:
+    elif len(ip_matched) < 1:  # 如果没匹配到
         color_print('没有该主机，或者您没有该主机的权限 No Permission or No host.', 'red')
-    else:
+    else:  # 恰好是1个
         asset = get_object(Asset, ip=ip_matched[0])
         jtty = Jtty(user, asset)
         jtty.connect()
 
 
 def print_prompt():
+    """
+    Print prompt
+    打印提示导航
+    """
     msg = """\033[1;32m###  Welcome Use JumpServer To Login. ### \033[0m
     1) Type \033[32mIP or Part IP, Host Alias or Comments \033[0m To Login.
     2) Type \033[32mP/p\033[0m To Print The Servers You Available.
@@ -162,6 +169,10 @@ def print_prompt():
 
 
 def main():
+    """
+    he he
+    主程序
+    """
     if not login_user:  # 判断用户是否存在
         color_print(u'没有该用户，或许你是以root运行的 No that user.', exits=True)
 

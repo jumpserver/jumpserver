@@ -14,9 +14,9 @@ urlpatterns = patterns('',
     (r'^file/download/$', 'jumpserver.views.download'),
     (r'^error/$', 'jumpserver.views.httperror'),
     (r'^juser/', include('juser.urls')),
-    (r'^jasset/', include('jasset.urls')),
-    (r'^jlog/', include('jlog.urls')),
-    (r'^jperm/', include('jperm.urls')),
+    # (r'^jasset/', include('jasset.urls')),
+    # (r'^jlog/', include('jlog.urls')),
+    # (r'^jperm/', include('jperm.urls')),
     (r'^node_auth/', 'jumpserver.views.node_auth'),
 
 )

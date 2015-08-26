@@ -11,6 +11,7 @@
     <link rel="shortcut icon" href="/static/img/facio.ico" type="image/x-icon">
     {% include 'link_css.html' %}
     {% include 'head_script.html' %}
+    {% block self_head_css_js %} {% endblock %}
 
 
 </head>
@@ -30,4 +31,5 @@
 
 </body>
     {% include 'foot_script.html' %}
+    {% block self_footer_js %} {% endblock %}
 </html>
