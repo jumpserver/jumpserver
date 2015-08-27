@@ -24,6 +24,10 @@ def chg_role(request):
 
 @require_role(role='super')
 def group_add(request):
+    """
+    group add view for route
+    添加用户组的视图
+    """
     error = ''
     msg = ''
     header_title, path1, path2 = '添加用户组', '用户管理', '添加用户组'
@@ -55,51 +59,27 @@ def group_add(request):
 
 @require_role(role='super')
 def group_list(request):
-    header_title, path1, path2 = '查看小组', '用户管理', '查看小组'
+    """
+    list user group
+    用户组列表
+    """
+    header_title, path1, path2 = '查看用户组', '用户管理', '查看用户组'
     keyword = request.GET.get('search', '')
-    did = request.GET.get('did', '')
-    contact_list = UserGroup.objects.all().order_by('name')
-
-    if did:
-        dept = DEPT.objects.filter(id=did)
-        if dept:
-            dept = dept[0]
-            contact_list = dept.usergroup_set.all()
+    user_group_list = UserGroup.objects.all().order_by('name')
 
     if keyword:
-        contact_list = contact_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
+        user_group_list = user_group_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
 
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
+    contacts, p, contacts, page_range, current_page, show_first, show_end = pages(user_group_list, request)
     return render_to_response('juser/group_list.html', locals(), context_instance=RequestContext(request))
-
-
-@require_role(role='admin')
-def group_list_adm(request):
-    header_title, path1, path2 = '查看部门小组', '用户管理', '查看小组'
-    keyword = request.GET.get('search', '')
-    did = request.GET.get('did', '')
-    user, dept = get_session_user_dept(request)
-    contact_list = dept.usergroup_set.all().order_by('name')
-
-    if keyword:
-        contact_list = contact_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
-
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
-    return render_to_response('juser/group_list.html', locals(), context_instance=RequestContext(request))
-
-
-@require_role(role='admin')
-def group_detail(request):
-    group_id = request.GET.get('id', None)
-    if not group_id:
-        return HttpResponseRedirect('/')
-    group = UserGroup.objects.get(id=group_id)
-    users = group.user_set.all()
-    return render_to_response('juser/group_detail.html', locals(), context_instance=RequestContext(request))
 
 
 @require_role(role='super')
 def group_del(request):
+    """
+    del a group
+    删除用户组
+    """
     group_id = request.GET.get('id', '')
     if not group_id:
         return HttpResponseRedirect('/')
@@ -107,59 +87,56 @@ def group_del(request):
     return HttpResponseRedirect('/juser/group_list/')
 
 
-@require_role(role='admin')
-def group_del_adm(request):
-    group_id = request.GET.get('id', '')
-    if not validate(request, user_group=[group_id]):
-        return HttpResponseRedirect('/juser/group_list/')
-    if not group_id:
-        return HttpResponseRedirect('/')
-    UserGroup.objects.filter(id=group_id).delete()
-    return HttpResponseRedirect('/juser/group_list/')
-
-
-@require_role(role='admin')
+@require_role(role='super')
 def group_del_ajax(request):
     group_ids = request.POST.get('group_ids')
     group_ids = group_ids.split(',')
-    if request.session.get('role_id') == 1:
-        if not validate(request, user_group=group_ids):
-            return "error"
     for group_id in group_ids:
         UserGroup.objects.filter(id=group_id).delete()
     return HttpResponse('删除成功')
 
+# @require_role(role='admin')
+# def group_list_adm(request):
+#     header_title, path1, path2 = '查看部门小组', '用户管理', '查看小组'
+#     keyword = request.GET.get('search', '')
+#     did = request.GET.get('did', '')
+#     user, dept = get_session_user_dept(request)
+#     contact_list = dept.usergroup_set.all().order_by('name')
+#
+#     if keyword:
+#         contact_list = contact_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
+#
+#     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
+#     return render_to_response('juser/group_list.html', locals(), context_instance=RequestContext(request))
 
-def group_update_member(group_id, users_id_list):
-    group = UserGroup.objects.filter(id=group_id)
-    if group:
-        group = group[0]
-        group.user_set.clear()
-        for user_id in users_id_list:
-            user = User.objects.get(id=user_id)
-            group.user_set.add(user)
+#
+# @require_role(role='admin')
+# def group_detail(request):
+#     group_id = request.GET.get('id', None)
+#     if not group_id:
+#         return HttpResponseRedirect('/')
+#     group = UserGroup.objects.get(id=group_id)
+#     users = group.user_set.all()
+#     return render_to_response('juser/group_detail.html', locals(), context_instance=RequestContext(request))
 
 
 @require_role(role='super')
 def group_edit(request):
     error = ''
     msg = ''
-    header_title, path1, path2 = '修改小组信息', '用户管理', '编辑小组'
+    header_title, path1, path2 = '编辑用户组', '用户管理', '编辑用户组'
+
     if request.method == 'GET':
         group_id = request.GET.get('id', '')
-        group = UserGroup.objects.filter(id=group_id)
-        if group:
-            group = group[0]
-            dept_all = DEPT.objects.all()
+        user_group = get_object(UserGroup, id=group_id)
+        if user_group:
             users_all = User.objects.all()
-            users_selected = group.user_set.all()
-            users = [user for user in users_all if user not in users_selected]
+            users_selected = user_group.user_set.all()
+            users_remain = [user for user in users_all if user not in users_selected]
 
-        return render_to_response('juser/group_edit.html', locals(), context_instance=RequestContext(request))
     else:
         group_id = request.POST.get('group_id', '')
         group_name = request.POST.get('group_name', '')
-        dept_id = request.POST.get('dept_id', '')
         comment = request.POST.get('comment', '')
         users_selected = request.POST.getlist('users_selected')
 
@@ -167,25 +144,31 @@ def group_edit(request):
         try:
             if '' in [group_id, group_name]:
                 raise ServerError('组名不能为空')
-            dept = DEPT.objects.filter(id=dept_id)
-            if dept:
-                dept = dept[0]
-            else:
-                raise ServerError('部门不存在')
+
+            user_group = get_object(UserGroup, id=group_id)
+            other_group = get_object(UserGroup, name=group_name)
+
+            if other_group and other_group.id != int(group_id):
+                raise ServerError(u'%s 用户组已存在' % group_name)
+
             for user_id in users_selected:
                 users.extend(User.objects.filter(id=user_id))
 
-            user_group = UserGroup.objects.filter(id=group_id)
             if user_group:
-                user_group.update(name=group_name, comment=comment, dept=dept)
-                user_group = user_group[0]
+                user_group.update(name=group_name, comment=comment)
                 user_group.user_set.clear()
                 user_group.user_set = users
 
         except ServerError, e:
             error = e
+        if not error:
+            return HttpResponseRedirect('/juser/group_list/')
+        else:
+            users_all = User.objects.all()
+            users_selected = user_group.user_set.all()
+            users_remain = [user for user in users_all if user not in users_selected]
 
-        return HttpResponseRedirect('/juser/group_list/')
+    return render_to_response('juser/group_edit.html', locals(), context_instance=RequestContext(request))
 
 
 @require_role(role='admin')

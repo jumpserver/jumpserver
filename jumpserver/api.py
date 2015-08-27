@@ -152,35 +152,35 @@ def page_list_return(total, current=1):
     return range(min_page, max_page+1)
 
 
-def pages(posts, r):
+def pages(post_objects, request):
     """
     page public function , return page's object tuple
     分页公用函数，返回分页的对象元组
     """
-    contact_list = posts
-    p = paginator = Paginator(contact_list, 10)
+    paginator = Paginator(post_objects, 10)
     try:
-        current_page = int(r.GET.get('page', '1'))
+        current_page = int(request.GET.get('page', '1'))
     except ValueError:
         current_page = 1
 
-    page_range = page_list_return(len(p.page_range), current_page)
+    page_range = page_list_return(len(paginator.page_range), current_page)
 
     try:
-        contacts = paginator.page(current_page)
+        page_objects = paginator.page(current_page)
     except (EmptyPage, InvalidPage):
-        contacts = paginator.page(paginator.num_pages)
+        page_objects = paginator.page(paginator.num_pages)
 
     if current_page >= 5:
         show_first = 1
     else:
         show_first = 0
-    if current_page <= (len(p.page_range) - 3):
+
+    if current_page <= (len(paginator.page_range) - 3):
         show_end = 1
     else:
         show_end = 0
 
-    return contact_list, p, contacts, page_range, current_page, show_first, show_end
+    return post_objects, paginator, page_objects, page_range, current_page, show_first, show_end
 
 
 class Jtty(object):

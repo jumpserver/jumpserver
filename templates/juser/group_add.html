@@ -20,6 +20,7 @@
                             </a>
                         </div>
                     </div>
+
                     <div class="ibox-content">
                         <form id="groupForm" method="post" class="form-horizontal" action="">
                             {% if error %}
@@ -105,23 +106,6 @@ $('#groupForm').validator({
         form.submit();
     }
 });
-
-function change_type(type){
-    $.post('/juser/group_add_ajax/',
-           {'type': type},
-           function(data){
-               $('#users').html(data)
-           })
-}
-
-
-function change_dept(dept_id){
-    $.get('/juser/dept_user_ajax/',
-            {'id': dept_id},
-            function(data){
-                $('#users').html(data)
-            })
-}
 
 
 $(document).ready(function(){

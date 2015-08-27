@@ -116,10 +116,13 @@ def bool2str(value):
 #     return True
 #
 
-@register.filter(name='member_count')
-def member_count(group_id):
-    group = UserGroup.objects.get(id=group_id)
-    return group.user_set.count()
+@register.filter(name='members_count')
+def members_count(group_id):
+    group = get_object(UserGroup, id=group_id)
+    if group:
+        return group.user_set.count()
+    else:
+        return 0
 
 
 @register.filter(name='group_user_count')

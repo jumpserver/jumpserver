@@ -13,6 +13,11 @@ class UserGroup(models.Model):
     def get_user(self):
         return self.user_set.all()
 
+    def update(self, **kwargs):
+        for key, value in kwargs.items():
+            self.__setattr__(key, value)
+            self.save()
+
 
 class User(models.Model):
     USER_ROLE_CHOICES = (

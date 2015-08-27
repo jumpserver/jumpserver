@@ -35,6 +35,20 @@ def db_add_group(**kwargs):
             group_add_user(group, user_id)
 
 
+def group_update_member(group_id, users_id_list):
+    """
+    user group update member
+    用户组更新成员
+    """
+    group = get_object(UserGroup, id=group_id)
+    if group:
+        group.user_set.clear()
+        for user_id in users_id_list:
+            user = get_object(UserGroup, id=user_id)
+            if isinstance(user, UserGroup):
+                group.user_set.add(user)
+
+
 def db_add_user(**kwargs):
     """
     add a user in database
