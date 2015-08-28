@@ -17,12 +17,6 @@
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                                 <i class="fa fa-wrench"></i>
                             </a>
-                            <ul class="dropdown-menu dropdown-user">
-                                <li><a href="#">未启用 1</a>
-                                </li>
-                                <li><a href="#">未启用 2</a>
-                                </li>
-                            </ul>
                             <a class="close-link">
                                 <i class="fa fa-times"></i>
                             </a>
@@ -42,26 +36,6 @@
                                     <input id="username" name="username" placeholder="Username" type="text" class="form-control" {% if error %}value="{{ username }}" {% endif %}>
                                 </div>
                             </div>
-{#                            <div class="hr-line-dashed"></div>#}
-{#                            <div class="form-group">#}
-{#                                <label for="password" class="col-sm-2 control-label">密码<span class="red-fonts">*</span></label>#}
-{#                                <div class="col-sm-8">#}
-{#                                    <input id="password" name="password" placeholder="Password" type="password" class="form-control" {% if error %}value="{{ password }}" {% endif %}>#}
-{#                                    <span class="help-block m-b-none">#}
-{#                                        登陆web的密码#}
-{#                                    </span>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                            <div class="hr-line-dashed"></div>#}
-{#                            <div class="form-group">#}
-{#                                <label for="ssh_key_pwd" class="col-sm-2 control-label">密钥密码<span class="red-fonts">*</span></label>#}
-{#                                <div class="col-sm-8">#}
-{#                                    <input id="ssh_key_pwd" name="ssh_key_pwd" placeholder="SSH Key Password" type="password" class="form-control" {% if error %}value="{{ ssh_key_pwd }}" {% endif %}>#}
-{#                                    <span class="help-block m-b-none">#}
-{#                                        登陆 Jumpserver 使用的SSH密钥的密码#}
-{#                                    </span>#}
-{#                                </div>#}
-{#                            </div>#}
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
                                 <label for="name" class="col-sm-2 control-label">姓名<span class="red-fonts">*</span></label>
@@ -69,22 +43,9 @@
                                     <input id="name" name="name" placeholder="Name" type="text" class="form-control" {% if error %}value="{{ name }}" {% endif %} >
                                 </div>
                             </div>
-                            {% ifequal session_role_id 2 %}
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
-                                <label for="dept_id" class="col-lg-2 control-label">部门<span class="red-fonts">*</span></label>
-                                <div class="col-sm-8">
-                                    <select id="dept_id" name="dept_id" class="form-control m-b">
-                                        {% for dept in dept_all %}
-                                            <option value="{{ dept.id }}">{{ dept.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                            {% endifequal %}
-                            <div class="hr-line-dashed"></div>
-                            <div class="form-group">
-                                <label for="groups" class="col-lg-2 control-label">小组</label>
+                                <label for="groups" class="col-sm-2 control-label">用户组</label>
                                 <div class="col-sm-8">
                                     <select id="groups" name="groups" class="form-control m-b" multiple size="12">
                                         {% for group in group_all %}
@@ -100,17 +61,27 @@
                             {% ifequal session_role_id 2 %}
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
-                                <label for="role" class="col-lg-2 control-label">角色<span class="red-fonts">*</span></label>
+                                <label for="role" class="col-sm-2 control-label">角色<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <select id="role" name="role" class="form-control m-b">
-                                        {% for r, role_name in user_role.items %}
-                                            {% ifequal r role_post %}
-                                                <option value="{{ r }}" selected>{{ role_name }}</option>
-                                            {% else %}
-                                                <option value="{{ r }}">{{ role_name }}</option>
-                                            {% endifequal %}
-                                        {% endfor %}
-                                    </select>
+                                    {% for r, role_name in user_role.items %}
+                                    <div class="col-sm-3">
+                                        <div class="radio i-checks">
+                                            <label><input type="radio" value="{{ r }}" class="role" name="role" {% ifequal r 'CU' %}checked{% endifequal %}>{{ role_name }}</label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="form-group" id="admin_groups" style="display: none">
+                                <label for="role" class="col-sm-2 control-label">管理用户组<span class="red-fonts">*</span></label>
+                                <div class="col-sm-8">
+                                    {% for user_group in group_all %}
+                                    <div class="col-sm-3">
+                                        <div class="checkbox i-checks">
+                                            <label><input type="checkbox" value="{{ user_group.id }}" name="admin_groups" > {{ user_group.name }}</label>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
                                 </div>
                             </div>
                             {% endifequal %}
@@ -118,7 +89,7 @@
                             <div class="form-group">
                                 <label for="email" class="col-sm-2 control-label">Email<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <input id="email" name="email" type="email" placeholder="Email" class="form-control" {% if error %}value="{{ email }}" {% endif %}>
+                                    <input id="email" name="email" type="email" placeholder="username@jumpserver.org" class="form-control" {% if error %}value="{{ email }}" {% endif %}>
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
@@ -135,7 +106,7 @@
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-2">
-                                    <button class="btn btn-white" type="submit">取消</button>
+                                    <button class="btn btn-white" type="reset">取消</button>
                                     <button id="submit_button" class="btn btn-primary" type="submit">确认保存</button>
                                 </div>
                             </div>
@@ -145,21 +116,22 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block self_footer_js %}
 
 <script>
 $('#userForm').validator({
     timely: 2,
     theme: "yellow_right_effect",
     rules: {
-        check_ip: [/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])){3}$/, 'ip地址不正确'],
-        check_port: [/^\d{1,5}$/, '端口号不正确'],
+        check_username: [/^\w{3,20}$/, '大小写字母数字和下划线'],
         type_m: function(element){
                     return  $("#M").is(":checked");
             }
     },
     fields: {
         "username": {
-            rule: "required",
+            rule: "required;check_username",
             tip: "输入用户名",
             ok: "",
             msg: {required: "必须填写!"}
@@ -169,18 +141,6 @@ $('#userForm').validator({
             tip: "输入密码",
             ok: "",
             msg: {required: "必须填写!"}
-        },
-        "ssh_key_pwd": {
-            rule: "required;length[6~50]",
-            tip: "ssh私钥密码",
-            ok: "",
-            msg: {required: "必须填写"}
-        },
-        "dept_id": {
-            rule: "checked",
-            tip: "选择部门",
-            ok: "",
-            msg: {checked: "至少选择一个部门"}
         },
         "name": {
             rule: "required",
@@ -193,12 +153,6 @@ $('#userForm').validator({
             tip: "Email",
             ok: "",
             msg: {required: "必须填写"}
-        },
-        "role": {
-            rule: "checked",
-            tip: "角色",
-            ok: "",
-            msg: {required: "选择一个"}
         }
     },
     valid: function(form) {
@@ -206,7 +160,16 @@ $('#userForm').validator({
     }
 });
 
+$("document").ready(function(){
+    $("input.role").click(function(){
+        if($("input.role[value=GA]").is( ":checked" )){
+            $("#admin_groups").css("display", 'block');
+        }
+        else {
+            $("#admin_groups").css("display", 'none');
+        }
+    })
+})
+
 </script>
-
-
 {% endblock %}

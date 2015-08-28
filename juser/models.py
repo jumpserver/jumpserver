@@ -119,3 +119,13 @@ class User(models.Model):
             print ''
         else:
             return assets_info
+
+
+class AdminGroup(models.Model):
+    """
+    under the user control group
+    用户可以管理的用户组，或组的管理员是该用户
+    """
+
+    user = models.ForeignKey(User)
+    group = models.ForeignKey(UserGroup)

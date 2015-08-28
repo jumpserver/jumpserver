@@ -2,6 +2,7 @@
 
 from Crypto.PublicKey import RSA
 
+from juser.models import AdminGroup
 from jumpserver.api import *
 
 
@@ -55,6 +56,8 @@ def db_add_user(**kwargs):
     数据库中添加用户
     """
     groups_post = kwargs.pop('groups')
+    admin_groups = kwargs.pop('admin_groups')
+    role = kwargs.get('role', 'CU')
     user = User(**kwargs)
     user.save()
     if groups_post:
@@ -63,6 +66,12 @@ def db_add_user(**kwargs):
             group = UserGroup.objects.filter(id=group_id)
             group_select.extend(group)
         user.group = group_select
+
+    if admin_groups and role == 'GA':  # 如果是组管理员就要添加组管理员和组到管理组中
+        for group_id in admin_groups:
+            group = get_object(UserGroup, id=group_id)
+            if group:
+                AdminGroup(user=user, group=group).save()
     return user
 
 
@@ -132,6 +141,27 @@ def server_add_user(username, password, ssh_key_pwd):
     gen_ssh_key(username, ssh_key_pwd)
 
 
+def user_add_mail(user, kwargs):
+    """
+    add user send mail
+    发送用户添加邮件
+    """
+    print kwargs
+    user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
+    mail_title = u'恭喜你的跳板机用户 %s 添加成功 Jumpserver' % user.name
+    mail_msg = u"""
+    Hi, %s
+        您的用户名： %s
+        您的角色： %s
+        您的web登录密码： %s
+        您的ssh密钥文件密码： %s
+        密钥下载地址： http://%s:%s/juser/down_key/?id=%s
+        说明： 请登陆后再下载密钥！
+    """ % (user.name, user.username, user_role.get(user.role, u'普通用户'),
+           kwargs.get('password'), kwargs.get('ssh_key_pwd'), SEND_IP, SEND_PORT, user.id)
+    send_mail(mail_title, mail_msg, MAIL_FROM, [user.email], fail_silently=False)
+
+
 def server_del_user(username):
     """
     delete a user from jumpserver linux system
@@ -146,11 +176,9 @@ def ldap_add_user(username, ldap_pwd):
     在LDAP中添加用户
     """
     user_dn = "uid=%s,ou=People,%s" % (username, LDAP_BASE_DN)
-    password_sha512 = PyCrypt.gen_sha512(PyCrypt.gen_rand_pwd(6), ldap_pwd)
-    user = User.objects.filter(username=username)
-    if user:
-        user = user[0]
-    else:
+    password_sha512 = PyCrypt.gen_sha512(PyCrypt.random_pass(6), ldap_pwd)
+    user = get_object(UserGroup, username=username)
+    if not user:
         raise ServerError(u'用户 %s 不存在' % username)
 
     user_attr = {'uid': [str(username)],

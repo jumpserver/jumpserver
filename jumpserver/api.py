@@ -51,6 +51,7 @@ LOGIN_NAME = getpass.getuser()
 LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
 SEND_IP = CONF.get('base', 'ip')
 SEND_PORT = CONF.get('base', 'port')
+MAIL_ENABLE = CONF.get('mail', 'mail_enable')
 MAIL_FROM = CONF.get('mail', 'email_host_user')
 log_dir = os.path.join(BASE_DIR, 'logs')
 
@@ -397,18 +398,22 @@ class PyCrypt(object):
         self.mode = AES.MODE_CBC
 
     @staticmethod
-    def random_pass():
+    def random_pass(length, especial=False):
         """
         random password
         随机生成密码
         """
-        salt_key = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!@$%^&*()_'
+        salt_key = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
         symbol = '!@$%^&*()_'
         salt_list = []
-        for i in range(60):
-            salt_list.append(random.choice(salt_key))
-        for i in range(4):
-            salt_list.append(random.choice(symbol))
+        if especial:
+            for i in range(length-4):
+                salt_list.append(random.choice(salt_key))
+            for i in range(4):
+                salt_list.append(random.choice(symbol))
+        else:
+            for i in range(length):
+                salt_list.append(random.choice(salt_key))
         salt = ''.join(salt_list)
         return salt
 

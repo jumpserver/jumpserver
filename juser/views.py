@@ -171,52 +171,52 @@ def group_edit(request):
     return render_to_response('juser/group_edit.html', locals(), context_instance=RequestContext(request))
 
 
-@require_role(role='admin')
-def group_edit_adm(request):
-    error = ''
-    msg = ''
-    header_title, path1, path2 = '修改小组信息', '用户管理', '编辑小组'
-    user, dept = get_session_user_dept(request)
-    if request.method == 'GET':
-        group_id = request.GET.get('id', '')
-        if not validate(request, user_group=[group_id]):
-            return HttpResponseRedirect('/juser/group_list/')
-        group = UserGroup.objects.filter(id=group_id)
-        if group:
-            group = group[0]
-            users_all = dept.user_set.all()
-            users_selected = group.user_set.all()
-            users = [user for user in users_all if user not in users_selected]
-
-        return render_to_response('juser/group_edit.html', locals(), context_instance=RequestContext(request))
-    else:
-        group_id = request.POST.get('group_id', '')
-        group_name = request.POST.get('group_name', '')
-        comment = request.POST.get('comment', '')
-        users_selected = request.POST.getlist('users_selected')
-
-        users = []
-        try:
-            if not validate(request, user=users_selected):
-                raise ServerError(u'右侧非部门用户')
-
-            if not validate(request, user_group=[group_id]):
-                raise ServerError(u'没有权限修改本组')
-
-            for user_id in users_selected:
-                users.extend(User.objects.filter(id=user_id))
-
-            user_group = UserGroup.objects.filter(id=group_id)
-            if user_group:
-                user_group.update(name=group_name, comment=comment, dept=dept)
-                user_group = user_group[0]
-                user_group.user_set.clear()
-                user_group.user_set = users
-
-        except ServerError, e:
-            error = e
-
-        return HttpResponseRedirect('/juser/group_list/')
+# @require_role(role='admin')
+# def group_edit_adm(request):
+#     error = ''
+#     msg = ''
+#     header_title, path1, path2 = '修改小组信息', '用户管理', '编辑小组'
+#     user, dept = get_session_user_dept(request)
+#     if request.method == 'GET':
+#         group_id = request.GET.get('id', '')
+#         if not validate(request, user_group=[group_id]):
+#             return HttpResponseRedirect('/juser/group_list/')
+#         group = UserGroup.objects.filter(id=group_id)
+#         if group:
+#             group = group[0]
+#             users_all = dept.user_set.all()
+#             users_selected = group.user_set.all()
+#             users = [user for user in users_all if user not in users_selected]
+#
+#         return render_to_response('juser/group_edit.html', locals(), context_instance=RequestContext(request))
+#     else:
+#         group_id = request.POST.get('group_id', '')
+#         group_name = request.POST.get('group_name', '')
+#         comment = request.POST.get('comment', '')
+#         users_selected = request.POST.getlist('users_selected')
+#
+#         users = []
+#         try:
+#             if not validate(request, user=users_selected):
+#                 raise ServerError(u'右侧非部门用户')
+#
+#             if not validate(request, user_group=[group_id]):
+#                 raise ServerError(u'没有权限修改本组')
+#
+#             for user_id in users_selected:
+#                 users.extend(User.objects.filter(id=user_id))
+#
+#             user_group = UserGroup.objects.filter(id=group_id)
+#             if user_group:
+#                 user_group.update(name=group_name, comment=comment, dept=dept)
+#                 user_group = user_group[0]
+#                 user_group.user_set.clear()
+#                 user_group.user_set = users
+#
+#         except ServerError, e:
+#             error = e
+#
+#         return HttpResponseRedirect('/juser/group_list/')
 
 
 @require_role(role='super')
@@ -224,37 +224,30 @@ def user_add(request):
     error = ''
     msg = ''
     header_title, path1, path2 = '添加用户', '用户管理', '添加用户'
-    user_role = {'SU': u'超级管理员', 'DA': u'部门管理员', 'CU': u'普通用户'}
-    dept_all = DEPT.objects.all()
+    user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
     group_all = UserGroup.objects.all()
 
     if request.method == 'POST':
         username = request.POST.get('username', '')
-        password = PyCrypt.gen_rand_pwd(16)
+        password = PyCrypt.random_pass(16)
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
         dept_id = request.POST.get('dept_id')
         groups = request.POST.getlist('groups', [])
-        role_post = request.POST.get('role', 'CU')
-        ssh_key_pwd = PyCrypt.gen_rand_pwd(16)
+        admin_groups = request.POST.getlist('admin_groups', [])
+        role = request.POST.get('role', 'CU')
+        ssh_key_pwd = PyCrypt.random_pass(16)
         is_active = True if request.POST.get('is_active', '1') == '1' else False
-        ldap_pwd = PyCrypt.gen_rand_pwd(16)
+        ldap_pwd = PyCrypt.random_pass(32, especial=True)
 
         try:
-            if '' in [username, password, ssh_key_pwd, name, groups, role_post, is_active]:
+            if '' in [username, password, ssh_key_pwd, name, groups, role, is_active]:
                 error = u'带*内容不能为空'
                 raise ServerError
-            user = User.objects.filter(username=username)
-            if user:
+            user_test = get_object(User, username=username)
+            if user_test:
                 error = u'用户 %s 已存在' % username
                 raise ServerError
-
-            dept = DEPT.objects.filter(id=dept_id)
-            if dept:
-                dept = dept[0]
-            else:
-                error = u'部门不存在'
-                raise ServerError(error)
 
         except ServerError:
             pass
@@ -262,8 +255,8 @@ def user_add(request):
             try:
                 user = db_add_user(username=username,
                                    password=CRYPTOR.md5_crypt(password),
-                                   name=name, email=email, dept=dept,
-                                   groups=groups, role=role_post,
+                                   name=name, email=email, role=role,
+                                   groups=groups, admin_groups=admin_groups,
                                    ssh_key_pwd=CRYPTOR.md5_crypt(ssh_key_pwd),
                                    ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
                                    is_active=is_active,
@@ -272,18 +265,6 @@ def user_add(request):
                 server_add_user(username, password, ssh_key_pwd)
                 if LDAP_ENABLE:
                     ldap_add_user(username, ldap_pwd)
-                mail_title = u'恭喜你的跳板机用户添加成功 Jumpserver'
-                mail_msg = """
-                Hi, %s
-                    您的用户名： %s
-                    您的部门: %s
-                    您的角色： %s
-                    您的web登录密码： %s
-                    您的ssh密钥文件密码： %s
-                    密钥下载地址： http://%s:%s/juser/down_key/?id=%s
-                    说明： 请登陆后再下载密钥！
-                """ % (name, username, dept.name, user_role.get(role_post, ''),
-                       password, ssh_key_pwd, SEND_IP, SEND_PORT, user.id)
 
             except Exception, e:
                 error = u'添加用户 %s 失败 %s ' % (username, e)
@@ -295,8 +276,9 @@ def user_add(request):
                 except Exception:
                     pass
             else:
-                send_mail(mail_title, mail_msg, MAIL_FROM, [email], fail_silently=False)
-                msg = u'添加用户 %s 成功！ 用户密码已发送到 %s 邮箱！' % (username, email)
+                if MAIL_ENABLE:
+                    user_add_mail(user, kwargs=locals())
+                    msg = u'添加用户 %s 成功！ 用户密码已发送到 %s 邮箱！' % (username, email)
     return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
 
 
