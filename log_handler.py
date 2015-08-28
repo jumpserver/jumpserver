@@ -69,7 +69,7 @@ def run():
         try:
             file_time = int(os.stat(log_path).st_ctime)
             now_time = int(time.time())
-            if now_time - file_time > 18000:
+            if now_time - file_time > 10800:
                 if psutil.pid_exists(pid):
                     kill_pid(pid)
                 set_finish(pid_id)
@@ -77,7 +77,29 @@ def run():
         except OSError:
             pass
 
+#function erorcheck is added by Lin to resolve CPU filled issue 2015.08.24
+
+def errorcheck():
+    f=os.popen("ps auxr | grep -v auxr|sed -n 2p")
+    a=f.read().strip()
+    f.close()
+    pid=0
+    try:
+        if a is not None:
+            b=a.split(" ")
+            if b[-1]=='/opt/jumpserver/connect.py' and b[-2]=='python' and b[-8]=='R' and int(b[-3].split(':')[0])>100:
+                for i,j in enumerate(b):
+                    if i==0 or j=='':
+                        continue
+                    else:
+                        pid=int(j)
+                        break
+                kill_pid(pid)
+    except :
+        pass
+
 if __name__ == '__main__':
     while True:
         run()
         time.sleep(5)
+        errorcheck()
