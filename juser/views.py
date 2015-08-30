@@ -232,12 +232,12 @@ def user_add(request):
         password = PyCrypt.random_pass(16)
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
-        dept_id = request.POST.get('dept_id')
         groups = request.POST.getlist('groups', [])
         admin_groups = request.POST.getlist('admin_groups', [])
         role = request.POST.get('role', 'CU')
         ssh_key_pwd = PyCrypt.random_pass(16)
-        is_active = True if request.POST.get('is_active', '1') == '1' else False
+        extra = request.POST.getlist('extra', [])
+        is_active = True if '0' in extra else False
         ldap_pwd = PyCrypt.random_pass(32, especial=True)
 
         try:
@@ -261,12 +261,10 @@ def user_add(request):
                                    ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
                                    is_active=is_active,
                                    date_joined=datetime.datetime.now())
-
-                server_add_user(username, password, ssh_key_pwd)
                 if LDAP_ENABLE:
                     ldap_add_user(username, ldap_pwd)
 
-            except Exception, e:
+            except IndexError, e:
                 error = u'添加用户 %s 失败 %s ' % (username, e)
                 try:
                     db_del_user(username)
@@ -282,76 +280,76 @@ def user_add(request):
     return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
 
 
-@require_role(role='admin')
-def user_add_adm(request):
-    error = ''
-    msg = ''
-    header_title, path1, path2 = '添加用户', '用户管理', '添加用户'
-    user, dept = get_session_user_dept(request)
-    group_all = dept.usergroup_set.all()
-
-    if request.method == 'POST':
-        username = request.POST.get('username', '')
-        password = PyCrypt.gen_rand_pwd(16)
-        name = request.POST.get('name', '')
-        email = request.POST.get('email', '')
-        groups = request.POST.getlist('groups', [])
-        ssh_key_pwd = PyCrypt.gen_rand_pwd(16)
-        is_active = True if request.POST.get('is_active', '1') == '1' else False
-        ldap_pwd = PyCrypt.gen_rand_pwd(16)
-
-        try:
-            if '' in [username, password, ssh_key_pwd, name, groups, is_active]:
-                error = u'带*内容不能为空'
-                raise ServerError
-            user = User.objects.filter(username=username)
-            if user:
-                error = u'用户 %s 已存在' % username
-                raise ServerError
-
-        except ServerError:
-            pass
-        else:
-            try:
-                user = db_add_user(username=username,
-                                   password=CRYPTOR.md5_crypt(password),
-                                   name=name, email=email, dept=dept,
-                                   groups=groups, role='CU',
-                                   ssh_key_pwd=CRYPTOR.md5_crypt(ssh_key_pwd),
-                                   ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
-                                   is_active=is_active,
-                                   date_joined=datetime.datetime.now())
-
-                server_add_user(username, password, ssh_key_pwd)
-                if LDAP_ENABLE:
-                    ldap_add_user(username, ldap_pwd)
-
-            except Exception, e:
-                error = u'添加用户 %s 失败 %s ' % (username, e)
-                try:
-                    db_del_user(username)
-                    server_del_user(username)
-                    if LDAP_ENABLE:
-                        ldap_del_user(username)
-                except Exception:
-                    pass
-            else:
-                mail_title = u'恭喜你的跳板机用户添加成功 Jumpserver'
-                mail_msg = """
-                Hi, %s
-                    您的用户名： %s
-                    您的部门: %s
-                    您的角色： %s
-                    您的web登录密码： %s
-                    您的ssh密钥文件密码： %s
-                    密钥下载地址： http://%s:%s/juser/down_key/?id=%s
-                    说明： 请登陆后再下载密钥！
-                """ % (name, username, dept.name, '普通用户',
-                       password, ssh_key_pwd, SEND_IP, SEND_PORT, user.id)
-                send_mail(mail_title, mail_msg, MAIL_FROM, [email], fail_silently=False)
-                msg = u'添加用户 %s 成功！ 用户密码已发送到 %s 邮箱！' % (username, email)
-
-    return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
+# @require_role(role='admin')
+# def user_add_adm(request):
+#     error = ''
+#     msg = ''
+#     header_title, path1, path2 = '添加用户', '用户管理', '添加用户'
+#     user, dept = get_session_user_dept(request)
+#     group_all = dept.usergroup_set.all()
+#
+#     if request.method == 'POST':
+#         username = request.POST.get('username', '')
+#         password = PyCrypt.gen_rand_pwd(16)
+#         name = request.POST.get('name', '')
+#         email = request.POST.get('email', '')
+#         groups = request.POST.getlist('groups', [])
+#         ssh_key_pwd = PyCrypt.gen_rand_pwd(16)
+#         is_active = True if request.POST.get('is_active', '1') == '1' else False
+#         ldap_pwd = PyCrypt.gen_rand_pwd(16)
+#
+#         try:
+#             if '' in [username, password, ssh_key_pwd, name, groups, is_active]:
+#                 error = u'带*内容不能为空'
+#                 raise ServerError
+#             user = User.objects.filter(username=username)
+#             if user:
+#                 error = u'用户 %s 已存在' % username
+#                 raise ServerError
+#
+#         except ServerError:
+#             pass
+#         else:
+#             try:
+#                 user = db_add_user(username=username,
+#                                    password=CRYPTOR.md5_crypt(password),
+#                                    name=name, email=email, dept=dept,
+#                                    groups=groups, role='CU',
+#                                    ssh_key_pwd=CRYPTOR.md5_crypt(ssh_key_pwd),
+#                                    ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
+#                                    is_active=is_active,
+#                                    date_joined=datetime.datetime.now())
+#
+#                 server_add_user(username, password, ssh_key_pwd)
+#                 if LDAP_ENABLE:
+#                     ldap_add_user(username, ldap_pwd)
+#
+#             except Exception, e:
+#                 error = u'添加用户 %s 失败 %s ' % (username, e)
+#                 try:
+#                     db_del_user(username)
+#                     server_del_user(username)
+#                     if LDAP_ENABLE:
+#                         ldap_del_user(username)
+#                 except Exception:
+#                     pass
+#             else:
+#                 mail_title = u'恭喜你的跳板机用户添加成功 Jumpserver'
+#                 mail_msg = """
+#                 Hi, %s
+#                     您的用户名： %s
+#                     您的部门: %s
+#                     您的角色： %s
+#                     您的web登录密码： %s
+#                     您的ssh密钥文件密码： %s
+#                     密钥下载地址： http://%s:%s/juser/down_key/?id=%s
+#                     说明： 请登陆后再下载密钥！
+#                 """ % (name, username, dept.name, '普通用户',
+#                        password, ssh_key_pwd, SEND_IP, SEND_PORT, user.id)
+#                 send_mail(mail_title, mail_msg, MAIL_FROM, [email], fail_silently=False)
+#                 msg = u'添加用户 %s 成功！ 用户密码已发送到 %s 邮箱！' % (username, email)
+#
+#     return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
 
 
 @require_role(role='super')

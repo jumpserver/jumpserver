@@ -111,8 +111,9 @@ def db_del_user(username):
 def gen_ssh_key(username, password=None, length=2048):
     """
     generate a user ssh key in a property dir
-    生成一个用户密钥
+    生成一个用户ssh密钥对
     """
+    print "gen_ssh_key" + str(time.time())
     private_key_dir = os.path.join(BASE_DIR, 'keys/jumpserver/')
     private_key_file = os.path.join(private_key_dir, username+".pem")
     public_key_dir = '/home/%s/.ssh/' % username
@@ -124,12 +125,13 @@ def gen_ssh_key(username, password=None, length=2048):
     with open(private_key_file, 'w') as pri_f:
         pri_f.write(key.exportKey('PEM', password))
     os.chmod(private_key_file, 0600)
-
+    print "gen_ssh_pub_key" + str(time.time())
     pub_key = key.publickey()
     with open(public_key_file, 'w') as pub_f:
         pub_f.write(pub_key.exportKey('OpenSSH'))
     os.chmod(public_key_file, 0600)
     bash('chown %s:%s %s' % (username, username, public_key_file))
+    print "gen_ssh_key_end" + str(time.time())
 
 
 def server_add_user(username, password, ssh_key_pwd):
@@ -146,7 +148,6 @@ def user_add_mail(user, kwargs):
     add user send mail
     发送用户添加邮件
     """
-    print kwargs
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
     mail_title = u'恭喜你的跳板机用户 %s 添加成功 Jumpserver' % user.name
     mail_msg = u"""
@@ -177,7 +178,7 @@ def ldap_add_user(username, ldap_pwd):
     """
     user_dn = "uid=%s,ou=People,%s" % (username, LDAP_BASE_DN)
     password_sha512 = PyCrypt.gen_sha512(PyCrypt.random_pass(6), ldap_pwd)
-    user = get_object(UserGroup, username=username)
+    user = get_object(User, username=username)
     if not user:
         raise ServerError(u'用户 %s 不存在' % username)
 
