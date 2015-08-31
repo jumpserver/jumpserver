@@ -262,70 +262,70 @@ def unicode2str(unicode_list):
     return [str(i) for i in unicode_list]
 
 
-def sudo_ldap_add(user_group, user_runas, asset_groups_select,
-                  cmd_groups_select):
-    if not LDAP_ENABLE:
-        return True
-    
-    assets = []
-    cmds = []
-    user_runas = user_runas.split(',')
-    if len(asset_groups_select) == 1 and asset_groups_select[0].name == 'ALL':
-        asset_all = True
-    else:
-        asset_all = False
-        for asset_group in asset_groups_select:
-            assets.extend(asset_group.asset_set.all())
+# def sudo_ldap_add(user_group, user_runas, asset_groups_select,
+#                   cmd_groups_select):
+#     if not LDAP_ENABLE:
+#         return True
+#
+#     assets = []
+#     cmds = []
+#     user_runas = user_runas.split(',')
+#     if len(asset_groups_select) == 1 and asset_groups_select[0].name == 'ALL':
+#         asset_all = True
+#     else:
+#         asset_all = False
+#         for asset_group in asset_groups_select:
+#             assets.extend(asset_group.asset_set.all())
+#
+#     if user_group.name == 'ALL':
+#         user_all = True
+#         users = []
+#     else:
+#         user_all = False
+#         users = user_group.user_set.all()
+#
+#     for cmd_group in cmd_groups_select:
+#         cmds.extend(cmd_group.cmd.split(','))
+#
+#     if user_all:
+#         users_name = ['ALL']
+#     else:
+#         users_name = list(set([user.username for user in users]))
+#
+#     if asset_all:
+#         assets_ip = ['ALL']
+#     else:
+#         assets_ip = list(set([asset.ip for asset in assets]))
+#
+#     name = 'sudo%s' % user_group.id
+#     sudo_dn = 'cn=%s,ou=Sudoers,%s' % (name, LDAP_BASE_DN)
+#     sudo_attr = {'objectClass': ['top', 'sudoRole'],
+#                  'cn': ['%s' % name],
+#                  'sudoCommand': unicode2str(cmds),
+#                  'sudoHost': unicode2str(assets_ip),
+#                  'sudoOption': ['!authenticate'],
+#                  'sudoRunAsUser': unicode2str(user_runas),
+#                  'sudoUser': unicode2str(users_name)}
+#     ldap_conn.delete(sudo_dn)
+#     ldap_conn.add(sudo_dn, sudo_attr)
 
-    if user_group.name == 'ALL':
-        user_all = True
-        users = []
-    else:
-        user_all = False
-        users = user_group.user_set.all()
-
-    for cmd_group in cmd_groups_select:
-        cmds.extend(cmd_group.cmd.split(','))
-
-    if user_all:
-        users_name = ['ALL']
-    else:
-        users_name = list(set([user.username for user in users]))
-
-    if asset_all:
-        assets_ip = ['ALL']
-    else:
-        assets_ip = list(set([asset.ip for asset in assets]))
-
-    name = 'sudo%s' % user_group.id
-    sudo_dn = 'cn=%s,ou=Sudoers,%s' % (name, LDAP_BASE_DN)
-    sudo_attr = {'objectClass': ['top', 'sudoRole'],
-                 'cn': ['%s' % name],
-                 'sudoCommand': unicode2str(cmds),
-                 'sudoHost': unicode2str(assets_ip),
-                 'sudoOption': ['!authenticate'],
-                 'sudoRunAsUser': unicode2str(user_runas),
-                 'sudoUser': unicode2str(users_name)}
-    ldap_conn.delete(sudo_dn)
-    ldap_conn.add(sudo_dn, sudo_attr)
-
-
-def sudo_update(user_group, user_runas, asset_groups_select, cmd_groups_select, comment):
-    asset_groups_select_list, cmd_groups_select_list = \
-        asset_cmd_groups_get(asset_groups_select, cmd_groups_select)
-    sudo_perm = user_group.sudoperm_set.all()
-    if sudo_perm:
-        sudo_perm.update(user_runas=user_runas, comment=comment)
-        sudo_perm = sudo_perm[0]
-        sudo_perm.asset_group = asset_groups_select_list
-        sudo_perm.cmd_group = cmd_groups_select_list
-    else:
-        sudo_perm = SudoPerm(user_group=user_group, user_runas=user_runas, comment=comment)
-        sudo_perm.save()
-        sudo_perm.asset_group = asset_groups_select_list
-        sudo_perm.cmd_group = cmd_groups_select_list
-
-    sudo_ldap_add(user_group, user_runas, asset_groups_select_list, cmd_groups_select_list)
+#
+# def sudo_update(user_group, user_runas, asset_groups_select, cmd_groups_select, comment):
+#     asset_groups_select_list, cmd_groups_select_list = \
+#         asset_cmd_groups_get(asset_groups_select, cmd_groups_select)
+#     sudo_perm = user_group.sudoperm_set.all()
+#     if sudo_perm:
+#         sudo_perm.update(user_runas=user_runas, comment=comment)
+#         sudo_perm = sudo_perm[0]
+#         sudo_perm.asset_group = asset_groups_select_list
+#         sudo_perm.cmd_group = cmd_groups_select_list
+#     else:
+#         sudo_perm = SudoPerm(user_group=user_group, user_runas=user_runas, comment=comment)
+#         sudo_perm.save()
+#         sudo_perm.asset_group = asset_groups_select_list
+#         sudo_perm.cmd_group = cmd_groups_select_list
+#
+#     sudo_ldap_add(user_group, user_runas, asset_groups_select_list, cmd_groups_select_list)
 
 
 @require_super_user

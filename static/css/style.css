@@ -3516,8 +3516,8 @@ body.modal-open {
   z-index: 100;
 }
 .lockscreen.middle-box {
-  width: 200px;
-  margin-left: -100px;
+  width: 400px;
+  margin-left: -200px;
   margin-top: -190px;
 }
 .loginscreen.middle-box {

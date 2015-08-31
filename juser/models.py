@@ -30,8 +30,8 @@ class User(models.Model):
     name = models.CharField(max_length=80)
     email = models.EmailField(max_length=75)
     role = models.CharField(max_length=2, choices=USER_ROLE_CHOICES, default='CU')
+    uuid = models.CharField(max_length=100)
     group = models.ManyToManyField(UserGroup)
-    ldap_pwd = models.CharField(max_length=128)
     ssh_key_pwd = models.CharField(max_length=200)
     is_active = models.BooleanField(default=True)
     last_login = models.DateTimeField(null=True)
@@ -129,3 +129,5 @@ class AdminGroup(models.Model):
 
     user = models.ForeignKey(User)
     group = models.ForeignKey(UserGroup)
+
+

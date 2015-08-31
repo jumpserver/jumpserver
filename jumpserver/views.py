@@ -213,7 +213,7 @@ def login(request):
                 user_filter.update(last_login=datetime.datetime.now())
                 if user.role == 'SU':
                     request.session['role_id'] = 2
-                elif user.role == 'DA':
+                elif user.role == 'GA':
                     request.session['role_id'] = 1
                 else:
                     request.session['role_id'] = 0

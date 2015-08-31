@@ -17,12 +17,6 @@
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                                 <i class="fa fa-wrench"></i>
                             </a>
-                            <ul class="dropdown-menu dropdown-user">
-                                <li><a href="#">未启用 1</a>
-                                </li>
-                                <li><a href="#">未启用 2</a>
-                                </li>
-                            </ul>
                             <a class="close-link">
                                 <i class="fa fa-times"></i>
                             </a>
@@ -71,23 +65,6 @@
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
-                            {% ifequal session_role_id 2 %}
-                            <div class="form-group">
-                                <label for="dept_id" class="col-lg-2 control-label">部门<span class="red-fonts">*</span></label>
-                                <div class="col-sm-8">
-                                    <select id="dept_id" name="dept_id" class="form-control m-b">
-                                        {% for dept in dept_all %}
-                                            {% ifequal user.dept.id dept.id %}
-                                            <option selected value="{{ dept.id }}">{{ dept.name }}</option>
-                                            {% else %}
-                                            <option value="{{ dept.id }}">{{ dept.name }}</option>
-                                            {% endifequal %}
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="hr-line-dashed"></div>
-                            {% endifequal %}
                             <div class="form-group">
                                 <label for="groups" class="col-lg-2 control-label">小组</label>
                                 <div class="col-sm-8">

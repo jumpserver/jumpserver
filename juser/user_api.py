@@ -101,11 +101,9 @@ def db_del_user(username):
     delete a user from database
     从数据库中删除用户
     """
-    try:
-        user = User.objects.get(username=username)
+    user = get_object(User, username=username)
+    if user:
         user.delete()
-    except ObjectDoesNotExist:
-        pass
 
 
 def gen_ssh_key(username, password=None, length=2048):
@@ -134,13 +132,14 @@ def gen_ssh_key(username, password=None, length=2048):
     print "gen_ssh_key_end" + str(time.time())
 
 
-def server_add_user(username, password, ssh_key_pwd):
+def server_add_user(username, password, ssh_key_pwd, ssh_key_login_need):
     """
     add a system user in jumpserver
     在jumpserver服务器上添加一个用户
     """
-    bash("useradd '%s'; echo '%s' | passwd --stdin '%s'" % (username, password, username))
-    gen_ssh_key(username, ssh_key_pwd)
+    bash("useradd '%s'; echo '%s'; echo '%s' | passwd --stdin '%s'" % (username, password, password, username))
+    if ssh_key_login_need:
+        gen_ssh_key(username, ssh_key_pwd)
 
 
 def user_add_mail(user, kwargs):
@@ -156,10 +155,10 @@ def user_add_mail(user, kwargs):
         您的角色： %s
         您的web登录密码： %s
         您的ssh密钥文件密码： %s
-        密钥下载地址： http://%s:%s/juser/down_key/?id=%s
+        密钥下载地址： %s/juser/down_key/?uuid=%s
         说明： 请登陆后再下载密钥！
     """ % (user.name, user.username, user_role.get(user.role, u'普通用户'),
-           kwargs.get('password'), kwargs.get('ssh_key_pwd'), SEND_IP, SEND_PORT, user.id)
+           kwargs.get('password'), kwargs.get('ssh_key_pwd'), URL, user.uuid)
     send_mail(mail_title, mail_msg, MAIL_FROM, [user.email], fail_silently=False)
 
 
@@ -171,49 +170,73 @@ def server_del_user(username):
     bash('userdel -r %s' % username)
 
 
-def ldap_add_user(username, ldap_pwd):
-    """
-    add a user in ldap database
-    在LDAP中添加用户
-    """
-    user_dn = "uid=%s,ou=People,%s" % (username, LDAP_BASE_DN)
-    password_sha512 = PyCrypt.gen_sha512(PyCrypt.random_pass(6), ldap_pwd)
-    user = get_object(User, username=username)
-    if not user:
-        raise ServerError(u'用户 %s 不存在' % username)
+def get_display_msg(user, password, ssh_key_pwd, ssh_key_login_need, send_mail_need):
+    if send_mail_need:
+        msg = u'添加用户 %s 成功！ 用户密码已发送到 %s 邮箱！' % (user.name, user.email)
+        return msg
 
-    user_attr = {'uid': [str(username)],
-                 'cn': [str(username)],
-                 'objectClass': ['account', 'posixAccount', 'top', 'shadowAccount'],
-                 'userPassword': ['{crypt}%s' % password_sha512],
-                 'shadowLastChange': ['16328'],
-                 'shadowMin': ['0'],
-                 'shadowMax': ['99999'],
-                 'shadowWarning': ['7'],
-                 'loginShell': ['/bin/bash'],
-                 'uidNumber': [str(user.id)],
-                 'gidNumber': [str(user.id)],
-                 'homeDirectory': [str('/home/%s' % username)]}
+    if ssh_key_login_need:
+        msg = u"""
+        跳板机地址： %s
+        用户名：%s
+        密码：%s
+        密钥密码：%s
+        密钥下载url: %s/juser/down_key/?id=%s
+        该账号密码可以登陆web和跳板机。
+        """ % (URL, user.username, password, ssh_key_pwd, URL, user.id)
+    else:
+        msg = u"""
+        跳板机地址： %s \n
+        用户名：%s \n
+        密码：%s \n
+        该账号密码可以登陆web和跳板机。
+        """ % (URL, user.username, password)
 
-    group_dn = "cn=%s,ou=Group,%s" % (username, LDAP_BASE_DN)
-    group_attr = {'objectClass': ['posixGroup', 'top'],
-                  'cn': [str(username)],
-                  'userPassword': ['{crypt}x'],
-                  'gidNumber': [str(user.id)]}
+    return msg
 
-    ldap_conn.add(user_dn, user_attr)
-    ldap_conn.add(group_dn, group_attr)
+# def ldap_add_user(username, ldap_pwd):
+#     """
+#     add a user in ldap database
+#     在LDAP中添加用户
+#     """
+#     user_dn = "uid=%s,ou=People,%s" % (username, LDAP_BASE_DN)
+#     password_sha512 = PyCrypt.gen_sha512(PyCrypt.random_pass(6), ldap_pwd)
+#     user = get_object(User, username=username)
+#     if not user:
+#         raise ServerError(u'用户 %s 不存在' % username)
+#
+#     user_attr = {'uid': [str(username)],
+#                  'cn': [str(username)],
+#                  'objectClass': ['account', 'posixAccount', 'top', 'shadowAccount'],
+#                  'userPassword': ['{crypt}%s' % password_sha512],
+#                  'shadowLastChange': ['16328'],
+#                  'shadowMin': ['0'],
+#                  'shadowMax': ['99999'],
+#                  'shadowWarning': ['7'],
+#                  'loginShell': ['/bin/bash'],
+#                  'uidNumber': [str(user.id)],
+#                  'gidNumber': [str(user.id)],
+#                  'homeDirectory': [str('/home/%s' % username)]}
+#
+#     group_dn = "cn=%s,ou=Group,%s" % (username, LDAP_BASE_DN)
+#     group_attr = {'objectClass': ['posixGroup', 'top'],
+#                   'cn': [str(username)],
+#                   'userPassword': ['{crypt}x'],
+#                   'gidNumber': [str(user.id)]}
+#
+#     ldap_conn.add(user_dn, user_attr)
+#     ldap_conn.add(group_dn, group_attr)
 
 
-def ldap_del_user(username):
-    """
-    delete a user in ldap database
-    在ldap中删除某用户
-    """
-    user_dn = "uid=%s,ou=People,%s" % (username, LDAP_BASE_DN)
-    group_dn = "cn=%s,ou=Group,%s" % (username, LDAP_BASE_DN)
-    sudo_dn = 'cn=%s,ou=Sudoers,%s' % (username, LDAP_BASE_DN)
-
-    ldap_conn.delete(user_dn)
-    ldap_conn.delete(group_dn)
-    ldap_conn.delete(sudo_dn)
+# def ldap_del_user(username):
+#     """
+#     delete a user in ldap database
+#     在ldap中删除某用户
+#     """
+#     user_dn = "uid=%s,ou=People,%s" % (username, LDAP_BASE_DN)
+#     group_dn = "cn=%s,ou=Group,%s" % (username, LDAP_BASE_DN)
+#     sudo_dn = 'cn=%s,ou=Sudoers,%s' % (username, LDAP_BASE_DN)
+#
+#     ldap_conn.delete(user_dn)
+#     ldap_conn.delete(group_dn)
+#     ldap_conn.delete(sudo_dn)

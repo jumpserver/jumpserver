@@ -6,15 +6,12 @@ import getpass
 from Crypto.Cipher import AES
 import crypt
 from binascii import b2a_hex, a2b_hex
-import ldap
-from ldap import modlist
 import hashlib
 import datetime
 import random
 import subprocess
 import paramiko
 import struct, fcntl, signal,socket, select, fnmatch
-from functools import partial
 
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
@@ -23,7 +20,7 @@ from juser.models import User, UserGroup
 from jasset.models import Asset, BisGroup, IDC
 from jlog.models import Log
 from jasset.models import AssetAlias
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.mail import send_mail
@@ -48,9 +45,8 @@ SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys')
 # SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
 KEY = CONF.get('base', 'key')
 LOGIN_NAME = getpass.getuser()
-LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
-SEND_IP = CONF.get('base', 'ip')
-SEND_PORT = CONF.get('base', 'port')
+# LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
+URL = CONF.get('base', 'url')
 MAIL_ENABLE = CONF.get('mail', 'mail_enable')
 MAIL_FROM = CONF.get('mail', 'email_host_user')
 log_dir = os.path.join(BASE_DIR, 'logs')
@@ -73,73 +69,73 @@ def set_log(level):
     return logger_f
 
 
-class LDAPMgmt():
-    """
-    LDAP class for add, select, del, update
-    LDAP 管理类，增删改查
-    """
-    def __init__(self,
-                 host_url,
-                 base_dn,
-                 root_cn,
-                 root_pw):
-        self.ldap_host = host_url
-        self.ldap_base_dn = base_dn
-        self.conn = ldap.initialize(host_url)
-        self.conn.set_option(ldap.OPT_REFERRALS, 0)
-        self.conn.protocol_version = ldap.VERSION3
-        self.conn.simple_bind_s(root_cn, root_pw)
-
-    def list(self, filter, scope=ldap.SCOPE_SUBTREE, attr=None):
-        """
-        query
-        查询
-        """
-        result = {}
-        try:
-            ldap_result = self.conn.search_s(self.ldap_base_dn, scope, filter, attr)
-            for entry in ldap_result:
-                name, data = entry
-                for k, v in data.items():
-                    print '%s: %s' % (k, v)
-                    result[k] = v
-            return result
-        except ldap.LDAPError, e:
-            print e
-
-    def add(self, dn, attrs):
-        """
-        add
-        添加
-        """
-        try:
-            ldif = modlist.addModlist(attrs)
-            self.conn.add_s(dn, ldif)
-        except ldap.LDAPError, e:
-            print e
-
-    def modify(self, dn, attrs):
-        """
-        modify
-        更改
-        """
-        try:
-            attr_s = []
-            for k, v in attrs.items():
-                attr_s.append((2, k, v))
-            self.conn.modify_s(dn, attr_s)
-        except ldap.LDAPError, e:
-            print e
-
-    def delete(self, dn):
-        """
-        delete
-        删除
-        """
-        try:
-            self.conn.delete_s(dn)
-        except ldap.LDAPError, e:
-            print e
+# class LDAPMgmt():
+#     """
+#     LDAP class for add, select, del, update
+#     LDAP 管理类，增删改查
+#     """
+#     def __init__(self,
+#                  host_url,
+#                  base_dn,
+#                  root_cn,
+#                  root_pw):
+#         self.ldap_host = host_url
+#         self.ldap_base_dn = base_dn
+#         self.conn = ldap.initialize(host_url)
+#         self.conn.set_option(ldap.OPT_REFERRALS, 0)
+#         self.conn.protocol_version = ldap.VERSION3
+#         self.conn.simple_bind_s(root_cn, root_pw)
+#
+#     def list(self, filter, scope=ldap.SCOPE_SUBTREE, attr=None):
+#         """
+#         query
+#         查询
+#         """
+#         result = {}
+#         try:
+#             ldap_result = self.conn.search_s(self.ldap_base_dn, scope, filter, attr)
+#             for entry in ldap_result:
+#                 name, data = entry
+#                 for k, v in data.items():
+#                     print '%s: %s' % (k, v)
+#                     result[k] = v
+#             return result
+#         except ldap.LDAPError, e:
+#             print e
+#
+#     def add(self, dn, attrs):
+#         """
+#         add
+#         添加
+#         """
+#         try:
+#             ldif = modlist.addModlist(attrs)
+#             self.conn.add_s(dn, ldif)
+#         except ldap.LDAPError, e:
+#             print e
+#
+#     def modify(self, dn, attrs):
+#         """
+#         modify
+#         更改
+#         """
+#         try:
+#             attr_s = []
+#             for k, v in attrs.items():
+#                 attr_s.append((2, k, v))
+#             self.conn.modify_s(dn, attr_s)
+#         except ldap.LDAPError, e:
+#             print e
+#
+#     def delete(self, dn):
+#         """
+#         delete
+#         删除
+#         """
+#         try:
+#             self.conn.delete_s(dn)
+#         except ldap.LDAPError, e:
+#             print e
 
 
 def page_list_return(total, current=1):
@@ -480,9 +476,10 @@ def get_object(model, **kwargs):
     use this function for query
     使用改封装函数查询数据库
     """
-    try:
-        the_object = model.objects.get(**kwargs)
-    except ObjectDoesNotExist:
+    the_object = model.objects.filter(**kwargs)
+    if len(the_object) == 1:
+        the_object = the_object[0]
+    else:
         the_object = None
     return the_object
 
@@ -498,10 +495,10 @@ def require_role(role='user'):
                 if not request.session.get('user_id'):
                     return HttpResponseRedirect('/login/')
             elif role == 'admin':
-                if request.session.get('role_id', 0) != 1:
+                if request.session.get('role_id', 0) < 1:
                     return HttpResponseRedirect('/')
             elif role == 'super':
-                if request.session.get('role_id', 0) != 2:
+                if request.session.get('role_id', 0) < 2:
                     return HttpResponseRedirect('/')
             return func(request, *args, **kwargs)
         return __deco
@@ -531,8 +528,7 @@ def get_session_user_dept(request):
     user = User.objects.filter(id=user_id)
     if user:
         user = user[0]
-        dept = user.dept
-        return user, dept
+        return user, None
 
 
 @require_role
@@ -704,14 +700,14 @@ def http_error(request, emg):
 
 CRYPTOR = PyCrypt(KEY)
 
-if LDAP_ENABLE:
-    LDAP_HOST_URL = CONF.get('ldap', 'host_url')
-    LDAP_BASE_DN = CONF.get('ldap', 'base_dn')
-    LDAP_ROOT_DN = CONF.get('ldap', 'root_dn')
-    LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
-    ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
-else:
-    ldap_conn = None
+# if LDAP_ENABLE:
+#     LDAP_HOST_URL = CONF.get('ldap', 'host_url')
+#     LDAP_BASE_DN = CONF.get('ldap', 'base_dn')
+#     LDAP_ROOT_DN = CONF.get('ldap', 'root_dn')
+#     LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
+#     ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
+# else:
+#     ldap_conn = None
 
 log_level = CONF.get('base', 'log')
 logger = set_log(log_level)
