@@ -81,19 +81,28 @@ def db_update_user(**kwargs):
     数据库更新用户信息
     """
     groups_post = kwargs.pop('groups')
+    admin_groups_post = kwargs.pop('admin_groups')
     user_id = kwargs.pop('user_id')
     user = User.objects.filter(id=user_id)
     if user:
         user.update(**kwargs)
-        user = User.objects.get(id=user_id)
+        user = user[0]
         user.save()
+    else:
+        return None
 
+    group_select = []
     if groups_post:
-        group_select = []
         for group_id in groups_post:
             group = UserGroup.objects.filter(id=group_id)
             group_select.extend(group)
-        user.group = group_select
+    user.group = group_select
+
+    if admin_groups_post != '':
+        user.admingroup_set.all().delete()
+        for group_id in admin_groups_post:
+            group = get_object(UserGroup, id=group_id)
+            AdminGroup(user=user, group=group).save()
 
 
 def db_del_user(username):

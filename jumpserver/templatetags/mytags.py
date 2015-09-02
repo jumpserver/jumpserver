@@ -27,10 +27,9 @@ def int2str(value):
 
 @register.filter(name='get_role')
 def get_role(user_id):
-    user_role = {'SU': u'超级管理员', 'DA': u'部门管理员', 'CU': u'普通用户'}
-    user = User.objects.filter(id=user_id)
+    user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
+    user = get_object(User, id=user_id)
     if user:
-        user = user[0]
         return user_role.get(str(user.role), u"普通用户")
     else:
         return u"普通用户"

@@ -527,54 +527,60 @@ def user_edit(request):
         if not user_id:
             return HttpResponseRedirect('/')
 
-        user_role = {'SU': u'超级管理员', 'DA': u'组管理员', 'CU': u'普通用户'}
+        user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
         user = get_object(User, id=user_id)
         group_all = UserGroup.objects.all()
-
         if user:
             groups_str = ' '.join([str(group.id) for group in user.group.all()])
+            admin_groups_str = ' '.join([str(admin_group.group.id) for admin_group in user.admingroup_set.all()])
 
     else:
-        user_id = request.POST.get('user_id', '')
+        user_id = request.GET.get('id', '')
         password = request.POST.get('password', '')
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
-        dept_id = request.POST.get('dept_id')
         groups = request.POST.getlist('groups', [])
         role_post = request.POST.get('role', 'CU')
-        ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
-        is_active = True if request.POST.get('is_active', '1') == '1' else False
-
+        admin_groups = request.POST.getlist('admin_groups', [])
+        extra = request.POST.getlist('extra', [])
+        is_active = True if '0' in extra else False
+        email_need = True if '2' in extra else False
         user_role = {'SU': u'超级管理员', 'DA': u'部门管理员', 'CU': u'普通用户'}
-        dept = DEPT.objects.filter(id=dept_id)
-        if dept:
-            dept = dept[0]
-        else:
-            dept = DEPT.objects.get(id='2')
-
+        print '#'*10 + str(email_need)
+        print extra
         if user_id:
-            user = User.objects.filter(id=user_id)
-            if user:
-                user = user[0]
+            user = get_object(User, id=user_id)
         else:
             return HttpResponseRedirect('/juser/user_list/')
 
         if password != user.password:
+            password_decode = password
             password = CRYPTOR.md5_crypt(password)
-
-        if ssh_key_pwd != user.ssh_key_pwd:
-            gen_ssh_key(user.username, ssh_key_pwd)
-            ssh_key_pwd = CRYPTOR.encrypt(ssh_key_pwd)
+        else:
+            password_decode = None
 
         db_update_user(user_id=user_id,
                        password=password,
                        name=name,
                        email=email,
                        groups=groups,
-                       dept=dept,
+                       admin_groups=admin_groups,
                        role=role_post,
-                       is_active=is_active,
-                       ssh_key_pwd=ssh_key_pwd)
+                       is_active=is_active)
+
+        if email_need:
+
+            msg = u"""
+            Hi %s:
+                您的信息已修改，请登录跳板机查看详细信息
+                地址：%s
+                用户名： %s
+                密码：%s (如果密码为None代表密码为原密码)
+                角色：%s
+
+            """ % (user.name, URL, user.username, password_decode, user_role.get(role_post, u''))
+
+            send_mail('您的信息已修改', msg, MAIL_FROM, [email], fail_silently=False)
 
         return HttpResponseRedirect('/juser/user_list/')
 

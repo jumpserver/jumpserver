@@ -130,4 +130,7 @@ class AdminGroup(models.Model):
     user = models.ForeignKey(User)
     group = models.ForeignKey(UserGroup)
 
+    def __unicode__(self):
+        return '%s: %s' % (self.user.username, self.group.name)
+
 
