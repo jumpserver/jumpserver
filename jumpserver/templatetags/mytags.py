@@ -290,7 +290,7 @@ def to_dept_name(user_id):
 
 @register.filter(name='to_role_name')
 def to_role_name(role_id):
-    role_dict = {'0': '普通用户', '1': '部门管理员', '2': '超级管理员'}
+    role_dict = {'0': '普通用户', '1': '组管理员', '2': '超级管理员'}
     return role_dict.get(str(role_id), '未知')
 
 
@@ -302,7 +302,7 @@ def to_avatar(role_id='0'):
 
 @register.filter(name='get_user_asset_group')
 def get_user_asset_group(user):
-    return user_perm_group_api(user)
+    return user.get_asset_group()
 
 
 @register.filter(name='group_asset_list')

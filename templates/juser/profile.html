@@ -24,7 +24,6 @@
                                 <td class="text-center">用户名</td>
                                 <td class="text-center">姓名</td>
                                 <td class="text-center">角色</td>
-                                <td class="text-center">部门</td>
                                 <td class="text-center">Email</td>
                                 <td class="text-center">激活</td>
 {#                                <td class="text-center">添加时间</td>#}
@@ -38,7 +37,6 @@
                             <td class="text-center">{{ user.username }}</td>
                             <td class="text-center">{{ user.name }}</td>
                             <td class="text-center">{{ user.id | get_role }}</td>
-                            <td class="text-center">{{ user.dept.name }}</td>
                             <td class="text-center">{{ user.email }}</td>
                             <td class="text-center">{{ user.is_active|bool2str }}</td>
 {#                            <td class="text-center">{{ user.date_joined }}</td>#}

@@ -538,11 +538,9 @@ def get_session_user_info(request):
     获取用户的信息
     """
     user_id = request.session.get('user_id', 0)
-    user = User.objects.filter(id=user_id)
+    user = get_object(User, id=user_id)
     if user:
-        user = user[0]
-        dept = user.dept
-        return [user.id, user.username, user, dept.id, dept.name, dept]
+        return [user.id, user.username, user]
 
 
 def get_user_dept(request):
@@ -696,6 +694,10 @@ def http_success(request, msg):
 def http_error(request, emg):
     message = emg
     return render_to_response('error.html', locals())
+
+
+def my_render(template, data, request):
+    return render_to_response(template, data, context_instance=RequestContext(request))
 
 
 CRYPTOR = PyCrypt(KEY)

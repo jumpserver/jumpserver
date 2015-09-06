@@ -9,15 +9,8 @@ from django.shortcuts import get_object_or_404
 from jperm.models import Perm
 from jumpserver.api import *
 
-cryptor = PyCrypt(KEY)
 
 
-class RaiseError(Exception):
-    pass
-
-
-def my_render(template, data, request):
-    return render_to_response(template, data, context_instance=RequestContext(request))
 
 
 def get_host_groups(groups):

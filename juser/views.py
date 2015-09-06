@@ -55,7 +55,7 @@ def group_add(request):
         else:
             msg = u'添加组 %s 成功' % group_name
 
-    return render_to_response('juser/group_add.html', locals(), context_instance=RequestContext(request))
+    return my_render('juser/group_add.html', locals(), request)
 
 
 @require_role(role='super')
@@ -72,7 +72,7 @@ def group_list(request):
         user_group_list = user_group_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
 
     contacts, p, contacts, page_range, current_page, show_first, show_end = pages(user_group_list, request)
-    return render_to_response('juser/group_list.html', locals(), context_instance=RequestContext(request))
+    return my_render('juser/group_list.html', locals(), request)
 
 
 @require_role(role='super')
@@ -169,7 +169,7 @@ def group_edit(request):
             users_selected = user_group.user_set.all()
             users_remain = [user for user in users_all if user not in users_selected]
 
-    return render_to_response('juser/group_edit.html', locals(), context_instance=RequestContext(request))
+    return my_render('juser/group_edit.html', locals(), request)
 
 
 # @require_role(role='admin')
@@ -275,7 +275,7 @@ def user_add(request):
                 if MAIL_ENABLE and send_mail_need:
                     user_add_mail(user, kwargs=locals())
                 msg = get_display_msg(user, password, ssh_key_pwd, ssh_key_login_need, send_mail_need)
-    return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
+    return my_render('juser/user_add.html', locals(), request)
 
 
 # @require_role(role='admin')
@@ -369,7 +369,7 @@ def user_list(request):
 
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
 
-    return render_to_response('juser/user_list.html', locals(), context_instance=RequestContext(request))
+    return my_render('juser/user_list.html', locals(), request)
 
 
 # @require_role(role='admin')
@@ -413,12 +413,13 @@ def user_detail(request):
 
     user = get_object(User, id=user_id)
     if user:
+        pass
         # asset_group_permed = user.get_asset_group()
-        logs_last = Log.objects.filter(user=user.name).order_by('-start_time')[0:10]
-        logs_all = Log.objects.filter(user=user.name).order_by('-start_time')
-        logs_num = len(logs_all)
+        # logs_last = Log.objects.filter(user=user.name).order_by('-start_time')[0:10]
+        # logs_all = Log.objects.filter(user=user.name).order_by('-start_time')
+        # logs_num = len(logs_all)
 
-    return render_to_response('juser/user_detail.html', locals(), context_instance=RequestContext(request))
+    return my_render('juser/user_detail.html', locals(), request)
 
 
 @require_role(role='admin')
@@ -545,9 +546,8 @@ def user_edit(request):
         extra = request.POST.getlist('extra', [])
         is_active = True if '0' in extra else False
         email_need = True if '2' in extra else False
-        user_role = {'SU': u'超级管理员', 'DA': u'部门管理员', 'CU': u'普通用户'}
-        print '#'*10 + str(email_need)
-        print extra
+        user_role = {'SU': u'超级管理员', 'GA': u'部门管理员', 'CU': u'普通用户'}
+
         if user_id:
             user = get_object(User, id=user_id)
         else:
@@ -568,8 +568,9 @@ def user_edit(request):
                        role=role_post,
                        is_active=is_active)
 
-        if email_need:
+        print '#'* 10 + role_post
 
+        if email_need:
             msg = u"""
             Hi %s:
                 您的信息已修改，请登录跳板机查看详细信息
@@ -579,68 +580,69 @@ def user_edit(request):
                 角色：%s
 
             """ % (user.name, URL, user.username, password_decode, user_role.get(role_post, u''))
-
             send_mail('您的信息已修改', msg, MAIL_FROM, [email], fail_silently=False)
 
         return HttpResponseRedirect('/juser/user_list/')
 
-    return render_to_response('juser/user_edit.html', locals(), context_instance=RequestContext(request))
+    return my_render('juser/user_edit.html', locals(), request)
 
 
-@require_role(role='admin')
+# @require_role(role='admin')
 def user_edit_adm(request):
-    header_title, path1, path2 = '编辑用户', '用户管理', '用户编辑'
-    user, dept = get_session_user_dept(request)
-    if request.method == 'GET':
-        user_id = request.GET.get('id', '')
-        if not user_id:
-            return HttpResponseRedirect('/juser/user_list/')
-
-        if not validate(request, user=[user_id]):
-            return HttpResponseRedirect('/juser/user_list/')
-
-        user = User.objects.filter(id=user_id)
-        dept_all = DEPT.objects.all()
-        group_all = dept.usergroup_set.all()
-        if user:
-            user = user[0]
-            groups_str = ' '.join([str(group.id) for group in user.group.all()])
-
-    else:
-        user_id = request.POST.get('user_id', '')
-        password = request.POST.get('password', '')
-        name = request.POST.get('name', '')
-        email = request.POST.get('email', '')
-        groups = request.POST.getlist('groups', [])
-        ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
-        is_active = True if request.POST.get('is_active', '1') == '1' else False
-
-        if not validate(request, user=[user_id], user_group=groups):
-            return HttpResponseRedirect('/juser/user_edit/')
-        if user_id:
-            user = User.objects.filter(id=user_id)
-            if user:
-                user = user[0]
-        else:
-            return HttpResponseRedirect('/juser/user_list/')
-
-        if password != user.password:
-            password = CRYPTOR.md5_crypt(password)
-
-        if ssh_key_pwd != user.ssh_key_pwd:
-            ssh_key_pwd = CRYPTOR.encrypt(ssh_key_pwd)
-
-        db_update_user(user_id=user_id,
-                       password=password,
-                       name=name,
-                       email=email,
-                       groups=groups,
-                       is_active=is_active,
-                       ssh_key_pwd=ssh_key_pwd)
-
-        return HttpResponseRedirect('/juser/user_list/')
-
-    return render_to_response('juser/user_edit.html', locals(), context_instance=RequestContext(request))
+    pass
+#     header_title, path1, path2 = '编辑用户', '用户管理', '用户编辑'
+#     user, dept = get_session_user_dept(request)
+#     if request.method == 'GET':
+#         user_id = request.GET.get('id', '')
+#         if not user_id:
+#             return HttpResponseRedirect('/juser/user_list/')
+#
+#         if not validate(request, user=[user_id]):
+#             return HttpResponseRedirect('/juser/user_list/')
+#
+#         user = User.objects.filter(id=user_id)
+#         dept_all = DEPT.objects.all()
+#         group_all = dept.usergroup_set.all()
+#         if user:
+#             user = user[0]
+#             groups_str = ' '.join([str(group.id) for group in user.group.all()])
+#
+#     else:
+#         user_id = request.POST.get('user_id', '')
+#         password = request.POST.get('password', '')
+#         name = request.POST.get('name', '')
+#         email = request.POST.get('email', '')
+#         groups = request.POST.getlist('groups', [])
+#         ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
+#         is_active = True if request.POST.get('is_active', '1') == '1' else False
+#
+#         if not validate(request, user=[user_id], user_group=groups):
+#             return HttpResponseRedirect('/juser/user_edit/')
+#         if user_id:
+#             user = User.objects.filter(id=user_id)
+#             if user:
+#                 user = user[0]
+#         else:
+#             return HttpResponseRedirect('/juser/user_list/')
+#
+#         if password != user.password:
+#             password = CRYPTOR.md5_crypt(password)
+#
+#         if ssh_key_pwd != user.ssh_key_pwd:
+#             ssh_key_pwd = CRYPTOR.encrypt(ssh_key_pwd)
+#
+#         db_update_user(user_id=user_id,
+#                        password=password,
+#                        name=name,
+#                        email=email,
+#                        groups=groups,
+#                        is_active=is_active,
+#                        ssh_key_pwd=ssh_key_pwd)
+#
+#         return HttpResponseRedirect('/juser/user_list/')
+#
+#     return render_to_response('juser/user_edit.html', locals(), context_instance=RequestContext(request))
+#
 
 
 def profile(request):
@@ -651,40 +653,46 @@ def profile(request):
     return render_to_response('juser/profile.html', locals(), context_instance=RequestContext(request))
 
 
-def chg_info(request):
+def change_info(request):
     header_title, path1, path2 = '修改信息', '用户管理', '修改个人信息'
     user_id = request.session.get('user_id')
-    user_set = User.objects.filter(id=user_id)
+    user = get_object(User, id=user_id)
     error = ''
-    if user_set:
-        user = user_set[0]
-    else:
+    if not user:
         return HttpResponseRedirect('/')
 
     if request.method == 'POST':
         name = request.POST.get('name', '')
         password = request.POST.get('password', '')
-        ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
         email = request.POST.get('email', '')
 
-        if '' in [name, password, ssh_key_pwd, email]:
+        if '' in [name, password, email]:
             error = '不能为空'
 
-        if len(password) < 6 or len(ssh_key_pwd) < 6:
+        if len(password) < 6 :
             error = '密码须大于6位'
 
         if not error:
             if password != user.password:
                 password = CRYPTOR.md5_crypt(password)
 
-            if ssh_key_pwd != user.ssh_key_pwd:
-                gen_ssh_key(user.username, ssh_key_pwd)
-                ssh_key_pwd = CRYPTOR.md5_crypt(ssh_key_pwd)
-
-            user_set.update(name=name, password=password, ssh_key_pwd=ssh_key_pwd, email=email)
+            user.update(name=name, password=password, email=email)
             msg = '修改成功'
 
-    return render_to_response('juser/chg_info.html', locals(), context_instance=RequestContext(request))
+    return render_to_response('juser/change_info.html', locals(), context_instance=RequestContext(request))
+
+
+@require_role(role='user')
+def regen_ssh_key(request):
+    uuid = request.GET.get('uuid', '')
+    user = get_object(User, uuid=uuid)
+    if not user:
+        return HttpResponse('没有该用户')
+
+    username = user.username
+    ssh_key_pass = PyCrypt.random_pass(16)
+    gen_ssh_key(username, ssh_key_pass)
+    return HttpResponse('ssh密钥已生成，密码为 %s, 请到下载页面下载' % ssh_key_pass)
 
 
 @require_role(role='user')
@@ -693,21 +701,14 @@ def down_key(request):
     if is_role_request(request, 'super'):
         user_id = request.GET.get('id')
 
-    if is_role_request(request, 'admin'):
-        user_id = request.GET.get('id')
-        if not validate(request, user=[user_id]):
-            user_id = request.session.get('user_id')
-
     if is_role_request(request, 'user'):
         user_id = request.session.get('user_id')
 
     if user_id:
-        user = User.objects.filter(id=user_id)
+        user = get_object(User, id=user_id)
         if user:
-            user = user[0]
             username = user.username
-            private_key_dir = os.path.join(BASE_DIR, 'keys/jumpserver/')
-            private_key_file = os.path.join(private_key_dir, username+".pem")
+            private_key_file = os.path.join(BASE_DIR, 'keys/jumpserver', username+".pem")
             if os.path.isfile(private_key_file):
                 f = open(private_key_file)
                 data = f.read()

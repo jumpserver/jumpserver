@@ -120,6 +120,11 @@ class User(models.Model):
         else:
             return assets_info
 
+    def update(self, **kwargs):
+        for key, value in kwargs.items():
+            self.__setattr__(key, value)
+            self.save()
+
 
 class AdminGroup(models.Model):
     """

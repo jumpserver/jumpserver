@@ -50,12 +50,9 @@ def get_data(data, items, option):
 @require_role(role='user')
 def index_cu(request):
     user_id = request.session.get('user_id')
-    user = User.objects.filter(id=user_id)
-    if user:
-        user = user[0]
+    user = get_object(User, id=user_id)
     login_types = {'L': 'LDAP', 'M': 'MAP'}
-    user_id = request.session.get('user_id')
-    username = User.objects.get(id=user_id).username
+    username = user.username
     posts = user.get_asset()
     host_count = len(posts)
     new_posts = []
@@ -91,16 +88,16 @@ def index(request):
         week_data = Log.objects.filter(start_time__range=[from_week, datetime.datetime.now()])
 
     elif is_role_request(request, 'admin'):
-        user = get_session_user_info(request)[2]
-        dept_name, dept = get_session_user_info(request)[4:]
-        users = User.objects.filter(dept=dept)
-        hosts = Asset.objects.filter(dept=dept)
-        online = Log.objects.filter(dept_name=dept_name, is_finished=0)
-        online_host = online.values('host').distinct()
-        online_user = online.values('user').distinct()
-        active_users = users.filter(is_active=1)
-        active_hosts = hosts.filter(is_active=1)
-        week_data = Log.objects.filter(dept_name=dept_name, start_time__range=[from_week, datetime.datetime.now()])
+        return index_cu(request)
+        # user = get_session_user_info(request)[2]
+        # users = User.objects.filter(dept=dept)
+        # hosts = Asset.objects.filter(dept=dept)
+        # online = Log.objects.filter(dept_name=dept_name, is_finished=0)
+        # online_host = online.values('host').distinct()
+        # online_user = online.values('user').distinct()
+        # active_users = users.filter(is_active=1)
+        # active_hosts = hosts.filter(is_active=1)
+        # week_data = Log.objects.filter(dept_name=dept_name, start_time__range=[from_week, datetime.datetime.now()])
 
     # percent of dashboard
     if users.count() == 0:
@@ -157,32 +154,32 @@ def skin_config(request):
     return render_to_response('skin_config.html')
 
 
-def pages(posts, r):
-    """分页公用函数"""
-    contact_list = posts
-    p = paginator = Paginator(contact_list, 10)
-    try:
-        current_page = int(r.GET.get('page', '1'))
-    except ValueError:
-        current_page = 1
-
-    page_range = page_list_return(len(p.page_range), current_page)
-
-    try:
-        contacts = paginator.page(current_page)
-    except (EmptyPage, InvalidPage):
-        contacts = paginator.page(paginator.num_pages)
-
-    if current_page >= 5:
-        show_first = 1
-    else:
-        show_first = 0
-    if current_page <= (len(p.page_range) - 3):
-        show_end = 1
-    else:
-        show_end = 0
-
-    return contact_list, p, contacts, page_range, current_page, show_first, show_end
+# def pages(posts, r):
+#     """分页公用函数"""
+#     contact_list = posts
+#     p = paginator = Paginator(contact_list, 10)
+#     try:
+#         current_page = int(r.GET.get('page', '1'))
+#     except ValueError:
+#         current_page = 1
+#
+#     page_range = page_list_return(len(p.page_range), current_page)
+#
+#     try:
+#         contacts = paginator.page(current_page)
+#     except (EmptyPage, InvalidPage):
+#         contacts = paginator.page(paginator.num_pages)
+#
+#     if current_page >= 5:
+#         show_first = 1
+#     else:
+#         show_first = 0
+#     if current_page <= (len(p.page_range) - 3):
+#         show_end = 1
+#     else:
+#         show_end = 0
+#
+#     return contact_list, p, contacts, page_range, current_page, show_first, show_end
 
 
 def is_latest():
