@@ -16,12 +16,6 @@
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                             <i class="fa fa-wrench"></i>
                         </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">未启用 1</a>
-                            </li>
-                            <li><a href="#">未启用 2</a>
-                            </li>
-                        </ul>
                         <a class="close-link">
                             <i class="fa fa-times"></i>
                         </a>
@@ -29,14 +23,14 @@
                 </div>
                 <div class="ibox-content">
                     <div class="">
-                    <a target="_blank" href="/jasset/group_add" class="btn btn-sm btn-primary "> 添加主机组 </a>
+                    <a target="_blank" href="/jasset/group_add/" class="btn btn-sm btn-primary "> 添加主机组 </a>
                     <form id="search_form" method="get" action="" class="pull-right mail-search">
                         <div class="input-group">
                             <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
                             <input type="text" style="display: none">
                             <div class="input-group-btn">
                                 <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
-                                    Search
+                                    - 搜索 -
                                 </button>
                             </div>
                         </div>
@@ -47,26 +41,24 @@
                     <table class="table table-striped table-bordered table-hover " id="editable" >
                         <thead>
                             <tr>
-                                <th class="text-center"><input id="checkall" type="checkbox" class="i-checks" name="checkall" value="checkall" data-editable='false' onclick="check_all('contents_form')"></th>
+                                <th class="text-center">
+                                    <input id="checkall" type="checkbox" class="i-checks" name="checkall" value="checkall" data-editable='false' onclick="check_all('contents_form')">
+                                </th>
                                 <th class="text-center"> 主机组名 </th>
-                                <th class="text-center"> 所属部门 </th>
                                 <th class="text-center"> 主机数量 </th>
                                 <th class="text-center"> 备注 </th>
                                 <th class="text-center"> 操作 </th>
                             </tr>
                         </thead>
                         <tbody>
-                        {% for post in contacts.object_list %}
+                        {% for asset_group in asset_groups.object_list %}
                             <tr class="gradeX">
-                                <td class="text-center" name="j_id" value="{{ post.id }}" data-editable='false'><input name="id" value="{{ post.id }}" type="checkbox" class="i-checks"></td>
-                                <td class="text-center"> {{ post.name }} </td>
-                                <td class="text-center"> {{ post.dept.name }} </td>
-                                {% ifequal session_role_id 2 %}
-                                    <td class="text-center"> <a href="/jasset/group_detail/?id={{ post.id }}">{{ post.asset_set.count }}</a> </td>
-                                {% else %}
-                                    <td class="text-center"> <a href="/jasset/group_detail/?id={{ post.id }}">{{ post|get_group_count:dept }}</a> </td>
-                                {% endifequal %}
-                                <td class="text-center"> {{ post.comment }} </td>
+                                <td class="text-center" name="id" value="{{ asset_group.id }}" data-editable='false'>
+                                    <input name="id" value="{{ post.id }}" type="checkbox" class="i-checks">
+                                </td>
+                                <td class="text-center"> {{ asset_group.name }} </td>
+                                <td class="text-center"> <a href="/jasset/group_detail/?id={{ post.id }}">{{ asset_group.asset_set.count }}</a> </td>
+                                <td class="text-center"> {{ asset_group.comment }} </td>
                                 <td class="text-center">
                                     <a href="/jasset/group_detail/?id={{ post.id }}" class="btn btn-xs btn-info">详情</a>
                                     <a href="/jasset/group_edit/?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>

@@ -109,30 +109,30 @@
                         <small><i class="fa fa-map-marker"></i> 这里包含了用户所有的主机组和组下的主机.</small>
                     </div>
                     <div class="ibox-content inspinia-timeline">
-                        {% for group in user|get_user_asset_group %}
-                            <div class="timeline-item">
-                                <div class="row">
-                                    <div class="col-xs-3 date">
-                                        <i class="fa fa-repeat"></i>
-                                        <b><a href="/jperm/perm_list/?uid={{ user.id }}&agid={{ group.id }}">{{ group.name }}</a></b>
-                                        <br>
-                                        <small class="text-navy">共: {{ group | group_asset_list_count }}台</small>
-                                    </div>
-                                    <div class="col-xs-7 content no-top-border">
-                                        <p class="m-b-xs"><strong>{{ group.comment }}</strong></p>
-                                        <p>
-                                            {% for asset in group|group_asset_list %}
-                                                {{ asset.ip }}<br>
-                                            {% endfor %}
-                                        </p>
-                                        <p></p>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
-                        {% if not user|get_user_asset_group %}
-                            (无)
-                        {% endif %}
+{#                        {% for group in user|get_user_asset_group %}#}
+{#                            <div class="timeline-item">#}
+{#                                <div class="row">#}
+{#                                    <div class="col-xs-3 date">#}
+{#                                        <i class="fa fa-repeat"></i>#}
+{#                                        <b><a href="/jperm/perm_list/?uid={{ user.id }}&agid={{ group.id }}">{{ group.name }}</a></b>#}
+{#                                        <br>#}
+{#                                        <small class="text-navy">共: {{ group | group_asset_list_count }}台</small>#}
+{#                                    </div>#}
+{#                                    <div class="col-xs-7 content no-top-border">#}
+{#                                        <p class="m-b-xs"><strong>{{ group.comment }}</strong></p>#}
+{#                                        <p>#}
+{#                                            {% for asset in group|group_asset_list %}#}
+{#                                                {{ asset.ip }}<br>#}
+{#                                            {% endfor %}#}
+{#                                        </p>#}
+{#                                        <p></p>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        {% endfor %}#}
+{#                        {% if not user|get_user_asset_group %}#}
+{#                            (无)#}
+{#                        {% endif %}#}
                     </div>
                 </div>
             </div>
@@ -154,7 +154,8 @@
                                                 <img alt="image" class="img-circle" src="/static/img/{{ session_role_id | to_avatar }}.png">
                                             </a>
                                             <div class="media-body ">
-                                                <small class="pull-right">{{ log.start_time|time_delta }}</small>
+{#                                                <small class="pull-right">{{ log.start_time|time_delta }}</small>#}
+                                                <small class="pull-right">{{ log.start_time }}</small>
                                                 <strong>{{ log.user }}</strong> 登录了 <span class="text-navy">{{ log.host }}. </span><br>
                                                 <small class="text-muted">{{ log.start_time|date:"Y-m-d H:i:s" }}</small>
                                             </div>
@@ -177,21 +178,18 @@
                                                 <img alt="image" class="img-circle" src="/static/img/{{ session_role_id | to_avatar }}.png">
                                             </a>
                                             <div class="media-body ">
-                                                <small class="pull-right">{{ log.start_time|time_delta }}</small>
+                                                <small class="pull-right">{{ log.start_time }}</small>
+{#                                                <small class="pull-right">{{ log.start_time|time_delta }}</small>#}
                                                 <strong>{{ log.user }}</strong> 登录了 <span class="text-navy">{{ log.host }}. </span><br>
                                                 <small class="text-muted">{{ log.start_time|date:"Y-m-d H:i:s" }}</small>
                                             </div>
                                         </div>
                                     {% endfor %}
                                 </div>
-
                             </div>
-
                         </div>
                     </div>
-
                 </div>
-
             </div>
     </div>
 

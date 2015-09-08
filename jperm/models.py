@@ -4,12 +4,12 @@ from uuidfield import UUIDField
 
 from django.db import models
 from juser.models import UserGroup
-from jasset.models import Asset, BisGroup
+from jasset.models import Asset, AssetGroup
 
 
 class Perm(models.Model):
     user_group = models.ForeignKey(UserGroup)
-    asset_group = models.ForeignKey(BisGroup)
+    asset_group = models.ForeignKey(AssetGroup)
 
     def __unicode__(self):
         return '%s_%s' % (self.user_group.name, self.asset_group.name)
@@ -27,7 +27,7 @@ class CmdGroup(models.Model):
 class SudoPerm(models.Model):
     user_group = models.ForeignKey(UserGroup)
     user_runas = models.CharField(max_length=100)
-    asset_group = models.ManyToManyField(BisGroup)
+    asset_group = models.ManyToManyField(AssetGroup)
     cmd_group = models.ManyToManyField(CmdGroup)
     comment = models.CharField(max_length=30, null=True, blank=True)
 

@@ -56,8 +56,8 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'jumpserver',
     'juser',
-    # 'jasset',
-    # 'jperm',
+    'jasset',
+    'jperm',
     # 'jlog',
 )
 

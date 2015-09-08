@@ -10,7 +10,7 @@
                     <strong class="font-bold">{{ session_user_id | to_name}}  <span style="color: #8095a8"></span></strong>
                 </span>
                 <span class="text-muted text-xs block">
-                    {{ session_role_id | to_role_name }} <b class="caret"></b>
+                    {{ session_user_id | get_role }} <b class="caret"></b>
                 </span>
             </span>
         </a>

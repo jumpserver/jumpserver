@@ -71,7 +71,7 @@ def group_list(request):
     if keyword:
         user_group_list = user_group_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
 
-    contacts, p, contacts, page_range, current_page, show_first, show_end = pages(user_group_list, request)
+    user_group_list, p, user_groups, page_range, current_page, show_first, show_end = pages(user_group_list, request)
     return my_render('juser/group_list.html', locals(), request)
 
 
@@ -356,18 +356,18 @@ def user_list(request):
     header_title, path1, path2 = '查看用户', '用户管理', '用户列表'
     keyword = request.GET.get('keyword', '')
     gid = request.GET.get('gid', '')
-    contact_list = User.objects.all().order_by('name')
+    users_list = User.objects.all().order_by('username')
 
     if gid:
         user_group = UserGroup.objects.filter(id=gid)
         if user_group:
             user_group = user_group[0]
-            contact_list = user_group.user_set.all()
+            users_list = user_group.user_set.all()
 
     if keyword:
-        contact_list = contact_list.filter(Q(username__icontains=keyword) | Q(name__icontains=keyword)).order_by('name')
+        users_list = users_list.filter(Q(username__icontains=keyword) | Q(name__icontains=keyword)).order_by('username')
 
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
+    users_list, p, users, page_range, current_page, show_first, show_end = pages(users_list, request)
 
     return my_render('juser/user_list.html', locals(), request)
 
@@ -568,8 +568,6 @@ def user_edit(request):
                        role=role_post,
                        is_active=is_active)
 
-        print '#'* 10 + role_post
-
         if email_need:
             msg = u"""
             Hi %s:
@@ -669,7 +667,7 @@ def change_info(request):
         if '' in [name, password, email]:
             error = '不能为空'
 
-        if len(password) < 6 :
+        if len(password) < 6:
             error = '密码须大于6位'
 
         if not error:

@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load mytags %}
+
+
+{% block content %}
+    {% include 'nav_cat_bar.html' %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="text text-primary"><b>{{ asset.ip }}</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content ibox-heading">
+                        <h3>主机详细信息</h3>
+                        <small><i class="fa fa-map-marker"></i> 此主机详细信息.</small>
+                    </div>
+                    <div class="ibox-content">
+                        <div>
+                            <div class="text-left">
+                                <table class="table">
+                                    <tr>
+                                        <td class="text-navy">IP</td>
+                                        <td>{{ asset.ip }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">端口</td>
+                                        <td>{{ asset.port }}</td>
+                                    </tr>
+
+                                    <tr>
+                                        <td class="text-navy">主机组</td>
+                                        <td>
+                                             <table class="table">
+                                             </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">使用默认管理账号</td>
+                                        <td>{{ asset.use_default_auth|bool2str }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">激活</td>
+                                        <td>{{ asset.is_active|bool2str }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">添加日期</td>
+                                        <td>{{ asset.date_added|date:"Y-m-d H:i:s" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">备注</td>
+                                        <td>{{ asset.comment }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>拥有权限的用户</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content ibox-heading">
+                        <h3>主机所有授权的用户</h3>
+                        <small><i class="fa fa-map-marker"></i> 包含了此主机所有授权的用户.</small>
+                    </div>
+                    <div class="ibox-content">
+                        <div>
+                            <div class="text-left">
+                                <table class="table">
+{#                                    {% if user_permed_list %}#}
+{#                                        {% for user in user_permed_list %}#}
+{#                                            <tr>#}
+{#                                                <td class="text-navy">{{ user.name }}</td>#}
+{#                                                <td>{{ user.dept.name }}</td>#}
+{#                                                <td><a href="/juser/user_detail/?id={{ user.id }}">详情</a></td>#}
+{#                                            </tr>#}
+{#                                        {% endfor %}#}
+{#                                    {% else %}#}
+{#                                        <p class="text-center">(暂无)</p>#}
+{#                                    {% endif %}#}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>最近一周登录记录</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content ibox-heading">
+                        <h3>最近一周登录记录</h3>
+                        <small><i class="fa fa-map-marker"></i> 此主机最近一周用户登录信息.</small>
+                    </div>
+                    <div class="ibox-content inspinia-timeline">
+{#                        {% if log %}#}
+{#                            {% for l in log %}#}
+{#                                <div class="timeline-item">#}
+{#                                    <div class="row">#}
+{#                                        <div class="col-xs-5 date">#}
+{#                                            <i class="fa fa-info-circle"></i>#}
+{#                                            <small class="text-navy">{{ l.user }}</small>#}
+{#                                            <br/>#}
+{#                                            <strong>{{l.dept_name}}</strong>#}
+{#                                        </div>#}
+{#                                        <div class="col-xs-7 content no-top-border">#}
+{#                                            <p class="m-b-xs"><strong>详细信息</strong></p>#}
+{#                                            <p>来源IP: {{ l.remote_ip }}</p>#}
+{#                                            <p>开始: {{ l.start_time |date:"Y-m-d H:i:s" }}</p>#}
+{#                                            <p>结束: {{ l.end_time |date:"Y-m-d H:i:s" }}</p>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            {% endfor %}#}
+{#                            <button id="show" class="btn btn-primary btn-block m-t"><i class="fa fa-arrow-down"></i> 所有 </button>#}
+{#                            <div id='more' style="display: none">#}
+{#                            <br/>#}
+{#                            {% for l in log_more %}#}
+{#                                <div class="timeline-item">#}
+{#                                    <div class="row">#}
+{#                                        <div class="col-xs-5 date">#}
+{#                                            <i class="fa fa-info-circle"></i>#}
+{#                                            <small class="text-navy">{{ l.user }}</small>#}
+{#                                            <br/>#}
+{#                                            <strong>{{l.dept_name}}</strong>#}
+{#                                        </div>#}
+{#                                        <div class="col-xs-7 content no-top-border">#}
+{#                                            <p class="m-b-xs"><strong>详细信息</strong></p>#}
+{#                                            <p>来源IP: {{ l.remote_ip }}</p>#}
+{#                                            <p>开始: {{ l.start_time |date:"Y-m-d H:i:s" }}</p>#}
+{#                                            <p>结束: {{ l.end_time |date:"Y-m-d H:i:s" }}</p>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            {% endfor %}#}
+{#                        {% else %}#}
+{#                            <p class="text-center">(暂无)</p>#}
+{#                        {% endif %}#}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        $('#show').click(function(){
+            $('#show').css('display', 'none');
+            $('#more').css('display', 'block');
+        })
+    })
+</script>
+
+
+{% endblock %}

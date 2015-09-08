@@ -54,7 +54,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                        {% for user in contacts.object_list %}
+                        {% for user in users.object_list %}
                             <tr class="gradeX">
                                 <td class="text-center">
                                     <input type="checkbox"  name="selected" value="{{ user.id }}">
@@ -63,7 +63,7 @@
                                 <td class="text-center"> {{ user.name }} </td>
                                 <td class="text-center" title="{% for user_group in user.group.all %} {{ user_group.name }} {% endfor %}"> {{ user.group.all | group_str2  }} </td>
                                 <td class="text-center"> {{ user.id | get_role }}</td>
-                                <td class="text-center">{{ user.is_active|bool2str }}</td>
+                                <td class="text-center">{{ user.is_active | bool2str }}</td>
                                 <td class="text-center"><a href="/juser/down_key/?id={{ user.id }}">下载</a></td>
                                 <td class="text-center">
                                     <a href="../user_detail/?id={{ user.id }}" class="btn btn-xs btn-primary">详情</a>
@@ -78,7 +78,7 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="dataTables_info" id="editable_info" role="status" aria-live="polite">
-                                Showing {{ contacts.start_index }} to {{ contacts.end_index }} of {{ p.count }} entries
+                                Showing {{ users.start_index }} to {{ users.end_index }} of {{ p.count }} entries
                             </div>
                         </div>
                         {% include 'paginator.html' %}
@@ -93,25 +93,27 @@
 {% block self_head_css_js %}
 <script>
     $(document).ready(function(){
-        $(".iframe").on('click', function() {
-            var url = $(this).attr("value");
-            $.layer({
-                type: 2,
-                title: '用户详情',
-                maxmin: true,
-                shift: 'top',
-                border: [2, 0.3, '#1AB394'],
-                shade: [0.5, '#000000'],
-                shadeClose: true,
-                area: ['800px', '600px'],
-                iframe: {src: url}
-            })
-        });
+{#        $(".iframe").on('click', function() {#}
+{#            var url = $(this).attr("value");#}
+{#            $.layer({#}
+{#                type: 2,#}
+{#                title: '用户详情',#}
+{#                maxmin: true,#}
+{#                shift: 'top',#}
+{#                border: [2, 0.3, '#1AB394'],#}
+{#                shade: [0.5, '#000000'],#}
+{#                shadeClose: true,#}
+{#                area: ['800px', '600px'],#}
+{#                iframe: {src: url}#}
+{#            })#}
+{#        });#}
 
         var check_array = [];
         $('#del_btn').click(function(){
             if (confirm("确定删除")) {
-                $(".gradeX input:checked").each(function() {check_array.push($(this).attr("value")) });
+                $(".gradeX input:checked").each(function() {
+                    check_array.push($(this).attr("value"))
+                });
                 $.post("/juser/user_del_ajax/",
                         {ids: check_array.join(",")},
                         function(data){

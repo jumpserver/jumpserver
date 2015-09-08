@@ -17,7 +17,7 @@ from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
 from django.template import RequestContext
 from juser.models import User, UserGroup
-from jasset.models import Asset, BisGroup, IDC
+from jasset.models import Asset, AssetGroup
 from jlog.models import Log
 from jasset.models import AssetAlias
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
@@ -177,6 +177,7 @@ def pages(post_objects, request):
     else:
         show_end = 0
 
+    # 所有对象， 分页器， 本页对象， 所有页码， 本页页码，是否显示第一页，是否显示最后一页
     return post_objects, paginator, page_objects, page_range, current_page, show_first, show_end
 
 
@@ -429,7 +430,7 @@ class PyCrypt(object):
         """
         return crypt.crypt(password, '$6$%s$' % salt)
 
-    def encrypt(self, passwd=None):
+    def encrypt(self, passwd=None, length=32):
         """
         encrypt gen password
         对称加密之加密生成密码
@@ -438,7 +439,6 @@ class PyCrypt(object):
             passwd = self.random_pass()
 
         cryptor = AES.new(self.key, self.mode, b'8122ca7d906ad5e1')
-        length = 64
         try:
             count = len(passwd)
         except TypeError:
