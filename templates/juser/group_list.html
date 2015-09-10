@@ -26,7 +26,7 @@
                 <div class="ibox-content">
                     <div class="">
                     <a target="_blank" href="/juser/group_add/" class="btn btn-sm btn-primary "> 添加用户组 </a>
-                    <a id="del_btn" class="btn btn-sm btn-danger "> 删除所选组 </a>
+                    <a id="del_btn" class="btn btn-sm btn-danger "> 删除所选 </a>
                     <form id="search_form" method="get" action="" class="pull-right mail-search">
                         <div class="input-group">
                             <input type="text" class="form-control input-sm" id="search_input" name="search" placeholder="Search">
@@ -62,7 +62,7 @@
                                 <td class="text-center"> {{ group.comment }} </td>
                                 <td class="text-center">
                                     <a href="../group_edit/?id={{ group.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <a href="../group_del/?id={{ group.id }}" class="btn btn-xs btn-danger">删除</a>
+                                    <a value="../group_del/?id={{ group.id }}" class="btn btn-xs btn-danger del">删除</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -71,7 +71,7 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="dataTables_info" id="editable_info" role="status" aria-live="polite">
-                                Showing {{ contacts.start_index }} to {{ contacts.end_index }} of {{ p.count }} entries
+                                Showing {{ user_groups.start_index }} to {{ user_groups.end_index }} of {{ p.count }} entries
                             </div>
                         </div>
                         {% include 'paginator.html' %}
@@ -86,14 +86,27 @@
 {% block self_footer_js %}
 <script>
     $(document).ready(function(){
-        var check_array = [];
+        $('.del').click(function(){
+            var row = $(this).closest('tr');
+            $.get(
+                    $(this).attr('value'),
+                    {},
+                    function(data){
+                        row.remove();
+                        alert(data);
+                    }
+
+            )
+        });
+
         $('#del_btn').click(function(){
+            var check_array = [];
             if (confirm("确定删除")) {
                 $(".gradeX input:checked").each(function() {
                     check_array.push($(this).attr("value"))
                 });
-                $.post("/juser/group_del_ajax/",
-                    {group_ids: check_array.join(",")},
+                $.get("/juser/group_del/",
+                    {id: check_array.join(",")},
                     function(result){
                         alert(result);
                         $(".gradeX input:checked").closest("tr").remove();

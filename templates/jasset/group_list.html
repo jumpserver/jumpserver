@@ -24,6 +24,7 @@
                 <div class="ibox-content">
                     <div class="">
                     <a target="_blank" href="/jasset/group_add/" class="btn btn-sm btn-primary "> 添加主机组 </a>
+                    <a target="_blank" class="btn btn-sm btn-danger" id="del_check"> 删除所选 </a>
                     <form id="search_form" method="get" action="" class="pull-right mail-search">
                         <div class="input-group">
                             <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
@@ -54,15 +55,15 @@
                         {% for asset_group in asset_groups.object_list %}
                             <tr class="gradeX">
                                 <td class="text-center" name="id" value="{{ asset_group.id }}" data-editable='false'>
-                                    <input name="id" value="{{ post.id }}" type="checkbox" class="i-checks">
+                                    <input name="id" value="{{ asset_group.id }}" type="checkbox" class="i-checks">
                                 </td>
                                 <td class="text-center"> {{ asset_group.name }} </td>
-                                <td class="text-center"> <a href="/jasset/group_detail/?id={{ post.id }}">{{ asset_group.asset_set.count }}</a> </td>
+                                <td class="text-center"> <a href="/jasset/group_detail/?id={{ asset_group.id }}">{{ asset_group.asset_set.count }}</a> </td>
                                 <td class="text-center"> {{ asset_group.comment }} </td>
                                 <td class="text-center">
-                                    <a href="/jasset/group_detail/?id={{ post.id }}" class="btn btn-xs btn-info">详情</a>
-                                    <a href="/jasset/group_edit/?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <a href="/jasset/group_del/?id={{ post.id }}" class="btn btn-xs btn-danger">删除</a>
+                                    <a href="/jasset/group_detail/?id={{ asset_group.id }}" class="btn btn-xs btn-info">详情</a>
+                                    <a href="/jasset/group_edit/?id={{ asset_group.id }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a value="/jasset/group_del/?id={{ asset_group.id }}" id="del" class="btn btn-xs btn-danger">删除</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -70,8 +71,9 @@
                     </table>
                     <div class="row">
                         <div class="col-sm-6">
-                            <input type="button" id="del_button" class="btn btn-danger btn-sm"  name="del_button" value="删除" onclick="del('contents_form')" />
-                            <!--<input type="button" id="alter_button" class="btn btn-warning btn-sm" name="alter_button" value="修改" onclick="alter('contents_form')" />-->
+                            <div class="dataTables_info" id="editable_info" role="status" aria-live="polite">
+                                Showing {{ asset_groups.start_index }} to {{ asset_groups.end_index }} of {{ p.count }} entries
+                            </div>
                         </div>
                         {% include 'paginator.html' %}
                     </div>
@@ -81,29 +83,43 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block self_footer_js %}
 <script>
-    function del(form) {
-    var checkboxes = document.getElementById(form);
-    var id_list = {};
-    var j = 0;
-    for (var i = 0; i < checkboxes.elements.length; i++) {
-        if (checkboxes.elements[i].type == "checkbox" && checkboxes.elements[i].checked == true && checkboxes.elements[i].value != "checkall") {
-            id_list[j] = checkboxes.elements[i].value;
-            j++;
-        }
-    }
-    if (confirm("确定删除")) {
-        $.ajax({
-            type: "POST",
-            url: "/jasset/group_del/?id=multi",
-            data: {"id_list": id_list, "len_list": j},
-            success: function (data) {
-                window.open("/jasset/group_list/", "_self");
-            }
+    $(document).ready(function(){
+        $('#del').click(function(){
+            var row = $(this).closest('tr');
+            $.get(
+                    $(this).attr('value'),
+                    {},
+                    function(data){
+                        row.remove();
+                        alert(data)
+                    }
+            )
         });
-    }
-    }
+
+        $('#del_check').click(function(){
+            var check_array = [];
+            if (confirm('确定删除')){
+                $('tr.gradeX input:checked').each(function(){
+                    check_array.push($(this).attr('value'))
+                });
+                $.get(
+                        '/jasset/group_del/',
+                        {id: check_array.join(',')},
+                        function(data){
+                            $('tr.gradeX input:checked').closest('tr').remove();
+                            alert(data);
+                        }
+                )
+
+            }
+        })
+    });
+
+
 </script>
 
 {% endblock %}

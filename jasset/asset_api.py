@@ -37,8 +37,15 @@ def db_asset_add(**kwargs):
     add asset to db
     添加主机时数据库操作函数
     """
+    group_id_list = kwargs.pop('groups')
+    asset = Asset(**kwargs)
+    asset.save()
 
-    Asset(**kwargs).save()
+    group_select = []
+    for group_id in group_id_list:
+        group = AssetGroup.objects.filter(id=group_id)
+        group_select.extend(group)
+    asset.group = group_select
 
 
 #

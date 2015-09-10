@@ -69,7 +69,7 @@
                                     <a href="../user_detail/?id={{ user.id }}" class="btn btn-xs btn-primary">详情</a>
                                     <a href="../user_edit/?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a value="{{ user.uuid }}" class="btn btn-xs btn-warning email">Email</a>
-                                    <a href="../user_del/?id={{ user.id }}" class="btn btn-xs btn-danger {% if user.username == 'admin' %} disabled {% endif %}">删除</a>
+                                    <a value="../user_del/?id={{ user.id }}" class="btn btn-xs btn-danger del {% if user.username == 'admin' %} disabled {% endif %}">删除</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -93,32 +93,29 @@
 {% block self_head_css_js %}
 <script>
     $(document).ready(function(){
-{#        $(".iframe").on('click', function() {#}
-{#            var url = $(this).attr("value");#}
-{#            $.layer({#}
-{#                type: 2,#}
-{#                title: '用户详情',#}
-{#                maxmin: true,#}
-{#                shift: 'top',#}
-{#                border: [2, 0.3, '#1AB394'],#}
-{#                shade: [0.5, '#000000'],#}
-{#                shadeClose: true,#}
-{#                area: ['800px', '600px'],#}
-{#                iframe: {src: url}#}
-{#            })#}
-{#        });#}
+        $('.del').click(function(){
+            var row = $(this).closest('tr');
+            $.get(
+                    $(this).attr('value'),
+                    {},
+                    function(data){
+                        row.remove();
+                        alert(data);
+                    }
+            )
+        });
 
-        var check_array = [];
         $('#del_btn').click(function(){
+            var check_array = [];
             if (confirm("确定删除")) {
                 $(".gradeX input:checked").each(function() {
                     check_array.push($(this).attr("value"))
                 });
-                $.post("/juser/user_del_ajax/",
-                        {ids: check_array.join(",")},
+                $.post("/juser/user_del/",
+                        {id: check_array.join(",")},
                         function(data){
                             $(".gradeX input:checked").closest("tr").remove();
-                            window.open("/juser/user_list/", "_self");
+                            alert(data);
                         }
                 )
             }

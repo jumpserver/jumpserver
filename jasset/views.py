@@ -57,10 +57,25 @@ def group_list(request):
     asset_group_list = AssetGroup.objects.all()
 
     if keyword:
-        asset_groups = asset_group_list.filter(Q(name__contains=keyword) | Q(comment__contains=keyword))
+        asset_group_list = asset_group_list.filter(Q(name__contains=keyword) | Q(comment__contains=keyword))
 
     asset_group_list, p, asset_groups, page_range, current_page, show_first, show_end = pages(asset_group_list, request)
     return my_render('jasset/group_list.html', locals(), request)
+
+
+@require_role('admin')
+def group_del(request):
+    """
+    del asset group
+    删除主机组
+    """
+    group_ids = request.GET.get('id', '')
+    group_id_list = group_ids.split(',')
+
+    for group_id in group_id_list:
+        AssetGroup.objects.filter(id=group_id).delete()
+
+    return HttpResponse(u'删除成功')
 
 
 @require_role('admin')
@@ -70,10 +85,11 @@ def asset_add(request):
     添加资产
     """
     header_title, path1, path2 = u'添加资产', u'资产管理', u'添加资产'
+    asset_group_all = AssetGroup.objects.all()
     if request.method == 'POST':
         ip = request.POST.get('ip')
         port = request.POST.get('port')
-        group = request.POST.getlist('group')
+        groups = request.POST.getlist('groups')
         use_default_auth = True if request.POST.getlist('use_default_auth', []) else False
         is_active = True if request.POST.get('is_active') else False
         comment = request.POST.get('comment')
@@ -96,7 +112,7 @@ def asset_add(request):
         else:
             db_asset_add(
                 ip=ip, port=port, use_default_auth=use_default_auth, is_active=is_active, comment=comment,
-                username=username, password=password_encode
+                groups=groups, username=username, password=password_encode
             )
 
             msg = u'主机 %s 添加成功' % ip
@@ -447,27 +463,7 @@ def asset_detail(request):
 #
 #     return HttpResponseRedirect('/jasset/group_detail/?id=%s' % group.id)
 #
-#
-# @require_admin
-# def group_del(request):
-#     """ 删除主机组 """
-#     offset = request.GET.get('id', '')
-#     if offset == 'multi':
-#         len_list = request.POST.get("len_list")
-#         for i in range(int(len_list)):
-#             key = "id_list[" + str(i) + "]"
-#             gid = request.POST.get(key)
-#             if is_group_admin(request) and not validate(request, asset_group=[gid]):
-#                 return httperror(request, '删除失败, 您无权删除!')
-#             BisGroup.objects.filter(id=gid).delete()
-#     else:
-#         gid = int(offset)
-#         if is_group_admin(request) and not validate(request, asset_group=[gid]):
-#             return httperror(request, '删除失败, 您无权删除!')
-#         BisGroup.objects.filter(id=gid).delete()
-#     return HttpResponseRedirect('/jasset/group_list/')
-#
-#
+
 # @require_admin
 # def dept_host_ajax(request):
 #     """ 添加主机组时, 部门联动主机异步 """

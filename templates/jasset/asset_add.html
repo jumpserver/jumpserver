@@ -80,8 +80,8 @@
                                             <label for="groups" class="col-sm-2 control-label">所属主机组</label>
                                             <div class="col-sm-8">
                                                 <select id="groups" name="groups" class="form-control m-b" multiple size="10">
-                                                    {% for g in egroup %}
-                                                        <option type="checkbox" value="{{ g.id }}">{{ g.name }} {% if g.comment %} --- {{ g.comment }} {% endif %}</option>
+                                                    {% for asset_group in asset_group_all %}
+                                                        <option type="checkbox" value="{{ asset_group.id }}">{{ asset_group.name }} {% if asset_group.comment %} --- {{ asset_group.comment }} {% endif %}</option>
                                                     {% endfor %}
                                                 </select>
                                             </div>

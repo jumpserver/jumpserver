@@ -81,20 +81,13 @@ def group_del(request):
     del a group
     删除用户组
     """
-    group_id = request.GET.get('id', '')
-    if not group_id:
-        return HttpResponseRedirect('/')
-    UserGroup.objects.filter(id=group_id).delete()
-    return HttpResponseRedirect('/juser/group_list/')
-
-
-@require_role(role='super')
-def group_del_ajax(request):
-    group_ids = request.POST.get('group_ids')
-    group_ids = group_ids.split(',')
-    for group_id in group_ids:
+    group_ids = request.GET.get('id', '')
+    group_id_list = group_ids.split(',')
+    for group_id in group_id_list:
         UserGroup.objects.filter(id=group_id).delete()
+
     return HttpResponse('删除成功')
+
 
 # @require_role(role='admin')
 # def group_list_adm(request):
@@ -424,30 +417,10 @@ def user_detail(request):
 
 @require_role(role='admin')
 def user_del(request):
-    user_id = request.GET.get('id', '')
-    if not user_id:
-        return HttpResponseRedirect('/juser/user_list/')
-
-    user = get_object(User, id=user_id)
-    if user and user.username != 'admin':
-        user.delete()
-        server_del_user(user.username)
-    return HttpResponseRedirect('/juser/user_list/')
-
-
-@require_role(role='admin')
-def user_del_ajax(request):
-    user_ids = request.POST.get('ids')
-    user_ids = user_ids.split(',')
-    if request.session.get('role_id', '') == 1:
-        if not validate(request, user=user_ids):
-            return "error"
-
-    for user_id in user_ids:
-        user = get_object(User, id=user_id)
-        if user and user.username != 'admin':
-            user.delete()
-            server_del_user(user.username)
+    user_ids = request.GET.get('id', '')
+    user_id_list = user_ids.split(',')
+    for user_id in user_id_list:
+        User.objects.filter(id=user_id).delete()
 
     return HttpResponse('删除成功')
 

@@ -16,7 +16,7 @@ urlpatterns = patterns('',
     (r'^juser/', include('juser.urls')),
     (r'^jasset/', include('jasset.urls')),
     # (r'^jlog/', include('jlog.urls')),
-    # (r'^jperm/', include('jperm.urls')),
+    (r'^jperm/', include('jperm.urls')),
     (r'^node_auth/', 'jumpserver.views.node_auth'),
 
 )
