@@ -12,7 +12,8 @@ from jumpserver.api import *
 
 
 def user_perm(request):
-    return my_render('jperm/perm_add.html', locals(), request)
+    header_title, path1, path2 = '用户授权', '授权管理', '用户授权'
+    return my_render('jperm/user_perm.html', locals(), request)
 
 
 # def asset_cmd_groups_get(asset_groups_select='', cmd_groups_select=''):
@@ -50,7 +51,7 @@ def user_perm(request):
 #         perm.user_group = user_groups
 #         perm.asset_group = asset_groups
 #         msg = '添加成功'
-#     return render_to_response('jperm/perm_add.html', locals(), context_instance=RequestContext(request))
+#     return render_to_response('jperm/user_perm.html', locals(), context_instance=RequestContext(request))
 #
 #
 # def dept_add_asset(dept_id, asset_list):

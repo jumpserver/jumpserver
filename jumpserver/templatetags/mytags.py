@@ -5,7 +5,7 @@ import ast
 import time
 
 from django import template
-from jperm.models import CmdGroup
+# from jperm.models import CmdGroup
 from jumpserver.api import *
 from jasset.models import AssetAlias
 

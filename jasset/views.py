@@ -6,7 +6,6 @@ from django.db.models import Q
 from django.template import RequestContext
 from django.shortcuts import get_object_or_404
 
-from jperm.models import Perm
 from jasset.asset_api import *
 from jumpserver.api import *
 
