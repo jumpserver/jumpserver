@@ -1,4 +1,4 @@
-#coding: utf-8
+# coding: utf-8
 
 from django.db import models
 
@@ -17,6 +17,21 @@ class UserGroup(models.Model):
         for key, value in kwargs.items():
             self.__setattr__(key, value)
             self.save()
+
+
+from django.contrib.auth.models import AbstractUser
+
+class CustomUser(AbstractUser):
+    USER_ROLE_CHOICES = (
+        ('SU', 'SuperUser'),
+        ('GA', 'GroupAdmin'),
+        ('CU', 'CommonUser'),
+    )
+    name = models.CharField(max_length=80)
+    uuid = models.CharField(max_length=100)
+    role = models.CharField(max_length=2, choices=USER_ROLE_CHOICES, default='CU')
+    group = models.ManyToManyField(UserGroup)
+    ssh_key_pwd = models.CharField(max_length=200)
 
 
 class User(models.Model):
@@ -137,5 +152,3 @@ class AdminGroup(models.Model):
 
     def __unicode__(self):
         return '%s: %s' % (self.user.username, self.group.name)
-
-

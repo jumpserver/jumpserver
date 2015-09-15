@@ -12,7 +12,8 @@ from django.http import HttpResponse
 # from jperm.models import Apply
 import paramiko
 from jumpserver.api import *
-
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 
 
 def getDaysByNum(num):
@@ -46,13 +47,105 @@ def get_data(data, items, option):
         dic[name] = li
     return dic
 
+class CustomUser(object):
+    def __init__(self,request):
+        self.requset = request
 
+    def __unicode__(self):
+        return self.requset.user.username
+
+    def get_asset_group(self):
+        """
+        Get user host_groups.
+        获取用户有权限的主机组
+        """
+        host_group_list = []
+        perm_list = []
+        user_group_all = self.requset.user.group.all()
+        for user_group in user_group_all:
+            perm_list.extend(user_group.perm_set.all())
+
+        for perm in perm_list:
+            host_group_list.append(perm.asset_group)
+
+        return host_group_list
+
+    def get_asset_group_info(self, printable=False):
+        """
+        Get or print asset group info
+        获取或打印用户授权资产组
+        """
+        asset_groups_info = {}
+        asset_groups = self.get_asset_group()
+
+        for asset_group in asset_groups:
+            asset_groups_info[asset_group.id] = [asset_group.name, asset_group.comment]
+
+        if printable:
+            for group_id in asset_groups_info:
+                if asset_groups_info[group_id][1]:
+                    print "[%3s] %s -- %s" % (group_id,
+                                              asset_groups_info[group_id][0],
+                                              asset_groups_info[group_id][1])
+                else:
+                    print "[%3s] %s" % (group_id, asset_groups_info[group_id][0])
+                print ''
+        else:
+            return asset_groups_info
+
+    def get_asset(self):
+        """
+        Get the assets of under the user control.
+        获取主机列表
+        """
+        assets = []
+        asset_groups = self.get_asset_group()
+
+        for asset_group in asset_groups:
+            assets.extend(asset_group.asset_set.all())
+
+        return assets
+
+    def get_asset_info(self, printable=False):
+        """
+        Get or print the user asset info
+        获取或打印用户资产信息
+        """
+        from jasset.models import AssetAlias
+        assets_info = {}
+        assets = self.get_asset()
+
+        for asset in assets:
+            asset_alias = AssetAlias.objects.filter(user=self, asset=asset)
+            if asset_alias and asset_alias[0].alias != '':
+                assets_info[asset.ip] = [asset.id, asset.ip, str(asset_alias[0].alias)]
+            else:
+                assets_info[asset.ip] = [asset.id, asset.ip, str(asset.comment)]
+
+        if printable:
+            ips = assets_info.keys()
+            ips.sort()
+            for ip in ips:
+                if assets_info[ip][2]:
+                    print '%-15s -- %s' % (ip, assets_info[ip][2])
+                else:
+                    print '%-15s' % ip
+            print ''
+        else:
+            return assets_info
+
+
+# @login_required
 @require_role(role='user')
 def index_cu(request):
-    user_id = request.session.get('user_id')
-    user = get_object(User, id=user_id)
+    # user_id = request.session.get('user_id')
+    # user = get_object(User, id=user_id)
+    # user = {}
+    # user.name = request.user.username
+    # user.username = request.user.username
+    # user.id = request.user.id
     login_types = {'L': 'LDAP', 'M': 'MAP'}
-    username = user.username
+    user = CustomUser(request)
     posts = user.get_asset()
     host_count = len(posts)
     new_posts = []
@@ -64,7 +157,6 @@ def index_cu(request):
             new_posts.append(post_five)
             post_five = []
     new_posts.append(post_five)
-
     return render_to_response('index_cu.html', locals(), context_instance=RequestContext(request))
 
 
@@ -193,7 +285,7 @@ def is_latest():
         pass
 
 
-def login(request):
+def Login(request):
     """登录界面"""
     if request.session.get('username'):
         return HttpResponseRedirect('/')
@@ -202,22 +294,20 @@ def login(request):
     else:
         username = request.POST.get('username')
         password = request.POST.get('password')
-        user_filter = User.objects.filter(username=username)
-        if user_filter:
-            user = user_filter[0]
-            if PyCrypt.md5_crypt(password) == user.password:
+        user = authenticate(username=username, password=password)
+        if user is not None:
+            if user.is_active:
+                login(request, user)
                 request.session['user_id'] = user.id
-                user_filter.update(last_login=datetime.datetime.now())
                 if user.role == 'SU':
                     request.session['role_id'] = 2
                 elif user.role == 'GA':
                     request.session['role_id'] = 1
                 else:
                     request.session['role_id'] = 0
-                response = HttpResponseRedirect('/', )
-                response.set_cookie('username', username, expires=604800)
-                response.set_cookie('seed', PyCrypt.md5_crypt(password), expires=604800)
-                return response
+                # response.set_cookie('username', username, expires=604800)
+                # response.set_cookie('seed', PyCrypt.md5_crypt(password), expires=604800)
+                return HttpResponseRedirect('/', )
             else:
                 error = '密码错误，请重新输入。'
         else:
@@ -225,8 +315,8 @@ def login(request):
     return render_to_response('login.html', {'error': error})
 
 
-def logout(request):
-    request.session.delete()
+def Logout(request):
+    logout(request)
     return HttpResponseRedirect('/login/')
 
 #

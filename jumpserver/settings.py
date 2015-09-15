@@ -22,7 +22,7 @@ DB_PORT = config.getint('db', 'port')
 DB_USER = config.get('db', 'user')
 DB_PASSWORD = config.get('db', 'password')
 DB_DATABASE = config.get('db', 'database')
-
+AUTH_USER_MODEL = 'juser.CustomUser'
 # mail config
 EMAIL_HOST = config.get('mail', 'email_host')
 EMAIL_PORT = config.get('mail', 'email_port')
@@ -98,7 +98,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.static',
     'django.core.context_processors.tz',
     'django.contrib.messages.context_processors.messages',
-    'jumpserver.context_processors.name_proc'
+    'jumpserver.context_processors.name_proc',
 )
 
 TEMPLATE_DIRS = (
