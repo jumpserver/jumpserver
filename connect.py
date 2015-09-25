@@ -91,7 +91,7 @@ def log_record(username, host):
     dept_name = User.objects.get(username=username).dept.name
     pid = os.getpid()
     pts = os.popen("ps axu | awk '$2==%s{ print $7 }'" % pid).read().strip()
-    ip_list = os.popen("who | awk '$2==%s{ print $5 }'" % pts).read().strip('()\n')
+    ip_list = os.popen("who | awk '$2==\"%s\"{ print $5 }'" % pts).read().strip('()\n')
 
     if not os.path.isdir(today_connect_log_dir):
         try:
