@@ -9,7 +9,7 @@ import uuid as uuid_r
 from django.db.models import Q
 from django.template import RequestContext
 from django.db.models import ObjectDoesNotExist
-
+from jumpserver.settings import MAIL_FROM, MAIL_ENABLE
 from juser.user_api import *
 
 
@@ -240,8 +240,8 @@ def user_add(request):
             if '' in [username, password, ssh_key_pwd, name, role]:
                 error = u'带*内容不能为空'
                 raise ServerError
-            user_test = get_object(User, username=username)
-            if user_test:
+            check_user_is_exist = User.objects.filter(username=username)
+            if check_user_is_exist:
                 error = u'用户 %s 已存在' % username
                 raise ServerError
 
@@ -250,10 +250,10 @@ def user_add(request):
         else:
             try:
                 user = db_add_user(username=username, name=name,
-                                   password=CRYPTOR.md5_crypt(password),
+                                   password=password,
                                    email=email, role=role, uuid=uuid,
                                    groups=groups, admin_groups=admin_groups,
-                                   ssh_key_pwd=CRYPTOR.md5_crypt(ssh_key_pwd),
+                                   ssh_key_pwd=ssh_key_pwd,
                                    is_active=is_active,
                                    date_joined=datetime.datetime.now())
                 server_add_user(username, password, ssh_key_pwd, ssh_key_login_need)
@@ -417,8 +417,14 @@ def user_detail(request):
 
 @require_role(role='admin')
 def user_del(request):
-    user_ids = request.GET.get('id', '')
-    user_id_list = user_ids.split(',')
+    if request.method == "GET":
+        user_ids = request.GET.get('id', '')
+        user_id_list = user_ids.split(',')
+    elif request.method == "POST":
+        user_ids = request.POST.get('id', '')
+        user_id_list = user_ids.split(',')
+    else:
+        return HttpResponse('错误请求')
     for user_id in user_id_list:
         User.objects.filter(id=user_id).delete()
 

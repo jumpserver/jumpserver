@@ -1,10 +1,28 @@
-- model: IDC.person
+- model: juser.user
+  pk: 5000
+  fields:
+    username: admin
+    name: admin
+    password: pbkdf2_sha256$20000$jBIDGPB2j5JT$orxqGgzzjzykColYm1BswPjgHOiERjZkcgkuVIkD2Hc=
+    email: admin@jumpserver.org
+    role: SU
+    is_active: 1
+- model: juser.user
+  pk: 5001
+  fields:
+    username: group_admin
+    name: group_admin
+    password: pbkdf2_sha256$20000$ttObUWd15q10$NJoyZf2OZz9oiw2g4j2TkTh9zGgyVDRFdUkhn8X0nB0=
+    email: group_admin@jumpserver.org
+    role: DA
+    is_active: 1
+- model: juser.usergroup
   pk: 1
   fields:
-    first_name: John
-    last_name: Lennon
-- model: myapp.person
+    name: ALL
+    comment: ALL
+- model: juser.usergroup
   pk: 2
   fields:
-    first_name: Paul
-    last_name: McCartney
+    name: 默认
+    comment: 默认

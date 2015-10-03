@@ -65,7 +65,7 @@ class Asset(models.Model):
     username = models.CharField(max_length=20, blank=True, null=True)
     password = models.CharField(max_length=80, blank=True, null=True)
     use_default_auth = models.BooleanField(default=True)
-    date_added = models.DateTimeField(auto_now=True, default=datetime.datetime.now(), null=True)
+    date_added = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
 
