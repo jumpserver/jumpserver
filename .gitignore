@@ -41,3 +41,4 @@ logs
 keys
 jumpserver.conf
 nohup.out
+tmp/*
