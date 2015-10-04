@@ -4,7 +4,7 @@ from Crypto.PublicKey import RSA
 
 from juser.models import AdminGroup
 from jumpserver.api import *
-
+from  jumpserver.settings import BASE_DIR
 
 def group_add_user(group, user_id=None, username=None):
     """

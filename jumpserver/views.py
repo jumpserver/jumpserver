@@ -15,6 +15,7 @@ from jumpserver.api import *
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from settings import BASE_DIR
+from jlog.models import Log
 
 def getDaysByNum(num):
     today = datetime.date.today()
