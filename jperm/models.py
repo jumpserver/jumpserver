@@ -5,22 +5,37 @@ from juser.models import User, UserGroup
 from jasset.models import Asset, AssetGroup
 
 
-class UserPerm(models.Model):
-    user = models.ForeignKey(User)
-    asset = models.ForeignKey(Asset, null=True)
-    asset_group = models.ForeignKey(AssetGroup, null=True)
+# class PermUserAsset(models.Model):
+#     user = models.ForeignKey(User)
+#     asset = models.ForeignKey(Asset)
+#
+#     def __unicode__(self):
+#         return self.user.username
+#
+#
+# class PermUserAssetGroup(models.Model):
+#     user = models.ForeignKey(User)
+#     asset_group = models.ForeignKey(AssetGroup)
+#
+#     def __unicode__(self):
+#         return self.user.username
+#
+#
+# class PermUserGroupAsset(models.Model):
+#     user_group = models.ForeignKey(UserGroup)
+#     asset = models.ForeignKey(Asset)
+#
+#     def __unicode__(self):
+#         return self.user_group.name
+#
+#
+# class PermUserGroupAssetGroup(models.Model):
+#     user_group = models.ForeignKey(UserGroup)
+#     asset_group = models.ForeignKey(AssetGroup)
+#
+#     def __unicode__(self):
+#         return self.user_group.name
 
-    def __unicode__(self):
-        return self.user.name
-
-
-class GroupPerm(models.Model):
-    user_group = models.ForeignKey(UserGroup)
-    asset = models.ForeignKey(Asset, null=True)
-    asset_group = models.ForeignKey(AssetGroup, null=True)
-
-    def __unicode__(self):
-        return self.user.name
 
 
 # class CmdGroup(models.Model):

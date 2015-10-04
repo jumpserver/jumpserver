@@ -229,6 +229,9 @@ def logout(request):
     request.session.delete()
     return HttpResponseRedirect('/login/')
 
+
+def setting(request):
+    return my_render('setting.html', locals(), request)
 #
 # def filter_ajax_api(request):
 #     attr = request.GET.get('attr', 'user')

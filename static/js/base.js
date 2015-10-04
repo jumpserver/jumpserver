@@ -89,7 +89,7 @@ function move(from, to, from_o, to_o) {
 //}
 //
 
-function selectAll(){
+function selectAllOption(){
          var checklist = document.getElementsByName ("selected");
             if(document.getElementById("select_all").checked)
             {
@@ -105,6 +105,12 @@ function selectAll(){
             }
 
         }
+
+function checkAll(formID){
+    $('#'+formID+'option').each(function(){
+        $(this).attr('checked', true)
+    })
+}
 
 //
 //function move_all(from, to){

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+{% load mytags %}
+
+
+{% block content %}
+    {% include 'nav_cat_bar.html' %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-lg-10">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5> 项目设置 </h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="ibox-content">
+                        <div class="panel blank-panel">
+                            <div class="panel-heading">
+                                <div class="panel-options">
+                                    <ul class="nav nav-tabs">
+                                        <li id="tab1" class="active"><a data-toggle="tab" href="#tab-default" aria-expanded="true">默认设置</a></li>
+                                        <li id="tab2" class=""><a data-toggle="tab" href="#tab-email" aria-expanded="true">邮箱设置</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="panel-body">
+                                <div class="tab-content">
+                                    <div id="tab-default" class="tab-pane active">
+                                        <form method="post" id="userForm" class="form-horizontal" action="">
+                                            {% if error %}
+                                                <div class="alert alert-warning text-center">{{ error }}</div>
+                                            {% endif %}
+                                            {% if msg %}
+                                                <div class="alert alert-success text-center">{{ msg }}</div>
+                                            {% endif %}
+                                            <div class="form-group">
+                                                <label for="username" class="col-sm-2 control-label">默认用户名<span class="red-fonts">*</span></label>
+                                                <div class="col-sm-8">
+                                                    <input id="username" name="username" placeholder="Username" type="text" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="hr-line-dashed"></div>
+                                            <div class="form-group">
+                                                <label for="groups" class="col-sm-2 control-label">默认密码</label>
+                                                <div class="col-sm-8">
+                                                    <input id="password" name="password" placeholder="Password" type="password" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="hr-line-dashed"></div>
+                                            <div class="form-group">
+                                                <label for="email" class="col-sm-2 control-label">默认密钥<span class="red-fonts"></span></label>
+                                                <div class="col-sm-8">
+                                                    <textarea class="form-control" placeholder="" rows="5"></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="hr-line-dashed"></div>
+                                            <div class="form-group">
+                                                <div class="col-sm-4 col-sm-offset-2">
+                                                    <button class="btn btn-white" type="reset">取消</button>
+                                                    <button id="submit_button" class="btn btn-primary" type="submit">确认保存</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <div id="tab-email" class="tab-pane">
+                                        <table class="table table-striped table-bordered table-hover " id="editable" >
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-center">组名</th>
+
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    $(document).ready(function(){
+
+    });
+        $("#refresh").click(function(){
+            $.get('/jperm/sudo_refresh/',
+                    {'test':''},
+                    function(data){
+                        alert(data)
+                    }
+            )
+        })
+    });
+</script>
+
+{% endblock %}

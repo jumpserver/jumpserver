@@ -1,0 +1,3 @@
+[new]
+192.168.244.129 ansible_ssh_port=22 ansible_ssh_user=root ansbile_ssh_pass=redhat
+[del]

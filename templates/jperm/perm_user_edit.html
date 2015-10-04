@@ -8,7 +8,7 @@
         <div class="col-lg-10">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <h5> 主机授权添加 </h5>
+                    <h5> {{ user.name }}授权修改</h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -23,7 +23,7 @@
                 </div>
 
                 <div class="ibox-content">
-                    <form id="sudoPerm" method="post" class="form-horizontal" action="">
+                    <form id="userPerm" method="post" class="form-horizontal" action="../perm_user_edit/?id={{ user.id }}">
                         {% if error %}
                             <div class="alert alert-warning text-center">{{ error }}</div>
                         {% endif %}
@@ -34,40 +34,47 @@
                             <div class="form-group">
                                 <label for="" class="col-sm-2 control-label">用户<span class="red-fonts">*</span></label>
                                 <div class="col-sm-4">
+                                    <input id="user_group_id" name="user_group_id"type="text"  value="{{ user.id }}" style="display: none">
+                                    <input id="user_group_name" name="user_group_name"  type="text" class="form-control" value="{{ user.name }}" readonly>
+                                </div>
+                            </div>
+
+                            <div class="hr-line-dashed"></div>
+
+                            <div class="form-group">
+                                <label for="" class="col-sm-2 control-label">资产<span class="red-fonts">*</span></label>
+                                <div class="col-sm-4">
                                     <div>
-                                        <select id="user_groups" name="user_groups" class="form-control" size="12" multiple>
-                                            {% for user_group in user_groups %}
-                                            <option value="{{ user_group.id }}">{{ user_group.name }}</option>
+                                        <select id="assets" name="assets" class="form-control m-b" size="12" multiple>
+                                            {% for asset in assets %}
+                                            <option value="{{ asset.id }}">{{ asset.ip }}</option>
                                             {% endfor %}
                                         </select>
                                     </div>
                                 </div>
 
                                 <div class="col-sm-1">
-                                    <div class="btn-group" style="margin-top: 12px;">
-                                        <button type="button" class="btn btn-white" onclick="move('user_groups', 'user_groups_select')"><i class="fa fa-chevron-right"></i></button>
-                                        <button type="button" class="btn btn-white" onclick="move('user_groups_select', 'user_groups')"><i class="fa fa-chevron-left"></i> </button>
+                                    <div class="btn-group" style="margin-top: 42px;">
+                                        <button type="button" class="btn btn-white" onclick="move('assets', 'asset_select')"><i class="fa fa-chevron-right"></i></button>
+                                        <button type="button" class="btn btn-white" onclick="move('asset_select', 'assets')"><i class="fa fa-chevron-left"></i> </button>
                                     </div>
                                 </div>
 
                                 <div class="col-sm-3">
                                     <div>
-                                        <select id="user_groups_select" name="user_groups_select" class="form-control m-b" size="12"  multiple>
+                                        <select id="asset_select" name="asset_select" class="form-control m-b" size="12"  multiple>
+                                            {% for asset in asset_permed %}
+                                            <option value="{{ asset.id }}">{{ asset.ip }}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="hr-line-dashed"></div>
-                            <div class="form-group">
-                                <label for="group_name" class="col-sm-2 control-label">类型<span class="red-fonts">*</span></label>
-                                <div class="col-sm-8">
-                                    <input id="comment" name="comment" placeholder="备注说明" type="text" class="form-control">
-                                </div>
-                            </div>
 
                             <div class="form-group">
-                                <label for="" class="col-sm-2 control-label">主机组<span class="red-fonts">*</span></label>
+                                <label for="" class="col-sm-2 control-label">资产组<span class="red-fonts">*</span></label>
                                 <div class="col-sm-4">
                                     <div>
                                         <select id="asset_groups" name="asset_groups" class="form-control m-b" size="12" multiple>
@@ -79,7 +86,7 @@
                                 </div>
 
                                 <div class="col-sm-1">
-                                    <div class="btn-group" style="margin-top: 12px;">
+                                    <div class="btn-group" style="margin-top: 42px;">
                                         <button type="button" class="btn btn-white" onclick="move('asset_groups', 'asset_groups_select')"><i class="fa fa-chevron-right"></i></button>
                                         <button type="button" class="btn btn-white" onclick="move('asset_groups_select', 'asset_groups')"><i class="fa fa-chevron-left"></i> </button>
                                     </div>
@@ -88,26 +95,20 @@
                                 <div class="col-sm-3">
                                     <div>
                                         <select id="asset_groups_select" name="asset_groups_select" class="form-control m-b" size="12"  multiple>
+                                            {% for asset_group in asset_group_permed %}
+                                            <option value="{{ asset_group.id }}">{{ asset_group.name }}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="hr-line-dashed"></div>
-                            <div class="form-group">
-                                <label for="group_name" class="col-sm-2 control-label">备注</label>
-                                <div class="col-sm-8">
-                                    <input id="comment" name="comment" placeholder="备注说明" type="text" class="form-control">
-                                </div>
-                            </div>
-                            <div class="hr-line-dashed"></div>
                         </div>
 
                         <div class="row">
                             <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-2">
                                     <button class="btn btn-white" type="reset">取消</button>
-                                    <button id="submit_button" class="btn btn-primary" type="submit">确认保存</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit" onclick="selectAllOption('userForm')">确认保存</button>
                                 </div>
                             </div>
                         </div>
@@ -130,18 +131,6 @@ $('#sudoPerm').validator({
             tip: "输入授权名",
             ok: "",
             msg: {required: "必须填写!"}
-        },
-        "user_groups_select": {
-            rule: "required",
-            tip: "选择用户组",
-            ok: "",
-            msg: {checked: "至少选择一个用户组"}
-        },
-        "asset_groups_select": {
-            rule: "required",
-            tip: "选择主机组",
-            ok: "",
-            msg: {checked: "至少选择一个主机组"}
         }
 
     },
@@ -156,6 +145,7 @@ $(document).ready(function(){
         $('#user_groups_select option').each(function(){
             $(this).prop('selected', true)
         })
+
         $('#asset_groups_select option').each(function(){
             $(this).prop('selected', true)
         })
