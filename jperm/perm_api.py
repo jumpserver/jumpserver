@@ -7,6 +7,8 @@ import re
 from ansible.playbook import PlayBook
 from ansible import callbacks, utils
 
+from jumpserver.models import Setting
+
 
 def get_object_list(model, id_list):
     object_list = []
@@ -92,12 +94,17 @@ def perm_user_api(user, asset_new, asset_del, asset_group_new, asset_group_del):
         playbook = get_playbook(os.path.join(BASE_DIR, 'playbook', 'user_perm.yaml'),
                                 {'the_new_group': 'new', 'the_del_group': 'del',
                                  'the_user': user.username, 'the_pub_key': '/tmp/id_rsa.pub'})
-        print host_list, playbook
+        settings = get_object(Setting, id=1)
+        if settings:
+            default_user = settings.default_user
+            default_pri_key_path = settings.default_pri_key_path
+        else:
+            default_user = default_pri_key_path = ''
         results = PlayBook(host_list=host_list,
                            playbook=playbook,
                            forks=5,
-                           remote_user='web',
-                           remote_pass='redhat',
+                           remote_user=default_user,
+                           private_key_file=default_pri_key_path,
                            callbacks=playbook_cb,
                            runner_callbacks=runner_cb,
                            stats=stats,

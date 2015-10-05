@@ -87,18 +87,19 @@ def asset_add(request):
     asset_group_all = AssetGroup.objects.all()
     if request.method == 'POST':
         ip = request.POST.get('ip')
-        port = request.POST.get('port')
         groups = request.POST.getlist('groups')
-        use_default_auth = True if request.POST.getlist('use_default_auth', []) else False
+        use_default = True if request.POST.getlist('use_default', []) else False
         is_active = True if request.POST.get('is_active') else False
         comment = request.POST.get('comment')
 
-        if not use_default_auth:
+        if not use_default:
             username = request.POST.get('username')
             password = request.POST.get('password')
+            port = request.POST.get('port')
             password_encode = CRYPTOR.encrypt(password)
         else:
             username = None
+            port = None
             password_encode = None
 
         try:
@@ -110,7 +111,7 @@ def asset_add(request):
             pass
         else:
             db_asset_add(
-                ip=ip, port=port, use_default_auth=use_default_auth, is_active=is_active, comment=comment,
+                ip=ip, port=port, use_default=use_default, is_active=is_active, comment=comment,
                 groups=groups, username=username, password=password_encode
             )
 
