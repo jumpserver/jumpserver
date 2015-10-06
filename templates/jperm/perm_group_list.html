@@ -24,7 +24,7 @@
 
                 <div class="ibox-content">
                     <div class="">
-                    <a target="_blank" href="/juser/user_add/" class="btn btn-sm btn-primary "> 添加用户 </a>
+                    <a target="_blank" href="/juser/group_add/" class="btn btn-sm btn-primary "> 添加用户组 </a>
                     <form id="search_form" method="get" action="" class="pull-right mail-search">
                         <div class="input-group">
                             <input type="text" class="form-control input-sm" id="search_input" name="search" placeholder="Search">
@@ -40,25 +40,25 @@
                     <table class="table table-striped table-bordered table-hover " id="editable" >
                         <thead>
                             <tr>
-                                <th class="text-center">用户</th>
-                                <th class="text-center">所属用户组</th>
+                                <th class="text-center">用户组</th>
+                                <th class="text-center">成员</th>
                                 <th class="text-center">授权资产</th>
                                 <th class="text-center">授权资产组</th>
                                 <th class="text-center">操作</th>
                             </tr>
                         </thead>
                         <tbody>
-                        {% for user in users.object_list %}
+                        {% for user_group in user_groups.object_list %}
                             <tr class="gradeX">
-                                <td class="text-center"> {{ user.name }} </td>
+                                <td class="text-center"> {{ user_group.name }} </td>
                                 <td class="text-center">
-                                    <a href="/juser/user_list/?gid={{ user.id }}">{{ user.group.all | groups2str  }} </a>
+                                    <a href="/juser/user_list/?gid={{ user_group.id }}">{{ user_group.user_set.all | length  }} </a>
                                 </td>
-                                <td class="text-center"> <a href="/jasset/asset_list/?gid={{ user.id }}">{{ user | user_asset_count }} </a> </td>
-                                <td class="text-center"> <a href="/jasset/group_list/?gid={{ user.id }}">{{ user | user_asset_group_count }}</a></td>
+                                <td class="text-center"> <a href="/jasset/asset_list/?gid={{ user_group.id }}">{{ user_group | user_asset_count }} </a> </td>
+                                <td class="text-center"> <a href="/jasset/group_list/?gid={{ user_group.id }}">{{ user_group | user_asset_group_count }}</a></td>
                                 <td class="text-center">
-                                    <a href="../perm_user_detail/?id={{ user.id }}" class="btn btn-xs btn-primary">详情</a>
-                                    <a href="../perm_user_edit/?id={{ user.id }}" class="btn btn-xs btn-danger">编辑</a>
+                                    <a href="../perm_user_detail/?id={{ user_group.id }}" class="btn btn-xs btn-primary">详情</a>
+                                    <a href="../perm_group_edit/?id={{ user_group.id }}" class="btn btn-xs btn-danger">编辑</a>
                                 </td>
                             </tr>
                         {% endfor %}

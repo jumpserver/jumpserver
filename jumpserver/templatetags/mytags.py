@@ -54,8 +54,8 @@ def get_role(user_id):
 #         return "%s ..." % ' '.join(groups[0:2])
 #
 
-@register.filter(name='group_str2')
-def groups_str2(group_list):
+@register.filter(name='groups2str')
+def groups2str(group_list):
     """
     将用户组列表转换为str
     """
@@ -64,6 +64,55 @@ def groups_str2(group_list):
     else:
         return '%s ...' % ' '.join([group.name for group in group_list[0:2]])
 
+
+@register.filter(name='user_asset_count')
+def user_asset_count(user):
+    """
+    返回用户权限主机的数量
+    """
+    assets_id = user.assets.split(',')
+    asset_groups = user.asset_groups.split(',')
+
+    for asset_group_id in asset_groups:
+        asset_group = get_object(AssetGroup, id=asset_group_id)
+        if asset_group:
+            assets_id.extend(asset.id for asset in asset_group.asset_set.all())
+
+    assets_id = set(map(str, assets_id))
+    return len(assets_id)
+
+
+@register.filter(name='user_asset_group_count')
+def user_asset_group_count(user):
+    """
+    返回用户权限主机组的数量
+    """
+    return len(filter(lambda x: x, user.asset_groups.split(',')))
+
+#
+# @register.filter(name='user_group_asset_count')
+# def user_group_asset_count(user_group):
+#     """
+#     返回用户组权限主机的数量
+#     """
+#     assets_id = user_group.assets.split(',')
+#     asset_groups = user_group.asset_groups.split(',')
+#
+#     for asset_group_id in asset_groups:
+#         asset_group = get_object(AssetGroup, id=asset_group_id)
+#         if asset_group:
+#             assets_id.extend(asset.id for asset in asset_group.asset_set.all())
+#
+#     assets_id = set(map(str, assets_id))
+#     return len(assets_id)
+#
+#
+# @register.filter(name='user_group_asset_count')
+# def user_group_asset_group_count(user_group):
+#     """
+#     返回用户组权限主机组的数量
+#     """
+#     return len(user_group.asset_groups.split(','))
 #
 # @register.filter(name='group_str2_all')
 # def group_str2_all(group_list):

@@ -1,17 +1,19 @@
-- hosts: the_new_group
-  vars:
-    user: the_user
-  tasks:
-    - name: add user
-      user: name={{ user }} state=present
-    - name: .ssh direcotory
-      file: name=/home/{{ user }}/.ssh mode=700 owner={{ user }} group={{ user }} state=directory
-    - name: set authorizied_file
-      copy: src=the_pub_key dest=/home/{{ user }}/.ssh/authorizied_keys owner={{ user }} group={{ user }} mode=600
-
 - hosts: the_del_group
-  vars:
-    user: the_user
   tasks:
     - name: del user
-      user: name={{ user }} state=absent remove=yes
+      user: name={{ item }} state=absent remove=yes
+      with_items: [ the_items ]
+
+- hosts: the_new_group
+  tasks:
+    - name: add user
+      user: name={{ item }} state=present
+      with_items: [ the_items ]
+    - name: .ssh direcotory
+      file: name=/home/{{ item }}/.ssh mode=700 owner={{ item }} group={{ item }} state=directory
+      with_items: [ the_items ]
+    - name: set authorizied_file
+      copy: src=the_pub_key dest=/home/{{ item }}/.ssh/authorizied_keys owner={{ item }} group={{ item }} mode=600
+      with_items: [ the_items ]
+
+

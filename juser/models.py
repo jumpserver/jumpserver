@@ -5,6 +5,8 @@ from django.db import models
 
 class UserGroup(models.Model):
     name = models.CharField(max_length=80, unique=True)
+    assets = models.TextField(max_length=1000, verbose_name="Assets", default='')
+    asset_groups = models.CharField(max_length=1000, verbose_name="Asset Groups", default='')
     comment = models.CharField(max_length=160, blank=True, null=True)
 
     def __unicode__(self):

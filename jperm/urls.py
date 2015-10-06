@@ -5,6 +5,8 @@ urlpatterns = patterns('jperm.views',
     # Examples:
     (r'^user/$', perm_user_list),
     (r'^perm_user_edit/$', perm_user_edit),
+    (r'^group/$', perm_group_list),
+    (r'^perm_group_edit/$', perm_group_edit),
     # (r'^dept_perm_edit/$', 'dept_perm_edit'),
     # (r'^perm_list/$', view_splitter, {'su': perm_list, 'adm': perm_list_adm}),
     # (r'^dept_perm_list/$', 'dept_perm_list'),
