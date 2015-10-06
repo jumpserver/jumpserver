@@ -125,3 +125,9 @@ def perm_user_api(asset_new, asset_del, asset_group_new, asset_group_del, user=N
 
         results = playbook_run(inventory, playbook, default_user, default_port, default_pri_key_path)
         return results
+
+
+def refresh_group_api(user_group=None, asset_group=None):
+    """用户组添加删除用户，主机组添加删除主机触发"""
+    pass
+

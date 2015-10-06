@@ -1,6 +1,6 @@
 import datetime
 from django.db import models
-from juser.models import User, UserGroup
+# from juser.models import User, UserGroup
 
 
 class AssetGroup(models.Model):
@@ -90,9 +90,10 @@ class Asset(models.Model):
 
 
 class AssetAlias(models.Model):
-    user = models.ForeignKey(User)
-    asset = models.ForeignKey(Asset)
-    alias = models.CharField(max_length=100, blank=True, null=True)
-
-    def __unicode__(self):
-        return self.alias
+    pass
+#     user = models.ForeignKey(User)
+#     asset = models.ForeignKey(Asset)
+#     alias = models.CharField(max_length=100, blank=True, null=True)
+#
+#     def __unicode__(self):
+#         return self.alias

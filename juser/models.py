@@ -2,11 +2,15 @@
 
 from django.db import models
 
+from jasset.models import Asset, AssetGroup
+
 
 class UserGroup(models.Model):
     name = models.CharField(max_length=80, unique=True)
-    assets = models.TextField(max_length=1000, verbose_name="Assets", default='')
-    asset_groups = models.CharField(max_length=1000, verbose_name="Asset Groups", default='')
+    # assets = models.TextField(max_length=1000, verbose_name="Assets", default='')
+    # asset_groups = models.CharField(max_length=1000, verbose_name="Asset Groups", default='')
+    assets = models.ManyToManyField(Asset)
+    asset_groups = models.ManyToManyField(AssetGroup)
     comment = models.CharField(max_length=160, blank=True, null=True)
 
     def __unicode__(self):
@@ -34,8 +38,8 @@ class User(models.Model):
     role = models.CharField(max_length=2, choices=USER_ROLE_CHOICES, default='CU')
     uuid = models.CharField(max_length=100)
     group = models.ManyToManyField(UserGroup)
-    assets = models.TextField(max_length=1000, verbose_name="Assets", default='')
-    asset_groups = models.CharField(max_length=1000, verbose_name="Asset Groups", default='')
+    assets = models.ManyToManyField(Asset)
+    asset_groups = models.ManyToManyField(AssetGroup)
     ssh_key_pwd = models.CharField(max_length=200)
     is_active = models.BooleanField(default=True)
     last_login = models.DateTimeField(null=True)
