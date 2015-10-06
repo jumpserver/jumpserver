@@ -42,3 +42,4 @@ keys
 jumpserver.conf
 nohup.out
 tmp/*
+db.sqlite3
