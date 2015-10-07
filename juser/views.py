@@ -2,8 +2,8 @@
 # Author: Guanghongwei
 # Email: ibuler@qq.com
 
-import random
-from Crypto.PublicKey import RSA
+# import random
+# from Crypto.PublicKey import RSA
 import uuid as uuid_r
 
 from django.db.models import Q
@@ -650,10 +650,11 @@ def change_info(request):
             error = '密码须大于6位'
 
         if not error:
-            if password != user.password:
-                password = CRYPTOR.md5_crypt(password)
+            # if password != user.password:
+            #     password = CRYPTOR.md5_crypt(password)
 
-            user.update(name=name, password=password, email=email)
+            user.update(name=name, email=email)
+            user.set_password(password)
             msg = '修改成功'
 
     return render_to_response('juser/change_info.html', locals(), context_instance=RequestContext(request))
