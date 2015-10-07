@@ -34,7 +34,6 @@
                             <div class="form-group">
                                 <label for="" class="col-sm-2 control-label">用户<span class="red-fonts">*</span></label>
                                 <div class="col-sm-4">
-                                    <input id="user_group_id" name="user_group_id"type="text"  value="{{ user.id }}" style="display: none">
                                     <input id="user_group_name" name="user_group_name"  type="text" class="form-control" value="{{ user.name }}" readonly>
                                 </div>
                             </div>
@@ -108,7 +107,7 @@
                             <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-2">
                                     <button class="btn btn-white" type="reset">取消</button>
-                                    <button id="submit_button" class="btn btn-primary" type="submit" onclick="selectAllOption('userForm')">确认保存</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit" onclick="checkAll('userPerm')">确认保存</button>
                                 </div>
                             </div>
                         </div>
@@ -119,38 +118,5 @@
         </div>
     </div>
 </div>
-
-
-<script>
-$('#sudoPerm').validator({
-    timely: 2,
-    theme: "yellow_right_effect",
-    fields: {
-        "name": {
-            rule: "required",
-            tip: "输入授权名",
-            ok: "",
-            msg: {required: "必须填写!"}
-        }
-
-    },
-    valid: function(form) {
-        form.submit();
-    }
-});
-
-
-$(document).ready(function(){
-    $("#submit_button").click(function(){
-        $('#user_groups_select option').each(function(){
-            $(this).prop('selected', true)
-        })
-
-        $('#asset_groups_select option').each(function(){
-            $(this).prop('selected', true)
-        })
-    })
-})
-</script>
 
 {% endblock %}

@@ -70,16 +70,14 @@ def user_asset_count(user):
     """
     返回用户权限主机的数量
     """
-    assets_id = user.assets.split(',')
-    asset_groups = user.asset_groups.split(',')
+    assets = user.asset.all()
+    asset_groups = user.asset_group.all()
 
-    for asset_group_id in asset_groups:
-        asset_group = get_object(AssetGroup, id=asset_group_id)
+    for asset_group in asset_groups:
         if asset_group:
-            assets_id.extend(asset.id for asset in asset_group.asset_set.all())
+            assets.extend(asset_group.asset_set.all())
 
-    assets_id = set(map(str, assets_id))
-    return len(assets_id)
+    return len(assets)
 
 
 @register.filter(name='user_asset_group_count')
@@ -87,7 +85,7 @@ def user_asset_group_count(user):
     """
     返回用户权限主机组的数量
     """
-    return len(filter(lambda x: x, user.asset_groups.split(',')))
+    return len(user.asset_group.all())
 
 #
 # @register.filter(name='user_group_asset_count')

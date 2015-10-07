@@ -232,6 +232,8 @@ def logout(request):
 
 def setting(request):
     header_title, path1 = '项目设置', '设置'
+    setting_r = get_object(Setting, name='default')
+
     if request.method == "POST":
         username = request.POST.get('username', '')
         port = request.POST.get('port', '')
@@ -246,11 +248,11 @@ def setting(request):
                     f.write(private_key)
             os.chmod(private_key_path, 0600)
             if settings:
-                Setting.objects.filter(id=1).update(default_user=username, default_port=port,
-                                                    default_pri_key_path=private_key_path)
+                Setting.objects.filter(name='default').update(default_user=username, default_port=port,
+                                                              default_pri_key_path=private_key_path)
             else:
-                settings = Setting(default_user=username, default_port=port,
-                                   default_pri_key_path=private_key_path).save()
+                setting_r = Setting(name='default', default_user=username, default_port=port,
+                                    default_pri_key_path=private_key_path).save()
 
             msg = "设置成功"
     return my_render('setting.html', locals(), request)

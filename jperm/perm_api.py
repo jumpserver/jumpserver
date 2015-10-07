@@ -59,24 +59,43 @@ def playbook_run(inventory, playbook, default_user=None, default_port=None, defa
     playbook_cb = callbacks.PlaybookCallbacks(verbose=utils.VERBOSITY)
     runner_cb = callbacks.PlaybookRunnerCallbacks(stats, verbose=utils.VERBOSITY)
     # run the playbook
-    results = PlayBook(host_list=inventory,
-                       playbook=playbook,
-                       forks=5,
-                       remote_user=default_user,
-                       remote_port=default_port,
-                       private_key_file=default_pri_key_path,
-                       callbacks=playbook_cb,
-                       runner_callbacks=runner_cb,
-                       stats=stats,
-                       become=True,
-                       become_user='root').run()
+    print default_user, default_port, default_pri_key_path, inventory, playbook
+    if default_user and default_port and default_pri_key_path:
+        playbook = PlayBook(host_list=inventory,
+                            playbook=playbook,
+                            forks=5,
+                            remote_user=default_user,
+                            remote_port=default_port,
+                            private_key_file=default_pri_key_path,
+                            callbacks=playbook_cb,
+                            runner_callbacks=runner_cb,
+                            stats=stats,
+                            become=True,
+                            become_user='root')
+    else:
+        playbook = PlayBook(host_list=inventory,
+                            playbook=playbook,
+                            forks=5,
+                            callbacks=playbook_cb,
+                            runner_callbacks=runner_cb,
+                            stats=stats,
+                            become=True,
+                            become_user='root')
 
+    results = playbook.run()
+    results_r = {'unreachable': [], 'failures': [], 'success': []}
     for hostname, result in results.items():
-        if result.get('failures', 2):
+        if result.get('unreachable', 2):
+            results_r['unreachable'].append(hostname)
+            print "%s >>> unreachable" % hostname
+        elif result.get('failures', 2):
+            results_r['failures'].append(hostname)
             print "%s >>> Failed" % hostname
         else:
+            results_r['success'].append(hostname)
             print "%s >>> Success" % hostname
-    return results
+
+    return results_r
 
 
 def perm_user_api(asset_new, asset_del, asset_group_new, asset_group_del, user=None, user_group=None):
@@ -84,21 +103,12 @@ def perm_user_api(asset_new, asset_del, asset_group_new, asset_group_del, user=N
     asset_new_ip = []  # 新授权的ip列表
     asset_del_ip = []  # 回收授权的ip列表
 
-    if '' in asset_group_new:
-        asset_group_new.remove('')
-
-    if '' in asset_group_del:
-        asset_group_del.remove('')
-
-    asset_new_ip.extend([asset.ip for asset in get_object_list(Asset, asset_new)])  # 查库，获取新授权ip
-    for asset_group_id in asset_group_new:
-        asset_new_ip.extend([asset.ip for asset in get_object(AssetGroup, id=asset_group_id).asset_set.all()])  # 同理
-    asset_del_ip.extend([asset.ip for asset in get_object_list(Asset, asset_del)])  # 查库，获取回收授权的ip
-    for asset_group_id in asset_group_del:
-        asset_del_ip.extend([asset.ip for asset in get_object(AssetGroup, id=asset_group_id).asset_set.all()])  # 同理
-
-    print asset_new_ip
-    print asset_del_ip
+    asset_new_ip.extend([asset.ip for asset in asset_new])  # 查库，获取新授权ip
+    for asset_group in asset_group_new:
+        asset_new_ip.extend([asset.ip for asset in asset_group.asset_set.all()])  # 同理
+    asset_del_ip.extend([asset.ip for asset in asset_del])  # 查库，获取回收授权的ip
+    for asset_group in asset_group_del:
+        asset_del_ip.extend([asset.ip for asset in asset_group.asset_set.all()])  # 同理
 
     if asset_new_ip or asset_del_ip:
         host_group = {'new': asset_new_ip, 'del': asset_del_ip}
@@ -123,8 +133,8 @@ def perm_user_api(asset_new, asset_del, asset_group_new, asset_group_del, user=N
         else:
             default_user = default_port = default_pri_key_path = ''
 
-        results = playbook_run(inventory, playbook, default_user, default_port, default_pri_key_path)
-        return results
+        results_r = playbook_run(inventory, playbook, default_user, default_port, default_pri_key_path)
+        return results_r
 
 
 def refresh_group_api(user_group=None, asset_group=None):

@@ -16,6 +16,13 @@ function check_all(form) {
     }
 }
 
+function checkAll(){
+    // 选择该页面所有checkbox
+    $('input[type=checkbox]').each(function(){
+        $(this).attr('checked', true)
+    })
+}
+
 //提取指定行的数据，JSON格式
 function GetRowData(row){
     var rowData = {};
@@ -89,28 +96,31 @@ function move(from, to, from_o, to_o) {
 //}
 //
 
-function selectAllOption(){
-         var checklist = document.getElementsByName ("selected");
-            if(document.getElementById("select_all").checked)
-            {
-            for(var i=0;i<checklist.length;i++)
-            {
-              checklist[i].checked = 1;
-            }
-            }else{
-            for(var j=0;j<checklist.length;j++)
-            {
-             checklist[j].checked = 0;
-            }
-            }
+//function selectAllOption(){
+//         var checklist = document.getElementsByName ("selected");
+//            if(document.getElementById("select_all").checked)
+//            {
+//            for(var i=0;i<checklist.length;i++)
+//            {
+//              checklist[i].checked = 1;
+//            }
+//            }else{
+//            for(var j=0;j<checklist.length;j++)
+//            {
+//             checklist[j].checked = 0;
+//            }
+//            }
+//
+//        }
 
-        }
 
-function checkAll(formID){
-    $('#'+formID+'option').each(function(){
-        $(this).attr('checked', true)
+function selectAll(){
+    // 选择该页面所有option
+    $('option').each(function(){
+        $(this).attr('selected', true)
     })
 }
+
 
 //
 //function move_all(from, to){

@@ -54,8 +54,8 @@
                                 <td class="text-center">
                                     <a href="/juser/user_list/?gid={{ user.id }}">{{ user.group.all | groups2str  }} </a>
                                 </td>
-                                <td class="text-center"> <a href="/jasset/asset_list/?gid={{ user.id }}">{{ user | user_asset_count }} </a> </td>
-                                <td class="text-center"> <a href="/jasset/group_list/?gid={{ user.id }}">{{ user | user_asset_group_count }}</a></td>
+                                <td class="text-center"> <a href="/jasset/asset_list/?gid={{ user.id }}">{{ user.name }} </a> </td>
+                                <td class="text-center"> <a href="/jasset/group_list/?gid={{ user.id }}">{{ user.name }}</a></td>
                                 <td class="text-center">
                                     <a href="../perm_user_detail/?id={{ user.id }}" class="btn btn-xs btn-primary">详情</a>
                                     <a href="../perm_user_edit/?id={{ user.id }}" class="btn btn-xs btn-danger">编辑</a>

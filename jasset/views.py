@@ -278,15 +278,15 @@ def asset_edit(request):
 
     if request.method == 'POST':
         ip = request.POST.get('ip')
-        port = request.POST.get('port')
         groups = request.POST.getlist('groups')
-        use_default_auth = True if request.POST.getlist('use_default_auth', []) else False
+        use_default = True if request.POST.getlist('use_default', []) else False
         is_active = True if request.POST.get('is_active') else False
         comment = request.POST.get('comment')
 
-        if not use_default_auth:
+        if not use_default:
             username = request.POST.get('username')
             password = request.POST.get('password')
+            port = request.POST.get('port')
             if password == asset.password:
                 password_encode = password
             else:
@@ -294,6 +294,7 @@ def asset_edit(request):
         else:
             username = None
             password_encode = None
+            port = 22
 
         try:
             asset_test = get_object(Asset, ip=ip)
@@ -303,7 +304,7 @@ def asset_edit(request):
         except ServerError:
             pass
         else:
-            db_asset_update(id=asset_id, ip=ip, port=port, use_default_auth=use_default_auth,
+            db_asset_update(id=asset_id, ip=ip, port=port, use_default=use_default,
                             username=username, password=password_encode,
                             is_active=is_active, comment=comment)
             msg = u'主机 %s 修改成功' % ip
