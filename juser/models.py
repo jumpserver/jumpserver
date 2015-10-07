@@ -21,6 +21,7 @@ class UserGroup(models.Model):
 
 from django.contrib.auth.models import AbstractUser
 
+
 class User(AbstractUser):
     USER_ROLE_CHOICES = (
         ('SU', 'SuperUser'),
