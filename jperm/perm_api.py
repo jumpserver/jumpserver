@@ -54,19 +54,18 @@ def get_playbook(template, var):
     return path
 
 
-def playbook_run(inventory, playbook, default_user=None, default_port=None, default_pri_key_path=None):
+def playbook_run(inventory, playbook, settings):
     stats = callbacks.AggregateStats()
     playbook_cb = callbacks.PlaybookCallbacks(verbose=utils.VERBOSITY)
     runner_cb = callbacks.PlaybookRunnerCallbacks(stats, verbose=utils.VERBOSITY)
     # run the playbook
-    print default_user, default_port, default_pri_key_path, inventory, playbook
-    if default_user and default_port and default_pri_key_path:
+    if settings:
         playbook = PlayBook(host_list=inventory,
                             playbook=playbook,
                             forks=5,
-                            remote_user=default_user,
-                            remote_port=default_port,
-                            private_key_file=default_pri_key_path,
+                            remote_user=settings.default_user,
+                            remote_port=settings.default_port,
+                            private_key_file=settings.default_pri_key_path,
                             callbacks=playbook_cb,
                             runner_callbacks=runner_cb,
                             stats=stats,
@@ -98,43 +97,67 @@ def playbook_run(inventory, playbook, default_user=None, default_port=None, defa
     return results_r
 
 
-def perm_user_api(asset_new, asset_del, asset_group_new, asset_group_del, user=None, user_group=None):
-    """用户授权api，通过调用ansible API完成用户新建等"""
-    asset_new_ip = []  # 新授权的ip列表
-    asset_del_ip = []  # 回收授权的ip列表
+def perm_user_api(perm_info):
+    """
+    用户授权api，通过调用ansible API完成用户新建等,传入参数必须如下,列表中可以是对象，也可以是用户名和ip
+    perm_info = {'del': {'users': [],
+                         'assets': [],
+                        },
+                 'new': {'users': [],
+                         'assets': []}}
+    """
+    try:
+        new_users = perm_info['new']['users']
+        new_assets = perm_info['new']['assets']
+        del_users = perm_info['del']['users']
+        del_assets = perm_info['del']['assets']
+    except IndexError:
+        raise ServerError("Error: function perm_user_api传入参数错误")
 
-    asset_new_ip.extend([asset.ip for asset in asset_new])  # 查库，获取新授权ip
-    for asset_group in asset_group_new:
-        asset_new_ip.extend([asset.ip for asset in asset_group.asset_set.all()])  # 同理
-    asset_del_ip.extend([asset.ip for asset in asset_del])  # 查库，获取回收授权的ip
-    for asset_group in asset_group_del:
-        asset_del_ip.extend([asset.ip for asset in asset_group.asset_set.all()])  # 同理
-
-    if asset_new_ip or asset_del_ip:
-        host_group = {'new': asset_new_ip, 'del': asset_del_ip}
-        inventory = get_inventory(host_group)
-        if user:
-            the_items = user.username,
-        elif user_group:
-            users = user_group.user_set.all()
-            the_items = ','.join([user.username for user in users])
+    # 检查传入的是字符串还是对象
+    check_users = new_users + del_users
+    try:
+        if isinstance(check_users[0], str):
+            var_type = 'str'
         else:
-            return HttpResponse('Argument error.')
+            var_type = 'obj'
 
-        playbook = get_playbook(os.path.join(BASE_DIR, 'playbook', 'user_perm.yaml'),
-                                {'the_new_group': 'new', 'the_del_group': 'del',
-                                 'the_items': the_items, 'the_pub_key': '/tmp/id_rsa.pub'})
+    except IndexError:
+        raise ServerError("Error: function perm_user_api传入参数错误")
 
-        settings = get_object(Setting, id=1)
-        if settings:
-            default_user = settings.default_user
-            default_port = settings.default_port
-            default_pri_key_path = settings.default_pri_key_path
+    print new_assets, del_assets
+    print new_users, del_users
+    try:
+        if var_type == 'str':
+            new_ip = new_assets
+            del_ip = del_assets
+            new_username = new_users
+            del_username = del_users
         else:
-            default_user = default_port = default_pri_key_path = ''
+            new_ip = [asset.ip for asset in new_assets if isinstance(asset, Asset)]
+            del_ip = [asset.ip for asset in del_assets if isinstance(asset, Asset)]
+            new_username = [user.username for user in new_users if isinstance(user, User)]
+            del_username = [user.username for user in del_users if isinstance(user, User)]
+    except IndexError:
+        raise ServerError("Error: function perm_user_api传入参数类型错误")
 
-        results_r = playbook_run(inventory, playbook, default_user, default_port, default_pri_key_path)
-        return results_r
+    print new_ip, del_ip
+    print new_username, del_username
+
+    host_group = {'new': new_ip, 'del': del_ip}
+    inventory = get_inventory(host_group)
+
+    the_new_users = ','.join(new_username)
+    the_del_users = ','.join(del_username)
+
+    playbook = get_playbook(os.path.join(BASE_DIR, 'playbook', 'user_perm.yaml'),
+                            {'the_new_group': 'new', 'the_del_group': 'del',
+                             'the_new_users': the_new_users, 'the_del_users': the_del_users,
+                             'the_pub_key': '/tmp/id_rsa.pub'})
+
+    settings = get_object(Setting, name='default')
+    results_r = playbook_run(inventory, playbook, settings)
+    return results_r
 
 
 def refresh_group_api(user_group=None, asset_group=None):
