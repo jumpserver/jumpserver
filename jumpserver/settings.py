@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import ConfigParser
+import djcelery
 
+djcelery.setup_loader()
 config = ConfigParser.ConfigParser()
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -43,7 +45,7 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = ['0.0.0.0/8']
 
-
+BROKER_URL = 'django://'
 # Application definition
 
 INSTALLED_APPS = (
@@ -54,6 +56,8 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'djcelery',
+    'kombu.transport.django',
     'jumpserver',
     'juser',
     'jasset',

@@ -6,6 +6,7 @@ import uuid
 import re
 from ansible.playbook import PlayBook
 from ansible import callbacks, utils
+from jumpserver.tasks import playbook_run, add
 
 from jumpserver.models import Setting
 
@@ -54,49 +55,6 @@ def get_playbook(template, var):
     return path
 
 
-def playbook_run(inventory, playbook, settings):
-    stats = callbacks.AggregateStats()
-    playbook_cb = callbacks.PlaybookCallbacks(verbose=utils.VERBOSITY)
-    runner_cb = callbacks.PlaybookRunnerCallbacks(stats, verbose=utils.VERBOSITY)
-    # run the playbook
-    if settings:
-        playbook = PlayBook(host_list=inventory,
-                            playbook=playbook,
-                            forks=5,
-                            remote_user=settings.default_user,
-                            remote_port=settings.default_port,
-                            private_key_file=settings.default_pri_key_path,
-                            callbacks=playbook_cb,
-                            runner_callbacks=runner_cb,
-                            stats=stats,
-                            become=True,
-                            become_user='root')
-    else:
-        playbook = PlayBook(host_list=inventory,
-                            playbook=playbook,
-                            forks=5,
-                            callbacks=playbook_cb,
-                            runner_callbacks=runner_cb,
-                            stats=stats,
-                            become=True,
-                            become_user='root')
-
-    results = playbook.run()
-    results_r = {'unreachable': [], 'failures': [], 'success': []}
-    for hostname, result in results.items():
-        if result.get('unreachable', 2):
-            results_r['unreachable'].append(hostname)
-            print "%s >>> unreachable" % hostname
-        elif result.get('failures', 2):
-            results_r['failures'].append(hostname)
-            print "%s >>> Failed" % hostname
-        else:
-            results_r['success'].append(hostname)
-            print "%s >>> Success" % hostname
-
-    return results_r
-
-
 def perm_user_api(perm_info):
     """
     用户授权api，通过调用ansible API完成用户新建等,传入参数必须如下,列表中可以是对象，也可以是用户名和ip
@@ -111,6 +69,8 @@ def perm_user_api(perm_info):
         new_assets = perm_info['new']['assets']
         del_users = perm_info['del']['users']
         del_assets = perm_info['del']['assets']
+
+        print new_users, new_assets
     except IndexError:
         raise ServerError("Error: function perm_user_api传入参数错误")
 
@@ -125,8 +85,6 @@ def perm_user_api(perm_info):
     except IndexError:
         raise ServerError("Error: function perm_user_api传入参数错误")
 
-    print new_assets, del_assets
-    print new_users, del_users
     try:
         if var_type == 'str':
             new_ip = new_assets
@@ -141,9 +99,6 @@ def perm_user_api(perm_info):
     except IndexError:
         raise ServerError("Error: function perm_user_api传入参数类型错误")
 
-    print new_ip, del_ip
-    print new_username, del_username
-
     host_group = {'new': new_ip, 'del': del_ip}
     inventory = get_inventory(host_group)
 
@@ -155,9 +110,22 @@ def perm_user_api(perm_info):
                              'the_new_users': the_new_users, 'the_del_users': the_del_users,
                              'the_pub_key': '/tmp/id_rsa.pub'})
 
+    print playbook, inventory
+
     settings = get_object(Setting, name='default')
-    results_r = playbook_run(inventory, playbook, settings)
-    return results_r
+    results = playbook_run(inventory, playbook, settings)
+    return results
+
+
+def get_user_assets(user):
+    if isinstance(user, int):
+        user = get_object(User, id=user)
+    elif isinstance(user, str):
+        user = get_object(User, username=user)
+    elif isinstance(user, User):
+        user = user
+    else:
+        user = None
 
 
 def refresh_group_api(user_group=None, asset_group=None):

@@ -18,8 +18,8 @@ from django.http import HttpResponse, Http404
 from django.template import RequestContext
 from juser.models import User, UserGroup
 from jasset.models import Asset, AssetGroup
-from jlog.models import Log
 from jasset.models import AssetAlias
+from jlog.models import Log
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
