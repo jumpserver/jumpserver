@@ -663,8 +663,11 @@ def user_add(request):
                 except Exception:
                     pass
             else:
-                send_mail(mail_title, mail_msg, MAIL_FROM, [email], fail_silently=False)
-                msg = u'添加用户 %s 成功！ 用户密码已发送到 %s 邮箱！' % (username, email)
+                try:
+                    send_mail(mail_title, mail_msg, MAIL_FROM, [email], fail_silently=False)
+                    msg = u'添加用户 %s 成功！ 用户密码已发送到 %s 邮箱！' % (username, email)
+                except:
+                    msg = u'添加用户 %s 成功！ 用户密码发送失败，请检查邮箱是否正确！' % username
     return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
 
 
