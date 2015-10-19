@@ -65,10 +65,10 @@ def perm_user_api(perm_info):
                          'assets': []}}
     """
     try:
-        new_users = perm_info['new']['users']
-        new_assets = perm_info['new']['assets']
-        del_users = perm_info['del']['users']
-        del_assets = perm_info['del']['assets']
+        new_users = perm_info.get('new', {}).get('users', [])
+        new_assets = perm_info.get('new', {}).get('assets',[])
+        del_users = perm_info.get('del', {}).get('users', [])
+        del_assets = perm_info.get('del', {}).get('assets', [])
 
         print new_users, new_assets
     except IndexError:
@@ -117,18 +117,151 @@ def perm_user_api(perm_info):
     return results
 
 
-def get_user_assets(user):
-    if isinstance(user, int):
-        user = get_object(User, id=user)
-    elif isinstance(user, str):
-        user = get_object(User, username=user)
-    elif isinstance(user, User):
-        user = user
-    else:
-        user = None
+def user_group_permed(user_group):
+    assets = user_group.asset_set.all()
+    asset_groups = user_group.asset_group.all()
+
+    for asset_group in asset_groups:
+        assets.extend(asset_group.asset.all())
+
+    return {'assets': assets, 'asset_groups': asset_groups}
 
 
-def refresh_group_api(user_group=None, asset_group=None):
-    """用户组添加删除用户，主机组添加删除主机触发"""
-    pass
+def user_permed(user):
+    asset_groups = []
+    assets = []
+    user_groups = user.user_group.all()
+    asset_groups.extend(user.asset_group.all())
+    assets.extend(user.asset.all())
+
+    for user_group in user_groups:
+        asset_groups.extend(user_group_permed(user_group).get('assets', []))
+        assets.extend((user_group_permed(user_group).get('asset_groups', [])))
+
+    return {'assets': assets, 'asset_groups': asset_groups}
+
+
+def _public_perm_api(info):
+    """
+    公用的用户，用户组，主机，主机组编辑修改新建调用的api，用来完成授权
+    info like that:
+    {
+      'type': 'new_user',
+      'user': 'a',
+      'group': ['A', 'B']
+    }
+
+    {
+      'type': 'edit_user',
+      'user': 'a',
+      'group': {'new': ['A'], 'del': []}
+    }
+
+    {
+      'type': 'del_user',
+      'user': ['a', 'b']
+    }
+
+    {
+      'type': 'edit_user_group',
+      'group': 'A',
+      'user': {'del': ['a', 'b'], 'new': ['c', 'd']}
+    }
+
+    {
+      'type': 'del_user_group',
+      'group': ['A']
+    }
+
+    {
+      'type': 'new_asset',
+      'asset': 'a',
+      'group': ['A', 'B']
+    }
+
+    {
+      'type': 'edit_asset',
+      'asset': 'a',
+      'group': {
+          'del': ['A', ['B'],
+          'new': ['C', ['D']]
+      }
+    }
+
+    {
+      'type': 'del_asset',
+      'asset': ['a', 'b']
+    }
+
+    {
+      'type': 'edit_asset_group',
+      'group': 'A',
+      'asset': {'new': ['a', 'b'], 'del': ['c', 'd']}
+    }
+
+    {
+      'type': 'del_asset_group',
+      'group': ['A', 'B']
+    }
+    """
+
+    if info.get('type') == 'new_user':
+        new_assets = []
+        user = info.get('user')
+        user_groups = info.get('group')
+        for user_group in user_groups:
+            new_assets.extend(user_group_permed(user_group).get('assets', []))
+
+        perm_info = {
+            'new': {'users': [user], 'assets': new_assets}
+        }
+    elif info.get('type') == 'edit_user':
+        new_assets = []
+        del_assets = []
+        user = info.get('user')
+        new_group = info.get('group').get('new')
+        del_group = info.get('group').get('del')
+
+        for user_group in new_group:
+            new_assets.extend(user_group_permed(user_group).get('assets', []))
+
+        for user_group in del_group:
+            del_assets.extend((user_group_permed(user_group).get('assets', [])))
+
+        perm_info = {
+            'del': {'users': [user], 'assets': del_assets},
+            'new': {'users': [user], 'assets': new_assets}
+        }
+
+    elif info.get('type') == 'del_user':
+        user = info.get('user')
+        del_assets = user_permed(user).get('assets', [])
+        perm_info = {
+            'del': {'users': [user], 'assets': del_assets},
+        }
+
+    elif info.get('type') == 'edit_user_group':
+        user_group = info.get('group')
+        new_users = info.get('user').get('new')
+        del_users = info.get('user').get('del')
+        assets = user_group_permed(user_group).get('assets', [])
+
+        perm_info = {
+            'new': {'users': new_users, 'assets': assets},
+            'del': {'users': del_users, 'assets': assets}
+        }
+
+    elif info.get('type') == 'del_user_group':
+        assets = []
+        user_groups = info.get('group', [])
+        del_users = [user_group.user_set.all() for user_group in user_groups]
+        for user_group in user_groups:
+            assets.extend(user_group_permed(user_group).get('assets', []))
+
+        perm_info = {}
+
+
+
+
+
 
