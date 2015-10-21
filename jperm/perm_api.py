@@ -204,7 +204,8 @@ def _public_perm_api(info):
             new_assets.extend(user_group_permed(user_group).get('assets', []))
 
         perm_info = {
-            'new': {'action': 'new user: ' + user.name, 'users': [user], 'assets': new_assets}
+            'action': 'new user: ' + user.name,
+            'new': {'users': [user], 'assets': new_assets}
         }
     elif info.get('type') == 'edit_user':
         new_assets = []

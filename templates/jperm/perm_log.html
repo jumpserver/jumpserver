@@ -40,7 +40,8 @@
                         <thead>
                             <tr>
                                 <th class="text-center">日期</th>
-                                <th class="text-center">结果</th>
+                                <th class="text-center">动作</th>
+                                <th class="text-center">成功</th>
                                 <th class="text-center">完成</th>
                             </tr>
                         </thead>
@@ -48,10 +49,13 @@
                         {% for log in logs %}
                             <tr class="gradeX">
                                 <td class="text-center"> {{ log.datetime | date:"Y-n-d G:i:s" }} </td>
+                                <td class="text-center"> {{ log.action }} </td>
                                 <td class="text-center">
-                                    {{ log.result | result2bool | safe }}
+                                    <a class="log_result" value="{{ log.results }}">
+                                    {{ log.is_success | yesno:"是,否,为止" }}
+                                    </a>
                                 </td>
-                                <td class="text-center"> {{ log.is_finished | yesno:"是,否,为止" }} </td>
+                                <td class="text-center"> {{ log.is_finish | yesno:"是,否,为止" }} </td>
                             </tr>
                         {% endfor %}
                         </tbody>
@@ -69,5 +73,16 @@
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block self_footer_js %}
+<script>
+$('document').ready(function(){
+    $('.log_result').click(function(){
+        alert($(this).attr('value'))
+    })
+})
+</script>
 
 {% endblock %}
