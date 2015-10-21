@@ -6,9 +6,10 @@ import uuid
 import re
 from ansible.playbook import PlayBook
 from ansible import callbacks, utils
-from jumpserver.tasks import playbook_run, add
+from jumpserver.tasks import playbook_run
 
 from jumpserver.models import Setting
+from jperm.models import PermLog
 
 
 def get_object_list(model, id_list):
@@ -64,38 +65,21 @@ def perm_user_api(perm_info):
                  'new': {'users': [],
                          'assets': []}}
     """
+    log = PermLog(action=perm_info.get('action', ''))
     try:
         new_users = perm_info.get('new', {}).get('users', [])
-        new_assets = perm_info.get('new', {}).get('assets',[])
+        new_assets = perm_info.get('new', {}).get('assets', [])
         del_users = perm_info.get('del', {}).get('users', [])
         del_assets = perm_info.get('del', {}).get('assets', [])
-
         print new_users, new_assets
     except IndexError:
         raise ServerError("Error: function perm_user_api传入参数错误")
 
-    # 检查传入的是字符串还是对象
-    check_users = new_users + del_users
     try:
-        if isinstance(check_users[0], str):
-            var_type = 'str'
-        else:
-            var_type = 'obj'
-
-    except IndexError:
-        raise ServerError("Error: function perm_user_api传入参数错误")
-
-    try:
-        if var_type == 'str':
-            new_ip = new_assets
-            del_ip = del_assets
-            new_username = new_users
-            del_username = del_users
-        else:
-            new_ip = [asset.ip for asset in new_assets if isinstance(asset, Asset)]
-            del_ip = [asset.ip for asset in del_assets if isinstance(asset, Asset)]
-            new_username = [user.username for user in new_users if isinstance(user, User)]
-            del_username = [user.username for user in del_users if isinstance(user, User)]
+        new_ip = [asset.ip for asset in new_assets if isinstance(asset, Asset)]
+        del_ip = [asset.ip for asset in del_assets if isinstance(asset, Asset)]
+        new_username = [user.username for user in new_users if isinstance(user, User)]
+        del_username = [user.username for user in del_users if isinstance(user, User)]
     except IndexError:
         raise ServerError("Error: function perm_user_api传入参数类型错误")
 
@@ -114,11 +98,20 @@ def perm_user_api(perm_info):
 
     settings = get_object(Setting, name='default')
     results = playbook_run(inventory, playbook, settings)
+    if not results.get('failed', 1) and not results.get('unreachable', ''):
+        is_success = True
+    else:
+        is_success = False
+
+    log.results = results
+    log.is_finish = True
+    log.is_success = is_success
+    log.save()
     return results
 
 
 def user_group_permed(user_group):
-    assets = user_group.asset_set.all()
+    assets = user_group.asset.all()
     asset_groups = user_group.asset_group.all()
 
     for asset_group in asset_groups:
@@ -130,7 +123,7 @@ def user_group_permed(user_group):
 def user_permed(user):
     asset_groups = []
     assets = []
-    user_groups = user.user_group.all()
+    user_groups = user.group.all()
     asset_groups.extend(user.asset_group.all())
     assets.extend(user.asset.all())
 
@@ -213,7 +206,7 @@ def _public_perm_api(info):
             new_assets.extend(user_group_permed(user_group).get('assets', []))
 
         perm_info = {
-            'new': {'users': [user], 'assets': new_assets}
+            'new': {'action': 'new user: ' + user.name, 'users': [user], 'assets': new_assets}
         }
     elif info.get('type') == 'edit_user':
         new_assets = []
@@ -229,6 +222,7 @@ def _public_perm_api(info):
             del_assets.extend((user_group_permed(user_group).get('assets', [])))
 
         perm_info = {
+            'action': 'edit user: ' + user.name,
             'del': {'users': [user], 'assets': del_assets},
             'new': {'users': [user], 'assets': new_assets}
         }
@@ -237,7 +231,7 @@ def _public_perm_api(info):
         user = info.get('user')
         del_assets = user_permed(user).get('assets', [])
         perm_info = {
-            'del': {'users': [user], 'assets': del_assets},
+            'action': 'del user: ' + user.name, 'del': {'users': [user], 'assets': del_assets},
         }
 
     elif info.get('type') == 'edit_user_group':
@@ -247,18 +241,32 @@ def _public_perm_api(info):
         assets = user_group_permed(user_group).get('assets', [])
 
         perm_info = {
+            'action': 'edit user group: ' + user_group.name,
             'new': {'users': new_users, 'assets': assets},
             'del': {'users': del_users, 'assets': assets}
         }
 
     elif info.get('type') == 'del_user_group':
-        assets = []
-        user_groups = info.get('group', [])
-        del_users = [user_group.user_set.all() for user_group in user_groups]
-        for user_group in user_groups:
-            assets.extend(user_group_permed(user_group).get('assets', []))
+        user_group = info.get('group', [])
+        del_users = user_group.user_set.all()
+        assets = user_group_permed(user_group).get('assets', [])
 
-        perm_info = {}
+        perm_info = {
+            'action': "del user group: " + user_group.name, 'del': {'users': del_users, 'assets': assets}
+        }
+    else:
+        return
+
+    try:
+        results = perm_user_api(perm_info)  # 通过API授权或回收
+    except ServerError, e:
+        return e
+    else:
+        return results
+
+
+
+
 
 
 
