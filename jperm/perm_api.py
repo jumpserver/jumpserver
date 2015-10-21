@@ -4,8 +4,6 @@ from jasset.models import *
 from jumpserver.api import *
 import uuid
 import re
-from ansible.playbook import PlayBook
-from ansible import callbacks, utils
 from jumpserver.tasks import playbook_run
 
 from jumpserver.models import Setting
