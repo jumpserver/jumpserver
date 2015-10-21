@@ -96,7 +96,7 @@ def perm_user_api(perm_info):
 
     settings = get_object(Setting, name='default')
     results = playbook_run(inventory, playbook, settings)
-    if not results.get('failed', 1) and not results.get('unreachable', ''):
+    if not results.get('failures', 1) and not results.get('unreachable', ''):
         is_success = True
     else:
         is_success = False
