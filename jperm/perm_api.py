@@ -76,8 +76,8 @@ def perm_user_api(perm_info):
     try:
         new_ip = [asset.ip for asset in new_assets if isinstance(asset, Asset)]
         del_ip = [asset.ip for asset in del_assets if isinstance(asset, Asset)]
-        new_username = [user.username for user in new_users if isinstance(user, User)]
-        del_username = [user.username for user in del_users if isinstance(user, User)]
+        new_username = [user.username for user in new_users]
+        del_username = [user.username for user in del_users]
     except IndexError:
         raise ServerError("Error: function perm_user_api传入参数类型错误")
 
@@ -90,7 +90,7 @@ def perm_user_api(perm_info):
     playbook = get_playbook(os.path.join(BASE_DIR, 'playbook', 'user_perm.yaml'),
                             {'the_new_group': 'new', 'the_del_group': 'del',
                              'the_new_users': the_new_users, 'the_del_users': the_del_users,
-                             'the_pub_key': '/tmp/id_rsa.pub'})
+                             'KEY_DIR': os.path.join(SSH_KEY_DIR, 'sysuser')})
 
     print playbook, inventory
 
@@ -263,6 +263,22 @@ def _public_perm_api(info):
     else:
         return results
 
+
+def push_user(user, asset_groups_id):
+    assets = []
+    if not user:
+        return {'error': '没有该用户'}
+    for group_id in asset_groups_id:
+        asset_group = get_object(AssetGroup, id=group_id)
+        if asset_group:
+            assets.extend(asset_group.asset_set.all())
+    perm_info = {
+        'action': 'Push user:' + user.username,
+        'new': {'users': [user], 'assets': assets}
+    }
+
+    results = perm_user_api(perm_info)
+    return results
 
 
 

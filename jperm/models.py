@@ -11,3 +11,11 @@ class PermLog(models.Model):
     results = models.CharField(max_length=1000, null=True, blank=True, default='')
     is_success = models.BooleanField(default=False)
     is_finish = models.BooleanField(default=False)
+
+
+class SysUser(models.Model):
+    username = models.CharField(max_length=100)
+    password = models.CharField(max_length=100)
+    comment = models.CharField(max_length=100, null=True, blank=True, default='')
+
+

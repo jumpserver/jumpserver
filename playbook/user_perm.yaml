@@ -13,5 +13,5 @@
       file: name=/home/{{ item }}/.ssh mode=700 owner={{ item }} group={{ item }} state=directory
       with_items: [ the_new_users ]
     - name: set authorizied_file
-      copy: src=the_pub_key dest=/home/{{ item }}/.ssh/authorizied_keys owner={{ item }} group={{ item }} mode=600
+      copy: src=KEY_DIR/{{ item }}.pub dest=/home/{{ item }}/.ssh/authorizied_keys owner={{ item }} group={{ item }} mode=600
       with_items: [ the_new_users ]

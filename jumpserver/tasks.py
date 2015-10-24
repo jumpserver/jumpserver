@@ -32,6 +32,7 @@ def playbook_run(inventory, playbook, default_user=None, default_port=None, defa
                             become=True,
                             become_user='root')
     results = playbook.run()
+    print results
     results_r = {'unreachable': [], 'failures': [], 'success': []}
     for hostname, result in results.items():
         if result.get('unreachable', 2):
