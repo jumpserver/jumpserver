@@ -19,7 +19,6 @@ if django.get_version() != '1.6':
     django.setup()
 from jumpserver.api import ServerError, User, Asset, Jtty, get_object
 from jumpserver.api import logger
-from jumpserver.api import BisGroup as AssetGroup
 
 login_user = get_object(User, username=getpass.getuser())
 
@@ -96,76 +95,6 @@ def print_prompt():
     6) Type \033[32mQ/q\033[0m To Quit.
     """
     print textwrap.dedent(msg)
-
-
-# def remote_exec_cmd(ip, port, username, password, cmd):
-#     try:
-#         time.sleep(5)
-#         ssh = paramiko.SSHClient()
-#         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-#         ssh.connect(ip, port, username, password, timeout=5)
-#         stdin, stdout, stderr = ssh.exec_command("bash -l -c '%s'" % cmd)
-#         out = stdout.readlines()
-#         err = stderr.readlines()
-#         color_print('%s:' % ip, 'blue')
-#         for i in out:
-#             color_print(" " * 4 + i.strip(), 'green')
-#         for j in err:
-#             color_print(" " * 4 + j.strip(), 'red')
-#         ssh.close()
-#     except Exception as e:
-#         color_print(ip + ':', 'blue')
-#         color_print(str(e), 'red')
-
-
-# def multi_remote_exec_cmd(hosts, username, cmd):
-#     pool = Pool(processes=5)
-#     for host in hosts:
-#         username, password, ip, port = get_connect_item(username, host)
-#         pool.apply_async(remote_exec_cmd, (ip, port, username, password, cmd))
-#     pool.close()
-#     pool.join()
-
-
-# def exec_cmd_servers(username):
-#     color_print("You can choose in the following IP(s), Use glob or ips split by comma. q/Q to PreLayer.", 'green')
-#     user.get_asset_info(printable=True)
-#     while True:
-#         hosts = []
-#         inputs = raw_input('\033[1;32mip(s)>: \033[0m')
-#         if inputs in ['q', 'Q']:
-#             break
-#         get_hosts = login_user.get_asset_info().keys()
-#
-#         if ',' in inputs:
-#             ips_input = inputs.split(',')
-#             for host in ips_input:
-#                 if host in get_hosts:
-#                     hosts.append(host)
-#         else:
-#             for host in get_hosts:
-#                 if fnmatch.fnmatch(host, inputs):
-#                     hosts.append(host.strip())
-#
-#         if len(hosts) == 0:
-#             color_print("Check again, Not matched any ip!", 'red')
-#             continue
-#         else:
-#             print "You matched ip: %s" % hosts
-#         color_print("Input the Command , The command will be Execute on servers, q/Q to quit.", 'green')
-#         while True:
-#             cmd = raw_input('\033[1;32mCmd(s): \033[0m')
-#             if cmd in ['q', 'Q']:
-#                 break
-#             exec_log_dir = os.path.join(log_dir, 'exec_cmds')
-#             if not os.path.isdir(exec_log_dir):
-#                 os.mkdir(exec_log_dir)
-#                 os.chmod(exec_log_dir, 0777)
-#             filename = "%s/%s.log" % (exec_log_dir, time.strftime('%Y%m%d'))
-#             f = open(filename, 'a')
-#             f.write("DateTime: %s User: %s Host: %s Cmds: %s\n" %
-#                     (time.strftime('%Y/%m/%d %H:%M:%S'), username, hosts, cmd))
-#             multi_remote_exec_cmd(hosts, username, cmd)
 
 
 def main():

@@ -12,6 +12,7 @@ import random
 import subprocess
 import paramiko
 import struct, fcntl, signal,socket, select, fnmatch
+import re
 
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
@@ -69,75 +70,6 @@ def set_log(level):
     return logger_f
 
 
-# class LDAPMgmt():
-#     """
-#     LDAP class for add, select, del, update
-#     LDAP 管理类，增删改查
-#     """
-#     def __init__(self,
-#                  host_url,
-#                  base_dn,
-#                  root_cn,
-#                  root_pw):
-#         self.ldap_host = host_url
-#         self.ldap_base_dn = base_dn
-#         self.conn = ldap.initialize(host_url)
-#         self.conn.set_option(ldap.OPT_REFERRALS, 0)
-#         self.conn.protocol_version = ldap.VERSION3
-#         self.conn.simple_bind_s(root_cn, root_pw)
-#
-#     def list(self, filter, scope=ldap.SCOPE_SUBTREE, attr=None):
-#         """
-#         query
-#         查询
-#         """
-#         result = {}
-#         try:
-#             ldap_result = self.conn.search_s(self.ldap_base_dn, scope, filter, attr)
-#             for entry in ldap_result:
-#                 name, data = entry
-#                 for k, v in data.items():
-#                     print '%s: %s' % (k, v)
-#                     result[k] = v
-#             return result
-#         except ldap.LDAPError, e:
-#             print e
-#
-#     def add(self, dn, attrs):
-#         """
-#         add
-#         添加
-#         """
-#         try:
-#             ldif = modlist.addModlist(attrs)
-#             self.conn.add_s(dn, ldif)
-#         except ldap.LDAPError, e:
-#             print e
-#
-#     def modify(self, dn, attrs):
-#         """
-#         modify
-#         更改
-#         """
-#         try:
-#             attr_s = []
-#             for k, v in attrs.items():
-#                 attr_s.append((2, k, v))
-#             self.conn.modify_s(dn, attr_s)
-#         except ldap.LDAPError, e:
-#             print e
-#
-#     def delete(self, dn):
-#         """
-#         delete
-#         删除
-#         """
-#         try:
-#             self.conn.delete_s(dn)
-#         except ldap.LDAPError, e:
-#             print e
-
-
 def page_list_return(total, current=1):
     """
     page
@@ -181,17 +113,46 @@ def pages(post_objects, request):
     return post_objects, paginator, page_objects, page_range, current_page, show_first, show_end
 
 
+def remove_control_char(str_r):
+    """
+    处理日志特殊字符
+    """
+    control_char = re.compile(r"""
+            \x1b[ #%()*+\-.\/]. |
+            \r |                                               #匹配 回车符(CR)
+            (?:\x1b\[|\x9b) [ -?]* [@-~] |                     #匹配 控制顺序描述符(CSI)... Cmd
+            (?:\x1b\]|\x9d) .*? (?:\x1b\\|[\a\x9c]) | \x07 |   #匹配 操作系统指令(OSC)...终止符或振铃符(ST|BEL)
+            (?:\x1b[P^_]|[\x90\x9e\x9f]) .*? (?:\x1b\\|\x9c) | #匹配 设备控制串或私讯或应用程序命令(DCS|PM|APC)...终止符(ST)
+            \x1b.                                              #匹配 转义过后的字符
+            [\x80-\x9f]                                        #匹配 所有控制字符
+            """, re.X)
+    backspace = re.compile(r"[^\b][\b]")
+    line_filtered = control_char.sub('', str_r.rstrip())
+    while backspace.search(line_filtered):
+        line_filtered = backspace.sub('', line_filtered)
+
+    return line_filtered
+
+
+def newline_code_in(strings):
+    for i in ['\r', '\r\n', '\n']:
+        if i in strings:
+            #print "new line"
+            return True
+    return False
+
+
 class Jtty(object):
     """
     A virtual tty class
     一个虚拟终端类，实现连接ssh和记录日志
     """
-    def __init__(self, user, asset):
+    def __init__(self, username, ip):
         self.chan = None
-        self.username = user.username
-        self.ip = asset.ip
-        self.user = user
-        self.asset = asset
+        self.username = username
+        self.ip = ip
+        # self.user = user
+        # self.asset = asset
 
     @staticmethod
     def get_win_size():
@@ -227,11 +188,8 @@ class Jtty(object):
         timestamp_start = int(time.time())
         date_start = time.strftime('%Y%m%d', time.localtime(timestamp_start))
         time_start = time.strftime('%H%M%S', time.localtime(timestamp_start))
-        log_filename = '%s_%s_%s.log' % (self.username, self.ip, time_start)
         today_connect_log_dir = os.path.join(tty_log_dir, date_start)
-        log_file_path = os.path.join(today_connect_log_dir, log_filename)
-        dept_name = self.user.dept.name
-
+        log_file_path = os.path.join(today_connect_log_dir, '%s_%s_%s' % (self.username, self.ip, time_start))
         pid = os.getpid()
         pts = os.popen("ps axu | grep %s | grep -v grep | awk '{ print $7 }'" % pid).read().strip()
         ip_list = os.popen("who | grep %s | awk '{ print $5 }'" % pts).read().strip('()\n')
@@ -242,23 +200,29 @@ class Jtty(object):
             raise ServerError('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, tty_log_dir))
 
         try:
-            log_file = open(log_file_path, 'a')
+            log_file_f = open(log_file_path + '.log', 'a')
+            log_time_f = open(log_file_path + '.time', 'a')
+            log_res_f = open(log_file_path + '.res', 'a')
         except IOError:
             raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 
-        log = Log(user=self.username, host=self.ip, remote_ip=ip_list, dept_name=dept_name,
+        log = Log(user=self.username, host=self.ip, remote_ip=ip_list,
                   log_path=log_file_path, start_time=datetime.datetime.now(), pid=pid)
-        log_file.write('Start time is %s\n' % datetime.datetime.now())
+        log_file_f.write('Start time is %s\n' % datetime.datetime.now())
         log.save()
-        return log_file, log
+        return log_file_f, log_time_f, log_res_f, log
 
     def posix_shell(self):
         """
         Use paramiko channel connect server interactive.
         使用paramiko模块的channel，连接后端，进入交互式
         """
-        log_file, log = self.log_record()
+        log_file_f, log_time_f, log_res_f, log = self.log_record()
         old_tty = termios.tcgetattr(sys.stdin)
+        pre_timestamp = time.time()
+        input_r = ''
+        input_mode = False
+
         try:
             tty.setraw(sys.stdin.fileno())
             tty.setcbreak(sys.stdin.fileno())
@@ -277,23 +241,40 @@ class Jtty(object):
                             break
                         sys.stdout.write(x)
                         sys.stdout.flush()
-                        log_file.write(x)
-                        log_file.flush()
+                        log_file_f.write(x)
+                        now_timestamp = time.time()
+                        log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(x)))
+                        pre_timestamp = now_timestamp
+                        log_file_f.flush()
+                        log_time_f.flush()
+
+                        if input_mode and not newline_code_in(x):
+                            input_r += x
+
                     except socket.timeout:
                         pass
 
                 if sys.stdin in r:
                     x = os.read(sys.stdin.fileno(), 1)
+                    if not input_mode:
+                        input_mode = True
+
+                    if str(x) in ['\r', '\n', '\r\n']:
+                        input_r = remove_control_char(input_r)
+                        log_res_f.write('%s: %s\n' % (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), input_r))
+                        log_res_f.flush()
+                        input_r = ''
+                        input_mode = False
+
                     if len(x) == 0:
                         break
                     self.chan.send(x)
 
         finally:
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)
-            log_file.write('End time is %s' % datetime.datetime.now())
-            log_file.close()
+            log_file_f.write('End time is %s' % datetime.datetime.now())
+            log_file_f.close()
             log.is_finished = True
-            log.handle_finished = False
             log.end_time = datetime.datetime.now()
             log.save()
 
@@ -302,27 +283,15 @@ class Jtty(object):
         get args for connect: ip, port, username, passwd
         获取连接需要的参数，也就是服务ip, 端口, 用户账号和密码
         """
-        if not self.asset.is_active:
-            raise ServerError('该主机被禁用 Host %s is not active.' % self.ip)
+        # if not self.asset.is_active:
+        #     raise ServerError('该主机被禁用 Host %s is not active.' % self.ip)
+        #
+        # if not self.user.is_active:
+        #     raise ServerError('该用户被禁用 User %s is not active.' % self.username)
 
-        if not self.user.is_active:
-            raise ServerError('该用户被禁用 User %s is not active.' % self.username)
-
-        login_type_dict = {
-            'L': self.user.ldap_pwd,
-        }
-
-        if self.asset.login_type in login_type_dict:
-            password = CRYPTOR.decrypt(login_type_dict[self.asset.login_type])
-            return self.username, password, self.ip, int(self.asset.port)
-
-        elif self.asset.login_type == 'M':
-            username = self.asset.username
-            password = CRYPTOR.decrypt(self.asset.password)
-            return username, password, self.ip, int(self.asset.port)
-
-        else:
-            raise ServerError('不支持的服务器登录方式 Login type is not in ["L", "M"]')
+        # password = CRYPTOR.decrypt(self.])
+        # return self.username, password, self.ip, int(self.asset.port)
+        return 'root', 'redhat', '127.0.0.1', 22
 
     def get_connection(self):
         """
@@ -337,7 +306,7 @@ class Jtty(object):
         ssh.load_system_host_keys()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
-            ssh.connect(ip, port=port, username=username, password=password, compress=True)
+            ssh.connect(ip, port=port, username=username, password=password)
         except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
             raise ServerError('认证错误 Authentication Error.')
         except socket.error:
@@ -351,7 +320,7 @@ class Jtty(object):
         连接服务器
         """
         ps1 = "PS1='[\u@%s \W]\$ '\n" % self.ip
-        login_msg = "clear;echo -e '\\033[32mLogin %s done. Enjoy it.\\033[0m'\n" % self.asset.ip
+        login_msg = "clear;echo -e '\\033[32mLogin %s done. Enjoy it.\\033[0m'\n" % self.ip
 
         # 发起ssh连接请求 Make a ssh connection
         ssh = self.get_connection()
@@ -705,15 +674,6 @@ def my_render(template, data, request):
 
 
 CRYPTOR = PyCrypt(KEY)
-
-# if LDAP_ENABLE:
-#     LDAP_HOST_URL = CONF.get('ldap', 'host_url')
-#     LDAP_BASE_DN = CONF.get('ldap', 'base_dn')
-#     LDAP_ROOT_DN = CONF.get('ldap', 'root_dn')
-#     LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
-#     ldap_conn = LDAPMgmt(LDAP_HOST_URL, LDAP_BASE_DN, LDAP_ROOT_DN, LDAP_ROOT_PW)
-# else:
-#     ldap_conn = None
 
 log_level = CONF.get('base', 'log')
 logger = set_log(log_level)

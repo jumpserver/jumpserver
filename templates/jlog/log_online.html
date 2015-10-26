@@ -39,12 +39,6 @@
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                             <i class="fa fa-wrench"></i>
                         </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">未启用 1</a>
-                            </li>
-                            <li><a href="#">未启用 2</a>
-                            </li>
-                        </ul>
                         <a class="close-link">
                             <i class="fa fa-times"></i>
                         </a>
@@ -77,7 +71,6 @@
                             <thead>
                                 <tr>
                                     <th class="text-center"> 用户名 </th>
-                                    <th class="text-center"> 所属部门 </th>
                                     <th class="text-center"> 登录主机 </th>
                                     <th class="text-center"> 来源IP </th>
                                     {% ifnotequal session_role_id 0 %}
@@ -92,7 +85,6 @@
                             {% for post in contacts.object_list %}
                                 <tr class="gradeX">
                                     <td id="username" class="text-center"> {{ post.user }} </td>
-                                    <td id="deptname" class="text-center"> {{ post.dept_name }} </td>
                                     <td id="ip" class="text-center"> {{ post.host }} </td>
                                     <td id="remote_ip" class="text-center"> {{ post.remote_ip }} </td>
                                     {% ifnotequal session_role_id 0 %}
