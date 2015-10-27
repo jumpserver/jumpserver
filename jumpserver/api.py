@@ -202,7 +202,7 @@ class Jtty(object):
         try:
             log_file_f = open(log_file_path + '.log', 'a')
             log_time_f = open(log_file_path + '.time', 'a')
-            log_res_f = open(log_file_path + '.res', 'a')
+            log_res_f = open(log_file_path + '.his', 'a')
         except IOError:
             raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 

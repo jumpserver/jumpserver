@@ -50,19 +50,6 @@
                         <ul class="nav nav-tabs">
                             <li class="active"><a href="/jlog/log_list/online/" class="text-center"><i class="fa fa-laptop"></i> 在线 </a></li>
                             <li><a href="/jlog/log_list/offline/" class="text-center"><i class="fa fa-bar-chart-o"></i> 历史记录 </a></li>
-                            <li style="float: right">
-                                <form id="search_form" method="get" action="" class="pull-right mail-search">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
-                                        <input type="text" style="display: none">
-                                        <div class="input-group-btn">
-                                            <button id='search_btn' type="button" class="btn btn-sm btn-primary" onclick="log_search()">
-                                                Search
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </li>
                         </ul>
                     </div>
                     <br/>
@@ -74,6 +61,7 @@
                                     <th class="text-center"> 登录主机 </th>
                                     <th class="text-center"> 来源IP </th>
                                     {% ifnotequal session_role_id 0 %}
+                                        <th class="text-center"> 统计命令 </th>
                                         <th class="text-center"> 实时监控 </th>
                                         <th class="text-center"> 阻断 </th>
                                     {% endifnotequal %}
@@ -88,6 +76,7 @@
                                     <td id="ip" class="text-center"> {{ post.host }} </td>
                                     <td id="remote_ip" class="text-center"> {{ post.remote_ip }} </td>
                                     {% ifnotequal session_role_id 0 %}
+                                        <td class="text-center"><a href="/jlog/history/?id={{ post.id }}" class="log_command"> 命令统计 </a></td>
                                         <td class="text-center"><a class="monitor" filename="{{ post.log_path }}"> 监控 </a></td>
                                         <td class="text-center"><input type="button" id="cut" class="btn btn-danger btn-xs"  name="cut" value="阻断" onclick='cut("{{ post.pid }}")' /></td>
                                     {% endifnotequal %}
@@ -146,7 +135,7 @@
                         seed = info[1];
                     }
                 }
-            })
+            });
 
             //告诉服务器端有用户登录
             socket.emit('login', {userid:message.id, filename:message.filename,username:username,seed:seed});
@@ -168,30 +157,23 @@
             });
             tag[0].style.color = "#00FF00";
             return tag[0];
-
         } ,
             title:'Jumpserver实时监控 '+' 登录用户名: '+'<span class="text-info">'+username+'</span>'+' 登录主机: '+'<span class="text-info">'+ip,
             onhide:function(){
                 socket.emit('disconnect');
         }});
-    }
-    $this.on("click",function(e){
-        init(e);
-        return false;
-    });
-}
-   $('.log_command').on('click',function(){
-       var url = $(this).attr('href');
-        $.ajax({url:url,success:function(data){
-        BootstrapDialog.show({title:'命令统计',message:data});
-        }});
-       return false;
-    })
+    };
+        $this.on("click",function(e){
+            init(e);
+            return false;
+        });
+    };
+
+
    globalConfig = {
         SOCKET_HOST: "{{ web_socket_host }}"
-   }
-   $(".monitor").webSocket()
-
+   };
+   $(".monitor").webSocket();
 
    function log_search(){
         $.ajax({
@@ -204,11 +186,33 @@
         });
     }
 
-    $("#search_input").keydown(function(e){
+   $(document).ready(function(){
+       $('.log_command').on('click',function(){
+           var url = $(this).attr('href');
+           var username = $('#username')[0].innerText;
+           var ip = $('#ip')[0].innerText;
+           var start_time = $('#start_time')[0].innerText;
+           var end_time = $('#end_time')[0].innerText;
+           var div_username = ' 用户名: '+'<span class="text-info">'+username+'' + '</span>';
+           var div_ip = ' 主机: '+'<span class="text-info">' + ip + '</span>';
+           var div_time = ' 开始时间: ' + '<span class="text-info">'+start_time +'</span>' + ' 结束时间: ' +'<span class="text-info">' + end_time + '</span>';
+           var title = 'JumpServer命令统计 '+ div_username + div_ip + div_time;
+            $.ajax({url:url,
+                    success:function(data){
+                        var tag = $('<div style="height: 500px;overflow: auto;background-color: rgba(0, 0, 0, 0);"></div>').html(data.replace(/\n/g,"<br />"));
+                        BootstrapDialog.show({title: title, message:tag[0]});
+            }});
+           return false;
+        });
+
+       $("#search_input").keydown(function(e){
         if(e.keyCode==13){
             log_search()
             }
-    })
+    });
+   });
+
+
 
    function cut(num){
       var g_url = "/jlog/log_kill/?id="+num;

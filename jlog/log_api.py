@@ -49,7 +49,7 @@ def scriptToJSON(scriptf, timing=None):
     return dumps(ret)
 
 
-def renderTemplate(script_path, time_file_path, dimensions=(24, 60), templatename=DEFAULT_TEMPLATE):
+def renderTemplate(script_path, time_file_path, dimensions=(24, 80), templatename=DEFAULT_TEMPLATE):
     with copen(script_path, encoding='utf-8', errors='replace') as scriptf:
         with open(time_file_path) as timef:
             timing = getTiming(timef)

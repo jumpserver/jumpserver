@@ -9,6 +9,7 @@ from django.http import HttpResponseNotFound
 CONF = ConfigParser()
 CONF.read('%s/jumpserver.conf' % BASE_DIR)
 from jlog.models import Log
+from jlog.log_api import renderTemplate
 
 # def get_user_info(request, offset):
 #     """ 获取用户信息及环境 """
@@ -72,31 +73,38 @@ def log_list(request, offset):
 #         return render_to_response('jlog/log_offline.html', locals(), context_instance=RequestContext(request))
 #     else:
 #         return HttpResponseNotFound(u'没有此进程!')
-#
-#
-# def log_history(request):
-#     """ 命令历史记录 """
-#     log_id = request.GET.get('id', 0)
-#     log = Log.objects.filter(id=int(log_id))
-#     if log:
-#         log = log[0]
-#         dept_name = log.dept_name
-#         deptname = get_session_user_info(request)[4]
-#         if is_group_admin(request) and dept_name != deptname:
-#             return httperror(request, '查看失败, 您无权查看!')
-#
-#         elif is_common_user(request):
-#             return httperror(request, '查看失败, 您无权查看!')
-#
-#         log_his = "%s.his" % log.log_path
-#         if os.path.isfile(log_his):
-#             f = open(log_his)
-#             content = f.read()
-#             return HttpResponse(content)
-#         else:
-#             return httperror(request, '无日志记录, 请查看日志处理脚本是否开启!')
-#
-#
+
+
+def log_history(request):
+    """ 命令历史记录 """
+    log_id = request.GET.get('id', 0)
+    log = Log.objects.filter(id=int(log_id))
+    if log:
+        log = log[0]
+        log_his = "%s.his" % log.log_path
+        print log_his
+        if os.path.isfile(log_his):
+            f = open(log_his)
+            content = f.read()
+            return HttpResponse(content)
+        else:
+            return HttpResponse('无日志记录, 请查看日志处理脚本是否开启!')
+
+
+def log_record(request):
+    log_id = request.GET.get('id', 0)
+    log = Log.objects.filter(id=int(log_id))
+    if log:
+        log = log[0]
+        log_file = log.log_path + '.log'
+        log_time = log.log_path + '.time'
+        if os.path.isfile(log_file) and os.path.isfile(log_time):
+            content = renderTemplate(log_file, log_time)
+            return HttpResponse(content)
+        else:
+            return HttpResponse('无日志记录, 请查看日志处理脚本是否开启!')
+
+
 # def log_search(request):
 #     """ 日志搜索 """
 #     offset = request.GET.get('env', '')

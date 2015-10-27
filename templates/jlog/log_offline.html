@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
 {% include 'nav_cat_bar.html' %}
+
 <style>
     .bootstrap-dialog-body  {
         background-color: rgba(0, 0, 0, 0);
@@ -51,17 +52,23 @@
                             <li><a href="/jlog/log_list/online/" class="text-center"><i class="fa fa-laptop"></i> 在线 </a></li>
                             <li class="active"><a href="/jlog/log_list/offline/" class="text-center"><i class="fa fa-bar-chart-o"></i> 历史记录 </a></li>
                             <li style="float: right">
-                                <form id="search_form" method="get" action="" class="pull-right mail-search">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
-                                        <input type="text" style="display: none">
-                                        <div class="input-group-btn">
-                                            <button id='search_btn' type="button" class="btn btn-sm btn-primary" onclick="log_search()">
-                                                Search
-                                            </button>
+                                <form class="form-inline">
+                                    <div class="form-group" id="data_5">
+                                        <div class="input-daterange input-group" id="datepicker">
+                                            <input type="text" class="input-sm form-control" style="width: 100px;" name="start" value="05/14/2014">
+                                            <span class="input-group-addon">to</span>
+                                            <input type="text" class="input-sm form-control" style="width: 100px;" name="end" value="05/22/2014">
                                         </div>
-                                    </div>
+                                        </div>
+                                        <div class="form-group">
+                                        <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
+                                        </div>
+
+                                        <button id='search_btn' type="button" class="btn btn-sm btn-primary" onclick="log_search()">
+                                                Search
+                                        </button>
                                 </form>
+
                             </li>
                         </ul>
                     </div>
@@ -89,9 +96,9 @@
                                     <td class="text-center" id="ip"> {{ post.host }} </td>
                                     <td class="text-center" id="remote_ip"> {{ post.remote_ip }} </td>
                                     {% ifnotequal session_role_id 0 %}
-                                        <td class="text-center"><a href="/jlog/history/?id={{ post.id }}" class="log_command"> 命令统计 </td>
+                                        <td class="text-center"><a href="/jlog/history/?id={{ post.id }}" class="log_command"> 命令统计 </a></td>
                                     {% endifnotequal %}
-                                    <td class="text-center"><a href="/jlog/record/?id={{ post.id }}" class="log_command"> 回放 </td>
+                                    <td class="text-center"><a value="/jlog/record/?id={{ post.id }}" class="log_record"> 回放 </a></td>
                                     <td class="text-center" id="start_time"> {{ post.start_time|date:"Y-m-d H:i:s"}} </td>
                                     <td class="text-center" id="end_time"> {{ post.end_time|date:"Y-m-d H:i:s" }} </td>
                                 </tr>
@@ -110,10 +117,14 @@
     </div>
 </div>
 
-
-{#<script src="http://{{ web_socket_host }}/socket.io/socket.io.js"></script>#}
 <script>
-   $('.log_command').on('click',function(){
+    $('.log_record').click(function(){
+        var url = $(this).attr('value');
+        window.open(url, '播放', 'height=500, width=910, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');
+        return false;
+    });
+
+    $('.log_command').on('click',function(){
        var url = $(this).attr('href');
        var username = $('#username')[0].innerText;
        var ip = $('#ip')[0].innerText;
@@ -121,17 +132,15 @@
        var end_time = $('#end_time')[0].innerText;
        var div_username = ' 用户名: '+'<span class="text-info">'+username+'' + '</span>';
        var div_ip = ' 主机: '+'<span class="text-info">' + ip + '</span>';
-       var div_time = ' 开始时间: ' + '<span class="text-info">'+start_time +'</span>' + ' 结束时间: ' +'<span class="text-info">' + end_time + '</span'
+       var div_time = ' 开始时间: ' + '<span class="text-info">'+start_time +'</span>' + ' 结束时间: ' +'<span class="text-info">' + end_time + '</span>';
        var title = 'JumpServer命令统计 '+ div_username + div_ip + div_time;
-        $.ajax({url:url,success:function(data){
-        var tag = $('<div style="height: 500px;overflow: auto;background-color: rgba(0, 0, 0, 0);"></div>').html(data.replace(/\n/g,"<br />"));
-        BootstrapDialog.show({title: title, message:tag[0]});
+        $.ajax({url:url,
+                success:function(data){
+                    var tag = $('<div style="height: 500px;overflow: auto;background-color: rgba(0, 0, 0, 0);"></div>').html(data.replace(/\n/g,"<br />"));
+                    BootstrapDialog.show({title: title, message:tag[0]});
         }});
        return false;
     });
-    globalConfig = {
-        SOCKET_HOST: "{{ web_socket_host }}"
-    };
 
     function log_search(){
         $.ajax({
@@ -148,7 +157,16 @@
         if(e.keyCode==13){
             log_search()
             }
-    })
+    });
+
+    $('#data_5 .input-daterange').datepicker({
+            keyboardNavigation: false,
+            forceParse: false,
+            autoclose: true
+    });
 
 </script>
+{% endblock %}
+{% block self_footer_js %}
+
 {% endblock %}
