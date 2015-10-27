@@ -1,3 +1,6 @@
+# coding=utf-8
+# coding: utf-8
+
 import datetime
 from django.db import models
 from juser.models import User, UserGroup
@@ -58,16 +61,94 @@ class AssetGroup(models.Model):
         return False
 
 
+class AssetType(models.Model):
+    name = models.CharField(max_length=16, verbose_name=u"机器类型名")
+    comment = models.CharField(max_length=16, blank=True, null=True, verbose_name=u"备注")
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = u"机器类型"
+        verbose_name_plural = verbose_name
+
+
+class Project(models.Model):
+    name = models.CharField(max_length=32, blank=True, null=True, verbose_name=u'项目名')
+    manager = models.CharField(max_length=16,  blank=True, null=True, verbose_name=u'项目负责人')
+    comment = models.TextField(blank=True, null=True, verbose_name=u'项目说明')
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = u"项目"
+        verbose_name_plural = verbose_name
+
+
+class Service(models.Model):
+    """
+    服务，如nginx, haproxy, php....
+    """
+    name = models.CharField(max_length=32, null=True, blank=True, verbose_name=u"服务名称")
+    port = models.IntegerField(null=True, blank=True, verbose_name=u"端口")
+    path = models.CharField(max_length=64, null=True, blank=True, verbose_name=u"程序路径")
+    comment = models.TextField(null=True, blank=True, verbose_name=u"备注")
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = u"服务"
+        verbose_name_plural = verbose_name
+
+
 class Asset(models.Model):
-    ip = models.IPAddressField(unique=True)
-    port = models.IntegerField(max_length=6)
-    group = models.ManyToManyField(AssetGroup)
-    username = models.CharField(max_length=20, blank=True, null=True)
-    password = models.CharField(max_length=80, blank=True, null=True)
-    use_default_auth = models.BooleanField(default=True)
+    """
+    asset modle
+    """
+    ENVIRONMENT = (
+        (0, U'生产环境'),
+        (1, U'测试环境')
+    )
+    SERVER_STATUS = (
+        (0, u"已使用"),
+        (1, u"未使用"),
+        (2, u"报废")
+    )
+    ip = models.IPAddressField(unique=True, verbose_name=u"IP1")
+    second_ip = models.IPAddressField(unique=True, blank=True, null=True, verbose_name=u"IP2")
+    hostname = models.CharField(max_length=64, blank=True, null=True, verbose_name=u"主机名")
+    port = models.IntegerField(max_length=6, verbose_name=u"端口号")
+    group = models.ManyToManyField(AssetGroup, blank=True, null=True, verbose_name=u"所属主机组")
+    username = models.CharField(max_length=16, blank=True, null=True, verbose_name=u"管理用户名")
+    password = models.CharField(max_length=64, blank=True, null=True, verbose_name=u"密码")
+    use_default_auth = models.BooleanField(default=True, verbose_name=u"使用默认管理账号")
+    idc = models.ForeignKey(IDC, blank=True, null=True,  on_delete=models.SET_NULL, verbose_name=u'机房')
+    mac = models.CharField(max_length=20, blank=True, null=True, verbose_name=u"MAC地址")
+    remote_ip = models.IPAddressField(unique=True, blank=True, null=True, verbose_name=u'远控卡')
+    brand = models.CharField(max_length=64, blank=True, null=True, verbose_name=u'硬件厂商型号')
+    cpu = models.CharField(max_length=64, blank=True, null=True, verbose_name=u'CPU')
+    memory = models.CharField(max_length=128, blank=True, null=True, verbose_name=u'内存')
+    disk = models.CharField(max_length=128, blank=True, null=True, verbose_name=u'硬盘')
+    system_type = models.CharField(max_length=32, blank=True, null=True, verbose_name=u"系统类型")
+    system_version = models.CharField(max_length=8, blank=True, null=True, verbose_name=u"版本号")
+    guarantee_date = models.DateField(blank=True, null=True, verbose_name=u'保修时间')
+    cabinet = models.CharField(max_length=32, blank=True, null=True, verbose_name=u'机柜号')
+    position = models.IntegerField(max_length=2, blank=True, null=True, verbose_name=u'机器位置')
+    number = models.CharField(max_length=32, blank=True, null=True, verbose_name=u'资产编号')
+    project = models.ManyToManyField(Project, blank=True, null=True, verbose_name=u'所属项目')
+    service = models.ManyToManyField(Service, blank=True, null=True, verbose_name=u'运行服务')
+    status = models.IntegerField(max_length=2, choices=SERVER_STATUS, default=1, verbose_name=u"机器状态")
+    parent = models.ForeignKey("self", blank=True, null=True, verbose_name=u"虚拟机父主机")
+    type = models.ManyToManyField(AssetType, blank=True, null=True, verbose_name=u"主机类型")
+    service_code = models.CharField(max_length=16, blank=True, null=True, verbose_name=u"快速服务编码")
+    env = models.CharField(max_length=32, choices=ENVIRONMENT, blank=True, null=True, verbose_name=u"运行环境")
+    sn = models.CharField(max_length=32, blank=True, null=True, verbose_name=u"SN编号")
+    switch_port = models.CharField(max_length=12, blank=True, null=True, verbose_name=u"交换机端口号")
     date_added = models.DateTimeField(auto_now=True, default=datetime.datetime.now(), null=True)
-    is_active = models.BooleanField(default=True)
-    comment = models.CharField(max_length=100, blank=True, null=True)
+    is_active = models.BooleanField(default=True, verbose_name=u"是否激活")
+    comment = models.CharField(max_length=128, blank=True, null=True, verbose_name=u"备注")
 
     def __unicode__(self):
         return self.ip
@@ -87,6 +168,25 @@ class Asset(models.Model):
             user_permed_list.extend(user_group.user_set.all())
         user_permed_list = list(set(user_permed_list))
         return user_permed_list
+
+
+class IDC(models.Model):
+    name = models.CharField(max_length=64, verbose_name=u'机房名称')
+    bandwidth = models.CharField(max_length=64, blank=True, null=True, verbose_name=u'机房带宽')
+    linkman = models.CharField(max_length=32, null=True, verbose_name=u'联系人')
+    phone = models.CharField(max_length=32, verbose_name=u'联系电话')
+    address = models.CharField(max_length=128, blank=True, null=True, verbose_name=u"机房地址")
+    network = models.TextField(blank=True, null=True, verbose_name=u"IP地址段")
+    create_time = models.DateField(auto_now=True)
+    operator = models.IntegerField(max_length=32 ,blank=True, null=True, verbose_name=u"运营商")
+    comment = models.TextField(blank=True, null=True, verbose_name=u"备注")
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = u"IDC机房"
+        verbose_name_plural = verbose_name
 
 
 class AssetAlias(models.Model):
