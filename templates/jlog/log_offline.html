@@ -1,4 +1,7 @@
 {% extends 'base.html' %}
+{% block self_head_css_js %}
+    <link href="/static/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+{% endblock %}
 {% block content %}
 {% include 'nav_cat_bar.html' %}
 
@@ -52,23 +55,21 @@
                             <li><a href="/jlog/log_list/online/" class="text-center"><i class="fa fa-laptop"></i> 在线 </a></li>
                             <li class="active"><a href="/jlog/log_list/offline/" class="text-center"><i class="fa fa-bar-chart-o"></i> 历史记录 </a></li>
                             <li style="float: right">
-                                <form class="form-inline">
+                                <form class="form-inline" action="" method="get">
                                     <div class="form-group" id="data_5">
                                         <div class="input-daterange input-group" id="datepicker">
-                                            <input type="text" class="input-sm form-control" style="width: 100px;" name="start" value="05/14/2014">
+                                            <input type="text" class="input-sm form-control" style="width: 100px;" name="start" value="{{ date_seven_day }}">
                                             <span class="input-group-addon">to</span>
-                                            <input type="text" class="input-sm form-control" style="width: 100px;" name="end" value="05/22/2014">
+                                            <input type="text" class="input-sm form-control" style="width: 100px;" name="end" value="{{ date_now_str }}">
                                         </div>
-                                        </div>
-                                        <div class="form-group">
+                                    </div>
+                                    <div class="form-group">
                                         <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
-                                        </div>
-
-                                        <button id='search_btn' type="button" class="btn btn-sm btn-primary" onclick="log_search()">
-                                                Search
-                                        </button>
+                                    </div>
+                                    <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                                            Search
+                                    </button>
                                 </form>
-
                             </li>
                         </ul>
                     </div>
@@ -153,13 +154,14 @@
         });
     }
 
-    $("#search_input").keydown(function(e){
-        if(e.keyCode==13){
-            log_search()
-            }
-    });
+{#    $("#search_input").keydown(function(e){#}
+{#        if(e.keyCode==13){#}
+{#            log_search()#}
+{#            }#}
+{#    });#}
 
     $('#data_5 .input-daterange').datepicker({
+            dateFormat: 'yy-mm-dd',
             keyboardNavigation: false,
             forceParse: false,
             autoclose: true
@@ -168,5 +170,6 @@
 </script>
 {% endblock %}
 {% block self_footer_js %}
-
+    <script src="/static/js/cropper/cropper.min.js"></script>
+    <script src="/static/js/datapicker/bootstrap-datepicker.js"></script>
 {% endblock %}
