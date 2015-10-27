@@ -24,7 +24,9 @@
 
                 <div class="ibox-content">
                     <div>
+                        {% if session_role_id > 0 %}
                         <a target="_blank" href="/jasset/asset_add/" class="btn btn-sm btn-primary "> 添加 </a>
+                        {% endif %}
                         <form id="search_form" method="get" action="" class="pull-right mail-search">
                             <div class="input-group">
                                 <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
