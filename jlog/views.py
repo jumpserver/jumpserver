@@ -6,10 +6,8 @@ from django.shortcuts import render_to_response
 from jumpserver.api import *
 from jasset.views import httperror
 from django.http import HttpResponseNotFound
-
-CONF = ConfigParser()
-CONF.read('%s/jumpserver.conf' % BASE_DIR)
-
+from models import Log
+from jumpserver.settings import web_socket_host
 
 def get_user_info(request, offset):
     """ 获取用户信息及环境 """
@@ -58,7 +56,6 @@ def log_list(request, offset):
     """ 显示日志 """
     header_title, path1, path2 = u'查看日志', u'查看日志', u'在线用户'
     keyword = request.GET.get('keyword', '')
-    web_socket_host = CONF.get('websocket', 'web_socket_host')
     posts = get_user_log(get_user_info(request, offset))
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 

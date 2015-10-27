@@ -1,6 +1,7 @@
-#coding: utf-8
+# coding: utf-8
 
 from django.db import models
+from django.contrib.auth.models import AbstractUser
 
 
 class UserGroup(models.Model):
@@ -19,23 +20,17 @@ class UserGroup(models.Model):
             self.save()
 
 
-class User(models.Model):
+class User(AbstractUser):
     USER_ROLE_CHOICES = (
         ('SU', 'SuperUser'),
         ('GA', 'GroupAdmin'),
         ('CU', 'CommonUser'),
     )
-    username = models.CharField(max_length=80, unique=True)
-    password = models.CharField(max_length=100)
     name = models.CharField(max_length=80)
-    email = models.EmailField(max_length=75)
-    role = models.CharField(max_length=2, choices=USER_ROLE_CHOICES, default='CU')
     uuid = models.CharField(max_length=100)
+    role = models.CharField(max_length=2, choices=USER_ROLE_CHOICES, default='CU')
     group = models.ManyToManyField(UserGroup)
     ssh_key_pwd = models.CharField(max_length=200)
-    is_active = models.BooleanField(default=True)
-    last_login = models.DateTimeField(null=True)
-    date_joined = models.DateTimeField(null=True)
 
     def __unicode__(self):
         return self.username
@@ -47,13 +42,11 @@ class User(models.Model):
         """
         host_group_list = []
         perm_list = []
-        user_group_all = self.group.all()
-        for user_group in user_group_all:
-            perm_list.extend(user_group.perm_set.all())
-
-        for perm in perm_list:
-            host_group_list.append(perm.asset_group)
-
+        # user_group_all = self.group.all()
+        # for user_group in user_group_all:
+        #     perm_list.extend(user_group.perm_set.all())
+        # for perm in perm_list:
+        #     host_group_list.append(perm.asset_group)
         return host_group_list
 
     def get_asset_group_info(self, printable=False):
@@ -63,10 +56,8 @@ class User(models.Model):
         """
         asset_groups_info = {}
         asset_groups = self.get_asset_group()
-
         for asset_group in asset_groups:
             asset_groups_info[asset_group.id] = [asset_group.name, asset_group.comment]
-
         if printable:
             for group_id in asset_groups_info:
                 if asset_groups_info[group_id][1]:
@@ -86,10 +77,8 @@ class User(models.Model):
         """
         assets = []
         asset_groups = self.get_asset_group()
-
         for asset_group in asset_groups:
             assets.extend(asset_group.asset_set.all())
-
         return assets
 
     def get_asset_info(self, printable=False):
@@ -100,14 +89,12 @@ class User(models.Model):
         from jasset.models import AssetAlias
         assets_info = {}
         assets = self.get_asset()
-
         for asset in assets:
             asset_alias = AssetAlias.objects.filter(user=self, asset=asset)
             if asset_alias and asset_alias[0].alias != '':
                 assets_info[asset.ip] = [asset.id, asset.ip, str(asset_alias[0].alias)]
             else:
                 assets_info[asset.ip] = [asset.id, asset.ip, str(asset.comment)]
-
         if printable:
             ips = assets_info.keys()
             ips.sort()
@@ -137,5 +124,3 @@ class AdminGroup(models.Model):
 
     def __unicode__(self):
         return '%s: %s' % (self.user.username, self.group.name)
-
-

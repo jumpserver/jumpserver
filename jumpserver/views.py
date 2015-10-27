@@ -12,8 +12,10 @@ from django.http import HttpResponse
 # from jperm.models import Apply
 import paramiko
 from jumpserver.api import *
-from django.contrib.auth import authenticate,logout,login
-
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from settings import BASE_DIR
+from jlog.models import Log
 
 def getDaysByNum(num):
     today = datetime.date.today()
@@ -64,7 +66,6 @@ def index_cu(request):
             new_posts.append(post_five)
             post_five = []
     new_posts.append(post_five)
-
     return render_to_response('index_cu.html', locals(), context_instance=RequestContext(request))
 
 
@@ -195,7 +196,7 @@ def is_latest():
 
 def Login(request):
     """登录界面"""
-    if not request.user.is_authenticated():
+    if request.user.is_authenticated():
         return HttpResponseRedirect('/')
     if request.method == 'GET':
         return render_to_response('login.html')
@@ -216,12 +217,12 @@ def Login(request):
         #     if PyCrypt.md5_crypt(password) == user.password:
         #         request.session['user_id'] = user.id
         #         user_filter.update(last_login=datetime.datetime.now())
-                    if user.role == 'SU':
-                        request.session['role_id'] = 2
-                    elif user.role == 'GA':
-                        request.session['role_id'] = 1
-                    else:
-                        request.session['role_id'] = 0
+        #             if user.role == 'SU':
+        #                 request.session['role_id'] = 2
+        #             elif user.role == 'GA':
+        #                 request.session['role_id'] = 1
+        #             else:
+        #                 request.session['role_id'] = 0
                     return HttpResponseRedirect('/', )
                 # response.set_cookie('username', username, expires=604800)
                 # response.set_cookie('seed', PyCrypt.md5_crypt(password), expires=604800)
