@@ -12,7 +12,7 @@ from django.http import HttpResponse
 # from jperm.models import Apply
 import paramiko
 from jumpserver.api import *
-
+from django.contrib.auth import authenticate,logout,login
 
 
 def getDaysByNum(num):
@@ -49,7 +49,7 @@ def get_data(data, items, option):
 
 @require_role(role='user')
 def index_cu(request):
-    user_id = request.session.get('user_id')
+    user_id = request.user.id
     user = get_object(User, id=user_id)
     login_types = {'L': 'LDAP', 'M': 'MAP'}
     username = user.username
@@ -193,40 +193,49 @@ def is_latest():
         pass
 
 
-def login(request):
+def Login(request):
     """登录界面"""
-    if request.session.get('username'):
+    if not request.user.is_authenticated():
         return HttpResponseRedirect('/')
     if request.method == 'GET':
         return render_to_response('login.html')
     else:
         username = request.POST.get('username')
         password = request.POST.get('password')
-        user_filter = User.objects.filter(username=username)
-        if user_filter:
-            user = user_filter[0]
-            if PyCrypt.md5_crypt(password) == user.password:
-                request.session['user_id'] = user.id
-                user_filter.update(last_login=datetime.datetime.now())
-                if user.role == 'SU':
-                    request.session['role_id'] = 2
-                elif user.role == 'GA':
-                    request.session['role_id'] = 1
-                else:
-                    request.session['role_id'] = 0
-                response = HttpResponseRedirect('/', )
-                response.set_cookie('username', username, expires=604800)
-                response.set_cookie('seed', PyCrypt.md5_crypt(password), expires=604800)
-                return response
-            else:
-                error = '密码错误，请重新输入。'
+        if username and password:
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    # c = {}
+                    # c.update(csrf(request))
+                    # request.session['csrf_token'] = str(c.get('csrf_token'))
+        # user_filter = User.objects.filter(username=username)
+        # if user_filter:
+        #     user = user_filter[0]
+        #     if PyCrypt.md5_crypt(password) == user.password:
+        #         request.session['user_id'] = user.id
+        #         user_filter.update(last_login=datetime.datetime.now())
+                    if user.role == 'SU':
+                        request.session['role_id'] = 2
+                    elif user.role == 'GA':
+                        request.session['role_id'] = 1
+                    else:
+                        request.session['role_id'] = 0
+                    return HttpResponseRedirect('/', )
+                # response.set_cookie('username', username, expires=604800)
+                # response.set_cookie('seed', PyCrypt.md5_crypt(password), expires=604800)
+                # return response
+            # else:
+            #     error = '密码错误，请重新输入。'
         else:
-            error = '用户不存在。'
+            error = '用户名或密码错误'
     return render_to_response('login.html', {'error': error})
 
 
-def logout(request):
+def Logout(request):
     request.session.delete()
+    logout(request)
     return HttpResponseRedirect('/login/')
 
 #

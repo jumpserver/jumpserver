@@ -492,7 +492,7 @@ def require_role(role='user'):
     def _deco(func):
         def __deco(request, *args, **kwargs):
             if role == 'user':
-                if not request.session.get('user_id'):
+                if not request.user.is_authenticated():
                     return HttpResponseRedirect('/login/')
             elif role == 'admin':
                 if request.session.get('role_id', 0) < 1:
@@ -522,13 +522,14 @@ def get_session_user_dept(request):
     get department of the user in session
     获取session中用户的部门
     """
-    user_id = request.session.get('user_id', 0)
-    print '#' * 20
-    print user_id
-    user = User.objects.filter(id=user_id)
-    if user:
-        user = user[0]
-        return user, None
+    # user_id = request.session.get('user_id', 0)
+    # print '#' * 20
+    # print user_id
+    # user = User.objects.filter(id=user_id)
+    # if user:
+    #     user = user[0]
+    #     return user, None
+    return request.user, None
 
 
 @require_role
@@ -537,18 +538,18 @@ def get_session_user_info(request):
     get the user info of the user in session, for example id, username etc.
     获取用户的信息
     """
-    user_id = request.session.get('user_id', 0)
-    user = get_object(User, id=user_id)
-    if user:
-        return [user.id, user.username, user]
-
+    # user_id = request.session.get('user_id', 0)
+    # user = get_object(User, id=user_id)
+    # if user:
+    #     return [user.id, user.username, user]
+    return [request.user.id, request.user.username, request.user]
 
 def get_user_dept(request):
     """
     get the user dept id
     获取用户的部门id
     """
-    user_id = request.session.get('user_id')
+    user_id = request.user.id
     if user_id:
         user_dept = User.objects.get(id=user_id).dept
         return user_dept.id

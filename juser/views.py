@@ -394,7 +394,7 @@ def user_list(request):
 def user_detail(request):
     header_title, path1, path2 = '用户详情', '用户管理', '用户详情'
     if request.session.get('role_id') == 0:
-        user_id = request.session.get('user_id')
+        user_id = request.user.id
     else:
         user_id = request.GET.get('id', '')
     #     if request.session.get('role_id') == 1:
@@ -617,7 +617,10 @@ def user_edit_adm(request):
 
 
 def profile(request):
-    user_id = request.session.get('user_id')
+    a = request.user.id
+    a = request.user.groups
+
+    user_id = request.user.id
     if not user_id:
         return HttpResponseRedirect('/')
     user = User.objects.get(id=user_id)
@@ -626,7 +629,7 @@ def profile(request):
 
 def change_info(request):
     header_title, path1, path2 = '修改信息', '用户管理', '修改个人信息'
-    user_id = request.session.get('user_id')
+    user_id = request.user.id
     user = get_object(User, id=user_id)
     error = ''
     if not user:
@@ -673,7 +676,7 @@ def down_key(request):
         user_id = request.GET.get('id')
 
     if is_role_request(request, 'user'):
-        user_id = request.session.get('user_id')
+        user_id = request.user.id
 
     if user_id:
         user = get_object(User, id=user_id)
