@@ -72,38 +72,24 @@
                         </div>
                         <div class="form-group">
                             <div class="input-group">
-                                <select name="single" data-placeholder="用户名" class="chosen-select" multiple style="width:200px;" tabindex="2">
-                                    <option value="用户">用户名</option>
-                                    <option value="Bolivia, Plurinational State of">hongweiguang</option>
-                                    <option value="Bonaire, Sint Eustatius and Saba">wangyong</option>
-                                    <option value="Bosnia and Herzegovina">hehe</option>
-                                    <option value="Botswana">wangyong</option>
-                                    <option value="Bouvet Island">wangyongd</option>
-                                    <option value="Romania">Romania</option>
-                                    <option value="Zambia">Zambia</option>
-                                    <option value="Zimbabwe">Zimbabwe</option>
+                                <select name="username" data-placeholder="用户名" class="chosen-select" multiple style="width:200px;" tabindex="2">
+                                    {% for username in username_all %}
+                                        <option value="{{ username }}"{% if username in username_list %}selected{% endif %}>{{ username }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>
                         <div class="form-group">
                             <div class="input-group">
-                                <select name="multi" data-placeholder="主机" class="chosen-select" multiple style="width:200px;" tabindex="4">
-                                    <option value="主机">主机</option>
-                                    <option value="United States">172.16.1.1</option>
-                                    <option value="Afghanistan">172.16.1.1</option>
-                                    <option value="Aland Islands">172.16.1.1</option>
-                                    <option value="Albania">172.16.1.1</option>
-                                    <option value="Algeria">172.16.1.1</option>
-                                    <option value="American Samoa">172.16.1.1</option>
-                                    <option value="Andorra">172.16.1.1</option>
-                                    <option value="Angola">172.16.1.1</option>
-                                    <option value="Anguilla">172.16.1.1</option>
-                                    <option value="Antarctica">172.16.1.1</option>
+                                <select name="host" data-placeholder="主机" class="chosen-select" multiple style="width:200px;" tabindex="4">
+                                    {% for ip in ip_all %}
+                                    <option value="{{ ip }}" {% if ip in host_list %}selected{% endif %}>{{ ip }}</option>
+                                    {% endfor %}
                                 </select>
                             </div>
                         </div>
                         <div class="form-group">
-                            <input id="cmd" name="cmd" placeholder="命令" type="text" class="form-control" style="width: 200px;">
+                            <input id="cmd" name="cmd" placeholder="命令" type="text" class="form-control" value="{{ cmd }}" style="width: 200px;">
                         </div>
                         </div>
                         <button id='search_btn' type="submit" class="btn btn-sm btn-primary">

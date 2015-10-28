@@ -43,23 +43,38 @@ from jlog.log_api import renderTemplate
 def log_list(request, offset):
     """ 显示日志 """
     header_title, path1, path2 = u'查看日志', u'查看日志', u'在线用户'
-    keyword = request.GET.get('keyword', None)
     # posts = get_user_log(get_user_info(request, offset))
-
+    date_seven_day = request.GET.get('start', '')
+    date_now_str = request.GET.get('end', '')
+    username_list = request.GET.getlist('username', [])
+    host_list = request.GET.getlist('host', [])
+    cmd = request.GET.get('cmd', '')
+    print date_seven_day, date_now_str
     if offset == 'online':
         web_socket_host = CONF.get('websocket', 'web_socket_host')
         posts = Log.objects.filter(is_finished=False).order_by('-start_time')
     else:
         posts = Log.objects.filter(is_finished=True).order_by('-start_time')
-        if keyword is not None:
-            date_seven_day = request.GET.get('start')
-            date_now_str = request.GET.get('end')
-            datetime_start = datetime.datetime.strptime(date_seven_day, '%m/%d/%Y')
-            datetime_end = datetime.datetime.strptime(date_now_str, '%m/%d/%Y')
-            print datetime_start, datetime_end
-            posts = posts.filter(start_time__gte=datetime_start).filter(start_time__lte=datetime_end).filter(
-                                Q(user__icontains=keyword) | Q(host__icontains=keyword) | Q(remote_ip__icontains=keyword))
+        username_all = set([log.user for log in Log.objects.all()])
+        ip_all = set([log.host for log in Log.objects.all()])
 
+        if date_seven_day and date_now_str:
+            datetime_start = datetime.datetime.strptime(date_seven_day, '%m/%d/%Y %H:%M:%S')
+            datetime_end = datetime.datetime.strptime(date_now_str, '%m/%d/%Y %H:%M:%S')
+            posts = posts.filter(start_time__gte=datetime_start).filter(start_time__lte=datetime_end)
+
+        if username_list:
+            print username_list
+            posts = posts.filter(user__in=username_list)
+
+        if host_list:
+            posts = posts.filter(host__in=host_list)
+        print posts
+        if cmd:
+            log_id_list = set([log.log_id for log in TtyLog.objects.filter(cmd__contains=cmd)])
+            print [post.id for post in posts]
+            posts = posts.filter(id__in=log_id_list)
+            print posts
         else:
             date_now = datetime.datetime.now()
             date_now_str = date_now.strftime('%m/%d/%Y')
@@ -92,14 +107,18 @@ def log_list(request, offset):
 def log_history(request):
     """ 命令历史记录 """
     log_id = request.GET.get('id', 0)
-    tty_logs = TtyLog.objects.filter(log_id=int(log_id)).order_by('datetime')
-    if tty_logs:
-        content = ''
-        for tty_log in tty_logs:
-            content += '%s: %s\n' % (tty_log.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), tty_log.cmd)
-        return HttpResponse(content)
-    else:
-        return HttpResponse('无日志记录, 请查看日志处理脚本是否开启!')
+    log = Log.objects.filter(id=log_id)
+    if log:
+        log = log[0]
+        tty_logs = log.ttylog_set.all()
+
+        if tty_logs:
+            content = ''
+            for tty_log in tty_logs:
+                content += '%s: %s\n' % (tty_log.datetime.strftime('%Y-%m-%d %H:%M:%S'), tty_log.cmd)
+            return HttpResponse(content)
+
+    return HttpResponse('无日志记录, 请查看日志处理脚本是否开启!')
 
 
 def log_record(request):

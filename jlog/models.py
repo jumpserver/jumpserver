@@ -22,10 +22,7 @@ class Alert(models.Model):
 
 
 class TtyLog(models.Model):
-    log_id = models.IntegerField(max_length=50)
-    username = models.CharField(max_length=100)
-    host = models.CharField(max_length=100)
-    remote_ip = models.CharField(max_length=100)
+    log = models.ForeignKey(Log)
     datetime = models.DateTimeField()
     cmd = models.CharField(max_length=200)
 

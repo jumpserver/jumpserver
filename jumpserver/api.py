@@ -260,7 +260,7 @@ class Jtty(object):
 
                     if str(x) in ['\r', '\n', '\r\n']:
                         input_r = remove_control_char(input_r)
-                        TtyLog(log_id=log.id, username=self.username, host=self.ip, remote_ip=ip_list, datetime=datetime.datetime.now(), cmd=input_r).save()
+                        TtyLog(log=log, datetime=datetime.datetime.now(), cmd=input_r).save()
                         input_r = ''
                         input_mode = False
 
