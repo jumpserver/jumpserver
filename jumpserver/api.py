@@ -20,7 +20,7 @@ from django.template import RequestContext
 from juser.models import User, UserGroup
 from jasset.models import Asset, AssetGroup
 from jasset.models import AssetAlias
-from jlog.models import Log
+from jlog.models import Log, TtyLog
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -202,7 +202,6 @@ class Jtty(object):
         try:
             log_file_f = open(log_file_path + '.log', 'a')
             log_time_f = open(log_file_path + '.time', 'a')
-            log_res_f = open(log_file_path + '.his', 'a')
         except IOError:
             raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 
@@ -210,14 +209,14 @@ class Jtty(object):
                   log_path=log_file_path, start_time=datetime.datetime.now(), pid=pid)
         log_file_f.write('Start time is %s\n' % datetime.datetime.now())
         log.save()
-        return log_file_f, log_time_f, log_res_f, log
+        return log_file_f, log_time_f, ip_list, log
 
     def posix_shell(self):
         """
         Use paramiko channel connect server interactive.
         使用paramiko模块的channel，连接后端，进入交互式
         """
-        log_file_f, log_time_f, log_res_f, log = self.log_record()
+        log_file_f, log_time_f, ip_list, log = self.log_record()
         old_tty = termios.tcgetattr(sys.stdin)
         pre_timestamp = time.time()
         input_r = ''
@@ -261,8 +260,7 @@ class Jtty(object):
 
                     if str(x) in ['\r', '\n', '\r\n']:
                         input_r = remove_control_char(input_r)
-                        log_res_f.write('%s: %s\n' % (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), input_r))
-                        log_res_f.flush()
+                        TtyLog(log_id=log.id, username=self.username, host=self.ip, remote_ip=ip_list, datetime=datetime.datetime.now(), cmd=input_r).save()
                         input_r = ''
                         input_mode = False
 

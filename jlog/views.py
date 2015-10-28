@@ -92,17 +92,14 @@ def log_list(request, offset):
 def log_history(request):
     """ 命令历史记录 """
     log_id = request.GET.get('id', 0)
-    log = Log.objects.filter(id=int(log_id))
-    if log:
-        log = log[0]
-        log_his = "%s.his" % log.log_path
-        print log_his
-        if os.path.isfile(log_his):
-            f = open(log_his)
-            content = f.read()
-            return HttpResponse(content)
-        else:
-            return HttpResponse('无日志记录, 请查看日志处理脚本是否开启!')
+    tty_logs = TtyLog.objects.filter(log_id=int(log_id)).order_by('datetime')
+    if tty_logs:
+        content = ''
+        for tty_log in tty_logs:
+            content += '%s: %s\n' % (tty_log.datetime.now().strftime('%Y-%m-%d %H:%M:%S'), tty_log.cmd)
+        return HttpResponse(content)
+    else:
+        return HttpResponse('无日志记录, 请查看日志处理脚本是否开启!')
 
 
 def log_record(request):
@@ -118,6 +115,10 @@ def log_record(request):
         else:
             return HttpResponse('无日志记录, 请查看日志处理脚本是否开启!')
 
+
+def log_search(request):
+    print request.GET
+    return render_to_response('jlog/log_filter.html', locals())
 
 # def log_search(request):
 #     """ 日志搜索 """

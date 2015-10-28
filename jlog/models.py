@@ -19,3 +19,13 @@ class Alert(models.Model):
     msg = models.CharField(max_length=20)
     time = models.DateTimeField(null=True)
     is_finished = models.BigIntegerField(default=False)
+
+
+class TtyLog(models.Model):
+    log_id = models.IntegerField(max_length=50)
+    username = models.CharField(max_length=100)
+    host = models.CharField(max_length=100)
+    remote_ip = models.CharField(max_length=100)
+    datetime = models.DateTimeField()
+    cmd = models.CharField(max_length=200)
+
