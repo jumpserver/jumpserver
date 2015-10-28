@@ -14,7 +14,7 @@
     name: group_admin
     password: pbkdf2_sha256$20000$ttObUWd15q10$NJoyZf2OZz9oiw2g4j2TkTh9zGgyVDRFdUkhn8X0nB0=
     email: group_admin@jumpserver.org
-    role: DA
+    role: GA
     is_active: 1
 - model: juser.usergroup
   pk: 1
