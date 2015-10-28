@@ -14,14 +14,11 @@ from juser.user_api import *
 
 
 def chg_role(request):
-    # TODO: disable it! by liuzheng
     role = {'SU': 2, 'GA': 1, 'CU': 0}
-    user, dept = get_session_user_dept(request)
-    # TODO: liuzheng's work
     if request.session['role_id'] > 0:
         request.session['role_id'] = 0
     elif request.session['role_id'] == 0:
-        request.session['role_id'] = role.get(user.role, 0)
+        request.session['role_id'] = role.get(request.user.role, 0)
     return HttpResponseRedirect('/')
 
 

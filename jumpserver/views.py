@@ -217,12 +217,12 @@ def Login(request):
         #     if PyCrypt.md5_crypt(password) == user.password:
         #         request.session['user_id'] = user.id
         #         user_filter.update(last_login=datetime.datetime.now())
-        #             if user.role == 'SU':
-        #                 request.session['role_id'] = 2
-        #             elif user.role == 'GA':
-        #                 request.session['role_id'] = 1
-        #             else:
-        #                 request.session['role_id'] = 0
+                    if user.role == 'SU':
+                        request.session['role_id'] = 2
+                    elif user.role == 'GA':
+                        request.session['role_id'] = 1
+                    else:
+                        request.session['role_id'] = 0
                     return HttpResponseRedirect('/', )
                 # response.set_cookie('username', username, expires=604800)
                 # response.set_cookie('seed', PyCrypt.md5_crypt(password), expires=604800)

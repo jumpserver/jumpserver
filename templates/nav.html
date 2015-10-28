@@ -1,4 +1,4 @@
-{% ifequal session_role_id 2 %}
+{% if request.session.role_id == 2 %}
 <nav class="navbar-default navbar-static-side" role="navigation">
     <div class="sidebar-collapse">
         <ul class="nav" id="side-menu">
@@ -51,8 +51,8 @@
 
     </div>
 </nav>
-{% endifequal %}
-{% ifequal session_role_id 1 %}
+{% endif %}
+{% if request.session.role_id == 1 %}
 <nav class="navbar-default navbar-static-side" role="navigation">
     <div class="sidebar-collapse">
         <ul class="nav" id="side-menu">
@@ -103,9 +103,9 @@
         </ul>
     </div>
 </nav>
-{% endifequal %}
+{% endif %}
 
-{% ifequal session_role_id 0 %}
+{% if request.session.role_id == 0 %}
 <nav class="navbar-default navbar-static-side" role="navigation">
     <div class="sidebar-collapse">
         <ul class="nav" id="side-menu">
@@ -144,4 +144,4 @@
         </ul>
     </div>
 </nav>
-{% endifequal %}
+{% endif %}
