@@ -5,39 +5,10 @@ from django.shortcuts import render_to_response
 
 from jumpserver.api import *
 from django.http import HttpResponseNotFound
-
-CONF = ConfigParser()
-CONF.read('%s/jumpserver.conf' % BASE_DIR)
-from jlog.models import Log
 from jlog.log_api import renderTemplate
 
-# def get_user_info(request, offset):
-#     """ 获取用户信息及环境 """
-#     env_dic = {'online': 0, 'offline': 1}
-#     env = env_dic[offset]
-#     keyword = request.GET.get('keyword', '')
-#     user_info = get_session_user_info(request)
-#     user_id, username = user_info[0:2]
-#     dept_id, dept_name = user_info[3:5]
-#     ret = [request, keyword, env, username, dept_name]
-#
-#     return ret
-#
-#
-# def get_user_log(ret_list):
-#     """ 获取不同类型用户日志记录 """
-#     request, keyword, env, username, dept_name = ret_list
-#     post_all = Log.objects.filter(is_finished=env).order_by('-start_time')
-#     post_keyword_all = Log.objects.filter(Q(user__contains=keyword) |
-#                                           Q(host__contains=keyword)) \
-#         .filter(is_finished=env).order_by('-start_time')
-#
-#     if keyword:
-#         posts = post_keyword_all
-#     else:
-#         posts = post_all
-#
-#     return posts
+from models import Log
+from jumpserver.settings import web_socket_host
 
 
 def log_list(request, offset):
@@ -51,7 +22,6 @@ def log_list(request, offset):
     cmd = request.GET.get('cmd', '')
     print date_seven_day, date_now_str
     if offset == 'online':
-        web_socket_host = CONF.get('websocket', 'web_socket_host')
         posts = Log.objects.filter(is_finished=False).order_by('-start_time')
     else:
         posts = Log.objects.filter(is_finished=True).order_by('-start_time')
@@ -79,6 +49,7 @@ def log_list(request, offset):
             date_now = datetime.datetime.now()
             date_now_str = date_now.strftime('%m/%d/%Y')
             date_seven_day = (date_now + datetime.timedelta(days=-7)).strftime('%m/%d/%Y')
+
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     return render_to_response('jlog/log_%s.html' % offset, locals(), context_instance=RequestContext(request))

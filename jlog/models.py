@@ -7,7 +7,7 @@ class Log(models.Model):
     remote_ip = models.CharField(max_length=100)
     log_path = models.CharField(max_length=100)
     start_time = models.DateTimeField(null=True)
-    pid = models.IntegerField(max_length=10)
+    pid = models.IntegerField()
     is_finished = models.BooleanField(default=False)
     end_time = models.DateTimeField(null=True)
 

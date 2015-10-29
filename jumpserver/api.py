@@ -1,8 +1,6 @@
 # coding: utf-8
 
-import os, sys, time
-from ConfigParser import ConfigParser
-import getpass
+import os, sys, time, re
 from Crypto.Cipher import AES
 import crypt
 from binascii import b2a_hex, a2b_hex
@@ -11,15 +9,15 @@ import datetime
 import random
 import subprocess
 import paramiko
-import struct, fcntl, signal,socket, select, fnmatch
-import re
+import struct, fcntl, signal, socket, select, fnmatch
+from settings import JLOG_FILE, KEY, URL, log_dir, log_level
 
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
 from django.template import RequestContext
 from juser.models import User, UserGroup
 from jasset.models import Asset, AssetGroup
-from jasset.models import AssetAlias
+# from jlog.models import Log
 from jlog.models import Log, TtyLog
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.http import HttpResponseRedirect
@@ -35,22 +33,6 @@ except ImportError:
     print '\033[1;31m仅支持类Unix系统 Only unix like supported.\033[0m'
     time.sleep(3)
     sys.exit()
-
-
-BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-CONF = ConfigParser()
-CONF.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
-LOG_DIR = os.path.join(BASE_DIR, 'logs')
-JLOG_FILE = os.path.join(LOG_DIR, 'jumpserver.log')
-SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys')
-# SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
-KEY = CONF.get('base', 'key')
-LOGIN_NAME = getpass.getuser()
-# LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
-URL = CONF.get('base', 'url')
-MAIL_ENABLE = CONF.get('mail', 'mail_enable')
-MAIL_FROM = CONF.get('mail', 'email_host_user')
-log_dir = os.path.join(BASE_DIR, 'logs')
 
 
 def set_log(level):
@@ -78,7 +60,7 @@ def page_list_return(total, current=1):
     min_page = current - 2 if current - 4 > 0 else 1
     max_page = min_page + 4 if min_page + 4 < total else total
 
-    return range(min_page, max_page+1)
+    return range(min_page, max_page + 1)
 
 
 def pages(post_objects, request):
@@ -371,7 +353,7 @@ class PyCrypt(object):
         symbol = '!@$%^&*()_'
         salt_list = []
         if especial:
-            for i in range(length-4):
+            for i in range(length - 4):
                 salt_list.append(random.choice(salt_key))
             for i in range(4):
                 salt_list.append(random.choice(symbol))
@@ -460,19 +442,24 @@ def require_role(role='user'):
     decorator for require user role in ["super", "admin", "user"]
     要求用户是某种角色 ["super", "admin", "user"]的装饰器
     """
+
     def _deco(func):
         def __deco(request, *args, **kwargs):
             if role == 'user':
-                if not request.session.get('user_id'):
+                if not request.user.is_authenticated():
                     return HttpResponseRedirect('/login/')
             elif role == 'admin':
-                if request.session.get('role_id', 0) < 1:
+                # if request.session.get('role_id', 0) < 1:
+                if request.user.role == 'CU':
                     return HttpResponseRedirect('/')
             elif role == 'super':
-                if request.session.get('role_id', 0) < 2:
+                # if request.session.get('role_id', 0) < 2:
+                if request.user.role in ['CU', 'GA']:
                     return HttpResponseRedirect('/')
             return func(request, *args, **kwargs)
+
         return __deco
+
     return _deco
 
 
@@ -481,8 +468,8 @@ def is_role_request(request, role='user'):
     require this request of user is right
     要求请求角色正确
     """
-    role_all = {'user': 0, 'admin': 1, 'super': 2}
-    if request.session.get('role_id') == role_all.get(role, 0):
+    role_all = {'user': 'CU', 'admin': 'GA', 'super': 'SU'}
+    if request.user.role == role_all.get(role, 'CU'):
         return True
     else:
         return False
@@ -493,13 +480,14 @@ def get_session_user_dept(request):
     get department of the user in session
     获取session中用户的部门
     """
-    user_id = request.session.get('user_id', 0)
-    print '#' * 20
-    print user_id
-    user = User.objects.filter(id=user_id)
-    if user:
-        user = user[0]
-        return user, None
+    # user_id = request.session.get('user_id', 0)
+    # print '#' * 20
+    # print user_id
+    # user = User.objects.filter(id=user_id)
+    # if user:
+    #     user = user[0]
+    #     return user, None
+    return request.user, None
 
 
 @require_role
@@ -508,18 +496,18 @@ def get_session_user_info(request):
     get the user info of the user in session, for example id, username etc.
     获取用户的信息
     """
-    user_id = request.session.get('user_id', 0)
-    user = get_object(User, id=user_id)
-    if user:
-        return [user.id, user.username, user]
-
+    # user_id = request.session.get('user_id', 0)
+    # user = get_object(User, id=user_id)
+    # if user:
+    #     return [user.id, user.username, user]
+    return [request.user.id, request.user.username, request.user]
 
 def get_user_dept(request):
     """
     get the user dept id
     获取用户的部门id
     """
-    user_id = request.session.get('user_id')
+    user_id = request.user.id
     if user_id:
         user_dept = User.objects.get(id=user_id).dept
         return user_dept.id
@@ -555,7 +543,7 @@ def validate(request, user_group=None, user=None, asset_group=None, asset=None, 
     if edept:
         if dept.id != int(edept[0]):
             return False
-        
+
     if user_group:
         dept_user_groups = dept.usergroup_set.all()
         user_group_ids = []
@@ -672,6 +660,5 @@ def my_render(template, data, request):
 
 
 CRYPTOR = PyCrypt(KEY)
-
-log_level = CONF.get('base', 'log')
 logger = set_log(log_level)
+

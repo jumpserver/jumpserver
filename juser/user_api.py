@@ -5,7 +5,7 @@ from subprocess import call
 
 from juser.models import AdminGroup
 from jumpserver.api import *
-
+from  jumpserver.settings import BASE_DIR
 
 def group_add_user(group, user_id=None, username=None):
     """
@@ -60,6 +60,7 @@ def db_add_user(**kwargs):
     admin_groups = kwargs.pop('admin_groups')
     role = kwargs.get('role', 'CU')
     user = User(**kwargs)
+    user.set_password(kwargs.get('password'))
     user.save()
     if groups_post:
         group_select = []
@@ -84,10 +85,10 @@ def db_update_user(**kwargs):
     groups_post = kwargs.pop('groups')
     admin_groups_post = kwargs.pop('admin_groups')
     user_id = kwargs.pop('user_id')
-    user = User.objects.filter(id=user_id)
+    user = User.objects.get(id=user_id)
     if user:
         user.update(**kwargs)
-        user = user[0]
+        user.set_password(kwargs.pop('password'))
         user.save()
     else:
         return None

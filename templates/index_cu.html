@@ -72,7 +72,7 @@
         <div class="col-lg-4">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <span class="label label-primary"><b>{{ user.name }}</b></span>
+                    <span class="label label-primary"><b>{{ user.username }}</b></span>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -109,7 +109,7 @@
                                 </tr>
                                 <tr>
                                     <td class="text-navy">角色</td>
-                                    <td>{{ user.id | get_role }}</td>
+                                    <td>{{ user.role }}</td>
                                 </tr>
                                 <tr>
                                     <td class="text-navy">Email</td>
