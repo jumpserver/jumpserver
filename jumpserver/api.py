@@ -10,7 +10,7 @@ import random
 import subprocess
 import paramiko
 import struct, fcntl, signal, socket, select, fnmatch
-from settings import JLOG_FILE, KEY, URL, log_dir, log_level
+from settings import *
 
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
