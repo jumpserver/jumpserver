@@ -97,6 +97,7 @@ class Command(MyInventory):
                      )
         
         self.results = hoc.run()
+        return self.stdout
 
 
     @property
@@ -163,6 +164,60 @@ class Tasks(Command):
         super(Tasks, self).__init__(*args, **kwargs)
 
 
+    def __run(self, module_args, module_name="command", timeout=5, forks=10):
+        """
+        run command from andible ad-hoc.
+        command  : 必须是一个需要执行的命令字符串， 比如 
+                 'uname -a'
+        """
+        hoc = Runner(module_name=module_name,
+                     module_args=module_args,
+                     timeout=timeout,
+                     inventory=self.inventory,
+                     subset='my_group',
+                     forks=forks
+                     )
+        
+        self.results = hoc.run()
+
+
+    def push_key(self, user, key_path):
+        """
+        push the ssh authorized key to target.
+        """
+        module_args = 'user="%s" key="{{ lookup("file", "%s") }}"' % (user, key_path)
+        self.__run(module_args, "authorized_key")
+
+        msg = {}
+        for result in ["contacted", "dark"]:
+            all = self.results.get(result)
+            for key, value in all.iteritems():
+                if value.get("msg"):
+                    msg[key] = value.get("msg")
+
+        if not msg:
+            return {"status": "ok"}
+        else:
+            return {"status": "failed","msg": msg}
+
+
+    def add_user(self, user):
+        """
+        add a host user.
+        """
+        pass
+
+
+    def del_user(self, user):
+        """
+        delete a host user.
+        """
+        pass
+
+        
+        
+
+
 class MyPlaybook(MyInventory):
     """
     this is my playbook object for execute playbook.
@@ -188,13 +243,9 @@ class App(MyPlaybook):
         
 
 if __name__ == "__main__":
-   resource =  [{"hostname": "127.0.0.1",      "port": "22", "username": "root", "password": "xxx"},
-                {"hostname": "192.168.10.128", "port": "22", "username": "root", "password": "xxx"}] 
-   command = Command(resource)
-   command.run("uname -a", "copy")
-   print command.stdout
-   print command.stderr
-   print command.dark
+   resource =  [ {"hostname": "192.168.10.128", "port": "22", "username": "root", "password": "xxx"}]
+   task = Tasks(resource)
+   print task.push_key('root', '/root/.ssh/id_rsa.pub')
 
 
 
