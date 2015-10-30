@@ -195,10 +195,7 @@ class Tasks(Command):
                 if value.get("msg"):
                     msg[key] = value.get("msg")
 
-        if not msg:
-            return {"status": "ok"}
-        else:
-            return {"status": "failed","msg": msg}
+        return {"status": "ok"} if msg else {"status": "failed","msg": msg}
 
 
     def add_user(self, user):
