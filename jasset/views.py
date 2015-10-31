@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404
 
 from jasset.asset_api import *
 from jumpserver.api import *
+from jasset.forms import AssetForm
 
 
 @require_role('admin')
@@ -85,6 +86,7 @@ def asset_add(request):
     """
     header_title, path1, path2 = u'添加资产', u'资产管理', u'添加资产'
     asset_group_all = AssetGroup.objects.all()
+    af = AssetForm()
     if request.method == 'POST':
         ip = request.POST.get('ip')
         port = request.POST.get('port')
