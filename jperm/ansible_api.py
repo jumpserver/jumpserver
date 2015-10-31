@@ -7,6 +7,14 @@ from ansible.inventory         import Inventory
 from ansible.runner            import Runner
 from ansible.playbook          import PlayBook
 
+from ansible                   import callbacks 
+from ansible                   import utils 
+from passlib.hash              import sha512_crypt
+
+import os.path
+JPERM_DIR = os.path.dirname(os.path.abspath(__file__))
+ANSIBLE_DIR = os.path.join(JPERM_DIR, 'playbooks')
+
 
 class AnsibleError(StandardError):
     """
@@ -38,21 +46,28 @@ class MyInventory(object):
     def __init__(self, resource):
         """
         resource :
-                 必须是一个字典列表，比如
-                 [{"hostname": "10.10.10.10", "port": "22", 
-                   "username": "test", "password": "mypass"}, ...] 
+                 resource的数据格式是一个列表字典，比如
+                 {
+                     "group1": [{"hostname": "10.10.10.10", "port": "22", 
+                                "username": "test", "password": "mypass"}, ...],
+                     "group2": [{"hostname": "10.10.10.10", "port": "22", 
+                                "username": "test", "password": "mypass"}, ...] 
+                 }
+                 如果你只传入1个列表，这默认该列表内的所有主机属于my_group组,比如
+                     [{"hostname": "10.10.10.10", "port": "22", 
+                       "username": "test", "password": "mypass"}, ...]
+                 
         """
         self.resource = resource
-        self._gen_inventory()
+        self.inventory = Inventory()
+        self.gen_inventory()
 
-
-    def _gen_inventory(self):
+    def add_group(self, hosts, groupname):
         """
-        add hosts to inventory.
+        add hosts to a group
         """
-        my_group = Group(name='my_group')
-
-        for host in self.resource:
+        my_group = Group(name=groupname)
+        for host in hosts:
             hostname = host.get("hostname")
             hostport = host.get("hostport")
             username = host.get("username")
@@ -64,11 +79,17 @@ class MyInventory(object):
             my_host.set_variable('ansible_ssh_pass', password)
             my_group.add_host(my_host)
 
-        my_inventory = Inventory()
-        my_inventory.add_group(my_group)
-        my_inventory.subset('my_group')
+        self.inventory.add_group(my_group)
 
-        self.inventory = my_inventory
+    def gen_inventory(self):
+        """
+        add hosts to inventory.
+        """
+        if isinstance(self.resource, list):
+            self.add_group(self.resource, 'my_group')
+        elif isinstance(self.resource, dict):
+            for groupname, hosts in self.resource.iteritems():
+                self.add_group(hosts, groupname)
 
 
 class Command(MyInventory):
@@ -77,7 +98,6 @@ class Command(MyInventory):
     """
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
-   
 
     def run(self, command, module_name="command", timeout=5, forks=10):
         """
@@ -99,14 +119,12 @@ class Command(MyInventory):
         self.results = hoc.run()
         return self.stdout
 
-
     @property
     def raw_results(self):
         """
         get the ansible raw results.
         """
         return self.results
-
 
     @property
     def exec_time(self):
@@ -121,7 +139,6 @@ class Command(MyInventory):
                     "end"  : value.get("end"),
                     "delta": value.get("delta"),}
         return result
-            
 
     @property
     def stdout(self):
@@ -133,7 +150,6 @@ class Command(MyInventory):
         for key, value in all.iteritems():
             result[key] =  value.get("stdout")
         return result
-    
 
     @property
     def stderr(self):
@@ -163,7 +179,6 @@ class Tasks(Command):
     def __init__(self, *args, **kwargs):
         super(Tasks, self).__init__(*args, **kwargs)
 
-
     def __run(self, module_args, module_name="command", timeout=5, forks=10):
         """
         run command from andible ad-hoc.
@@ -180,6 +195,18 @@ class Tasks(Command):
         
         self.results = hoc.run()
 
+    @property
+    def msg(self):
+        """
+        get the contacted and dark msg
+        """
+        msg = {}
+        for result in ["contacted", "dark"]:
+            all = self.results.get(result)
+            for key, value in all.iteritems():
+                if value.get("msg"):
+                    msg[key] = value.get("msg")
+        return msg
 
     def push_key(self, user, key_path):
         """
@@ -188,32 +215,60 @@ class Tasks(Command):
         module_args = 'user="%s" key="{{ lookup("file", "%s") }}"' % (user, key_path)
         self.__run(module_args, "authorized_key")
 
-        msg = {}
-        for result in ["contacted", "dark"]:
-            all = self.results.get(result)
-            for key, value in all.iteritems():
-                if value.get("msg"):
-                    msg[key] = value.get("msg")
+        return {"status": "failed","msg": self.msg} if self.msg else {"status": "ok"}
 
-        return {"status": "ok"} if msg else {"status": "failed","msg": msg}
-
-
-    def add_user(self, user):
+    def add_user(self, username, password):
         """
         add a host user.
         """
-        pass
+        encrypt_pass = sha512_crypt.encrypt(password) 
+        module_args = 'name=%s shell=/bin/bash password=%s' % (username, encrypt_pass)
+        self.__run(module_args, "user")
 
+        return {"status": "failed","msg": self.msg} if self.msg else {"status": "ok"}
 
-    def del_user(self, user):
+    def del_user(self, username):
         """
         delete a host user.
         """
-        pass
+        module_args = 'name=%s state=absent remove=yes move_home=yes force=yes' % (username)
+        self.__run(module_args, "user")
 
-        
+        return {"status": "failed","msg": self.msg} if self.msg else {"status": "ok"}
         
 
+
+
+class CustomAggregateStats(callbacks.AggregateStats):
+    """                                                                             
+    Holds stats about per-host activity during playbook runs.                       
+    """
+    def __init__(self):
+        super(CustomAggregateStats, self).__init__()
+        self.results = []
+ 
+    def compute(self, runner_results, setup=False, poll=False,
+                ignore_errors=False):
+        """                                                                         
+        Walk through all results and increment stats.                               
+        """
+        super(CustomAggregateStats, self).compute(runner_results, setup, poll,
+                                              ignore_errors)
+ 
+        self.results.append(runner_results)
+                       
+ 
+    def summarize(self, host):
+        """                                                                         
+        Return information about a particular host                                  
+        """
+        summarized_info = super(CustomAggregateStats, self).summarize(host)
+ 
+        # Adding the info I need                                                    
+        summarized_info['result'] = self.results
+ 
+        return summarized_info
+        
 
 class MyPlaybook(MyInventory):
     """
@@ -223,11 +278,32 @@ class MyPlaybook(MyInventory):
         super(MyPlaybook, self).__init__(*args, **kwargs)
 
 
-    def deploy(self):
+    def run(self, playbook_relational_path):
         """
-        use ansible playbook to deploy a application.
+        run ansible playbook,
+        only surport relational path.
         """
-        pass
+        stats = CustomAggregateStats() 
+        playbook_cb = callbacks.PlaybookCallbacks(verbose=utils.VERBOSITY) 
+        runner_cb = callbacks.PlaybookRunnerCallbacks(stats, verbose=utils.VERBOSITY)
+        playbook_path = os.path.join(ANSIBLE_DIR, playbook_relational_path)
+
+        pb = PlayBook(
+            playbook = playbook_path, 
+            stats = stats, 
+            callbacks = playbook_cb, 
+            runner_callbacks = runner_cb, 
+            inventory = self.inventory, 
+            check=True)
+
+        self.results = pb.run()
+
+    @property
+    def raw_results(self):
+        """
+        get the raw results after playbook run.
+        """
+        return self.results
 
 
 class App(MyPlaybook):
@@ -240,15 +316,13 @@ class App(MyPlaybook):
         
 
 if __name__ == "__main__":
-   resource =  [ {"hostname": "192.168.10.128", "port": "22", "username": "root", "password": "xxx"}]
-   task = Tasks(resource)
-   print task.push_key('root', '/root/.ssh/id_rsa.pub')
-
-
-
-
-
-
+   resource =  {"test": [{"hostname": "192.168.10.128", "port": "22", "username": "root", "password": "xxx"}]}
+   playbook = MyPlaybook(resource)
+   playbook.run('test.yml')
+   print playbook.raw_results
+#   print task.add_user('test', 'mypass')
+#   print task.del_user('test')
+#   print task.push_key('root', '/root/.ssh/id_rsa.pub')
 
 
 
