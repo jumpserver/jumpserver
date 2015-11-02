@@ -223,7 +223,7 @@ def Login(request):
                         request.session['role_id'] = 1
                     else:
                         request.session['role_id'] = 0
-                    return HttpResponseRedirect('/', )
+                    return HttpResponseRedirect(request.GET.get('next', '/'), )
                 # response.set_cookie('username', username, expires=604800)
                 # response.set_cookie('seed', PyCrypt.md5_crypt(password), expires=604800)
                 # return response
@@ -235,7 +235,6 @@ def Login(request):
 
 
 def Logout(request):
-    request.session.delete()
     logout(request)
     return HttpResponseRedirect('/login/')
 
