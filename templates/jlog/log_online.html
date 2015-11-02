@@ -97,83 +97,13 @@
 </div>
 
 
-<script src="http://{{ web_socket_host }}/socket.io/socket.io.js"></script>
+{#<script src="http://{{ web_socket_host }}/socket.io/socket.io.js"></script>#}
 <script>
-   $.fn.webSocket = function(opt){
-    var st = {};
-    st = $.extend(st,opt);
-    var message = {};
-    var $this = $(this);
-    var genUid = function(){
-        return new Date().getTime()+""+Math.floor(Math.random()*899+100);
-    };
-    var init = function(e){
-        var socket = io.connect('ws://'+globalConfig.SOCKET_HOST);
-        var node = $(e.target);
-        message.id = genUid();
-        message.filename = node.attr('filename');
-        var username = $('#username')[0].innerText;
-        var ip = $('#ip')[0].innerText;
-        BootstrapDialog.show({message:function(){
-            var option, exsit_message;
-            var escapeString = function (html){
-                var elem = document.createElement('div');
-                var txt = document.createTextNode(html);
-                elem.appendChild(txt);
-                return elem.innerHTML;
-            };
-            var tag = $('<div id="log" style="height: 500px;overflow: auto;background-color: rgba(0, 0, 0, 0);"></div>');
-
-            var username = "";
-            var seed = "";
-            document.cookie.split('; ').forEach(function(obj){
-                var info = obj.split('=');
-                if(info.length == 2 ){
-                    if(info[0] == 'username'){
-                        username = info[1];
-                    }else if(info[0] == 'seed'){
-                        seed = info[1];
-                    }
-                }
-            });
-
-            //告诉服务器端有用户登录
-            socket.emit('login', {userid:message.id, filename:message.filename,username:username,seed:seed});
-            socket.on('message',function(obj){
-                option = obj.option;
-                console.log(option+'so')
-                exsit_message = obj.content;
-                console.log(obj.content)
-                //去除log中的颜色控制字符
-                var regx =  /\x1B\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[m|K]/g;
-//                tag.append('<p>'+escapeString(obj.content.replace(regx,''))+'</p>');
-                if (option == 'new') {
-//                    tag.append('<p style="margin: 2px">' + escapeString(obj.content) + '</p>');
-                    tag.append('<p  style="margin: 2px">'+escapeString(obj.content.replace(regx,' '))+'</p>');
-                } else if (option == 'exist') {
-                    tag.append('<pre>' + exsit_message + '</pre>');
-                }
-                tag.animate({ scrollTop: tag[0].scrollHeight}, 1);
-            });
-            tag[0].style.color = "#00FF00";
-            return tag[0];
-        } ,
-            title:'Jumpserver实时监控 '+' 登录用户名: '+'<span class="text-info">'+username+'</span>'+' 登录主机: '+'<span class="text-info">'+ip,
-            onhide:function(){
-                socket.emit('disconnect');
-        }});
-    };
-        $this.on("click",function(e){
-            init(e);
-            return false;
-        });
-    };
-
-
-   globalConfig = {
-        SOCKET_HOST: "{{ web_socket_host }}"
-   };
-   $(".monitor").webSocket();
+   $(document).ready(function(){
+       $('.monitor').click(function(){
+           window.open('/jlog/monitor/', '监控', 'height=500, width=910, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');
+        })
+   });
 
    function log_search(){
         $.ajax({
@@ -209,7 +139,9 @@
         if(e.keyCode==13){
             log_search()
             }
-    });
+        });
+
+       $('')
    });
 
 

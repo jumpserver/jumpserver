@@ -110,6 +110,11 @@ def log_search(request):
     print request.GET
     return render_to_response('jlog/log_filter.html', locals())
 
+
+def log_monitor(request):
+    return my_render('jlog/log_monitor.html', locals(), request)
+
+
 # def log_search(request):
 #     """ 日志搜索 """
 #     offset = request.GET.get('env', '')
