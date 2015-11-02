@@ -11,9 +11,14 @@ from ansible                   import callbacks
 from ansible                   import utils 
 from passlib.hash              import sha512_crypt
 
+from utils                     import get_rand_pass
+
 import os.path
 JPERM_DIR = os.path.dirname(os.path.abspath(__file__))
 ANSIBLE_DIR = os.path.join(JPERM_DIR, 'playbooks')
+
+
+
 
 
 class AnsibleError(StandardError):
@@ -217,6 +222,15 @@ class Tasks(Command):
 
         return {"status": "failed","msg": self.msg} if self.msg else {"status": "ok"}
 
+    def del_key(self, user, key_path):
+        """
+        push the ssh authorized key to target.
+        """
+        module_args = 'user="%s" key="{{ lookup("file", "%s") }}" state="absent"' % (user, key_path)
+        self.__run(module_args, "authorized_key")
+
+        return {"status": "failed","msg": self.msg} if self.msg else {"status": "ok"}
+
     def add_user(self, username, password):
         """
         add a host user.
@@ -235,7 +249,31 @@ class Tasks(Command):
         self.__run(module_args, "user")
 
         return {"status": "failed","msg": self.msg} if self.msg else {"status": "ok"}
-        
+
+    def add_init_users(self):
+        """
+        add initail users: SA, DBA, DEV
+        """
+        results = {}
+        action = results["action_info"] = {}
+        users = {"SA": get_rand_pass(), "DBA": get_rand_pass(), "DEV": get_rand_pass()}
+        for user, password in users.iteritems():
+            ret = self.add_user(user, password)
+            action[user] = ret
+        results["user_info"] = users
+
+        return results
+            
+    def del_init_users(self):
+        """
+        delete initail users: SA, DBA, DEV
+        """
+        results = {}
+        action = results["action_info"] = {}
+        for user in ["SA", "DBA", "DEV"]:
+            ret = self.del_user(user)
+            action[user] = ret
+        return results
 
 
 
@@ -316,13 +354,28 @@ class App(MyPlaybook):
         
 
 if __name__ == "__main__":
-   resource =  {"test": [{"hostname": "192.168.10.128", "port": "22", "username": "root", "password": "xxx"}]}
-   playbook = MyPlaybook(resource)
-   playbook.run('test.yml')
-   print playbook.raw_results
+   resource =  [{"hostname": "192.168.10.128", "port": "22", "username": "root", "password": "yusky0902"}]
+#   playbook = MyPlaybook(resource)
+#   playbook.run('test.yml')
+#   print playbook.raw_results
+   command = Command(resource)
+   command.run("who")
+   print command.stdout
+
+
+#   task = Tasks(resource)
 #   print task.add_user('test', 'mypass')
 #   print task.del_user('test')
 #   print task.push_key('root', '/root/.ssh/id_rsa.pub')
+#   print task.del_key('root', '/root/.ssh/id_rsa.pub')
+
+
+#   task = Tasks(resource)
+#   print task.add_init_users()
+#   print task.del_init_users()
+
+
+
 
 
 
