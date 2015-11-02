@@ -354,7 +354,7 @@ class App(MyPlaybook):
         
 
 if __name__ == "__main__":
-   resource =  [{"hostname": "192.168.10.128", "port": "22", "username": "root", "password": "yusky0902"}]
+   resource =  [{"hostname": "192.168.10.128", "port": "22", "username": "root", "password": "xxx"}]
 #   playbook = MyPlaybook(resource)
 #   playbook.run('test.yml')
 #   print playbook.raw_results
