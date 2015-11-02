@@ -5,6 +5,7 @@
 # import random
 # from Crypto.PublicKey import RSA
 import uuid as uuid_r
+from django.contrib.auth.decorators import login_required
 
 from django.db.models import Q
 from django.template import RequestContext
@@ -212,6 +213,7 @@ def group_edit(request):
 #         return HttpResponseRedirect('/juser/group_list/')
 
 
+@login_required(login_url='/login')
 @require_role(role='super')
 def user_add(request):
     error = ''
