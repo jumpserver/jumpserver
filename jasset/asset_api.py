@@ -1,4 +1,6 @@
 # coding: utf-8
+import xlsxwriter
+
 from jumpserver.api import *
 
 
@@ -171,3 +173,62 @@ def db_asset_update(**kwargs):
 #     else:
 #         return httperror(request, '删除失败, 没有这个IDC!')
 
+
+SERVER_STATUS = {1: u"已安装系统", 2: u"未安装系统", 3: u"正在安装系统", 4: u"报废"}
+now = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M')
+file_name = 'cmdb_excel_' + now + '.xlsx'
+workbook = xlsxwriter.Workbook('static/excels/%s' % file_name)
+worksheet = workbook.add_worksheet('CMDB数据')
+worksheet.set_first_sheet()
+worksheet.set_column('A:Z', 15)
+
+
+def write_excel(hosts):
+    data = []
+    title = [u'主机名', u'IP', u'IDC', u'MAC', u'远控IP', u'CPU', u'内存', u'硬盘', u'操作系统', u'机柜位置',
+             u'资产编号', u'所属业务', u'机器状态', u'SN', u'运行服务', u'备注']
+    for host in hosts:
+        projects_list, services_list = [], []
+        for p in host.project.all():
+            projects_list.append(p.name)
+        for s in host.service.all():
+            print s.name, s.port
+            services_list.append(s.name + '-' + str(s.port))
+        projects = '/'.join(projects_list)
+        services = '/'.join(services_list)
+        status = SERVER_STATUS.get(int(host.status))
+        info = [host.hostname, host.eth1, host.idc.name, host.mac, host.remote_ip, host.cpu, host.memory,
+                host.disk, host.system_type, host.cabinet, host.number, projects, status,
+                host.sn, services, host.comment]
+        data.append(info)
+    print data
+    format = workbook.add_format()
+    format.set_border(1)
+    format.set_align('center')
+
+    format_title = workbook.add_format()
+    format_title.set_border(1)
+    format_title.set_bg_color('#cccccc')
+    format_title.set_align('center')
+    format_title.set_bold()
+
+    format_ave = workbook.add_format()
+    format_ave.set_border(1)
+    format_ave.set_num_format('0.00')
+
+    worksheet.write_row('A1', title, format_title)
+    i = 2
+    for info in data:
+        location = 'A' + str(i)
+        worksheet.write_row(location, info, format)
+        i += 1
+
+    workbook.close()
+    ret = (True, file_name)
+    return ret
+
+
+def sort_ip_list(ip_list):
+    """ ip地址排序 """
+    ip_list.sort(key=lambda s: map(int, s.split('.')))
+    return ip_list

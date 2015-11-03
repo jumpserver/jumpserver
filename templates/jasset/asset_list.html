@@ -23,109 +23,125 @@
                 </div>
 
                 <div class="ibox-content">
-                    <div class="col-sm-2" style="padding-left: 0px">
-                        <label>
-                            <select name="change_idc" class="form-control m-b" onchange="change_info()">
-                                <option value="">IDC机房</option>
-                                {% for i in idcs %}
-                                    <option value="{{i.name}}"> {{ i }}</option>
-                                {% endfor %}
-                            </select>
-                        </label>
-                    </div>
-                    <div class="col-sm-2">
-                        <label>
-                            <select name="change_project" class="form-control m-b" onchange="change_info()">
-                                <option value="all">主机组</option>
-                                {% for i in projects %}
-                                    <option value="{{ i.name }}"> {{ i.name }} </option>
-                                {% endfor %}
-                            </select>
-                        </label>
-                    </div>
-
-                    <div class="col-sm-2">
-                        <label>
-                            <select name="change_type" class="form-control m-b" onchange="change_info()">
-                                <option value="">所有类型</option>
-                                {% for i in server_type %}
-                                    <option value="{{ i.0 }}"> {{ i.1 }}</option>
-                                {% endfor %}
-                            </select>
-                        </label>
-                    </div>
-                    <div class="col-sm-2">
-                        <label>
-                            <select name="change_type" class="form-control m-b" onchange="change_info()">
-                                <option value="">状态</option>
-                                {% for i in server_type %}
-                                    <option value="{{ i.0 }}"> {{ i.1 }}</option>
-                                {% endfor %}
-                            </select>
-                        </label>
-                    </div>
-                    <div>
-                        <form id="search_form" method="get" action="" class="pull-right mail-search">
-                            <div class="input-group">
-                                <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
-                                <input type="text" style="display: none">
-                                <div class="input-group-btn">
-                                    <button type="submit" class="btn btn-sm btn-primary">
-                                        - 搜索 -
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <form id="contents_form" name="contents_form">
-                    <table class="table table-striped table-bordered table-hover " id="editable" name="editable">
-                        <thead>
-                            <tr>
-                                <th class="text-center">
-                                    <input id="checkall" type="checkbox" class="i-checks" name="checkall" value="checkall" data-editable='false' onclick="check_all('contents_form')">
-                                </th>
-                                <th class="text-center" name="ip"> IP地址 </th>
-                                <th class="text-center"> 主机名 </th>
-                                <th class="text-center"> IDC </th>
-                                <th class="text-center"> 所属主机组 </th>
-                                <th class="text-center"> 配置信息 </th>
-                                <th class="text-center"> 使用默认管理 </th>
-                                <th class="text-center"> 操作 </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        {% for asset in assets.object_list %}
-                            <tr class="gradeX">
-                                <td class="text-center" name="id" value="{{ asset.id }}" data-editable='false'>
-                                    <input name="id" value="{{ asset.id }}" type="checkbox" class="i-checks">
-                                </td>
-                                <td class="text-center"> {{ asset.ip }} </td>
-                                <td class="text-center"> {{ asset.hostname }} </td>
-                                <td class="text-center"> {{ asset.idc.name }} </td>
-                                <td class="text-center">{{ asset.port }}</td>
-                                <td class="text-center">{{ asset.cpu }}|{{ asset.memory }}|{{ asset.disk }}</td>
-                                <td class="text-center"> {{ asset.use_default_auth|bool2str }} </td>
-                                <td class="text-center" data-editable='false'>
-                                    <a href="/jasset/asset_detail/?id={{ asset.id }}" class="btn btn-xs btn-primary">详情</a>
-                                    {% ifnotequal session_role_id 0 %}
-                                        <a href="/jasset/asset_edit/?id={{ asset.id }}" class="btn btn-xs btn-info">编辑</a>
-                                        <a value="/jasset/asset_del/?id={{ asset.id }}" class="btn btn-xs btn-danger asset_del">删除</a>
-                                    {% endifnotequal %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <input type="button" id="del_button" class="btn btn-danger btn-sm"  name="del_button" value="删除" onclick="del('contents_form')" />
-                            <input type="button" id="alter_button" class="btn btn-warning btn-sm" name="alter_button" value="修改" onclick="alter('contents_form')" />
+                    <form id="asset_form">
+                        <div class="col-sm-2" style="padding-left: 0px">
+                            <label>
+                                <select name="idc" class="form-control m-b" onchange="change_info()">
+                                    <option value="">IDC机房</option>
+                                    {% for idc in idc_all %}
+                                        {% ifequal idc.name idc_name %}
+                                            <option value="{{idc.name}}" selected> {{ idc.name }}</option>
+                                        {% else %}
+                                            <option value="{{idc.name}}"> {{ idc.name }}</option>
+                                        {% endifequal %}
+                                    {% endfor %}
+                                </select>
+                            </label>
                         </div>
-                        {% include 'paginator.html' %}
+                        <div class="col-sm-2">
+                            <label>
+                                <select name="group" class="form-control m-b" onchange="change_info()">
+                                    <option value="all">主机组</option>
+                                    {% for asset_group in asset_group_all %}
+                                        {% ifequal asset_group.name group_name %}
+                                            <option value="{{ asset_group.name }}" selected> {{ asset_group.name }} </option>
+                                        {% else %}
+                                            <option value="{{ asset_group.name }}"> {{ asset_group.name }} </option>
+                                        {% endifequal %}
+                                    {% endfor %}
+                                </select>
+                            </label>
+                        </div>
+
+                        <div class="col-sm-2">
+                            <label>
+                                <select name="server_type" class="form-control m-b" onchange="change_info()">
+                                    <option value="">所有类型</option>
+                                    {% for type in asset_type %}
+                                        {% ifequal type.0|int2str asset_type %}
+                                            <option value="{{ type.0 }}" selected> {{ type.1 }}</option>
+                                        {% else %}
+                                            <option value="{{ type.0 }}"> {{ type.1 }}</option>
+                                        {% endifequal %}
+                                    {% endfor %}
+                                </select>
+                            </label>
+                        </div>
+                        <div class="col-sm-2">
+                            <label>
+                                <select name="status" class="form-control m-b" onchange="change_info()">
+                                    <option value="">状态</option>
+                                    {% for status in asset_status %}
+                                        {% ifequal status.0|int2str status %}
+                                            <option value="{{ status.0 }}" selected> {{ status.1 }}</option>
+                                        {% else %}
+                                            <option value="{{ status.0 }}"> {{ status.1 }}</option>
+                                        {% endifequal %}
+                                    {% endfor %}
+                                </select>
+                            </label>
+                        </div>
+                        <div>
+                            <form id="search_form" method="get" action="" class="pull-right mail-search">
+                                <div class="input-group">
+                                    <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
+                                    <input type="text" style="display: none">
+                                    <div class="input-group-btn">
+                                        <button type="submit" class="btn btn-sm btn-primary">
+                                            - 搜索 -
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <table class="table table-striped table-bordered table-hover " id="editable" name="editable">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">
+                                        <input id="checkall" type="checkbox" class="i-checks" name="checkall" value="checkall" data-editable='false' onclick="check_all('contents_form')">
+                                    </th>
+                                    <th class="text-center" name="ip"> IP地址 </th>
+                                    <th class="text-center"> 主机名 </th>
+                                    <th class="text-center"> IDC </th>
+                                    <th class="text-center"> 所属主机组 </th>
+                                    <th class="text-center"> 配置信息 </th>
+                                    <th class="text-center"> 使用默认管理 </th>
+                                    <th class="text-center"> 操作 </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for asset in assets.object_list %}
+                                <tr class="gradeX">
+                                    <td class="text-center" name="id" value="{{ asset.id }}" data-editable='false'>
+                                        <input name="id" value="{{ asset.id }}" type="checkbox" class="i-checks">
+                                    </td>
+                                    <td class="text-center"> {{ asset.ip }} </td>
+                                    <td class="text-center"> {{ asset.hostname }} </td>
+                                    <td class="text-center"> {{ asset.idc.name }} </td>
+                                    <td class="text-center">{{ asset.port }}</td>
+                                    <td class="text-center">{{ asset.cpu }}|{{ asset.memory }}|{{ asset.disk }}</td>
+                                    <td class="text-center"> {{ asset.use_default_auth|bool2str }} </td>
+                                    <td class="text-center" data-editable='false'>
+                                        <a href="/jasset/asset_detail/?id={{ asset.id }}" class="btn btn-xs btn-primary">详情</a>
+                                        {% ifnotequal session_role_id 0 %}
+                                            <a href="/jasset/asset_edit/?id={{ asset.id }}" class="btn btn-xs btn-info">编辑</a>
+                                            <a value="/jasset/asset_del/?id={{ asset.id }}" class="btn btn-xs btn-danger asset_del">删除</a>
+                                        {% endifnotequal %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <input type="button" id="asset_del" class="btn btn-danger btn-sm"  name="del_button" value="删除"/>
+                                <input type="button" id="alter_button" class="btn btn-warning btn-sm" name="alter_button" value="修改" onclick="alter('contents_form')" />
+                            </div>
+                            {% include 'paginator.html' %}
+                        </div>
                     </div>
-                    </form>
-                </div>
+                </form>
             </div>
         </div>
     </div>
@@ -180,38 +196,31 @@
         }
     }
 
-    function del(form) {
-        var checkboxes = document.getElementById(form);
-        var id_list = {};
-        var j = 0;
-        for (var i = 0; i < checkboxes.elements.length; i++) {
-            if (checkboxes.elements[i].type == "checkbox" && checkboxes.elements[i].checked == true && checkboxes.elements[i].value != "checkall") {
-                id_list[j] = checkboxes.elements[i].value;
-                j++;
-            }
+    $('#asset_del').click(function () {
+        var asset_id_all = getIDall();
+        console.log(asset_id_all);
+        if (asset_id_all == ''){
+            alert("请至少选择一行!");
+            return false;
         }
         if (confirm("确定删除")) {
             $.ajax({
-                type: "POST",
-                url: "/jasset/host_del/multi/",
-                data: {"id_list": id_list, "len_list": j},
-                success: function (data) {
-                    window.open("/jasset/host_list/", "_self");
+                type: "post",
+                data: {asset_id_all: asset_id_all},
+                url: "/jasset/asset_del/?arg=batch",
+                success: function () {
+                    window.open("/jasset/asset_list/", "_self");
                 }
             });
         }
+    });
+
+
+    function change_info(){
+        var args = $("#asset_form").serialize();
+        window.location = "/jasset/asset_search/?" + args
     }
 
-{#    function host_search(){#}
-{#        $.ajax({#}
-{#            type: "GET",#}
-{#            url: "/jasset/search/",#}
-{#            data: $("#search_form").serialize(),#}
-{#            success: function (data) {#}
-{#                $("#contents_form").html(data);#}
-{#            }#}
-{#        });#}
-{#    }#}
 
     $("#search_input").keydown(function(e){
         if(e.keyCode==13){

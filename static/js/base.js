@@ -119,3 +119,11 @@ function selectAll(){
 //        })
 //}
 
+function getIDall() {
+    var check_array = [];
+    $(".gradeX input:checked").each(function () {
+        var id = $(this).attr("value");
+        check_array.push(id);
+    });
+    return check_array.join(",");
+}

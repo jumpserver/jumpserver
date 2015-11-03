@@ -4,6 +4,23 @@ import datetime
 from django.db import models
 from juser.models import User, UserGroup
 
+ENVIRONMENT = (
+    (0, U'生产环境'),
+    (1, U'测试环境')
+    )
+
+ASSET_STATUS = (
+    (0, u"已使用"),
+    (1, u"未使用"),
+    (2, u"报废")
+    )
+
+ASSET_TYPE = (
+    (0, u"服务器"),
+    (2, u"网络设备"),
+    (3, u"其他")
+    )
+
 
 class AssetGroup(models.Model):
     GROUP_TYPE = (
@@ -83,21 +100,6 @@ class Asset(models.Model):
     """
     asset modle
     """
-    ENVIRONMENT = (
-        (0, U'生产环境'),
-        (1, U'测试环境')
-    )
-    SERVER_STATUS = (
-        (0, u"已使用"),
-        (1, u"未使用"),
-        (2, u"报废")
-    )
-    ASSET_TYPE = (
-        (0, u"服务器"),
-        (2, u"网络设备"),
-        (3, u"其他")
-    )
-
     ip = models.IPAddressField(unique=True, verbose_name=u"主机IP")
     second_ip = models.CharField(max_length=255, blank=True, null=True, verbose_name=u"其他IP")
     hostname = models.CharField(max_length=64, blank=True, null=True, verbose_name=u"主机名")
@@ -118,7 +120,7 @@ class Asset(models.Model):
     cabinet = models.CharField(max_length=32, blank=True, null=True, verbose_name=u'机柜号')
     position = models.IntegerField(max_length=2, blank=True, null=True, verbose_name=u'机器位置')
     number = models.CharField(max_length=32, blank=True, null=True, verbose_name=u'资产编号')
-    status = models.IntegerField(max_length=2, choices=SERVER_STATUS, blank=True, null=True, default=1, verbose_name=u"机器状态")
+    status = models.IntegerField(max_length=2, choices=ASSET_STATUS, blank=True, null=True, default=1, verbose_name=u"机器状态")
     asset_type = models.IntegerField(max_length=2, choices=ASSET_TYPE, blank=True, null=True, verbose_name=u"主机类型")
     env = models.IntegerField(max_length=2, choices=ENVIRONMENT, blank=True, null=True, verbose_name=u"运行环境")
     sn = models.CharField(max_length=32, blank=True, null=True, verbose_name=u"SN编号")
@@ -128,22 +130,6 @@ class Asset(models.Model):
 
     def __unicode__(self):
         return self.ip
-
-    def get_user(self):
-        perm_list = []
-        asset_group_all = self.bis_group.all()
-        for asset_group in asset_group_all:
-            perm_list.extend(asset_group.perm_set.all())
-
-        user_group_list = []
-        for perm in perm_list:
-            user_group_list.append(perm.user_group)
-
-        user_permed_list = []
-        for user_group in user_group_list:
-            user_permed_list.extend(user_group.user_set.all())
-        user_permed_list = list(set(user_permed_list))
-        return user_permed_list
 
 
 class AssetAlias(models.Model):
