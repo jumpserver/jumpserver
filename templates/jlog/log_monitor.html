@@ -42,7 +42,7 @@
 
         ws.onmessage = function(evt){
             console.log(evt.data);
-            $('#content').append(evt.data.replace('\r\n', '<br />').replace('[\r\n]', '<br />'));
+            $('#content').append(evt.data.replace(/\n|\r|(\r\n)|(\u0085)|(\u2028)|(\u2029)/g, '<br>'));
         };
 
         ws.onclose = function(evt){

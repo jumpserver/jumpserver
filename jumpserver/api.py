@@ -182,6 +182,7 @@ class Jtty(object):
             raise ServerError('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, tty_log_dir))
 
         try:
+            # log_file_f = open('/opt/jumpserver/logs/tty/20151102/a_b_191034.log', 'a')
             log_file_f = open(log_file_path + '.log', 'a')
             log_time_f = open(log_file_path + '.time', 'a')
         except IOError:
