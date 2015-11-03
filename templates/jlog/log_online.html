@@ -114,6 +114,10 @@
              socket.send(file_path)
         };
 
+        window.onbeforeunload = function(){
+            socket.close()
+        };
+
         var username = obj.closest('tr').find('#username').text();
         var ip = obj.closest('tr').find('#ip').text();
 
