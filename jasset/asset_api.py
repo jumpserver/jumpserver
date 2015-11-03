@@ -32,6 +32,21 @@ def db_add_group(**kwargs):
             group_add_asset(group, asset_id)
 
 
+def db_update_group(**kwargs):
+    """
+    add a asset group in database
+    数据库中更新资产
+    """
+    group_id = kwargs.pop('id')
+    asset_id_list = kwargs.pop('asset_select')
+    group = get_object(AssetGroup, id=group_id)
+
+    for asset_id in asset_id_list:
+            group_add_asset(group, asset_id)
+
+    AssetGroup.objects.filter(id=group_id).update(**kwargs)
+
+
 def db_asset_add(**kwargs):
     """
     add asset to db

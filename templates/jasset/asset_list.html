@@ -23,8 +23,48 @@
                 </div>
 
                 <div class="ibox-content">
+                    <div class="col-sm-2" style="padding-left: 0px">
+                        <label>
+                            <select name="change_idc" class="form-control m-b" onchange="change_info()">
+                                <option value="">IDC机房</option>
+                                {% for i in idcs %}
+                                    <option value="{{i.name}}"> {{ i }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+                    <div class="col-sm-2">
+                        <label>
+                            <select name="change_project" class="form-control m-b" onchange="change_info()">
+                                <option value="all">主机组</option>
+                                {% for i in projects %}
+                                    <option value="{{ i.name }}"> {{ i.name }} </option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="col-sm-2">
+                        <label>
+                            <select name="change_type" class="form-control m-b" onchange="change_info()">
+                                <option value="">所有类型</option>
+                                {% for i in server_type %}
+                                    <option value="{{ i.0 }}"> {{ i.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
+                    <div class="col-sm-2">
+                        <label>
+                            <select name="change_type" class="form-control m-b" onchange="change_info()">
+                                <option value="">状态</option>
+                                {% for i in server_type %}
+                                    <option value="{{ i.0 }}"> {{ i.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                    </div>
                     <div>
-                        <a target="_blank" href="/jasset/asset_add/" class="btn btn-sm btn-primary "> 添加 </a>
                         <form id="search_form" method="get" action="" class="pull-right mail-search">
                             <div class="input-group">
                                 <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
@@ -46,11 +86,11 @@
                                     <input id="checkall" type="checkbox" class="i-checks" name="checkall" value="checkall" data-editable='false' onclick="check_all('contents_form')">
                                 </th>
                                 <th class="text-center" name="ip"> IP地址 </th>
-                                <th class="text-center"> 端口号 </th>
+                                <th class="text-center"> 主机名 </th>
+                                <th class="text-center"> IDC </th>
                                 <th class="text-center"> 所属主机组 </th>
+                                <th class="text-center"> 配置信息 </th>
                                 <th class="text-center"> 使用默认管理 </th>
-                                <th class="text-center"> 激活 </th>
-                                <th class="text-center" name="comment"> 备注 </th>
                                 <th class="text-center"> 操作 </th>
                             </tr>
                         </thead>
@@ -61,11 +101,11 @@
                                     <input name="id" value="{{ asset.id }}" type="checkbox" class="i-checks">
                                 </td>
                                 <td class="text-center"> {{ asset.ip }} </td>
-                                <td class="text-center"> {{ asset.port }} </td>
+                                <td class="text-center"> {{ asset.hostname }} </td>
+                                <td class="text-center"> {{ asset.idc.name }} </td>
                                 <td class="text-center">{{ asset.port }}</td>
+                                <td class="text-center">{{ asset.cpu }}|{{ asset.memory }}|{{ asset.disk }}</td>
                                 <td class="text-center"> {{ asset.use_default_auth|bool2str }} </td>
-                                <td class="text-center"> {{ asset.is_active|bool2str }} </td>
-                                <td class="text-center"> {{ asset.comment }} </td>
                                 <td class="text-center" data-editable='false'>
                                     <a href="/jasset/asset_detail/?id={{ asset.id }}" class="btn btn-xs btn-primary">详情</a>
                                     {% ifnotequal session_role_id 0 %}

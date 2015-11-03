@@ -37,11 +37,67 @@ def group_add(request):
 
         except ServerError:
             pass
+
         else:
             db_add_group(name=name, comment=comment, asset_select=asset_select)
-            msg = u"主机组 %s 添加成功" % name
+            smg = u"主机组 %s 添加成功" % name
 
     return my_render('jasset/group_add.html', locals(), request)
+
+
+@require_role('admin')
+def group_edit(request):
+    """
+    Edit asset group
+    编辑资产组
+    """
+    header_title, path1, path2 = u'编辑主机组', u'资产管理', u'编辑主机组'
+    group_id = request.GET.get('id', '')
+    group = get_object(AssetGroup, id=group_id)
+
+    asset_all = Asset.objects.all()
+    asset_select = Asset.objects.filter(group=group)
+    asset_no_select = [a for a in asset_all if a not in asset_select]
+
+    if request.method == 'POST':
+        name = request.POST.get('name', '')
+        asset_select = request.POST.getlist('asset_select', [])
+        comment = request.POST.get('comment', '')
+
+        try:
+            if not name:
+                emg = u'组名不能为空'
+                raise ServerError(emg)
+
+            if group.name != name:
+                asset_group_test = get_object(AssetGroup, name=name)
+                if asset_group_test:
+                    emg = u"该组名 %s 已存在" % name
+                    raise ServerError(emg)
+
+        except ServerError:
+            pass
+
+        else:
+            group.asset_set.clear()
+            db_update_group(id=group_id, name=name, comment=comment, asset_select=asset_select)
+            smg = u"主机组 %s 添加成功" % name
+
+        return HttpResponseRedirect('/jasset/group_list')
+
+    return my_render('jasset/group_edit.html', locals(), request)
+
+
+@require_role('admin')
+def group_detail(request):
+    """ 主机组详情 """
+    header_title, path1, path2 = u'主机组详情', u'资产管理', u'主机组详情'
+    group_id = request.GET.get('id', '')
+    group = get_object(AssetGroup, id=group_id)
+    asset_all = Asset.objects.filter(group=group).order_by('ip')
+
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(asset_all, request)
+    return my_render('jasset/group_detail.html', locals(), request)
 
 
 @require_role('admin')
@@ -88,20 +144,8 @@ def asset_add(request):
     asset_group_all = AssetGroup.objects.all()
     af = AssetForm()
     if request.method == 'POST':
+        af_post = AssetForm(request.POST)
         ip = request.POST.get('ip')
-        port = request.POST.get('port')
-        groups = request.POST.getlist('groups')
-        use_default_auth = True if request.POST.getlist('use_default_auth', []) else False
-        is_active = True if request.POST.get('is_active') else False
-        comment = request.POST.get('comment')
-
-        if not use_default_auth:
-            username = request.POST.get('username')
-            password = request.POST.get('password')
-            password_encode = CRYPTOR.encrypt(password)
-        else:
-            username = None
-            password_encode = None
 
         try:
             if Asset.objects.filter(ip=str(ip)):
@@ -110,13 +154,15 @@ def asset_add(request):
 
         except ServerError:
             pass
-        else:
-            db_asset_add(
-                ip=ip, port=port, use_default_auth=use_default_auth, is_active=is_active, comment=comment,
-                groups=groups, username=username, password=password_encode
-            )
 
-            msg = u'主机 %s 添加成功' % ip
+        else:
+            if af_post.is_valid():
+                asset_save = af_post.save(commit=False)
+                asset_save.save()
+                af_post.save_m2m()
+                msg = u'主机 %s 添加成功' % ip
+            else:
+                esg = u'主机 %s 添加失败' % ip
 
     return my_render('jasset/asset_add.html', locals(), request)
 #
@@ -269,32 +315,38 @@ def asset_del(request):
 
 @require_role(role='super')
 def asset_edit(request):
-    """ 修改主机 """
+    """
+    edit a asset
+    修改主机
+    """
     header_title, path1, path2 = u'修改资产', u'资产管理', u'修改资产'
 
     asset_id = request.GET.get('id', '')
     if not asset_id:
         return HttpResponse('没有该主机')
     asset = get_object(Asset, id=asset_id)
-
+    af = AssetForm(instance=asset)
     if request.method == 'POST':
-        ip = request.POST.get('ip')
-        port = request.POST.get('port')
-        groups = request.POST.getlist('groups')
-        use_default_auth = True if request.POST.getlist('use_default_auth', []) else False
-        is_active = True if request.POST.get('is_active') else False
-        comment = request.POST.get('comment')
+        af_post = AssetForm(request.POST, instance=asset)
+        ip = request.POST.get('ip', '')
 
-        if not use_default_auth:
-            username = request.POST.get('username')
-            password = request.POST.get('password')
-            if password == asset.password:
-                password_encode = password
-            else:
-                password_encode = CRYPTOR.encrypt(password)
-        else:
-            username = None
-            password_encode = None
+        # ip = request.POST.get('ip')
+        # port = request.POST.get('port')
+        # groups = request.POST.getlist('groups')
+        # use_default_auth = True if request.POST.getlist('use_default_auth', []) else False
+        # is_active = True if request.POST.get('is_active') else False
+        # comment = request.POST.get('comment')
+
+        # if not use_default_auth:
+        #     username = request.POST.get('username')
+        #     password = request.POST.get('password')
+        #     if password == asset.password:
+        #         password_encode = password
+        #     else:
+        #         password_encode = CRYPTOR.encrypt(password)
+        # else:
+        #     username = None
+        #     password_encode = None
 
         try:
             asset_test = get_object(Asset, ip=ip)
@@ -304,10 +356,13 @@ def asset_edit(request):
         except ServerError:
             pass
         else:
-            db_asset_update(id=asset_id, ip=ip, port=port, use_default_auth=use_default_auth,
-                            username=username, password=password_encode,
-                            is_active=is_active, comment=comment)
-            msg = u'主机 %s 修改成功' % ip
+            if af_post.is_valid():
+                af_save = af_post.save(commit=False)
+                af_save.save()
+                af_post.save_m2m()
+                msg = u'主机 %s 修改成功' % ip
+            else:
+                emg = u'主机 %s 修改失败' % ip
             return HttpResponseRedirect('/jasset/asset_detail/?id=%s' % asset_id)
 
     return my_render('jasset/asset_edit.html', locals(), request)

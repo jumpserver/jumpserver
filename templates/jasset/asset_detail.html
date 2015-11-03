@@ -34,6 +34,14 @@
                                         <td>{{ asset.ip }}</td>
                                     </tr>
                                     <tr>
+                                        <td class="text-navy">主机名</td>
+                                        <td>{{ asset.hostname }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">远控IP</td>
+                                        <td>{{ asset.remote_ip }}</td>
+                                    </tr>
+                                    <tr>
                                         <td class="text-navy">端口</td>
                                         <td>{{ asset.port }}</td>
                                     </tr>
@@ -42,12 +50,65 @@
                                         <td class="text-navy">主机组</td>
                                         <td>
                                              <table class="table">
+                                                 {% for asset_group in asset.group.all %}
+                                                    <tr>
+                                                        <td>{{ asset_group.name }}</td>
+                                                    </tr>
+                                                 {% endfor %}
                                              </table>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">使用默认管理账号</td>
                                         <td>{{ asset.use_default_auth|bool2str }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">机房</td>
+                                        <td>{{ asset.idc.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">硬件厂商型号</td>
+                                        <td>{{ asset.brand }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">CPU</td>
+                                        <td>{{ asset.cpu }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">内存</td>
+                                        <td>{{ asset.memory }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">硬盘</td>
+                                        <td>{{ asset.disk }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">资产编号</td>
+                                        <td>{{ asset.number }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">SN</td>
+                                        <td>{{ asset.sn }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">主机类型</td>
+                                        <td>{{ asset.get_asset_type_display }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">运行环境</td>
+                                        <td>{{ asset.get_env_display }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">机器状态</td>
+                                        <td>{{ asset.get_status_display }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">机柜号</td>
+                                        <td>{{ asset.cabinet }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">机柜位置</td>
+                                        <td>{{ asset.position }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">激活</td>

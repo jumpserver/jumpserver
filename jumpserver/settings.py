@@ -54,7 +54,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
-    "bootstrapform",
+    'bootstrapform',
     'jumpserver',
     'juser',
     'jasset',
