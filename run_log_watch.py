@@ -22,6 +22,17 @@ define("port", default=8080, help="run on the given port", type=int)
 define("host", default='0.0.0.0', help="run port on", type=str)
 
 
+class MyThread(threading.Thread):
+    def __init__(self, *args, **kwargs):
+        super(MyThread, self).__init__(*args, **kwargs)
+
+    def run(self):
+        try:
+            super(MyThread, self).run()
+        except WebSocketClosedError:
+            pass
+
+
 class EventHandler(ProcessEvent):
     def __init__(self, client=None):
         self.client = client
@@ -34,10 +45,7 @@ class EventHandler(ProcessEvent):
 
     def process_IN_MODIFY(self, event):
         print "Modify file:%s." % os.path.join(event.path, event.name)
-        try:
-            self.client.write_message(f.read())
-        except WebSocketClosedError:
-            raise WebSocketClosedError
+        self.client.write_message(f.read())
 
 
 def file_monitor(path='.', client=None):
@@ -99,7 +107,7 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
         # 获取监控的path
         self.file_path = self.get_argument('file_path', '')
         MonitorHandler.clients.append(self)
-        thread = threading.Thread(target=file_monitor, args=('%s.log' % self.file_path, self))
+        thread = MyThread(target=file_monitor, args=('%s.log' % self.file_path, self))
         MonitorHandler.threads.append(thread)
         self.stream.set_nodelay(True)
 
@@ -116,7 +124,7 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
                 t.setDaemon(True)
                 t.start()
 
-        except WebSocketClosedError, e:
+        except WebSocketClosedError:
             client_index = MonitorHandler.clients.index(self)
             MonitorHandler.threads[client_index].stop()
             MonitorHandler.clients.remove(self)
