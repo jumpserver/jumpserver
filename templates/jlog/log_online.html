@@ -6,7 +6,7 @@
         background-color: rgba(0, 0, 0, 0);
     }
     .bootstrap-dialog-message {
-        background-color: rgba(0, 0, 0, 0);
+        color: #00FF00;
     }
     .pre-class {
         background-color: rgba(0, 0, 0, 1);
@@ -80,7 +80,7 @@
                                         <td class="text-center"><a class="monitor" file_path="{{ post.log_path }}"> 监控 </a></td>
                                         <td class="text-center"><input type="button" id="cut" class="btn btn-danger btn-xs"  name="cut" value="阻断" onclick='cut("{{ post.pid }}")' /></td>
                                     {% endifnotequal %}
-                                    <td class="text-center"> {{ post.start_time|date:"Y-m-d H:i:s" }} </td>
+                                    <td class="text-center" id="start_time"> {{ post.start_time|date:"Y-m-d H:i:s" }} </td>
                                 </tr>
                             {% endfor %}
                             </tbody>
@@ -108,8 +108,8 @@
 
     function init(obj){
         var file_path = obj.attr('file_path');
-        console.log(file_path);
-        var socket = new WebSocket('ws://j:8080/monitor?file_path='+file_path);
+        var wsUri = '{{ web_socket_uri }}';
+        var socket = new WebSocket(wsUri + '?file_path=' + file_path);
         socket.onopen = function(evt){
              socket.send(file_path)
         };
@@ -159,30 +159,16 @@
     $(document).ready(function(){
         $('.monitor').click(function(){
             init($(this))
-        })
-    });
-
-    function log_search(){
-        $.ajax({
-            type: "GET",
-            url: "/jlog/search/?env=online",
-            data: $("#search_form").serialize(),
-            success: function (data) {
-                $(".tab-content").html(data);
-            }
         });
-     }
 
-    $(document).ready(function(){
-       $('.log_command').on('click',function(){
+        $('.log_command').on('click',function(){
            var url = $(this).attr('href');
-           var username = $('#username')[0].innerText;
-           var ip = $('#ip')[0].innerText;
-           var start_time = $('#start_time')[0].innerText;
-           var end_time = $('#end_time')[0].innerText;
+           var username = $(this).closest('tr').find('#username').text();
+           var ip = $(this).closest('tr').find('#ip').text();
+           var start_time = $(this).closest('tr').find('#start_time').text();
            var div_username = ' 用户名: '+'<span class="text-info">'+username+'' + '</span>';
            var div_ip = ' 主机: '+'<span class="text-info">' + ip + '</span>';
-           var div_time = ' 开始时间: ' + '<span class="text-info">'+start_time +'</span>' + ' 结束时间: ' +'<span class="text-info">' + end_time + '</span>';
+           var div_time = ' 开始时间: ' + '<span class="text-info">'+start_time +'</span>' + '</span>';
            var title = 'JumpServer命令统计 '+ div_username + div_ip + div_time;
             $.ajax({url:url,
                     success:function(data){
@@ -191,16 +177,18 @@
             }});
            return false;
         });
-
-       $("#search_input").keydown(function(e){
-        if(e.keyCode==13){
-            log_search()
-            }
-        });
-
-       $('')
     });
 
+{#    function log_search(){#}
+{#        $.ajax({#}
+{#            type: "GET",#}
+{#            url: "/jlog/search/?env=online",#}
+{#            data: $("#search_form").serialize(),#}
+{#            success: function (data) {#}
+{#                $(".tab-content").html(data);#}
+{#            }#}
+{#        });#}
+{#     }#}
 
 
    function cut(num){
@@ -209,7 +197,6 @@
            type: "GET",
            url: g_url,
            success: window.open("/jlog/log_list/online/", "_self")
-//           error: window.open(g_url, "_self")
        });
 
 }
