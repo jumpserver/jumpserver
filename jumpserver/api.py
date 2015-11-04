@@ -25,6 +25,9 @@ from django.shortcuts import render_to_response
 from django.core.mail import send_mail
 import json
 import logging
+VIM_FLAG = False
+VIM_COMMAND = ''
+SSH_TTY = ''
 
 try:
     import termios
