@@ -14,9 +14,10 @@ from jumpserver.settings import web_socket_host
 web_socket_host = 'ws://j:8080/monitor'
 
 
+@require_role('admin')
 def log_list(request, offset):
     """ 显示日志 """
-    header_title, path1, path2 = u'查看日志', u'查看日志', u'在线用户'
+    header_title, path1 = u'审计', u'操作审计'
     date_seven_day = request.GET.get('start', '')
     date_now_str = request.GET.get('end', '')
     username_list = request.GET.getlist('username', [])
@@ -54,6 +55,7 @@ def log_list(request, offset):
     return render_to_response('jlog/log_%s.html' % offset, locals(), context_instance=RequestContext(request))
 
 
+@require_role('admin')
 def log_kill(request):
     """ 杀掉connect进程 """
     pid = request.GET.get('id', '')
@@ -70,6 +72,7 @@ def log_kill(request):
         return HttpResponseNotFound(u'没有此进程!')
 
 
+@require_role('admin')
 def log_history(request):
     """ 命令历史记录 """
     log_id = request.GET.get('id', 0)
@@ -87,6 +90,7 @@ def log_history(request):
     return HttpResponse('无日志记录, 请查看日志处理脚本是否开启!')
 
 
+@require_role('admin')
 def log_record(request):
     log_id = request.GET.get('id', 0)
     log = Log.objects.filter(id=int(log_id))
