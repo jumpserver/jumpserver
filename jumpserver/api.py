@@ -187,7 +187,7 @@ def deal_command(str_r, ssh):
     global VIM_FLAG
     global VIM_COMMAND
     if not VIM_FLAG:
-        if result_command.startswith('vim'):
+        if result_command.startswith('vim') or result_command.startswith('vi') :
             VIM_FLAG = True
             VIM_COMMAND = result_command
         return result_command.decode('utf8',"ignore")
