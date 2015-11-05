@@ -8,5 +8,5 @@ urlpatterns = patterns('',
                        url(r'^history/$', log_history),
                        url(r'^log_kill/', log_kill),
                        url(r'^record/$', log_record),
-                       url(r'web_terminal/$', web_terminal),
+                       url(r'^web_terminal/$', web_terminal),
                       )

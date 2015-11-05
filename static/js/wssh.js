@@ -37,7 +37,7 @@ client.connect({
 */
 
 function WSSHClient() {
-};
+}
 
 WSSHClient.prototype._generateEndpoint = function(options) {
     console.log(options);

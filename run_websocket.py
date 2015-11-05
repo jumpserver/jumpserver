@@ -16,32 +16,22 @@ import tornado.gen
 from tornado.websocket import WebSocketClosedError
 
 from tornado.options import define, options
-from pyinotify import WatchManager, Notifier, ProcessEvent, IN_DELETE, IN_CREATE, IN_MODIFY
+from pyinotify import WatchManager, Notifier, ProcessEvent, IN_DELETE, IN_CREATE, IN_MODIFY, AsyncNotifier
 
-from gevent import monkey
-monkey.patch_all()
-
-import gevent
+# from gevent import monkey
+# monkey.patch_all()
+# import gevent
 from gevent.socket import wait_read, wait_write
-from gevent.select import select
-from gevent.event import Event
 
 import paramiko
-from paramiko import PasswordRequiredException
-from paramiko.dsskey import DSSKey
-from paramiko.rsakey import RSAKey
-from paramiko.ssh_exception import SSHException
-
-import socket
 
 try:
     import simplejson as json
 except ImportError:
     import json
 
-from StringIO import StringIO
 
-define("port", default=8080, help="run on the given port", type=int)
+define("port", default=3000, help="run on the given port", type=int)
 define("host", default='0.0.0.0', help="run port on", type=str)
 
 
@@ -80,7 +70,7 @@ def file_monitor(path='.', client=None):
         print "You should monitor a file"
         sys.exit(3)
     else:
-        print "now starting monitor %s." %path
+        print "now starting monitor %s." % path
         global f
         f = open(path, 'r')
         st_size = os.stat(path)[6]
@@ -88,7 +78,6 @@ def file_monitor(path='.', client=None):
 
     while True:
         try:
-            print "hello world"
             notifier.process_events()
             if notifier.check_events():
                 notifier.read_events()
@@ -101,7 +90,6 @@ def file_monitor(path='.', client=None):
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
-            (r'/', MainHandler),
             (r'/monitor', MonitorHandler),
             (r'/terminal', WebTerminalHandler),
         ]
@@ -162,11 +150,6 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
         client_index = MonitorHandler.clients.index(self)
         MonitorHandler.clients.remove(self)
         MonitorHandler.threads.remove(MonitorHandler.threads[client_index])
-
-
-class MainHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.render('log_watch.html')
 
 
 class WebTerminalHandler(tornado.websocket.WebSocketHandler):

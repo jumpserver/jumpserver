@@ -11,9 +11,6 @@ from models import Log
 from jumpserver.settings import web_socket_host
 
 
-web_socket_host = 'ws://j:8080/monitor'
-
-
 @require_role('admin')
 def log_list(request, offset):
     """ 显示日志 """
@@ -51,7 +48,7 @@ def log_list(request, offset):
 
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
-    web_socket_uri = web_socket_host
+    web_monitor_uri = '%s/monitor' % web_socket_host
     return render_to_response('jlog/log_%s.html' % offset, locals(), context_instance=RequestContext(request))
 
 
@@ -106,5 +103,6 @@ def log_record(request):
 
 
 def web_terminal(request):
+    web_terminal_uri = '%s/terminal' % web_socket_host
     return render_to_response('jlog/web_terminal.html', locals())
 

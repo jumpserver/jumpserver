@@ -108,7 +108,7 @@
 
     function init(obj){
         var file_path = obj.attr('file_path');
-        var wsUri = '{{ web_socket_uri }}';
+        var wsUri = '{{ web_monitor_uri }}';
         var socket = new WebSocket(wsUri + '?file_path=' + file_path);
         socket.onopen = function(evt){
              socket.send(file_path)
