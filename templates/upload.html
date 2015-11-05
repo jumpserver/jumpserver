@@ -2,7 +2,47 @@
 {% load mytags %}
 {% block content %}
 {% include 'nav_cat_bar.html' %}
+ <style>
+     table {
+     display: table;
+     border-collapse: separate;
+     border-spacing: 2px;
+     border-color: grey;
+ }
 
+ tbody {
+     display: table-row-group;
+     vertical-align: middle;
+     border-color: inherit;
+ }
+
+ .table.border {
+     border: 1px solid #999;
+ }
+.table.hovered tbody tr:hover {
+    background-color: rgba(28,183,236,.1)
+}
+ tr {
+     display: table-row;
+     vertical-align: inherit;
+     border-color: inherit;
+ }
+
+ td, th {
+     display: table-cell;
+     vertical-align: inherit;
+ }
+
+ #hosts_list {
+     background-color: white;
+     background-image: none;
+     border-radius: 1px;
+     color: inherit;
+     display: block;
+     right: 23px;
+     left: 23px;
+ }
+ </style>
 <div class="wrapper wrapper-content animated fadeIn">
     <div class="row">
         <div class="col-lg-12">
@@ -28,13 +68,34 @@
                 </div>
             </div>
             <div class="ibox-content">
-                <div class="">
+                <div>
                     <form id="my-awesome-dropzone" class="dropzone" action="#">
                         <div class="dropzone-previews">
-                            <input id="hosts" name="hosts"  type="text" class="form-control" required="不能为空" placeholder="输入主机地址，逗号隔开，确保你有输入主机地址的权限" size="80%">
+                            <input id="hosts" name="hosts" type="text" class="form-control" required="不能为空"
+                                   placeholder="输入主机地址，逗号隔开，确保你有输入主机地址的权限" size="80%">
+
+{#                            <div id="hosts_list" style="position:absolute;display: none;z-index:999;">#}
+{#                            TODO: by liuzheng#}
+{#                                <table class="table hovered border ">#}
+{#                                    <tbody style="background-color: white">#}
+{#                                    <tr>#}
+{#                                        <td tabindex="2"><a>aaa</a></td>#}
+{#                                    </tr>#}
+{#                                    <tr>#}
+{#                                        <td tabindex="2"><a>aaa</a></td>#}
+{#                                    </tr>#}
+{#                                    <tr>#}
+{#                                        <td tabindex="2"><a>aaa</a></td>#}
+{#                                    </tr>#}
+{#                                    <tr>#}
+{#                                        <td tabindex="2"><a>aaa</a></td>#}
+{#                                    </tr>#}
+{##}
+{#                                    </tbody>#}
+{#                                </table>#}
+{#                            </div>#}
                         </div>
                         <button type="submit" class="btn btn-primary pull-right">全部上传</button>
-                        <div></div>
                     </form>
                 </div>
                 <div>
@@ -78,8 +139,14 @@
 
         }
 
-   });
-
+    });
+{#    $("#hosts")[0].onfocus = function () {#}
+{#    TODO: by liuzheng#}
+{#        $("#hosts_list").show()#}
+{#    };#}
+{#    $("#hosts")[0].focusout = function () {#}
+{#        $("#hosts_list").hide()#}
+{#    };#}
 $('#my-awesome-dropzone').validator({
     timely: 2,
     theme: "yellow_right_effect",
