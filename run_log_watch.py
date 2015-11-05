@@ -16,7 +16,30 @@ import tornado.gen
 from tornado.websocket import WebSocketClosedError
 
 from tornado.options import define, options
-from pyinotify import WatchManager, Notifier, ProcessEvent, IN_DELETE, IN_CREATE, IN_MODIFY, AsyncNotifier, TornadoAsyncNotifier, ThreadedNotifier
+from pyinotify import WatchManager, Notifier, ProcessEvent, IN_DELETE, IN_CREATE, IN_MODIFY
+
+from gevent import monkey
+monkey.patch_all()
+
+import gevent
+from gevent.socket import wait_read, wait_write
+from gevent.select import select
+from gevent.event import Event
+
+import paramiko
+from paramiko import PasswordRequiredException
+from paramiko.dsskey import DSSKey
+from paramiko.rsakey import RSAKey
+from paramiko.ssh_exception import SSHException
+
+import socket
+
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
+from StringIO import StringIO
 
 define("port", default=8080, help="run on the given port", type=int)
 define("host", default='0.0.0.0', help="run port on", type=str)
@@ -80,6 +103,7 @@ class Application(tornado.web.Application):
         handlers = [
             (r'/', MainHandler),
             (r'/monitor', MonitorHandler),
+            (r'/terminal', WebTerminalHandler),
         ]
 
         setting = {
@@ -143,6 +167,68 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         self.render('log_watch.html')
+
+
+class WebTerminalHandler(tornado.websocket.WebSocketHandler):
+    tasks = []
+
+    def __init__(self, *args, **kwargs):
+        self.chan = None
+        self.ssh = None
+        super(WebTerminalHandler, self).__init__(*args, **kwargs)
+
+    def check_origin(self, origin):
+        return True
+
+    def open(self):
+        self.ssh = paramiko.SSHClient()
+        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        try:
+            self.ssh.connect('127.0.0.1', 22, 'root', 'redhat')
+        except:
+            self.write_message(json.loads({'data': 'Connect server Error'}))
+            self.close()
+
+        self.chan = self.ssh.invoke_shell(term='xterm')
+        WebTerminalHandler.tasks.append(threading.Thread(target=self._forward_outbound))
+
+        for t in WebTerminalHandler.tasks:
+            if t.is_alive():
+                continue
+            t.setDaemon(True)
+            t.start()
+
+    def on_message(self, message):
+        data = json.loads(message)
+        if not data:
+            return
+        if 'resize' in data:
+            self.chan.resize_pty(
+                data['resize'].get('width', 80),
+                data['resize'].get('height', 24))
+        if 'data' in data:
+            self.chan.send(data['data'])
+
+    def on_close(self):
+        self.write_message(json.dumps({'data': 'close websocket'}))
+
+    def _forward_outbound(self):
+        """ Forward outbound traffic (ssh -> websockets) """
+        try:
+            data = ''
+            while True:
+                wait_read(self.chan.fileno())
+                recv = self.chan.recv(1024)
+                if not len(recv):
+                    return
+                data += recv
+                try:
+                    self.write_message(json.dumps({'data': data}))
+                    data = ''
+                except UnicodeDecodeError:
+                    pass
+        finally:
+            self.close()
 
 
 if __name__ == '__main__':

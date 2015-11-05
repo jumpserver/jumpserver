@@ -105,4 +105,6 @@ def log_record(request):
             return HttpResponse('无日志记录, 请查看日志处理脚本是否开启!')
 
 
+def web_terminal(request):
+    return render_to_response('jlog/web_terminal.html', locals())
 
