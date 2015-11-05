@@ -9,7 +9,12 @@ from jperm.models import SysUser
 from juser.user_api import gen_ssh_key
 
 
-from django.shortcuts import render_to_response
+from juser.models     import User
+from jasset.models    import Asset, AssetGroup
+
+from jperm.utils      import updates_dict
+
+from jumpserver.api   import my_render, get_object
 
 
 @require_role('admin')
@@ -22,8 +27,8 @@ def perm_user_list(request):
         2. include 部分：{% include 'nav_cat_bar.html' %}
              rander_nav 为渲染数据
     """
-    render_data = {}
     data_nav = {"header_title": "用户授权", "path1": "授权管理", "path2": "用户授权"}
+
     # 获取所有用户
     users_list = User.objects.all()
     
@@ -32,39 +37,72 @@ def perm_user_list(request):
     if keyword:
         users_list = users_list.filter(Q(name=keyword) | Q(username=keyword))
     users_list, p, users, page_range, current_page, show_first, show_end = pages(users_list, request)
-
     data_content = {"users": users}
-    for data in [data_nav, data_content]:
-        render_data.update(data)
-        
-    return render_to_response('jperm/perm_user_list.html', render_data)
 
+    render_data = updates_dict(data_nav, data_content)
+        
+    return my_render('jperm/perm_user_list.html', render_data, request)
+
+
+@require_role('admin')
+def perm_user_detail(request):
+    """
+    用户详情视图：
+      该视图的模板包含2部分：
+        1. block   部分：{% block content %}
+             rander_content 为渲染数据
+        2. include 部分：{% include 'nav_cat_bar.html' %}
+             rander_nav 为渲染数据
+    """
+    data_nav = {"header_title": "用户授权", "path1": "授权管理", "path2": "用户详情"}
+
+    # 待实现
+    render_data = updates_dict(data_nav)
+
+    return my_render('jperm/perm_user_detail.html', render_data, request)
+    
 
 @require_role('admin')
 def perm_user_edit(request):
     """
     TODO:
     """
-    header_title, path1, path2 = '用户授权', '授权管理', '授权更改'
+    data_nav = {"header_title": "用户授权", "path1": "授权管理", "path2": "授权更改"}
+
+    # 获取user对象
     user_id = request.GET.get('id', '')
     user = get_object(User, id=user_id)
-    asset_all = Asset.objects.all()  # 获取所有资产
-    asset_group_all = AssetGroup.objects.all()  # 获取所有资产组
-    asset_permed = user.asset.all()  # 获取授权的资产对象列表
-    asset_group_permed = user.asset_group.all() # 获取授权的资产组对象列表
+
+    # 获取所有 资产 和 资产组
+    asset_all = Asset.objects.all()
+    asset_group_all = AssetGroup.objects.all()
+
+    # 获取授权的 资产对象列表 和 资产组对象列表
+    asset_permed = user.asset.all()
+    asset_group_permed = user.asset_group.all()
+
+    # 获取未授权的 资产对象列表 和 资产组对象列表
     if request.method == 'GET' and user:
-        assets = [asset for asset in asset_all if asset not in asset_permed]  # 获取没有授权的资产对象列表
-        asset_groups = [asset_group for asset_group in asset_group_all if asset_group not in asset_group_permed]  # 同理
-        return my_render('jperm/perm_user_edit.html', locals(), request)
+        assets = [asset for asset in asset_all if asset not in asset_permed]
+        asset_groups = [asset_group for asset_group in asset_group_all if asset_group not in asset_group_permed]
+        data_content = {"assets": assets, "asset_groups": asset_groups, "user": user}
+
+        render_data = updates_dict(data_nav, data_content)        
+        return my_render('jperm/perm_user_edit.html', render_data, request)
+
     elif request.method == 'POST' and user:
-        asset_id_select = request.POST.getlist('asset_select', [])  # 获取选择的资产id列表
-        asset_group_id_select = request.POST.getlist('asset_groups_select', [])  # 获取选择的资产组id列表
+        # 获取选择的资产列表 和 资产组列表
+        asset_id_select = request.POST.getlist('asset_select', [])
+        asset_group_id_select = request.POST.getlist('asset_groups_select', [])
         asset_select = get_object_list(Asset, asset_id_select)
         asset_group_select = get_object_list(AssetGroup, asset_group_id_select)
-        asset_new = list(set(asset_select) - set(asset_permed))  # 计算的得到新授权的资产对象列表
-        asset_del = list(set(asset_permed) - set(asset_select))  # 计算得到回收权限的资产对象列表
-        asset_group_new = list(set(asset_group_select) - set(asset_group_permed))  # 新授权的资产组对象列表
-        asset_group_del = list(set(asset_group_permed) - set(asset_group_select))  # 回收的资产组对象列表
+
+        # 新授权的资产对象列表, 回收权限的资产对象列表, 新授权的资产组对象列表, 回收的资产组对象列表
+        asset_new = list(set(asset_select) - set(asset_permed))
+        asset_del = list(set(asset_permed) - set(asset_select))
+        asset_group_new = list(set(asset_group_select) - set(asset_group_permed))
+        asset_group_del = list(set(asset_group_permed) - set(asset_group_select))
+
         for asset_group in asset_group_new:
             asset_new.extend(asset_group.asset_set.all())
         for asset_group in asset_group_del:

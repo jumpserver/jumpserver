@@ -2,7 +2,6 @@
 
 from django.db import models
 
-from jasset.models import Asset, AssetGroup
 
 
 class UserGroup(models.Model):
@@ -10,8 +9,8 @@ class UserGroup(models.Model):
     # assets = models.TextField(max_length=1000, verbose_name="Assets", default='')
     # asset_groups = models.CharField(max_length=1000, verbose_name="Asset Groups", default='')
     comment = models.CharField(max_length=160, blank=True, null=True)
-    asset = models.ManyToManyField(Asset)
-    asset_group = models.ManyToManyField(AssetGroup)
+    #asset = models.ManyToManyField(Asset)
+    #asset_group = models.ManyToManyField(AssetGroup)
 
     def __unicode__(self):
         return self.name
@@ -42,8 +41,7 @@ class User(models.Model):
     is_active = models.BooleanField(default=True)
     last_login = models.DateTimeField(null=True)
     date_joined = models.DateTimeField(null=True)
-    asset = models.ManyToManyField(Asset)
-    asset_group = models.ManyToManyField(AssetGroup)
+
 
     def __unicode__(self):
         return self.username
