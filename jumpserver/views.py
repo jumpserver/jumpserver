@@ -227,8 +227,8 @@ def Login(request):
                 # response.set_cookie('username', username, expires=604800)
                 # response.set_cookie('seed', PyCrypt.md5_crypt(password), expires=604800)
                 # return response
-            # else:
-            #     error = '密码错误，请重新输入。'
+            else:
+                error = '用户名或密码错误'
         else:
             error = '用户名或密码错误'
     return render_to_response('login.html', {'error': error})

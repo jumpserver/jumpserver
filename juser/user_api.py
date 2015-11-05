@@ -86,8 +86,10 @@ def db_update_user(**kwargs):
     user_id = kwargs.pop('user_id')
     user = User.objects.get(id=user_id)
     if user:
+        pwd = kwargs.pop('password')
         user.update(**kwargs)
-        user.set_password(kwargs.pop('password'))
+        if pwd != '':
+            user.set_password(pwd)
         user.save()
     else:
         return None
