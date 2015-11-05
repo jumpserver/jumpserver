@@ -124,3 +124,9 @@ class AdminGroup(models.Model):
 
     def __unicode__(self):
         return '%s: %s' % (self.user.username, self.group.name)
+
+
+class Document(models.Model):
+    # TODO: upload path with userID
+    docfile = models.FileField(upload_to='upload/%Y/%m/%d')
+    user = models.ForeignKey(User)

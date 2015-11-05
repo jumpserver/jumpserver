@@ -355,3 +355,25 @@ def Logout(request):
 #         result = {'auth': {'username': username, 'result': 'failed'}}
 #
 #     return HttpResponse(json.dumps(result, sort_keys=True, indent=2), content_type='application/json')
+
+def upload(request):
+    if request.method == 'GET':
+        machines = [{'name':'aaa'}]
+        return render_to_response('upload.html', locals(), context_instance=RequestContext(request))
+    elif request.method == 'POST':
+        from juser.models import Document
+        upload_files = request.FILES.getlist('file[]', None)
+        # form = DocumentForm(request.POST, request.FILES)
+        # if form.is_valid():
+        # for upload_file in upload_files:
+        print request.FILES
+        for file in upload_files:
+            print file
+            newdoc = Document(docfile=file, user_id=request.user.id)
+            newdoc.save()
+        return HttpResponse("success")
+    else:
+        return HttpResponse("ERROR")
+
+def download(request):
+    return render_to_response('download.html', locals(), context_instance=RequestContext(request))
