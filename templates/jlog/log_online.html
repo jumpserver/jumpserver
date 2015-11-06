@@ -1,7 +1,21 @@
 {% extends 'base.html' %}
-{% block content %}
-{% include 'nav_cat_bar.html' %}
-<style>
+{% block self_head_css_js %}
+    <style>
+    .terminal {
+        border: #000 solid 5px;
+        font-family: "Monaco", "DejaVu Sans Mono", "Liberation Mono", monospace;
+        font-size: 11px;
+        color: #f0f0f0;
+        background: rgba(0, 0, 0, 0.6);
+        width: 600px;
+        box-shadow: rgba(0, 0, 0, 0.6) 2px 2px 20px;
+    }
+
+    .reverse-video {
+        color: #000;
+        background: #f0f0f0;
+    }
+
     .bootstrap-dialog-body  {
         background-color: rgba(0, 0, 0, 0);
     }
@@ -12,7 +26,7 @@
         background-color: rgba(0, 0, 0, 1);
     }
     .modal-content {
-        background-color: rgba(0, 0, 0, 0.6);
+        background-color: #000;
     }
     .modal-dialog {
         background-color: rgba(0, 0, 0, 0);
@@ -24,7 +38,12 @@
     .modal-header {
         background-color: #FFFFFF;
     }
-</style>
+    </style>
+    <script src="/static/js/term.js"></script>
+
+{% endblock %}
+{% block content %}
+{% include 'nav_cat_bar.html' %}
 
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
@@ -104,8 +123,6 @@
 {#           window.open('/jlog/monitor/', '监控', 'height=500, width=910, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');#}
 {#        })#}
 {#   });#}
-
-
     function init(obj){
         var file_path = obj.attr('file_path');
         var wsUri = '{{ web_monitor_uri }}';
@@ -121,31 +138,27 @@
         var username = obj.closest('tr').find('#username').text();
         var ip = obj.closest('tr').find('#ip').text();
 
-        BootstrapDialog.show({message: function(){
-            var tag = $('<pre id="log" style="height: 500px;overflow: auto;background-color: rgba(0, 0, 0, 0);line-height: 0.8; border: none"></pre>');
-{#            document.cookie.split('; ').forEach(function(obj){#}
-{#                var info = obj.split('=');#}
-{#                if(info.length == 2 ){#}
-{#                    if(info[0] == 'username'){#}
-{#                        username = info[1];#}
-{#                    }else if(info[0] == 'seed'){#}
-{#                        seed = info[1];#}
-{#                    }#}
-{#                }#}
-{#            });#}
 
+
+        BootstrapDialog.show({message: function(){
             //服务器端认证
 {#            socket.send('login', {userid:message.id, filename:message.filename,username:username,seed:seed});#}
-            socket.onmessage = function(evt){
-                var control_regx =  /\x1B\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[m|K]/g;
-                var newline_regx = /\n|\r|(\r\n)|(\u0085)|(\u2028)|(\u2029)/g;
-{#                if (option == 'new') {#}
-                tag.append(evt.data.replace(newline_regx, '<br />').replace(control_regx, ''));
-{#                } else if (option == 'exist') {#}
-{#                    tag.append('<pre>' + exsit_message + '</pre>');#}
-{#                }#}
-                tag.animate({ scrollTop: tag[0].scrollHeight}, 1);
-            };
+            var term = new Terminal({
+              cols: 80,
+              rows: 24,
+              screenKeys: false
+            });
+            var tag = $('<div id="term" style="height:500px; overflow: auto;background-color: rgba(0, 0, 0, 0);border: none"></div>');
+            term.open();
+            term.resize(80, 24);
+
+            window.setTimeout(function(){
+                $('.terminal').detach().appendTo('#term');
+                socket.onmessage = function(evt){
+                term.write(evt.data);
+            }}, 1000);
+
+
 
             tag[0].style.color = "#00FF00";
             return tag[0];
@@ -158,7 +171,7 @@
 
     $(document).ready(function(){
         $('.monitor').click(function(){
-            init($(this))
+            init($(this));
         });
 
         $('.log_command').on('click',function(){

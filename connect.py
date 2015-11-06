@@ -430,8 +430,8 @@ class Jtty(object):
             time.sleep(1)
         tmp = channel.recv(1024)
         #print 'ok'+tmp+'ok'
-        SSH_TTY  = re.search(r'(?<=/dev/).*', tmp).group().strip()
-
+        # SSH_TTY  = re.search(r'(?<=/dev/).*', tmp).group().strip()
+        SSH_TTY = ''
         channel.send('clear\n')
         # Make ssh interactive tunnel
         self.posix_shell(ssh)
