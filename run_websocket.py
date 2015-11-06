@@ -21,7 +21,8 @@ from pyinotify import WatchManager, Notifier, ProcessEvent, IN_DELETE, IN_CREATE
 # from gevent import monkey
 # monkey.patch_all()
 # import gevent
-from gevent.socket import wait_read, wait_write
+# from gevent.socket import wait_read, wait_write
+import struct, fcntl, signal, socket, select, fnmatch
 
 import paramiko
 
@@ -200,16 +201,18 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         try:
             data = ''
             while True:
-                wait_read(self.chan.fileno())
-                recv = self.chan.recv(1024)
-                if not len(recv):
-                    return
-                data += recv
-                try:
-                    self.write_message(json.dumps({'data': data}))
-                    data = ''
-                except UnicodeDecodeError:
-                    pass
+                r, w, e = select.select([self.chan, sys.stdin], [], [])
+                if self.chan in r:
+                    recv = self.chan.recv(1024)
+                    print recv
+                    if not len(recv):
+                        return
+                    data += recv
+                    try:
+                        self.write_message(json.dumps({'data': data}))
+                        data = ''
+                    except UnicodeDecodeError:
+                        pass
         finally:
             self.close()
 
