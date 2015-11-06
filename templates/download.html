@@ -29,6 +29,12 @@
             </div>
             <div class="ibox-content">
                <h2>下载文件可联系管理员在服务器安装lrzsz，使用sz命令下载。 </h2>
+                <div>
+                    {% for document in documents %}
+                    <a href="/download/{{ document  }}">{{ document  }}</a>
+                    {% endfor %}
+                </div>
+
             </div>
         </div>
     </div>

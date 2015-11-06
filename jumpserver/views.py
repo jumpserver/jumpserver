@@ -356,17 +356,18 @@ def Logout(request):
 #
 #     return HttpResponse(json.dumps(result, sort_keys=True, indent=2), content_type='application/json')
 
+
+#######################  liuzheng's  test(start) ########################
+from django.contrib.auth.decorators import login_required
+from juser.models import Document
+
+@login_required(login_url='/login')
 def upload(request):
     if request.method == 'GET':
         machines = [{'name':'aaa'}]
         return render_to_response('upload.html', locals(), context_instance=RequestContext(request))
     elif request.method == 'POST':
-        from juser.models import Document
         upload_files = request.FILES.getlist('file[]', None)
-        # form = DocumentForm(request.POST, request.FILES)
-        # if form.is_valid():
-        # for upload_file in upload_files:
-        print request.FILES
         for file in upload_files:
             print file
             newdoc = Document(docfile=file, user_id=request.user.id)
@@ -375,5 +376,26 @@ def upload(request):
     else:
         return HttpResponse("ERROR")
 
+@login_required(login_url='/login')
 def download(request):
+    documents = []
+    for doc in Document.objects.filter(user_id=request.user.id).all():
+        documents.append('/'.join(str(doc.docfile).split('/')[2:]))
     return render_to_response('download.html', locals(), context_instance=RequestContext(request))
+
+def download_file(request, path):
+    # TODO: get downlode file and make sure it is exist!
+    # by liuzheng
+    filepath = 'upload/' + str(request.user.id)+'/'+path
+    return HttpResponse(filepath)
+
+def node_auth(request):
+    return HttpResponse('nothing')
+def httperror(request):
+    return HttpResponse('nothing')
+def base(request):
+    return HttpResponse('nothing')
+def install(request):
+    return HttpResponse('nothing')
+
+#######################  liuzheng's  test(end) ########################
