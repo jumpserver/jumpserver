@@ -2,7 +2,7 @@
 
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-
+import time
 
 class UserGroup(models.Model):
     name = models.CharField(max_length=80, unique=True)
@@ -127,6 +127,8 @@ class AdminGroup(models.Model):
 
 
 class Document(models.Model):
-    # TODO: upload path with userID
-    docfile = models.FileField(upload_to='upload/%Y/%m/%d')
+    def upload_to(self, filename):
+        return 'upload/'+str(self.user.id)+time.strftime('/%Y/%m/%d/', time.localtime())+filename
+
+    docfile = models.FileField(upload_to=upload_to)
     user = models.ForeignKey(User)
