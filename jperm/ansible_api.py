@@ -7,17 +7,16 @@ from ansible.inventory         import Inventory
 from ansible.runner            import Runner
 from ansible.playbook          import PlayBook
 
-from ansible                   import callbacks 
-from ansible                   import utils 
+from ansible                   import callbacks
+from ansible                   import utils
 from passlib.hash              import sha512_crypt
 
 from utils                     import get_rand_pass
 
+
 import os.path
-JPERM_DIR = os.path.dirname(os.path.abspath(__file__))
-ANSIBLE_DIR = os.path.join(JPERM_DIR, 'playbooks')
-
-
+API_DIR = os.path.dirname(os.path.abspath(__file__))
+ANSIBLE_DIR = os.path.join(API_DIR, 'playbooks')
 
 
 
@@ -50,38 +49,48 @@ class MyInventory(object):
     """
     def __init__(self, resource):
         """
-        resource :
-                 resource的数据格式是一个列表字典，比如
-                 {
-                     "group1": [{"hostname": "10.10.10.10", "port": "22", 
-                                "username": "test", "password": "mypass"}, ...],
-                     "group2": [{"hostname": "10.10.10.10", "port": "22", 
-                                "username": "test", "password": "mypass"}, ...] 
-                 }
-                 如果你只传入1个列表，这默认该列表内的所有主机属于my_group组,比如
-                     [{"hostname": "10.10.10.10", "port": "22", 
-                       "username": "test", "password": "mypass"}, ...]
-                 
+        resource的数据格式是一个列表字典，比如
+            {
+                "group1": {
+                    "hosts": [{"hostname": "10.10.10.10", "port": "22", "username": "test", "password": "mypass"}, ...],
+                    "vars": {"var1": value1, "var2": value2, ...}
+                }
+            }
+
+        如果你只传入1个列表，这默认该列表内的所有主机属于my_group组,比如
+            [{"hostname": "10.10.10.10", "port": "22", "username": "test", "password": "mypass"}, ...]
         """
         self.resource = resource
         self.inventory = Inventory()
         self.gen_inventory()
 
-    def add_group(self, hosts, groupname):
+    def add_group(self, hosts, groupname, groupvars=None):
         """
         add hosts to a group
         """
         my_group = Group(name=groupname)
+
+        # if group variables exists, add them to group
+        if groupvars:
+            for key, value in groupvars.iteritems():
+                my_group.set_variable(key, value)
+
+        # add hosts to group
         for host in hosts:
-            hostname = host.get("hostname")
-            hostport = host.get("hostport")
-            username = host.get("username")
-            password = host.get("password") 
+            # set connection variables
+            hostname = host.pop("hostname")
+            hostport = host.pop("port")
+            username = host.pop("username")
+            password = host.pop("password")
             my_host = Host(name=hostname, port=hostport)
             my_host.set_variable('ansible_ssh_host', hostname)
             my_host.set_variable('ansible_ssh_port', hostport)
-            my_host.set_variable('ansible_ssh_user', username) 
+            my_host.set_variable('ansible_ssh_user', username)
             my_host.set_variable('ansible_ssh_pass', password)
+            # set other variables
+            for key, value in host.iteritems():
+                my_host.set_variable(key, value)
+            # add to group
             my_group.add_host(my_host)
 
         self.inventory.add_group(my_group)
@@ -93,8 +102,8 @@ class MyInventory(object):
         if isinstance(self.resource, list):
             self.add_group(self.resource, 'my_group')
         elif isinstance(self.resource, dict):
-            for groupname, hosts in self.resource.iteritems():
-                self.add_group(hosts, groupname)
+            for groupname, hosts_and_vars in self.resource.iteritems():
+                self.add_group(hosts_and_vars.get("hosts"), groupname, hosts_and_vars.get("vars"))
 
 
 class Command(MyInventory):
@@ -120,7 +129,7 @@ class Command(MyInventory):
                      subset='my_group',
                      forks=forks
                      )
-        
+
         self.results = hoc.run()
         return self.stdout
 
@@ -197,7 +206,7 @@ class Tasks(Command):
                      subset='my_group',
                      forks=forks
                      )
-        
+
         self.results = hoc.run()
 
     @property
@@ -235,7 +244,7 @@ class Tasks(Command):
         """
         add a host user.
         """
-        encrypt_pass = sha512_crypt.encrypt(password) 
+        encrypt_pass = sha512_crypt.encrypt(password)
         module_args = 'name=%s shell=/bin/bash password=%s' % (username, encrypt_pass)
         self.__run(module_args, "user")
 
@@ -263,7 +272,7 @@ class Tasks(Command):
         results["user_info"] = users
 
         return results
-            
+
     def del_init_users(self):
         """
         delete initail users: SA, DBA, DEV
@@ -284,7 +293,7 @@ class CustomAggregateStats(callbacks.AggregateStats):
     def __init__(self):
         super(CustomAggregateStats, self).__init__()
         self.results = []
- 
+
     def compute(self, runner_results, setup=False, poll=False,
                 ignore_errors=False):
         """                                                                         
@@ -292,21 +301,21 @@ class CustomAggregateStats(callbacks.AggregateStats):
         """
         super(CustomAggregateStats, self).compute(runner_results, setup, poll,
                                               ignore_errors)
- 
+
         self.results.append(runner_results)
-                       
- 
+
+
     def summarize(self, host):
         """                                                                         
         Return information about a particular host                                  
         """
         summarized_info = super(CustomAggregateStats, self).summarize(host)
- 
+
         # Adding the info I need                                                    
         summarized_info['result'] = self.results
- 
+
         return summarized_info
-        
+
 
 class MyPlaybook(MyInventory):
     """
@@ -316,23 +325,24 @@ class MyPlaybook(MyInventory):
         super(MyPlaybook, self).__init__(*args, **kwargs)
 
 
-    def run(self, playbook_relational_path):
+    def run(self, playbook_relational_path, extra_vars=None):
         """
         run ansible playbook,
         only surport relational path.
         """
-        stats = CustomAggregateStats() 
-        playbook_cb = callbacks.PlaybookCallbacks(verbose=utils.VERBOSITY) 
+        stats = callbacks.AggregateStats()
+        playbook_cb = callbacks.PlaybookCallbacks(verbose=utils.VERBOSITY)
         runner_cb = callbacks.PlaybookRunnerCallbacks(stats, verbose=utils.VERBOSITY)
         playbook_path = os.path.join(ANSIBLE_DIR, playbook_relational_path)
 
         pb = PlayBook(
-            playbook = playbook_path, 
-            stats = stats, 
-            callbacks = playbook_cb, 
-            runner_callbacks = runner_cb, 
-            inventory = self.inventory, 
-            check=True)
+            playbook = playbook_path,
+            stats = stats,
+            callbacks = playbook_cb,
+            runner_callbacks = runner_cb,
+            inventory = self.inventory,
+            extra_vars = extra_vars,
+            check=False)
 
         self.results = pb.run()
 
@@ -351,16 +361,17 @@ class App(MyPlaybook):
     def __init__(self, *args, **kwargs):
         super(App, self).__init__(*args, **kwargs)
 
-        
+
 
 if __name__ == "__main__":
-   resource =  [{"hostname": "192.168.10.128", "port": "22", "username": "root", "password": "xxx"}]
+    pass
+#   resource =  [{"hostname": "192.168.10.128", "port": "22", "username": "root", "password": "yusky0902"}]
 #   playbook = MyPlaybook(resource)
 #   playbook.run('test.yml')
 #   print playbook.raw_results
-   command = Command(resource)
-   command.run("who")
-   print command.stdout
+#   command = Command(resource)
+#   command.run("who")
+#   print command.raw_results
 
 
 #   task = Tasks(resource)
@@ -373,9 +384,5 @@ if __name__ == "__main__":
 #   task = Tasks(resource)
 #   print task.add_init_users()
 #   print task.del_init_users()
-
-
-
-
 
 
