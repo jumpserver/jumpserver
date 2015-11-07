@@ -48,7 +48,8 @@ def log_list(request, offset):
 
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
-    web_monitor_uri = '%s/monitor' % web_socket_host
+    web_monitor_uri = 'ws://%s/monitor' % web_socket_host
+    web_kill_uri = 'http://%s/kill' % web_socket_host
     return render_to_response('jlog/log_%s.html' % offset, locals(), context_instance=RequestContext(request))
 
 
@@ -103,6 +104,6 @@ def log_record(request):
 
 
 def web_terminal(request):
-    web_terminal_uri = '%s/terminal' % web_socket_host
+    web_terminal_uri = 'ws://%s/terminal' % web_socket_host
     return render_to_response('jlog/web_terminal.html', locals())
 

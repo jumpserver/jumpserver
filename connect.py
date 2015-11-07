@@ -269,12 +269,7 @@ class Tty(object):
         today_connect_log_dir = os.path.join(tty_log_dir, date_start)
         log_file_path = os.path.join(today_connect_log_dir, '%s_%s_%s' % (self.username, self.asset_name, time_start))
 
-        if self.login_type == 'ssh':
-            pid = os.getpid()
-            remote_ip = os.popen("who -m | awk '{ print $5 }'").read().strip('()\n')
-        else:
-            pid = 0
-            remote_ip = 'Web'
+
 
         try:
             is_dir(today_connect_log_dir, mode=0777)
@@ -287,8 +282,19 @@ class Tty(object):
         except IOError:
             raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 
-        log = Log(user=self.username, host=self.asset_name, remote_ip=remote_ip,
-                  log_path=log_file_path, start_time=datetime.datetime.now(), pid=pid)
+        if self.login_type == 'ssh':
+            pid = os.getpid()
+            remote_ip = os.popen("who -m | awk '{ print $5 }'").read().strip('()\n')
+            log = Log(user=self.username, host=self.asset_name, remote_ip=remote_ip,
+                      log_path=log_file_path, start_time=datetime.datetime.now(), pid=pid)
+        else:
+            remote_ip = 'Web'
+            log = Log(user=self.username, host=self.asset_name, remote_ip=remote_ip,
+                      log_path=log_file_path, start_time=datetime.datetime.now(), pid=0)
+            log.save()
+            log.pid = log.id
+            log.save()
+
         log_file_f.write('Start at %s\n' % datetime.datetime.now())
         log.save()
         return log_file_f, log_time_f, log

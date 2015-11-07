@@ -7,6 +7,7 @@ import os
 import sys
 import os.path
 import threading
+import uuid
 
 import tornado.ioloop
 import tornado.options
@@ -96,6 +97,7 @@ class Application(tornado.web.Application):
         handlers = [
             (r'/monitor', MonitorHandler),
             (r'/terminal', WebTerminalHandler),
+            (r'/kill', WebTerminalKillHandler),
         ]
 
         setting = {
@@ -165,8 +167,20 @@ class WebTty(Tty):
         self.input_mode = False
 
 
+class WebTerminalKillHandler(tornado.web.RequestHandler):
+    def get(self):
+        ws_id = self.get_argument('id')
+        for ws in WebTerminalHandler.clients:
+            print ws.id
+            if ws.id == int(ws_id):
+                print "killed"
+                ws.close()
+        print len(WebTerminalHandler.clients)
+
+
 class WebTerminalHandler(tornado.websocket.WebSocketHandler):
     tasks = []
+    clients = []
 
     def __init__(self, *args, **kwargs):
         self.term = None
@@ -174,6 +188,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         self.log_file_f = None
         self.log_time_f = None
         self.log = None
+        self.id = 0
         super(WebTerminalHandler, self).__init__(*args, **kwargs)
 
     def check_origin(self, origin):
@@ -184,6 +199,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         self.term.get_connection()
         self.channel = self.term.ssh.invoke_shell(term='xterm')
         WebTerminalHandler.tasks.append(MyThread(target=self.forward_outbound))
+        WebTerminalHandler.clients.append(self)
 
         for t in WebTerminalHandler.tasks:
             if t.is_alive():
@@ -205,6 +221,8 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
 
     def on_close(self):
         print 'On_close'
+        if self in WebTerminalHandler.clients:
+            WebTerminalHandler.clients.remove(self)
         self.log_file_f.write('End time is %s' % datetime.datetime.now())
         self.log.is_finished = True
         self.log.end_time = datetime.datetime.now()
@@ -213,6 +231,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
 
     def forward_outbound(self):
         self.log_file_f, self.log_time_f, self.log = self.term.get_log_file()
+        self.id = self.log.id
         try:
             data = ''
             pre_timestamp = time.time()
