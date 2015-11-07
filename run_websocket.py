@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import time
+import datetime
 import json
 import os
 import sys
@@ -25,6 +26,8 @@ from pyinotify import WatchManager, Notifier, ProcessEvent, IN_DELETE, IN_CREATE
 import struct, fcntl, signal, socket, select, fnmatch
 
 import paramiko
+from connect import Tty
+from connect import TtyLog
 
 try:
     import simplejson as json
@@ -124,12 +127,6 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
         MonitorHandler.threads.append(thread)
         self.stream.set_nodelay(True)
 
-        print len(MonitorHandler.threads), len(MonitorHandler.clients)
-
-    def on_message(self, message):
-        self.write_message('Connect WebSocket Success. <br/>')
-        # 监控日志，发生变动发向客户端
-
         try:
             for t in MonitorHandler.threads:
                 if t.is_alive():
@@ -143,6 +140,12 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
             MonitorHandler.clients.remove(self)
             MonitorHandler.threads.remove(MonitorHandler.threads[client_index])
 
+        print len(MonitorHandler.threads), len(MonitorHandler.clients)
+
+    def on_message(self, message):
+        # 监控日志，发生变动发向客户端
+        pass
+
     def on_close(self):
         # 客户端主动关闭
         # self.close()
@@ -153,28 +156,34 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
         MonitorHandler.threads.remove(MonitorHandler.threads[client_index])
 
 
+class WebTty(Tty):
+    def __init__(self, *args, **kwargs):
+        super(WebTty, self).__init__(*args, **kwargs)
+        self.login_type = 'web'
+        self.ws = None
+        self.input_r = ''
+        self.input_mode = False
+
+
 class WebTerminalHandler(tornado.websocket.WebSocketHandler):
     tasks = []
 
     def __init__(self, *args, **kwargs):
-        self.chan = None
-        self.ssh = None
+        self.term = None
+        self.channel = None
+        self.log_file_f = None
+        self.log_time_f = None
+        self.log = None
         super(WebTerminalHandler, self).__init__(*args, **kwargs)
 
     def check_origin(self, origin):
         return True
 
     def open(self):
-        self.ssh = paramiko.SSHClient()
-        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        try:
-            self.ssh.connect('127.0.0.1', 22, 'root', 'redhat')
-        except:
-            self.write_message(json.loads({'data': 'Connect server Error'}))
-            self.close()
-
-        self.chan = self.ssh.invoke_shell(term='xterm')
-        WebTerminalHandler.tasks.append(threading.Thread(target=self._forward_outbound))
+        self.term = WebTty('a', 'b')
+        self.term.get_connection()
+        self.channel = self.term.ssh.invoke_shell(term='xterm')
+        WebTerminalHandler.tasks.append(MyThread(target=self.forward_outbound))
 
         for t in WebTerminalHandler.tasks:
             if t.is_alive():
@@ -186,36 +195,49 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         data = json.loads(message)
         if not data:
             return
-        if 'resize' in data:
-            self.chan.resize_pty(
-                data['resize'].get('width', 80),
-                data['resize'].get('height', 24))
-        if 'data' in data:
-            self.chan.send(data['data'])
+        if data.get('data'):
+            self.term.input_mode = True
+            if str(data['data']) in ['\r', '\n', '\r\n']:
+                TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=self.term.remove_control_char(self.term.input_r)).save()
+                self.term.input_r = ''
+                self.term.input_mode = False
+            self.channel.send(data['data'])
 
     def on_close(self):
-        self.write_message(json.dumps({'data': 'close websocket'}))
+        print 'On_close'
+        self.log_file_f.write('End time is %s' % datetime.datetime.now())
+        self.log.is_finished = True
+        self.log.end_time = datetime.datetime.now()
+        self.log.save()
+        self.close()
 
-    def _forward_outbound(self):
-        """ Forward outbound traffic (ssh -> websockets) """
+    def forward_outbound(self):
+        self.log_file_f, self.log_time_f, self.log = self.term.get_log_file()
         try:
             data = ''
+            pre_timestamp = time.time()
             while True:
-                r, w, e = select.select([self.chan, sys.stdin], [], [])
-                if self.chan in r:
-                    recv = self.chan.recv(1024)
-                    print recv
+                r, w, e = select.select([self.channel, sys.stdin], [], [])
+                if self.channel in r:
+                    recv = self.channel.recv(1024)
                     if not len(recv):
                         return
                     data += recv
                     try:
                         self.write_message(json.dumps({'data': data}))
+                        now_timestamp = time.time()
+                        self.log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
+                        self.log_file_f.write(data)
+                        pre_timestamp = now_timestamp
+                        self.log_file_f.flush()
+                        self.log_time_f.flush()
+                        if self.term.input_mode and not self.term.is_output(data):
+                            self.term.input_r += data
                         data = ''
                     except UnicodeDecodeError:
                         pass
         finally:
             self.close()
-
 
 if __name__ == '__main__':
     tornado.options.parse_command_line()

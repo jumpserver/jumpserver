@@ -127,8 +127,20 @@
         var file_path = obj.attr('file_path');
         var wsUri = '{{ web_monitor_uri }}';
         var socket = new WebSocket(wsUri + '?file_path=' + file_path);
+
+        var term = new Terminal({
+              cols: 80,
+              rows: 24,
+              screenKeys: false
+        });
+
+        var tag = $('<div id="term" style="height:500px; overflow: auto;background-color: rgba(0, 0, 0, 0);border: none"></div>');
+            term.open();
+            term.resize(80, 24);
+
         socket.onopen = function(evt){
-             socket.send(file_path)
+                socket.send('hello');
+                term.write('~.~ Connect WebSocket Success.~.~ \r\n');
         };
 
         window.onbeforeunload = function(){
@@ -138,29 +150,15 @@
         var username = obj.closest('tr').find('#username').text();
         var ip = obj.closest('tr').find('#ip').text();
 
-
-
         BootstrapDialog.show({message: function(){
             //服务器端认证
 {#            socket.send('login', {userid:message.id, filename:message.filename,username:username,seed:seed});#}
-            var term = new Terminal({
-              cols: 80,
-              rows: 24,
-              screenKeys: false
-            });
-            var tag = $('<div id="term" style="height:500px; overflow: auto;background-color: rgba(0, 0, 0, 0);border: none"></div>');
-            term.open();
-            term.resize(80, 24);
-
             window.setTimeout(function(){
                 $('.terminal').detach().appendTo('#term');
                 socket.onmessage = function(evt){
                 term.write(evt.data);
             }}, 1000);
 
-
-
-            tag[0].style.color = "#00FF00";
             return tag[0];
         } ,
             title:'Jumpserver实时监控 '+' 登录用户名: '+'<span class="text-info">'+username+'</span>'+' 登录主机: '+'<span class="text-info">'+ip,
