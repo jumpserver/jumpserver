@@ -12,6 +12,7 @@ from django.template import RequestContext
 from django.db.models import ObjectDoesNotExist
 from jumpserver.settings import MAIL_FROM, MAIL_ENABLE
 from juser.user_api import *
+from jperm.perm_api import _public_perm_api, perm_user_api, user_permed
 
 
 def chg_role(request):
@@ -89,31 +90,6 @@ def group_del(request):
     return HttpResponse('删除成功')
 
 
-# @require_role(role='admin')
-# def group_list_adm(request):
-#     header_title, path1, path2 = '查看部门小组', '用户管理', '查看小组'
-#     keyword = request.GET.get('search', '')
-#     did = request.GET.get('did', '')
-#     user, dept = get_session_user_dept(request)
-#     contact_list = dept.usergroup_set.all().order_by('name')
-#
-#     if keyword:
-#         contact_list = contact_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
-#
-#     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
-#     return render_to_response('juser/group_list.html', locals(), context_instance=RequestContext(request))
-
-#
-# @require_role(role='admin')
-# def group_detail(request):
-#     group_id = request.GET.get('id', None)
-#     if not group_id:
-#         return HttpResponseRedirect('/')
-#     group = UserGroup.objects.get(id=group_id)
-#     users = group.user_set.all()
-#     return render_to_response('juser/group_detail.html', locals(), context_instance=RequestContext(request))
-
-
 @require_role(role='super')
 def group_edit(request):
     error = ''
@@ -165,6 +141,7 @@ def group_edit(request):
     return my_render('juser/group_edit.html', locals(), request)
 
 
+<<<<<<< HEAD
 # @require_role(role='admin')
 # def group_edit_adm(request):
 #     error = ''
@@ -258,11 +235,20 @@ def user_add(request):
                                    is_active=is_active,
                                    date_joined=datetime.datetime.now())
                 server_add_user(username, password, ssh_key_pwd, ssh_key_login_need)
-            except Exception, e:
+                user = get_object(User, username=username)
+                if groups:
+                    user_groups = []
+                    for user_group_id in groups:
+                        user_groups.extend(UserGroup.objects.filter(id=user_group_id))
+                    print user_groups
+                    results = _public_perm_api({'type': 'new_user', 'user': user, 'group': user_groups})
+                    print results
+            except IndexError, e:
                 error = u'添加用户 %s 失败 %s ' % (username, e)
                 try:
                     db_del_user(username)
                     server_del_user(username)
+                    _public_perm_api({'type': 'del_user', 'user': user, 'group': user_groups})
                 except Exception:
                     pass
             else:
@@ -270,78 +256,6 @@ def user_add(request):
                     user_add_mail(user, kwargs=locals())
                 msg = get_display_msg(user, password, ssh_key_pwd, ssh_key_login_need, send_mail_need)
     return my_render('juser/user_add.html', locals(), request)
-
-
-# @require_role(role='admin')
-# def user_add_adm(request):
-#     error = ''
-#     msg = ''
-#     header_title, path1, path2 = '添加用户', '用户管理', '添加用户'
-#     user, dept = get_session_user_dept(request)
-#     group_all = dept.usergroup_set.all()
-#
-#     if request.method == 'POST':
-#         username = request.POST.get('username', '')
-#         password = PyCrypt.gen_rand_pwd(16)
-#         name = request.POST.get('name', '')
-#         email = request.POST.get('email', '')
-#         groups = request.POST.getlist('groups', [])
-#         ssh_key_pwd = PyCrypt.gen_rand_pwd(16)
-#         is_active = True if request.POST.get('is_active', '1') == '1' else False
-#         ldap_pwd = PyCrypt.gen_rand_pwd(16)
-#
-#         try:
-#             if '' in [username, password, ssh_key_pwd, name, groups, is_active]:
-#                 error = u'带*内容不能为空'
-#                 raise ServerError
-#             user = User.objects.filter(username=username)
-#             if user:
-#                 error = u'用户 %s 已存在' % username
-#                 raise ServerError
-#
-#         except ServerError:
-#             pass
-#         else:
-#             try:
-#                 user = db_add_user(username=username,
-#                                    password=CRYPTOR.md5_crypt(password),
-#                                    name=name, email=email, dept=dept,
-#                                    groups=groups, role='CU',
-#                                    ssh_key_pwd=CRYPTOR.md5_crypt(ssh_key_pwd),
-#                                    ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
-#                                    is_active=is_active,
-#                                    date_joined=datetime.datetime.now())
-#
-#                 server_add_user(username, password, ssh_key_pwd)
-#                 if LDAP_ENABLE:
-#                     ldap_add_user(username, ldap_pwd)
-#
-#             except Exception, e:
-#                 error = u'添加用户 %s 失败 %s ' % (username, e)
-#                 try:
-#                     db_del_user(username)
-#                     server_del_user(username)
-#                     if LDAP_ENABLE:
-#                         ldap_del_user(username)
-#                 except Exception:
-#                     pass
-#             else:
-#                 mail_title = u'恭喜你的跳板机用户添加成功 Jumpserver'
-#                 mail_msg = """
-#                 Hi, %s
-#                     您的用户名： %s
-#                     您的部门: %s
-#                     您的角色： %s
-#                     您的web登录密码： %s
-#                     您的ssh密钥文件密码： %s
-#                     密钥下载地址： http://%s:%s/juser/down_key/?id=%s
-#                     说明： 请登陆后再下载密钥！
-#                 """ % (name, username, dept.name, '普通用户',
-#                        password, ssh_key_pwd, SEND_IP, SEND_PORT, user.id)
-#                 send_mail(mail_title, mail_msg, MAIL_FROM, [email], fail_silently=False)
-#                 msg = u'添加用户 %s 成功！ 用户密码已发送到 %s 邮箱！' % (username, email)
-#
-#     return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
 
 
 @require_role(role='super')
@@ -364,31 +278,6 @@ def user_list(request):
     users_list, p, users, page_range, current_page, show_first, show_end = pages(users_list, request)
 
     return my_render('juser/user_list.html', locals(), request)
-
-
-# @require_role(role='admin')
-# def user_list_adm(request):
-#     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
-#     header_title, path1, path2 = '查看用户', '用户管理', '用户列表'
-#     keyword = request.GET.get('keyword', '')
-#     user, dept = get_session_user_dept(request)
-#     gid = request.GET.get('gid', '')
-#     contact_list = dept.user_set.all().order_by('name')
-#
-#     if gid:
-#         if not validate(request, user_group=[gid]):
-#             return HttpResponseRedirect('/juser/user_list/')
-#         user_group = UserGroup.objects.filter(id=gid)
-#         if user_group:
-#             user_group = user_group[0]
-#             contact_list = user_group.user_set.all()
-#
-#     if keyword:
-#         contact_list = contact_list.filter(Q(username__icontains=keyword) | Q(name__icontains=keyword)).order_by('name')
-#
-#     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
-#
-#     return render_to_response('juser/user_list.html', locals(), context_instance=RequestContext(request))
 
 
 @require_role(role='user')
@@ -427,8 +316,12 @@ def user_del(request):
     else:
         return HttpResponse('错误请求')
     for user_id in user_id_list:
-        User.objects.filter(id=user_id).delete()
-
+        user = get_object(User, id=user_id)
+        if user:
+            assets = user_permed(user)
+            result = _public_perm_api({'type': 'del_user', 'user': user, 'asset': assets})
+            print result
+            user.delete()
     return HttpResponse('删除成功')
 
 
@@ -547,6 +440,7 @@ def user_edit(request):
                        admin_groups=admin_groups,
                        role=role_post,
                        is_active=is_active)
+        _public_perm_api({'type': 'del_user', 'user': user, 'asset': user_permed(user)})
 
         if email_need:
             msg = u"""
@@ -568,59 +462,6 @@ def user_edit(request):
 # @require_role(role='admin')
 def user_edit_adm(request):
     pass
-#     header_title, path1, path2 = '编辑用户', '用户管理', '用户编辑'
-#     user, dept = get_session_user_dept(request)
-#     if request.method == 'GET':
-#         user_id = request.GET.get('id', '')
-#         if not user_id:
-#             return HttpResponseRedirect('/juser/user_list/')
-#
-#         if not validate(request, user=[user_id]):
-#             return HttpResponseRedirect('/juser/user_list/')
-#
-#         user = User.objects.filter(id=user_id)
-#         dept_all = DEPT.objects.all()
-#         group_all = dept.usergroup_set.all()
-#         if user:
-#             user = user[0]
-#             groups_str = ' '.join([str(group.id) for group in user.group.all()])
-#
-#     else:
-#         user_id = request.POST.get('user_id', '')
-#         password = request.POST.get('password', '')
-#         name = request.POST.get('name', '')
-#         email = request.POST.get('email', '')
-#         groups = request.POST.getlist('groups', [])
-#         ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
-#         is_active = True if request.POST.get('is_active', '1') == '1' else False
-#
-#         if not validate(request, user=[user_id], user_group=groups):
-#             return HttpResponseRedirect('/juser/user_edit/')
-#         if user_id:
-#             user = User.objects.filter(id=user_id)
-#             if user:
-#                 user = user[0]
-#         else:
-#             return HttpResponseRedirect('/juser/user_list/')
-#
-#         if password != user.password:
-#             password = CRYPTOR.md5_crypt(password)
-#
-#         if ssh_key_pwd != user.ssh_key_pwd:
-#             ssh_key_pwd = CRYPTOR.encrypt(ssh_key_pwd)
-#
-#         db_update_user(user_id=user_id,
-#                        password=password,
-#                        name=name,
-#                        email=email,
-#                        groups=groups,
-#                        is_active=is_active,
-#                        ssh_key_pwd=ssh_key_pwd)
-#
-#         return HttpResponseRedirect('/juser/user_list/')
-#
-#     return render_to_response('juser/user_edit.html', locals(), context_instance=RequestContext(request))
-#
 
 
 def profile(request):

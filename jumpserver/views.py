@@ -12,10 +12,12 @@ from django.http import HttpResponse
 # from jperm.models import Apply
 import paramiko
 from jumpserver.api import *
+from jumpserver.models import Setting
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from settings import BASE_DIR
 from jlog.models import Log
+
 
 def getDaysByNum(num):
     today = datetime.date.today()
@@ -196,6 +198,7 @@ def is_latest():
 
 def Login(request):
     """登录界面"""
+    error = ''
     if request.user.is_authenticated():
         return HttpResponseRedirect('/')
     if request.method == 'GET':
@@ -240,6 +243,33 @@ def Logout(request):
     logout(request)
     return HttpResponseRedirect('/login/')
 
+
+def setting(request):
+    header_title, path1 = '项目设置', '设置'
+    setting_r = get_object(Setting, name='default')
+
+    if request.method == "POST":
+        username = request.POST.get('username', '')
+        port = request.POST.get('port', '')
+        private_key = request.POST.get('key', '')
+
+        if '' in [username, port, private_key]:
+            return HttpResponse('所填内容不能为空')
+        else:
+            settings = get_object(Setting, id=1)
+            private_key_path = os.path.join(BASE_DIR, 'keys', 'default', 'default_private_key.pem')
+            with open(private_key_path, 'w') as f:
+                    f.write(private_key)
+            os.chmod(private_key_path, 0600)
+            if settings:
+                Setting.objects.filter(name='default').update(default_user=username, default_port=port,
+                                                              default_pri_key_path=private_key_path)
+            else:
+                setting_r = Setting(name='default', default_user=username, default_port=port,
+                                    default_pri_key_path=private_key_path).save()
+
+            msg = "设置成功"
+    return my_render('setting.html', locals(), request)
 #
 # def filter_ajax_api(request):
 #     attr = request.GET.get('attr', 'user')

@@ -1,10 +1,12 @@
 # coding: utf-8
 
 from Crypto.PublicKey import RSA
+from subprocess import call
 
 from juser.models import AdminGroup
 from jumpserver.api import *
-from  jumpserver.settings import BASE_DIR
+from jumpserver.settings import BASE_DIR
+
 
 def group_add_user(group, user_id=None, username=None):
     """
@@ -118,30 +120,27 @@ def db_del_user(username):
         user.delete()
 
 
-def gen_ssh_key(username, password=None, length=2048):
+def gen_ssh_key(username, password='',
+                key_dir=os.path.join(BASE_DIR, 'keys/user/'),
+                authorized_keys=True, home="/home", length=2048):
     """
     generate a user ssh key in a property dir
     生成一个用户ssh密钥对
     """
-    print "gen_ssh_key" + str(time.time())
-    private_key_dir = os.path.join(BASE_DIR, 'keys/jumpserver/')
-    private_key_file = os.path.join(private_key_dir, username+".pem")
-    public_key_dir = '/home/%s/.ssh/' % username
-    public_key_file = os.path.join(public_key_dir, 'authorized_keys')
-    is_dir(private_key_dir)
-    is_dir(public_key_dir, username, mode=0700)
+    private_key_file = os.path.join(key_dir, username)
+    if os.path.isfile(private_key_file):
+        os.unlink(private_key_file)
+    ret = bash('ssh-keygen -t rsa -f %s -b %s -P "%s"' % (private_key_file, length, password))
 
-    key = RSA.generate(length)
-    with open(private_key_file, 'w') as pri_f:
-        pri_f.write(key.exportKey('PEM', password))
-    os.chmod(private_key_file, 0600)
-    print "gen_ssh_pub_key" + str(time.time())
-    pub_key = key.publickey()
-    with open(public_key_file, 'w') as pub_f:
-        pub_f.write(pub_key.exportKey('OpenSSH'))
-    os.chmod(public_key_file, 0600)
-    bash('chown %s:%s %s' % (username, username, public_key_file))
-    print "gen_ssh_key_end" + str(time.time())
+    if authorized_keys:
+        auth_key_dir = os.path.join(home, username, '.ssh')
+        is_dir(auth_key_dir, username, mode=0700)
+        authorized_key_file = os.path.join(auth_key_dir, 'authorized_keys')
+        with open(private_key_file+'.pub') as pub_f:
+            with open(authorized_key_file, 'w') as auth_f:
+                auth_f.write(pub_f.read())
+        os.chmod(authorized_key_file, 0600)
+        bash('chown %s:%s %s' % (username, username, authorized_key_file))
 
 
 def server_add_user(username, password, ssh_key_pwd, ssh_key_login_need):

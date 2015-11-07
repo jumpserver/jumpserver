@@ -1,0 +1,111 @@
+<html>
+    <head>{% block head %}{% endblock %}
+    </head>
+    
+    <body>
+        <input type="button" value="Play/Pause" onclick="pause(false);" /> 
+        <input type="button" value="Restart" onclick="restart(1);" /> 
+        <span id="beforeScrubberText"></span>
+        <input id="scrubber" type="range" value="0" min=0 max=100
+               onmousedown="pause(true);" onmouseup="scrub();" />
+        <span id="afterScrubberText"></span>
+        -5x <input id="speed" type="range" value="0" min=-5 max=5
+               onmouseup="setSpeed();" /> +5x
+        <script>
+            var data = {{ json }};
+            var toggle = true;
+            var totalTime = 0;
+            var TICK = 33;
+            var TIMESTEP = 33;
+            var time = 33;
+            var pos = 0;
+            var timer;
+
+            // Thanks http://stackoverflow.com/a/2998822
+            function zeroPad(num, size) {
+                var s = "0" + num;
+                return s.substr(s.length-size);
+            }
+
+            function scrub() {
+               setPercent = document.getElementById('scrubber').value;
+               time = (setPercent / 100) * totalTime;
+               restart(time); 
+            }
+
+            function buildTimeString(millis) {
+                hours   = zeroPad(Math.floor(millis / (1000 * 60 * 60)), 2);
+                millis -= hours * (1000 * 60 * 60)
+                minutes = zeroPad(Math.floor(millis / (1000 * 60)), 2);
+                millis -= minutes * (1000 * 60);
+                seconds = zeroPad(Math.floor(millis / 1000), 2);
+                return hours + ':' + minutes + ':' + seconds;
+            }
+
+            function advance() {
+                document.getElementById('scrubber').value =
+                                           Math.ceil((time / totalTime) * 100);
+                timestr = buildTimeString(time);
+                document.getElementById("beforeScrubberText").innerHTML = 
+                                                                       timestr;
+                for (; pos < data.length; pos++) {
+                    if (data[pos][1] <= time) {
+                        term.write(eval(data[pos][0]));
+                    } else {
+                        break;
+                    }
+                }
+
+                if (pos >= data.length) {
+                    clearInterval(timer);
+                }
+
+                time += TIMESTEP;
+            }
+
+            function pause(test) {
+                if (!toggle && test) {
+                    return;
+                }
+                if (toggle) {
+                    clearInterval(timer);
+                    toggle = !toggle;
+                } else {
+                   timer = setInterval(advance, TICK);
+                   toggle = !toggle; 
+                }
+            }
+
+            function setSpeed() {
+                speed = document.getElementById('speed').value;
+                if (speed == 0) {
+                    TIMESTEP = TICK;
+                } else if (speed < 0) {
+                    TIMESTEP = TICK / -speed;
+                } else {
+                    TIMESTEP = TICK * speed;
+                }
+            }
+
+            function restart(millis) {
+                    clearInterval(timer);
+                    term.reset();
+                    time = millis;
+                    pos = 0;
+                    toggle = true;
+                    timer = setInterval(advance, TICK);
+            }
+
+            var term = new Terminal({
+                                        cols: {{ dimensions[1] }},
+                                        rows: {{ dimensions[0] }},
+                                        screenKeys: true
+                                    });
+            totalTime = data[data.length - 1][1];
+            timestr = buildTimeString(totalTime);
+            document.getElementById("afterScrubberText").innerHTML = timestr;
+            term.open(document.body);
+            timer = setInterval(advance, TICK);
+            </script>
+        </body>
+    </html>

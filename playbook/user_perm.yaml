@@ -1,0 +1,17 @@
+- hosts: the_del_group
+  tasks:
+    - name: del user
+      user: name={{ item }} state=absent remove=yes
+      with_items: [ the_del_users ]
+
+- hosts: the_new_group
+  tasks:
+    - name: add user
+      user: name={{ item }} state=present
+      with_items: [ the_new_users ]
+    - name: .ssh direcotory
+      file: name=/home/{{ item }}/.ssh mode=700 owner={{ item }} group={{ item }} state=directory
+      with_items: [ the_new_users ]
+    - name: set authorizied_file
+      copy: src=KEY_DIR/{{ item }}.pub dest=/home/{{ item }}/.ssh/authorizied_keys owner={{ item }} group={{ item }} mode=600
+      with_items: [ the_new_users ]
