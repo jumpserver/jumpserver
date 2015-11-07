@@ -141,7 +141,6 @@ def group_edit(request):
     return my_render('juser/group_edit.html', locals(), request)
 
 
-<<<<<<< HEAD
 # @require_role(role='admin')
 # def group_edit_adm(request):
 #     error = ''
@@ -426,11 +425,10 @@ def user_edit(request):
         else:
             return HttpResponseRedirect('/juser/user_list/')
 
-        # if password != user.password:
-        #     password_decode = password
-        #     password = CRYPTOR.md5_crypt(password)
-        # else:
-        #     password_decode = None
+        if password != '':
+            password_decode = password
+        else:
+            password_decode = None
 
         db_update_user(user_id=user_id,
                        password=password,
