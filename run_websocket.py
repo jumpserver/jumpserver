@@ -50,8 +50,8 @@ def require_auth(func):
         client = tornado.httpclient.HTTPClient()
         # response = client.fetch('http://some/url') + urllib.urlencode({'username': username,
         #                                                                'asset_name': asset_name, 'token': token})
-        return request.close()
-        # return func(request, *args, **kwargs)
+        # return request.close()
+        return func(request, *args, **kwargs)
     return _deco
 
 

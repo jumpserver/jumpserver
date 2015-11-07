@@ -50,7 +50,7 @@
         <div class="col-lg-12">
             <div class="ibox float-e-margins">
                 <div id="ibox-content" class="ibox-title">
-                    <h5> 用户日志详细信息列表 </h5>
+                    <h5> 用户日志详细信息列表 <input type="button" id="test_connect" class="btn btn-primary" value="测试连接 web terminal" /> </h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -187,6 +187,10 @@
                         BootstrapDialog.show({title: title, message:tag[0]});
             }});
            return false;
+        });
+
+        $('#test_connect').click(function(){
+            window.open('/jlog/web_terminal/?asset_name="hello', '播放', 'height=400, width=600, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');
         });
     });
 
