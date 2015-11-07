@@ -269,8 +269,6 @@ class Tty(object):
         today_connect_log_dir = os.path.join(tty_log_dir, date_start)
         log_file_path = os.path.join(today_connect_log_dir, '%s_%s_%s' % (self.username, self.asset_name, time_start))
 
-
-
         try:
             is_dir(today_connect_log_dir, mode=0777)
         except OSError:
@@ -308,7 +306,7 @@ class Tty(object):
         # 2. get 映射用户
         # 3. get 映射用户的账号，密码或者key
         # self.connect_info = {'user': '', 'asset': '', 'ip': '', 'port': 0, 'role_name': '', 'role_pass': '', 'role_key': ''}
-        self.connect_info = {'user': 'a', 'asset': 'b', 'ip': '127.0.0.1', 'port': 22, 'role_name': 'root', 'role_pass': 'redhat', 'role_key': ''}
+        self.connect_info = {'user': 'a', 'asset': 'b', 'ip': '127.0.0.1', 'port': 22, 'role_name': 'root', 'role_pass': '', 'role_key': '/root/.ssh/id_rsa.bak'}
         return self.connect_info
 
     def get_connection(self):

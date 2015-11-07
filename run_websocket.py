@@ -7,7 +7,7 @@ import os
 import sys
 import os.path
 import threading
-import uuid
+import urllib
 
 import tornado.ioloop
 import tornado.options
@@ -15,6 +15,7 @@ import tornado.web
 import tornado.websocket
 import tornado.httpserver
 import tornado.gen
+import tornado.httpclient
 from tornado.websocket import WebSocketClosedError
 
 from tornado.options import define, options
@@ -38,6 +39,20 @@ except ImportError:
 
 define("port", default=3000, help="run on the given port", type=int)
 define("host", default='0.0.0.0', help="run port on", type=str)
+
+
+def require_auth(func):
+    def _deco(request, *args, **kwargs):
+        username = request.get_argument('username', '')
+        asset_name = request.get_argument('asset_name', '')
+        token = request.get_argument('token', '')
+        print username, asset_name, token
+        client = tornado.httpclient.HTTPClient()
+        # response = client.fetch('http://some/url') + urllib.urlencode({'username': username,
+        #                                                                'asset_name': asset_name, 'token': token})
+        return request.close()
+        # return func(request, *args, **kwargs)
+    return _deco
 
 
 class MyThread(threading.Thread):
@@ -121,6 +136,7 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
+    @require_auth
     def open(self):
         # 获取监控的path
         self.file_path = self.get_argument('file_path', '')
@@ -174,6 +190,8 @@ class WebTerminalKillHandler(tornado.web.RequestHandler):
             print ws.id
             if ws.id == int(ws_id):
                 print "killed"
+                ws.log.is_finished = True
+                ws.log.save()
                 ws.close()
         print len(WebTerminalHandler.clients)
 
@@ -194,7 +212,12 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
+    @require_auth
     def open(self):
+        asset_name = self.get_argument('asset_name', '')
+        username = self.get_argument('username', '')
+        token = self.get_argument('token', '')
+        print asset_name, username, token
         self.term = WebTty('a', 'b')
         self.term.get_connection()
         self.channel = self.term.ssh.invoke_shell(term='xterm')
@@ -223,11 +246,14 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         print 'On_close'
         if self in WebTerminalHandler.clients:
             WebTerminalHandler.clients.remove(self)
-        self.log_file_f.write('End time is %s' % datetime.datetime.now())
-        self.log.is_finished = True
-        self.log.end_time = datetime.datetime.now()
-        self.log.save()
-        self.close()
+        try:
+            self.log_file_f.write('End time is %s' % datetime.datetime.now())
+            self.log.is_finished = True
+            self.log.end_time = datetime.datetime.now()
+            self.log.save()
+            self.close()
+        except AttributeError:
+            pass
 
     def forward_outbound(self):
         self.log_file_f, self.log_time_f, self.log = self.term.get_log_file()
