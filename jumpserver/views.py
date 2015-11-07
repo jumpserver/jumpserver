@@ -227,6 +227,8 @@ def Login(request):
                 # response.set_cookie('username', username, expires=604800)
                 # response.set_cookie('seed', PyCrypt.md5_crypt(password), expires=604800)
                 # return response
+                else:
+                    error = '用户未激活'
             else:
                 error = '用户名或密码错误'
         else:
