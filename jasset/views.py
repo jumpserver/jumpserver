@@ -146,8 +146,10 @@ def asset_add(request):
     af = AssetForm()
     if request.method == 'POST':
         af_post = AssetForm(request.POST)
-        ip = request.POST.get('ip')
-
+        print af_post
+        ip = request.POST.get('ip', '')
+        is_active = True if request.POST.get('is_active') == '1' else False
+        use_default_auth = request.POST.get('use_default_auth', '')
         try:
             if Asset.objects.filter(ip=str(ip)):
                 error = u'该IP %s 已存在!' % ip
@@ -159,37 +161,19 @@ def asset_add(request):
         else:
             if af_post.is_valid():
                 asset_save = af_post.save(commit=False)
+                if not use_default_auth:
+                    password = request.POST.get('password', '')
+                    password_encode = CRYPTOR.encrypt(password)
+                    asset_save.password = password_encode
+                asset_save.is_active = True if is_active else False
                 asset_save.save()
                 af_post.save_m2m()
+
                 msg = u'主机 %s 添加成功' % ip
             else:
                 esg = u'主机 %s 添加失败' % ip
 
     return my_render('jasset/asset_add.html', locals(), request)
-
-
-@require_role(role='user')
-def asset_list(request):
-    """
-    list assets
-    列出资产表
-    """
-    header_title, path1, path2 = u'查看主机', u'资产管理', u'查看主机'
-    idc_all = IDC.objects.filter()
-    asset_group_all = AssetGroup.objects.all()
-    asset_type = ASSET_TYPE
-    asset_status = ASSET_STATUS
-    keyword = request.GET.get('keyword', '')
-    gid = request.GET.get('gid', '')  # asset group id
-    sid = request.GET.get('sid', '')
-    assets_list = Asset.objects.all().order_by('ip')
-
-    if keyword:
-        assets_list = assets_list.filter(Q(ip__contains=keyword) |
-                                        Q(comment__contains=keyword)).distinct().order_by('ip')
-
-    assets_list, p, assets, page_range, current_page, show_first, show_end = pages(assets_list, request)
-    return my_render('jasset/asset_list.html', locals(), request)
 
 
 @require_role('admin')
@@ -223,8 +207,9 @@ def asset_edit(request):
     header_title, path1, path2 = u'修改资产', u'资产管理', u'修改资产'
 
     asset_id = request.GET.get('id', '')
-    if not asset_id:
-        return HttpResponse('没有该主机')
+    username = request.session.get('username', 'admin')
+    # if not asset_id:
+    #     return HttpResponse('没有该主机')
     asset = get_object(Asset, id=asset_id)
     af = AssetForm(instance=asset)
     if request.method == 'POST':
@@ -239,8 +224,8 @@ def asset_edit(request):
         # comment = request.POST.get('comment')
 
         # if not use_default_auth:
-        #     username = request.POST.get('username')
-        #     password = request.POST.get('password')
+        # username = request.POST.get('username')
+        # password = request.POST.get('password')
         #     if password == asset.password:
         #         password_encode = password
         #     else:
@@ -251,7 +236,7 @@ def asset_edit(request):
 
         try:
             asset_test = get_object(Asset, ip=ip)
-            if asset_test and asset_id != str(asset_test.id):
+            if asset_test and asset_id != unicode(asset_test.id):
                 error = u'该IP %s 已存在!' % ip
                 raise ServerError(error)
         except ServerError:
@@ -261,12 +246,75 @@ def asset_edit(request):
                 af_save = af_post.save(commit=False)
                 af_save.save()
                 af_post.save_m2m()
+                info = asset_diff(af_post.__dict__.get('initial'), request.POST)
+                print info
+                db_asset_alert(asset, username, info)
+
                 msg = u'主机 %s 修改成功' % ip
             else:
                 emg = u'主机 %s 修改失败' % ip
             return HttpResponseRedirect('/jasset/asset_detail/?id=%s' % asset_id)
 
     return my_render('jasset/asset_edit.html', locals(), request)
+
+
+@require_role('user')
+def asset_list(request):
+    """
+    asset list view
+    """
+    idc_all = IDC.objects.filter()
+    asset_group_all = AssetGroup.objects.all()
+    asset_types = ASSET_TYPE
+    asset_status = ASSET_STATUS
+
+    idc_name = request.GET.get('idc', '')
+    group_name = request.GET.get('group', '')
+    asset_type = request.GET.get('asset_type', '')
+    status = request.GET.get('status', '')
+    keyword = request.GET.get('keyword', '')
+    export = request.GET.get("export", False)
+
+    asset_find = Asset.objects.all()
+    if idc_name:
+        asset_find = asset_find.filter(idc__name__contains=idc_name)
+
+    if group_name:
+        asset_find = asset_find.filter(group__name__contains=group_name)
+
+    if asset_type:
+        asset_find = asset_find.filter(asset_type__contains=asset_type)
+
+    if status:
+        asset_find = asset_find.filter(status__contains=status)
+
+    if keyword:
+        asset_find = asset_find.filter(
+            Q(hostname__contains=keyword) |
+            Q(other_ip__contains=keyword) |
+            Q(ip__contains=keyword) |
+            Q(remote_ip__contains=keyword) |
+            Q(comment__contains=keyword) |
+            Q(group__name__contains=keyword) |
+            Q(cpu__contains=keyword) |
+            Q(memory__contains=keyword) |
+            Q(disk__contains=keyword))
+
+    if export:
+        s = write_excel(asset_find)
+        if s[0]:
+            file_name = s[1]
+        smg = 'excel文件已生成，请点击下载!'
+        return my_render('jasset/asset_excel_download.html', locals(), request)
+    assets_list, p, assets, page_range, current_page, show_first, show_end = pages(asset_find, request)
+    return my_render('jasset/asset_list.html', locals(), request)
+
+
+@require_role('admin')
+def asset_edit_batch(request):
+    af = AssetForm()
+    asset_group_all = AssetGroup.objects.all()
+    return my_render('jasset/asset_edit_batch.html', locals(), request)
 
 
 @require_role('admin')
@@ -277,86 +325,6 @@ def asset_detail(request):
     header_title, path1, path2 = u'主机详细信息', u'资产管理', u'主机详情'
     asset_id = request.GET.get('id', '')
     asset = get_object(Asset, id=asset_id)
+    asset_record = AssetRecord.objects.filter(asset=asset).order_by('-alert_time')
 
     return my_render('jasset/asset_detail.html', locals(), request)
-
-
-@require_role('user')
-def asset_search(request):
-    """
-    主机搜索
-    """
-    idc_all = IDC.objects.filter()
-    asset_group_all = AssetGroup.objects.all()
-    asset_type = ASSET_TYPE
-    asset_status = ASSET_STATUS
-
-    idc_name = request.GET.get('idc', '')
-    group_name = request.GET.get('group', '')
-    asset_type = request.GET.get('asset_type', '')
-    status = request.GET.get('status', '')
-    keyword = request.GET.get('keyword', '')
-
-    if not idc_name and not asset_type and not status and group_name == 'all':
-        select_number = 0
-    else:
-        select_number = 1
-
-    if group_name == 'all':
-        asset_find = Asset.objects.filter(
-            idc__name__contains=idc_name,
-            asset_type__contains=asset_type,
-            status__contains=status
-        )
-
-    else:
-        asset_find = Asset.objects.filter(
-            idc__name__contains=idc_name,
-            group__name__contains=group_name,
-            asset_type__contains=asset_type,
-            status__contains=status
-        )
-    if keyword and select_number == 1:
-        asset_find = asset_find.filter(
-            Q(hostname__contains=keyword) |
-            Q(idc__name__contains=keyword) |
-            Q(ip__contains=keyword) |
-            Q(remote_ip__contains=keyword) |
-            Q(comment__contains=keyword) |
-            Q(group__name__contains=keyword) |
-            Q(cpu__contains=keyword) |
-            Q(memory__contains=keyword) |
-            Q(disk__contains=keyword))
-
-    elif keyword:
-        asset_find = Asset.objects.filter(
-            Q(hostname__contains=keyword) |
-            Q(idc__name__contains=keyword) |
-            Q(ip__contains=keyword) |
-            Q(remote_ip__contains=keyword) |
-            Q(comment__contains=keyword) |
-            Q(group__name__contains=keyword) |
-            Q(cpu__contains=keyword) |
-            Q(memory__contains=keyword) |
-            Q(disk__contains=keyword))
-
-    # asset_find = list(set(asset_find))
-    # asset_find_dic = {}
-    # asset_find_lis = []
-    # for server in asset_find:
-    #     if server.ip:
-    #         asset_find_dic[server.ip] = server
-    #         asset_find_lis.append(server.ip)
-    # sort_ip_list(asset_find_lis)
-    # asset_find = []
-    # for ip in asset_find_lis:
-    #     asset_find.append(asset_find_dic[ip])
-    # search_status = request.GET.get("_search", False)
-    # if search_status:
-    #     s = write_excel(asset_find)
-    #     if s[0]:
-    #         file_name = s[1]
-    #         smg = 'excel文件已生成，请点击下载!'
-    #         return my_render('cmdb/excel_download.html', locals(), request)
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(asset_find, request)
-    return my_render('jasset/asset_list.html', locals(), request)

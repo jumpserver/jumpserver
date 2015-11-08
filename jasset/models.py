@@ -4,19 +4,19 @@ import datetime
 from django.db import models
 from juser.models import User, UserGroup
 
-ENVIRONMENT = (
-    (0, U'生产环境'),
-    (1, U'测试环境')
+ASSET_ENV = (
+    (1, U'生产环境'),
+    (2, U'测试环境')
     )
 
 ASSET_STATUS = (
-    (0, u"已使用"),
-    (1, u"未使用"),
-    (2, u"报废")
+    (1, u"已使用"),
+    (2, u"未使用"),
+    (3, u"报废")
     )
 
 ASSET_TYPE = (
-    (0, u"服务器"),
+    (1, u"服务器"),
     (2, u"网络设备"),
     (3, u"其他")
     )
@@ -32,49 +32,6 @@ class AssetGroup(models.Model):
 
     def __unicode__(self):
         return self.name
-
-    def get_asset(self):
-        return self.asset_set.all()
-
-    def get_asset_info(self, printable=False):
-        assets = self.get_asset()
-        ip_comment = {}
-        for asset in assets:
-            ip_comment[asset.ip] = asset.comment
-
-        for ip in sorted(ip_comment):
-            if ip_comment[ip]:
-                print '%-15s -- %s' % (ip, ip_comment[ip])
-            else:
-                print '%-15s' % ip
-        print ''
-
-    def get_asset_num(self):
-        return len(self.get_asset())
-
-    def get_user_group(self):
-        perm_list = self.perm_set.all()
-        user_group_list = []
-        for perm in perm_list:
-            user_group_list.append(perm.user_group)
-        return user_group_list
-
-    def get_user(self):
-        user_list = []
-        user_group_list = self.get_user_group()
-        for user_group in user_group_list:
-            user_list.extend(user_group.user_set.all())
-        return user_list
-
-    def is_permed(self, user=None, user_group=None):
-        if user:
-            if user in self.get_user():
-                return True
-
-        if user_group:
-            if user_group in self.get_user_group():
-                return True
-        return False
 
 
 class IDC(models.Model):
@@ -101,7 +58,7 @@ class Asset(models.Model):
     asset modle
     """
     ip = models.IPAddressField(unique=True, verbose_name=u"主机IP")
-    second_ip = models.CharField(max_length=255, blank=True, null=True, verbose_name=u"其他IP")
+    other_ip = models.CharField(max_length=255, blank=True, null=True, verbose_name=u"其他IP")
     hostname = models.CharField(max_length=64, blank=True, null=True, verbose_name=u"主机名")
     port = models.IntegerField(max_length=6, verbose_name=u"端口号")
     group = models.ManyToManyField(AssetGroup, blank=True, null=True, verbose_name=u"所属主机组")
@@ -122,7 +79,7 @@ class Asset(models.Model):
     number = models.CharField(max_length=32, blank=True, null=True, verbose_name=u'资产编号')
     status = models.IntegerField(max_length=2, choices=ASSET_STATUS, blank=True, null=True, default=1, verbose_name=u"机器状态")
     asset_type = models.IntegerField(max_length=2, choices=ASSET_TYPE, blank=True, null=True, verbose_name=u"主机类型")
-    env = models.IntegerField(max_length=2, choices=ENVIRONMENT, blank=True, null=True, verbose_name=u"运行环境")
+    env = models.IntegerField(max_length=2, choices=ASSET_ENV, blank=True, null=True, verbose_name=u"运行环境")
     sn = models.CharField(max_length=32, blank=True, null=True, verbose_name=u"SN编号")
     date_added = models.DateTimeField(auto_now=True, default=datetime.datetime.now(), null=True)
     is_active = models.BooleanField(default=True, verbose_name=u"是否激活")
@@ -130,6 +87,14 @@ class Asset(models.Model):
 
     def __unicode__(self):
         return self.ip
+
+
+class AssetRecord(models.Model):
+    asset = models.ForeignKey(Asset)
+    username = models.CharField(max_length=30, null=True)
+    alert_time = models.DateTimeField(auto_now_add=True)
+    content = models.TextField(null=True, blank=True)
+    comment = models.TextField(null=True, blank=True)
 
 
 class AssetAlias(models.Model):

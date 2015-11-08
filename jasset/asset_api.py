@@ -1,7 +1,9 @@
 # coding: utf-8
+import ast
 import xlsxwriter
 
 from jumpserver.api import *
+from jasset.models import ASSET_STATUS, ASSET_TYPE, ASSET_ENV, IDC, AssetRecord
 
 
 def group_add_asset(group, asset_id=None, asset_ip=None):
@@ -99,9 +101,9 @@ def db_asset_update(**kwargs):
 
 #
 #
-# def batch_host_edit(host_info, j_user='', j_password=''):
+# def batch_host_edit(host_alter_dic, j_user='', j_password=''):
 #     """ 批量修改主机函数 """
-#     j_id, j_ip, j_idc, j_port, j_type, j_group, j_dept, j_active, j_comment = host_info
+#     j_id, j_ip, j_idc, j_port, j_type, j_group, j_dept, j_active, j_comment = host_alter_dic
 #     groups, depts = [], []
 #     is_active = {u'是': '1', u'否': '2'}
 #     login_types = {'LDAP': 'L', 'MAP': 'M'}
@@ -174,34 +176,117 @@ def db_asset_update(**kwargs):
 #         return httperror(request, '删除失败, 没有这个IDC!')
 
 
-SERVER_STATUS = {1: u"已安装系统", 2: u"未安装系统", 3: u"正在安装系统", 4: u"报废"}
-now = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M')
-file_name = 'cmdb_excel_' + now + '.xlsx'
-workbook = xlsxwriter.Workbook('static/excels/%s' % file_name)
-worksheet = workbook.add_worksheet('CMDB数据')
-worksheet.set_first_sheet()
-worksheet.set_column('A:Z', 15)
+def sort_ip_list(ip_list):
+    """ ip地址排序 """
+    ip_list.sort(key=lambda s: map(int, s.split('.')))
+    return ip_list
 
 
-def write_excel(hosts):
+def get_tuple_name(asset_tuple, value):
+    """"""
+    for t in asset_tuple:
+        if t[0] == value:
+            return t[1]
+
+    return ''
+
+
+def get_tuple_diff(asset_tuple, field_name, value):
+    """"""
+    old_name = get_tuple_name(asset_tuple, int(value[0])) if value[0] else u''
+    new_name = get_tuple_name(asset_tuple, int(value[1])) if value[1] else u''
+    alert_info = [field_name, old_name, new_name]
+    return alert_info
+
+
+def asset_diff(before, after):
+    """
+    asset change before and after
+    """
+    alter_dic = {}
+    before_dic, after_dic = before, dict(after.iterlists())
+    for k, v in before_dic.items():
+        after_dic_values = after_dic.get(k, [])
+        if k == 'group':
+            after_dic_value = after_dic_values if len(after_dic_values) > 0 else u''
+            uv = v if v is not None else u''
+        else:
+            after_dic_value = after_dic_values[0] if len(after_dic_values) > 0 else u''
+            uv = unicode(v) if v is not None else u''
+        if uv != after_dic_value:
+            alter_dic.update({k: [uv, after_dic_value]})
+
+    for k, v in alter_dic.items():
+        if v == [None, u'']:
+            alter_dic.pop(k)
+
+    return alter_dic
+
+
+def db_asset_alert(asset, username, alert_dic):
+    """
+    asset alert info to db
+    """
+    alert_list = []
+    asset_tuple_dic = {'status': ASSET_STATUS, 'env': ASSET_ENV, 'asset_type': ASSET_TYPE}
+    for field, value in alert_dic.iteritems():
+        print field
+        field_name = Asset._meta.get_field_by_name(field)[0].verbose_name
+        if field == 'idc':
+            old = IDC.objects.filter(id=value[0])
+            new = IDC.objects.filter(id=value[1])
+            old_name = old[0].name if old else u''
+            new_name = new[0].name if new else u''
+            alert_info = [field_name, old_name, new_name]
+
+        elif field in ['status', 'env', 'asset_type']:
+            alert_info = get_tuple_diff(asset_tuple_dic.get(field), field_name, value)
+
+        elif field == 'group':
+            old, new = [], []
+            for group_id in value[0]:
+                group_name = AssetGroup.objects.get(id=int(group_id)).name
+                old.append(group_name)
+            for group_id in value[1]:
+                group_name = AssetGroup.objects.get(id=int(group_id)).name
+                new.append(group_name)
+            alert_info = [field_name, ','.join(old), ','.join(new)]
+
+        elif field == 'use_default_auth':
+            pass
+        elif field == 'is_active':
+            pass
+
+        else:
+            alert_info = [field_name, unicode(value[0]), unicode(value[1])]
+
+        if 'alert_info' in dir():
+            alert_list.append(alert_info)
+
+    if alert_list:
+        AssetRecord.objects.create(asset=asset, username=username, content=alert_list)
+
+
+def write_excel(asset_all):
     data = []
+    now = datetime.datetime.now().strftime('%Y_%m_%d_%H_%M')
+    file_name = 'cmdb_excel_' + now + '.xlsx'
+    workbook = xlsxwriter.Workbook('static/files/excels/%s' % file_name)
+    worksheet = workbook.add_worksheet(u'CMDB数据')
+    worksheet.set_first_sheet()
+    worksheet.set_column('A:Z', 14)
     title = [u'主机名', u'IP', u'IDC', u'MAC', u'远控IP', u'CPU', u'内存', u'硬盘', u'操作系统', u'机柜位置',
-             u'资产编号', u'所属业务', u'机器状态', u'SN', u'运行服务', u'备注']
-    for host in hosts:
-        projects_list, services_list = [], []
-        for p in host.project.all():
-            projects_list.append(p.name)
-        for s in host.service.all():
-            print s.name, s.port
-            services_list.append(s.name + '-' + str(s.port))
-        projects = '/'.join(projects_list)
-        services = '/'.join(services_list)
-        status = SERVER_STATUS.get(int(host.status))
-        info = [host.hostname, host.eth1, host.idc.name, host.mac, host.remote_ip, host.cpu, host.memory,
-                host.disk, host.system_type, host.cabinet, host.number, projects, status,
-                host.sn, services, host.comment]
-        data.append(info)
-    print data
+             u'所属主机组', u'机器状态', u'备注']
+    for asset in asset_all:
+        group_list = []
+        for p in asset.group.all():
+            group_list.append(p.name)
+
+        group_all = '/'.join(group_list)
+        status = asset.get_status_display()
+        alter_dic = [asset.hostname, asset.ip, asset.idc.name, asset.mac, asset.remote_ip, asset.cpu, asset.memory,
+                asset.disk, asset.system_type, asset.cabinet, group_all, status, asset.comment]
+        data.append(alter_dic)
     format = workbook.add_format()
     format.set_border(1)
     format.set_align('center')
@@ -218,17 +303,11 @@ def write_excel(hosts):
 
     worksheet.write_row('A1', title, format_title)
     i = 2
-    for info in data:
+    for alter_dic in data:
         location = 'A' + str(i)
-        worksheet.write_row(location, info, format)
+        worksheet.write_row(location, alter_dic, format)
         i += 1
 
     workbook.close()
     ret = (True, file_name)
     return ret
-
-
-def sort_ip_list(ip_list):
-    """ ip地址排序 """
-    ip_list.sort(key=lambda s: map(int, s.split('.')))
-    return ip_list

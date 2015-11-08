@@ -41,7 +41,7 @@
                         <div class="col-sm-2">
                             <label>
                                 <select name="group" class="form-control m-b" onchange="change_info()">
-                                    <option value="all">主机组</option>
+                                    <option value="">主机组</option>
                                     {% for asset_group in asset_group_all %}
                                         {% ifequal asset_group.name group_name %}
                                             <option value="{{ asset_group.name }}" selected> {{ asset_group.name }} </option>
@@ -55,9 +55,9 @@
 
                         <div class="col-sm-2">
                             <label>
-                                <select name="server_type" class="form-control m-b" onchange="change_info()">
+                                <select name="asset_type" class="form-control m-b" onchange="change_info()">
                                     <option value="">所有类型</option>
-                                    {% for type in asset_type %}
+                                    {% for type in asset_types %}
                                         {% ifequal type.0|int2str asset_type %}
                                             <option value="{{ type.0 }}" selected> {{ type.1 }}</option>
                                         {% else %}
@@ -71,35 +71,37 @@
                             <label>
                                 <select name="status" class="form-control m-b" onchange="change_info()">
                                     <option value="">状态</option>
-                                    {% for status in asset_status %}
-                                        {% ifequal status.0|int2str status %}
-                                            <option value="{{ status.0 }}" selected> {{ status.1 }}</option>
+                                    {% for s in asset_status %}
+                                        {% ifequal s.0|int2str status %}
+                                            <option value="{{ s.0 }}" selected> {{ s.1 }}</option>
                                         {% else %}
-                                            <option value="{{ status.0 }}"> {{ status.1 }}</option>
+                                            <option value="{{ s.0 }}"> {{ s.1 }}</option>
                                         {% endifequal %}
                                     {% endfor %}
                                 </select>
                             </label>
                         </div>
-                        <div>
-                            <form id="search_form" method="get" action="" class="pull-right mail-search">
-                                <div class="input-group">
-                                    <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
-                                    <input type="text" style="display: none">
-                                    <div class="input-group-btn">
-                                        <button type="submit" class="btn btn-sm btn-primary">
-                                            - 搜索 -
-                                        </button>
-                                    </div>
+                         <div class="col-sm-4">
+                            <div class="input-group">
+                                <input type="text" class="form-control m-b" id="search_input" name="keyword" value="{{ keyword }}" placeholder="Search">
+                                <input type="text" style="display: none">
+                                <div class="input-group-btn">
+                                    <button id='search_btn' href="/jasset/asset_list/?search=true" type="button" class="btn btn-xm btn-primary search-btn"  onclick="change_info()">
+                                        - 搜索 -
+                                    </button>
+                                    <button type="button" href="/jasset/asset_list/?export=true" name="export" class="btn btn-xm btn-success search-btn-excel" onclick="return false">
+                                        - 导出 -
+                                    </button>
                                 </div>
-                            </form>
+                            </div>
                         </div>
 
+                        <div id="export"></div>
                         <table class="table table-striped table-bordered table-hover " id="editable" name="editable">
                             <thead>
                                 <tr>
                                     <th class="text-center">
-                                        <input id="checkall" type="checkbox" class="i-checks" name="checkall" value="checkall" data-editable='false' onclick="check_all('contents_form')">
+                                        <input id="checkall" type="checkbox" class="i-checks" name="checkall" value="checkall" data-editable='false' onclick="check_all('asset_form')">
                                     </th>
                                     <th class="text-center" name="ip"> IP地址 </th>
                                     <th class="text-center"> 主机名 </th>
@@ -119,7 +121,7 @@
                                     <td class="text-center"> {{ asset.ip }} </td>
                                     <td class="text-center"> {{ asset.hostname }} </td>
                                     <td class="text-center"> {{ asset.idc.name }} </td>
-                                    <td class="text-center">{{ asset.port }}</td>
+                                    <td class="text-center">{{ asset.group.all|group_str2 }}</td>
                                     <td class="text-center">{{ asset.cpu }}|{{ asset.memory }}|{{ asset.disk }}</td>
                                     <td class="text-center"> {{ asset.use_default_auth|bool2str }} </td>
                                     <td class="text-center" data-editable='false'>
@@ -136,12 +138,12 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <input type="button" id="asset_del" class="btn btn-danger btn-sm"  name="del_button" value="删除"/>
-                                <input type="button" id="alter_button" class="btn btn-warning btn-sm" name="alter_button" value="修改" onclick="alter('contents_form')" />
+                                <a value="/jasset/asset_edit_batch/" type="button" class="btn btn-sm btn-warning iframe">修改</a>
                             </div>
                             {% include 'paginator.html' %}
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -178,23 +180,41 @@
         })
     });
 
-
-    function alter(form) {
-        selectData = GetTableDataBox();
-        console.log(selectData[0])
-        if (selectData[1] != 0) {
-            $.ajax({
-                type: "post",
-                url: "/jasset/host_edit/batch/",
-                data: {"editable": selectData[0], "len_table": selectData[1]},
-                success: function (data) {
-                    alert("修改成功");
-                    window.open("/jasset/host_list/", "_self");
-                error: window.open("/jasset/host_list/", "_self");
+    $(".iframe").on('click', function(){
+        var ids = getIDall();
+        if (ids == ''){
+            alert("请至少选择一行!");
+            return false;
+        }
+        var url= $(this).attr("value") + '?id=' + ids;
+            index = $.layer({
+                type: 2,
+                title: 'JumpServer - 批量修改主机',
+                maxmin: true,
+                shift: 'top',
+                border: [2, 0.3, '#1AB394'],
+                shade: [0.5, '#000000'],
+                shadeClose: true,
+                area : ['800px' , '600px'],
+                iframe: {src: url},
+                close: function(){
+                    location.replace(location.href);
                 }
             });
-        }
-    }
+    });
+
+    $('.search-btn-excel').unbind('click').bind('click',function(){
+        var url= $(this).attr("href");
+        console.log(url);
+        $.ajax({
+            type: "GET",
+            url: url,
+            data: $("#asset_form").serialize(),
+            success: function (data) {
+                $("#export").html(data);
+            }
+        });
+    });
 
     $('#asset_del').click(function () {
         var asset_id_all = getIDall();
@@ -218,13 +238,12 @@
 
     function change_info(){
         var args = $("#asset_form").serialize();
-        window.location = "/jasset/asset_search/?" + args
+        window.location = "/jasset/asset_list/?" + args
     }
-
 
     $("#search_input").keydown(function(e){
         if(e.keyCode==13){
-            host_search()
+            change_info()
             }
     });
 
@@ -234,7 +253,6 @@
         $.ajax({
             type: "GET",
             url: url,
-//            data: $("#search_form").serialize(),
             success: function (data) {
                 $("#j_group_" + id).html(data);
 

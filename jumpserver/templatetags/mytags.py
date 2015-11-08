@@ -408,3 +408,19 @@ def to_avatar(role_id='0'):
 # @register.filter(name='cmd_group_split')
 # def cmd_group_split(cmd_group):
 #     return cmd_group.cmd.split(',')
+
+
+@register.filter(name='str_to_list')
+def str_to_list(info):
+    """
+    str to list
+    """
+    return ast.literal_eval(info)
+
+
+@register.filter(name='str_to_code')
+def str_to_code(char_str):
+    if char_str:
+        return char_str
+    else:
+        return u'空'

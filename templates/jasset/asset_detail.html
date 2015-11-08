@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load mytags %}
-
+{% load humanize %}
 
 {% block content %}
     {% include 'nav_cat_bar.html' %}
@@ -60,7 +60,8 @@
                                     </tr>
                                     <tr>
                                         <td class="text-navy">使用默认管理账号</td>
-                                        <td>{{ asset.use_default_auth|bool2str }}</td>
+{#                                        <td>{{ asset.use_default_auth|bool2str }}</td>#}
+                                        <td>{{ asset.use_default_auth|bool2str }} {% if not asset.use_default_auth %} <span class="text-info">{{ asset.username }}</span> {% endif %}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">机房</td>
@@ -152,8 +153,8 @@
                     </div>
                     <div class="ibox-content">
                         <div>
-                            <div class="text-left">
-                                <table class="table">
+{#                            <div class="text-left">#}
+{#                                <table class="table">#}
 {#                                    {% if user_permed_list %}#}
 {#                                        {% for user in user_permed_list %}#}
 {#                                            <tr>#}
@@ -165,8 +166,48 @@
 {#                                    {% else %}#}
 {#                                        <p class="text-center">(暂无)</p>#}
 {#                                    {% endif %}#}
-                                </table>
-                            </div>
+{#                                </table>#}
+{#                            </div>#}
+                        </div>
+                    </div>
+                    <div class="ibox-title">
+                        <h5>主机修改记录</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content ibox-heading">
+                        <h3>主机修改记录</h3>
+                        <small><i class="fa fa-map-marker"></i> 包含了此主机所有历史修改记录.</small>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="feed-activity-list">
+                            {% if asset_record %}
+                                {% for r in asset_record %}
+                                    <div class="feed-element">
+                                        <div>
+                                            <small class="pull-right">{{ r.alert_time|naturaltime }}</small>
+                                            <strong class="text-navy">{{ r.username }}</strong>
+                                                {% for i in r.content|str_to_list %}
+                                                    <div>{{ i.0 }} 由 <span class="text-success">{{ i.1|str_to_code }}</span> 改为 <span class="text-warning">{{ i.2|str_to_code }}</span></div>
+                                                {% endfor %}
+                                            <small class="text-success">{{ r.alert_time }}</small>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-center">(暂无)</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

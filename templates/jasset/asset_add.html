@@ -50,11 +50,9 @@
                                         <div class="hr-line-dashed"></div>
                                         {{ af.idc|bootstrap_horizontal }}
 
-{#                                        {{ af.use_default_auth|bootstrap_horizontal }}#}
-
                                         <div class="hr-line-dashed"></div>
                                         <div class="form-group">
-                                            <label for="j_group" class="col-sm-2 control-label">管理账号</label>
+                                            <label for="j_group" class="col-sm-2 control-label">管理账号<span class="red-fonts"> *</span></label>
                                             <div class="col-sm-2">
                                                 <div class="radio i-checks">
                                                     <label>
@@ -79,21 +77,17 @@
                                         <div class="hr-line-dashed"></div>
                                         {{ af.group|bootstrap_horizontal }}
 
-                                        <div class="hr-line-dashed"></div>
-                                        {{ af.is_active|bootstrap_horizontal }}
-
-{#                                        <div class="hr-line-dashed"></div>#}
-{#                                        <div class="form-group"><label class="col-sm-2 control-label"> 是否激活<span class="red-fonts">*</span> </label>#}
-{#                                            <div class="col-sm-8">#}
-{#                                                <div class="radio i-checks">#}
-{#                                                    <label> <input type="radio" checked="" name="is_active">激活 </label>#}
-{#                                                    <label> <input type="radio" name="is_active"> 禁用</label>#}
-{#                                                </div>#}
-{#                                            </div>#}
-{#                                        </div>#}
+{#                                        {{ af.is_active|bootstrap_horizontal }}#}
 
                                         <div class="hr-line-dashed"></div>
-                                        {{ af.comment|bootstrap_horizontal }}
+                                        <div class="form-group"><label class="col-sm-2 control-label"> 是否激活<span class="red-fonts"> *</span> </label>
+                                            <div class="col-sm-8">
+                                                <div class="radio i-checks">
+                                                    <label> <input type="radio" checked="" value="1" name="is_active">激活 </label>
+                                                    <label> <input type="radio" value="0" name="is_active"> 禁用</label>
+                                                </div>
+                                            </div>
+                                        </div>
 
                                         <div class="hr-line-dashed"></div>
                                         <div class="form-group">
@@ -116,43 +110,47 @@
 
 {% block self_footer_js %}
 <script>
+    $('document').ready(function(){
+        $('#id_use_default_auth').click(function(){
+            if ($(this).is(':checked')){
+                $('#admin_account').css('display', 'none')
+            }
+            else {
+                $('#admin_account').css('display', 'block')
+            }
+        })
+    });
 
-$('document').ready(function(){
-    $('#id_use_default_auth').click(function(){
-        if ($(this).is(':checked')){
-            $('#admin_account').css('display', 'none')
-        }
-        else {
-            $('#admin_account').css('display', 'block')
-        }
-    })
-});
+    var required_fields = ["id_hostname", "id_ip", "id_port"];
+    required_fields.forEach(function(field) {
+        $('label[for="' + field + '"]').parent().addClass("required");
+    });
 
-$('#assetForm').validator({
-    timely: 2,
-    theme: "yellow_right_effect",
-    rules: {
-        check_ip: [/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])){3}$/, 'ip地址不正确'],
-        check_port: [/^\d{1,5}$/, '端口号不正确'],
-    },
-    fields: {
-        "ip": {
-            rule: "required;check_ip",
-            tip: "输入IP",
-            ok: "",
-            msg: {required: "必须填写!"}
+    $('#assetForm').validator({
+        timely: 2,
+        theme: "yellow_right_effect",
+        rules: {
+            check_ip: [/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])){3}$/, 'ip地址不正确'],
+            check_port: [/^\d{1,5}$/, '端口号不正确'],
         },
-        "port": {
-            rule: "required;check_port",
-            tip: "输入端口号",
-            ok: "",
-            msg: {required: "必须填写!"}
+        fields: {
+            "ip": {
+                rule: "required;check_ip",
+                tip: "输入IP",
+                ok: "",
+                msg: {required: "必须填写!"}
+            },
+            "port": {
+                rule: "required;check_port",
+                tip: "输入端口号",
+                ok: "",
+                msg: {required: "必须填写!"}
+            }
+        },
+        valid: function(form) {
+            form.submit();
         }
-    },
-    valid: function(form) {
-        form.submit();
-    }
-});
+    });
 
 </script>
 
