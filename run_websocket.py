@@ -29,7 +29,7 @@ import struct, fcntl, signal, socket, select, fnmatch
 
 import paramiko
 from connect import Tty
-from connect import TtyLog
+from connect import TtyLog, Log
 
 try:
     import simplejson as json
@@ -186,11 +186,11 @@ class WebTty(Tty):
 class WebTerminalKillHandler(tornado.web.RequestHandler):
     def get(self):
         ws_id = self.get_argument('id')
+        Log.objects.filter(id=ws_id).update(is_finished=True)
         for ws in WebTerminalHandler.clients:
             print ws.id
             if ws.id == int(ws_id):
                 print "killed"
-                ws.log.is_finished = True
                 ws.log.save()
                 ws.close()
         print len(WebTerminalHandler.clients)
