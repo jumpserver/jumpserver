@@ -25,11 +25,13 @@ DB_PASSWORD = config.get('db', 'password')
 DB_DATABASE = config.get('db', 'database')
 AUTH_USER_MODEL = 'juser.User'
 # mail config
+MAIL_ENABLE = config.get('mail', 'mail_enable')
 EMAIL_HOST = config.get('mail', 'email_host')
 EMAIL_PORT = config.get('mail', 'email_port')
 EMAIL_HOST_USER = config.get('mail', 'email_host_user')
 EMAIL_HOST_PASSWORD = config.get('mail', 'email_host_password')
 EMAIL_USE_TLS = config.getboolean('mail', 'email_use_tls')
+EMAIL_TIMEOUT = 5
 
 # ======== Log ==========
 LOG = False
@@ -41,8 +43,6 @@ KEY = config.get('base', 'key')
 LOGIN_NAME = getpass.getuser()
 # LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
 URL = config.get('base', 'url')
-MAIL_ENABLE = config.get('mail', 'mail_enable')
-MAIL_FROM = config.get('mail', 'email_host_user')
 log_dir = os.path.join(BASE_DIR, 'logs')
 log_level = config.get('base', 'log')
 web_socket_host = config.get('websocket', 'web_socket_host')

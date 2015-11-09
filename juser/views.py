@@ -9,10 +9,11 @@ import uuid as uuid_r
 from django.db.models import Q
 from django.template import RequestContext
 from django.db.models import ObjectDoesNotExist
-from jumpserver.settings import MAIL_FROM, MAIL_ENABLE
+from jumpserver.settings import EMAIL_HOST_USER
 from juser.user_api import *
 from jperm.perm_api import _public_perm_api, perm_user_api, user_permed
 
+MAIL_FROM = EMAIL_HOST_USER
 
 def chg_role(request):
     role = {'SU': 2, 'GA': 1, 'CU': 0}
