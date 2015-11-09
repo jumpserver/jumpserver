@@ -5,7 +5,7 @@ from subprocess import call
 
 from juser.models import AdminGroup
 from jumpserver.api import *
-from jumpserver.settings import BASE_DIR
+from jumpserver.settings import BASE_DIR, EMAIL_HOST_USER as MAIL_FROM
 
 
 def group_add_user(group, user_id=None, username=None):
