@@ -211,29 +211,12 @@ def asset_edit(request):
     # if not asset_id:
     #     return HttpResponse('没有该主机')
     asset = get_object(Asset, id=asset_id)
+    asset_old = copy_model_instance(asset)
     af = AssetForm(instance=asset)
     if request.method == 'POST':
         af_post = AssetForm(request.POST, instance=asset)
         ip = request.POST.get('ip', '')
-
-        # ip = request.POST.get('ip')
-        # port = request.POST.get('port')
-        # groups = request.POST.getlist('groups')
-        # use_default_auth = True if request.POST.getlist('use_default_auth', []) else False
-        # is_active = True if request.POST.get('is_active') else False
-        # comment = request.POST.get('comment')
-
-        # if not use_default_auth:
-        # username = request.POST.get('username')
-        # password = request.POST.get('password')
-        #     if password == asset.password:
-        #         password_encode = password
-        #     else:
-        #         password_encode = CRYPTOR.encrypt(password)
-        # else:
-        #     username = None
-        #     password_encode = None
-
+        use_default_auth = request.POST.get('use_default_auth')
         try:
             asset_test = get_object(Asset, ip=ip)
             if asset_test and asset_id != unicode(asset_test.id):
@@ -244,10 +227,14 @@ def asset_edit(request):
         else:
             if af_post.is_valid():
                 af_save = af_post.save(commit=False)
+                if use_default_auth:
+                    af_save.username = ''
+                    af_save.password = ''
                 af_save.save()
                 af_post.save_m2m()
+                asset_new = get_object(Asset, id=asset_id)
+                asset_diff_one(asset_old, asset_new)
                 info = asset_diff(af_post.__dict__.get('initial'), request.POST)
-                print info
                 db_asset_alert(asset, username, info)
 
                 msg = u'主机 %s 修改成功' % ip
