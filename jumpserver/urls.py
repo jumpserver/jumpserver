@@ -19,5 +19,6 @@ urlpatterns = patterns('',
     (r'^jlog/', include('jlog.urls')),
     (r'^jperm/', include('jperm.urls')),
     (r'^node_auth/', 'jumpserver.views.node_auth'),
+    (r'test2', 'jumpserver.views.test2'),
 
 )

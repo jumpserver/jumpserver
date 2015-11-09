@@ -281,6 +281,10 @@ def setting(request):
 
             msg = "设置成功"
     return my_render('setting.html', locals(), request)
+
+
+def test2(request):
+    return my_render('test2.html', locals(), request)
 #
 # def filter_ajax_api(request):
 #     attr = request.GET.get('attr', 'user')
