@@ -245,27 +245,39 @@ def Logout(request):
 
 def setting(request):
     header_title, path1 = '项目设置', '设置'
-    setting_r = get_object(Setting, name='default')
+    setting_default = get_object(Setting, name='default')
 
     if request.method == "POST":
-        username = request.POST.get('username', '')
-        port = request.POST.get('port', '')
-        private_key = request.POST.get('key', '')
+        setting_raw = request.POST.get('setting', '')
+        if setting_raw == 'default':
+            username = request.POST.get('username', '')
+            port = request.POST.get('port', '')
+            password = request.POST.get('password', '')
+            private_key = request.POST.get('key', '')
 
-        if '' in [username, port, private_key]:
-            return HttpResponse('所填内容不能为空')
-        else:
-            settings = get_object(Setting, id=1)
-            private_key_path = os.path.join(BASE_DIR, 'keys', 'default', 'default_private_key.pem')
-            with open(private_key_path, 'w') as f:
-                    f.write(private_key)
-            os.chmod(private_key_path, 0600)
-            if settings:
-                Setting.objects.filter(name='default').update(default_user=username, default_port=port,
-                                                              default_pri_key_path=private_key_path)
+            if '' in [username, port] and ('' in password or '' in private_key):
+                return HttpResponse('所填内容不能为空, 且密码和私钥填一个')
             else:
-                setting_r = Setting(name='default', default_user=username, default_port=port,
-                                    default_pri_key_path=private_key_path).save()
+                private_key_path = os.path.join(BASE_DIR, 'keys', 'default', 'default_private_key.pem')
+                if private_key:
+                    with open(private_key_path, 'w') as f:
+                            f.write(private_key)
+                    os.chmod(private_key_path, 0600)
+
+                if setting_default:
+                    if password != setting_default.default_password:
+                        password_encode = CRYPTOR.encrypt(password)
+                    else:
+                        password_encode = password
+                    Setting.objects.filter(name='default').update(default_user=username, default_port=port,
+                                                                  default_password=password_encode,
+                                                                  default_pri_key_path=private_key_path)
+
+                else:
+                    password_encode = CRYPTOR.encrypt(password)
+                    setting_r = Setting(name='default', default_user=username, default_port=port,
+                                        default_password=password_encode,
+                                        default_pri_key_path=private_key_path).save()
 
             msg = "设置成功"
     return my_render('setting.html', locals(), request)
