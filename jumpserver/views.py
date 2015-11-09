@@ -20,17 +20,20 @@ from jlog.models import Log
 
 
 def getDaysByNum(num):
+    """
+    输出格式:([datetime.date(2015, 11, 6),  datetime.date(2015, 11, 8)], ['11-06', '11-08'])
+    """
+
     today = datetime.date.today()
     oneday = datetime.timedelta(days=1)
-    li_date, li_str = [], []
+    date_li, date_str = [], []
     for i in range(0, num):
         today = today-oneday
-        li_date.append(today)
-        li_str.append(str(today)[5:10])
-    li_date.reverse()
-    li_str.reverse()
-    t = (li_date, li_str)
-    return t
+        date_li.append(today)
+        date_str.append(str(today)[5:10])
+    date_li.reverse()
+    date_str.reverse()
+    return date_li, date_str
 
 
 def get_data(data, items, option):
@@ -49,6 +52,24 @@ def get_data(data, items, option):
             li.append(times)
         dic[name] = li
     return dic
+
+
+def get_count_by_day(date_li, item):
+    data_li = []
+    for d in date_li:
+        logs = Log.objects.filter(start_time__year=d.year,
+                                  start_time__month=d.month,
+                                  start_time__day=d.day)
+        if item == 'user':
+            count = len(set([log.user for log in logs]))
+        elif item == 'asset':
+            count = len(set([log.host for log in logs]))
+        elif item == 'login':
+            count = len(logs)
+        else:
+            count = 0
+        data_li.append(count)
+    return data_li
 
 
 @require_role(role='user')
@@ -89,6 +110,13 @@ def index(request):
         active_users = User.objects.filter(is_active=1)
         active_hosts = Asset.objects.filter(is_active=1)
         week_data = Log.objects.filter(start_time__range=[from_week, datetime.datetime.now()])
+
+        date_li, date_str = getDaysByNum(30)
+        date_month = repr(date_str)
+        print date_month
+        active_user_month = str(get_count_by_day(date_li, 'user'))
+        active_asset_month = str(get_count_by_day(date_li, 'asset'))
+        active_login_month = str(get_count_by_day(date_li, 'login'))
 
     elif is_role_request(request, 'admin'):
         return index_cu(request)
