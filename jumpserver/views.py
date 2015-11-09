@@ -53,11 +53,11 @@ def get_data(data, items, option):
 
 @require_role(role='user')
 def index_cu(request):
-    user_id = request.user.id
-    user = get_object(User, id=user_id)
+    # user_id = request.user.id
+    # user = get_object(User, id=user_id)
     login_types = {'L': 'LDAP', 'M': 'MAP'}
-    username = user.username
-    posts = user.get_asset()
+    username = request.user.username
+    posts = Asset.object.all()
     host_count = len(posts)
     new_posts = []
     post_five = []
