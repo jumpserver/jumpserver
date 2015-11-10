@@ -85,7 +85,7 @@ def log_history(request):
                 content += '%s: %s\n' % (tty_log.datetime.strftime('%Y-%m-%d %H:%M:%S'), tty_log.cmd)
             return HttpResponse(content)
 
-    return HttpResponse('无日志记录, 请查看日志处理脚本是否开启!')
+    return HttpResponse('无日志记录!')
 
 
 @require_role('admin')
@@ -100,7 +100,7 @@ def log_record(request):
             content = renderTemplate(log_file, log_time)
             return HttpResponse(content)
         else:
-            return HttpResponse('无日志记录, 请查看日志处理脚本是否开启!')
+            return HttpResponse('无日志记录!')
 
 
 def web_terminal(request):
