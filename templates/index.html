@@ -14,7 +14,7 @@
                 </div>
                 <div class="ibox-content">
                     <h1 class="no-margins"><a href="/juser/user_list/">{{ users.count}}</a></h1>
-                    <div class="stat-percent font-bold text-success">{{ percent_user }} <i class="fa fa-bolt"></i></div>
+{#                    <div class="stat-percent font-bold text-success">{{ percent_user }} <i class="fa fa-bolt"></i></div>#}
                     <small>All user</small>
                 </div>
             </div>
@@ -27,7 +27,7 @@
                 </div>
                 <div class="ibox-content">
                     <h1 class="no-margins"><a href="/jasset/host_list/">{{ hosts.count }}</a></h1>
-                    <div class="stat-percent font-bold text-info">{{ percent_host }} <i class="fa fa-level-up"></i></div>
+{#                    <div class="stat-percent font-bold text-info">{{ percent_host }} <i class="fa fa-level-up"></i></div>#}
                     <small>All host</small>
                 </div>
             </div>
@@ -40,8 +40,8 @@
                     <h5>实时在线用户</h5>
                 </div>
                 <div class="ibox-content">
-                    <h1 class="no-margins"><a href="/jlog/log_list/online/"> <span id="online_users">10</span></a></h1>
-                    <div class="stat-percent font-bold text-navy">{{ percent_online_user }} <i class="fa fa-level-up"></i></div>
+                    <h1 class="no-margins"><a href="/jlog/log_list/online/"> <span id="online_users">{{ online_user | length }}</span></a></h1>
+{#                    <div class="stat-percent font-bold text-navy">{{ percent_online_user }} <i class="fa fa-level-up"></i></div>#}
                     <small>Online user</small>
                 </div>
             </div>
@@ -54,8 +54,8 @@
                     <h5>已连接服务器</h5>
                 </div>
                 <div class="ibox-content">
-                        <h1 class="no-margins"><a href="/jlog/log_list/online/"> <span id="online_hosts">10</span></a></h1>
-                    <div class="stat-percent font-bold text-danger">{{ percent_online_host }} <i class="fa fa-level-down"></i></div>
+                        <h1 class="no-margins"><a href="/jlog/log_list/online/"> <span id="online_hosts">{{ online_host | length }}</span></a></h1>
+{#                    <div class="stat-percent font-bold text-danger">{{ percent_online_host }} <i class="fa fa-level-down"></i></div>#}
                     <small>Connected host</small>
                 </div>
             </div>
@@ -151,6 +151,51 @@
                     </div>
                 </div>
             </div>
+
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>一周Top10资产</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-user"></ul>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content ibox-heading">
+                    <h3><i class="fa fa-user"></i> 一周Top10资产 </h3>
+                    <small><i class="fa fa-map-marker"></i> 登录次数及最近一次登录记录. </small>
+                </div>
+                <div class="ibox-content inspinia-timeline">
+                    {% if host_top_ten %}
+                        {% for data in host_top_ten %}
+                            <div class="timeline-item">
+                                <div class="row">
+                                    <div class="col-xs-5 date">
+                                        <i class="fa fa-info-circle"></i>
+                                        <strong>{{ data.host }}</strong>
+                                        <br/>
+                                        <small class="text-navy">{{ data.times }}次</small>
+                                    </div>
+                                    <div class="col-xs-7 content no-top-border">
+                                        <p class="m-b-xs">最近一次登录用户</p>
+                                        <p>{{ data.last.user }}</p>
+                                        <p>于{{ data.last.start_time |date:"Y-m-d H:i:s" }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-center">(暂无)</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
         <div class="col-lg-4">
             <div class="ibox float-e-margins">
@@ -162,7 +207,7 @@
                 </div>
                 <div class="ibox-content ibox-heading">
                     <h3><i class="fa fa-paper-plane-o"></i> 登录记录 </h3>
-                    <small<i class="fa fa-map-marker"></i> 最近十次登录记录. </small>
+                    <small><i class="fa fa-map-marker"></i> 最近十次登录记录. </small>
                 </div>
                 <div class="ibox-content">
                     <div>
@@ -237,7 +282,7 @@
                 </div>
                 <div class="ibox-content ibox-heading">
                     <h3><i class="fa fa-user"></i> 一周Top10用户 </h3>
-                    <small><i class="fa fa-map-marker"></i> 一周Top10用户登录次数及最近一次登录记录. </small>
+                    <small><i class="fa fa-map-marker"></i> 用户登录次数及最近一次登录记录. </small>
                 </div>
                 <div class="ibox-content inspinia-timeline">
                     {% if user_top_ten %}
@@ -251,7 +296,7 @@
                                         <small class="text-navy">{{ data.times }}次</small>
                                     </div>
                                     <div class="col-xs-7 content no-top-border">
-                                        <p class="m-b-xs">最近一次登录</p>
+                                        <p class="m-b-xs">最近一次登录主机</p>
                                         <p>{{ data.last.host }}</p>
                                         <p>于{{ data.last.start_time |date:"Y-m-d H:i:s" }}</p>
                                     </div>
@@ -271,6 +316,7 @@
         <!--<div class="row">-->
             <!--<div class="col-lg-6" id="hosttop10" style="width:50%;height:400px; margin-top: 20px"></div>-->
         <!--</div>-->
+</div>
 </div>
 
 <script src="/static/js/echarts/echarts.js"></script>
@@ -337,22 +383,22 @@ $(document).ready(function(){
                         type:'line',
                         smooth:true,
                         itemStyle: {normal: {areaStyle: {type: 'default'}}},
-                        data: {{ active_login_month | safe }}
+                        data: {{ active_login_per_month | safe }}
                     },
                     {
                         name:'活跃用户',
                         type:'line',
                         smooth:true,
                         itemStyle: {normal: {areaStyle: {type: 'default'}}},
-                        data: {{ active_user_month | safe }}
+                        data: {{ active_user_per_month | safe }}
                     },
                     {
                         name:'活跃资产',
                         type:'line',
                         smooth:true,
                         itemStyle: {normal: {areaStyle: {type: 'default'}}},
-                        data: {{ active_asset_month | safe }}
-                    },
+                        data: {{ active_asset_per_month | safe }}
+                    }
 
                 ]
             };
@@ -368,7 +414,6 @@ $(document).ready(function(){
         ],
         function (ec) {
             var auChart = ec.init(document.getElementById('activeUser'));
-            var aaChart = ec.init(document.getElementById('activeAsset'));
             var option = {
                 tooltip : {
                     trigger: 'item',
@@ -378,7 +423,7 @@ $(document).ready(function(){
                     show: false,
                     orient : 'vertical',
                     x : 'left',
-                    data:['直接访问','邮件营销','联盟广告','视频广告','搜索引擎']
+                    data:['月活跃用户','禁用用户','月未登陆用户']
                 },
                 toolbox: {
                     show : false,
@@ -428,17 +473,94 @@ $(document).ready(function(){
                             }
                         },
                         data:[
-                            {value:335, name:'直接访问'},
-                            {value:310, name:'邮件营销'},
-                            {value:234, name:'联盟广告'},
-                            {value:135, name:'视频广告'},
-                            {value:1548, name:'搜索引擎'}
+                            {value:{{ active_user_month }}, name:'月活跃用户'},
+                            {value:{{ disabled_user_count }}, name:'禁用用户'},
+                            {value:{{ inactive_user_month }}, name:'月未登陆用户'}
+
                         ]
                     }
                 ]
             };
 
             auChart.setOption(option);
+        }
+    );
+
+    require(
+        [
+            'echarts',
+            'echarts/chart/pie'
+        ],
+        function (ec) {
+            var aaChart = ec.init(document.getElementById('activeAsset'));
+            var option = {
+                tooltip : {
+                    trigger: 'item',
+                    formatter: "{b} <br> {c} ({d}%)"
+                },
+                legend: {
+                    show: false,
+                    orient : 'vertical',
+                    x : 'left',
+                    data:['月被登陆主机','禁用主机','月未登陆主机']
+                },
+                toolbox: {
+                    show : false,
+                    feature : {
+                        mark : {show: true},
+                        dataView : {show: true, readOnly: false},
+                        magicType : {
+                            show: true,
+                            type: ['pie', 'funnel'],
+                            option: {
+                                funnel: {
+                                    x: '25%',
+                                    width: '50%',
+                                    funnelAlign: 'center',
+                                    max: 1548
+                                }
+                            }
+                        },
+                        restore : {show: true},
+                        saveAsImage : {show: true}
+                    }
+                },
+                calculable : true,
+                series : [
+                    {
+                        name:'访问来源',
+                        type:'pie',
+                        radius : ['50%', '70%'],
+                        itemStyle : {
+                            normal : {
+                                label : {
+                                    show : false
+                                },
+                                labelLine : {
+                                    show : false
+                                }
+                            },
+                            emphasis : {
+                                label : {
+                                    show : true,
+                                    position : 'center',
+                                    textStyle : {
+                                        fontSize : '5',
+                                        fontWeight : 'bold'
+                                    }
+                                }
+                            }
+                        },
+                        data:[
+                            {value:{{ active_asset_month }}, name:'月被登陆主机'},
+                            {value:{{ disabled_asset_count }}, name:'禁用主机'},
+                            {value:{{ inactive_asset_month }}, name:'月未登陆主机'}
+
+                        ]
+                    }
+                ]
+            };
+
             aaChart.setOption(option);
         }
     );
