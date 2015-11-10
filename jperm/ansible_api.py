@@ -114,7 +114,7 @@ class Command(MyInventory):
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
 
-    def run(self, command, module_name="command", timeout=5, forks=10):
+    def run(self, command, module_name="command", timeout=5, forks=10, group='my_group'):
         """
         run command from andible ad-hoc.
         command  : 必须是一个需要执行的命令字符串， 比如 
@@ -127,12 +127,20 @@ class Command(MyInventory):
                      module_args=command,
                      timeout=timeout,
                      inventory=self.inventory,
-                     subset='my_group',
+                     subset=group,
                      forks=forks
                      )
 
         self.results = hoc.run()
-        return self.stdout
+        if self.stdout:
+            return {"ok": self.stdout}
+        else:
+            msg = []
+            if self.stderr:
+                msg.append(self.stderr)
+            if self.dark:
+                msg.append(self.dark)
+            return {"failed": msg}
 
     @property
     def raw_results(self):
@@ -365,22 +373,29 @@ class App(MyPlaybook):
 
 
 if __name__ == "__main__":
-   resource =  [{"hostname": "192.168.10.161", "port": "22", "username": "yumaojun", "password": "yusky0902"}]
+    pass
+#   resource =  {
+#                "group1": {
+#                    "hosts": [{"hostname": "127.0.0.1", "port": "22", "username": "root", "password": "xxx"},],
+#                    "vars" : {"var1": "value1", "var2": "value2"},
+#                          },
+#                }
+#   command = Command(resource)
+#   print    command.run("who", group="group1")
+
+#   resource =  [{"hostname": "127.0.1.1", "port": "22", "username": "root", "password": "xxx"}]
+#   command = Command(resource)
+#   print command.run("who")
+
 #   playbook = MyPlaybook(resource)
 #   playbook.run('test.yml')
 #   print playbook.raw_results
-   command = Command(resource)
-   command.run("who")
-   print command.raw_results
-   print       command.resource
-
 
 #   task = Tasks(resource)
 #   print task.add_user('test', 'mypass')
 #   print task.del_user('test')
 #   print task.push_key('root', '/root/.ssh/id_rsa.pub')
 #   print task.del_key('root', '/root/.ssh/id_rsa.pub')
-
 
 #   task = Tasks(resource)
 #   print task.add_init_users()
