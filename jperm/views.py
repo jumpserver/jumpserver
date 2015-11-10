@@ -9,8 +9,9 @@ from jperm.models import SysUser
 from juser.user_api import gen_ssh_key
 
 
-from juser.models     import User
+from juser.models     import User, UserGroup
 from jasset.models    import Asset, AssetGroup
+from jperm.models     import PermRole, PermRule
 
 from jperm.utils      import updates_dict
 
@@ -69,72 +70,57 @@ def perm_user_edit(request):
     """
     data_nav = {"header_title": "用户授权", "path1": "授权管理", "path2": "授权更改"}
 
-    # 获取user对象
     user_id = request.GET.get('id', '')
     user = get_object(User, id=user_id)
 
-    # 获取所有 资产 和 资产组
-    asset_all = Asset.objects.all()
-    asset_group_all = AssetGroup.objects.all()
-
-    # 获取授权的 资产对象列表 和 资产组对象列表
-    asset_permed = user.asset.all()
-    asset_group_permed = user.asset_group.all()
-
-    # 获取未授权的 资产对象列表 和 资产组对象列表
     if request.method == 'GET' and user:
-        assets = [asset for asset in asset_all if asset not in asset_permed]
-        asset_groups = [asset_group for asset_group in asset_group_all if asset_group not in asset_group_permed]
-        data_content = {"assets": assets, "asset_groups": asset_groups, "user": user}
+        # 获取所有 用户,用户组,资产,资产组,用户角色, 用于添加授权规则
+        users = User.objects.all()
+        user_groups = UserGroup.objects.all()
+        assets = Asset.objects.all()
+        asset_groups = AssetGroup.objects.all()
+        roles = PermRole.objects.all()
 
+        data_content = {"users": users, "user_groups": user_groups, 
+                        "assets": assets, "asset_groups": asset_groups,
+                        "roles": roles}
         render_data = updates_dict(data_nav, data_content)        
-        return my_render('jperm/perm_user_edit.html', render_data, request)
+        return my_render('jperm/rule_add.html', render_data, request)
 
     elif request.method == 'POST' and user:
-        # 获取选择的资产列表 和 资产组列表
-        asset_id_select = request.POST.getlist('asset_select', [])
-        asset_group_id_select = request.POST.getlist('asset_groups_select', [])
-        asset_select = get_object_list(Asset, asset_id_select)
-        asset_group_select = get_object_list(AssetGroup, asset_group_id_select)
+        # 获取用户选择的 用户,用户组,资产,资产组,用户角色
+        users_select = request.POST.getlist('user', [])
+        user_groups_select = request.POST.getlist('usergroup', [])
+        assets_select = request.POST.getlist('asset', [])
+        asset_groups_select = request.POST.getlist('assetgroup', [])
+        roles_select = request.POST.getlist('role', [])
 
-        # 新授权的资产对象列表, 回收权限的资产对象列表, 新授权的资产组对象列表, 回收的资产组对象列表
-        asset_new = list(set(asset_select) - set(asset_permed))
-        asset_del = list(set(asset_permed) - set(asset_select))
-        asset_group_new = list(set(asset_group_select) - set(asset_group_permed))
-        asset_group_del = list(set(asset_group_permed) - set(asset_group_select))
+        # 获取需要授权的主机列表
+        assets_obj = [Asset.objects.get(ip=asset) for asset in assets_select]
+        asset_groups_obj = [AssetGroup.objects.get(name=group) for group in asset_groups_select]
+        
+        group_assets_obj = [ asset for assets in [group.user_set.all() for group in asset_groups_obj]]
+        
 
-        for asset_group in asset_group_new:
-            asset_new.extend(asset_group.asset_set.all())
-        for asset_group in asset_group_del:
-            asset_del.extend(asset_group.asset_set.all())
-        perm_info = {
-            'action': 'perm user edit: ' + user.name,
-            'del': {'users': [user], 'assets': asset_del},
-            'new': {'users': [user], 'assets': asset_new}
-        }
-        print perm_info
-        try:
-            results = perm_user_api(perm_info)  # 通过API授权或回收
-        except ServerError, e:
-            return HttpResponse(e)
-        unreachable_asset = []
-        failures_asset = []
-        for ip in results.get('unreachable'):
-            unreachable_asset.extend(filter(lambda x: x, Asset.objects.filter(ip=ip)))
-        for ip in results.get('failures'):
-            failures_asset.extend(filter(lambda x: x, Asset.objects.filter(ip=ip)))
-        failures_asset.extend(unreachable_asset)  # 失败的授权要统计
-        for asset in failures_asset:
-            if asset in asset_select:
-                asset_select.remove(asset)
-            else:
-                asset_select.append(asset)
-        user.asset = asset_select
-        user.asset_group = asset_group_select
-        user.save()  # 保存到数据库
-        return HttpResponse(json.dumps(results, sort_keys=True, indent=4), content_type="application/json")
-    else:
-        return HttpResponse('输入错误')
+
+        # 获取需要授权的用户列表
+        users_obj = [User.objects.get(name=user) for user in users_select]
+        user_groups_obj = [UserGroup.objects.get(name=group) for group in user_groups_select]
+
+        group_users_obj = [user for user in [group.user_set.all() for group in user_groups_obj]]
+
+
+        # 获取授予的角色列表
+        roles_obj = [User.objects.get(name=role) for role in roles_select]
+
+
+        # 调用Ansible API 执行授权
+
+
+        # 授权成功，写回数据库
+
+        print request.POST
+        return HttpResponse(request.POST)
 
 
 @require_role('admin')

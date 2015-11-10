@@ -78,18 +78,19 @@ class MyInventory(object):
         # add hosts to group
         for host in hosts:
             # set connection variables
-            hostname = host.pop("hostname")
-            hostport = host.pop("port")
-            username = host.pop("username")
-            password = host.pop("password")
+            hostname = host.get("hostname")
+            hostport = host.get("port")
+            username = host.get("username")
+            password = host.get("password")
             my_host = Host(name=hostname, port=hostport)
             my_host.set_variable('ansible_ssh_host', hostname)
             my_host.set_variable('ansible_ssh_port', hostport)
             my_host.set_variable('ansible_ssh_user', username)
             my_host.set_variable('ansible_ssh_pass', password)
-            # set other variables
+            # set other variables 
             for key, value in host.iteritems():
-                my_host.set_variable(key, value)
+                if key not in ["hostname", "port", "username", "password"]:
+                    my_host.set_variable(key, value)
             # add to group
             my_group.add_host(my_host)
 
@@ -364,14 +365,14 @@ class App(MyPlaybook):
 
 
 if __name__ == "__main__":
-    pass
-#   resource =  [{"hostname": "192.168.10.128", "port": "22", "username": "root", "password": "yusky0902"}]
+   resource =  [{"hostname": "192.168.10.161", "port": "22", "username": "yumaojun", "password": "yusky0902"}]
 #   playbook = MyPlaybook(resource)
 #   playbook.run('test.yml')
 #   print playbook.raw_results
-#   command = Command(resource)
-#   command.run("who")
-#   print command.raw_results
+   command = Command(resource)
+   command.run("who")
+   print command.raw_results
+   print       command.resource
 
 
 #   task = Tasks(resource)
