@@ -1,7 +1,7 @@
 # coding: utf-8
 import ast
 import xlsxwriter
-
+from django.db.models import AutoField
 from jumpserver.api import *
 from jasset.models import ASSET_STATUS, ASSET_TYPE, ASSET_ENV, IDC, AssetRecord
 
@@ -46,7 +46,7 @@ def db_update_group(**kwargs):
     group = get_object(AssetGroup, id=group_id)
 
     for asset_id in asset_id_list:
-            group_add_asset(group, asset_id)
+        group_add_asset(group, asset_id)
 
     AssetGroup.objects.filter(id=group_id).update(**kwargs)
 
@@ -98,6 +98,7 @@ def db_asset_update(**kwargs):
     """ 修改主机时数据库操作函数 """
     asset_id = kwargs.pop('id')
     Asset.objects.filter(id=asset_id).update(**kwargs)
+
 
 #
 #
@@ -223,6 +224,13 @@ def asset_diff(before, after):
     return alter_dic
 
 
+def asset_diff_one(before, after):
+    print before.__dict__, after.__dict__
+    fields =  Asset._meta.get_all_field_names()
+    for field in fields:
+        print before.field, after.field
+
+
 def db_asset_alert(asset, username, alert_dic):
     """
     asset alert info to db
@@ -233,8 +241,8 @@ def db_asset_alert(asset, username, alert_dic):
         print field
         field_name = Asset._meta.get_field_by_name(field)[0].verbose_name
         if field == 'idc':
-            old = IDC.objects.filter(id=value[0])
-            new = IDC.objects.filter(id=value[1])
+            old = IDC.objects.filter(id=value[0]) if value[0] else u''
+            new = IDC.objects.filter(id=value[1]) if value[1] else u''
             old_name = old[0].name if old else u''
             new_name = new[0].name if new else u''
             alert_info = [field_name, old_name, new_name]
@@ -250,12 +258,30 @@ def db_asset_alert(asset, username, alert_dic):
             for group_id in value[1]:
                 group_name = AssetGroup.objects.get(id=int(group_id)).name
                 new.append(group_name)
-            alert_info = [field_name, ','.join(old), ','.join(new)]
+            if old == new:
+                continue
+            else:
+                alert_info = [field_name, ','.join(old), ','.join(new)]
 
         elif field == 'use_default_auth':
-            pass
+            if unicode(value[0]) == 'True' and unicode(value[1]) == 'on' or \
+                                    unicode(value[0]) == 'False' and unicode(value[1]) == '':
+                continue
+            else:
+                name = asset.username
+                alert_info = [field_name, u'默认', name] if unicode(value[0]) == 'True' else \
+                                    [field_name, name, u'默认']
+
+        elif field in ['username', 'password']:
+            continue
+
         elif field == 'is_active':
-            pass
+            if unicode(value[0]) == 'True' and unicode(value[1]) == '1' or \
+                                    unicode(value[0]) == 'False' and unicode(value[1]) == '0':
+                continue
+            else:
+                alert_info = [u'是否激活', u'激活', u'禁用'] if unicode(value[0]) == 'True' else \
+                                    [u'是否激活', u'禁用', u'激活']
 
         else:
             alert_info = [field_name, unicode(value[0]), unicode(value[1])]
@@ -285,7 +311,7 @@ def write_excel(asset_all):
         group_all = '/'.join(group_list)
         status = asset.get_status_display()
         alter_dic = [asset.hostname, asset.ip, asset.idc.name, asset.mac, asset.remote_ip, asset.cpu, asset.memory,
-                asset.disk, asset.system_type, asset.cabinet, group_all, status, asset.comment]
+                     asset.disk, asset.system_type, asset.cabinet, group_all, status, asset.comment]
         data.append(alter_dic)
     format = workbook.add_format()
     format.set_border(1)
@@ -311,3 +337,11 @@ def write_excel(asset_all):
     workbook.close()
     ret = (True, file_name)
     return ret
+
+
+def copy_model_instance(obj):
+    initial = dict([(f.name, getattr(obj, f.name))
+                    for f in obj._meta.fields
+                    if not isinstance(f, AutoField) and\
+                       not f in obj._meta.parents.values()])
+    return obj.__class__(**initial)
