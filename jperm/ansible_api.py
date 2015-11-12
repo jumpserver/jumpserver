@@ -78,18 +78,19 @@ class MyInventory(object):
         # add hosts to group
         for host in hosts:
             # set connection variables
-            hostname = host.pop("hostname")
-            hostport = host.pop("port")
-            username = host.pop("username")
-            password = host.pop("password")
+            hostname = host.get("hostname")
+            hostport = host.get("port")
+            username = host.get("username")
+            password = host.get("password")
             my_host = Host(name=hostname, port=hostport)
             my_host.set_variable('ansible_ssh_host', hostname)
             my_host.set_variable('ansible_ssh_port', hostport)
             my_host.set_variable('ansible_ssh_user', username)
             my_host.set_variable('ansible_ssh_pass', password)
-            # set other variables
+            # set other variables 
             for key, value in host.iteritems():
-                my_host.set_variable(key, value)
+                if key not in ["hostname", "port", "username", "password"]:
+                    my_host.set_variable(key, value)
             # add to group
             my_group.add_host(my_host)
 
@@ -112,8 +113,9 @@ class Command(MyInventory):
     """
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
+        self.results = ''
 
-    def run(self, command, module_name="command", timeout=5, forks=10):
+    def run(self, command, module_name="command", timeout=5, forks=10, group='my_group'):
         """
         run command from andible ad-hoc.
         command  : 必须是一个需要执行的命令字符串， 比如 
@@ -126,12 +128,20 @@ class Command(MyInventory):
                      module_args=command,
                      timeout=timeout,
                      inventory=self.inventory,
-                     subset='my_group',
+                     subset=group,
                      forks=forks
                      )
-
         self.results = hoc.run()
-        return self.stdout
+
+        if self.stdout:
+            return {"ok": self.stdout}
+        else:
+            msg = []
+            if self.stderr:
+                msg.append(self.stderr)
+            if self.dark:
+                msg.append(self.dark)
+            return {"failed": msg}
 
     @property
     def raw_results(self):
@@ -193,7 +203,7 @@ class Tasks(Command):
     def __init__(self, *args, **kwargs):
         super(Tasks, self).__init__(*args, **kwargs)
 
-    def __run(self, module_args, module_name="command", timeout=5, forks=10):
+    def __run(self, module_args, module_name="command", timeout=5, forks=10, group='my_group'):
         """
         run command from andible ad-hoc.
         command  : 必须是一个需要执行的命令字符串， 比如 
@@ -203,7 +213,7 @@ class Tasks(Command):
                      module_args=module_args,
                      timeout=timeout,
                      inventory=self.inventory,
-                     subset='my_group',
+                     subset=group,
                      forks=forks
                      )
 
@@ -250,6 +260,25 @@ class Tasks(Command):
 
         return {"status": "failed","msg": self.msg} if self.msg else {"status": "ok"}
 
+    def add_multi_user(self, *args):
+        """
+        add multi user
+        :param args:
+            user
+        :return:
+        """
+        results = {}
+        users = {}
+        action = results["action_info"] = {}
+        for user in args:
+            users[user] = get_rand_pass()
+        for user, password in users.iteritems():
+            ret = self.add_user(user, password)
+            action[user] = ret
+        results["user_info"] = users
+
+        return results
+
     def del_user(self, username):
         """
         delete a host user.
@@ -283,6 +312,56 @@ class Tasks(Command):
             ret = self.del_user(user)
             action[user] = ret
         return results
+
+    def get_host_info(self):
+        """
+        use the setup module get host informations
+        :return:
+          all_ip is list
+          processor_count is int
+          system_dist_version is string
+          system_type is string
+          disk is dict (device_name: device_size}
+          system_dist is string
+          processor_type is string
+          default_ip is string
+          hostname is string
+          product_sn is string
+          memory_total is int (MB)
+          default_mac is string
+          product_name is string
+        """
+        self.__run('', 'setup')
+
+        result = {}
+        all = self.results.get("contacted")
+        for key, value in all.iteritems():
+            setup =value.get("ansible_facts")
+            # get disk informations
+            disk_all = setup.get("ansible_devices")
+            disk_need = {}
+            for disk_name, disk_info in disk_all.iteritems():
+                if disk_name.startswith('sd') or disk_name.startswith('hd'):
+                    disk_need[disk_name] = disk_info.get("size")
+
+            result[key] = {
+                    "all_ip": setup.get("ansible_all_ipv4_addresses"),
+                    "hostname"  : setup.get("ansible_hostname" ),
+                    "default_ip": setup.get("ansible_default_ipv4").get("address"),
+                    "default_mac": setup.get("ansible_default_ipv4").get("macaddress"),
+                    "product_name": setup.get("ansible_product_name"),
+                    "processor_type": ' '.join(setup.get("ansible_processor")),
+                    "processor_count": setup.get("ansible_processor_count"),
+                    "memory_total": setup.get("ansible_memtotal_mb"),
+                    "disk": disk_need,
+                    "system_type": setup.get("ansible_system"),
+                    "system_dist": setup.get("ansible_distribution"),
+                    "system_dist_verion": setup.get("ansible_distribution_major_version"),
+                    "product_sn": setup.get("ansible_product_serial")
+            }
+
+        return {"status": "failed", "msg": self.msg} if self.msg else {"status": "ok", "result": result}
+
 
 
 
@@ -362,24 +441,31 @@ class App(MyPlaybook):
         super(App, self).__init__(*args, **kwargs)
 
 
-
 if __name__ == "__main__":
     pass
-#   resource =  [{"hostname": "192.168.10.128", "port": "22", "username": "root", "password": "yusky0902"}]
+
+#   resource =  {
+#                "group1": {
+#                    "hosts": [{"hostname": "127.0.0.1", "port": "22", "username": "root", "password": "xxx"},],
+#                    "vars" : {"var1": "value1", "var2": "value2"},
+#                          },
+#                }
+#   command = Command(resource)
+#   print    command.run("who", group="group1")
+
+    # resource = [{"hostname": "192.168.10.148", "port": "22", "username": "root", "password": "xxx"}]
+    # task = Tasks(resource)
+    # print task.get_host_info()
+
 #   playbook = MyPlaybook(resource)
 #   playbook.run('test.yml')
 #   print playbook.raw_results
-#   command = Command(resource)
-#   command.run("who")
-#   print command.raw_results
 
-
-#   task = Tasks(resource)
-#   print task.add_user('test', 'mypass')
+#    task = Tasks(resource)
+    # print task.add_user('test', 'mypass')
 #   print task.del_user('test')
 #   print task.push_key('root', '/root/.ssh/id_rsa.pub')
 #   print task.del_key('root', '/root/.ssh/id_rsa.pub')
-
 
 #   task = Tasks(resource)
 #   print task.add_init_users()
