@@ -3,12 +3,11 @@
 import ast
 
 from django.db.models import Q
-from django.template import RequestContext
 from django.shortcuts import get_object_or_404
 
 from jasset.asset_api import *
 from jumpserver.api import *
-from jasset.forms import AssetForm
+from jasset.forms import AssetForm, IdcForm
 from jasset.models import Asset, IDC, AssetGroup, ASSET_TYPE, ASSET_STATUS
 
 
@@ -328,3 +327,77 @@ def asset_detail(request):
     asset_record = AssetRecord.objects.filter(asset=asset).order_by('-alert_time')
 
     return my_render('jasset/asset_detail.html', locals(), request)
+
+
+@require_role('admin')
+def idc_add(request):
+    """
+    IDC add view
+    """
+    header_title, path1, path2 = u'添加IDC', u'资产管理', u'添加IDC'
+    if request.method == 'POST':
+        idc_form = IdcForm(request.POST)
+        if idc_form.is_valid():
+            idc_name = idc_form.cleaned_data['name']
+
+            if IDC.objects.filter(name=idc_name):
+                emg = u'添加失败, 此IDC %s 已存在!' % idc_name
+                return my_render('jasset/idc_add.html', locals(), request)
+            else:
+                idc_form.save()
+                smg = u'IDC: %s添加成功' % idc_name
+            return HttpResponseRedirect("/jasset/idc_list/")
+    else:
+        idc_form = IdcForm()
+    return render_to_response('jasset/idc_add.html',
+                              locals(),
+                              context_instance=RequestContext(request))
+
+
+@require_role('admin')
+def idc_list(request):
+    header_title, path1, path2 = u'查看IDC', u'资产管理', u'查看IDC'
+    posts = IDC.objects.all()
+    keyword = request.GET.get('keyword', '')
+    if keyword:
+        posts = IDC.objects.filter(Q(name__contains=keyword) | Q(comment__contains=keyword))
+    else:
+        posts = IDC.objects.exclude(name='ALL').order_by('id')
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+    return render_to_response('jasset/idc_list.html',
+                              locals(),
+                              context_instance=RequestContext(request))
+
+
+@require_role('admin')
+def idc_edit(request):
+    idc_id = request.GET.get('id', '')
+    idc = get_object(IDC, id=idc_id)
+    if request.method == 'POST':
+        idc_form = IdcForm(request.POST, instance=idc)
+        if idc_form.is_valid():
+            idc_form.save()
+            return HttpResponseRedirect("/jasset/idc_list/")
+    else:
+        idc_form = IdcForm(instance=idc)
+        return my_render('jasset/idc_edit.html', locals(), request)
+
+
+@require_role('admin')
+def idc_detail(request):
+    """ IDC详情 """
+    header_title, path1, path2 = u'IDC详情', u'资产管理', u'IDC详情'
+    idc_id = request.GET.get('id', '')
+    idc = get_object(IDC, id=idc_id)
+    posts = Asset.objects.filter(idc=idc).order_by('ip')
+    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
+
+    return my_render('jasset/idc_detail.html', locals(), request)
+
+
+@require_role('admin')
+def idc_del(request):
+    uuid = request.GET.get('uuid', '')
+    idc = get_object_or_404(IDC, uuid=uuid)
+    idc.delete()
+    return HttpResponseRedirect('/jasset/idc_list/')

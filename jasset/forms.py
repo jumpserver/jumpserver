@@ -22,3 +22,11 @@ class AssetGroupForm(forms.ModelForm):
         fields = [
             "name", "comment"
         ]
+
+
+class IdcForm(forms.ModelForm):
+    class Meta:
+        model = IDC
+        fields = ['name', "bandwidth", "operator", 'linkman', 'phone', 'address', 'network', 'comment']
+
+

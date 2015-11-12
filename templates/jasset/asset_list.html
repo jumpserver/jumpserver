@@ -229,7 +229,7 @@
                 data: {asset_id_all: asset_id_all},
                 url: "/jasset/asset_del/?arg=batch",
                 success: function () {
-                    window.open("/jasset/asset_list/", "_self");
+                    parent.location.reload();
                 }
             });
         }

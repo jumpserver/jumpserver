@@ -43,7 +43,7 @@ class IDC(models.Model):
     network = models.TextField(blank=True, null=True, verbose_name=u"IP地址段")
     date_added = models.DateField(auto_now=True, default=datetime.datetime.now(), null=True)
     operator = models.IntegerField(max_length=32, blank=True, null=True, verbose_name=u"运营商")
-    comment = models.TextField(blank=True, null=True, verbose_name=u"备注")
+    comment = models.CharField(max_length=128, blank=True, null=True, verbose_name=u"备注")
 
     def __unicode__(self):
         return self.name
