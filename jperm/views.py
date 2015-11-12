@@ -9,9 +9,15 @@ from jperm.models import SysUser
 from juser.user_api import gen_ssh_key
 
 
+<<<<<<< HEAD
 from juser.models      import User, UserGroup
 from jasset.models     import Asset, AssetGroup
 from jperm.models      import PermRole, PermRule
+=======
+from juser.models     import User, UserGroup
+from jasset.models    import Asset, AssetGroup
+from jperm.models     import PermRole, PermRule
+>>>>>>> 1c3d642be250026193bbdd9e2fe798e0197f5696
 
 from jperm.utils       import updates_dict
 from jperm.ansible_api import Tasks
@@ -150,6 +156,7 @@ def perm_rule_add(request):
         else:
             return HttpResponse("add rule failed")
 
+<<<<<<< HEAD
 @require_role('admin')
 def perm_rule_list(request):
     """
@@ -169,6 +176,59 @@ def perm_rule_list(request):
 
 
 
+=======
+    user_id = request.GET.get('id', '')
+    user = get_object(User, id=user_id)
+
+    if request.method == 'GET' and user:
+        # 获取所有 用户,用户组,资产,资产组,用户角色, 用于添加授权规则
+        users = User.objects.all()
+        user_groups = UserGroup.objects.all()
+        assets = Asset.objects.all()
+        asset_groups = AssetGroup.objects.all()
+        roles = PermRole.objects.all()
+
+        data_content = {"users": users, "user_groups": user_groups, 
+                        "assets": assets, "asset_groups": asset_groups,
+                        "roles": roles}
+        render_data = updates_dict(data_nav, data_content)        
+        return my_render('jperm/rule_add.html', render_data, request)
+
+    elif request.method == 'POST' and user:
+        # 获取用户选择的 用户,用户组,资产,资产组,用户角色
+        users_select = request.POST.getlist('user', [])
+        user_groups_select = request.POST.getlist('usergroup', [])
+        assets_select = request.POST.getlist('asset', [])
+        asset_groups_select = request.POST.getlist('assetgroup', [])
+        roles_select = request.POST.getlist('role', [])
+
+        # 获取需要授权的主机列表
+        assets_obj = [Asset.objects.get(ip=asset) for asset in assets_select]
+        asset_groups_obj = [AssetGroup.objects.get(name=group) for group in asset_groups_select]
+        
+        group_assets_obj = [ asset for assets in [group.user_set.all() for group in asset_groups_obj]]
+        
+
+
+        # 获取需要授权的用户列表
+        users_obj = [User.objects.get(name=user) for user in users_select]
+        user_groups_obj = [UserGroup.objects.get(name=group) for group in user_groups_select]
+
+        group_users_obj = [user for user in [group.user_set.all() for group in user_groups_obj]]
+
+
+        # 获取授予的角色列表
+        roles_obj = [User.objects.get(name=role) for role in roles_select]
+
+
+        # 调用Ansible API 执行授权
+
+
+        # 授权成功，写回数据库
+
+        print request.POST
+        return HttpResponse(request.POST)
+>>>>>>> 1c3d642be250026193bbdd9e2fe798e0197f5696
 
 
 @require_role('admin')
