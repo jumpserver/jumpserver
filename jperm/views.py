@@ -58,10 +58,18 @@ def perm_rule_detail(request):
         2. include 部分：{% include 'nav_cat_bar.html' %}
              rander_nav 为渲染数据
     """
-    data_nav = {"header_title": "用户授权", "path1": "授权管理", "path2": "用户详情"}
+    data_nav = {"header_title": "授权规则", "path1": "授权管理", "path2": "规则详情"}
 
-    # 待实现
-    render_data = updates_dict(data_nav)
+    # 根据rule_id 取得rule对象
+    rule_id = request.GET.get("id")
+    rule_obj = PermRule.objects.get(id=rule_id)
+    user_obj = rule_obj.user.all()
+    asset_obj = rule_obj.asset.all()
+
+    roles_name = [role.name for role in rule_obj.role.all()]
+    data_content = {"roles_name": ','.join(roles_name), "rule": rule_obj, "users": user_obj, "assets": asset_obj}
+
+    render_data = updates_dict(data_nav, data_content)
 
     return my_render('jperm/perm_rule_detail.html', render_data, request)
     
@@ -73,7 +81,7 @@ def perm_rule_add(request):
     :param request:
     :return:
     """
-    data_nav = {"header_title": "用户授权", "path1": "授权管理", "path2": "添加授权规则"}
+    data_nav = {"header_title": "授权规则", "path1": "授权管理", "path2": "添加规则"}
 
     if request.method == 'GET':
         # 获取所有 用户,用户组,资产,资产组,用户角色, 用于添加授权规则
@@ -150,23 +158,52 @@ def perm_rule_add(request):
         else:
             return HttpResponse("add rule failed")
 
+
 @require_role('admin')
-def perm_rule_list(request):
+def perm_rule_edit(request):
     """
     list rules
     :param request:
     :return:
     """
 
-    data_nav = {"header_title": "用户授权", "path1": "授权管理", "path2": "查看授权规则"}
+    data_nav = {"header_title": "授权规则", "path1": "授权管理", "path2": "编辑规则"}
+    # 根据rule_id 取得rule对象
+    rule_id = request.GET.get("id")
+    rule_obj = PermRule.objects.get(id=rule_id)
 
-    user_id = request.GET.get('id', '')
-    user = get_object(User, id=user_id)
 
-    if request.method == 'GET' and user:
+    if request.method == 'GET' and rule_id:
         # 获取所有的rule对象
-        rules = PermRule.obects.all()
+        users = rule_obj.user.all()
+        user_groups = rule_obj.user_group.all()
+        assets = rule_obj.asset.all()
+        asset_groups = rule_obj.asset_group.all()
+        roles = rule_obj.role.all()
 
+        data_content = {"users": users, "user_groups": user_groups,
+                        "assets": assets, "asset_groups": asset_groups,
+                        "roles": roles}
+        render_data = updates_dict(data_nav, data_content)
+        return my_render('jperm/perm_rule_edit.html', render_data, request)
+
+    elif request.method == 'POST' and rule_id:
+        return HttpResponse("uncompleted")
+
+
+@require_role('admin')
+def perm_rule_delete(request):
+    """
+    use to delete rule
+    :param request:
+    :return:
+    """
+    # 根据rule_id 取得rule对象
+    rule_id = request.GET.get("id")
+    rule_obj = PermRule.objects.get(id=rule_id)
+
+    if request.method == 'POST' and rule_id:
+        return HttpResponse("uncompleted")
 
 
 

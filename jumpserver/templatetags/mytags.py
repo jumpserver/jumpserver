@@ -127,6 +127,13 @@ def result2bool(result=''):
 
 @register.filter(name='rule_member_count')
 def rule_member_count(instance, member):
+    """
+    instance is a rule object,
+    use to get the number of the members
+    :param instance:
+    :param member:
+    :return:
+    """
     member = getattr(instance, member)
     counts = member.all().count()
     return str(counts)
@@ -134,11 +141,44 @@ def rule_member_count(instance, member):
 
 @register.filter(name='rule_member_name')
 def rule_member_name(instance, member):
+    """
+    instance is a rule object,
+    use to get the name of the members
+    :param instance:
+    :param member:
+    :return:
+    """
     member = getattr(instance, member)
     names = member.all()
 
     return names
 
 
+@register.filter(name='user_which_groups')
+def user_which_group(user, member):
+    """
+    instance is a user object,
+    use to get the group of the user
+    :param instance:
+    :param member:
+    :return:
+    """
+    member = getattr(user, member)
+    names = [members.name for members in member.all()]
+
+    return ','.join(names)
 
 
+@register.filter(name='asset_which_groups')
+def asset_which_group(asset, member):
+    """
+    instance is a user object,
+    use to get the group of the user
+    :param instance:
+    :param member:
+    :return:
+    """
+    member = getattr(asset, member)
+    names = [members.name for members in member.all()]
+
+    return ','.join(names)

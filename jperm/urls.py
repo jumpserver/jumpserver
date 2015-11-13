@@ -3,8 +3,10 @@ from jperm.views import *
 
 urlpatterns = patterns('jperm.views',
                        (r'^user/$', perm_rules),
-                       (r'^perm_user_edit/$', perm_rule_add),
-                       (r'^perm_user_detail/$', perm_rule_detail),
+                       (r'^perm_rule_add/$', perm_rule_add),
+                       (r'^perm_rule_detail/$', perm_rule_detail),
+                       (r'^perm_rule_edit/$', perm_rule_edit),
+                       (r'^perm_rule_delete/$', perm_rule_delete),
                        (r'^group/$', perm_group_list),
                        (r'^perm_group_edit/$', perm_group_edit),
                        (r'^log/$', log),

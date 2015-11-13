@@ -24,7 +24,7 @@
 
                 <div class="ibox-content">
                     <div class="">
-                    <a target="_blank" href="/jperm/perm_user_edit/" class="btn btn-sm btn-primary "> 添加规则 </a>
+                    <a target="_blank" href="/jperm/perm_rule_add/" class="btn btn-sm btn-primary "> 添加规则 </a>
                     <a id="del_btn" class="btn btn-sm btn-danger "> 删除所选 </a>
                     <form id="search_form" method="get" action="" class="pull-right mail-search">
                         <div class="input-group">
@@ -70,9 +70,9 @@
                                     <a href="/jasset/group_list/?gid={{ user.id }}">{{ rule | rule_member_count:"role" }}</a>
                                 </td>
                                 <td class="text-center">
-                                    <a href="../perm_user_detail/?id={{ user.id }}" class="btn btn-xs btn-primary">详情</a>
-                                    <a href="../perm_user_edit/?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <a href="../perm_user_edit/?id={{ user.id }}" class="btn btn-xs btn-danger">删除</a>
+                                    <a href="/jperm/perm_rule_detail/?id={{ rule.id }}" class="btn btn-xs btn-primary">详情</a>
+                                    <a href="/jperm/perm_rule_edit/?id={{ rule.id }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a onclick="remove_rule({{ rule.id }});" class="btn btn-xs btn-danger">删除</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -93,3 +93,12 @@
 </div>
 
 {% endblock %}
+
+
+
+<script type="text/javascript">
+    function remove_rule(rule_id){
+
+    }
+
+</script>
