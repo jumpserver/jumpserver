@@ -22,24 +22,16 @@ class SysUser(models.Model):
 class PermRole(models.Model):
     name = models.CharField(max_length=100)
     comment = models.CharField(max_length=100)
+    date_added = models.DateTimeField(auto_now=True)
 
 
-class UserMapping(models.Model):
-    role = models.ForeignKey(PermRole, related_name='user_mapping')
-    user = models.ForeignKey(User, related_name='user_mapping')
-    asset = models.ForeignKey(Asset, related_name='user_mapping')
-    asset_group = models.ForeignKey(AssetGroup, related_name='user_mapping', null=True, blank=True)
-
-
-class GroupMapping(models.Model):
-    role = models.ForeignKey(PermRole, related_name='group_mapping')
-    usergroup = models.ForeignKey(UserGroup, related_name='group_mapping', null=True, blank=True)
-    asset = models.ForeignKey(Asset, related_name='group_mapping')
-    asset_group = models.ForeignKey(AssetGroup, related_name='group_mapping', null=True, blank=True)
-
-
-
-
-
-
-
+class PermRule(models.Model):
+    date_added = models.DateTimeField(auto_now=True)
+    name = models.CharField(max_length=100)
+    comment = models.CharField(max_length=100)
+    asset = models.ManyToManyField(Asset)
+    asset_group = models.ManyToManyField(AssetGroup)
+    user = models.ManyToManyField(User)
+    user_group = models.ManyToManyField(UserGroup)
+    role = models.ManyToManyField(PermRole)
+    ssh_type = models.BooleanField()

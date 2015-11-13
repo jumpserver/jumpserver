@@ -9,8 +9,6 @@ class UserGroup(models.Model):
     # assets = models.TextField(max_length=1000, verbose_name="Assets", default='')
     # asset_groups = models.CharField(max_length=1000, verbose_name="Asset Groups", default='')
     comment = models.CharField(max_length=160, blank=True, null=True)
-    #asset = models.ManyToManyField(Asset)
-    #asset_group = models.ManyToManyField(AssetGroup)
 
     def __unicode__(self):
         return self.name

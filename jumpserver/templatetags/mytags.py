@@ -123,3 +123,22 @@ def result2bool(result=''):
         return '<b style="color: red">失败</b>'
     else:
         return '<b style="color: green">成功</b>'
+
+
+@register.filter(name='rule_member_count')
+def rule_member_count(instance, member):
+    member = getattr(instance, member)
+    counts = member.all().count()
+    return str(counts)
+
+
+@register.filter(name='rule_member_name')
+def rule_member_name(instance, member):
+    member = getattr(instance, member)
+    names = member.all()
+
+    return names
+
+
+
+
