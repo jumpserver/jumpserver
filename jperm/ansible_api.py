@@ -132,10 +132,7 @@ class Command(MyInventory):
                      forks=forks
                      )
         self.results = hoc.run()
-<<<<<<< HEAD
 
-=======
->>>>>>> 1c3d642be250026193bbdd9e2fe798e0197f5696
         if self.stdout:
             return {"ok": self.stdout}
         else:
@@ -446,10 +443,7 @@ class App(MyPlaybook):
 
 if __name__ == "__main__":
     pass
-<<<<<<< HEAD
 
-=======
->>>>>>> 1c3d642be250026193bbdd9e2fe798e0197f5696
 #   resource =  {
 #                "group1": {
 #                    "hosts": [{"hostname": "127.0.0.1", "port": "22", "username": "root", "password": "xxx"},],
@@ -459,15 +453,9 @@ if __name__ == "__main__":
 #   command = Command(resource)
 #   print    command.run("who", group="group1")
 
-<<<<<<< HEAD
     # resource = [{"hostname": "192.168.10.148", "port": "22", "username": "root", "password": "xxx"}]
     # task = Tasks(resource)
     # print task.get_host_info()
-=======
-#   resource =  [{"hostname": "127.0.1.1", "port": "22", "username": "root", "password": "xxx"}]
-#   command = Command(resource)
-#   print command.run("who")
->>>>>>> 1c3d642be250026193bbdd9e2fe798e0197f5696
 
 #   playbook = MyPlaybook(resource)
 #   playbook.run('test.yml')
