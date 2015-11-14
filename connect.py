@@ -13,16 +13,19 @@ import textwrap
 import getpass
 import readline
 import django
-from multiprocessing import Pool
 import paramiko
-import struct, fcntl, signal, socket, select, fnmatch
+import struct, fcntl, signal, socket, select
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
     django.setup()
 from jumpserver.api import ServerError, User, Asset, AssetGroup, get_object
-from jumpserver.api import logger, is_dir, Log, TtyLog
-from jumpserver.settings import log_dir
+from jumpserver.api import logger, mkdir, Log, TtyLog
+from jumpserver.settings import LOG_DIR
+
+
+login_user = get_object(User, username=getpass.getuser())
+
 
 try:
     import termios
@@ -31,11 +34,6 @@ except ImportError:
     print '\033[1;31m仅支持类Unix系统 Only unix like supported.\033[0m'
     time.sleep(3)
     sys.exit()
-
-VIM_FLAG = False
-VIM_COMMAND = ''
-SSH_TTY = ''
-login_user = get_object(User, username=getpass.getuser())
 
 
 def color_print(msg, color='red', exits=False):
@@ -51,49 +49,6 @@ def color_print(msg, color='red', exits=False):
     if exits:
         time.sleep(2)
         sys.exit()
-
-
-def verify_connect(user, option):
-    """
-    Check user was permed or not . Check ip is unique or not.
-    鉴定用户是否有该主机权限 或 匹配到的ip是否唯一
-    """
-    ip_matched = []
-    try:
-        assets_info = login_user.get_asset_info()
-    except ServerError, e:
-        color_print(e, 'red')
-        return False
-
-    for ip, asset_info in assets_info.items():
-        if option in asset_info[1:] and option:
-            ip_matched = [asset_info[1]]
-            break
-
-        for info in asset_info[1:]:
-            if option in info:
-                ip_matched.append(ip)
-
-    logger.debug('%s matched input %s: %s' % (login_user.username, option, ip_matched))
-    ip_matched = list(set(ip_matched))
-
-    if len(ip_matched) > 1:  # 如果匹配ip不唯一
-        ip_comment = {}
-        for ip in ip_matched:
-            ip_comment[ip] = assets_info[ip][2]
-
-        for ip in sorted(ip_comment):
-            if ip_comment[ip]:
-                print '%-15s -- %s' % (ip, ip_comment[ip])
-            else:
-                print '%-15s' % ip
-        print ''
-    elif len(ip_matched) < 1:  # 如果没匹配到
-        color_print('没有该主机，或者您没有该主机的权限 No Permission or No host.', 'red')
-    else:  # 恰好是1个
-        asset = get_object(Asset, ip=ip_matched[0])
-        jtty = Jtty(user, asset)
-        jtty.connect()
 
 
 def check_vim_status(command, ssh):
@@ -194,7 +149,7 @@ def deal_command(str_r, ssh):
         else :
             result_command += str_r[0]
         str_r = str_r[1:]
-        
+
     if pattern_str !='':
         pattern_list.append(pattern_str)
     
@@ -207,8 +162,7 @@ def deal_command(str_r, ssh):
                     result_command = result_command[:-int(backspace)]
                     result_command += pattern_list[0]
                 pattern_list = pattern_list[1:]
-                
-        
+
     control_char = re.compile(r"""
             \x1b[ #%()*+\-.\/]. |
             \r |                                               #匹配 回车符(CR)
@@ -237,14 +191,6 @@ def deal_command(str_r, ssh):
             return ''
 
 
-def newline_code_in(strings):
-    for i in ['\r', '\r\n', '\n']:
-        if i in strings:
-            #print "new line"
-            return True
-    return False
-
-
 class Tty(object):
     """
     A virtual tty class
@@ -256,8 +202,8 @@ class Tty(object):
         self.ip = None
         self.port = 22
         self.channel = None
-        self.user = None
-        self.asset = None
+        #self.asset = get_object(Asset, name=asset_name)
+        #self.user = get_object(User, username=username)
         self.role = None
         self.ssh = None
         self.connect_info = None
@@ -292,44 +238,45 @@ class Tty(object):
 
         return line_filtered
 
-    def get_log_file(self):
+    def get_log(self):
         """
         Logging user command and output.
         记录用户的日志
         """
-        tty_log_dir = os.path.join(log_dir, 'tty')
-        timestamp_start = int(time.time())
-        date_start = time.strftime('%Y%m%d', time.localtime(timestamp_start))
-        time_start = time.strftime('%H%M%S', time.localtime(timestamp_start))
+        tty_log_dir = os.path.join(LOG_DIR, 'tty')
+        date_today = datetime.datetime.now()
+        date_start = date_today.strftime('%Y%m%d')
+        time_start = date_today.strftime('%H%M%S')
         today_connect_log_dir = os.path.join(tty_log_dir, date_start)
         log_file_path = os.path.join(today_connect_log_dir, '%s_%s_%s' % (self.username, self.asset_name, time_start))
 
         try:
-            is_dir(today_connect_log_dir, mode=0777)
+            mkdir(today_connect_log_dir, mode=0777)
         except OSError:
+            logger.debug('创建目录 %s 失败，请修改%s目录权限' % (today_connect_log_dir, tty_log_dir))
             raise ServerError('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, tty_log_dir))
 
         try:
             log_file_f = open(log_file_path + '.log', 'a')
             log_time_f = open(log_file_path + '.time', 'a')
         except IOError:
+            logger.debug('创建tty日志文件失败, 请修改目录%s权限' % today_connect_log_dir)
             raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 
-        if self.login_type == 'ssh':
+        if self.login_type == 'ssh':  # 如果是ssh连接过来，记录connect.py的pid，web terminal记录为日志的id
             pid = os.getpid()
-            remote_ip = os.popen("who -m | awk '{ print $5 }'").read().strip('()\n')
+            remote_ip = os.popen("who -m | awk '{ print $5 }'").read().strip('()\n')  # 获取远端IP
             log = Log(user=self.username, host=self.asset_name, remote_ip=remote_ip,
-                      log_path=log_file_path, start_time=datetime.datetime.now(), pid=pid)
+                      log_path=log_file_path, start_time=date_today, pid=pid)
         else:
             remote_ip = 'Web'
             log = Log(user=self.username, host=self.asset_name, remote_ip=remote_ip,
-                      log_path=log_file_path, start_time=datetime.datetime.now(), pid=0)
+                      log_path=log_file_path, start_time=date_today, pid=0)
             log.save()
             log.pid = log.id
-            log.save()
 
-        log_file_f.write('Start at %s\n' % datetime.datetime.now())
         log.save()
+        log_file_f.write('Start at %s\n' % datetime.datetime.now())
         return log_file_f, log_time_f, log
 
     def get_connect_info(self):
@@ -413,10 +360,10 @@ class SshTty(Tty):
         Use paramiko channel connect server interactive.
         使用paramiko模块的channel，连接后端，进入交互式
         """
-        log_file_f, log_time_f, log = self.get_log_file()
+        log_file_f, log_time_f, log = self.get_log()
         old_tty = termios.tcgetattr(sys.stdin)
         pre_timestamp = time.time()
-        input_r = ''
+        data = ''
         input_mode = False
 
         try:
@@ -445,22 +392,20 @@ class SshTty(Tty):
                         log_time_f.flush()
 
                         if input_mode and not self.is_output(x):
-                            input_r += x
+                            data += x
 
                     except socket.timeout:
                         pass
 
                 if sys.stdin in r:
                     x = os.read(sys.stdin.fileno(), 1)
-                    if not input_mode:
-                        input_mode = True
+                    input_mode = True
 
                     if str(x) in ['\r', '\n', '\r\n']:
-                        # input_r = deal_command(input_r,ssh)
-                        input_r = self.remove_control_char(input_r)
+                        data = self.remove_control_char(data)
 
-                        TtyLog(log=log, datetime=datetime.datetime.now(), cmd=input_r).save()
-                        input_r = ''
+                        TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
+                        data = ''
                         input_mode = False
 
                     if len(x) == 0:

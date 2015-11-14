@@ -179,7 +179,7 @@ class WebTty(Tty):
         super(WebTty, self).__init__(*args, **kwargs)
         self.login_type = 'web'
         self.ws = None
-        self.input_r = ''
+        self.data = ''
         self.input_mode = False
 
 
@@ -197,12 +197,11 @@ class WebTerminalKillHandler(tornado.web.RequestHandler):
 
 
 class WebTerminalHandler(tornado.websocket.WebSocketHandler):
-    tasks = []
     clients = []
+    tasks = []
 
     def __init__(self, *args, **kwargs):
         self.term = None
-        self.channel = None
         self.log_file_f = None
         self.log_time_f = None
         self.log = None
@@ -220,7 +219,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         print asset_name, username, token
         self.term = WebTty('a', 'b')
         self.term.get_connection()
-        self.channel = self.term.ssh.invoke_shell(term='xterm')
+        self.term.channel = self.term.ssh.invoke_shell(term='xterm')
         WebTerminalHandler.tasks.append(MyThread(target=self.forward_outbound))
         WebTerminalHandler.clients.append(self)
 
@@ -237,10 +236,10 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         if data.get('data'):
             self.term.input_mode = True
             if str(data['data']) in ['\r', '\n', '\r\n']:
-                TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=self.term.remove_control_char(self.term.input_r)).save()
-                self.term.input_r = ''
+                TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=self.term.remove_control_char(self.term.data)).save()
+                self.term.data = ''
                 self.term.input_mode = False
-            self.channel.send(data['data'])
+            self.term.channel.send(data['data'])
 
     def on_close(self):
         print 'On_close'
@@ -256,15 +255,15 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             pass
 
     def forward_outbound(self):
-        self.log_file_f, self.log_time_f, self.log = self.term.get_log_file()
+        self.log_file_f, self.log_time_f, self.log = self.term.get_log()
         self.id = self.log.id
         try:
             data = ''
             pre_timestamp = time.time()
             while True:
-                r, w, e = select.select([self.channel, sys.stdin], [], [])
-                if self.channel in r:
-                    recv = self.channel.recv(1024)
+                r, w, e = select.select([self.term.channel, sys.stdin], [], [])
+                if self.term.channel in r:
+                    recv = self.term.channel.recv(1024)
                     if not len(recv):
                         return
                     data += recv
@@ -277,7 +276,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                         self.log_file_f.flush()
                         self.log_time_f.flush()
                         if self.term.input_mode and not self.term.is_output(data):
-                            self.term.input_r += data
+                            self.term.data += data
                         data = ''
                     except UnicodeDecodeError:
                         pass

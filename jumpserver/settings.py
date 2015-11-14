@@ -34,18 +34,12 @@ EMAIL_USE_TLS = config.getboolean('mail', 'email_use_tls')
 EMAIL_TIMEOUT = 5
 
 # ======== Log ==========
-LOG = False
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
-JLOG_FILE = os.path.join(LOG_DIR, 'jumpserver.log')
 SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys')
-# SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
 KEY = config.get('base', 'key')
-LOGIN_NAME = getpass.getuser()
-# LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
 URL = config.get('base', 'url')
-log_dir = os.path.join(BASE_DIR, 'logs')
-log_level = config.get('base', 'log')
-web_socket_host = config.get('websocket', 'web_socket_host')
+LOG_LEVEL = config.get('base', 'log')
+WEB_SOCKET_HOST = config.get('websocket', 'web_socket_host')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/

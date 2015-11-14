@@ -25,7 +25,6 @@ import json
 import logging
 
 
-
 def set_log(level):
     """
     return a log file object
@@ -35,7 +34,7 @@ def set_log(level):
                        'critical': logging.CRITICAL}
     logger_f = logging.getLogger('jumpserver')
     logger_f.setLevel(logging.DEBUG)
-    fh = logging.FileHandler(JLOG_FILE)
+    fh = logging.FileHandler(os.path.join(LOG_DIR, 'jumpserver.log'))
     fh.setLevel(log_level_total.get(level, logging.DEBUG))
     formatter = logging.Formatter('%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
@@ -86,7 +85,6 @@ def pages(post_objects, request):
     return post_objects, paginator, page_objects, page_range, current_page, show_first, show_end
 
 
-
 class PyCrypt(object):
     """
     This class used to encrypt and decrypt password.
@@ -98,7 +96,7 @@ class PyCrypt(object):
         self.mode = AES.MODE_CBC
 
     @staticmethod
-    def random_pass(length, especial=False):
+    def gen_rand_pass(length, especial=False):
         """
         random password
         随机生成密码
@@ -139,7 +137,7 @@ class PyCrypt(object):
         对称加密之加密生成密码
         """
         if not passwd:
-            passwd = self.random_pass()
+            passwd = self.gen_rand_pass()
 
         cryptor = AES.new(self.key, self.mode, b'8122ca7d906ad5e1')
         try:
@@ -255,6 +253,7 @@ def get_session_user_info(request):
     # if user:
     #     return [user.id, user.username, user]
     return [request.user.id, request.user.username, request.user]
+
 
 def get_user_dept(request):
     """
@@ -389,7 +388,7 @@ def bash(cmd):
     return subprocess.call(cmd, shell=True)
 
 
-def is_dir(dir_name, username='root', mode=0755):
+def mkdir(dir_name, username='root', mode=0755):
     """
     insure the dir exist and mode ok
     目录存在，如果不存在就建立，并且权限正确
@@ -414,5 +413,5 @@ def my_render(template, data, request):
 
 
 CRYPTOR = PyCrypt(KEY)
-logger = set_log(log_level)
+logger = set_log(LOG_LEVEL)
 
