@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block self_head_css_js %}
+    <link href="/static/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
+    <link href="/static/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <script src="/static/js/plugins/chosen/chosen.jquery.js"></script>
+{% endblock %}
+{% load mytags %}
+{% block content %}
+    {% include 'nav_cat_bar.html' %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-lg-10">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>填写基本信息</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <form method="post" id="userForm" class="form-horizontal" action="">
+                            {% if error %}
+                                <div class="alert alert-warning text-center">{{ error }}</div>
+                            {% endif %}
+                            {% if msg %}
+                                <div class="alert alert-success text-center">{{ msg }}</div>
+                            {% endif %}
+                            <div class="form-group">
+                                <label for="role_name" class="col-sm-2 control-label">规则名称<span class="red-fonts">*</span></label>
+                                <div class="col-sm-8">
+                                    <input id="role_name" name="role_name" placeholder="Role Name" type="text" class="form-control" value="{{ role.name }}">
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label for="role_comment" class="col-sm-2 control-label">备注</label>
+                                <div class="col-sm-8">
+                                    <input id="role_comment" name="role_comment" placeholder="Role Comment" type="text" class="form-control" value="{{ role.comment }}">
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <button class="btn btn-white" type="reset">取消</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit">确认保存</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block self_footer_js %}
+<script>
+$(document).ready(function(){
+    $("input.role").click(function(){
+        if($("input.role[value=GA]").is( ":checked" )){
+            $("#admin_groups").css("display", 'none');
+        }
+        else {
+
+            $("#admin_groups").css("display", 'block');
+        }
+    });
+
+    $('#use_password').click(function(){
+        if ($(this).is(':checked')){
+            $('#admin_account_password').css('display', 'block')
+        }
+        else {
+
+            $('#admin_account_password').css('display', 'none')
+        }
+    });
+
+    $('#use_publicKey').click(function(){
+        if ($(this).is(':checked')){
+
+            $('#admin_account_publicKey').css('display', 'block')
+        }
+        else {
+            $('#admin_account_publicKey').css('display', 'none')
+        }
+    });
+});
+
+var config = {
+                '.chosen-select'           : {},
+                '.chosen-select-deselect'  : {allow_single_deselect:true},
+                '.chosen-select-no-single' : {disable_search_threshold:10},
+                '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
+                '.chosen-select-width'     : {width:"95%"}
+            };
+
+for (var selector in config) {
+    $(selector).chosen(config[selector]);
+}
+
+</script>
+    <script src="/static/js/cropper/cropper.min.js"></script>
+    <script src="/static/js/datapicker/bootstrap-datepicker.js"></script>
+{% endblock %}
+

@@ -307,6 +307,7 @@ def perm_role_detail(request):
         render_data = updates_dict(data_nav, role_info)
         return my_render('jperm/perm_role_detail.html', render_data, request)
 
+
 @require_role('admin')
 def perm_role_edit(request):
     """
@@ -324,6 +325,34 @@ def perm_role_edit(request):
 
     if request.method == "POST":
         return HttpResponse(u"未实现")
+
+
+@require_role('admin')
+def perm_role_push(request):
+    """
+
+    :param request:
+    :return:
+    """
+    data_nav = {"header_title": "系统角色", "path1": "角色管理", "path2": "角色推送"}
+
+    if request.method == "GET":
+        data_content = {"roles": PermRole.objects.all(),
+                        "assets": Asset.objects.all(),
+                        "asset_groups": AssetGroup.objects.all()}
+        render_data = updates_dict(data_nav, data_content)
+        return my_render('jperm/perm_role_push.html', render_data, request)
+
+    if request.method == "POST":
+        return HttpResponse(u"未实现")
+
+
+
+
+
+
+
+
 
 
 @require_role('admin')
