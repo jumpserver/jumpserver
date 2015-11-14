@@ -1,5 +1,5 @@
 # coding: utf-8
-import ast
+import xlrd
 import xlsxwriter
 from django.db.models import AutoField
 from jumpserver.api import *
@@ -226,7 +226,7 @@ def asset_diff(before, after):
 
 def asset_diff_one(before, after):
     print before.__dict__, after.__dict__
-    fields =  Asset._meta.get_all_field_names()
+    fields = Asset._meta.get_all_field_names()
     for field in fields:
         print before.field, after.field
 
@@ -270,7 +270,7 @@ def db_asset_alert(asset, username, alert_dic):
             else:
                 name = asset.username
                 alert_info = [field_name, u'默认', name] if unicode(value[0]) == 'True' else \
-                                    [field_name, name, u'默认']
+                    [field_name, name, u'默认']
 
         elif field in ['username', 'password']:
             continue
@@ -281,7 +281,7 @@ def db_asset_alert(asset, username, alert_dic):
                 continue
             else:
                 alert_info = [u'是否激活', u'激活', u'禁用'] if unicode(value[0]) == 'True' else \
-                                    [u'是否激活', u'禁用', u'激活']
+                    [u'是否激活', u'禁用', u'激活']
 
         else:
             alert_info = [field_name, unicode(value[0]), unicode(value[1])]
@@ -310,8 +310,10 @@ def write_excel(asset_all):
 
         group_all = '/'.join(group_list)
         status = asset.get_status_display()
-        alter_dic = [asset.hostname, asset.ip, asset.idc.name, asset.mac, asset.remote_ip, asset.cpu, asset.memory,
-                     asset.disk, asset.system_type, asset.cabinet, group_all, status, asset.comment]
+        idc_name = asset.idc.name if asset.idc else u''
+        alter_dic = [asset.hostname, asset.ip, idc_name, asset.mac, asset.remote_ip, asset.cpu, asset.memory,
+                     asset.disk, (asset.system_type + asset.system_version), asset.cabinet, group_all, status,
+                     asset.comment]
         data.append(alter_dic)
     format = workbook.add_format()
     format.set_border(1)
@@ -342,6 +344,62 @@ def write_excel(asset_all):
 def copy_model_instance(obj):
     initial = dict([(f.name, getattr(obj, f.name))
                     for f in obj._meta.fields
-                    if not isinstance(f, AutoField) and\
-                       not f in obj._meta.parents.values()])
+                    if not isinstance(f, AutoField) and \
+                    not f in obj._meta.parents.values()])
     return obj.__class__(**initial)
+
+
+def ansible_record(asset, ansible_dic, username):
+    alert_dic = {}
+    asset_dic = asset.__dict__
+    for field, value in ansible_dic.items():
+        old = asset_dic.get(field)
+        new = ansible_dic.get(field)
+        if unicode(old) != unicode(new):
+            print old, new, type(old), type(new)
+            setattr(asset, field, value)
+            asset.save()
+            alert_dic[field] = [old, new]
+
+    db_asset_alert(asset, username, alert_dic)
+
+
+def excel_to_db(excel_file):
+    """
+    Asset add batch function
+    """
+    try:
+        data = xlrd.open_workbook(filename=None, file_contents=excel_file.read())
+    except Exception, e:
+        return False
+
+    else:
+        table = data.sheets()[0]
+        rows = table.nrows
+        group_instance = []
+        for row_num in range(1, rows):
+            row = table.row_values(row_num)
+            if row:
+                ip, port, hostname, use_default_auth, username, password, group = row
+                print ip
+                use_default_auth = 1 if use_default_auth == u'默认' else 0
+                if get_object(Asset, ip=ip):
+                    continue
+                if ip and port:
+                    asset = Asset(ip=ip,
+                                  port=port,
+                                  use_default_auth=use_default_auth,
+                                  username=username,
+                                  password=password
+                                  )
+                    asset.save()
+                    group_list = group.split('/')
+                    for group_name in group_list:
+                        group = get_object(AssetGroup, name=group_name)
+                        if group:
+                            group_instance.append(group)
+                    if group_instance:
+                        print group_instance
+                        asset.group = group_instance
+                    asset.save()
+        return True

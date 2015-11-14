@@ -107,7 +107,8 @@
                                     <th class="text-center"> 主机名 </th>
                                     <th class="text-center"> IDC </th>
                                     <th class="text-center"> 所属主机组 </th>
-                                    <th class="text-center"> 配置信息 </th>
+{#                                    <th class="text-center"> 配置信息 </th>#}
+                                    <th class="text-center"> 操作系统 </th>
                                     <th class="text-center"> 使用默认管理 </th>
                                     <th class="text-center"> 操作 </th>
                                 </tr>
@@ -122,12 +123,14 @@
                                     <td class="text-center"> {{ asset.hostname }} </td>
                                     <td class="text-center"> {{ asset.idc.name }} </td>
                                     <td class="text-center">{{ asset.group.all|group_str2 }}</td>
-                                    <td class="text-center">{{ asset.cpu }}|{{ asset.memory }}|{{ asset.disk }}</td>
+{#                                    <td class="text-center">{{ asset.cpu }}|{{ asset.memory }}|{{ asset.disk }}</td>#}
+                                    <td class="text-center">{{ asset.system_type }}{{ asset.system_version }}</td>
                                     <td class="text-center"> {{ asset.use_default_auth|bool2str }} </td>
                                     <td class="text-center" data-editable='false'>
                                         <a href="/jasset/asset_detail/?id={{ asset.id }}" class="btn btn-xs btn-primary">详情</a>
                                         {% ifnotequal session_role_id 0 %}
                                             <a href="/jasset/asset_edit/?id={{ asset.id }}" class="btn btn-xs btn-info">编辑</a>
+                                            <a href="/jasset/asset_update/?id={{ asset.id }}" class="btn btn-xs btn-info">更新</a>
                                             <a value="/jasset/asset_del/?id={{ asset.id }}" class="btn btn-xs btn-danger asset_del">删除</a>
                                         {% endifnotequal %}
                                     </td>

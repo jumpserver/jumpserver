@@ -415,7 +415,16 @@ def str_to_list(info):
     """
     str to list
     """
+    print ast.literal_eval(info), type(ast.literal_eval(info))
     return ast.literal_eval(info)
+
+
+@register.filter(name='str_to_dic')
+def str_to_dic(info):
+    """
+    str to list
+    """
+    return ast.literal_eval(info).iteritems()
 
 
 @register.filter(name='str_to_code')
@@ -424,3 +433,11 @@ def str_to_code(char_str):
         return char_str
     else:
         return u'空'
+
+
+@register.filter(name='ip_str_to_list')
+def ip_str_to_list(ip_str):
+    """
+    ip str to list
+    """
+    return ip_str.split(',')

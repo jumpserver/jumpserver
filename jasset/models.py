@@ -80,7 +80,7 @@ class Asset(models.Model):
     status = models.IntegerField(max_length=2, choices=ASSET_STATUS, blank=True, null=True, default=1, verbose_name=u"机器状态")
     asset_type = models.IntegerField(max_length=2, choices=ASSET_TYPE, blank=True, null=True, verbose_name=u"主机类型")
     env = models.IntegerField(max_length=2, choices=ASSET_ENV, blank=True, null=True, verbose_name=u"运行环境")
-    sn = models.CharField(max_length=32, blank=True, null=True, verbose_name=u"SN编号")
+    sn = models.CharField(max_length=128, blank=True, null=True, verbose_name=u"SN编号")
     date_added = models.DateTimeField(auto_now=True, default=datetime.datetime.now(), null=True)
     is_active = models.BooleanField(default=True, verbose_name=u"是否激活")
     comment = models.CharField(max_length=128, blank=True, null=True, verbose_name=u"备注")

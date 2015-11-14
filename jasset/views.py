@@ -1,14 +1,13 @@
 # coding:utf-8
 
 import ast
-
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-
 from jasset.asset_api import *
 from jumpserver.api import *
 from jasset.forms import AssetForm, IdcForm
 from jasset.models import Asset, IDC, AssetGroup, ASSET_TYPE, ASSET_STATUS
+from ansible_api import Tasks
 
 
 @require_role('admin')
@@ -176,6 +175,12 @@ def asset_add(request):
 
 
 @require_role('admin')
+def asset_add_batch(request):
+    header_title, path1, path2 = u'添加资产', u'资产管理', u'批量添加'
+    return my_render('jasset/asset_add_batch.html', locals(), request)
+
+
+@require_role('admin')
 def asset_del(request):
     """
     del a asset
@@ -207,8 +212,6 @@ def asset_edit(request):
 
     asset_id = request.GET.get('id', '')
     username = request.session.get('username', 'admin')
-    # if not asset_id:
-    #     return HttpResponse('没有该主机')
     asset = get_object(Asset, id=asset_id)
     asset_old = copy_model_instance(asset)
     af = AssetForm(instance=asset)
@@ -231,8 +234,8 @@ def asset_edit(request):
                     af_save.password = ''
                 af_save.save()
                 af_post.save_m2m()
-                asset_new = get_object(Asset, id=asset_id)
-                asset_diff_one(asset_old, asset_new)
+                # asset_new = get_object(Asset, id=asset_id)
+                # asset_diff_one(asset_old, asset_new)
                 info = asset_diff(af_post.__dict__.get('initial'), request.POST)
                 db_asset_alert(asset, username, info)
 
@@ -306,7 +309,7 @@ def asset_edit_batch(request):
 @require_role('admin')
 def asset_detail(request):
     """
-    主机详情
+    Asset detail view
     """
     header_title, path1, path2 = u'主机详细信息', u'资产管理', u'主机详情'
     asset_id = request.GET.get('id', '')
@@ -314,6 +317,53 @@ def asset_detail(request):
     asset_record = AssetRecord.objects.filter(asset=asset).order_by('-alert_time')
 
     return my_render('jasset/asset_detail.html', locals(), request)
+
+
+@require_role('admin')
+def asset_update(request):
+    """
+    Asset update host info via ansible view
+    """
+    asset_id = request.GET.get('id', '')
+    asset = get_object(Asset, id=asset_id)
+    if not asset:
+        return HttpResponseRedirect('/jasset/asset_detail/?id=%s' % asset_id)
+    name = request.session.get('username', 'admin')
+    if asset.use_default_auth:
+        username = 'root'
+        password = '123456'
+    else:
+        username = asset.username
+        password = asset.password
+
+    resource = [{"hostname": asset.ip, "port": asset.port,
+                 "username": username, "password": password}]
+
+    ansible_instance = Tasks(resource)
+    ansible_asset_info = ansible_instance.get_host_info()
+    if ansible_asset_info['status'] == 'ok':
+        asset_info = ansible_asset_info['result'][asset.ip]
+        if asset_info:
+            hostname = asset_info.get('hostname')
+            other_ip = ','.join(asset_info.get('other_ip'))
+            cpu_type = asset_info.get('cpu_type')[1]
+            cpu_cores = asset_info.get('cpu_cores')
+            cpu = cpu_type + ' * ' + unicode(cpu_cores)
+            memory = asset_info.get('memory')
+            disk = asset_info.get('disk')
+            sn = asset_info.get('sn')
+            brand = asset_info.get('brand')
+            system_type = asset_info.get('system_type')
+            system_version = asset_info.get('system_version')
+
+            asset_dic = {"hostname": hostname, "other_ip": other_ip, "cpu": cpu,
+                         "memory": memory, "disk": disk, "system_type": system_type,
+                         "system_version": system_version, "brand": brand, "sn": sn
+                         }
+
+            ansible_record(asset, asset_dic, name)
+
+    return HttpResponseRedirect('/jasset/asset_detail/?id=%s' % asset_id)
 
 
 @require_role('admin')
@@ -343,6 +393,9 @@ def idc_add(request):
 
 @require_role('admin')
 def idc_list(request):
+    """
+    IDC list view
+    """
     header_title, path1, path2 = u'查看IDC', u'资产管理', u'查看IDC'
     posts = IDC.objects.all()
     keyword = request.GET.get('keyword', '')
@@ -358,6 +411,10 @@ def idc_list(request):
 
 @require_role('admin')
 def idc_edit(request):
+    """
+    IDC edit view
+    """
+    header_title, path1, path2 = u'编辑IDC', u'资产管理', u'编辑IDC'
     idc_id = request.GET.get('id', '')
     idc = get_object(IDC, id=idc_id)
     if request.method == 'POST':
@@ -372,7 +429,9 @@ def idc_edit(request):
 
 @require_role('admin')
 def idc_detail(request):
-    """ IDC详情 """
+    """
+    IDC detail view
+    """
     header_title, path1, path2 = u'IDC详情', u'资产管理', u'IDC详情'
     idc_id = request.GET.get('id', '')
     idc = get_object(IDC, id=idc_id)
@@ -384,7 +443,25 @@ def idc_detail(request):
 
 @require_role('admin')
 def idc_del(request):
+    """
+    IDC delete view
+    """
     uuid = request.GET.get('uuid', '')
     idc = get_object_or_404(IDC, uuid=uuid)
     idc.delete()
     return HttpResponseRedirect('/jasset/idc_list/')
+
+
+@require_role('admin')
+def asset_upload(request):
+    """
+    Upload file view
+    """
+    if request.method == 'POST':
+        excel_file = request.FILES.get('file_name', '')
+        ret = excel_to_db(excel_file)
+        if ret:
+            smg = u'批量添加成功'
+        else:
+            emg = u'批量添加失败,请检查格式.'
+    return my_render('jasset/asset_add_batch.html', locals(), request)

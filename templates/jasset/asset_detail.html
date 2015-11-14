@@ -38,6 +38,20 @@
                                         <td>{{ asset.hostname }}</td>
                                     </tr>
                                     <tr>
+                                        <td class="text-navy">其他IP</td>
+                                        <td>
+                                            <table class="table">
+                                                {% if asset.other_ip %}
+                                                    {% for ip in asset.other_ip|ip_str_to_list %}
+                                                        <tr>
+                                                            <td>{{ ip }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <td class="text-navy">远控IP</td>
                                         <td>{{ asset.remote_ip }}</td>
                                     </tr>
@@ -77,11 +91,21 @@
                                     </tr>
                                     <tr>
                                         <td class="text-navy">内存</td>
-                                        <td>{{ asset.memory }}</td>
+                                        <td>{{ asset.memory }}M</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">硬盘</td>
-                                        <td>{{ asset.disk }}</td>
+                                        <td>
+                                            <table class="table">
+                                            {% if asset.disk %}
+                                                 {% for disk, value in asset.disk|str_to_dic %}
+                                                    <tr>
+                                                        <td><span class="text-navy">{{ disk }}</span> &nbsp&nbsp&nbsp {{ value }}</td>
+                                                    </tr>
+                                                 {% endfor %}
+                                            {% endif %}
+                                            </table>
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">资产编号</td>
@@ -94,6 +118,10 @@
                                     <tr>
                                         <td class="text-navy">主机类型</td>
                                         <td>{{ asset.get_asset_type_display }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">系统版本</td>
+                                        <td>{{ asset.system_type }} {{ asset.system_version }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">运行环境</td>
