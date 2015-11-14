@@ -183,7 +183,7 @@ def deal_command(str_r, ssh):
             (?:\x1b\]|\x9d) .*? (?:\x1b\\|[\a\x9c]) | \x07 |   #匹配 操作系统指令(OSC)...终止符或振铃符(ST|BEL)
             (?:\x1b[P^_]|[\x90\x9e\x9f]) .*? (?:\x1b\\|\x9c) | #匹配 设备控制串或私讯或应用程序命令(DCS|PM|APC)...终止符(ST)
             \x1b.                                              #匹配 转义过后的字符
-            [\x80-\x9f]                                        #匹配 所有控制字符
+            [\x80-\x9f] | (?:\x1b\]0.*) |\[.*@.*\][\$#] | (.*mysql>.*)     #匹配 所有控制字符
             """, re.X)
     result_command = control_char.sub('', result_command.strip())
     global VIM_FLAG
