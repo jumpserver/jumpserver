@@ -198,12 +198,16 @@ def perm_rule_delete(request):
     :param request:
     :return:
     """
-    # 根据rule_id 取得rule对象
-    rule_id = request.GET.get("id")
-    rule_obj = PermRule.objects.get(id=rule_id)
-
-    if request.method == 'POST' and rule_id:
-        return HttpResponse("uncompleted")
+    if request.method == 'POST':
+        # 根据rule_id 取得rule对象
+        rule_id = request.POST.get("id")
+        rule_obj = PermRule.objects.get(id=rule_id)
+        print rule_id, rule_obj
+        print rule_obj.name
+        rule_obj.delete()
+        return HttpResponse(u"删除授权规则：%s" % rule_obj.name)
+    else:
+        return HttpResponse(u"不支持该操作")
 
 
 

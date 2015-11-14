@@ -50,9 +50,9 @@
                                 <th class="text-center">操作</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="edittbody">
                         {% for rule in rules %}
-                            <tr class="gradeX">
+                            <tr class="gradeX" id={{ rule.id }}>
                                 <td class="text-center"> {{ rule.name }} </td>
                                 <td class="text-center">
                                     <a href="/jasset/asset_list/?gid={{ user.id }}">{{ rule | rule_member_count:"user" }} </a>
@@ -72,7 +72,7 @@
                                 <td class="text-center">
                                     <a href="/jperm/perm_rule_detail/?id={{ rule.id }}" class="btn btn-xs btn-primary">详情</a>
                                     <a href="/jperm/perm_rule_edit/?id={{ rule.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <a onclick="remove_rule({{ rule.id }});" class="btn btn-xs btn-danger">删除</a>
+                                    <button onclick="remove_rule({{ rule.id }})" class="btn btn-xs btn-danger">删除</button>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -92,13 +92,29 @@
     </div>
 </div>
 
+
+<script>
+function remove_rule(rule_id){
+    if (confirm("确认删除")) {
+        $.ajax({
+           type: "POST",
+           url: "/jperm/perm_rule_delete/",
+           data: "id=" + rule_id,
+           success: function(msg){
+               alert( "成功: " + msg );
+               var del_row = $('tbody#edittbody>tr#' + rule_id);
+               del_row.remove()
+           },
+           error: function (msg) {
+               alert("失败: " + msg)
+           }
+        });
+    }
+
+}
+</script>
+
+
 {% endblock %}
 
 
-
-<script type="text/javascript">
-    function remove_rule(rule_id){
-
-    }
-
-</script>

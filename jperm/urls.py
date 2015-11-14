@@ -2,7 +2,7 @@ from django.conf.urls import patterns, include, url
 from jperm.views import *
 
 urlpatterns = patterns('jperm.views',
-                       (r'^user/$', perm_rules),
+                       (r'^rule/$', perm_rules),
                        (r'^perm_rule_add/$', perm_rule_add),
                        (r'^perm_rule_detail/$', perm_rule_detail),
                        (r'^perm_rule_edit/$', perm_rule_edit),
