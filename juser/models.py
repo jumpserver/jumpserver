@@ -24,9 +24,9 @@ class User(AbstractUser):
     role = models.CharField(max_length=2, choices=USER_ROLE_CHOICES, default='CU')
     group = models.ManyToManyField(UserGroup)
     ssh_key_pwd = models.CharField(max_length=200)
-    is_active = models.BooleanField(default=True)
-    last_login = models.DateTimeField(null=True)
-    date_joined = models.DateTimeField(null=True)
+    # is_active = models.BooleanField(default=True)
+    # last_login = models.DateTimeField(null=True)
+    # date_joined = models.DateTimeField(null=True)
 
 
 
