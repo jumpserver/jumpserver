@@ -60,12 +60,12 @@ class AssetGroup(models.Model):
 
 class Asset(models.Model):
     ip = models.GenericIPAddressField(unique=True)
-    port = models.IntegerField(blank=True, null=True)
+    port = models.IntegerField()
     group = models.ManyToManyField(AssetGroup)
     username = models.CharField(max_length=20, blank=True, null=True)
     password = models.CharField(max_length=80, blank=True, null=True)
-    use_default = models.BooleanField(default=True)
-    date_added = models.DateTimeField(auto_now=True)
+    use_default_auth = models.BooleanField(default=True)
+    date_added = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     comment = models.CharField(max_length=100, blank=True, null=True)
 

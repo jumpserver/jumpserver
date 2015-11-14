@@ -1,7 +1,8 @@
 *.py[cod]
 .idea
 test.py
-
+.DS_Store
+db.sqlite3
 # C extensions
 *.so
 

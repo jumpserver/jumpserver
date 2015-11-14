@@ -2,25 +2,25 @@
 # Author: Guanghongwei
 # Email: ibuler@qq.com
 
-import random
-from Crypto.PublicKey import RSA
+# import random
+# from Crypto.PublicKey import RSA
 import uuid as uuid_r
 
 from django.db.models import Q
 from django.template import RequestContext
 from django.db.models import ObjectDoesNotExist
-
+from jumpserver.settings import EMAIL_HOST_USER
 from juser.user_api import *
 from jperm.perm_api import _public_perm_api, perm_user_api, user_permed
 
+MAIL_FROM = EMAIL_HOST_USER
 
 def chg_role(request):
-    role = {'SU': 2, 'DA': 1, 'CU': 0}
-    user, dept = get_session_user_dept(request)
+    role = {'SU': 2, 'GA': 1, 'CU': 0}
     if request.session['role_id'] > 0:
         request.session['role_id'] = 0
     elif request.session['role_id'] == 0:
-        request.session['role_id'] = role.get(user.role, 0)
+        request.session['role_id'] = role.get(request.user.role, 0)
     return HttpResponseRedirect('/')
 
 
@@ -168,8 +168,8 @@ def user_add(request):
             if '' in [username, password, ssh_key_pwd, name, role]:
                 error = u'带*内容不能为空'
                 raise ServerError
-            user_test = get_object(User, username=username)
-            if user_test:
+            check_user_is_exist = User.objects.filter(username=username)
+            if check_user_is_exist:
                 error = u'用户 %s 已存在' % username
                 raise ServerError
 
@@ -178,10 +178,10 @@ def user_add(request):
         else:
             try:
                 user = db_add_user(username=username, name=name,
-                                   password=CRYPTOR.md5_crypt(password),
+                                   password=password,
                                    email=email, role=role, uuid=uuid,
                                    groups=groups, admin_groups=admin_groups,
-                                   ssh_key_pwd=CRYPTOR.md5_crypt(ssh_key_pwd),
+                                   ssh_key_pwd=ssh_key_pwd,
                                    is_active=is_active,
                                    date_joined=datetime.datetime.now())
                 server_add_user(username, password, ssh_key_pwd, ssh_key_login_need)
@@ -233,10 +233,10 @@ def user_list(request):
 @require_role(role='user')
 def user_detail(request):
     header_title, path1, path2 = '用户详情', '用户管理', '用户详情'
-    if request.session.get('role_id') == 0:
-        user_id = request.session.get('user_id')
-    else:
-        user_id = request.GET.get('id', '')
+    # if request.session.get('role_id') == 0:
+    #     user_id = request.user.id
+    # else:
+    #     user_id = request.GET.get('id', '')
     #     if request.session.get('role_id') == 1:
     #         user, dept = get_session_user_dept(request)
     #         if not validate(request, user=[user_id]):
@@ -244,9 +244,9 @@ def user_detail(request):
     # if not user_id:
     #     return HttpResponseRedirect('/juser/user_list/')
 
-    user = get_object(User, id=user_id)
-    if user:
-        pass
+    # user = get_object(User, id=user_id)
+    # if user:
+    #     pass
         # asset_group_permed = user.get_asset_group()
         # logs_last = Log.objects.filter(user=user.name).order_by('-start_time')[0:10]
         # logs_all = Log.objects.filter(user=user.name).order_by('-start_time')
@@ -257,8 +257,14 @@ def user_detail(request):
 
 @require_role(role='admin')
 def user_del(request):
-    user_ids = request.GET.get('id', '')
-    user_id_list = user_ids.split(',')
+    if request.method == "GET":
+        user_ids = request.GET.get('id', '')
+        user_id_list = user_ids.split(',')
+    elif request.method == "POST":
+        user_ids = request.POST.get('id', '')
+        user_id_list = user_ids.split(',')
+    else:
+        return HttpResponse('错误请求')
     for user_id in user_id_list:
         user = get_object(User, id=user_id)
         if user:
@@ -370,11 +376,11 @@ def user_edit(request):
         else:
             return HttpResponseRedirect('/juser/user_list/')
 
-        if password != user.password:
-            password_decode = password
-            password = CRYPTOR.md5_crypt(password)
-        else:
-            password_decode = None
+        # if password != user.password:
+        #     password_decode = password
+        #     password = CRYPTOR.md5_crypt(password)
+        # else:
+        #     password_decode = None
 
         db_update_user(user_id=user_id,
                        password=password,
@@ -409,7 +415,10 @@ def user_edit_adm(request):
 
 
 def profile(request):
-    user_id = request.session.get('user_id')
+    a = request.user.id
+    a = request.user.groups
+
+    user_id = request.user.id
     if not user_id:
         return HttpResponseRedirect('/')
     user = User.objects.get(id=user_id)
@@ -418,7 +427,7 @@ def profile(request):
 
 def change_info(request):
     header_title, path1, path2 = '修改信息', '用户管理', '修改个人信息'
-    user_id = request.session.get('user_id')
+    user_id = request.user.id
     user = get_object(User, id=user_id)
     error = ''
     if not user:
@@ -436,10 +445,11 @@ def change_info(request):
             error = '密码须大于6位'
 
         if not error:
-            if password != user.password:
-                password = CRYPTOR.md5_crypt(password)
+            # if password != user.password:
+            #     password = CRYPTOR.md5_crypt(password)
 
-            user.update(name=name, password=password, email=email)
+            user.update(name=name, email=email)
+            user.set_password(password)
             msg = '修改成功'
 
     return render_to_response('juser/change_info.html', locals(), context_instance=RequestContext(request))
@@ -465,7 +475,7 @@ def down_key(request):
         user_id = request.GET.get('id')
 
     if is_role_request(request, 'user'):
-        user_id = request.session.get('user_id')
+        user_id = request.user.id
 
     if user_id:
         user = get_object(User, id=user_id)

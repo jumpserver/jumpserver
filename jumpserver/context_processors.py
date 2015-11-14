@@ -4,8 +4,9 @@ from jumpserver.api import *
 
 
 def name_proc(request):
-    user_id = request.session.get('user_id')
-    role_id = request.session.get('role_id')
+    user_id = request.user.id
+    # role_id = request.session.get('role_id')
+    role_id = {'SU':2,'GA':1,'CU':0}.get(request.user.role,0)
     # if role_id == 2:
     user_total_num = User.objects.all().count()
     user_active_num = User.objects.filter().count()

@@ -4,78 +4,62 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 
 from jumpserver.api import *
-from jasset.views import httperror
 from django.http import HttpResponseNotFound
+from jlog.log_api import renderTemplate
 
-CONF = ConfigParser()
-CONF.read('%s/jumpserver.conf' % BASE_DIR)
-
-
-def get_user_info(request, offset):
-    """ 获取用户信息及环境 """
-    env_dic = {'online': 0, 'offline': 1}
-    env = env_dic[offset]
-    keyword = request.GET.get('keyword', '')
-    user_info = get_session_user_info(request)
-    user_id, username = user_info[0:2]
-    dept_id, dept_name = user_info[3:5]
-    ret = [request, keyword, env, username, dept_name]
-
-    return ret
+from models import Log
+from jumpserver.settings import web_socket_host
 
 
-def get_user_log(ret_list):
-    """ 获取不同类型用户日志记录 """
-    request, keyword, env, username, dept_name = ret_list
-    post_all = Log.objects.filter(is_finished=env).order_by('-start_time')
-    post_keyword_all = Log.objects.filter(Q(user__contains=keyword) |
-                                          Q(host__contains=keyword)) \
-        .filter(is_finished=env).order_by('-start_time')
-
-    if is_super_user(request):
-        if keyword:
-            posts = post_keyword_all
-        else:
-            posts = post_all
-
-    elif is_group_admin(request):
-        if keyword:
-            posts = post_keyword_all.filter(dept_name=dept_name)
-        else:
-            posts = post_all.filter(dept_name=dept_name)
-
-    elif is_common_user(request):
-        if keyword:
-            posts = post_keyword_all.filter(user=username)
-        else:
-            posts = post_all.filter(user=username)
-
-    return posts
-
-
-@require_login
+@require_role('admin')
 def log_list(request, offset):
     """ 显示日志 """
-    header_title, path1, path2 = u'查看日志', u'查看日志', u'在线用户'
-    keyword = request.GET.get('keyword', '')
-    web_socket_host = CONF.get('websocket', 'web_socket_host')
-    posts = get_user_log(get_user_info(request, offset))
+    header_title, path1 = u'审计', u'操作审计'
+    date_seven_day = request.GET.get('start', '')
+    date_now_str = request.GET.get('end', '')
+    username_list = request.GET.getlist('username', [])
+    host_list = request.GET.getlist('host', [])
+    cmd = request.GET.get('cmd', '')
+    print date_seven_day, date_now_str
+    if offset == 'online':
+        posts = Log.objects.filter(is_finished=False).order_by('-start_time')
+    else:
+        posts = Log.objects.filter(is_finished=True).order_by('-start_time')
+        username_all = set([log.user for log in Log.objects.all()])
+        ip_all = set([log.host for log in Log.objects.all()])
+
+        if date_seven_day and date_now_str:
+            datetime_start = datetime.datetime.strptime(date_seven_day + ' 00:00:01', '%m/%d/%Y %H:%M:%S')
+            datetime_end = datetime.datetime.strptime(date_now_str + ' 23:59:59', '%m/%d/%Y %H:%M:%S')
+            posts = posts.filter(start_time__gte=datetime_start).filter(start_time__lte=datetime_end)
+
+        if username_list:
+            posts = posts.filter(user__in=username_list)
+
+        if host_list:
+            posts = posts.filter(host__in=host_list)
+        if cmd:
+            log_id_list = set([log.log_id for log in TtyLog.objects.filter(cmd__contains=cmd)])
+            posts = posts.filter(id__in=log_id_list)
+        else:
+            date_now = datetime.datetime.now()
+            date_now_str = date_now.strftime('%m/%d/%Y')
+            date_seven_day = (date_now + datetime.timedelta(days=-7)).strftime('%m/%d/%Y')
+
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
+    web_monitor_uri = 'ws://%s/monitor' % web_socket_host
+    web_kill_uri = 'http://%s/kill' % web_socket_host
     return render_to_response('jlog/log_%s.html' % offset, locals(), context_instance=RequestContext(request))
 
 
-@require_admin
+@require_role('admin')
 def log_kill(request):
     """ 杀掉connect进程 """
     pid = request.GET.get('id', '')
     log = Log.objects.filter(pid=pid)
     if log:
         log = log[0]
-        dept_name = log.dept_name
-        deptname = get_session_user_info(request)[4]
-        if is_group_admin(request) and dept_name != deptname:
-            return httperror(request, u'Kill失败, 您无权操作!')
         try:
             os.kill(int(pid), 9)
         except OSError:
@@ -86,35 +70,44 @@ def log_kill(request):
         return HttpResponseNotFound(u'没有此进程!')
 
 
-@require_login
+@require_role('admin')
 def log_history(request):
     """ 命令历史记录 """
+    log_id = request.GET.get('id', 0)
+    log = Log.objects.filter(id=log_id)
+    if log:
+        log = log[0]
+        tty_logs = log.ttylog_set.all()
+
+        if tty_logs:
+            content = ''
+            for tty_log in tty_logs:
+                content += '%s: %s\n' % (tty_log.datetime.strftime('%Y-%m-%d %H:%M:%S'), tty_log.cmd)
+            return HttpResponse(content)
+
+    return HttpResponse('无日志记录!')
+
+
+@require_role('admin')
+def log_record(request):
     log_id = request.GET.get('id', 0)
     log = Log.objects.filter(id=int(log_id))
     if log:
         log = log[0]
-        dept_name = log.dept_name
-        deptname = get_session_user_info(request)[4]
-        if is_group_admin(request) and dept_name != deptname:
-            return httperror(request, '查看失败, 您无权查看!')
-
-        elif is_common_user(request):
-            return httperror(request, '查看失败, 您无权查看!')
-
-        log_his = "%s.his" % log.log_path
-        if os.path.isfile(log_his):
-            f = open(log_his)
-            content = f.read()
+        log_file = log.log_path + '.log'
+        log_time = log.log_path + '.time'
+        if os.path.isfile(log_file) and os.path.isfile(log_time):
+            content = renderTemplate(log_file, log_time)
             return HttpResponse(content)
         else:
-            return httperror(request, '无日志记录, 请查看日志处理脚本是否开启!')
+            return HttpResponse('无日志记录!')
 
 
-@require_login
-def log_search(request):
-    """ 日志搜索 """
-    offset = request.GET.get('env', '')
-    keyword = request.GET.get('keyword', '')
-    posts = get_user_log(get_user_info(request, offset))
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-    return render_to_response('jlog/log_search.html', locals(), context_instance=RequestContext(request))
+def web_terminal(request):
+    #username = get_session.get('username', '')
+    token = request.COOKIES.get('sessionid')
+    username = request.user.username
+    asset_name = '127.0.0.1'
+    web_terminal_uri = 'ws://%s/terminal?username=%s&asset_name=%s&token=%s' % (web_socket_host, username, asset_name, token)
+    return render_to_response('jlog/web_terminal.html', locals())
+
