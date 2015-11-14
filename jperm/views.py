@@ -13,14 +13,16 @@ from juser.models      import User, UserGroup
 from jasset.models     import Asset, AssetGroup
 from jperm.models      import PermRole, PermRule
 
-from jperm.utils       import updates_dict
+from jperm.utils       import updates_dict, gen_keys, get_rand_pass
 from jperm.ansible_api import Tasks
+from jperm.perm_api    import get_role_info
 
 from jumpserver.api    import my_render, get_object
 
 
+
 @require_role('admin')
-def perm_rules(request):
+def perm_rule_list(request):
     """
     用户授权视图：
       该视图的模板包含2部分：
@@ -45,7 +47,7 @@ def perm_rules(request):
 
     render_data = updates_dict(data_nav, data_content)
         
-    return my_render('jperm/perm_rules.html', render_data, request)
+    return my_render('jperm/perm_rule_list.html', render_data, request)
 
 
 @require_role('admin')
@@ -175,15 +177,15 @@ def perm_rule_edit(request):
 
     if request.method == 'GET' and rule_id:
         # 获取所有的rule对象
-        users = rule_obj.user.all()
-        user_groups = rule_obj.user_group.all()
-        assets = rule_obj.asset.all()
-        asset_groups = rule_obj.asset_group.all()
-        roles = rule_obj.role.all()
+        users_obj = rule_obj.user.all()
+        user_groups_obj = rule_obj.user_group.all()
+        assets_obj = rule_obj.asset.all()
+        asset_groups_obj = rule_obj.asset_group.all()
+        roles_obj = rule_obj.role.all()
 
-        data_content = {"users": users, "user_groups": user_groups,
-                        "assets": assets, "asset_groups": asset_groups,
-                        "roles": roles}
+        data_content = {"users": users_obj, "user_groups": user_groups_obj,
+                        "assets": assets_obj, "asset_groups": asset_groups_obj,
+                        "roles": roles_obj, "rule": rule_obj}
         render_data = updates_dict(data_nav, data_content)
         return my_render('jperm/perm_rule_edit.html', render_data, request)
 
@@ -210,6 +212,118 @@ def perm_rule_delete(request):
         return HttpResponse(u"不支持该操作")
 
 
+@require_role('admin')
+def perm_role_list(request):
+    """
+    用户授权视图：
+      该视图的模板包含2部分：
+        1. block   部分：{% block content %}
+             rander_content 为渲染数据
+        2. include 部分：{% include 'nav_cat_bar.html' %}
+             rander_nav 为渲染数据
+    """
+    data_nav = {"header_title": "系统角色", "path1": "角色管理", "path2": "查看角色"}
+
+    # 获取所有系统角色
+    roles_list = PermRole.objects.all()
+
+
+    # TODO: 搜索和分页
+    keyword = request.GET.get('search', '')
+    if keyword:
+        roles_list = roles_list.filter(Q(name=keyword))
+
+    roles_list, p, roles, page_range, current_page, show_first, show_end = pages(roles_list, request)
+    data_content = {"roles": roles_list}
+
+    render_data = updates_dict(data_nav, data_content)
+
+    return my_render('jperm/perm_role_list.html', render_data, request)
+
+
+@require_role('admin')
+def perm_role_add(request):
+    """
+    用户授权视图：
+      该视图的模板包含2部分：
+        1. block   部分：{% block content %}
+             rander_content 为渲染数据
+        2. include 部分：{% include 'nav_cat_bar.html' %}
+             rander_nav 为渲染数据
+    """
+    data_nav = {"header_title": "系统角色", "path1": "角色管理", "path2": "添加角色"}
+
+    if request.method == "GET":
+        return my_render('jperm/perm_role_add.html', data_nav, request)
+
+    elif request.method == "POST":
+        # 获取参数： name, comment
+        name = request.POST.get("role_name")
+        comment = request.POST.get("role_comment")
+        # 生成随机密码，生成秘钥对
+        password = get_rand_pass()
+        key_path = gen_keys()
+        role = PermRole(name=name, comment=comment, password=password, key_path=key_path)
+        role.save()
+        return HttpResponse(u"添加角色: %s" % name)
+    else:
+        return HttpResponse(u"不支持该操作")
+
+@require_role('admin')
+def perm_role_delete(request):
+    """
+    用户授权视图：
+      该视图的模板包含2部分：
+        1. block   部分：{% block content %}
+             rander_content 为渲染数据
+        2. include 部分：{% include 'nav_cat_bar.html' %}
+             rander_nav 为渲染数据
+    """
+    if request.method == "POST":
+        # 获取参数删除的role对象
+        role_id = request.POST.get("id")
+        role = PermRole.objects.get(id=role_id)
+        role.delete()
+        return HttpResponse(u"删除角色: %s" % role.name)
+    else:
+        return HttpResponse(u"不支持该操作")
+
+
+@require_role('admin')
+def perm_role_detail(request):
+    """
+        the role_info data like:
+            {'asset_groups': [],
+            'assets': [<Asset: 192.168.10.148>],
+            'rules': [<PermRule: PermRule object>],
+            'user_groups': [],
+            'users': [<User: user1>]}
+    """
+    data_nav = {"header_title": "系统角色", "path1": "角色管理", "path2": "角色详情"}
+
+    if request.method == "GET":
+        role_id = request.GET.get("id")
+        role_info = get_role_info(role_id)
+        render_data = updates_dict(data_nav, role_info)
+        return my_render('jperm/perm_role_detail.html', render_data, request)
+
+@require_role('admin')
+def perm_role_edit(request):
+    """
+
+    :param request:
+    :return:
+    """
+    data_nav = {"header_title": "系统角色", "path1": "角色管理", "path2": "角色编辑"}
+
+    if request.method == "GET":
+        role_id = request.GET.get("id")
+        data_content = {"role": PermRole.objects.get(id=role_id)}
+        render_data = updates_dict(data_nav, data_content)
+        return my_render('jperm/perm_role_edit.html', render_data, request)
+
+    if request.method == "POST":
+        return HttpResponse(u"未实现")
 
 
 @require_role('admin')

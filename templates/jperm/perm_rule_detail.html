@@ -43,7 +43,7 @@
                                     </tr>
                                     <tr>
                                         <td class="text-navy">时间</td>
-                                        <td>{{ rule.date_added }}</td>
+                                        <td>{{ rule.date_added | date:"Y-m-d H:i:s"}}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">角色</td>
@@ -60,15 +60,32 @@
                     </div>
                 </div>
             </div>
-
             <div class="col-lg-4">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h5>授权用户/用户组</h5>
+                        <span class="label label-primary"><b>授权用户/用户组</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#"></a>
+                                </li>
+                                <li><a href="#"></a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
                     <div class="ibox-content">
                         <div>
                             <div class="text-left">
-                                <table class="table table-striped table-bordered table-hover " id="editable" >
+                                <table class="table table-striped" id="ugedit" >
                                     <thead>
                                         <tr>
                                             <th class="text-center">用户</th>
@@ -88,19 +105,33 @@
                         </div>
                     </div>
                     </div>
-                    <div class="ibox-content inspinia-timeline">
                     </div>
-                </div>
-            </div>
-
             <div class="col-lg-4">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h5>授权主机/主机组</h5>
+                        <span class="label label-primary"><b>授权主机/主机组</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#"></a>
+                                </li>
+                                <li><a href="#"></a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
                     <div class="ibox-content">
                         <div>
                             <div class="text-left">
-                                <table class="table table-striped table-bordered table-hover " id="editable" >
+                                <table class="table table-striped" id="agedit" >
                                     <thead>
                                         <tr>
                                             <th class="text-center">主机</th>
@@ -120,11 +151,8 @@
                         </div>
                     </div>
                     </div>
-                    <div class="ibox-content inspinia-timeline">
                     </div>
-                </div>
-            </div>
-
+        </div>
     </div>
 
 <script>

@@ -1,6 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import random
+import os.path
+
+from Crypto.PublicKey import RSA
+from os import chmod, mkdir
+from uuid import uuid4
+
+PERM_DIR = os.path.dirname(os.path.abspath(__file__))
+KEY_DIR = os.path.join(PERM_DIR, 'role_keys')
+
 
 def get_rand_pass():
     """
@@ -19,6 +28,7 @@ def get_rand_pass():
     password = ''.join(pass_list)
     return password
 
+
 def updates_dict(*args):
     """
     surport update multi dict
@@ -29,8 +39,30 @@ def updates_dict(*args):
     return result
 
 
+def gen_keys():
+    """
+    在KEY_DIR下创建一个 uuid命名的目录，
+    并且在该目录下 生产一对秘钥
+    :return: 返回目录名(uuid)
+    """
+    key_basename = "keys-" + uuid4().hex
+    key_path_dir = os.path.join(KEY_DIR, key_basename)
+    mkdir(key_path_dir, 0700)
+
+    key = RSA.generate(4096)
+    private_key = os.path.join(key_path_dir, 'id_rsa')
+    public_key = os.path.join(key_path_dir, 'id_rsa.pub')
+    with open(private_key, 'w') as content_file:
+        content_file.write(key.exportKey('PEM'))
+    with open(public_key, 'w') as content_file:
+        content_file.write(key.publickey().exportKey('OpenSSH'))
+
+    return key_path_dir
+
+
+
 
 if __name__ == "__main__":
-    pass
+    print gen_keys()
 
 

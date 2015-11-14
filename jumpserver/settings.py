@@ -19,6 +19,7 @@ config = ConfigParser.ConfigParser()
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 config.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
 
+
 DB_HOST = config.get('db', 'host')
 DB_PORT = config.getint('db', 'port')
 DB_USER = config.get('db', 'user')

@@ -36,7 +36,7 @@
                             <div class="form-group">
                                 <label for="username" class="col-sm-2 control-label">授权名称<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <input id="rulename" name="rulename" placeholder="RuleName" type="text" class="form-control" {% if error %}value="{{ username }}" {% endif %}>
+                                    <input id="rulename" name="rulename" placeholder="RuleName" type="text" class="form-control" value="{{ rule.name }}">
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
