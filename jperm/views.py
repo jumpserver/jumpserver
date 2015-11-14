@@ -344,6 +344,46 @@ def perm_role_push(request):
         return my_render('jperm/perm_role_push.html', render_data, request)
 
     if request.method == "POST":
+        # 获取推荐角色的名称列表
+        role_names = request.POST.getlist("roles")
+
+        # 计算出需要推送的资产列表
+        asset_ips = request.POST.getlist("assets")
+        asset_group_names = request.POST.getlist("asset_groups")
+        assets_obj = [Asset.objects.get(ip=asset_ip) for asset_ip in asset_ips]
+        asset_groups_obj = [AssetGroup.objects.get(name=asset_group_name) for asset_group_name in asset_group_names]
+        group_assets_obj = []
+        for asset_group in asset_groups_obj:
+            group_assets_obj.extend(asset_group.asset_set.all())
+        calc_assets = set(assets_obj) | set(group_assets_obj)
+
+        # 生成Inventory
+        hosts = [{"hostname": asset.ip,
+                "port": asset.port,
+                "username": asset.username,
+                "password": asset.password} for asset in calc_assets]
+
+        # 获取角色的推送方式,以及推送需要的信息
+        roles_obj = [PermRole.objects.get(name=role_name) for role_name in role_names]
+        roles_info = {}
+        for role in roles_obj:
+            roles_info[role.name] = {"password": role.password, "key": role.key_path}
+
+        # 推送
+        password_push = request.POST.get("use_password")
+        key_push = request.POST.get("use_publicKey")
+        if password_push:
+            pass
+        if key_push:
+            pass
+
+
+
+
+        # 调用Ansible API 执行 password方式的授权 TODO: Surport sudo
+        # tasks = Tasks(hosts)
+        # ret = tasks.add_multi_user(*role_names)
+
         return HttpResponse(u"未实现")
 
 

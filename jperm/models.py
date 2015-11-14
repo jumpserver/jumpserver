@@ -20,7 +20,7 @@ class SysUser(models.Model):
 
 
 class PermRole(models.Model):
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     comment = models.CharField(max_length=100, null=True, blank=True, default='')
     password = models.CharField(max_length=100)
     key_path = models.CharField(max_length=100)
