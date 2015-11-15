@@ -414,4 +414,4 @@ def my_render(template, data, request):
 
 CRYPTOR = PyCrypt(KEY)
 logger = set_log(LOG_LEVEL)
-
+KEY_DIR = os.path.join(BASE_DIR, 'keys')
