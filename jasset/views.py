@@ -177,7 +177,7 @@ def asset_edit(request):
             if password == asset.password:
                 password_encode = password
             else:
-                password_encode = CRYPTOR.encrypt(password)
+                password_encode = password
         else:
             username = None
             password_encode = None
