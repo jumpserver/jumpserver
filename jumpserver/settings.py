@@ -65,12 +65,12 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'bootstrapform',
     'jumpserver',
     'juser',
     'jasset',
     'jperm',
     'jlog',
-
 )
 
 MIDDLEWARE_CLASSES = (
@@ -146,3 +146,5 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+BOOTSTRAP_COLUMN_COUNT = 10

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load mytags %}
-
+{% load humanize %}
 
 {% block content %}
     {% include 'nav_cat_bar.html' %}
@@ -34,6 +34,28 @@
                                         <td>{{ asset.ip }}</td>
                                     </tr>
                                     <tr>
+                                        <td class="text-navy">主机名</td>
+                                        <td>{{ asset.hostname }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">其他IP</td>
+                                        <td>
+                                            <table class="table">
+                                                {% if asset.other_ip %}
+                                                    {% for ip in asset.other_ip|ip_str_to_list %}
+                                                        <tr>
+                                                            <td>{{ ip }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                {% endif %}
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">远控IP</td>
+                                        <td>{{ asset.remote_ip }}</td>
+                                    </tr>
+                                    <tr>
                                         <td class="text-navy">端口</td>
                                         <td>{{ asset.port }}</td>
                                     </tr>
@@ -42,12 +64,80 @@
                                         <td class="text-navy">主机组</td>
                                         <td>
                                              <table class="table">
+                                                 {% for asset_group in asset.group.all %}
+                                                    <tr>
+                                                        <td>{{ asset_group.name }}</td>
+                                                    </tr>
+                                                 {% endfor %}
                                              </table>
                                         </td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">使用默认管理账号</td>
-                                        <td>{{ asset.use_default_auth|bool2str }}</td>
+{#                                        <td>{{ asset.use_default_auth|bool2str }}</td>#}
+                                        <td>{{ asset.use_default_auth|bool2str }} {% if not asset.use_default_auth %} <span class="text-info">{{ asset.username }}</span> {% endif %}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">机房</td>
+                                        <td>{{ asset.idc.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">硬件厂商型号</td>
+                                        <td>{{ asset.brand }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">CPU</td>
+                                        <td>{{ asset.cpu }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">内存</td>
+                                        <td>{{ asset.memory }}M</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">硬盘</td>
+                                        <td>
+                                            <table class="table">
+                                            {% if asset.disk %}
+                                                 {% for disk, value in asset.disk|str_to_dic %}
+                                                    <tr>
+                                                        <td><span class="text-navy">{{ disk }}</span> &nbsp&nbsp&nbsp {{ value }}</td>
+                                                    </tr>
+                                                 {% endfor %}
+                                            {% endif %}
+                                            </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">资产编号</td>
+                                        <td>{{ asset.number }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">SN</td>
+                                        <td>{{ asset.sn }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">主机类型</td>
+                                        <td>{{ asset.get_asset_type_display }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">系统版本</td>
+                                        <td>{{ asset.system_type }} {{ asset.system_version }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">运行环境</td>
+                                        <td>{{ asset.get_env_display }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">机器状态</td>
+                                        <td>{{ asset.get_status_display }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">机柜号</td>
+                                        <td>{{ asset.cabinet }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">机柜位置</td>
+                                        <td>{{ asset.position }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">激活</td>
@@ -91,8 +181,8 @@
                     </div>
                     <div class="ibox-content">
                         <div>
-                            <div class="text-left">
-                                <table class="table">
+{#                            <div class="text-left">#}
+{#                                <table class="table">#}
 {#                                    {% if user_permed_list %}#}
 {#                                        {% for user in user_permed_list %}#}
 {#                                            <tr>#}
@@ -104,8 +194,48 @@
 {#                                    {% else %}#}
 {#                                        <p class="text-center">(暂无)</p>#}
 {#                                    {% endif %}#}
-                                </table>
-                            </div>
+{#                                </table>#}
+{#                            </div>#}
+                        </div>
+                    </div>
+                    <div class="ibox-title">
+                        <h5>主机修改记录</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content ibox-heading">
+                        <h3>主机修改记录</h3>
+                        <small><i class="fa fa-map-marker"></i> 包含了此主机所有历史修改记录.</small>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="feed-activity-list">
+                            {% if asset_record %}
+                                {% for r in asset_record %}
+                                    <div class="feed-element">
+                                        <div>
+                                            <small class="pull-right">{{ r.alert_time|naturaltime }}</small>
+                                            <strong class="text-navy">{{ r.username }}</strong>
+                                                {% for i in r.content|str_to_list %}
+                                                    <div>{{ i.0 }} 由 <span class="text-success">{{ i.1|str_to_code }}</span> 改为 <span class="text-warning">{{ i.2|str_to_code }}</span></div>
+                                                {% endfor %}
+                                            <small class="text-success">{{ r.alert_time }}</small>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-center">(暂无)</p>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
