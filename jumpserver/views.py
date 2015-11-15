@@ -81,7 +81,10 @@ def index_cu(request):
     login_types = {'L': 'LDAP', 'M': 'MAP'}
     username = user.username
     # posts = user.get_asset()
-    # host_count = len(posts)
+
+    posts = User.objects.all()
+    host_count = len(posts)
+
     new_posts = []
     post_five = []
     # for post in posts:
