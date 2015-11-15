@@ -132,7 +132,7 @@ def gen_ssh_key(username, password='',
 
     if authorized_keys:
         auth_key_dir = os.path.join(home, username, '.ssh')
-        is_dir(auth_key_dir, username, mode=0700)
+        mkdir(auth_key_dir, username, mode=0700)
         authorized_key_file = os.path.join(auth_key_dir, 'authorized_keys')
         with open(private_key_file+'.pub') as pub_f:
             with open(authorized_key_file, 'w') as auth_f:
@@ -203,49 +203,3 @@ def get_display_msg(user, password, ssh_key_pwd, ssh_key_login_need, send_mail_n
 
     return msg
 
-# def ldap_add_user(username, ldap_pwd):
-#     """
-#     add a user in ldap database
-#     在LDAP中添加用户
-#     """
-#     user_dn = "uid=%s,ou=People,%s" % (username, LDAP_BASE_DN)
-#     password_sha512 = PyCrypt.gen_sha512(PyCrypt.random_pass(6), ldap_pwd)
-#     user = get_object(User, username=username)
-#     if not user:
-#         raise ServerError(u'用户 %s 不存在' % username)
-#
-#     user_attr = {'uid': [str(username)],
-#                  'cn': [str(username)],
-#                  'objectClass': ['account', 'posixAccount', 'top', 'shadowAccount'],
-#                  'userPassword': ['{crypt}%s' % password_sha512],
-#                  'shadowLastChange': ['16328'],
-#                  'shadowMin': ['0'],
-#                  'shadowMax': ['99999'],
-#                  'shadowWarning': ['7'],
-#                  'loginShell': ['/bin/bash'],
-#                  'uidNumber': [str(user.id)],
-#                  'gidNumber': [str(user.id)],
-#                  'homeDirectory': [str('/home/%s' % username)]}
-#
-#     group_dn = "cn=%s,ou=Group,%s" % (username, LDAP_BASE_DN)
-#     group_attr = {'objectClass': ['posixGroup', 'top'],
-#                   'cn': [str(username)],
-#                   'userPassword': ['{crypt}x'],
-#                   'gidNumber': [str(user.id)]}
-#
-#     ldap_conn.add(user_dn, user_attr)
-#     ldap_conn.add(group_dn, group_attr)
-
-
-# def ldap_del_user(username):
-#     """
-#     delete a user in ldap database
-#     在ldap中删除某用户
-#     """
-#     user_dn = "uid=%s,ou=People,%s" % (username, LDAP_BASE_DN)
-#     group_dn = "cn=%s,ou=Group,%s" % (username, LDAP_BASE_DN)
-#     sudo_dn = 'cn=%s,ou=Sudoers,%s' % (username, LDAP_BASE_DN)
-#
-#     ldap_conn.delete(user_dn)
-#     ldap_conn.delete(group_dn)
-#     ldap_conn.delete(sudo_dn)

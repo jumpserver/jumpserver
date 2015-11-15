@@ -182,102 +182,17 @@ def asset_which_group(asset, member):
     names = [members.name for members in member.all()]
 
     return ','.join(names)
-#
-#
-# @register.filter(name='get_user_asset_group')
-# def get_user_asset_group(user):
-#     return user.get_asset_group()
-#
-#
-# @register.filter(name='group_asset_list')
-# def group_asset_list(group):
-#     return group.asset_set.all()
-#
-#
-# @register.filter(name='group_asset_list_count')
-# def group_asset_list_count(group):
-#     return group.asset_set.all().count()
-#
-#
-# @register.filter(name='time_delta')
-# def time_delta(time_before):
-#     delta = datetime.datetime.now() - time_before
-#     days = delta.days
-#     if days:
-#         return "%s 天前" % days
-#     else:
-#         hours = delta.seconds/3600
-#         if hours:
-#             return "%s 小时前" % hours
-#         else:
-#             mins = delta.seconds/60
-#             if mins:
-#                 return '%s 分钟前' % mins
-#             else:
-#                 return '%s 秒前' % delta.seconds
-#
-#
-# @register.filter(name='sudo_cmd_list')
-# def sudo_cmd_list(cmd_group_id):
-#     cmd_group = CmdGroup.objects.filter(id=cmd_group_id)
-#     if cmd_group:
-#         cmd_group = cmd_group[0]
-#         return cmd_group.cmd.split(',')
-#
-#
-# @register.filter(name='sudo_cmd_count')
-# def sudo_cmd_count(user_group_id):
-#     user_group = UserGroup.objects.filter(id=user_group_id)
-#     cmds = []
-#     if user_group:
-#         user_group = user_group[0]
-#         cmd_groups = []
-#
-#         for perm in user_group.sudoperm_set.all():
-#             cmd_groups.extend(perm.cmd_group.all())
-#
-#         for cmd_group in cmd_groups:
-#             cmds.extend(cmd_group.cmd.split(','))
-#         return len(set(cmds))
-#
-#     else:
-#         return 0
-#
-#
-# @register.filter(name='sudo_cmd_count')
-# def sudo_cmd_count(user_group_id):
-#     user_group = UserGroup.objects.filter(id=user_group_id)
-#     cmds = []
-#     if user_group:
-#         user_group = user_group[0]
-#         cmd_groups = []
-#         for perm in user_group.sudoperm_set.all():
-#             cmd_groups.extend(perm.cmd_group.all())
-#
-#         for cmd_group in cmd_groups:
-#             cmds.extend(cmd_group.cmd.split(','))
-#         return len(set(cmds))
-#     else:
-#         return 0
-#
-#
-# @register.filter(name='sudo_cmd_ids')
-# def sudo_cmd_ids(user_group_id):
-#     user_group = UserGroup.objects.filter(id=user_group_id)
-#     if user_group:
-#         user_group = user_group[0]
-#         cmd_groups = []
-#         for perm in user_group.sudoperm_set.all():
-#             cmd_groups.extend(perm.cmd_group.all())
-#         cmd_ids = [str(cmd_group.id) for cmd_group in cmd_groups]
-#         return ','.join(cmd_ids)
-#     else:
-#         return '0'
-#
-#
-# @register.filter(name='cmd_group_split')
-# def cmd_group_split(cmd_group):
-#     return cmd_group.cmd.split(',')
+
+
+@register.filter(name='group_str2')
+def groups_str2(group_list):
+    """
+    将用户组列表转换为str
+    """
+    if len(group_list) < 3:
+        return ' '.join([group.name for group in group_list])
+    else:
+        return '%s ...' % ' '.join([group.name for group in group_list[0:2]])
 
 
 @register.filter(name='str_to_list')

@@ -76,7 +76,6 @@ def perm_rule_detail(request):
     return my_render('jperm/perm_rule_detail.html', render_data, request)
     
 
-@require_role('admin')
 def perm_rule_add(request):
     """
 

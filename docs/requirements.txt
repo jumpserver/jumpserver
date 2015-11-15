@@ -7,3 +7,6 @@ ecdsa==0.13
 MySQL-python==1.2.5
 django-uuidfield==0.5.0
 psutil==2.2.1
+xlsxwriter==0.7.7
+xlrd==0.9.4
+django-bootstrap-form
