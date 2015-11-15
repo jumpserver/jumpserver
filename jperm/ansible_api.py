@@ -241,6 +241,26 @@ class Tasks(Command):
 
         return {"status": "failed","msg": self.msg} if self.msg else {"status": "ok"}
 
+    def push_multi_key(self, **user_info):
+        """
+        push multi key
+        :param user_info:
+        :return:
+        """
+        ret_failed = []
+        ret_success = []
+        for user, key_path in user_info.iteritems():
+            ret = self.push_key(user, key_path)
+            if ret.get("status") == "ok":
+                ret_success.append(ret)
+            if ret.get("status") == "failed":
+                ret_failed.append(ret)
+
+        if ret_failed:
+            return {"status": "failed", "msg": ret_failed}
+        else:
+            return {"status": "success", "msg": ret_success}
+
     def del_key(self, user, key_path):
         """
         push the ssh authorized key to target.
@@ -260,24 +280,26 @@ class Tasks(Command):
 
         return {"status": "failed","msg": self.msg} if self.msg else {"status": "ok"}
 
-    def add_multi_user(self, *args):
+    def add_multi_user(self, **user_info):
         """
         add multi user
-        :param args:
-            user
+        :param user_info: keyword args
+            {username: password}
         :return:
         """
-        results = {}
-        users = {}
-        action = results["action_info"] = {}
-        for user in args:
-            users[user] = get_rand_pass()
-        for user, password in users.iteritems():
+        ret_success = []
+        ret_failed = []
+        for user, password in user_info.iteritems():
             ret = self.add_user(user, password)
-            action[user] = ret
-        results["user_info"] = users
+            if ret.get("status") == "ok":
+                ret_success.append(ret)
+            if ret.get("status") == "failed":
+                ret_failed.append(ret)
 
-        return results
+        if ret_failed:
+            return {"status": "failed", "msg": ret_failed}
+        else:
+            return {"status": "success", "msg": ret_success}
 
     def del_user(self, username):
         """

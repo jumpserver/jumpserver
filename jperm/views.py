@@ -282,6 +282,13 @@ def perm_role_delete(request):
         # 获取参数删除的role对象
         role_id = request.POST.get("id")
         role = PermRole.objects.get(id=role_id)
+        role_key = role.key_path
+        # 删除存储的秘钥，以及目录
+        key_files = os.listdir(role_key)
+        for key_file in key_files:
+            os.remove(os.path.join(role_key, key_file))
+        os.rmdir(role_key)
+        # 数据库里删除记录
         role.delete()
         return HttpResponse(u"删除角色: %s" % role.name)
     else:
@@ -357,34 +364,39 @@ def perm_role_push(request):
         calc_assets = set(assets_obj) | set(group_assets_obj)
 
         # 生成Inventory
-        hosts = [{"hostname": asset.ip,
+        push_resource = [{"hostname": asset.ip,
                 "port": asset.port,
                 "username": asset.username,
                 "password": asset.password} for asset in calc_assets]
 
         # 获取角色的推送方式,以及推送需要的信息
         roles_obj = [PermRole.objects.get(name=role_name) for role_name in role_names]
-        roles_info = {}
+        role_pass = {}
+        role_key = {}
         for role in roles_obj:
-            roles_info[role.name] = {"password": role.password, "key": role.key_path}
+            role_pass[role.name] = role.password
+            role_key[role.name] = os.path.join(role.key_path, 'id_rsa.pub')
 
-        # 推送
+        # 调用Ansible API 进行推送
         password_push = request.POST.get("use_password")
         key_push = request.POST.get("use_publicKey")
+        task = Tasks(push_resource)
+        ret = {}
+        ret_failed = []
         if password_push:
-            pass
+            ret["password_push"] = task.add_multi_user(**role_pass)
+            if ret["password_push"].get("status") != "success":
+                ret_failed.append(1)
         if key_push:
-            pass
+            ret["key_push"] = task.push_multi_key(**role_key)
+            if ret["key_push"].get("status") != "success":
+                ret_failed.append(1)
 
-
-
-
-        # 调用Ansible API 执行 password方式的授权 TODO: Surport sudo
-        # tasks = Tasks(hosts)
-        # ret = tasks.add_multi_user(*role_names)
-
-        return HttpResponse(u"未实现")
-
+        print ret
+        if ret_failed:
+            return HttpResponse(u"推送失败")
+        else:
+            return HttpResponse(u"推送系统角色： %s" % ','.join(role_names))
 
 
 

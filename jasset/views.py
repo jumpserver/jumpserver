@@ -218,6 +218,7 @@ def asset_edit(request):
         af_post = AssetForm(request.POST, instance=asset)
         ip = request.POST.get('ip', '')
         use_default_auth = request.POST.get('use_default_auth')
+
         try:
             asset_test = get_object(Asset, ip=ip)
             if asset_test and asset_id != unicode(asset_test.id):
