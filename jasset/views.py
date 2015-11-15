@@ -96,7 +96,7 @@ def asset_add(request):
             username = request.POST.get('username')
             password = request.POST.get('password')
             port = request.POST.get('port')
-            password_encode = CRYPTOR.encrypt(password)
+            password_encode = password
         else:
             username = None
             port = None

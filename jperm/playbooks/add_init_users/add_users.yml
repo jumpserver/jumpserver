@@ -1,0 +1,12 @@
+---
+
+- hosts: 'add_users_group'
+  gather_facts: no
+  tasks:
+    - name: add SA user
+      command: uname -a
+
+
+
+
+
