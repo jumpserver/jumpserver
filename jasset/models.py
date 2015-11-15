@@ -41,7 +41,7 @@ class IDC(models.Model):
     phone = models.CharField(max_length=32, verbose_name=u'联系电话')
     address = models.CharField(max_length=128, blank=True, null=True, verbose_name=u"机房地址")
     network = models.TextField(blank=True, null=True, verbose_name=u"IP地址段")
-    date_added = models.DateField(auto_now=True, default=datetime.datetime.now(), null=True)
+    date_added = models.DateField(auto_now=True, null=True)
     operator = models.IntegerField(max_length=32, blank=True, null=True, verbose_name=u"运营商")
     comment = models.CharField(max_length=128, blank=True, null=True, verbose_name=u"备注")
 
@@ -81,7 +81,7 @@ class Asset(models.Model):
     asset_type = models.IntegerField(max_length=2, choices=ASSET_TYPE, blank=True, null=True, verbose_name=u"主机类型")
     env = models.IntegerField(max_length=2, choices=ASSET_ENV, blank=True, null=True, verbose_name=u"运行环境")
     sn = models.CharField(max_length=128, blank=True, null=True, verbose_name=u"SN编号")
-    date_added = models.DateTimeField(auto_now=True, default=datetime.datetime.now(), null=True)
+    date_added = models.DateTimeField(auto_now=True, null=True)
     is_active = models.BooleanField(default=True, verbose_name=u"是否激活")
     comment = models.CharField(max_length=128, blank=True, null=True, verbose_name=u"备注")
 

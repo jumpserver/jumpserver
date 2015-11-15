@@ -358,7 +358,7 @@
 			getRelated(settings.get('rel'));
 
 			if (!open) {
-				open = active = true; // Prevents the page-change action from queuing up if the visitor holds down the left or right keys.
+				open = active = true; // Prevents the page-change action from queuing up if the visitor holds down the left or right role_keys.
 
 				setClass(settings.get('className'));
 				

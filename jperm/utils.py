@@ -7,8 +7,7 @@ from paramiko.rsakey import RSAKey
 from os import chmod, mkdir
 from uuid import uuid4
 
-PERM_DIR = os.path.dirname(os.path.abspath(__file__))
-KEY_DIR = os.path.join(PERM_DIR, 'role_keys')
+from jumpserver.settings import KEY_DIR
 
 
 def get_rand_pass():
@@ -45,7 +44,7 @@ def gen_keys():
     并且在该目录下 生产一对秘钥
     :return: 返回目录名(uuid)
     """
-    key_basename = "keys-" + uuid4().hex
+    key_basename = "key-" + uuid4().hex
     key_path_dir = os.path.join(KEY_DIR, key_basename)
     mkdir(key_path_dir, 0700)
 

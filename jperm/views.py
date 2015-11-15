@@ -2,7 +2,6 @@
 
 
 from django.db.models import Q
-from jumpserver.api import *
 from jperm.perm_api import *
 from jperm.models import PermLog as Log
 from jperm.models import SysUser
@@ -47,7 +46,7 @@ def perm_rule_list(request):
 
     render_data = updates_dict(data_nav, data_content)
         
-    return my_render('jperm/perm_rule_list.html', render_data, request)
+    return my_render('jperm/perm_rule_list.html', locals(), request)
 
 
 @require_role('admin')
@@ -73,7 +72,7 @@ def perm_rule_detail(request):
 
     render_data = updates_dict(data_nav, data_content)
 
-    return my_render('jperm/perm_rule_detail.html', render_data, request)
+    return my_render('jperm/perm_rule_detail.html', locals(), request)
     
 
 def perm_rule_add(request):
@@ -96,7 +95,7 @@ def perm_rule_add(request):
                         "assets": assets, "asset_groups": asset_groups,
                         "roles": roles}
         render_data = updates_dict(data_nav, data_content)        
-        return my_render('jperm/perm_rule_add.html', render_data, request)
+        return my_render('jperm/perm_rule_add.html', locals(), request)
 
     elif request.method == 'POST':
         # 获取用户选择的 用户,用户组,资产,资产组,用户角色
@@ -186,7 +185,7 @@ def perm_rule_edit(request):
                         "assets": assets_obj, "asset_groups": asset_groups_obj,
                         "roles": roles_obj, "rule": rule_obj}
         render_data = updates_dict(data_nav, data_content)
-        return my_render('jperm/perm_rule_edit.html', render_data, request)
+        return my_render('jperm/perm_rule_edit.html', locals(), request)
 
     elif request.method == 'POST' and rule_id:
         return HttpResponse("uncompleted")
@@ -237,7 +236,7 @@ def perm_role_list(request):
 
     render_data = updates_dict(data_nav, data_content)
 
-    return my_render('jperm/perm_role_list.html', render_data, request)
+    return my_render('jperm/perm_role_list.html', locals(), request)
 
 
 @require_role('admin')
@@ -253,7 +252,7 @@ def perm_role_add(request):
     data_nav = {"header_title": "系统角色", "path1": "角色管理", "path2": "添加角色"}
 
     if request.method == "GET":
-        return my_render('jperm/perm_role_add.html', data_nav, request)
+        return my_render('jperm/perm_role_add.html', locals(), request)
 
     elif request.method == "POST":
         # 获取参数： name, comment
@@ -311,7 +310,7 @@ def perm_role_detail(request):
         role_id = request.GET.get("id")
         role_info = get_role_info(role_id)
         render_data = updates_dict(data_nav, role_info)
-        return my_render('jperm/perm_role_detail.html', render_data, request)
+        return my_render('jperm/perm_role_detail.html', locals(), request)
 
 
 @require_role('admin')
@@ -327,7 +326,7 @@ def perm_role_edit(request):
         role_id = request.GET.get("id")
         data_content = {"role": PermRole.objects.get(id=role_id)}
         render_data = updates_dict(data_nav, data_content)
-        return my_render('jperm/perm_role_edit.html', render_data, request)
+        return my_render('jperm/perm_role_edit.html', locals(), request)
 
     if request.method == "POST":
         return HttpResponse(u"未实现")
@@ -347,7 +346,7 @@ def perm_role_push(request):
                         "assets": Asset.objects.all(),
                         "asset_groups": AssetGroup.objects.all()}
         render_data = updates_dict(data_nav, data_content)
-        return my_render('jperm/perm_role_push.html', render_data, request)
+        return my_render('jperm/perm_role_push.html', locals(), request)
 
     if request.method == "POST":
         # 获取推荐角色的名称列表
@@ -397,12 +396,6 @@ def perm_role_push(request):
             return HttpResponse(u"推送失败")
         else:
             return HttpResponse(u"推送系统角色： %s" % ','.join(role_names))
-
-
-
-
-
-
 
 
 

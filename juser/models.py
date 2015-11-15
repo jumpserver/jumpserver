@@ -28,8 +28,6 @@ class User(AbstractUser):
     # last_login = models.DateTimeField(null=True)
     # date_joined = models.DateTimeField(null=True)
 
-
-
     def __unicode__(self):
         return self.username
 

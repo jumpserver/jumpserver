@@ -481,7 +481,7 @@ def down_key(request):
         user = get_object(User, id=user_id)
         if user:
             username = user.username
-            private_key_file = os.path.join(BASE_DIR, 'keys/jumpserver', username+".pem")
+            private_key_file = os.path.join(BASE_DIR, 'role_keys/jumpserver', username + ".pem")
             if os.path.isfile(private_key_file):
                 f = open(private_key_file)
                 data = f.read()
