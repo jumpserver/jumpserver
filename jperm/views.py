@@ -383,15 +383,21 @@ def perm_role_push(request):
         key_push = request.POST.get("use_publicKey")
         task = Tasks(push_resource)
         ret = {}
+        ret_failed = []
         if password_push:
             ret["password_push"] = task.add_multi_user(**role_pass)
+            if ret["password_push"].get("status") != "success":
+                ret_failed.append(1)
         if key_push:
             ret["key_push"] = task.push_multi_key(**role_key)
+            if ret["key_push"].get("status") != "success":
+                ret_failed.append(1)
 
-        if ret["password_push"].get("status") == "success" and ret["kye_push"].get("status") == "success":
-            return HttpResponse(u"推送系统角色： %s" % ','.join(role_names))
-        else:
+        print ret
+        if ret_failed:
             return HttpResponse(u"推送失败")
+        else:
+            return HttpResponse(u"推送系统角色： %s" % ','.join(role_names))
 
 
 
