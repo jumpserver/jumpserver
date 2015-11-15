@@ -126,34 +126,6 @@
         })
     });
 
-<<<<<<< HEAD
-$('document').ready(function(){
-    $('#use_default').click(function(){
-        if ($(this).is(':checked')){
-            $('#admin_account').css('display', 'none');
-            $('#port').css('display', 'none')
-        }
-        else {
-            $('#admin_account').css('display', 'block');
-            $('#port').css('display', 'block')
-        }
-    })
-});
-
-$('#assetForm').validator({
-    timely: 2,
-    theme: "yellow_right_effect",
-    rules: {
-        check_ip: [/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])){3}$/, 'ip地址不正确'],
-        check_port: [/^\d{1,5}$/, '端口号不正确'],
-    },
-    fields: {
-        "ip": {
-            rule: "required;check_ip",
-            tip: "输入IP",
-            ok: "",
-            msg: {required: "必须填写!"}
-=======
     var required_fields = ["id_hostname", "id_ip", "id_port"];
     required_fields.forEach(function(field) {
         $('label[for="' + field + '"]').parent().addClass("required");
@@ -182,7 +154,6 @@ $('#assetForm').validator({
         },
         valid: function(form) {
             form.submit();
->>>>>>> cmdb
         }
     });
 
