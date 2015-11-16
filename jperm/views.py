@@ -19,32 +19,23 @@ from jperm.perm_api    import get_role_info
 from jumpserver.api    import my_render, get_object
 
 
-
 @require_role('admin')
 def perm_rule_list(request):
     """
-    用户授权视图：
-      该视图的模板包含2部分：
-        1. block   部分：{% block content %}
-             rander_content 为渲染数据
-        2. include 部分：{% include 'nav_cat_bar.html' %}
-             rander_nav 为渲染数据
+    list rule page
     """
-    data_nav = {"header_title": "授权规则", "path1": "规则管理", "path2": "查看规则"}
+    # 渲染数据
+    header_title, path1, path2 = "授权规则", "规则管理", "查看规则"
 
     # 获取所有规则
     rules_list = PermRule.objects.all()
 
-    
     # TODO: 搜索和分页
     keyword = request.GET.get('search', '')
     if keyword:
         rules_list = rules_list.filter(Q(name=keyword))
 
     rules_list, p, rules, page_range, current_page, show_first, show_end = pages(rules_list, request)
-    data_content = {"rules": rules_list}
-
-    render_data = updates_dict(data_nav, data_content)
         
     return my_render('jperm/perm_rule_list.html', locals(), request)
 
@@ -52,49 +43,42 @@ def perm_rule_list(request):
 @require_role('admin')
 def perm_rule_detail(request):
     """
-    用户详情视图：
-      该视图的模板包含2部分：
-        1. block   部分：{% block content %}
-             rander_content 为渲染数据
-        2. include 部分：{% include 'nav_cat_bar.html' %}
-             rander_nav 为渲染数据
+    rule detail page
     """
-    data_nav = {"header_title": "授权规则", "path1": "授权管理", "path2": "规则详情"}
+    # 渲染数据
+    header_title, path1, path2 = "授权规则", "规则管理", "规则详情"
 
     # 根据rule_id 取得rule对象
     rule_id = request.GET.get("id")
     rule_obj = PermRule.objects.get(id=rule_id)
     user_obj = rule_obj.user.all()
     asset_obj = rule_obj.asset.all()
-
     roles_name = [role.name for role in rule_obj.role.all()]
-    data_content = {"roles_name": ','.join(roles_name), "rule": rule_obj, "users": user_obj, "assets": asset_obj}
 
-    render_data = updates_dict(data_nav, data_content)
+    # 渲染数据
+    roles_name = ','.join(roles_name)
+    rule = rule_obj
+    users = user_obj
+    assets = asset_obj
 
     return my_render('jperm/perm_rule_detail.html', locals(), request)
     
 
 def perm_rule_add(request):
     """
-
-    :param request:
-    :return:
+    add rule page
     """
-    data_nav = {"header_title": "授权规则", "path1": "授权管理", "path2": "添加规则"}
+    # 渲染数据
+    header_title, path1, path2 = "授权规则", "规则管理", "添加规则"
 
     if request.method == 'GET':
-        # 获取所有 用户,用户组,资产,资产组,用户角色, 用于添加授权规则
+        # 渲染数据, 获取所有 用户,用户组,资产,资产组,用户角色, 用于添加授权规则
         users = User.objects.all()
         user_groups = UserGroup.objects.all()
         assets = Asset.objects.all()
         asset_groups = AssetGroup.objects.all()
         roles = PermRole.objects.all()
 
-        data_content = {"users": users, "user_groups": user_groups, 
-                        "assets": assets, "asset_groups": asset_groups,
-                        "roles": roles}
-        render_data = updates_dict(data_nav, data_content)        
         return my_render('jperm/perm_rule_add.html', locals(), request)
 
     elif request.method == 'POST':
@@ -122,69 +106,38 @@ def perm_rule_add(request):
         # 获取授予的角色列表
         roles_obj = [PermRole.objects.get(name=role) for role in roles_select]
 
-        # 调用Ansible API 执行授权 资源---Role---用户
-        # 生成Inventory, 这里需要向CMDB 获取认证信息（1. password， 2, key）
-        hosts = [{"hostname": asset.ip,
-                  "port": asset.port,
-                  "username": asset.username,
-                  "password": asset.password} for asset in calc_assets]
-        # 获取需要授权的角色名称
-        roles = [role.name for role in roles_obj]
-        # 调用Ansible API 执行 password方式的授权 TODO: Surport sudo
-        tasks = Tasks(hosts)
-        ret = tasks.add_multi_user(*roles)
-        # TODO: 调用Ansible API 执行 key方式的授权
-
-        # 计算授权成功和授权失败的主机 TODO: 记录成功和失败
-        perm_sucess = {}
-        perm_failed = {}
-        for role, status in ret.get('action_info').iteritems():
-            if status['status'] == 'failed':
-                failed_ip = status['msg'].keys()
-                perm_sucess[role] = [asset for asset in calc_assets if asset.ip not in failed_ip]
-                perm_failed[role] = [asset for asset in calc_assets if asset.ip in failed_ip]
-
-        if not perm_failed.values():
-            # 仅授权成功的，写回数据库(授权规则,用户,用户组,资产,资产组,用户角色)
-            rule = PermRule(name=rule_name, comment=rule_comment)
-            rule.save()
-            rule.user = users_obj
-            rule.usergroup = user_groups_obj
-            rule.asset = assets_obj
-            rule.asset_group = asset_groups_obj
-            rule.role = roles_obj
-            rule.save()
-            return HttpResponse(ret)
-        else:
-            return HttpResponse("add rule failed")
+        # 仅授权成功的，写回数据库(授权规则,用户,用户组,资产,资产组,用户角色)
+        rule = PermRule(name=rule_name, comment=rule_comment)
+        rule.save()
+        rule.user = users_obj
+        rule.usergroup = user_groups_obj
+        rule.asset = assets_obj
+        rule.asset_group = asset_groups_obj
+        rule.role = roles_obj
+        rule.save()
+        return HttpResponse(u"添加授权规则：%s" % rule.name)
 
 
 @require_role('admin')
 def perm_rule_edit(request):
     """
-    list rules
-    :param request:
-    :return:
+    edit rule page
     """
+    # 渲染数据
+    header_title, path1, path2 = "授权规则", "规则管理", "添加规则"
 
-    data_nav = {"header_title": "授权规则", "path1": "授权管理", "path2": "编辑规则"}
     # 根据rule_id 取得rule对象
     rule_id = request.GET.get("id")
-    rule_obj = PermRule.objects.get(id=rule_id)
-
+    rule = PermRule.objects.get(id=rule_id)
 
     if request.method == 'GET' and rule_id:
-        # 获取所有的rule对象
-        users_obj = rule_obj.user.all()
-        user_groups_obj = rule_obj.user_group.all()
-        assets_obj = rule_obj.asset.all()
-        asset_groups_obj = rule_obj.asset_group.all()
-        roles_obj = rule_obj.role.all()
+        # 渲染数据, 获取所有的rule对象
+        users = rule.user.all()
+        user_groups = rule.user_group.all()
+        assets = rule.asset.all()
+        asset_groups = rule.asset_group.all()
+        roles = rule.role.all()
 
-        data_content = {"users": users_obj, "user_groups": user_groups_obj,
-                        "assets": assets_obj, "asset_groups": asset_groups_obj,
-                        "roles": roles_obj, "rule": rule_obj}
-        render_data = updates_dict(data_nav, data_content)
         return my_render('jperm/perm_rule_edit.html', locals(), request)
 
     elif request.method == 'POST' and rule_id:
@@ -213,18 +166,13 @@ def perm_rule_delete(request):
 @require_role('admin')
 def perm_role_list(request):
     """
-    用户授权视图：
-      该视图的模板包含2部分：
-        1. block   部分：{% block content %}
-             rander_content 为渲染数据
-        2. include 部分：{% include 'nav_cat_bar.html' %}
-             rander_nav 为渲染数据
+    list role page
     """
-    data_nav = {"header_title": "系统角色", "path1": "角色管理", "path2": "查看角色"}
+    # 渲染数据
+    header_title, path1, path2 = "系统角色", "角色管理", "查看角色"
 
     # 获取所有系统角色
     roles_list = PermRole.objects.all()
-
 
     # TODO: 搜索和分页
     keyword = request.GET.get('search', '')
@@ -232,9 +180,6 @@ def perm_role_list(request):
         roles_list = roles_list.filter(Q(name=keyword))
 
     roles_list, p, roles, page_range, current_page, show_first, show_end = pages(roles_list, request)
-    data_content = {"roles": roles_list}
-
-    render_data = updates_dict(data_nav, data_content)
 
     return my_render('jperm/perm_role_list.html', locals(), request)
 
@@ -242,24 +187,22 @@ def perm_role_list(request):
 @require_role('admin')
 def perm_role_add(request):
     """
-    用户授权视图：
-      该视图的模板包含2部分：
-        1. block   部分：{% block content %}
-             rander_content 为渲染数据
-        2. include 部分：{% include 'nav_cat_bar.html' %}
-             rander_nav 为渲染数据
+    add role page
     """
-    data_nav = {"header_title": "系统角色", "path1": "角色管理", "path2": "添加角色"}
+    # 渲染数据
+    header_title, path1, path2 = "系统角色", "角色管理", "添加角色"
 
     if request.method == "GET":
+        default_password = get_rand_pass()
         return my_render('jperm/perm_role_add.html', locals(), request)
 
     elif request.method == "POST":
         # 获取参数： name, comment
         name = request.POST.get("role_name")
         comment = request.POST.get("role_comment")
+        password = request.POST.get("role_password")
         # 生成随机密码，生成秘钥对
-        password = get_rand_pass()
+
         key_path = gen_keys()
         role = PermRole(name=name, comment=comment, password=password, key_path=key_path)
         role.save()
@@ -267,15 +210,11 @@ def perm_role_add(request):
     else:
         return HttpResponse(u"不支持该操作")
 
+
 @require_role('admin')
 def perm_role_delete(request):
     """
-    用户授权视图：
-      该视图的模板包含2部分：
-        1. block   部分：{% block content %}
-             rander_content 为渲染数据
-        2. include 部分：{% include 'nav_cat_bar.html' %}
-             rander_nav 为渲染数据
+    delete role page
     """
     if request.method == "POST":
         # 获取参数删除的role对象
@@ -297,35 +236,40 @@ def perm_role_delete(request):
 @require_role('admin')
 def perm_role_detail(request):
     """
+    the role detail page
         the role_info data like:
             {'asset_groups': [],
             'assets': [<Asset: 192.168.10.148>],
             'rules': [<PermRule: PermRule object>],
-            'user_groups': [],
-            'users': [<User: user1>]}
+            '': [],
+            '': [<User: user1>]}
     """
-    data_nav = {"header_title": "系统角色", "path1": "角色管理", "path2": "角色详情"}
+    # 渲染数据
+    header_title, path1, path2 = "系统角色", "角色管理", "角色详情"
 
     if request.method == "GET":
         role_id = request.GET.get("id")
         role_info = get_role_info(role_id)
-        render_data = updates_dict(data_nav, role_info)
+
+        # 渲染数据
+        for key, value in role_info.iteritems():
+            key = value
         return my_render('jperm/perm_role_detail.html', locals(), request)
 
 
 @require_role('admin')
 def perm_role_edit(request):
     """
-
-    :param request:
-    :return:
+    edit role page
     """
-    data_nav = {"header_title": "系统角色", "path1": "角色管理", "path2": "角色编辑"}
+    # 渲染数据
+    header_title, path1, path2 = "系统角色", "角色管理", "角色编辑"
 
     if request.method == "GET":
         role_id = request.GET.get("id")
-        data_content = {"role": PermRole.objects.get(id=role_id)}
-        render_data = updates_dict(data_nav, data_content)
+        # 渲染数据
+        role = PermRole.objects.get(id=role_id)
+
         return my_render('jperm/perm_role_edit.html', locals(), request)
 
     if request.method == "POST":
@@ -335,17 +279,17 @@ def perm_role_edit(request):
 @require_role('admin')
 def perm_role_push(request):
     """
-
-    :param request:
-    :return:
+    the role push page
     """
-    data_nav = {"header_title": "系统角色", "path1": "角色管理", "path2": "角色推送"}
+    # 渲染数据
+    header_title, path1, path2 = "系统角色", "角色管理", "角色推送"
 
     if request.method == "GET":
-        data_content = {"roles": PermRole.objects.all(),
-                        "assets": Asset.objects.all(),
-                        "asset_groups": AssetGroup.objects.all()}
-        render_data = updates_dict(data_nav, data_content)
+        # 渲染数据
+        roles = PermRole.objects.all()
+        assets = Asset.objects.all()
+        asset_groups = AssetGroup.objects.all()
+
         return my_render('jperm/perm_role_push.html', locals(), request)
 
     if request.method == "POST":
@@ -364,9 +308,9 @@ def perm_role_push(request):
 
         # 生成Inventory
         push_resource = [{"hostname": asset.ip,
-                "port": asset.port,
-                "username": asset.username,
-                "password": asset.password} for asset in calc_assets]
+                          "port": asset.port,
+                          "username": asset.username,
+                          "password": asset.password} for asset in calc_assets]
 
         # 获取角色的推送方式,以及推送需要的信息
         roles_obj = [PermRole.objects.get(name=role_name) for role_name in role_names]
@@ -396,6 +340,13 @@ def perm_role_push(request):
             return HttpResponse(u"推送失败")
         else:
             return HttpResponse(u"推送系统角色： %s" % ','.join(role_names))
+
+
+
+
+
+
+
 
 
 

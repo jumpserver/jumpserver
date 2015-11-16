@@ -42,7 +42,7 @@ class IDC(models.Model):
     address = models.CharField(max_length=128, blank=True, null=True, verbose_name=u"机房地址")
     network = models.TextField(blank=True, null=True, verbose_name=u"IP地址段")
     date_added = models.DateField(auto_now=True, null=True)
-    operator = models.IntegerField(max_length=32, blank=True, null=True, verbose_name=u"运营商")
+    operator = models.IntegerField(blank=True, null=True, verbose_name=u"运营商")
     comment = models.CharField(max_length=128, blank=True, null=True, verbose_name=u"备注")
 
     def __unicode__(self):
@@ -57,11 +57,11 @@ class Asset(models.Model):
     """
     asset modle
     """
-    ip = models.IPAddressField(unique=True, verbose_name=u"主机IP")
+    ip = models.GenericIPAddressField(unique=True, verbose_name=u"主机IP")
     other_ip = models.CharField(max_length=255, blank=True, null=True, verbose_name=u"其他IP")
     hostname = models.CharField(max_length=64, blank=True, null=True, verbose_name=u"主机名")
-    port = models.IntegerField(max_length=6, verbose_name=u"端口号")
-    group = models.ManyToManyField(AssetGroup, blank=True, null=True, verbose_name=u"所属主机组")
+    port = models.IntegerField(verbose_name=u"端口号")
+    group = models.ManyToManyField(AssetGroup, blank=True, verbose_name=u"所属主机组")
     username = models.CharField(max_length=16, blank=True, null=True, verbose_name=u"管理用户名")
     password = models.CharField(max_length=64, blank=True, null=True, verbose_name=u"密码")
     use_default_auth = models.BooleanField(default=True, verbose_name=u"使用默认管理账号")
@@ -75,11 +75,11 @@ class Asset(models.Model):
     system_type = models.CharField(max_length=32, blank=True, null=True, verbose_name=u"系统类型")
     system_version = models.CharField(max_length=8, blank=True, null=True, verbose_name=u"版本号")
     cabinet = models.CharField(max_length=32, blank=True, null=True, verbose_name=u'机柜号')
-    position = models.IntegerField(max_length=2, blank=True, null=True, verbose_name=u'机器位置')
+    position = models.IntegerField(blank=True, null=True, verbose_name=u'机器位置')
     number = models.CharField(max_length=32, blank=True, null=True, verbose_name=u'资产编号')
-    status = models.IntegerField(max_length=2, choices=ASSET_STATUS, blank=True, null=True, default=1, verbose_name=u"机器状态")
-    asset_type = models.IntegerField(max_length=2, choices=ASSET_TYPE, blank=True, null=True, verbose_name=u"主机类型")
-    env = models.IntegerField(max_length=2, choices=ASSET_ENV, blank=True, null=True, verbose_name=u"运行环境")
+    status = models.IntegerField(choices=ASSET_STATUS, blank=True, null=True, default=1, verbose_name=u"机器状态")
+    asset_type = models.IntegerField(choices=ASSET_TYPE, blank=True, null=True, verbose_name=u"主机类型")
+    env = models.IntegerField(choices=ASSET_ENV, blank=True, null=True, verbose_name=u"运行环境")
     sn = models.CharField(max_length=128, blank=True, null=True, verbose_name=u"SN编号")
     date_added = models.DateTimeField(auto_now=True, null=True)
     is_active = models.BooleanField(default=True, verbose_name=u"是否激活")
