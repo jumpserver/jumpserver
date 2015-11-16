@@ -3,7 +3,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 import time
-from jasset.models import Asset, AssetGroup
+# from jasset.models import Asset, AssetGroup
 
 
 class UserGroup(models.Model):
