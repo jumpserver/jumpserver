@@ -91,6 +91,10 @@
 
 {% endblock %}
 {% block self_head_css_js %}
+    {% load staticfiles %}
+    <script src="{% static 'js/jquery.shiftcheckbox.js' %}"></script>
+{% endblock %}
+{% block self_footer_js %}
 <script>
     $(document).ready(function(){
         $('.del').click(function(){
@@ -129,7 +133,13 @@
                         alert(data)
                     }
             )
-        })
+        });
+        $("tbody tr").shiftcheckbox({
+            checkboxSelector: 'input:checkbox',
+            selectAll: $('#select_all'),
+            ignoreClick: 'a'
+        });
+        $('.shiftCheckbox').shiftcheckbox();
     });
 </script>
 {% endblock %}
