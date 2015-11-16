@@ -13,16 +13,19 @@ import textwrap
 import getpass
 import readline
 import django
-from multiprocessing import Pool
 import paramiko
-import struct, fcntl, signal, socket, select, fnmatch
+import struct, fcntl, signal, socket, select
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
     django.setup()
 from jumpserver.api import ServerError, User, Asset, AssetGroup, get_object
-from jumpserver.api import logger, is_dir, Log, TtyLog
-from jumpserver.settings import log_dir
+from jumpserver.api import logger, mkdir, Log, TtyLog
+from jumpserver.settings import LOG_DIR
+
+
+login_user = get_object(User, username=getpass.getuser())
+
 
 try:
     import termios
@@ -31,11 +34,6 @@ except ImportError:
     print '\033[1;31m仅支持类Unix系统 Only unix like supported.\033[0m'
     time.sleep(3)
     sys.exit()
-
-VIM_FLAG = False
-VIM_COMMAND = ''
-SSH_TTY = ''
-login_user = get_object(User, username=getpass.getuser())
 
 
 def color_print(msg, color='red', exits=False):
@@ -51,49 +49,6 @@ def color_print(msg, color='red', exits=False):
     if exits:
         time.sleep(2)
         sys.exit()
-
-
-def verify_connect(user, option):
-    """
-    Check user was permed or not . Check ip is unique or not.
-    鉴定用户是否有该主机权限 或 匹配到的ip是否唯一
-    """
-    ip_matched = []
-    try:
-        assets_info = login_user.get_asset_info()
-    except ServerError, e:
-        color_print(e, 'red')
-        return False
-
-    for ip, asset_info in assets_info.items():
-        if option in asset_info[1:] and option:
-            ip_matched = [asset_info[1]]
-            break
-
-        for info in asset_info[1:]:
-            if option in info:
-                ip_matched.append(ip)
-
-    logger.debug('%s matched input %s: %s' % (login_user.username, option, ip_matched))
-    ip_matched = list(set(ip_matched))
-
-    if len(ip_matched) > 1:  # 如果匹配ip不唯一
-        ip_comment = {}
-        for ip in ip_matched:
-            ip_comment[ip] = assets_info[ip][2]
-
-        for ip in sorted(ip_comment):
-            if ip_comment[ip]:
-                print '%-15s -- %s' % (ip, ip_comment[ip])
-            else:
-                print '%-15s' % ip
-        print ''
-    elif len(ip_matched) < 1:  # 如果没匹配到
-        color_print('没有该主机，或者您没有该主机的权限 No Permission or No host.', 'red')
-    else:  # 恰好是1个
-        asset = get_object(Asset, ip=ip_matched[0])
-        jtty = Jtty(user, asset)
-        jtty.connect()
 
 
 def check_vim_status(command, ssh):
@@ -114,67 +69,99 @@ def check_vim_status(command, ssh):
 
 
 def deal_command(str_r, ssh):
-
+    
     """
             处理命令中特殊字符
     """
+    t = time.time()
     str_r = re.sub('\x07','',str_r)   #删除响铃
     patch_char = re.compile('\x08\x1b\[C')      #删除方向左右一起的按键
     while patch_char.search(str_r):
         str_r = patch_char.sub('', str_r.rstrip())
-
+        
     result_command = ''      #最后的结果
-    pattern_str = ''        #模式中间中的字符串
     backspace_num = 0              #光标移动的个数
+    backspace_list = []
     reach_backspace_flag = False    #没有检测到光标键则为true
-    end_flag = False
+    reach_backspace_second_flag = False
+    pattern_list = []
+    pattern_str=''
     while str_r:
-        tmp = re.match(r'\w', str_r)
+        tmp = re.match(r'\s*\w+\s*', str_r)                 #获取字符串，其它特殊字符匹配暂时还不知道。。
         if tmp:
-            if reach_backspace_flag:
-                pattern_str += str(tmp.group(0))
-                str_r = str_r[1:]
+            if reach_backspace_flag :
+                if not reach_backspace_second_flag:
+                    pattern_str +=str(tmp.group(0))
+                else:
+                    pattern_list.append(pattern_str)
+                    pattern_str=str(tmp.group(0))
+                    reach_backspace_second_flag=False
+                str_r = str_r[len(str(tmp.group(0))):]
                 continue
             else:
                 result_command += str(tmp.group(0))
-                str_r = str_r[1:]
+                str_r = str_r[len(str(tmp.group(0))):]
                 continue
-
-        tmp = re.match(r'\x1b\[K[\x08]*', str_r)
+            
+        tmp = re.match(r'\x1b\[K[\x08]*', str_r)           #遇到删除确认符，确定删除数据
         if tmp:
+            for x in backspace_list:
+                backspace_num += int(x)
             if backspace_num > 0:
                 if backspace_num > len(result_command) :
+                    result_command += ''.join(pattern_list)
                     result_command += pattern_str
                     result_command = result_command[0:-backspace_num]
                 else:
                     result_command = result_command[0:-backspace_num]
+                    result_command += ''.join(pattern_list)
                     result_command += pattern_str
             del_len = len(str(tmp.group(0)))-3
             if del_len > 0:
                 result_command = result_command[0:-del_len]
             reach_backspace_flag = False
+            reach_backspace_second_flag =False
             backspace_num =0
+            del pattern_list[:]
+            del backspace_list[:]
             pattern_str=''
             str_r = str_r[len(str(tmp.group(0))):]
             continue
-        if re.match(r'\x08', str_r):
-            backspace_num += 1
-            reach_backspace_flag = True
-            str_r = str_r[1:]
-            if len(str_r) == 0:
-                end_flag = True
+        
+        tmp = re.match(r'\x08+', str_r)                    #将遇到的退格数字存放到队列中
+        if tmp:
+            if reach_backspace_flag:
+                reach_backspace_second_flag = True
+            else:
+                reach_backspace_flag = True
+            str_r = str_r[len(str(tmp.group(0))):]
+            if len(str_r) != 0:                             #如果退格键在最后，则放弃
+                backspace_list.append(len(str(tmp.group(0))))
             continue
-        if reach_backspace_flag :
-            pattern_str += str_r[0]
+        
+        if reach_backspace_flag :   
+            if not reach_backspace_second_flag:
+                pattern_str +=str_r[0]
+            else:
+                pattern_list.append(pattern_str)
+                pattern_str=str_r[0]
+                reach_backspace_second_flag=False
         else :
             result_command += str_r[0]
         str_r = str_r[1:]
 
-    if backspace_num > 0 and not end_flag:
-        result_command = result_command[:-backspace_num]
-        result_command += pattern_str
-
-
+    if pattern_str !='':
+        pattern_list.append(pattern_str)
+    
+    #退格队列中还有腿哥键，则进行删除操作        
+    if len(backspace_list) > 0 :                       
+            for backspace in backspace_list:
+                if int(backspace) >= len(result_command):
+                    result_command = pattern_list[0]
+                else:
+                    result_command = result_command[:-int(backspace)]
+                    result_command += pattern_list[0]
+                pattern_list = pattern_list[1:]
 
     control_char = re.compile(r"""
             \x1b[ #%()*+\-.\/]. |
@@ -183,13 +170,13 @@ def deal_command(str_r, ssh):
             (?:\x1b\]|\x9d) .*? (?:\x1b\\|[\a\x9c]) | \x07 |   #匹配 操作系统指令(OSC)...终止符或振铃符(ST|BEL)
             (?:\x1b[P^_]|[\x90\x9e\x9f]) .*? (?:\x1b\\|\x9c) | #匹配 设备控制串或私讯或应用程序命令(DCS|PM|APC)...终止符(ST)
             \x1b.                                              #匹配 转义过后的字符
-            [\x80-\x9f]                                        #匹配 所有控制字符
+            [\x80-\x9f] | (?:\x1b\]0.*) | \[.*@.*\][\$#] | (.*mysql>.*)      #匹配 所有控制字符
             """, re.X)
     result_command = control_char.sub('', result_command.strip())
     global VIM_FLAG
     global VIM_COMMAND
     if not VIM_FLAG:
-        if result_command.startswith('vim') or result_command.startswith('vi') :
+        if result_command.startswith('vi'):
             VIM_FLAG = True
             VIM_COMMAND = result_command
         return result_command.decode('utf8',"ignore")
@@ -197,17 +184,11 @@ def deal_command(str_r, ssh):
         if check_vim_status(VIM_COMMAND, ssh):
             VIM_FLAG = False
             VIM_COMMAND=''
+            if result_command.endswith(':wq') or result_command.endswith(':wq!') or result_command.endswith(':q!'):
+                return ''
             return result_command.decode('utf8',"ignore")
         else:
             return ''
-
-
-def newline_code_in(strings):
-    for i in ['\r', '\r\n', '\n']:
-        if i in strings:
-            #print "new line"
-            return True
-    return False
 
 
 class Tty(object):
@@ -221,8 +202,8 @@ class Tty(object):
         self.ip = None
         self.port = 22
         self.channel = None
-        self.user = None
-        self.asset = None
+        #self.asset = get_object(Asset, name=asset_name)
+        #self.user = get_object(User, username=username)
         self.role = None
         self.ssh = None
         self.connect_info = None
@@ -257,44 +238,45 @@ class Tty(object):
 
         return line_filtered
 
-    def get_log_file(self):
+    def get_log(self):
         """
         Logging user command and output.
         记录用户的日志
         """
-        tty_log_dir = os.path.join(log_dir, 'tty')
-        timestamp_start = int(time.time())
-        date_start = time.strftime('%Y%m%d', time.localtime(timestamp_start))
-        time_start = time.strftime('%H%M%S', time.localtime(timestamp_start))
+        tty_log_dir = os.path.join(LOG_DIR, 'tty')
+        date_today = datetime.datetime.now()
+        date_start = date_today.strftime('%Y%m%d')
+        time_start = date_today.strftime('%H%M%S')
         today_connect_log_dir = os.path.join(tty_log_dir, date_start)
         log_file_path = os.path.join(today_connect_log_dir, '%s_%s_%s' % (self.username, self.asset_name, time_start))
 
         try:
-            is_dir(today_connect_log_dir, mode=0777)
+            mkdir(today_connect_log_dir, mode=0777)
         except OSError:
+            logger.debug('创建目录 %s 失败，请修改%s目录权限' % (today_connect_log_dir, tty_log_dir))
             raise ServerError('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, tty_log_dir))
 
         try:
             log_file_f = open(log_file_path + '.log', 'a')
             log_time_f = open(log_file_path + '.time', 'a')
         except IOError:
+            logger.debug('创建tty日志文件失败, 请修改目录%s权限' % today_connect_log_dir)
             raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
 
-        if self.login_type == 'ssh':
+        if self.login_type == 'ssh':  # 如果是ssh连接过来，记录connect.py的pid，web terminal记录为日志的id
             pid = os.getpid()
-            remote_ip = os.popen("who -m | awk '{ print $5 }'").read().strip('()\n')
+            remote_ip = os.popen("who -m | awk '{ print $5 }'").read().strip('()\n')  # 获取远端IP
             log = Log(user=self.username, host=self.asset_name, remote_ip=remote_ip,
-                      log_path=log_file_path, start_time=datetime.datetime.now(), pid=pid)
+                      log_path=log_file_path, start_time=date_today, pid=pid)
         else:
             remote_ip = 'Web'
             log = Log(user=self.username, host=self.asset_name, remote_ip=remote_ip,
-                      log_path=log_file_path, start_time=datetime.datetime.now(), pid=0)
+                      log_path=log_file_path, start_time=date_today, pid=0)
             log.save()
             log.pid = log.id
-            log.save()
 
-        log_file_f.write('Start at %s\n' % datetime.datetime.now())
         log.save()
+        log_file_f.write('Start at %s\n' % datetime.datetime.now())
         return log_file_f, log_time_f, log
 
     def get_connect_info(self):
@@ -378,10 +360,10 @@ class SshTty(Tty):
         Use paramiko channel connect server interactive.
         使用paramiko模块的channel，连接后端，进入交互式
         """
-        log_file_f, log_time_f, log = self.get_log_file()
+        log_file_f, log_time_f, log = self.get_log()
         old_tty = termios.tcgetattr(sys.stdin)
         pre_timestamp = time.time()
-        input_r = ''
+        data = ''
         input_mode = False
 
         try:
@@ -410,22 +392,20 @@ class SshTty(Tty):
                         log_time_f.flush()
 
                         if input_mode and not self.is_output(x):
-                            input_r += x
+                            data += x
 
                     except socket.timeout:
                         pass
 
                 if sys.stdin in r:
                     x = os.read(sys.stdin.fileno(), 1)
-                    if not input_mode:
-                        input_mode = True
+                    input_mode = True
 
                     if str(x) in ['\r', '\n', '\r\n']:
-                        # input_r = deal_command(input_r,ssh)
-                        input_r = self.remove_control_char(input_r)
+                        data = self.remove_control_char(data)
 
-                        TtyLog(log=log, datetime=datetime.datetime.now(), cmd=input_r).save()
-                        input_r = ''
+                        TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
+                        data = ''
                         input_mode = False
 
                     if len(x) == 0:

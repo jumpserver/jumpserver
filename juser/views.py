@@ -201,14 +201,14 @@ def user_add(request):
 
     if request.method == 'POST':
         username = request.POST.get('username', '')
-        password = PyCrypt.random_pass(16)
+        password = PyCrypt.gen_rand_pass(16)
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
         groups = request.POST.getlist('groups', [])
         admin_groups = request.POST.getlist('admin_groups', [])
         role = request.POST.get('role', 'CU')
         uuid = uuid_r.uuid1()
-        ssh_key_pwd = PyCrypt.random_pass(16)
+        ssh_key_pwd = PyCrypt.gen_rand_pass(16)
         extra = request.POST.getlist('extra', [])
         is_active = True if '0' in extra else False
         ssh_key_login_need = True if '1' in extra else False
@@ -241,14 +241,11 @@ def user_add(request):
                     for user_group_id in groups:
                         user_groups.extend(UserGroup.objects.filter(id=user_group_id))
                     print user_groups
-                    results = _public_perm_api({'type': 'new_user', 'user': user, 'group': user_groups})
-                    print results
             except IndexError, e:
                 error = u'添加用户 %s 失败 %s ' % (username, e)
                 try:
                     db_del_user(username)
                     server_del_user(username)
-                    _public_perm_api({'type': 'del_user', 'user': user, 'group': user_groups})
                 except Exception:
                     pass
             else:
@@ -512,7 +509,7 @@ def regen_ssh_key(request):
         return HttpResponse('没有该用户')
 
     username = user.username
-    ssh_key_pass = PyCrypt.random_pass(16)
+    ssh_key_pass = PyCrypt.gen_rand_pass(16)
     gen_ssh_key(username, ssh_key_pass)
     return HttpResponse('ssh密钥已生成，密码为 %s, 请到下载页面下载' % ssh_key_pass)
 
@@ -530,7 +527,7 @@ def down_key(request):
         user = get_object(User, id=user_id)
         if user:
             username = user.username
-            private_key_file = os.path.join(BASE_DIR, 'keys/jumpserver', username+".pem")
+            private_key_file = os.path.join(BASE_DIR, 'role_keys/jumpserver', username + ".pem")
             if os.path.isfile(private_key_file):
                 f = open(private_key_file)
                 data = f.read()

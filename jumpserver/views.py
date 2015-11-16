@@ -20,35 +20,58 @@ from jlog.models import Log
 
 
 def getDaysByNum(num):
+    """
+    输出格式:([datetime.date(2015, 11, 6),  datetime.date(2015, 11, 8)], ['11-06', '11-08'])
+    """
+
     today = datetime.date.today()
     oneday = datetime.timedelta(days=1)
-    li_date, li_str = [], []
+    date_li, date_str = [], []
     for i in range(0, num):
         today = today-oneday
-        li_date.append(today)
-        li_str.append(str(today)[5:10])
-    li_date.reverse()
-    li_str.reverse()
-    t = (li_date, li_str)
-    return t
+        date_li.append(today)
+        date_str.append(str(today)[5:10])
+    date_li.reverse()
+    date_str.reverse()
+    return date_li, date_str
 
 
-def get_data(data, items, option):
-    dic = {}
-    li_date, li_str = getDaysByNum(7)
-    for item in items:
-        li = []
-        name = item[option]
-        if option == 'user':
-            option_data = data.filter(user=name)
-        elif option == 'host':
-            option_data = data.filter(host=name)
-        for t in li_date:
-            year, month, day = t.year, t.month, t.day
-            times = option_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).count()
-            li.append(times)
-        dic[name] = li
-    return dic
+def get_data(x, y, z):
+    pass
+
+
+def get_data_by_day(date_li, item):
+    data_li = []
+    for d in date_li:
+        logs = Log.objects.filter(start_time__year=d.year,
+                                  start_time__month=d.month,
+                                  start_time__day=d.day)
+        if item == 'user':
+            data_li.append(set([log.user for log in logs]))
+        elif item == 'asset':
+            data_li.append(set([log.host for log in logs]))
+        elif item == 'login':
+            data_li.append(logs)
+        else:
+            pass
+    return data_li
+
+
+def get_count_by_day(date_li, item):
+    data_li = get_data_by_day(date_li, item)
+    data_count_li = []
+    for data in data_li:
+        data_count_li.append(len(data))
+    return data_count_li
+
+
+def get_count_by_date(date_li, item):
+    data_li = get_data_by_day(date_li, item)
+    data_count_tmp = []
+    for data in data_li:
+        data_count_tmp.extend(list(data))
+
+    return len(set(data_count_tmp))
 
 
 @require_role(role='user')
@@ -59,6 +82,7 @@ def index_cu(request):
     username = request.user.username
     posts = Asset.object.all()
     host_count = len(posts)
+
     new_posts = []
     post_five = []
     for post in posts:
@@ -81,6 +105,7 @@ def index(request):
         return index_cu(request)
 
     elif is_role_request(request, 'super'):
+        # dashboard 显示汇总
         users = User.objects.all()
         hosts = Asset.objects.all()
         online = Log.objects.filter(is_finished=0)
@@ -88,68 +113,52 @@ def index(request):
         online_user = online.values('user').distinct()
         active_users = User.objects.filter(is_active=1)
         active_hosts = Asset.objects.filter(is_active=1)
+
+        # 一个月历史汇总
+        date_li, date_str = getDaysByNum(30)
+        date_month = repr(date_str)
+        active_user_per_month = str(get_count_by_day(date_li, 'user'))
+        active_asset_per_month = str(get_count_by_day(date_li, 'asset'))
+        active_login_per_month = str(get_count_by_day(date_li, 'login'))
+
+        # 活跃用户资产图
+        active_user_month = get_count_by_date(date_li, 'user')
+        disabled_user_count = len(users.filter(is_active=False))
+        inactive_user_month = len(users) - active_user_month
+        active_asset_month = get_count_by_date(date_li, 'asset')
+        disabled_asset_count = len(hosts.filter(is_active=False)) if hosts.filter(is_active=False) else 0
+        inactive_asset_month = len(hosts) - active_asset_month if len(hosts) > active_asset_month else 0
+
+        # 一周top10用户和主机
         week_data = Log.objects.filter(start_time__range=[from_week, datetime.datetime.now()])
+        user_top_ten = week_data.values('user').annotate(times=Count('user')).order_by('-times')[:10]
+        host_top_ten = week_data.values('host').annotate(times=Count('host')).order_by('-times')[:10]
 
-    elif is_role_request(request, 'admin'):
-        return index_cu(request)
-        # user = get_session_user_info(request)[2]
-        # users = User.objects.filter(dept=dept)
-        # hosts = Asset.objects.filter(dept=dept)
-        # online = Log.objects.filter(dept_name=dept_name, is_finished=0)
-        # online_host = online.values('host').distinct()
-        # online_user = online.values('user').distinct()
-        # active_users = users.filter(is_active=1)
-        # active_hosts = hosts.filter(is_active=1)
-        # week_data = Log.objects.filter(dept_name=dept_name, start_time__range=[from_week, datetime.datetime.now()])
+        for user_info in user_top_ten:
+            username = user_info.get('user')
+            last = Log.objects.filter(user=username).latest('start_time')
+            user_info['last'] = last
 
-    # percent of dashboard
-    if users.count() == 0:
-        percent_user, percent_online_user = '0%', '0%'
-    else:
-        percent_user = format(active_users.count() / users.count(), '.0%')
-        percent_online_user = format(online_user.count() / users.count(), '.0%')
-    if hosts.count() == 0:
-        percent_host, percent_online_host = '0%', '0%'
-    else:
-        percent_host = format(active_hosts.count() / hosts.count(), '.0%')
-        percent_online_host = format(online_host.count() / hosts.count(), '.0%')
+        for host_info in host_top_ten:
+            host = host_info.get('host')
+            last = Log.objects.filter(host=host).latest('start_time')
+            host_info['last'] = last
 
-    user_top_ten = week_data.values('user').annotate(times=Count('user')).order_by('-times')[:10]
-    host_top_ten = week_data.values('host').annotate(times=Count('host')).order_by('-times')[:10]
-    user_dic, host_dic = get_data(week_data, user_top_ten, 'user'), get_data(week_data, host_top_ten, 'host')
+        # 一周top5
+        week_users = week_data.values('user').distinct().count()
+        week_hosts = week_data.count()
 
-    # a week data
-    week_users = week_data.values('user').distinct().count()
-    week_hosts = week_data.count()
+        user_top_five = week_data.values('user').annotate(times=Count('user')).order_by('-times')[:5]
+        color = ['label-success', 'label-info', 'label-primary', 'label-default', 'label-warnning']
 
-    user_top_five = week_data.values('user').annotate(times=Count('user')).order_by('-times')[:5]
-    color = ['label-success', 'label-info', 'label-primary', 'label-default', 'label-warnning']
+        # 最后10次权限申请
+        # perm apply latest 10
+        # perm_apply_10 = Apply.objects.order_by('-date_add')[:10]
 
-    # perm apply latest 10
-    # perm_apply_10 = Apply.objects.order_by('-date_add')[:10]
+        # 最后10次登陆
+        login_10 = Log.objects.order_by('-start_time')[:10]
+        login_more_10 = Log.objects.order_by('-start_time')[10:21]
 
-    # latest 10 login
-    login_10 = Log.objects.order_by('-start_time')[:10]
-    login_more_10 = Log.objects.order_by('-start_time')[10:21]
-
-    # a week top 10
-    for user_info in user_top_ten:
-        username = user_info.get('user')
-        last = Log.objects.filter(user=username).latest('start_time')
-        user_info['last'] = last
-
-    top = {'user': '活跃用户数', 'host': '活跃主机数', 'times': '登录次数'}
-    top_dic = {}
-    for key, value in top.items():
-        li = []
-        for t in li_date:
-            year, month, day = t.year, t.month, t.day
-            if key != 'times':
-                times = week_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).values(key).distinct().count()
-            else:
-                times = week_data.filter(start_time__year=year, start_time__month=month, start_time__day=day).count()
-            li.append(times)
-        top_dic[value] = li
     return render_to_response('index.html', locals(), context_instance=RequestContext(request))
 
 
@@ -259,7 +268,7 @@ def setting(request):
             if '' in [username, port] and ('' in password or '' in private_key):
                 return HttpResponse('所填内容不能为空, 且密码和私钥填一个')
             else:
-                private_key_path = os.path.join(BASE_DIR, 'keys', 'default', 'default_private_key.pem')
+                private_key_path = os.path.join(BASE_DIR, 'role_keys', 'default', 'default_private_key.pem')
                 if private_key:
                     with open(private_key_path, 'w') as f:
                             f.write(private_key)
@@ -282,6 +291,10 @@ def setting(request):
 
             msg = "设置成功"
     return my_render('setting.html', locals(), request)
+
+
+def test2(request):
+    return my_render('test2.html', locals(), request)
 #
 # def filter_ajax_api(request):
 #     attr = request.GET.get('attr', 'user')

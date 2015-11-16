@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+{% load mytags %}
+
+
+{% block content %}
+    {% include 'nav_cat_bar.html' %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-primary"><b>{{ rule.name }}</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#"></a>
+                                </li>
+                                <li><a href="#"></a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div>
+                            <div class="text-left">
+                                <table class="table">
+                                    <tr>
+                                        <td class="text-navy">ID</td>
+                                        <td>{{ rule.id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">名称</td>
+                                        <td>{{ rule.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">时间</td>
+                                        <td>{{ rule.date_added | date:"Y-m-d H:i:s"}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">角色</td>
+                                        <td>{{ roles_name }}</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">激活</td>
+                                        <td>是</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-primary"><b>授权用户/用户组</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#"></a>
+                                </li>
+                                <li><a href="#"></a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div>
+                            <div class="text-left">
+                                <table class="table table-striped" id="ugedit" >
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">用户</th>
+                                            <th class="text-center">用户组</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for user in users %}
+                                        <tr class="gradeX">
+                                            <td class="text-center"> {{ user.name }} </td>
+                                            <td class="text-center"> {{ user | user_which_groups:"group" }} </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    </div>
+            <div class="col-lg-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-primary"><b>授权主机/主机组</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#"></a>
+                                </li>
+                                <li><a href="#"></a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div>
+                            <div class="text-left">
+                                <table class="table table-striped" id="agedit" >
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">主机</th>
+                                            <th class="text-center">主机组</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for asset in assets %}
+                                        <tr class="gradeX">
+                                            <td class="text-center"> {{ asset.ip }} </td>
+                                            <td class="text-center"> {{ asset | asset_which_groups:"group" }} </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    </div>
+        </div>
+    </div>
+
+<script>
+    $(document).ready(function(){
+        $('#show').click(function(){
+            $('#last').css('display', 'none');
+            $('#all').css('display', 'block');
+        })
+    })
+</script>
+
+
+{% endblock %}

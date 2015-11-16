@@ -2777,7 +2777,7 @@ Terminal.prototype.deviceStatus = function(params) {
         // this.send('\x1b[?11n');
         break;
       case 25:
-        // dont support user defined keys
+        // dont support user defined role_keys
         // this.send('\x1b[?21n');
         break;
       case 26:
@@ -2964,7 +2964,7 @@ Terminal.prototype.HPositionRelative = function(params) {
 //     Ps = 1  -> 132-columns.
 //     Ps = 2  -> Printer.
 //     Ps = 6  -> Selective erase.
-//     Ps = 8  -> User-defined keys.
+//     Ps = 8  -> User-defined role_keys.
 //     Ps = 9  -> National replacement character sets.
 //     Ps = 1 5  -> Technical characters.
 //     Ps = 2 2  -> ANSI color, e.g., VT525.
@@ -3105,7 +3105,7 @@ Terminal.prototype.HVPosition = function(params) {
 //     Ps = 1 0 3 4  -> Interpret "meta" key, sets eighth bit.
 //     (enables the eightBitInput resource).
 //     Ps = 1 0 3 5  -> Enable special modifiers for Alt and Num-
-//     Lock keys.  (This enables the numLock resource).
+//     Lock role_keys.  (This enables the numLock resource).
 //     Ps = 1 0 3 6  -> Send ESC   when Meta modifies a key.  (This
 //     enables the metaSendsEscape resource).
 //     Ps = 1 0 3 7  -> Send DEL from the editing-keypad Delete
@@ -3304,7 +3304,7 @@ Terminal.prototype.setMode = function(params) {
 //     Ps = 1 0 3 4  -> Don't interpret "meta" key.  (This disables
 //     the eightBitInput resource).
 //     Ps = 1 0 3 5  -> Disable special modifiers for Alt and Num-
-//     Lock keys.  (This disables the numLock resource).
+//     Lock role_keys.  (This disables the numLock resource).
 //     Ps = 1 0 3 6  -> Don't send ESC  when Meta modifies a key.
 //     (This disables the metaSendsEscape resource).
 //     Ps = 1 0 3 7  -> Send VT220 Remove from the editing-keypad
@@ -3588,7 +3588,7 @@ Terminal.prototype.setResources = function(params) {
 //     Ps = 4  -> modifyOtherKeys.
 //   If the parameter is omitted, modifyFunctionKeys is disabled.
 //   When modifyFunctionKeys is disabled, xterm uses the modifier
-//   keys to make an extended sequence of functions rather than
+//   role_keys to make an extended sequence of functions rather than
 //   adding a parameter to each function key to denote the modi-
 //   fiers.
 Terminal.prototype.disableModifiers = function(params) {

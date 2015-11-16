@@ -18,6 +18,8 @@ config = ConfigParser.ConfigParser()
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 config.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
 
+KEY_DIR = os.path.join(BASE_DIR, 'role_keys')
+
 DB_HOST = config.get('db', 'host')
 DB_PORT = config.getint('db', 'port')
 DB_USER = config.get('db', 'user')
@@ -34,18 +36,12 @@ EMAIL_USE_TLS = config.getboolean('mail', 'email_use_tls')
 EMAIL_TIMEOUT = 5
 
 # ======== Log ==========
-LOG = False
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
-JLOG_FILE = os.path.join(LOG_DIR, 'jumpserver.log')
-SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys')
-# SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
+SSH_KEY_DIR = os.path.join(BASE_DIR, 'role_keys')
 KEY = config.get('base', 'key')
-LOGIN_NAME = getpass.getuser()
-# LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
 URL = config.get('base', 'url')
-log_dir = os.path.join(BASE_DIR, 'logs')
-log_level = config.get('base', 'log')
-web_socket_host = config.get('websocket', 'web_socket_host')
+LOG_LEVEL = config.get('base', 'log')
+WEB_SOCKET_HOST = config.get('websocket', 'web_socket_host')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
@@ -70,6 +66,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'bootstrapform',
     'jumpserver',
     'juser',
     'jasset',
@@ -150,3 +147,5 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/1.7/howto/static-files/
 
 STATIC_URL = '/static/'
+
+BOOTSTRAP_COLUMN_COUNT = 10

@@ -123,3 +123,106 @@ def result2bool(result=''):
         return '<b style="color: red">失败</b>'
     else:
         return '<b style="color: green">成功</b>'
+
+
+@register.filter(name='rule_member_count')
+def rule_member_count(instance, member):
+    """
+    instance is a rule object,
+    use to get the number of the members
+    :param instance:
+    :param member:
+    :return:
+    """
+    member = getattr(instance, member)
+    counts = member.all().count()
+    return str(counts)
+
+
+@register.filter(name='rule_member_name')
+def rule_member_name(instance, member):
+    """
+    instance is a rule object,
+    use to get the name of the members
+    :param instance:
+    :param member:
+    :return:
+    """
+    member = getattr(instance, member)
+    names = member.all()
+
+    return names
+
+
+@register.filter(name='user_which_groups')
+def user_which_group(user, member):
+    """
+    instance is a user object,
+    use to get the group of the user
+    :param instance:
+    :param member:
+    :return:
+    """
+    member = getattr(user, member)
+    names = [members.name for members in member.all()]
+
+    return ','.join(names)
+
+
+@register.filter(name='asset_which_groups')
+def asset_which_group(asset, member):
+    """
+    instance is a user object,
+    use to get the group of the user
+    :param instance:
+    :param member:
+    :return:
+    """
+    member = getattr(asset, member)
+    names = [members.name for members in member.all()]
+
+    return ','.join(names)
+
+
+@register.filter(name='group_str2')
+def groups_str2(group_list):
+    """
+    将用户组列表转换为str
+    """
+    if len(group_list) < 3:
+        return ' '.join([group.name for group in group_list])
+    else:
+        return '%s ...' % ' '.join([group.name for group in group_list[0:2]])
+
+
+@register.filter(name='str_to_list')
+def str_to_list(info):
+    """
+    str to list
+    """
+    print ast.literal_eval(info), type(ast.literal_eval(info))
+    return ast.literal_eval(info)
+
+
+@register.filter(name='str_to_dic')
+def str_to_dic(info):
+    """
+    str to list
+    """
+    return ast.literal_eval(info).iteritems()
+
+
+@register.filter(name='str_to_code')
+def str_to_code(char_str):
+    if char_str:
+        return char_str
+    else:
+        return u'空'
+
+
+@register.filter(name='ip_str_to_list')
+def ip_str_to_list(ip_str):
+    """
+    ip str to list
+    """
+    return ip_str.split(',')

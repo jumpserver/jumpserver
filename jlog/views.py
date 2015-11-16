@@ -8,7 +8,7 @@ from django.http import HttpResponseNotFound
 from jlog.log_api import renderTemplate
 
 from models import Log
-from jumpserver.settings import web_socket_host
+from jumpserver.settings import WEB_SOCKET_HOST
 
 
 @require_role('admin')
@@ -48,8 +48,8 @@ def log_list(request, offset):
 
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
-    web_monitor_uri = 'ws://%s/monitor' % web_socket_host
-    web_kill_uri = 'http://%s/kill' % web_socket_host
+    web_monitor_uri = 'ws://%s/monitor' % WEB_SOCKET_HOST
+    web_kill_uri = 'http://%s/kill' % WEB_SOCKET_HOST
     return render_to_response('jlog/log_%s.html' % offset, locals(), context_instance=RequestContext(request))
 
 
@@ -85,7 +85,7 @@ def log_history(request):
                 content += '%s: %s\n' % (tty_log.datetime.strftime('%Y-%m-%d %H:%M:%S'), tty_log.cmd)
             return HttpResponse(content)
 
-    return HttpResponse('无日志记录, 请查看日志处理脚本是否开启!')
+    return HttpResponse('无日志记录!')
 
 
 @require_role('admin')
@@ -100,7 +100,7 @@ def log_record(request):
             content = renderTemplate(log_file, log_time)
             return HttpResponse(content)
         else:
-            return HttpResponse('无日志记录, 请查看日志处理脚本是否开启!')
+            return HttpResponse('无日志记录!')
 
 
 def web_terminal(request):
@@ -108,6 +108,6 @@ def web_terminal(request):
     token = request.COOKIES.get('sessionid')
     username = request.user.username
     asset_name = '127.0.0.1'
-    web_terminal_uri = 'ws://%s/terminal?username=%s&asset_name=%s&token=%s' % (web_socket_host, username, asset_name, token)
+    web_terminal_uri = 'ws://%s/terminal?username=%s&asset_name=%s&token=%s' % (WEB_SOCKET_HOST, username, asset_name, token)
     return render_to_response('jlog/web_terminal.html', locals())
 

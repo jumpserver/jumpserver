@@ -1,4 +1,4 @@
-# coding: utf-8
+# -*- coding: utf-8 -*-
 
 from ansible.playbook import PlayBook
 from ansible import callbacks, utils
@@ -45,3 +45,4 @@ def playbook_run(inventory, playbook, default_user=None, default_port=None, defa
             results_r['success'].append(hostname)
             print "%s >>> Success" % hostname
     return results_r
+

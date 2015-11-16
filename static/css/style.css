@@ -4562,3 +4562,8 @@ body.skin-3 {
 .red-fonts {
     color: #ed5565;
 }
+
+.form-group.required .control-label:after {
+  content: " *";
+  color: red;
+}
