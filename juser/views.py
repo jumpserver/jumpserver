@@ -315,9 +315,10 @@ def user_del(request):
     for user_id in user_id_list:
         user = get_object(User, id=user_id)
         if user:
-            assets = user_permed(user)
-            result = _public_perm_api({'type': 'del_user', 'user': user, 'asset': assets})
-            print result
+            # TODO: annotation by liuzheng, because useless for me
+            # assets = user_permed(user)
+            # result = _public_perm_api({'type': 'del_user', 'user': user, 'asset': assets})
+            # print result
             user.delete()
     return HttpResponse('删除成功')
 
