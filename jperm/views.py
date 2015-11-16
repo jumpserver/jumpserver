@@ -326,10 +326,13 @@ def perm_role_push(request):
         task = Tasks(push_resource)
         ret = {}
         ret_failed = []
-        if password_push:
-            ret["password_push"] = task.add_multi_user(**role_pass)
-            if ret["password_push"].get("status") != "success":
-                ret_failed.append(1)
+
+        # 因为要先建立用户，所以password 是必选项，
+        # 而push key是在 password也完成的情况下的 可选项
+        ret["password_push"] = task.add_multi_user(**role_pass)
+        if ret["password_push"].get("status") != "success":
+            ret_failed.append(1)
+
         if key_push:
             ret["key_push"] = task.push_multi_key(**role_key)
             if ret["key_push"].get("status") != "success":
