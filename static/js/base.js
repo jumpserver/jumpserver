@@ -17,10 +17,19 @@ function check_all(form) {
 }
 
 function checkAll(){
-    // 选择该页面所有checkbox
-    $('input[type=checkbox]').each(function(){
-        $(this).attr('checked', true)
-    })
+    var checklist = document.getElementsByName ("checked");
+    if(document.getElementById("check_all").checked)
+        {
+        for(var i=0;i<checklist.length;i++)
+        {
+          checklist[i].checked = 1;
+        }
+    }else{
+        for(var j=0;j<checklist.length;j++)
+        {
+         checklist[j].checked = 0;
+        }
+    }
 }
 
 //提取指定行的数据，JSON格式

@@ -55,9 +55,7 @@
                 searchArray.pop();
             }
 
-            console.log(searchStr);
             searchArray.push(old_href);
-            console.log(searchArray);
             if (searchArray.length > 1) {
                 $(this).attr('href', searchArray.join('&'));
             }
