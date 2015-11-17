@@ -443,7 +443,7 @@ def change_info(request):
             # if password != user.password:
             #     password = CRYPTOR.md5_crypt(password)
 
-            user.update(username=name, email=email)
+            user.update(name=name, email=email)
             User.objects.get(id=user_id).set_password(password)
             msg = '修改成功'
 
