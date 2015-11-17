@@ -236,7 +236,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         if data.get('data'):
             self.term.input_mode = True
             if str(data['data']) in ['\r', '\n', '\r\n']:
-                TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=self.term.remove_control_char(self.term.data)).save()
+                TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=self.term.deal_command(self.term.data, self.term.ssh)).save()
                 self.term.data = ''
                 self.term.input_mode = False
             self.term.channel.send(data['data'])
