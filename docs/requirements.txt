@@ -1,6 +1,5 @@
 sphinx-me==0.3
 django==1.6
-python-ldap==2.4.19
 pycrypto==2.6.1
 paramiko==1.15.2
 ecdsa==0.13
@@ -10,3 +9,8 @@ psutil==2.2.1
 xlsxwriter==0.7.7
 xlrd==0.9.4
 django-bootstrap-form
+tornado
+ansible
+pyinotify
+passlib
+argparse

@@ -14,7 +14,6 @@
                 </div>
                 <div class="ibox-content">
                     <h1 class="no-margins"><a href="/juser/user_list/">{{ users.count}}</a></h1>
-{#                    <div class="stat-percent font-bold text-success">{{ percent_user }} <i class="fa fa-bolt"></i></div>#}
                     <small>All user</small>
                 </div>
             </div>
@@ -27,7 +26,6 @@
                 </div>
                 <div class="ibox-content">
                     <h1 class="no-margins"><a href="/jasset/host_list/">{{ hosts.count }}</a></h1>
-{#                    <div class="stat-percent font-bold text-info">{{ percent_host }} <i class="fa fa-level-up"></i></div>#}
                     <small>All host</small>
                 </div>
             </div>
@@ -37,7 +35,7 @@
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
                     <span class="label label-primary pull-right">Online</span>
-                    <h5>实时在线用户</h5>
+                    <h5>在线用户</h5>
                 </div>
                 <div class="ibox-content">
                     <h1 class="no-margins"><a href="/jlog/log_list/online/"> <span id="online_users">{{ online_user | length }}</span></a></h1>
@@ -55,7 +53,6 @@
                 </div>
                 <div class="ibox-content">
                         <h1 class="no-margins"><a href="/jlog/log_list/online/"> <span id="online_hosts">{{ online_host | length }}</span></a></h1>
-{#                    <div class="stat-percent font-bold text-danger">{{ percent_online_host }} <i class="fa fa-level-down"></i></div>#}
                     <small>Connected host</small>
                 </div>
             </div>
@@ -169,7 +166,7 @@
                     </div>
                 </div>
                 <div class="ibox-content ibox-heading">
-                    <h3><i class="fa fa-user"></i> 一周Top10资产 </h3>
+                    <h3><i class="fa fa-inbox"></i> 一周Top10资产 </h3>
                     <small><i class="fa fa-map-marker"></i> 登录次数及最近一次登录记录. </small>
                 </div>
                 <div class="ibox-content inspinia-timeline">
@@ -309,14 +306,7 @@
                 </div>
             </div>
         </div>
-
-    <!--</div>-->
-            <!--<div class="col-xm-6" id="top10" style="width:50%;height:400px;"></div>-->
-            <!--<div class="col-xm-6" id="usertop10" style="width:50%;height:400px;"></div>-->
-        <!--<div class="row">-->
-            <!--<div class="col-lg-6" id="hosttop10" style="width:50%;height:400px; margin-top: 20px"></div>-->
-        <!--</div>-->
-</div>
+    </div>
 </div>
 
 {% endblock %}

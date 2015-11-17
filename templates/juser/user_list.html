@@ -42,7 +42,7 @@
                         <thead>
                             <tr>
                                 <th class="text-center">
-                                    <input type="checkbox" id="select_all" onclick="selectAll()"  name="select_all">
+                                    <input type="checkbox" id="check_all" onclick="checkAll()">
                                 </th>
                                 <th class="text-center">用户名</th>
                                 <th class="text-center">姓名</th>
@@ -57,7 +57,7 @@
                         {% for user in users.object_list %}
                             <tr class="gradeX">
                                 <td class="text-center">
-                                    <input type="checkbox"  name="selected" value="{{ user.id }}">
+                                    <input type="checkbox" name="checked" value="{{ user.id }}">
                                 </td>
                                 <td class="text-center"> {{ user.username }} </td>
                                 <td class="text-center"> {{ user.name }} </td>
@@ -91,10 +91,15 @@
 
 {% endblock %}
 {% block self_head_css_js %}
+    {% load staticfiles %}
+    <script src="{% static 'js/jquery.shiftcheckbox.js' %}"></script>
+{% endblock %}
+{% block self_footer_js %}
 <script>
     $(document).ready(function(){
         $('.del').click(function(){
             var row = $(this).closest('tr');
+            if (confirm("确定删除")) {
             $.get(
                     $(this).attr('value'),
                     {},
@@ -102,7 +107,7 @@
                         row.remove();
                         alert(data);
                     }
-            )
+            )}
         });
 
         $('#del_btn').click(function(){
@@ -129,7 +134,13 @@
                         alert(data)
                     }
             )
-        })
+        });
+        $("tbody tr").shiftcheckbox({
+            checkboxSelector: 'input:checkbox',
+            selectAll: $('#select_all'),
+            ignoreClick: 'a'
+        });
+        $('.shiftCheckbox').shiftcheckbox();
     });
 </script>
 {% endblock %}

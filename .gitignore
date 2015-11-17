@@ -37,11 +37,9 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
-*.xlsx
-node_modules
-logs
-keys
+*.log
+logs/*
+keys/*
 jumpserver.conf
 nohup.out
 tmp/*
-db.sqlite3
