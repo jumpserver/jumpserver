@@ -31,11 +31,11 @@
                                 <table class="table">
                                     <tr>
                                         <td class="text-navy">IP</td>
-                                        <td>{{ asset.ip }}</td>
+                                        <td>{{ asset.ip|default_if_none:""  }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">主机名</td>
-                                        <td>{{ asset.hostname }}</td>
+                                        <td>{{ asset.hostname|default_if_none:""  }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">其他IP</td>
@@ -53,11 +53,11 @@
                                     </tr>
                                     <tr>
                                         <td class="text-navy">远控IP</td>
-                                        <td>{{ asset.remote_ip }}</td>
+                                        <td>{{ asset.remote_ip|default_if_none:"" }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">端口</td>
-                                        <td>{{ asset.port }}</td>
+                                        <td>{{ asset.port|default_if_none:"" }}</td>
                                     </tr>
 
                                     <tr>
@@ -66,7 +66,7 @@
                                              <table class="table">
                                                  {% for asset_group in asset.group.all %}
                                                     <tr>
-                                                        <td>{{ asset_group.name }}</td>
+                                                        <td>{{ asset_group.name|default_if_none:"" }}</td>
                                                     </tr>
                                                  {% endfor %}
                                              </table>
@@ -79,19 +79,19 @@
                                     </tr>
                                     <tr>
                                         <td class="text-navy">机房</td>
-                                        <td>{{ asset.idc.name }}</td>
+                                        <td>{{ asset.idc.name|default_if_none:"" }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">硬件厂商型号</td>
-                                        <td>{{ asset.brand }}</td>
+                                        <td>{{ asset.brand|default_if_none:"" }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">CPU</td>
-                                        <td>{{ asset.cpu }}</td>
+                                        <td>{{ asset.cpu|default_if_none:"" }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">内存</td>
-                                        <td>{{ asset.memory }}M</td>
+                                        <td>{{ asset.memory|default_if_none:"" }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">硬盘</td>
@@ -100,7 +100,7 @@
                                             {% if asset.disk %}
                                                  {% for disk, value in asset.disk|str_to_dic %}
                                                     <tr>
-                                                        <td><span class="text-navy">{{ disk }}</span> &nbsp&nbsp&nbsp {{ value }}</td>
+                                                        <td><span class="text-navy">{{ disk|default_if_none:"" }}</span> &nbsp&nbsp&nbsp {{ value|default_if_none:"" }}</td>
                                                     </tr>
                                                  {% endfor %}
                                             {% endif %}
@@ -109,35 +109,35 @@
                                     </tr>
                                     <tr>
                                         <td class="text-navy">资产编号</td>
-                                        <td>{{ asset.number }}</td>
+                                        <td>{{ asset.number|default_if_none:"" }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">SN</td>
-                                        <td>{{ asset.sn }}</td>
+                                        <td>{{ asset.sn|default_if_none:"" }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">主机类型</td>
-                                        <td>{{ asset.get_asset_type_display }}</td>
+                                        <td>{{ asset.get_asset_type_display|default_if_none:"" }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">系统版本</td>
-                                        <td>{{ asset.system_type }} {{ asset.system_version }}</td>
+                                        <td>{{ asset.system_type|default_if_none:"" }} {{ asset.system_version|default_if_none:"" }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">运行环境</td>
-                                        <td>{{ asset.get_env_display }}</td>
+                                        <td>{{ asset.get_env_display|default_if_none:"" }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">机器状态</td>
-                                        <td>{{ asset.get_status_display }}</td>
+                                        <td>{{ asset.get_status_display|default_if_none:"" }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">机柜号</td>
-                                        <td>{{ asset.cabinet }}</td>
+                                        <td>{{ asset.cabinet|default_if_none:"" }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">机柜位置</td>
-                                        <td>{{ asset.position }}</td>
+                                        <td>{{ asset.position|default_if_none:"" }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">激活</td>
@@ -149,7 +149,7 @@
                                     </tr>
                                     <tr>
                                         <td class="text-navy">备注</td>
-                                        <td>{{ asset.comment }}</td>
+                                        <td>{{ asset.comment|default_if_none:"" }}</td>
                                     </tr>
                                 </table>
                             </div>

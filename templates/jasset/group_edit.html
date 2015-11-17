@@ -86,7 +86,7 @@
                                 <div>
                                     <select id="assets" name="assets" class="form-control m-b" size="12" multiple>
                                         {% for asset in asset_no_select %}
-                                        <option value="{{ asset.id }}">{{ asset.ip }}</option>
+                                        <option value="{{ asset.id }}">{{ asset.hostname|default_if_none:"" }} - {{ asset.ip|default_if_none:"" }} - {{ asset.port|default_if_none:"" }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -103,7 +103,7 @@
                                 <div>
                                     <select id="asset_select" name="asset_select" class="form-control m-b" size="12"  multiple>
                                         {% for asset in asset_select %}
-                                            <option value="{{ asset.id }}">{{ asset.ip }}</option>
+                                            <option value="{{ asset.id }}">{{ asset.hostname|default_if_none:"" }} - {{ asset.ip|default_if_none:"" }} - {{ asset.port|default_if_none:"" }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>

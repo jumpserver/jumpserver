@@ -381,13 +381,13 @@ def excel_to_db(excel_file):
             row = table.row_values(row_num)
             if row:
                 ip, port, hostname, use_default_auth, username, password, group = row
-                print ip
                 use_default_auth = 1 if use_default_auth == u'默认' else 0
                 if get_object(Asset, ip=ip):
                     continue
                 if ip and port:
                     asset = Asset(ip=ip,
                                   port=port,
+                                  hostname=hostname,
                                   use_default_auth=use_default_auth,
                                   username=username,
                                   password=password

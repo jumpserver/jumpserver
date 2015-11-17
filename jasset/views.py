@@ -2,9 +2,9 @@
 
 import ast
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
 from jasset.asset_api import *
 from jumpserver.api import *
+from jumpserver.models import Setting
 from jasset.forms import AssetForm, IdcForm
 from jasset.models import Asset, IDC, AssetGroup, ASSET_TYPE, ASSET_STATUS
 from ansible_api import Tasks
@@ -330,13 +330,20 @@ def asset_update(request):
         return HttpResponseRedirect('/jasset/asset_detail/?id=%s' % asset_id)
     name = request.session.get('username', 'admin')
     if asset.use_default_auth:
-        username = 'root'
-        password = '123456'
+        default = Setting.objects.all()
+        if default:
+            default = default[0]
+            username = default.default_user
+            password = default.default_password
+            port = default.default_port
+        else:
+            return HttpResponse(u'没有设置默认用户名和密码!')
     else:
         username = asset.username
         password = asset.password
+        port = asset.port
 
-    resource = [{"hostname": asset.ip, "port": asset.port,
+    resource = [{"hostname": asset.ip, "port": port,
                  "username": username, "password": password}]
 
     ansible_instance = Tasks(resource)
@@ -446,9 +453,10 @@ def idc_del(request):
     """
     IDC delete view
     """
-    uuid = request.GET.get('uuid', '')
-    idc = get_object_or_404(IDC, uuid=uuid)
-    idc.delete()
+    uuid = request.GET.get('id', '')
+    idc = get_object(IDC, id=uuid)
+    if idc:
+        idc.delete()
     return HttpResponseRedirect('/jasset/idc_list/')
 
 
