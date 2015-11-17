@@ -423,7 +423,7 @@ def profile(request):
 def change_info(request):
     header_title, path1, path2 = '修改信息', '用户管理', '修改个人信息'
     user_id = request.user.id
-    user = get_object(User, id=user_id)
+    user = User.objects.get(id=user_id)
     error = ''
     if not user:
         return HttpResponseRedirect('/')
