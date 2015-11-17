@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-
 from django.db.models import Q
 from jperm.perm_api import *
 from jperm.models import PermLog as Log
