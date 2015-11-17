@@ -423,7 +423,7 @@ def profile(request):
 def change_info(request):
     header_title, path1, path2 = '修改信息', '用户管理', '修改个人信息'
     user_id = request.user.id
-    user = get_object(User, id=user_id)
+    user = User.objects.get(id=user_id)
     error = ''
     if not user:
         return HttpResponseRedirect('/')
@@ -433,18 +433,19 @@ def change_info(request):
         password = request.POST.get('password', '')
         email = request.POST.get('email', '')
 
-        if '' in [name, password, email]:
+        if '' in [name, email]:
             error = '不能为空'
-
-        if len(password) < 6:
+        if len(password) > 0 and len(password) < 6:
             error = '密码须大于6位'
 
         if not error:
             # if password != user.password:
             #     password = CRYPTOR.md5_crypt(password)
 
-            user.update(name=name, email=email)
-            user.set_password(password)
+            User.objects.filter(id=user_id).update(name=name, email=email)
+            if len(password) > 0:
+                user.set_password(password)
+                user.save()
             msg = '修改成功'
 
     return render_to_response('juser/change_info.html', locals(), context_instance=RequestContext(request))

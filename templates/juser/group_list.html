@@ -43,7 +43,7 @@
                         <thead>
                             <tr>
                                 <th class="text-center">
-                                    <input type="checkbox" id="check_all" onclick="checkAll()"  name="check_all">
+                                    <input type="checkbox" id="select_all" name="select_all">
                                 </th>
                                 <th class="text-center">组名</th>
                                 <th class="text-center">成员数目</th>
@@ -55,7 +55,8 @@
                         {% for group in user_groups.object_list %}
                             <tr class="gradeX">
                                 <td class="text-center">
-                                    <input type="checkbox"  name="checked" value="{{ group.id }}">
+                                    <input class="shiftCheckbox"
+type="checkbox"  name="selected" value="{{ group.id }}">
                                 </td>
                                 <td class="text-center"> {{ group.name }} </td>
                                 <td class="text-center"><a href="/juser/user_list/?gid={{ group.id }}"> {{ group.id | members_count }}</a> </td>
@@ -83,6 +84,10 @@
 </div>
 {% endblock %}
 
+{% block self_head_css_js %}
+    {% load staticfiles %}
+    <script src="{% static 'js/jquery.shiftcheckbox.js' %}"></script>
+{% endblock %}
 {% block self_footer_js %}
 <script>
     $(document).ready(function(){
@@ -115,7 +120,13 @@
                 )
             }
 
-        })
+        });
+        $("tbody tr").shiftcheckbox({
+            checkboxSelector: 'input:checkbox',
+            selectAll: $('#select_all'),
+            ignoreClick: 'a'
+        });
+        $('.shiftCheckbox').shiftcheckbox();
     });
 </script>
 {% endblock %}
