@@ -47,13 +47,19 @@
             var old_href = $(this).attr('href').replace('?', '');
             var searchArray = searchStr.split('&');
 
+            if (searchStr == ''){
+                searchStr = '?page=1'
+            }
+
             if (searchStr.indexOf('page')>=0){
                 searchArray.pop();
             }
+
             searchArray.push(old_href);
-            if (searchArray.length > 1){
+            if (searchArray.length > 1) {
                 $(this).attr('href', searchArray.join('&'));
             }
+{#            sleep(1000)#}
         })
     });
 

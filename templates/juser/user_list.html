@@ -42,7 +42,7 @@
                         <thead>
                             <tr>
                                 <th class="text-center">
-                                    <input type="checkbox" id="select_all" onclick="selectAll()"  name="select_all">
+                                    <input type="checkbox" id="check_all" onclick="checkAll()">
                                 </th>
                                 <th class="text-center">用户名</th>
                                 <th class="text-center">姓名</th>
@@ -57,7 +57,7 @@
                         {% for user in users.object_list %}
                             <tr class="gradeX">
                                 <td class="text-center">
-                                    <input type="checkbox"  name="selected" value="{{ user.id }}">
+                                    <input type="checkbox" name="checked" value="{{ user.id }}">
                                 </td>
                                 <td class="text-center"> {{ user.username }} </td>
                                 <td class="text-center"> {{ user.name }} </td>

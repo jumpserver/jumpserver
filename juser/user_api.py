@@ -121,8 +121,7 @@ def db_del_user(username):
 
 
 def gen_ssh_key(username, password='',
-
-                key_dir=os.path.join(BASE_DIR, 'role_keys/user/'),
+                key_dir=os.path.join(KEY_DIR, 'user'),
 
                 authorized_keys=True, home="/home", length=2048):
     """

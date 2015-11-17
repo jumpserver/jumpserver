@@ -8,13 +8,10 @@ import uuid as uuid_r
 from django.contrib.auth.decorators import login_required
 
 from django.db.models import Q
-from django.template import RequestContext
-from django.db.models import ObjectDoesNotExist
-from jumpserver.settings import EMAIL_HOST_USER
 from juser.user_api import *
-from jperm.perm_api import _public_perm_api, perm_user_api, user_permed
 
 MAIL_FROM = EMAIL_HOST_USER
+
 
 def chg_role(request):
     role = {'SU': 2, 'GA': 1, 'CU': 0}
@@ -142,54 +139,6 @@ def group_edit(request):
     return my_render('juser/group_edit.html', locals(), request)
 
 
-# @require_role(role='admin')
-# def group_edit_adm(request):
-#     error = ''
-#     msg = ''
-#     header_title, path1, path2 = '修改小组信息', '用户管理', '编辑小组'
-#     user, dept = get_session_user_dept(request)
-#     if request.method == 'GET':
-#         group_id = request.GET.get('id', '')
-#         if not validate(request, user_group=[group_id]):
-#             return HttpResponseRedirect('/juser/group_list/')
-#         group = UserGroup.objects.filter(id=group_id)
-#         if group:
-#             group = group[0]
-#             users_all = dept.user_set.all()
-#             users_selected = group.user_set.all()
-#             users = [user for user in users_all if user not in users_selected]
-#
-#         return render_to_response('juser/group_edit.html', locals(), context_instance=RequestContext(request))
-#     else:
-#         group_id = request.POST.get('group_id', '')
-#         group_name = request.POST.get('group_name', '')
-#         comment = request.POST.get('comment', '')
-#         users_selected = request.POST.getlist('users_selected')
-#
-#         users = []
-#         try:
-#             if not validate(request, user=users_selected):
-#                 raise ServerError(u'右侧非部门用户')
-#
-#             if not validate(request, user_group=[group_id]):
-#                 raise ServerError(u'没有权限修改本组')
-#
-#             for user_id in users_selected:
-#                 users.extend(User.objects.filter(id=user_id))
-#
-#             user_group = UserGroup.objects.filter(id=group_id)
-#             if user_group:
-#                 user_group.update(name=group_name, comment=comment, dept=dept)
-#                 user_group = user_group[0]
-#                 user_group.user_set.clear()
-#                 user_group.user_set = users
-#
-#         except ServerError, e:
-#             error = e
-#
-#         return HttpResponseRedirect('/juser/group_list/')
-
-
 @login_required(login_url='/login')
 @require_role(role='super')
 def user_add(request):
@@ -210,7 +159,7 @@ def user_add(request):
         uuid = uuid_r.uuid1()
         ssh_key_pwd = PyCrypt.gen_rand_pass(16)
         extra = request.POST.getlist('extra', [])
-        is_active = True if '0' in extra else False
+        is_active = False if '0' in extra else True
         ssh_key_login_need = True if '1' in extra else False
         send_mail_need = True if '2' in extra else False
 
@@ -437,7 +386,6 @@ def user_edit(request):
                        admin_groups=admin_groups,
                        role=role_post,
                        is_active=is_active)
-        _public_perm_api({'type': 'del_user', 'user': user, 'asset': user_permed(user)})
 
         if email_need:
             msg = u"""
@@ -528,7 +476,7 @@ def down_key(request):
         user = get_object(User, id=user_id)
         if user:
             username = user.username
-            private_key_file = os.path.join(BASE_DIR, 'role_keys/jumpserver', username + ".pem")
+            private_key_file = os.path.join(KEY_DIR, 'user', username)
             if os.path.isfile(private_key_file):
                 f = open(private_key_file)
                 data = f.read()
