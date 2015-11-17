@@ -93,7 +93,7 @@ def db_update_user(**kwargs):
         user.update(**kwargs)
         if pwd != '':
             user_get.set_password(pwd)
-        # user.save()
+            user_get.save()
     else:
         return None
 
