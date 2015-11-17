@@ -89,7 +89,8 @@ def perm_rule_add(request):
         asset_groups_select = request.POST.getlist('assetgroup', [])
         roles_select = request.POST.getlist('role', [])
         rule_name = request.POST.get('rulename')
-        rule_comment = request.POST.get('comment')
+        rule_comment = request.POST.get('rule_comment')
+        rule_ssh_key = request.POST.get("use_publicKey")
 
         # 获取需要授权的主机列表
         assets_obj = [Asset.objects.get(ip=asset) for asset in assets_select]
@@ -114,7 +115,9 @@ def perm_rule_add(request):
         rule.asset = assets_obj
         rule.asset_group = asset_groups_obj
         rule.role = roles_obj
+        rule.is_secret_key = bool(rule_ssh_key)
         rule.save()
+
         return HttpResponse(u"添加授权规则：%s" % rule.name)
 
 
@@ -130,8 +133,10 @@ def perm_rule_edit(request):
     rule_id = request.GET.get("id")
     rule = PermRule.objects.get(id=rule_id)
 
+
     if request.method == 'GET' and rule_id:
         # 渲染数据, 获取所有的rule对象
+        rule_comment = rule.comment
         users = rule.user.all()
         user_groups = rule.user_group.all()
         assets = rule.asset.all()
@@ -141,7 +146,44 @@ def perm_rule_edit(request):
         return my_render('jperm/perm_rule_edit.html', locals(), request)
 
     elif request.method == 'POST' and rule_id:
-        return HttpResponse("uncompleted")
+        # 获取用户选择的 用户,用户组,资产,资产组,用户角色
+        rule_name = request.POST.get('rule_name')
+        rule_comment = request.POST.get("rule_comment")
+        users_select = request.POST.getlist('user', [])
+        user_groups_select = request.POST.getlist('usergroup', [])
+        assets_select = request.POST.getlist('asset', [])
+        asset_groups_select = request.POST.getlist('assetgroup', [])
+        roles_select = request.POST.getlist('role', [])
+
+        # 获取需要授权的主机列表
+        assets_obj = [Asset.objects.get(ip=asset) for asset in assets_select]
+        asset_groups_obj = [AssetGroup.objects.get(name=group) for group in asset_groups_select]
+        group_assets_obj = [asset for asset in [group.asset_set.all() for group in asset_groups_obj]]
+        calc_assets = set(group_assets_obj) | set(assets_obj)
+
+        # 获取需要授权的用户列表
+        users_obj = [User.objects.get(name=user) for user in users_select]
+        user_groups_obj = [UserGroup.objects.get(name=group) for group in user_groups_select]
+        group_users_obj = [user for user in [group.user_set.all() for group in user_groups_obj]]
+        calc_users = set(group_users_obj) | set(users_obj)
+
+        # 获取授予的角色列表
+        roles_obj = [PermRole.objects.get(name=role) for role in roles_select]
+
+        # 仅授权成功的，写回数据库(授权规则,用户,用户组,资产,资产组,用户角色)
+        rule.user = users_obj
+        rule.usergroup = user_groups_obj
+        rule.asset = assets_obj
+        rule.asset_group = asset_groups_obj
+        rule.role = roles_obj
+        rule.name = rule_name
+        rule.comment = rule.comment
+
+        print rule, rule.name
+        rule.save()
+        return HttpResponse(u"更新授权规则：%s" % rule.name)
+
+
 
 
 @require_role('admin')
@@ -252,8 +294,12 @@ def perm_role_detail(request):
         role_info = get_role_info(role_id)
 
         # 渲染数据
-        for key, value in role_info.iteritems():
-            key = value
+        rules = role_info.get("rules")
+        assets = role_info.get("assets")
+        asset_groups = role_info.get("asset_groups")
+        users = role_info.get("users")
+        user_groups = role_info.get("user_groups")
+
         return my_render('jperm/perm_role_detail.html', locals(), request)
 
 
@@ -265,15 +311,27 @@ def perm_role_edit(request):
     # 渲染数据
     header_title, path1, path2 = "系统角色", "角色管理", "角色编辑"
 
+    # 渲染数据
+    role_id = request.GET.get("id")
+    role = PermRole.objects.get(id=role_id)
     if request.method == "GET":
-        role_id = request.GET.get("id")
-        # 渲染数据
-        role = PermRole.objects.get(id=role_id)
-
         return my_render('jperm/perm_role_edit.html', locals(), request)
 
     if request.method == "POST":
-        return HttpResponse(u"未实现")
+        # 获取 POST 数据
+        role_name = request.POST.get("role_name")
+        role_password = request.POST.get("role_password")
+        role_comment = request.POST.get("role_comment")
+
+        # 写入数据库
+        role.name = role_name
+        role.password = role_password
+        role.comment = role_comment
+
+        role.save()
+        return HttpResponse(u"更新系统角色： %s" % role.name)
+
+
 
 
 @require_role('admin')
