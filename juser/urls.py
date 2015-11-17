@@ -11,17 +11,21 @@ urlpatterns = patterns('juser.views',
                        (r'^group_list/$', group_list),
                        (r'^group_del/$', group_del),
                        (r'^group_edit/$', group_edit),
+
                        (r'^user_add/$', user_add),
+                       (r'^user_del/$', 'user_del'),
                        (r'^user_list/$', user_list),
+                       (r'^user_edit/$', user_edit),
+                       (r'^user_detail/$', 'user_detail'),
+
+                       (r'^profile/$', 'profile'),
+
                        (r'^send_mail_retry/$', send_mail_retry),
                        (r'^reset_password/$', reset_password),
                        (r'^forget_password/$', forget_password),
-                       (r'^user_detail/$', 'user_detail'),
-                       (r'^user_del/$', 'user_del'),
-                       (r'^user_edit/$', user_edit),
-                       (r'^profile/$', 'profile'),
+
                        (r'^change_info/$', 'change_info'),
-                       (r'^regen_ssh_key/$', 'regen_ssh_key'),
                        (r'^change_role/$', 'chg_role'),
+                       (r'^regen_ssh_key/$', 'regen_ssh_key'),
                        (r'^down_key/$', 'down_key'),
                        )
