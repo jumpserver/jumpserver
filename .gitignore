@@ -37,6 +37,7 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+*.log
 logs/*
 keys/*
 jumpserver.conf
