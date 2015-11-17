@@ -266,7 +266,7 @@ def connect(username, password, host, port, login_name):
     ssh.load_system_host_keys()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
     try:
-        ssh.connect(host, port=port, username=username, password=password, compress=True)
+        ssh.connect(host, port=port, username=username, password=password)
     except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
         raise ServerError('Authentication Error.')
     except socket.error:
