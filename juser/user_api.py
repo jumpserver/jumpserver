@@ -87,12 +87,13 @@ def db_update_user(**kwargs):
     admin_groups_post = kwargs.pop('admin_groups')
     user_id = kwargs.pop('user_id')
     user = User.objects.filter(id=user_id)
+    user_get = User.objects.get(id=user_id)
     if user:
         pwd = kwargs.pop('password')
         user.update(**kwargs)
         if pwd != '':
-            user.set_password(pwd)
-        user.save()
+            user_get.set_password(pwd)
+        # user.save()
     else:
         return None
 
@@ -101,10 +102,10 @@ def db_update_user(**kwargs):
         for group_id in groups_post:
             group = UserGroup.objects.filter(id=group_id)
             group_select.extend(group)
-    user.group = group_select
+    user_get.group = group_select
 
     if admin_groups_post != '':
-        user.admingroup_set.all().delete()
+        user_get.admingroup_set.all().delete()
         for group_id in admin_groups_post:
             group = get_object(UserGroup, id=group_id)
             AdminGroup(user=user, group=group).save()
