@@ -4,7 +4,7 @@ import random
 import os.path
 
 from paramiko.rsakey import RSAKey
-from os import chmod, mkdir
+from os import chmod, makedirs
 from uuid import uuid4
 
 from jumpserver.settings import KEY_DIR
@@ -45,8 +45,8 @@ def gen_keys():
     :return: 返回目录名(uuid)
     """
     key_basename = "key-" + uuid4().hex
-    key_path_dir = os.path.join(KEY_DIR, key_basename)
-    mkdir(key_path_dir, 0700)
+    key_path_dir = os.path.join(KEY_DIR, 'role_key', key_basename)
+    makedirs(key_path_dir, 0775)
 
     key = RSAKey.generate(2048)
     private_key = os.path.join(key_path_dir, 'id_rsa')
@@ -60,8 +60,6 @@ def gen_keys():
                      " %s@%s" % ("jumpserver", os.uname()[1])]:
             content_file.write(data)
     return key_path_dir
-
-
 
 
 if __name__ == "__main__":

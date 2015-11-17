@@ -18,7 +18,7 @@ config = ConfigParser.ConfigParser()
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 config.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
 
-KEY_DIR = os.path.join(BASE_DIR, 'role_keys')
+KEY_DIR = os.path.join(BASE_DIR, 'keys')
 
 DB_HOST = config.get('db', 'host')
 DB_PORT = config.getint('db', 'port')

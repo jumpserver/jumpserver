@@ -19,7 +19,6 @@ API_DIR = os.path.dirname(os.path.abspath(__file__))
 ANSIBLE_DIR = os.path.join(API_DIR, 'playbooks')
 
 
-
 class AnsibleError(StandardError):
     """
     the base AnsibleError which contains error(required),
@@ -115,7 +114,7 @@ class Command(MyInventory):
         super(Command, self).__init__(*args, **kwargs)
         self.results = ''
 
-    def run(self, command, module_name="command", timeout=5, forks=10, group='my_group'):
+    def run(self, command, module_name="command", timeout=5, forks=10, pattern='*'):
         """
         run command from andible ad-hoc.
         command  : 必须是一个需要执行的命令字符串， 比如 
@@ -128,7 +127,7 @@ class Command(MyInventory):
                      module_args=command,
                      timeout=timeout,
                      inventory=self.inventory,
-                     subset=group,
+                     pattern=pattern,
                      forks=forks
                      )
         self.results = hoc.run()

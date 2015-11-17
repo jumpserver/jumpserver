@@ -14,10 +14,8 @@ from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
 from django.template import RequestContext
 from juser.models import User, UserGroup
+from jlog.models import Log
 from jasset.models import Asset, AssetGroup
-# from jlog.models import Log
-from jlog.models import Log, TtyLog
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.mail import send_mail
@@ -414,4 +412,3 @@ def my_render(template, data, request):
 
 CRYPTOR = PyCrypt(KEY)
 logger = set_log(LOG_LEVEL)
-KEY_DIR = os.path.join(BASE_DIR, 'keys')
