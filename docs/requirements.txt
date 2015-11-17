@@ -11,3 +11,6 @@ xlrd==0.9.4
 django-bootstrap-form
 tornado
 ansible
+pyinotify
+passlib
+argparse
