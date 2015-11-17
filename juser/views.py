@@ -433,10 +433,9 @@ def change_info(request):
         password = request.POST.get('password', '')
         email = request.POST.get('email', '')
 
-        if '' in [name, password, email]:
+        if '' in [name, email]:
             error = '不能为空'
-
-        if len(password) < 6:
+        if len(password) > 0 and len(password) < 6:
             error = '密码须大于6位'
 
         if not error:
@@ -444,8 +443,9 @@ def change_info(request):
             #     password = CRYPTOR.md5_crypt(password)
 
             User.objects.filter(id=user_id).update(name=name, email=email)
-            user.set_password(password)
-            user.save()
+            if len(password) > 0:
+                user.set_password(password)
+                user.save()
             msg = '修改成功'
 
     return render_to_response('juser/change_info.html', locals(), context_instance=RequestContext(request))
