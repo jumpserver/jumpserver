@@ -99,6 +99,7 @@
     $(document).ready(function(){
         $('.del').click(function(){
             var row = $(this).closest('tr');
+            if (confirm("确定删除")) {
             $.get(
                     $(this).attr('value'),
                     {},
@@ -106,7 +107,7 @@
                         row.remove();
                         alert(data);
                     }
-            )
+            )}
         });
 
         $('#del_btn').click(function(){
