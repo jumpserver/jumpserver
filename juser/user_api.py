@@ -86,7 +86,7 @@ def db_update_user(**kwargs):
     groups_post = kwargs.pop('groups')
     admin_groups_post = kwargs.pop('admin_groups')
     user_id = kwargs.pop('user_id')
-    user = User.objects.get(id=user_id)
+    user = User.objects.filter(id=user_id)
     if user:
         pwd = kwargs.pop('password')
         user.update(**kwargs)

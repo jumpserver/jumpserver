@@ -423,7 +423,7 @@ def profile(request):
 def change_info(request):
     header_title, path1, path2 = '修改信息', '用户管理', '修改个人信息'
     user_id = request.user.id
-    user = User.objects.get(id=user_id)
+    user = User.objects.filter(id=user_id)
     error = ''
     if not user:
         return HttpResponseRedirect('/')
@@ -443,8 +443,8 @@ def change_info(request):
             # if password != user.password:
             #     password = CRYPTOR.md5_crypt(password)
 
-            user.update(name=name, email=email)
-            user.set_password(password)
+            user.update(username=name, email=email)
+            User.objects.get(id=user_id).set_password(password)
             msg = '修改成功'
 
     return render_to_response('juser/change_info.html', locals(), context_instance=RequestContext(request))
