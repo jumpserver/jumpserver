@@ -130,9 +130,10 @@ def gen_ssh_key(username, password='',
     生成一个用户ssh密钥对
     """
     private_key_file = os.path.join(key_dir, username)
+    mkdir(private_key_file, username)
     if os.path.isfile(private_key_file):
         os.unlink(private_key_file)
-    ret = bash('ssh-keygen -t rsa -f %s -b %s -P "%s"' % (private_key_file, length, password))
+    ret = bash('echo -e  "y\n"|ssh-keygen -t rsa -f %s -b %s -P "%s"' % (private_key_file, length, password))
 
     if authorized_keys:
         auth_key_dir = os.path.join(home, username, '.ssh')
