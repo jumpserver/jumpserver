@@ -45,14 +45,8 @@ def gen_keys():
     :return: 返回目录名(uuid)
     """
     key_basename = "key-" + uuid4().hex
-<<<<<<< HEAD
-    key_path_dir = os.path.join(KEY_DIR, key_basename)
-    mkdir(key_path_dir, 0755)
-=======
     key_path_dir = os.path.join(KEY_DIR, 'role_key', key_basename)
-    makedirs(key_path_dir, 0775)
->>>>>>> dev
-
+    mkdir(key_path_dir, 0755)
     key = RSAKey.generate(2048)
     private_key = os.path.join(key_path_dir, 'id_rsa')
     public_key = os.path.join(key_path_dir, 'id_rsa.pub')
@@ -66,10 +60,7 @@ def gen_keys():
             content_file.write(data)
     return key_path_dir
 
-<<<<<<< HEAD
-=======
 
->>>>>>> dev
 if __name__ == "__main__":
     print gen_keys()
 
