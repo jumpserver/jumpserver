@@ -15,9 +15,9 @@ from utils                     import get_rand_pass
 
 
 import os.path
+
 API_DIR = os.path.dirname(os.path.abspath(__file__))
 ANSIBLE_DIR = os.path.join(API_DIR, 'playbooks')
-NULL_FILE = os.path.join(ANSIBLE_DIR, 'ansible_need.txt')
 
 
 
@@ -62,7 +62,7 @@ class MyInventory(object):
             [{"hostname": "10.10.10.10", "port": "22", "username": "test", "password": "mypass"}, ...]
         """
         self.resource = resource
-        self.inventory = Inventory(host_list=NULL_FILE)
+        self.inventory = Inventory(host_list=[])
         self.gen_inventory()
 
     def add_group(self, hosts, groupname, groupvars=None):
