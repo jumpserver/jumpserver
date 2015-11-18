@@ -160,7 +160,7 @@ def asset_add(request):
                 asset_save = af_post.save(commit=False)
                 if not use_default_auth:
                     password = request.POST.get('password', '')
-                    password_encode = CRYPTOR.encrypt(password)
+                    password_encode = password
                     asset_save.password = password_encode
                 asset_save.is_active = True if is_active else False
                 asset_save.save()

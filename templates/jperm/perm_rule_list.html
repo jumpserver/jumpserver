@@ -55,19 +55,19 @@
                             <tr class="gradeX" id={{ rule.id }}>
                                 <td class="text-center"> {{ rule.name }} </td>
                                 <td class="text-center">
-                                    <a href="/jasset/asset_list/?gid={{ user.id }}">{{ rule | rule_member_count:"user" }} </a>
+                                    {{ rule | rule_member_count:"user" }}
                                 </td>
                                 <td class="text-center">
-                                    <a href="/jasset/group_list/?gid={{ user.id }}">{{ rule | rule_member_count:"user_group" }}</a>
+                                    {{ rule | rule_member_count:"user_group" }}
                                 </td>
                                 <td class="text-center">
-                                    <a href="/jasset/group_list/?gid={{ user.id }}">{{ rule | rule_member_count:"asset" }}</a>
+                                    {{ rule | rule_member_count:"asset" }}
                                 </td>
                                 <td class="text-center">
-                                    <a href="/jasset/group_list/?gid={{ user.id }}">{{ rule | rule_member_count:"asset_group" }}</a>
+                                    {{ rule | rule_member_count:"asset_group" }}
                                 </td>
                                 <td class="text-center">
-                                    <a href="/jasset/group_list/?gid={{ user.id }}">{{ rule | rule_member_count:"role" }}</a>
+                                    {{ rule | rule_member_count:"role" }}
                                 </td>
                                 <td class="text-center">
                                     <a href="/jperm/perm_rule_detail/?id={{ rule.id }}" class="btn btn-xs btn-primary">详情</a>

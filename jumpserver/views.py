@@ -15,7 +15,6 @@ from jumpserver.api import *
 from jumpserver.models import Setting
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from settings import BASE_DIR
 from jlog.models import Log
 
 
