@@ -7,7 +7,7 @@ from paramiko.rsakey import RSAKey
 from os import chmod, makedirs
 from uuid import uuid4
 
-#from jumpserver.settings import KEY_DIR
+from jumpserver.settings import KEY_DIR
 
 
 def get_rand_pass():

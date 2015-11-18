@@ -62,7 +62,7 @@ def perm_rule_detail(request):
     assets = asset_obj
 
     return my_render('jperm/perm_rule_detail.html', locals(), request)
-    
+
 
 def perm_rule_add(request):
     """
@@ -117,7 +117,18 @@ def perm_rule_add(request):
         rule.role = roles_obj
         rule.save()
 
-        return HttpResponse(u"添加授权规则：%s" % rule.name)
+        msg = u"添加授权规则：%s" % rule.name
+        # 渲染数据
+        header_title, path1, path2 = "授权规则", "规则管理", "查看规则"
+        rules_list = PermRule.objects.all()
+
+        # TODO: 搜索和分页
+        keyword = request.GET.get('search', '')
+        if keyword:
+            rules_list = rules_list.filter(Q(name=keyword))
+        rules_list, p, rules, page_range, current_page, show_first, show_end = pages(rules_list, request)
+
+        return my_render('jperm/perm_rule_list.html', locals(), request)
 
 
 @require_role('admin')
@@ -131,7 +142,6 @@ def perm_rule_edit(request):
     # 根据rule_id 取得rule对象
     rule_id = request.GET.get("id")
     rule = PermRule.objects.get(id=rule_id)
-
 
     if request.method == 'GET' and rule_id:
         # 渲染数据, 获取所选的rule对象
@@ -183,12 +193,20 @@ def perm_rule_edit(request):
         rule.role = roles_obj
         rule.name = rule_name
         rule.comment = rule.comment
-
-        print rule, rule.name
         rule.save()
-        return HttpResponse(u"更新授权规则：%s" % rule.name)
 
+        msg = u"更新授权规则：%s" % rule.name
+        # 渲染数据
+        header_title, path1, path2 = "授权规则", "规则管理", "查看规则"
+        rules_list = PermRule.objects.all()
 
+        # TODO: 搜索和分页
+        keyword = request.GET.get('search', '')
+        if keyword:
+            rules_list = rules_list.filter(Q(name=keyword))
+        rules_list, p, rules, page_range, current_page, show_first, show_end = pages(rules_list, request)
+
+        return my_render('jperm/perm_rule_list.html', locals(), request)
 
 
 @require_role('admin')
@@ -254,7 +272,18 @@ def perm_role_add(request):
         key_path = gen_keys()
         role = PermRole(name=name, comment=comment, password=encrypt_pass, key_path=key_path)
         role.save()
-        return HttpResponse(u"添加角色: %s" % name)
+
+        msg = u"添加角色: %s" % name
+        # 渲染 刷新数据
+        header_title, path1, path2 = "系统角色", "角色管理", "查看角色"
+        roles_list = PermRole.objects.all()
+        # TODO: 搜索和分页
+        keyword = request.GET.get('search', '')
+        if keyword:
+            roles_list = roles_list.filter(Q(name=keyword))
+
+        roles_list, p, roles, page_range, current_page, show_first, show_end = pages(roles_list, request)
+        return my_render('jperm/perm_role_list.html', locals(), request)
     else:
         return HttpResponse(u"不支持该操作")
 
@@ -320,6 +349,7 @@ def perm_role_edit(request):
     # 渲染数据
     role_id = request.GET.get("id")
     role = PermRole.objects.get(id=role_id)
+    role_pass = CRYPTOR.decrypt(role.password)
     if request.method == "GET":
         return my_render('jperm/perm_role_edit.html', locals(), request)
 
@@ -336,7 +366,18 @@ def perm_role_edit(request):
         role.comment = role_comment
 
         role.save()
-        return HttpResponse(u"更新系统角色： %s" % role.name)
+        msg = u"更新系统角色： %s" % role.name
+
+        # 渲染 刷新数据
+        header_title, path1, path2 = "系统角色", "角色管理", "查看角色"
+        roles_list = PermRole.objects.all()
+        # TODO: 搜索和分页
+        keyword = request.GET.get('search', '')
+        if keyword:
+            roles_list = roles_list.filter(Q(name=keyword))
+
+        roles_list, p, roles, page_range, current_page, show_first, show_end = pages(roles_list, request)
+        return my_render('jperm/perm_role_list.html', locals(), request)
 
 
 
