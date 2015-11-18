@@ -10,12 +10,13 @@ from juser.user_api import gen_ssh_key
 from juser.models      import User, UserGroup
 from jasset.models     import Asset, AssetGroup
 from jperm.models      import PermRole, PermRule
+from jumpserver.models import Setting
 
 from jperm.utils       import updates_dict, gen_keys, get_rand_pass
 from jperm.ansible_api import Tasks
 from jperm.perm_api    import get_role_info
 
-from jumpserver.api    import my_render, get_object
+from jumpserver.api    import my_render, get_object, CRYPTOR
 
 
 @require_role('admin')
@@ -114,7 +115,6 @@ def perm_rule_add(request):
         rule.asset = assets_obj
         rule.asset_group = asset_groups_obj
         rule.role = roles_obj
-        rule.is_secret_key = bool(rule_ssh_key)
         rule.save()
 
         return HttpResponse(u"添加授权规则：%s" % rule.name)
@@ -134,13 +134,19 @@ def perm_rule_edit(request):
 
 
     if request.method == 'GET' and rule_id:
-        # 渲染数据, 获取所有的rule对象
+        # 渲染数据, 获取所选的rule对象
         rule_comment = rule.comment
-        users = rule.user.all()
-        user_groups = rule.user_group.all()
-        assets = rule.asset.all()
-        asset_groups = rule.asset_group.all()
-        roles = rule.role.all()
+        users_select = rule.user.all()
+        user_groups_select = rule.user_group.all()
+        assets_select = rule.asset.all()
+        asset_groups_select = rule.asset_group.all()
+        roles_select = rule.role.all()
+
+        users = User.objects.all()
+        user_groups = UserGroup.objects.all()
+        assets = Asset.objects.all()
+        asset_groups = AssetGroup.objects.all()
+        roles = PermRole.objects.all()
 
         return my_render('jperm/perm_rule_edit.html', locals(), request)
 
@@ -242,10 +248,11 @@ def perm_role_add(request):
         name = request.POST.get("role_name")
         comment = request.POST.get("role_comment")
         password = request.POST.get("role_password")
+        encrypt_pass = CRYPTOR.encrypt(password)
         # 生成随机密码，生成秘钥对
 
         key_path = gen_keys()
-        role = PermRole(name=name, comment=comment, password=password, key_path=key_path)
+        role = PermRole(name=name, comment=comment, password=encrypt_pass, key_path=key_path)
         role.save()
         return HttpResponse(u"添加角色: %s" % name)
     else:
@@ -320,11 +327,12 @@ def perm_role_edit(request):
         # 获取 POST 数据
         role_name = request.POST.get("role_name")
         role_password = request.POST.get("role_password")
+        encrypt_role_pass = CRYPTOR.encrypt(role_password)
         role_comment = request.POST.get("role_comment")
 
         # 写入数据库
         role.name = role_name
-        role.password = role_password
+        role.password = encrypt_role_pass
         role.comment = role_comment
 
         role.save()
@@ -364,10 +372,20 @@ def perm_role_push(request):
         calc_assets = set(assets_obj) | set(group_assets_obj)
 
         # 生成Inventory
-        push_resource = [{"hostname": asset.ip,
-                          "port": asset.port,
-                          "username": asset.username,
-                          "password": asset.password} for asset in calc_assets]
+        push_resource = []
+        for asset in calc_assets:
+            if asset.use_default_auth:
+                username = Setting.default_user
+                password = Setting.default_password
+                port = Setting.default_port
+            else:
+                username = asset.username
+                password = asset.password
+                port = asset.port
+            push_resource.append({"hostname": asset.ip,
+                                  "port": port,
+                                  "username": username,
+                                  "password": password})
 
         # 获取角色的推送方式,以及推送需要的信息
         roles_obj = [PermRole.objects.get(name=role_name) for role_name in role_names]

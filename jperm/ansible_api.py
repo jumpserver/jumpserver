@@ -17,6 +17,7 @@ from utils                     import get_rand_pass
 import os.path
 API_DIR = os.path.dirname(os.path.abspath(__file__))
 ANSIBLE_DIR = os.path.join(API_DIR, 'playbooks')
+NULL_FILE = os.path.join(ANSIBLE_DIR, 'ansible_need.txt')
 
 
 
@@ -61,7 +62,7 @@ class MyInventory(object):
             [{"hostname": "10.10.10.10", "port": "22", "username": "test", "password": "mypass"}, ...]
         """
         self.resource = resource
-        self.inventory = Inventory()
+        self.inventory = Inventory(host_list=NULL_FILE)
         self.gen_inventory()
 
     def add_group(self, hosts, groupname, groupvars=None):
@@ -101,7 +102,7 @@ class MyInventory(object):
         add hosts to inventory.
         """
         if isinstance(self.resource, list):
-            self.add_group(self.resource, 'my_group')
+            self.add_group(self.resource, 'default_group')
         elif isinstance(self.resource, dict):
             for groupname, hosts_and_vars in self.resource.iteritems():
                 self.add_group(hosts_and_vars.get("hosts"), groupname, hosts_and_vars.get("vars"))
@@ -115,21 +116,23 @@ class Command(MyInventory):
         super(Command, self).__init__(*args, **kwargs)
         self.results = ''
 
-    def run(self, command, module_name="command", timeout=5, forks=10, group='my_group'):
+    def run(self, command, module_name="command", timeout=10, forks=10, group='default_group', pattern='*'):
         """
         run command from andible ad-hoc.
         command  : 必须是一个需要执行的命令字符串， 比如 
                  'uname -a'
         """
+
         if module_name not in ["raw", "command", "shell"]:
-            raise  CommandValueError("module_name",
+            raise CommandValueError("module_name",
                                      "module_name must be of the 'raw, command, shell'")
         hoc = Runner(module_name=module_name,
                      module_args=command,
                      timeout=timeout,
                      inventory=self.inventory,
                      subset=group,
-                     forks=forks
+                     pattern=pattern,
+                     forks=forks,
                      )
         self.results = hoc.run()
 
@@ -203,7 +206,7 @@ class Tasks(Command):
     def __init__(self, *args, **kwargs):
         super(Tasks, self).__init__(*args, **kwargs)
 
-    def __run(self, module_args, module_name="command", timeout=5, forks=10, group='my_group'):
+    def __run(self, module_args, module_name="command", timeout=5, forks=10, group='default_group', pattern='*'):
         """
         run command from andible ad-hoc.
         command  : 必须是一个需要执行的命令字符串， 比如 
@@ -214,7 +217,8 @@ class Tasks(Command):
                      timeout=timeout,
                      inventory=self.inventory,
                      subset=group,
-                     forks=forks
+                     pattern=pattern,
+                     forks=forks,
                      )
 
         self.results = hoc.run()
@@ -425,7 +429,6 @@ class MyPlaybook(MyInventory):
     def __init__(self, *args, **kwargs):
         super(MyPlaybook, self).__init__(*args, **kwargs)
 
-
     def run(self, playbook_relational_path, extra_vars=None):
         """
         run ansible playbook,
@@ -464,7 +467,6 @@ class App(MyPlaybook):
 
 
 if __name__ == "__main__":
-    pass
 
 #   resource =  {
 #                "group1": {
@@ -472,8 +474,10 @@ if __name__ == "__main__":
 #                    "vars" : {"var1": "value1", "var2": "value2"},
 #                          },
 #                }
-#   command = Command(resource)
-#   print    command.run("who", group="group1")
+
+    resource = [{"hostname": "127.0.0.1", "port": "22", "username": "yumaojun", "password": "yusky0902"}]
+    command = Command(resource)
+    print command.run("who")
 
     # resource = [{"hostname": "192.168.10.148", "port": "22", "username": "root", "password": "xxx"}]
     # task = Tasks(resource)

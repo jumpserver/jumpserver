@@ -4,10 +4,10 @@ import random
 import os.path
 
 from paramiko.rsakey import RSAKey
-from os import chmod, mkdir
+from os import chmod, makedirs
 from uuid import uuid4
 
-from jumpserver.settings import KEY_DIR
+#from jumpserver.settings import KEY_DIR
 
 
 def get_rand_pass():
@@ -46,7 +46,7 @@ def gen_keys():
     """
     key_basename = "key-" + uuid4().hex
     key_path_dir = os.path.join(KEY_DIR, key_basename)
-    mkdir(key_path_dir, 0700)
+    makedirs(key_path_dir, 0755)
 
     key = RSAKey.generate(2048)
     private_key = os.path.join(key_path_dir, 'id_rsa')
