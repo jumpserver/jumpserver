@@ -267,7 +267,7 @@ def setting(request):
             if '' in [username, port] and ('' in password or '' in private_key):
                 return HttpResponse('所填内容不能为空, 且密码和私钥填一个')
             else:
-                private_key_path = os.path.join(BASE_DIR, 'role_keys', 'default', 'default_private_key.pem')
+                private_key_path = os.path.join(BASE_DIR, 'keys/role_keys', 'default', 'default_private_key.pem')
                 if private_key:
                     with open(private_key_path, 'w') as f:
                             f.write(private_key)

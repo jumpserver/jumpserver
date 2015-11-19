@@ -45,8 +45,8 @@ def gen_keys():
     :return: 返回目录名(uuid)
     """
     key_basename = "key-" + uuid4().hex
-    key_path_dir = os.path.join(KEY_DIR, 'role_key', key_basename)
-    makedirs(key_path_dir, 0775)
+    key_path_dir = os.path.join(KEY_DIR, key_basename)
+    makedirs(key_path_dir, 0755)
 
     key = RSAKey.generate(2048)
     private_key = os.path.join(key_path_dir, 'id_rsa')
