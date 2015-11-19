@@ -306,6 +306,54 @@ def asset_list(request):
 def asset_edit_batch(request):
     af = AssetForm()
     asset_group_all = AssetGroup.objects.all()
+
+    if request.method == 'POST':
+        env = request.POST.get('env', '')
+        idc_id = request.POST.get('idc', '')
+        port = request.POST.get('port', '')
+        use_default_auth = request.POST.get('use_default_auth', '')
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+        group = request.POST.getlist('group', [])
+        cabinet = request.POST.get('cabinet', '')
+        comment = request.POST.get('comment', '')
+        asset_id_all = unicode(request.GET.get('asset_id_all', ''))
+        asset_id_all = asset_id_all.split(',')
+        for asset_id in asset_id_all:
+            asset = get_object(Asset, id=asset_id)
+            if asset:
+                if env:
+                    asset.env = env
+                if idc_id:
+                    idc = get_object(IDC, id=idc_id)
+                    if idc:
+                        asset.idc = idc
+                if port:
+                    asset.port = port
+                if use_default_auth:
+                    if use_default_auth == 'default':
+                        asset.use_default_auth = 1
+                        asset.username = ''
+                        asset.password = ''
+                    elif use_default_auth == 'user_passwd':
+                        asset.use_default_auth = 0
+                        asset.username = username
+                        password_encode = CRYPTOR.encrypt(password)
+                        asset.password = password_encode
+                if group:
+                    group_instance = []
+                    for group_id in group:
+                        g = get_object(AssetGroup, id=group_id)
+                        if g:
+                            group_instance.append(g)
+                    asset.group = group_instance
+                if cabinet:
+                    asset.cabinet = cabinet
+                if comment:
+                    asset.comment = comment
+                asset.save()
+        return HttpResponse('ok')
+
     return my_render('jasset/asset_edit_batch.html', locals(), request)
 
 

@@ -49,33 +49,31 @@
                     {{ af.port|bootstrap_horizontal }}
 
                     <div class="hr-line-dashed"></div>
-                    <div class="form-group">
+                        <div class="form-group">
                         <label for="j_group" class="col-sm-2 control-label">管理账号</label>
                         <div class="col-sm-2">
                             <div class="radio i-checks">
                                 <label>
-                                    <input type="radio" checked="" value="no_action" name="use_default_auth"><span> 不修改 </span>
+                                    <input type="radio" checked="" value="" id="no" name="use_default_auth" class="auth"><span> 不修改 </span>
                                 </label>
                             </div>
                             <div class="radio i-checks">
                                 <label>
-                                    <input type="radio" name="use_default_auth"><span> 使用默认 </span>
+                                    <input type="radio" id="default" name="use_default_auth" class="auth" value="default"><span> 使用默认 </span>
                                 </label>
                             </div>
                             <div class="radio i-checks">
                                 <label>
-                                    <input type="radio" id="id_use_default_auth" name="use_default_auth"><span> 用户名密码 </span>
+                                    <input type="radio" id="pass" name="use_default_auth" class="auth" value="user_passwd"><span> 用户名密码 </span>
                                 </label>
                             </div>
                         </div>
                     </div>
-
                     <div class="form-group" id="admin_account" style="display: none">
                         <label class="col-sm-2 control-label"> 管理用户名<span class="red-fonts"> *</span></label>
                         <div class="col-sm-3">
                             <input type="text" placeholder="Username" name="username" class="form-control">
                         </div>
-
                         <label class="col-sm-1 control-label"> 密码<span class="red-fonts">*</span> </label>
                         <div class="col-sm-4">
                             <input type="password" placeholder="Password" name="password" class="form-control">
@@ -101,7 +99,7 @@
                         </div>
                         <div class="col-sm-3">
                             <div>
-                                <select id="groups_selected" name="project" class="form-control m-b" size="10"  multiple>
+                                <select id="groups_selected" name="group" class="form-control m-b" size="10"  multiple>
                                 </select>
                             </div>
                         </div>
@@ -117,7 +115,7 @@
                    <div class="form-group">
                        <div class="col-sm-4 col-sm-offset-5">
                            <button class="btn btn-white" type="submit"> 重置 </button>
-                           <button class="btn btn-primary" id="host_edit"> 提交 </button>
+                           <button class="btn btn-primary"> 提交 </button>
                        </div>
                    </div>
                 </form>
@@ -128,20 +126,8 @@
 </div>
 <script>
     $(document).ready(function() {
-        $('#host_edit').click(function () {
-            var args = {};
-            var match = null;
-            var uuid = decodeURIComponent(location.search.substring(1));
-            var reg = /(?:([^&amp;]+)=([^&amp;]+))/g;
-            while((match = reg.exec(uuid))!==null){
-                args[match[1]] = match[2];
-            }
-            var ids = args['uuid'];
-            $('#uuid').val(ids)
-        });
-
-        $('#id_use_default_auth').click(function(){
-            if ($(this).is(':checked')){
+        $('.auth').click(function(){
+            if ($(this).attr('id') == 'pass'){
                 $('#admin_account').css('display', 'block')
             }
             else {

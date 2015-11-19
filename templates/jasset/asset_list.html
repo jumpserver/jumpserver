@@ -184,12 +184,12 @@
     });
 
     $(".iframe").on('click', function(){
-        var ids = getIDall();
-        if (ids == ''){
+        var asset_id_all = getIDall();
+        if (asset_id_all == ''){
             alert("请至少选择一行!");
             return false;
         }
-        var url= $(this).attr("value") + '?id=' + ids;
+        var url= $(this).attr("value") + '?asset_id_all=' + asset_id_all;
             index = $.layer({
                 type: 2,
                 title: 'JumpServer - 批量修改主机',
