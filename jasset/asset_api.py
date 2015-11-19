@@ -311,8 +311,12 @@ def write_excel(asset_all):
         group_all = '/'.join(group_list)
         status = asset.get_status_display()
         idc_name = asset.idc.name if asset.idc else u''
+        system_type = asset.system_type if asset.idc else u''
+        system_version = asset.system_version if asset.idc else u''
+        system_os = unicode(system_type) + unicode(system_version)
+
         alter_dic = [asset.hostname, asset.ip, idc_name, asset.mac, asset.remote_ip, asset.cpu, asset.memory,
-                     asset.disk, (asset.system_type + asset.system_version), asset.cabinet, group_all, status,
+                     asset.disk, system_os, asset.cabinet, group_all, status,
                      asset.comment]
         data.append(alter_dic)
     format = workbook.add_format()
@@ -381,13 +385,13 @@ def excel_to_db(excel_file):
             row = table.row_values(row_num)
             if row:
                 ip, port, hostname, use_default_auth, username, password, group = row
-                print ip
                 use_default_auth = 1 if use_default_auth == u'默认' else 0
                 if get_object(Asset, ip=ip):
                     continue
                 if ip and port:
                     asset = Asset(ip=ip,
                                   port=port,
+                                  hostname=hostname,
                                   use_default_auth=use_default_auth,
                                   username=username,
                                   password=password

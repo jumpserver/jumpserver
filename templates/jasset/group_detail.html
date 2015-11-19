@@ -52,17 +52,17 @@
                         <tbody>
                         {% for asset in contacts.object_list %}
                             <tr class="gradeX">
-                                <td class="text-center" name="j_id" value="{{ asset.id }}" data-editable='false'><input name="id" value="{{ asset.id }}" type="checkbox" class="i-checks"></td>
-                                <td class="text-center" name="j_ip"> {{ asset.ip }} </td>
-                                <td class="text-center" name="j_port"> {{ asset.port }} </td>
-                                <td class="text-center" name="j_idc"> {{ asset.idc.name }} </td>
+                                <td class="text-center" name="j_id" value="{{ asset.id|default_if_none:"" }}" data-editable='false'><input name="id" value="{{ asset.id }}" type="checkbox" class="i-checks"></td>
+                                <td class="text-center" name="j_ip"> {{ asset.ip|default_if_none:"" }} </td>
+                                <td class="text-center" name="j_port"> {{ asset.port|default_if_none:"" }} </td>
+                                <td class="text-center" name="j_idc"> {{ asset.idc.name|default_if_none:"" }} </td>
                                 <td class="text-center" name="j_group">{{ asset.bis_group.all | group_str2 }}</td>
                                 <td class="text-center" name="j_active"> {{ asset.is_active|bool2str }} </td>
                                 <td class="text-center"> {{ asset.date_added|date:"Y-m-d H:i:s" }} </td>
-                                <td class="text-center" name="j_comment"> {{ asset.comment }} </td>
+                                <td class="text-center" name="j_comment"> {{ asset.comment|default_if_none:"" }} </td>
                                 <td class="text-center" data-editable='false'>
-                                    <a href="/jasset/host_detail/?id={{ asset.id }}" class="iframe btn btn-xs btn-primary">详情</a>
-                                    <a href="/jasset/host_edit/?id={{ asset.id }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a href="/jasset/asset_detail/?id={{ asset.id }}" class="iframe btn btn-xs btn-primary">详情</a>
+                                    <a href="/jasset/asset_edit/?id={{ asset.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a href="/jasset/group_del_host/?id={{ asset.id }}&gid={{ group.id }}" class="btn btn-xs btn-danger">删除</a>
                                 </td>
                             </tr>
