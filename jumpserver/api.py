@@ -386,7 +386,7 @@ def bash(cmd):
     return subprocess.call(cmd, shell=True)
 
 
-def mkdir(dir_name, mode=0755):
+def mkdir(dir_name, username='root', mode=0755):
     """
     insure the dir exist and mode ok
     目录存在，如果不存在就建立，并且权限正确
@@ -394,6 +394,8 @@ def mkdir(dir_name, mode=0755):
     if not os.path.isdir(dir_name):
         os.makedirs(dir_name)
     os.chmod(dir_name, mode)
+    if username:
+        bash('chown %s:%s %s' % (username, username, dir_name))
 
 
 def http_success(request, msg):
