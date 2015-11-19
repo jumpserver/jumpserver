@@ -39,7 +39,6 @@ class PermRule(models.Model):
     user = models.ManyToManyField(User, related_name='perm_rule')
     user_group = models.ManyToManyField(UserGroup, related_name='perm_rule')
     role = models.ManyToManyField(PermRole, related_name='perm_rule')
-    is_secret_key = models.BooleanField()
 
     def __unicode__(self):
         return self.name

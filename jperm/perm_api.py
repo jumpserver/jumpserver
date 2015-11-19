@@ -89,7 +89,7 @@ def perm_user_api(perm_info):
     the_new_users = ','.join(new_username)
     the_del_users = ','.join(del_username)
 
-    playbook = get_playbook(os.path.join(BASE_DIR, 'playbook', 'user_perm.yaml'),
+    playbook = get_playbook(os.path.join(BASE_DIR, 'keys/../playbook', 'user_perm.yaml'),
                             {'the_new_group': 'new', 'the_del_group': 'del',
                              'the_new_users': the_new_users, 'the_del_users': the_del_users,
                              'KEY_DIR': os.path.join(SSH_KEY_DIR, 'sysuser')})

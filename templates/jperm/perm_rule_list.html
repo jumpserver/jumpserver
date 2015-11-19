@@ -3,10 +3,20 @@
 {% block content %}
 {% include 'nav_cat_bar.html' %}
 
+
+
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
         <div class="col-lg-10">
             <div class="ibox float-e-margins">
+                <div>
+                    {% if error %}
+                        <div class="alert alert-warning text-center">{{ error }}</div>
+                    {% endif %}
+                    {% if msg %}
+                        <div class="alert alert-success text-center">{{ msg }}</div>
+                    {% endif %}
+                </div>
                 <div class="ibox-title">
                     <h5> 所有规则</h5>
                     <div class="ibox-tools">
