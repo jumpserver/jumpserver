@@ -91,7 +91,7 @@
                                     </tr>
                                     <tr>
                                         <td class="text-navy">内存</td>
-                                        <td>{{ asset.memory|default_if_none:"" }}</td>
+                                        <td>{{ asset.memory|default_if_none:"" }}{% if asset.memory %}M{% endif %}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">硬盘</td>

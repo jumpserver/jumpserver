@@ -169,17 +169,17 @@
     });
 
     $(document).ready(function(){
-        $('#editable').editableTableWidget({editor: $('<textarea>')});
         $('.asset_del').click(function(){
             var row = $(this).closest('tr');
-            $.get(
-                    $(this).attr('value'),
-                    {},
-                    function(data){
-                        alert(data);
-                        row.remove()
-                    }
-            )
+            if (confirm("确定删除")) {
+                $.get(
+                        $(this).attr('value'),
+                        {},
+                        function (data) {
+                            row.remove()
+                        }
+                )
+            }
         })
     });
 

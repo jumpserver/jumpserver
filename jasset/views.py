@@ -13,7 +13,7 @@ from ansible_api import Tasks
 @require_role('admin')
 def group_add(request):
     """
-    Add asset group
+    Group add view
     添加资产组
     """
     header_title, path1, path2 = u'添加资产组', u'资产管理', u'添加资产组'
@@ -47,7 +47,7 @@ def group_add(request):
 @require_role('admin')
 def group_edit(request):
     """
-    Edit asset group
+    Group edit view
     编辑资产组
     """
     header_title, path1, path2 = u'编辑主机组', u'资产管理', u'编辑主机组'
@@ -89,7 +89,10 @@ def group_edit(request):
 
 @require_role('admin')
 def group_detail(request):
-    """ 主机组详情 """
+    """
+    Group detail view
+    主机组详情
+    """
     header_title, path1, path2 = u'主机组详情', u'资产管理', u'主机组详情'
     group_id = request.GET.get('id', '')
     group = get_object(AssetGroup, id=group_id)
@@ -121,7 +124,7 @@ def group_list(request):
 @require_role('admin')
 def group_del(request):
     """
-    del asset group
+    Group delete view
     删除主机组
     """
     group_ids = request.GET.get('id', '')
@@ -293,7 +296,7 @@ def asset_list(request):
         s = write_excel(asset_find)
         if s[0]:
             file_name = s[1]
-        smg = 'excel文件已生成，请点击下载!'
+        smg = u'excel文件已生成，请点击下载!'
         return my_render('jasset/asset_excel_download.html', locals(), request)
     assets_list, p, assets, page_range, current_page, show_first, show_end = pages(asset_find, request)
     return my_render('jasset/asset_list.html', locals(), request)
@@ -463,7 +466,7 @@ def idc_del(request):
 @require_role('admin')
 def asset_upload(request):
     """
-    Upload file view
+    Upload asset excel file view
     """
     if request.method == 'POST':
         excel_file = request.FILES.get('file_name', '')

@@ -311,8 +311,12 @@ def write_excel(asset_all):
         group_all = '/'.join(group_list)
         status = asset.get_status_display()
         idc_name = asset.idc.name if asset.idc else u''
+        system_type = asset.system_type if asset.idc else u''
+        system_version = asset.system_version if asset.idc else u''
+        system_os = unicode(system_type) + unicode(system_version)
+
         alter_dic = [asset.hostname, asset.ip, idc_name, asset.mac, asset.remote_ip, asset.cpu, asset.memory,
-                     asset.disk, (asset.system_type + asset.system_version), asset.cabinet, group_all, status,
+                     asset.disk, system_os, asset.cabinet, group_all, status,
                      asset.comment]
         data.append(alter_dic)
     format = workbook.add_format()
