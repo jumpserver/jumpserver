@@ -93,6 +93,7 @@ type="checkbox"  name="selected" value="{{ group.id }}">
     $(document).ready(function(){
         $('.del').click(function(){
             var row = $(this).closest('tr');
+            if (confirm("确定删除")) {
             $.get(
                     $(this).attr('value'),
                     {},
@@ -101,7 +102,7 @@ type="checkbox"  name="selected" value="{{ group.id }}">
                         alert(data);
                     }
 
-            )
+            )}
         });
 
         $('#del_btn').click(function(){
