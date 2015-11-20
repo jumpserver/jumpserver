@@ -26,7 +26,7 @@
                         </div>
                     </div>
                     <div class="ibox-content">
-                        <form method="post" id="userForm" class="form-horizontal" action="">
+                        <form method="post" id="ruleForm" class="form-horizontal" action="">
                             {% if error %}
                                 <div class="alert alert-warning text-center">{{ error }}</div>
                             {% endif %}
@@ -36,16 +36,16 @@
                             <div class="form-group">
                                 <label for="username" class="col-sm-2 control-label">授权名称<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <input id="rulename" name="rulename" placeholder="Rule Name" type="text" class="form-control" {% if error %}value="{{ username }}" {% endif %}>
+                                    <input id="rulename" name="rulename" placeholder="Rule Name" type="text" class="form-control">
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
                                 <label for="user" class="col-sm-2 control-label">用户<span class="red-fonts">*</span></label>
-                                <div class="col-sm-8">
+                                <div class="col-sm-8" id="username">
                                     <select name="user" data-placeholder="用户名" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for user in users %}
-                                            <option value="{{ user.name }}">{{ user.name }}</option>
+                                            <option>{{ user.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -53,7 +53,7 @@
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
                                 <label for="usergroup" class="col-sm-2 control-label">用户组<span class="red-fonts">*</span></label>
-                                <div class="col-sm-8">
+                                <div class="col-sm-8" id="user_group_name">
                                     <select name="usergroup" data-placeholder="请选择用户组" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for user_group in user_groups %}
                                             <option value="{{ user_group.name }}">{{ user_group.name }}</option>
@@ -64,7 +64,7 @@
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
                                 <label for="asset" class="col-sm-2 control-label">资产<span class="red-fonts">*</span></label>
-                                <div class="col-sm-8">
+                                <div class="col-sm-8" id="asset_name">
                                     <select name="asset" data-placeholder="请选择资产" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for asset in assets %}
                                             <option value="{{ asset.ip }}">{{ asset.ip }}</option>
@@ -75,7 +75,7 @@
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
                                 <label for="assetgroup" class="col-sm-2 control-label">资产组<span class="red-fonts">*</span></label>
-                                <div class="col-sm-8">
+                                <div class="col-sm-8" id="asset_group_name">
                                     <select name="assetgroup" data-placeholder="请选择资产组" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for asset_group in asset_groups %}
                                             <option value="{{ asset_group.name }}">{{ asset_group.name }}</option>
@@ -86,7 +86,7 @@
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
                                 <label for="role" class="col-sm-2 control-label">角色<span class="red-fonts">*</span></label>
-                                <div class="col-sm-8">
+                                <div class="col-sm-8"　id="role_name">
                                     <select name="role" data-placeholder="请选择角色" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for role in roles %}
                                             <option value="{{ role.name }}">{{ role.name }}</option>
@@ -118,6 +118,39 @@
 {% endblock %}
 {% block self_footer_js %}
 <script>
+
+$('#ruleForm').submit(function() {
+    var result = {}
+    var data = $(this).serializeArray();
+    $.each(data, function(i, field){
+        result[field.name] = field.value;
+    });
+    if (result['user'] || result['usergroup'] || result['asset'] || result['assetgroup'] || result['rulename'] || result['role']) {
+        if (result['rulename'] === '') {
+            alert("请添加授权名称")
+            return false
+        }
+        if (! result['user'] && ! result['usergroup']) {
+            alert("用户和用户组必选１个")
+            return false
+        }
+        if (! result['asset'] && ! result['assetgroup']) {
+            alert("资产和资产组必选１个")
+            return false
+        }
+        if (! result['role']) {
+            alert("请填写角色")
+            return false
+        }
+        return true
+    } else {
+        alert("请填必选项")
+        return false;
+    }
+});
+
+
+
 $(document).ready(function(){
     $("input.role").click(function(){
         if($("input.role[value=GA]").is( ":checked" )){
