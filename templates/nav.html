@@ -4,10 +4,10 @@
         <ul class="nav" id="side-menu">
             {% include 'nav_li_profile.html' %}
             <li id="index">
-               <a href="/"><i class="fa fa-th-large"></i> <span class="nav-label">仪表盘</span><span class="label label-info pull-right"></span></a>
+               <a href="/"><i class="fa fa-dashboard"></i> <span class="nav-label">仪表盘</span><span class="label label-info pull-right"></span></a>
             </li>
             <li id="juser">
-                <a href="#"><i class="fa fa-rebel"></i> <span class="nav-label">用户管理</span><span class="fa arrow"></span></a>
+                <a href="#"><i class="fa fa-group"></i> <span class="nav-label">用户管理</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
                     <li class="group_list group_edit"><a href="/juser/group_list/">查看用户组</a></li>
                     <li class="group_add"><a href="/juser/group_add/">添加用户组</a></li>
@@ -16,7 +16,7 @@
                 </ul>
             </li>
             <li id="jasset">
-                <a><i class="fa fa-cube"></i> <span class="nav-label">资产管理</span><span class="fa arrow"></span></a>
+                <a><i class="fa fa-inbox"></i> <span class="nav-label">资产管理</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
                     <li class="group_add"><a href="/jasset/group_add/">添加资产组</a></li>
                     <li class="group_list group_detail group_edit"><a href="/jasset/group_list/">查看资产组</a></li>
@@ -44,7 +44,7 @@
                <a href="/jlog/log_list/online/"><i class="fa fa-files-o"></i> <span class="nav-label">日志审计</span><span class="label label-info pull-right"></span></a>
             </li>
             <li id="setting">
-                   <a href="/setting/"><i class="fa fa-files-o"></i> <span class="nav-label">设置</span><span class="label label-info pull-right"></span></a>
+                   <a href="/setting/"><i class="fa fa-gears"></i> <span class="nav-label">设置</span><span class="label label-info pull-right"></span></a>
             </li>
             <li class="special_link">
                 <a href="http://www.jumpserver.org" target="_blank"><i class="fa fa-database"></i> <span class="nav-label">访问官网</span></a>
@@ -76,7 +76,7 @@
                 <a><i class="fa fa-cube"></i> <span class="nav-label">资产管理</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
 {#                    <li class="host_add host_add_multi"><a href="/jasset/host_add/">添加资产</a></li>#}
-                    <li class="host_list host_detail host_edit"><a href="/jasset/asset_list/">查看资产<span class="label label-info pull-right">{{ host_active_num }}/{{ host_total_num}}</span></a></li>
+                    <li class="asset_list asset_detail asset_edit"><a href="/jasset/asset_list/">查看资产<span class="label label-info pull-right">{{ host_active_num }}/{{ host_total_num}}</span></a></li>
                     <li class="idc_list idc_detail idc_edit"><a href="/jasset/idc_list/">查看IDC</a></li>
                     <li class="group_add"><a href="/jasset/group_add/">添加主机组</a></li>
                     <li class="group_list group_detail group_edit"><a href="/jasset/group_list/">查看主机组</a></li>

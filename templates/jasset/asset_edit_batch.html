@@ -54,17 +54,17 @@
                         <div class="col-sm-2">
                             <div class="radio i-checks">
                                 <label>
-                                    <input type="radio" checked="" value="no_action" name="use_default_auth"><span> 不修改 </span>
+                                    <input type="radio" checked="" value="no_action" id="no" name="use_default_auth" class="auth"><span> 不修改 </span>
                                 </label>
                             </div>
                             <div class="radio i-checks">
                                 <label>
-                                    <input type="radio" name="use_default_auth"><span> 使用默认 </span>
+                                    <input type="radio" id="default" name="use_default_auth" class="auth"><span> 使用默认 </span>
                                 </label>
                             </div>
                             <div class="radio i-checks">
                                 <label>
-                                    <input type="radio" id="id_use_default_auth" name="use_default_auth"><span> 用户名密码 </span>
+                                    <input type="radio" id="pass" name="use_default_auth" class="auth"><span> 用户名密码 </span>
                                 </label>
                             </div>
                         </div>
@@ -140,8 +140,8 @@
             $('#uuid').val(ids)
         });
 
-        $('#id_use_default_auth').click(function(){
-            if ($(this).is(':checked')){
+        $('.auth').click(function(){
+            if ($(this).attr('id') == 'pass'){
                 $('#admin_account').css('display', 'block')
             }
             else {

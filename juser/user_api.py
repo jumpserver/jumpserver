@@ -123,21 +123,21 @@ def db_del_user(username):
 
 def gen_ssh_key(username, password='',
                 key_dir=os.path.join(KEY_DIR, 'user'),
-
                 authorized_keys=True, home="/home", length=2048):
     """
     generate a user ssh key in a property dir
     生成一个用户ssh密钥对
     """
+    logger.debug('生成ssh key， 并设置authorized_keys')
     private_key_file = os.path.join(key_dir, username)
-    mkdir(private_key_file, username)
+    mkdir(key_dir)
     if os.path.isfile(private_key_file):
         os.unlink(private_key_file)
     ret = bash('echo -e  "y\n"|ssh-keygen -t rsa -f %s -b %s -P "%s"' % (private_key_file, length, password))
 
     if authorized_keys:
         auth_key_dir = os.path.join(home, username, '.ssh')
-        mkdir(auth_key_dir, username, mode=0700)
+        mkdir(auth_key_dir, mode=0700)
         authorized_key_file = os.path.join(auth_key_dir, 'authorized_keys')
         with open(private_key_file+'.pub') as pub_f:
             with open(authorized_key_file, 'w') as auth_f:

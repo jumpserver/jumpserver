@@ -15,7 +15,6 @@ from jumpserver.api import *
 from jumpserver.models import Setting
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from settings import BASE_DIR
 from jlog.models import Log
 
 
@@ -236,7 +235,7 @@ def Login(request):
                         request.session['role_id'] = 1
                     else:
                         request.session['role_id'] = 0
-                    return HttpResponseRedirect(request.GET.get('next', '/'), )
+                    return HttpResponseRedirect(request.session.get('pre_url', '/'))
                 # response.set_cookie('username', username, expires=604800)
                 # response.set_cookie('seed', PyCrypt.md5_crypt(password), expires=604800)
                 # return response
@@ -269,7 +268,7 @@ def setting(request):
             if '' in [username, port] and ('' in password or '' in private_key):
                 return HttpResponse('所填内容不能为空, 且密码和私钥填一个')
             else:
-                private_key_path = os.path.join(BASE_DIR, 'role_keys', 'default', 'default_private_key.pem')
+                private_key_path = os.path.join(BASE_DIR, 'keys/role_keys', 'default', 'default_private_key.pem')
                 if private_key:
                     with open(private_key_path, 'w') as f:
                             f.write(private_key)

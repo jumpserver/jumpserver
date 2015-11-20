@@ -63,7 +63,7 @@
                                 <td class="text-center">
                                     <a href="/jasset/group_detail/?id={{ asset_group.id }}" class="btn btn-xs btn-info">详情</a>
                                     <a href="/jasset/group_edit/?id={{ asset_group.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <a value="/jasset/group_del/?id={{ asset_group.id }}" id="del" class="btn btn-xs btn-danger">删除</a>
+                                    <a value="/jasset/group_del/?id={{ asset_group.id }}" class="btn btn-xs btn-danger group_del">删除</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -88,16 +88,17 @@
 {% block self_footer_js %}
 <script>
     $(document).ready(function(){
-        $('#del').click(function(){
+        $('.group_del').click(function(){
             var row = $(this).closest('tr');
-            $.get(
-                    $(this).attr('value'),
-                    {},
-                    function(data){
-                        row.remove();
-                        alert(data)
-                    }
-            )
+            if (confirm('确定删除')) {
+                $.get(
+                        $(this).attr('value'),
+                        {},
+                        function (data) {
+                            row.remove();
+                        }
+                )
+            }
         });
 
         $('#del_check').click(function(){
@@ -111,15 +112,12 @@
                         {id: check_array.join(',')},
                         function(data){
                             $('tr.gradeX input:checked').closest('tr').remove();
-                            alert(data);
                         }
                 )
 
             }
         })
     });
-
-
 </script>
 
 {% endblock %}

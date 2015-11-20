@@ -17,8 +17,8 @@ config = ConfigParser.ConfigParser()
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 config.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
+KEY_DIR = os.path.join(BASE_DIR, 'keys')
 
-KEY_DIR = os.path.join(BASE_DIR, 'role_keys')
 
 DB_HOST = config.get('db', 'host')
 DB_PORT = config.getint('db', 'port')
@@ -37,7 +37,7 @@ EMAIL_TIMEOUT = 5
 
 # ======== Log ==========
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
-SSH_KEY_DIR = os.path.join(BASE_DIR, 'role_keys')
+SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys/role_keys')
 KEY = config.get('base', 'key')
 URL = config.get('base', 'url')
 LOG_LEVEL = config.get('base', 'log')

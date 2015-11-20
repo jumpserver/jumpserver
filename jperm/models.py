@@ -32,14 +32,13 @@ class PermRole(models.Model):
 
 class PermRule(models.Model):
     date_added = models.DateTimeField(auto_now=True)
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     comment = models.CharField(max_length=100)
     asset = models.ManyToManyField(Asset, related_name='perm_rule')
     asset_group = models.ManyToManyField(AssetGroup, related_name='perm_rule')
     user = models.ManyToManyField(User, related_name='perm_rule')
     user_group = models.ManyToManyField(UserGroup, related_name='perm_rule')
     role = models.ManyToManyField(PermRole, related_name='perm_rule')
-    ssh_type = models.BooleanField()
 
     def __unicode__(self):
         return self.name

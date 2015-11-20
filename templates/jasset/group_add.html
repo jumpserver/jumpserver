@@ -75,12 +75,12 @@
 
 
                         <div class="form-group">
-                            <label for="" class="col-sm-2 control-label">主机<span class="red-fonts">*</span></label>
+                            <label for="" class="col-sm-2 control-label">主机</label>
                             <div class="col-sm-4">
                                 <div>
                                     <select id="assets" name="assets" class="form-control m-b" size="12" multiple>
                                         {% for asset in asset_all %}
-                                            <option value="{{ asset.id }}">{{ asset.ip }}</option>
+                                            <option value="{{ asset.id }}">{{ asset.hostname|default_if_none:"" }} - {{ asset.ip|default_if_none:"" }} - {{ asset.port|default_if_none:"" }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -133,12 +133,12 @@
     timely: 2,
     theme: "yellow_right_effect",
     fields: {
-        "j_group": {
+        "name": {
             rule: "required",
-            tip: "输入业务组名",
+            tip: "输入主机组名",
             ok: "",
-            msg: {required: "业务组名必须填写!"},
-            data: {'data-ok':"业务组名可以使用"}
+            msg: {required: "主机组名必须填写!"},
+            data: {'data-ok':"主机组名可以使用"}
         }
     },
     valid: function(form) {

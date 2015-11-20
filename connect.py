@@ -19,8 +19,8 @@ import struct, fcntl, signal, socket, select
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
     django.setup()
-from jumpserver.api import ServerError, User, Asset, AssetGroup, get_object
-from jumpserver.api import logger, mkdir, Log, TtyLog
+from jumpserver.api import ServerError, User, Asset, AssetGroup, get_object, mkdir
+from jumpserver.api import logger, Log, TtyLog
 from jumpserver.settings import LOG_DIR
 
 
@@ -66,9 +66,6 @@ def check_vim_status(command, ssh):
             return True
         else:
             return False
-
-
-
 
 
 class Tty(object):
@@ -252,6 +249,7 @@ class Tty(object):
         log_file_path = os.path.join(today_connect_log_dir, '%s_%s_%s' % (self.username, self.asset_name, time_start))
 
         try:
+            mkdir(os.path.dirname(today_connect_log_dir), mode=0777)
             mkdir(today_connect_log_dir, mode=0777)
         except OSError:
             logger.debug('创建目录 %s 失败，请修改%s目录权限' % (today_connect_log_dir, tty_log_dir))
@@ -289,7 +287,7 @@ class Tty(object):
         # 2. get 映射用户
         # 3. get 映射用户的账号，密码或者key
         # self.connect_info = {'user': '', 'asset': '', 'ip': '', 'port': 0, 'role_name': '', 'role_pass': '', 'role_key': ''}
-        self.connect_info = {'user': 'a', 'asset': 'b', 'ip': '127.0.0.1', 'port': 22, 'role_name': 'root', 'role_pass': '', 'role_key': '/root/.ssh/id_rsa.bak'}
+        self.connect_info = {'user': 'a', 'asset': 'b', 'ip': '127.0.0.1', 'port': 22, 'role_name': 'root', 'role_pass': 'redhat', 'role_key': ''}
         return self.connect_info
 
     def get_connection(self):
@@ -452,7 +450,7 @@ class SshTty(Tty):
         #print 'ok'+tmp+'ok'
         # SSH_TTY  = re.search(r'(?<=/dev/).*', tmp).group().strip()
         # SSH_TTY = ''
-        channel.send('clear\n')
+        # channel.send('clear\n')
         # Make ssh interactive tunnel
         self.posix_shell()
 
@@ -468,20 +466,83 @@ class SshTty(Tty):
         pass
 
 
-def print_prompt():
-    """
-    Print prompt
-    打印提示导航
-    """
-    msg = """\033[1;32m###  Welcome Use JumpServer To Login. ### \033[0m
-    1) Type \033[32mIP or Part IP, Host Alias or Comments \033[0m To Login.
-    2) Type \033[32mP/p\033[0m To Print The Servers You Available.
-    3) Type \033[32mG/g\033[0m To Print The Server Groups You Available.
-    4) Type \033[32mG/g(1-N)\033[0m To Print The Server Group Hosts You Available.
-    5) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
-    6) Type \033[32mQ/q\033[0m To Quit.
-    """
-    print textwrap.dedent(msg)
+def print_user_asset_group_info(user):
+    asset_groups = AssetGroup.objects.all()
+    for asset_group in asset_groups:
+        if asset_group.comment:
+            print '[%-2s]  %-10s  %s' % (asset_group.id, asset_group.name, asset_group.comment)
+        else:
+            print '[%-2s]  %-10s' % (asset_group.id, asset_group.name)
+    print
+
+
+class Nav(object):
+    def __init__(self, user):
+        self.user = user
+        self.search_result = {}
+
+    @staticmethod
+    def print_nav():
+        """
+        Print prompt
+        打印提示导航
+        """
+        msg = """\n\033[1;32m###  Welcome To Use JumpServer, A Open Source System . ### \033[0m
+        1) Type \033[32mID\033[0m To Login.
+        2) Type \033[32m/\033[0m + \033[32mIP, Host Name, Host Alias or Comments \033[0mTo Search.
+        3) Type \033[32mP/p\033[0m To Print The Servers You Available.
+        4) Type \033[32mG/g\033[0m To Print The Server Groups You Available.
+        5) Type \033[32mG/g\033[0m\033[0m + \033[32mGroup ID\033[0m To Print The Server Group You Available.
+        6) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
+        7) Type \033[32mQ/q\033[0m To Quit.
+        """
+
+        msg = """\n\033[1;32m###  欢迎使用Jumpserver开源跳板机  ### \033[0m
+        1) 输入 \033[32mID\033[0m 直接登录.
+        2) 输入 \033[32m/\033[0m + \033[32mIP, 主机名, 主机别名 or 备注 \033[0m搜索.
+        3) 输入 \033[32mP/p\033[0m 显示您有权限的主机.
+        4) 输入 \033[32mG/g\033[0m 显示您有权限的主机组.
+        5) 输入 \033[32mG/g\033[0m\033[0m + \033[32m组ID\033[0m 显示该组下主机.
+        6) 输入 \033[32mE/e\033[0m 批量执行命令.
+        7) 输入 \033[32mQ/q\033[0m 退出.
+        """
+        print textwrap.dedent(msg)
+
+    def search(self, str_r=''):
+        gid_pattern = re.compile(r'^g\d+$')
+        user_asset_all = list(Asset.objects.all())
+        user_asset_search = []
+        if str_r:
+            if gid_pattern.match(str_r):
+                user_asset_search = list(Asset.objects.all())
+            else:
+                for asset in user_asset_all:
+                    if str_r in asset.ip or str_r in str(asset.comment):
+                        user_asset_search.append(asset)
+        else:
+            user_asset_search = user_asset_all
+
+        self.search_result = dict(zip(range(len(user_asset_search)), user_asset_search))
+
+        print '\033[32m[%-3s] %-15s  %-15s  %-5s  %-5s  %s \033[0m' % ('ID', 'AssetName', 'IP', 'Port', 'Role', 'Comment')
+        for index, asset in self.search_result.items():
+            if asset.comment:
+                print '[%-3s] %-15s  %-15s  %-5s  %-5s  %s' % (index, 'asset_name'+str(index), asset.ip, asset.port, 'role', asset.comment)
+            else:
+                print '[%-3s] %-15s  %-15s  %-5s  %-5s' % (index, 'asset_name'+str(index), asset.ip, asset.port, 'role')
+        print
+
+    @staticmethod
+    def print_asset_group():
+        user_asset_group_all = AssetGroup.objects.all()
+
+        print '\033[32m[%-3s] %-15s %s \033[0m' % ('ID', 'GroupName', 'Comment')
+        for asset_group in user_asset_group_all:
+            if asset_group.comment:
+                print '[%-3s] %-15s %s' % (asset_group.id, asset_group.name, asset_group.comment)
+            else:
+                print '[%-3s] %-15s' % (asset_group.id, asset_group.name)
+        print
 
 
 def main():
@@ -492,29 +553,26 @@ def main():
     if not login_user:  # 判断用户是否存在
         color_print(u'没有该用户，或许你是以root运行的 No that user.', exits=True)
 
-    print_prompt()
     gid_pattern = re.compile(r'^g\d+$')
+    nav = Nav(login_user)
+    nav.print_nav()
 
     try:
         while True:
             try:
-                option = raw_input("\033[1;32mOpt or IP>:\033[0m ")
+                option = raw_input("\033[1;32mOpt or ID>:\033[0m ").strip()
             except EOFError:
-                print_prompt()
+                nav.print_nav()
                 continue
             except KeyboardInterrupt:
                 sys.exit(0)
-            if option in ['P', 'p']:
-                login_user.get_asset_info(printable=True)
+            if option in ['P', 'p', '\n', '']:
+                nav.search()
                 continue
+            if option.startswith('/') or gid_pattern.match(option):
+                nav.search(option.lstrip('/'))
             elif option in ['G', 'g']:
-                login_user.get_asset_group_info(printable=True)
-                continue
-            elif gid_pattern.match(option):
-                gid = option[1:].strip()
-                asset_group = get_object(AssetGroup, id=gid)
-                if asset_group and asset_group.is_permed(user=login_user):
-                    asset_group.get_asset_info(printable=True)
+                nav.print_asset_group()
                 continue
             elif option in ['E', 'e']:
                 # exec_cmd_servers(login_name)
@@ -523,7 +581,11 @@ def main():
                 sys.exit()
             else:
                 try:
-                    verify_connect(login_user, option)
+                    asset = nav.search_result[int(option)]
+                    ssh_tty = SshTty('a', 'b')
+                    ssh_tty.connect()
+                except (KeyError, ValueError):
+                    color_print('请输入正确ID', 'red')
                 except ServerError, e:
                     color_print(e, 'red')
     except IndexError:
