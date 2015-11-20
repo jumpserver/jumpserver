@@ -2,8 +2,6 @@
 
 from django.db.models import Q
 from jperm.perm_api import *
-from jperm.models import PermLog as Log
-from jperm.models import SysUser
 from juser.user_api import gen_ssh_key
 
 
@@ -535,27 +533,6 @@ def log(request):
     log_all = Log.objects.all().order_by('-datetime')
     log_all, p, logs, page_range, current_page, show_first, show_end = pages(log_all, request)
     return my_render('jperm/perm_log.html', locals(), request)
-
-
-def sys_user_add(request):
-    asset_group_all = AssetGroup.objects.all()
-    if request.method == 'POST':
-        username = request.POST.get('username', '')
-        password = request.POST.get('password', '')
-        asset_groups_id = request.POST.getlist('asset_groups_select', [])
-        comment = request.POST.get('comment')
-        sys_user = SysUser(username=username, password=password, comment=comment)
-        sys_user.save()
-        gen_ssh_key(username, key_dir=os.path.join(SSH_KEY_DIR, 'sysuser'), authorized_keys=False)
-        results = push_user(sys_user, asset_groups_id)
-        return HttpResponse(json.dumps(results, sort_keys=True, indent=4), content_type="application/json")
-    return my_render('jperm/sys_user_add.html', locals(), request)
-
-
-def sys_user_list(request):
-    users_list = SysUser.objects.all()
-    users_list, p, users, page_range, current_page, show_first, show_end = pages(users_list, request)
-    return my_render('jperm/sys_user_list.html', locals(), request)
 
 
 def sys_user_edit(request):
