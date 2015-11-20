@@ -3,6 +3,7 @@
 import os, sys, time, re
 from Crypto.Cipher import AES
 import crypt
+import pwd
 from binascii import b2a_hex, a2b_hex
 import hashlib
 import datetime
@@ -42,6 +43,14 @@ def set_log(level):
     fh.setFormatter(formatter)
     logger_f.addHandler(fh)
     return logger_f
+
+
+def chown(path, user, group='', ):
+    if not group:
+        group = user
+    uid = pwd.getpwnam(user).pwd_uid
+    gid = pwd.getpwnam(group).gr_gid
+    os.chown(path, uid, gid)
 
 
 def page_list_return(total, current=1):
@@ -390,7 +399,7 @@ def bash(cmd):
     return subprocess.call(cmd, shell=True)
 
 
-def mkdir(dir_name, username='root', mode=0755):
+def mkdir(dir_name, username='', mode=0755):
     """
     insure the dir exist and mode ok
     目录存在，如果不存在就建立，并且权限正确
@@ -399,7 +408,7 @@ def mkdir(dir_name, username='root', mode=0755):
         os.makedirs(dir_name)
     os.chmod(dir_name, mode)
     if username:
-        bash('chown %s:%s %s' % (username, username, dir_name))
+        chown(dir_name, username)
 
 
 def http_success(request, msg):

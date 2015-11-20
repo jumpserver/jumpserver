@@ -143,7 +143,7 @@ def gen_ssh_key(username, password='',
             with open(authorized_key_file, 'w') as auth_f:
                 auth_f.write(pub_f.read())
         os.chmod(authorized_key_file, 0600)
-        bash('chown %s:%s %s' % (username, username, authorized_key_file))
+        chown(authorized_key_file, username)
 
 
 def server_add_user(username, password, ssh_key_pwd, ssh_key_login_need):

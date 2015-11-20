@@ -10,6 +10,11 @@ from jperm.models import PermRole
 from jperm.models import PermRule
 
 
+class PermGet(object):
+    def __init__(self):
+        pass
+
+
 def get_object_list(model, id_list):
     """根据id列表获取对象列表"""
     object_list = []

@@ -82,11 +82,13 @@ class MyInventory(object):
             hostport = host.get("port")
             username = host.get("username")
             password = host.get("password")
+            ssh_key = host.get("ssh_key")
             my_host = Host(name=hostname, port=hostport)
             my_host.set_variable('ansible_ssh_host', hostname)
             my_host.set_variable('ansible_ssh_port', hostport)
             my_host.set_variable('ansible_ssh_user', username)
             my_host.set_variable('ansible_ssh_pass', password)
+            my_host.set_variable('ansible_ssh_private_key_file', ssh_key)
             # set other variables 
             for key, value in host.iteritems():
                 if key not in ["hostname", "port", "username", "password"]:
@@ -156,12 +158,12 @@ class Command(MyInventory):
         if module_name not in ["raw", "command", "shell"]:
             raise CommandValueError("module_name",
                                     "module_name must be of the 'raw, command, shell'")
-        hoc = MyRunner(module_name=module_name,
-                       module_args=command,
-                       timeout=timeout,
-                       inventory=self.inventory,
-                       pattern=pattern,
-                       forks=forks,
+        hoc = Runner(module_name=module_name,
+                     module_args=command,
+                     timeout=timeout,
+                     inventory=self.inventory,
+                     pattern=pattern,
+                     forks=forks,
                      )
         self.results = hoc.run()
 
@@ -418,8 +420,6 @@ class Tasks(Command):
         return {"status": "failed", "msg": self.msg} if self.msg else {"status": "ok", "result": result}
 
 
-
-
 class CustomAggregateStats(callbacks.AggregateStats):
     """                                                                             
     Holds stats about per-host activity during playbook runs.                       
@@ -437,7 +437,6 @@ class CustomAggregateStats(callbacks.AggregateStats):
                                               ignore_errors)
 
         self.results.append(runner_results)
-
 
     def summarize(self, host):
         """                                                                         
