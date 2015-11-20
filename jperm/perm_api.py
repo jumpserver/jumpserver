@@ -10,9 +10,52 @@ from jperm.models import PermRole
 from jperm.models import PermRule
 
 
-class PermGet(object):
-    def __init__(self):
-        pass
+def get_user_perm(user):
+    """
+    return:
+    {’asset_group': {
+            asset_group1: {'role': [role1, role2], 'rule': [rule1, rule2]},
+            asset_group2: {'role': [role1, role2], 'rule': [rule1, rule2]},
+            }
+    'asset':{
+            asset1: {'role': [role1, role2], 'rule': [rule1, rule2]},
+            asset2: {'role': [role1, role2], 'rule': [rule1, rule2]},
+            }
+        ]},
+    'rule':[rule1, rule2,]
+    }
+    """
+    perm = {}
+    user_rule_all = PermRule.objects.filter(user=user)
+    perm['rule'] = user_rule_all
+    perm_asset_group = perm['asset_group'] = {}
+    perm_asset = perm['asset'] = {}
+    for rule in user_rule_all:
+        asset_groups = rule.asset_group.all()
+        assets = rule.asset.all()
+        for asset_group in asset_groups:
+            if perm_asset_group.get(asset_group):
+                perm_asset_group[asset_group].get('role', []).update(set(rule.role.all()))
+                perm_asset_group[asset_group].get('rule', []).append(rule)
+            else:
+                perm_asset_group[asset_group] = {'role': set(rule.role.all()), 'rule': [rule]}
+
+        for asset in assets:
+            if perm_asset.get(asset):
+                perm_asset[asset].get('role', []).update(set(rule.role.all()))
+                perm_asset[asset].get('rule', []).append(rule)
+            else:
+                perm_asset[asset] = {'role': set(rule.role.all()), 'rule': [rule]}
+
+    return perm
+
+
+
+
+
+
+
+
 
 
 def get_object_list(model, id_list):
