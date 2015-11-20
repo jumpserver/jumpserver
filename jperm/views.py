@@ -2,8 +2,6 @@
 
 from django.db.models import Q
 from jperm.perm_api import *
-from jperm.models import PermLog as Log
-from jperm.models import SysUser
 from juser.user_api import gen_ssh_key
 
 
