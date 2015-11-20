@@ -22,7 +22,7 @@ if django.get_version() != '1.6':
 from jumpserver.api import ServerError, User, Asset, AssetGroup, get_object, mkdir
 from jumpserver.api import logger, Log, TtyLog
 from jumpserver.settings import LOG_DIR
-
+from jperm.ansible_api import Command
 
 login_user = get_object(User, username=getpass.getuser())
 VIM_FLAG = False
@@ -301,18 +301,24 @@ class Tty(object):
         ssh.load_system_host_keys()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
-            if connect_info.get('role_pass'):
-                ssh.connect(connect_info.get('ip'),
-                            port=connect_info.get('port'),
-                            username=connect_info.get('role_name'),
-                            password=connect_info.get('role_pass'),
-                            look_for_keys=False)
-            else:
-                ssh.connect(connect_info.get('ip'),
-                            port=connect_info.get('port'),
-                            username=connect_info.get('role_name'),
-                            key_filename=connect_info.get('role_key'),
-                            look_for_keys=False)
+            role_key = connect_info.get('role_key')
+            if role_key and os.path.isfile(role_key):
+                try:
+                    ssh.connect(connect_info.get('ip'),
+                                port=connect_info.get('port'),
+                                username=connect_info.get('role_name'),
+                                key_filename=role_key,
+                                look_for_keys=False)
+                    self.ssh = ssh
+                    return ssh
+                except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
+                    pass
+
+            ssh.connect(connect_info.get('ip'),
+                        port=connect_info.get('port'),
+                        username=connect_info.get('role_name'),
+                        password=connect_info.get('role_pass'),
+                        look_for_keys=False)
 
         except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
             raise ServerError('认证失败 Authentication Error.')
@@ -458,23 +464,6 @@ class SshTty(Tty):
         channel.close()
         ssh.close()
 
-    def execute(self, cmd):
-        """
-        execute cmd on the asset
-        执行命令
-        """
-        pass
-
-
-def print_user_asset_group_info(user):
-    asset_groups = AssetGroup.objects.all()
-    for asset_group in asset_groups:
-        if asset_group.comment:
-            print '[%-2s]  %-10s  %s' % (asset_group.id, asset_group.name, asset_group.comment)
-        else:
-            print '[%-2s]  %-10s' % (asset_group.id, asset_group.name)
-    print
-
 
 class Nav(object):
     def __init__(self, user):
@@ -544,6 +533,52 @@ class Nav(object):
                 print '[%-3s] %-15s' % (asset_group.id, asset_group.name)
         print
 
+    def exec_cmd(self):
+        self.search()
+        while True:
+            print "请输入主机名、IP或ansile支持的pattern, q退出"
+            try:
+                pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
+                if pattern == 'q':
+                    break
+                else:
+                    res = {
+                            "group1": {
+                                "hosts": [{"hostname": "127.0.0.1", "port": "22", "username": "lastimac", "password": "redhat"}, {"hostname": "192.168.244.129", "port": "22", "username": "root", "password": "redhat"}, {"hostname": "j", "port": "22", "username": "root", "password": "redhat"}],
+                                "vars": {"var1": 'a', "var2": 'a'}
+                            }
+                        }
+                    cmd = Command(res)
+                    for inv in cmd.inventory.get_hosts(pattern=pattern):
+                        print inv.name
+                    confirm_host = raw_input("\033[1;32mIs that [y/n]>:\033[0m ").strip()
+                    if confirm_host == 'y':
+                        while True:
+                            print "请输入执行的命令， 按q退出"
+                            command = raw_input("\033[1;32mCmds>:\033[0m ").strip()
+                            if command == 'q':
+                                break
+                            result = cmd.run(module_name='shell', command=command, pattern=pattern)
+                            for k, v in result.items():
+                                if k == 'ok':
+                                    for host, output in v.items():
+                                        color_print("%s => %s" % (host, 'Ok'), 'green')
+                                        print output
+                                        print
+                                else:
+                                    for host, output in v.items():
+                                        color_print("%s => %s" % (host, k), 'red')
+                                        color_print(output, 'red')
+                                        print
+                                print "=" * 20
+                                print
+                    else:
+                        continue
+
+            except EOFError:
+                print
+                break
+
 
 def main():
     """
@@ -575,8 +610,8 @@ def main():
                 nav.print_asset_group()
                 continue
             elif option in ['E', 'e']:
-                # exec_cmd_servers(login_name)
-                pass
+                nav.exec_cmd()
+                continue
             elif option in ['Q', 'q', 'exit']:
                 sys.exit()
             else:

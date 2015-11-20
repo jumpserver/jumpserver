@@ -14,7 +14,7 @@ from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
 from django.template import RequestContext
 from juser.models import User, UserGroup
-from jlog.models import Log
+from jlog.models import Log, TtyLog
 from jasset.models import Asset, AssetGroup
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -28,11 +28,15 @@ def set_log(level):
     return a log file object
     根据提示设置log打印
     """
+    log_file = os.path.join(LOG_DIR, 'jumpserver.log')
+    if not os.path.isfile(log_file):
+        os.mknod(log_file)
+        os.chmod(log_file, 0777)
     log_level_total = {'debug': logging.DEBUG, 'info': logging.INFO, 'warning': logging.WARN, 'error': logging.ERROR,
                        'critical': logging.CRITICAL}
     logger_f = logging.getLogger('jumpserver')
     logger_f.setLevel(logging.DEBUG)
-    fh = logging.FileHandler(os.path.join(LOG_DIR, 'jumpserver.log'))
+    fh = logging.FileHandler(log_file)
     fh.setLevel(log_level_total.get(level, logging.DEBUG))
     formatter = logging.Formatter('%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)

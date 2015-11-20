@@ -107,43 +107,72 @@ class MyInventory(object):
                 self.add_group(hosts_and_vars.get("hosts"), groupname, hosts_and_vars.get("vars"))
 
 
+class MyRunner(MyInventory):
+    """
+    This is a General object for parallel execute modules.
+    """
+    def __init__(self, *args, **kwargs):
+        super(MyRunner, self).__init__(*args, **kwargs)
+        self.results = {}
+
+    def run(self, module_name, module_args='', timeout=10, forks=10, pattern='',
+            sudo=False, sudo_user='root', sudo_pass=''):
+        """
+        run module from andible ad-hoc.
+        module_name: ansible module_name
+        module_args: ansible module args
+        """
+        hoc = Runner(module_name=module_name,
+                     module_args=module_args,
+                     timeout=timeout,
+                     inventory=self.inventory,
+                     pattern=pattern,
+                     forks=forks,
+                     become=sudo,
+                     become_method='sudo',
+                     become_user=sudo_user,
+                     become_pass=sudo_pass
+                     )
+        self.results = hoc.run()
+        return self.results
+
+
 class Command(MyInventory):
     """
     this is a command object for parallel execute command.
     """
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
-        self.results = ''
+        self.results = {}
 
-    def run(self, command, module_name="command", timeout=10, forks=10, group='default_group', pattern='*'):
+    def run(self, command, module_name="command", timeout=10, forks=10, pattern='*'):
         """
         run command from andible ad-hoc.
         command  : 必须是一个需要执行的命令字符串， 比如 
                  'uname -a'
         """
+        data = {}
 
         if module_name not in ["raw", "command", "shell"]:
             raise CommandValueError("module_name",
-                                     "module_name must be of the 'raw, command, shell'")
-        hoc = Runner(module_name=module_name,
-                     module_args=command,
-                     timeout=timeout,
-                     inventory=self.inventory,
-                     subset=group,
-                     pattern=pattern,
-                     forks=forks,
+                                    "module_name must be of the 'raw, command, shell'")
+        hoc = MyRunner(module_name=module_name,
+                       module_args=command,
+                       timeout=timeout,
+                       inventory=self.inventory,
+                       pattern=pattern,
+                       forks=forks,
                      )
         self.results = hoc.run()
 
         if self.stdout:
-            return {"ok": self.stdout}
-        else:
-            msg = []
-            if self.stderr:
-                msg.append(self.stderr)
-            if self.dark:
-                msg.append(self.dark)
-            return {"failed": msg}
+            data['ok'] = self.stdout
+        if self.stderr:
+            data['err'] = self.stderr
+        if self.dark:
+            data['dark'] = self.dark
+
+        return data
 
     @property
     def raw_results(self):
@@ -174,7 +203,7 @@ class Command(MyInventory):
         result = {}
         all = self.results.get("contacted")
         for key, value in all.iteritems():
-            result[key] =  value.get("stdout")
+            result[key] = value.get("stdout")
         return result
 
     @property
@@ -185,7 +214,8 @@ class Command(MyInventory):
         result = {}
         all = self.results.get("contacted")
         for key, value in all.iteritems():
-            result[key] = {
+            if value.get("stderr") or value.get("warnings"):
+                result[key] = {
                     "stderr": value.get("stderr"),
                     "warnings": value.get("warnings"),}
         return result
