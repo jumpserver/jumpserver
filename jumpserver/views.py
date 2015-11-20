@@ -79,18 +79,19 @@ def index_cu(request):
     # user = get_object(User, id=user_id)
     login_types = {'L': 'LDAP', 'M': 'MAP'}
     username = request.user.username
-    posts = Asset.object.all()
-    host_count = len(posts)
-
-    new_posts = []
-    post_five = []
-    for post in posts:
-        if len(post_five) < 5:
-            post_five.append(post)
-        else:
-            new_posts.append(post_five)
-            post_five = []
-    new_posts.append(post_five)
+    # TODO: need fix,liuzheng need Asset help
+    # posts = Asset.object.all()
+    # host_count = len(posts)
+    #
+    # new_posts = []
+    # post_five = []
+    # for post in posts:
+    #     if len(post_five) < 5:
+    #         post_five.append(post)
+    #     else:
+    #         new_posts.append(post_five)
+    #         post_five = []
+    # new_posts.append(post_five)
     return render_to_response('index_cu.html', locals(), context_instance=RequestContext(request))
 
 
