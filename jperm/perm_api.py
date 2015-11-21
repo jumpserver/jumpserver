@@ -12,6 +12,7 @@ from jperm.models import PermRule
 
 def get_group_user_perm(ob):
     """
+    ob为用户或用户组
     获取用户、用户组授权的资产、资产组
     return:
     {’asset_group': {
@@ -72,6 +73,7 @@ def get_group_user_perm(ob):
 
 def get_group_asset_perm(ob):
     """
+    ob为资产或资产组
     获取资产，资产组授权的用户，用户组
     return:
     {’user_group': {
@@ -132,6 +134,7 @@ def get_group_asset_perm(ob):
 
 def gen_resource(ob):
     """
+    ob为用户或资产列表或资产queryset
     生成MyInventory需要的 resource文件
     """
     res = []
