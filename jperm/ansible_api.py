@@ -79,12 +79,13 @@ class MyInventory(object):
         for host in hosts:
             # set connection variables
             hostname = host.get("hostname")
+            hostip = host.get('ip', hostname)
             hostport = host.get("port")
             username = host.get("username")
             password = host.get("password")
             ssh_key = host.get("ssh_key")
             my_host = Host(name=hostname, port=hostport)
-            my_host.set_variable('ansible_ssh_host', hostname)
+            my_host.set_variable('ansible_ssh_host', hostip)
             my_host.set_variable('ansible_ssh_port', hostport)
             my_host.set_variable('ansible_ssh_user', username)
             my_host.set_variable('ansible_ssh_pass', password)

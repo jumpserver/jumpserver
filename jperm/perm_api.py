@@ -1,6 +1,6 @@
 # coding: utf-8
 
-
+from django.db.models.query import QuerySet
 from jumpserver.api import *
 import uuid
 import re
@@ -128,6 +128,40 @@ def get_group_asset_perm(ob):
                     perm_user[user] = {'role': perm_user_group[user_group].get('role', set()),
                                        'rule': perm_user_group[user_group].get('rule', set())}
     return perm
+
+
+def gen_resource(ob):
+    """
+    生成MyInventory需要的 resource文件
+    """
+    res = []
+    if isinstance(ob, User):
+        perm = get_group_user_perm(ob)
+        for asset, asset_info in perm.get('asset').items():
+            info = {'hostname': asset.hostname, 'ip': asset.ip, 'port': asset.port}
+            try:
+                role = sorted(list(asset_info.get('role')))[0]
+            except IndexError:
+                continue
+            info['username'] = role.name
+            info['password'] = role.password
+            info['key_path'] = role.key_path
+            res.append(info)
+    elif isinstance(ob, (list, QuerySet)):
+        default = get_object(Setting, name='default')
+        for asset in ob:
+            info = {'hostname': asset.hostname, 'ip': asset.ip}
+            if asset.use_default_auth:
+                if default:
+                    info['port'] = default.default_port
+                    info['username'] = default.default_user
+                    info['password'] = default.default_password
+                    info['ssh_key'] = default.default_pri_key_path
+            else:
+                info['port'] = asset.port
+                info['username'] = asset.username
+            res.append(info)
+    return res
 
 
 def get_object_list(model, id_list):
