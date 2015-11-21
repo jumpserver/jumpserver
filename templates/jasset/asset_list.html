@@ -70,7 +70,7 @@
                         <div class="col-sm-2">
                             <label>
                                 <select name="status" class="form-control m-b" onchange="change_info()">
-                                    <option value="">状态</option>
+                                    <option value="">所有状态</option>
                                     {% for s in asset_status %}
                                         {% ifequal s.0|int2str status %}
                                             <option value="{{ s.0 }}" selected> {{ s.1 }}</option>
@@ -103,8 +103,8 @@
                                     <th class="text-center">
                                         <input id="checkall" type="checkbox" class="i-checks" name="checkall" value="checkall" data-editable='false' onclick="check_all('asset_form')">
                                     </th>
-                                    <th class="text-center" name="ip"> IP地址 </th>
                                     <th class="text-center"> 主机名 </th>
+                                    <th class="text-center" name="ip"> IP地址 </th>
                                     <th class="text-center"> IDC </th>
                                     <th class="text-center"> 所属主机组 </th>
 {#                                    <th class="text-center"> 配置信息 </th>#}
@@ -119,8 +119,8 @@
                                     <td class="text-center" name="id" value="{{ asset.id }}" data-editable='false'>
                                         <input name="id" value="{{ asset.id }}" type="checkbox" class="i-checks">
                                     </td>
-                                    <td class="text-center"> {{ asset.ip|default_if_none:"" }} </td>
                                     <td class="text-center"> {{ asset.hostname|default_if_none:"" }} </td>
+                                    <td class="text-center"> {{ asset.ip|default_if_none:"" }} </td>
                                     <td class="text-center"> {{ asset.idc.name|default_if_none:"" }} </td>
                                     <td class="text-center">{{ asset.group.all|group_str2 }}</td>
 {#                                    <td class="text-center">{{ asset.cpu }}|{{ asset.memory }}|{{ asset.disk }}</td>#}
@@ -190,20 +190,20 @@
             return false;
         }
         var url= $(this).attr("value") + '?asset_id_all=' + asset_id_all;
-            index = $.layer({
-                type: 2,
-                title: 'JumpServer - 批量修改主机',
-                maxmin: true,
-                shift: 'top',
-                border: [2, 0.3, '#1AB394'],
-                shade: [0.5, '#000000'],
-                shadeClose: true,
-                area : ['800px' , '600px'],
-                iframe: {src: url},
-                close: function(){
-                    location.replace(location.href);
-                }
-            });
+        layer.open({
+            type: 2,
+            title: 'JumpServer - 批量修改主机',
+            maxmin: true,
+            shift: 'top',
+            border: [2, 0.3, '#1AB394'],
+            shade: [0.5, '#000000'],
+            shadeClose: true,
+            area : ['800px' , '600px'],
+            content: url,
+            cancel: function(){
+                location.replace(location.href);
+            }
+        });
     });
 
     $('.search-btn-excel').unbind('click').bind('click',function(){
