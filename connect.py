@@ -19,10 +19,11 @@ import struct, fcntl, signal, socket, select
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
     django.setup()
-from jumpserver.api import ServerError, User, Asset, AssetGroup, get_object, mkdir
-from jumpserver.api import logger, Log, TtyLog
+from jumpserver.api import ServerError, User, Asset, AssetGroup, get_object, mkdir, get_asset_info, get_role
+from jumpserver.api import logger, Log, TtyLog, get_role_key
+from jperm.perm_api import gen_resource, get_group_asset_perm, get_group_user_perm
 from jumpserver.settings import LOG_DIR
-
+from jperm.ansible_api import Command
 
 login_user = get_object(User, username=getpass.getuser())
 VIM_FLAG = False
@@ -73,15 +74,15 @@ class Tty(object):
     A virtual tty class
     一个虚拟终端类，实现连接ssh和记录日志，基类
     """
-    def __init__(self, username, asset_name):
-        self.username = username
-        self.asset_name = asset_name
+    def __init__(self, user, asset, role):
+        self.username = user.username
+        self.asset_name = asset.hostname
         self.ip = None
         self.port = 22
         self.channel = None
-        #self.asset = get_object(Asset, name=asset_name)
-        #self.user = get_object(User, username=username)
-        self.role = None
+        self.asset = asset
+        self.user = user
+        self.role = role
         self.ssh = None
         self.connect_info = None
         self.login_type = 'ssh'
@@ -287,7 +288,10 @@ class Tty(object):
         # 2. get 映射用户
         # 3. get 映射用户的账号，密码或者key
         # self.connect_info = {'user': '', 'asset': '', 'ip': '', 'port': 0, 'role_name': '', 'role_pass': '', 'role_key': ''}
-        self.connect_info = {'user': 'a', 'asset': 'b', 'ip': '127.0.0.1', 'port': 22, 'role_name': 'root', 'role_pass': 'redhat', 'role_key': ''}
+        asset_info = get_asset_info(self.asset)
+        self.connect_info = {'user': self.user, 'asset': self.asset, 'ip': asset_info.get('ip'),
+                             'port': int(asset_info.get('port')), 'role_name': self.role.name,
+                             'role_pass': self.role.password, 'role_key': self.role.key_path}
         return self.connect_info
 
     def get_connection(self):
@@ -301,18 +305,24 @@ class Tty(object):
         ssh.load_system_host_keys()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
-            if connect_info.get('role_pass'):
-                ssh.connect(connect_info.get('ip'),
-                            port=connect_info.get('port'),
-                            username=connect_info.get('role_name'),
-                            password=connect_info.get('role_pass'),
-                            look_for_keys=False)
-            else:
-                ssh.connect(connect_info.get('ip'),
-                            port=connect_info.get('port'),
-                            username=connect_info.get('role_name'),
-                            key_filename=connect_info.get('role_key'),
-                            look_for_keys=False)
+            role_key = get_role_key(self.user, self.role)
+            if role_key and os.path.isfile(role_key):
+                try:
+                    ssh.connect(connect_info.get('ip'),
+                                port=connect_info.get('port'),
+                                username=connect_info.get('role_name'),
+                                key_filename=role_key,
+                                look_for_keys=False)
+                    self.ssh = ssh
+                    return ssh
+                except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
+                    pass
+
+            ssh.connect(connect_info.get('ip'),
+                        port=connect_info.get('port'),
+                        username=connect_info.get('role_name'),
+                        password=connect_info.get('role_pass'),
+                        look_for_keys=False)
 
         except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
             raise ServerError('认证失败 Authentication Error.')
@@ -458,28 +468,12 @@ class SshTty(Tty):
         channel.close()
         ssh.close()
 
-    def execute(self, cmd):
-        """
-        execute cmd on the asset
-        执行命令
-        """
-        pass
-
-
-def print_user_asset_group_info(user):
-    asset_groups = AssetGroup.objects.all()
-    for asset_group in asset_groups:
-        if asset_group.comment:
-            print '[%-2s]  %-10s  %s' % (asset_group.id, asset_group.name, asset_group.comment)
-        else:
-            print '[%-2s]  %-10s' % (asset_group.id, asset_group.name)
-    print
-
 
 class Nav(object):
     def __init__(self, user):
         self.user = user
         self.search_result = {}
+        self.user_perm = {}
 
     @staticmethod
     def print_nav():
@@ -510,7 +504,9 @@ class Nav(object):
 
     def search(self, str_r=''):
         gid_pattern = re.compile(r'^g\d+$')
-        user_asset_all = list(Asset.objects.all())
+        if not self.user_perm:
+            self.user_perm = get_group_user_perm(self.user)
+        user_asset_all = self.user_perm.get('asset').keys()
         user_asset_search = []
         if str_r:
             if gid_pattern.match(str_r):
@@ -523,13 +519,15 @@ class Nav(object):
             user_asset_search = user_asset_all
 
         self.search_result = dict(zip(range(len(user_asset_search)), user_asset_search))
-
-        print '\033[32m[%-3s] %-15s  %-15s  %-5s  %-5s  %s \033[0m' % ('ID', 'AssetName', 'IP', 'Port', 'Role', 'Comment')
+        print '\033[32m[%-3s] %-15s  %-15s  %-5s  %-10s  %s \033[0m' % ('ID', 'AssetName', 'IP', 'Port', 'Role', 'Comment')
         for index, asset in self.search_result.items():
+            asset_info = get_asset_info(asset)
+            role = [str(role.name) for role in self.user_perm.get('asset').get(asset).get('role')]
             if asset.comment:
-                print '[%-3s] %-15s  %-15s  %-5s  %-5s  %s' % (index, 'asset_name'+str(index), asset.ip, asset.port, 'role', asset.comment)
+                print '[%-3s] %-15s  %-15s  %-5s  %-10s  %s' % (index, asset.hostname, asset.ip, asset_info.get('port'),
+                                                                role, asset.comment)
             else:
-                print '[%-3s] %-15s  %-15s  %-5s  %-5s' % (index, 'asset_name'+str(index), asset.ip, asset.port, 'role')
+                print '[%-3s] %-15s  %-15s  %-5s  %-10s' % (index, asset.hostname, asset.ip, asset_info.get('port'), role)
         print
 
     @staticmethod
@@ -543,6 +541,50 @@ class Nav(object):
             else:
                 print '[%-3s] %-15s' % (asset_group.id, asset_group.name)
         print
+
+    def exec_cmd(self):
+        self.search()
+        while True:
+            print "请输入主机名、IP或ansile支持的pattern, q退出"
+            try:
+                pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
+                if pattern == 'q':
+                    break
+                else:
+                    if not self.user_perm:
+                        self.user_perm = get_group_user_perm(self.user)
+                    res = gen_resource(self.user, perm=self.user_perm)
+                    cmd = Command(res)
+                    logger.debug(res)
+                    for inv in cmd.inventory.get_hosts(pattern=pattern):
+                        print inv.name
+                    confirm_host = raw_input("\033[1;32mIs that [y/n]>:\033[0m ").strip()
+                    if confirm_host == 'y':
+                        while True:
+                            print "请输入执行的命令， 按q退出"
+                            command = raw_input("\033[1;32mCmds>:\033[0m ").strip()
+                            if command == 'q':
+                                break
+                            result = cmd.run(module_name='shell', command=command, pattern=pattern)
+                            for k, v in result.items():
+                                if k == 'ok':
+                                    for host, output in v.items():
+                                        color_print("%s => %s" % (host, 'Ok'), 'green')
+                                        print output
+                                        print
+                                else:
+                                    for host, output in v.items():
+                                        color_print("%s => %s" % (host, k), 'red')
+                                        color_print(output, 'red')
+                                        print
+                                print "=" * 20
+                                print
+                    else:
+                        continue
+
+            except EOFError:
+                print
+                break
 
 
 def main():
@@ -575,14 +617,35 @@ def main():
                 nav.print_asset_group()
                 continue
             elif option in ['E', 'e']:
-                # exec_cmd_servers(login_name)
-                pass
+                nav.exec_cmd()
+                continue
             elif option in ['Q', 'q', 'exit']:
                 sys.exit()
             else:
                 try:
                     asset = nav.search_result[int(option)]
-                    ssh_tty = SshTty('a', 'b')
+                    roles = get_role(login_user, asset)
+                    if len(roles) > 1:
+                        role_check = dict(zip(range(len(roles)), roles))
+                        print role_check
+                        for index, role in role_check.items():
+                            print "[%s] %s" % (index, role.name)
+                        print "输入角色ID, q退出"
+                        try:
+                            role_index = raw_input("\033[1;32mID>:\033[0m ").strip()
+                            if role_index == 'q':
+                                continue
+                            else:
+                                role = role_check[int(role_index)]
+                        except IndexError:
+                            color_print('请输入正确ID', 'red')
+                            continue
+                    elif len(roles) == 1:
+                        role = roles[0]
+                    else:
+                        color_print('没有映射用户', 'red')
+                        continue
+                    ssh_tty = SshTty(login_user, asset, role)
                     ssh_tty.connect()
                 except (KeyError, ValueError):
                     color_print('请输入正确ID', 'red')

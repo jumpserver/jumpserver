@@ -31,10 +31,6 @@
                             <i class="fa fa-wrench"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">未启用 1</a>
-                            </li>
-                            <li><a href="#">未启用 2</a>
-                            </li>
                         </ul>
                         <a class="close-link">
                             <i class="fa fa-times"></i>
@@ -44,7 +40,13 @@
 
                 <select id="assets_total" name="assets" class="form-control m-b" size="12" multiple style="display: none">
                     {% for asset in asset_all %}
-                        <option value="{{ asset.id }}">{{ asset.ip }}</option>
+                        <option value="{{ asset.id }}">{{ asset.hostname }} - {{ asset.ip }}</option>
+                    {% endfor %}
+                </select>
+
+                <select id="asset_select_total" name="j_hosts" class="form-control m-b" size="12"  multiple style="display: none">
+                    {% for asset in asset_select %}
+                        <option value="{{ asset.id }}">{{ asset.hostname }} - {{ asset.ip }}</option>
                     {% endfor %}
                 </select>
 
@@ -80,7 +82,7 @@
                                 <div>
                                     <select id="assets" name="assets" class="form-control m-b" size="12" multiple>
                                         {% for asset in asset_all %}
-                                            <option value="{{ asset.id }}">{{ asset.hostname|default_if_none:"" }} - {{ asset.ip|default_if_none:"" }} - {{ asset.port|default_if_none:"" }}</option>
+                                            <option value="{{ asset.id }}">{{ asset.hostname|default_if_none:"" }} - {{ asset.ip|default_if_none:"" }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>

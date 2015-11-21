@@ -13,11 +13,4 @@ urlpatterns = patterns('jperm.views',
                        (r'^role/perm_role_detail/$', perm_role_detail),
                        (r'^role/perm_role_edit/$', perm_role_edit),
                        (r'^role/perm_role_push/$', perm_role_push),
-
-
-                       (r'^log/$', log),
-                       (r'^sys_user_add/$', sys_user_add),
-                       (r'^perm_user_list/$', sys_user_list),
-                       (r'^sys_user_del/$', sys_user_del),
-                       (r'^sys_user_edit/$', sys_user_edit),
                        )

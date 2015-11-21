@@ -26,13 +26,13 @@ def group_add(request):
 
         try:
             if not name:
-                error = u'组名不能为空'
-                raise ServerError(error)
+                emg = u'组名不能为空'
+                raise ServerError(emg)
 
             asset_group_test = get_object(AssetGroup, name=name)
             if asset_group_test:
-                error = u"该组名 %s 已存在" % name
-                raise ServerError(error)
+                emg = u"该组名 %s 已存在" % name
+                raise ServerError(emg)
 
         except ServerError:
             pass
@@ -88,21 +88,6 @@ def group_edit(request):
 
 
 @require_role('admin')
-def group_detail(request):
-    """
-    Group detail view
-    主机组详情
-    """
-    header_title, path1, path2 = u'主机组详情', u'资产管理', u'主机组详情'
-    group_id = request.GET.get('id', '')
-    group = get_object(AssetGroup, id=group_id)
-    asset_all = Asset.objects.filter(group=group).order_by('ip')
-
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(asset_all, request)
-    return my_render('jasset/group_detail.html', locals(), request)
-
-
-@require_role('admin')
 def group_list(request):
     """
     list asset group
@@ -147,13 +132,13 @@ def asset_add(request):
     af = AssetForm()
     if request.method == 'POST':
         af_post = AssetForm(request.POST)
-        print af_post
         ip = request.POST.get('ip', '')
+        hostname = request.POST.get('hostname', '')
         is_active = True if request.POST.get('is_active') == '1' else False
         use_default_auth = request.POST.get('use_default_auth', '')
         try:
-            if Asset.objects.filter(ip=str(ip)):
-                error = u'该IP %s 已存在!' % ip
+            if Asset.objects.filter(hostname=str(hostname)):
+                error = u'该主机名 %s 已存在!' % hostname
                 raise ServerError(error)
 
         except ServerError:
@@ -165,13 +150,15 @@ def asset_add(request):
                     password = request.POST.get('password', '')
                     password_encode = password
                     asset_save.password = password_encode
+                if not ip:
+                    asset_save.ip = hostname
                 asset_save.is_active = True if is_active else False
                 asset_save.save()
                 af_post.save_m2m()
 
-                msg = u'主机 %s 添加成功' % ip
+                msg = u'主机 %s 添加成功' % hostname
             else:
-                esg = u'主机 %s 添加失败' % ip
+                esg = u'主机 %s 添加失败' % hostname
 
     return my_render('jasset/asset_add.html', locals(), request)
 
@@ -215,17 +202,21 @@ def asset_edit(request):
     asset_id = request.GET.get('id', '')
     username = request.session.get('username', 'admin')
     asset = get_object(Asset, id=asset_id)
-    asset_old = copy_model_instance(asset)
+    if asset:
+        password_old = asset.password
+    # asset_old = copy_model_instance(asset)
     af = AssetForm(instance=asset)
     if request.method == 'POST':
         af_post = AssetForm(request.POST, instance=asset)
         ip = request.POST.get('ip', '')
-        use_default_auth = request.POST.get('use_default_auth')
+        hostname = request.POST.get('hostname', '')
+        password = request.POST.get('password', '')
+        use_default_auth = request.POST.get('use_default_auth', '')
 
         try:
-            asset_test = get_object(Asset, ip=ip)
+            asset_test = get_object(Asset, hostname=hostname)
             if asset_test and asset_id != unicode(asset_test.id):
-                error = u'该IP %s 已存在!' % ip
+                error = u'该主机名 %s 已存在!' % hostname
                 raise ServerError(error)
         except ServerError:
             pass
@@ -235,6 +226,10 @@ def asset_edit(request):
                 if use_default_auth:
                     af_save.username = ''
                     af_save.password = ''
+                else:
+                    if password_old != password:
+                        password_encode = CRYPTOR.encrypt(password)
+                        af_save.password = password_encode
                 af_save.save()
                 af_post.save_m2m()
                 # asset_new = get_object(Asset, id=asset_id)
@@ -266,8 +261,19 @@ def asset_list(request):
     status = request.GET.get('status', '')
     keyword = request.GET.get('keyword', '')
     export = request.GET.get("export", False)
+    group_id = request.GET.get("group_id", '')
+    idc_id = request.GET.get("idc_id", '')
+    if group_id:
+        group = get_object(AssetGroup, id=group_id)
+        if group:
+            asset_find = Asset.objects.filter(group=group)
+    elif idc_id:
+        idc = get_object(IDC, id=idc_id)
+        if idc:
+            asset_find = Asset.objects.filter(idc=idc)
+    else:
+        asset_find = Asset.objects.all()
 
-    asset_find = Asset.objects.all()
     if idc_name:
         asset_find = asset_find.filter(idc__name__contains=idc_name)
 
@@ -305,7 +311,82 @@ def asset_list(request):
 @require_role('admin')
 def asset_edit_batch(request):
     af = AssetForm()
+    name = request.session.get('username', 'admin')
     asset_group_all = AssetGroup.objects.all()
+
+    if request.method == 'POST':
+        env = request.POST.get('env', '')
+        idc_id = request.POST.get('idc', '')
+        port = request.POST.get('port', '')
+        use_default_auth = request.POST.get('use_default_auth', '')
+        username = request.POST.get('username', '')
+        password = request.POST.get('password', '')
+        group = request.POST.getlist('group', [])
+        cabinet = request.POST.get('cabinet', '')
+        comment = request.POST.get('comment', '')
+        asset_id_all = unicode(request.GET.get('asset_id_all', ''))
+        asset_id_all = asset_id_all.split(',')
+        for asset_id in asset_id_all:
+            alert_list = []
+            asset = get_object(Asset, id=asset_id)
+            if asset:
+                if env:
+                    if asset.env != env:
+                        asset.env = env
+                        alert_list.append([u'运行环境', asset.env, env])
+                if idc_id:
+                    idc = get_object(IDC, id=idc_id)
+                    name_old = asset.idc.name if asset.idc else u''
+                    if idc and idc.name != name_old:
+                        asset.idc = idc
+                        alert_list.append([u'机房', name_old, idc.name])
+                if port:
+                    if unicode(asset.port) != port:
+                        asset.port = port
+                        alert_list.append([u'端口号', asset.port, port])
+
+                if use_default_auth:
+                    if use_default_auth == 'default':
+                        asset.use_default_auth = 1
+                        asset.username = ''
+                        asset.password = ''
+                        alert_list.append([u'使用默认管理账号', asset.use_default_auth, u'默认'])
+                    elif use_default_auth == 'user_passwd':
+                        asset.use_default_auth = 0
+                        asset.username = username
+                        password_encode = CRYPTOR.encrypt(password)
+                        asset.password = password_encode
+                        alert_list.append([u'使用默认管理账号', asset.use_default_auth, username])
+                if group:
+                    group_new, group_old, group_new_name, group_old_name = [], asset.group.all(), [], []
+                    for group_id in group:
+                        g = get_object(AssetGroup, id=group_id)
+                        if g:
+                            group_new.append(g)
+                    if not set(group_new) < set(group_old):
+                        group_instance = list(set(group_new) | set(group_old))
+                        for g in group_instance:
+                            group_new_name.append(g.name)
+                        for g in group_old:
+                            group_old_name.append(g.name)
+                        asset.group = group_instance
+                        alert_list.append([u'主机组', ','.join(group_old_name), ','.join(group_new_name)])
+                if cabinet:
+                    if asset.cabinet != cabinet:
+                        asset.cabinet = cabinet
+                        alert_list.append([u'机柜号', asset.cabinet, cabinet])
+                if comment:
+                    if asset.comment != comment:
+                        asset.comment = comment
+                        alert_list.append([u'备注', asset.comment, comment])
+                asset.save()
+
+            if alert_list:
+                username = unicode(name) + ' - ' + u'批量'
+                print alert_list
+                AssetRecord.objects.create(asset=asset, username=username, content=alert_list)
+        return HttpResponse('ok')
+
     return my_render('jasset/asset_edit_batch.html', locals(), request)
 
 
@@ -438,28 +519,16 @@ def idc_edit(request):
 
 
 @require_role('admin')
-def idc_detail(request):
-    """
-    IDC detail view
-    """
-    header_title, path1, path2 = u'IDC详情', u'资产管理', u'IDC详情'
-    idc_id = request.GET.get('id', '')
-    idc = get_object(IDC, id=idc_id)
-    posts = Asset.objects.filter(idc=idc).order_by('ip')
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-
-    return my_render('jasset/idc_detail.html', locals(), request)
-
-
-@require_role('admin')
 def idc_del(request):
     """
     IDC delete view
     """
-    uuid = request.GET.get('id', '')
-    idc = get_object(IDC, id=uuid)
-    if idc:
-        idc.delete()
+    idc_ids = request.GET.get('id', '')
+    idc_id_list = idc_ids.split(',')
+
+    for idc_id in idc_id_list:
+        IDC.objects.filter(id=idc_id).delete()
+
     return HttpResponseRedirect('/jasset/idc_list/')
 
 

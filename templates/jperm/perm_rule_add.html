@@ -118,6 +118,37 @@
 {% endblock %}
 {% block self_footer_js %}
 <script>
+
+$('#ruleForm').submit(function() {
+    var result = {}
+    var data = $(this).serializeArray();
+    $.each(data, function(i, field){
+        result[field.name] = field.value;
+    });
+    if (result['user'] || result['usergroup'] || result['asset'] || result['assetgroup'] || result['rulename'] || result['role']) {
+        if (result['rulename'] === '') {
+            alert("请添加授权名称")
+            return false
+        }
+        if (! result['user'] && ! result['usergroup']) {
+            alert("用户和用户组必选１个")
+            return false
+        }
+        if (! result['asset'] && ! result['assetgroup']) {
+            alert("资产和资产组必选１个")
+            return false
+        }
+        if (! result['role']) {
+            alert("请填写角色")
+            return false
+        }
+        return true
+    } else {
+        alert("请填必选项")
+        return false;
+    }
+});
+
 $(document).ready(function(){
     $("input.role").click(function(){
         if($("input.role[value=GA]").is( ":checked" )){
