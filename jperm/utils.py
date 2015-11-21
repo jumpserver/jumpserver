@@ -51,6 +51,7 @@ def gen_keys():
     private_key = os.path.join(key_path_dir, 'id_rsa')
     public_key = os.path.join(key_path_dir, 'id_rsa.pub')
     key.write_private_key_file(private_key)
+    os.chmod(private_key, 0644)
 
     with open(public_key, 'w') as content_file:
         for data in [key.get_name(),

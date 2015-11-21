@@ -404,7 +404,7 @@ class Tasks(Command):
 
             result[key] = {
                     "all_ip": setup.get("ansible_all_ipv4_addresses"),
-                    "hostname"  : setup.get("ansible_hostname" ),
+                    "hostname"  : setup.get("ansible_hostname"),
                     "default_ip": setup.get("ansible_default_ipv4").get("address"),
                     "default_mac": setup.get("ansible_default_ipv4").get("macaddress"),
                     "product_name": setup.get("ansible_product_name"),

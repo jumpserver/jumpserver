@@ -132,37 +132,30 @@ def get_group_asset_perm(ob):
     return perm
 
 
-def gen_resource(ob):
+def gen_resource(ob, perm=None):
     """
     ob为用户或资产列表或资产queryset
     生成MyInventory需要的 resource文件
     """
     res = []
     if isinstance(ob, User):
-        perm = get_group_user_perm(ob)
+        if not perm:
+            perm = get_group_user_perm(ob)
+
         for asset, asset_info in perm.get('asset').items():
-            info = {'hostname': asset.hostname, 'ip': asset.ip, 'port': asset.port}
+            asset_info = get_asset_info(asset)
+            info = {'hostname': asset.hostname, 'ip': asset.ip, 'port': asset_info.get('port', 22)}
             try:
-                role = sorted(list(asset_info.get('role')))[0]
+                role = sorted(list(perm.get('asset').get(asset).get('role')))[0]
             except IndexError:
                 continue
             info['username'] = role.name
             info['password'] = role.password
-            info['key_path'] = role.key_path
+            info['ssh_key'] = get_role_key(ob, role)
             res.append(info)
     elif isinstance(ob, (list, QuerySet)):
-        default = get_object(Setting, name='default')
         for asset in ob:
-            info = {'hostname': asset.hostname, 'ip': asset.ip}
-            if asset.use_default_auth:
-                if default:
-                    info['port'] = default.default_port
-                    info['username'] = default.default_user
-                    info['password'] = default.default_password
-                    info['ssh_key'] = default.default_pri_key_path
-            else:
-                info['port'] = asset.port
-                info['username'] = asset.username
+            info = get_asset_info(asset)
             res.append(info)
     return res
 

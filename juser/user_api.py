@@ -130,7 +130,7 @@ def gen_ssh_key(username, password='',
     """
     logger.debug('生成ssh key， 并设置authorized_keys')
     private_key_file = os.path.join(key_dir, username)
-    mkdir(key_dir)
+    mkdir(key_dir, mode=777)
     if os.path.isfile(private_key_file):
         os.unlink(private_key_file)
     ret = bash('echo -e  "y\n"|ssh-keygen -t rsa -f %s -b %s -P "%s"' % (private_key_file, length, password))

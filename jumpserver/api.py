@@ -9,19 +9,21 @@ import hashlib
 import datetime
 import random
 import subprocess
-from settings import *
+import json
+import logging
 
+from settings import *
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
 from django.template import RequestContext
 from juser.models import User, UserGroup
 from jlog.models import Log, TtyLog
 from jasset.models import Asset, AssetGroup
+from jperm.models import PermRule, PermRole
+from jumpserver.models import Setting
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.mail import send_mail
-import json
-import logging
 
 
 def set_log(level):
@@ -45,11 +47,57 @@ def set_log(level):
     return logger_f
 
 
-def chown(path, user, group='', ):
+def get_asset_info(asset):
+    default = get_object(Setting, name='default')
+    info = {'hostname': asset.hostname, 'ip': asset.ip}
+    if asset.use_default_auth:
+        if default:
+            info['port'] = default.default_port
+            info['username'] = default.default_user
+            info['password'] = CRYPTOR.decrypt(default.default_password)
+            info['ssh_key'] = default.default_pri_key_path
+    else:
+        info['port'] = asset.port
+        info['username'] = asset.username
+        info['password'] = asset.password
+
+    return info
+
+
+def get_role(user, asset):
+    roles = []
+    rules = PermRule.objects.filter(user=user, asset=asset)
+    for rule in rules:
+        roles.extend(list(rule.role.all()))
+    return roles
+
+
+def get_role_key(user, role):
+    """
+    由于role的key的权限是所有人可以读的， ansible要求为600，所以拷贝一份到特殊目录
+    :param user:
+    :param role:
+    :return: self key path
+    """
+    user_role_key_dir = os.path.join(KEY_DIR, 'user')
+    user_role_key_path = os.path.join(user_role_key_dir, '%s_%s.pem' % (user.username, role.name))
+    mkdir(user_role_key_dir, mode=777)
+    if not os.path.isfile(user_role_key_path):
+        with open(os.path.join(role.key_path, 'id_rsa')) as fk:
+            with open(user_role_key_path, 'w') as fu:
+                fu.write(fk.read())
+
+        print user_role_key_path, user.username
+        chown(user_role_key_path, user.username)
+        os.chmod(user_role_key_path, 0600)
+    return user_role_key_path
+
+
+def chown(path, user, group=''):
     if not group:
         group = user
-    uid = pwd.getpwnam(user).pwd_uid
-    gid = pwd.getpwnam(group).gr_gid
+    uid = pwd.getpwnam(user).pw_uid
+    gid = pwd.getpwnam(group).pwd_gid
     os.chown(path, uid, gid)
 
 
@@ -170,8 +218,7 @@ class PyCrypt(object):
         try:
             plain_text = cryptor.decrypt(a2b_hex(text))
         except TypeError:
-            # raise ServerError('Decrypt password error, TYpe error.')
-            pass
+            raise ServerError('Decrypt password error, TYpe error.')
         return plain_text.rstrip('\0')
 
 
@@ -406,7 +453,7 @@ def mkdir(dir_name, username='', mode=0755):
     """
     if not os.path.isdir(dir_name):
         os.makedirs(dir_name)
-    os.chmod(dir_name, mode)
+        os.chmod(dir_name, mode)
     if username:
         chown(dir_name, username)
 
