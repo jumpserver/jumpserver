@@ -238,10 +238,10 @@ def user_detail(request):
     #         user, dept = get_session_user_dept(request)
     #         if not validate(request, user=[user_id]):
     #             return HttpResponseRedirect('/')
-    # if not user_id:
-    #     return HttpResponseRedirect('/juser/user_list/')
-
-    # user = get_object(User, id=user_id)
+    user_id = request.GET.get('id', '')
+    if not user_id:
+        return HttpResponseRedirect('/juser/user_list/')
+    user = User.objects.get(id=user_id)
     # if user:
     #     pass
         # asset_group_permed = user.get_asset_group()
@@ -491,5 +491,5 @@ def down_key(request):
 from jperm.perm_api import get_group_user_perm
 def RunCommand(request):
     if request.method == 'GET':
-        print
+        print get_group_user_perm(request.user)
         return render_to_response('juser/run_command.html', locals(), context_instance=RequestContext(request))
