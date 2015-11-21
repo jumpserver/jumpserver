@@ -488,3 +488,8 @@ def down_key(request):
                 return response
 
     return HttpResponse('No Key File. Contact Admin.')
+from jperm.perm_api import get_group_user_perm
+def RunCommand(request):
+    if request.method == 'GET':
+        print
+        return render_to_response('juser/run_command.html', locals(), context_instance=RequestContext(request))

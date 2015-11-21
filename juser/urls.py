@@ -28,4 +28,6 @@ urlpatterns = patterns('juser.views',
                        (r'^change_role/$', 'chg_role'),
                        (r'^regen_ssh_key/$', 'regen_ssh_key'),
                        (r'^down_key/$', 'down_key'),
+
+                       (r'runcommand/$', 'RunCommand'),
                        )
