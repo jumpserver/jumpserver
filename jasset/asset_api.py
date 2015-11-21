@@ -238,7 +238,6 @@ def db_asset_alert(asset, username, alert_dic):
     alert_list = []
     asset_tuple_dic = {'status': ASSET_STATUS, 'env': ASSET_ENV, 'asset_type': ASSET_TYPE}
     for field, value in alert_dic.iteritems():
-        print field
         field_name = Asset._meta.get_field_by_name(field)[0].verbose_name
         if field == 'idc':
             old = IDC.objects.filter(id=value[0]) if value[0] else u''
@@ -386,9 +385,9 @@ def excel_to_db(excel_file):
             if row:
                 ip, port, hostname, use_default_auth, username, password, group = row
                 use_default_auth = 1 if use_default_auth == u'默认' else 0
-                if get_object(Asset, ip=ip):
+                if get_object(Asset, hostname=hostname):
                     continue
-                if ip and port:
+                if hostname:
                     asset = Asset(ip=ip,
                                   port=port,
                                   hostname=hostname,

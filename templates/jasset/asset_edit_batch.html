@@ -7,9 +7,9 @@
         <link href="/static/css/style.css" rel="stylesheet">
 
         <script src="/static/js/jquery-2.1.1.js"></script>
-{#        <style>#}
-{#            body {background: #ffffff;}#}
-{#        </style>#}
+        <style>
+            body {background: #ffffff;}
+        </style>
     </head>
 
 {% load bootstrap %}
@@ -20,21 +20,21 @@
     <div class="row">
         <div class="col-lg-10">
             <div class="ibox float-e-margins">
-                <div class="ibox-title">
-                    <h5 class="text-center"> 填写修改主机信息. </h5>
-                    <div class="ibox-tools">
-                        <a class="collapse-link">
-                            <i class="fa fa-chevron-up"></i>
-                        </a>
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="fa fa-wrench"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-user"></ul>
-                        <a class="close-link">
-                            <i class="fa fa-times"></i>
-                        </a>
-                    </div>
-                </div>
+{#                <div class="ibox-title">#}
+{#                    <h5 class="text-center"> 填写修改主机信息. </h5>#}
+{#                    <div class="ibox-tools">#}
+{#                        <a class="collapse-link">#}
+{#                            <i class="fa fa-chevron-up"></i>#}
+{#                        </a>#}
+{#                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">#}
+{#                            <i class="fa fa-wrench"></i>#}
+{#                        </a>#}
+{#                        <ul class="dropdown-menu dropdown-user"></ul>#}
+{#                        <a class="close-link">#}
+{#                            <i class="fa fa-times"></i>#}
+{#                        </a>#}
+{#                    </div>#}
+{#                </div>#}
 
             <div class="ibox-content">
                 <form class="form-horizontal" action="" id="signupForm"  method="post" name="horizontal" role="form" autocomplete="off">
@@ -49,33 +49,43 @@
                     {{ af.port|bootstrap_horizontal }}
 
                     <div class="hr-line-dashed"></div>
-                    <div class="form-group">
+                        <div class="form-group">
                         <label for="j_group" class="col-sm-2 control-label">管理账号</label>
                         <div class="col-sm-2">
                             <div class="radio i-checks">
                                 <label>
+<<<<<<< HEAD
                                     <input type="radio" checked="" value="no_action" id="no" name="use_default_auth" class="auth"><span> 不修改 </span>
+=======
+                                    <input type="radio" checked="" value="" id="no" name="use_default_auth" class="auth"><span> 不修改 </span>
+>>>>>>> cmdb
                                 </label>
                             </div>
                             <div class="radio i-checks">
                                 <label>
+<<<<<<< HEAD
                                     <input type="radio" id="default" name="use_default_auth" class="auth"><span> 使用默认 </span>
+=======
+                                    <input type="radio" id="default" name="use_default_auth" class="auth" value="default"><span> 使用默认 </span>
+>>>>>>> cmdb
                                 </label>
                             </div>
                             <div class="radio i-checks">
                                 <label>
+<<<<<<< HEAD
                                     <input type="radio" id="pass" name="use_default_auth" class="auth"><span> 用户名密码 </span>
+=======
+                                    <input type="radio" id="pass" name="use_default_auth" class="auth" value="user_passwd"><span> 用户名密码 </span>
+>>>>>>> cmdb
                                 </label>
                             </div>
                         </div>
                     </div>
-
                     <div class="form-group" id="admin_account" style="display: none">
                         <label class="col-sm-2 control-label"> 管理用户名<span class="red-fonts"> *</span></label>
                         <div class="col-sm-3">
                             <input type="text" placeholder="Username" name="username" class="form-control">
                         </div>
-
                         <label class="col-sm-1 control-label"> 密码<span class="red-fonts">*</span> </label>
                         <div class="col-sm-4">
                             <input type="password" placeholder="Password" name="password" class="form-control">
@@ -101,7 +111,7 @@
                         </div>
                         <div class="col-sm-3">
                             <div>
-                                <select id="groups_selected" name="project" class="form-control m-b" size="10"  multiple>
+                                <select id="groups_selected" name="group" class="form-control m-b" size="10"  multiple>
                                 </select>
                             </div>
                         </div>
@@ -117,7 +127,7 @@
                    <div class="form-group">
                        <div class="col-sm-4 col-sm-offset-5">
                            <button class="btn btn-white" type="submit"> 重置 </button>
-                           <button class="btn btn-primary" id="host_edit"> 提交 </button>
+                           <button class="btn btn-primary"> 提交 </button>
                        </div>
                    </div>
                 </form>
@@ -128,6 +138,7 @@
 </div>
 <script>
     $(document).ready(function() {
+<<<<<<< HEAD
         $('#host_edit').click(function () {
             var args = {};
             var match = null;
@@ -140,6 +151,8 @@
             $('#uuid').val(ids)
         });
 
+=======
+>>>>>>> cmdb
         $('.auth').click(function(){
             if ($(this).attr('id') == 'pass'){
                 $('#admin_account').css('display', 'block')
