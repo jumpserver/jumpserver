@@ -12,6 +12,7 @@ from jperm.models import PermRule
 
 def get_group_user_perm(ob):
     """
+    获取用户、用户组授权的资产、资产组
     return:
     {’asset_group': {
             asset_group1: {'asset': [], 'role': [role1, role2], 'rule': [rule1, rule2]},
@@ -66,6 +67,66 @@ def get_group_user_perm(ob):
                 else:
                     perm_asset[asset] = {'role': perm_asset_group[asset_group].get('role', set()),
                                          'rule': perm_asset_group[asset_group].get('rule', set())}
+    return perm
+
+
+def get_group_asset_perm(ob):
+    """
+    获取资产，资产组授权的用户，用户组
+    return:
+    {’user_group': {
+            user_group1: {'user': [], 'role': [role1, role2], 'rule': [rule1, rule2]},
+            user_group2: {'user: [], 'role': [role1, role2], 'rule': [rule1, rule2]},
+            }
+    'user':{
+            user1: {'role': [role1, role2], 'rule': [rule1, rule2]},
+            user2: {'role': [role1, role2], 'rule': [rule1, rule2]},
+            }
+        ]},
+    'rule':[rule1, rule2,]
+    }
+    """
+    perm = {}
+    if isinstance(ob, Asset):
+        rule_all = PermRule.objects.filter(asset=ob)
+    elif isinstance(ob, AssetGroup):
+        rule_all = PermRule.objects.filter(asset_group=ob)
+    else:
+        rule_all = []
+
+    perm['rule'] = rule_all
+    perm_user_group = perm['user_group'] = {}
+    perm_user = perm['user'] = {}
+    for rule in rule_all:
+        user_groups = rule.user_group.all()
+        users = rule.user.all()
+
+        # 获取一个规则资产的用户
+        for user in users:
+            if perm_user.get(user):
+                perm_user[user].get('role', set()).update(set(rule.role.all()))
+                perm_user[user].get('rule', set()).add(rule)
+            else:
+                perm_user[user] = {'role': set(rule.role.all()), 'rule': set([rule])}
+
+        # 获取一个规则资产授权的用户组
+        for user_group in user_groups:
+            user_group_users = user_group.user_set.all()
+            if perm_user_group.get(user_group):
+                perm_user_group[user_group].get('role', set()).update(set(rule.role.all()))
+                perm_user_group[user_group].get('rule', set()).add(rule)
+            else:
+                perm_user_group[user_group] = {'role': set(rule.role.all()), 'rule': set([rule]),
+                                               'user': user_group_users}
+
+            # 将用户组中的资产添加到用户授权中
+            for user in user_group_users:
+                if perm_user.get(user):
+                    perm_user[user].get('role', set()).update(perm_user_group[user_group].get('role', set()))
+                    perm_user[user].get('rule', set()).update(perm_user_group[user_group].get('rule', set()))
+                else:
+                    perm_user[user] = {'role': perm_user_group[user_group].get('role', set()),
+                                       'rule': perm_user_group[user_group].get('rule', set())}
     return perm
 
 
