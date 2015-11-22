@@ -107,87 +107,60 @@ class Tty(object):
 
         result_command = ''      #最后的结果
         backspace_num = 0              #光标移动的个数
-        backspace_list = []
         reach_backspace_flag = False    #没有检测到光标键则为true
-        reach_backspace_second_flag = False
-        pattern_list = []
         pattern_str=''
         while str_r:
-            tmp = re.match(r'\s*\w+\s*', str_r)                 #获取字符串，其它特殊字符匹配暂时还不知道。。
+            tmp = re.match(r'\s*\w+\s*', str_r)
             if tmp:
                 if reach_backspace_flag :
-                    if not reach_backspace_second_flag:
-                        pattern_str +=str(tmp.group(0))
-                    else:
-                        pattern_list.append(pattern_str)
-                        pattern_str=str(tmp.group(0))
-                        reach_backspace_second_flag=False
+                    pattern_str +=str(tmp.group(0))
                     str_r = str_r[len(str(tmp.group(0))):]
                     continue
                 else:
                     result_command += str(tmp.group(0))
                     str_r = str_r[len(str(tmp.group(0))):]
                     continue
-
-            tmp = re.match(r'\x1b\[K[\x08]*', str_r)           #遇到删除确认符，确定删除数据
+                
+            tmp = re.match(r'\x1b\[K[\x08]*', str_r)
             if tmp:
-                for x in backspace_list:
-                    backspace_num += int(x)
                 if backspace_num > 0:
                     if backspace_num > len(result_command) :
-                        result_command += ''.join(pattern_list)
                         result_command += pattern_str
                         result_command = result_command[0:-backspace_num]
                     else:
                         result_command = result_command[0:-backspace_num]
-                        result_command += ''.join(pattern_list)
                         result_command += pattern_str
                 del_len = len(str(tmp.group(0)))-3
                 if del_len > 0:
                     result_command = result_command[0:-del_len]
                 reach_backspace_flag = False
-                reach_backspace_second_flag =False
                 backspace_num =0
-                del pattern_list[:]
-                del backspace_list[:]
                 pattern_str=''
                 str_r = str_r[len(str(tmp.group(0))):]
                 continue
-
-            tmp = re.match(r'\x08+', str_r)                    #将遇到的退格数字存放到队列中
+            
+            tmp = re.match(r'\x08+', str_r)
             if tmp:
-                if reach_backspace_flag:
-                    reach_backspace_second_flag = True
-                else:
-                    reach_backspace_flag = True
                 str_r = str_r[len(str(tmp.group(0))):]
-                if len(str_r) != 0:                             #如果退格键在最后，则放弃
-                    backspace_list.append(len(str(tmp.group(0))))
-                continue
-
-            if reach_backspace_flag :
-                if not reach_backspace_second_flag:
-                    pattern_str +=str_r[0]
+                if len(str_r) != 0:
+                    if reach_backspace_flag:
+                        result_command = result_command[0:-backspace_num] + pattern_str
+                        pattern_str = ''
+                    else:
+                        reach_backspace_flag = True
+                    backspace_num = len(str(tmp.group(0)))
+                    continue
                 else:
-                    pattern_list.append(pattern_str)
-                    pattern_str=str_r[0]
-                    reach_backspace_second_flag=False
+                    break
+            
+            if reach_backspace_flag :   
+                pattern_str +=str_r[0]
             else :
                 result_command += str_r[0]
             str_r = str_r[1:]
-
-        if pattern_str !='':
-            pattern_list.append(pattern_str)
-
-        #退格队列中还有腿哥键，则进行删除操作
-        if len(backspace_list) > 0 :
-                for backspace in backspace_list:
-                    if int(backspace) >= len(result_command):
-                        result_command = pattern_list[0]
-                    else:
-                        result_command = result_command[:-int(backspace)]
-                        result_command += pattern_list[0]
-                    pattern_list = pattern_list[1:]
+        
+        if backspace_num > 0 :
+            result_command = result_command[0:-backspace_num] + pattern_str
 
         control_char = re.compile(r"""
                 \x1b[ #%()*+\-.\/]. |
@@ -200,21 +173,14 @@ class Tty(object):
                 """, re.X)
         result_command = control_char.sub('', result_command.strip())
         global VIM_FLAG
-        global VIM_COMMAND
         if not VIM_FLAG:
             if result_command.startswith('vi'):
                 VIM_FLAG = True
-                VIM_COMMAND = result_command
             return result_command.decode('utf8',"ignore")
         else:
-            if check_vim_status(VIM_COMMAND, ssh):
+            if result_command.endswith(':wq') or result_command.endswith(':wq!') or result_command.endswith(':q!'):
                 VIM_FLAG = False
-                VIM_COMMAND=''
-                if result_command.endswith(':wq') or result_command.endswith(':wq!') or result_command.endswith(':q!'):
-                    return ''
-                return result_command.decode('utf8',"ignore")
-            else:
-                return ''
+            return ''
 
     @staticmethod
     def remove_control_char(str_r):
