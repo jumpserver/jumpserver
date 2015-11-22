@@ -52,23 +52,6 @@ def color_print(msg, color='red', exits=False):
         sys.exit()
 
 
-def check_vim_status(command, ssh):
-    global SSH_TTY
-    print command
-    if command == '':
-        return True
-    else:
-        command_str= 'ps -ef |grep "%s" | grep "%s"|grep -v grep |wc -l' % (command,SSH_TTY)
-        print command_str
-        stdin, stdout, stderr = ssh.exec_command(command_str)
-        ps_num = stdout.read()
-        print ps_num
-        if int(ps_num) == 0:
-            return True
-        else:
-            return False
-
-
 class Tty(object):
     """
     A virtual tty class
