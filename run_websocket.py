@@ -20,15 +20,9 @@ from tornado.websocket import WebSocketClosedError
 
 from tornado.options import define, options
 from pyinotify import WatchManager, Notifier, ProcessEvent, IN_DELETE, IN_CREATE, IN_MODIFY, AsyncNotifier
+import select
 
-# from gevent import monkey
-# monkey.patch_all()
-# import gevent
-# from gevent.socket import wait_read, wait_write
-import struct, fcntl, signal, socket, select, fnmatch
-
-import paramiko
-from connect import Tty
+from connect import Tty, User, Asset, PermRole
 from connect import TtyLog, Log
 
 try:
@@ -217,7 +211,10 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         username = self.get_argument('username', '')
         token = self.get_argument('token', '')
         print asset_name, username, token
-        self.term = WebTty('a', 'b')
+        user = User.objects.get(username='lastimac')
+        asset = Asset.objects.get(ip='192.168.244.129')
+        role = PermRole.objects.get(name='dev')
+        self.term = WebTty(user, asset, role)
         self.term.get_connection()
         self.term.channel = self.term.ssh.invoke_shell(term='xterm')
         WebTerminalHandler.tasks.append(MyThread(target=self.forward_outbound))
@@ -236,7 +233,17 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         if data.get('data'):
             self.term.input_mode = True
             if str(data['data']) in ['\r', '\n', '\r\n']:
-                TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=self.term.deal_command(self.term.data, self.term.ssh)).save()
+                if self.term.vim_flag:
+                    match = self.term.ps1_pattern.search(self.term.vim_data)
+                    if match:
+                        self.term.vim_flag = False
+                        vim_data = self.term.deal_command(self.term.vim_data)[0:200]
+                        if len(data) > 0:
+                            TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=vim_data).save()
+
+                TtyLog(log=self.log, datetime=datetime.datetime.now(),
+                       cmd=self.term.deal_command(self.term.data)[0:200]).save()
+                self.term.vim_data = ''
                 self.term.data = ''
                 self.term.input_mode = False
             self.term.channel.send(data['data'])
@@ -267,6 +274,8 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                     if not len(recv):
                         return
                     data += recv
+                    if self.term.vim_flag:
+                        self.term.vim_data += recv
                     try:
                         self.write_message(json.dumps({'data': data}))
                         now_timestamp = time.time()
@@ -290,4 +299,5 @@ if __name__ == '__main__':
     server.bind(options.port, options.host)
     # server.listen(options.port)
     server.start(num_processes=1)
+    print "Run server on %s:%s" % (options.host, options.port)
     tornado.ioloop.IOLoop.instance().start()
