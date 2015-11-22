@@ -96,9 +96,12 @@ def get_role_key(user, role):
 def chown(path, user, group=''):
     if not group:
         group = user
-    uid = pwd.getpwnam(user).pw_uid
-    gid = pwd.getpwnam(group).pwd_gid
-    os.chown(path, uid, gid)
+    try:
+        uid = pwd.getpwnam(user).pw_uid
+        gid = pwd.getpwnam(group).pw_gid
+        os.chown(path, uid, gid)
+    except KeyError:
+        pass
 
 
 def page_list_return(total, current=1):
