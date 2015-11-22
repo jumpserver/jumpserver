@@ -226,3 +226,14 @@ def ip_str_to_list(ip_str):
     ip str to list
     """
     return ip_str.split(',')
+
+
+@register.filter(name='key_exist')
+def key_exist(username):
+    """
+    ssh key is exist or not
+    """
+    if os.path.isfile(os.path.join(KEY_DIR, 'user', username)):
+        return True
+    else:
+        return False

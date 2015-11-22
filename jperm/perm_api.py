@@ -1,15 +1,179 @@
 # coding: utf-8
 
-
+from django.db.models.query import QuerySet
 from jumpserver.api import *
 import uuid
 import re
-from jumpserver.tasks import playbook_run
 
 from jumpserver.models import Setting
-from jperm.models import PermLog
-
 from jperm.models import PermRole
+from jperm.models import PermRule
+
+
+def get_group_user_perm(ob):
+    """
+    ob为用户或用户组
+    获取用户、用户组授权的资产、资产组
+    return:
+    {’asset_group': {
+            asset_group1: {'asset': [], 'role': [role1, role2], 'rule': [rule1, rule2]},
+            asset_group2: {'asset: [], 'role': [role1, role2], 'rule': [rule1, rule2]},
+            }
+    'asset':{
+            asset1: {'role': [role1, role2], 'rule': [rule1, rule2]},
+            asset2: {'role': [role1, role2], 'rule': [rule1, rule2]},
+            }
+        ]},
+    'rule':[rule1, rule2,]
+    }
+    """
+    perm = {}
+    if isinstance(ob, User):
+        rule_all = PermRule.objects.filter(user=ob)
+    elif isinstance(ob, UserGroup):
+        rule_all = PermRule.objects.filter(user_group=ob)
+    else:
+        rule_all = []
+
+    perm['rule'] = rule_all
+    perm_asset_group = perm['asset_group'] = {}
+    perm_asset = perm['asset'] = {}
+    for rule in rule_all:
+        asset_groups = rule.asset_group.all()
+        assets = rule.asset.all()
+
+        # 获取一个规则用户授权的资产
+        for asset in assets:
+            if perm_asset.get(asset):
+                perm_asset[asset].get('role', set()).update(set(rule.role.all()))
+                perm_asset[asset].get('rule', set()).add(rule)
+            else:
+                perm_asset[asset] = {'role': set(rule.role.all()), 'rule': set([rule])}
+
+        # 获取一个规则用户授权的资产组
+        for asset_group in asset_groups:
+            asset_group_assets = asset_group.asset_set.all()
+            if perm_asset_group.get(asset_group):
+                perm_asset_group[asset_group].get('role', set()).update(set(rule.role.all()))
+                perm_asset_group[asset_group].get('rule', set()).add(rule)
+            else:
+                perm_asset_group[asset_group] = {'role': set(rule.role.all()), 'rule': set([rule]),
+                                                 'asset': asset_group_assets}
+
+            # 将资产组中的资产添加到资产授权中
+            for asset in asset_group_assets:
+                if perm_asset.get(asset):
+                    perm_asset[asset].get('role', set()).update(perm_asset_group[asset_group].get('role', set()))
+                    perm_asset[asset].get('rule', set()).update(perm_asset_group[asset_group].get('rule', set()))
+                else:
+                    perm_asset[asset] = {'role': perm_asset_group[asset_group].get('role', set()),
+                                         'rule': perm_asset_group[asset_group].get('rule', set())}
+    return perm
+
+
+def get_group_asset_perm(ob):
+    """
+    ob为资产或资产组
+    获取资产，资产组授权的用户，用户组
+    return:
+    {’user_group': {
+            user_group1: {'user': [], 'role': [role1, role2], 'rule': [rule1, rule2]},
+            user_group2: {'user: [], 'role': [role1, role2], 'rule': [rule1, rule2]},
+            }
+    'user':{
+            user1: {'role': [role1, role2], 'rule': [rule1, rule2]},
+            user2: {'role': [role1, role2], 'rule': [rule1, rule2]},
+            }
+        ]},
+    'rule':[rule1, rule2,]
+    }
+    """
+    perm = {}
+    if isinstance(ob, Asset):
+        rule_all = PermRule.objects.filter(asset=ob)
+    elif isinstance(ob, AssetGroup):
+        rule_all = PermRule.objects.filter(asset_group=ob)
+    else:
+        rule_all = []
+
+    perm['rule'] = rule_all
+    perm_user_group = perm['user_group'] = {}
+    perm_user = perm['user'] = {}
+    for rule in rule_all:
+        user_groups = rule.user_group.all()
+        users = rule.user.all()
+
+        # 获取一个规则资产的用户
+        for user in users:
+            if perm_user.get(user):
+                perm_user[user].get('role', set()).update(set(rule.role.all()))
+                perm_user[user].get('rule', set()).add(rule)
+            else:
+                perm_user[user] = {'role': set(rule.role.all()), 'rule': set([rule])}
+
+        # 获取一个规则资产授权的用户组
+        for user_group in user_groups:
+            user_group_users = user_group.user_set.all()
+            if perm_user_group.get(user_group):
+                perm_user_group[user_group].get('role', set()).update(set(rule.role.all()))
+                perm_user_group[user_group].get('rule', set()).add(rule)
+            else:
+                perm_user_group[user_group] = {'role': set(rule.role.all()), 'rule': set([rule]),
+                                               'user': user_group_users}
+
+            # 将用户组中的资产添加到用户授权中
+            for user in user_group_users:
+                if perm_user.get(user):
+                    perm_user[user].get('role', set()).update(perm_user_group[user_group].get('role', set()))
+                    perm_user[user].get('rule', set()).update(perm_user_group[user_group].get('rule', set()))
+                else:
+                    perm_user[user] = {'role': perm_user_group[user_group].get('role', set()),
+                                       'rule': perm_user_group[user_group].get('rule', set())}
+    return perm
+
+
+def gen_resource(ob, ex='', perm=None):
+    """
+    ob为用户或资产列表或资产queryset, 如果同时输入用户和资产，则获取用户在这些资产上的信息
+    生成MyInventory需要的 resource文件
+    """
+    res = []
+    if isinstance(ob, User) and isinstance(ex, (list, QuerySet)):
+        if not perm:
+            perm = get_group_user_perm(ob)
+            for asset, asset_info in perm.get('asset').items():
+                if asset not in ex:
+                    continue
+                asset_info = get_asset_info(asset)
+                info = {'hostname': asset.hostname, 'ip': asset.ip, 'port': asset_info.get('port', 22)}
+                try:
+                    role = sorted(list(perm.get('asset').get(asset).get('role')))[0]
+                except IndexError:
+                    continue
+                info['username'] = role.name
+                info['password'] = role.password
+                info['ssh_key'] = get_role_key(ob, role)
+                res.append(info)
+    elif isinstance(ob, User):
+        if not perm:
+            perm = get_group_user_perm(ob)
+
+        for asset, asset_info in perm.get('asset').items():
+            asset_info = get_asset_info(asset)
+            info = {'hostname': asset.hostname, 'ip': asset.ip, 'port': asset_info.get('port', 22)}
+            try:
+                role = sorted(list(perm.get('asset').get(asset).get('role')))[0]
+            except IndexError:
+                continue
+            info['username'] = role.name
+            info['password'] = role.password
+            info['ssh_key'] = get_role_key(ob, role)
+            res.append(info)
+    elif isinstance(ob, (list, QuerySet)):
+        for asset in ob:
+            info = get_asset_info(asset)
+            res.append(info)
+    return res
 
 
 def get_object_list(model, id_list):
@@ -20,267 +184,6 @@ def get_object_list(model, id_list):
             object_list.extend(model.objects.filter(id=int(object_id)))
 
     return object_list
-
-
-def get_rand_file_path(base_dir=os.path.join(BASE_DIR, 'tmp')):
-    """获取随机文件路径"""
-    filename = uuid.uuid1().hex
-    return os.path.join(base_dir, filename)
-
-
-def get_inventory(host_group):
-    """生成资产表库存清单"""
-    path = get_rand_file_path()
-    f = open(path, 'w')
-    for group, host_list in host_group.items():
-        f.write('[%s]\n' % group)
-        for ip in host_list:
-            asset = get_object(Asset, ip=ip)
-            if asset.use_default:
-                f.write('%s\n' % ip)
-            else:
-                f.write('%s ansible_ssh_port=%s ansible_ssh_user=%s ansible_ssh_pass=%s\n' %
-                        (ip, asset.port, asset.username, CRYPTOR.decrypt(asset.password)))
-    f.close()
-    return path
-
-
-def get_playbook(template, var):
-    """根据playbook模板，生成playbook"""
-    str_playbook = open(template).read()
-    for k, v in var.items():
-        str_playbook = re.sub(r'%s' % k, v, str_playbook)  # 正则来替换传入的字符
-    path = get_rand_file_path()
-    f = open(path, 'w')
-    f.write(str_playbook)
-    return path
-
-
-def perm_user_api(perm_info):
-    """
-    用户授权api，通过调用ansible API完成用户新建等,传入参数必须如下,列表中可以是对象，也可以是用户名和ip
-    perm_info = {'del': {'users': [],
-                         'assets': [],
-                        },
-                 'new': {'users': [],
-                         'assets': []}}
-    """
-    log = PermLog(action=perm_info.get('action', ''))
-    try:
-        new_users = perm_info.get('new', {}).get('users', [])
-        new_assets = perm_info.get('new', {}).get('assets', [])
-        del_users = perm_info.get('del', {}).get('users', [])
-        del_assets = perm_info.get('del', {}).get('assets', [])
-        print new_users, new_assets
-    except IndexError:
-        raise ServerError("Error: function perm_user_api传入参数错误")
-
-    try:
-        new_ip = [asset.ip for asset in new_assets if isinstance(asset, Asset)]
-        del_ip = [asset.ip for asset in del_assets if isinstance(asset, Asset)]
-        new_username = [user.username for user in new_users]
-        del_username = [user.username for user in del_users]
-    except IndexError:
-        raise ServerError("Error: function perm_user_api传入参数类型错误")
-
-    host_group = {'new': new_ip, 'del': del_ip}
-    inventory = get_inventory(host_group)
-
-    the_new_users = ','.join(new_username)
-    the_del_users = ','.join(del_username)
-
-    playbook = get_playbook(os.path.join(BASE_DIR, 'playbook', 'user_perm.yaml'),
-                            {'the_new_group': 'new', 'the_del_group': 'del',
-                             'the_new_users': the_new_users, 'the_del_users': the_del_users,
-                             'KEY_DIR': os.path.join(SSH_KEY_DIR, 'sysuser')})
-
-    print playbook, inventory
-
-    settings = get_object(Setting, name='default')
-    results = playbook_run(inventory, playbook, settings)
-    if not results.get('failures', 1) and not results.get('unreachable', ''):
-        is_success = True
-    else:
-        is_success = False
-
-    log.results = results
-    log.is_finish = True
-    log.is_success = is_success
-    log.save()
-    return results
-
-
-def user_group_permed(user_group):
-    assets = user_group.asset.all()
-    asset_groups = user_group.asset_group.all()
-
-    for asset_group in asset_groups:
-        assets.extend(asset_group.asset.all())
-
-    return {'assets': assets, 'asset_groups': asset_groups}
-
-
-def user_permed(user):
-    asset_groups = []
-    assets = []
-    user_groups = user.group.all()
-    asset_groups.extend(user.asset_group.all())
-    assets.extend(user.asset.all())
-
-    for user_group in user_groups:
-        asset_groups.extend(user_group_permed(user_group).get('assets', []))
-        assets.extend((user_group_permed(user_group).get('asset_groups', [])))
-
-    return {'assets': assets, 'asset_groups': asset_groups}
-
-
-def _public_perm_api(info):
-    """
-    公用的用户，用户组，主机，主机组编辑修改新建调用的api，用来完成授权
-    info like that:
-    {
-      'type': 'new_user',
-      'user': 'a',
-      'group': ['A', 'B']
-    }
-
-    {
-      'type': 'edit_user',
-      'user': 'a',
-      'group': {'new': ['A'], 'del': []}
-    }
-
-    {
-      'type': 'del_user',
-      'user': ['a', 'b']
-    }
-
-    {
-      'type': 'edit_user_group',
-      'group': 'A',
-      'user': {'del': ['a', 'b'], 'new': ['c', 'd']}
-    }
-
-    {
-      'type': 'del_user_group',
-      'group': ['A']
-    }
-
-    {
-      'type': 'new_asset',
-      'asset': 'a',
-      'group': ['A', 'B']
-    }
-
-    {
-      'type': 'edit_asset',
-      'asset': 'a',
-      'group': {
-          'del': ['A', ['B'],
-          'new': ['C', ['D']]
-      }
-    }
-
-    {
-      'type': 'del_asset',
-      'asset': ['a', 'b']
-    }
-
-    {
-      'type': 'edit_asset_group',
-      'group': 'A',
-      'asset': {'new': ['a', 'b'], 'del': ['c', 'd']}
-    }
-
-    {
-      'type': 'del_asset_group',
-      'group': ['A', 'B']
-    }
-    """
-
-    if info.get('type') == 'new_user':
-        new_assets = []
-        user = info.get('user')
-        user_groups = info.get('group')
-        for user_group in user_groups:
-            new_assets.extend(user_group_permed(user_group).get('assets', []))
-
-        perm_info = {
-            'action': 'new user: ' + user.name,
-            'new': {'users': [user], 'assets': new_assets}
-        }
-    elif info.get('type') == 'edit_user':
-        new_assets = []
-        del_assets = []
-        user = info.get('user')
-        new_group = info.get('group').get('new')
-        del_group = info.get('group').get('del')
-
-        for user_group in new_group:
-            new_assets.extend(user_group_permed(user_group).get('assets', []))
-
-        for user_group in del_group:
-            del_assets.extend((user_group_permed(user_group).get('assets', [])))
-
-        perm_info = {
-            'action': 'edit user: ' + user.name,
-            'del': {'users': [user], 'assets': del_assets},
-            'new': {'users': [user], 'assets': new_assets}
-        }
-
-    elif info.get('type') == 'del_user':
-        user = info.get('user')
-        del_assets = user_permed(user).get('assets', [])
-        perm_info = {
-            'action': 'del user: ' + user.name, 'del': {'users': [user], 'assets': del_assets},
-        }
-
-    elif info.get('type') == 'edit_user_group':
-        user_group = info.get('group')
-        new_users = info.get('user').get('new')
-        del_users = info.get('user').get('del')
-        assets = user_group_permed(user_group).get('assets', [])
-
-        perm_info = {
-            'action': 'edit user group: ' + user_group.name,
-            'new': {'users': new_users, 'assets': assets},
-            'del': {'users': del_users, 'assets': assets}
-        }
-
-    elif info.get('type') == 'del_user_group':
-        user_group = info.get('group', [])
-        del_users = user_group.user_set.all()
-        assets = user_group_permed(user_group).get('assets', [])
-
-        perm_info = {
-            'action': "del user group: " + user_group.name, 'del': {'users': del_users, 'assets': assets}
-        }
-    else:
-        return
-
-    try:
-        results = perm_user_api(perm_info)  # 通过API授权或回收
-    except ServerError, e:
-        return e
-    else:
-        return results
-
-
-def push_user(user, asset_groups_id):
-    assets = []
-    if not user:
-        return {'error': '没有该用户'}
-    for group_id in asset_groups_id:
-        asset_group = get_object(AssetGroup, id=group_id)
-        if asset_group:
-            assets.extend(asset_group.asset_set.all())
-    perm_info = {
-        'action': 'Push user:' + user.username,
-        'new': {'users': [user], 'assets': assets}
-    }
-
-    results = perm_user_api(perm_info)
-    return results
 
 
 def get_role_info(role_id, type="all"):

@@ -3,26 +3,27 @@
 import os, sys, time, re
 from Crypto.Cipher import AES
 import crypt
+import pwd
 from binascii import b2a_hex, a2b_hex
 import hashlib
 import datetime
 import random
 import subprocess
-from settings import *
+import json
+import logging
 
+from settings import *
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
 from django.template import RequestContext
 from juser.models import User, UserGroup
-from jasset.models import Asset, AssetGroup
-# from jlog.models import Log
 from jlog.models import Log, TtyLog
-from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from jasset.models import Asset, AssetGroup
+from jperm.models import PermRule, PermRole
+from jumpserver.models import Setting
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.mail import send_mail
-import json
-import logging
 
 
 def set_log(level):
@@ -30,16 +31,77 @@ def set_log(level):
     return a log file object
     根据提示设置log打印
     """
+    log_file = os.path.join(LOG_DIR, 'jumpserver.log')
+    if not os.path.isfile(log_file):
+        os.mknod(log_file)
+        os.chmod(log_file, 0777)
     log_level_total = {'debug': logging.DEBUG, 'info': logging.INFO, 'warning': logging.WARN, 'error': logging.ERROR,
                        'critical': logging.CRITICAL}
     logger_f = logging.getLogger('jumpserver')
     logger_f.setLevel(logging.DEBUG)
-    fh = logging.FileHandler(os.path.join(LOG_DIR, 'jumpserver.log'))
+    fh = logging.FileHandler(log_file)
     fh.setLevel(log_level_total.get(level, logging.DEBUG))
     formatter = logging.Formatter('%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
     fh.setFormatter(formatter)
     logger_f.addHandler(fh)
     return logger_f
+
+
+def get_asset_info(asset):
+    default = get_object(Setting, name='default')
+    info = {'hostname': asset.hostname, 'ip': asset.ip}
+    if asset.use_default_auth:
+        if default:
+            info['port'] = default.default_port
+            info['username'] = default.default_user
+            info['password'] = CRYPTOR.decrypt(default.default_password)
+            info['ssh_key'] = default.default_pri_key_path
+    else:
+        info['port'] = asset.port
+        info['username'] = asset.username
+        info['password'] = asset.password
+
+    return info
+
+
+def get_role(user, asset):
+    roles = []
+    rules = PermRule.objects.filter(user=user, asset=asset)
+    for rule in rules:
+        roles.extend(list(rule.role.all()))
+    return roles
+
+
+def get_role_key(user, role):
+    """
+    由于role的key的权限是所有人可以读的， ansible要求为600，所以拷贝一份到特殊目录
+    :param user:
+    :param role:
+    :return: self key path
+    """
+    user_role_key_dir = os.path.join(KEY_DIR, 'user')
+    user_role_key_path = os.path.join(user_role_key_dir, '%s_%s.pem' % (user.username, role.name))
+    mkdir(user_role_key_dir, mode=777)
+    if not os.path.isfile(user_role_key_path):
+        with open(os.path.join(role.key_path, 'id_rsa')) as fk:
+            with open(user_role_key_path, 'w') as fu:
+                fu.write(fk.read())
+
+        print user_role_key_path, user.username
+        chown(user_role_key_path, user.username)
+        os.chmod(user_role_key_path, 0600)
+    return user_role_key_path
+
+
+def chown(path, user, group=''):
+    if not group:
+        group = user
+    try:
+        uid = pwd.getpwnam(user).pw_uid
+        gid = pwd.getpwnam(group).pw_gid
+        os.chown(path, uid, gid)
+    except KeyError:
+        pass
 
 
 def page_list_return(total, current=1):
@@ -159,8 +221,7 @@ class PyCrypt(object):
         try:
             plain_text = cryptor.decrypt(a2b_hex(text))
         except TypeError:
-            # raise ServerError('Decrypt password error, TYpe error.')
-            pass
+            raise ServerError('Decrypt password error, TYpe error.')
         return plain_text.rstrip('\0')
 
 
@@ -197,9 +258,9 @@ def require_role(role='user'):
 
     def _deco(func):
         def __deco(request, *args, **kwargs):
+            request.session['pre_url'] = request.path
             if not request.user.is_authenticated():
                 return HttpResponseRedirect('/login/')
-            
             if role == 'admin':
                 # if request.session.get('role_id', 0) < 1:
                 if request.user.role == 'CU':
@@ -388,15 +449,16 @@ def bash(cmd):
     return subprocess.call(cmd, shell=True)
 
 
-def mkdir(dir_name, username='root', mode=0755):
+def mkdir(dir_name, username='', mode=0755):
     """
     insure the dir exist and mode ok
     目录存在，如果不存在就建立，并且权限正确
     """
     if not os.path.isdir(dir_name):
         os.makedirs(dir_name)
-        bash("chown %s:%s '%s'" % (username, username, dir_name))
-    os.chmod(dir_name, mode)
+        os.chmod(dir_name, mode)
+    if username:
+        chown(dir_name, username)
 
 
 def http_success(request, msg):
@@ -414,4 +476,3 @@ def my_render(template, data, request):
 
 CRYPTOR = PyCrypt(KEY)
 logger = set_log(LOG_LEVEL)
-KEY_DIR = os.path.join(BASE_DIR, 'keys')

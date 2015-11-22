@@ -19,10 +19,11 @@ import struct, fcntl, signal, socket, select
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
     django.setup()
-from jumpserver.api import ServerError, User, Asset, AssetGroup, get_object
-from jumpserver.api import logger, mkdir, Log, TtyLog
+from jumpserver.api import ServerError, User, Asset, AssetGroup, get_object, mkdir, get_asset_info, get_role
+from jumpserver.api import logger, Log, TtyLog, get_role_key
+from jperm.perm_api import gen_resource, get_group_asset_perm, get_group_user_perm
 from jumpserver.settings import LOG_DIR
-
+from jperm.ansible_api import Command
 
 login_user = get_object(User, username=getpass.getuser())
 VIM_FLAG = False
@@ -68,23 +69,20 @@ def check_vim_status(command, ssh):
             return False
 
 
-
-
-
 class Tty(object):
     """
     A virtual tty class
     一个虚拟终端类，实现连接ssh和记录日志，基类
     """
-    def __init__(self, username, asset_name):
-        self.username = username
-        self.asset_name = asset_name
+    def __init__(self, user, asset, role):
+        self.username = user.username
+        self.asset_name = asset.hostname
         self.ip = None
         self.port = 22
         self.channel = None
-        #self.asset = get_object(Asset, name=asset_name)
-        #self.user = get_object(User, username=username)
-        self.role = None
+        self.asset = asset
+        self.user = user
+        self.role = role
         self.ssh = None
         self.connect_info = None
         self.login_type = 'ssh'
@@ -252,6 +250,7 @@ class Tty(object):
         log_file_path = os.path.join(today_connect_log_dir, '%s_%s_%s' % (self.username, self.asset_name, time_start))
 
         try:
+            mkdir(os.path.dirname(today_connect_log_dir), mode=0777)
             mkdir(today_connect_log_dir, mode=0777)
         except OSError:
             logger.debug('创建目录 %s 失败，请修改%s目录权限' % (today_connect_log_dir, tty_log_dir))
@@ -289,7 +288,10 @@ class Tty(object):
         # 2. get 映射用户
         # 3. get 映射用户的账号，密码或者key
         # self.connect_info = {'user': '', 'asset': '', 'ip': '', 'port': 0, 'role_name': '', 'role_pass': '', 'role_key': ''}
-        self.connect_info = {'user': 'a', 'asset': 'b', 'ip': '127.0.0.1', 'port': 22, 'role_name': 'root', 'role_pass': '', 'role_key': '/root/.ssh/id_rsa.bak'}
+        asset_info = get_asset_info(self.asset)
+        self.connect_info = {'user': self.user, 'asset': self.asset, 'ip': asset_info.get('ip'),
+                             'port': int(asset_info.get('port')), 'role_name': self.role.name,
+                             'role_pass': self.role.password, 'role_key': self.role.key_path}
         return self.connect_info
 
     def get_connection(self):
@@ -303,18 +305,24 @@ class Tty(object):
         ssh.load_system_host_keys()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
-            if connect_info.get('role_pass'):
-                ssh.connect(connect_info.get('ip'),
-                            port=connect_info.get('port'),
-                            username=connect_info.get('role_name'),
-                            password=connect_info.get('role_pass'),
-                            look_for_keys=False)
-            else:
-                ssh.connect(connect_info.get('ip'),
-                            port=connect_info.get('port'),
-                            username=connect_info.get('role_name'),
-                            key_filename=connect_info.get('role_key'),
-                            look_for_keys=False)
+            role_key = get_role_key(self.user, self.role)
+            if role_key and os.path.isfile(role_key):
+                try:
+                    ssh.connect(connect_info.get('ip'),
+                                port=connect_info.get('port'),
+                                username=connect_info.get('role_name'),
+                                key_filename=role_key,
+                                look_for_keys=False)
+                    self.ssh = ssh
+                    return ssh
+                except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
+                    pass
+
+            ssh.connect(connect_info.get('ip'),
+                        port=connect_info.get('port'),
+                        username=connect_info.get('role_name'),
+                        password=connect_info.get('role_pass'),
+                        look_for_keys=False)
 
         except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
             raise ServerError('认证失败 Authentication Error.')
@@ -452,7 +460,7 @@ class SshTty(Tty):
         #print 'ok'+tmp+'ok'
         # SSH_TTY  = re.search(r'(?<=/dev/).*', tmp).group().strip()
         # SSH_TTY = ''
-        channel.send('clear\n')
+        # channel.send('clear\n')
         # Make ssh interactive tunnel
         self.posix_shell()
 
@@ -460,28 +468,123 @@ class SshTty(Tty):
         channel.close()
         ssh.close()
 
-    def execute(self, cmd):
-        """
-        execute cmd on the asset
-        执行命令
-        """
-        pass
 
+class Nav(object):
+    def __init__(self, user):
+        self.user = user
+        self.search_result = {}
+        self.user_perm = {}
 
-def print_prompt():
-    """
-    Print prompt
-    打印提示导航
-    """
-    msg = """\033[1;32m###  Welcome Use JumpServer To Login. ### \033[0m
-    1) Type \033[32mIP or Part IP, Host Alias or Comments \033[0m To Login.
-    2) Type \033[32mP/p\033[0m To Print The Servers You Available.
-    3) Type \033[32mG/g\033[0m To Print The Server Groups You Available.
-    4) Type \033[32mG/g(1-N)\033[0m To Print The Server Group Hosts You Available.
-    5) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
-    6) Type \033[32mQ/q\033[0m To Quit.
-    """
-    print textwrap.dedent(msg)
+    @staticmethod
+    def print_nav():
+        """
+        Print prompt
+        打印提示导航
+        """
+        msg = """\n\033[1;32m###  Welcome To Use JumpServer, A Open Source System . ### \033[0m
+        1) Type \033[32mID\033[0m To Login.
+        2) Type \033[32m/\033[0m + \033[32mIP, Host Name, Host Alias or Comments \033[0mTo Search.
+        3) Type \033[32mP/p\033[0m To Print The Servers You Available.
+        4) Type \033[32mG/g\033[0m To Print The Server Groups You Available.
+        5) Type \033[32mG/g\033[0m\033[0m + \033[32mGroup ID\033[0m To Print The Server Group You Available.
+        6) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
+        7) Type \033[32mQ/q\033[0m To Quit.
+        """
+
+        msg = """\n\033[1;32m###  欢迎使用Jumpserver开源跳板机  ### \033[0m
+        1) 输入 \033[32mID\033[0m 直接登录.
+        2) 输入 \033[32m/\033[0m + \033[32mIP, 主机名, 主机别名 or 备注 \033[0m搜索.
+        3) 输入 \033[32mP/p\033[0m 显示您有权限的主机.
+        4) 输入 \033[32mG/g\033[0m 显示您有权限的主机组.
+        5) 输入 \033[32mG/g\033[0m\033[0m + \033[32m组ID\033[0m 显示该组下主机.
+        6) 输入 \033[32mE/e\033[0m 批量执行命令.
+        7) 输入 \033[32mQ/q\033[0m 退出.
+        """
+        print textwrap.dedent(msg)
+
+    def search(self, str_r=''):
+        gid_pattern = re.compile(r'^g\d+$')
+        if not self.user_perm:
+            self.user_perm = get_group_user_perm(self.user)
+        user_asset_all = self.user_perm.get('asset').keys()
+        user_asset_search = []
+        if str_r:
+            if gid_pattern.match(str_r):
+                user_asset_search = list(Asset.objects.all())
+            else:
+                for asset in user_asset_all:
+                    if str_r in asset.ip or str_r in str(asset.comment):
+                        user_asset_search.append(asset)
+        else:
+            user_asset_search = user_asset_all
+
+        self.search_result = dict(zip(range(len(user_asset_search)), user_asset_search))
+        print '\033[32m[%-3s] %-15s  %-15s  %-5s  %-10s  %s \033[0m' % ('ID', 'AssetName', 'IP', 'Port', 'Role', 'Comment')
+        for index, asset in self.search_result.items():
+            asset_info = get_asset_info(asset)
+            role = [str(role.name) for role in self.user_perm.get('asset').get(asset).get('role')]
+            if asset.comment:
+                print '[%-3s] %-15s  %-15s  %-5s  %-10s  %s' % (index, asset.hostname, asset.ip, asset_info.get('port'),
+                                                                role, asset.comment)
+            else:
+                print '[%-3s] %-15s  %-15s  %-5s  %-10s' % (index, asset.hostname, asset.ip, asset_info.get('port'), role)
+        print
+
+    @staticmethod
+    def print_asset_group():
+        user_asset_group_all = AssetGroup.objects.all()
+
+        print '\033[32m[%-3s] %-15s %s \033[0m' % ('ID', 'GroupName', 'Comment')
+        for asset_group in user_asset_group_all:
+            if asset_group.comment:
+                print '[%-3s] %-15s %s' % (asset_group.id, asset_group.name, asset_group.comment)
+            else:
+                print '[%-3s] %-15s' % (asset_group.id, asset_group.name)
+        print
+
+    def exec_cmd(self):
+        self.search()
+        while True:
+            print "请输入主机名、IP或ansile支持的pattern, q退出"
+            try:
+                pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
+                if pattern == 'q':
+                    break
+                else:
+                    if not self.user_perm:
+                        self.user_perm = get_group_user_perm(self.user)
+                    res = gen_resource(self.user, perm=self.user_perm)
+                    cmd = Command(res)
+                    logger.debug(res)
+                    for inv in cmd.inventory.get_hosts(pattern=pattern):
+                        print inv.name
+                    confirm_host = raw_input("\033[1;32mIs that [y/n]>:\033[0m ").strip()
+                    if confirm_host == 'y':
+                        while True:
+                            print "请输入执行的命令， 按q退出"
+                            command = raw_input("\033[1;32mCmds>:\033[0m ").strip()
+                            if command == 'q':
+                                break
+                            result = cmd.run(module_name='shell', command=command, pattern=pattern)
+                            for k, v in result.items():
+                                if k == 'ok':
+                                    for host, output in v.items():
+                                        color_print("%s => %s" % (host, 'Ok'), 'green')
+                                        print output
+                                        print
+                                else:
+                                    for host, output in v.items():
+                                        color_print("%s => %s" % (host, k), 'red')
+                                        color_print(output, 'red')
+                                        print
+                                print "=" * 20
+                                print
+                    else:
+                        continue
+
+            except EOFError:
+                print
+                break
 
 
 def main():
@@ -492,38 +595,60 @@ def main():
     if not login_user:  # 判断用户是否存在
         color_print(u'没有该用户，或许你是以root运行的 No that user.', exits=True)
 
-    print_prompt()
     gid_pattern = re.compile(r'^g\d+$')
+    nav = Nav(login_user)
+    nav.print_nav()
 
     try:
         while True:
             try:
-                option = raw_input("\033[1;32mOpt or IP>:\033[0m ")
+                option = raw_input("\033[1;32mOpt or ID>:\033[0m ").strip()
             except EOFError:
-                print_prompt()
+                nav.print_nav()
                 continue
             except KeyboardInterrupt:
                 sys.exit(0)
-            if option in ['P', 'p']:
-                login_user.get_asset_info(printable=True)
+            if option in ['P', 'p', '\n', '']:
+                nav.search()
                 continue
+            if option.startswith('/') or gid_pattern.match(option):
+                nav.search(option.lstrip('/'))
             elif option in ['G', 'g']:
-                login_user.get_asset_group_info(printable=True)
-                continue
-            elif gid_pattern.match(option):
-                gid = option[1:].strip()
-                asset_group = get_object(AssetGroup, id=gid)
-                if asset_group and asset_group.is_permed(user=login_user):
-                    asset_group.get_asset_info(printable=True)
+                nav.print_asset_group()
                 continue
             elif option in ['E', 'e']:
-                # exec_cmd_servers(login_name)
-                pass
+                nav.exec_cmd()
+                continue
             elif option in ['Q', 'q', 'exit']:
                 sys.exit()
             else:
                 try:
-                    verify_connect(login_user, option)
+                    asset = nav.search_result[int(option)]
+                    roles = get_role(login_user, asset)
+                    if len(roles) > 1:
+                        role_check = dict(zip(range(len(roles)), roles))
+                        print role_check
+                        for index, role in role_check.items():
+                            print "[%s] %s" % (index, role.name)
+                        print "输入角色ID, q退出"
+                        try:
+                            role_index = raw_input("\033[1;32mID>:\033[0m ").strip()
+                            if role_index == 'q':
+                                continue
+                            else:
+                                role = role_check[int(role_index)]
+                        except IndexError:
+                            color_print('请输入正确ID', 'red')
+                            continue
+                    elif len(roles) == 1:
+                        role = roles[0]
+                    else:
+                        color_print('没有映射用户', 'red')
+                        continue
+                    ssh_tty = SshTty(login_user, asset, role)
+                    ssh_tty.connect()
+                except (KeyError, ValueError):
+                    color_print('请输入正确ID', 'red')
                 except ServerError, e:
                     color_print(e, 'red')
     except IndexError:

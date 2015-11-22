@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
 
-
 from django.db.models import Q
 from jperm.perm_api import *
-from jperm.models import PermLog as Log
-from jperm.models import SysUser
 from juser.user_api import gen_ssh_key
 
 
 from juser.models      import User, UserGroup
 from jasset.models     import Asset, AssetGroup
 from jperm.models      import PermRole, PermRule
+from jumpserver.models import Setting
 
 from jperm.utils       import updates_dict, gen_keys, get_rand_pass
 from jperm.ansible_api import Tasks
 from jperm.perm_api    import get_role_info
 
-from jumpserver.api    import my_render, get_object
+from jumpserver.api    import my_render, get_object, CRYPTOR
 
 
 @require_role('admin')
@@ -62,7 +60,7 @@ def perm_rule_detail(request):
     assets = asset_obj
 
     return my_render('jperm/perm_rule_detail.html', locals(), request)
-    
+
 
 def perm_rule_add(request):
     """
@@ -89,7 +87,8 @@ def perm_rule_add(request):
         asset_groups_select = request.POST.getlist('assetgroup', [])
         roles_select = request.POST.getlist('role', [])
         rule_name = request.POST.get('rulename')
-        rule_comment = request.POST.get('comment')
+        rule_comment = request.POST.get('rule_comment')
+        rule_ssh_key = request.POST.get("use_publicKey")
 
         # 获取需要授权的主机列表
         assets_obj = [Asset.objects.get(ip=asset) for asset in assets_select]
@@ -115,7 +114,19 @@ def perm_rule_add(request):
         rule.asset_group = asset_groups_obj
         rule.role = roles_obj
         rule.save()
-        return HttpResponse(u"添加授权规则：%s" % rule.name)
+
+        msg = u"添加授权规则：%s" % rule.name
+        # 渲染数据
+        header_title, path1, path2 = "授权规则", "规则管理", "查看规则"
+        rules_list = PermRule.objects.all()
+
+        # TODO: 搜索和分页
+        keyword = request.GET.get('search', '')
+        if keyword:
+            rules_list = rules_list.filter(Q(name=keyword))
+        rules_list, p, rules, page_range, current_page, show_first, show_end = pages(rules_list, request)
+
+        return my_render('jperm/perm_rule_list.html', locals(), request)
 
 
 @require_role('admin')
@@ -131,17 +142,69 @@ def perm_rule_edit(request):
     rule = PermRule.objects.get(id=rule_id)
 
     if request.method == 'GET' and rule_id:
-        # 渲染数据, 获取所有的rule对象
-        users = rule.user.all()
-        user_groups = rule.user_group.all()
-        assets = rule.asset.all()
-        asset_groups = rule.asset_group.all()
-        roles = rule.role.all()
+        # 渲染数据, 获取所选的rule对象
+        rule_comment = rule.comment
+        users_select = rule.user.all()
+        user_groups_select = rule.user_group.all()
+        assets_select = rule.asset.all()
+        asset_groups_select = rule.asset_group.all()
+        roles_select = rule.role.all()
+
+        users = User.objects.all()
+        user_groups = UserGroup.objects.all()
+        assets = Asset.objects.all()
+        asset_groups = AssetGroup.objects.all()
+        roles = PermRole.objects.all()
 
         return my_render('jperm/perm_rule_edit.html', locals(), request)
 
     elif request.method == 'POST' and rule_id:
-        return HttpResponse("uncompleted")
+        # 获取用户选择的 用户,用户组,资产,资产组,用户角色
+        rule_name = request.POST.get('rule_name')
+        rule_comment = request.POST.get("rule_comment")
+        users_select = request.POST.getlist('user', [])
+        user_groups_select = request.POST.getlist('usergroup', [])
+        assets_select = request.POST.getlist('asset', [])
+        asset_groups_select = request.POST.getlist('assetgroup', [])
+        roles_select = request.POST.getlist('role', [])
+
+        # 获取需要授权的主机列表
+        assets_obj = [Asset.objects.get(ip=asset) for asset in assets_select]
+        asset_groups_obj = [AssetGroup.objects.get(name=group) for group in asset_groups_select]
+        group_assets_obj = [asset for asset in [group.asset_set.all() for group in asset_groups_obj]]
+        calc_assets = set(group_assets_obj) | set(assets_obj)
+
+        # 获取需要授权的用户列表
+        users_obj = [User.objects.get(name=user) for user in users_select]
+        user_groups_obj = [UserGroup.objects.get(name=group) for group in user_groups_select]
+        group_users_obj = [user for user in [group.user_set.all() for group in user_groups_obj]]
+        calc_users = set(group_users_obj) | set(users_obj)
+
+        # 获取授予的角色列表
+        roles_obj = [PermRole.objects.get(name=role) for role in roles_select]
+
+        # 仅授权成功的，写回数据库(授权规则,用户,用户组,资产,资产组,用户角色)
+        rule.user = users_obj
+        rule.usergroup = user_groups_obj
+        rule.asset = assets_obj
+        rule.asset_group = asset_groups_obj
+        rule.role = roles_obj
+        rule.name = rule_name
+        rule.comment = rule.comment
+        rule.save()
+
+        msg = u"更新授权规则：%s" % rule.name
+        # 渲染数据
+        header_title, path1, path2 = "授权规则", "规则管理", "查看规则"
+        rules_list = PermRule.objects.all()
+
+        # TODO: 搜索和分页
+        keyword = request.GET.get('search', '')
+        if keyword:
+            rules_list = rules_list.filter(Q(name=keyword))
+        rules_list, p, rules, page_range, current_page, show_first, show_end = pages(rules_list, request)
+
+        return my_render('jperm/perm_rule_list.html', locals(), request)
 
 
 @require_role('admin')
@@ -201,12 +264,24 @@ def perm_role_add(request):
         name = request.POST.get("role_name")
         comment = request.POST.get("role_comment")
         password = request.POST.get("role_password")
+        encrypt_pass = CRYPTOR.encrypt(password)
         # 生成随机密码，生成秘钥对
 
         key_path = gen_keys()
-        role = PermRole(name=name, comment=comment, password=password, key_path=key_path)
+        role = PermRole(name=name, comment=comment, password=encrypt_pass, key_path=key_path)
         role.save()
-        return HttpResponse(u"添加角色: %s" % name)
+
+        msg = u"添加角色: %s" % name
+        # 渲染 刷新数据
+        header_title, path1, path2 = "系统角色", "角色管理", "查看角色"
+        roles_list = PermRole.objects.all()
+        # TODO: 搜索和分页
+        keyword = request.GET.get('search', '')
+        if keyword:
+            roles_list = roles_list.filter(Q(name=keyword))
+
+        roles_list, p, roles, page_range, current_page, show_first, show_end = pages(roles_list, request)
+        return my_render('jperm/perm_role_list.html', locals(), request)
     else:
         return HttpResponse(u"不支持该操作")
 
@@ -252,8 +327,12 @@ def perm_role_detail(request):
         role_info = get_role_info(role_id)
 
         # 渲染数据
-        for key, value in role_info.iteritems():
-            key = value
+        rules = role_info.get("rules")
+        assets = role_info.get("assets")
+        asset_groups = role_info.get("asset_groups")
+        users = role_info.get("users")
+        user_groups = role_info.get("user_groups")
+
         return my_render('jperm/perm_role_detail.html', locals(), request)
 
 
@@ -265,15 +344,38 @@ def perm_role_edit(request):
     # 渲染数据
     header_title, path1, path2 = "系统角色", "角色管理", "角色编辑"
 
+    # 渲染数据
+    role_id = request.GET.get("id")
+    role = PermRole.objects.get(id=role_id)
+    role_pass = CRYPTOR.decrypt(role.password)
     if request.method == "GET":
-        role_id = request.GET.get("id")
-        # 渲染数据
-        role = PermRole.objects.get(id=role_id)
-
         return my_render('jperm/perm_role_edit.html', locals(), request)
 
     if request.method == "POST":
-        return HttpResponse(u"未实现")
+        # 获取 POST 数据
+        role_name = request.POST.get("role_name")
+        role_password = request.POST.get("role_password")
+        encrypt_role_pass = CRYPTOR.encrypt(role_password)
+        role_comment = request.POST.get("role_comment")
+
+        # 写入数据库
+        role.name = role_name
+        role.password = encrypt_role_pass
+        role.comment = role_comment
+
+        role.save()
+        msg = u"更新系统角色： %s" % role.name
+
+        # 渲染 刷新数据
+        header_title, path1, path2 = "系统角色", "角色管理", "查看角色"
+        roles_list = PermRole.objects.all()
+        # TODO: 搜索和分页
+        keyword = request.GET.get('search', '')
+        if keyword:
+            roles_list = roles_list.filter(Q(name=keyword))
+
+        roles_list, p, roles, page_range, current_page, show_first, show_end = pages(roles_list, request)
+        return my_render('jperm/perm_role_list.html', locals(), request)
 
 
 @require_role('admin')
@@ -307,10 +409,20 @@ def perm_role_push(request):
         calc_assets = set(assets_obj) | set(group_assets_obj)
 
         # 生成Inventory
-        push_resource = [{"hostname": asset.ip,
-                          "port": asset.port,
-                          "username": asset.username,
-                          "password": asset.password} for asset in calc_assets]
+        push_resource = []
+        for asset in calc_assets:
+            if asset.use_default_auth:
+                username = Setting.default_user
+                password = Setting.default_password
+                port = Setting.default_port
+            else:
+                username = asset.username
+                password = asset.password
+                port = asset.port
+            push_resource.append({"hostname": asset.ip,
+                                  "port": port,
+                                  "username": username,
+                                  "password": password})
 
         # 获取角色的推送方式,以及推送需要的信息
         roles_obj = [PermRole.objects.get(name=role_name) for role_name in role_names]
@@ -326,10 +438,13 @@ def perm_role_push(request):
         task = Tasks(push_resource)
         ret = {}
         ret_failed = []
-        if password_push:
-            ret["password_push"] = task.add_multi_user(**role_pass)
-            if ret["password_push"].get("status") != "success":
-                ret_failed.append(1)
+
+        # 因为要先建立用户，所以password 是必选项，
+        # 而push key是在 password也完成的情况下的 可选项
+        ret["password_push"] = task.add_multi_user(**role_pass)
+        if ret["password_push"].get("status") != "success":
+            ret_failed.append(1)
+
         if key_push:
             ret["key_push"] = task.push_multi_key(**role_key)
             if ret["key_push"].get("status") != "success":
@@ -340,109 +455,4 @@ def perm_role_push(request):
             return HttpResponse(u"推送失败")
         else:
             return HttpResponse(u"推送系统角色： %s" % ','.join(role_names))
-
-
-
-
-
-
-
-
-
-
-@require_role('admin')
-def perm_group_list(request):
-    header_title, path1, path2 = '用户组授权', '授权管理', '用户组授权'
-    keyword = request.GET.get('search', '')
-    user_groups_list = UserGroup.objects.all()
-    if keyword:
-        request = user_groups_list.filter(Q(name=keyword) | Q(comment=keyword))
-    user_groups_list, p, user_groups, page_range, current_page, show_first, show_end = pages(user_groups_list, request)
-    return my_render('jperm/perm_group_list.html', locals(), request)
-
-
-
-@require_role('admin')
-def perm_group_edit(request):
-    header_title, path1, path2 = '用户组授权', '授权管理', '授权更改'
-    user_group_id = request.GET.get('id', '')
-    user_group = get_object(UserGroup, id=user_group_id)
-    asset_all = Asset.objects.all()
-    asset_group_all = AssetGroup.objects.all()
-    asset_permed = user_group.asset.all()  # 获取授权的资产对象列表
-    asset_group_permed = user_group.asset_group.all()  # 获取授权的资产组对象列表
-    if request.method == 'GET' and user_group:
-        assets = [asset for asset in asset_all if asset not in asset_permed]
-        asset_groups = [asset_group for asset_group in asset_group_all if asset_group not in asset_group_permed]
-        return my_render('jperm/perm_group_edit.html', locals(), request)
-    elif request.method == 'POST' and user_group:
-        asset_id_select = request.POST.getlist('asset_select', [])
-        asset_group_id_select = request.POST.getlist('asset_groups_select', [])
-        asset_select = get_object_list(Asset, asset_id_select)
-        asset_group_select = get_object_list(AssetGroup, asset_group_id_select)
-        asset_new = list(set(asset_select) - set(asset_permed))  # 计算的得到新授权的资产对象列表
-        asset_del = list(set(asset_permed) - set(asset_select))  # 计算得到回收权限的资产对象列表
-        asset_group_new = list(set(asset_group_select) - set(asset_group_permed))  # 新授权的资产组对象列表
-        asset_group_del = list(set(asset_group_permed) - set(asset_group_select))  # 回收的资产组对象列表
-        users = user_group.user_set.all()
-        perm_info = {
-            'action': 'perm group edit: ' + user_group.name,
-            'del': {'users': users, 'assets': asset_del},
-            'new': {'users': users, 'assets': asset_new}
-        }
-        results = perm_user_api(perm_info)
-        unreachable_asset = []
-        failures_asset = []
-        for ip in results.get('unreachable'):
-            unreachable_asset.extend(filter(lambda x: x, Asset.objects.filter(ip=ip)))
-        for ip in results.get('failures'):
-            failures_asset.extend(filter(lambda x: x, Asset.objects.filter(ip=ip)))
-        failures_asset.extend(unreachable_asset)  # 失败的授权要统计
-        for asset in failures_asset:
-            if asset in asset_select:
-                asset_select.remove(asset)
-            else:
-                asset_select.append(asset)
-        user_group.asset = asset_select
-        user_group.asset_group = asset_group_select
-        user_group.save()  # 保存到数据库
-        return HttpResponse(json.dumps(results, sort_keys=True, indent=4), content_type="application/json")
-    else:
-        return HttpResponse('输入错误')
-
-
-def log(request):
-    header_title, path1, path2 = '授权记录', '授权管理', '授权记录'
-    log_all = Log.objects.all().order_by('-datetime')
-    log_all, p, logs, page_range, current_page, show_first, show_end = pages(log_all, request)
-    return my_render('jperm/perm_log.html', locals(), request)
-
-
-def sys_user_add(request):
-    asset_group_all = AssetGroup.objects.all()
-    if request.method == 'POST':
-        username = request.POST.get('username', '')
-        password = request.POST.get('password', '')
-        asset_groups_id = request.POST.getlist('asset_groups_select', [])
-        comment = request.POST.get('comment')
-        sys_user = SysUser(username=username, password=password, comment=comment)
-        sys_user.save()
-        gen_ssh_key(username, key_dir=os.path.join(SSH_KEY_DIR, 'sysuser'), authorized_keys=False)
-        results = push_user(sys_user, asset_groups_id)
-        return HttpResponse(json.dumps(results, sort_keys=True, indent=4), content_type="application/json")
-    return my_render('jperm/sys_user_add.html', locals(), request)
-
-
-def sys_user_list(request):
-    users_list = SysUser.objects.all()
-    users_list, p, users, page_range, current_page, show_first, show_end = pages(users_list, request)
-    return my_render('jperm/sys_user_list.html', locals(), request)
-
-
-def sys_user_edit(request):
-    pass
-
-
-def sys_user_del(request):
-    pass
 

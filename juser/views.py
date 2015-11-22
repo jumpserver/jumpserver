@@ -96,36 +96,37 @@ def group_edit(request):
 
     if request.method == 'GET':
         group_id = request.GET.get('id', '')
-        user_group = get_object(UserGroup, id=group_id)
-        if user_group:
-            users_all = User.objects.all()
-            users_selected = user_group.user_set.all()
-            users_remain = [user for user in users_all if user not in users_selected]
+        # user_group = get_object(UserGroup, id=group_id)
+        user_group = UserGroup.objects.get(id=group_id)
+        users_selected = User.objects.filter(group=user_group)
+        users_remain = User.objects.filter(~Q(group=user_group))
+        users_all = User.objects.all()
 
-    else:
+    elif request.method == 'POST':
         group_id = request.POST.get('group_id', '')
         group_name = request.POST.get('group_name', '')
         comment = request.POST.get('comment', '')
         users_selected = request.POST.getlist('users_selected')
 
-        users = []
         try:
             if '' in [group_id, group_name]:
                 raise ServerError('组名不能为空')
 
-            user_group = get_object(UserGroup, id=group_id)
-            other_group = get_object(UserGroup, name=group_name)
-
-            if other_group and other_group.id != int(group_id):
+            if len(UserGroup.objects.filter(name=group_name)) > 1:
                 raise ServerError(u'%s 用户组已存在' % group_name)
+            # add user group
+            for user in User.objects.filter(id__in=users_selected):
+                user.group.add(UserGroup.objects.get(id=group_id))
+            # delete user group
+            user_group = UserGroup.objects.get(id=group_id)
+            for user in [user for user in User.objects.filter(group=user_group) if user not in User.objects.filter(id__in=users_selected)]:
+                user_group_all = user.group.all()
+                user.group.clear()
+                for g in user_group_all:
+                    if g == user_group:
+                        continue
+                    user.group.add(g)
 
-            for user_id in users_selected:
-                users.extend(User.objects.filter(id=user_id))
-
-            if user_group:
-                user_group.update(name=group_name, comment=comment)
-                user_group.user_set.clear()
-                user_group.user_set = users
 
         except ServerError, e:
             error = e
@@ -133,8 +134,8 @@ def group_edit(request):
             return HttpResponseRedirect('/juser/group_list/')
         else:
             users_all = User.objects.all()
-            users_selected = user_group.user_set.all()
-            users_remain = [user for user in users_all if user not in users_selected]
+            users_selected = User.objects.filter(group=user_group)
+            users_remain = User.objects.filter(~Q(group=user_group))
 
     return my_render('juser/group_edit.html', locals(), request)
 

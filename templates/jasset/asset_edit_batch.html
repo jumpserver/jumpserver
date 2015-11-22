@@ -54,17 +54,29 @@
                         <div class="col-sm-2">
                             <div class="radio i-checks">
                                 <label>
+<<<<<<< HEAD
+                                    <input type="radio" checked="" value="no_action" id="no" name="use_default_auth" class="auth"><span> 不修改 </span>
+=======
                                     <input type="radio" checked="" value="" id="no" name="use_default_auth" class="auth"><span> 不修改 </span>
+>>>>>>> cmdb
                                 </label>
                             </div>
                             <div class="radio i-checks">
                                 <label>
+<<<<<<< HEAD
+                                    <input type="radio" id="default" name="use_default_auth" class="auth"><span> 使用默认 </span>
+=======
                                     <input type="radio" id="default" name="use_default_auth" class="auth" value="default"><span> 使用默认 </span>
+>>>>>>> cmdb
                                 </label>
                             </div>
                             <div class="radio i-checks">
                                 <label>
+<<<<<<< HEAD
+                                    <input type="radio" id="pass" name="use_default_auth" class="auth"><span> 用户名密码 </span>
+=======
                                     <input type="radio" id="pass" name="use_default_auth" class="auth" value="user_passwd"><span> 用户名密码 </span>
+>>>>>>> cmdb
                                 </label>
                             </div>
                         </div>
@@ -126,6 +138,21 @@
 </div>
 <script>
     $(document).ready(function() {
+<<<<<<< HEAD
+        $('#host_edit').click(function () {
+            var args = {};
+            var match = null;
+            var uuid = decodeURIComponent(location.search.substring(1));
+            var reg = /(?:([^&amp;]+)=([^&amp;]+))/g;
+            while((match = reg.exec(uuid))!==null){
+                args[match[1]] = match[2];
+            }
+            var ids = args['uuid'];
+            $('#uuid').val(ids)
+        });
+
+=======
+>>>>>>> cmdb
         $('.auth').click(function(){
             if ($(this).attr('id') == 'pass'){
                 $('#admin_account').css('display', 'block')
