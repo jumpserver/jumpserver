@@ -26,7 +26,6 @@ from jumpserver.settings import LOG_DIR
 from jperm.ansible_api import Command
 
 login_user = get_object(User, username=getpass.getuser())
-VIM_FLAG = False
 
 try:
     import termios
@@ -52,23 +51,6 @@ def color_print(msg, color='red', exits=False):
         sys.exit()
 
 
-def check_vim_status(command, ssh):
-    global SSH_TTY
-    print command
-    if command == '':
-        return True
-    else:
-        command_str= 'ps -ef |grep "%s" | grep "%s"|grep -v grep |wc -l' % (command,SSH_TTY)
-        print command_str
-        stdin, stdout, stderr = ssh.exec_command(command_str)
-        ps_num = stdout.read()
-        print ps_num
-        if int(ps_num) == 0:
-            return True
-        else:
-            return False
-
-
 class Tty(object):
     """
     A virtual tty class
@@ -86,6 +68,7 @@ class Tty(object):
         self.ssh = None
         self.connect_info = None
         self.login_type = 'ssh'
+        self.vim_flag = False
 
     @staticmethod
     def is_output(strings):
@@ -95,25 +78,24 @@ class Tty(object):
                 return True
         return False
 
-    @staticmethod
-    def deal_command(str_r):
+    def deal_command(self, str_r):
         """
-                处理命令中特殊字符
+            处理命令中特殊字符
         """
-        str_r = re.sub('\x07','',str_r)   #删除响铃
-        patch_char = re.compile('\x08\x1b\[C')      #删除方向左右一起的按键
+        str_r = re.sub('\x07', '', str_r)       # 删除响铃
+        patch_char = re.compile('\x08\x1b\[C')  # 删除方向左右一起的按键
         while patch_char.search(str_r):
             str_r = patch_char.sub('', str_r.rstrip())
 
-        result_command = ''      #最后的结果
-        backspace_num = 0              #光标移动的个数
-        reach_backspace_flag = False    #没有检测到光标键则为true
-        pattern_str=''
+        result_command = ''             # 最后的结果
+        backspace_num = 0               # 光标移动的个数
+        reach_backspace_flag = False    # 没有检测到光标键则为true
+        pattern_str = ''
         while str_r:
             tmp = re.match(r'\s*\w+\s*', str_r)
             if tmp:
-                if reach_backspace_flag :
-                    pattern_str +=str(tmp.group(0))
+                if reach_backspace_flag:
+                    pattern_str += str(tmp.group(0))
                     str_r = str_r[len(str(tmp.group(0))):]
                     continue
                 else:
@@ -124,7 +106,7 @@ class Tty(object):
             tmp = re.match(r'\x1b\[K[\x08]*', str_r)
             if tmp:
                 if backspace_num > 0:
-                    if backspace_num > len(result_command) :
+                    if backspace_num > len(result_command):
                         result_command += pattern_str
                         result_command = result_command[0:-backspace_num]
                     else:
@@ -134,8 +116,8 @@ class Tty(object):
                 if del_len > 0:
                     result_command = result_command[0:-del_len]
                 reach_backspace_flag = False
-                backspace_num =0
-                pattern_str=''
+                backspace_num = 0
+                pattern_str = ''
                 str_r = str_r[len(str(tmp.group(0))):]
                 continue
             
@@ -153,13 +135,13 @@ class Tty(object):
                 else:
                     break
             
-            if reach_backspace_flag :   
-                pattern_str +=str_r[0]
-            else :
+            if reach_backspace_flag:
+                pattern_str += str_r[0]
+            else:
                 result_command += str_r[0]
             str_r = str_r[1:]
         
-        if backspace_num > 0 :
+        if backspace_num > 0:
             result_command = result_command[0:-backspace_num] + pattern_str
 
         control_char = re.compile(r"""
@@ -172,11 +154,10 @@ class Tty(object):
                 [\x80-\x9f] | (?:\x1b\]0.*) | \[.*@.*\][\$#] | (.*mysql>.*)      #匹配 所有控制字符
                 """, re.X)
         result_command = control_char.sub('', result_command.strip())
-        global VIM_FLAG
-        if not VIM_FLAG:
+        if not self.vim_flag:
             if result_command.startswith('vi'):
-                VIM_FLAG = True
-            return result_command.decode('utf8',"ignore")
+                self.vim_flag = True
+            return result_command.decode('utf8', "ignore")
         else:
             return ''
 
@@ -247,11 +228,6 @@ class Tty(object):
         """
         获取需要登陆的主机的信息和映射用户的账号密码
         """
-
-        # 1. get ip, port
-        # 2. get 映射用户
-        # 3. get 映射用户的账号，密码或者key
-        # self.connect_info = {'user': '', 'asset': '', 'ip': '', 'port': 0, 'role_name': '', 'role_pass': '', 'role_key': ''}
         asset_info = get_asset_info(self.asset)
         self.connect_info = {'user': self.user, 'asset': self.asset, 'ip': asset_info.get('ip'),
                              'port': int(asset_info.get('port')), 'role_name': self.role.name,
@@ -340,8 +316,6 @@ class SshTty(Tty):
         data = ''
         chan_str = ''
         input_mode = False
-        global VIM_FLAG
-        
         try:
             tty.setraw(sys.stdin.fileno())
             tty.setcbreak(sys.stdin.fileno())
@@ -358,7 +332,7 @@ class SshTty(Tty):
                         x = self.channel.recv(1024)
                         if len(x) == 0:
                             break
-                        if VIM_FLAG:
+                        if self.vim_flag:
                             chan_str += x
                         sys.stdout.write(x)
                         sys.stdout.flush()
@@ -380,10 +354,10 @@ class SshTty(Tty):
                     input_mode = True
 
                     if str(x) in ['\r', '\n', '\r\n']:
-                        if VIM_FLAG:
+                        if self.vim_flag:
                             match = pattern.search(chan_str)
                             if match:
-                                VIM_FLAG = False
+                                self.vim_flag = False
                                 data = self.deal_command(data)
                                 if len(data) > 0:
                                     TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
