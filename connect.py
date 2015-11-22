@@ -52,23 +52,6 @@ def color_print(msg, color='red', exits=False):
         sys.exit()
 
 
-def check_vim_status(command, ssh):
-    global SSH_TTY
-    print command
-    if command == '':
-        return True
-    else:
-        command_str= 'ps -ef |grep "%s" | grep "%s"|grep -v grep |wc -l' % (command,SSH_TTY)
-        print command_str
-        stdin, stdout, stderr = ssh.exec_command(command_str)
-        ps_num = stdout.read()
-        print ps_num
-        if int(ps_num) == 0:
-            return True
-        else:
-            return False
-
-
 class Tty(object):
     """
     A virtual tty class
@@ -96,7 +79,7 @@ class Tty(object):
         return False
 
     @staticmethod
-    def deal_command(str_r, ssh):
+    def deal_command(str_r):
         """
                 处理命令中特殊字符
         """
@@ -107,87 +90,60 @@ class Tty(object):
 
         result_command = ''      #最后的结果
         backspace_num = 0              #光标移动的个数
-        backspace_list = []
         reach_backspace_flag = False    #没有检测到光标键则为true
-        reach_backspace_second_flag = False
-        pattern_list = []
         pattern_str=''
         while str_r:
-            tmp = re.match(r'\s*\w+\s*', str_r)                 #获取字符串，其它特殊字符匹配暂时还不知道。。
+            tmp = re.match(r'\s*\w+\s*', str_r)
             if tmp:
                 if reach_backspace_flag :
-                    if not reach_backspace_second_flag:
-                        pattern_str +=str(tmp.group(0))
-                    else:
-                        pattern_list.append(pattern_str)
-                        pattern_str=str(tmp.group(0))
-                        reach_backspace_second_flag=False
+                    pattern_str +=str(tmp.group(0))
                     str_r = str_r[len(str(tmp.group(0))):]
                     continue
                 else:
                     result_command += str(tmp.group(0))
                     str_r = str_r[len(str(tmp.group(0))):]
                     continue
-
-            tmp = re.match(r'\x1b\[K[\x08]*', str_r)           #遇到删除确认符，确定删除数据
+                
+            tmp = re.match(r'\x1b\[K[\x08]*', str_r)
             if tmp:
-                for x in backspace_list:
-                    backspace_num += int(x)
                 if backspace_num > 0:
                     if backspace_num > len(result_command) :
-                        result_command += ''.join(pattern_list)
                         result_command += pattern_str
                         result_command = result_command[0:-backspace_num]
                     else:
                         result_command = result_command[0:-backspace_num]
-                        result_command += ''.join(pattern_list)
                         result_command += pattern_str
                 del_len = len(str(tmp.group(0)))-3
                 if del_len > 0:
                     result_command = result_command[0:-del_len]
                 reach_backspace_flag = False
-                reach_backspace_second_flag =False
                 backspace_num =0
-                del pattern_list[:]
-                del backspace_list[:]
                 pattern_str=''
                 str_r = str_r[len(str(tmp.group(0))):]
                 continue
-
-            tmp = re.match(r'\x08+', str_r)                    #将遇到的退格数字存放到队列中
+            
+            tmp = re.match(r'\x08+', str_r)
             if tmp:
-                if reach_backspace_flag:
-                    reach_backspace_second_flag = True
-                else:
-                    reach_backspace_flag = True
                 str_r = str_r[len(str(tmp.group(0))):]
-                if len(str_r) != 0:                             #如果退格键在最后，则放弃
-                    backspace_list.append(len(str(tmp.group(0))))
-                continue
-
-            if reach_backspace_flag :
-                if not reach_backspace_second_flag:
-                    pattern_str +=str_r[0]
+                if len(str_r) != 0:
+                    if reach_backspace_flag:
+                        result_command = result_command[0:-backspace_num] + pattern_str
+                        pattern_str = ''
+                    else:
+                        reach_backspace_flag = True
+                    backspace_num = len(str(tmp.group(0)))
+                    continue
                 else:
-                    pattern_list.append(pattern_str)
-                    pattern_str=str_r[0]
-                    reach_backspace_second_flag=False
+                    break
+            
+            if reach_backspace_flag :   
+                pattern_str +=str_r[0]
             else :
                 result_command += str_r[0]
             str_r = str_r[1:]
-
-        if pattern_str !='':
-            pattern_list.append(pattern_str)
-
-        #退格队列中还有腿哥键，则进行删除操作
-        if len(backspace_list) > 0 :
-                for backspace in backspace_list:
-                    if int(backspace) >= len(result_command):
-                        result_command = pattern_list[0]
-                    else:
-                        result_command = result_command[:-int(backspace)]
-                        result_command += pattern_list[0]
-                    pattern_list = pattern_list[1:]
+        
+        if backspace_num > 0 :
+            result_command = result_command[0:-backspace_num] + pattern_str
 
         control_char = re.compile(r"""
                 \x1b[ #%()*+\-.\/]. |
@@ -200,21 +156,12 @@ class Tty(object):
                 """, re.X)
         result_command = control_char.sub('', result_command.strip())
         global VIM_FLAG
-        global VIM_COMMAND
         if not VIM_FLAG:
             if result_command.startswith('vi'):
                 VIM_FLAG = True
-                VIM_COMMAND = result_command
             return result_command.decode('utf8',"ignore")
         else:
-            if check_vim_status(VIM_COMMAND, ssh):
-                VIM_FLAG = False
-                VIM_COMMAND=''
-                if result_command.endswith(':wq') or result_command.endswith(':wq!') or result_command.endswith(':q!'):
-                    return ''
-                return result_command.decode('utf8',"ignore")
-            else:
-                return ''
+            return ''
 
     @staticmethod
     def remove_control_char(str_r):
@@ -372,9 +319,12 @@ class SshTty(Tty):
         log_file_f, log_time_f, log = self.get_log()
         old_tty = termios.tcgetattr(sys.stdin)
         pre_timestamp = time.time()
+        pattern = re.compile('\[.*@.*\][\$#]')
         data = ''
+        chan_str = ''
         input_mode = False
-
+        global VIM_FLAG
+        
         try:
             tty.setraw(sys.stdin.fileno())
             tty.setcbreak(sys.stdin.fileno())
@@ -391,6 +341,8 @@ class SshTty(Tty):
                         x = self.channel.recv(1024)
                         if len(x) == 0:
                             break
+                        if VIM_FLAG:
+                            chan_str += x
                         sys.stdout.write(x)
                         sys.stdout.flush()
                         now_timestamp = time.time()
@@ -411,10 +363,19 @@ class SshTty(Tty):
                     input_mode = True
 
                     if str(x) in ['\r', '\n', '\r\n']:
-                        data = self.deal_command(data, self.ssh)
-
-                        TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
+                        if VIM_FLAG:
+                            match = pattern.search(chan_str)
+                            if match:
+                                VIM_FLAG = False
+                                data = self.deal_command(data)
+                                if len(data) > 0:
+                                    TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
+                        else:
+                            data = self.deal_command(data)
+                            if len(data) > 0:
+                                TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
                         data = ''
+                        chan_str = ''
                         input_mode = False
 
                     if len(x) == 0:

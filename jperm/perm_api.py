@@ -132,13 +132,29 @@ def get_group_asset_perm(ob):
     return perm
 
 
-def gen_resource(ob, perm=None):
+def gen_resource(ob, ex='', perm=None):
     """
-    ob为用户或资产列表或资产queryset
+    ob为用户或资产列表或资产queryset, 如果同时输入用户和资产，则获取用户在这些资产上的信息
     生成MyInventory需要的 resource文件
     """
     res = []
-    if isinstance(ob, User):
+    if isinstance(ob, User) and isinstance(ex, (list, QuerySet)):
+        if not perm:
+            perm = get_group_user_perm(ob)
+            for asset, asset_info in perm.get('asset').items():
+                if asset not in ex:
+                    continue
+                asset_info = get_asset_info(asset)
+                info = {'hostname': asset.hostname, 'ip': asset.ip, 'port': asset_info.get('port', 22)}
+                try:
+                    role = sorted(list(perm.get('asset').get(asset).get('role')))[0]
+                except IndexError:
+                    continue
+                info['username'] = role.name
+                info['password'] = role.password
+                info['ssh_key'] = get_role_key(ob, role)
+                res.append(info)
+    elif isinstance(ob, User):
         if not perm:
             perm = get_group_user_perm(ob)
 
