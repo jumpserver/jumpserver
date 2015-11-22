@@ -4,6 +4,8 @@ import xlsxwriter
 from django.db.models import AutoField
 from jumpserver.api import *
 from jasset.models import ASSET_STATUS, ASSET_TYPE, ASSET_ENV, IDC, AssetRecord
+from jperm.ansible_api import MyRunner
+from jperm.perm_api import gen_resource
 
 
 def group_add_asset(group, asset_id=None, asset_ip=None):
@@ -406,3 +408,64 @@ def excel_to_db(excel_file):
                         asset.group = group_instance
                     asset.save()
         return True
+
+
+def get_ansible_asset_info(asset_ip, setup_info):
+    disk_all = setup_info.get("ansible_devices")
+    disk_need = {}
+    for disk_name, disk_info in disk_all.iteritems():
+        if disk_name.startswith('sd') or disk_name.startswith('hd') or disk_name.startswith('vd'):
+            disk_need[disk_name] = disk_info.get("size")
+
+    all_ip = setup_info.get("ansible_all_ipv4_addresses")
+    other_ip_list = all_ip.remove(asset_ip) if asset_ip in all_ip else []
+    other_ip = ','.join(other_ip_list) if other_ip_list else ''
+    # hostname = setup_info.get("ansible_hostname")
+    # ip = setup_info.get("ansible_default_ipv4").get("address")
+    mac = setup_info.get("ansible_default_ipv4").get("macaddress")
+    brand = setup_info.get("ansible_product_name")
+    cpu_type = setup_info.get("ansible_processor")[1]
+    cpu_cores = setup_info.get("ansible_processor_count")
+    cpu = cpu_type + ' * ' + unicode(cpu_cores)
+    memory = setup_info.get("ansible_memtotal_mb")
+    disk = disk_need
+    system_type = setup_info.get("ansible_distribution")
+    system_version = setup_info.get("ansible_distribution_version")
+    # asset_type = setup_info.get("ansible_system")
+    sn = setup_info.get("ansible_product_serial")
+    asset_info = [other_ip, mac, cpu, memory, disk, sn, system_type, system_version, brand]
+
+    return asset_info
+
+
+def asset_ansible_update(obj_list, name=''):
+    resource = gen_resource(obj_list)
+    ansible_instance = MyRunner(resource)
+    ansible_asset_info = ansible_instance.run(module_name='setup', pattern='*')
+    for asset in obj_list:
+        try:
+            setup_info = ansible_asset_info['contacted'][asset.hostname]['ansible_facts']
+        except KeyError:
+            continue
+        else:
+            asset_info = get_ansible_asset_info(asset.ip, setup_info)
+            other_ip, mac, cpu, memory, disk, sn, system_type, system_version, brand = asset_info
+            asset_dic = {"other_ip": other_ip,
+                         "mac": mac,
+                         "cpu": cpu,
+                         "memory": memory,
+                         "disk": disk,
+                         "sn": sn,
+                         "system_type": system_type,
+                         "system_version": system_version,
+                         "brand": brand
+                         }
+
+            ansible_record(asset, asset_dic, name)
+
+
+def asset_ansible_update_all():
+    name = u'定时更新'
+    asset_all = Asset.objects.all()
+    asset_ansible_update(asset_all, name)
+

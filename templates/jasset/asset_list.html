@@ -130,7 +130,6 @@
                                         <a href="/jasset/asset_detail/?id={{ asset.id }}" class="btn btn-xs btn-primary">详情</a>
                                         {% ifnotequal session_role_id 0 %}
                                             <a href="/jasset/asset_edit/?id={{ asset.id }}" class="btn btn-xs btn-info">编辑</a>
-                                            <a href="/jasset/asset_update/?id={{ asset.id }}" class="btn btn-xs btn-info">更新</a>
                                             <a value="/jasset/asset_del/?id={{ asset.id }}" class="btn btn-xs btn-danger asset_del">删除</a>
                                         {% endifnotequal %}
                                     </td>
@@ -142,7 +141,7 @@
                             <div class="col-sm-6">
                                 <input type="button" id="asset_del" class="btn btn-danger btn-sm"  name="del_button" value="删除"/>
                                 <a value="/jasset/asset_edit_batch/" type="button" class="btn btn-sm btn-warning iframe">修改</a>
-                                <a value="/jasset/asset_update_batch/" type="button" class="btn btn-sm btn-info">更新</a>
+                                <input type="button" id="asset_update" class="btn btn-info btn-sm"  name="update_button" value="更新"/>
                             </div>
                             {% include 'paginator.html' %}
                         </div>
@@ -156,23 +155,10 @@
 
 {% block self_footer_js %}
 <script>
-     $('table td').on('change', function(env, id){
-        var url = "/jasset/show_all_ajax/?env=" + env + "&id=" + id;
-        console.log(url);
-        $.ajax({
-            type: "GET",
-            url: url,
-//            data: $("#search_form").serialize(),
-            success: function (data) {
-                $("#j_dept_"+id).html(data);
-            }
-        });
-    });
-
     $(document).ready(function(){
         $('.asset_del').click(function(){
             var row = $(this).closest('tr');
-            if (confirm("确定删除")) {
+            if (confirm("确定删除?")) {
                 $.get(
                         $(this).attr('value'),
                         {},
@@ -222,12 +208,11 @@
 
     $('#asset_del').click(function () {
         var asset_id_all = getIDall();
-        console.log(asset_id_all);
         if (asset_id_all == ''){
             alert("请至少选择一行!");
             return false;
         }
-        if (confirm("确定删除")) {
+        if (confirm("确定删除?")) {
             $.ajax({
                 type: "post",
                 data: {asset_id_all: asset_id_all},
@@ -237,6 +222,23 @@
                 }
             });
         }
+    });
+
+    $('#asset_update').click(function () {
+        var asset_id_all = getIDall();
+        if (asset_id_all == ''){
+            alert("请至少选择一行!");
+            return false;
+        }
+        layer.msg('玩命更新中...', {time: 200000});
+        $.ajax({
+            type: "post",
+            data: {asset_id_all: asset_id_all},
+            url: "/jasset/asset_update_batch/",
+            success: function () {
+                parent.location.reload();
+            }
+        });
     });
 
 
@@ -250,19 +252,6 @@
             change_info()
             }
     });
-
-    function show_all(env, id) {
-        var url = "/jasset/show_all_ajax/?env=" + env + "&id=" + id;
-        console.log(url);
-        $.ajax({
-            type: "GET",
-            url: url,
-            success: function (data) {
-                $("#j_group_" + id).html(data);
-
-            }
-        });
-    }
 </script>
 
 {% endblock %}
