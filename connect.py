@@ -504,24 +504,33 @@ class Nav(object):
 
     def search(self, str_r=''):
         gid_pattern = re.compile(r'^g\d+$')
+        # 获取用户授权的所有主机信息
         if not self.user_perm:
             self.user_perm = get_group_user_perm(self.user)
         user_asset_all = self.user_perm.get('asset').keys()
+        # 搜索结果保存
         user_asset_search = []
         if str_r:
+            # 资产组组id匹配
             if gid_pattern.match(str_r):
-                user_asset_search = list(Asset.objects.all())
+                gid = int(str_r.lstrip('g'))
+                # 获取资产组包含的资产
+                user_asset_search = get_object(AssetGroup, id=gid).asset_set.all()
             else:
+                # 匹配 ip, hostname, 备注
                 for asset in user_asset_all:
-                    if str_r in asset.ip or str_r in str(asset.comment):
+                    if str_r in asset.ip or str_r in str(asset.hostname) or str_r in str(asset.comment):
                         user_asset_search.append(asset)
         else:
+            # 如果没有输入就展现所有
             user_asset_search = user_asset_all
 
         self.search_result = dict(zip(range(len(user_asset_search)), user_asset_search))
         print '\033[32m[%-3s] %-15s  %-15s  %-5s  %-10s  %s \033[0m' % ('ID', 'AssetName', 'IP', 'Port', 'Role', 'Comment')
         for index, asset in self.search_result.items():
+            # 获取该资产信息
             asset_info = get_asset_info(asset)
+            # 获取该资产包含的角色
             role = [str(role.name) for role in self.user_perm.get('asset').get(asset).get('role')]
             if asset.comment:
                 print '[%-3s] %-15s  %-15s  %-5s  %-10s  %s' % (index, asset.hostname, asset.ip, asset_info.get('port'),
@@ -530,9 +539,11 @@ class Nav(object):
                 print '[%-3s] %-15s  %-15s  %-5s  %-10s' % (index, asset.hostname, asset.ip, asset_info.get('port'), role)
         print
 
-    @staticmethod
-    def print_asset_group():
-        user_asset_group_all = AssetGroup.objects.all()
+    def print_asset_group(self):
+        """
+        打印用户授权的资产组
+        """
+        user_asset_group_all = get_group_user_perm(self.user).get('asset_group', [])
 
         print '\033[32m[%-3s] %-15s %s \033[0m' % ('ID', 'GroupName', 'Comment')
         for asset_group in user_asset_group_all:
@@ -543,6 +554,9 @@ class Nav(object):
         print
 
     def exec_cmd(self):
+        """
+        批量执行命令
+        """
         self.search()
         while True:
             print "请输入主机名、IP或ansile支持的pattern, q退出"
