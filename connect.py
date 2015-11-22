@@ -96,7 +96,7 @@ class Tty(object):
         return False
 
     @staticmethod
-    def deal_command(str_r, ssh):
+    def deal_command(str_r):
         """
                 处理命令中特殊字符
         """
@@ -384,11 +384,11 @@ class SshTty(Tty):
                             match = pattern.search(chan_str)
                             if match:
                                 VIM_FLAG = False
-                                data = self.deal_command(data, self.ssh)
+                                data = self.deal_command(data)
                                 if len(data) > 0:
                                     TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
                         else:
-                            data = self.deal_command(data, self.ssh)
+                            data = self.deal_command(data)
                             if len(data) > 0:
                                 TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
                         data = ''
