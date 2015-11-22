@@ -359,7 +359,6 @@ def ansible_record(asset, ansible_dic, username):
         old = asset_dic.get(field)
         new = ansible_dic.get(field)
         if unicode(old) != unicode(new):
-            print old, new, type(old), type(new)
             setattr(asset, field, value)
             asset.save()
             alert_dic[field] = [old, new]
@@ -384,16 +383,17 @@ def excel_to_db(excel_file):
             row = table.row_values(row_num)
             if row:
                 ip, port, hostname, use_default_auth, username, password, group = row
-                use_default_auth = 1 if use_default_auth == u'默认' else 0
                 if get_object(Asset, hostname=hostname):
                     continue
+                use_default_auth = 1 if use_default_auth == u'默认' else 0
+                password_encode = CRYPTOR.encrypt(password) if password else ''
                 if hostname:
                     asset = Asset(ip=ip,
                                   port=port,
                                   hostname=hostname,
                                   use_default_auth=use_default_auth,
                                   username=username,
-                                  password=password
+                                  password=password_encode
                                   )
                     asset.save()
                     group_list = group.split('/')

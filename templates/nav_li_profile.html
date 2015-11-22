@@ -36,7 +36,7 @@
 <script>
     $(".iframe_user").on('click', function(){
         var url= $(this).attr("value");
-        $.layer({
+        layer.open({
             type: 2,
             title: '个人信息',
             maxmin: true,
@@ -45,7 +45,7 @@
             shade: [0.5, '#000000'],
             shadeClose: true,
             area : ['800px' , '600px'],
-            iframe: {src: url}
+            content: url
         });
     });
 </script>

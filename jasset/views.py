@@ -1,6 +1,5 @@
 # coding:utf-8
 
-import ast
 from django.db.models import Q
 from jasset.asset_api import *
 from jumpserver.api import *
@@ -95,8 +94,6 @@ def group_list(request):
     """
     header_title, path1, path2 = u'查看资产组', u'资产管理', u'查看资产组'
     keyword = request.GET.get('keyword', '')
-    gid = request.GET.get('gid')
-    sid = request.GET.get('sid')
     asset_group_list = AssetGroup.objects.all()
 
     if keyword:
@@ -211,6 +208,7 @@ def asset_edit(request):
         ip = request.POST.get('ip', '')
         hostname = request.POST.get('hostname', '')
         password = request.POST.get('password', '')
+        is_active = True if request.POST.get('is_active') == '1' else False
         use_default_auth = request.POST.get('use_default_auth', '')
 
         try:
@@ -230,6 +228,7 @@ def asset_edit(request):
                     if password_old != password:
                         password_encode = CRYPTOR.encrypt(password)
                         af_save.password = password_encode
+                af_save.is_active = True if is_active else False
                 af_save.save()
                 af_post.save_m2m()
                 # asset_new = get_object(Asset, id=asset_id)
@@ -250,6 +249,7 @@ def asset_list(request):
     """
     asset list view
     """
+    header_title, path1, path2 = u'查看资产', u'资产管理', u'查看资产'
     idc_all = IDC.objects.filter()
     asset_group_all = AssetGroup.objects.all()
     asset_types = ASSET_TYPE
@@ -382,9 +382,8 @@ def asset_edit_batch(request):
                 asset.save()
 
             if alert_list:
-                username = unicode(name) + ' - ' + u'批量'
-                print alert_list
-                AssetRecord.objects.create(asset=asset, username=username, content=alert_list)
+                recode_name = unicode(name) + ' - ' + u'批量'
+                AssetRecord.objects.create(asset=asset, username=recode_name, content=alert_list)
         return HttpResponse('ok')
 
     return my_render('jasset/asset_edit_batch.html', locals(), request)
@@ -410,21 +409,21 @@ def asset_update(request):
     """
     asset_id = request.GET.get('id', '')
     asset = get_object(Asset, id=asset_id)
+    name = request.session.get('username', 'admin')
     if not asset:
         return HttpResponseRedirect('/jasset/asset_detail/?id=%s' % asset_id)
-    name = request.session.get('username', 'admin')
     if asset.use_default_auth:
         default = Setting.objects.all()
         if default:
             default = default[0]
             username = default.default_user
-            password = default.default_password
+            password = CRYPTOR.decrypt(default.default_password)
             port = default.default_port
         else:
             return HttpResponse(u'没有设置默认用户名和密码!')
     else:
         username = asset.username
-        password = asset.password
+        password = CRYPTOR.decrypt(asset.password)
         port = asset.port
 
     resource = [{"hostname": asset.ip, "port": port,
@@ -436,7 +435,9 @@ def asset_update(request):
         asset_info = ansible_asset_info['result'][asset.ip]
         if asset_info:
             hostname = asset_info.get('hostname')
-            other_ip = ','.join(asset_info.get('other_ip'))
+            all_ip = asset_info.get('other_ip')
+            other_ip_list = all_ip.remove(asset.ip) if asset.ip in all_ip else []
+            other_ip = ','.join(other_ip_list) if other_ip_list else ''
             cpu_type = asset_info.get('cpu_type')[1]
             cpu_cores = asset_info.get('cpu_cores')
             cpu = cpu_type + ' * ' + unicode(cpu_cores)
