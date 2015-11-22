@@ -12,7 +12,7 @@ from juser.user_api import *
 
 MAIL_FROM = EMAIL_HOST_USER
 
-
+@login_required(login_url='/login')
 def chg_role(request):
     role = {'SU': 2, 'GA': 1, 'CU': 0}
     if request.session['role_id'] > 0:
