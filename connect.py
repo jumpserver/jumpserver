@@ -178,8 +178,6 @@ class Tty(object):
                 VIM_FLAG = True
             return result_command.decode('utf8',"ignore")
         else:
-            if result_command.endswith(':wq') or result_command.endswith(':wq!') or result_command.endswith(':q!'):
-                VIM_FLAG = False
             return ''
 
     @staticmethod
@@ -338,9 +336,12 @@ class SshTty(Tty):
         log_file_f, log_time_f, log = self.get_log()
         old_tty = termios.tcgetattr(sys.stdin)
         pre_timestamp = time.time()
+        pattern = re.compile('\[.*@.*\][\$#]')
         data = ''
+        chan_str = ''
         input_mode = False
-
+        global VIM_FLAG
+        
         try:
             tty.setraw(sys.stdin.fileno())
             tty.setcbreak(sys.stdin.fileno())
@@ -357,6 +358,8 @@ class SshTty(Tty):
                         x = self.channel.recv(1024)
                         if len(x) == 0:
                             break
+                        if VIM_FLAG:
+                            chan_str += x
                         sys.stdout.write(x)
                         sys.stdout.flush()
                         now_timestamp = time.time()
@@ -377,10 +380,19 @@ class SshTty(Tty):
                     input_mode = True
 
                     if str(x) in ['\r', '\n', '\r\n']:
-                        data = self.deal_command(data, self.ssh)
-
-                        TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
+                        if VIM_FLAG:
+                            match = pattern.search(chan_str)
+                            if match:
+                                VIM_FLAG = False
+                                data = self.deal_command(data, self.ssh)
+                                if len(data) > 0:
+                                    TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
+                        else:
+                            data = self.deal_command(data, self.ssh)
+                            if len(data) > 0:
+                                TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
                         data = ''
+                        chan_str = ''
                         input_mode = False
 
                     if len(x) == 0:
