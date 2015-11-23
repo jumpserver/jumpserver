@@ -11,8 +11,14 @@
                     <div class="ibox-title">
                         <span class="text text-primary"><b>{{ asset.ip }}</b></span>
                         <div class="ibox-tools">
+                            <a class="" href="/jasset/asset_update/?id={{ asset.id }}">
+                                <i class="fa fa-refresh"></i>
+                            </a>
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
                             </a>
                             <ul class="dropdown-menu dropdown-user">
                             </ul>
@@ -30,12 +36,12 @@
                             <div class="text-left">
                                 <table class="table">
                                     <tr>
-                                        <td class="text-navy">IP</td>
-                                        <td>{{ asset.ip|default_if_none:""  }}</td>
-                                    </tr>
-                                    <tr>
                                         <td class="text-navy">主机名</td>
                                         <td>{{ asset.hostname|default_if_none:""  }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">IP</td>
+                                        <td>{{ asset.ip|default_if_none:""  }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">其他IP</td>

@@ -66,6 +66,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+    'django_crontab',
     'bootstrapform',
     'jumpserver',
     'juser',
@@ -149,3 +150,7 @@ USE_TZ = False
 STATIC_URL = '/static/'
 
 BOOTSTRAP_COLUMN_COUNT = 10
+
+CRONJOBS = [
+    ('0 1 * * *', 'jasset.asset_api.asset_ansible_update_all')
+]
