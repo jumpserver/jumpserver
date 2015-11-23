@@ -130,6 +130,7 @@
                                         <a href="/jasset/asset_detail/?id={{ asset.id }}" class="btn btn-xs btn-primary">详情</a>
                                         {% ifnotequal session_role_id 0 %}
                                             <a href="/jasset/asset_edit/?id={{ asset.id }}" class="btn btn-xs btn-info">编辑</a>
+                                            <a value="{{ asset.id }}" class="conn btn btn-xs btn-warning">连接</a>
                                             <a value="/jasset/asset_del/?id={{ asset.id }}" class="btn btn-xs btn-danger asset_del">删除</a>
                                         {% endifnotequal %}
                                     </td>
@@ -167,8 +168,45 @@
                         }
                 )
             }
-        })
+        });
+
+        $('.conn').click(function(evt){
+            var url='/jlog/get_role_name/?id' + $(this).attr('value');
+            var href = $(this).attr('href');
+            var new_url = '/jlog/web_terminal/?id=' + $(this).attr('value') + '&role=';
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: {},
+                success: function(data){
+                    var dataArray = data.split(',');
+                    if (dataArray.length == 1){
+                       window.open(new_url + data, '播放', 'height=400, width=600, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');
+                    } else if (dataArray.length == 0){
+                        layer.alert('没有授权角色')
+                    } else {
+                        aUrl = '';
+                        $.each(dataArray, function(index, value){
+                            aUrl += '<a onclick="windowOpen(this); return false" class="btn btn-xs btn-primary newa" href=' + new_url + value +  '>' + value  + '</a> '
+                        });
+                        layer.alert(aUrl, {
+                            skin: 'layui-layer-molv',
+                            title: '多个角色，请选择一个连接',
+                            closeBtn: 0
+                        })
+                    }
+
+                }
+            });
+            return false
+        });
     });
+
+    function windowOpen(aTab){
+        var new_url = aTab.href;
+        window.open(new_url, '播放', 'height=400, width=600, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');
+        return false
+    }
 
     $(".iframe").on('click', function(){
         var asset_id_all = getIDall();
@@ -205,6 +243,8 @@
             }
         });
     });
+
+
 
     $('#asset_del').click(function () {
         var asset_id_all = getIDall();

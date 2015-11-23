@@ -4,6 +4,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 
 from jumpserver.api import *
+from jperm.perm_api import user_have_perm
 from django.http import HttpResponseNotFound
 from jlog.log_api import renderTemplate
 
@@ -103,8 +104,18 @@ def log_record(request):
             return HttpResponse('无日志记录!')
 
 
+def get_role_name(request):
+    asset_id = request.GET.get('id', 9999)
+    asset = get_object(Asset, id=asset_id)
+    if asset:
+        role = user_have_perm(request.user, asset=asset)
+        return HttpResponse(','.join(list(role)))
+    return HttpResponse('dev,sa')
+
+
+@require_role()
 def web_terminal(request):
-    asset_id = 15
-    web_terminal_uri = 'ws://%s/terminal?asset_id=%s' % (WEB_SOCKET_HOST, asset_id)
+    asset_id = request.GET.get('id')
+    web_terminal_uri = 'ws://%s/terminal?id=%s&role=dev' % (WEB_SOCKET_HOST, asset_id)
     return render_to_response('jlog/web_terminal.html', locals())
 

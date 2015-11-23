@@ -56,7 +56,7 @@ def require_auth(func):
             session = session[0]
         uid = session.get_decoded().get('_auth_user_id')
         user = User.objects.filter(id=uid)
-        asset_id = request.get_argument('asset_id', 9999)
+        asset_id = int(request.get_argument('id', 9999))
 
         asset = Asset.objects.filter(id=asset_id)
         if asset:
@@ -240,10 +240,19 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
     @require_auth
     def open(self):
         print self.user, self.asset
-        user = User.objects.get(username='lastimac')
-        asset = Asset.objects.get(ip='192.168.244.129')
-        role = PermRole.objects.get(name='dev')
-        self.term = WebTty(user, asset, role)
+        role_name = self.get_argument('role', 'root')
+        roles = user_have_perm(self.user, self.asset)
+        login_role = ''
+        for role in roles:
+            if role.name == role_name:
+                login_role = role
+                break
+        if not login_role:
+            print "no role"
+            self.close()
+            return
+        # Todo: 判断
+        self.term = WebTty(self.user, self.asset, login_role)
         self.term.get_connection()
         self.term.channel = self.term.ssh.invoke_shell(term='xterm')
         WebTerminalHandler.tasks.append(MyThread(target=self.forward_outbound))
