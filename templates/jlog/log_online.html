@@ -79,11 +79,9 @@
                                     <th class="text-center"> 用户名 </th>
                                     <th class="text-center"> 登录主机 </th>
                                     <th class="text-center"> 来源IP </th>
-                                    {% ifnotequal session_role_id 0 %}
-                                        <th class="text-center"> 统计命令 </th>
-                                        <th class="text-center"> 实时监控 </th>
-                                        <th class="text-center"> 阻断 </th>
-                                    {% endifnotequal %}
+                                    <th class="text-center"> 统计命令 </th>
+                                    <th class="text-center"> 实时监控 </th>
+                                    <th class="text-center"> 阻断 </th>
                                     <th class="text-center"> 登录时间 </th>
 
                                 </tr>
@@ -94,11 +92,9 @@
                                     <td id="username" class="text-center"> {{ post.user }} </td>
                                     <td id="ip" class="text-center"> {{ post.host }} </td>
                                     <td id="remote_ip" class="text-center"> {{ post.remote_ip }} </td>
-                                    {% ifnotequal session_role_id 0 %}
-                                        <td class="text-center"><a href="/jlog/history/?id={{ post.id }}" class="log_command"> 命令统计 </a></td>
-                                        <td class="text-center"><a class="monitor" file_path="{{ post.log_path }}"> 监控 </a></td>
-                                        <td class="text-center"><input type="button" id="cut" class="btn btn-danger btn-xs"  name="cut" value="阻断" onclick='cut("{{ post.pid }}", "{{ post.remote_ip }}")' /></td>
-                                    {% endifnotequal %}
+                                    <td class="text-center"><a href="/jlog/history/?id={{ post.id }}" class="log_command"> 命令统计 </a></td>
+                                    <td class="text-center"><a class="monitor" file_path="{{ post.log_path }}"> 监控 </a></td>
+                                    <td class="text-center"><input type="button" id="cut" class="btn btn-danger btn-xs"  name="cut" value="阻断" onclick='cut("{{ post.pid }}", "{{ post.remote_ip }}")' /></td>
                                     <td class="text-center" id="start_time"> {{ post.start_time|date:"Y-m-d H:i:s" }} </td>
                                 </tr>
                             {% endfor %}
@@ -187,10 +183,6 @@
                         BootstrapDialog.show({title: title, message:tag[0]});
             }});
            return false;
-        });
-
-        $('#test_connect').click(function(){
-            window.open('/jlog/web_terminal/?asset_name="hello', '播放', 'height=400, width=600, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');
         });
     });
 

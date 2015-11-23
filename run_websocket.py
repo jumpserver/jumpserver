@@ -7,6 +7,7 @@ import os
 import sys
 import os.path
 import threading
+import datetime
 import urllib
 
 import tornado.ioloop
@@ -22,7 +23,7 @@ from tornado.options import define, options
 from pyinotify import WatchManager, Notifier, ProcessEvent, IN_DELETE, IN_CREATE, IN_MODIFY, AsyncNotifier
 import select
 
-from connect import Tty, User, Asset, PermRole
+from connect import Tty, User, Asset, PermRole, logger, get_object
 from connect import TtyLog, Log, Session, user_have_perm
 
 try:
@@ -35,45 +36,49 @@ define("port", default=3000, help="run on the given port", type=int)
 define("host", default='0.0.0.0', help="run port on", type=str)
 
 
-def require_auth(func):
-    def _deco(request, *args, **kwargs):
-        if request.get_cookie('sessionid'):
-            session_key = request.get_cookie('sessionid')
-        else:
-            session_key = request.get_secure_cookie('sessionid')
+def require_auth(role='user'):
+    def _deco(func):
+        def _deco(request, *args, **kwargs):
+            if request.get_cookie('sessionid'):
+                session_key = request.get_cookie('sessionid')
+            else:
+                session_key = request.get_secure_cookie('sessionid')
 
-        print "session: " + session_key
+            logger.debug('Websocket: session_key: ' + session_key)
 
-        if not session_key:
-            print('Auth Failed')
+            if session_key:
+                session = get_object(Session, session_key=session_key)
+                if session and datetime.datetime.now() > session.expire_date:
+                    user_id = session.get_decoded().get('_auth_user_id')
+                    user = get_object(User, id=user_id)
+                    if user:
+                        logger.debug('Websocket: user [ %s ] request websocket' % user.username)
+                        request.user = user
+                        if role == 'admin':
+                            if user.role in ['SU', 'GA']:
+                                return func(request, *args, **kwargs)
+                            logger.debug('Websocket: user [ %s ] is not admin.' % user.username)
+                        else:
+                            return func(request, *args, **kwargs)
             request.close()
-
-        session = Session.objects.filter(session_key=session_key)
-        if not session:
-            print('Auth Failed')
-            request.close()
-        else:
-            session = session[0]
-        uid = session.get_decoded().get('_auth_user_id')
-        user = User.objects.filter(id=uid)
-        asset_id = int(request.get_argument('id', 9999))
-        print asset_id
-        asset = Asset.objects.filter(id=asset_id)
-        if asset:
-            asset = asset[0]
-            request.asset = asset
-        else:
-            request.close()
-
-        if user:
-            user = user[0]
-            request.user = user
-
-        else:
-            print("No session user.")
-            request.close()
-
-        return func(request, *args, **kwargs)
+            logger.warning('Websocket: Request auth failed.')
+        # asset_id = int(request.get_argument('id', 9999))
+        # print asset_id
+        # asset = Asset.objects.filter(id=asset_id)
+        # if asset:
+        #     asset = asset[0]
+        #     request.asset = asset
+        # else:
+        #     request.close()
+        #
+        # if user:
+        #     user = user[0]
+        #     request.user = user
+        #
+        # else:
+        #     print("No session user.")
+        #     request.close()
+        return _deco
     return _deco
 
 
@@ -109,10 +114,10 @@ def file_monitor(path='.', client=None):
     notifier = AsyncNotifier(wm, EventHandler(client))
     wm.add_watch(path, mask, auto_add=True, rec=True)
     if not os.path.isfile(path):
-        print "You should monitor a file"
+        logger.debug("File %s does not exist." % path)
         sys.exit(3)
     else:
-        print "now starting monitor %s." % path
+        logger.debug("Now starting monitor file %s." % path)
         global f
         f = open(path, 'r')
         st_size = os.stat(path)[6]
@@ -158,7 +163,7 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
-    @require_auth
+    @require_auth('admin')
     def open(self):
         # 获取监控的path
         self.file_path = self.get_argument('file_path', '')
@@ -180,7 +185,8 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
             MonitorHandler.clients.remove(self)
             MonitorHandler.threads.remove(MonitorHandler.threads[client_index])
 
-        print len(MonitorHandler.threads), len(MonitorHandler.clients)
+        logger.debug("Websocket: Monitor client num: %s, thread num: %s" % (len(MonitorHandler.clients),
+                                                                            len(MonitorHandler.threads)))
 
     def on_message(self, message):
         # 监控日志，发生变动发向客户端
@@ -190,10 +196,13 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
         # 客户端主动关闭
         # self.close()
 
-        print "Close websocket."
-        client_index = MonitorHandler.clients.index(self)
-        MonitorHandler.clients.remove(self)
-        MonitorHandler.threads.remove(MonitorHandler.threads[client_index])
+        logger.debug("Websocket: Monitor client close request")
+        try:
+            client_index = MonitorHandler.clients.index(self)
+            MonitorHandler.clients.remove(self)
+            MonitorHandler.threads.remove(MonitorHandler.threads[client_index])
+        except ValueError:
+            pass
 
 
 class WebTty(Tty):
@@ -206,6 +215,7 @@ class WebTty(Tty):
 
 
 class WebTerminalKillHandler(tornado.web.RequestHandler):
+    @require_auth('admin')
     def get(self):
         ws_id = self.get_argument('id')
         Log.objects.filter(id=ws_id).update(is_finished=True)
@@ -228,7 +238,6 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         self.log_time_f = None
         self.log = None
         self.id = 0
-        self.asset = None
         self.user = None
         super(WebTerminalHandler, self).__init__(*args, **kwargs)
 
@@ -237,19 +246,22 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
 
     @require_auth
     def open(self):
-        print self.user, self.asset
-        role_name = self.get_argument('role', 'root')
-        roles = user_have_perm(self.user, self.asset)
-        login_role = ''
-        for role in roles:
-            if role.name == role_name:
-                login_role = role
-                break
-        print login_role
-        if not login_role:
-            print "no role"
-            self.close()
-            return
+        role_name = self.get_argument('role', 'sb')
+        asset_id = self.get_argument('id', 9999)
+        asset = get_object(Asset, id=asset_id)
+        if asset:
+            roles = user_have_perm(self.user, asset)
+            login_role = ''
+            for role in roles:
+                if role.name == role_name:
+                    login_role = role
+                    break
+            if not login_role:
+                logger.warning('Websocket: Not that Role %s for Host: %s User: %s ' % (role_name, asset.name,
+                                                                                       self.user.username))
+                self.close()
+                return
+        logger.debug('Websocket: request web terminal Host: %s User: %s Role: %s' % ())
         # Todo: 判断
         self.term = WebTty(self.user, self.asset, login_role)
         self.term.get_connection()

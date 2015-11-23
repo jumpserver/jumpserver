@@ -179,10 +179,10 @@
                 url: url,
                 data: {},
                 success: function(data){
-                    console.log(data);
                     var dataArray = data.split(',');
                     if (dataArray.length == 1 && data != 'error'){
-                       window.open(new_url + data, '播放', 'height=400, width=600, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');
+                        console.log('one');
+                        window.open(new_url + data, '', 'height=400, width=600, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');
                     } else if (dataArray.length == '1' && data == 'error'){
                         layer.alert('没有授权角色')
                     } else {
