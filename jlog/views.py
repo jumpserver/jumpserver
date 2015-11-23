@@ -109,8 +109,8 @@ def get_role_name(request):
     asset = get_object(Asset, id=asset_id)
     if asset:
         role = user_have_perm(request.user, asset=asset)
-        return HttpResponse(','.join(list(role)))
-    return HttpResponse('dev,sa')
+        return HttpResponse(','.join([i.name for i in role]))
+    return HttpResponse('error')
 
 
 @require_role()

@@ -170,8 +170,8 @@
             }
         });
 
-        $('.conn').click(function(evt){
-            var url='/jlog/get_role_name/?id' + $(this).attr('value');
+        $('.conn').click(function(){
+            var url='/jlog/get_role_name/?id=' + $(this).attr('value');
             var href = $(this).attr('href');
             var new_url = '/jlog/web_terminal/?id=' + $(this).attr('value') + '&role=';
             $.ajax({
@@ -179,10 +179,11 @@
                 url: url,
                 data: {},
                 success: function(data){
+                    console.log(data);
                     var dataArray = data.split(',');
-                    if (dataArray.length == 1){
+                    if (dataArray.length == 1 && data != 'error'){
                        window.open(new_url + data, '播放', 'height=400, width=600, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');
-                    } else if (dataArray.length == 0){
+                    } else if (dataArray.length == '1' && data == 'error'){
                         layer.alert('没有授权角色')
                     } else {
                         aUrl = '';
@@ -195,7 +196,6 @@
                             closeBtn: 0
                         })
                     }
-
                 }
             });
             return false
@@ -204,7 +204,7 @@
 
     function windowOpen(aTab){
         var new_url = aTab.href;
-        window.open(new_url, '播放', 'height=400, width=600, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');
+        window.open(new_url, '', 'height=400, width=600, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');
         return false
     }
 

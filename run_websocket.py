@@ -57,15 +57,13 @@ def require_auth(func):
         uid = session.get_decoded().get('_auth_user_id')
         user = User.objects.filter(id=uid)
         asset_id = int(request.get_argument('id', 9999))
-
+        print asset_id
         asset = Asset.objects.filter(id=asset_id)
         if asset:
             asset = asset[0]
             request.asset = asset
-            role = user_have_perm(user, asset)
-            request.role = role
         else:
-            role = ''
+            request.close()
 
         if user:
             user = user[0]
@@ -247,6 +245,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             if role.name == role_name:
                 login_role = role
                 break
+        print login_role
         if not login_role:
             print "no role"
             self.close()
