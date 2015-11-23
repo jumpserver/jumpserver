@@ -1,13 +1,13 @@
 # coding:utf-8
 
-import ast
 from django.db.models import Q
 from jasset.asset_api import *
 from jumpserver.api import *
 from jumpserver.models import Setting
 from jasset.forms import AssetForm, IdcForm
 from jasset.models import Asset, IDC, AssetGroup, ASSET_TYPE, ASSET_STATUS
-from ansible_api import Tasks
+from jperm.ansible_api import Tasks, MyRunner
+from jperm.perm_api import gen_resource
 
 
 @require_role('admin')
@@ -95,8 +95,6 @@ def group_list(request):
     """
     header_title, path1, path2 = u'查看资产组', u'资产管理', u'查看资产组'
     keyword = request.GET.get('keyword', '')
-    gid = request.GET.get('gid')
-    sid = request.GET.get('sid')
     asset_group_list = AssetGroup.objects.all()
 
     if keyword:
@@ -200,7 +198,7 @@ def asset_edit(request):
     header_title, path1, path2 = u'修改资产', u'资产管理', u'修改资产'
 
     asset_id = request.GET.get('id', '')
-    username = request.session.get('username', 'admin')
+    username = request.user.username
     asset = get_object(Asset, id=asset_id)
     if asset:
         password_old = asset.password
@@ -211,6 +209,7 @@ def asset_edit(request):
         ip = request.POST.get('ip', '')
         hostname = request.POST.get('hostname', '')
         password = request.POST.get('password', '')
+        is_active = True if request.POST.get('is_active') == '1' else False
         use_default_auth = request.POST.get('use_default_auth', '')
 
         try:
@@ -230,6 +229,7 @@ def asset_edit(request):
                     if password_old != password:
                         password_encode = CRYPTOR.encrypt(password)
                         af_save.password = password_encode
+                af_save.is_active = True if is_active else False
                 af_save.save()
                 af_post.save_m2m()
                 # asset_new = get_object(Asset, id=asset_id)
@@ -250,6 +250,7 @@ def asset_list(request):
     """
     asset list view
     """
+    header_title, path1, path2 = u'查看资产', u'资产管理', u'查看资产'
     idc_all = IDC.objects.filter()
     asset_group_all = AssetGroup.objects.all()
     asset_types = ASSET_TYPE
@@ -311,7 +312,7 @@ def asset_list(request):
 @require_role('admin')
 def asset_edit_batch(request):
     af = AssetForm()
-    name = request.session.get('username', 'admin')
+    name = request.user.username
     asset_group_all = AssetGroup.objects.all()
 
     if request.method == 'POST':
@@ -382,9 +383,8 @@ def asset_edit_batch(request):
                 asset.save()
 
             if alert_list:
-                username = unicode(name) + ' - ' + u'批量'
-                print alert_list
-                AssetRecord.objects.create(asset=asset, username=username, content=alert_list)
+                recode_name = unicode(name) + ' - ' + u'批量'
+                AssetRecord.objects.create(asset=asset, username=recode_name, content=alert_list)
         return HttpResponse('ok')
 
     return my_render('jasset/asset_edit_batch.html', locals(), request)
@@ -410,51 +410,28 @@ def asset_update(request):
     """
     asset_id = request.GET.get('id', '')
     asset = get_object(Asset, id=asset_id)
+    name = request.user.username
     if not asset:
         return HttpResponseRedirect('/jasset/asset_detail/?id=%s' % asset_id)
-    name = request.session.get('username', 'admin')
-    if asset.use_default_auth:
-        default = Setting.objects.all()
-        if default:
-            default = default[0]
-            username = default.default_user
-            password = default.default_password
-            port = default.default_port
-        else:
-            return HttpResponse(u'没有设置默认用户名和密码!')
     else:
-        username = asset.username
-        password = asset.password
-        port = asset.port
-
-    resource = [{"hostname": asset.ip, "port": port,
-                 "username": username, "password": password}]
-
-    ansible_instance = Tasks(resource)
-    ansible_asset_info = ansible_instance.get_host_info()
-    if ansible_asset_info['status'] == 'ok':
-        asset_info = ansible_asset_info['result'][asset.ip]
-        if asset_info:
-            hostname = asset_info.get('hostname')
-            other_ip = ','.join(asset_info.get('other_ip'))
-            cpu_type = asset_info.get('cpu_type')[1]
-            cpu_cores = asset_info.get('cpu_cores')
-            cpu = cpu_type + ' * ' + unicode(cpu_cores)
-            memory = asset_info.get('memory')
-            disk = asset_info.get('disk')
-            sn = asset_info.get('sn')
-            brand = asset_info.get('brand')
-            system_type = asset_info.get('system_type')
-            system_version = asset_info.get('system_version')
-
-            asset_dic = {"hostname": hostname, "other_ip": other_ip, "cpu": cpu,
-                         "memory": memory, "disk": disk, "system_type": system_type,
-                         "system_version": system_version, "brand": brand, "sn": sn
-                         }
-
-            ansible_record(asset, asset_dic, name)
-
+        asset_ansible_update(asset_list, name)
     return HttpResponseRedirect('/jasset/asset_detail/?id=%s' % asset_id)
+
+
+@require_role('admin')
+def asset_update_batch(request):
+    if request.method == 'POST':
+        asset_list = []
+        name = unicode(request.user.username) + ' - ' + u'自动更新'
+        asset_id_all = unicode(request.POST.get('asset_id_all', ''))
+        asset_id_all = asset_id_all.split(',')
+        for asset_id in asset_id_all:
+            asset = get_object(Asset, id=asset_id)
+            if asset:
+                asset_list.append(asset)
+        asset_ansible_update(asset_list, name)
+        return HttpResponse(u'批量更新成功!')
+    return HttpResponse(u'批量更新成功!')
 
 
 @require_role('admin')
@@ -477,9 +454,7 @@ def idc_add(request):
             return HttpResponseRedirect("/jasset/idc_list/")
     else:
         idc_form = IdcForm()
-    return render_to_response('jasset/idc_add.html',
-                              locals(),
-                              context_instance=RequestContext(request))
+    return my_render('jasset/idc_add.html', locals(), request)
 
 
 @require_role('admin')
@@ -495,9 +470,7 @@ def idc_list(request):
     else:
         posts = IDC.objects.exclude(name='ALL').order_by('id')
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-    return render_to_response('jasset/idc_list.html',
-                              locals(),
-                              context_instance=RequestContext(request))
+    return my_render('jasset/idc_list.html', locals(), request)
 
 
 @require_role('admin')

@@ -77,7 +77,7 @@
                                             <div class="hr-line-dashed"></div>
                                             <label class="col-sm-2 control-label"> 端口<span class="red-fonts">*</span> </label>
                                                 <div class="col-sm-8">
-                                                    <input type="text" placeholder="Port" value="{{ asset.port }}" name="port" class="form-control">
+                                                    <input type="text" placeholder="Port" value="{{ asset.port|default_if_none:"" }}" name="port" class="form-control">
                                                 </div>
                                         </div>
 
@@ -95,6 +95,12 @@
 
                                         <div class="hr-line-dashed"></div>
                                         {{ af.memory|bootstrap_horizontal }}
+
+                                        <div class="hr-line-dashed"></div>
+                                        {{ af.system_type|bootstrap_horizontal }}
+
+                                        <div class="hr-line-dashed"></div>
+                                        {{ af.system_version|bootstrap_horizontal }}
 
                                         <div class="hr-line-dashed"></div>
                                         {{ af.disk|bootstrap_horizontal }}
