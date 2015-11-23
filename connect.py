@@ -155,7 +155,7 @@ class Tty(object):
                 """, re.X)
         result_command = control_char.sub('', result_command.strip())
         if not self.vim_flag:
-            if result_command.startswith('vi'):
+            if result_command.startswith('vi') or result_command.startswith('fg'):
                 self.vim_flag = True
             return result_command.decode('utf8', "ignore")
         else:
