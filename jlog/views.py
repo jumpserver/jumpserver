@@ -104,10 +104,7 @@ def log_record(request):
 
 
 def web_terminal(request):
-    #username = get_session.get('username', '')
-    token = request.COOKIES.get('sessionid')
-    username = request.user.username
-    asset_name = '127.0.0.1'
-    web_terminal_uri = 'ws://%s/terminal?username=%s&asset_name=%s&token=%s' % (WEB_SOCKET_HOST, username, asset_name, token)
+    asset_id = 15
+    web_terminal_uri = 'ws://%s/terminal?asset_id=%s' % (WEB_SOCKET_HOST, asset_id)
     return render_to_response('jlog/web_terminal.html', locals())
 

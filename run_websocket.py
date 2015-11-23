@@ -23,7 +23,7 @@ from pyinotify import WatchManager, Notifier, ProcessEvent, IN_DELETE, IN_CREATE
 import select
 
 from connect import Tty, User, Asset, PermRole
-from connect import TtyLog, Log
+from connect import TtyLog, Log, Session, user_have_perm
 
 try:
     import simplejson as json
@@ -37,14 +37,44 @@ define("host", default='0.0.0.0', help="run port on", type=str)
 
 def require_auth(func):
     def _deco(request, *args, **kwargs):
-        username = request.get_argument('username', '')
-        asset_name = request.get_argument('asset_name', '')
-        token = request.get_argument('token', '')
-        print username, asset_name, token
-        client = tornado.httpclient.HTTPClient()
-        # response = client.fetch('http://some/url') + urllib.urlencode({'username': username,
-        #                                                                'asset_name': asset_name, 'token': token})
-        # return request.close()
+        if request.get_cookie('sessionid'):
+            session_key = request.get_cookie('sessionid')
+        else:
+            session_key = request.get_secure_cookie('sessionid')
+
+        print "session: " + session_key
+
+        if not session_key:
+            print('Auth Failed')
+            request.close()
+
+        session = Session.objects.filter(session_key=session_key)
+        if not session:
+            print('Auth Failed')
+            request.close()
+        else:
+            session = session[0]
+        uid = session.get_decoded().get('_auth_user_id')
+        user = User.objects.filter(id=uid)
+        asset_id = request.get_argument('asset_id', 9999)
+
+        asset = Asset.objects.filter(id=asset_id)
+        if asset:
+            asset = asset[0]
+            request.asset = asset
+            role = user_have_perm(user, asset)
+            request.role = role
+        else:
+            role = ''
+
+        if user:
+            user = user[0]
+            request.user = user
+
+        else:
+            print("No session user.")
+            request.close()
+
         return func(request, *args, **kwargs)
     return _deco
 
@@ -200,6 +230,8 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         self.log_time_f = None
         self.log = None
         self.id = 0
+        self.asset = None
+        self.user = None
         super(WebTerminalHandler, self).__init__(*args, **kwargs)
 
     def check_origin(self, origin):
@@ -207,10 +239,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
 
     @require_auth
     def open(self):
-        asset_name = self.get_argument('asset_name', '')
-        username = self.get_argument('username', '')
-        token = self.get_argument('token', '')
-        print asset_name, username, token
+        print self.user, self.asset
         user = User.objects.get(username='lastimac')
         asset = Asset.objects.get(ip='192.168.244.129')
         role = PermRole.objects.get(name='dev')

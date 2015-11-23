@@ -19,9 +19,10 @@ import struct, fcntl, signal, socket, select
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
     django.setup()
+from django.contrib.sessions.models import Session
 from jumpserver.api import ServerError, User, Asset, PermRole, AssetGroup, get_object, mkdir, get_asset_info, get_role
 from jumpserver.api import logger, Log, TtyLog, get_role_key
-from jperm.perm_api import gen_resource, get_group_asset_perm, get_group_user_perm
+from jperm.perm_api import gen_resource, get_group_asset_perm, get_group_user_perm, user_have_perm
 from jumpserver.settings import LOG_DIR
 from jperm.ansible_api import Command
 
