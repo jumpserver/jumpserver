@@ -132,6 +132,15 @@ def get_group_asset_perm(ob):
     return perm
 
 
+def user_have_perm(user, asset):
+    user_perm_all = get_group_user_perm(user)
+    user_assets = user_perm_all.get('asset').keys()
+    if asset in user_assets:
+        return user_perm_all.get('asset').get(asset).get('role')
+    else:
+        return False
+
+
 def gen_resource(ob, ex='', perm=None):
     """
     ob为用户或资产列表或资产queryset, 如果同时输入用户和资产，则获取用户在这些资产上的信息

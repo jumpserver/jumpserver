@@ -19,9 +19,10 @@ import struct, fcntl, signal, socket, select
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
     django.setup()
-from jumpserver.api import ServerError, User, Asset, AssetGroup, get_object, mkdir, get_asset_info, get_role
+from django.contrib.sessions.models import Session
+from jumpserver.api import ServerError, User, Asset, PermRole, AssetGroup, get_object, mkdir, get_asset_info, get_role
 from jumpserver.api import logger, Log, TtyLog, get_role_key
-from jperm.perm_api import gen_resource, get_group_asset_perm, get_group_user_perm
+from jperm.perm_api import gen_resource, get_group_asset_perm, get_group_user_perm, user_have_perm
 from jumpserver.settings import LOG_DIR
 from jperm.ansible_api import Command
 
@@ -69,6 +70,8 @@ class Tty(object):
         self.connect_info = None
         self.login_type = 'ssh'
         self.vim_flag = False
+        self.ps1_pattern = re.compile('\[.*@.*\][\$#]')
+        self.vim_data = ''
 
     @staticmethod
     def is_output(strings):
@@ -155,32 +158,11 @@ class Tty(object):
                 """, re.X)
         result_command = control_char.sub('', result_command.strip())
         if not self.vim_flag:
-            if result_command.startswith('vi'):
+            if result_command.startswith('vi') or result_command.startswith('fg'):
                 self.vim_flag = True
             return result_command.decode('utf8', "ignore")
         else:
             return ''
-
-    @staticmethod
-    def remove_control_char(str_r):
-        """
-        处理日志特殊字符
-        """
-        control_char = re.compile(r"""
-                \x1b[ #%()*+\-.\/]. |
-                \r |                                               #匹配 回车符(CR)
-                (?:\x1b\[|\x9b) [ -?]* [@-~] |                     #匹配 控制顺序描述符(CSI)... Cmd
-                (?:\x1b\]|\x9d) .*? (?:\x1b\\|[\a\x9c]) | \x07 |   #匹配 操作系统指令(OSC)...终止符或振铃符(ST|BEL)
-                (?:\x1b[P^_]|[\x90\x9e\x9f]) .*? (?:\x1b\\|\x9c) | #匹配 设备控制串或私讯或应用程序命令(DCS|PM|APC)...终止符(ST)
-                \x1b.                                              #匹配 转义过后的字符
-                [\x80-\x9f]                                        #匹配 所有控制字符
-                """, re.X)
-        backspace = re.compile(r"[^\b][\b]")
-        line_filtered = control_char.sub('', str_r.rstrip())
-        while backspace.search(line_filtered):
-            line_filtered = backspace.sub('', line_filtered)
-
-        return line_filtered
 
     def get_log(self):
         """
@@ -312,9 +294,7 @@ class SshTty(Tty):
         log_file_f, log_time_f, log = self.get_log()
         old_tty = termios.tcgetattr(sys.stdin)
         pre_timestamp = time.time()
-        pattern = re.compile('\[.*@.*\][\$#]')
         data = ''
-        chan_str = ''
         input_mode = False
         try:
             tty.setraw(sys.stdin.fileno())
@@ -333,7 +313,7 @@ class SshTty(Tty):
                         if len(x) == 0:
                             break
                         if self.vim_flag:
-                            chan_str += x
+                            self.vim_data += x
                         sys.stdout.write(x)
                         sys.stdout.flush()
                         now_timestamp = time.time()
@@ -352,21 +332,20 @@ class SshTty(Tty):
                 if sys.stdin in r:
                     x = os.read(sys.stdin.fileno(), 1)
                     input_mode = True
-
                     if str(x) in ['\r', '\n', '\r\n']:
                         if self.vim_flag:
-                            match = pattern.search(chan_str)
+                            match = self.ps1_pattern.search(self.vim_data)
                             if match:
                                 self.vim_flag = False
-                                data = self.deal_command(data)
+                                data = self.deal_command(data)[0:200]
                                 if len(data) > 0:
                                     TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
                         else:
-                            data = self.deal_command(data)
+                            data = self.deal_command(data)[0:200]
                             if len(data) > 0:
                                 TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
                         data = ''
-                        chan_str = ''
+                        self.vim_data = ''
                         input_mode = False
 
                     if len(x) == 0:
@@ -456,24 +435,33 @@ class Nav(object):
 
     def search(self, str_r=''):
         gid_pattern = re.compile(r'^g\d+$')
+        # 获取用户授权的所有主机信息
         if not self.user_perm:
             self.user_perm = get_group_user_perm(self.user)
         user_asset_all = self.user_perm.get('asset').keys()
+        # 搜索结果保存
         user_asset_search = []
         if str_r:
+            # 资产组组id匹配
             if gid_pattern.match(str_r):
-                user_asset_search = list(Asset.objects.all())
+                gid = int(str_r.lstrip('g'))
+                # 获取资产组包含的资产
+                user_asset_search = get_object(AssetGroup, id=gid).asset_set.all()
             else:
+                # 匹配 ip, hostname, 备注
                 for asset in user_asset_all:
-                    if str_r in asset.ip or str_r in str(asset.comment):
+                    if str_r in asset.ip or str_r in str(asset.hostname) or str_r in str(asset.comment):
                         user_asset_search.append(asset)
         else:
+            # 如果没有输入就展现所有
             user_asset_search = user_asset_all
 
         self.search_result = dict(zip(range(len(user_asset_search)), user_asset_search))
         print '\033[32m[%-3s] %-15s  %-15s  %-5s  %-10s  %s \033[0m' % ('ID', 'AssetName', 'IP', 'Port', 'Role', 'Comment')
         for index, asset in self.search_result.items():
+            # 获取该资产信息
             asset_info = get_asset_info(asset)
+            # 获取该资产包含的角色
             role = [str(role.name) for role in self.user_perm.get('asset').get(asset).get('role')]
             if asset.comment:
                 print '[%-3s] %-15s  %-15s  %-5s  %-10s  %s' % (index, asset.hostname, asset.ip, asset_info.get('port'),
@@ -482,9 +470,11 @@ class Nav(object):
                 print '[%-3s] %-15s  %-15s  %-5s  %-10s' % (index, asset.hostname, asset.ip, asset_info.get('port'), role)
         print
 
-    @staticmethod
-    def print_asset_group():
-        user_asset_group_all = AssetGroup.objects.all()
+    def print_asset_group(self):
+        """
+        打印用户授权的资产组
+        """
+        user_asset_group_all = get_group_user_perm(self.user).get('asset_group', [])
 
         print '\033[32m[%-3s] %-15s %s \033[0m' % ('ID', 'GroupName', 'Comment')
         for asset_group in user_asset_group_all:
@@ -495,6 +485,9 @@ class Nav(object):
         print
 
     def exec_cmd(self):
+        """
+        批量执行命令
+        """
         self.search()
         while True:
             print "请输入主机名、IP或ansile支持的pattern, q退出"

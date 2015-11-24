@@ -7,6 +7,7 @@ import os
 import sys
 import os.path
 import threading
+import datetime
 import urllib
 
 import tornado.ioloop
@@ -20,16 +21,10 @@ from tornado.websocket import WebSocketClosedError
 
 from tornado.options import define, options
 from pyinotify import WatchManager, Notifier, ProcessEvent, IN_DELETE, IN_CREATE, IN_MODIFY, AsyncNotifier
+import select
 
-# from gevent import monkey
-# monkey.patch_all()
-# import gevent
-# from gevent.socket import wait_read, wait_write
-import struct, fcntl, signal, socket, select, fnmatch
-
-import paramiko
-from connect import Tty
-from connect import TtyLog, Log
+from connect import Tty, User, Asset, PermRole, logger, get_object
+from connect import TtyLog, Log, Session, user_have_perm
 
 try:
     import simplejson as json
@@ -41,17 +36,49 @@ define("port", default=3000, help="run on the given port", type=int)
 define("host", default='0.0.0.0', help="run port on", type=str)
 
 
-def require_auth(func):
-    def _deco(request, *args, **kwargs):
-        username = request.get_argument('username', '')
-        asset_name = request.get_argument('asset_name', '')
-        token = request.get_argument('token', '')
-        print username, asset_name, token
-        client = tornado.httpclient.HTTPClient()
-        # response = client.fetch('http://some/url') + urllib.urlencode({'username': username,
-        #                                                                'asset_name': asset_name, 'token': token})
-        # return request.close()
-        return func(request, *args, **kwargs)
+def require_auth(role='user'):
+    def _deco(func):
+        def _deco(request, *args, **kwargs):
+            if request.get_cookie('sessionid'):
+                session_key = request.get_cookie('sessionid')
+            else:
+                session_key = request.get_secure_cookie('sessionid')
+
+            logger.debug('Websocket: session_key: ' + session_key)
+
+            if session_key:
+                session = get_object(Session, session_key=session_key)
+                if session and datetime.datetime.now() > session.expire_date:
+                    user_id = session.get_decoded().get('_auth_user_id')
+                    user = get_object(User, id=user_id)
+                    if user:
+                        logger.debug('Websocket: user [ %s ] request websocket' % user.username)
+                        request.user = user
+                        if role == 'admin':
+                            if user.role in ['SU', 'GA']:
+                                return func(request, *args, **kwargs)
+                            logger.debug('Websocket: user [ %s ] is not admin.' % user.username)
+                        else:
+                            return func(request, *args, **kwargs)
+            request.close()
+            logger.warning('Websocket: Request auth failed.')
+        # asset_id = int(request.get_argument('id', 9999))
+        # print asset_id
+        # asset = Asset.objects.filter(id=asset_id)
+        # if asset:
+        #     asset = asset[0]
+        #     request.asset = asset
+        # else:
+        #     request.close()
+        #
+        # if user:
+        #     user = user[0]
+        #     request.user = user
+        #
+        # else:
+        #     print("No session user.")
+        #     request.close()
+        return _deco
     return _deco
 
 
@@ -87,10 +114,10 @@ def file_monitor(path='.', client=None):
     notifier = AsyncNotifier(wm, EventHandler(client))
     wm.add_watch(path, mask, auto_add=True, rec=True)
     if not os.path.isfile(path):
-        print "You should monitor a file"
+        logger.debug("File %s does not exist." % path)
         sys.exit(3)
     else:
-        print "now starting monitor %s." % path
+        logger.debug("Now starting monitor file %s." % path)
         global f
         f = open(path, 'r')
         st_size = os.stat(path)[6]
@@ -136,7 +163,7 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
-    @require_auth
+    @require_auth('admin')
     def open(self):
         # 获取监控的path
         self.file_path = self.get_argument('file_path', '')
@@ -158,7 +185,8 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
             MonitorHandler.clients.remove(self)
             MonitorHandler.threads.remove(MonitorHandler.threads[client_index])
 
-        print len(MonitorHandler.threads), len(MonitorHandler.clients)
+        logger.debug("Websocket: Monitor client num: %s, thread num: %s" % (len(MonitorHandler.clients),
+                                                                            len(MonitorHandler.threads)))
 
     def on_message(self, message):
         # 监控日志，发生变动发向客户端
@@ -168,10 +196,13 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
         # 客户端主动关闭
         # self.close()
 
-        print "Close websocket."
-        client_index = MonitorHandler.clients.index(self)
-        MonitorHandler.clients.remove(self)
-        MonitorHandler.threads.remove(MonitorHandler.threads[client_index])
+        logger.debug("Websocket: Monitor client close request")
+        try:
+            client_index = MonitorHandler.clients.index(self)
+            MonitorHandler.clients.remove(self)
+            MonitorHandler.threads.remove(MonitorHandler.threads[client_index])
+        except ValueError:
+            pass
 
 
 class WebTty(Tty):
@@ -184,6 +215,7 @@ class WebTty(Tty):
 
 
 class WebTerminalKillHandler(tornado.web.RequestHandler):
+    @require_auth('admin')
     def get(self):
         ws_id = self.get_argument('id')
         Log.objects.filter(id=ws_id).update(is_finished=True)
@@ -206,6 +238,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         self.log_time_f = None
         self.log = None
         self.id = 0
+        self.user = None
         super(WebTerminalHandler, self).__init__(*args, **kwargs)
 
     def check_origin(self, origin):
@@ -213,11 +246,28 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
 
     @require_auth
     def open(self):
-        asset_name = self.get_argument('asset_name', '')
-        username = self.get_argument('username', '')
-        token = self.get_argument('token', '')
-        print asset_name, username, token
-        self.term = WebTty('a', 'b')
+        role_name = self.get_argument('role', 'sb')
+        asset_id = self.get_argument('id', 9999)
+        asset = get_object(Asset, id=asset_id)
+        if asset:
+            roles = user_have_perm(self.user, asset)
+            login_role = ''
+            for role in roles:
+                if role.name == role_name:
+                    login_role = role
+                    break
+            if not login_role:
+                logger.warning('Websocket: Not that Role %s for Host: %s User: %s ' % (role_name, asset.hostname,
+                                                                                       self.user.username))
+                self.close()
+                return
+        else:
+            logger.warning('Websocket: No that Host: %s User: %s ' % (asset_id, self.user.username))
+            self.close()
+            return
+        logger.debug('Websocket: request web terminal Host: %s User: %s Role: %s' % (asset.hostname, self.user.username,
+                                                                                     login_role.name))
+        self.term = WebTty(self.user, self.asset, login_role)
         self.term.get_connection()
         self.term.channel = self.term.ssh.invoke_shell(term='xterm')
         WebTerminalHandler.tasks.append(MyThread(target=self.forward_outbound))
@@ -236,7 +286,17 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         if data.get('data'):
             self.term.input_mode = True
             if str(data['data']) in ['\r', '\n', '\r\n']:
-                TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=self.term.deal_command(self.term.data, self.term.ssh)).save()
+                if self.term.vim_flag:
+                    match = self.term.ps1_pattern.search(self.term.vim_data)
+                    if match:
+                        self.term.vim_flag = False
+                        vim_data = self.term.deal_command(self.term.vim_data)[0:200]
+                        if len(data) > 0:
+                            TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=vim_data).save()
+
+                TtyLog(log=self.log, datetime=datetime.datetime.now(),
+                       cmd=self.term.deal_command(self.term.data)[0:200]).save()
+                self.term.vim_data = ''
                 self.term.data = ''
                 self.term.input_mode = False
             self.term.channel.send(data['data'])
@@ -267,6 +327,8 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                     if not len(recv):
                         return
                     data += recv
+                    if self.term.vim_flag:
+                        self.term.vim_data += recv
                     try:
                         self.write_message(json.dumps({'data': data}))
                         now_timestamp = time.time()
@@ -290,4 +352,5 @@ if __name__ == '__main__':
     server.bind(options.port, options.host)
     # server.listen(options.port)
     server.start(num_processes=1)
+    print "Run server on %s:%s" % (options.host, options.port)
     tornado.ioloop.IOLoop.instance().start()

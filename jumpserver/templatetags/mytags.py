@@ -237,3 +237,12 @@ def key_exist(username):
         return True
     else:
         return False
+
+
+@register.filter(name='check_role')
+def check_role(asset_id, user):
+    """
+    ssh key is exist or not
+    """
+    return user
+
