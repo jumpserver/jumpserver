@@ -211,8 +211,8 @@ class Tty(object):
         获取需要登陆的主机的信息和映射用户的账号密码
         """
         asset_info = get_asset_info(self.asset)
+        role_key = get_role_key(self.user, self.role)
         role_pass = CRYPTOR.decrypt(self.role.password)
-        role_key = os.path.join(self.role.key_path, 'id_rsa')
         self.connect_info = {'user': self.user, 'asset': self.asset, 'ip': asset_info.get('ip'),
                              'port': int(asset_info.get('port')), 'role_name': self.role.name,
                              'role_pass': role_pass, 'role_key': role_key}
@@ -234,7 +234,7 @@ class Tty(object):
         ssh.load_system_host_keys()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
-            role_key = get_role_key(self.user, self.role)
+            role_key = connect_info.get('role_key')
             if role_key and os.path.isfile(role_key):
                 try:
                     ssh.connect(connect_info.get('ip'),
@@ -245,6 +245,7 @@ class Tty(object):
                     self.ssh = ssh
                     return ssh
                 except (paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException):
+                    logger.warning('Use ssh key %s Failed.' % role_key)
                     pass
 
             ssh.connect(connect_info.get('ip'),
