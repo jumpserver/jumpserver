@@ -130,6 +130,7 @@ def asset_add(request):
     af = AssetForm()
     if request.method == 'POST':
         af_post = AssetForm(request.POST)
+        print af_post
         ip = request.POST.get('ip', '')
         hostname = request.POST.get('hostname', '')
         is_active = True if request.POST.get('is_active') == '1' else False
@@ -220,12 +221,11 @@ def asset_edit(request):
             pass
         else:
             if af_post.is_valid():
-                print 'hehe', af_post
                 af_save = af_post.save(commit=False)
                 if use_default_auth:
                     af_save.username = ''
                     af_save.password = ''
-                    af_save.port = ''
+                    af_save.port = None
                 else:
                     if password_old != password:
                         password_encode = CRYPTOR.encrypt(password)
@@ -423,14 +423,18 @@ def asset_update(request):
 @require_role('admin')
 def asset_update_batch(request):
     if request.method == 'POST':
-        asset_list = []
+        arg = request.GET.get('arg', '')
         name = unicode(request.user.username) + ' - ' + u'自动更新'
-        asset_id_all = unicode(request.POST.get('asset_id_all', ''))
-        asset_id_all = asset_id_all.split(',')
-        for asset_id in asset_id_all:
-            asset = get_object(Asset, id=asset_id)
-            if asset:
-                asset_list.append(asset)
+        if arg == 'all':
+            asset_list = Asset.objects.all()
+        else:
+            asset_list = []
+            asset_id_all = unicode(request.POST.get('asset_id_all', ''))
+            asset_id_all = asset_id_all.split(',')
+            for asset_id in asset_id_all:
+                asset = get_object(Asset, id=asset_id)
+                if asset:
+                    asset_list.append(asset)
         asset_ansible_update(asset_list, name)
         return HttpResponse(u'批量更新成功!')
     return HttpResponse(u'批量更新成功!')

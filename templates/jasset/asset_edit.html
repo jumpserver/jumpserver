@@ -186,12 +186,20 @@
         $('label[for="' + field + '"]').parent().addClass("required");
     });
 
-    $('#assetForm').validator({
+   $('#assetForm').validator({
         timely: 2,
         theme: "yellow_right_effect",
         rules: {
             check_ip: [/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])){3}$/, 'ip地址不正确'],
             check_port: [/^\d{1,5}$/, '端口号不正确'],
+            use_default_auth: function() {
+                var str1 = $("#id_use_default_auth").is(":checked");
+                if (str1 == true){
+                    var decide = false;
+                } else {
+                    var decide = true;
+                }
+                return decide}
         },
         fields: {
             "hostname": {
@@ -200,17 +208,24 @@
                 ok: "",
                 msg: {required: "必须填写!"}
             },
-{#            "ip": {#}
-{#                rule: "required;check_ip",#}
-{#                tip: "输入IP",#}
-{#                ok: "",#}
-{#                msg: {required: "必须填写!"}#}
-{#            },#}
-{#            "port": {#}
-{#                rule: "required;check_port",#}
-{#                tip: "输入端口号",#}
-{#                ok: "",#}
-{#                msg: {required: "必须填写!"}#}
+            "port": {
+                rule: "required(use_default_auth)",
+                tip: "输入端口号",
+                ok: "",
+                msg: {required: "必须填写!"}
+            },
+            "username": {
+                rule: "required(use_default_auth)",
+                tip: "输入用户名",
+                ok: "",
+                msg: {required: "必须填写!"}
+            },
+            "password": {
+                rule: "required(use_default_auth)",
+                tip: "输入密码",
+                ok: "",
+                msg: {required: "必须填写!"}
+            }
         },
         valid: function(form) {
             form.submit();
