@@ -38,17 +38,17 @@ define("host", default='0.0.0.0', help="run port on", type=str)
 
 def require_auth(role='user'):
     def _deco(func):
-        def _deco(request, *args, **kwargs):
+        def _deco2(request, *args, **kwargs):
             if request.get_cookie('sessionid'):
                 session_key = request.get_cookie('sessionid')
             else:
                 session_key = request.get_secure_cookie('sessionid')
 
-            logger.debug('Websocket: session_key: ' + session_key)
-
+            logger.debug('Websocket: session_key: %s' % session_key)
             if session_key:
                 session = get_object(Session, session_key=session_key)
-                if session and datetime.datetime.now() > session.expire_date:
+                logger.debug('Websocket: session: %s' % session)
+                if session and datetime.datetime.now() < session.expire_date:
                     user_id = session.get_decoded().get('_auth_user_id')
                     user = get_object(User, id=user_id)
                     if user:
@@ -60,6 +60,8 @@ def require_auth(role='user'):
                             logger.debug('Websocket: user [ %s ] is not admin.' % user.username)
                         else:
                             return func(request, *args, **kwargs)
+                else:
+                    logger.debug('Websocket: session expired: %s' % session_key)
             request.close()
             logger.warning('Websocket: Request auth failed.')
         # asset_id = int(request.get_argument('id', 9999))
@@ -78,7 +80,7 @@ def require_auth(role='user'):
         # else:
         #     print("No session user.")
         #     request.close()
-        return _deco
+        return _deco2
     return _deco
 
 
@@ -244,13 +246,15 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
-    @require_auth
+    @require_auth('user')
     def open(self):
+        logger.debug('Websocket: Open request')
         role_name = self.get_argument('role', 'sb')
         asset_id = self.get_argument('id', 9999)
         asset = get_object(Asset, id=asset_id)
         if asset:
             roles = user_have_perm(self.user, asset)
+            logger.debug(roles)
             login_role = ''
             for role in roles:
                 if role.name == role_name:
@@ -267,7 +271,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             return
         logger.debug('Websocket: request web terminal Host: %s User: %s Role: %s' % (asset.hostname, self.user.username,
                                                                                      login_role.name))
-        self.term = WebTty(self.user, self.asset, login_role)
+        self.term = WebTty(self.user, asset, login_role)
         self.term.get_connection()
         self.term.channel = self.term.ssh.invoke_shell(term='xterm')
         WebTerminalHandler.tasks.append(MyThread(target=self.forward_outbound))
@@ -302,7 +306,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             self.term.channel.send(data['data'])
 
     def on_close(self):
-        print 'On_close'
+        logger.debug('Websocket: Close request')
         if self in WebTerminalHandler.clients:
             WebTerminalHandler.clients.remove(self)
         try:

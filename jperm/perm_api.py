@@ -138,7 +138,7 @@ def user_have_perm(user, asset):
     if asset in user_assets:
         return user_perm_all.get('asset').get(asset).get('role')
     else:
-        return False
+        return []
 
 
 def gen_resource(ob, ex='', perm=None):
