@@ -143,6 +143,7 @@
                                 <input type="button" id="asset_del" class="btn btn-danger btn-sm"  name="del_button" value="删除"/>
                                 <a value="/jasset/asset_edit_batch/" type="button" class="btn btn-sm btn-warning iframe">修改</a>
                                 <input type="button" id="asset_update" class="btn btn-info btn-sm"  name="update_button" value="更新"/>
+                                <input type="button" id="asset_update_all" class="btn btn-primary btn-sm"  name="update_button" value="更新全部"/>
                             </div>
                             {% include 'paginator.html' %}
                         </div>
@@ -281,6 +282,23 @@
         });
     });
 
+{#    function update_tips(){#}
+{#        layer.tips('我是另外一个tips，只不过我长得跟之前那位稍有些不一样。', '吸附元素选择器', {#}
+{#            tips: [1, '#3595CC'],#}
+{#            time: 4000#}
+{#        });#}
+{#    }#}
+
+    $('#asset_update_all').click(function () {
+        layer.msg('玩命更新中...', {time: 200000});
+        $.ajax({
+            type: "post",
+            url: "/jasset/asset_update_batch/?arg=all",
+            success: function () {
+                parent.location.reload();
+            }
+        });
+    });
 
     function change_info(){
         var args = $("#asset_form").serialize();

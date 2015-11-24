@@ -130,6 +130,7 @@ def asset_add(request):
     af = AssetForm()
     if request.method == 'POST':
         af_post = AssetForm(request.POST)
+        print af_post
         ip = request.POST.get('ip', '')
         hostname = request.POST.get('hostname', '')
         is_active = True if request.POST.get('is_active') == '1' else False
@@ -211,12 +212,11 @@ def asset_edit(request):
         password = request.POST.get('password', '')
         is_active = True if request.POST.get('is_active') == '1' else False
         use_default_auth = request.POST.get('use_default_auth', '')
-
         try:
             asset_test = get_object(Asset, hostname=hostname)
             if asset_test and asset_id != unicode(asset_test.id):
-                error = u'该主机名 %s 已存在!' % hostname
-                raise ServerError(error)
+                emg = u'该主机名 %s 已存在!' % hostname
+                raise ServerError(emg)
         except ServerError:
             pass
         else:
@@ -225,6 +225,7 @@ def asset_edit(request):
                 if use_default_auth:
                     af_save.username = ''
                     af_save.password = ''
+                    af_save.port = None
                 else:
                     if password_old != password:
                         password_encode = CRYPTOR.encrypt(password)
@@ -237,9 +238,10 @@ def asset_edit(request):
                 info = asset_diff(af_post.__dict__.get('initial'), request.POST)
                 db_asset_alert(asset, username, info)
 
-                msg = u'主机 %s 修改成功' % ip
+                smg = u'主机 %s 修改成功' % ip
             else:
                 emg = u'主机 %s 修改失败' % ip
+                return my_render('jasset/error.html', locals(), request)
             return HttpResponseRedirect('/jasset/asset_detail/?id=%s' % asset_id)
 
     return my_render('jasset/asset_edit.html', locals(), request)
@@ -414,21 +416,25 @@ def asset_update(request):
     if not asset:
         return HttpResponseRedirect('/jasset/asset_detail/?id=%s' % asset_id)
     else:
-        asset_ansible_update(asset_list, name)
+        asset_ansible_update([asset], name)
     return HttpResponseRedirect('/jasset/asset_detail/?id=%s' % asset_id)
 
 
 @require_role('admin')
 def asset_update_batch(request):
     if request.method == 'POST':
-        asset_list = []
+        arg = request.GET.get('arg', '')
         name = unicode(request.user.username) + ' - ' + u'自动更新'
-        asset_id_all = unicode(request.POST.get('asset_id_all', ''))
-        asset_id_all = asset_id_all.split(',')
-        for asset_id in asset_id_all:
-            asset = get_object(Asset, id=asset_id)
-            if asset:
-                asset_list.append(asset)
+        if arg == 'all':
+            asset_list = Asset.objects.all()
+        else:
+            asset_list = []
+            asset_id_all = unicode(request.POST.get('asset_id_all', ''))
+            asset_id_all = asset_id_all.split(',')
+            for asset_id in asset_id_all:
+                asset = get_object(Asset, id=asset_id)
+                if asset:
+                    asset_list.append(asset)
         asset_ansible_update(asset_list, name)
         return HttpResponse(u'批量更新成功!')
     return HttpResponse(u'批量更新成功!')
