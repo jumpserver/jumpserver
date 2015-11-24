@@ -46,7 +46,7 @@ def gen_keys():
     """
     key_basename = "key-" + uuid4().hex
     key_path_dir = os.path.join(KEY_DIR, 'role_key', key_basename)
-    mkdir(key_path_dir, 0755)
+    mkdir(key_path_dir, mode=0755)
     key = RSAKey.generate(2048)
     private_key = os.path.join(key_path_dir, 'id_rsa')
     public_key = os.path.join(key_path_dir, 'id_rsa.pub')
