@@ -209,7 +209,11 @@ def str_to_dic(info):
     """
     str to list
     """
-    return ast.literal_eval(info).iteritems()
+    if '{' in info:
+        info_dic = ast.literal_eval(info).iteritems()
+    else:
+        info_dic = {}
+    return info_dic
 
 
 @register.filter(name='str_to_code')
