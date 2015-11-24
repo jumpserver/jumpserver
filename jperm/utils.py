@@ -6,6 +6,8 @@ import os.path
 from paramiko.rsakey import RSAKey
 from os import chmod, makedirs
 from uuid import uuid4
+from django.template.loader import get_template
+from django.template import Context
 
 from jumpserver.settings import KEY_DIR
 
@@ -61,6 +63,29 @@ def gen_keys():
             content_file.write(data)
     return key_path_dir
 
+
+def gen_sudo(role_custom, role_name, role_chosen):
+    """
+    生成sudo file, 仅测试了cenos7
+    role_custom: 自定义支持的sudo 命令　格式: 'CMD1, CMD2, CMD3, ...'
+    role_name: role name
+    role_chosen: 选择那些sudo的命令别名：
+    　　　　NETWORKING, SOFTWARE, SERVICES, STORAGE,
+    　　　　DELEGATING, PROCESSES, LOCATE, DRIVERS
+    :return:
+    """
+    sudo_file_basename = os.path.join(os.path.dirname(KEY_DIR), 'role_sudo_file')
+    makedirs(sudo_file_basename)
+    sudo_file_path = os.path.join(sudo_file_basename, role_name)
+
+    t = get_template('role_sudo.j2')
+    content = t.render(Context({"role_custom": role_custom,
+                      "role_name": role_name,
+                      "role_chosen": role_chosen,
+                      }))
+    with open(sudo_file_path, 'w') as f:
+        f.write(content)
+    return sudo_file_path
 
 
 

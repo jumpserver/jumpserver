@@ -226,3 +226,12 @@ def ip_str_to_list(ip_str):
     ip str to list
     """
     return ip_str.split(',')
+
+
+@register.filter(name='role_contain_which_sudos')
+def role_contain_which_sudos(role):
+    """
+    get role sudo commands
+    """
+    sudo_names = [sudo.name for sudo in role.sudo.all()]
+    return ','.join(sudo_names)

@@ -19,12 +19,23 @@ class SysUser(models.Model):
     comment = models.CharField(max_length=100, null=True, blank=True, default='')
 
 
+class PermSudo(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    date_added = models.DateTimeField(auto_now=True)
+    commands = models.TextField()
+    comment = models.CharField(max_length=100, null=True, blank=True, default='')
+
+    def __unicode__(self):
+        return self.name
+
+
 class PermRole(models.Model):
     name = models.CharField(max_length=100, unique=True)
     comment = models.CharField(max_length=100, null=True, blank=True, default='')
     password = models.CharField(max_length=100)
     key_path = models.CharField(max_length=100)
     date_added = models.DateTimeField(auto_now=True)
+    sudo = models.ManyToManyField(PermSudo, related_name='perm_role')
 
     def __unicode__(self):
         return self.name
@@ -42,3 +53,7 @@ class PermRule(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+
+

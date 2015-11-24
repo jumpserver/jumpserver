@@ -20,7 +20,6 @@ API_DIR = os.path.dirname(os.path.abspath(__file__))
 ANSIBLE_DIR = os.path.join(API_DIR, 'playbooks')
 
 
-
 class AnsibleError(StandardError):
     """
     the base AnsibleError which contains error(required),
@@ -44,7 +43,7 @@ class CommandValueError(AnsibleError):
         super(CommandValueError, self).__init__('value:invalid', field, message)
 
 
-class MyInventory(object):
+class MyInventory(Inventory):
     """
     this is my ansible inventory object.
     """
@@ -65,7 +64,7 @@ class MyInventory(object):
         self.inventory = Inventory(host_list=[])
         self.gen_inventory()
 
-    def add_group(self, hosts, groupname, groupvars=None):
+    def my_add_group(self, hosts, groupname, groupvars=None):
         """
         add hosts to a group
         """
@@ -83,11 +82,13 @@ class MyInventory(object):
             hostport = host.get("port")
             username = host.get("username")
             password = host.get("password")
+            sudo_password = host.get("sudo_password")
             my_host = Host(name=hostname, port=hostport)
             my_host.set_variable('ansible_ssh_host', hostname)
             my_host.set_variable('ansible_ssh_port', hostport)
             my_host.set_variable('ansible_ssh_user', username)
             my_host.set_variable('ansible_ssh_pass', password)
+
             # set other variables 
             for key, value in host.iteritems():
                 if key not in ["hostname", "port", "username", "password"]:
@@ -102,10 +103,10 @@ class MyInventory(object):
         add hosts to inventory.
         """
         if isinstance(self.resource, list):
-            self.add_group(self.resource, 'default_group')
+            self.my_add_group(self.resource, 'default_group')
         elif isinstance(self.resource, dict):
             for groupname, hosts_and_vars in self.resource.iteritems():
-                self.add_group(hosts_and_vars.get("hosts"), groupname, hosts_and_vars.get("vars"))
+                self.my_add_group(hosts_and_vars.get("hosts"), groupname, hosts_and_vars.get("vars"))
 
 
 class Command(MyInventory):
@@ -125,7 +126,7 @@ class Command(MyInventory):
 
         if module_name not in ["raw", "command", "shell"]:
             raise CommandValueError("module_name",
-                                     "module_name must be of the 'raw, command, shell'")
+                                    "module_name must be of the 'raw, command, shell'")
         hoc = Runner(module_name=module_name,
                      module_args=command,
                      timeout=timeout,
@@ -136,15 +137,17 @@ class Command(MyInventory):
                      )
         self.results = hoc.run()
 
+        ret = {}
         if self.stdout:
-            return {"ok": self.stdout}
+            ret["ok"] = self.stdout
         else:
             msg = []
             if self.stderr:
                 msg.append(self.stderr)
             if self.dark:
                 msg.append(self.dark)
-            return {"failed": msg}
+            ret["failed"] = msg
+        return ret
 
     @property
     def raw_results(self):
@@ -206,7 +209,14 @@ class Tasks(Command):
     def __init__(self, *args, **kwargs):
         super(Tasks, self).__init__(*args, **kwargs)
 
-    def __run(self, module_args, module_name="command", timeout=5, forks=10, group='default_group', pattern='*'):
+    def __run(self,
+              module_args,
+              module_name="command",
+              timeout=5,
+              forks=10,
+              group='default_group',
+              pattern='*',
+              ):
         """
         run command from andible ad-hoc.
         command  : 必须是一个需要执行的命令字符串， 比如 
@@ -219,6 +229,7 @@ class Tasks(Command):
                      subset=group,
                      pattern=pattern,
                      forks=forks,
+                     become=False,
                      )
 
         self.results = hoc.run()
@@ -272,7 +283,7 @@ class Tasks(Command):
         module_args = 'user="%s" key="{{ lookup("file", "%s") }}" state="absent"' % (user, key_path)
         self.__run(module_args, "authorized_key")
 
-        return {"status": "failed","msg": self.msg} if self.msg else {"status": "ok"}
+        return {"status": "failed", "msg": self.msg} if self.msg else {"status": "ok"}
 
     def add_user(self, username, password):
         """
@@ -310,7 +321,8 @@ class Tasks(Command):
         delete a host user.
         """
         module_args = 'name=%s state=absent remove=yes move_home=yes force=yes' % (username)
-        self.__run(module_args, "user")
+        self.__run(module_args,
+                   "user",)
 
         return {"status": "failed","msg": self.msg} if self.msg else {"status": "ok"}
 
@@ -386,9 +398,15 @@ class Tasks(Command):
                     "product_sn": setup.get("ansible_product_serial")
             }
 
-        return {"status": "failed", "msg": self.msg} if self.msg else {"status": "ok", "result": result}
+        return {"failed": self.msg, "ok": result}
 
-
+    def push_sudo(self, role_custo, role_name, role_chosen):
+        """
+        use template to render pushed sudoers file
+        :return:
+        """
+        module_args = 'src=%s dest=%s owner=root group=root mode=0440' % (username, encrypt_pass)
+        self.__run(module_args, "template")
 
 
 class CustomAggregateStats(callbacks.AggregateStats):
@@ -440,12 +458,12 @@ class MyPlaybook(MyInventory):
         playbook_path = os.path.join(ANSIBLE_DIR, playbook_relational_path)
 
         pb = PlayBook(
-            playbook = playbook_path,
-            stats = stats,
-            callbacks = playbook_cb,
-            runner_callbacks = runner_cb,
-            inventory = self.inventory,
-            extra_vars = extra_vars,
+            playbook=playbook_path,
+            stats=stats,
+            callbacks=playbook_cb,
+            runner_callbacks=runner_cb,
+            inventory=self.inventory,
+            extra_vars=extra_vars,
             check=False)
 
         self.results = pb.run()
@@ -475,9 +493,14 @@ if __name__ == "__main__":
 #                          },
 #                }
 
-    resource = [{"hostname": "127.0.0.1", "port": "22", "username": "yumaojun", "password": "yusky0902"}]
-    command = Command(resource)
-    print command.run("who")
+    resource = [{"hostname": "127.0.0.1", "port": "22", "username": "yumaojun", "password": "yusky0902",
+                 # "ansible_become": "yes",
+                 # "ansible_become_method": "sudo",
+                 # # "ansible_become_user": "root",
+                 # "ansible_become_pass": "yusky0902",
+                 }]
+    cmd = Command(resource)
+    print cmd.run('ls')
 
     # resource = [{"hostname": "192.168.10.148", "port": "22", "username": "root", "password": "xxx"}]
     # task = Tasks(resource)

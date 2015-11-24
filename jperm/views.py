@@ -9,7 +9,7 @@ from juser.user_api import gen_ssh_key
 
 from juser.models      import User, UserGroup
 from jasset.models     import Asset, AssetGroup
-from jperm.models      import PermRole, PermRule
+from jperm.models      import PermRole, PermRule, PermSudo
 from jumpserver.models import Setting
 
 from jperm.utils       import updates_dict, gen_keys, get_rand_pass
@@ -259,18 +259,23 @@ def perm_role_add(request):
 
     if request.method == "GET":
         default_password = get_rand_pass()
+        sudos = PermSudo.objects.all()
         return my_render('jperm/perm_role_add.html', locals(), request)
 
     elif request.method == "POST":
-        # 获取参数： name, comment
+        # 获取参数： name, comment, sudo
         name = request.POST.get("role_name")
         comment = request.POST.get("role_comment")
         password = request.POST.get("role_password")
+        sudos_name = request.POST.getlist("sudo_name")
+        sudos_obj = [PermSudo.objects.get(name=sudo_name) for sudo_name in sudos_name]
         encrypt_pass = CRYPTOR.encrypt(password)
         # 生成随机密码，生成秘钥对
 
         key_path = gen_keys()
         role = PermRole(name=name, comment=comment, password=encrypt_pass, key_path=key_path)
+        role.save()
+        role.sudo = sudos_obj
         role.save()
 
         msg = u"添加角色: %s" % name
@@ -350,6 +355,7 @@ def perm_role_edit(request):
     role_id = request.GET.get("id")
     role = PermRole.objects.get(id=role_id)
     role_pass = CRYPTOR.decrypt(role.password)
+    role_sudos = role.sudo.all()
     if request.method == "GET":
         return my_render('jperm/perm_role_edit.html', locals(), request)
 
@@ -359,11 +365,14 @@ def perm_role_edit(request):
         role_password = request.POST.get("role_password")
         encrypt_role_pass = CRYPTOR.encrypt(role_password)
         role_comment = request.POST.get("role_comment")
+        role_sudo_names = request.POST.getlist("sudo_name")
+        role_sudos = [PermSudo.objects.get(name=sudo_name) for sudo_name in role_sudo_names]
 
         # 写入数据库
         role.name = role_name
         role.password = encrypt_role_pass
         role.comment = role_comment
+        role.sudo = role_sudos
 
         role.save()
         msg = u"更新系统角色： %s" % role.name
@@ -378,8 +387,6 @@ def perm_role_edit(request):
 
         roles_list, p, roles, page_range, current_page, show_first, show_end = pages(roles_list, request)
         return my_render('jperm/perm_role_list.html', locals(), request)
-
-
 
 
 @require_role('admin')
@@ -459,6 +466,127 @@ def perm_role_push(request):
             return HttpResponse(u"推送失败")
         else:
             return HttpResponse(u"推送系统角色： %s" % ','.join(role_names))
+
+
+@require_role('admin')
+def perm_sudo_list(request):
+    """
+    list sudo commands alias
+    :param request:
+    :return:
+    """
+    # 渲染数据
+    header_title, path1, path2 = "Sudo命令", "别名管理", "查看别名"
+
+    # 获取所有sudo 命令别名
+    sudos_list = PermSudo.objects.all()
+
+    # TODO: 搜索和分页
+    keyword = request.GET.get('search', '')
+    if keyword:
+        sudos_list = sudos_list.filter(Q(name=keyword))
+
+    sudos_list, p, sudos, page_range, current_page, show_first, show_end = pages(sudos_list, request)
+
+    return my_render('jperm/perm_sudo_list.html', locals(), request)
+
+
+@require_role('admin')
+def perm_sudo_add(request):
+    """
+    list sudo commands alias
+    :param request:
+    :return:
+    """
+    # 渲染数据
+    header_title, path1, path2 = "Sudo命令", "别名管理", "添加别名"
+
+    if request.method == "GET":
+        return my_render('jperm/perm_sudo_add.html', locals(), request)
+
+    elif request.method == "POST":
+        # 获取参数： name, comment
+        name = request.POST.get("sudo_name")
+        comment = request.POST.get("sudo_comment")
+        commands = request.POST.get("sudo_commands")
+
+        sudo = PermSudo(name=name, comment=comment, commands=commands)
+        sudo.save()
+
+        msg = u"添加Sudo命令别名: %s" % name
+        # 渲染数据
+        header_title, path1, path2 = "Sudo命令", "别名管理", "查看别名"
+        # 获取所有sudo 命令别名
+        sudos_list = PermSudo.objects.all()
+
+        # TODO: 搜索和分页
+        keyword = request.GET.get('search', '')
+        if keyword:
+            roles_list = sudos_list.filter(Q(name=keyword))
+
+        sudos_list, p, sudos, page_range, current_page, show_first, show_end = pages(sudos_list, request)
+
+        return my_render('jperm/perm_sudo_list.html', locals(), request)
+    else:
+        return HttpResponse(u"不支持该操作")
+
+
+@require_role('admin')
+def perm_sudo_edit(request):
+    """
+    list sudo commands alias
+    :param request:
+    :return:
+    """
+    # 渲染数据
+    header_title, path1, path2 = "Sudo命令", "别名管理", "编辑别名"
+
+    sudo_id = request.GET.get("id")
+    sudo = PermSudo.objects.get(id=sudo_id)
+    if request.method == "GET":
+        return my_render('jperm/perm_sudo_edit.html', locals(), request)
+
+    if request.method == "POST":
+        name = request.POST.get("sudo_name")
+        commands = request.POST.get("sudo_commands")
+        comment = request.POST.get("sudo_comment")
+        sudo.name = name
+        sudo.commands = commands
+        sudo.comment = comment
+        sudo.save()
+
+        msg = u"更新命令别名： %s" % name
+        # 渲染数据
+        header_title, path1, path2 = "Sudo命令", "别名管理", "查看别名"
+        # 获取所有sudo 命令别名
+        sudos_list = PermSudo.objects.all()
+        # TODO: 搜索和分页
+        keyword = request.GET.get('search', '')
+        if keyword:
+            sudos_list = sudos_list.filter(Q(name=keyword))
+        sudos_list, p, sudos, page_range, current_page, show_first, show_end = pages(sudos_list, request)
+        return my_render('jperm/perm_sudo_list.html', locals(), request)
+
+
+@require_role('admin')
+def perm_sudo_delete(request):
+    """
+    list sudo commands alias
+    :param request:
+    :return:
+    """
+    if request.method == "POST":
+        # 获取参数删除的role对象
+        sudo_id = request.POST.get("id")
+        sudo = PermSudo.objects.get(id=sudo_id)
+        # 数据库里删除记录
+        sudo.delete()
+        return HttpResponse(u"删除角色: %s" % sudo.name)
+    else:
+        return HttpResponse(u"不支持该操作")
+
+
+
 
 
 
