@@ -21,7 +21,7 @@ if django.get_version() != '1.6':
     django.setup()
 from django.contrib.sessions.models import Session
 from jumpserver.api import ServerError, User, Asset, PermRole, AssetGroup, get_object, mkdir, get_asset_info, get_role
-from jumpserver.api import logger, Log, TtyLog, get_role_key
+from jumpserver.api import logger, Log, TtyLog, get_role_key, CRYPTOR
 from jperm.perm_api import gen_resource, get_group_asset_perm, get_group_user_perm, user_have_perm
 from jumpserver.settings import LOG_DIR
 from jperm.ansible_api import Command
@@ -211,9 +211,16 @@ class Tty(object):
         获取需要登陆的主机的信息和映射用户的账号密码
         """
         asset_info = get_asset_info(self.asset)
+        role_pass = CRYPTOR.decrypt(self.role.password)
+        role_key = os.path.join(self.role.key_path, 'id_rsa')
         self.connect_info = {'user': self.user, 'asset': self.asset, 'ip': asset_info.get('ip'),
                              'port': int(asset_info.get('port')), 'role_name': self.role.name,
-                             'role_pass': self.role.password, 'role_key': self.role.key_path}
+                             'role_pass': role_pass, 'role_key': role_key}
+        logger.debug("Connect: Host: %s Port: %s User: %s Pass: %s Key: %s" % (asset_info.get('ip'),
+                                                                               asset_info.get('port'),
+                                                                               self.role.name,
+                                                                               role_pass,
+                                                                               role_key))
         return self.connect_info
 
     def get_connection(self):
@@ -237,7 +244,7 @@ class Tty(object):
                                 look_for_keys=False)
                     self.ssh = ssh
                     return ssh
-                except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
+                except (paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException):
                     pass
 
             ssh.connect(connect_info.get('ip'),
