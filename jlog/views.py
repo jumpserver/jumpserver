@@ -51,6 +51,7 @@ def log_list(request, offset):
 
     web_monitor_uri = 'ws://%s/monitor' % WEB_SOCKET_HOST
     web_kill_uri = 'http://%s/kill' % WEB_SOCKET_HOST
+    session_id = request.session.session_key
     return render_to_response('jlog/log_%s.html' % offset, locals(), context_instance=RequestContext(request))
 
 

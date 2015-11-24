@@ -50,7 +50,7 @@
         <div class="col-lg-12">
             <div class="ibox float-e-margins">
                 <div id="ibox-content" class="ibox-title">
-                    <h5> 用户日志详细信息列表 <input type="button" id="test_connect" class="btn btn-primary" value="测试连接 web terminal" /> </h5>
+                    <h5> 用户日志详细信息列表 </h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -186,29 +186,17 @@
         });
     });
 
-{#    function log_search(){#}
-{#        $.ajax({#}
-{#            type: "GET",#}
-{#            url: "/jlog/search/?env=online",#}
-{#            data: $("#search_form").serialize(),#}
-{#            success: function (data) {#}
-{#                $(".tab-content").html(data);#}
-{#            }#}
-{#        });#}
-{#     }#}
-
-
    function cut(num, host){
        console.log(host);
        if (host=='Web'){
            var g_url = '{{ web_kill_uri }}' + '?id=' + num;
        } else {
-           g_url = "/jlog/log_kill/?id=" + num;
+           var g_url = "/jlog/log_kill/?id=" + num;
        }
 
        $.ajax({
            type: "GET",
-           url: g_url,
+           url: g_url+"&sessionid={{ session_id }}",
            success: window.open("/jlog/log_list/online/", "_self")
        });
 

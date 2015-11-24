@@ -42,7 +42,7 @@ def require_auth(role='user'):
             if request.get_cookie('sessionid'):
                 session_key = request.get_cookie('sessionid')
             else:
-                session_key = request.get_secure_cookie('sessionid')
+                session_key = request.get_argument('sessionid', '')
 
             logger.debug('Websocket: session_key: %s' % session_key)
             if session_key:
@@ -62,7 +62,10 @@ def require_auth(role='user'):
                             return func(request, *args, **kwargs)
                 else:
                     logger.debug('Websocket: session expired: %s' % session_key)
-            request.close()
+            try:
+                request.close()
+            except AttributeError:
+                pass
             logger.warning('Websocket: Request auth failed.')
         # asset_id = int(request.get_argument('id', 9999))
         # print asset_id
@@ -99,14 +102,7 @@ class EventHandler(ProcessEvent):
     def __init__(self, client=None):
         self.client = client
 
-    def process_IN_CREATE(self, event):
-        print "Create file:%s." % os.path.join(event.path, event.name)
-
-    def process_IN_DELETE(self, event):
-        print "Delete file:%s." % os.path.join(event.path, event.name)
-
     def process_IN_MODIFY(self, event):
-        print "Modify file:%s." % os.path.join(event.path, event.name)
         self.client.write_message(f.read())
 
 
@@ -222,12 +218,11 @@ class WebTerminalKillHandler(tornado.web.RequestHandler):
         ws_id = self.get_argument('id')
         Log.objects.filter(id=ws_id).update(is_finished=True)
         for ws in WebTerminalHandler.clients:
-            print ws.id
             if ws.id == int(ws_id):
-                print "killed"
+                logger.debug("Kill log id %s" % ws_id)
                 ws.log.save()
                 ws.close()
-        print len(WebTerminalHandler.clients)
+        logger.debug('Websocket: web terminal client num: %s' % len(WebTerminalHandler.clients))
 
 
 class WebTerminalHandler(tornado.websocket.WebSocketHandler):
