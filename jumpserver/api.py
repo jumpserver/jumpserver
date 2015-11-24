@@ -54,7 +54,10 @@ def get_asset_info(asset):
         if default:
             info['port'] = default.default_port
             info['username'] = default.default_user
-            info['password'] = CRYPTOR.decrypt(default.default_password)
+            try:
+                info['password'] = CRYPTOR.decrypt(default.default_password)
+            except ServerError:
+                pass
             info['ssh_key'] = default.default_pri_key_path
     else:
         info['port'] = asset.port
