@@ -412,9 +412,9 @@ def perm_role_push(request):
         push_resource = []
         for asset in calc_assets:
             if asset.use_default_auth:
-                username = Setting.default_user
-                password = Setting.default_password
-                port = Setting.default_port
+                username = Setting.field1
+                port = Setting.field2
+                password = Setting.field3
             else:
                 username = asset.username
                 password = asset.password

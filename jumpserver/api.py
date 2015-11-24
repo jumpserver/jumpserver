@@ -52,15 +52,15 @@ def get_asset_info(asset):
     info = {'hostname': asset.hostname, 'ip': asset.ip}
     if asset.use_default_auth:
         if default:
-            info['port'] = default.default_port
-            info['username'] = default.default_user
+            info['port'] = int(default.field2)
+            info['username'] = default.field1
             try:
-                info['password'] = CRYPTOR.decrypt(default.default_password)
+                info['password'] = CRYPTOR.decrypt(default.field3)
             except ServerError:
                 pass
-            info['ssh_key'] = default.default_pri_key_path
+            info['ssh_key'] = default.field4
     else:
-        info['port'] = asset.port
+        info['port'] = int(asset.port)
         info['username'] = asset.username
         info['password'] = CRYPTOR.decrypt(asset.password)
 
