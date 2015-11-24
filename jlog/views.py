@@ -104,6 +104,7 @@ def log_record(request):
             return HttpResponse('无日志记录!')
 
 
+@require_role('user')
 def get_role_name(request):
     asset_id = request.GET.get('id', 9999)
     asset = get_object(Asset, id=asset_id)
@@ -113,9 +114,10 @@ def get_role_name(request):
     return HttpResponse('error')
 
 
-@require_role()
+@require_role('user')
 def web_terminal(request):
     asset_id = request.GET.get('id')
-    web_terminal_uri = 'ws://%s/terminal?id=%s&role=dev' % (WEB_SOCKET_HOST, asset_id)
+    role_name = request.GET.get('role')
+    web_terminal_uri = 'ws://%s/terminal?id=%s&role=%s' % (WEB_SOCKET_HOST, asset_id, role_name)
     return render_to_response('jlog/web_terminal.html', locals())
 

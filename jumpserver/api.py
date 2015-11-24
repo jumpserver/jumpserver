@@ -59,7 +59,7 @@ def get_asset_info(asset):
     else:
         info['port'] = asset.port
         info['username'] = asset.username
-        info['password'] = asset.password
+        info['password'] = CRYPTOR.decrypt(asset.password)
 
     return info
 

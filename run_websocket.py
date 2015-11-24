@@ -257,12 +257,16 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                     login_role = role
                     break
             if not login_role:
-                logger.warning('Websocket: Not that Role %s for Host: %s User: %s ' % (role_name, asset.name,
+                logger.warning('Websocket: Not that Role %s for Host: %s User: %s ' % (role_name, asset.hostname,
                                                                                        self.user.username))
                 self.close()
                 return
-        logger.debug('Websocket: request web terminal Host: %s User: %s Role: %s' % ())
-        # Todo: 判断
+        else:
+            logger.warning('Websocket: No that Host: %s User: %s ' % (asset_id, self.user.username))
+            self.close()
+            return
+        logger.debug('Websocket: request web terminal Host: %s User: %s Role: %s' % (asset.hostname, self.user.username,
+                                                                                     login_role.name))
         self.term = WebTty(self.user, self.asset, login_role)
         self.term.get_connection()
         self.term.channel = self.term.ssh.invoke_shell(term='xterm')
