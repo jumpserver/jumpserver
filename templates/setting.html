@@ -48,28 +48,30 @@
                                                 <label for="username" class="col-sm-2 control-label">默认用户名<span class="red-fonts">*</span></label>
                                                 <input name="setting" value="default" style="display: none">
                                                 <div class="col-sm-8">
-                                                    <input id="username" name="username" placeholder="Username" type="text" value="{{ setting_default.default_user }}" class="form-control">
+                                                    <input id="username" name="username" placeholder="Username" type="text" value="{{ setting_default.field1 }}" class="form-control">
                                                 </div>
                                             </div>
                                             <div class="hr-line-dashed"></div>
                                             <div class="form-group">
                                                 <label for="port" class="col-sm-2 control-label">默认ssh端口<span class="red-fonts">*</span></label>
                                                 <div class="col-sm-8">
-                                                    <input id="port" name="port" placeholder="Port" type="text" value="{{ setting_default.default_port }}" class="form-control">
+                                                    <input id="port" name="port" placeholder="Port" type="text" value="{{ setting_default.field2 }}" class="form-control">
                                                 </div>
                                             </div>
                                             <div class="hr-line-dashed"></div>
                                             <div class="form-group">
                                                 <label for="key" class="col-sm-2 control-label">默认密码</label>
                                                 <div class="col-sm-8">
-                                                    <input id="password" name="password" placeholder="Password" type="password" value="{{ setting_default.default_password }}" class="form-control">
+                                                    <input id="password" name="password" placeholder="Password" type="password" class="form-control">
+                                                    <span class="help-block m-b-none">如果不修改密码，请留空</span>
                                                 </div>
                                             </div>
                                             <div class="hr-line-dashed"></div>
                                             <div class="form-group">
                                                 <label for="key" class="col-sm-2 control-label">默认密钥</label>
                                                 <div class="col-sm-8">
-                                                    <textarea class="form-control" name="key" placeholder="请复制粘贴私钥(原来的因为安全原因不被显示)" rows="10" style="font-size: 9px;"></textarea>
+                                                    <textarea class="form-control" name="key" placeholder="请复制粘贴私钥" rows="10" style="font-size: 9px;"></textarea>
+                                                    <span class="help-block m-b-none">如果不修改密钥，请留空</span>
                                                 </div>
                                             </div>
                                             <div class="hr-line-dashed"></div>

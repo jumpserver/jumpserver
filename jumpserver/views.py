@@ -265,7 +265,7 @@ def setting(request):
             password = request.POST.get('password', '')
             private_key = request.POST.get('key', '')
 
-            if '' in [username, port] and ('' in password or '' in private_key):
+            if '' in [username, port]:
                 return HttpResponse('所填内容不能为空, 且密码和私钥填一个')
             else:
                 private_key_path = os.path.join(BASE_DIR, 'keys/role_keys', 'default', 'default_private_key.pem')
@@ -275,19 +275,19 @@ def setting(request):
                     os.chmod(private_key_path, 0600)
 
                 if setting_default:
-                    if password != setting_default.default_password:
+                    if password:
                         password_encode = CRYPTOR.encrypt(password)
                     else:
                         password_encode = password
-                    Setting.objects.filter(name='default').update(default_user=username, default_port=port,
-                                                                  default_password=password_encode,
-                                                                  default_pri_key_path=private_key_path)
+                    Setting.objects.filter(name='default').update(field1=username, field2=port,
+                                                                  field3=password_encode,
+                                                                  field4=private_key_path)
 
                 else:
                     password_encode = CRYPTOR.encrypt(password)
-                    setting_r = Setting(name='default', default_user=username, default_port=port,
-                                        default_password=password_encode,
-                                        default_pri_key_path=private_key_path).save()
+                    setting_r = Setting(name='default', field1=username, field2=port,
+                                        field3=password_encode,
+                                        field4=private_key_path).save()
 
             msg = "设置成功"
     return my_render('setting.html', locals(), request)
