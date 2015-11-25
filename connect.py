@@ -74,6 +74,17 @@ class Tty(object):
         self.vim_data = ''
 
     @staticmethod
+    def remove_obstruct_char(cmd_str):
+        '''删除一些干扰的特殊符号'''
+        control_char = re.compile(r'\x07 | \x1b\[1P | \r ', re.X)
+        cmd_str = control_char.sub('',cmd_str.strip())
+        patch_char = re.compile('\x08\x1b\[C')      #删除方向左右一起的按键
+        while patch_char.search(cmd_str):
+            cmd_str = patch_char.sub('', cmd_str.rstrip())
+        return cmd_str
+        
+        
+    @staticmethod
     def is_output(strings):
         newline_char = ['\n', '\r', '\r\n']
         for char in newline_char:
@@ -85,10 +96,7 @@ class Tty(object):
         """
             处理命令中特殊字符
         """
-        str_r = re.sub('\x07', '', str_r)       # 删除响铃
-        patch_char = re.compile('\x08\x1b\[C')  # 删除方向左右一起的按键
-        while patch_char.search(str_r):
-            str_r = patch_char.sub('', str_r.rstrip())
+        str_r = remove_obstruct_char(str_r)
 
         result_command = ''             # 最后的结果
         backspace_num = 0               # 光标移动的个数
@@ -97,13 +105,12 @@ class Tty(object):
         while str_r:
             tmp = re.match(r'\s*\w+\s*', str_r)
             if tmp:
+                str_r = str_r[len(str(tmp.group(0))):]
                 if reach_backspace_flag:
                     pattern_str += str(tmp.group(0))
-                    str_r = str_r[len(str(tmp.group(0))):]
                     continue
                 else:
                     result_command += str(tmp.group(0))
-                    str_r = str_r[len(str(tmp.group(0))):]
                     continue
                 
             tmp = re.match(r'\x1b\[K[\x08]*', str_r)
@@ -137,6 +144,20 @@ class Tty(object):
                     continue
                 else:
                     break
+                
+            tmp = re.match(r'(\x1b\[1@\w)+', str_r)                           #处理替换的命令
+            if tmp:
+                str_lists = re.findall(r'(?<=\x1b\[1@)\w',str(tmp.group(0)))
+                tmp_str =''.join(str_lists)
+                result_command_list = list(result_command)
+                if len(tmp_str) > 1:
+                    result_command_list[-backspace_num:-(backspace_num-len(tmp_str))] = tmp_str
+                elif len(tmp_str) > 0:
+                    result_command_list.insert(-backspace_num, tmp_str)
+                result_command = ''.join(result_command_list)
+                str_r = str_r[len(str(tmp.group(0))):]
+                backspace_num = 0
+                continue
             
             if reach_backspace_flag:
                 pattern_str += str_r[0]
@@ -261,6 +282,48 @@ class Tty(object):
         else:
             self.ssh = ssh
             return ssh
+            
+    def get_connect2(self):
+        connect_info = self.get_connect_info()
+        try:
+            sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            sock.connect((connect_info.get('ip'), connect_info.get('port')))
+        except Exception as e:
+            raise ServerError('连接失败: ' + str(e))
+
+        try:
+            transport = paramiko.Transport(sock)
+            try:
+                transport.start_client()
+            except paramiko.SSHException:
+                raise ServerError('ssh  协商失败.')
+                
+            role_key = connect_info.get('role_key')
+            if role_key and os.path.isfile(role_key):
+                mykey=paramiko.RSAKey.from_private_key_file(filename=role_key,password=connect_info.get('role_pass'))
+                transport.auth_publickey(connect_info.get('role_name'), mykey)
+            else:
+                transport.auth_password(connect_info.get('role_name'), connect_info.get('role_pass'))
+            if not transport.is_authenticated():
+                raise ServerError('认证失败')
+            
+            transport.set_keepalive(30)
+            transport.use_compression(True)
+            channel = transport.open_session()
+            channel.get_pty()
+            channel.invoke_shell()
+            win_size = self.get_win_size()
+            channel.resize_pty(height=win_size[0], width=win_size[1])
+            self.channel = channel
+            return self.channel
+        except Exception as e:
+            raise ServerError('*** Caught exception:' + str(e))
+            try:
+                transport.close()
+            except:
+                pass
+            sys.exit(1)
+       
 
 
 class SshTty(Tty):
@@ -388,18 +451,7 @@ class SshTty(Tty):
         except:
             pass
 
-        # 设置PS1并提示 Set PS1 and msg it
-        #channel.send(ps1)
-        #channel.send(login_msg)
-        # channel.send('echo ${SSH_TTY}\n')
-        # global SSH_TTY
-        # while not channel.recv_ready():
-        #     time.sleep(1)
-        # tmp = channel.recv(1024)
-        #print 'ok'+tmp+'ok'
-        # SSH_TTY  = re.search(r'(?<=/dev/).*', tmp).group().strip()
-        # SSH_TTY = ''
-        # channel.send('clear\n')
+        channel.send('TERM=xterm;clear\n')
         # Make ssh interactive tunnel
         self.posix_shell()
 
