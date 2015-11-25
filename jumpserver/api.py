@@ -48,6 +48,9 @@ def set_log(level):
 
 
 def get_asset_info(asset):
+    """
+    获取资产的相关账号端口信息
+    """
     default = get_object(Setting, name='default')
     info = {'hostname': asset.hostname, 'ip': asset.ip}
     if asset.use_default_auth:
@@ -68,6 +71,9 @@ def get_asset_info(asset):
 
 
 def get_role(user, asset):
+    """
+    获取用户在这个资产上的授权角色列表
+    """
     roles = []
     rules = PermRule.objects.filter(user=user, asset=asset)
     for rule in rules:
@@ -77,20 +83,19 @@ def get_role(user, asset):
 
 def get_role_key(user, role):
     """
-    由于role的key的权限是所有人可以读的， ansible要求为600，所以拷贝一份到特殊目录
+    由于role的key的权限是所有人可以读的， ansible执行命令等要求为600，所以拷贝一份到特殊目录
     :param user:
     :param role:
     :return: self key path
     """
     user_role_key_dir = os.path.join(KEY_DIR, 'user')
     user_role_key_path = os.path.join(user_role_key_dir, '%s_%s.pem' % (user.username, role.name))
-    mkdir(user_role_key_dir, mode=777)
+    mkdir(user_role_key_dir, mode=0777)
     if not os.path.isfile(user_role_key_path):
         with open(os.path.join(role.key_path, 'id_rsa')) as fk:
             with open(user_role_key_path, 'w') as fu:
                 fu.write(fk.read())
-
-        print user_role_key_path, user.username
+        logger.debug("创建新的用户角色key %s" % user_role_key_path)
         chown(user_role_key_path, user.username)
         os.chmod(user_role_key_path, 0600)
     return user_role_key_path

@@ -6,6 +6,7 @@ import os.path
 from paramiko.rsakey import RSAKey
 from jumpserver.api import mkdir
 from uuid import uuid4
+from jumpserver.api import CRYPTOR
 
 from jumpserver.settings import KEY_DIR
 
@@ -14,18 +15,7 @@ def get_rand_pass():
     """
     get a reandom password.
     """
-    lower = [chr(i) for i in range(97,123)]
-    upper = [chr(i).upper() for i in range(97,123)]
-    digit = [str(i) for i in range(10)]
-    password_pool = []
-    password_pool.extend(lower)
-    password_pool.extend(upper)
-    password_pool.extend(digit)
-    pass_list = [random.choice(password_pool) for i in range(1,14)]
-    pass_list.insert(random.choice(range(1,14)), '@')
-    pass_list.insert(random.choice(range(1,14)), random.choice(digit))
-    password = ''.join(pass_list)
-    return password
+    CRYPTOR.gen_rand_pass(20)
 
 
 def updates_dict(*args):
@@ -38,7 +28,7 @@ def updates_dict(*args):
     return result
 
 
-def gen_keys():
+def gen_keys(gen=True):
     """
     在KEY_DIR下创建一个 uuid命名的目录，
     并且在该目录下 生产一对秘钥
@@ -47,6 +37,8 @@ def gen_keys():
     key_basename = "key-" + uuid4().hex
     key_path_dir = os.path.join(KEY_DIR, 'role_key', key_basename)
     mkdir(key_path_dir, mode=0755)
+    if not gen:
+        return key_path_dir
     key = RSAKey.generate(2048)
     private_key = os.path.join(key_path_dir, 'id_rsa')
     public_key = os.path.join(key_path_dir, 'id_rsa.pub')

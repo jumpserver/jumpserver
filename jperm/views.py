@@ -255,35 +255,40 @@ def perm_role_add(request):
     # 渲染数据
     header_title, path1, path2 = "系统角色", "角色管理", "添加角色"
 
-    if request.method == "GET":
-        default_password = get_rand_pass()
-        return my_render('jperm/perm_role_add.html', locals(), request)
-
-    elif request.method == "POST":
+    if request.method == "POST":
         # 获取参数： name, comment
-        name = request.POST.get("role_name")
-        comment = request.POST.get("role_comment")
-        password = request.POST.get("role_password")
-        encrypt_pass = CRYPTOR.encrypt(password)
-        # 生成随机密码，生成秘钥对
+        name = request.POST.get("role_name", "")
+        comment = request.POST.get("role_comment", "")
+        password = request.POST.get("role_password", "")
+        key_content = request.POST.get("role_key", "")
+        try:
+            if get_object(PermRole, name=name):
+                raise ServerError('已经存在该用户 %s' % name)
 
-        key_path = gen_keys()
-        role = PermRole(name=name, comment=comment, password=encrypt_pass, key_path=key_path)
-        role.save()
-
-        msg = u"添加角色: %s" % name
-        # 渲染 刷新数据
-        header_title, path1, path2 = "系统角色", "角色管理", "查看角色"
-        roles_list = PermRole.objects.all()
-        # TODO: 搜索和分页
-        keyword = request.GET.get('search', '')
-        if keyword:
-            roles_list = roles_list.filter(Q(name=keyword))
-
-        roles_list, p, roles, page_range, current_page, show_first, show_end = pages(roles_list, request)
-        return my_render('jperm/perm_role_list.html', locals(), request)
+            if '' == password and '' == key_content:
+                raise ServerError('账号和密码必填一项')
+            if password:
+                encrypt_pass = CRYPTOR.encrypt(password)
+            else:
+                encrypt_pass = CRYPTOR.encrypt(CRYPTOR.gen_rand_pass(20))
+            # 生成随机密码，生成秘钥对
+            if key_content:
+                key_path = gen_keys(gen=False)
+                with open(os.path.join(key_path, 'id_rsa'), 'w') as f:
+                    f.write(key_content)
+            else:
+                key_path = gen_keys()
+            logger.debug('generate role key: %s' % key_path)
+            role = PermRole(name=name, comment=comment, password=encrypt_pass, key_path=key_path)
+            role.save()
+            msg = u"添加角色: %s" % name
+            return HttpResponseRedirect('/perm/role/')
+        except ServerError, e:
+            error = e
     else:
         return HttpResponse(u"不支持该操作")
+
+    return my_render('jperm/perm_role_add.html', locals(), request)
 
 
 @require_role('admin')
@@ -346,36 +351,37 @@ def perm_role_edit(request):
 
     # 渲染数据
     role_id = request.GET.get("id")
-    role = PermRole.objects.get(id=role_id)
-    role_pass = CRYPTOR.decrypt(role.password)
-    if request.method == "GET":
-        return my_render('jperm/perm_role_edit.html', locals(), request)
+    role = get_object(PermRole, id=role_id)
 
     if request.method == "POST":
         # 获取 POST 数据
         role_name = request.POST.get("role_name")
         role_password = request.POST.get("role_password")
-        encrypt_role_pass = CRYPTOR.encrypt(role_password)
         role_comment = request.POST.get("role_comment")
+        key_content = request.POST.get("role_key", "")
+        try:
+            if not role:
+                raise ServerError('角色用户不能存在')
 
-        # 写入数据库
-        role.name = role_name
-        role.password = encrypt_role_pass
-        role.comment = role_comment
+            if role_password:
+                encrypt_pass = CRYPTOR.encrypt(role_password)
+                role.password = encrypt_pass
+            # 生成随机密码，生成秘钥对
+            if key_content:
+                with open(os.path.join(role.key_path, 'id_rsa'), 'w') as f:
+                    f.write(key_content)
+                logger.debug('Recreate role key: %s' % role.key_path)
+            # 写入数据库
+            role.name = role_name
+            role.comment = role_comment
 
-        role.save()
-        msg = u"更新系统角色： %s" % role.name
+            role.save()
+            msg = u"更新系统角色： %s" % role.name
+            return HttpResponseRedirect('/jperm/role/')
+        except ServerError, e:
+            error = e
 
-        # 渲染 刷新数据
-        header_title, path1, path2 = "系统角色", "角色管理", "查看角色"
-        roles_list = PermRole.objects.all()
-        # TODO: 搜索和分页
-        keyword = request.GET.get('search', '')
-        if keyword:
-            roles_list = roles_list.filter(Q(name=keyword))
-
-        roles_list, p, roles, page_range, current_page, show_first, show_end = pages(roles_list, request)
-        return my_render('jperm/perm_role_list.html', locals(), request)
+    return my_render('jperm/perm_role_edit.html', locals(), request)
 
 
 @require_role('admin')

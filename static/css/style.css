@@ -4567,3 +4567,5 @@ body.skin-3 {
   content: " *";
   color: red;
 }
+
+.n-invalid {border: 1px solid #f00;}
