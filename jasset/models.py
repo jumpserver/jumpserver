@@ -57,7 +57,7 @@ class Asset(models.Model):
     """
     asset modle
     """
-    ip = models.GenericIPAddressField(blank=True, null=True, verbose_name=u"主机IP")
+    ip = models.CharField(max_length=32, blank=True, null=True, verbose_name=u"主机IP")
     other_ip = models.CharField(max_length=255, blank=True, null=True, verbose_name=u"其他IP")
     hostname = models.CharField(unique=True, max_length=128, verbose_name=u"主机名")
     port = models.IntegerField(blank=True, null=True, verbose_name=u"端口号")
@@ -73,7 +73,7 @@ class Asset(models.Model):
     memory = models.CharField(max_length=128, blank=True, null=True, verbose_name=u'内存')
     disk = models.CharField(max_length=128, blank=True, null=True, verbose_name=u'硬盘')
     system_type = models.CharField(max_length=32, blank=True, null=True, verbose_name=u"系统类型")
-    system_version = models.CharField(max_length=8, blank=True, null=True, verbose_name=u"版本号")
+    system_version = models.CharField(max_length=8, blank=True, null=True, verbose_name=u"系统版本号")
     cabinet = models.CharField(max_length=32, blank=True, null=True, verbose_name=u'机柜号')
     position = models.IntegerField(blank=True, null=True, verbose_name=u'机器位置')
     number = models.CharField(max_length=32, blank=True, null=True, verbose_name=u'资产编号')

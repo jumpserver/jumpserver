@@ -19,14 +19,14 @@ import struct, fcntl, signal, socket, select
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
     django.setup()
-from jumpserver.api import ServerError, User, Asset, AssetGroup, get_object, mkdir, get_asset_info, get_role
-from jumpserver.api import logger, Log, TtyLog, get_role_key
-from jperm.perm_api import gen_resource, get_group_asset_perm, get_group_user_perm
+from django.contrib.sessions.models import Session
+from jumpserver.api import ServerError, User, Asset, PermRole, AssetGroup, get_object, mkdir, get_asset_info, get_role
+from jumpserver.api import logger, Log, TtyLog, get_role_key, CRYPTOR
+from jperm.perm_api import gen_resource, get_group_asset_perm, get_group_user_perm, user_have_perm
 from jumpserver.settings import LOG_DIR
 from jperm.ansible_api import Command
 
 login_user = get_object(User, username=getpass.getuser())
-VIM_FLAG = False
 
 try:
     import termios
@@ -69,6 +69,9 @@ class Tty(object):
         self.ssh = None
         self.connect_info = None
         self.login_type = 'ssh'
+        self.vim_flag = False
+        self.ps1_pattern = re.compile('\[.*@.*\][\$#]')
+        self.vim_data = ''
 
     @staticmethod
     def is_output(strings):
@@ -78,25 +81,24 @@ class Tty(object):
                 return True
         return False
 
-    @staticmethod
-    def deal_command(str_r):
+    def deal_command(self, str_r):
         """
-                处理命令中特殊字符
+            处理命令中特殊字符
         """
-        str_r = re.sub('\x07','',str_r)   #删除响铃
-        patch_char = re.compile('\x08\x1b\[C')      #删除方向左右一起的按键
+        str_r = re.sub('\x07', '', str_r)       # 删除响铃
+        patch_char = re.compile('\x08\x1b\[C')  # 删除方向左右一起的按键
         while patch_char.search(str_r):
             str_r = patch_char.sub('', str_r.rstrip())
 
-        result_command = ''      #最后的结果
-        backspace_num = 0              #光标移动的个数
-        reach_backspace_flag = False    #没有检测到光标键则为true
-        pattern_str=''
+        result_command = ''             # 最后的结果
+        backspace_num = 0               # 光标移动的个数
+        reach_backspace_flag = False    # 没有检测到光标键则为true
+        pattern_str = ''
         while str_r:
             tmp = re.match(r'\s*\w+\s*', str_r)
             if tmp:
-                if reach_backspace_flag :
-                    pattern_str +=str(tmp.group(0))
+                if reach_backspace_flag:
+                    pattern_str += str(tmp.group(0))
                     str_r = str_r[len(str(tmp.group(0))):]
                     continue
                 else:
@@ -107,7 +109,7 @@ class Tty(object):
             tmp = re.match(r'\x1b\[K[\x08]*', str_r)
             if tmp:
                 if backspace_num > 0:
-                    if backspace_num > len(result_command) :
+                    if backspace_num > len(result_command):
                         result_command += pattern_str
                         result_command = result_command[0:-backspace_num]
                     else:
@@ -117,8 +119,8 @@ class Tty(object):
                 if del_len > 0:
                     result_command = result_command[0:-del_len]
                 reach_backspace_flag = False
-                backspace_num =0
-                pattern_str=''
+                backspace_num = 0
+                pattern_str = ''
                 str_r = str_r[len(str(tmp.group(0))):]
                 continue
             
@@ -136,13 +138,13 @@ class Tty(object):
                 else:
                     break
             
-            if reach_backspace_flag :   
-                pattern_str +=str_r[0]
-            else :
+            if reach_backspace_flag:
+                pattern_str += str_r[0]
+            else:
                 result_command += str_r[0]
             str_r = str_r[1:]
         
-        if backspace_num > 0 :
+        if backspace_num > 0:
             result_command = result_command[0:-backspace_num] + pattern_str
 
         control_char = re.compile(r"""
@@ -155,34 +157,12 @@ class Tty(object):
                 [\x80-\x9f] | (?:\x1b\]0.*) | \[.*@.*\][\$#] | (.*mysql>.*)      #匹配 所有控制字符
                 """, re.X)
         result_command = control_char.sub('', result_command.strip())
-        global VIM_FLAG
-        if not VIM_FLAG:
-            if result_command.startswith('vi'):
-                VIM_FLAG = True
-            return result_command.decode('utf8',"ignore")
+        if not self.vim_flag:
+            if result_command.startswith('vi') or result_command.startswith('fg'):
+                self.vim_flag = True
+            return result_command.decode('utf8', "ignore")
         else:
             return ''
-
-    @staticmethod
-    def remove_control_char(str_r):
-        """
-        处理日志特殊字符
-        """
-        control_char = re.compile(r"""
-                \x1b[ #%()*+\-.\/]. |
-                \r |                                               #匹配 回车符(CR)
-                (?:\x1b\[|\x9b) [ -?]* [@-~] |                     #匹配 控制顺序描述符(CSI)... Cmd
-                (?:\x1b\]|\x9d) .*? (?:\x1b\\|[\a\x9c]) | \x07 |   #匹配 操作系统指令(OSC)...终止符或振铃符(ST|BEL)
-                (?:\x1b[P^_]|[\x90\x9e\x9f]) .*? (?:\x1b\\|\x9c) | #匹配 设备控制串或私讯或应用程序命令(DCS|PM|APC)...终止符(ST)
-                \x1b.                                              #匹配 转义过后的字符
-                [\x80-\x9f]                                        #匹配 所有控制字符
-                """, re.X)
-        backspace = re.compile(r"[^\b][\b]")
-        line_filtered = control_char.sub('', str_r.rstrip())
-        while backspace.search(line_filtered):
-            line_filtered = backspace.sub('', line_filtered)
-
-        return line_filtered
 
     def get_log(self):
         """
@@ -230,15 +210,17 @@ class Tty(object):
         """
         获取需要登陆的主机的信息和映射用户的账号密码
         """
-
-        # 1. get ip, port
-        # 2. get 映射用户
-        # 3. get 映射用户的账号，密码或者key
-        # self.connect_info = {'user': '', 'asset': '', 'ip': '', 'port': 0, 'role_name': '', 'role_pass': '', 'role_key': ''}
         asset_info = get_asset_info(self.asset)
+        role_key = get_role_key(self.user, self.role)
+        role_pass = CRYPTOR.decrypt(self.role.password)
         self.connect_info = {'user': self.user, 'asset': self.asset, 'ip': asset_info.get('ip'),
                              'port': int(asset_info.get('port')), 'role_name': self.role.name,
-                             'role_pass': self.role.password, 'role_key': self.role.key_path}
+                             'role_pass': role_pass, 'role_key': role_key}
+        logger.debug("Connect: Host: %s Port: %s User: %s Pass: %s Key: %s" % (asset_info.get('ip'),
+                                                                               asset_info.get('port'),
+                                                                               self.role.name,
+                                                                               role_pass,
+                                                                               role_key))
         return self.connect_info
 
     def get_connection(self):
@@ -252,7 +234,7 @@ class Tty(object):
         ssh.load_system_host_keys()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
-            role_key = get_role_key(self.user, self.role)
+            role_key = connect_info.get('role_key')
             if role_key and os.path.isfile(role_key):
                 try:
                     ssh.connect(connect_info.get('ip'),
@@ -262,7 +244,8 @@ class Tty(object):
                                 look_for_keys=False)
                     self.ssh = ssh
                     return ssh
-                except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
+                except (paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException):
+                    logger.warning('Use ssh key %s Failed.' % role_key)
                     pass
 
             ssh.connect(connect_info.get('ip'),
@@ -319,12 +302,8 @@ class SshTty(Tty):
         log_file_f, log_time_f, log = self.get_log()
         old_tty = termios.tcgetattr(sys.stdin)
         pre_timestamp = time.time()
-        pattern = re.compile('\[.*@.*\][\$#]')
         data = ''
-        chan_str = ''
         input_mode = False
-        global VIM_FLAG
-        
         try:
             tty.setraw(sys.stdin.fileno())
             tty.setcbreak(sys.stdin.fileno())
@@ -341,8 +320,8 @@ class SshTty(Tty):
                         x = self.channel.recv(1024)
                         if len(x) == 0:
                             break
-                        if VIM_FLAG:
-                            chan_str += x
+                        if self.vim_flag:
+                            self.vim_data += x
                         sys.stdout.write(x)
                         sys.stdout.flush()
                         now_timestamp = time.time()
@@ -361,21 +340,20 @@ class SshTty(Tty):
                 if sys.stdin in r:
                     x = os.read(sys.stdin.fileno(), 1)
                     input_mode = True
-
                     if str(x) in ['\r', '\n', '\r\n']:
-                        if VIM_FLAG:
-                            match = pattern.search(chan_str)
+                        if self.vim_flag:
+                            match = self.ps1_pattern.search(self.vim_data)
                             if match:
-                                VIM_FLAG = False
-                                data = self.deal_command(data)
+                                self.vim_flag = False
+                                data = self.deal_command(data)[0:200]
                                 if len(data) > 0:
                                     TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
                         else:
-                            data = self.deal_command(data)
+                            data = self.deal_command(data)[0:200]
                             if len(data) > 0:
                                 TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
                         data = ''
-                        chan_str = ''
+                        self.vim_data = ''
                         input_mode = False
 
                     if len(x) == 0:
@@ -465,24 +443,33 @@ class Nav(object):
 
     def search(self, str_r=''):
         gid_pattern = re.compile(r'^g\d+$')
+        # 获取用户授权的所有主机信息
         if not self.user_perm:
             self.user_perm = get_group_user_perm(self.user)
         user_asset_all = self.user_perm.get('asset').keys()
+        # 搜索结果保存
         user_asset_search = []
         if str_r:
+            # 资产组组id匹配
             if gid_pattern.match(str_r):
-                user_asset_search = list(Asset.objects.all())
+                gid = int(str_r.lstrip('g'))
+                # 获取资产组包含的资产
+                user_asset_search = get_object(AssetGroup, id=gid).asset_set.all()
             else:
+                # 匹配 ip, hostname, 备注
                 for asset in user_asset_all:
-                    if str_r in asset.ip or str_r in str(asset.comment):
+                    if str_r in asset.ip or str_r in str(asset.hostname) or str_r in str(asset.comment):
                         user_asset_search.append(asset)
         else:
+            # 如果没有输入就展现所有
             user_asset_search = user_asset_all
 
         self.search_result = dict(zip(range(len(user_asset_search)), user_asset_search))
         print '\033[32m[%-3s] %-15s  %-15s  %-5s  %-10s  %s \033[0m' % ('ID', 'AssetName', 'IP', 'Port', 'Role', 'Comment')
         for index, asset in self.search_result.items():
+            # 获取该资产信息
             asset_info = get_asset_info(asset)
+            # 获取该资产包含的角色
             role = [str(role.name) for role in self.user_perm.get('asset').get(asset).get('role')]
             if asset.comment:
                 print '[%-3s] %-15s  %-15s  %-5s  %-10s  %s' % (index, asset.hostname, asset.ip, asset_info.get('port'),
@@ -491,9 +478,11 @@ class Nav(object):
                 print '[%-3s] %-15s  %-15s  %-5s  %-10s' % (index, asset.hostname, asset.ip, asset_info.get('port'), role)
         print
 
-    @staticmethod
-    def print_asset_group():
-        user_asset_group_all = AssetGroup.objects.all()
+    def print_asset_group(self):
+        """
+        打印用户授权的资产组
+        """
+        user_asset_group_all = get_group_user_perm(self.user).get('asset_group', [])
 
         print '\033[32m[%-3s] %-15s %s \033[0m' % ('ID', 'GroupName', 'Comment')
         for asset_group in user_asset_group_all:
@@ -504,6 +493,9 @@ class Nav(object):
         print
 
     def exec_cmd(self):
+        """
+        批量执行命令
+        """
         self.search()
         while True:
             print "请输入主机名、IP或ansile支持的pattern, q退出"
