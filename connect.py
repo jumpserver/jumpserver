@@ -72,16 +72,6 @@ class Tty(object):
         self.vim_flag = False
         self.ps1_pattern = re.compile('\[.*@.*\][\$#]')
         self.vim_data = ''
-
-    @staticmethod
-    def remove_obstruct_char(cmd_str):
-        '''删除一些干扰的特殊符号'''
-        control_char = re.compile(r'\x07 | \x1b\[1P | \r ', re.X)
-        cmd_str = control_char.sub('',cmd_str.strip())
-        patch_char = re.compile('\x08\x1b\[C')      #删除方向左右一起的按键
-        while patch_char.search(cmd_str):
-            cmd_str = patch_char.sub('', cmd_str.rstrip())
-        return cmd_str
         
         
     @staticmethod
@@ -91,6 +81,40 @@ class Tty(object):
             if char in strings:
                 return True
         return False
+        
+        
+     def remove_obstruct_char(cmd_str):
+        '''删除一些干扰的特殊符号'''
+        control_char = re.compile(r'\x07 | \x1b\[1P | \r ', re.X)
+        cmd_str = control_char.sub('',cmd_str.strip())
+        patch_char = re.compile('\x08\x1b\[C')      #删除方向左右一起的按键
+        while patch_char.search(cmd_str):
+            cmd_str = patch_char.sub('', cmd_str.rstrip())
+        return cmd_str
+        
+    
+    def remove_control_char(result_command):    
+        """
+        处理日志特殊字符
+        """
+        control_char = re.compile(r"""
+                \x1b[ #%()*+\-.\/]. |
+                \r |                                               #匹配 回车符(CR)
+                (?:\x1b\[|\x9b) [ -?]* [@-~] |                     #匹配 控制顺序描述符(CSI)... Cmd
+                (?:\x1b\]|\x9d) .*? (?:\x1b\\|[\a\x9c]) | \x07 |   #匹配 操作系统指令(OSC)...终止符或振铃符(ST|BEL)
+                (?:\x1b[P^_]|[\x90\x9e\x9f]) .*? (?:\x1b\\|\x9c) | #匹配 设备控制串或私讯或应用程序命令(DCS|PM|APC)...终止符(ST)
+                \x1b.                                              #匹配 转义过后的字符
+                [\x80-\x9f] | (?:\x1b\]0.*) | \[.*@.*\][\$#] | (.*mysql>.*)      #匹配 所有控制字符
+                """, re.X)
+        result_command = control_char.sub('', result_command.strip())
+        global VIM_FLAG
+        if not VIM_FLAG:
+            if result_command.startswith('vi') or result_command.startswith('fg'):
+                VIM_FLAG = True
+            return result_command.decode('utf8',"ignore")
+        else:
+            return ''
+
 
     def deal_command(self, str_r):
         """
@@ -113,7 +137,7 @@ class Tty(object):
                     result_command += str(tmp.group(0))
                     continue
                 
-            tmp = re.match(r'\x1b\[K[\x08]*', str_r)
+            tmp = re.match(r'\x1b\[K[\x08]*', str_r)                 #处理删除确认符号，删除退格确认之前的数据，当结果队列不够删除时，则将临时队列中的加上一起删除
             if tmp:
                 if backspace_num > 0:
                     if backspace_num > len(result_command):
@@ -131,12 +155,12 @@ class Tty(object):
                 str_r = str_r[len(str(tmp.group(0))):]
                 continue
             
-            tmp = re.match(r'\x08+', str_r)
+            tmp = re.match(r'\x08+', str_r)                                 #处理退格符号，第一次碰到则记下，第二次碰到则进行删除操作，如果退格符在最后则不计
             if tmp:
                 str_r = str_r[len(str(tmp.group(0))):]
                 if len(str_r) != 0:
                     if reach_backspace_flag:
-                        result_command = result_command[0:-backspace_num] + pattern_str
+                        result_command = result_command[0:-backspace_num] + pattern_str         
                         pattern_str = ''
                     else:
                         reach_backspace_flag = True
@@ -159,31 +183,17 @@ class Tty(object):
                 backspace_num = 0
                 continue
             
-            if reach_backspace_flag:
+            if reach_backspace_flag:                                        #处理其他没有匹配的字符
                 pattern_str += str_r[0]
             else:
                 result_command += str_r[0]
             str_r = str_r[1:]
         
-        if backspace_num > 0:
+        if backspace_num > 0:                                               #处理最后的退格符号
             result_command = result_command[0:-backspace_num] + pattern_str
 
-        control_char = re.compile(r"""
-                \x1b[ #%()*+\-.\/]. |
-                \r |                                               #匹配 回车符(CR)
-                (?:\x1b\[|\x9b) [ -?]* [@-~] |                     #匹配 控制顺序描述符(CSI)... Cmd
-                (?:\x1b\]|\x9d) .*? (?:\x1b\\|[\a\x9c]) | \x07 |   #匹配 操作系统指令(OSC)...终止符或振铃符(ST|BEL)
-                (?:\x1b[P^_]|[\x90\x9e\x9f]) .*? (?:\x1b\\|\x9c) | #匹配 设备控制串或私讯或应用程序命令(DCS|PM|APC)...终止符(ST)
-                \x1b.                                              #匹配 转义过后的字符
-                [\x80-\x9f] | (?:\x1b\]0.*) | \[.*@.*\][\$#] | (.*mysql>.*)      #匹配 所有控制字符
-                """, re.X)
-        result_command = control_char.sub('', result_command.strip())
-        if not self.vim_flag:
-            if result_command.startswith('vi') or result_command.startswith('fg'):
-                self.vim_flag = True
-            return result_command.decode('utf8', "ignore")
-        else:
-            return ''
+        result_command = remove_control_char(result_command)
+        return result_command
 
     def get_log(self):
         """
