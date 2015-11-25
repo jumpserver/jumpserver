@@ -204,6 +204,7 @@ class Tty(object):
 
         log.save()
         log_file_f.write('Start at %s\n' % datetime.datetime.now())
+        log_time_f.write('0.0000 ')
         return log_file_f, log_time_f, log
 
     def get_connect_info(self):
@@ -325,7 +326,7 @@ class SshTty(Tty):
                         sys.stdout.write(x)
                         sys.stdout.flush()
                         now_timestamp = time.time()
-                        log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(x)))
+                        log_time_f.write('%s\n%s ' % (len(x), round(now_timestamp-pre_timestamp, 4)))
                         log_file_f.write(x)
                         pre_timestamp = now_timestamp
                         log_file_f.flush()
@@ -362,8 +363,10 @@ class SshTty(Tty):
 
         finally:
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)
+            log_time_f.write('0')
             log_file_f.write('End time is %s' % datetime.datetime.now())
             log_file_f.close()
+            log_time_f.close()
             log.is_finished = True
             log.end_time = datetime.datetime.now()
             log.save()

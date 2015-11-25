@@ -182,8 +182,15 @@
                 success: function(data){
                     var dataArray = data.split(',');
                     if (dataArray.length == 1 && data != 'error'){
-                        console.log('one');
-                        window.open(new_url + data, '', 'height=400, width=600, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');
+                        layer.open({
+                        type: 2,
+                        title: 'Jumpserver Web Terminal',
+                        maxmin: true,
+                        shade: false,
+                        area: ['628px', '452px'],
+                        content: new_url
+                    });
+                        //window.open(new_url + data, '', 'location=no, resizeable=no, height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,status=no');
                     } else if (dataArray.length == '1' && data == 'error'){
                         layer.alert('没有授权角色')
                     } else {
@@ -194,6 +201,7 @@
                         layer.alert(aUrl, {
                             skin: 'layui-layer-molv',
                             title: '多个角色，请选择一个连接',
+                            shade: false,
                             closeBtn: 0
                         })
                     }
@@ -205,7 +213,15 @@
 
     function windowOpen(aTab){
         var new_url = aTab.href;
-        window.open(new_url, '', 'height=400, width=600, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');
+        layer.open({
+            type: 2,
+            title: 'Jumpserver Web Terminal',
+            maxmin: true,
+            area: ['628px', '452px'],
+            shade: false,
+            content: new_url
+        });
+        //window.open(new_url, '', 'height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');
         return false
     }
 
@@ -224,7 +240,6 @@
             border: [2, 0.3, '#1AB394'],
             shade: [0.5, '#000000'],
             shadeClose: true,
-            area : ['800px' , '600px'],
             content: url,
             cancel: function(){
                 location.replace(location.href);
