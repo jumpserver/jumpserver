@@ -12,7 +12,7 @@ from juser.user_api import *
 
 MAIL_FROM = EMAIL_HOST_USER
 
-
+@login_required(login_url='/login')
 def chg_role(request):
     role = {'SU': 2, 'GA': 1, 'CU': 0}
     if request.session['role_id'] > 0:
@@ -238,10 +238,10 @@ def user_detail(request):
     #         user, dept = get_session_user_dept(request)
     #         if not validate(request, user=[user_id]):
     #             return HttpResponseRedirect('/')
-    # if not user_id:
-    #     return HttpResponseRedirect('/juser/user_list/')
-
-    # user = get_object(User, id=user_id)
+    user_id = request.GET.get('id', '')
+    if not user_id:
+        return HttpResponseRedirect('/juser/user_list/')
+    user = User.objects.get(id=user_id)
     # if user:
     #     pass
         # asset_group_permed = user.get_asset_group()
@@ -488,3 +488,11 @@ def down_key(request):
                 return response
 
     return HttpResponse('No Key File. Contact Admin.')
+from jperm.perm_api import get_group_user_perm
+@require_role(role='user')
+def RunCommand(request):
+    if request.method == 'GET':
+        GUP = get_group_user_perm(request.user)
+        print GUP
+        assets = GUP.get('asset')
+        return render_to_response('juser/run_command.html', locals(), context_instance=RequestContext(request))

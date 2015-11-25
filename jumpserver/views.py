@@ -16,7 +16,7 @@ from jumpserver.models import Setting
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from jlog.models import Log
-
+from jperm.perm_api import get_group_user_perm
 
 def getDaysByNum(num):
     """
@@ -72,7 +72,7 @@ def get_count_by_date(date_li, item):
 
     return len(set(data_count_tmp))
 
-
+from jasset.models import Asset, IDC
 @require_role(role='user')
 def index_cu(request):
     # user_id = request.user.id
@@ -80,6 +80,21 @@ def index_cu(request):
     login_types = {'L': 'LDAP', 'M': 'MAP'}
     username = request.user.username
     # TODO: need fix,liuzheng need Asset help
+    GUP = get_group_user_perm(request.user)
+    print GUP
+    assets = GUP.get('asset')
+    idcs = []
+    for i in assets:
+        if i.idc_id:
+            idcs.append(i.idc_id)
+    idc_all = IDC.objects.filter(id__in=idcs)
+    for i in idc_all:
+        print i.name
+    # idc_all = []
+    # for i in assets:
+    #     idc_all.append(i.idc)
+    #     print i.idc.name
+    asset_group_all = GUP.get('asset_group')
     # posts = Asset.object.all()
     # host_count = len(posts)
     #

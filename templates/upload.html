@@ -73,6 +73,11 @@
                         <div class="dropzone-previews">
                             <input id="hosts" name="hosts" type="text" class="form-control" required="不能为空"
                                    placeholder="输入主机地址，逗号隔开，确保你有输入主机地址的权限" size="80%">
+                            <select name="assetgroup" data-placeholder="请选择资产组" class="chosen-select form-control m-b" multiple  tabindex="2">
+                                        {% for asset_group in asset_groups %}
+                                            <option value="{{ asset_group.name }}">{{ asset_group.name }}</option>
+                                        {% endfor %}
+                                    </select>
 
 {#                            <div id="hosts_list" style="position:absolute;display: none;z-index:999;">#}
 {#                            TODO: by liuzheng#}
