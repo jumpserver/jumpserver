@@ -2,7 +2,8 @@
 
 import random
 import os.path
-
+import shutil
+from paramiko import SSHException
 from paramiko.rsakey import RSAKey
 from jumpserver.api import mkdir
 from uuid import uuid4
@@ -28,21 +29,32 @@ def updates_dict(*args):
     return result
 
 
-def gen_keys(gen=True):
+def gen_keys(key="", key_path_dir=""):
     """
     在KEY_DIR下创建一个 uuid命名的目录，
     并且在该目录下 生产一对秘钥
     :return: 返回目录名(uuid)
     """
     key_basename = "key-" + uuid4().hex
-    key_path_dir = os.path.join(KEY_DIR, 'role_key', key_basename)
-    mkdir(key_path_dir, mode=0755)
-    if not gen:
-        return key_path_dir
-    key = RSAKey.generate(2048)
+    if not key_path_dir:
+        key_path_dir = os.path.join(KEY_DIR, 'role_key', key_basename)
     private_key = os.path.join(key_path_dir, 'id_rsa')
     public_key = os.path.join(key_path_dir, 'id_rsa.pub')
-    key.write_private_key_file(private_key)
+    mkdir(key_path_dir, mode=0755)
+    if not key:
+        key = RSAKey.generate(2048)
+        key.write_private_key_file(private_key)
+    else:
+        key_file = os.path.join(key_path_dir, 'id_rsa')
+        with open(key_file, 'w') as f:
+            f.write(key)
+            f.close()
+        with open(key_file) as f:
+            try:
+                key = RSAKey.from_private_key(f)
+            except SSHException:
+                shutil.rmtree(key_path_dir, ignore_errors=True)
+                raise SSHException
     os.chmod(private_key, 0644)
 
     with open(public_key, 'w') as content_file:

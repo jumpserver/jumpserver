@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db.models import Q
+from paramiko import SSHException
 from jperm.perm_api import *
 from juser.user_api import gen_ssh_key
 
@@ -273,20 +274,19 @@ def perm_role_add(request):
                 encrypt_pass = CRYPTOR.encrypt(CRYPTOR.gen_rand_pass(20))
             # 生成随机密码，生成秘钥对
             if key_content:
-                key_path = gen_keys(gen=False)
-                with open(os.path.join(key_path, 'id_rsa'), 'w') as f:
-                    f.write(key_content)
+                try:
+                    key_path = gen_keys(key=key_content)
+                except SSHException:
+                    raise ServerError('输入的密钥不合法')
             else:
                 key_path = gen_keys()
             logger.debug('generate role key: %s' % key_path)
             role = PermRole(name=name, comment=comment, password=encrypt_pass, key_path=key_path)
             role.save()
             msg = u"添加角色: %s" % name
-            return HttpResponseRedirect('/perm/role/')
+            return HttpResponseRedirect('/jperm/role/')
         except ServerError, e:
             error = e
-    else:
-        return HttpResponse(u"不支持该操作")
 
     return my_render('jperm/perm_role_add.html', locals(), request)
 
@@ -368,8 +368,10 @@ def perm_role_edit(request):
                 role.password = encrypt_pass
             # 生成随机密码，生成秘钥对
             if key_content:
-                with open(os.path.join(role.key_path, 'id_rsa'), 'w') as f:
-                    f.write(key_content)
+                try:
+                    key_path = gen_keys(key=key_content, key_path_dir=role.key_path)
+                except SSHException:
+                    raise ServerError('输入的密钥不合法')
                 logger.debug('Recreate role key: %s' % role.key_path)
             # 写入数据库
             role.name = role_name
