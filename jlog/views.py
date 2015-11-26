@@ -39,10 +39,12 @@ def log_list(request, offset):
 
         if host_list:
             posts = posts.filter(host__in=host_list)
+
         if cmd:
             log_id_list = set([log.log_id for log in TtyLog.objects.filter(cmd__contains=cmd)])
             posts = posts.filter(id__in=log_id_list)
-        else:
+
+        if not date_seven_day:
             date_now = datetime.datetime.now()
             date_now_str = date_now.strftime('%m/%d/%Y')
             date_seven_day = (date_now + datetime.timedelta(days=-7)).strftime('%m/%d/%Y')
