@@ -69,11 +69,11 @@
 
                                             <label class="col-sm-1 control-label"> 密码<span class="red-fonts">*</span> </label>
                                             <div class="col-sm-4">
-                                                <input type="password" value="{{ asset.password }}" name="password" class="form-control">
+                                                <input type="password" value="" name="password" placeholder="不填写即不更改密码." class="form-control">
                                             </div>
                                         </div>
 
-                                        <div class="form-group" id="id_port" {% if asset.use_default_auth %} style="display: none" {% endif %}>
+                                        <div class="form-group" id="id_port">
                                             <div class="hr-line-dashed"></div>
                                             <label class="col-sm-2 control-label"> 端口<span class="red-fonts">*</span> </label>
                                                 <div class="col-sm-8">
@@ -172,11 +172,9 @@
         $('#id_use_default_auth').click(function(){
             if ($(this).is(':checked')){
                 $('#admin_account').css('display', 'none');
-                $('#id_port').css('display', 'none')
             }
             else {
                 $('#admin_account').css('display', 'block');
-                $('#id_port').css('display', 'block')
             }
         })
     });
@@ -220,12 +218,12 @@
                 ok: "",
                 msg: {required: "必须填写!"}
             },
-            "password": {
-                rule: "required(use_default_auth)",
-                tip: "输入密码",
-                ok: "",
-                msg: {required: "必须填写!"}
-            }
+{#            "password": {#}
+{#                rule: "required(use_default_auth)",#}
+{#                tip: "输入密码",#}
+{#                ok: "",#}
+{#                msg: {required: "必须填写!"}#}
+{#            }#}
         },
         valid: function(form) {
             form.submit();

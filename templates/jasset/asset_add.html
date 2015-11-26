@@ -74,11 +74,11 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group" id="id_port" style="display: none">
+                                        <div class="form-group" id="id_port">
                                             <div class="hr-line-dashed"></div>
                                             <label class="col-sm-2 control-label"> 端口<span class="red-fonts">*</span> </label>
                                                 <div class="col-sm-8">
-                                                    <input type="text" placeholder="Port" name="port" class="form-control">
+                                                    <input type="text" placeholder="Port" name="port" class="form-control" value="{{ default_port }}">
                                                 </div>
                                         </div>
 
@@ -122,11 +122,9 @@
         $('#id_use_default_auth').click(function(){
             if ($(this).is(':checked')){
                 $('#admin_account').css('display', 'none');
-                $('#id_port').css('display', 'none')
             }
             else {
                 $('#admin_account').css('display', 'block');
-                $('#id_port').css('display', 'block')
             }
         })
     });
@@ -165,7 +163,7 @@
                 msg: {required: "必须填写!"}
             },
             "port": {
-                rule: "required(use_default_auth)",
+                rule: "required",
                 tip: "输入端口号",
                 ok: "",
                 msg: {required: "必须填写!"}

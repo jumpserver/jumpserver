@@ -69,33 +69,6 @@ def db_asset_add(**kwargs):
     asset.group = group_select
 
 
-#
-# def get_host_groups(groups):
-#     """ 获取主机所属的组类 """
-#     ret = []
-#     for group_id in groups:
-#         group = BisGroup.objects.filter(id=group_id)
-#         if group:
-#             group = group[0]
-#             ret.append(group)
-#     group_all = get_object_or_404(BisGroup, name='ALL')
-#     ret.append(group_all)
-#     return ret
-#
-#
-# # def get_host_depts(depts):
-# #     """ 获取主机所属的部门类 """
-# #     ret = []
-# #     for dept_id in depts:
-# #         dept = DEPT.objects.filter(id=dept_id)
-# #         if dept:
-# #             dept = dept[0]
-# #             ret.append(dept)
-# #     return ret
-#
-#
-
-
 def db_asset_update(**kwargs):
     """ 修改主机时数据库操作函数 """
     asset_id = kwargs.pop('id')
