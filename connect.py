@@ -83,7 +83,7 @@ class Tty(object):
         return False
         
         
-    def remove_obstruct_char(cmd_str):
+    def remove_obstruct_char(self, cmd_str):
         '''删除一些干扰的特殊符号'''
         control_char = re.compile(r'\x07 | \x1b\[1P | \r ', re.X)
         cmd_str = control_char.sub('',cmd_str.strip())
@@ -93,7 +93,7 @@ class Tty(object):
         return cmd_str
         
     
-    def remove_control_char(result_command):    
+    def remove_control_char(self, result_command):    
         """
         处理日志特殊字符
         """
@@ -107,10 +107,10 @@ class Tty(object):
                 [\x80-\x9f] | (?:\x1b\]0.*) | \[.*@.*\][\$#] | (.*mysql>.*)      #匹配 所有控制字符
                 """, re.X)
         result_command = control_char.sub('', result_command.strip())
-        global VIM_FLAG
-        if not VIM_FLAG:
+ 
+        if not self.vim_flag:
             if result_command.startswith('vi') or result_command.startswith('fg'):
-                VIM_FLAG = True
+                self.vim_flag = True
             return result_command.decode('utf8',"ignore")
         else:
             return ''
