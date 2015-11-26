@@ -83,7 +83,7 @@ class Tty(object):
         return False
         
         
-     def remove_obstruct_char(cmd_str):
+    def remove_obstruct_char(cmd_str):
         '''删除一些干扰的特殊符号'''
         control_char = re.compile(r'\x07 | \x1b\[1P | \r ', re.X)
         cmd_str = control_char.sub('',cmd_str.strip())
@@ -120,7 +120,7 @@ class Tty(object):
         """
             处理命令中特殊字符
         """
-        str_r = remove_obstruct_char(str_r)
+        str_r = self.remove_obstruct_char(str_r)
 
         result_command = ''             # 最后的结果
         backspace_num = 0               # 光标移动的个数
@@ -192,7 +192,7 @@ class Tty(object):
         if backspace_num > 0:                                               #处理最后的退格符号
             result_command = result_command[0:-backspace_num] + pattern_str
 
-        result_command = remove_control_char(result_command)
+        result_command = self.remove_control_char(result_command)
         return result_command
 
     def get_log(self):
