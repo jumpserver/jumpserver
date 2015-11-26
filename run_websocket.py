@@ -275,8 +275,11 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         for t in WebTerminalHandler.tasks:
             if t.is_alive():
                 continue
-            t.setDaemon(True)
-            t.start()
+            try:
+                t.setDaemon(True)
+                t.start()
+            except RuntimeError:
+                pass
 
     def on_message(self, message):
         data = json.loads(message)
@@ -309,6 +312,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             self.log.is_finished = True
             self.log.end_time = datetime.datetime.now()
             self.log.save()
+            self.log_time_f.close()
             self.close()
         except AttributeError:
             pass
