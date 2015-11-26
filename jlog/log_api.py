@@ -44,11 +44,9 @@ def scriptToJSON(scriptf, timing=None):
         offset = 0
         for t in timing:
             dt = scriptf.read(t[1])
-            print "## %s: %s" % (t, dt)
             data = escapeString(dt)
             offset += t[0]
             ret.append((data, offset))
-        print ret
     return dumps(ret)
 
 
