@@ -119,7 +119,7 @@
                                     <td class="text-center" name="id" value="{{ asset.id }}" data-editable='false'>
                                         <input name="id" value="{{ asset.id }}" type="checkbox" class="i-checks">
                                     </td>
-                                    <td class="text-center"> {{ asset.hostname|default_if_none:"" }} </td>
+                                    <td class="text-center hostname"> {{ asset.hostname|default_if_none:"" }} </td>
                                     <td class="text-center"> {{ asset.ip|default_if_none:"" }} </td>
                                     <td class="text-center"> {{ asset.idc.name|default_if_none:"" }} </td>
                                     <td class="text-center">{{ asset.group.all|group_str2 }}</td>
@@ -175,6 +175,7 @@
             var url='/jlog/get_role_name/?id=' + $(this).attr('value');
             var href = $(this).attr('href');
             var new_url = '/jlog/web_terminal/?id=' + $(this).attr('value') + '&role=';
+            var hostname = $(this).closest('tr').find('.hostname')[0].innerHTML;
             $.ajax({
                 type: 'GET',
                 url: url,
@@ -182,21 +183,22 @@
                 success: function(data){
                     var dataArray = data.split(',');
                     if (dataArray.length == 1 && data != 'error'){
+                        var title = 'Jumpserver Web Terminal' + '<span class="text-info"> '+ hostname +'</span>';
                         layer.open({
-                        type: 2,
-                        title: 'Jumpserver Web Terminal',
-                        maxmin: true,
-                        shade: false,
-                        area: ['628px', '452px'],
-                        content: new_url
-                    });
+                            type: 2,
+                            title: title,
+                            maxmin: true,
+                            shade: false,
+                            area: ['628px', '452px'],
+                            content: new_url
+                        });
                         //window.open(new_url + data, '', 'location=no, resizeable=no, height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,status=no');
                     } else if (dataArray.length == '1' && data == 'error'){
                         layer.alert('没有授权角色')
                     } else {
                         aUrl = '';
                         $.each(dataArray, function(index, value){
-                            aUrl += '<a onclick="windowOpen(this); return false" class="btn btn-xs btn-primary newa" href=' + new_url + value +  '>' + value  + '</a> '
+                            aUrl += '<a onclick="windowOpen(this); return false" class="btn btn-xs btn-primary newa" href=' + new_url + value + ' value=' + hostname +  '>' + value  + '</a> '
                         });
                         layer.alert(aUrl, {
                             skin: 'layui-layer-molv',
@@ -211,11 +213,13 @@
         });
     });
 
-    function windowOpen(aTab){
-        var new_url = aTab.href;
+    function windowOpen(a){
+        var new_url = $(a).attr('href');
+        var hostname = $(a).attr('value');
+        var title = 'Jumpserver Web Terminal - ' + '<span class="text-info"> '+ hostname +'</span>';
         layer.open({
             type: 2,
-            title: 'Jumpserver Web Terminal',
+            title: title,
             maxmin: true,
             area: ['628px', '452px'],
             shade: false,
@@ -259,7 +263,6 @@
             }
         });
     });
-
 
 
     $('#asset_del').click(function () {
