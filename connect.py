@@ -67,6 +67,7 @@ class Tty(object):
         self.user = user
         self.role = role
         self.ssh = None
+        self.remote_ip = ''
         self.connect_info = None
         self.login_type = 'ssh'
         self.vim_flag = False
@@ -192,17 +193,18 @@ class Tty(object):
 
         if self.login_type == 'ssh':  # 如果是ssh连接过来，记录connect.py的pid，web terminal记录为日志的id
             pid = os.getpid()
-            remote_ip = os.popen("who -m | awk '{ print $5 }'").read().strip('()\n')  # 获取远端IP
-            log = Log(user=self.username, host=self.asset_name, remote_ip=remote_ip,
-                      log_path=log_file_path, start_time=date_today, pid=pid)
+            self.remote_ip = os.popen("who -m | awk '{ print $5 }'").read().strip('()\n')  # 获取远端IP
         else:
-            remote_ip = 'Web'
-            log = Log(user=self.username, host=self.asset_name, remote_ip=remote_ip,
-                      log_path=log_file_path, start_time=date_today, pid=0)
-            log.save()
-            log.pid = log.id
+            pid = 0
+
+        log = Log(user=self.username, host=self.asset_name, remote_ip=self.remote_ip, login_type=self.login_type,
+                  log_path=log_file_path, start_time=date_today, pid=pid)
 
         log.save()
+        if self.login_type == 'web':
+            log.pid = log.id
+            log.save()
+
         log_file_f.write('Start at %s\n' % datetime.datetime.now())
         return log_file_f, log_time_f, log
 
