@@ -24,11 +24,11 @@
 
                 <div class="ibox-content">
                     <form id="asset_form">
-{#                        <div class="col-sm-1">#}
-{#                            <a target="_blank" href="/jasset/group_add/" class="btn btn-sm btn-primary "> 添加资产 </a>#}
-{#                        </div>#}
-                        <div class="col-sm-8" style="padding-left: 0px">
-                            <a target="_blank" href="/jasset/group_add/" class="btn btn-sm btn-primary" > 添加资产 </a>
+                        <div class="col-sm-1" style="padding-left: 0">
+                            <a target="_blank" href="/jasset/group_add/" class="btn btn-sm btn-primary "> 添加资产 </a>
+                        </div>
+
+                        <div class="col-sm-7" style="padding-left: 0px">
                             <label>
                                 <select name="idc" class="form-control m-b" onchange="change_info()">
                                     <option value="">IDC机房</option>
@@ -37,19 +37,6 @@
                                             <option value="{{idc.name}}" selected> {{ idc.name }}</option>
                                         {% else %}
                                             <option value="{{idc.name}}"> {{ idc.name }}</option>
-                                        {% endifequal %}
-                                    {% endfor %}
-                                </select>
-                            </label>
-
-                            <label>
-                                <select name="group" class="form-control m-b" onchange="change_info()">
-                                    <option value="">主机组</option>
-                                    {% for asset_group in asset_group_all %}
-                                        {% ifequal asset_group.name group_name %}
-                                            <option value="{{ asset_group.name }}" selected> {{ asset_group.name }} </option>
-                                        {% else %}
-                                            <option value="{{ asset_group.name }}"> {{ asset_group.name }} </option>
                                         {% endifequal %}
                                     {% endfor %}
                                 </select>
@@ -95,7 +82,7 @@
                             </label>
                         </div>
 
-                        <div class="col-sm-4">
+                        <div class="col-sm-4" style="padding-right: 0">
                              <div class="input-group inline-group">
                                 <input type="text" class="form-control m-b" id="search_input" name="keyword" value="{{ keyword }}" placeholder="Search">
                                 <input type="text" style="display: none">

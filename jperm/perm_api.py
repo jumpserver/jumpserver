@@ -160,7 +160,7 @@ def gen_resource(ob, ex='', perm=None):
                 except IndexError:
                     continue
                 info['username'] = role.name
-                info['password'] = role.password
+                info['password'] = CRYPTOR.decrypt(role.password)
                 info['ssh_key'] = get_role_key(ob, role)
                 res.append(info)
     elif isinstance(ob, User):
@@ -175,7 +175,7 @@ def gen_resource(ob, ex='', perm=None):
             except IndexError:
                 continue
             info['username'] = role.name
-            info['password'] = role.password
+            info['password'] = CRYPTOR.decrypt(role.password)
             info['ssh_key'] = get_role_key(ob, role)
             res.append(info)
     elif isinstance(ob, (list, QuerySet)):
