@@ -23,34 +23,13 @@
 ## Command Aliases
 ## These are groups of related commands...
 
-## Networking
-Cmnd_Alias NETWORKING = /sbin/route, /sbin/ifconfig, /bin/ping, /sbin/dhclient, /usr/bin/net, /sbin/iptables, /usr/bin/rfcomm, /usr/bin/wvdial, /sbin/iwconfig, /sbin/mii-tool
+{% for sudo in sudo_chosen_obj %}
+Cmnd_Alias {{ sudo.name }} = {{ sudo.commands }}
+{% endfor %}
 
-## Installation and management of software
-Cmnd_Alias SOFTWARE = /bin/rpm, /usr/bin/up2date, /usr/bin/yum
 
-## Services
-Cmnd_Alias SERVICES = /sbin/service, /sbin/chkconfig
 
-## Updating the locate database
-Cmnd_Alias LOCATE = /usr/bin/updatedb
 
-## Storage
-Cmnd_Alias STORAGE = /sbin/fdisk, /sbin/sfdisk, /sbin/parted, /sbin/partprobe, /bin/mount, /bin/umount
-
-## Delegating permissions
-Cmnd_Alias DELEGATING = /bin/chown, /bin/chmod, /bin/chgrp
-
-## Processes
-Cmnd_Alias PROCESSES = /bin/nice, /bin/kill, /usr/bin/kill, /usr/bin/killall
-
-## Drivers
-Cmnd_Alias DRIVERS = /sbin/modprobe
-
-## Custom
-{% if {{ role_custom }} %}
-{% Cmnd_Alias CUSTOM = {{ role_custom }} %}
-{% endif %}
 
 # Defaults specification
 
@@ -102,8 +81,9 @@ Defaults    secure_path = /sbin:/bin:/usr/sbin:/usr/bin
 ## Allow root to run any commands anywhere
 root    ALL=(ALL)       ALL
 
-{{ role_name }} ALL = {{ role_chosen }}
-
+{% for role, alias in sudo_chosen_aliase.items %}
+{{ role }} ALL = {{ alias }}
+{% endfor %}
 
 ## Allows members of the 'sys' group to run networking, software,
 ## service management apps and more.

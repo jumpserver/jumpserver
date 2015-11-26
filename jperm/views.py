@@ -6,13 +6,12 @@ from jperm.models import PermLog as Log
 from jperm.models import SysUser
 from juser.user_api import gen_ssh_key
 
-
 from juser.models      import User, UserGroup
 from jasset.models     import Asset, AssetGroup
-from jperm.models      import PermRole, PermRule, PermSudo
+from jperm.models      import PermRole, PermRule, PermSudo, PermPush
 from jumpserver.models import Setting
 
-from jperm.utils       import updates_dict, gen_keys, get_rand_pass
+from jperm.utils       import updates_dict, gen_keys, get_rand_pass, get_sudo_file
 from jperm.ansible_api import Tasks
 from jperm.perm_api    import get_role_info
 
@@ -448,24 +447,61 @@ def perm_role_push(request):
         key_push = request.POST.get("use_publicKey")
         task = Tasks(push_resource)
         ret = {}
-        ret_failed = []
+        ret_failed = {}
 
-        # 因为要先建立用户，所以password 是必选项，
-        # 而push key是在 password也完成的情况下的 可选项
-        ret["password_push"] = task.add_multi_user(**role_pass)
-        if ret["password_push"].get("status") != "success":
-            ret_failed.append(1)
+        # 因为要先建立用户，所以password 是必选项，而push key是在 password也完成的情况下的 可选项
+        # 1. 以password 方式推送角色
+        if password_push:
+            ret["password_push"] = task.add_multi_user(**role_pass)
+            if ret["password_push"].get("status") != "success":
+                ret_failed["step1"] == "failed"
 
+        # 2. 以秘钥 方式推送角色
         if key_push:
+            ret["password_push"] = task.add_multi_user(**role_pass)
+            if ret["password_push"].get("status") != "success":
+                ret_failed["step2-1"] == "failed"
             ret["key_push"] = task.push_multi_key(**role_key)
             if ret["key_push"].get("status") != "success":
-                ret_failed.append(1)
+                ret_failed["step2-2"] == "failed"
 
-        print ret
+        # 3. 推送sudo配置文件
+        sudo_chosen_aliase = {}
+        sudo_alias = []
+        for role in roles_obj:
+            role_alias = [sudo.name for sudo in role.sudo.all()]
+            sudo_alias.extend(role_alias)
+            sudo_chosen_aliase[role.name] = ','.join(role_alias)
+        sudo_chosen_obj = [PermSudo.objects.get(name=sudo_name) for sudo_name in set(sudo_alias)]
+        sudo_file = get_sudo_file(sudo_chosen_aliase, sudo_chosen_obj)
+        ret_sudo = task.push_sudo_file(sudo_file)
+        if ret_sudo["step1"] != "ok" and ret_sudo["step2"] != "ok":
+            ret_failed["step3"] == "failed"
+
+        # 结果汇总统计
         if ret_failed:
-            return HttpResponse(u"推送失败")
+            # 推送失败
+            msg = u"推送失败, 原因: %s 失败" % ','.join(ret_failed.keys())
         else:
-            return HttpResponse(u"推送系统角色： %s" % ','.join(role_names))
+            # 推送成功 写会push表
+            msg = u"推送系统角色： %s" % ','.join(role_names)
+            push = PermPush(is_public_key=bool(key_push), is_password=bool(password_push))
+            push.save()
+            push.asset_group = asset_groups_obj
+            push.asset = calc_assets
+            push.role = roles_obj
+            push.save()
+
+        # 渲染 刷新数据
+        header_title, path1, path2 = "系统角色", "角色管理", "查看角色"
+        roles_list = PermRole.objects.all()
+        # TODO: 搜索和分页
+        keyword = request.GET.get('search', '')
+        if keyword:
+            roles_list = roles_list.filter(Q(name=keyword))
+
+        roles_list, p, roles, page_range, current_page, show_first, show_end = pages(roles_list, request)
+        return my_render('jperm/perm_role_list.html', locals(), request)
 
 
 @require_role('admin')

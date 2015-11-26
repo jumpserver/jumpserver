@@ -233,6 +233,7 @@ class Tasks(Command):
                      )
 
         self.results = hoc.run()
+        return {"msg": self.msg, "result": self.results}
 
     @property
     def msg(self):
@@ -400,13 +401,29 @@ class Tasks(Command):
 
         return {"failed": self.msg, "ok": result}
 
-    def push_sudo(self, role_custo, role_name, role_chosen):
+    def push_sudo_file(self, file_path):
         """
         use template to render pushed sudoers file
         :return:
         """
-        module_args = 'src=%s dest=%s owner=root group=root mode=0440' % (username, encrypt_pass)
-        self.__run(module_args, "template")
+        module_args1 = 'src=%s dest=%s owner=root group=root mode=0440' % (file_path, '/etc/sudoers')
+        ret1 = self.__run(module_args1, "copy")
+        module_args2 = 'visudo -c | grep "parsed OK" &> /dev/null && echo "ok" || echo "failed"'
+        ret2 = self.__run(module_args2, "shell")
+        ret2_status = [host_value.get("stdout") for host_value in ret2["result"]["contacted"].values()]
+
+        result = {}
+        if not ret1["msg"]:
+            result["step1"] = "ok"
+        else:
+            result["step1"] = "failed"
+
+        if not ret2["msg"] and "failed" not in ret2_status:
+            result["step2"] = "ok"
+        else:
+            result["step2"] = "failed"
+
+        return result
 
 
 class CustomAggregateStats(callbacks.AggregateStats):
@@ -426,7 +443,6 @@ class CustomAggregateStats(callbacks.AggregateStats):
                                               ignore_errors)
 
         self.results.append(runner_results)
-
 
     def summarize(self, host):
         """                                                                         

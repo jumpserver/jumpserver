@@ -8,6 +8,7 @@ from os import chmod, makedirs
 from uuid import uuid4
 from django.template.loader import get_template
 from django.template import Context
+from tempfile import NamedTemporaryFile
 
 from jumpserver.settings import KEY_DIR
 
@@ -87,6 +88,21 @@ def gen_sudo(role_custom, role_name, role_chosen):
         f.write(content)
     return sudo_file_path
 
+
+def get_sudo_file(sudo_chosen_aliase, sudo_chosen_obj):
+    """
+    get the sudo file
+    :param kwargs:
+    :return:
+    """
+    sudo_j2 = get_template('jperm/role_sudo.j2')
+    sudo_content = sudo_j2.render(Context({"sudo_chosen_aliase": sudo_chosen_aliase,
+                                           "sudo_chosen_obj": sudo_chosen_obj}))
+    sudo_file = NamedTemporaryFile(delete=False)
+    sudo_file.write(sudo_content)
+    sudo_file.close()
+
+    return sudo_file.name
 
 
 if __name__ == "__main__":

@@ -55,5 +55,13 @@ class PermRule(models.Model):
         return self.name
 
 
+class PermPush(models.Model):
+    date_added = models.DateTimeField(auto_now=True)
+    asset = models.ManyToManyField(Asset, related_name='perm_push')
+    asset_group = models.ManyToManyField(AssetGroup, related_name='perm_push')
+    role = models.ManyToManyField(PermRole, related_name='perm_push')
+    is_public_key = models.BooleanField(default=False)
+    is_password = models.BooleanField(default=False)
+
 
 
