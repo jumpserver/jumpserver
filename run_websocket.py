@@ -312,7 +312,6 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             self.log.is_finished = True
             self.log.end_time = datetime.datetime.now()
             self.log.save()
-            self.log_time_f.write('0')
             self.log_time_f.close()
             self.close()
         except AttributeError:
@@ -336,7 +335,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                     try:
                         self.write_message(json.dumps({'data': data}))
                         now_timestamp = time.time()
-                        self.log_time_f.write('%s\n%s ' % (len(data), round(now_timestamp-pre_timestamp, 4)))
+                        self.log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
                         self.log_file_f.write(data)
                         pre_timestamp = now_timestamp
                         self.log_file_f.flush()

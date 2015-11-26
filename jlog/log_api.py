@@ -43,14 +43,18 @@ def scriptToJSON(scriptf, timing=None):
         scriptf.readline()  # ignore first header line from script file
         offset = 0
         for t in timing:
-            data = escapeString(scriptf.read(t[1]))
+            dt = scriptf.read(t[1])
+            print "## %s: %s" % (t, dt)
+            data = escapeString(dt)
             offset += t[0]
             ret.append((data, offset))
+        print ret
     return dumps(ret)
 
 
 def renderTemplate(script_path, time_file_path, dimensions=(24, 80), templatename=DEFAULT_TEMPLATE):
-    with copen(script_path, encoding='utf-8', errors='replace') as scriptf:
+    #with copen(script_path, encoding='utf-8', errors='replace') as scriptf:
+    with open(script_path) as scriptf:
         with open(time_file_path) as timef:
             timing = getTiming(timef)
             json = scriptToJSON(scriptf, timing)
