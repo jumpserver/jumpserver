@@ -310,7 +310,7 @@ class Tty(object):
                 
             role_key = connect_info.get('role_key')
             if role_key and os.path.isfile(role_key):
-                mykey=paramiko.RSAKey.from_private_key_file(filename=role_key,password=connect_info.get('role_pass'))
+                mykey=paramiko.RSAKey.from_private_key_file(filename=role_key)
                 transport.auth_publickey(connect_info.get('role_name'), mykey)
             else:
                 transport.auth_password(connect_info.get('role_name'), connect_info.get('role_pass'))
