@@ -6,6 +6,7 @@ from contextlib import closing
 from codecs import open as copen
 from json import dumps
 from math import ceil
+import re
 from os.path import basename, dirname, exists, join
 from struct import unpack
 from subprocess import Popen
@@ -19,10 +20,16 @@ from jumpserver.api import BASE_DIR
 
 
 DEFAULT_TEMPLATE = join(BASE_DIR, 'templates', 'jlog', 'static.jinja2')
+rz_pat = re.compile(r'\x18B\w+\r\x8a(\x11)?')
 
 
 def escapeString(string):
-    string = string.encode('unicode_escape').decode('utf-8')
+    string = rz_pat.sub('', string)
+    try:
+        string = string.encode('unicode_escape').decode('utf-8', 'ignore')
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        string = string.decode('utf-8', 'ignore')
+    print repr(string)
     string = string.replace("'", "\\'")
     string = '\'' + string + '\''
     return string

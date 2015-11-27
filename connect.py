@@ -53,6 +53,12 @@ def color_print(msg, color='red', exits=False):
     return msg
 
 
+def write_log(f, msg):
+    msg = re.sub(r'[\r\n]', '\r\n', msg)
+    f.write(msg)
+    f.flush()
+
+
 class Tty(object):
     """
     A virtual tty class
@@ -603,19 +609,15 @@ class Nav(object):
                         while True:
                             print "请输入执行的命令， 按q退出"
                             data = 'ansible> '
-                            log_file_f.write(data)
-                            log_file_f.flush()
+                            write_log(log_file_f, data)
                             now_timestamp = time.time()
-                            log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
-                            log_time_f.flush()
+                            write_log(log_time_f, '%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
                             pre_timestamp = now_timestamp
                             command = raw_input("\033[1;32mCmds>:\033[0m ").strip()
                             data = '%s\r\n' % command
-                            log_file_f.write(data)
-                            log_file_f.flush()
+                            write_log(log_file_f, data)
                             now_timestamp = time.time()
-                            log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
-                            log_time_f.flush()
+                            write_log(log_time_f, '%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
                             pre_timestamp = now_timestamp
                             TtyLog(log=log, cmd=command, datetime=datetime.datetime.now()).save()
                             if command == 'q':
@@ -632,10 +634,8 @@ class Nav(object):
                                         output = re.sub(r'[\r\n]', '\r\n', output)
                                         data = '%s\r\n%s\r\n' % (header, output)
                                         now_timestamp = time.time()
-                                        log_file_f.write(data)
-                                        log_file_f.flush()
-                                        log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
-                                        log_time_f.flush()
+                                        write_log(log_file_f, data)
+                                        write_log(log_time_f, '%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
                                         pre_timestamp = now_timestamp
                                         print
                                 else:
@@ -645,10 +645,8 @@ class Nav(object):
                                         output = re.sub(r'[\r\n]', '\r\n', output)
                                         data = '%s\r\n%s\r\n' % (header, output)
                                         now_timestamp = time.time()
-                                        log_file_f.write(data)
-                                        log_file_f.flush()
-                                        log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
-                                        log_time_f.flush()
+                                        write_log(log_file_f, data)
+                                        write_log(log_time_f, '%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
                                         pre_timestamp = now_timestamp
                                         print
                                 print "=" * 20
