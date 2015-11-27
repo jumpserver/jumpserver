@@ -25,6 +25,7 @@ def get_group_user_perm(ob):
             }
         ]},
     'rule':[rule1, rule2,]
+    'role': {role1: {'asset': []}, 'asset_group': []}, role2: {}},
     }
     """
     perm = {}
@@ -38,9 +39,18 @@ def get_group_user_perm(ob):
     perm['rule'] = rule_all
     perm_asset_group = perm['asset_group'] = {}
     perm_asset = perm['asset'] = {}
+    perm_role = perm['role'] = {}
     for rule in rule_all:
         asset_groups = rule.asset_group.all()
         assets = rule.asset.all()
+        perm_roles = rule.role.all()
+        # 获取一个规则授权的角色和对应主机
+        for role in perm_roles:
+            if perm_role.get('role'):
+                perm_role[role]['asset'] = perm_role[role].get('asset', set()).union(set(assets))
+                perm_role[role]['asset_group'] = perm_role[role].get('asset_group', set()).union(set(asset_groups))
+            else:
+                perm_role[role] = {'asset': set(assets), 'asset_group': set(asset_groups)}
 
         # 获取一个规则用户授权的资产
         for asset in assets:
@@ -85,7 +95,7 @@ def get_group_asset_perm(ob):
             user2: {'role': [role1, role2], 'rule': [rule1, rule2]},
             }
         ]},
-    'rule':[rule1, rule2,]
+    'rule':[rule1, rule2,],
     }
     """
     perm = {}
@@ -102,7 +112,6 @@ def get_group_asset_perm(ob):
     for rule in rule_all:
         user_groups = rule.user_group.all()
         users = rule.user.all()
-
         # 获取一个规则资产的用户
         for user in users:
             if perm_user.get(user):
@@ -147,22 +156,30 @@ def gen_resource(ob, ex='', perm=None):
     生成MyInventory需要的 resource文件
     """
     res = []
-    if isinstance(ob, User) and isinstance(ex, (list, QuerySet)):
+    if isinstance(ob, User) and isinstance(ex, dict):
         if not perm:
             perm = get_group_user_perm(ob)
-            for asset, asset_info in perm.get('asset').items():
-                if asset not in ex:
-                    continue
-                asset_info = get_asset_info(asset)
-                info = {'hostname': asset.hostname, 'ip': asset.ip, 'port': asset_info.get('port', 22)}
-                try:
-                    role = sorted(list(perm.get('asset').get(asset).get('role')))[0]
-                except IndexError:
-                    continue
-                info['username'] = role.name
-                info['password'] = CRYPTOR.decrypt(role.password)
-                info['ssh_key'] = get_role_key(ob, role)
-                res.append(info)
+
+        role = ex.get('role')
+        asset_r = ex.get('asset')
+        roles = perm.get('role', {}).keys()
+        if role not in roles:
+            return {}
+
+        role_assets_all = perm.get('role').get(ex.get('role')).get('asset')
+        assets = set(role_assets_all) & set(asset_r)
+
+        for asset in assets:
+            asset_info = get_asset_info(asset)
+            info = {'hostname': asset.hostname,
+                    'ip': asset.ip,
+                    'port': asset_info.get('port', 22),
+                    'username': role.name,
+                    'password': CRYPTOR.decrypt(role.password),
+                    'ssh_key': get_role_key(ob, role)
+                    }
+            res.append(info)
+
     elif isinstance(ob, User):
         if not perm:
             perm = get_group_user_perm(ob)

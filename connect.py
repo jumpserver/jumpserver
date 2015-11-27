@@ -531,23 +531,41 @@ class Nav(object):
         """
         批量执行命令
         """
-        self.search()
         while True:
-            print "请输入主机名、IP或ansile支持的pattern, q退出"
+            if not self.user_perm:
+                self.user_perm = get_group_user_perm(self.user)
+            print '\033[32m[%-2s] %-15s \033[0m' % ('ID', '角色')
+            roles = self.user_perm.get('role').keys()
+            role_check = dict(zip(range(len(roles)), roles))
+
+            for i, r in role_check.items():
+                print '[%-2s] %-15s' % (i, r.name)
+            print
+            print "请输入运行命令角色的ID, q退出"
+
             try:
-                pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
-                if pattern == 'q':
+                role_id = raw_input("\033[1;32mRole>:\033[0m ").strip()
+                if role_id == 'q':
                     break
                 else:
-                    if not self.user_perm:
-                        self.user_perm = get_group_user_perm(self.user)
-                    res = gen_resource(self.user, perm=self.user_perm)
-                    cmd = Command(res)
-                    logger.debug(res)
-                    for inv in cmd.inventory.get_hosts(pattern=pattern):
-                        print inv.name
-                    confirm_host = raw_input("\033[1;32mIs that [y/n]>:\033[0m ").strip()
-                    if confirm_host == 'y':
+                    role = role_check[int(role_id)]
+                    assets = list(self.user_perm.get('role', {}).get(role).get('asset'))
+                    print "该角色有权限的所有主机"
+                    for asset in assets:
+                        print asset.hostname
+
+                    print
+                    print "请输入主机名、IP或ansile支持的pattern, q退出"
+                    pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
+                    if pattern == 'q':
+                        break
+                    else:
+                        res = gen_resource(self.user, {'asset': assets, 'role': role}, perm=self.user_perm)
+                        cmd = Command(res)
+                        logger.debug("res: %s" % res)
+                        for inv in cmd.inventory.get_hosts(pattern=pattern):
+                            print inv.name
+                        print
                         while True:
                             print "请输入执行的命令， 按q退出"
                             command = raw_input("\033[1;32mCmds>:\033[0m ").strip()
@@ -567,8 +585,10 @@ class Nav(object):
                                         print
                                 print "=" * 20
                                 print
-                    else:
-                        continue
+
+            except (IndexError, KeyError):
+                color_print('ID输入错误')
+                continue
 
             except EOFError:
                 print
@@ -615,10 +635,11 @@ def main():
                     roles = get_role(login_user, asset)
                     if len(roles) > 1:
                         role_check = dict(zip(range(len(roles)), roles))
-                        print role_check
+                        print "\033[32m[ID] 角色\033[0m"
                         for index, role in role_check.items():
-                            print "[%s] %s" % (index, role.name)
-                        print "输入角色ID, q退出"
+                            print "[%-2s] %s" % (index, role.name)
+                        print
+                        print "授权角色超过1个，请输入角色ID, q退出"
                         try:
                             role_index = raw_input("\033[1;32mID>:\033[0m ").strip()
                             if role_index == 'q':
