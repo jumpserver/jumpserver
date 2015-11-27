@@ -26,4 +26,3 @@ class TtyLog(models.Model):
     log = models.ForeignKey(Log)
     datetime = models.DateTimeField()
     cmd = models.CharField(max_length=200)
-

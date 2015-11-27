@@ -45,11 +45,12 @@ def color_print(msg, color='red', exits=False):
     color_msg = {'blue': '\033[1;36m%s\033[0m',
                  'green': '\033[1;32m%s\033[0m',
                  'red': '\033[1;31m%s\033[0m'}
-
-    print color_msg.get(color, 'blue') % msg
+    msg = color_msg.get(color, 'blue') % msg
+    print msg
     if exits:
         time.sleep(2)
         sys.exit()
+    return msg
 
 
 class Tty(object):
@@ -527,6 +528,35 @@ class Nav(object):
                 print '[%-3s] %-15s' % (asset_group.id, asset_group.name)
         print
 
+    def get_exec_log(self, assets_name_str):
+        exec_log_dir = os.path.join(LOG_DIR, 'exec')
+        date_today = datetime.datetime.now()
+        date_start = date_today.strftime('%Y%m%d')
+        time_start = date_today.strftime('%H%M%S')
+        today_connect_log_dir = os.path.join(exec_log_dir, date_start)
+        log_file_path = os.path.join(today_connect_log_dir, '%s_%s' % (self.user.username, time_start))
+
+        try:
+            mkdir(os.path.dirname(today_connect_log_dir), mode=0777)
+            mkdir(today_connect_log_dir, mode=0777)
+        except OSError:
+            logger.debug('创建目录 %s 失败，请修改%s目录权限' % (today_connect_log_dir, exec_log_dir))
+            raise ServerError('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, exec_log_dir))
+
+        try:
+            log_file_f = open(log_file_path + '.log', 'a')
+            log_file_f.write('Start at %s\r\n' % datetime.datetime.now())
+            log_time_f = open(log_file_path + '.time', 'a')
+        except IOError:
+            logger.debug('创建tty日志文件失败, 请修改目录%s权限' % today_connect_log_dir)
+            raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
+
+        remote_ip = os.popen("who -m | awk '{ print $5 }'").read().strip('()\n')
+        log = Log(user=self.user.username, host=assets_name_str, remote_ip=remote_ip, login_type='exec',
+                  log_path=log_file_path, start_time=datetime.datetime.now(), pid=os.getpid())
+        log.save()
+        return log_file_f, log_time_f, log
+
     def exec_cmd(self):
         """
         批量执行命令
@@ -553,7 +583,6 @@ class Nav(object):
                     print "该角色有权限的所有主机"
                     for asset in assets:
                         print asset.hostname
-
                     print
                     print "请输入主机名、IP或ansile支持的pattern, q退出"
                     pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
@@ -563,25 +592,64 @@ class Nav(object):
                         res = gen_resource({'user': self.user, 'asset': assets, 'role': role}, perm=self.user_perm)
                         cmd = Command(res)
                         logger.debug("res: %s" % res)
+                        asset_name_str = ''
                         for inv in cmd.inventory.get_hosts(pattern=pattern):
                             print inv.name
+                            asset_name_str += inv.name
                         print
+
+                        log_file_f, log_time_f, log = self.get_exec_log(asset_name_str)
+                        pre_timestamp = time.time()
                         while True:
                             print "请输入执行的命令， 按q退出"
+                            data = 'ansible> '
+                            log_file_f.write(data)
+                            log_file_f.flush()
+                            now_timestamp = time.time()
+                            log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
+                            log_time_f.flush()
+                            pre_timestamp = now_timestamp
                             command = raw_input("\033[1;32mCmds>:\033[0m ").strip()
+                            data = '%s\r\n' % command
+                            log_file_f.write(data)
+                            log_file_f.flush()
+                            now_timestamp = time.time()
+                            log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
+                            log_time_f.flush()
+                            pre_timestamp = now_timestamp
+                            TtyLog(log=log, cmd=command, datetime=datetime.datetime.now()).save()
                             if command == 'q':
+                                log.is_finished = True
+                                log.end_time = datetime.datetime.now()
+                                log.save()
                                 break
                             result = cmd.run(module_name='shell', command=command, pattern=pattern)
                             for k, v in result.items():
                                 if k == 'ok':
                                     for host, output in v.items():
-                                        color_print("%s => %s" % (host, 'Ok'), 'green')
+                                        header = color_print("%s => %s" % (host, 'Ok'), 'green')
                                         print output
+                                        output = re.sub(r'[\r\n]', '\r\n', output)
+                                        data = '%s\r\n%s\r\n' % (header, output)
+                                        now_timestamp = time.time()
+                                        log_file_f.write(data)
+                                        log_file_f.flush()
+                                        log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
+                                        log_time_f.flush()
+                                        pre_timestamp = now_timestamp
                                         print
                                 else:
                                     for host, output in v.items():
-                                        color_print("%s => %s" % (host, k), 'red')
-                                        color_print(output, 'red')
+                                        header = color_print("%s => %s" % (host, k), 'red')
+                                        output = color_print(output, 'red')
+                                        output = re.sub(r'[\r\n]', '\r\n', output)
+                                        data = '%s\r\n%s\r\n' % (header, output)
+                                        now_timestamp = time.time()
+                                        log_file_f.write(data)
+                                        log_file_f.flush()
+                                        log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
+                                        log_time_f.flush()
+                                        pre_timestamp = now_timestamp
                                         print
                                 print "=" * 20
                                 print
@@ -593,6 +661,9 @@ class Nav(object):
             except EOFError:
                 print
                 break
+            finally:
+                log.is_finished = True
+                log.end_time = datetime.datetime.now()
 
 
 def main():

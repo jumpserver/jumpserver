@@ -76,6 +76,7 @@
                         <table class="table table-striped table-bordered table-hover ">
                             <thead>
                                 <tr>
+                                    <th class="text-center"> ID </th>
                                     <th class="text-center"> 用户名 </th>
                                     <th class="text-center"> 登录主机 </th>
                                     <th class="text-center"> 来源IP </th>
@@ -84,12 +85,12 @@
                                     <th class="text-center"> 实时监控 </th>
                                     <th class="text-center"> 阻断 </th>
                                     <th class="text-center"> 登录时间 </th>
-
                                 </tr>
                             </thead>
                             <tbody>
                             {% for post in contacts.object_list %}
                                 <tr class="gradeX">
+                                    <td class="text-center">{{ post.id }}</td>
                                     <td id="username" class="text-center"> {{ post.user }} </td>
                                     <td id="ip" class="text-center"> {{ post.host }} </td>
                                     <td id="remote_ip" class="text-center"> {{ post.remote_ip }} </td>
