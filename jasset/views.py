@@ -128,9 +128,10 @@ def asset_add(request):
     header_title, path1, path2 = u'添加资产', u'资产管理', u'添加资产'
     asset_group_all = AssetGroup.objects.all()
     af = AssetForm()
+    default_setting = get_object(Setting, name='default')
+    default_port = default_setting.field2 if default_setting else ''
     if request.method == 'POST':
         af_post = AssetForm(request.POST)
-        print af_post
         ip = request.POST.get('ip', '')
         hostname = request.POST.get('hostname', '')
         is_active = True if request.POST.get('is_active') == '1' else False
@@ -147,7 +148,7 @@ def asset_add(request):
                 asset_save = af_post.save(commit=False)
                 if not use_default_auth:
                     password = request.POST.get('password', '')
-                    password_encode = password
+                    password_encode = CRYPTOR.encrypt(password)
                     asset_save.password = password_encode
                 if not ip:
                     asset_save.ip = hostname
@@ -227,9 +228,11 @@ def asset_edit(request):
                     af_save.password = ''
                     af_save.port = None
                 else:
-                    if password_old != password:
+                    if password:
                         password_encode = CRYPTOR.encrypt(password)
                         af_save.password = password_encode
+                    else:
+                        af_save.password = password_old
                 af_save.is_active = True if is_active else False
                 af_save.save()
                 af_post.save_m2m()
@@ -266,6 +269,7 @@ def asset_list(request):
     export = request.GET.get("export", False)
     group_id = request.GET.get("group_id", '')
     idc_id = request.GET.get("idc_id", '')
+    asset_id_all = request.GET.getlist("id", '')
     if group_id:
         group = get_object(AssetGroup, id=group_id)
         if group:
@@ -302,6 +306,12 @@ def asset_list(request):
             Q(disk__contains=keyword))
 
     if export:
+        if asset_id_all:
+            asset_find = []
+            for asset_id in asset_id_all:
+                asset = get_object(Asset, id=asset_id)
+                if asset:
+                    asset_find.append(asset)
         s = write_excel(asset_find)
         if s[0]:
             file_name = s[1]

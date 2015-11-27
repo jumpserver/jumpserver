@@ -25,7 +25,7 @@
                 <div class="ibox-content">
                     <form id="asset_form">
                         <div class="col-sm-1" style="padding-left: 0">
-                            <a target="_blank" href="/jasset/group_add/" class="btn btn-sm btn-primary "> 添加资产 </a>
+                            <a target="_blank" href="/jasset/asset_add/" class="btn btn-sm btn-primary "> 添加资产 </a>
                         </div>
 
                         <div class="col-sm-7" style="padding-left: 0px">
@@ -268,6 +268,7 @@
             shift: 'top',
             border: [2, 0.3, '#1AB394'],
             shade: [0.5, '#000000'],
+            area: ['800px', '600px'],
             shadeClose: true,
             content: url,
             cancel: function(){
@@ -278,7 +279,6 @@
 
     $('.search-btn-excel').unbind('click').bind('click',function(){
         var url= $(this).attr("href");
-        console.log(url);
         $.ajax({
             type: "GET",
             url: url,
