@@ -150,23 +150,23 @@ def user_have_perm(user, asset):
         return []
 
 
-def gen_resource(ob, ex='', perm=None):
+def gen_resource(ob, perm=None):
     """
-    ob为用户或资产列表或资产queryset, 如果同时输入用户和资产，则获取用户在这些资产上的信息
+    ob为用户或资产列表或资产queryset, 如果同时输入用户和{'role': role1, 'asset': []}，则获取用户在这些资产上的信息
     生成MyInventory需要的 resource文件
     """
     res = []
-    if isinstance(ob, User) and isinstance(ex, dict):
+    if isinstance(ob, dict):
+        role = ob.get('role')
+        asset_r = ob.get('asset')
+        user = ob.get('user')
         if not perm:
-            perm = get_group_user_perm(ob)
-
-        role = ex.get('role')
-        asset_r = ex.get('asset')
+            perm = get_group_user_perm(user)
         roles = perm.get('role', {}).keys()
         if role not in roles:
             return {}
 
-        role_assets_all = perm.get('role').get(ex.get('role')).get('asset')
+        role_assets_all = perm.get('role').get(role).get('asset')
         assets = set(role_assets_all) & set(asset_r)
 
         for asset in assets:
@@ -176,7 +176,7 @@ def gen_resource(ob, ex='', perm=None):
                     'port': asset_info.get('port', 22),
                     'username': role.name,
                     'password': CRYPTOR.decrypt(role.password),
-                    'ssh_key': get_role_key(ob, role)
+                    'ssh_key': get_role_key(user, role)
                     }
             res.append(info)
 

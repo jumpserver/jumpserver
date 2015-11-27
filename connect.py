@@ -560,7 +560,7 @@ class Nav(object):
                     if pattern == 'q':
                         break
                     else:
-                        res = gen_resource(self.user, {'asset': assets, 'role': role}, perm=self.user_perm)
+                        res = gen_resource({'user': self.user, 'asset': assets, 'role': role}, perm=self.user_perm)
                         cmd = Command(res)
                         logger.debug("res: %s" % res)
                         for inv in cmd.inventory.get_hosts(pattern=pattern):
