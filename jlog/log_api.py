@@ -29,7 +29,6 @@ def escapeString(string):
         string = string.encode('unicode_escape').decode('utf-8', 'ignore')
     except (UnicodeEncodeError, UnicodeDecodeError):
         string = string.decode('utf-8', 'ignore')
-    print repr(string)
     string = string.replace("'", "\\'")
     string = '\'' + string + '\''
     return string
@@ -52,13 +51,14 @@ def scriptToJSON(scriptf, timing=None):
         for t in timing:
             dt = scriptf.read(t[1])
             data = escapeString(dt)
+            # print ('###### (%s, %s)' % (t[1], data))
             offset += t[0]
             ret.append((data, offset))
     return dumps(ret)
 
 
 def renderTemplate(script_path, time_file_path, dimensions=(24, 80), templatename=DEFAULT_TEMPLATE):
-    #with copen(script_path, encoding='utf-8', errors='replace') as scriptf:
+    # with copen(script_path, encoding='utf-8', errors='replace') as scriptf:
     with open(script_path) as scriptf:
         with open(time_file_path) as timef:
             timing = getTiming(timef)

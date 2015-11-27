@@ -25,6 +25,7 @@ from jumpserver.api import logger, Log, TtyLog, get_role_key, CRYPTOR
 from jperm.perm_api import gen_resource, get_group_asset_perm, get_group_user_perm, user_have_perm
 from jumpserver.settings import LOG_DIR
 from jperm.ansible_api import Command
+from jlog.log_api import escapeString
 
 login_user = get_object(User, username=getpass.getuser())
 
@@ -365,8 +366,9 @@ class SshTty(Tty):
                             self.vim_data += x
                         sys.stdout.write(x)
                         sys.stdout.flush()
+                        es_x = escapeString(x)
                         now_timestamp = time.time()
-                        log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(x)))
+                        log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(es_x)))
                         log_file_f.write(x)
                         pre_timestamp = now_timestamp
                         log_file_f.flush()
