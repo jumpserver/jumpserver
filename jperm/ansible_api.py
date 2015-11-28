@@ -438,7 +438,7 @@ class Tasks(Command):
         use template to render pushed sudoers file
         :return:
         """
-        module_args1 = 'test'
+        module_args1 = file_path
         ret1 = self.__run(module_args1, "script")
         module_args2 = 'visudo -c | grep "parsed OK" &> /dev/null && echo "ok" || echo "failed"'
         ret2 = self.__run(module_args2, "shell")

@@ -353,6 +353,7 @@ def perm_role_edit(request):
     role = PermRole.objects.get(id=role_id)
     role_pass = CRYPTOR.decrypt(role.password)
     role_sudos = role.sudo.all()
+    sudo_all = PermSudo.objects.all()
     if request.method == "GET":
         return my_render('jperm/perm_role_edit.html', locals(), request)
 
@@ -364,6 +365,7 @@ def perm_role_edit(request):
         role_sudo_names = request.POST.getlist("sudo_name")
         role_sudos = [PermSudo.objects.get(name=sudo_name) for sudo_name in role_sudo_names]
         key_content = request.POST.get("role_key", "")
+
         try:
             if not role:
                 raise ServerError('角色用户不能存在')
@@ -384,6 +386,7 @@ def perm_role_edit(request):
             role.comment = role_comment
             role.sudo = role_sudos
 
+
             role.save()
             msg = u"更新系统角色： %s" % role.name
             return HttpResponseRedirect('/jperm/role/')
@@ -391,7 +394,6 @@ def perm_role_edit(request):
             error = e
 
     return my_render('jperm/perm_role_edit.html', locals(), request)
-
 
 
 @require_role('admin')
