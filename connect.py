@@ -602,7 +602,7 @@ class Nav(object):
                     else:
                         res = gen_resource({'user': self.user, 'asset': assets, 'role': role}, perm=self.user_perm)
                         cmd = Command(res)
-                        logger.debug("res: %s" % res)
+                        logger.debug("批量执行res: %s" % res)
                         asset_name_str = ''
                         for inv in cmd.inventory.get_hosts(pattern=pattern):
                             print inv.name
