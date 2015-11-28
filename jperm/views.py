@@ -11,9 +11,9 @@ from jasset.models     import Asset, AssetGroup
 from jperm.models      import PermRole, PermRule, PermSudo, PermPush
 from jumpserver.models import Setting
 
-from jperm.utils       import updates_dict, gen_keys, get_rand_pass, get_sudo_file
+from jperm.utils       import updates_dict, gen_keys, get_rand_pass, get_add_sudo_script
 from jperm.ansible_api import Tasks
-from jperm.perm_api    import get_role_info
+from jperm.perm_api    import get_role_info, get_role_push_host
 
 from jumpserver.api    import my_render, get_object, CRYPTOR
 
@@ -338,6 +338,7 @@ def perm_role_detail(request):
         asset_groups = role_info.get("asset_groups")
         users = role_info.get("users")
         user_groups = role_info.get("user_groups")
+        push_info = get_role_push_host(PermRole.objects.get(id=role_id))
 
         return my_render('jperm/perm_role_detail.html', locals(), request)
 
@@ -460,10 +461,10 @@ def perm_role_push(request):
         if key_push:
             ret["password_push"] = task.add_multi_user(**role_pass)
             if ret["password_push"].get("status") != "success":
-                ret_failed["step2-1"] == "failed"
+                ret_failed["step2-1"] = "failed"
             ret["key_push"] = task.push_multi_key(**role_key)
             if ret["key_push"].get("status") != "success":
-                ret_failed["step2-2"] == "failed"
+                ret_failed["step2-2"] = "failed"
 
         # 3. 推送sudo配置文件
         sudo_chosen_aliase = {}
@@ -473,17 +474,21 @@ def perm_role_push(request):
             sudo_alias.extend(role_alias)
             sudo_chosen_aliase[role.name] = ','.join(role_alias)
         sudo_chosen_obj = [PermSudo.objects.get(name=sudo_name) for sudo_name in set(sudo_alias)]
-        sudo_file = get_sudo_file(sudo_chosen_aliase, sudo_chosen_obj)
-        ret_sudo = task.push_sudo_file(sudo_file)
-        if ret_sudo["step1"] != "ok" and ret_sudo["step2"] != "ok":
-            ret_failed["step3"] == "failed"
+
+        add_sudo_script = get_add_sudo_script(sudo_chosen_aliase, sudo_chosen_obj)
+        ret_sudo = task.push_sudo_file(add_sudo_script)
+
+        if ret_sudo["step1"] != "ok" or ret_sudo["step2"] != "ok":
+            ret_failed["step3"] = "failed"
+        os.remove(add_sudo_script)
+
 
         # 结果汇总统计
         if ret_failed:
             # 推送失败
-            msg = u"推送失败, 原因: %s 失败" % ','.join(ret_failed.keys())
+            error = u"推送失败, 原因: %s 失败" % ','.join(ret_failed.keys())
         else:
-            # 推送成功 写会push表
+            # 推送成功 回写push表
             msg = u"推送系统角色： %s" % ','.join(role_names)
             push = PermPush(is_public_key=bool(key_push), is_password=bool(password_push))
             push.save()
@@ -546,7 +551,7 @@ def perm_sudo_add(request):
         comment = request.POST.get("sudo_comment")
         commands = request.POST.get("sudo_commands")
 
-        sudo = PermSudo(name=name, comment=comment, commands=commands)
+        sudo = PermSudo(name=name.strip(), comment=comment, commands=commands.strip())
         sudo.save()
 
         msg = u"添加Sudo命令别名: %s" % name
@@ -586,8 +591,8 @@ def perm_sudo_edit(request):
         name = request.POST.get("sudo_name")
         commands = request.POST.get("sudo_commands")
         comment = request.POST.get("sudo_comment")
-        sudo.name = name
-        sudo.commands = commands
+        sudo.name = name.strip()
+        sudo.commands = commands.strip()
         sudo.comment = comment
         sudo.save()
 

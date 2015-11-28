@@ -406,8 +406,8 @@ class Tasks(Command):
         use template to render pushed sudoers file
         :return:
         """
-        module_args1 = 'src=%s dest=%s owner=root group=root mode=0440' % (file_path, '/etc/sudoers')
-        ret1 = self.__run(module_args1, "copy")
+        module_args1 = 'test'
+        ret1 = self.__run(module_args1, "script")
         module_args2 = 'visudo -c | grep "parsed OK" &> /dev/null && echo "ok" || echo "failed"'
         ret2 = self.__run(module_args2, "shell")
         ret2_status = [host_value.get("stdout") for host_value in ret2["result"]["contacted"].values()]

@@ -89,7 +89,7 @@ def gen_sudo(role_custom, role_name, role_chosen):
     return sudo_file_path
 
 
-def get_sudo_file(sudo_chosen_aliase, sudo_chosen_obj):
+def get_add_sudo_script(sudo_chosen_aliase, sudo_chosen_obj):
     """
     get the sudo file
     :param kwargs:
