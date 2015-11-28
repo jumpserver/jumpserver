@@ -5,12 +5,37 @@ from jasset.models import Asset, AssetGroup
 from juser.models  import User, UserGroup
 
 
+class PermLog(models.Model):
+    datetime = models.DateTimeField(auto_now_add=True)
+    action = models.CharField(max_length=100, null=True, blank=True, default='')
+    results = models.CharField(max_length=1000, null=True, blank=True, default='')
+    is_success = models.BooleanField(default=False)
+    is_finish = models.BooleanField(default=False)
+
+
+class SysUser(models.Model):
+    username = models.CharField(max_length=100)
+    password = models.CharField(max_length=100)
+    comment = models.CharField(max_length=100, null=True, blank=True, default='')
+
+
+class PermSudo(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    date_added = models.DateTimeField(auto_now=True)
+    commands = models.TextField()
+    comment = models.CharField(max_length=100, null=True, blank=True, default='')
+
+    def __unicode__(self):
+        return self.name
+
+
 class PermRole(models.Model):
     name = models.CharField(max_length=100, unique=True)
     comment = models.CharField(max_length=100, null=True, blank=True, default='')
     password = models.CharField(max_length=100)
     key_path = models.CharField(max_length=100)
     date_added = models.DateTimeField(auto_now=True)
+    sudo = models.ManyToManyField(PermSudo, related_name='perm_role')
 
     def __unicode__(self):
         return self.name
@@ -28,3 +53,13 @@ class PermRule(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+class PermPush(models.Model):
+    date_added = models.DateTimeField(auto_now=True)
+    asset = models.ManyToManyField(Asset, related_name='perm_push')
+    asset_group = models.ManyToManyField(AssetGroup, related_name='perm_push')
+    role = models.ManyToManyField(PermRole, related_name='perm_push')
+    is_public_key = models.BooleanField(default=False)
+    is_password = models.BooleanField(default=False)
+

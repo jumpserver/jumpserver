@@ -250,3 +250,12 @@ def check_role(asset_id, user):
     """
     return user
 
+
+@register.filter(name='role_contain_which_sudos')
+def role_contain_which_sudos(role):
+    """
+    get role sudo commands
+    """
+    sudo_names = [sudo.name for sudo in role.sudo.all()]
+    return ','.join(sudo_names)
+
