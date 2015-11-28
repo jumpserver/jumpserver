@@ -15,6 +15,7 @@ import readline
 import django
 import paramiko
 import struct, fcntl, signal, socket, select
+from io import open as copen
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
@@ -225,6 +226,8 @@ class Tty(object):
             raise ServerError('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, tty_log_dir))
 
         try:
+            # log_file_f = copen(log_file_path + '.log', mode='at', encoding='utf-8', errors='replace')
+            # log_time_f = copen(log_file_path + '.time', mode='at', encoding='utf-8', errors='replace')
             log_file_f = open(log_file_path + '.log', 'a')
             log_time_f = open(log_file_path + '.time', 'a')
         except IOError:
@@ -245,7 +248,7 @@ class Tty(object):
             log.pid = log.id
             log.save()
 
-        log_file_f.write('Start at %s\n' % datetime.datetime.now())
+        log_file_f.write('Start at %s\r\n' % datetime.datetime.now())
         return log_file_f, log_time_f, log
 
     def get_connect_info(self):
@@ -366,13 +369,13 @@ class SshTty(Tty):
                             self.vim_data += x
                         sys.stdout.write(x)
                         sys.stdout.flush()
-                        es_x = escapeString(x)
                         now_timestamp = time.time()
-                        log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(es_x)))
+                        log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(x)))
+                        log_time_f.flush()
                         log_file_f.write(x)
+                        log_file_f.flush()
                         pre_timestamp = now_timestamp
                         log_file_f.flush()
-                        log_time_f.flush()
 
                         if input_mode and not self.is_output(x):
                             data += x
