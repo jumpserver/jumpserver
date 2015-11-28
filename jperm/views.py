@@ -356,7 +356,6 @@ def perm_role_edit(request):
     if request.method == "GET":
         return my_render('jperm/perm_role_edit.html', locals(), request)
 
-
     if request.method == "POST":
         # 获取 POST 数据
         role_name = request.POST.get("role_name")
@@ -423,23 +422,25 @@ def perm_role_push(request):
         group_assets_obj = []
         for asset_group in asset_groups_obj:
             group_assets_obj.extend(asset_group.asset_set.all())
-        calc_assets = set(assets_obj) | set(group_assets_obj)
+        calc_assets = list(set(assets_obj) | set(group_assets_obj))
 
         # 生成Inventory
-        push_resource = []
-        for asset in calc_assets:
-            if asset.use_default_auth:
-                username = Setting.field1
-                port = Setting.field2
-                password = Setting.field3
-            else:
-                username = asset.username
-                password = asset.password
-                port = asset.port
-            push_resource.append({"hostname": asset.ip,
-                                  "port": port,
-                                  "username": username,
-                                  "password": password})
+        # push_resource = []
+        # for asset in calc_assets:
+        #     if asset.use_default_auth:
+        #         username = Setting.field1
+        #         port = Setting.field2
+        #         password = Setting.field3
+        #     else:
+        #         username = asset.username
+        #         password = asset.password
+        #         port = asset.port
+        #     push_resource.append({"hostname": asset.ip,
+        #                           "port": port,
+        #                           "username": username,
+        #                           "password": password})
+        push_resource = gen_resource(calc_assets)
+        print push_resource
 
         # 获取角色的推送方式,以及推送需要的信息
         roles_obj = [PermRole.objects.get(name=role_name) for role_name in role_names]
@@ -486,7 +487,9 @@ def perm_role_push(request):
 
         if ret_sudo["step1"] != "ok" or ret_sudo["step2"] != "ok":
             ret_failed["step3"] = "failed"
-        os.remove(add_sudo_script)
+        # os.remove(add_sudo_script)
+
+        print ret
 
 
         # 结果汇总统计

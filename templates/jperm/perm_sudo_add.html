@@ -1,9 +1,4 @@
 {% extends 'base.html' %}
-{% block self_head_css_js %}
-    <link href="/static/css/plugins/datapicker/datepicker3.css" rel="stylesheet">
-    <link href="/static/css/plugins/chosen/chosen.css" rel="stylesheet">
-    <script src="/static/js/plugins/chosen/chosen.jquery.js"></script>
-{% endblock %}
 {% load mytags %}
 {% block content %}
     {% include 'nav_cat_bar.html' %}
@@ -69,52 +64,7 @@
 {% endblock %}
 {% block self_footer_js %}
 <script>
-$(document).ready(function(){
-    $("input.role").click(function(){
-        if($("input.role[value=GA]").is( ":checked" )){
-            $("#admin_groups").css("display", 'none');
-        }
-        else {
-
-            $("#admin_groups").css("display", 'block');
-        }
-    });
-
-    $('#use_password').click(function(){
-        if ($(this).is(':checked')){
-            $('#admin_account_password').css('display', 'block')
-        }
-        else {
-
-            $('#admin_account_password').css('display', 'none')
-        }
-    });
-
-    $('#use_publicKey').click(function(){
-        if ($(this).is(':checked')){
-
-            $('#admin_account_publicKey').css('display', 'block')
-        }
-        else {
-            $('#admin_account_publicKey').css('display', 'none')
-        }
-    });
-});
-
-var config = {
-                '.chosen-select'           : {},
-                '.chosen-select-deselect'  : {allow_single_deselect:true},
-                '.chosen-select-no-single' : {disable_search_threshold:10},
-                '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
-                '.chosen-select-width'     : {width:"95%"}
-            };
-
-for (var selector in config) {
-    $(selector).chosen(config[selector]);
-}
 
 </script>
-    <script src="/static/js/cropper/cropper.min.js"></script>
-    <script src="/static/js/datapicker/bootstrap-datepicker.js"></script>
 {% endblock %}
 

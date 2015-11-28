@@ -108,7 +108,7 @@ def get_add_sudo_script(sudo_chosen_aliase, sudo_chosen_obj):
     sudo_file = NamedTemporaryFile(delete=False)
     sudo_file.write(sudo_content)
     sudo_file.close()
-
+    print(sudo_file.name)
     return sudo_file.name
 
 
