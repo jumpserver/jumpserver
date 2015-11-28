@@ -266,6 +266,40 @@ def get_role_info(role_id, type="all"):
         return u"不支持的查询"
 
 
+def get_role_push_host(role):
+    """
+    get the role push host
+    :return: the asset object
+    """
+    # 计算该role 所有push记录 总共推送的主机
+    assets = []
+    asset_groups = []
+    for push in role.perm_push.all():
+        assets.extend(push.asset.all())
+        asset_groups.extend(push.asset_group.all())
+    group_assets = []
+    for asset_group in asset_groups:
+        group_assets.extend(asset_group.asset_set.all())
+    cacl_assets = set(assets) | set(group_assets)
+
+    # 计算所有主机 在push记录里面的 使用密码和使用秘钥状况
+    result = []
+    for asset in cacl_assets:
+        all_push = asset.perm_push.all()
+        if True in [push.is_password for push in all_push if role in push.role.all()]:
+            is_password = u"是"
+        else:
+            is_password = u"否"
+        if True in [push.is_public_key for push in all_push if role in push.role.all()]:
+            is_public_key = u"是"
+        else:
+            is_public_key = u"否"
+        result.append({"ip": asset.ip,
+                       "group": ','.join([group.name for group in asset.group.all()]),
+                       "password": is_password,
+                       "pubkey": is_public_key})
+    return result
+
 if __name__ == "__main__":
     print get_role_info(1)
 

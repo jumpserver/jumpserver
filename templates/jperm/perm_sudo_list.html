@@ -16,7 +16,7 @@
                     {% endif %}
                 </div>
                 <div class="ibox-title">
-                    <h5> 所有系统角色</h5>
+                    <h5> 所有Sudo命令别名</h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -32,8 +32,8 @@
 
                 <div class="ibox-content">
                     <div class="">
-                    <a  href="/jperm/role/perm_role_add/" class="btn btn-sm btn-primary "> 添加角色 </a>
-                    <a  href="/jperm/role/perm_role_push/" class="btn btn-sm btn-primary "> 推送角色 </a>
+                    <a  href="/jperm/sudo/perm_sudo_add/" class="btn btn-sm btn-primary "> 添加别名 </a>
+                    <a id="del_btn" class="btn btn-sm btn-danger "> 删除所选 </a>
                     <form id="search_form" method="get" action="" class="pull-right mail-search">
                         <div class="input-group">
                             <input type="text" class="form-control input-sm" id="search_input" name="search" placeholder="Search">
@@ -49,24 +49,22 @@
                     <table class="table table-striped table-bordered table-hover " id="editable" >
                         <thead>
                             <tr>
-                                <th class="text-center">名称 </th>
-                                <th class="text-center">备注</th>
+                                <th class="text-center">命令别名 </th>
+                                <th class="text-center">系统命令</th>
                                 <th class="text-center">创建时间</th>
-                                <th class="text-center">sudo别名</th>
                                 <th class="text-center">操作</th>
                             </tr>
                         </thead>
                         <tbody id="edittbody">
-                        {% for role in roles %}
-                            <tr class="gradeX" id={{ role.id }}>
-                                <td class="text-center"> {{ role.name }} </td>
-                                <td class="text-center"> {{ role.comment }} </td>
-                                <td class="text-center"> {{ role.date_added | date:"Y-m-d H:i:s"}} </td>
-                                <td class="text-center"> {{ role | role_contain_which_sudos }} </td>
+                        {% for sudo in sudos %}
+                            <tr class="gradeX" id={{ sudo.id }}>
+                                <td class="text-center"> {{ sudo.name }} </td>
+                                <td class="text-center"> {{ sudo.commands }} </td>
+                                <td class="text-center"> {{ sudo.date_added | date:"Y-m-d H:i:s"}} </td>
                                 <td class="text-center">
-                                    <a href="/jperm/role/perm_role_detail/?id={{ role.id }}" class="btn btn-xs btn-primary">详情</a>
-                                    <a href="/jperm/role/perm_role_edit/?id={{ role.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <button onclick="remove_role({{ role.id }})" class="btn btn-xs btn-danger">删除</button>
+{#                                    <a href="/jperm/sudo/perm_sudo_detail/?id={{ sudo.id }}" class="btn btn-xs btn-primary">详情</a>#}
+                                    <a href="/jperm/sudo/perm_sudo_edit/?id={{ sudo.id }}" class="btn btn-xs btn-info">编辑</a>
+                                    <button onclick="remove_sudo({{ sudo.id }})" class="btn btn-xs btn-danger">删除</button>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -88,19 +86,18 @@
 
 
 <script>
-function remove_role(role_id){
+function remove_sudo(sudo_id){
     if (confirm("确认删除")) {
         $.ajax({
            type: "POST",
-           url: "/jperm/role/perm_role_delete/",
-           data: "id=" + role_id,
+           url: "/jperm/sudo/perm_sudo_delete/",
+           data: "id=" + sudo_id,
            success: function(msg){
                alert( "成功: " + msg );
-               var del_row = $('tbody#edittbody>tr#' + role_id);
+               var del_row = $('tbody#edittbody>tr#' + sudo_id);
                del_row.remove()
            },
            error: function (msg) {
-               console.log(msg)
                alert("失败: " + msg)
            }
         });

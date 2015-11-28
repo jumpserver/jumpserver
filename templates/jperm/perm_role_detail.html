@@ -5,7 +5,6 @@
 {% block content %}
     {% include 'nav_cat_bar.html' %}
     <div class="wrapper wrapper-content animated fadeInRight">
-
         <div class="row">
             <div class="col-lg-4">
                 <div class="ibox float-e-margins">
@@ -51,8 +50,8 @@
                             </div>
                         </div>
                     </div>
-                    </div>
-                    </div>
+                </div>
+            </div>
             <div class="col-lg-4">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
@@ -97,8 +96,8 @@
                             </div>
                         </div>
                     </div>
-                    </div>
-                    </div>
+                </div>
+            </div>
             <div class="col-lg-4">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
@@ -143,8 +142,60 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-primary"><b>推送主机</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#"></a>
+                                </li>
+                                <li><a href="#"></a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
                     </div>
+                    <div class="ibox-content">
+                        <div>
+                            <div class="text-left">
+                                <table class="table table-striped" id="ugedit" >
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">主机</th>
+                                            <th class="text-center">主机组</th>
+                                            <th class="text-center">使用密码</th>
+                                            <th class="text-center">使用秘钥</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for host in push_info %}
+                                        <tr class="gradeX">
+                                            <td class="text-center"> {{ host.ip }} </td>
+                                            <td class="text-center"> {{ host.group }} </td>
+                                            <td class="text-center"> {{ host.password }} </td>
+                                            <td class="text-center"> {{ host.pubkey }} </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
+                </div>
+            </div>
         </div>
     </div>
 

@@ -8,6 +8,12 @@ from paramiko.rsakey import RSAKey
 from jumpserver.api import mkdir
 from uuid import uuid4
 from jumpserver.api import CRYPTOR
+from os import makedirs
+
+from django.template.loader import get_template
+from django.template import Context
+from tempfile import NamedTemporaryFile
+
 
 from jumpserver.settings import KEY_DIR
 
@@ -64,6 +70,47 @@ def gen_keys(key="", key_path_dir=""):
                      " %s@%s" % ("jumpserver", os.uname()[1])]:
             content_file.write(data)
     return key_path_dir
+
+
+def gen_sudo(role_custom, role_name, role_chosen):
+    """
+    生成sudo file, 仅测试了cenos7
+    role_custom: 自定义支持的sudo 命令　格式: 'CMD1, CMD2, CMD3, ...'
+    role_name: role name
+    role_chosen: 选择那些sudo的命令别名：
+    　　　　NETWORKING, SOFTWARE, SERVICES, STORAGE,
+    　　　　DELEGATING, PROCESSES, LOCATE, DRIVERS
+    :return:
+    """
+    sudo_file_basename = os.path.join(os.path.dirname(KEY_DIR), 'role_sudo_file')
+    makedirs(sudo_file_basename)
+    sudo_file_path = os.path.join(sudo_file_basename, role_name)
+
+    t = get_template('role_sudo.j2')
+    content = t.render(Context({"role_custom": role_custom,
+                      "role_name": role_name,
+                      "role_chosen": role_chosen,
+                      }))
+    with open(sudo_file_path, 'w') as f:
+        f.write(content)
+    return sudo_file_path
+
+
+def get_add_sudo_script(sudo_chosen_aliase, sudo_chosen_obj):
+    """
+    get the sudo file
+    :param kwargs:
+    :return:
+    """
+    sudo_j2 = get_template('jperm/role_sudo.j2')
+    sudo_content = sudo_j2.render(Context({"sudo_chosen_aliase": sudo_chosen_aliase,
+                                           "sudo_chosen_obj": sudo_chosen_obj}))
+    sudo_file = NamedTemporaryFile(delete=False)
+    sudo_file.write(sudo_content)
+    sudo_file.close()
+
+    return sudo_file.name
+
 
 
 if __name__ == "__main__":
