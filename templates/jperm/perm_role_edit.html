@@ -60,8 +60,8 @@
                                 <label for="sudo" class="col-sm-2 control-label">角色Sudo命令<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8" id="sudo_name">
                                     <select name="sudo_name" data-placeholder="请选择Sudo别名" class="chosen-select form-control m-b" multiple  tabindex="2">
-                                        {% for sudo in role_sudos %}
-                                            <option selected >{{ sudo.name }}</option>
+                                        {% for sudo in sudo_all %}
+                                            <option value="{{ sudo.id }}" {% if sudo in role_sudos %} selected {% endif %}>{{ sudo.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>

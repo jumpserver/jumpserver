@@ -250,6 +250,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         if asset:
             roles = user_have_perm(self.user, asset)
             logger.debug(roles)
+            logger.debug('rolename: %s' % role_name)
             login_role = ''
             for role in roles:
                 if role.name == role_name:

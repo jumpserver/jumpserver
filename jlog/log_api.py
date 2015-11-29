@@ -46,12 +46,12 @@ def scriptToJSON(scriptf, timing=None):
     ret = []
 
     with closing(scriptf):
-        print "# %s #" % scriptf.readline()  # ignore first header line from script file
+        scriptf.readline()  # ignore first header line from script file
         offset = 0
         for t in timing:
             dt = scriptf.read(t[1])
             data = escapeString(dt)
-            print ('###### (%s, %s)' % (t[1], repr(data)))
+            # print ('###### (%s, %s)' % (t[1], repr(data)))
             offset += t[0]
             ret.append((data, offset))
     return dumps(ret)
