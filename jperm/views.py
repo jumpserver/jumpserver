@@ -263,6 +263,11 @@ def perm_role_add(request):
         try:
             if get_object(PermRole, name=name):
                 raise ServerError('已经存在该用户 %s' % name)
+            default = get_object(Setting, name='default')
+            if default and name == default.field1:
+                raise ServerError('与默认管理账号同名')
+            if name == 'root':
+                raise ServerError('不能为root')
             if password:
                 encrypt_pass = CRYPTOR.encrypt(password)
             else:
@@ -398,15 +403,13 @@ def perm_role_push(request):
     """
     # 渲染数据
     header_title, path1, path2 = "系统角色", "角色管理", "角色推送"
-
-    roles = PermRole.objects.all()
+    role_id = request.GET.get('id')
+    role = get_object(PermRole, id=role_id)
     assets = Asset.objects.all()
     asset_groups = AssetGroup.objects.all()
 
     if request.method == "POST":
         # 获取推荐角色的名称列表
-        role_ids = request.POST.getlist("roles")
-
         # 计算出需要推送的资产列表
         asset_ids = request.POST.getlist("assets")
         asset_group_ids = request.POST.getlist("asset_groups")
@@ -434,13 +437,7 @@ def perm_role_push(request):
         #                           "password": password})
         push_resource = gen_resource(calc_assets)
 
-        # 获取角色的推送方式,以及推送需要的信息
-        roles_obj = [PermRole.objects.get(id=role_id) for role_id in role_ids]
-        role_pass = {}
-        role_key = {}
-        for role in roles_obj:
-            role_pass[role.name] = role.password
-            role_key[role.name] = os.path.join(role.key_path, 'id_rsa.pub')
+        logger.debug('推送role res: %s' % push_resource)
 
         # 调用Ansible API 进行推送
         password_push = request.POST.get("use_password")
@@ -452,34 +449,31 @@ def perm_role_push(request):
         # 因为要先建立用户，所以password 是必选项，而push key是在 password也完成的情况下的 可选项
         # 1. 以password 方式推送角色
         if password_push:
-            ret["password_push"] = task.add_multi_user(**role_pass)
+            ret["password_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
             if ret["password_push"].get("status") != "success":
                 ret_failed["step1"] == "failed"
 
         # 2. 以秘钥 方式推送角色
         if key_push:
-            ret["password_push"] = task.add_multi_user(**role_pass)
-            if ret["password_push"].get("status") != "success":
+            ret["password_push"] = task.add_user(role.name)
+            if ret["password_push"].get("status") != "ok":
                 ret_failed["step2-1"] = "failed"
-            ret["key_push"] = task.push_multi_key(**role_key)
-            if ret["key_push"].get("status") != "success":
+            ret["key_push"] = task.push_key(role.name, os.path.join(role.key_path, 'id_rsa.pub'))
+            if ret["key_push"].get("status") != "ok":
                 ret_failed["step2-2"] = "failed"
 
         # 3. 推送sudo配置文件
-        role_chosen_aliase = {}  # {'dev': 'NETWORKING, SHUTDOWN', 'sa': 'NETWORKING, SHUTDOWN'}
-        sudo_alias = set()     # set(sudo1, sudo2, sudo3)
-        for role in roles_obj:
-            sudos = set([sudo for sudo in role.sudo.all()])
-            sudo_alias.update(sudos)
-            role_chosen_aliase[role.name] = ','.join(sudo.name for sudo in sudos)
+        role_chosen_aliase = {}  # {'dev': 'NETWORKING, SHUTDOWN'}
+        sudo_alias = set([sudo for sudo in role.sudo.all()])  # set(sudo1, sudo2, sudo3)
+        role_chosen_aliase[role.name] = ','.join(sudo.name for sudo in sudo_alias)
         add_sudo_script = get_add_sudo_script(role_chosen_aliase, sudo_alias)
-        ret_sudo = task.push_sudo_file(add_sudo_script)
+        ret['sudo'] = task.push_sudo_file(add_sudo_script)
 
-        if ret_sudo["step1"] != "ok" or ret_sudo["step2"] != "ok":
+        if ret['sudo']["step1"] != "ok" or ret['sudo']["step2"] != "ok":
             ret_failed["step3"] = "failed"
         os.remove(add_sudo_script)
 
-        print ret
+        logger.debug('推送role结果: %s' % ret)
         # 结果汇总统计
         if ret_failed:
             # 推送失败
@@ -491,7 +485,7 @@ def perm_role_push(request):
             push.save()
             push.asset_group = asset_groups_obj
             push.asset = calc_assets
-            push.role = roles_obj
+            push.role = role
             push.save()
 
     return my_render('jperm/perm_role_push.html', locals(), request)
@@ -592,5 +586,7 @@ def perm_sudo_delete(request):
         return HttpResponse(u"不支持该操作")
 
 
-
+def role_push_list(request):
+    push_all = PermPush.objects.all()
+    return my_render('jperm/role_push_list.html', locals(), request)
 

@@ -146,7 +146,7 @@ def user_add(request):
     error = ''
     msg = ''
     header_title, path1, path2 = '添加用户', '用户管理', '添加用户'
-    user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
+    user_role = {'SU': u'超级管理员', 'CU': u'普通用户'}
     group_all = UserGroup.objects.all()
 
     if request.method == 'POST':
@@ -349,7 +349,7 @@ def user_edit(request):
         if not user_id:
             return HttpResponseRedirect('/')
 
-        user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
+        user_role = {'SU': u'超级管理员', 'CU': u'普通用户'}
         user = get_object(User, id=user_id)
         group_all = UserGroup.objects.all()
         if user:

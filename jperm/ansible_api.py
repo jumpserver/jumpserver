@@ -284,10 +284,10 @@ class Tasks(Command):
         """
         push the ssh authorized key to target.
         """
-        module_args = 'user="%s" key="{{ lookup("file", "%s") }}"' % (user, key_path)
+        module_args = 'user="%s" key="{{ lookup("file", "%s") }}" state=present' % (user, key_path)
         self.__run(module_args, "authorized_key")
 
-        return {"status": "failed","msg": self.msg} if self.msg else {"status": "ok"}
+        return {"status": "failed", "msg": self.msg} if self.msg else {"status": "ok"}
 
     def push_multi_key(self, **user_info):
         """
@@ -318,12 +318,15 @@ class Tasks(Command):
 
         return {"status": "failed", "msg": self.msg} if self.msg else {"status": "ok"}
 
-    def add_user(self, username, password):
+    def add_user(self, username, password=''):
         """
         add a host user.
         """
-        encrypt_pass = sha512_crypt.encrypt(password)
-        module_args = 'name=%s shell=/bin/bash password=%s' % (username, encrypt_pass)
+        if password:
+            encrypt_pass = sha512_crypt.encrypt(password)
+            module_args = 'name=%s shell=/bin/bash password=%s' % (username, encrypt_pass)
+        else:
+            module_args = 'name=%s shell=/bin/bash' % username
         self.__run(module_args, "user")
 
         return {"status": "failed", "msg": self.msg} if self.msg else {"status": "ok"}

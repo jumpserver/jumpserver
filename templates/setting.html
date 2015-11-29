@@ -49,7 +49,7 @@
                                                 <input name="setting" value="default" style="display: none">
                                                 <div class="col-sm-8">
                                                     <input id="username" name="username" placeholder="Username" type="text" value="{{ setting_default.field1 }}" class="form-control">
-                                                    <span class="help-block m-b-none">该用户为root或用户NOPASS:ALL sudo权限的用户</span>
+                                                    <span class="help-block m-b-none"> 管理用户为root或用户拥有NOPASSWD:ALL sudo权限的用户</span>
                                                 </div>
                                             </div>
                                             <div class="hr-line-dashed"></div>
@@ -128,13 +128,13 @@
                 tip: "输入端口号",
                 ok: "",
                 msg: {required: "端口号必填"}
-            },
-            "key": {
-                rule: "required(either)",
-                tip: "输入密钥",
-                ok: "",
-                msg: {required: "密码和密钥必填一个!"}
             }
+{#            "key": {#}
+{#                rule: "required(either)",#}
+{#                tip: "输入密钥",#}
+{#                ok: "",#}
+{#                msg: {required: "密码和密钥必填一个!"}#}
+{#            }#}
         },
         valid: function(form) {
                 form.submit();

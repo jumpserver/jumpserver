@@ -5,7 +5,7 @@ import ast
 import time
 
 from django import template
-# from jperm.models import CmdGroup
+from jperm.models import PermPush
 from jumpserver.api import *
 from jasset.models import AssetAlias
 
@@ -259,3 +259,16 @@ def role_contain_which_sudos(role):
     sudo_names = [sudo.name for sudo in role.sudo.all()]
     return ','.join(sudo_names)
 
+
+@register.filter(name='get_push_info')
+def get_push_info(push_id, arg):
+    push = get_object(PermPush, id=push_id)
+    if push and arg:
+        if arg == 'asset':
+            return [asset.hostname for asset in push.asset.all()]
+        if arg == 'asset_group':
+            return [asset_group.name for asset_group in push.asset_group.all()]
+        if arg == 'role':
+            return [role.name for role in push.role.all()]
+    else:
+        return []
