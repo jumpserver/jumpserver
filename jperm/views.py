@@ -106,6 +106,19 @@ def perm_rule_add(request):
             # 获取授予的角色列表
             roles_obj = [PermRole.objects.get(id=role_id) for role_id in roles_select]
 
+            for role in roles_obj:
+                push_assets_or_group = get_role_push_host(role=role, raw=True)
+                push_assets = push_assets_or_group.get('asset')
+                push_asset_groups = push_assets_or_group.get('asset_group')
+                no_push_assets = set(assets_obj) - set(push_assets)
+                no_push_asset_groups = set(asset_groups_obj) - set(push_asset_groups)
+                if no_push_assets:
+                    raise ServerError(u'没有推送角色 %s 的主机 %s'
+                                      % (role.name, ','.join([asset.hostname for asset in no_push_assets])))
+                elif no_push_asset_groups:
+                    raise ServerError(u'没有推送角色 %s 的主机组 %s'
+                                      % (role.name, ','.join(asset_group.name for asset_group in no_push_asset_groups)))
+
             # 仅授权成功的，写回数据库(授权规则,用户,用户组,资产,资产组,用户角色)
             rule = PermRule(name=rule_name, comment=rule_comment)
             rule.save()
@@ -117,7 +130,6 @@ def perm_rule_add(request):
             rule.save()
 
             msg = u"添加授权规则：%s" % rule.name
-            # 渲染数据
             return HttpResponseRedirect('/jperm/rule/')
         except ServerError, e:
             error = e
@@ -465,7 +477,6 @@ def perm_role_push(request):
         os.remove(add_sudo_script)
 
         print ret
-
         # 结果汇总统计
         if ret_failed:
             # 推送失败

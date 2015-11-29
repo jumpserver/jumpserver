@@ -266,7 +266,7 @@ def get_role_info(role_id, type="all"):
         return u"不支持的查询"
 
 
-def get_role_push_host(role):
+def get_role_push_host(role, raw=False):
     """
     get the role push host
     :return: the asset object
@@ -282,6 +282,8 @@ def get_role_push_host(role):
         group_assets.extend(asset_group.asset_set.all())
     cacl_assets = set(assets) | set(group_assets)
 
+    if raw:
+        return {'asset': cacl_assets, 'asset_group': set(asset_groups)}
     # 计算所有主机 在push记录里面的 使用密码和使用秘钥状况
     result = []
     for asset in cacl_assets:

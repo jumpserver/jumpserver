@@ -136,25 +136,21 @@ $('#ruleForm').validator({
         "rulename": {
             rule: "required;check_name",
             tip: "输入规则名称",
-            ok: "",
             msg: {required: "规则名称必填"}
         },
         "usergroup": {
             rule: "required(check_user)",
             tip: "请选择用户组",
-            ok: "",
             msg: {required: "用户和用户组必选一个!"}
         },
         "assetgroup": {
             rule: "required(check_asset)",
             tip: "输入资产组",
-            ok: "",
             msg: {required: "资产和资产组必选一个!"}
         },
         "role": {
             rule: "required",
             tip: "请选择角色",
-            ok: "",
             msg: {required: "必须选择角色"}
         }
     },
