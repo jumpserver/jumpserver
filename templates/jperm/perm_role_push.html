@@ -38,7 +38,7 @@
                                 <div class="col-sm-8">
                                     <select name="assets" id="assets" data-placeholder="请选择资产" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for asset in assets %}
-                                            <option value="{{ asset.ip }}">{{ asset.ip }}</option>
+                                            <option value="{{ asset.id }}">{{ asset.ip }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -49,7 +49,7 @@
                                 <div class="col-sm-8">
                                     <select name="asset_groups" data-placeholder="请选择资产组" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for asset_group in asset_groups %}
-                                            <option value="{{ asset_group.name }}">{{ asset_group.name }}</option>
+                                            <option value="{{ asset_group.id }}">{{ asset_group.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -60,7 +60,7 @@
                                 <div class="col-sm-8">
                                     <select name="roles" data-placeholder="请选择角色" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for role in roles %}
-                                            <option value="{{ role.name }}">{{ role.name }}</option>
+                                            <option value="{{ role.id }}">{{ role.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -124,13 +124,11 @@ $('#pushForm').validator({
         "asset_groups": {
             rule: "required(check_asset)",
             tip: "输入资产组",
-            ok: "",
             msg: {required: "资产和资产组必选一个!"}
         },
         "roles": {
             rule: "required",
             tip: "请选择角色",
-            ok: "",
             msg: {required: "必须选择角色"}
         }
     },

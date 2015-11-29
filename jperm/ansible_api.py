@@ -326,7 +326,7 @@ class Tasks(Command):
         module_args = 'name=%s shell=/bin/bash password=%s' % (username, encrypt_pass)
         self.__run(module_args, "user")
 
-        return {"status": "failed","msg": self.msg} if self.msg else {"status": "ok"}
+        return {"status": "failed", "msg": self.msg} if self.msg else {"status": "ok"}
 
     def add_multi_user(self, **user_info):
         """
@@ -438,7 +438,7 @@ class Tasks(Command):
         use template to render pushed sudoers file
         :return:
         """
-        module_args1 = 'test'
+        module_args1 = file_path
         ret1 = self.__run(module_args1, "script")
         module_args2 = 'visudo -c | grep "parsed OK" &> /dev/null && echo "ok" || echo "failed"'
         ret2 = self.__run(module_args2, "shell")
@@ -456,6 +456,7 @@ class Tasks(Command):
             result["step2"] = "failed"
 
         return result
+
 
 class CustomAggregateStats(callbacks.AggregateStats):
     """                                                                             

@@ -22,6 +22,7 @@ class SysUser(models.Model):
 class PermSudo(models.Model):
     name = models.CharField(max_length=100, unique=True)
     date_added = models.DateTimeField(auto_now=True)
+    runas = models.CharField(max_length=200, default='root')
     commands = models.TextField()
     comment = models.CharField(max_length=100, null=True, blank=True, default='')
 
