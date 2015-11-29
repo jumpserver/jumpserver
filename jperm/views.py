@@ -466,12 +466,12 @@ def perm_role_push(request):
                 ret_failed["step2-2"] = "failed"
 
         # 3. 推送sudo配置文件
-        role_chosen_aliase = {}  # {'dev': [sudo1, sudo2], 'sa': [sudo2, sudo3]}
+        role_chosen_aliase = {}  # {'dev': 'NETWORKING, SHUTDOWN', 'sa': 'NETWORKING, SHUTDOWN'}
         sudo_alias = set()     # set(sudo1, sudo2, sudo3)
         for role in roles_obj:
             sudos = set([sudo for sudo in role.sudo.all()])
             sudo_alias.update(sudos)
-            role_chosen_aliase[role.name] = sudos
+            role_chosen_aliase[role.name] = ','.join(sudo.name for sudo in sudos)
         add_sudo_script = get_add_sudo_script(role_chosen_aliase, sudo_alias)
         ret_sudo = task.push_sudo_file(add_sudo_script)
 
@@ -533,14 +533,13 @@ def perm_sudo_add(request):
     if request.method == "POST":
         # 获取参数： name, comment
         name = request.POST.get("sudo_name").strip()
-        runas = request.POST.get('sudo_runas', 'root').strip()
         comment = request.POST.get("sudo_comment").strip()
         commands = request.POST.get("sudo_commands").strip()
 
         if get_object(PermSudo, name=name):
             error = 'Sudo别名 %s已经存在' % name
         else:
-            sudo = PermSudo(name=name.strip(), runas=runas, comment=comment, commands=commands.strip())
+            sudo = PermSudo(name=name.strip(), comment=comment, commands=commands.strip())
             sudo.save()
             msg = u"添加Sudo命令别名: %s" % name
         # 渲染数据
@@ -564,11 +563,9 @@ def perm_sudo_edit(request):
     if request.method == "POST":
         name = request.POST.get("sudo_name")
         commands = request.POST.get("sudo_commands")
-        runas = request.POST.get('sudo_runas', 'root')
         comment = request.POST.get("sudo_comment")
         sudo.name = name.strip()
         sudo.commands = commands.strip()
-        sudo.runas = runas.strip()
         sudo.comment = comment
         sudo.save()
 

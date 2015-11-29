@@ -17,14 +17,12 @@ add_cmd_alias() {
 
 
 add_role_chosen() {
-    {% for role, sudos in role_chosen_aliase.items %}
-        {% for sudo in sudos %}
-        if $(grep '^{{ role }}.*sudo.name' ${sudo_file} &> /dev/null); then
-            sed -i 's@^{{ role }}.*sudo.name@{{ role }} ALL = ({{ sudo.runas }}) NOPASSWD: {{ sudo.name }}@g' ${sudo_file}
+    {% for role, alias in role_chosen_aliase.items %}
+        if $(grep '^{{ role }}.*' ${sudo_file} &> /dev/null); then
+            sed -i 's@^{{ role }}.*@{{ role }} ALL =  NOPASSWD: {{ alias }}@g' ${sudo_file}
         else
-            echo "{{ role }} ALL = ({{ sudo.runas }}) NOPASSWD: {{ sudo.name }}"  >> ${sudo_file}
+            echo "{{ role }} ALL =  NOPASSWD: {{ alias }}"  >> ${sudo_file}
         fi
-        {% endfor %}
     {% endfor %}
 }
 
