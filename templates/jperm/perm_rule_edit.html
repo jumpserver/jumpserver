@@ -45,7 +45,7 @@
                                 <div class="col-sm-8">
                                     <select name="user" data-placeholder="用户名" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for user in users %}
-                                            <option value="{{ user.name }}" {% if user in users_select %} selected {%  endif %}>{{ user.name }}</option>
+                                            <option value="{{ user.id }}" {% if user in users_select %} selected {%  endif %}>{{ user.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -56,7 +56,7 @@
                                 <div class="col-sm-8">
                                     <select name="usergroup" data-placeholder="请选择用户组" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for user_group in user_groups %}
-                                            <option value="{{ user_group.name }}"{% if user_group in users_groups_select %} selected {% endif %}>{{ user_group.name }}</option>
+                                            <option value="{{ user_group.id }}"{% if user_group in user_groups_select %} selected {% endif %}>{{ user_group.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -67,7 +67,7 @@
                                 <div class="col-sm-8">
                                     <select name="asset" data-placeholder="请选择资产" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for asset in assets %}
-                                            <option value="{{ asset.ip }}"{% if asset in assets_select %} selected {% endif %}>{{ asset.ip }}</option>
+                                            <option value="{{ asset.id }}"{% if asset in assets_select %} selected {% endif %}>{{ asset.ip }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -78,7 +78,7 @@
                                 <div class="col-sm-8">
                                     <select name="assetgroup" data-placeholder="请选择资产组" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for asset_group in asset_groups %}
-                                            <option value="{{ asset_group.name }}"{% if asset_group in asset_groups_select %} selected {% endif %}>{{ asset_group.name }}</option>
+                                            <option value="{{ asset_group.id }}"{% if asset_group in asset_groups_select %} selected {% endif %}>{{ asset_group.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -89,7 +89,7 @@
                                 <div class="col-sm-8">
                                     <select name="role" data-placeholder="请选择角色" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for role in roles %}
-                                            <option value="{{ role.name }}"{% if role in roles_select %} selected {% endif %}>{{ role.name }}</option>
+                                            <option value="{{ role.id }}"{% if role in roles_select %} selected {% endif %}>{{ role.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -118,37 +118,6 @@
 {% endblock %}
 {% block self_footer_js %}
 <script>
-$(document).ready(function(){
-    $("input.role").click(function(){
-        if($("input.role[value=GA]").is( ":checked" )){
-            $("#admin_groups").css("display", 'none');
-        }
-        else {
-
-            $("#admin_groups").css("display", 'block');
-        }
-    });
-
-    $('#use_password').click(function(){
-        if ($(this).is(':checked')){
-            $('#admin_account_password').css('display', 'block')
-        }
-        else {
-
-            $('#admin_account_password').css('display', 'none')
-        }
-    });
-
-    $('#use_publicKey').click(function(){
-        if ($(this).is(':checked')){
-
-            $('#admin_account_publicKey').css('display', 'block')
-        }
-        else {
-            $('#admin_account_publicKey').css('display', 'none')
-        }
-    });
-});
 
 var config = {
                 '.chosen-select'           : {},

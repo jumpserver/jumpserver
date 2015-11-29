@@ -96,22 +96,20 @@ def gen_sudo(role_custom, role_name, role_chosen):
     return sudo_file_path
 
 
-def get_add_sudo_script(sudo_chosen_aliase, sudo_chosen_obj):
+def get_add_sudo_script(role_chosen_aliase, sudo_alias):
     """
     get the sudo file
     :param kwargs:
     :return:
     """
     sudo_j2 = get_template('jperm/role_sudo.j2')
-    sudo_content = sudo_j2.render(Context({"sudo_chosen_aliase": sudo_chosen_aliase,
-                                           "sudo_chosen_obj": sudo_chosen_obj}))
+    sudo_content = sudo_j2.render(Context({"role_chosen_aliase": role_chosen_aliase,
+                                           "sudo_alias": sudo_alias}))
     sudo_file = NamedTemporaryFile(delete=False)
     sudo_file.write(sudo_content)
     sudo_file.close()
     print(sudo_file.name)
     return sudo_file.name
-
-
 
 if __name__ == "__main__":
     print gen_keys()

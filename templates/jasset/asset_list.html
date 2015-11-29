@@ -31,7 +31,7 @@
                         <div class="col-sm-7" style="padding-left: 0px">
                             <label>
                                 <select name="idc" class="form-control m-b" onchange="change_info()">
-                                    <option value="">IDC机房</option>
+                                    <option value="">机房</option>
                                     {% for idc in idc_all %}
                                         {% ifequal idc.name idc_name %}
                                             <option value="{{idc.name}}" selected> {{ idc.name }}</option>
@@ -57,7 +57,7 @@
 
                             <label>
                                 <select name="asset_type" class="form-control m-b" onchange="change_info()">
-                                    <option value="">所有类型</option>
+                                    <option value="">资产类型</option>
                                     {% for type in asset_types %}
                                         {% ifequal type.0|int2str asset_type %}
                                             <option value="{{ type.0 }}" selected> {{ type.1 }}</option>
@@ -70,7 +70,7 @@
 
                             <label>
                                 <select name="status" class="form-control m-b" onchange="change_info()">
-                                    <option value="">所有状态</option>
+                                    <option value="">资产状态</option>
                                     {% for s in asset_status %}
                                         {% ifequal s.0|int2str status %}
                                             <option value="{{ s.0 }}" selected> {{ s.1 }}</option>
@@ -215,7 +215,7 @@
                             maxmin: true,
                             shade: false,
                             area: ['628px', '452px'],
-                            content: new_url
+                            content: new_url+data
                         });
                         //window.open(new_url + data, '', 'location=no, resizeable=no, height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,status=no');
                     } else if (dataArray.length == '1' && data == 'error'){

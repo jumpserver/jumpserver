@@ -56,11 +56,11 @@
                             </div>
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
-                                <label for="sudo" class="col-sm-2 control-label">角色Sudo命令<span class="red-fonts">*</span></label>
+                                <label for="sudo" class="col-sm-2 control-label">角色Sudo命令</label>
                                 <div class="col-sm-8" id="sudo_name">
                                     <select name="sudo_name" data-placeholder="请选择Sudo别名" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for sudo in sudos %}
-                                            <option >{{ sudo.name }}</option>
+                                            <option  value="{{ sudo.id }}">{{ sudo.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -93,9 +93,9 @@ $('#roleForm').validator({
     theme: "yellow_right_effect",
     rules: {
         check_name: [/^\w{2,20}$/, '大小写字母数字和下划线,2-20位'],
-        either: function(){
-            return $('#role_password').val() == ''
-        }
+{#        either: function(){#}
+{#            return $('#role_password').val() == ''#}
+{#        }#}
     },
 
     fields: {
@@ -105,12 +105,12 @@ $('#roleForm').validator({
             ok: "",
             msg: {required: "角色名称必填"}
         },
-        "role_key": {
-            rule: "required(either)",
-            tip: "输入密钥",
-            ok: "",
-            msg: {required: "密码和密钥必填一个!"}
-        }
+{#        "role_key": {#}
+{#            rule: "required(either)",#}
+{#            tip: "输入密钥",#}
+{#            ok: "",#}
+{#            msg: {required: "密码和密钥必填一个!"}#}
+{#        }#}
     },
     valid: function(form) {
             form.submit();

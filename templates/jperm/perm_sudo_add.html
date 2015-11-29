@@ -36,9 +36,17 @@
                             </div>
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
-                                <label for="sudo_commands_label" class="col-sm-2 control-label">系统命令<span class="red-fonts">*</span></label>
+                                <label for="sudo_runas" class="col-sm-2 control-label">RunAs<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <textarea id="sudo_commands" name="sudo_commands" class="form-control" rows="3"></textarea>
+                                    <input id="sudo_runas" name="sudo_runas" placeholder="Sudo RunAs User" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label for="sudo_commands" class="col-sm-2 control-label">系统命令<span class="red-fonts">*</span></label>
+                                <div class="col-sm-8">
+                                    <textarea id="sudo_commands" name="sudo_commands" class="form-control" rows="3" placeholder="/bin/grep, /bin/find"></textarea>
+                                    <span class="help-block m-b-none">sudo命令，逗号分隔, 不支持换行</span>
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
@@ -64,7 +72,28 @@
 {% endblock %}
 {% block self_footer_js %}
 <script>
+$('#sudoForm').validator({
+    timely: 2,
+    theme: "yellow_right_effect",
+    rules: {
+        check_name: [/^\w{2,20}$/, '大小写字母数字和下划线,2-20位']
+    },
 
+    fields: {
+        "sudo_name": {
+            rule: "required;check_name"
+        },
+        "sudo_runas": {
+            rule: "required;check_name"
+        },
+        "sudo_commands": {
+            rule: "required"
+        }
+    },
+    valid: function(form) {
+            form.submit();
+        }
+});
 </script>
 {% endblock %}
 

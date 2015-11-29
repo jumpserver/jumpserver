@@ -61,7 +61,7 @@
                                 <div class="col-sm-8">
                                     <select name="sudo_name" data-placeholder="请选择Sudo别名" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for sudo in sudo_all %}
-                                            <option value="{{ sudo.name }}" {% if sudo in role_sudos %} selected {% endif %}>{{ sudo.name }}</option>
+                                            <option value="{{ sudo.id }}" {% if sudo in role_sudos %} selected {% endif %}>{{ sudo.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>

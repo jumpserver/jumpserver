@@ -26,7 +26,7 @@
                         </div>
                     </div>
                     <div class="ibox-content">
-                        <form method="post" id="userForm" class="form-horizontal" action="">
+                        <form method="post" id="pushForm" class="form-horizontal" action="">
                             {% if error %}
                                 <div class="alert alert-warning text-center">{{ error }}</div>
                             {% endif %}
@@ -34,22 +34,22 @@
                                 <div class="alert alert-success text-center">{{ msg }}</div>
                             {% endif %}
                             <div class="form-group">
-                                <label for="asset" class="col-sm-2 control-label">资产<span class="red-fonts">*</span></label>
+                                <label for="asset" class="col-sm-2 control-label">资产</label>
                                 <div class="col-sm-8">
-                                    <select name="assets" data-placeholder="请选择资产" class="chosen-select form-control m-b" multiple  tabindex="2">
+                                    <select name="assets" id="assets" data-placeholder="请选择资产" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for asset in assets %}
-                                            <option value="{{ asset.ip }}">{{ asset.ip }}</option>
+                                            <option value="{{ asset.id }}">{{ asset.ip }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
-                                <label for="assetgroup" class="col-sm-2 control-label">资产组<span class="red-fonts">*</span></label>
+                                <label for="assetgroup" class="col-sm-2 control-label">资产组</label>
                                 <div class="col-sm-8">
                                     <select name="asset_groups" data-placeholder="请选择资产组" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for asset_group in asset_groups %}
-                                            <option value="{{ asset_group.name }}">{{ asset_group.name }}</option>
+                                            <option value="{{ asset_group.id }}">{{ asset_group.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -60,7 +60,7 @@
                                 <div class="col-sm-8">
                                     <select name="roles" data-placeholder="请选择角色" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for role in roles %}
-                                            <option value="{{ role.name }}">{{ role.name }}</option>
+                                            <option value="{{ role.id }}">{{ role.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -68,11 +68,11 @@
                             <div class="hr-line-dashed"></div>
                             <div class="row">
                                 <div class="form-group">
-                                    <label for="j_group" class="col-sm-2 control-label">使用秘钥</label>
+                                    <label for="j_group" class="col-sm-2 control-label">使用密钥</label>
                                     <div class="col-sm-1">
                                         <div class="radio i-checks">
                                             <label>
-                                                <input type="checkbox" value="1" id="use_publicKey" name="use_publicKey">
+                                                <input type="checkbox" value="1" id="use_publicKey" name="use_publicKey" checked>
                                             </label>
                                         </div>
                                     </div>
@@ -111,37 +111,33 @@
 {% endblock %}
 {% block self_footer_js %}
 <script>
-$(document).ready(function(){
-    $("input.role").click(function(){
-        if($("input.role[value=GA]").is( ":checked" )){
-            $("#admin_groups").css("display", 'none');
+$('#pushForm').validator({
+    timely: 2,
+    theme: "yellow_right_effect",
+    rules: {
+        check_name: [/^\w{2,20}$/, '大小写字母数字和下划线,2-20位'],
+        check_asset: function(){
+            return $('#assets').val() == null
         }
-        else {
-
-            $("#admin_groups").css("display", 'block');
+    },
+    fields: {
+        "asset_groups": {
+            rule: "required(check_asset)",
+            tip: "输入资产组",
+            msg: {required: "资产和资产组必选一个!"}
+        },
+        "roles": {
+            rule: "required",
+            tip: "请选择角色",
+            msg: {required: "必须选择角色"}
         }
-    });
-
-    $('#use_password').click(function(){
-        if ($(this).is(':checked')){
-            $('#admin_account_password').css('display', 'block')
+    },
+    valid: function(form) {
+            form.submit();
         }
-        else {
-
-            $('#admin_account_password').css('display', 'none')
-        }
-    });
-
-    $('#use_publicKey').click(function(){
-        if ($(this).is(':checked')){
-
-            $('#admin_account_publicKey').css('display', 'block')
-        }
-        else {
-            $('#admin_account_publicKey').css('display', 'none')
-        }
-    });
 });
+
+
 
 var config = {
                 '.chosen-select'           : {},
