@@ -410,25 +410,8 @@ def perm_role_push(request):
         for asset_group in asset_groups_obj:
             group_assets_obj.extend(asset_group.asset_set.all())
         calc_assets = list(set(assets_obj) | set(group_assets_obj))
-
-        # 生成Inventory
-        # push_resource = []
-        # for asset in calc_assets:
-        #     if asset.use_default_auth:
-        #         username = Setting.field1
-        #         port = Setting.field2
-        #         password = Setting.field3
-        #     else:
-        #         username = asset.username
-        #         password = asset.password
-        #         port = asset.port
-        #     push_resource.append({"hostname": asset.ip,
-        #                           "port": port,
-        #                           "username": username,
-        #                           "password": password})
         push_resource = gen_resource(calc_assets)
-
-        logger.debug('推送role res: %s' % push_resource)
+        logger.debug('Push role res: %s' % push_resource)
 
         # 调用Ansible API 进行推送
         password_push = True if request.POST.get("use_password") else False
@@ -463,7 +446,7 @@ def perm_role_push(request):
 
             if ret['sudo'].get('msg'):
                 ret_failed = ret['sudo'].get('msg')
-            os.remove(add_sudo_script)
+            # os.remove(add_sudo_script)
 
         logger.debug('推送role结果: %s' % ret)
         logger.debug('推送role错误: %s' % ret_failed)

@@ -1,11 +1,12 @@
 #!/bin/bash
 
 
-sudo_file=/etc/sudoers
-
+real_file=/etc/sudoers
+tmp_file=$(mktemp /tmp/XXXXXXX)
 
 # Add Command Aliases
 add_cmd_alias() {
+    sudo_file=$1
     {% for sudo in sudo_alias %}
     if $(grep '^Cmnd_Alias {{ sudo.name }}' ${sudo_file} &> /dev/null); then
         sed -i 's@^Cmnd_Alias.*{{ sudo.name }}.*@Cmnd_Alias {{ sudo.name }} = {{ sudo.commands }}@g' ${sudo_file}
@@ -17,6 +18,7 @@ add_cmd_alias() {
 
 
 add_role_chosen() {
+    sudo_file=$1
     {% for role, alias in role_chosen_aliase.items %}
         if $(grep '^{{ role }}.*' ${sudo_file} &> /dev/null); then
             sed -i 's@^{{ role }}.*@{{ role }} ALL =  NOPASSWD: {{ alias }}@g' ${sudo_file}
@@ -26,6 +28,11 @@ add_role_chosen() {
     {% endfor %}
 }
 
+check_syntax(){
+    visudo -c -f $1
+}
 
-add_cmd_alias
-add_role_chosen
+cp $real_file $tmp_file && add_cmd_alias $tmp_file && add_role_chosen $tmp_file || exit 1
+check_syntax $tmp_file && add_cmd_alias $real_file && add_role_chosen $real_file && rm -f $tmp_file || exit 2
+check_syntax $real_file
+
