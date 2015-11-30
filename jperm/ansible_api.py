@@ -248,6 +248,7 @@ class Tasks(Command):
               forks=10,
               group='default_group',
               pattern='*',
+              become=False,
               ):
         """
         run command from andible ad-hoc.
@@ -261,7 +262,7 @@ class Tasks(Command):
                      subset=group,
                      pattern=pattern,
                      forks=forks,
-                     become=False,
+                     become=become,
                      )
 
         self.results = hoc.run()
@@ -324,7 +325,7 @@ class Tasks(Command):
         """
         encrypt_pass = sha512_crypt.encrypt(password)
         module_args = 'name=%s shell=/bin/bash password=%s' % (username, encrypt_pass)
-        self.__run(module_args, "user")
+        self.__run(module_args, "user", become=True)
 
         return {"status": "failed", "msg": self.msg} if self.msg else {"status": "ok"}
 
@@ -402,7 +403,7 @@ class Tasks(Command):
           default_mac is string
           product_name is string
         """
-        self.__run('', 'setup')
+        self.__run('', 'setup', become=True)
 
         result = {}
         all = self.results.get("contacted")
@@ -439,21 +440,8 @@ class Tasks(Command):
         :return:
         """
         module_args1 = file_path
-        ret1 = self.__run(module_args1, "script")
-        module_args2 = 'visudo -c | grep "parsed OK" &> /dev/null && echo "ok" || echo "failed"'
-        ret2 = self.__run(module_args2, "shell")
-        ret2_status = [host_value.get("stdout") for host_value in ret2["result"]["contacted"].values()]
-
-        result = {}
-        if not ret1["msg"]:
-            result["step1"] = "ok"
-        else:
-            result["step1"] = "failed"
-
-        if not ret2["msg"] and "failed" not in ret2_status:
-            result["step2"] = "ok"
-        else:
-            result["step2"] = "failed"
+        result = self.__run(module_args1, "script")
+        print result
 
         return result
 

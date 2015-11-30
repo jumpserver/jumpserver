@@ -2,7 +2,11 @@
 
 
 sudo_file=/etc/sudoers
+sudo_file_bak=/etc/sudoers.bak
 
+
+# Backup sudoers file
+cp ${sudo_file} ${sudo_file_bak}
 
 # Add Command Aliases
 add_cmd_alias() {
@@ -16,18 +20,33 @@ add_cmd_alias() {
 }
 
 
+# Add Command Aliases to role
 add_role_chosen() {
     {% for role, sudos in role_chosen_aliase.items %}
         {% for sudo in sudos %}
-        if $(grep '^{{ role }}.*sudo.name' ${sudo_file} &> /dev/null); then
-            sed -i 's@^{{ role }}.*sudo.name@{{ role }} ALL = ({{ sudo.runas }}) NOPASSWD: {{ sudo.name }}@g' ${sudo_file}
+        if $(grep '^{{ role }}.*{{ sudo.name }}' ${sudo_file} &> /dev/null); then
+            sed -i 's@^{{ role }}.*{{ sudo.name }}@{{ role }} ALL = NOPASSWD: {{ sudo.name }}@g' ${sudo_file}
         else
-            echo "{{ role }} ALL = ({{ sudo.runas }}) NOPASSWD: {{ sudo.name }}"  >> ${sudo_file}
+            echo "{{ role }} ALL = NOPASSWD: {{ sudo.name }}"  >> ${sudo_file}
         fi
         {% endfor %}
     {% endfor %}
 }
 
+# Check sudoers file configured correctly
+check_sudo_file() {
+    status=$(visudo -c &> /dev/null && echo "ok" || echo "failed")
+    if [ ${status} == "failed" ]; then
+        mv ${sudo_file_bak} ${sudo_file}
+        ret="failed"
+    else
+        ret="ok"
+    fi
+}
+
 
 add_cmd_alias
 add_role_chosen
+check_sudo_file
+
+echo ${ret}

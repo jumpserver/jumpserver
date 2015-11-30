@@ -463,9 +463,8 @@ def perm_role_push(request):
         add_sudo_script = get_add_sudo_script(role_chosen_aliase, sudo_alias)
         ret_sudo = task.push_sudo_file(add_sudo_script)
 
-        if ret_sudo["step1"] != "ok" or ret_sudo["step2"] != "ok":
-            ret_failed["step3"] = "failed"
-        os.remove(add_sudo_script)
+        print add_sudo_script
+        # os.remove(add_sudo_script)
 
         print ret
 
