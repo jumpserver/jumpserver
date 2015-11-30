@@ -94,8 +94,8 @@ def perm_rule_add(request):
             # 获取需要授权的主机列表
             assets_obj = [Asset.objects.get(id=asset_id) for asset_id in assets_select]
             asset_groups_obj = [AssetGroup.objects.get(id=group_id) for group_id in asset_groups_select]
-            # group_assets_obj = [asset for asset in [group.asset_set.all() for group in asset_groups_obj]]
-            # calc_assets = set(group_assets_obj) | set(assets_obj)
+            group_assets_obj = [asset for asset in [group.asset_set.all() for group in asset_groups_obj]]
+            calc_assets = set(group_assets_obj) | set(assets_obj)
 
             # 获取需要授权的用户列表
             users_obj = [User.objects.get(id=user_id) for user_id in users_select]
@@ -105,19 +105,13 @@ def perm_rule_add(request):
 
             # 获取授予的角色列表
             roles_obj = [PermRole.objects.get(id=role_id) for role_id in roles_select]
-
+            need_push_asset = set()
             for role in roles_obj:
-                push_assets_or_group = get_role_push_host(role=role, raw=True)
-                push_assets = push_assets_or_group.get('asset')
-                push_asset_groups = push_assets_or_group.get('asset_group')
-                no_push_assets = set(assets_obj) - set(push_assets)
-                no_push_asset_groups = set(asset_groups_obj) - set(push_asset_groups)
-                if no_push_assets:
+                asset_no_push = get_role_push_host(role=role)[1]
+                need_push_asset.update(set(calc_assets) - set(asset_no_push))
+                if need_push_asset:
                     raise ServerError(u'没有推送角色 %s 的主机 %s'
-                                      % (role.name, ','.join([asset.hostname for asset in no_push_assets])))
-                elif no_push_asset_groups:
-                    raise ServerError(u'没有推送角色 %s 的主机组 %s'
-                                      % (role.name, ','.join(asset_group.name for asset_group in no_push_asset_groups)))
+                                      % (role.name, ','.join([asset.hostname for asset in need_push_asset])))
 
             # 仅授权成功的，写回数据库(授权规则,用户,用户组,资产,资产组,用户角色)
             rule = PermRule(name=rule_name, comment=rule_comment)
@@ -264,10 +258,7 @@ def perm_role_add(request):
             if get_object(PermRole, name=name):
                 raise ServerError('已经存在该用户 %s' % name)
             default = get_object(Setting, name='default')
-            if default and name == default.field1:
-                raise ServerError('与默认管理账号同名')
-            if name == 'root':
-                raise ServerError('不能为root')
+
             if password:
                 encrypt_pass = CRYPTOR.encrypt(password)
             else:
@@ -336,7 +327,7 @@ def perm_role_detail(request):
         asset_groups = role_info.get("asset_groups")
         users = role_info.get("users")
         user_groups = role_info.get("user_groups")
-        push_info = get_role_push_host(PermRole.objects.get(id=role_id))
+        pushed_asset, need_push_asset = get_role_push_host(get_object(PermRole, id=role_id))
 
         return my_render('jperm/perm_role_detail.html', locals(), request)
 
@@ -440,8 +431,8 @@ def perm_role_push(request):
         logger.debug('推送role res: %s' % push_resource)
 
         # 调用Ansible API 进行推送
-        password_push = request.POST.get("use_password")
-        key_push = request.POST.get("use_publicKey")
+        password_push = True if request.POST.get("use_password") else False
+        key_push = True if request.POST.get("use_publicKey") else False
         task = Tasks(push_resource)
         ret = {}
         ret_failed = {}
@@ -451,43 +442,57 @@ def perm_role_push(request):
         if password_push:
             ret["password_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
             if ret["password_push"].get("status") != "success":
-                ret_failed["step1"] == "failed"
+                ret_failed = ret["password_push"].get('msg')
 
         # 2. 以秘钥 方式推送角色
         if key_push:
             ret["password_push"] = task.add_user(role.name)
             if ret["password_push"].get("status") != "ok":
-                ret_failed["step2-1"] = "failed"
+                ret_failed = ret["password_push"].get('msg')
             ret["key_push"] = task.push_key(role.name, os.path.join(role.key_path, 'id_rsa.pub'))
             if ret["key_push"].get("status") != "ok":
-                ret_failed["step2-2"] = "failed"
+                ret_failed = ret["key_push"].get('msg')
 
         # 3. 推送sudo配置文件
-        role_chosen_aliase = {}  # {'dev': 'NETWORKING, SHUTDOWN'}
-        sudo_alias = set([sudo for sudo in role.sudo.all()])  # set(sudo1, sudo2, sudo3)
-        role_chosen_aliase[role.name] = ','.join(sudo.name for sudo in sudo_alias)
-        add_sudo_script = get_add_sudo_script(role_chosen_aliase, sudo_alias)
-        ret['sudo'] = task.push_sudo_file(add_sudo_script)
+        if password_push or key_push:
+            role_chosen_aliase = {}  # {'dev': 'NETWORKING, SHUTDOWN'}
+            sudo_alias = set([sudo for sudo in role.sudo.all()])  # set(sudo1, sudo2, sudo3)
+            role_chosen_aliase[role.name] = ','.join(sudo.name for sudo in sudo_alias)
+            add_sudo_script = get_add_sudo_script(role_chosen_aliase, sudo_alias)
+            ret['sudo'] = task.push_sudo_file(add_sudo_script)
 
-        if ret['sudo']["step1"] != "ok" or ret['sudo']["step2"] != "ok":
-            ret_failed["step3"] = "failed"
-        os.remove(add_sudo_script)
+            if ret['sudo'].get('msg'):
+                ret_failed = ret['sudo'].get('msg')
+            os.remove(add_sudo_script)
 
         logger.debug('推送role结果: %s' % ret)
-        # 结果汇总统计
-        if ret_failed:
-            # 推送失败
-            error = u"推送失败, 原因: %s 失败" % ','.join(ret_failed.keys())
-        else:
-            # 推送成功 回写push表
-            msg = u"推送系统角色： %s" % ','.join(role_chosen_aliase.keys())
-            push = PermPush(is_public_key=bool(key_push), is_password=bool(password_push))
-            push.save()
-            push.asset_group = asset_groups_obj
-            push.asset = calc_assets
-            push.role = role
-            push.save()
+        logger.debug('推送role错误: %s' % ret_failed)
 
+        success_asset = []
+        failed_asset = []
+        # 推送成功 回写push表
+        for asset in calc_assets:
+            push_check = PermPush.objects.filter(role=role, asset=asset)
+            if push_check:
+                func = push_check.update
+            else:
+                def func(**kwargs):
+                    PermPush(**kwargs).save()
+
+            if ret_failed.get(asset.hostname):
+                failed_asset.append(asset)
+                func(is_password=password_push, is_public_key=key_push, role=role, asset=asset, success=False,
+                     result=ret_failed.get(asset.hostname))
+            else:
+                success_asset.append(asset)
+                func(is_password=password_push, is_public_key=key_push, role=role, asset=asset, success=True)
+
+        if not failed_asset:
+            msg = u'角色 %s 推送成功[ %s ]' % (role.name, ','.join([asset.hostname for asset in success_asset]))
+        else:
+            error = u'角色 %s 推送失败 [ %s ], 推送成功 [ %s ]' % (role.name,
+                                                                ','.join([asset.hostname for asset in failed_asset]),
+                                                                ','.join([asset.hostname for asset in success_asset]))
     return my_render('jperm/perm_role_push.html', locals(), request)
 
 
@@ -585,8 +590,4 @@ def perm_sudo_delete(request):
     else:
         return HttpResponse(u"不支持该操作")
 
-
-def role_push_list(request):
-    push_all = PermPush.objects.all()
-    return my_render('jperm/role_push_list.html', locals(), request)
 

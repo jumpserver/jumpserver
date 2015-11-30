@@ -451,12 +451,12 @@ class Tasks(Command):
         if not ret1["msg"]:
             result["step1"] = "ok"
         else:
-            result["step1"] = "failed"
+            result["msg"] = ret1["msg"]
 
         if not ret2["msg"] and "failed" not in ret2_status:
             result["step2"] = "ok"
         else:
-            result["step2"] = "failed"
+            result["msg"] = ret1["msg"]
 
         return result
 

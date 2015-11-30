@@ -6,7 +6,7 @@
     {% include 'nav_cat_bar.html' %}
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
-            <div class="col-lg-4">
+            <div class="col-sm-4">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
                         <span class="label label-primary"><b>授权规则</b></span>
@@ -52,7 +52,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4">
+            <div class="col-sm-4">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
                         <span class="label label-primary"><b>授权用户/用户组</b></span>
@@ -98,7 +98,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-4">
+            <div class="col-sm-4">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
                         <span class="label label-primary"><b>授权主机/主机组</b></span>
@@ -146,7 +146,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-lg-12">
+            <div class="col-sm-4">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
                         <span class="label label-primary"><b>推送主机</b></span>
@@ -175,18 +175,64 @@
                                     <thead>
                                         <tr>
                                             <th class="text-center">主机</th>
-                                            <th class="text-center">主机组</th>
-                                            <th class="text-center">使用密码</th>
-                                            <th class="text-center">使用秘钥</th>
+                                            <th class="text-center">密钥</th>
+                                            <th class="text-center">密码</th>
+                                            <th class="text-center">结果</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    {% for host in push_info %}
+                                    {% for asset, info in pushed_asset.items %}
                                         <tr class="gradeX">
-                                            <td class="text-center"> {{ host.ip }} </td>
-                                            <td class="text-center"> {{ host.group }} </td>
-                                            <td class="text-center"> {{ host.password }} </td>
-                                            <td class="text-center"> {{ host.pubkey }} </td>
+                                            <td class="text-center"> {{ asset.hostname }} </td>
+                                            <td class="text-center"> {{ info.key | yesno:"是,否,未知" }} </td>
+                                            <td class="text-center"> {{ info.password | yesno:"是,否,未知" }} </td>
+                                            {% if info.success %}
+                                            <td class="text-center" style="color: #1ab394;" >{{ info.success | yesno:"成功,失败,未知" }} </td>
+                                            {% else %}
+                                            <td class="text-center" style="color: #ec4758;cursor: help" title="{{ info.result }}" >{{ info.success | yesno:"成功,失败,未知" }} </td>
+                                            {% endif %}
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-primary"><b>未推送主机</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div>
+                            <div class="text-left">
+                                <table class="table table-striped" id="ugedit" >
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">主机</th>
+                                            <th class="text-center">IP</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for asset in need_push_asset %}
+                                        <tr class="gradeX">
+                                            <td class="text-center"> {{ asset.hostname }} </td>
+                                            <td class="text-center"> {{ asset.ip }} </td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>

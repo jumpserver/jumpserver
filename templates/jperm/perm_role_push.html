@@ -45,7 +45,7 @@
                                 <div class="col-sm-8">
                                     <select name="assets" id="assets" data-placeholder="请选择资产" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for asset in assets %}
-                                            <option value="{{ asset.id }}">{{ asset.ip }}</option>
+                                            <option value="{{ asset.id }}" {% if asset in pushed_assets %}selected{% endif %}>{{ asset.hostname }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -56,7 +56,7 @@
                                 <div class="col-sm-8">
                                     <select name="asset_groups" data-placeholder="请选择资产组" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for asset_group in asset_groups %}
-                                            <option value="{{ asset_group.id }}">{{ asset_group.name }}</option>
+                                            <option value="{{ asset_group.id }}"{% if asset_group in pushed_asset_groups %}selected{% endif %}>{{ asset_group.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
