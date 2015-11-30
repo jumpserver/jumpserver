@@ -13,16 +13,9 @@ class PermLog(models.Model):
     is_finish = models.BooleanField(default=False)
 
 
-class SysUser(models.Model):
-    username = models.CharField(max_length=100)
-    password = models.CharField(max_length=100)
-    comment = models.CharField(max_length=100, null=True, blank=True, default='')
-
-
 class PermSudo(models.Model):
     name = models.CharField(max_length=100, unique=True)
     date_added = models.DateTimeField(auto_now=True)
-    runas = models.CharField(max_length=200, default='root')
     commands = models.TextField()
     comment = models.CharField(max_length=100, null=True, blank=True, default='')
 
@@ -57,10 +50,11 @@ class PermRule(models.Model):
 
 
 class PermPush(models.Model):
-    date_added = models.DateTimeField(auto_now=True)
-    asset = models.ManyToManyField(Asset, related_name='perm_push')
-    asset_group = models.ManyToManyField(AssetGroup, related_name='perm_push')
-    role = models.ManyToManyField(PermRole, related_name='perm_push')
+    asset = models.ForeignKey(Asset, related_name='perm_push')
+    role = models.ForeignKey(PermRole, related_name='perm_push')
     is_public_key = models.BooleanField(default=False)
     is_password = models.BooleanField(default=False)
+    success = models.BooleanField(default=False)
+    result = models.TextField()
+    date_added = models.DateTimeField(auto_now=True)
 

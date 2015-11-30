@@ -285,10 +285,10 @@ class Tasks(Command):
         """
         push the ssh authorized key to target.
         """
-        module_args = 'user="%s" key="{{ lookup("file", "%s") }}"' % (user, key_path)
+        module_args = 'user="%s" key="{{ lookup("file", "%s") }}" state=present' % (user, key_path)
         self.__run(module_args, "authorized_key")
 
-        return {"status": "failed","msg": self.msg} if self.msg else {"status": "ok"}
+        return {"status": "failed", "msg": self.msg} if self.msg else {"status": "ok"}
 
     def push_multi_key(self, **user_info):
         """
@@ -319,13 +319,17 @@ class Tasks(Command):
 
         return {"status": "failed", "msg": self.msg} if self.msg else {"status": "ok"}
 
-    def add_user(self, username, password):
+    def add_user(self, username, password=''):
         """
         add a host user.
         """
-        encrypt_pass = sha512_crypt.encrypt(password)
-        module_args = 'name=%s shell=/bin/bash password=%s' % (username, encrypt_pass)
-        self.__run(module_args, "user", become=True)
+
+        if password:
+            encrypt_pass = sha512_crypt.encrypt(password)
+            module_args = 'name=%s shell=/bin/bash password=%s' % (username, encrypt_pass)
+        else:
+            module_args = 'name=%s shell=/bin/bash' % username
+        self.__run(module_args, "user")
 
         return {"status": "failed", "msg": self.msg} if self.msg else {"status": "ok"}
 
@@ -440,8 +444,21 @@ class Tasks(Command):
         :return:
         """
         module_args1 = file_path
-        result = self.__run(module_args1, "script")
-        print result
+        ret1 = self.__run(module_args1, "script")
+        module_args2 = 'visudo -c | grep "parsed OK" &> /dev/null && echo "ok" || echo "failed"'
+        ret2 = self.__run(module_args2, "shell")
+        ret2_status = [host_value.get("stdout") for host_value in ret2["result"]["contacted"].values()]
+
+        result = {}
+        if not ret1["msg"]:
+            result["step1"] = "ok"
+        else:
+            result["msg"] = ret1["msg"]
+
+        if not ret2["msg"] and "failed" not in ret2_status:
+            result["step2"] = "ok"
+        else:
+            result["msg"] = ret1["msg"]
 
         return result
 

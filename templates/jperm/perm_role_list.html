@@ -29,11 +29,10 @@
                         </a>
                     </div>
                 </div>
-
                 <div class="ibox-content">
                     <div class="">
                     <a  href="/jperm/role/perm_role_add/" class="btn btn-sm btn-primary "> 添加角色 </a>
-                    <a  href="/jperm/role/perm_role_push/" class="btn btn-sm btn-danger "> 推送角色 </a>
+{#                    <a  href="/jperm/role/perm_role_push/" class="btn btn-sm btn-danger "> 推送角色 </a>#}
                     <form id="search_form" method="get" action="" class="pull-right mail-search">
                         <div class="input-group">
                             <input type="text" class="form-control input-sm" id="search_input" name="search" placeholder="Search">
@@ -45,14 +44,13 @@
                         </div>
                     </form>
                     </div>
-
                     <table class="table table-striped table-bordered table-hover " id="editable" >
                         <thead>
                             <tr>
                                 <th class="text-center">名称 </th>
-                                <th class="text-center">备注</th>
-                                <th class="text-center">创建时间</th>
                                 <th class="text-center">sudo别名</th>
+                                <th class="text-center">创建时间</th>
+                                <th class="text-center">备注</th>
                                 <th class="text-center">操作</th>
                             </tr>
                         </thead>
@@ -60,12 +58,13 @@
                         {% for role in roles %}
                             <tr class="gradeX" id={{ role.id }}>
                                 <td class="text-center"> {{ role.name }} </td>
-                                <td class="text-center"> {{ role.comment }} </td>
-                                <td class="text-center"> {{ role.date_added | date:"Y-m-d H:i:s"}} </td>
                                 <td class="text-center"> {{ role | role_contain_which_sudos }} </td>
+                                <td class="text-center"> {{ role.date_added | date:"Y-m-d H:i:s"}} </td>
+                                <td class="text-center"> {{ role.comment }} </td>
                                 <td class="text-center">
                                     <a href="/jperm/role/perm_role_detail/?id={{ role.id }}" class="btn btn-xs btn-primary">详情</a>
                                     <a href="/jperm/role/perm_role_edit/?id={{ role.id }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a href="/jperm/role/push/?id={{ role.id }}" class="btn btn-xs btn-warning">推送</a>
                                     <button onclick="remove_role({{ role.id }})" class="btn btn-xs btn-danger">删除</button>
                                 </td>
                             </tr>
