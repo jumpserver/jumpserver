@@ -319,6 +319,7 @@ def perm_role_detail(request):
 
     if request.method == "GET":
         role_id = request.GET.get("id")
+        role = get_object(PermRole, id=role_id)
         role_info = get_role_info(role_id)
 
         # 渲染数据
@@ -410,25 +411,8 @@ def perm_role_push(request):
         for asset_group in asset_groups_obj:
             group_assets_obj.extend(asset_group.asset_set.all())
         calc_assets = list(set(assets_obj) | set(group_assets_obj))
-
-        # 生成Inventory
-        # push_resource = []
-        # for asset in calc_assets:
-        #     if asset.use_default_auth:
-        #         username = Setting.field1
-        #         port = Setting.field2
-        #         password = Setting.field3
-        #     else:
-        #         username = asset.username
-        #         password = asset.password
-        #         port = asset.port
-        #     push_resource.append({"hostname": asset.ip,
-        #                           "port": port,
-        #                           "username": username,
-        #                           "password": password})
         push_resource = gen_resource(calc_assets)
-
-        logger.debug('推送role res: %s' % push_resource)
+        logger.debug('Push role res: %s' % push_resource)
 
         # 调用Ansible API 进行推送
         password_push = True if request.POST.get("use_password") else False
@@ -463,7 +447,7 @@ def perm_role_push(request):
 
             if ret['sudo'].get('msg'):
                 ret_failed = ret['sudo'].get('msg')
-            os.remove(add_sudo_script)
+            # os.remove(add_sudo_script)
 
         logger.debug('推送role结果: %s' % ret)
         logger.debug('推送role错误: %s' % ret_failed)
@@ -589,5 +573,17 @@ def perm_sudo_delete(request):
         return HttpResponse(u"删除角色: %s" % sudo.name)
     else:
         return HttpResponse(u"不支持该操作")
+
+
+@require_role('admin')
+def perm_role_recycle(request):
+    role_id = request.GET.get('role_id')
+    asset_ids = request.GET.get('asset_id').split(',')
+    for asset_id in asset_ids:
+        asset = get_object(Asset, id=asset_id)
+        role = get_object(PermRole, id=role_id)
+        PermPush.objects.filter(asset=asset, role=role).delete()
+    return HttpResponse('删除成功')
+
 
 

@@ -444,23 +444,8 @@ class Tasks(Command):
         :return:
         """
         module_args1 = file_path
-        ret1 = self.__run(module_args1, "script")
-        module_args2 = 'visudo -c | grep "parsed OK" &> /dev/null && echo "ok" || echo "failed"'
-        ret2 = self.__run(module_args2, "shell")
-        ret2_status = [host_value.get("stdout") for host_value in ret2["result"]["contacted"].values()]
-
-        result = {}
-        if not ret1["msg"]:
-            result["step1"] = "ok"
-        else:
-            result["msg"] = ret1["msg"]
-
-        if not ret2["msg"] and "failed" not in ret2_status:
-            result["step2"] = "ok"
-        else:
-            result["msg"] = ret1["msg"]
-
-        return result
+        ret = self.__run(module_args1, "script")
+        return ret
 
 
 class CustomAggregateStats(callbacks.AggregateStats):

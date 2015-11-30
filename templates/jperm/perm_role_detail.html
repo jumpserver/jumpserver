@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% load mytags %}
 
-
 {% block content %}
     {% include 'nav_cat_bar.html' %}
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -146,7 +145,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
                         <span class="label label-primary"><b>推送主机</b></span>
@@ -172,17 +171,25 @@
                         <div>
                             <div class="text-left">
                                 <table class="table table-striped" id="ugedit" >
+                                    <a class="btn btn-xs btn-danger del_muti"> 删除 </a>
                                     <thead>
                                         <tr>
+                                            <th class="text-center">
+                                                <input type="checkbox" id="check_all" onclick="checkAll()">
+                                            </th>
                                             <th class="text-center">主机</th>
                                             <th class="text-center">密钥</th>
                                             <th class="text-center">密码</th>
                                             <th class="text-center">结果</th>
+                                            <th class="text-center">操作</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                     {% for asset, info in pushed_asset.items %}
                                         <tr class="gradeX">
+                                            <th class="text-center">
+                                                <input type="checkbox" name="checked" value="{{ asset.id }}">
+                                            </th>
                                             <td class="text-center"> {{ asset.hostname }} </td>
                                             <td class="text-center"> {{ info.key | yesno:"是,否,未知" }} </td>
                                             <td class="text-center"> {{ info.password | yesno:"是,否,未知" }} </td>
@@ -191,6 +198,7 @@
                                             {% else %}
                                             <td class="text-center" style="color: #ec4758;cursor: help" title="{{ info.result }}" >{{ info.success | yesno:"成功,失败,未知" }} </td>
                                             {% endif %}
+                                            <td class="text-center" ><a class="fa fa-times del" href="/jperm/role/recycle/?role_id={{ role.id }}&asset_id={{ asset.id }}" style="color: #ec4758;"></a></td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>
@@ -204,7 +212,7 @@
             <div class="col-sm-4">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <span class="label label-primary"><b>未推送主机</b></span>
+                        <span class="label label-danger"><b>未推送主机</b></span>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -245,14 +253,43 @@
         </div>
     </div>
 
+
+
+{% endblock %}
+{% block self_footer_js %}
+
 <script>
     $(document).ready(function(){
-        $('#show').click(function(){
-            $('#last').css('display', 'none');
-            $('#all').css('display', 'block');
-        })
+        $('.del').click(function(){
+            var url = $(this).attr('href');
+            $.get(
+                url,
+                {},
+                function(data){
+                    location.reload()
+                }
+
+            );
+            return false;
+        });
+
+        $('.del_muti').click(function(){
+            var check_array = [];
+            if (confirm("确定删除")) {
+                $(".gradeX input:checked").each(function() {
+                    check_array.push($(this).attr("value"))
+                });
+                var url = '/jperm/role/recycle/?role_id={{ role.id }}&asset_id=' + check_array.join(',');
+                $.get(url,
+                      {},
+                      function(data){
+                         location.reload()
+                      }
+                )
+            }
+            return false;
+        });
+
     })
 </script>
-
-
 {% endblock %}
