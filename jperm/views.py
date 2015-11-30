@@ -319,6 +319,7 @@ def perm_role_detail(request):
 
     if request.method == "GET":
         role_id = request.GET.get("id")
+        role = get_object(PermRole, id=role_id)
         role_info = get_role_info(role_id)
 
         # 渲染数据
@@ -572,5 +573,17 @@ def perm_sudo_delete(request):
         return HttpResponse(u"删除角色: %s" % sudo.name)
     else:
         return HttpResponse(u"不支持该操作")
+
+
+@require_role('admin')
+def perm_role_recycle(request):
+    role_id = request.GET.get('role_id')
+    asset_ids = request.GET.get('asset_id').split(',')
+    for asset_id in asset_ids:
+        asset = get_object(Asset, id=asset_id)
+        role = get_object(PermRole, id=role_id)
+        PermPush.objects.filter(asset=asset, role=role).delete()
+    return HttpResponse('删除成功')
+
 
 
