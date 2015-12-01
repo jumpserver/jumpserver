@@ -161,23 +161,42 @@ def gen_resource(ob, perm=None):
         user = ob.get('user')
         if not perm:
             perm = get_group_user_perm(user)
-        roles = perm.get('role', {}).keys()
-        if role not in roles:
-            return {}
 
-        role_assets_all = perm.get('role').get(role).get('asset')
-        assets = set(role_assets_all) & set(asset_r)
+        if role:
+            roles = perm.get('role', {}).keys()  # 获取用户所有授权角色
+            if role not in roles:
+                return {}
 
-        for asset in assets:
-            asset_info = get_asset_info(asset)
-            info = {'hostname': asset.hostname,
-                    'ip': asset.ip,
-                    'port': asset_info.get('port', 22),
-                    'username': role.name,
-                    'password': CRYPTOR.decrypt(role.password),
-                    'ssh_key': get_role_key(user, role)
-                    }
-            res.append(info)
+            role_assets_all = perm.get('role').get(role).get('asset')  # 获取用户该角色所有授权主机
+            assets = set(role_assets_all) & set(asset_r)  # 获取用户提交中合法的主机
+
+            for asset in assets:
+                asset_info = get_asset_info(asset)
+                info = {'hostname': asset.hostname,
+                        'ip': asset.ip,
+                        'port': asset_info.get('port', 22),
+                        'username': role.name,
+                        'password': CRYPTOR.decrypt(role.password),
+                        'ssh_key': get_role_key(user, role)
+                        }
+                res.append(info)
+        else:
+            for asset, asset_info in perm.get('asset').items():
+                if asset not in asset_r:
+                    continue
+                asset_info = get_asset_info(asset)
+                try:
+                    role = sorted(list(perm.get('asset').get(asset).get('role')))[0]
+                except IndexError:
+                    continue
+                info = {'hostname': asset.hostname,
+                        'ip': asset.ip,
+                        'port': asset_info.get('port', 22),
+                        'username': role.name,
+                        'password': CRYPTOR.decrypt(role.password),
+                        'ssh_key': get_role_key(user, role)
+                        }
+                res.append(info)
 
     elif isinstance(ob, User):
         if not perm:

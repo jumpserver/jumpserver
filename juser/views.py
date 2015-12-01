@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 
 from django.db.models import Q
 from juser.user_api import *
+from jperm.perm_api import get_group_user_perm
 
 MAIL_FROM = EMAIL_HOST_USER
 
@@ -486,9 +487,9 @@ def down_key(request):
                 response = HttpResponse(data, content_type='application/octet-stream')
                 response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(private_key_file)
                 return response
-
     return HttpResponse('No Key File. Contact Admin.')
-from jperm.perm_api import get_group_user_perm
+
+
 @require_role(role='user')
 def RunCommand(request):
     if request.method == 'GET':
