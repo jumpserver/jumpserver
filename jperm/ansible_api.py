@@ -286,7 +286,7 @@ class Tasks(Command):
         push the ssh authorized key to target.
         """
         module_args = 'user="%s" key="{{ lookup("file", "%s") }}" state=present' % (user, key_path)
-        self.__run(module_args, "authorized_key")
+        self.__run(module_args, "authorized_key", become=True)
 
         return {"status": "failed", "msg": self.msg} if self.msg else {"status": "ok"}
 
@@ -329,7 +329,7 @@ class Tasks(Command):
             module_args = 'name=%s shell=/bin/bash password=%s' % (username, encrypt_pass)
         else:
             module_args = 'name=%s shell=/bin/bash' % username
-        self.__run(module_args, "user")
+        self.__run(module_args, "user", become=True)
 
         return {"status": "failed", "msg": self.msg} if self.msg else {"status": "ok"}
 
