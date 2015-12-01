@@ -96,31 +96,6 @@
                                 </div>
                             </div>
                         </div>
-{#                        <div class="col-sm-2">#}
-
-{#                        </div>#}
-{##}
-{#                        <div class="col-sm-2">#}
-
-{#                        </div>#}
-{#                        <div class="col-sm-2">#}
-
-{#                        </div>#}
-{#                         <div class="col-sm-4">#}
-{#                            <div class="input-group">#}
-{#                                <input type="text" class="form-control m-b" id="search_input" name="keyword" value="{{ keyword }}" placeholder="Search">#}
-{#                                <input type="text" style="display: none">#}
-{#                                <div class="input-group-btn">#}
-{#                                    <button id='search_btn' href="/jasset/asset_list/?search=true" type="button" class="btn btn-xm btn-primary search-btn"  onclick="change_info()">#}
-{#                                        - 搜索 -#}
-{#                                    </button>#}
-{#                                    <button type="button" href="/jasset/asset_list/?export=true" name="export" class="btn btn-xm btn-success search-btn-excel" onclick="return false">#}
-{#                                        - 导出 -#}
-{#                                    </button>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        </div>#}
-
                         <div id="export"></div>
                         <table class="table table-striped table-bordered table-hover " id="editable" name="editable">
                             <thead>
@@ -134,7 +109,9 @@
                                     <th class="text-center"> 所属主机组 </th>
 {#                                    <th class="text-center"> 配置信息 </th>#}
                                     <th class="text-center"> 操作系统 </th>
-                                    <th class="text-center"> 使用默认管理 </th>
+                                    <th class="text-center"> cpu核数 </th>
+                                    <th class="text-center"> 内存 </th>
+                                    <th class="text-center"> 硬盘 </th>
                                     <th class="text-center"> 操作 </th>
                                 </tr>
                             </thead>
@@ -150,7 +127,9 @@
                                     <td class="text-center">{{ asset.group.all|group_str2 }}</td>
 {#                                    <td class="text-center">{{ asset.cpu }}|{{ asset.memory }}|{{ asset.disk }}</td>#}
                                     <td class="text-center">{{ asset.system_type|default_if_none:"" }}{{ asset.system_version|default_if_none:"" }}</td>
-                                    <td class="text-center"> {{ asset.use_default_auth|bool2str }} </td>
+                                    <td class="text-center"> {{ asset.cpu|get_cpu_core }} </td>
+                                    <td class="text-center"> {{ asset.memory }}{% if asset.memory %}G{% endif %} </td>
+                                    <td class="text-center"> {{ asset.disk }} </td>
                                     <td class="text-center" data-editable='false'>
                                         <a href="/jasset/asset_detail/?id={{ asset.id }}" class="btn btn-xs btn-primary">详情</a>
                                         {% ifnotequal session_role_id 0 %}

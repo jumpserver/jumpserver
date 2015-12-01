@@ -272,3 +272,8 @@ def get_push_info(push_id, arg):
             return [role.name for role in push.role.all()]
     else:
         return []
+
+
+@register.filter(name='get_cpu_core')
+def get_cpu_core(cpu_info):
+    return cpu_info.split('* ')[1] if cpu_info else ''

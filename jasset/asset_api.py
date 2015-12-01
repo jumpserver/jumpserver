@@ -1,4 +1,5 @@
 # coding: utf-8
+from __future__ import division
 import xlrd
 import xlsxwriter
 from django.db.models import AutoField
@@ -73,83 +74,6 @@ def db_asset_update(**kwargs):
     """ 修改主机时数据库操作函数 """
     asset_id = kwargs.pop('id')
     Asset.objects.filter(id=asset_id).update(**kwargs)
-
-
-#
-#
-# def batch_host_edit(host_alter_dic, j_user='', j_password=''):
-#     """ 批量修改主机函数 """
-#     j_id, j_ip, j_idc, j_port, j_type, j_group, j_dept, j_active, j_comment = host_alter_dic
-#     groups, depts = [], []
-#     is_active = {u'是': '1', u'否': '2'}
-#     login_types = {'LDAP': 'L', 'MAP': 'M'}
-#     a = Asset.objects.get(id=j_id)
-#     if '...' in j_group[0].split():
-#         groups = a.bis_group.all()
-#     else:
-#         for group in j_group[0].split():
-#             c = BisGroup.objects.get(name=group.strip())
-#             groups.append(c)
-#
-#     if '...' in j_dept[0].split():
-#         depts = a.dept.all()
-#     else:
-#         for d in j_dept[0].split():
-#             p = DEPT.objects.get(name=d.strip())
-#             depts.append(p)
-#
-#     j_type = login_types[j_type]
-#     j_idc = IDC.objects.get(name=j_idc)
-#     if j_type == 'M':
-#         if a.password != j_password:
-#             j_password = cryptor.decrypt(j_password)
-#         a.ip = j_ip
-#         a.port = j_port
-#         a.login_type = j_type
-#         a.idc = j_idc
-#         a.is_active = j_active
-#         a.comment = j_comment
-#         a.username = j_user
-#         a.password = j_password
-#     else:
-#         a.ip = j_ip
-#         a.port = j_port
-#         a.idc = j_idc
-#         a.login_type = j_type
-#         a.is_active = is_active[j_active]
-#         a.comment = j_comment
-#     a.save()
-#     a.bis_group = groups
-#     a.dept = depts
-#     a.save()
-#
-#
-# def db_host_delete(request, host_id):
-#     """ 删除主机操作 """
-#     if is_group_admin(request) and not validate(request, asset=[host_id]):
-#         return httperror(request, '删除失败, 您无权删除!')
-#
-#     asset = Asset.objects.filter(id=host_id)
-#     if asset:
-#         asset.delete()
-#     else:
-#         return httperror(request, '删除失败, 没有此主机!')
-#
-#
-# def db_idc_delete(request, idc_id):
-#     """ 删除IDC操作 """
-#     if idc_id == 1:
-#         return httperror(request, '删除失败, 默认IDC不能删除!')
-#
-#     default_idc = IDC.objects.get(id=1)
-#
-#     idc = IDC.objects.filter(id=idc_id)
-#     if idc:
-#         idc_class = idc[0]
-#         idc_class.asset_set.update(idc=default_idc)
-#         idc.delete()
-#     else:
-#         return httperror(request, '删除失败, 没有这个IDC!')
 
 
 def sort_ip_list(ip_list):
@@ -389,7 +313,6 @@ def get_ansible_asset_info(asset_ip, setup_info):
     for disk_name, disk_info in disk_all.iteritems():
         if disk_name.startswith('sd') or disk_name.startswith('hd') or disk_name.startswith('vd'):
             disk_need[disk_name] = disk_info.get("size")
-
     all_ip = setup_info.get("ansible_all_ipv4_addresses")
     other_ip_list = all_ip.remove(asset_ip) if asset_ip in all_ip else []
     other_ip = ','.join(other_ip_list) if other_ip_list else ''
@@ -401,12 +324,17 @@ def get_ansible_asset_info(asset_ip, setup_info):
     cpu_cores = setup_info.get("ansible_processor_count")
     cpu = cpu_type + ' * ' + unicode(cpu_cores)
     memory = setup_info.get("ansible_memtotal_mb")
+    try:
+        memory_format = round((int(memory) / 1000), 1)
+    except Exception:
+        memory_format = memory
     disk = disk_need
     system_type = setup_info.get("ansible_distribution")
     system_version = setup_info.get("ansible_distribution_version")
+    system_arch = setup_info.get("ansible_architecture")
     # asset_type = setup_info.get("ansible_system")
     sn = setup_info.get("ansible_product_serial")
-    asset_info = [other_ip, mac, cpu, memory, disk, sn, system_type, system_version, brand]
+    asset_info = [other_ip, mac, cpu, memory_format, disk, sn, system_type, system_version, brand, system_arch]
 
     return asset_info
 
@@ -422,7 +350,7 @@ def asset_ansible_update(obj_list, name=''):
             continue
         else:
             asset_info = get_ansible_asset_info(asset.ip, setup_info)
-            other_ip, mac, cpu, memory, disk, sn, system_type, system_version, brand = asset_info
+            other_ip, mac, cpu, memory, disk, sn, system_type, system_version, brand, system_arch = asset_info
             asset_dic = {"other_ip": other_ip,
                          "mac": mac,
                          "cpu": cpu,
@@ -431,6 +359,7 @@ def asset_ansible_update(obj_list, name=''):
                          "sn": sn,
                          "system_type": system_type,
                          "system_version": system_version,
+                         "system_arch": system_arch,
                          "brand": brand
                          }
 

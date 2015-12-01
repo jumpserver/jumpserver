@@ -97,7 +97,7 @@
                                     </tr>
                                     <tr>
                                         <td class="text-navy">内存</td>
-                                        <td>{{ asset.memory|default_if_none:"" }}{% if asset.memory %}M{% endif %}</td>
+                                        <td>{{ asset.memory|default_if_none:"" }}{% if asset.memory %}G{% endif %}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">硬盘</td>
@@ -128,6 +128,10 @@
                                     <tr>
                                         <td class="text-navy">系统版本</td>
                                         <td>{{ asset.system_type|default_if_none:"" }} {{ asset.system_version|default_if_none:"" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">系统平台</td>
+                                        <td>{{ asset.system_arch|default_if_none:"" }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">运行环境</td>
