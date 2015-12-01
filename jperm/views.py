@@ -396,9 +396,12 @@ def perm_role_push(request):
     # 渲染数据
     header_title, path1, path2 = "系统角色", "角色管理", "角色推送"
     role_id = request.GET.get('id')
+    asset_ids = request.GET.get('asset_id')
     role = get_object(PermRole, id=role_id)
     assets = Asset.objects.all()
     asset_groups = AssetGroup.objects.all()
+    if asset_ids:
+        need_push_asset = [get_object(Asset, id=asset_id) for asset_id in asset_ids.split(',')]
 
     if request.method == "POST":
         # 获取推荐角色的名称列表

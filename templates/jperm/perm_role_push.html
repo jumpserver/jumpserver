@@ -45,7 +45,7 @@
                                 <div class="col-sm-8">
                                     <select name="assets" id="assets" data-placeholder="请选择资产" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for asset in assets %}
-                                            <option value="{{ asset.id }}" {% if asset in pushed_assets %}selected{% endif %}>{{ asset.hostname }}</option>
+                                            <option value="{{ asset.id }}" {% if asset in need_push_asset %}selected{% endif %}>{{ asset.hostname }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
