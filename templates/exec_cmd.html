@@ -1,0 +1,198 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta name="viewport" content="width=320, initial-scale=1">
+        <title>Chat</title>
+        <style type="text/css"></style>
+    </head>
+
+    <body>
+      <div id="wrapper">
+        <div id="chat_box" class="content">
+            <p class="system"></p>
+        </div>
+
+        <div id="footer">
+          <div class="content">
+            <input type="text" id="pattern" placeholder="Ansible Pattern">
+            <input type="text" id="command" placeholder="Command to execute">
+            <input type="button" id="send_btn" value="Send" onclick="sendMessage()">
+          </div>
+        </div>
+      </div>
+
+
+<script type="text/javascript">
+    var wsUri = "{{ web_terminal_uri }}"+"&role=dev";
+    var ws = new WebSocket(wsUri);
+
+    function createSystemMessage(message) {
+        var message = document.createTextNode(message);
+        var messageBox = document.createElement('p');
+        messageBox.className = 'system';
+        messageBox.appendChild(message);
+        var chat = document.getElementById('chat_box');
+        chat.appendChild(messageBox);
+    }
+
+    function createUserMessage(message) {
+        message = message.replace('/\n/g', '<br>');
+        var messageOb = document.createElement('div');
+        messageOb.innerHTML = message;
+        var messageBox = document.createElement('p');
+        messageBox.appendChild(messageOb);
+        var chat = document.getElementById('chat_box');
+        chat.appendChild(messageBox);
+    }
+
+    ws.onopen = function(ev) {
+        createSystemMessage('[Connected]');
+    };
+
+    ws.onclose = function(ev) {
+        createSystemMessage('[Disconnected]');
+    };
+
+    ws.onmessage = function(ev) {
+        createUserMessage(ev.data);
+        var chat = document.getElementById('chat_box');
+        chat.scrollTop = chat.scrollHeight;
+    };
+
+    function sendMessage() {
+        var pattern = document.getElementById('pattern');
+        var command = document.getElementById('command');
+
+        var data = {
+          pattern: pattern.value,
+          command: command.value,
+        {#      ts: (new Date()).getTime()#}
+        };
+
+        ws.send(JSON.stringify(data));
+        command.value = ''
+}
+</script>
+
+<style type="text/css">
+  * {
+    font-family: "Monaco", "DejaVu Sans Mono", "Liberation Mono", monospace;
+    font-size: 11px;
+
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: #fff;
+  }
+
+  #wrapper {
+{#    background-color: #ecf0f1;#}
+{#    border: #000 solid 5px;#}
+    background: #000;
+    width: 600px;
+    box-shadow: rgba(0, 0, 0, 0.8) 2px 2px 20px;
+    color: #fff;
+  }
+
+  #chat_box {
+    box-sizing: border-box;
+    height: 100%;
+    overflow: auto;
+    padding-bottom: 50px;
+  }
+
+  #footer {
+    box-sizing: border-box;
+    position: fixed;
+    bottom: 0;
+    height: 50px;
+    width: 600px;
+{#    border: #000 solid -10px;#}
+    background-color: #2980b9;
+  }
+
+  #footer .content {
+    padding-top: 4px;
+    position: relative;
+  }
+
+  #pattern { width: 20%; }
+  #command { width: 60%; }
+  #send_btn {
+    width: 10%;
+{#    position: absolute;#}
+    margin-left: 5px;
+    right: 0;
+    bottom: 0;
+  }
+
+  .content {
+    width: 600px;
+    margin-left: 5px;
+  }
+
+  input[type="text"],
+  input[type="button"] {
+    border: 0;
+    color: #fff;
+  }
+
+  input[type="text"] {
+    background-color: #146EA8;
+    padding: 3px 10px;
+  }
+
+  input[type="button"] {
+    background-color: #f39c12;
+    border-right: 2px solid #e67e22;
+    border-bottom: 2px solid #e67e22;
+    min-width: 70px;
+    display: inline-block;
+  }
+
+  input[type="button"]:hover {
+    background-color: #e67e22;
+    border-right: 2px solid #f39c12;
+    border-bottom: 2px solid #f39c12;
+    cursor: pointer;
+  }
+
+  .system,
+  .username {
+    color: #aaa;
+    font-style: italic;
+    font-family: monospace;
+    font-size: 16px;
+  }
+
+  @media(max-width: 1000px) {
+    .content { width: 90%; }
+  }
+
+  @media(max-width: 780px) {
+    #footer { height: 91px; }
+    #chat_box { padding-bottom: 91px; }
+
+    #user { width: 100%; }
+    #message { width: 80%; }
+  }
+
+  @media(max-width: 400px) {
+    #footer { height: 135px; }
+    #chat_box { padding-bottom: 135px; }
+
+    #message { width: 100%; }
+    #send_btn {
+      position: relative;
+      margin-top: 3px;
+      width: 100%;
+    }
+  }
+</style>
+</body>
+<div></div>
+<div></div>
+</html>
