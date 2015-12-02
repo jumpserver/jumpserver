@@ -121,22 +121,19 @@
                                     <td class="text-center" name="id" value="{{ asset.id }}" data-editable='false'>
                                         <input name="id" value="{{ asset.id }}" type="checkbox" class="i-checks">
                                     </td>
-                                    <td class="text-center hostname"> {{ asset.hostname|default_if_none:"" }} </td>
+                                    <td class="text-center hostname"> <a href="/jasset/asset_detail/?id={{ asset.id }}">{{ asset.hostname|default_if_none:"" }}</a></td>
                                     <td class="text-center"> {{ asset.ip|default_if_none:"" }} </td>
                                     <td class="text-center"> {{ asset.idc.name|default_if_none:"" }} </td>
                                     <td class="text-center">{{ asset.group.all|group_str2 }}</td>
 {#                                    <td class="text-center">{{ asset.cpu }}|{{ asset.memory }}|{{ asset.disk }}</td>#}
                                     <td class="text-center">{{ asset.system_type|default_if_none:"" }}{{ asset.system_version|default_if_none:"" }}</td>
                                     <td class="text-center"> {{ asset.cpu|get_cpu_core }} </td>
-                                    <td class="text-center"> {{ asset.memory }}{% if asset.memory %}G{% endif %} </td>
-                                    <td class="text-center"> {{ asset.disk }} </td>
+                                    <td class="text-center"> {{ asset.memory }}{% if asset.memory %}G{% endif %}</td>
+                                    <td class="text-center"> {{ asset.disk|get_disk_info }}{% if asset.memory %}G{% endif %}</td>
                                     <td class="text-center" data-editable='false'>
-                                        <a href="/jasset/asset_detail/?id={{ asset.id }}" class="btn btn-xs btn-primary">详情</a>
-                                        {% ifnotequal session_role_id 0 %}
-                                            <a href="/jasset/asset_edit/?id={{ asset.id }}" class="btn btn-xs btn-info">编辑</a>
-                                            <a value="{{ asset.id }}" class="conn btn btn-xs btn-warning">连接</a>
-                                            <a value="/jasset/asset_del/?id={{ asset.id }}" class="btn btn-xs btn-danger asset_del">删除</a>
-                                        {% endifnotequal %}
+                                        <a href="/jasset/asset_edit/?id={{ asset.id }}" class="btn btn-xs btn-info">编辑</a>
+                                        <a value="{{ asset.id }}" class="conn btn btn-xs btn-warning">连接</a>
+                                        <a value="/jasset/asset_del/?id={{ asset.id }}" class="btn btn-xs btn-danger asset_del">删除</a>
                                     </td>
                                 </tr>
                             {% endfor %}

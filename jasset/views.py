@@ -6,6 +6,7 @@ from jumpserver.api import *
 from jumpserver.models import Setting
 from jasset.forms import AssetForm, IdcForm
 from jasset.models import Asset, IDC, AssetGroup, ASSET_TYPE, ASSET_STATUS
+from jperm.perm_api import get_group_asset_perm
 from jperm.ansible_api import Tasks, MyRunner
 from jperm.perm_api import gen_resource
 
@@ -410,6 +411,19 @@ def asset_detail(request):
     header_title, path1, path2 = u'主机详细信息', u'资产管理', u'主机详情'
     asset_id = request.GET.get('id', '')
     asset = get_object(Asset, id=asset_id)
+    perm_info = get_group_asset_perm(asset)
+    log = Log.objects.filter(host=asset.hostname)
+    if perm_info:
+        user_perm = []
+        for perm, value in perm_info.items():
+            if perm == 'user':
+                for user, role_dic in value.items():
+                    user_perm.append([user, role_dic.get('role', '')])
+            elif perm == 'user_group':
+                user_group_perm = value
+            elif perm == 'rule':
+                user_rule_perm = value
+
     asset_record = AssetRecord.objects.filter(asset=asset).order_by('-alert_time')
 
     return my_render('jasset/asset_detail.html', locals(), request)

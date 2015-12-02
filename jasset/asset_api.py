@@ -312,7 +312,14 @@ def get_ansible_asset_info(asset_ip, setup_info):
     disk_need = {}
     for disk_name, disk_info in disk_all.iteritems():
         if disk_name.startswith('sd') or disk_name.startswith('hd') or disk_name.startswith('vd'):
-            disk_need[disk_name] = disk_info.get("size")
+            disk_size = disk_info.get("size")
+            if 'M' in disk_size:
+                disk_format = round(float(disk_size[:-2]) / 1000, 0)
+            elif 'T' in disk_size:
+                disk_format = round(float(disk_size[:-2]) * 1000, 0)
+            else:
+                disk_format = float(disk_size)
+            disk_need[disk_name] = disk_format
     all_ip = setup_info.get("ansible_all_ipv4_addresses")
     other_ip_list = all_ip.remove(asset_ip) if asset_ip in all_ip else []
     other_ip = ','.join(other_ip_list) if other_ip_list else ''
@@ -325,7 +332,7 @@ def get_ansible_asset_info(asset_ip, setup_info):
     cpu = cpu_type + ' * ' + unicode(cpu_cores)
     memory = setup_info.get("ansible_memtotal_mb")
     try:
-        memory_format = round((int(memory) / 1000), 1)
+        memory_format = int(round((int(memory) / 1000), 0))
     except Exception:
         memory_format = memory
     disk = disk_need

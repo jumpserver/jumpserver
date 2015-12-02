@@ -186,26 +186,65 @@
                         </div>
                     </div>
                     <div class="ibox-content ibox-heading">
-                        <h3>主机所有授权的用户</h3>
-                        <small><i class="fa fa-map-marker"></i> 包含了此主机所有授权的用户.</small>
+                        <h3>主机所有授权的信息</h3>
+                        <small><i class="fa fa-map-marker"></i> 包含了此主机所有授权的信息.</small>
                     </div>
                     <div class="ibox-content">
                         <div>
-{#                            <div class="text-left">#}
-{#                                <table class="table">#}
-{#                                    {% if user_permed_list %}#}
-{#                                        {% for user in user_permed_list %}#}
-{#                                            <tr>#}
-{#                                                <td class="text-navy">{{ user.name }}</td>#}
-{#                                                <td>{{ user.dept.name }}</td>#}
-{#                                                <td><a href="/juser/user_detail/?id={{ user.id }}">详情</a></td>#}
-{#                                            </tr>#}
-{#                                        {% endfor %}#}
-{#                                    {% else %}#}
-{#                                        <p class="text-center">(暂无)</p>#}
-{#                                    {% endif %}#}
-{#                                </table>#}
-{#                            </div>#}
+                            <div class="text-left">
+                                {% if perm_info %}
+                                    <table class="table">
+                                    <p>授权用户信息</p>
+                                    <td class="text-navy">授权用户</td>
+                                    <td class="text-navy">系统角色</td>
+                                    {% for perm in user_perm %}
+                                        <tr>
+                                            <td class="text-navy"><a href="/juser/user_detail/?id={{ perm.0.id }}">{{ perm.0 }}</a></td>
+                                            <td>
+                                                <table class="table">
+                                                {% if perm.1 %}
+                                                     {% for role in perm.1 %}
+                                                        <tr>
+                                                            <td class="text-navy"><a href="/jperm/role/perm_role_detail/?id={{ role.id }}">{{ role }}</a></td>
+                                                        </tr>
+                                                     {% endfor %}
+                                                {% endif %}
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </table>
+                                    {% if user_group_perm %}
+                                        <table class="table">
+                                            <p>授权用户组信息</p>
+                                            <td class="text-navy">授权用户组</td>
+                                            <td class="text-navy">组详情</td>
+                                            {% for user_group in user_group_perm %}
+                                                <tr>
+                                                    <td class="text-navy">{{ user_group }}</td>
+                                                    <td class="text-navy"><a href="/juser/user_list/?gid={{ user_group.id }}">详情</a></td>
+                                                </tr>
+                                            {% endfor %}
+                                        </table>
+                                    {% endif %}
+
+                                    {% if user_rule_perm %}
+                                        <table class="table">
+                                            <p>授权规则信息</p>
+                                            <td class="text-navy">授权规则</td>
+                                            <td class="text-navy">详情</td>
+                                            {% for rule in user_rule_perm %}
+                                                <tr>
+                                                    <td class="text-navy">{{ rule }}</td>
+                                                    <td class="text-navy"><a href="/jperm/perm_rule_detail/?id={{ rule.id }}">详情</a></td>
+                                                </tr>
+                                            {% endfor %}
+                                        </table>
+                                    {% endif %}
+                                {% else %}
+                                    <p class="text-center">(暂无)</p>
+                                {% endif %}
+                            </div>
                         </div>
                     </div>
                     <div class="ibox-title">
@@ -275,49 +314,47 @@
                         <small><i class="fa fa-map-marker"></i> 此主机最近一周用户登录信息.</small>
                     </div>
                     <div class="ibox-content inspinia-timeline">
-{#                        {% if log %}#}
-{#                            {% for l in log %}#}
-{#                                <div class="timeline-item">#}
-{#                                    <div class="row">#}
-{#                                        <div class="col-xs-5 date">#}
-{#                                            <i class="fa fa-info-circle"></i>#}
-{#                                            <small class="text-navy">{{ l.user }}</small>#}
-{#                                            <br/>#}
-{#                                            <strong>{{l.dept_name}}</strong>#}
-{#                                        </div>#}
-{#                                        <div class="col-xs-7 content no-top-border">#}
-{#                                            <p class="m-b-xs"><strong>详细信息</strong></p>#}
-{#                                            <p>来源IP: {{ l.remote_ip }}</p>#}
-{#                                            <p>开始: {{ l.start_time |date:"Y-m-d H:i:s" }}</p>#}
-{#                                            <p>结束: {{ l.end_time |date:"Y-m-d H:i:s" }}</p>#}
-{#                                        </div>#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                            {% endfor %}#}
-{#                            <button id="show" class="btn btn-primary btn-block m-t"><i class="fa fa-arrow-down"></i> 所有 </button>#}
-{#                            <div id='more' style="display: none">#}
-{#                            <br/>#}
-{#                            {% for l in log_more %}#}
-{#                                <div class="timeline-item">#}
-{#                                    <div class="row">#}
-{#                                        <div class="col-xs-5 date">#}
-{#                                            <i class="fa fa-info-circle"></i>#}
-{#                                            <small class="text-navy">{{ l.user }}</small>#}
-{#                                            <br/>#}
-{#                                            <strong>{{l.dept_name}}</strong>#}
-{#                                        </div>#}
-{#                                        <div class="col-xs-7 content no-top-border">#}
-{#                                            <p class="m-b-xs"><strong>详细信息</strong></p>#}
-{#                                            <p>来源IP: {{ l.remote_ip }}</p>#}
-{#                                            <p>开始: {{ l.start_time |date:"Y-m-d H:i:s" }}</p>#}
-{#                                            <p>结束: {{ l.end_time |date:"Y-m-d H:i:s" }}</p>#}
-{#                                        </div>#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                            {% endfor %}#}
-{#                        {% else %}#}
-{#                            <p class="text-center">(暂无)</p>#}
-{#                        {% endif %}#}
+                        {% if log %}
+                            {% for l in log %}
+                                <div class="timeline-item">
+                                    <div class="row">
+                                        <div class="col-xs-5 date">
+                                            <i class="fa fa-info-circle"></i>
+                                            <small class="text-navy">{{ l.user }}</small>
+                                            <br/>
+                                        </div>
+                                        <div class="col-xs-7 content no-top-border">
+                                            <p class="m-b-xs"><strong>详细信息</strong></p>
+                                            <p>来源IP: {{ l.remote_ip }}</p>
+                                            <p>开始: {{ l.start_time |date:"Y-m-d H:i:s" }}</p>
+                                            <p>结束: {{ l.end_time |date:"Y-m-d H:i:s" }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                            <button id="show" class="btn btn-primary btn-block m-t"><i class="fa fa-arrow-down"></i> 所有 </button>
+                            <div id='more' style="display: none">
+                            <br/>
+                            {% for l in log_more %}
+                                <div class="timeline-item">
+                                    <div class="row">
+                                        <div class="col-xs-5 date">
+                                            <i class="fa fa-info-circle"></i>
+                                            <small class="text-navy">{{ l.user }}</small>
+                                            <br/>
+                                        </div>
+                                        <div class="col-xs-7 content no-top-border">
+                                            <p class="m-b-xs"><strong>详细信息</strong></p>
+                                            <p>来源IP: {{ l.remote_ip }}</p>
+                                            <p>开始: {{ l.start_time |date:"Y-m-d H:i:s" }}</p>
+                                            <p>结束: {{ l.end_time |date:"Y-m-d H:i:s" }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p class="text-center">(暂无)</p>
+                        {% endif %}
 
                     </div>
                 </div>
