@@ -694,6 +694,10 @@ class Nav(object):
                     logger.debug('Upload tmp dir: %s' % tmp_dir)
                     os.chdir(tmp_dir)
                     bash('rz')
+                    check_notempty = os.listdir(tmp_dir)
+                    if not check_notempty:
+                        print color_print("上传文件为空")
+                        continue
                     runner = MyRunner(res)
                     runner.run('copy', module_args='src=%s dest=%s directory_mode'
                                                      % (tmp_dir, tmp_dir), pattern=pattern)
@@ -742,7 +746,7 @@ class Nav(object):
                         ret = runner.get_result()
                         os.chdir('/tmp')
                         tmp_dir_name = os.path.basename(tmp_dir)
-                        bash('tar czf %s.tar.gz %s && sz %s.tar.gz' % (tmp_dir, tmp_dir_name, tmp_dir))
+                        bash('tar czf %s.tar.gz %s ' % (tmp_dir, tmp_dir_name))
 
                         if ret.get('failed'):
                             print ret

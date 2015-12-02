@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 {% load mytags %}
+{% block self_head_css_js %}
+    <link href="/static/css/plugins/datepicker/datepicker3.css" rel="stylesheet">
+    <link href="/static/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <script src="/static/js/plugins/chosen/chosen.jquery.js"></script>
+{% endblock %}
 {% block content %}
 {% include 'nav_cat_bar.html' %}
 
@@ -22,18 +27,56 @@
                 </div>
             </div>
             <div class="ibox-content">
-               <h2>下载文件可联系管理员在服务器安装lrzsz，使用sz命令下载。 </h2>
-                <div>
-                    {% for document in documents %}
-                    <a href="/download/{{ document  }}">{{ document  }}</a>
-                    {% endfor %}
-                </div>
-
+               <form id="downForm" class="form-horizontal" method="post">
+                    {% if error %}
+                        <div class="alert alert-warning text-center">{{ error }}</div>
+                    {% endif %}
+                    {% if msg %}
+                        <div class="alert alert-success text-center">{{ msg }}</div>
+                    {% endif %}
+                    <div class="form-group">
+                        <label for="file_path" class="col-sm-2 control-label">文件路径<span class="red-fonts">*</span></label>
+                        <div class="col-sm-8">
+                            <input id="file_path" name="file_path" placeholder="File Path" type="text" class="form-control">
+                        </div>
+                    </div>
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <label for="user" class="col-sm-2 control-label">选择主机<span class="red-fonts">*</span></label>
+                        <div class="col-sm-8">
+                            <select name="asset_ids" id="asset_ids" data-placeholder="请输入" class="chosen-select form-control m-b" multiple  tabindex="2">
+                                {% for asset in assets %}
+                                    <option value="{{ asset.id }}">{{ asset.hostname }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-4 col-sm-offset-2">
+                            <button class="btn btn-white" type="reset">取消</button>
+                            <button id="submit_button" class="btn btn-primary" type="submit">下载</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
     </div>
 </div>
+{% endblock %}
 
+{% block self_footer_js %}
+<script>
+var config = {
+                '.chosen-select'           : {},
+                '.chosen-select-deselect'  : {allow_single_deselect:true},
+                '.chosen-select-no-single' : {disable_search_threshold:10},
+                '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
+                '.chosen-select-width'     : {width:"95%"}
+            };
 
+for (var selector in config) {
+    $(selector).chosen(config[selector]);
+}
+</script>
 {% endblock %}

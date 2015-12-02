@@ -293,8 +293,7 @@ def upload(request):
         asset_ids = request.POST.getlist('asset_ids', '')
         upload_files = request.FILES.getlist('file[]', None)
         date_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
-        upload_dir = "/tmp/%s/%s" % (user.username, date_now)
-        mkdir(upload_dir, mode=0777)
+        upload_dir = get_tmp_dir()
         filenames = {}
         for asset_id in asset_ids:
             asset_select.append(get_object(Asset, id=asset_id))
@@ -328,6 +327,36 @@ def upload(request):
 
 @login_required(login_url='/login')
 def download(request):
+    user = request.user
+    assets = get_group_user_perm(user).get('asset').keys()
+
+    asset_select = []
+    if request.method == 'POST':
+        asset_ids = request.POST.getlist('asset_ids', '')
+        file_path = request.POST.get('file_path')
+        date_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        upload_dir = get_tmp_dir()
+        for asset_id in asset_ids:
+            asset_select.append(get_object(Asset, id=asset_id))
+
+        if not set(asset_select).issubset(set(assets)):
+            illegal_asset = set(asset_select).issubset(set(assets))
+            return HttpResponse('没有权限的服务器 %s' % ','.join([asset.hostname for asset in illegal_asset]))
+        res = gen_resource({'user': user, 'asset': asset_select})
+        runner = MyRunner(res)
+        runner.run('fetch', module_args='src=%s dest=%s' % (file_path, upload_dir), pattern='*')
+        logger.debug(runner.get_result())
+        os.chdir('/tmp')
+        tmp_dir_name = os.path.basename(upload_dir)
+        tar_file = '%s.tar.gz' % upload_dir
+        bash('tar czf %s %s && sz %s.tar.gz' % (tar_file, tmp_dir_name, upload_dir))
+        f = open(tar_file)
+        data = f.read()
+        f.close()
+        response = HttpResponse(data, content_type='application/octet-stream')
+        response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(tar_file)
+        return response
+
     return render_to_response('download.html', locals(), context_instance=RequestContext(request))
 
 
