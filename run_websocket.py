@@ -23,8 +23,8 @@ from tornado.options import define, options
 from pyinotify import WatchManager, Notifier, ProcessEvent, IN_DELETE, IN_CREATE, IN_MODIFY, AsyncNotifier
 import select
 
-from connect import Tty, User, Asset, PermRole, logger, get_object
-from connect import TtyLog, Log, Session, user_have_perm
+from connect import Tty, User, Asset, PermRole, logger, get_object, PermRole, gen_resource
+from connect import TtyLog, Log, Session, user_have_perm, get_group_user_perm, Command
 
 try:
     import simplejson as json
@@ -67,22 +67,6 @@ def require_auth(role='user'):
             except AttributeError:
                 pass
             logger.warning('Websocket: Request auth failed.')
-        # asset_id = int(request.get_argument('id', 9999))
-        # print asset_id
-        # asset = Asset.objects.filter(id=asset_id)
-        # if asset:
-        #     asset = asset[0]
-        #     request.asset = asset
-        # else:
-        #     request.close()
-        #
-        # if user:
-        #     user = user[0]
-        #     request.user = user
-        #
-        # else:
-        #     print("No session user.")
-        #     request.close()
         return _deco2
     return _deco
 
@@ -138,6 +122,7 @@ class Application(tornado.web.Application):
             (r'/monitor', MonitorHandler),
             (r'/terminal', WebTerminalHandler),
             (r'/kill', WebTerminalKillHandler),
+            (r'/exec', ExecHandler),
         ]
 
         setting = {
@@ -223,6 +208,61 @@ class WebTerminalKillHandler(tornado.web.RequestHandler):
                 ws.log.save()
                 ws.close()
         logger.debug('Websocket: web terminal client num: %s' % len(WebTerminalHandler.clients))
+
+
+class ExecHandler(tornado.websocket.WebSocketHandler):
+    clients = []
+    tasks = []
+
+    def __init__(self, *args, **kwargs):
+        self.id = 0
+        self.user = None
+        self.role = None
+        self.cmd = None
+        self.assets = []
+        self.perm = {}
+        super(ExecHandler, self).__init__(*args, **kwargs)
+
+    def check_origin(self, origin):
+        return True
+
+    @require_auth('user')
+    def open(self):
+        logger.debug('Websocket: Open exec request')
+        role_name = self.get_argument('role', 'dev')
+        self.role = get_object(PermRole, name=role_name)
+        self.perm = get_group_user_perm(self.user)
+        roles = self.perm.get('role').keys()
+        if self.role not in roles:
+            self.write_message('No perm that role %s' % role_name)
+            self.close()
+        self.assets = self.perm.get('role').get(self.role).get('asset')
+        res = gen_resource({'user': self.user, 'asset': self.assets, 'role': self.role})
+        logger.debug('Web执行命令res: %s' % res)
+        self.cmd = Command(res)
+        message = '有权限的主机：' + ', '.join([asset.hostname for asset in self.assets])
+        self.write_message(message)
+
+    def on_message(self, message):
+        data = json.loads(message)
+        pattern = data.get('pattern', '')
+        command = data.get('command', '')
+        asset_name_str = '匹配主机: '
+        if pattern and command:
+            for inv in self.cmd.inventory.get_hosts(pattern=pattern):
+                asset_name_str += '\n%s' % inv.name
+            self.write_message(asset_name_str)
+            self.write_message('<span style="color: yellow">Ansible> %s</span>\n\n' % command)
+            result = self.cmd.run(module_name='shell', command=command, pattern=pattern)
+            for k, v in result.items():
+                for host, output in v.items():
+                    if k == 'ok':
+                        header = "<span style='color: green'>[ %s => %s]</span>\n" % (host, 'Ok')
+                    else:
+                        header = "<span style='color: red'>[ %s => %s]</span>\n" % (host, 'failed')
+                    self.write_message(header)
+                    self.write_message(output)
+            self.write_message('\n\n')
 
 
 class WebTerminalHandler(tornado.websocket.WebSocketHandler):

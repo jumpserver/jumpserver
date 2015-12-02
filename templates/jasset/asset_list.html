@@ -148,6 +148,7 @@
                                 <a value="/jasset/asset_edit_batch/" type="button" class="btn btn-sm btn-warning iframe">修改</a>
                                 <input type="button" id="asset_update" class="btn btn-info btn-sm"  name="update_button" value="更新"/>
                                 <input type="button" id="asset_update_all" class="btn btn-primary btn-sm"  name="update_button" value="更新全部"/>
+                                <input type="button" id="exec_cmd" class="btn btn-sm btn-danger"  name="exec_cmd" value="执行命令"/>
                             </div>
                             {% include 'paginator.html' %}
                         </div>
@@ -173,6 +174,46 @@
                         }
                 )
             }
+        });
+
+        $('#exec_cmd').click(function(){
+            var url='/jlog/get_role_name/?id={{ user.id }}';
+            var href = $(this).attr('href');
+            $.ajax({
+                type: 'GET',
+                url: url,
+                data: {},
+                success: function(data){
+                    var dataArray = data.split(',');
+                    if (dataArray.length == 1 && data != 'error'){
+                        var title = 'Jumpserver Exec Terminal';
+                        layer.open({
+                            type: 2,
+                            title: title,
+                            maxmin: true,
+                            shade: false,
+                            area: ['628px', '452px'],
+                            content: new_url+data
+                        });
+                        //window.open(new_url + data, '', 'location=no, resizeable=no, height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,status=no');
+                    } else if (dataArray.length == '1' && data == 'error'){
+                        layer.alert('没有授权角色')
+                    } else {
+                        aUrl = '';
+                        $.each(dataArray, function(index, value){
+                            aUrl += '<a onclick="windowOpen(this); return false" class="btn btn-xs btn-primary newa" href=' + new_url + value + ' value=' + hostname +  '>' + value  + '</a> '
+                        });
+                        layer.alert(aUrl, {
+                            skin: 'layui-layer-molv',
+                            title: '多个角色，请选择一个连接',
+                            shade: false,
+                            closeBtn: 0
+                        })
+                    }
+                }
+            });
+            return false
+
         });
 
         $('.conn').click(function(){

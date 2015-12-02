@@ -360,3 +360,8 @@ def download(request):
     return render_to_response('download.html', locals(), context_instance=RequestContext(request))
 
 
+@login_required(login_url='/login')
+def exec_cmd(request):
+    role_name = request.GET.get('role_name')
+    web_terminal_uri = 'ws://%s/exec?role=%s' % (WEB_SOCKET_HOST, role_name)
+    return my_render('exec_cmd.html', locals(), request)
