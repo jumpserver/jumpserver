@@ -294,7 +294,7 @@ def upload(request):
         upload_files = request.FILES.getlist('file[]', None)
         date_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         upload_dir = "/tmp/%s/%s" % (user.username, date_now)
-        mkdir(upload_dir)
+        mkdir(upload_dir, mode=0777)
         filenames = {}
         for asset_id in asset_ids:
             asset_select.append(get_object(Asset, id=asset_id))
@@ -312,24 +312,22 @@ def upload(request):
 
         res = gen_resource({'user': user, 'asset': asset_select})
         runner = MyRunner(res)
-        ret = runner.run('copy', module_args='src=%s dest=%s directory_mode' % (upload_dir, '/tmp/hello/'), pattern='*')
+        runner.run('copy', module_args='src=%s dest=%s directory_mode'
+                                        % (upload_dir, upload_dir), pattern='*')
+        ret = runner.get_result()
         logger.debug(ret)
-        error = '上传失败: '
-        if ret.get('dark'):
-            error += ','.join(ret.get('dark').keys())
-
-        for asset, info in ret.get('contacted').items():
-            if info.get('msg'):
-                error += ',%s' % asset
-        if error:
+        if ret.get('failed'):
+            error = '上传目录: %s <br> 上传失败: [ %s ] <br>上传成功 [ %s ]' % (upload_dir,
+                                                                             ', '.join(ret.get('failed').keys()),
+                                                                             ', '.join(ret.get('ok')))
             return HttpResponse(error, status=500)
-        return HttpResponse('传送成功')
+        msg = '上传目录: %s <br> 传送成功 [ %s ]' % (upload_dir, ', '.join(ret.get('ok')))
+        return HttpResponse(msg)
     return my_render('upload.html', locals(), request)
 
 
 @login_required(login_url='/login')
 def download(request):
-    documents = []
     return render_to_response('download.html', locals(), context_instance=RequestContext(request))
 
 

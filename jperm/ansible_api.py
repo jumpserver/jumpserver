@@ -140,6 +140,22 @@ class MyRunner(MyInventory):
         self.results = hoc.run()
         return self.results
 
+    def get_result(self):
+        result = {'failed': {}, 'ok': []}
+        dark = self.results.get('dark')
+        contacted = self.results.get('contacted')
+        if dark:
+            for host, info in dark.items():
+                result['failed'][host] = info.get('msg')
+
+        if contacted:
+            for host, info in contacted.items():
+                if info.get('msg'):
+                    result['failed'][host] = info.get('msg')
+                else:
+                    result['ok'].append(host)
+        return result
+
 
 class Command(MyInventory):
     """

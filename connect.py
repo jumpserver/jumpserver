@@ -16,16 +16,17 @@ import django
 import paramiko
 import struct, fcntl, signal, socket, select
 from io import open as copen
+import uuid
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
     django.setup()
 from django.contrib.sessions.models import Session
 from jumpserver.api import ServerError, User, Asset, PermRole, AssetGroup, get_object, mkdir, get_asset_info, get_role
-from jumpserver.api import logger, Log, TtyLog, get_role_key, CRYPTOR
+from jumpserver.api import logger, Log, TtyLog, get_role_key, CRYPTOR, bash, get_tmp_dir
 from jperm.perm_api import gen_resource, get_group_asset_perm, get_group_user_perm, user_have_perm
 from jumpserver.settings import LOG_DIR
-from jperm.ansible_api import Command
+from jperm.ansible_api import Command, MyRunner
 from jlog.log_api import escapeString
 
 login_user = get_object(User, username=getpass.getuser())
@@ -484,6 +485,8 @@ class Nav(object):
         4) 输入 \033[32mG/g\033[0m 显示您有权限的主机组.
         5) 输入 \033[32mG/g\033[0m\033[0m + \033[32m组ID\033[0m 显示该组下主机.
         6) 输入 \033[32mE/e\033[0m 批量执行命令.
+        7) 输入 \033[32mU/u\033[0m 批量上传文件.
+        7) 输入 \033[32mD/d\033[0m 批量下载文件.
         7) 输入 \033[32mQ/q\033[0m 退出.
         """
         print textwrap.dedent(msg)
@@ -668,6 +671,91 @@ class Nav(object):
                 log.is_finished = True
                 log.end_time = datetime.datetime.now()
 
+    def upload(self):
+        while True:
+            if not self.user_perm:
+                self.user_perm = get_group_user_perm(self.user)
+            try:
+                print "请输入主机名、IP或ansile支持的pattern, q退出"
+                pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
+                if pattern == 'q':
+                    break
+                else:
+                    assets = self.user_perm.get('asset').keys()
+                    res = gen_resource({'user': self.user, 'asset': assets}, perm=self.user_perm)
+                    runner = MyRunner(res)
+                    logger.debug("Muti upload file res: %s" % res)
+                    asset_name_str = ''
+                    for inv in runner.inventory.get_hosts(pattern=pattern):
+                        print inv.name
+                        asset_name_str += inv.name
+                    print
+                    tmp_dir = get_tmp_dir()
+                    logger.debug('Upload tmp dir: %s' % tmp_dir)
+                    os.chdir(tmp_dir)
+                    bash('rz')
+                    runner = MyRunner(res)
+                    runner.run('copy', module_args='src=%s dest=%s directory_mode'
+                                                     % (tmp_dir, tmp_dir), pattern=pattern)
+                    ret = runner.get_result()
+                    logger.debug(ret)
+                    if ret.get('failed'):
+                        print ret
+                        error = '上传目录: %s \n上传失败: [ %s ] \n上传成功 [ %s ]' % (tmp_dir,
+                                                                             ', '.join(ret.get('failed').keys()),
+                                                                             ', '.join(ret.get('ok')))
+                        color_print(error)
+                    else:
+                        msg = '上传目录: %s \n传送成功 [ %s ]' % (tmp_dir, ', '.join(ret.get('ok')))
+                        color_print(msg, 'green')
+                    print
+
+            except IndexError:
+                pass
+
+    def download(self):
+        while True:
+            if not self.user_perm:
+                self.user_perm = get_group_user_perm(self.user)
+            try:
+                print "进入批量下载模式"
+                print "请输入主机名、IP或ansile支持的pattern, q退出"
+                pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
+                if pattern == 'q':
+                    break
+                else:
+                    assets = self.user_perm.get('asset').keys()
+                    res = gen_resource({'user': self.user, 'asset': assets}, perm=self.user_perm)
+                    runner = MyRunner(res)
+                    logger.debug("Muti Muti file res: %s" % res)
+                    for inv in runner.inventory.get_hosts(pattern=pattern):
+                        print inv.name
+                    print
+                    tmp_dir = get_tmp_dir()
+                    logger.debug('Download tmp dir: %s' % tmp_dir)
+                    while True:
+                        print "请输入文件路径(不支持目录)"
+                        file_path = raw_input("\033[1;32mPath>:\033[0m ").strip()
+                        if file_path == 'q':
+                            break
+                        runner.run('fetch', module_args='src=%s dest=%s' % (file_path, tmp_dir), pattern=pattern)
+                        ret = runner.get_result()
+                        os.chdir('/tmp')
+                        tmp_dir_name = os.path.basename(tmp_dir)
+                        bash('tar czf %s.tar.gz %s && sz %s.tar.gz' % (tmp_dir, tmp_dir_name, tmp_dir))
+
+                        if ret.get('failed'):
+                            print ret
+                            error = '文件名称: %s 下载失败: [ %s ] \n下载成功 [ %s ]' % \
+                                    ('%s.tar.gz' % tmp_dir_name, ', '.join(ret.get('failed').keys()), ', '.join(ret.get('ok')))
+                            color_print(error)
+                        else:
+                            msg = '文件名称: %s 下载成功 [ %s ]' % ('%s.tar.gz' % tmp_dir_name, ', '.join(ret.get('ok')))
+                            color_print(msg, 'green')
+                        print
+            except IndexError:
+                pass
+
 
 def main():
     """
@@ -701,6 +789,10 @@ def main():
             elif option in ['E', 'e']:
                 nav.exec_cmd()
                 continue
+            elif option in ['U', 'u']:
+                nav.upload()
+            elif option in ['D', 'd']:
+                nav.download()
             elif option in ['Q', 'q', 'exit']:
                 sys.exit()
             else:

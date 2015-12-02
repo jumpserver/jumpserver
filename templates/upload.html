@@ -66,6 +66,8 @@
             <div class="ibox-content">
                 <div>
                     <form id="my-awesome-dropzone" class="dropzone" action="">
+                        <div class="alert alert-warning text-center" id="error" style="display: none"></div>
+                        <div class="alert alert-success text-center" id="msg" style="display: none"></div>
                         <div class="dropzone-previews">
                             <div class="form-group">
                                 <div class="col-sm-10">
@@ -111,10 +113,12 @@
                 this.on("sendingmultiple", function() {
                 });
                 this.on("successmultiple", function(files, response) {
-                    alert(response)
+                    $('#msg').css('display', 'block');
+                    $('#msg').html(response)
                 });
                 this.on("errormultiple", function(files, response) {
-                    console.log(response)
+                    $('#error').css('display', 'block');
+                    $('#error').html(response)
                 });
             }
 

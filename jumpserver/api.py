@@ -9,6 +9,7 @@ import hashlib
 import datetime
 import random
 import subprocess
+import uuid
 import json
 import logging
 
@@ -481,6 +482,11 @@ def http_error(request, emg):
 def my_render(template, data, request):
     return render_to_response(template, data, context_instance=RequestContext(request))
 
+
+def get_tmp_dir():
+    dir_name = os.path.join('/tmp', uuid.uuid4().hex)
+    mkdir(dir_name, mode=0777)
+    return dir_name
 
 CRYPTOR = PyCrypt(KEY)
 logger = set_log(LOG_LEVEL)
