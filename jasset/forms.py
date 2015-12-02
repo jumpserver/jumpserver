@@ -12,7 +12,8 @@ class AssetForm(forms.ModelForm):
         fields = [
             "ip", "other_ip", "hostname", "port", "group", "username", "password", "use_default_auth",
             "idc", "mac", "remote_ip", "brand", "cpu", "memory", "disk", "system_type", "system_version",
-            "cabinet", "position", "number", "status", "asset_type", "env", "sn", "is_active", "comment"
+            "cabinet", "position", "number", "status", "asset_type", "env", "sn", "is_active", "comment",
+            "system_arch"
         ]
 
 
