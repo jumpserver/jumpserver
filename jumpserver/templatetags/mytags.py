@@ -277,3 +277,16 @@ def get_push_info(push_id, arg):
 @register.filter(name='get_cpu_core')
 def get_cpu_core(cpu_info):
     return cpu_info.split('* ')[1] if cpu_info else ''
+
+@register.filter(name='get_disk_info')
+def get_disk_info(disk_info):
+    try:
+        disk_size = 0
+        if disk_info:
+            disk_dic = ast.literal_eval(disk_info)
+            for disk, size in disk_dic.items():
+                disk_size += size
+            disk_size = int(disk_size)
+    except Exception:
+        disk_size = ''
+    return disk_size
