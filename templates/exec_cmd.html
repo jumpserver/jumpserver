@@ -23,7 +23,7 @@
 
 
 <script type="text/javascript">
-    var wsUri = "{{ web_terminal_uri }}"+"&role=dev";
+    var wsUri = "{{ web_terminal_uri }}"; //请求的websocket url
     var ws = new WebSocket(wsUri);
 
     function createSystemMessage(message) {
@@ -92,7 +92,7 @@
 {#    background-color: #ecf0f1;#}
 {#    border: #000 solid 5px;#}
     background: #000;
-    width: 600px;
+    width: 800px;
     box-shadow: rgba(0, 0, 0, 0.8) 2px 2px 20px;
     color: #fff;
   }
@@ -109,7 +109,7 @@
     position: fixed;
     bottom: 0;
     height: 50px;
-    width: 600px;
+    width: 800px;
 {#    border: #000 solid -10px;#}
     background-color: #2980b9;
   }
@@ -130,7 +130,7 @@
   }
 
   .content {
-    width: 600px;
+    width: 800px;
     margin-left: 5px;
   }
 

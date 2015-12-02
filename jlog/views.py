@@ -108,16 +108,6 @@ def log_record(request):
 
 
 @require_role('user')
-def get_role_name(request):
-    asset_id = request.GET.get('id', 9999)
-    asset = get_object(Asset, id=asset_id)
-    if asset:
-        role = user_have_perm(request.user, asset=asset)
-        return HttpResponse(','.join([i.name for i in role]))
-    return HttpResponse('error')
-
-
-@require_role('user')
 def web_terminal(request):
     asset_id = request.GET.get('id')
     role_name = request.GET.get('role')

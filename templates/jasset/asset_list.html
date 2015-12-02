@@ -177,8 +177,8 @@
         });
 
         $('#exec_cmd').click(function(){
-            var url='/jlog/get_role_name/?id={{ user.id }}';
-            var href = $(this).attr('href');
+            var url = '/jperm/role/get/';
+            var new_url = '/exec_cmd/?role=';
             $.ajax({
                 type: 'GET',
                 url: url,
@@ -192,7 +192,7 @@
                             title: title,
                             maxmin: true,
                             shade: false,
-                            area: ['628px', '452px'],
+                            area: ['800px', '700px'],
                             content: new_url+data
                         });
                         //window.open(new_url + data, '', 'location=no, resizeable=no, height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,status=no');
@@ -201,7 +201,7 @@
                     } else {
                         aUrl = '';
                         $.each(dataArray, function(index, value){
-                            aUrl += '<a onclick="windowOpen(this); return false" class="btn btn-xs btn-primary newa" href=' + new_url + value + ' value=' + hostname +  '>' + value  + '</a> '
+                            aUrl += '<a onclick="windowOpenExec(this); return false" class="btn btn-xs btn-primary newa" href=' + new_url + value + '>' + value  + '</a> '
                         });
                         layer.alert(aUrl, {
                             skin: 'layui-layer-molv',
@@ -217,7 +217,7 @@
         });
 
         $('.conn').click(function(){
-            var url='/jlog/get_role_name/?id=' + $(this).attr('value');
+            var url='/jperm/role/get/?id=' + $(this).attr('value');
             var href = $(this).attr('href');
             var new_url = '/jlog/web_terminal/?id=' + $(this).attr('value') + '&role=';
             var hostname = $(this).closest('tr').find('.hostname')[0].innerHTML;
@@ -270,7 +270,21 @@
             shade: false,
             content: new_url
         });
-        //window.open(new_url, '', 'height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');
+        return false
+    }
+
+     function windowOpenExec(a){
+        var new_url = $(a).attr('href');
+        var title = 'Jumpserver Exec Terminal';
+        layer.open({
+            type: 2,
+            title: title,
+            maxmin: true,
+            area: ['800px', '700px'],
+            shade: false,
+            content: new_url
+        });
+         console.log(new_url);
         return false
     }
 

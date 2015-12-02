@@ -362,6 +362,6 @@ def download(request):
 
 @login_required(login_url='/login')
 def exec_cmd(request):
-    role_name = request.GET.get('role_name')
-    web_terminal_uri = 'ws://%s/exec?role=%s' % (WEB_SOCKET_HOST, role_name)
+    role = request.GET.get('role')
+    web_terminal_uri = 'ws://%s/exec?role=%s' % (WEB_SOCKET_HOST, role)
     return my_render('exec_cmd.html', locals(), request)

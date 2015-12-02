@@ -229,7 +229,8 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
     @require_auth('user')
     def open(self):
         logger.debug('Websocket: Open exec request')
-        role_name = self.get_argument('role', 'dev')
+        role_name = self.get_argument('role', 'sb')
+        logger.debug('Web执行命令: 请求角色 %s' % role_name)
         self.role = get_object(PermRole, name=role_name)
         self.perm = get_group_user_perm(self.user)
         roles = self.perm.get('role').keys()
@@ -262,7 +263,7 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
                         header = "<span style='color: red'>[ %s => %s]</span>\n" % (host, 'failed')
                     self.write_message(header)
                     self.write_message(output)
-            self.write_message('\n\n')
+            self.write_message('\n~o~ Task finished ~o~\n')
 
 
 class WebTerminalHandler(tornado.websocket.WebSocketHandler):
