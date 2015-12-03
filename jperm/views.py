@@ -444,13 +444,14 @@ def perm_role_push(request):
         if password_push or key_push:
             role_chosen_aliase = {}  # {'dev': 'NETWORKING, SHUTDOWN'}
             sudo_alias = set([sudo for sudo in role.sudo.all()])  # set(sudo1, sudo2, sudo3)
-            role_chosen_aliase[role.name] = ','.join(sudo.name for sudo in sudo_alias)
-            add_sudo_script = get_add_sudo_script(role_chosen_aliase, sudo_alias)
-            ret['sudo'] = task.push_sudo_file(add_sudo_script)
+            if sudo_alias:
+                role_chosen_aliase[role.name] = ','.join(sudo.name for sudo in sudo_alias if sudo.name)
+                add_sudo_script = get_add_sudo_script(role_chosen_aliase, sudo_alias)
+                ret['sudo'] = task.push_sudo_file(add_sudo_script)
 
-            if ret['sudo'].get('msg'):
-                ret_failed = ret['sudo'].get('msg')
-            # os.remove(add_sudo_script)
+                if ret['sudo'].get('msg'):
+                    ret_failed = ret['sudo'].get('msg')
+                os.remove(add_sudo_script)
 
         logger.debug('推送role结果: %s' % ret)
         logger.debug('推送role错误: %s' % ret_failed)

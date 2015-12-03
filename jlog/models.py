@@ -32,5 +32,6 @@ class ExecLog(models.Model):
     user = models.CharField(max_length=100)
     host = models.TextField()
     cmd = models.TextField()
+    remote_ip = models.CharField(max_length=100)
     datetime = models.DateTimeField(auto_now=True)
 

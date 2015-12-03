@@ -31,6 +31,7 @@ from jperm.ansible_api import Command, MyRunner
 from jlog.models import ExecLog
 
 login_user = get_object(User, username=getpass.getuser())
+remote_ip = os.popen("who -m | awk '{ print $5 }'").read().strip('()\n')
 
 try:
     import termios
@@ -228,8 +229,6 @@ class Tty(object):
             raise ServerError('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, tty_log_dir))
 
         try:
-            # log_file_f = copen(log_file_path + '.log', mode='at', encoding='utf-8', errors='replace')
-            # log_time_f = copen(log_file_path + '.time', mode='at', encoding='utf-8', errors='replace')
             log_file_f = open(log_file_path + '.log', 'a')
             log_time_f = open(log_file_path + '.time', 'a')
         except IOError:
@@ -238,13 +237,12 @@ class Tty(object):
 
         if self.login_type == 'ssh':  # 如果是ssh连接过来，记录connect.py的pid，web terminal记录为日志的id
             pid = os.getpid()
-            self.remote_ip = os.popen("who -m | awk '{ print $5 }'").read().strip('()\n')  # 获取远端IP
+            self.remote_ip = remote_ip # 获取远端IP
         else:
             pid = 0
 
         log = Log(user=self.username, host=self.asset_name, remote_ip=self.remote_ip, login_type=self.login_type,
                   log_path=log_file_path, start_time=date_today, pid=pid)
-
         log.save()
         if self.login_type == 'web':
             log.pid = log.id
@@ -422,9 +420,6 @@ class SshTty(Tty):
         Connect server.
         连接服务器
         """
-        ps1 = "PS1='[\u@%s \W]\$ '\n" % self.ip
-        login_msg = "clear;echo -e '\\033[32mLogin %s done. Enjoy it.\\033[0m'\n" % self.ip
-
         # 发起ssh连接请求 Make a ssh connection
         ssh = self.get_connection()
 
@@ -436,20 +431,6 @@ class SshTty(Tty):
             signal.signal(signal.SIGWINCH, self.set_win_size)
         except:
             pass
-
-        # 设置PS1并提示 Set PS1 and msg it
-        #channel.send(ps1)
-        #channel.send(login_msg)
-        # channel.send('echo ${SSH_TTY}\n')
-        # global SSH_TTY
-        # while not channel.recv_ready():
-        #     time.sleep(1)
-        # tmp = channel.recv(1024)
-        #print 'ok'+tmp+'ok'
-        # SSH_TTY  = re.search(r'(?<=/dev/).*', tmp).group().strip()
-        # SSH_TTY = ''
-        # channel.send('clear\n')
-        # Make ssh interactive tunnel
         self.posix_shell()
 
         # Shutdown channel socket
@@ -559,7 +540,7 @@ class Nav(object):
                     color_print('错误输入')
                 else:
                     role = role_check[int(role_id)]
-            elif len(roles) == 1: # 授权角色数为1
+            elif len(roles) == 1:  # 授权角色数为1
                 role = roles[0]
             assets = list(self.user_perm.get('role', {}).get(role).get('asset'))  # 获取该用户，角色授权主机
             print "该角色有权限的所有主机"
@@ -584,7 +565,7 @@ class Nav(object):
                 while True:
                     print "请输入执行的命令， 按q退出"
                     command = raw_input("\033[1;32mCmds>:\033[0m ").strip()
-                    ExecLog(host=asset_name_str, cmd=command).save()
+                    ExecLog(host=asset_name_str, user=self.user.username, cmd=command, remote_ip=remote_ip).save()
                     if command == 'q':
                         break
                     runner.run('shell', command, pattern=pattern)

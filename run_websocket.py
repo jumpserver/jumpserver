@@ -221,6 +221,7 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
         self.runner = None
         self.assets = []
         self.perm = {}
+        self.remote_ip = ''
         super(ExecHandler, self).__init__(*args, **kwargs)
 
     def check_origin(self, origin):
@@ -230,6 +231,7 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         logger.debug('Websocket: Open exec request')
         role_name = self.get_argument('role', 'sb')
+        self.remote_ip = self.request.remote_ip
         logger.debug('Web执行命令: 请求角色 %s' % role_name)
         self.role = get_object(PermRole, name=role_name)
         self.perm = get_group_user_perm(self.user)
@@ -256,7 +258,7 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
             self.write_message('匹配主机: ' + asset_name_str)
             self.write_message('<span style="color: yellow">Ansible> %s</span>\n\n' % command)
             self.__class__.tasks.append(MyThread(target=self.run_cmd, args=(command, pattern)))
-            ExecLog(host=asset_name_str, cmd=command).save()
+            ExecLog(host=asset_name_str, cmd=command, user=self.user.username, remote_ip=self.remote_ip).save()
 
         for t in self.__class__.tasks:
             if t.is_alive():
