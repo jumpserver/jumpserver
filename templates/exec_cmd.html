@@ -14,7 +14,7 @@
 
         <div id="footer">
           <div class="content">
-            <input type="text" id="pattern" placeholder="Ansible Pattern">
+            <input type="text" id="pattern" value="{{ check_assets }}" placeholder="Ansible Pattern">
             <input type="text" id="command" placeholder="Command to execute">
             <input type="button" id="send_btn" value="Send" onclick="sendMessage()">
           </div>
@@ -119,7 +119,7 @@
     position: relative;
   }
 
-  #pattern { width: 20%; }
+  #pattern { width: 25%; }
   #command { width: 60%; }
   #send_btn {
     width: 10%;

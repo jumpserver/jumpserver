@@ -176,6 +176,11 @@
         $('#exec_cmd').click(function(){
             var url = '/jperm/role/get/';
             var new_url = '/exec_cmd/?role=';
+            var check_array = [];
+            $(".gradeX input:checked").closest('tr').find('.hostname a').each(function() {
+                check_array.push($(this).text())
+            });
+            check_assets = check_array.join(':');
             $.ajax({
                 type: 'GET',
                 url: url,
@@ -190,7 +195,7 @@
                             maxmin: true,
                             shade: false,
                             area: ['800px', '700px'],
-                            content: new_url+data
+                            content: new_url+data+'&check_assets='+check_assets
                         });
                         //window.open(new_url + data, '', 'location=no, resizeable=no, height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,status=no');
                     } else if (dataArray.length == '1' && data == 'error'){
@@ -198,7 +203,7 @@
                     } else {
                         aUrl = '';
                         $.each(dataArray, function(index, value){
-                            aUrl += '<a onclick="windowOpenExec(this); return false" class="btn btn-xs btn-primary newa" href=' + new_url + value + '>' + value  + '</a> '
+                            aUrl += '<a onclick="windowOpenExec(this); return false" class="btn btn-xs btn-primary newa" href=' + new_url + value  + '&check_assets=' + check_assets + '>' + value  + '</a> '
                         });
                         layer.alert(aUrl, {
                             skin: 'layui-layer-molv',
