@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% block self_head_css_js %}
+    <link href="/static/css/plugins/datepicker/datepicker3.css" rel="stylesheet">
+    <link href="/static/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <script src="/static/js/plugins/chosen/chosen.jquery.js"></script>
+{% endblock %}
+{% block content %}
+{% include 'nav_cat_bar.html' %}
+
+<style>
+    .bootstrap-dialog-body  {
+        background-color: rgba(0, 0, 0, 0);
+    }
+    .bootstrap-dialog-message {
+        color: #00FF00;
+    }
+    .modal-content {
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+    .modal-dialog {
+        background-color: rgba(0, 0, 0, 0);
+        width: 800px;
+    }
+    .modal-body {
+        background-color: rgba(0, 0, 0, 0);
+    }
+    .modal-header {
+        background-color: #FFFFFF;
+    }
+
+</style>
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+ol-sm/g
+            <div class="ibox float-e-margins">
+                <div id="ibox-content" class="ibox-title">
+                    <h5> 用户日志详细信息列表 </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="ibox-content">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li><a href="/jlog/log_list/online/" class="text-center"><i class="fa fa-laptop"></i> 在线 </a></li>
+                            <li class="active"><a href="/jlog/log_list/offline/" class="text-center"><i class="fa fa-bar-chart-o"></i> 历史记录 </a></li>
+                        </ul>
+                    </div>
+                    <br/>
+                    <form class="form-inline" action="" method="get">
+                        <div class="form-group" id="date_5">
+                            <div class="input-daterange input-group" id="datepicker">
+                                <input type="text" class="input-sm form-control" style="width: 100px;" name="start" value="{{ date_seven_day }}">
+                                <span class="input-group-addon">to</span>
+                                <input type="text" class="input-sm form-control" style="width: 100px;"  name="end" value="{{ date_now_str }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <select name="username" data-placeholder="用户名" class="chosen-select" multiple style="width:200px;" tabindex="2">
+                                    {% for username in username_all %}
+                                        <option value="{{ username }}"{% if username in username_list %}selected{% endif %}>{{ username }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <select name="host" data-placeholder="主机" class="chosen-select" multiple style="width:200px;" tabindex="4">
+                                    {% for ip in ip_all %}
+                                    <option value="{{ ip }}" {% if ip in host_list %}selected{% endif %}>{{ ip }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input id="cmd" name="cmd" placeholder="命令" type="text" class="form-control" value="{{ cmd }}" style="width: 200px;">
+                        </div>
+                        <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                                Search
+                        </button>
+                    </form>
+                    <div class="tab-content">
+                        <table class="table table-striped table-bordered table-hover ">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"> ID </th>
+                                    <th class="text-center"> 用户名 </th>
+                                    <th class="text-center"> 主机 </th>
+                                    <th class="text-center"> 来源IP </th>
+                                    <th class="text-center"> 时间 </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            {% for post in contacts.object_list %}
+                                <tr class="gradeX">
+                                    <td class="text-center"> {{ post.id }} </td>
+                                    <td class="text-center username"> {{ post.user }} </td>
+                                    <td class="text-center ip"> {{ post.host }} </td>
+                                    <td class="text-center remote_ip"> {{ post.remote_ip }} </td>
+                                    <td class="text-center"> {{ post.login_type }} </td>
+                                    {% ifnotequal session_role_id 0 %}
+                                        <td class="text-center"><a href="/jlog/history/?id={{ post.id }}" class="log_command"> 统计 </a></td>
+                                    {% endifnotequal %}
+                                    <td class="text-center"><a value="/jlog/record/?id={{ post.id }}" class="log_record"> 回放 </a></td>
+                                    <td class="text-center start_time"> {{ post.start_time|date:"Y-m-d H:i:s"}} </td>
+                                    <td class="text-center end_time"> {{ post.end_time|date:"Y-m-d H:i:s" }} </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-sm-6">
+                            </div>
+                            {% include 'paginator.html' %}
+                        </div>
+                    </div>    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function log_search(){
+        $.ajax({
+            type: "GET",
+            url: "/jlog/search/?env=offline",
+            data: $("#search_form").serialize(),
+            success: function (data) {
+                $(".tab-content").html(data);
+            }
+        });
+    }
+
+</script>
+{% endblock %}
