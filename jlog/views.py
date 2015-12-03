@@ -8,7 +8,7 @@ from jperm.perm_api import user_have_perm
 from django.http import HttpResponseNotFound
 from jlog.log_api import renderTemplate
 
-from jlog.models import Log, ExecLog
+from jlog.models import Log, ExecLog, FileLog
 from jumpserver.settings import WEB_SOCKET_HOST
 
 
@@ -24,8 +24,16 @@ def log_list(request, offset):
 
     if offset == 'online':
         posts = Log.objects.filter(is_finished=False).order_by('-start_time')
-    if offset == 'exec':
+    elif offset == 'exec':
         posts = ExecLog.objects.all().order_by('-id')
+        keyword = request.GET.get('keyword', '')
+        if keyword:
+            posts = posts.filter(Q(user__icontains=keyword)|Q(host__icontains=keyword)|Q(cmd__icontains=keyword))
+    elif offset == 'file':
+        posts = FileLog.objects.all().order_by('-id')
+        keyword = request.GET.get('keyword', '')
+        if keyword:
+            posts = posts.filter(Q(user__icontains=keyword)|Q(host__icontains=keyword)|Q(filename__icontains=keyword))
     else:
         posts = Log.objects.filter(is_finished=True).order_by('-start_time')
         username_all = set([log.user for log in Log.objects.all()])
@@ -57,6 +65,11 @@ def log_list(request, offset):
     web_kill_uri = 'http://%s/kill' % WEB_SOCKET_HOST
     session_id = request.session.session_key
     return render_to_response('jlog/log_%s.html' % offset, locals(), context_instance=RequestContext(request))
+
+
+@require_role('admin')
+def log_detail(request):
+    return my_render('jlog/exec_detail.html', locals(), request)
 
 
 @require_role('admin')

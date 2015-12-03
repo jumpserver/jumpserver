@@ -35,3 +35,13 @@ class ExecLog(models.Model):
     remote_ip = models.CharField(max_length=100)
     datetime = models.DateTimeField(auto_now=True)
 
+
+class FileLog(models.Model):
+    user = models.CharField(max_length=100)
+    host = models.TextField()
+    filename = models.TextField()
+    type = models.CharField(max_length=20)
+    remote_ip = models.CharField(max_length=100)
+    datetime = models.DateTimeField(auto_now=True)
+
+

@@ -28,7 +28,7 @@ from jperm.perm_api import gen_resource, get_group_asset_perm, get_group_user_pe
 from jumpserver.settings import LOG_DIR
 from jperm.ansible_api import Command, MyRunner
 # from jlog.log_api import escapeString
-from jlog.models import ExecLog
+from jlog.models import ExecLog, FileLog
 
 login_user = get_object(User, username=getpass.getuser())
 remote_ip = os.popen("who -m | awk '{ print $5 }'").read().strip('()\n')
@@ -601,16 +601,23 @@ class Nav(object):
                     print "匹配主机:\n"
                     for inv in runner.inventory.get_hosts(pattern=pattern):
                         print inv.name
-                        asset_name_str += inv.name
-                    print
+                        asset_name_str += '%s ' % inv.name
+
+                    if not asset_name_str:
+                        color_print('没有匹配主机')
+                        print
+                        continue
                     tmp_dir = get_tmp_dir()
                     logger.debug('Upload tmp dir: %s' % tmp_dir)
                     os.chdir(tmp_dir)
                     bash('rz')
-                    check_notempty = os.listdir(tmp_dir)
-                    if not check_notempty:
+                    filename_str = ' '.join(os.listdir(tmp_dir))
+                    if not filename_str:
                         print color_print("上传文件为空")
                         continue
+                    logger.debug('上传文件: %s' % filename_str)
+                    FileLog(user=self.user.name, host=asset_name_str, filename=filename_str,
+                            remote_ip=remote_ip, type='upload').save()
                     runner = MyRunner(res)
                     runner.run('copy', module_args='src=%s dest=%s directory_mode'
                                                      % (tmp_dir, tmp_dir), pattern=pattern)
@@ -644,9 +651,14 @@ class Nav(object):
                     res = gen_resource({'user': self.user, 'asset': assets}, perm=self.user_perm)
                     runner = MyRunner(res)
                     logger.debug("Muti download file res: %s" % res)
+                    asset_name_str = ''
                     print "匹配用户:\n"
                     for inv in runner.inventory.get_hosts(pattern=pattern):
-                        print inv.name
+                        asset_name_str += '%s ' % inv.name
+                        print ' %s' % inv.name
+                    if not asset_name_str:
+                        color_print('没有匹配主机')
+                        continue
                     print
                     while True:
                         tmp_dir = get_tmp_dir()
@@ -655,19 +667,24 @@ class Nav(object):
                         file_path = raw_input("\033[1;32mPath>:\033[0m ").strip()
                         if file_path == 'q':
                             break
+                        FileLog(user=self.user.name, host=asset_name_str, filename=file_path, type='download',
+                                remote_ip=remote_ip).save()
                         runner.run('fetch', module_args='src=%s dest=%s' % (file_path, tmp_dir), pattern=pattern)
                         ret = runner.results
                         logger.debug('Download file result: %s' % ret)
                         os.chdir('/tmp')
                         tmp_dir_name = os.path.basename(tmp_dir)
+                        if not os.listdir(tmp_dir):
+                            color_print('下载全部失败')
+                            continue
                         bash('tar czf %s.tar.gz %s && sz %s.tar.gz' % (tmp_dir, tmp_dir_name, tmp_dir))
 
                         if ret.get('failed'):
-                            error = '文件名称: %s 下载失败: [ %s ] \n下载成功 [ %s ]' % \
+                            error = '文件名称: %s \n下载失败: [ %s ] \n下载成功 [ %s ]' % \
                                     ('%s.tar.gz' % tmp_dir_name, ', '.join(ret.get('failed').keys()), ', '.join(ret.get('ok').keys()))
                             color_print(error)
                         else:
-                            msg = '文件名称: %s 下载成功 [ %s ]' % ('%s.tar.gz' % tmp_dir_name, ', '.join(ret.get('ok').keys()))
+                            msg = '文件名称: %s \n下载成功 [ %s ]' % ('%s.tar.gz' % tmp_dir_name, ', '.join(ret.get('ok').keys()))
                             color_print(msg, 'green')
                         print
             except IndexError:
