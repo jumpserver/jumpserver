@@ -8,7 +8,7 @@ from jperm.perm_api import user_have_perm
 from django.http import HttpResponseNotFound
 from jlog.log_api import renderTemplate
 
-from models import Log
+from jlog.models import Log, ExecLog
 from jumpserver.settings import WEB_SOCKET_HOST
 
 
@@ -21,9 +21,11 @@ def log_list(request, offset):
     username_list = request.GET.getlist('username', [])
     host_list = request.GET.getlist('host', [])
     cmd = request.GET.get('cmd', '')
-    print date_seven_day, date_now_str
+
     if offset == 'online':
         posts = Log.objects.filter(is_finished=False).order_by('-start_time')
+    if offset == 'exec':
+        posts = ExecLog.objects.all().order_by('-id')
     else:
         posts = Log.objects.filter(is_finished=True).order_by('-start_time')
         username_all = set([log.user for log in Log.objects.all()])
