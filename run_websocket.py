@@ -8,7 +8,7 @@ import sys
 import os.path
 import threading
 import datetime
-import urllib
+import re
 
 import tornado.ioloop
 import tornado.options
@@ -24,7 +24,7 @@ from pyinotify import WatchManager, Notifier, ProcessEvent, IN_DELETE, IN_CREATE
 import select
 
 from connect import Tty, User, Asset, PermRole, logger, get_object, PermRole, gen_resource
-from connect import TtyLog, Log, Session, user_have_perm, get_group_user_perm, Command
+from connect import TtyLog, Log, Session, user_have_perm, get_group_user_perm, MyRunner, ExecLog
 
 try:
     import simplejson as json
@@ -218,7 +218,7 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
         self.id = 0
         self.user = None
         self.role = None
-        self.cmd = None
+        self.runner = None
         self.assets = []
         self.perm = {}
         super(ExecHandler, self).__init__(*args, **kwargs)
@@ -238,32 +238,50 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
             self.write_message('No perm that role %s' % role_name)
             self.close()
         self.assets = self.perm.get('role').get(self.role).get('asset')
+
         res = gen_resource({'user': self.user, 'asset': self.assets, 'role': self.role})
-        logger.debug('Web执行命令res: %s' % res)
-        self.cmd = Command(res)
-        message = '有权限的主机：' + ', '.join([asset.hostname for asset in self.assets])
+        self.runner = MyRunner(res)
+        message = '有权限的主机: ' + ', '.join([asset.hostname for asset in self.assets])
+        self.__class__.clients.append(self)
         self.write_message(message)
 
     def on_message(self, message):
         data = json.loads(message)
         pattern = data.get('pattern', '')
         command = data.get('command', '')
-        asset_name_str = '匹配主机: '
+        asset_name_str = ''
         if pattern and command:
-            for inv in self.cmd.inventory.get_hosts(pattern=pattern):
-                asset_name_str += '\n%s' % inv.name
-            self.write_message(asset_name_str)
+            for inv in self.runner.inventory.get_hosts(pattern=pattern):
+                asset_name_str += '%s ' % inv.name
+            self.write_message('匹配主机: ' + asset_name_str)
             self.write_message('<span style="color: yellow">Ansible> %s</span>\n\n' % command)
-            result = self.cmd.run(module_name='shell', command=command, pattern=pattern)
-            for k, v in result.items():
-                for host, output in v.items():
-                    if k == 'ok':
-                        header = "<span style='color: green'>[ %s => %s]</span>\n" % (host, 'Ok')
-                    else:
-                        header = "<span style='color: red'>[ %s => %s]</span>\n" % (host, 'failed')
-                    self.write_message(header)
-                    self.write_message(output)
-            self.write_message('\n~o~ Task finished ~o~\n')
+            self.__class__.tasks.append(MyThread(target=self.run_cmd, args=(command, pattern)))
+            ExecLog(host=asset_name_str, cmd=command).save()
+
+        for t in self.__class__.tasks:
+            if t.is_alive():
+                continue
+            try:
+                t.setDaemon(True)
+                t.start()
+            except RuntimeError:
+                pass
+
+    def run_cmd(self, command, pattern):
+        self.runner.run('shell', command, pattern=pattern)
+        for k, v in self.runner.results.items():
+            for host, output in v.items():
+                if k == 'ok':
+                    header = "<span style='color: green'>[ %s => %s]</span>\n" % (host, 'Ok')
+                else:
+                    header = "<span style='color: red'>[ %s => %s]</span>\n" % (host, 'failed')
+                self.write_message(header)
+                self.write_message(output)
+
+        self.write_message('\n~o~ Task finished ~o~\n')
+
+    def on_close(self):
+        logger.debug('关闭web_exec请求')
 
 
 class WebTerminalHandler(tornado.websocket.WebSocketHandler):

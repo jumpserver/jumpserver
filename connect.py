@@ -27,7 +27,8 @@ from jumpserver.api import logger, Log, TtyLog, get_role_key, CRYPTOR, bash, get
 from jperm.perm_api import gen_resource, get_group_asset_perm, get_group_user_perm, user_have_perm, PermRole
 from jumpserver.settings import LOG_DIR
 from jperm.ansible_api import Command, MyRunner
-from jlog.log_api import escapeString
+# from jlog.log_api import escapeString
+from jlog.models import ExecLog
 
 login_user = get_object(User, username=getpass.getuser())
 
@@ -468,16 +469,6 @@ class Nav(object):
         Print prompt
         打印提示导航
         """
-        msg = """\n\033[1;32m###  Welcome To Use JumpServer, A Open Source System . ### \033[0m
-        1) Type \033[32mID\033[0m To Login.
-        2) Type \033[32m/\033[0m + \033[32mIP, Host Name, Host Alias or Comments \033[0mTo Search.
-        3) Type \033[32mP/p\033[0m To Print The Servers You Available.
-        4) Type \033[32mG/g\033[0m To Print The Server Groups You Available.
-        5) Type \033[32mG/g\033[0m\033[0m + \033[32mGroup ID\033[0m To Print The Server Group You Available.
-        6) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
-        7) Type \033[32mQ/q\033[0m To Quit.
-        """
-
         msg = """\n\033[1;32m###  欢迎使用Jumpserver开源跳板机  ### \033[0m
         1) 输入 \033[32mID\033[0m 直接登录.
         2) 输入 \033[32m/\033[0m + \033[32mIP, 主机名, 主机别名 or 备注 \033[0m搜索.
@@ -542,35 +533,6 @@ class Nav(object):
                 print '[%-3s] %-15s' % (asset_group.id, asset_group.name)
         print
 
-    def get_exec_log(self, assets_name_str):
-        exec_log_dir = os.path.join(LOG_DIR, 'exec')
-        date_today = datetime.datetime.now()
-        date_start = date_today.strftime('%Y%m%d')
-        time_start = date_today.strftime('%H%M%S')
-        today_connect_log_dir = os.path.join(exec_log_dir, date_start)
-        log_file_path = os.path.join(today_connect_log_dir, '%s_%s' % (self.user.username, time_start))
-
-        try:
-            mkdir(os.path.dirname(today_connect_log_dir), mode=0777)
-            mkdir(today_connect_log_dir, mode=0777)
-        except OSError:
-            logger.debug('创建目录 %s 失败，请修改%s目录权限' % (today_connect_log_dir, exec_log_dir))
-            raise ServerError('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, exec_log_dir))
-
-        try:
-            log_file_f = open(log_file_path + '.log', 'a')
-            log_file_f.write('Start at %s\r\n' % datetime.datetime.now())
-            log_time_f = open(log_file_path + '.time', 'a')
-        except IOError:
-            logger.debug('创建tty日志文件失败, 请修改目录%s权限' % today_connect_log_dir)
-            raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
-
-        remote_ip = os.popen("who -m | awk '{ print $5 }'").read().strip('()\n')
-        log = Log(user=self.user.username, host=assets_name_str, remote_ip=remote_ip, login_type='exec',
-                  log_path=log_file_path, start_time=datetime.datetime.now(), pid=os.getpid())
-        log.save()
-        return log_file_f, log_time_f, log
-
     def exec_cmd(self):
         """
         批量执行命令
@@ -578,104 +540,74 @@ class Nav(object):
         while True:
             if not self.user_perm:
                 self.user_perm = get_group_user_perm(self.user)
-            print '\033[32m[%-2s] %-15s \033[0m' % ('ID', '角色')
+
             roles = self.user_perm.get('role').keys()
-            role_check = dict(zip(range(len(roles)), roles))
+            if len(roles) > 1:  # 授权角色数大于1
+                print '\033[32m[%-2s] %-15s \033[0m' % ('ID', '角色')
+                role_check = dict(zip(range(len(roles)), roles))
 
-            for i, r in role_check.items():
-                print '[%-2s] %-15s' % (i, r.name)
-            print
-            print "请输入运行命令角色的ID, q退出"
+                for i, r in role_check.items():
+                    print '[%-2s] %-15s' % (i, r.name)
+                print
+                print "请输入运行命令角色的ID, q退出"
 
-            try:
-                role_id = raw_input("\033[1;32mRole>:\033[0m ").strip()
-                if role_id == 'q':
-                    break
+                try:
+                    role_id = raw_input("\033[1;32mRole>:\033[0m ").strip()
+                    if role_id == 'q':
+                        break
+                except (IndexError, ValueError):
+                    color_print('错误输入')
                 else:
                     role = role_check[int(role_id)]
-                    assets = list(self.user_perm.get('role', {}).get(role).get('asset'))
-                    print "该角色有权限的所有主机"
-                    for asset in assets:
-                        print asset.hostname
-                    print
-                    print "请输入主机名、IP或ansile支持的pattern, q退出"
-                    pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
-                    if pattern == 'q':
-                        break
-                    else:
-                        res = gen_resource({'user': self.user, 'asset': assets, 'role': role}, perm=self.user_perm)
-                        cmd = Command(res)
-                        logger.debug("批量执行res: %s" % res)
-                        asset_name_str = ''
-                        for inv in cmd.inventory.get_hosts(pattern=pattern):
-                            print inv.name
-                            asset_name_str += inv.name
-                        print
-
-                        log_file_f, log_time_f, log = self.get_exec_log(asset_name_str)
-                        pre_timestamp = time.time()
-                        while True:
-                            print "请输入执行的命令， 按q退出"
-                            data = 'ansible> '
-                            write_log(log_file_f, data)
-                            now_timestamp = time.time()
-                            write_log(log_time_f, '%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
-                            pre_timestamp = now_timestamp
-                            command = raw_input("\033[1;32mCmds>:\033[0m ").strip()
-                            data = '%s\r\n' % command
-                            write_log(log_file_f, data)
-                            now_timestamp = time.time()
-                            write_log(log_time_f, '%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
-                            pre_timestamp = now_timestamp
-                            TtyLog(log=log, cmd=command, datetime=datetime.datetime.now()).save()
-                            if command == 'q':
-                                log.is_finished = True
-                                log.end_time = datetime.datetime.now()
-                                log.save()
-                                break
-                            result = cmd.run(module_name='shell', command=command, pattern=pattern)
-                            for k, v in result.items():
-                                if k == 'ok':
-                                    for host, output in v.items():
-                                        header = color_print("%s => %s" % (host, 'Ok'), 'green')
-                                        print output
-                                        output = re.sub(r'[\r\n]', '\r\n', output)
-                                        data = '%s\r\n%s\r\n' % (header, output)
-                                        now_timestamp = time.time()
-                                        write_log(log_file_f, data)
-                                        write_log(log_time_f, '%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
-                                        pre_timestamp = now_timestamp
-                                        print
-                                else:
-                                    for host, output in v.items():
-                                        header = color_print("%s => %s" % (host, k), 'red')
-                                        output = color_print(output, 'red')
-                                        output = re.sub(r'[\r\n]', '\r\n', output)
-                                        data = '%s\r\n%s\r\n' % (header, output)
-                                        now_timestamp = time.time()
-                                        write_log(log_file_f, data)
-                                        write_log(log_time_f, '%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
-                                        pre_timestamp = now_timestamp
-                                        print
-                                print "=" * 20
-                                print
-
-            except (IndexError, KeyError):
-                color_print('ID输入错误')
-                continue
-
-            except EOFError:
-                print
+            elif len(roles) == 1: # 授权角色数为1
+                role = roles[0]
+            assets = list(self.user_perm.get('role', {}).get(role).get('asset'))  # 获取该用户，角色授权主机
+            print "该角色有权限的所有主机"
+            for asset in assets:
+                print ' %s' % asset.hostname
+            print
+            print "请输入主机名、IP或ansile支持的pattern, q退出"
+            pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
+            if pattern == 'q':
                 break
-            finally:
-                log.is_finished = True
-                log.end_time = datetime.datetime.now()
+            else:
+                res = gen_resource({'user': self.user, 'asset': assets, 'role': role}, perm=self.user_perm)
+                runner = MyRunner(res)
+                logger.debug("批量执行res: %s" % res)
+                asset_name_str = ''
+                print "匹配主机:"
+                for inv in runner.inventory.get_hosts(pattern=pattern):
+                    print ' %s' % inv.name
+                    asset_name_str += '%s ' % inv.name
+                print
+
+                while True:
+                    print "请输入执行的命令， 按q退出"
+                    command = raw_input("\033[1;32mCmds>:\033[0m ").strip()
+                    ExecLog(host=asset_name_str, cmd=command).save()
+                    if command == 'q':
+                        break
+                    runner.run('shell', command, pattern=pattern)
+                    for k, v in runner.results.items():
+                        if k == 'ok':
+                            for host, output in v.items():
+                                color_print("%s => %s" % (host, 'Ok'), 'green')
+                                print output
+                                print
+                        else:
+                            for host, output in v.items():
+                                color_print("%s => %s" % (host, k), 'red')
+                                color_print(output, 'red')
+                                print
+                    print "~o~ Task finished ~o~"
+                    print
 
     def upload(self):
         while True:
             if not self.user_perm:
                 self.user_perm = get_group_user_perm(self.user)
             try:
+                print "进入批量上传模式"
                 print "请输入主机名、IP或ansile支持的pattern, q退出"
                 pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
                 if pattern == 'q':
@@ -684,8 +616,8 @@ class Nav(object):
                     assets = self.user_perm.get('asset').keys()
                     res = gen_resource({'user': self.user, 'asset': assets}, perm=self.user_perm)
                     runner = MyRunner(res)
-                    logger.debug("Muti upload file res: %s" % res)
                     asset_name_str = ''
+                    print "匹配主机:\n"
                     for inv in runner.inventory.get_hosts(pattern=pattern):
                         print inv.name
                         asset_name_str += inv.name
@@ -701,16 +633,15 @@ class Nav(object):
                     runner = MyRunner(res)
                     runner.run('copy', module_args='src=%s dest=%s directory_mode'
                                                      % (tmp_dir, tmp_dir), pattern=pattern)
-                    ret = runner.get_result()
-                    logger.debug(ret)
+                    ret = runner.results
+                    logger.debug('Upload file: %s' % ret)
                     if ret.get('failed'):
-                        print ret
                         error = '上传目录: %s \n上传失败: [ %s ] \n上传成功 [ %s ]' % (tmp_dir,
                                                                              ', '.join(ret.get('failed').keys()),
-                                                                             ', '.join(ret.get('ok')))
+                                                                             ', '.join(ret.get('ok').keys()))
                         color_print(error)
                     else:
-                        msg = '上传目录: %s \n传送成功 [ %s ]' % (tmp_dir, ', '.join(ret.get('ok')))
+                        msg = '上传目录: %s \n传送成功 [ %s ]' % (tmp_dir, ', '.join(ret.get('ok').keys()))
                         color_print(msg, 'green')
                     print
 
@@ -731,30 +662,31 @@ class Nav(object):
                     assets = self.user_perm.get('asset').keys()
                     res = gen_resource({'user': self.user, 'asset': assets}, perm=self.user_perm)
                     runner = MyRunner(res)
-                    logger.debug("Muti Muti file res: %s" % res)
+                    logger.debug("Muti download file res: %s" % res)
+                    print "匹配用户:\n"
                     for inv in runner.inventory.get_hosts(pattern=pattern):
                         print inv.name
                     print
-                    tmp_dir = get_tmp_dir()
-                    logger.debug('Download tmp dir: %s' % tmp_dir)
                     while True:
+                        tmp_dir = get_tmp_dir()
+                        logger.debug('Download tmp dir: %s' % tmp_dir)
                         print "请输入文件路径(不支持目录)"
                         file_path = raw_input("\033[1;32mPath>:\033[0m ").strip()
                         if file_path == 'q':
                             break
                         runner.run('fetch', module_args='src=%s dest=%s' % (file_path, tmp_dir), pattern=pattern)
-                        ret = runner.get_result()
+                        ret = runner.results
+                        logger.debug('Download file result: %s' % ret)
                         os.chdir('/tmp')
                         tmp_dir_name = os.path.basename(tmp_dir)
-                        bash('tar czf %s.tar.gz %s ' % (tmp_dir, tmp_dir_name))
+                        bash('tar czf %s.tar.gz %s && sz %s.tar.gz' % (tmp_dir, tmp_dir_name, tmp_dir))
 
                         if ret.get('failed'):
-                            print ret
                             error = '文件名称: %s 下载失败: [ %s ] \n下载成功 [ %s ]' % \
-                                    ('%s.tar.gz' % tmp_dir_name, ', '.join(ret.get('failed').keys()), ', '.join(ret.get('ok')))
+                                    ('%s.tar.gz' % tmp_dir_name, ', '.join(ret.get('failed').keys()), ', '.join(ret.get('ok').keys()))
                             color_print(error)
                         else:
-                            msg = '文件名称: %s 下载成功 [ %s ]' % ('%s.tar.gz' % tmp_dir_name, ', '.join(ret.get('ok')))
+                            msg = '文件名称: %s 下载成功 [ %s ]' % ('%s.tar.gz' % tmp_dir_name, ', '.join(ret.get('ok').keys()))
                             color_print(msg, 'green')
                         print
             except IndexError:

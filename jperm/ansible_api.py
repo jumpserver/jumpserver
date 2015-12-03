@@ -117,9 +117,9 @@ class MyRunner(MyInventory):
     """
     def __init__(self, *args, **kwargs):
         super(MyRunner, self).__init__(*args, **kwargs)
-        self.results = {}
+        self.results_raw = {}
 
-    def run(self, module_name, module_args='', timeout=10, forks=10, pattern='',
+    def run(self, module_name='shell', module_args='', timeout=10, forks=10, pattern='',
             sudo=False, sudo_user='root', sudo_pass=''):
         """
         run module from andible ad-hoc.
@@ -137,23 +137,29 @@ class MyRunner(MyInventory):
                      become_user=sudo_user,
                      become_pass=sudo_pass
                      )
-        self.results = hoc.run()
-        return self.results
+        self.results_raw = hoc.run()
+        return self.results_raw
 
-    def get_result(self):
-        result = {'failed': {}, 'ok': []}
-        dark = self.results.get('dark')
-        contacted = self.results.get('contacted')
+    @property
+    def results(self):
+        """
+        {'failed': {'localhost': ''}, 'ok': {'jumpserver': ''}}
+        """
+        result = {'failed': {}, 'ok': {}}
+        dark = self.results_raw.get('dark')
+        contacted = self.results_raw.get('contacted')
         if dark:
             for host, info in dark.items():
                 result['failed'][host] = info.get('msg')
 
         if contacted:
             for host, info in contacted.items():
-                if info.get('msg'):
-                    result['failed'][host] = info.get('msg')
+                if info.get('failed'):
+                    result['failed'][host] = info.get('msg') + info.get('stderr', '')
+                elif info.get('stderr'):
+                    result['failed'][host] = info.get('stderr') + str(info.get('warnings'))
                 else:
-                    result['ok'].append(host)
+                    result['ok'][host] = info.get('stdout')
         return result
 
 
@@ -163,9 +169,9 @@ class Command(MyInventory):
     """
     def __init__(self, *args, **kwargs):
         super(Command, self).__init__(*args, **kwargs)
-        self.results = {}
+        self.results_raw = {}
 
-    def run(self, command, module_name="command", timeout=10, forks=10, pattern='*'):
+    def run(self, command, module_name="command", timeout=10, forks=10, pattern=''):
         """
         run command from andible ad-hoc.
         command  : 必须是一个需要执行的命令字符串， 比如 
@@ -183,25 +189,34 @@ class Command(MyInventory):
                      pattern=pattern,
                      forks=forks,
                      )
-        self.results = hoc.run()
-
-        ret = {}
-        if self.stdout:
-            data['ok'] = self.stdout
-        if self.stderr:
-            data['err'] = self.stderr
-        if self.dark:
-            data['dark'] = self.dark
-
-        return data
-
+        self.results_raw = hoc.run()
 
     @property
-    def raw_results(self):
-        """
-        get the ansible raw results.
-        """
-        return self.results
+    def result(self):
+        result = {}
+        for k, v in self.results_raw.items():
+            if k == 'dark':
+                for host, info in v.items():
+                    result[host] = {'dark': info.get('msg')}
+            elif k == 'contacted':
+                for host, info in v.items():
+                    result[host] = {}
+                    if info.get('stdout'):
+                        result[host]['stdout'] = info.get('stdout')
+                    elif info.get('stderr'):
+                        result[host]['stderr'] = info.get('stderr')
+        return result
+
+    @property
+    def state(self):
+        result = {}
+        if self.stdout:
+            result['ok'] = self.stdout
+        if self.stderr:
+            result['err'] = self.stderr
+        if self.dark:
+            result['dark'] = self.dark
+        return result
 
     @property
     def exec_time(self):
@@ -209,7 +224,7 @@ class Command(MyInventory):
         get the command execute time.
         """
         result = {}
-        all = self.results.get("contacted")
+        all = self.results_raw.get("contacted")
         for key, value in all.iteritems():
             result[key] = {
                     "start": value.get("start"),
@@ -223,7 +238,7 @@ class Command(MyInventory):
         get the comamnd standard output.
         """
         result = {}
-        all = self.results.get("contacted")
+        all = self.results_raw.get("contacted")
         for key, value in all.iteritems():
             result[key] = value.get("stdout")
         return result
@@ -234,7 +249,7 @@ class Command(MyInventory):
         get the command standard error.
         """
         result = {}
-        all = self.results.get("contacted")
+        all = self.results_raw.get("contacted")
         for key, value in all.iteritems():
             if value.get("stderr") or value.get("warnings"):
                 result[key] = {
@@ -247,7 +262,7 @@ class Command(MyInventory):
         """
         get the dark results.
         """
-        return self.results.get("dark")
+        return self.results_raw.get("dark")
 
 
 class Tasks(Command):

@@ -313,14 +313,14 @@ def upload(request):
         runner = MyRunner(res)
         runner.run('copy', module_args='src=%s dest=%s directory_mode'
                                         % (upload_dir, upload_dir), pattern='*')
-        ret = runner.get_result()
+        ret = runner.results
         logger.debug(ret)
         if ret.get('failed'):
             error = '上传目录: %s <br> 上传失败: [ %s ] <br>上传成功 [ %s ]' % (upload_dir,
                                                                              ', '.join(ret.get('failed').keys()),
-                                                                             ', '.join(ret.get('ok')))
+                                                                             ', '.join(ret.get('ok').keys()))
             return HttpResponse(error, status=500)
-        msg = '上传目录: %s <br> 传送成功 [ %s ]' % (upload_dir, ', '.join(ret.get('ok')))
+        msg = '上传目录: %s <br> 传送成功 [ %s ]' % (upload_dir, ', '.join(ret.get('ok')).keys())
         return HttpResponse(msg)
     return my_render('upload.html', locals(), request)
 
@@ -345,7 +345,7 @@ def download(request):
         res = gen_resource({'user': user, 'asset': asset_select})
         runner = MyRunner(res)
         runner.run('fetch', module_args='src=%s dest=%s' % (file_path, upload_dir), pattern='*')
-        logger.debug(runner.get_result())
+        logger.debug(runner.results)
         os.chdir('/tmp')
         tmp_dir_name = os.path.basename(upload_dir)
         tar_file = '%s.tar.gz' % upload_dir
