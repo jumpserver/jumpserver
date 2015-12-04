@@ -9,7 +9,7 @@
 
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
-        <div class="col-sm-10">
+        <div class="col-sm-12">
             <div class="ibox float-e-margins">
                 <div id="ibox-content" class="ibox-title">
                     <h5> 上传下载日志 </h5>
@@ -75,7 +75,7 @@
                                     <td class="text-center"> {{ post.remote_ip }} </td>
                                     <td class="text-center"> {{ post.datetime|date:"Y-m-d H:i:s"}} </td>
                                     <td class="text-center">
-                                        <a href="../user_detail/?id={{ user.id }}" class="btn btn-xs btn-primary">详情</a>
+                                        <a href="/jlog/log_detail/file/?id={{ post.id }}" class="btn btn-xs btn-primary">详情</a>
                                     </td>
                                 </tr>
                             {% endfor %}

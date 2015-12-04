@@ -565,10 +565,11 @@ class Nav(object):
                 while True:
                     print "请输入执行的命令， 按q退出"
                     command = raw_input("\033[1;32mCmds>:\033[0m ").strip()
-                    ExecLog(host=asset_name_str, user=self.user.username, cmd=command, remote_ip=remote_ip).save()
                     if command == 'q':
                         break
                     runner.run('shell', command, pattern=pattern)
+                    ExecLog(host=asset_name_str, user=self.user.username, cmd=command, remote_ip=remote_ip,
+                            result=runner.results).save()
                     for k, v in runner.results.items():
                         if k == 'ok':
                             for host, output in v.items():
@@ -605,7 +606,6 @@ class Nav(object):
 
                     if not asset_name_str:
                         color_print('没有匹配主机')
-                        print
                         continue
                     tmp_dir = get_tmp_dir()
                     logger.debug('Upload tmp dir: %s' % tmp_dir)
@@ -613,15 +613,16 @@ class Nav(object):
                     bash('rz')
                     filename_str = ' '.join(os.listdir(tmp_dir))
                     if not filename_str:
-                        print color_print("上传文件为空")
+                        color_print("上传文件为空")
                         continue
                     logger.debug('上传文件: %s' % filename_str)
-                    FileLog(user=self.user.name, host=asset_name_str, filename=filename_str,
-                            remote_ip=remote_ip, type='upload').save()
+
                     runner = MyRunner(res)
                     runner.run('copy', module_args='src=%s dest=%s directory_mode'
                                                      % (tmp_dir, tmp_dir), pattern=pattern)
                     ret = runner.results
+                    FileLog(user=self.user.name, host=asset_name_str, filename=filename_str,
+                            remote_ip=remote_ip, type='upload', result=ret).save()
                     logger.debug('Upload file: %s' % ret)
                     if ret.get('failed'):
                         error = '上传目录: %s \n上传失败: [ %s ] \n上传成功 [ %s ]' % (tmp_dir,
@@ -667,10 +668,10 @@ class Nav(object):
                         file_path = raw_input("\033[1;32mPath>:\033[0m ").strip()
                         if file_path == 'q':
                             break
-                        FileLog(user=self.user.name, host=asset_name_str, filename=file_path, type='download',
-                                remote_ip=remote_ip).save()
                         runner.run('fetch', module_args='src=%s dest=%s' % (file_path, tmp_dir), pattern=pattern)
                         ret = runner.results
+                        FileLog(user=self.user.name, host=asset_name_str, filename=file_path, type='download',
+                                remote_ip=remote_ip, result=ret).save()
                         logger.debug('Download file result: %s' % ret)
                         os.chdir('/tmp')
                         tmp_dir_name = os.path.basename(tmp_dir)

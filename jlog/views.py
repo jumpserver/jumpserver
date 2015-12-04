@@ -129,3 +129,21 @@ def web_terminal(request):
     web_terminal_uri = 'ws://%s/terminal?id=%s&role=%s' % (WEB_SOCKET_HOST, asset_id, role_name)
     return render_to_response('jlog/web_terminal.html', locals())
 
+
+@require_role('admin')
+def log_detail(request, offset):
+    log_id = request.GET.get('id')
+    if offset == 'exec':
+        log = get_object(ExecLog, id=log_id)
+        assets_hostname = log.host.split(' ')
+        result = eval(str(log.result))
+        return my_render('jlog/exec_detail.html', locals(), request)
+    elif offset == 'file':
+        log = get_object(FileLog, id=log_id)
+        assets_hostname = log.host.split(' ')
+        file_list = log.filename.split(' ')
+        try:
+            result = eval(str(log.result))
+        except (SyntaxError, NameError):
+            result = {}
+        return my_render('jlog/file_detail.html', locals(), request)

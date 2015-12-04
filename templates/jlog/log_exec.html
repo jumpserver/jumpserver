@@ -73,7 +73,7 @@
                                     <td class="text-center remote_ip"> {{ post.remote_ip }} </td>
                                     <td class="text-center start_time"> {{ post.datetime|date:"Y-m-d H:i:s"}} </td>
                                     <td class="text-center">
-                                        <a href="../user_detail/?id={{ user.id }}" class="btn btn-xs btn-primary">详情</a>
+                                        <a href="/jlog/log_detail/exec/?id={{ post.id }}" class="btn btn-xs btn-primary">详情</a>
                                     </td>
                                 </tr>
                             {% endfor %}

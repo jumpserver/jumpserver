@@ -7,7 +7,7 @@
             <div class="col-sm-4">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <span class="label label-primary"><b></b></span>
+                        <span class="label label-primary"><b>{{ log.id }}</b></span>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -28,44 +28,30 @@
                                 <table class="table">
                                     <tr>
                                         <td class="text-navy">ID</td>
-                                        <td>{{ user.id }}</td>
+                                        <td>{{ log.id }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">用户名</td>
-                                        <td>{{ user.username }}</td>
+                                        <td>{{ log.user }}</td>
                                     </tr>
                                     <tr>
                                         <td class="text-navy">来源IP</td>
-                                        <td>{{ user.name }}</td>
+                                        <td>{{ log.remote_ip }}</td>
                                     </tr>
                                     <tr>
-                                        <td class="text-navy">角色</td>
-                                        <td>{{ user.id | get_role }}</td>
+                                        <td class="text-navy">日期</td>
+                                        <td>{{ log.datetime|date:"Y-m-d H:i:s" }}</td>
                                     </tr>
                                     <tr>
-                                        <td class="text-navy">Email</td>
-                                        <td>{{ user.email }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-navy">激活</td>
-                                        <td>{{ user.is_active|bool2str }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-navy">添加日期</td>
-                                        <td>{{ user.date_joined|date:"Y-m-d H:i:s" }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-navy">最后登录</td>
-                                        <td>{{ user.last_login|date:"Y-m-d H:i:s" }}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="text-navy">所在用户组</td>
+                                        <td class="text-navy">主机</td>
                                         <td>
                                              <table class="table">
-                                                 {% for group in user.group.all %}
-                                                    <tr>
-                                                        <td><a href="/jperm/perm_edit/?id={{ group.id }}">{{ group.name }}</a></td>
-                                                    </tr>
+                                                 {% for asset_name in assets_hostname  %}
+                                                     {% if asset_name %}
+                                                        <tr>
+                                                            <td>{{ asset_name }}</td>
+                                                        </tr>
+                                                    {% endif %}
                                                  {% endfor %}
                                              </table>
                                         </td>
@@ -76,10 +62,10 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4">
+            <div class="col-sm-8">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h5>授权主机/组</h5>
+                        <h5>结果</h5>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -88,103 +74,43 @@
                                 <i class="fa fa-wrench"></i>
                             </a>
                             <ul class="dropdown-menu dropdown-user">
-                                <li><a href="#">Config option 1</a>
-                                </li>
-                                <li><a href="#">Config option 2</a>
-                                </li>
                             </ul>
                             <a class="close-link">
                                 <i class="fa fa-times"></i>
                             </a>
                         </div>
                     </div>
-                    <div class="ibox-content ibox-heading">
-                        <h3>用户的所有授权主机</h3>
-                        <small><i class="fa fa-map-marker"></i> 这里包含了用户所有的主机组和组下的主机.</small>
-                    </div>
                     <div class="ibox-content inspinia-timeline">
-{#                        {% for group in user|get_user_asset_group %}#}
-{#                            <div class="timeline-item">#}
-{#                                <div class="row">#}
-{#                                    <div class="col-xs-3 date">#}
-{#                                        <i class="fa fa-repeat"></i>#}
-{#                                        <b><a href="/jperm/perm_list/?uid={{ user.id }}&agid={{ group.id }}">{{ group.name }}</a></b>#}
-{#                                        <br>#}
-{#                                        <small class="text-navy">共: {{ group | group_asset_list_count }}台</small>#}
-{#                                    </div>#}
-{#                                    <div class="col-xs-7 content no-top-border">#}
-{#                                        <p class="m-b-xs"><strong>{{ group.comment }}</strong></p>#}
-{#                                        <p>#}
-{#                                            {% for asset in group|group_asset_list %}#}
-{#                                                {{ asset.ip }}<br>#}
-{#                                            {% endfor %}#}
-{#                                        </p>#}
-{#                                        <p></p>#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        {% endfor %}#}
-{#                        {% if not user|get_user_asset_group %}#}
-{#                            (无)#}
-{#                        {% endif %}#}
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-sm-4">
-                    <div class="ibox float-e-margins">
-                        <div class="ibox-title">
-                            <h5>登录记录</h5>
-                            <div class="ibox-tools">
-                                <span class="label label-warning-light">最近登录</span>
-                               </div>
-                        </div>
-                        <div class="ibox-content">
-                            <div id="last">
-                                <div class="feed-activity-list" >
-                                    {% for log in logs_last %}
-                                        <div class="feed-element">
-                                            <a href="profile.html" class="pull-left">
-                                                <img alt="image" class="img-circle" src="/static/img/{{ session_role_id | to_avatar }}.png">
-                                            </a>
-                                            <div class="media-body ">
-{#                                                <small class="pull-right">{{ log.start_time|time_delta }}</small>#}
-                                                <small class="pull-right">{{ log.start_time }}</small>
-                                                <strong>{{ log.user }}</strong> 登录了 <span class="text-navy">{{ log.host }}. </span><br>
-                                                <small class="text-muted">{{ log.start_time|date:"Y-m-d H:i:s" }}</small>
-                                            </div>
-                                        </div>
+                        <div>
+                            <div class="text-left">
+                                <table class="table">
+                                    <tr>
+                                        <td class="text-navy">命令</td>
+                                        <td>{{ log.cmd }}</td>
+                                    </tr>
+                                    {% for result, info in result.items %}
+                                        {% for host, msg in info.items %}
+                                            {% ifequal result 'failed' %}
+                                            <tr>
+                                                <td class="text-navy" style="color: #ed5565">{{ host }}</td>
+                                                <td>{{ msg }}</td>
+                                            </tr>
+                                            {% else %}
+                                            <tr>
+                                                <td class="text-navy">{{ host }}</td>
+                                                <td>{{ msg }}</td>
+                                            </tr>
+                                            {% endifequal %}
+                                        {% endfor %}
                                     {% endfor %}
-                                    {% if not logs_last %}
-                                        (暂无)
-                                    {% endif %}
-                                </div>
-                                {% if logs_num > 10 %}
-                                <button id="show" class="btn btn-primary btn-block m-t"><i class="fa fa-arrow-down"></i> Show All</button>
-                                {% endif %}
-                            </div>
-
-                            <div id="all" style="display: none">
-                                <div class="feed-activity-list" >
-                                    {% for log in logs_all %}
-                                        <div class="feed-element">
-                                            <a href="profile.html" class="pull-left">
-                                                <img alt="image" class="img-circle" src="/static/img/{{ session_role_id | to_avatar }}.png">
-                                            </a>
-                                            <div class="media-body ">
-                                                <small class="pull-right">{{ log.start_time }}</small>
-{#                                                <small class="pull-right">{{ log.start_time|time_delta }}</small>#}
-                                                <strong>{{ log.user }}</strong> 登录了 <span class="text-navy">{{ log.host }}. </span><br>
-                                                <small class="text-muted">{{ log.start_time|date:"Y-m-d H:i:s" }}</small>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
+                                </table>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+        </div>
     </div>
 
 <script>

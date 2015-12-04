@@ -33,6 +33,7 @@ class ExecLog(models.Model):
     host = models.TextField()
     cmd = models.TextField()
     remote_ip = models.CharField(max_length=100)
+    result = models.TextField(default='')
     datetime = models.DateTimeField(auto_now=True)
 
 
@@ -42,6 +43,7 @@ class FileLog(models.Model):
     filename = models.TextField()
     type = models.CharField(max_length=20)
     remote_ip = models.CharField(max_length=100)
+    result = models.TextField(default='')
     datetime = models.DateTimeField(auto_now=True)
 
 

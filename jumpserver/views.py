@@ -302,12 +302,10 @@ def upload(request):
             illegal_asset = set(asset_select).issubset(set(assets))
             return HttpResponse('没有权限的服务器 %s' % ','.join([asset.hostname for asset in illegal_asset]))
 
-        FileLog(user=request.user.username, host=' '.join([asset.hostname for asset in asset_select]),
-                filename=' '.join([f.name for f in upload_files]), type='upload', remote_ip=remote_ip).save()
+
 
         for upload_file in upload_files:
             file_path = '%s/%s' % (upload_dir, upload_file.name)
-            # file_dict[upload_file.name] = file_path
             with open(file_path, 'w') as f:
                 for chunk in upload_file.chunks():
                     f.write(chunk)
@@ -318,6 +316,9 @@ def upload(request):
                                         % (upload_dir, upload_dir), pattern='*')
         ret = runner.results
         logger.debug(ret)
+        FileLog(user=request.user.username, host=' '.join([asset.hostname for asset in asset_select]),
+                filename=' '.join([f.name for f in upload_files]), type='upload', remote_ip=remote_ip,
+                result=ret).save()
         if ret.get('failed'):
             error = '上传目录: %s <br> 上传失败: [ %s ] <br>上传成功 [ %s ]' % (upload_dir,
                                                                              ', '.join(ret.get('failed').keys()),
@@ -346,11 +347,11 @@ def download(request):
             illegal_asset = set(asset_select).issubset(set(assets))
             return HttpResponse('没有权限的服务器 %s' % ','.join([asset.hostname for asset in illegal_asset]))
 
-        FileLog(user=request.user.username, host=' '.join([asset.hostname for asset in asset_select]),
-                filename=file_path, type='download', remote_ip=remote_ip).save()
         res = gen_resource({'user': user, 'asset': asset_select})
         runner = MyRunner(res)
         runner.run('fetch', module_args='src=%s dest=%s' % (file_path, upload_dir), pattern='*')
+        FileLog(user=request.user.username, host=' '.join([asset.hostname for asset in asset_select]),
+                filename=file_path, type='download', remote_ip=remote_ip, result=runner.results).save()
         logger.debug(runner.results)
         os.chdir('/tmp')
         tmp_dir_name = os.path.basename(upload_dir)
