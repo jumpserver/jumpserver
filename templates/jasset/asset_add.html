@@ -76,9 +76,9 @@
                                         <div class="form-group" id="id_port">
                                             <div class="hr-line-dashed"></div>
                                             <label class="col-sm-2 control-label"> 端口<span class="red-fonts">*</span> </label>
-                                                <div class="col-sm-8">
-                                                    <input type="text" placeholder="Port" name="port" class="form-control" value="{{ default_port }}">
-                                                </div>
+                                            <div class="col-sm-8">
+                                                <input type="text" placeholder="Port" name="port" class="form-control" value="{{ default_port }}">
+                                            </div>
                                         </div>
 
                                         <div class="hr-line-dashed"></div>
@@ -118,14 +118,23 @@
 {% block self_footer_js %}
 <script>
     $('document').ready(function(){
-        $('#id_use_default_auth').click(function(){
-            if ($(this).is(':checked')){
-                $('#admin_account').css('display', 'none');
-            }
-            else {
-                $('#admin_account').css('display', 'block');
-            }
-        })
+        var check_default = "{{ default_setting.name }}";
+        console.log(check_default);
+        if (check_default != 'default'){
+            $('#id_use_default_auth').attr('disabled', true);
+            $('#id_use_default_auth').attr('checked', false);
+            $('#admin_account').css('display', 'block');
+        } else {
+            $('#id_use_default_auth').click(function(){
+                if ($(this).is(':checked')){
+                    $('#admin_account').css('display', 'none');
+                }
+                else {
+                    $('#admin_account').css('display', 'block');
+                }
+            })
+        }
+
     });
 
     var required_fields = ["id_hostname", "id_port"];

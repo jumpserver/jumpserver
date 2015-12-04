@@ -296,11 +296,9 @@ def get_role_push_host(role):
     asset_all = Asset.objects.all()
     asset_pushed = {}
     for push in pushs:
-        print push.result
         asset_pushed[push.asset] = {'success': push.success, 'key': push.is_public_key, 'password': push.is_password,
                                     'result': push.result}
     asset_no_push = set(asset_all) - set(asset_pushed.keys())
-    print asset_no_push, asset_pushed
     return asset_pushed, asset_no_push
 
 
