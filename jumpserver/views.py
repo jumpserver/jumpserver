@@ -302,8 +302,6 @@ def upload(request):
             illegal_asset = set(asset_select).issubset(set(assets))
             return HttpResponse('没有权限的服务器 %s' % ','.join([asset.hostname for asset in illegal_asset]))
 
-
-
         for upload_file in upload_files:
             file_path = '%s/%s' % (upload_dir, upload_file.name)
             with open(file_path, 'w') as f:
@@ -320,11 +318,11 @@ def upload(request):
                 filename=' '.join([f.name for f in upload_files]), type='upload', remote_ip=remote_ip,
                 result=ret).save()
         if ret.get('failed'):
-            error = '上传目录: %s <br> 上传失败: [ %s ] <br>上传成功 [ %s ]' % (upload_dir,
+            error = u'上传目录: %s <br> 上传失败: [ %s ] <br>上传成功 [ %s ]' % (upload_dir,
                                                                              ', '.join(ret.get('failed').keys()),
                                                                              ', '.join(ret.get('ok').keys()))
             return HttpResponse(error, status=500)
-        msg = '上传目录: %s <br> 传送成功 [ %s ]' % (upload_dir, ', '.join(ret.get('ok')).keys())
+        msg = u'上传目录: %s <br> 传送成功 [ %s ]' % (upload_dir, ', '.join(ret.get('ok').keys()))
         return HttpResponse(msg)
     return my_render('upload.html', locals(), request)
 
@@ -345,7 +343,7 @@ def download(request):
 
         if not set(asset_select).issubset(set(assets)):
             illegal_asset = set(asset_select).issubset(set(assets))
-            return HttpResponse('没有权限的服务器 %s' % ','.join([asset.hostname for asset in illegal_asset]))
+            return HttpResponse(u'没有权限的服务器 %s' % ','.join([asset.hostname for asset in illegal_asset]))
 
         res = gen_resource({'user': user, 'asset': asset_select})
         runner = MyRunner(res)

@@ -296,26 +296,10 @@ def get_role_push_host(role):
     asset_all = Asset.objects.all()
     asset_pushed = {}
     for push in pushs:
-        print push.result
         asset_pushed[push.asset] = {'success': push.success, 'key': push.is_public_key, 'password': push.is_password,
                                     'result': push.result}
     asset_no_push = set(asset_all) - set(asset_pushed.keys())
-    print asset_no_push, asset_pushed
     return asset_pushed, asset_no_push
-
-
-@require_role('user')
-def perm_role_get(request):
-    asset_id = request.GET.get('id', 0)
-    if asset_id:
-        asset = get_object(Asset, id=asset_id)
-        if asset:
-            role = user_have_perm(request.user, asset=asset)
-            return HttpResponse(','.join([i.name for i in role]))
-    else:
-        roles = get_group_user_perm(request.user).get('role').keys()
-        return HttpResponse(','.join(i.name for i in roles))
-    return HttpResponse('error')
 
 
 if __name__ == "__main__":
