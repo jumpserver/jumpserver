@@ -11,9 +11,8 @@ from jperm.models      import PermRole, PermRule, PermSudo, PermPush
 from jumpserver.models import Setting
 
 from jperm.utils       import updates_dict, gen_keys, get_rand_pass, get_add_sudo_script
-from jperm.ansible_api import Tasks
+from jperm.ansible_api import MyTask
 from jperm.perm_api    import get_role_info, get_role_push_host
-
 from jumpserver.api    import my_render, get_object, CRYPTOR
 
 
@@ -211,8 +210,6 @@ def perm_rule_delete(request):
         # 根据rule_id 取得rule对象
         rule_id = request.POST.get("id")
         rule_obj = PermRule.objects.get(id=rule_id)
-        print rule_id, rule_obj
-        print rule_obj.name
         rule_obj.delete()
         return HttpResponse(u"删除授权规则：%s" % rule_obj.name)
     else:
@@ -423,25 +420,18 @@ def perm_role_push(request):
         # 调用Ansible API 进行推送
         password_push = True if request.POST.get("use_password") else False
         key_push = True if request.POST.get("use_publicKey") else False
-        task = Tasks(push_resource)
+        task = MyTask(push_resource)
         ret = {}
-        ret_failed = {}
 
         # 因为要先建立用户，所以password 是必选项，而push key是在 password也完成的情况下的 可选项
-        # 1. 以password 方式推送角色
-        if password_push:
-            ret["password_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
-            if ret["password_push"].get("status") != "success":
-                ret_failed = ret["password_push"].get('msg')
-
-        # 2. 以秘钥 方式推送角色
+        # 1. 以秘钥 方式推送角色
         if key_push:
-            ret["password_push"] = task.add_user(role.name)
-            if ret["password_push"].get("status") != "ok":
-                ret_failed = ret["password_push"].get('msg')
+            ret["pass_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
             ret["key_push"] = task.push_key(role.name, os.path.join(role.key_path, 'id_rsa.pub'))
-            if ret["key_push"].get("status") != "ok":
-                ret_failed = ret["key_push"].get('msg')
+
+        # 2. 推送账号密码
+        elif password_push:
+            ret["pass_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
 
         # 3. 推送sudo配置文件
         if password_push or key_push:
@@ -451,16 +441,32 @@ def perm_role_push(request):
                 role_chosen_aliase[role.name] = ','.join(sudo.name for sudo in sudo_alias if sudo.name)
                 add_sudo_script = get_add_sudo_script(role_chosen_aliase, sudo_alias)
                 ret['sudo'] = task.push_sudo_file(add_sudo_script)
-
-                if ret['sudo'].get('msg'):
-                    ret_failed = ret['sudo'].get('msg')
                 os.remove(add_sudo_script)
 
         logger.debug('推送role结果: %s' % ret)
-        logger.debug('推送role错误: %s' % ret_failed)
+        success_asset = {}
+        failed_asset = {}
+        logger.debug(ret)
+        for push_type, result in ret.items():
+            if result.get('failed'):
+                for hostname, info in result.get('failed').items():
+                    if hostname in failed_asset.keys():
+                        if info in failed_asset.get(hostname):
+                            failed_asset[hostname] += info
+                    else:
+                        failed_asset[hostname] = info
 
-        success_asset = []
-        failed_asset = []
+        for push_type, result in ret.items():
+            if result.get('ok'):
+                for hostname, info in result.get('ok').items():
+                    if hostname in failed_asset.keys():
+                        continue
+                    elif hostname in success_asset.keys():
+                        if str(info) in success_asset.get(hostname, ''):
+                            success_asset[hostname] += str(info)
+                    else:
+                        success_asset[hostname] = str(info)
+
         # 推送成功 回写push表
         for asset in calc_assets:
             push_check = PermPush.objects.filter(role=role, asset=asset)
@@ -470,20 +476,18 @@ def perm_role_push(request):
                 def func(**kwargs):
                     PermPush(**kwargs).save()
 
-            if ret_failed.get(asset.hostname):
-                failed_asset.append(asset)
+            if failed_asset.get(asset.hostname):
                 func(is_password=password_push, is_public_key=key_push, role=role, asset=asset, success=False,
-                     result=ret_failed.get(asset.hostname))
+                     result=failed_asset.get(asset.hostname))
             else:
-                success_asset.append(asset)
                 func(is_password=password_push, is_public_key=key_push, role=role, asset=asset, success=True)
 
         if not failed_asset:
-            msg = u'角色 %s 推送成功[ %s ]' % (role.name, ','.join([asset.hostname for asset in success_asset]))
+            msg = u'角色 %s 推送成功[ %s ]' % (role.name, ','.join(success_asset.keys()))
         else:
             error = u'角色 %s 推送失败 [ %s ], 推送成功 [ %s ]' % (role.name,
-                                                                ','.join([asset.hostname for asset in failed_asset]),
-                                                                ','.join([asset.hostname for asset in success_asset]))
+                                                                ','.join(failed_asset.keys()),
+                                                                ','.join(success_asset.keys()))
     return my_render('jperm/perm_role_push.html', locals(), request)
 
 
@@ -586,11 +590,29 @@ def perm_sudo_delete(request):
 def perm_role_recycle(request):
     role_id = request.GET.get('role_id')
     asset_ids = request.GET.get('asset_id').split(',')
+    assets = []
     for asset_id in asset_ids:
         asset = get_object(Asset, id=asset_id)
+        assets.append(asset)
         role = get_object(PermRole, id=role_id)
         PermPush.objects.filter(asset=asset, role=role).delete()
+
+    res = gen_resource(assets)
+    task = MyTask(res)
+
     return HttpResponse('删除成功')
 
 
+@require_role('user')
+def perm_role_get(request):
+    asset_id = request.GET.get('id', 0)
+    if asset_id:
+        asset = get_object(Asset, id=asset_id)
+        if asset:
+            role = user_have_perm(request.user, asset=asset)
+            return HttpResponse(','.join([i.name for i in role]))
+    else:
+        roles = get_group_user_perm(request.user).get('role').keys()
+        return HttpResponse(','.join(i.name for i in roles))
+    return HttpResponse('error')
 

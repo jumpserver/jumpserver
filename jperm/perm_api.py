@@ -302,20 +302,6 @@ def get_role_push_host(role):
     return asset_pushed, asset_no_push
 
 
-@require_role('user')
-def perm_role_get(request):
-    asset_id = request.GET.get('id', 0)
-    if asset_id:
-        asset = get_object(Asset, id=asset_id)
-        if asset:
-            role = user_have_perm(request.user, asset=asset)
-            return HttpResponse(','.join([i.name for i in role]))
-    else:
-        roles = get_group_user_perm(request.user).get('role').keys()
-        return HttpResponse(','.join(i.name for i in roles))
-    return HttpResponse('error')
-
-
 if __name__ == "__main__":
     print get_role_info(1)
 

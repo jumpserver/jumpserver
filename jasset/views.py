@@ -7,7 +7,7 @@ from jumpserver.models import Setting
 from jasset.forms import AssetForm, IdcForm
 from jasset.models import Asset, IDC, AssetGroup, ASSET_TYPE, ASSET_STATUS
 from jperm.perm_api import get_group_asset_perm
-from jperm.ansible_api import Tasks, MyRunner
+from jperm.ansible_api import MyRunner
 from jperm.perm_api import gen_resource
 
 

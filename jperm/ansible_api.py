@@ -119,8 +119,8 @@ class MyRunner(MyInventory):
         super(MyRunner, self).__init__(*args, **kwargs)
         self.results_raw = {}
 
-    def run(self, module_name='shell', module_args='', timeout=10, forks=10, pattern='',
-            sudo=False, sudo_user='root', sudo_pass=''):
+    def run(self, module_name='shell', module_args='', timeout=10, forks=10, pattern='*',
+            become=False, become_method='sudo', become_user='root', become_pass=''):
         """
         run module from andible ad-hoc.
         module_name: ansible module_name
@@ -132,10 +132,10 @@ class MyRunner(MyInventory):
                      inventory=self.inventory,
                      pattern=pattern,
                      forks=forks,
-                     become=sudo,
-                     become_method='sudo',
-                     become_user=sudo_user,
-                     become_pass=sudo_pass
+                     become=become,
+                     become_method=become_method,
+                     become_user=become_user,
+                     become_pass=become_pass
                      )
         self.results_raw = hoc.run()
         return self.results_raw
@@ -156,7 +156,7 @@ class MyRunner(MyInventory):
             for host, info in contacted.items():
                 if info.get('failed'):
                     result['failed'][host] = info.get('msg') + info.get('stderr', '')
-                elif info.get('stderr'):
+                elif info.get('stderr') and info.get('module_name') in ['shell', 'command', 'raw']:
                     result['failed'][host] = info.get('stderr') + str(info.get('warnings'))
                 else:
                     result['ok'][host] = info.get('stdout')
@@ -265,60 +265,21 @@ class Command(MyInventory):
         return self.results_raw.get("dark")
 
 
-class Tasks(Command):
+class MyTask(MyRunner):
     """
     this is a tasks object for include the common command.
     """
     def __init__(self, *args, **kwargs):
-        super(Tasks, self).__init__(*args, **kwargs)
-
-    def __run(self,
-              module_args,
-              module_name="command",
-              timeout=5,
-              forks=10,
-              group='default_group',
-              pattern='*',
-              ):
-        """
-        run command from andible ad-hoc.
-        command  : 必须是一个需要执行的命令字符串， 比如 
-                 'uname -a'
-        """
-        hoc = Runner(module_name=module_name,
-                     module_args=module_args,
-                     timeout=timeout,
-                     inventory=self.inventory,
-                     subset=group,
-                     pattern=pattern,
-                     forks=forks,
-                     become=False,
-                     )
-
-        self.results = hoc.run()
-        return {"msg": self.msg, "result": self.results}
-
-    @property
-    def msg(self):
-        """
-        get the contacted and dark msg
-        """
-        msg = {}
-        for result in ["contacted", "dark"]:
-            all = self.results.get(result)
-            for key, value in all.iteritems():
-                if value.get("msg"):
-                    msg[key] = value.get("msg")
-        return msg
+        super(MyTask, self).__init__(*args, **kwargs)
 
     def push_key(self, user, key_path):
         """
         push the ssh authorized key to target.
         """
         module_args = 'user="%s" key="{{ lookup("file", "%s") }}" state=present' % (user, key_path)
-        self.__run(module_args, "authorized_key")
+        self.run("authorized_key", module_args, become=True)
 
-        return {"status": "failed", "msg": self.msg} if self.msg else {"status": "ok"}
+        return self.results
 
     def push_multi_key(self, **user_info):
         """
@@ -345,9 +306,9 @@ class Tasks(Command):
         push the ssh authorized key to target.
         """
         module_args = 'user="%s" key="{{ lookup("file", "%s") }}" state="absent"' % (user, key_path)
-        self.__run(module_args, "authorized_key")
+        self.run("authorized_key", module_args, become=True)
 
-        return {"status": "failed", "msg": self.msg} if self.msg else {"status": "ok"}
+        return self.results
 
     def add_user(self, username, password=''):
         """
@@ -358,9 +319,9 @@ class Tasks(Command):
             module_args = 'name=%s shell=/bin/bash password=%s' % (username, encrypt_pass)
         else:
             module_args = 'name=%s shell=/bin/bash' % username
-        self.__run(module_args, "user")
+        self.run("user", module_args, become=True)
 
-        return {"status": "failed", "msg": self.msg} if self.msg else {"status": "ok"}
+        return self.results
 
     def add_multi_user(self, **user_info):
         """
@@ -387,85 +348,10 @@ class Tasks(Command):
         """
         delete a host user.
         """
-        module_args = 'name=%s state=absent remove=yes move_home=yes force=yes' % (username)
-        self.__run(module_args,
-                   "user",)
+        module_args = 'name=%s state=absent remove=yes move_home=yes force=yes' % username
+        self.run("user", module_args, become=True)
 
-        return {"status": "failed","msg": self.msg} if self.msg else {"status": "ok"}
-
-    def add_init_users(self):
-        """
-        add initail users: SA, DBA, DEV
-        """
-        results = {}
-        action = results["action_info"] = {}
-        users = {"SA": get_rand_pass(), "DBA": get_rand_pass(), "DEV": get_rand_pass()}
-        for user, password in users.iteritems():
-            ret = self.add_user(user, password)
-            action[user] = ret
-        results["user_info"] = users
-
-        return results
-
-    def del_init_users(self):
-        """
-        delete initail users: SA, DBA, DEV
-        """
-        results = {}
-        action = results["action_info"] = {}
-        for user in ["SA", "DBA", "DEV"]:
-            ret = self.del_user(user)
-            action[user] = ret
-        return results
-
-    def get_host_info(self):
-        """
-        use the setup module get host informations
-        :return:
-          all_ip is list
-          processor_count is int
-          system_dist_version is string
-          system_type is string
-          disk is dict (device_name: device_size}
-          system_dist is string
-          processor_type is string
-          default_ip is string
-          hostname is string
-          product_sn is string
-          memory_total is int (MB)
-          default_mac is string
-          product_name is string
-        """
-        self.__run('', 'setup')
-
-        result = {}
-        all = self.results.get("contacted")
-        for key, value in all.iteritems():
-            setup =value.get("ansible_facts")
-            # get disk informations
-            disk_all = setup.get("ansible_devices")
-            disk_need = {}
-            for disk_name, disk_info in disk_all.iteritems():
-                if disk_name.startswith('sd') or disk_name.startswith('hd'):
-                    disk_need[disk_name] = disk_info.get("size")
-
-            result[key] = {
-                    "all_ip": setup.get("ansible_all_ipv4_addresses"),
-                    "hostname"  : setup.get("ansible_hostname"),
-                    "default_ip": setup.get("ansible_default_ipv4").get("address"),
-                    "default_mac": setup.get("ansible_default_ipv4").get("macaddress"),
-                    "product_name": setup.get("ansible_product_name"),
-                    "processor_type": ' '.join(setup.get("ansible_processor")),
-                    "processor_count": setup.get("ansible_processor_count"),
-                    "memory_total": setup.get("ansible_memtotal_mb"),
-                    "disk": disk_need,
-                    "system_type": setup.get("ansible_system"),
-                    "system_dist": setup.get("ansible_distribution"),
-                    "system_dist_verion": setup.get("ansible_distribution_major_version"),
-                    "product_sn": setup.get("ansible_product_serial")
-            }
-
-        return {"failed": self.msg, "ok": result}
+        return self.results
 
     def push_sudo_file(self, file_path):
         """
@@ -473,8 +359,9 @@ class Tasks(Command):
         :return:
         """
         module_args1 = file_path
-        ret = self.__run(module_args1, "script")
-        return ret
+        self.run("script", module_args1, become=True)
+        print self.results_raw
+        return self.results
 
 
 class CustomAggregateStats(callbacks.AggregateStats):
