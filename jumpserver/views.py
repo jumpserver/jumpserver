@@ -15,7 +15,7 @@ from jumpserver.api import *
 from jumpserver.models import Setting
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from jlog.models import Log
+from jlog.models import Log, FileLog
 from jperm.perm_api import get_group_user_perm, gen_resource
 from jasset.models import Asset, IDC
 from jperm.ansible_api import MyRunner
@@ -287,14 +287,14 @@ def setting(request):
 def upload(request):
     user = request.user
     assets = get_group_user_perm(user).get('asset').keys()
-
     asset_select = []
     if request.method == 'POST':
+        remote_ip = request.META.get('REMOTE_ADDR')
         asset_ids = request.POST.getlist('asset_ids', '')
         upload_files = request.FILES.getlist('file[]', None)
         date_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
         upload_dir = get_tmp_dir()
-        filenames = {}
+        # file_dict = {}
         for asset_id in asset_ids:
             asset_select.append(get_object(Asset, id=asset_id))
 
@@ -302,9 +302,10 @@ def upload(request):
             illegal_asset = set(asset_select).issubset(set(assets))
             return HttpResponse('没有权限的服务器 %s' % ','.join([asset.hostname for asset in illegal_asset]))
 
+
+
         for upload_file in upload_files:
             file_path = '%s/%s' % (upload_dir, upload_file.name)
-            filenames[upload_file.name] = file_path
             with open(file_path, 'w') as f:
                 for chunk in upload_file.chunks():
                     f.write(chunk)
@@ -313,14 +314,17 @@ def upload(request):
         runner = MyRunner(res)
         runner.run('copy', module_args='src=%s dest=%s directory_mode'
                                         % (upload_dir, upload_dir), pattern='*')
-        ret = runner.get_result()
+        ret = runner.results
         logger.debug(ret)
+        FileLog(user=request.user.username, host=' '.join([asset.hostname for asset in asset_select]),
+                filename=' '.join([f.name for f in upload_files]), type='upload', remote_ip=remote_ip,
+                result=ret).save()
         if ret.get('failed'):
             error = '上传目录: %s <br> 上传失败: [ %s ] <br>上传成功 [ %s ]' % (upload_dir,
                                                                              ', '.join(ret.get('failed').keys()),
-                                                                             ', '.join(ret.get('ok')))
+                                                                             ', '.join(ret.get('ok').keys()))
             return HttpResponse(error, status=500)
-        msg = '上传目录: %s <br> 传送成功 [ %s ]' % (upload_dir, ', '.join(ret.get('ok')))
+        msg = '上传目录: %s <br> 传送成功 [ %s ]' % (upload_dir, ', '.join(ret.get('ok')).keys())
         return HttpResponse(msg)
     return my_render('upload.html', locals(), request)
 
@@ -329,9 +333,9 @@ def upload(request):
 def download(request):
     user = request.user
     assets = get_group_user_perm(user).get('asset').keys()
-
     asset_select = []
     if request.method == 'POST':
+        remote_ip = request.META.get('REMOTE_ADDR')
         asset_ids = request.POST.getlist('asset_ids', '')
         file_path = request.POST.get('file_path')
         date_now = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
@@ -342,14 +346,17 @@ def download(request):
         if not set(asset_select).issubset(set(assets)):
             illegal_asset = set(asset_select).issubset(set(assets))
             return HttpResponse('没有权限的服务器 %s' % ','.join([asset.hostname for asset in illegal_asset]))
+
         res = gen_resource({'user': user, 'asset': asset_select})
         runner = MyRunner(res)
         runner.run('fetch', module_args='src=%s dest=%s' % (file_path, upload_dir), pattern='*')
-        logger.debug(runner.get_result())
+        FileLog(user=request.user.username, host=' '.join([asset.hostname for asset in asset_select]),
+                filename=file_path, type='download', remote_ip=remote_ip, result=runner.results).save()
+        logger.debug(runner.results)
         os.chdir('/tmp')
         tmp_dir_name = os.path.basename(upload_dir)
         tar_file = '%s.tar.gz' % upload_dir
-        bash('tar czf %s %s && sz %s.tar.gz' % (tar_file, tmp_dir_name, upload_dir))
+        bash('tar czf %s %s' % (tar_file, tmp_dir_name))
         f = open(tar_file)
         data = f.read()
         f.close()

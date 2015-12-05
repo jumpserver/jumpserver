@@ -8,7 +8,7 @@ from jperm.perm_api import user_have_perm
 from django.http import HttpResponseNotFound
 from jlog.log_api import renderTemplate
 
-from models import Log
+from jlog.models import Log, ExecLog, FileLog
 from jumpserver.settings import WEB_SOCKET_HOST
 
 
@@ -21,9 +21,19 @@ def log_list(request, offset):
     username_list = request.GET.getlist('username', [])
     host_list = request.GET.getlist('host', [])
     cmd = request.GET.get('cmd', '')
-    print date_seven_day, date_now_str
+
     if offset == 'online':
         posts = Log.objects.filter(is_finished=False).order_by('-start_time')
+    elif offset == 'exec':
+        posts = ExecLog.objects.all().order_by('-id')
+        keyword = request.GET.get('keyword', '')
+        if keyword:
+            posts = posts.filter(Q(user__icontains=keyword)|Q(host__icontains=keyword)|Q(cmd__icontains=keyword))
+    elif offset == 'file':
+        posts = FileLog.objects.all().order_by('-id')
+        keyword = request.GET.get('keyword', '')
+        if keyword:
+            posts = posts.filter(Q(user__icontains=keyword)|Q(host__icontains=keyword)|Q(filename__icontains=keyword))
     else:
         posts = Log.objects.filter(is_finished=True).order_by('-start_time')
         username_all = set([log.user for log in Log.objects.all()])
@@ -55,6 +65,11 @@ def log_list(request, offset):
     web_kill_uri = 'http://%s/kill' % WEB_SOCKET_HOST
     session_id = request.session.session_key
     return render_to_response('jlog/log_%s.html' % offset, locals(), context_instance=RequestContext(request))
+
+
+@require_role('admin')
+def log_detail(request):
+    return my_render('jlog/exec_detail.html', locals(), request)
 
 
 @require_role('admin')
@@ -114,3 +129,21 @@ def web_terminal(request):
     web_terminal_uri = 'ws://%s/terminal?id=%s&role=%s' % (WEB_SOCKET_HOST, asset_id, role_name)
     return render_to_response('jlog/web_terminal.html', locals())
 
+
+@require_role('admin')
+def log_detail(request, offset):
+    log_id = request.GET.get('id')
+    if offset == 'exec':
+        log = get_object(ExecLog, id=log_id)
+        assets_hostname = log.host.split(' ')
+        result = eval(str(log.result))
+        return my_render('jlog/exec_detail.html', locals(), request)
+    elif offset == 'file':
+        log = get_object(FileLog, id=log_id)
+        assets_hostname = log.host.split(' ')
+        file_list = log.filename.split(' ')
+        try:
+            result = eval(str(log.result))
+        except (SyntaxError, NameError):
+            result = {}
+        return my_render('jlog/file_detail.html', locals(), request)

@@ -2822,7 +2822,9 @@ body.body-small .footer.fixed {
 .table > thead > tr > td,
 .table > tbody > tr > td,
 .table > tfoot > tr > td {
-  border-top: 1px solid #e7eaec;
+  /*border-top: 1px solid #e7eaec;*/
+  border-bottom: 1px solid #e7eaec;
+  border-top: none;
   line-height: 1.42857;
   padding: 8px;
   vertical-align: top;

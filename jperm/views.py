@@ -78,11 +78,11 @@ def perm_rule_add(request):
 
     if request.method == 'POST':
         # 获取用户选择的 用户,用户组,资产,资产组,用户角色
-        users_select = request.POST.getlist('user', [])
-        user_groups_select = request.POST.getlist('usergroup', [])
-        assets_select = request.POST.getlist('asset', [])
-        asset_groups_select = request.POST.getlist('assetgroup', [])
-        roles_select = request.POST.getlist('role', [])
+        users_select = request.POST.getlist('user', [])  # 需要授权用户
+        user_groups_select = request.POST.getlist('usergroup', [])  # 需要授权用户组
+        assets_select = request.POST.getlist('asset', [])  # 需要授权资产
+        asset_groups_select = request.POST.getlist('assetgroup', [])  # 需要授权资产组
+        roles_select = request.POST.getlist('role', [])  # 需要授权角色
         rule_name = request.POST.get('rulename')
         rule_comment = request.POST.get('rule_comment')
 
@@ -94,8 +94,10 @@ def perm_rule_add(request):
             # 获取需要授权的主机列表
             assets_obj = [Asset.objects.get(id=asset_id) for asset_id in assets_select]
             asset_groups_obj = [AssetGroup.objects.get(id=group_id) for group_id in asset_groups_select]
-            group_assets_obj = [asset for asset in [group.asset_set.all() for group in asset_groups_obj]]
-            calc_assets = set(group_assets_obj) | set(assets_obj)
+            group_assets_obj = []
+            for asset_group in asset_groups_obj:
+                group_assets_obj.extend(list(asset_group.asset_set.all()))
+            calc_assets = set(group_assets_obj) | set(assets_obj)  # 授权资产和资产组包含的资产
 
             # 获取需要授权的用户列表
             users_obj = [User.objects.get(id=user_id) for user_id in users_select]
@@ -106,8 +108,9 @@ def perm_rule_add(request):
             # 获取授予的角色列表
             roles_obj = [PermRole.objects.get(id=role_id) for role_id in roles_select]
             need_push_asset = set()
+
             for role in roles_obj:
-                asset_no_push = get_role_push_host(role=role)[1]
+                asset_no_push = get_role_push_host(role=role)[0]  # 获取某角色已经推送的资产
                 need_push_asset.update(set(calc_assets) - set(asset_no_push))
                 if need_push_asset:
                     raise ServerError(u'没有推送角色 %s 的主机 %s'
@@ -444,13 +447,14 @@ def perm_role_push(request):
         if password_push or key_push:
             role_chosen_aliase = {}  # {'dev': 'NETWORKING, SHUTDOWN'}
             sudo_alias = set([sudo for sudo in role.sudo.all()])  # set(sudo1, sudo2, sudo3)
-            role_chosen_aliase[role.name] = ','.join(sudo.name for sudo in sudo_alias)
-            add_sudo_script = get_add_sudo_script(role_chosen_aliase, sudo_alias)
-            ret['sudo'] = task.push_sudo_file(add_sudo_script)
+            if sudo_alias:
+                role_chosen_aliase[role.name] = ','.join(sudo.name for sudo in sudo_alias if sudo.name)
+                add_sudo_script = get_add_sudo_script(role_chosen_aliase, sudo_alias)
+                ret['sudo'] = task.push_sudo_file(add_sudo_script)
 
-            if ret['sudo'].get('msg'):
-                ret_failed = ret['sudo'].get('msg')
-            # os.remove(add_sudo_script)
+                if ret['sudo'].get('msg'):
+                    ret_failed = ret['sudo'].get('msg')
+                os.remove(add_sudo_script)
 
         logger.debug('推送role结果: %s' % ret)
         logger.debug('推送role错误: %s' % ret_failed)

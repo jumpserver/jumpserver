@@ -55,6 +55,6 @@ class PermPush(models.Model):
     is_public_key = models.BooleanField(default=False)
     is_password = models.BooleanField(default=False)
     success = models.BooleanField(default=False)
-    result = models.TextField()
+    result = models.TextField(default='')
     date_added = models.DateTimeField(auto_now=True)
 
