@@ -127,7 +127,7 @@
                                     <td class="text-center">{{ asset.group.all|group_str2 }}</td>
 {#                                    <td class="text-center">{{ asset.cpu }}|{{ asset.memory }}|{{ asset.disk }}</td>#}
                                     <td class="text-center">{{ asset.system_type|default_if_none:"" }}{{ asset.system_version|default_if_none:"" }}</td>
-                                    <td class="text-center"> {{ asset.cpu|get_cpu_core }} </td>
+                                    <td class="text-center"> {{ asset.cpu|get_cpu_core|default_if_none:"" }} </td>
                                     <td class="text-center"> {{ asset.memory }}{% if asset.memory %}G{% endif %}</td>
                                     <td class="text-center"> {{ asset.disk|get_disk_info }}{% if asset.memory %}G{% endif %}</td>
                                     <td class="text-center" data-editable='false'>
@@ -144,8 +144,8 @@
                                 <input type="button" id="asset_del" class="btn btn-danger btn-sm"  name="del_button" value="删除"/>
                                 <a value="/jasset/asset_edit_batch/" type="button" class="btn btn-sm btn-warning iframe">修改</a>
                                 <input type="button" id="asset_update" class="btn btn-info btn-sm"  name="update_button" value="更新"/>
-                                <input type="button" id="asset_update_all" class="btn btn-primary btn-sm"  name="update_button" value="更新全部"/>
-                                <input type="button" id="exec_cmd" class="btn btn-sm btn-danger"  name="exec_cmd" value="执行命令"/>
+{#                                <input type="button" id="asset_update_all" class="btn btn-primary btn-sm"  name="update_button" value="更新全部"/>#}
+                                <input type="button" id="exec_cmd" class="btn btn-sm btn-primary"  name="exec_cmd" value="执行命令"/>
                             </div>
                             {% include 'paginator.html' %}
                         </div>
@@ -347,37 +347,40 @@
     $('#asset_update').click(function () {
         var asset_id_all = getIDall();
         if (asset_id_all == ''){
-            alert("请至少选择一行!");
-            return false;
+            if (confirm("更新全部资产信息?")) {
+                layer.msg('玩命更新中...', {time: 200000});
+                $.ajax({
+                    type: "post",
+                    url: "/jasset/asset_update_batch/?arg=all",
+                    success: function () {
+                        parent.location.reload();
+                    }
+                });
+            }
         }
-        layer.msg('玩命更新中...', {time: 200000});
-        $.ajax({
-            type: "post",
-            data: {asset_id_all: asset_id_all},
-            url: "/jasset/asset_update_batch/",
-            success: function () {
-                parent.location.reload();
-            }
-        });
+        else {
+            layer.msg('玩命更新中...', {time: 200000});
+            $.ajax({
+                type: "post",
+                data: {asset_id_all: asset_id_all},
+                url: "/jasset/asset_update_batch/",
+                success: function () {
+                    parent.location.reload();
+                }
+            });
+        }
     });
 
-{#    function update_tips(){#}
-{#        layer.tips('我是另外一个tips，只不过我长得跟之前那位稍有些不一样。', '吸附元素选择器', {#}
-{#            tips: [1, '#3595CC'],#}
-{#            time: 4000#}
+{#    $('#asset_update_all').click(function () {#}
+{#        layer.msg('玩命更新中...', {time: 200000});#}
+{#        $.ajax({#}
+{#            type: "post",#}
+{#            url: "/jasset/asset_update_batch/?arg=all",#}
+{#            success: function () {#}
+{#                parent.location.reload();#}
+{#            }#}
 {#        });#}
-{#    }#}
-
-    $('#asset_update_all').click(function () {
-        layer.msg('玩命更新中...', {time: 200000});
-        $.ajax({
-            type: "post",
-            url: "/jasset/asset_update_batch/?arg=all",
-            success: function () {
-                parent.location.reload();
-            }
-        });
-    });
+{#    });#}
 
     function change_info(){
         var args = $("#asset_form").serialize();
