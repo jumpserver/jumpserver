@@ -127,7 +127,7 @@
                                     <td class="text-center">{{ asset.group.all|group_str2 }}</td>
 {#                                    <td class="text-center">{{ asset.cpu }}|{{ asset.memory }}|{{ asset.disk }}</td>#}
                                     <td class="text-center">{{ asset.system_type|default_if_none:"" }}{{ asset.system_version|default_if_none:"" }}</td>
-                                    <td class="text-center"> {{ asset.cpu|get_cpu_core }} </td>
+                                    <td class="text-center"> {{ asset.cpu }} </td>
                                     <td class="text-center"> {{ asset.memory }}{% if asset.memory %}G{% endif %}</td>
                                     <td class="text-center"> {{ asset.disk|get_disk_info }}{% if asset.memory %}G{% endif %}</td>
                                     <td class="text-center" data-editable='false'>
