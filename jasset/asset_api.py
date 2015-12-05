@@ -7,6 +7,7 @@ from jumpserver.api import *
 from jasset.models import ASSET_STATUS, ASSET_TYPE, ASSET_ENV, IDC, AssetRecord
 from jperm.ansible_api import MyRunner
 from jperm.perm_api import gen_resource
+from jumpserver.templatetags.mytags import get_disk_info
 
 
 def group_add_asset(group, asset_id=None, asset_ip=None):
@@ -156,7 +157,7 @@ def db_asset_alert(asset, username, alert_dic):
             for group_id in value[1]:
                 group_name = AssetGroup.objects.get(id=int(group_id)).name
                 new.append(group_name)
-            if old == new:
+            if sorted(old) == sorted(new):
                 continue
             else:
                 alert_info = [field_name, ','.join(old), ','.join(new)]
@@ -198,14 +199,17 @@ def write_excel(asset_all):
     workbook = xlsxwriter.Workbook('static/files/excels/%s' % file_name)
     worksheet = workbook.add_worksheet(u'CMDB数据')
     worksheet.set_first_sheet()
-    worksheet.set_column('A:Z', 14)
-    title = [u'主机名', u'IP', u'IDC', u'MAC', u'远控IP', u'CPU', u'内存', u'硬盘', u'操作系统', u'机柜位置',
+    worksheet.set_column('A:E', 15)
+    worksheet.set_column('F:F', 40)
+    worksheet.set_column('G:Z', 15)
+    title = [u'主机名', u'IP', u'IDC', u'MAC', u'远控IP', u'CPU', u'内存(G)', u'硬盘(G)', u'操作系统', u'机柜位置',
              u'所属主机组', u'机器状态', u'备注']
     for asset in asset_all:
         group_list = []
         for p in asset.group.all():
             group_list.append(p.name)
 
+        disk = get_disk_info(asset.disk)
         group_all = '/'.join(group_list)
         status = asset.get_status_display()
         idc_name = asset.idc.name if asset.idc else u''
@@ -214,12 +218,13 @@ def write_excel(asset_all):
         system_os = unicode(system_type) + unicode(system_version)
 
         alter_dic = [asset.hostname, asset.ip, idc_name, asset.mac, asset.remote_ip, asset.cpu, asset.memory,
-                     asset.disk, system_os, asset.cabinet, group_all, status,
-                     asset.comment]
+                     disk, system_os, asset.cabinet, group_all, status, asset.comment]
         data.append(alter_dic)
     format = workbook.add_format()
     format.set_border(1)
     format.set_align('center')
+    format.set_align('vcenter')
+    format.set_text_wrap()
 
     format_title = workbook.add_format()
     format_title.set_border(1)
@@ -308,18 +313,21 @@ def excel_to_db(excel_file):
 
 
 def get_ansible_asset_info(asset_ip, setup_info):
-    disk_all = setup_info.get("ansible_devices")
+    print asset_ip
     disk_need = {}
-    for disk_name, disk_info in disk_all.iteritems():
-        if disk_name.startswith('sd') or disk_name.startswith('hd') or disk_name.startswith('vd'):
-            disk_size = disk_info.get("size")
-            if 'M' in disk_size:
-                disk_format = round(float(disk_size[:-2]) / 1000, 0)
-            elif 'T' in disk_size:
-                disk_format = round(float(disk_size[:-2]) * 1000, 0)
-            else:
-                disk_format = float(disk_size)
-            disk_need[disk_name] = disk_format
+    disk_all = setup_info.get("ansible_devices")
+    if disk_all:
+        for disk_name, disk_info in disk_all.iteritems():
+            print disk_name, disk_info
+            if disk_name.startswith('sd') or disk_name.startswith('hd') or disk_name.startswith('vd'):
+                disk_size = disk_info.get("size", '')
+                if 'M' in disk_size:
+                    disk_format = round(float(disk_size[:-2]) / 1000, 0)
+                elif 'T' in disk_size:
+                    disk_format = round(float(disk_size[:-2]) * 1000, 0)
+                else:
+                    disk_format = float(disk_size[:-2])
+                disk_need[disk_name] = disk_format
     all_ip = setup_info.get("ansible_all_ipv4_addresses")
     other_ip_list = all_ip.remove(asset_ip) if asset_ip in all_ip else []
     other_ip = ','.join(other_ip_list) if other_ip_list else ''
@@ -342,7 +350,7 @@ def get_ansible_asset_info(asset_ip, setup_info):
     # asset_type = setup_info.get("ansible_system")
     sn = setup_info.get("ansible_product_serial")
     asset_info = [other_ip, mac, cpu, memory_format, disk, sn, system_type, system_version, brand, system_arch]
-
+    print asset_info
     return asset_info
 
 
@@ -357,6 +365,7 @@ def asset_ansible_update(obj_list, name=''):
             continue
         else:
             asset_info = get_ansible_asset_info(asset.ip, setup_info)
+            print asset
             other_ip, mac, cpu, memory, disk, sn, system_type, system_version, brand, system_arch = asset_info
             asset_dic = {"other_ip": other_ip,
                          "mac": mac,

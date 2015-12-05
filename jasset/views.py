@@ -419,10 +419,9 @@ def asset_detail(request):
             if perm == 'user':
                 for user, role_dic in value.items():
                     user_perm.append([user, role_dic.get('role', '')])
-            elif perm == 'user_group':
+            elif perm == 'user_group' or perm == 'rule':
                 user_group_perm = value
-            elif perm == 'rule':
-                user_rule_perm = value
+    print perm_info
 
     asset_record = AssetRecord.objects.filter(asset=asset).order_by('-alert_time')
 

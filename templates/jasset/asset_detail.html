@@ -193,27 +193,29 @@
                         <div>
                             <div class="text-left">
                                 {% if perm_info %}
-                                    <table class="table">
-                                    <p>授权用户信息</p>
-                                    <td class="text-navy">授权用户</td>
-                                    <td class="text-navy">系统角色</td>
-                                    {% for perm in user_perm %}
-                                        <tr>
-                                            <td class="text-navy"><a href="/juser/user_detail/?id={{ perm.0.id }}">{{ perm.0 }}</a></td>
-                                            <td>
-                                                <table class="table">
-                                                {% if perm.1 %}
-                                                     {% for role in perm.1 %}
-                                                        <tr>
-                                                            <td class="text-navy"><a href="/jperm/role/perm_role_detail/?id={{ role.id }}">{{ role }}</a></td>
-                                                        </tr>
-                                                     {% endfor %}
-                                                {% endif %}
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                    </table>
+                                    {% if user_perm %}
+                                        <table class="table">
+                                        <p>授权用户信息</p>
+                                        <td class="text-navy">授权用户</td>
+                                        <td class="text-navy">系统角色</td>
+                                        {% for perm in user_perm %}
+                                            <tr>
+                                                <td class="text-navy"><a href="/juser/user_detail/?id={{ perm.0.id }}">{{ perm.0 }}</a></td>
+                                                <td>
+                                                    <table class="table">
+                                                    {% if perm.1 %}
+                                                         {% for role in perm.1 %}
+                                                            <tr>
+                                                                <td class="text-navy"><a href="/jperm/role/perm_role_detail/?id={{ role.id }}">{{ role }}</a></td>
+                                                            </tr>
+                                                         {% endfor %}
+                                                    {% endif %}
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </table>
+                                    {% endif %}
                                     {% if user_group_perm %}
                                         <table class="table">
                                             <p>授权用户组信息</p>
