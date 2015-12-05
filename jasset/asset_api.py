@@ -202,8 +202,8 @@ def write_excel(asset_all):
     worksheet.set_column('A:E', 15)
     worksheet.set_column('F:F', 40)
     worksheet.set_column('G:Z', 15)
-    title = [u'主机名', u'IP', u'IDC', u'MAC', u'远控IP', u'CPU', u'内存(G)', u'硬盘(G)', u'操作系统', u'机柜位置',
-             u'所属主机组', u'机器状态', u'备注']
+    title = [u'主机名', u'IP', u'IDC', u'所属主机组', u'操作系统', u'CPU', u'内存(G)', u'硬盘(G)',
+             u'机柜位置', u'MAC', u'远控IP', u'机器状态', u'备注']
     for asset in asset_all:
         group_list = []
         for p in asset.group.all():
@@ -217,8 +217,8 @@ def write_excel(asset_all):
         system_version = asset.system_version if asset.idc else u''
         system_os = unicode(system_type) + unicode(system_version)
 
-        alter_dic = [asset.hostname, asset.ip, idc_name, asset.mac, asset.remote_ip, asset.cpu, asset.memory,
-                     disk, system_os, asset.cabinet, group_all, status, asset.comment]
+        alter_dic = [asset.hostname, asset.ip, idc_name, group_all, system_os, asset.cpu, asset.memory,
+                     disk, asset.cabinet, asset.mac, asset.remote_ip, status, asset.comment]
         data.append(alter_dic)
     format = workbook.add_format()
     format.set_border(1)
