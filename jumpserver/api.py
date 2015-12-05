@@ -96,7 +96,7 @@ def get_role_key(user, role):
         with open(os.path.join(role.key_path, 'id_rsa')) as fk:
             with open(user_role_key_path, 'w') as fu:
                 fu.write(fk.read())
-        logger.debug(u"创建新的用户角色key %s" % user_role_key_path)
+        logger.debug(u"创建新的用户角色key %s, Owner: %s" % (user_role_key_path, user.username))
         chown(user_role_key_path, user.username)
         os.chmod(user_role_key_path, 0600)
     return user_role_key_path
