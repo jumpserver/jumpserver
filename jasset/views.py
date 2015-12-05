@@ -97,7 +97,9 @@ def group_list(request):
     header_title, path1, path2 = u'查看资产组', u'资产管理', u'查看资产组'
     keyword = request.GET.get('keyword', '')
     asset_group_list = AssetGroup.objects.all()
-
+    group_id = request.GET.get('id')
+    if group_id:
+        asset_group_list = asset_group_list.filter(id=group_id)
     if keyword:
         asset_group_list = asset_group_list.filter(Q(name__contains=keyword) | Q(comment__contains=keyword))
 
@@ -261,7 +263,7 @@ def asset_list(request):
     asset_group_all = AssetGroup.objects.all()
     asset_types = ASSET_TYPE
     asset_status = ASSET_STATUS
-
+    asset_id = request.GET.get('id')
     idc_name = request.GET.get('idc', '')
     group_name = request.GET.get('group', '')
     asset_type = request.GET.get('asset_type', '')
@@ -293,6 +295,9 @@ def asset_list(request):
 
     if status:
         asset_find = asset_find.filter(status__contains=status)
+
+    if asset_id:
+        asset_find = asset_find.filter(id=asset_id)
 
     if keyword:
         asset_find = asset_find.filter(

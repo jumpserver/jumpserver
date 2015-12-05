@@ -23,12 +23,14 @@ def perm_rule_list(request):
     """
     # 渲染数据
     header_title, path1, path2 = "授权规则", "规则管理", "查看规则"
-
     # 获取所有规则
     rules_list = PermRule.objects.all()
-
+    rule_id = request.GET.get('id')
     # TODO: 搜索和分页
     keyword = request.GET.get('search', '')
+    if rule_id:
+        rules_list = rules_list.filter(id=rule_id)
+
     if keyword:
         rules_list = rules_list.filter(Q(name=keyword))
 
@@ -226,11 +228,14 @@ def perm_role_list(request):
 
     # 获取所有系统角色
     roles_list = PermRole.objects.all()
-
+    role_id = request.GET.get('id')
     # TODO: 搜索和分页
     keyword = request.GET.get('search', '')
     if keyword:
         roles_list = roles_list.filter(Q(name=keyword))
+
+    if role_id:
+        roles_list = roles_list.filter(id=role_id)
 
     roles_list, p, roles, page_range, current_page, show_first, show_end = pages(roles_list, request)
 

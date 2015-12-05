@@ -231,24 +231,20 @@ def user_list(request):
 @require_role(role='user')
 def user_detail(request):
     header_title, path1, path2 = '用户详情', '用户管理', '用户详情'
-    # if request.session.get('role_id') == 0:
-    #     user_id = request.user.id
-    # else:
-    #     user_id = request.GET.get('id', '')
-    #     if request.session.get('role_id') == 1:
-    #         user, dept = get_session_user_dept(request)
-    #         if not validate(request, user=[user_id]):
-    #             return HttpResponseRedirect('/')
-    user_id = request.GET.get('id', '')
-    if not user_id:
+    if request.session.get('role_id') == 0:
+        user_id = request.user.id
+    else:
+        user_id = request.GET.get('id', '')
+
+    user = get_object(User, id=user_id)
+    if not user:
         return HttpResponseRedirect('/juser/user_list/')
-    user = User.objects.get(id=user_id)
-    # if user:
-    #     pass
-        # asset_group_permed = user.get_asset_group()
-        # logs_last = Log.objects.filter(user=user.name).order_by('-start_time')[0:10]
-        # logs_all = Log.objects.filter(user=user.name).order_by('-start_time')
-        # logs_num = len(logs_all)
+
+    user_perm_info = get_group_user_perm(user)
+    role_assets = user_perm_info.get('role')
+    user_log_ten = Log.objects.filter(user=user.username).order_by('id')[0:10]
+    user_log_last = Log.objects.filter(user=user.username).order_by('id')[0:50]
+    user_log_last_num = len(user_log_last)
 
     return my_render('juser/user_detail.html', locals(), request)
 
@@ -406,11 +402,6 @@ def user_edit(request):
     return my_render('juser/user_edit.html', locals(), request)
 
 
-# @require_role(role='admin')
-def user_edit_adm(request):
-    pass
-
-
 def profile(request):
     a = request.user.id
     a = request.user.groups
@@ -489,11 +480,3 @@ def down_key(request):
                 return response
     return HttpResponse('No Key File. Contact Admin.')
 
-
-@require_role(role='user')
-def RunCommand(request):
-    if request.method == 'GET':
-        GUP = get_group_user_perm(request.user)
-        print GUP
-        assets = GUP.get('asset')
-        return render_to_response('juser/run_command.html', locals(), context_instance=RequestContext(request))

@@ -43,13 +43,16 @@ def get_group_user_perm(ob):
         asset_groups = rule.asset_group.all()
         assets = rule.asset.all()
         perm_roles = rule.role.all()
+        group_assets = []
+        for asset_group in asset_groups:
+            group_assets.extend(asset_group.asset_set.all())
         # 获取一个规则授权的角色和对应主机
         for role in perm_roles:
-            if perm_role.get('role'):
-                perm_role[role]['asset'] = perm_role[role].get('asset', set()).union(set(assets))
+            if perm_role.get(role):
+                perm_role[role]['asset'] = perm_role[role].get('asset', set()).union(set(assets).union(set(group_assets)))
                 perm_role[role]['asset_group'] = perm_role[role].get('asset_group', set()).union(set(asset_groups))
             else:
-                perm_role[role] = {'asset': set(assets), 'asset_group': set(asset_groups)}
+                perm_role[role] = {'asset': set(assets).union(set(group_assets)), 'asset_group': set(asset_groups)}
 
         # 获取一个规则用户授权的资产
         for asset in assets:

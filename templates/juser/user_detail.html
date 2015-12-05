@@ -76,6 +76,36 @@
                                              </table>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td class="text-navy">授权主机数量</td>
+                                        <td>
+                                            {{ user_perm_info.asset.keys | length }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">授权主机组</td>
+                                        <td>
+                                             <table class="table">
+                                                 {% for group in  user_perm_info.asset_group.keys%}
+                                                    <tr>
+                                                        <td><a href="/jasset/group_list/?id={{ group.id }}">{{ group.name }}</a></td>
+                                                    </tr>
+                                                 {% endfor %}
+                                             </table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">授权规则</td>
+                                        <td>
+                                             <table class="table">
+                                                 {% for rule in  user_perm_info.rule%}
+                                                    <tr>
+                                                        <td><a href="/jperm/role/?id={{ rule.id }}">{{ rule.name }}</a></td>
+                                                    </tr>
+                                                 {% endfor %}
+                                             </table>
+                                        </td>
+                                    </tr>
                                 </table>
                             </div>
                         </div>
@@ -94,10 +124,6 @@
                                 <i class="fa fa-wrench"></i>
                             </a>
                             <ul class="dropdown-menu dropdown-user">
-                                <li><a href="#">Config option 1</a>
-                                </li>
-                                <li><a href="#">Config option 2</a>
-                                </li>
                             </ul>
                             <a class="close-link">
                                 <i class="fa fa-times"></i>
@@ -106,33 +132,35 @@
                     </div>
                     <div class="ibox-content ibox-heading">
                         <h3>用户的所有授权主机</h3>
-                        <small><i class="fa fa-map-marker"></i> 这里包含了用户所有的主机组和组下的主机.</small>
+                        <small><i class="fa fa-map-marker"></i> 这里包含了用户授权角色和角色下的主机.</small>
                     </div>
                     <div class="ibox-content inspinia-timeline">
-{#                        {% for group in user|get_user_asset_group %}#}
-{#                            <div class="timeline-item">#}
-{#                                <div class="row">#}
-{#                                    <div class="col-xs-3 date">#}
-{#                                        <i class="fa fa-repeat"></i>#}
-{#                                        <b><a href="/jperm/perm_list/?uid={{ user.id }}&agid={{ group.id }}">{{ group.name }}</a></b>#}
-{#                                        <br>#}
-{#                                        <small class="text-navy">共: {{ group | group_asset_list_count }}台</small>#}
-{#                                    </div>#}
-{#                                    <div class="col-xs-7 content no-top-border">#}
-{#                                        <p class="m-b-xs"><strong>{{ group.comment }}</strong></p>#}
-{#                                        <p>#}
-{#                                            {% for asset in group|group_asset_list %}#}
-{#                                                {{ asset.ip }}<br>#}
-{#                                            {% endfor %}#}
-{#                                        </p>#}
-{#                                        <p></p>#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                            </div>#}
-{#                        {% endfor %}#}
-{#                        {% if not user|get_user_asset_group %}#}
-{#                            (无)#}
-{#                        {% endif %}#}
+                        {% for role, assets in role_assets.items %}
+                            <div class="timeline-item">
+                                <div class="row">
+                                    <div class="col-xs-3 date">
+                                        <i class="fa fa-info"></i>
+                                        <b>
+                                            <a href="/jperm/role/&id={{ role.id }}">{{ role.name }}</a></b>
+                                        <br>
+                                        <small class="text-navy">共: {{ assets.asset | length }}台</small>
+                                    </div>
+                                    <div class="col-xs-7 content no-top-border">
+                                        <p class="m-b-xs">
+                                            <strong>{{ role.comment }}</strong></p>
+                                        <p>
+                                            {% for asset in assets.asset %}
+                                                <a href="/jasset/asset_list/?id={{ asset.id }}">{{ asset.hostname }}</a><br>
+                                            {% endfor %}
+                                        </p>
+                                        <p></p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                        {% ifequal '{{ asset.asset | length }}' 0 %}
+                            (无)
+                        {% endifequal %}
                     </div>
                 </div>
             </div>
@@ -147,8 +175,9 @@
                         </div>
                         <div class="ibox-content">
                             <div id="last">
+
                                 <div class="feed-activity-list" >
-                                    {% for log in logs_last %}
+                                    {% for log in user_log_ten %}
                                         <div class="feed-element">
                                             <a href="profile.html" class="pull-left">
                                                 <img alt="image" class="img-circle" src="/static/img/{{ session_role_id | to_avatar }}.png">
@@ -161,18 +190,18 @@
                                             </div>
                                         </div>
                                     {% endfor %}
-                                    {% if not logs_last %}
+                                    {% if not user_log_ten %}
                                         (暂无)
                                     {% endif %}
                                 </div>
-                                {% if logs_num > 10 %}
-                                <button id="show" class="btn btn-primary btn-block m-t"><i class="fa fa-arrow-down"></i> Show All</button>
+                                {% if user_log_last_num > 10 %}
+                                <button id="show" class="btn btn-primary btn-block m-t"><i class="fa fa-arrow-down"></i> Show More</button>
                                 {% endif %}
                             </div>
 
                             <div id="all" style="display: none">
                                 <div class="feed-activity-list" >
-                                    {% for log in logs_all %}
+                                    {% for log in user_log_last %}
                                         <div class="feed-element">
                                             <a href="profile.html" class="pull-left">
                                                 <img alt="image" class="img-circle" src="/static/img/{{ session_role_id | to_avatar }}.png">

@@ -7,7 +7,7 @@ import time
 from django import template
 from jperm.models import PermPush
 from jumpserver.api import *
-from jasset.models import AssetAlias
+from jperm.perm_api import get_group_user_perm
 
 register = template.Library()
 
@@ -294,3 +294,13 @@ def get_disk_info(disk_info):
     except Exception:
         disk_size = ''
     return disk_size
+
+
+@register.filter(name='user_perm_asset_num')
+def user_perm_asset_num(user_id):
+    user = get_object(User, id=user_id)
+    if user:
+        user_perm_info = get_group_user_perm(user)
+        return len(user_perm_info.get('asset').keys())
+    else:
+        return 0

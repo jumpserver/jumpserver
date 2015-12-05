@@ -222,7 +222,7 @@
             var url='/jperm/role/get/?id=' + $(this).attr('value');
             var href = $(this).attr('href');
             var new_url = '/jlog/web_terminal/?id=' + $(this).attr('value') + '&role=';
-            var hostname = $(this).closest('tr').find('.hostname')[0].innerHTML;
+            var hostname = $(this).closest('tr').find('.hostname a')[0].innerHTML;
             $.ajax({
                 type: 'GET',
                 url: url,
@@ -247,6 +247,7 @@
                         $.each(dataArray, function(index, value){
                             aUrl += '<a onclick="windowOpen(this); return false" class="btn btn-xs btn-primary newa" href=' + new_url + value + ' value=' + hostname +  '>' + value  + '</a> '
                         });
+                        console.log(aUrl);
                         layer.alert(aUrl, {
                             skin: 'layui-layer-molv',
                             title: '多个角色，请选择一个连接',

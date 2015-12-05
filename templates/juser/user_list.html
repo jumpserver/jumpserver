@@ -47,7 +47,8 @@
                                 <th class="text-center">用户名</th>
                                 <th class="text-center">姓名</th>
                                 <th class="text-center">小组</th>
-                                <th class="text-center">角色</th>
+                                <th class="text-center">权限</th>
+                                <th class="text-center">主机数量</th>
                                 <th class="text-center">激活</th>
                                 <th class="text-center">下载密钥</th>
                                 <th class="text-center">操作</th>
@@ -59,10 +60,11 @@
                                 <td class="text-center">
                                     <input type="checkbox" name="checked" value="{{ user.id }}">
                                 </td>
-                                <td class="text-center"> {{ user.username }} </td>
+                                <td class="text-center"><a href="../user_detail/?id={{ user.id }}">{{ user.username }}</a></td>
                                 <td class="text-center"> {{ user.name }} </td>
                                 <td class="text-center" title="{% for user_group in user.group.all %} {{ user_group.name }} {% endfor %}"> {{ user.group.all | groups2str  }} </td>
                                 <td class="text-center"> {{ user.id | get_role }}</td>
+                                <th class="text-center">{{ user.id | user_perm_asset_num }}</th>
                                 <td class="text-center">{{ user.is_active | bool2str }}</td>
                                 <td class="text-center">
                                     {% if user.username|key_exist %}
@@ -72,7 +74,6 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    <a href="../user_detail/?id={{ user.id }}" class="btn btn-xs btn-primary">详情</a>
                                     <a href="../user_edit/?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a value="{{ user.uuid }}" class="btn btn-xs btn-warning email">Email</a>
                                     <a value="../user_del/?id={{ user.id }}" class="btn btn-xs btn-danger del {% if user.username == 'admin' %} disabled {% endif %}">删除</a>
