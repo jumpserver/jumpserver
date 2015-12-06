@@ -297,12 +297,25 @@ def perm_role_delete(request):
         role_id = request.POST.get("id")
         role = PermRole.objects.get(id=role_id)
         role_key = role.key_path
+
+        # 删除推送到主机上的role
+        recycle_assets = [push.asset for push in role.perm_push.all() if push.success]
+        print recycle_assets
+
+        if recycle_assets:
+            recycle_resource = gen_resource(recycle_assets)
+            task = Tasks(recycle_resource)
+            msg = task.del_user(get_object(PermRole, id=role_id).name)
+            # TODO: 判断返回结果，处理异常
+            print msg
+
         # 删除存储的秘钥，以及目录
         key_files = os.listdir(role_key)
         for key_file in key_files:
             os.remove(os.path.join(role_key, key_file))
         os.rmdir(role_key)
-        # 数据库里删除记录
+
+        # 数据库里删除记录　TODO: 判断返回结果，处理异常
         role.delete()
         return HttpResponse(u"删除角色: %s" % role.name)
     else:
@@ -585,15 +598,20 @@ def perm_sudo_delete(request):
 def perm_role_recycle(request):
     role_id = request.GET.get('role_id')
     asset_ids = request.GET.get('asset_id').split(',')
-    success = request.GET.get("success")
     print request.GET
 
-    if success == "True":
-        assets = [get_object(Asset, id=asset_id) for asset_id in asset_ids]
-        recycle_resource = gen_resource(assets)
-        task = Tasks(recycle_resource)
-        msg = task.del_user(get_object(PermRole, id=role_id).name)
-        print msg
+    assets = [get_object(Asset, id=asset_id) for asset_id in asset_ids]
+
+    recycle_assets = []
+    for asset in assets:
+        if True in [push.success for push in asset.perm_push.all()]:
+            recycle_assets.append(asset)
+
+    recycle_resource = gen_resource(recycle_assets)
+    task = Tasks(recycle_resource)
+    msg = task.del_user(get_object(PermRole, id=role_id).name)
+    # TODO: 判断返回结果，处理异常
+    print msg
 
     for asset_id in asset_ids:
         asset = get_object(Asset, id=asset_id)

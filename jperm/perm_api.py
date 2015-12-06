@@ -218,25 +218,25 @@ def get_role_info(role_id, type="all"):
     """
     # 获取role对应的授权规则
     role_obj = PermRole.objects.get(id=role_id)
-    rules_obj = role_obj.perm_rule.all()
+    rule_push_obj = role_obj.perm_rule.all()
     # 获取role 对应的用户 和 用户组
     # 获取role 对应的主机 和主机组
     users_obj = []
     assets_obj = []
     user_groups_obj = []
     asset_groups_obj = []
-    for rule in rules_obj:
-        for user in rule.user.all():
+    for push in rule_push_obj:
+        for user in push.user.all():
             users_obj.append(user)
-        for asset in rule.asset.all():
+        for asset in push.asset.all():
             assets_obj.append(asset)
-        for user_group in rule.user_group.all():
+        for user_group in push.user_group.all():
             user_groups_obj.append(user_group)
-        for asset_group in rule.asset_group.all():
+        for asset_group in push.asset_group.all():
             asset_groups_obj.append(asset_group)
 
     if type == "all":
-        return {"rules": rules_obj,
+        return {"rules": rule_push_obj,
                 "users": users_obj,
                 "user_groups": user_groups_obj,
                 "assets": assets_obj,
@@ -244,7 +244,7 @@ def get_role_info(role_id, type="all"):
                 }
 
     elif type == "rule":
-        return rules_obj
+        return rule_push_obj
     elif type == "user":
         return users_obj
     elif type == "user_group":

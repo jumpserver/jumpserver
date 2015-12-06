@@ -198,7 +198,7 @@
                                             {% else %}
                                             <td class="text-center" style="color: #ec4758;cursor: help" title="{{ info.result }}" >{{ info.success | yesno:"成功,失败,未知" }} </td>
                                             {% endif %}
-                                            <td class="text-center" ><a class="fa fa-times del" href="/jperm/role/recycle/?role_id={{ role.id }}&asset_id={{ asset.id }}&success={{ info.success }}" style="color: #ec4758;"></a></td>
+                                            <td class="text-center" ><a class="fa fa-times del" href="/jperm/role/recycle/?role_id={{ role.id }}&asset_id={{ asset.id }}" style="color: #ec4758;"></a></td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>
