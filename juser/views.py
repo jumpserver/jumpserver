@@ -162,7 +162,7 @@ def user_add(request):
         ssh_key_pwd = PyCrypt.gen_rand_pass(16)
         extra = request.POST.getlist('extra', [])
         is_active = False if '0' in extra else True
-        ssh_key_login_need = True if '1' in extra else False
+        ssh_key_login_need = True
         send_mail_need = True if '2' in extra else False
 
         try:
@@ -191,7 +191,7 @@ def user_add(request):
                     user_groups = []
                     for user_group_id in groups:
                         user_groups.extend(UserGroup.objects.filter(id=user_group_id))
-                    print user_groups
+
             except IndexError, e:
                 error = u'添加用户 %s 失败 %s ' % (username, e)
                 try:
@@ -302,7 +302,7 @@ def forget_password(request):
             """ % (user.name, URL, user.uuid, timestamp, hash_encode)
             send_mail('忘记跳板机密码', msg, MAIL_FROM, [email], fail_silently=False)
             msg = u'请登陆邮箱，点击邮件重设密码'
-            return HttpResponse(msg)
+            return http_success(request, msg)
         else:
             error = u'用户不存在或邮件地址错误'
 
@@ -310,10 +310,16 @@ def forget_password(request):
 
 
 def reset_password(request):
-    uuid = request.GET.get('uuid', '')
+    uuid_r = request.GET.get('uuid', '')
     timestamp = request.GET.get('timestamp', '')
     hash_encode = request.GET.get('hash', '')
-    action = '/juser/reset_password/?uuid=%s&timestamp=%s&hash=%s' % (uuid, timestamp, hash_encode)
+    action = '/juser/reset_password/?uuid=%s&timestamp=%s&hash=%s' % (uuid_r, timestamp, hash_encode)
+
+    if hash_encode == PyCrypt.md5_crypt(uuid_r + timestamp + KEY):
+        if int(time.time()) - int(timestamp) > 600:
+            return http_error(request, u'链接已超时')
+        else:
+            return render_to_response('juser/reset_password.html', locals())
 
     if request.method == 'POST':
         password = request.POST.get('password')
@@ -325,15 +331,9 @@ def reset_password(request):
             if user:
                 user.password = PyCrypt.md5_crypt(password)
                 user.save()
-                return HttpResponse('密码重设成功')
+                return http_success(request, u'密码重设成功')
             else:
                 return HttpResponse('用户不存在')
-
-    if hash_encode == PyCrypt.md5_crypt(uuid + timestamp + KEY):
-        if int(time.time()) - int(timestamp) > 600:
-            return HttpResponse('链接已超时')
-        else:
-            return render_to_response('juser/reset_password.html', locals())
 
     return http_error(request, u'错误请求')
 
@@ -428,7 +428,8 @@ def change_info(request):
 
         if '' in [name, email]:
             error = '不能为空'
-        if len(password) > 0 and len(password) < 6:
+
+        if len(password) < 6:
             error = '密码须大于6位'
 
         if not error:

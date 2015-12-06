@@ -99,11 +99,11 @@
                                         <label><input type="checkbox" value="0" name="extra" >禁用 </label>
                                     </div>
                                 </div>
-                                <div class="col-sm-2">
-                                    <div class="checkbox i-checks">
-                                        <label><input type="checkbox" value="1" name="extra">ssh key登录 </label>
-                                    </div>
-                                </div>
+{#                                <div class="col-sm-2">#}
+{#                                    <div class="checkbox i-checks">#}
+{#                                        <label><input type="checkbox" value="1" name="extra">ssh key登录 </label>#}
+{#                                    </div>#}
+{#                                </div>#}
                                 <div class="col-sm-2">
                                     <div class="checkbox i-checks">
                                         <label><input type="checkbox" value="2" name="extra">发送邮件 </label>
@@ -167,16 +167,16 @@ $('#userForm').validator({
     }
 });
 
-$("document").ready(function(){
-    $("input.role").click(function(){
-        if($("input.role[value=GA]").is( ":checked" )){
-            $("#admin_groups").css("display", 'block');
-        }
-        else {
-            $("#admin_groups").css("display", 'none');
-        }
-    })
-})
+{#$("document").ready(function(){#}
+{#    $("input.role").click(function(){#}
+{#        if($("input.role[value=GA]").is( ":checked" )){#}
+{#            $("#admin_groups").css("display", 'block');#}
+{#        }#}
+{#        else {#}
+{#            $("#admin_groups").css("display", 'none');#}
+{#        }#}
+{#    })#}
+{#})#}
 
 </script>
 {% endblock %}

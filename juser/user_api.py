@@ -129,8 +129,8 @@ def gen_ssh_key(username, password='',
     生成一个用户ssh密钥对
     """
     logger.debug('生成ssh key， 并设置authorized_keys')
-    private_key_file = os.path.join(key_dir, username)
-    mkdir(key_dir, mode=777)
+    private_key_file = os.path.join(key_dir, username, 'pem')
+    mkdir(key_dir, mode=0777)
     if os.path.isfile(private_key_file):
         os.unlink(private_key_file)
     ret = bash('echo -e  "y\n"|ssh-keygen -t rsa -f %s -b %s -P "%s"' % (private_key_file, length, password))
@@ -142,7 +142,7 @@ def gen_ssh_key(username, password='',
         with open(private_key_file+'.pub') as pub_f:
             with open(authorized_key_file, 'w') as auth_f:
                 auth_f.write(pub_f.read())
-        os.chmod(authorized_key_file, 0600)
+        os.chmod(authorized_key_file, mode=0600)
         chown(authorized_key_file, username)
 
 

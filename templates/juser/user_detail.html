@@ -45,8 +45,16 @@
                                         <td>{{ user.name }}</td>
                                     </tr>
                                     <tr>
-                                        <td class="text-navy">角色</td>
+                                        <td class="text-navy">权限</td>
                                         <td>{{ user.id | get_role }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">key</td>
+                                        {% if user.username|key_exist %}
+                                        <td><a  href="/juser/down_key/?id={{ user.id }}" >下载</a></td>
+                                        {% else %}
+                                        <td><span style="color: #586b7d">下载</span></td>
+                                        {% endif %}
                                     </tr>
                                     <tr>
                                         <td class="text-navy">Email</td>

@@ -78,39 +78,8 @@ def get_count_by_date(date_li, item):
 
 @require_role(role='user')
 def index_cu(request):
-    # user_id = request.user.id
-    # user = get_object(User, id=user_id)
-    login_types = {'L': 'LDAP', 'M': 'MAP'}
     username = request.user.username
-    # TODO: need fix,liuzheng need Asset help
-    GUP = get_group_user_perm(request.user)
-    print GUP
-    assets = GUP.get('asset')
-    idcs = []
-    for i in assets:
-        if i.idc_id:
-            idcs.append(i.idc_id)
-    idc_all = IDC.objects.filter(id__in=idcs)
-    for i in idc_all:
-        print i.name
-    # idc_all = []
-    # for i in assets:
-    #     idc_all.append(i.idc)
-    #     print i.idc.name
-    asset_group_all = GUP.get('asset_group')
-    # posts = Asset.object.all()
-    # host_count = len(posts)
-    #
-    # new_posts = []
-    # post_five = []
-    # for post in posts:
-    #     if len(post_five) < 5:
-    #         post_five.append(post)
-    #     else:
-    #         new_posts.append(post_five)
-    #         post_five = []
-    # new_posts.append(post_five)
-    return render_to_response('index_cu.html', locals(), context_instance=RequestContext(request))
+    return HttpResponseRedirect('/juser/user_detail/')
 
 
 @require_role(role='user')
