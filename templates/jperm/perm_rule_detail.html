@@ -93,12 +93,15 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    {% for user in users %}
                                         <tr class="gradeX">
+                                            {% for user in users %}
                                             <td class="text-center"> {{ user.name }} </td>
-                                            <td class="text-center"> {{ user | user_which_groups:"group" }} </td>
+                                            {% endfor %}
+                                            {% for group in user_groups %}
+                                            <td class="text-center"> {{ group.name }} </td>
+                                            {% endfor %}
                                         </tr>
-                                    {% endfor %}
+
                                     </tbody>
                                 </table>
                             </div>
@@ -139,12 +142,14 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                    {% for asset in assets %}
                                         <tr class="gradeX">
+                                            {% for asset in assets %}
                                             <td class="text-center"> {{ asset.ip }} </td>
-                                            <td class="text-center"> {{ asset | asset_which_groups:"group" }} </td>
+                                            {% endfor %}
+                                            {% for group in asset_groups %}
+                                            <td class="text-center"> {{ group.name }} </td>
+                                            {% endfor %}
                                         </tr>
-                                    {% endfor %}
                                     </tbody>
                                 </table>
                             </div>

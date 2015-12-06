@@ -224,9 +224,7 @@ def get_role_info(role_id, type="all"):
     users_obj = []
     assets_obj = []
     user_groups_obj = []
-    group_users_obj = []
     asset_groups_obj = []
-    group_assets_obj = []
     for rule in rules_obj:
         for user in rule.user.all():
             users_obj.append(user)
@@ -234,31 +232,25 @@ def get_role_info(role_id, type="all"):
             assets_obj.append(asset)
         for user_group in rule.user_group.all():
             user_groups_obj.append(user_group)
-            for user in user_group.user_set.all():
-                group_users_obj.append(user)
         for asset_group in rule.asset_group.all():
             asset_groups_obj.append(asset_group)
-            for asset in asset_group.asset_set.all():
-                group_assets_obj.append(asset)
-
-    calc_users = set(users_obj) | set(group_users_obj)
-    calc_assets = set(assets_obj) | set(group_assets_obj)
 
     if type == "all":
         return {"rules": rules_obj,
-                "users": list(calc_users),
+                "users": users_obj,
                 "user_groups": user_groups_obj,
-                "assets": list(calc_assets),
+                "assets": assets_obj,
                 "asset_groups": asset_groups_obj,
                 }
+
     elif type == "rule":
         return rules_obj
     elif type == "user":
-        return calc_users
+        return users_obj
     elif type == "user_group":
         return user_groups_obj
     elif type == "asset":
-        return calc_assets
+        return assets_obj
     elif type == "asset_group":
         return asset_groups_obj
     else:

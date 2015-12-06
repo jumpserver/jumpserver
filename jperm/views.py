@@ -50,14 +50,19 @@ def perm_rule_detail(request):
     rule_id = request.GET.get("id")
     rule_obj = PermRule.objects.get(id=rule_id)
     user_obj = rule_obj.user.all()
+    usergroup_obj = rule_obj.user_group.all()
     asset_obj = rule_obj.asset.all()
+    assetgroup_obj = rule_obj.asset_group.all()
+
     roles_name = [role.name for role in rule_obj.role.all()]
 
     # 渲染数据
     roles_name = ','.join(roles_name)
     rule = rule_obj
     users = user_obj
+    user_groups = usergroup_obj
     assets = asset_obj
+    asset_groups = assetgroup_obj
 
     return my_render('jperm/perm_rule_detail.html', locals(), request)
 
@@ -108,7 +113,8 @@ def perm_rule_add(request):
             need_push_asset = set()
             for role in roles_obj:
                 asset_no_push = get_role_push_host(role=role)[1]
-                need_push_asset.update(set(calc_assets) - set(asset_no_push))
+                print set(calc_assets), set(asset_no_push)
+                need_push_asset.update(set(calc_assets) & set(asset_no_push))
                 if need_push_asset:
                     raise ServerError(u'没有推送角色 %s 的主机 %s'
                                       % (role.name, ','.join([asset.hostname for asset in need_push_asset])))
@@ -256,7 +262,7 @@ def perm_role_add(request):
 
         try:
             if get_object(PermRole, name=name):
-                raise ServerError('已经存在该用户 %s' % name)
+                raise ServerError(u'已经存在该用户 %s' % name)
             default = get_object(Setting, name='default')
 
             if password:
@@ -579,10 +585,21 @@ def perm_sudo_delete(request):
 def perm_role_recycle(request):
     role_id = request.GET.get('role_id')
     asset_ids = request.GET.get('asset_id').split(',')
+    success = request.GET.get("success")
+    print request.GET
+
+    if success == "True":
+        assets = [get_object(Asset, id=asset_id) for asset_id in asset_ids]
+        recycle_resource = gen_resource(assets)
+        task = Tasks(recycle_resource)
+        msg = task.del_user(get_object(PermRole, id=role_id).name)
+        print msg
+
     for asset_id in asset_ids:
         asset = get_object(Asset, id=asset_id)
         role = get_object(PermRole, id=role_id)
         PermPush.objects.filter(asset=asset, role=role).delete()
+
     return HttpResponse('删除成功')
 
 
