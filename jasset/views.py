@@ -6,9 +6,7 @@ from jumpserver.api import *
 from jumpserver.models import Setting
 from jasset.forms import AssetForm, IdcForm
 from jasset.models import Asset, IDC, AssetGroup, ASSET_TYPE, ASSET_STATUS
-from jperm.perm_api import get_group_asset_perm
-from jperm.ansible_api import MyRunner
-from jperm.perm_api import gen_resource
+from jperm.perm_api import get_group_asset_perm, get_group_user_perm
 
 
 @require_role('admin')
@@ -169,7 +167,7 @@ def asset_add(request):
 @require_role('admin')
 def asset_add_batch(request):
     header_title, path1, path2 = u'添加资产', u'资产管理', u'批量添加'
-    return my_render('jasset/asset_add_batch.html', locals(), request)
+    return my_render('jasset/server_add_batch.html', locals(), request)
 
 
 @require_role('admin')
@@ -259,6 +257,8 @@ def asset_list(request):
     asset list view
     """
     header_title, path1, path2 = u'查看资产', u'资产管理', u'查看资产'
+    username = request.user.username
+    user_perm = request.session['role_id']
     idc_all = IDC.objects.filter()
     asset_group_all = AssetGroup.objects.all()
     asset_types = ASSET_TYPE
@@ -282,12 +282,19 @@ def asset_list(request):
         if idc:
             asset_find = Asset.objects.filter(idc=idc)
     else:
-        asset_find = Asset.objects.all()
+        if user_perm != 0:
+            asset_find = Asset.objects.all()
+        else:
+            user = get_object(User, username=username)
+            asset_perm = get_group_user_perm(user) if user else {'asset': ''}
+            asset_find = asset_perm['asset'].keys()
+            asset_group_all = list(asset_perm['asset_group'])
 
     if idc_name:
         asset_find = asset_find.filter(idc__name__contains=idc_name)
 
     if group_name:
+        print asset_find, type(asset_find)
         asset_find = asset_find.filter(group__name__contains=group_name)
 
     if asset_type:
@@ -324,7 +331,10 @@ def asset_list(request):
         smg = u'excel文件已生成，请点击下载!'
         return my_render('jasset/asset_excel_download.html', locals(), request)
     assets_list, p, assets, page_range, current_page, show_first, show_end = pages(asset_find, request)
-    return my_render('jasset/asset_list.html', locals(), request)
+    if user_perm != 0:
+        return my_render('jasset/asset_list.html', locals(), request)
+    else:
+        return my_render('jasset/asset_cu_list.html', locals(), request)
 
 
 @require_role('admin')
@@ -551,4 +561,4 @@ def asset_upload(request):
             smg = u'批量添加成功'
         else:
             emg = u'批量添加失败,请检查格式.'
-    return my_render('jasset/asset_add_batch.html', locals(), request)
+    return my_render('jasset/server_add_batch.html', locals(), request)

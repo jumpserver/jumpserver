@@ -24,10 +24,6 @@
 
                 <div class="ibox-content">
                     <form id="asset_form">
-                        <div class="col-sm-1" style="padding-left: 0">
-                            <a target="_blank" href="/jasset/asset_add/" class="btn btn-sm btn-primary "> 添加资产 </a>
-                        </div>
-
                         <div class="col-sm-7" style="padding-left: 0px">
                             <label>
                                 <select name="idc" class="form-control m-b input-sm" onchange="change_info()">
@@ -131,9 +127,7 @@
                                     <td class="text-center"> {{ asset.memory }}{% if asset.memory %}G{% endif %}</td>
                                     <td class="text-center"> {{ asset.disk|get_disk_info }}{% if asset.memory %}G{% endif %}</td>
                                     <td class="text-center" data-editable='false'>
-                                        <a href="/jasset/asset_edit/?id={{ asset.id }}" class="btn btn-xs btn-info">编辑</a>
                                         <a value="{{ asset.id }}" class="conn btn btn-xs btn-warning">连接</a>
-                                        <a value="/jasset/asset_del/?id={{ asset.id }}" class="btn btn-xs btn-danger asset_del">删除</a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -141,10 +135,6 @@
                         </table>
                         <div class="row">
                             <div class="col-sm-6">
-                                <input type="button" id="asset_del" class="btn btn-danger btn-sm"  name="del_button" value="删除"/>
-                                <a value="/jasset/asset_edit_batch/" type="button" class="btn btn-sm btn-warning iframe">修改</a>
-                                <input type="button" id="asset_update" class="btn btn-info btn-sm"  name="update_button" value="更新"/>
-{#                                <input type="button" id="asset_update_all" class="btn btn-primary btn-sm"  name="update_button" value="更新全部"/>#}
                                 <input type="button" id="exec_cmd" class="btn btn-sm btn-primary"  name="exec_cmd" value="执行命令"/>
                             </div>
                             {% include 'paginator.html' %}

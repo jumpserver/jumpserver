@@ -213,8 +213,8 @@ def write_excel(asset_all):
         group_all = '/'.join(group_list)
         status = asset.get_status_display()
         idc_name = asset.idc.name if asset.idc else u''
-        system_type = asset.system_type if asset.idc else u''
-        system_version = asset.system_version if asset.idc else u''
+        system_type = asset.system_type if asset.system_type else u''
+        system_version = asset.system_version if asset.system_version else u''
         system_os = unicode(system_type) + unicode(system_version)
 
         alter_dic = [asset.hostname, asset.ip, idc_name, group_all, system_os, asset.cpu, asset.memory,
