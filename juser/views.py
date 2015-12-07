@@ -458,15 +458,13 @@ def regen_ssh_key(request):
 
 @require_role(role='user')
 def down_key(request):
-    user_id = ''
     if is_role_request(request, 'super'):
-        user_id = request.GET.get('id')
+        uuid_r = request.GET.get('uuid', '')
+    else:
+        uuid_r = request.user.uuid
 
-    if is_role_request(request, 'user'):
-        user_id = request.user.id
-
-    if user_id:
-        user = get_object(User, id=user_id)
+    if uuid_r:
+        user = get_object(User, uuid=uuid_r)
         if user:
             username = user.username
             private_key_file = os.path.join(KEY_DIR, 'user', username)

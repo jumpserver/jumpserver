@@ -68,7 +68,7 @@
                                 <td class="text-center">{{ user.is_active | bool2str }}</td>
                                 <td class="text-center">
                                     {% if user.username|key_exist %}
-                                        <a  href="/juser/down_key/?id={{ user.id }}" >下载</a>
+                                        <a  href="/juser/down_key/?uuid={{ user.uuid }}" >下载</a>
                                     {% else %}
                                         <span style="color: #586b7d">下载</span>
                                     {% endif %}
