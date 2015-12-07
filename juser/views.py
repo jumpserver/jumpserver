@@ -147,7 +147,7 @@ def user_add(request):
         groups = request.POST.getlist('groups', [])
         admin_groups = request.POST.getlist('admin_groups', [])
         role = request.POST.get('role', 'CU')
-        uuid_r = uuid.uuid1()
+        uuid_r = uuid.uuid4().get_hex()
         ssh_key_pwd = PyCrypt.gen_rand_pass(16)
         extra = request.POST.getlist('extra', [])
         is_active = False if '0' in extra else True
