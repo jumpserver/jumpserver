@@ -129,7 +129,7 @@ def gen_ssh_key(username, password='',
     生成一个用户ssh密钥对
     """
     logger.debug('生成ssh key， 并设置authorized_keys')
-    private_key_file = os.path.join(key_dir, username+'pem')
+    private_key_file = os.path.join(key_dir, username+'.pem')
     mkdir(key_dir, mode=0700)
     if os.path.isfile(private_key_file):
         os.unlink(private_key_file)
@@ -142,7 +142,7 @@ def gen_ssh_key(username, password='',
         with open(private_key_file+'.pub') as pub_f:
             with open(authorized_key_file, 'w') as auth_f:
                 auth_f.write(pub_f.read())
-        os.chmod(authorized_key_file, mode=0600)
+        os.chmod(authorized_key_file, 0600)
         chown(authorized_key_file, username)
 
 
@@ -166,7 +166,7 @@ def user_add_mail(user, kwargs):
     mail_msg = u"""
     Hi, %s
         您的用户名： %s
-        您的角色： %s
+        您的权限： %s
         您的web登录密码： %s
         您的ssh密钥文件密码： %s
         密钥下载地址： %s/juser/down_key/?uuid=%s

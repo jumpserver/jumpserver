@@ -4,7 +4,7 @@
 
 # import random
 # from Crypto.PublicKey import RSA
-import uuid as uuid_r
+import uuid
 from django.contrib.auth.decorators import login_required
 
 from django.db.models import Q
@@ -158,7 +158,7 @@ def user_add(request):
         groups = request.POST.getlist('groups', [])
         admin_groups = request.POST.getlist('admin_groups', [])
         role = request.POST.get('role', 'CU')
-        uuid = uuid_r.uuid1()
+        uuid_r = uuid.uuid1()
         ssh_key_pwd = PyCrypt.gen_rand_pass(16)
         extra = request.POST.getlist('extra', [])
         is_active = False if '0' in extra else True
@@ -180,7 +180,7 @@ def user_add(request):
             try:
                 user = db_add_user(username=username, name=name,
                                    password=password,
-                                   email=email, role=role, uuid=uuid,
+                                   email=email, role=role, uuid=uuid_r,
                                    groups=groups, admin_groups=admin_groups,
                                    ssh_key_pwd=ssh_key_pwd,
                                    is_active=is_active,
@@ -262,18 +262,16 @@ def user_del(request):
     for user_id in user_id_list:
         user = get_object(User, id=user_id)
         if user:
-            # TODO: annotation by liuzheng, because useless for me
-            # assets = user_permed(user)
-            # result = _public_perm_api({'type': 'del_user', 'user': user, 'asset': assets})
-            # print result
+            logger.debug("删除用户 %s " % user.username)
+            bash('userdel -r %s' % user.username)
             user.delete()
     return HttpResponse('删除成功')
 
 
 @require_role('admin')
 def send_mail_retry(request):
-    user_uuid = request.GET.get('uuid', '1')
-    user = get_object(User, uuid=user_uuid)
+    uuid_r = request.GET.get('uuid', '1')
+    user = get_object(User, uuid=uuid_r)
     msg = u"""
     跳板机地址： %s
     用户名：%s
@@ -315,25 +313,26 @@ def reset_password(request):
     hash_encode = request.GET.get('hash', '')
     action = '/juser/reset_password/?uuid=%s&timestamp=%s&hash=%s' % (uuid_r, timestamp, hash_encode)
 
-    if hash_encode == PyCrypt.md5_crypt(uuid_r + timestamp + KEY):
-        if int(time.time()) - int(timestamp) > 600:
-            return http_error(request, u'链接已超时')
-        else:
-            return render_to_response('juser/reset_password.html', locals())
-
     if request.method == 'POST':
         password = request.POST.get('password')
         password_confirm = request.POST.get('password_confirm')
+        print password, password_confirm
         if password != password_confirm:
             return HttpResponse('密码不匹配')
         else:
-            user = get_object(User, uuid=uuid)
+            user = get_object(User, uuid=uuid_r)
             if user:
                 user.password = PyCrypt.md5_crypt(password)
                 user.save()
                 return http_success(request, u'密码重设成功')
             else:
                 return HttpResponse('用户不存在')
+
+    if hash_encode == PyCrypt.md5_crypt(uuid_r + timestamp + KEY):
+        if int(time.time()) - int(timestamp) > 600:
+            return http_error(request, u'链接已超时')
+        else:
+            return render_to_response('juser/reset_password.html', locals())
 
     return http_error(request, u'错误请求')
 
@@ -398,7 +397,6 @@ def user_edit(request):
             send_mail('您的信息已修改', msg, MAIL_FROM, [email], fail_silently=False)
 
         return HttpResponseRedirect('/juser/user_list/')
-
     return my_render('juser/user_edit.html', locals(), request)
 
 
@@ -447,8 +445,8 @@ def change_info(request):
 
 @require_role(role='user')
 def regen_ssh_key(request):
-    uuid = request.GET.get('uuid', '')
-    user = get_object(User, uuid=uuid)
+    uuid_r = request.GET.get('uuid', '')
+    user = get_object(User, uuid=uuid_r)
     if not user:
         return HttpResponse('没有该用户')
 
