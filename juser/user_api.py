@@ -195,9 +195,9 @@ def get_display_msg(user, password, ssh_key_pwd, ssh_key_login_need, send_mail_n
         用户名：%s
         密码：%s
         密钥密码：%s
-        密钥下载url: %s/juser/down_key/?id=%s
+        密钥下载url: %s/juser/down_key/?uuid=%s
         该账号密码可以登陆web和跳板机。
-        """ % (URL, user.username, password, ssh_key_pwd, URL, user.id)
+        """ % (URL, user.username, password, ssh_key_pwd, URL, user.uuid)
     else:
         msg = u"""
         跳板机地址： %s \n

@@ -13,15 +13,6 @@ from jperm.perm_api import get_group_user_perm
 
 MAIL_FROM = EMAIL_HOST_USER
 
-@login_required(login_url='/login')
-def chg_role(request):
-    role = {'SU': 2, 'GA': 1, 'CU': 0}
-    if request.session['role_id'] > 0:
-        request.session['role_id'] = 0
-    elif request.session['role_id'] == 0:
-        request.session['role_id'] = role.get(request.user.role, 0)
-    return HttpResponseRedirect('/')
-
 
 @require_role(role='super')
 def group_add(request):
@@ -128,7 +119,6 @@ def group_edit(request):
                         continue
                     user.group.add(g)
 
-
         except ServerError, e:
             error = e
         if not error:
@@ -141,7 +131,6 @@ def group_edit(request):
     return my_render('juser/group_edit.html', locals(), request)
 
 
-@login_required(login_url='/login')
 @require_role(role='super')
 def user_add(request):
     error = ''
@@ -307,6 +296,7 @@ def forget_password(request):
     return render_to_response('juser/forget_password.html', locals())
 
 
+@require_role('user')
 def reset_password(request):
     uuid_r = request.GET.get('uuid', '')
     timestamp = request.GET.get('timestamp', '')
@@ -401,14 +391,11 @@ def user_edit(request):
 
 
 def profile(request):
-    a = request.user.id
-    a = request.user.groups
-
     user_id = request.user.id
     if not user_id:
         return HttpResponseRedirect('/')
     user = User.objects.get(id=user_id)
-    return render_to_response('juser/profile.html', locals(), context_instance=RequestContext(request))
+    return my_render('juser/profile.html', locals(), request)
 
 
 def change_info(request):
@@ -440,7 +427,7 @@ def change_info(request):
                 user.save()
             msg = '修改成功'
 
-    return render_to_response('juser/change_info.html', locals(), context_instance=RequestContext(request))
+    return my_render('juser/change_info.html', locals(), request)
 
 
 @require_role(role='user')
@@ -467,7 +454,8 @@ def down_key(request):
         user = get_object(User, uuid=uuid_r)
         if user:
             username = user.username
-            private_key_file = os.path.join(KEY_DIR, 'user', username)
+            private_key_file = os.path.join(KEY_DIR, 'user', username+'pem')
+            print private_key_file
             if os.path.isfile(private_key_file):
                 f = open(private_key_file)
                 data = f.read()
