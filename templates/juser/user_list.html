@@ -123,6 +123,7 @@
                 $(".gradeX input:checked").each(function() {
                     check_array.push($(this).attr("value"))
                 });
+                console.log(check_array.join(","));
                 $.post("/juser/user_del/",
                         {id: check_array.join(",")},
                         function(data){

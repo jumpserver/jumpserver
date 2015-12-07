@@ -312,6 +312,7 @@ class Tty(object):
                         port=connect_info.get('port'),
                         username=connect_info.get('role_name'),
                         password=connect_info.get('role_pass'),
+                        allow_agent=False,
                         look_for_keys=False)
 
         except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
@@ -748,7 +749,7 @@ def main():
             else:
                 try:
                     asset = nav.search_result[int(option)]
-                    roles = get_role(login_user, asset)
+                    roles = nav.user_perm.get('asset').get(asset).get('role')
                     if len(roles) > 1:
                         role_check = dict(zip(range(len(roles)), roles))
                         print "\033[32m[ID] 角色\033[0m"
@@ -766,7 +767,7 @@ def main():
                             color_print('请输入正确ID', 'red')
                             continue
                     elif len(roles) == 1:
-                        role = roles[0]
+                        role = list(roles)[0]
                     else:
                         color_print('没有映射用户', 'red')
                         continue

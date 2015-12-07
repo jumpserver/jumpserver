@@ -248,10 +248,11 @@ def user_del(request):
         user_id_list = user_ids.split(',')
     else:
         return HttpResponse('错误请求')
+
     for user_id in user_id_list:
         user = get_object(User, id=user_id)
-        if user:
-            logger.debug("删除用户 %s " % user.username)
+        if user and user.username != 'admin':
+            logger.debug(u"删除用户 %s " % user.username)
             bash('userdel -r %s' % user.username)
             user.delete()
     return HttpResponse('删除成功')
@@ -418,9 +419,6 @@ def change_info(request):
             error = '密码须大于6位'
 
         if not error:
-            # if password != user.password:
-            #     password = CRYPTOR.md5_crypt(password)
-
             User.objects.filter(id=user_id).update(name=name, email=email)
             if len(password) > 0:
                 user.set_password(password)
@@ -454,7 +452,7 @@ def down_key(request):
         user = get_object(User, uuid=uuid_r)
         if user:
             username = user.username
-            private_key_file = os.path.join(KEY_DIR, 'user', username+'pem')
+            private_key_file = os.path.join(KEY_DIR, 'user', username+'.pem')
             print private_key_file
             if os.path.isfile(private_key_file):
                 f = open(private_key_file)

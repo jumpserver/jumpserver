@@ -71,17 +71,6 @@ def get_asset_info(asset):
     return info
 
 
-def get_role(user, asset):
-    """
-    获取用户在这个资产上的授权角色列表
-    """
-    roles = []
-    rules = PermRule.objects.filter(user=user, asset=asset)
-    for rule in rules:
-        roles.extend(list(rule.role.all()))
-    return roles
-
-
 def get_role_key(user, role):
     """
     由于role的key的权限是所有人可以读的， ansible执行命令等要求为600，所以拷贝一份到特殊目录
