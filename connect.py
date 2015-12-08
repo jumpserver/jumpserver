@@ -438,15 +438,23 @@ class SshTty(Tty):
         """
         # 发起ssh连接请求 Make a ssh connection
         ssh = self.get_connection()
+        
+        transport = ssh.get_transport()
+        transport.set_keepalive(30)
+        transport.use_compression(True)
 
         # 获取连接的隧道并设置窗口大小 Make a channel and set windows size
         global channel
         win_size = self.get_win_size()
-        self.channel = channel = ssh.invoke_shell(height=win_size[0], width=win_size[1], term='xterm')
+        #self.channel = channel = ssh.invoke_shell(height=win_size[0], width=win_size[1], term='xterm')
+        self.channel = channel = transport.open_session()
+        channel.get_pty(term='xterm',height=win_size[0],width=win_size[1])
+        channel.invoke_shell()
         try:
             signal.signal(signal.SIGWINCH, self.set_win_size)
         except:
             pass
+        
         self.posix_shell()
 
         # Shutdown channel socket
