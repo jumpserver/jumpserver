@@ -49,8 +49,10 @@ def color_print(msg, color='red', exits=False):
     """
     color_msg = {'blue': '\033[1;36m%s\033[0m',
                  'green': '\033[1;32m%s\033[0m',
-                 'red': '\033[1;31m%s\033[0m'}
-    msg = color_msg.get(color, 'blue') % msg
+                 'yellow': '\033[1;33m%s\033[0m',
+                 'red': '\033[1;31m%s\033[0m',
+                 'info': '\033[32m%s\033[0m'}
+    msg = color_msg.get(color, 'red') % msg
     print msg
     if exits:
         time.sleep(2)
@@ -69,7 +71,7 @@ class Tty(object):
     A virtual tty class
     一个虚拟终端类，实现连接ssh和记录日志，基类
     """
-    def __init__(self, user, asset, role):
+    def __init__(self, user, asset, role, login_type='ssh'):
         self.username = user.username
         self.asset_name = asset.hostname
         self.ip = None
@@ -78,10 +80,8 @@ class Tty(object):
         self.asset = asset
         self.user = user
         self.role = role
-        self.ssh = None
         self.remote_ip = ''
-        self.connect_info = None
-        self.login_type = 'ssh'
+        self.login_type = login_type
         self.vim_flag = False
         self.ps1_pattern = re.compile('\[.*@.*\][\$#]')
         self.vim_data = ''
@@ -241,18 +241,18 @@ class Tty(object):
             mkdir(today_connect_log_dir, mode=0777)
         except OSError:
             logger.debug('创建目录 %s 失败，请修改%s目录权限' % (today_connect_log_dir, tty_log_dir))
-            raise ServerError('Create %s failed, Please modify %s permission.' % (today_connect_log_dir, tty_log_dir))
+            raise ServerError('创建目录 %s 失败，请修改%s目录权限' % (today_connect_log_dir, tty_log_dir))
 
         try:
             log_file_f = open(log_file_path + '.log', 'a')
             log_time_f = open(log_file_path + '.time', 'a')
         except IOError:
             logger.debug('创建tty日志文件失败, 请修改目录%s权限' % today_connect_log_dir)
-            raise ServerError('Create logfile failed, Please modify %s permission.' % today_connect_log_dir)
+            raise ServerError('创建tty日志文件失败, 请修改目录%s权限' % today_connect_log_dir)
 
         if self.login_type == 'ssh':  # 如果是ssh连接过来，记录connect.py的pid，web terminal记录为日志的id
             pid = os.getpid()
-            self.remote_ip = remote_ip # 获取远端IP
+            self.remote_ip = remote_ip  # 获取远端IP
         else:
             pid = 0
 
@@ -260,7 +260,7 @@ class Tty(object):
                   log_path=log_file_path, start_time=date_today, pid=pid)
         log.save()
         if self.login_type == 'web':
-            log.pid = log.id
+            log.pid = log.id  # 设置log id为websocket的id, 然后kill时干掉websocket
             log.save()
 
         log_file_f.write('Start at %s\r\n' % datetime.datetime.now())
@@ -271,17 +271,13 @@ class Tty(object):
         获取需要登陆的主机的信息和映射用户的账号密码
         """
         asset_info = get_asset_info(self.asset)
-        role_key = get_role_key(self.user, self.role)
+        role_key = get_role_key(self.user, self.role)  # 获取角色的key，因为ansible需要权限是600，所以统一生成用户_角色key
         role_pass = CRYPTOR.decrypt(self.role.password)
-        self.connect_info = {'user': self.user, 'asset': self.asset, 'ip': asset_info.get('ip'),
-                             'port': int(asset_info.get('port')), 'role_name': self.role.name,
-                             'role_pass': role_pass, 'role_key': role_key}
-        logger.debug("Connect: Host: %s Port: %s User: %s Pass: %s Key: %s" % (asset_info.get('ip'),
-                                                                               asset_info.get('port'),
-                                                                               self.role.name,
-                                                                               role_pass,
-                                                                               role_key))
-        return self.connect_info
+        connect_info = {'user': self.user, 'asset': self.asset, 'ip': asset_info.get('ip'),
+                        'port': int(asset_info.get('port')), 'role_name': self.role.name,
+                        'role_pass': role_pass, 'role_key': role_key}
+        logger.debug(connect_info)
+        return connect_info
 
     def get_connection(self):
         """
@@ -300,12 +296,13 @@ class Tty(object):
                     ssh.connect(connect_info.get('ip'),
                                 port=connect_info.get('port'),
                                 username=connect_info.get('role_name'),
+                                password=connect_info.get('role_pass'),
                                 key_filename=role_key,
-                                look_for_keys=False)
-                    self.ssh = ssh
+                                look_for_keys=False,
+                                allow_agent=False)
                     return ssh
                 except (paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException):
-                    logger.warning('Use ssh key %s Failed.' % role_key)
+                    logger.warning(u'使用ssh key %s 失败, 尝试只使用密码' % role_key)
                     pass
 
             ssh.connect(connect_info.get('ip'),
@@ -320,7 +317,6 @@ class Tty(object):
         except socket.error:
             raise ServerError('端口可能不对 Connect SSH Socket Port Error, Please Correct it.')
         else:
-            self.ssh = ssh
             return ssh
 
 
@@ -455,6 +451,9 @@ class SshTty(Tty):
 
 
 class Nav(object):
+    """
+    导航提示类
+    """
     def __init__(self, user):
         self.user = user
         self.search_result = {}
@@ -466,9 +465,10 @@ class Nav(object):
         Print prompt
         打印提示导航
         """
-        msg = """\n\033[1;32m###  欢迎使用Jumpserver开源跳板机  ### \033[0m
+        msg = """\n\033[1;32m###    欢迎使用Jumpserver开源跳板机系统   ### \033[0m
+
         1) 输入 \033[32mID\033[0m 直接登录.
-        2) 输入 \033[32m/\033[0m + \033[32mIP, 主机名, 主机别名 or 备注 \033[0m搜索.
+        2) 输入 \033[32m/\033[0m + \033[32mIP, 主机名 or 备注 \033[0m搜索.
         3) 输入 \033[32mP/p\033[0m 显示您有权限的主机.
         4) 输入 \033[32mG/g\033[0m 显示您有权限的主机组.
         5) 输入 \033[32mG/g\033[0m\033[0m + \033[32m组ID\033[0m 显示该组下主机.
@@ -503,17 +503,14 @@ class Nav(object):
             user_asset_search = user_asset_all
 
         self.search_result = dict(zip(range(len(user_asset_search)), user_asset_search))
-        print '\033[32m[%-3s] %-15s  %-15s  %-5s  %-10s  %s \033[0m' % ('ID', 'AssetName', 'IP', 'Port', 'Role', 'Comment')
+        color_print('[%-3s] %-15s  %-15s  %-5s  %-10s  %s' % ('ID', 'AssetName', 'IP', 'Port', 'Role', 'Comment'), 'info')
         for index, asset in self.search_result.items():
             # 获取该资产信息
             asset_info = get_asset_info(asset)
             # 获取该资产包含的角色
             role = [str(role.name) for role in self.user_perm.get('asset').get(asset).get('role')]
-            if asset.comment:
-                print '[%-3s] %-15s  %-15s  %-5s  %-10s  %s' % (index, asset.hostname, asset.ip, asset_info.get('port'),
-                                                                role, asset.comment)
-            else:
-                print '[%-3s] %-15s  %-15s  %-5s  %-10s' % (index, asset.hostname, asset.ip, asset_info.get('port'), role)
+            print '[%-3s] %-15s  %-15s  %-5s  %-10s  %s' % (index, asset.hostname, asset.ip, asset_info.get('port'),
+                                                            role, asset.comment)
         print
 
     def print_asset_group(self):
@@ -521,8 +518,7 @@ class Nav(object):
         打印用户授权的资产组
         """
         user_asset_group_all = get_group_user_perm(self.user).get('asset_group', [])
-
-        print '\033[32m[%-3s] %-15s %s \033[0m' % ('ID', 'GroupName', 'Comment')
+        color_print('[%-3s] %-15s %s' % ('ID', 'GroupName', 'Comment'), 'info')
         for asset_group in user_asset_group_all:
             if asset_group.comment:
                 print '[%-3s] %-15s %s' % (asset_group.id, asset_group.name, asset_group.comment)
@@ -540,7 +536,7 @@ class Nav(object):
 
             roles = self.user_perm.get('role').keys()
             if len(roles) > 1:  # 授权角色数大于1
-                print '\033[32m[%-2s] %-15s \033[0m' % ('ID', '角色')
+                color_print('[%-2s] %-15s' % ('ID', '角色'),  'info')
                 role_check = dict(zip(range(len(roles)), roles))
 
                 for i, r in role_check.items():
@@ -615,7 +611,7 @@ class Nav(object):
                     res = gen_resource({'user': self.user, 'asset': assets}, perm=self.user_perm)
                     runner = MyRunner(res)
                     asset_name_str = ''
-                    print "匹配主机:\n"
+                    print "匹配主机:"
                     for inv in runner.inventory.get_hosts(pattern=pattern):
                         print inv.name
                         asset_name_str += '%s ' % inv.name
@@ -667,7 +663,6 @@ class Nav(object):
                     assets = self.user_perm.get('asset').keys()
                     res = gen_resource({'user': self.user, 'asset': assets}, perm=self.user_perm)
                     runner = MyRunner(res)
-                    logger.debug("Muti download file res: %s" % res)
                     asset_name_str = ''
                     print "匹配用户:\n"
                     for inv in runner.inventory.get_hosts(pattern=pattern):

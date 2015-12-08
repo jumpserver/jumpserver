@@ -191,7 +191,6 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
 class WebTty(Tty):
     def __init__(self, *args, **kwargs):
         super(WebTty, self).__init__(*args, **kwargs)
-        self.login_type = 'web'
         self.ws = None
         self.data = ''
         self.input_mode = False
@@ -328,10 +327,10 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             return
         logger.debug('Websocket: request web terminal Host: %s User: %s Role: %s' % (asset.hostname, self.user.username,
                                                                                      login_role.name))
-        self.term = WebTty(self.user, asset, login_role)
+        self.term = WebTty(self.user, asset, login_role, login_type='web')
         self.term.remote_ip = self.request.remote_ip
-        self.term.get_connection()
-        self.term.channel = self.term.ssh.invoke_shell(term='xterm')
+        ssh = self.term.get_connection()
+        self.term.channel = ssh.invoke_shell(term='xterm')
         WebTerminalHandler.tasks.append(MyThread(target=self.forward_outbound))
         WebTerminalHandler.clients.append(self)
 

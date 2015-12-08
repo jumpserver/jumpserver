@@ -50,7 +50,7 @@ def set_log(level):
 
 def get_asset_info(asset):
     """
-    获取资产的相关账号端口信息
+    获取资产的相关管理账号端口等信息
     """
     default = get_object(Setting, name='default')
     info = {'hostname': asset.hostname, 'ip': asset.ip}
