@@ -563,7 +563,7 @@ class Nav(object):
             for asset in assets:
                 print ' %s' % asset.hostname
             print
-            print "请输入主机名、IP或ansile支持的pattern, q退出"
+            print "请输入主机名、IP或ansile支持的pattern, 多个主机:分隔, q退出"
             pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
             if pattern == 'q':
                 break
@@ -606,7 +606,7 @@ class Nav(object):
                 self.user_perm = get_group_user_perm(self.user)
             try:
                 print "进入批量上传模式"
-                print "请输入主机名、IP或ansile支持的pattern, q退出"
+                print "请输入主机名、IP或ansile支持的pattern, 多个主机:分隔 q退出"
                 pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
                 if pattern == 'q':
                     break
@@ -659,7 +659,7 @@ class Nav(object):
                 self.user_perm = get_group_user_perm(self.user)
             try:
                 print "进入批量下载模式"
-                print "请输入主机名、IP或ansile支持的pattern, q退出"
+                print "请输入主机名、IP或ansile支持的pattern, 多个主机:分隔,q退出"
                 pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
                 if pattern == 'q':
                     break

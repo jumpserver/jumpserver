@@ -88,8 +88,8 @@ def group_edit(request):
 
     if request.method == 'GET':
         group_id = request.GET.get('id', '')
-        # user_group = get_object(UserGroup, id=group_id)
-        user_group = UserGroup.objects.get(id=group_id)
+        user_group = get_object(UserGroup, id=group_id)
+        # user_group = UserGroup.objects.get(id=group_id)
         users_selected = User.objects.filter(group=user_group)
         users_remain = User.objects.filter(~Q(group=user_group))
         users_all = User.objects.all()
@@ -118,7 +118,9 @@ def group_edit(request):
                     if g == user_group:
                         continue
                     user.group.add(g)
-
+            user_group.name = group_name
+            user_group.comment = comment
+            user_group.save()
         except ServerError, e:
             error = e
         if not error:

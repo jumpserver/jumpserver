@@ -12,7 +12,11 @@ from ansible                   import utils
 from passlib.hash              import sha512_crypt
 
 from utils                     import get_rand_pass
+from jumpserver.api            import logger
 
+from tempfile import NamedTemporaryFile
+from django.template.loader import get_template
+from django.template import Context
 
 import os.path
 
@@ -138,6 +142,7 @@ class MyRunner(MyInventory):
                      become_pass=become_pass
                      )
         self.results_raw = hoc.run()
+        logger.debug(self.results_raw)
         return self.results_raw
 
     @property
@@ -353,14 +358,33 @@ class MyTask(MyRunner):
 
         return self.results
 
-    def push_sudo_file(self, file_path):
+    @staticmethod
+    def gen_sudo_script(role_list, sudo_list):
+        # receive role_list = [role1, role2] sudo_list = [sudo1, sudo2]
+        # return sudo_alias={'NETWORK': '/sbin/ifconfig, /ls'} sudo_user={'user1': ['NETWORK', 'SYSTEM']}
+        sudo_alias = {}
+        sudo_user = {}
+        for sudo in sudo_list:
+            sudo_alias[sudo.name] = sudo.commands
+
+        for role in role_list:
+            sudo_user[role.name] = ','.join(sudo_alias.keys())
+        print sudo_alias, sudo_user
+
+        sudo_j2 = get_template('jperm/role_sudo.j2')
+        sudo_content = sudo_j2.render(Context({"sudo_alias": sudo_alias, "sudo_user": sudo_user}))
+        sudo_file = NamedTemporaryFile(delete=False)
+        sudo_file.write(sudo_content)
+        sudo_file.close()
+        return sudo_file.name
+
+    def push_sudo_file(self, role_list, sudo_list):
         """
         use template to render pushed sudoers file
         :return:
         """
-        module_args1 = file_path
+        module_args1 = self.gen_sudo_script(role_list, sudo_list)
         self.run("script", module_args1, become=True)
-        print self.results_raw
         return self.results
 
 

@@ -10,7 +10,7 @@ from jasset.models     import Asset, AssetGroup
 from jperm.models      import PermRole, PermRule, PermSudo, PermPush
 from jumpserver.models import Setting
 
-from jperm.utils       import updates_dict, gen_keys, get_rand_pass, get_add_sudo_script
+from jperm.utils       import updates_dict, gen_keys, get_rand_pass
 from jperm.ansible_api import MyTask
 from jperm.perm_api    import get_role_info, get_role_push_host
 from jumpserver.api    import my_render, get_object, CRYPTOR
@@ -440,13 +440,8 @@ def perm_role_push(request):
 
         # 3. 推送sudo配置文件
         if password_push or key_push:
-            role_chosen_aliase = {}  # {'dev': 'NETWORKING, SHUTDOWN'}
-            sudo_alias = set([sudo for sudo in role.sudo.all()])  # set(sudo1, sudo2, sudo3)
-            if sudo_alias:
-                role_chosen_aliase[role.name] = ','.join(sudo.name for sudo in sudo_alias if sudo.name)
-                add_sudo_script = get_add_sudo_script(role_chosen_aliase, sudo_alias)
-                ret['sudo'] = task.push_sudo_file(add_sudo_script)
-                os.remove(add_sudo_script)
+            sudo_list = set([sudo for sudo in role.sudo.all()])  # set(sudo1, sudo2, sudo3)
+            ret['sudo'] = task.push_sudo_file([role], sudo_list)
 
         logger.debug('推送role结果: %s' % ret)
         success_asset = {}
