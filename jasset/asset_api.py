@@ -350,7 +350,6 @@ def get_ansible_asset_info(asset_ip, setup_info):
     # asset_type = setup_info.get("ansible_system")
     sn = setup_info.get("ansible_product_serial")
     asset_info = [other_ip, mac, cpu, memory_format, disk, sn, system_type, system_version, brand, system_arch]
-    print asset_info
     return asset_info
 
 
@@ -358,6 +357,7 @@ def asset_ansible_update(obj_list, name=''):
     resource = gen_resource(obj_list)
     ansible_instance = MyRunner(resource)
     ansible_asset_info = ansible_instance.run(module_name='setup', pattern='*')
+    logger.debug('获取硬件信息: %s' % ansible_asset_info)
     for asset in obj_list:
         try:
             setup_info = ansible_asset_info['contacted'][asset.hostname]['ansible_facts']
@@ -365,7 +365,6 @@ def asset_ansible_update(obj_list, name=''):
             continue
         else:
             asset_info = get_ansible_asset_info(asset.ip, setup_info)
-            print asset
             other_ip, mac, cpu, memory, disk, sn, system_type, system_version, brand, system_arch = asset_info
             asset_dic = {"other_ip": other_ip,
                          "mac": mac,

@@ -167,7 +167,7 @@ def asset_add(request):
 @require_role('admin')
 def asset_add_batch(request):
     header_title, path1, path2 = u'添加资产', u'资产管理', u'批量添加'
-    return my_render('jasset/server_add_batch.html', locals(), request)
+    return my_render('jasset/asset_add_batch.html', locals(), request)
 
 
 @require_role('admin')
@@ -561,4 +561,4 @@ def asset_upload(request):
             smg = u'批量添加成功'
         else:
             emg = u'批量添加失败,请检查格式.'
-    return my_render('jasset/server_add_batch.html', locals(), request)
+    return my_render('jasset/asset_add_batch.html', locals(), request)

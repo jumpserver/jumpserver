@@ -22,11 +22,11 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
     django.setup()
 from django.contrib.sessions.models import Session
-from jumpserver.api import ServerError, User, Asset, PermRole, AssetGroup, get_object, mkdir, get_asset_info, get_role
+from jumpserver.api import ServerError, User, Asset, PermRole, AssetGroup, get_object, mkdir, get_asset_info
 from jumpserver.api import logger, Log, TtyLog, get_role_key, CRYPTOR, bash, get_tmp_dir
 from jperm.perm_api import gen_resource, get_group_asset_perm, get_group_user_perm, user_have_perm, PermRole
 from jumpserver.settings import LOG_DIR
-from jperm.ansible_api import Command, MyRunner
+from jperm.ansible_api import MyRunner
 # from jlog.log_api import escapeString
 from jlog.models import ExecLog, FileLog
 
