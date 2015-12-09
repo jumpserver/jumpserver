@@ -261,7 +261,7 @@ class Tasks(Command):
                      subset=group,
                      pattern=pattern,
                      forks=forks,
-                     become=False,
+                     become=True,
                      )
 
         self.results = hoc.run()

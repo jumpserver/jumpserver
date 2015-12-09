@@ -3,18 +3,21 @@
 from django.db.models import Q
 from paramiko import SSHException
 from jperm.perm_api import *
-from juser.user_api import gen_ssh_key
 
 from juser.models      import User, UserGroup
 from jasset.models     import Asset, AssetGroup
 from jperm.models      import PermRole, PermRule, PermSudo, PermPush
 from jumpserver.models import Setting
 
-from jperm.utils       import updates_dict, gen_keys, get_rand_pass, get_add_sudo_script
+from jperm.utils       import gen_keys, get_add_sudo_script
 from jperm.ansible_api import Tasks
 from jperm.perm_api    import get_role_info, get_role_push_host
 
 from jumpserver.api    import my_render, get_object, CRYPTOR
+
+# 设置Perm APP Log
+from jumpserver.settings import LOG_LEVEL
+logger = set_log(LOG_LEVEL, filename='jumpserver_perm.log')
 
 
 @require_role('admin')
@@ -32,7 +35,6 @@ def perm_rule_list(request):
     keyword = request.GET.get('search', '')
     if keyword:
         rules_list = rules_list.filter(Q(name=keyword))
-
     rules_list, p, rules, page_range, current_page, show_first, show_end = pages(rules_list, request)
         
     return my_render('jperm/perm_rule_list.html', locals(), request)
@@ -92,23 +94,30 @@ def perm_rule_add(request):
         rule_comment = request.POST.get('rule_comment')
 
         try:
+            # 用户输入验证
             rule = get_object(PermRule, name=rule_name)
+            # 用户输入验证
             if rule:
                 raise ServerError(u'授权规则 %s 已存在' % rule_name)
+            if not users_select and not user_groups_select:
+                raise ServerError(u"用户和用户组 必选1个")
+            if not assets_select and not asset_groups_select:
+                raise ServerError(u"资产和资产组 必选1个")
+            if not roles_select:
+                raise ServerError(u"角色 必选为必选项")
 
             # 获取需要授权的主机列表
             assets_obj = [Asset.objects.get(id=asset_id) for asset_id in assets_select]
             asset_groups_obj = [AssetGroup.objects.get(id=group_id) for group_id in asset_groups_select]
             group_assets_obj = [asset for asset in [group.asset_set.all() for group in asset_groups_obj]]
             calc_assets = set(group_assets_obj) | set(assets_obj)
+            logger.debug(u"add rule %s| total assets: %s" % (rule_name, calc_assets))
 
             # 获取需要授权的用户列表
             users_obj = [User.objects.get(id=user_id) for user_id in users_select]
             user_groups_obj = [UserGroup.objects.get(id=group_id) for group_id in user_groups_select]
-            # group_users_obj = [user for user in [group.user_set.all() for group in user_groups_obj]]
-            # calc_users = set(group_users_obj) | set(users_obj)
 
-            # 获取授予的角色列表
+            # 获取授予的角色列表（角色必选事先已经推送）
             roles_obj = [PermRole.objects.get(id=role_id) for role_id in roles_select]
             need_push_asset = set()
             for role in roles_obj:
@@ -116,9 +125,13 @@ def perm_rule_add(request):
                 print set(calc_assets), set(asset_no_push)
                 need_push_asset.update(set(calc_assets) & set(asset_no_push))
                 if need_push_asset:
+                    logger.warning(u"add rule %s| need_push_asset: %s" % (rule_name, need_push_asset))
                     raise ServerError(u'没有推送角色 %s 的主机 %s'
                                       % (role.name, ','.join([asset.hostname for asset in need_push_asset])))
 
+            # 写会数据库前记录日志
+            logger.debug(u"add rule %s| user: %s, user_group: %s, asset: %s, asset_group: %s, role: %s" % (
+                         rule_name, users_obj, user_groups_obj, assets_obj, asset_groups_obj, roles_obj))
             # 仅授权成功的，写回数据库(授权规则,用户,用户组,资产,资产组,用户角色)
             rule = PermRule(name=rule_name, comment=rule_comment)
             rule.save()
@@ -144,61 +157,77 @@ def perm_rule_edit(request):
     # 渲染数据
     header_title, path1, path2 = "授权规则", "规则管理", "添加规则"
 
-    # 根据rule_id 取得rule对象
-    rule_id = request.GET.get("id")
-    rule = PermRule.objects.get(id=rule_id)
+    try:
+        # 根据rule_id 取得rule对象
+        rule_id = request.GET.get("id")
+        rule = get_object(PermRule, id=rule_id)
+        if not rule:
+            logger.info(u"edit rule %s| rule ready exist: %s" % (rule.name, rule.name))
+            raise ServerError(u"授权规则: %s 不存在" % rule.name)
 
-    if request.method == 'GET' and rule_id:
-        # 渲染数据, 获取所选的rule对象
-        rule_comment = rule.comment
-        users_select = rule.user.all()
-        user_groups_select = rule.user_group.all()
-        assets_select = rule.asset.all()
-        asset_groups_select = rule.asset_group.all()
-        roles_select = rule.role.all()
+        if request.method == 'GET':
+            # 渲染数据, 获取所选的rule对象
+            rule_comment = rule.comment
+            users_select = rule.user.all()
+            user_groups_select = rule.user_group.all()
+            assets_select = rule.asset.all()
+            asset_groups_select = rule.asset_group.all()
+            roles_select = rule.role.all()
 
-        users = User.objects.all()
-        user_groups = UserGroup.objects.all()
-        assets = Asset.objects.all()
-        asset_groups = AssetGroup.objects.all()
-        roles = PermRole.objects.all()
-        return my_render('jperm/perm_rule_edit.html', locals(), request)
+            users = User.objects.all()
+            user_groups = UserGroup.objects.all()
+            assets = Asset.objects.all()
+            asset_groups = AssetGroup.objects.all()
+            roles = PermRole.objects.all()
+            return my_render('jperm/perm_rule_edit.html', locals(), request)
 
-    elif request.method == 'POST' and rule_id:
-        # 获取用户选择的 用户,用户组,资产,资产组,用户角色
-        rule_name = request.POST.get('rule_name')
-        rule_comment = request.POST.get("rule_comment")
-        users_select = request.POST.getlist('user', [])
-        user_groups_select = request.POST.getlist('usergroup', [])
-        assets_select = request.POST.getlist('asset', [])
-        asset_groups_select = request.POST.getlist('assetgroup', [])
-        roles_select = request.POST.getlist('role', [])
+        elif request.method == 'POST' and rule_id:
+            # 获取用户选择的 用户,用户组,资产,资产组,用户角色
+            rule_name = request.POST.get('rule_name')
+            rule_comment = request.POST.get("rule_comment")
+            users_select = request.POST.getlist('user', [])
+            user_groups_select = request.POST.getlist('usergroup', [])
+            assets_select = request.POST.getlist('asset', [])
+            asset_groups_select = request.POST.getlist('assetgroup', [])
+            roles_select = request.POST.getlist('role', [])
 
-        assets_obj = [Asset.objects.get(id=asset_id) for asset_id in assets_select]
-        asset_groups_obj = [AssetGroup.objects.get(id=group_id) for group_id in asset_groups_select]
-        # group_assets_obj = [asset for asset in [group.asset_set.all() for group in asset_groups_obj]]
-        # calc_assets = set(group_assets_obj) | set(assets_obj)
+            # 用户输入验证
+            if not users_select and not user_groups_select:
+                raise ServerError(u"用户和用户组 必选1个")
+            if not assets_select and not asset_groups_select:
+                raise ServerError(u"资产和资产组 必选1个")
+            if not roles_select:
+                raise ServerError(u"角色 必选为必选项")
 
-        # 获取需要授权的用户列表
-        users_obj = [User.objects.get(id=user_id) for user_id in users_select]
-        user_groups_obj = [UserGroup.objects.get(id=group_id) for group_id in user_groups_select]
-        # group_users_obj = [user for user in [group.user_set.all() for group in user_groups_obj]]
-        # calc_users = set(group_users_obj) | set(users_obj)
+            assets_obj = [Asset.objects.get(id=asset_id) for asset_id in assets_select]
+            asset_groups_obj = [AssetGroup.objects.get(id=group_id) for group_id in asset_groups_select]
 
-        # 获取授予的角色列表
-        roles_obj = [PermRole.objects.get(id=role_id) for role_id in roles_select]
+            # 获取需要授权的用户列表
+            users_obj = [User.objects.get(id=user_id) for user_id in users_select]
+            user_groups_obj = [UserGroup.objects.get(id=group_id) for group_id in user_groups_select]
 
-        # 仅授权成功的，写回数据库(授权规则,用户,用户组,资产,资产组,用户角色)
-        rule.user = users_obj
-        rule.user_group = user_groups_obj
-        rule.asset = assets_obj
-        rule.asset_group = asset_groups_obj
-        rule.role = roles_obj
-        rule.name = rule_name
-        rule.comment = rule.comment
-        rule.save()
+            # 获取授予的角色列表
+            roles_obj = [PermRole.objects.get(id=role_id) for role_id in roles_select]
 
-        msg = u"更新授权规则：%s" % rule.name
+            # 写会数据库前记录日志
+            logger.debug(u"edit rule %s| user: %s, user_group: %s, asset: %s, asset_group: %s, role: %s" % (
+                         rule_name, users_obj, user_groups_obj, assets_obj, asset_groups_obj, roles_obj))
+
+            # 仅授权成功的，写回数据库(授权规则,用户,用户组,资产,资产组,用户角色)
+            rule.user = users_obj
+            rule.user_group = user_groups_obj
+            rule.asset = assets_obj
+            rule.asset_group = asset_groups_obj
+            rule.role = roles_obj
+            rule.name = rule_name
+            rule.comment = rule.comment
+            rule.save()
+
+            # 更新成功
+            msg = u"更新授权规则：%s" % rule.name
+
+    except ServerError, e:
+        error = e
 
     return HttpResponseRedirect('/jperm/rule/')
 
@@ -213,9 +242,8 @@ def perm_rule_delete(request):
     if request.method == 'POST':
         # 根据rule_id 取得rule对象
         rule_id = request.POST.get("id")
-        rule_obj = PermRule.objects.get(id=rule_id)
-        print rule_id, rule_obj
-        print rule_obj.name
+        rule_obj = get_object(PermRule, id=rule_id)
+        logger.debug(u"delete rule %s|" % rule_obj.name)
         rule_obj.delete()
         return HttpResponse(u"删除授权规则：%s" % rule_obj.name)
     else:
@@ -262,6 +290,7 @@ def perm_role_add(request):
 
         try:
             if get_object(PermRole, name=name):
+                logger.warning(u"add role %s| %s ready exist" % (name, name))
                 raise ServerError(u'已经存在该用户 %s' % name)
             default = get_object(Setting, name='default')
 
@@ -269,13 +298,14 @@ def perm_role_add(request):
                 encrypt_pass = CRYPTOR.encrypt(password)
             else:
                 encrypt_pass = CRYPTOR.encrypt(CRYPTOR.gen_rand_pass(20))
+                logger.debug(u"add role %s| use rand password" % name)
             # 生成随机密码，生成秘钥对
             sudos_obj = [get_object(PermSudo, id=sudo_id) for sudo_id in sudo_ids]
             if key_content:
                 key_path = gen_keys(key=key_content)
             else:
                 key_path = gen_keys()
-            logger.debug('generate role key: %s' % key_path)
+            logger.debug(u'add role %s| generate role key: %s' % (name, key_path))
             role = PermRole(name=name, comment=comment, password=encrypt_pass, key_path=key_path)
             role.save()
             role.sudo = sudos_obj
@@ -295,25 +325,26 @@ def perm_role_delete(request):
     if request.method == "POST":
         # 获取参数删除的role对象
         role_id = request.POST.get("id")
-        role = PermRole.objects.get(id=role_id)
+        role = get_object(PermRole, id=role_id)
         role_key = role.key_path
 
         # 删除推送到主机上的role
         recycle_assets = [push.asset for push in role.perm_push.all() if push.success]
-        print recycle_assets
+        logger.debug(u"delete role %s| delete_assets: %s" % (role.name, recycle_assets))
 
         if recycle_assets:
             recycle_resource = gen_resource(recycle_assets)
             task = Tasks(recycle_resource)
             msg = task.del_user(get_object(PermRole, id=role_id).name)
+            logger.info(u"delete role %s| execute delete user: %s" % (role.name, msg))
             # TODO: 判断返回结果，处理异常
-            print msg
 
         # 删除存储的秘钥，以及目录
         key_files = os.listdir(role_key)
         for key_file in key_files:
             os.remove(os.path.join(role_key, key_file))
         os.rmdir(role_key)
+        logger.info(u"delete role %s| delete role key directory: %s" % (role.name, role_key))
 
         # 数据库里删除记录　TODO: 判断返回结果，处理异常
         role.delete()
@@ -381,7 +412,8 @@ def perm_role_edit(request):
 
         try:
             if not role:
-                raise ServerError('角色用户不能存在')
+                logger.warning(u"edit role %s| role not exist" % role_name)
+                raise ServerError('角色用户不存在')
 
             if role_password:
                 encrypt_pass = CRYPTOR.encrypt(role_password)
@@ -392,7 +424,7 @@ def perm_role_edit(request):
                     key_path = gen_keys(key=key_content, key_path_dir=role.key_path)
                 except SSHException:
                     raise ServerError('输入的密钥不合法')
-                logger.debug('Recreate role key: %s' % role.key_path)
+                logger.info(u'edit role %s| recreate role key: %s' % (role_name, role.key_path))
             # 写入数据库
             role.name = role_name
             role.comment = role_comment
@@ -431,7 +463,7 @@ def perm_role_push(request):
             group_assets_obj.extend(asset_group.asset_set.all())
         calc_assets = list(set(assets_obj) | set(group_assets_obj))
         push_resource = gen_resource(calc_assets)
-        logger.debug('Push role res: %s' % push_resource)
+        logger.debug(u'push role %s| push role res: %s' % (role.name, push_resource))
 
         # 调用Ansible API 进行推送
         password_push = True if request.POST.get("use_password") else False
@@ -444,12 +476,14 @@ def perm_role_push(request):
         # 1. 以password 方式推送角色
         if password_push:
             ret["password_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
+            logger.info(u"push role %s| 1.1 push password msg: %s" % (role.name, ret))
             if ret["password_push"].get("status") != "success":
                 ret_failed = ret["password_push"].get('msg')
 
         # 2. 以秘钥 方式推送角色
         if key_push:
             ret["password_push"] = task.add_user(role.name)
+            logger.info(u"push role %s| 1.2 push public key msg: %s" % (role.name, ret))
             if ret["password_push"].get("status") != "ok":
                 ret_failed = ret["password_push"].get('msg')
             ret["key_push"] = task.push_key(role.name, os.path.join(role.key_path, 'id_rsa.pub'))
@@ -463,13 +497,13 @@ def perm_role_push(request):
             role_chosen_aliase[role.name] = ','.join(sudo.name for sudo in sudo_alias)
             add_sudo_script = get_add_sudo_script(role_chosen_aliase, sudo_alias)
             ret['sudo'] = task.push_sudo_file(add_sudo_script)
+            logger.info(u"push role %s| 2.1 push sudo msg: %s" % (role.name, ret))
 
             if ret['sudo'].get('msg'):
                 ret_failed = ret['sudo'].get('msg')
-            # os.remove(add_sudo_script)
 
-        logger.debug('推送role结果: %s' % ret)
-        logger.debug('推送role错误: %s' % ret_failed)
+        logger.info(u'push role %s| 推送role结果: %s' % (role.name, ret))
+        logger.info(u'push role %s| 推送role错误: %s' % (role.name, ret_failed))
 
         success_asset = []
         failed_asset = []
@@ -496,6 +530,7 @@ def perm_role_push(request):
             error = u'角色 %s 推送失败 [ %s ], 推送成功 [ %s ]' % (role.name,
                                                                 ','.join([asset.hostname for asset in failed_asset]),
                                                                 ','.join([asset.hostname for asset in success_asset]))
+        # return HttpResponseRedirect("/jperm/role/perm_role_detail/?id=%s" % role_id)
     return my_render('jperm/perm_role_push.html', locals(), request)
 
 
@@ -537,14 +572,17 @@ def perm_sudo_add(request):
         name = request.POST.get("sudo_name").strip()
         comment = request.POST.get("sudo_comment").strip()
         commands = request.POST.get("sudo_commands").strip()
+        logger.debug(u"add sudo %s| commands: %s" % (name, commands))
 
         if get_object(PermSudo, name=name):
-            error = 'Sudo别名 %s已经存在' % name
+            logger.info(u"add sudo %s| ready exists" % name)
+            error = u'Sudo别名 %s已经存在' % name
         else:
-            sudo = PermSudo(name=name.strip(), comment=comment, commands=commands.strip())
+            sudo = PermSudo(name=name, comment=comment, commands=commands)
             sudo.save()
             msg = u"添加Sudo命令别名: %s" % name
-        # 渲染数据
+
+        return HttpResponseRedirect('/jperm/sudo/')
 
     return my_render('jperm/perm_sudo_add.html', locals(), request)
 
@@ -571,9 +609,11 @@ def perm_sudo_edit(request):
         sudo.comment = comment
         sudo.save()
 
+        logger.debug(u"edit sudo %s| commands: %s" % (name, commands))
         msg = u"更新命令别名： %s" % name
+        return HttpResponseRedirect('/jperm/sudo/')
 
-    return my_render('jperm/perm_sudo_edit.html', locals(), request)
+    return my_render(u'jperm/perm_sudo_edit.html', locals(), request)
 
 
 @require_role('admin')
@@ -589,6 +629,7 @@ def perm_sudo_delete(request):
         sudo = PermSudo.objects.get(id=sudo_id)
         # 数据库里删除记录
         sudo.delete()
+        logger.debug(u"edit sudo %s| " % sudo.name)
         return HttpResponse(u"删除角色: %s" % sudo.name)
     else:
         return HttpResponse(u"不支持该操作")
@@ -597,8 +638,8 @@ def perm_sudo_delete(request):
 @require_role('admin')
 def perm_role_recycle(request):
     role_id = request.GET.get('role_id')
+    role = get_object(PermRole, id=role_id)
     asset_ids = request.GET.get('asset_id').split(',')
-    print request.GET
 
     assets = [get_object(Asset, id=asset_id) for asset_id in asset_ids]
 
@@ -608,10 +649,12 @@ def perm_role_recycle(request):
             recycle_assets.append(asset)
 
     recycle_resource = gen_resource(recycle_assets)
+    logger.debug(u"recycle role %s| delete role res: %s" % (role.name, recycle_resource))
+
     task = Tasks(recycle_resource)
     msg = task.del_user(get_object(PermRole, id=role_id).name)
+    logger.info(u"recycle role %s| delete role msg: %s" % (role.name, msg))
     # TODO: 判断返回结果，处理异常
-    print msg
 
     for asset_id in asset_ids:
         asset = get_object(Asset, id=asset_id)
