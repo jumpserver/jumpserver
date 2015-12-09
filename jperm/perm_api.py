@@ -241,47 +241,39 @@ def get_role_info(role_id, type="all"):
     """
     # 获取role对应的授权规则
     role_obj = PermRole.objects.get(id=role_id)
-    rules_obj = role_obj.perm_rule.all()
+    rule_push_obj = role_obj.perm_rule.all()
     # 获取role 对应的用户 和 用户组
     # 获取role 对应的主机 和主机组
     users_obj = []
     assets_obj = []
     user_groups_obj = []
-    group_users_obj = []
     asset_groups_obj = []
-    group_assets_obj = []
-    for rule in rules_obj:
-        for user in rule.user.all():
+    for push in rule_push_obj:
+        for user in push.user.all():
             users_obj.append(user)
-        for asset in rule.asset.all():
+        for asset in push.asset.all():
             assets_obj.append(asset)
-        for user_group in rule.user_group.all():
+        for user_group in push.user_group.all():
             user_groups_obj.append(user_group)
-            for user in user_group.user_set.all():
-                group_users_obj.append(user)
-        for asset_group in rule.asset_group.all():
+        for asset_group in push.asset_group.all():
             asset_groups_obj.append(asset_group)
-            for asset in asset_group.asset_set.all():
-                group_assets_obj.append(asset)
-
-    calc_users = set(users_obj) | set(group_users_obj)
-    calc_assets = set(assets_obj) | set(group_assets_obj)
 
     if type == "all":
-        return {"rules": rules_obj,
-                "users": list(calc_users),
+        return {"rules": rule_push_obj,
+                "users": users_obj,
                 "user_groups": user_groups_obj,
-                "assets": list(calc_assets),
+                "assets": assets_obj,
                 "asset_groups": asset_groups_obj,
                 }
+
     elif type == "rule":
-        return rules_obj
+        return rule_push_obj
     elif type == "user":
-        return calc_users
+        return users_obj
     elif type == "user_group":
         return user_groups_obj
     elif type == "asset":
-        return calc_assets
+        return assets_obj
     elif type == "asset_group":
         return asset_groups_obj
     else:
@@ -307,8 +299,4 @@ def get_role_push_host(role):
 
 if __name__ == "__main__":
     print get_role_info(1)
-
-
-
-
 

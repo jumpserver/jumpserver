@@ -27,12 +27,12 @@ from django.shortcuts import render_to_response
 from django.core.mail import send_mail
 
 
-def set_log(level):
+def set_log(level, filename='jumpserver.log'):
     """
     return a log file object
     根据提示设置log打印
     """
-    log_file = os.path.join(LOG_DIR, 'jumpserver.log')
+    log_file = os.path.join(LOG_DIR, filename)
     if not os.path.isfile(log_file):
         os.mknod(log_file)
         os.chmod(log_file, 0777)
