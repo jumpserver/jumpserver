@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/static/font-awesome/css/font-awesome.css" rel="stylesheet">
+        <link href="/static/css/plugins/iCheck/custom.css" rel="stylesheet">
+        <link href="/static/css/animate.css" rel="stylesheet">
+        <link href="/static/css/style.css" rel="stylesheet">
+
+        <script src="/static/js/jquery-2.1.1.js"></script>
+        <style>
+            body {background: #ffffff;}
+        </style>
+    </head>
+
+    {% load bootstrap %}
+    {% block content %}
+    <body onload="closeWindow();">
+        <div>
+            <div class="row">
+                <div class="col-lg-10">
+                    <div class="ibox-content">
+                        <h2 id="jumpTo" class="text-center text-info"></h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            var time=2;
+            function closeWindow(){
+                window.setTimeout('closeWindow()',1000);
+                if(time>0){
+                document.getElementById("jumpTo").innerHTML="修改成功, <font color=red>"+time+"</font>秒后关闭当前窗口";
+                time--;
+                }
+                else{
+                    window.parent.location.reload();
+                    var index = parent.layer.getFrameIndex(window.name);
+                    parent.layer.close(index);
+                }
+            }
+        </script>
+        {% endblock content %}
+    </body>
+</html>
