@@ -526,14 +526,18 @@ def perm_sudo_add(request):
 
     if request.method == "POST":
         # 获取参数： name, comment
-        name = request.POST.get("sudo_name").strip()
+        name = request.POST.get("sudo_name").strip().upper()
         comment = request.POST.get("sudo_comment").strip()
         commands = request.POST.get("sudo_commands").strip()
+
+        pattern = re.compile(r'[ \n,\r]')
+        commands = ', '.join(list_drop_str(pattern.split(commands), u''))
+        logger.debug(u'添加sudo %s: %s' % (name, commands))
 
         if get_object(PermSudo, name=name):
             error = 'Sudo别名 %s已经存在' % name
         else:
-            sudo = PermSudo(name=name.strip(), comment=comment, commands=commands.strip())
+            sudo = PermSudo(name=name.strip(), comment=comment, commands=commands)
             sudo.save()
             msg = u"添加Sudo命令别名: %s" % name
         # 渲染数据
@@ -555,11 +559,16 @@ def perm_sudo_edit(request):
     sudo = PermSudo.objects.get(id=sudo_id)
 
     if request.method == "POST":
-        name = request.POST.get("sudo_name")
+        name = request.POST.get("sudo_name").upper()
         commands = request.POST.get("sudo_commands")
         comment = request.POST.get("sudo_comment")
+
+        pattern = re.compile(r'[ \n,\r]')
+        commands = ', '.join(list_drop_str(pattern.split(commands), u'')).strip()
+        logger.debug(u'添加sudo %s: %s' % (name, commands))
+
         sudo.name = name.strip()
-        sudo.commands = commands.strip()
+        sudo.commands = commands
         sudo.comment = comment
         sudo.save()
 

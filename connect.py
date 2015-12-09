@@ -585,7 +585,6 @@ class Nav(object):
             else:
                 res = gen_resource({'user': self.user, 'asset': assets, 'role': role}, perm=self.user_perm)
                 runner = MyRunner(res)
-                logger.debug("批量执行res: %s" % res)
                 asset_name_str = ''
                 print "匹配主机:"
                 for inv in runner.inventory.get_hosts(pattern=pattern):

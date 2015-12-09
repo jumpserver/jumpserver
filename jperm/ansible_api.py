@@ -159,12 +159,16 @@ class MyRunner(MyInventory):
 
         if contacted:
             for host, info in contacted.items():
-                if info.get('failed'):
-                    result['failed'][host] = info.get('msg') + info.get('stderr', '')
-                elif info.get('stderr') and info.get('module_name') in ['shell', 'command', 'raw']:
-                    result['failed'][host] = info.get('stderr') + str(info.get('warnings'))
+                if info.get('invocation').get('module_name') in ['raw', 'shell', 'command', 'script']:
+                    if info.get('rc') == 0:
+                        result['ok'][host] = info.get('stdout') + info.get('stderr')
+                    else:
+                        result['failed'][host] = info.get('stdout') + info.get('stderr')
                 else:
-                    result['ok'][host] = info.get('stdout')
+                    if info.get('failed'):
+                        result['failed'][host] = info.get('msg')
+                    else:
+                        result['ok'][host] = info.get('changed')
         return result
 
 
@@ -369,7 +373,6 @@ class MyTask(MyRunner):
 
         for role in role_list:
             sudo_user[role.name] = ','.join(sudo_alias.keys())
-        print sudo_alias, sudo_user
 
         sudo_j2 = get_template('jperm/role_sudo.j2')
         sudo_content = sudo_j2.render(Context({"sudo_alias": sudo_alias, "sudo_user": sudo_user}))

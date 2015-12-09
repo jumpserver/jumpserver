@@ -48,6 +48,13 @@ def set_log(level):
     return logger_f
 
 
+def list_drop_str(a_list, a_str):
+    for i in a_list:
+        if i == a_str:
+            a_list.remove(a_str)
+    return a_list
+
+
 def get_asset_info(asset):
     """
     获取资产的相关管理账号端口等信息
