@@ -296,6 +296,8 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         self.log = None
         self.id = 0
         self.user = None
+        self.ssh = None
+        self.channel = None
         super(WebTerminalHandler, self).__init__(*args, **kwargs)
 
     def check_origin(self, origin):
@@ -310,7 +312,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         if asset:
             roles = user_have_perm(self.user, asset)
             logger.debug(roles)
-            logger.debug('rolename: %s' % role_name)
+            logger.debug('角色: %s' % role_name)
             login_role = ''
             for role in roles:
                 if role.name == role_name:
@@ -329,8 +331,8 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                                                                                      login_role.name))
         self.term = WebTty(self.user, asset, login_role, login_type='web')
         self.term.remote_ip = self.request.remote_ip
-        ssh = self.term.get_connection()
-        self.term.channel = ssh.invoke_shell(term='xterm')
+        self.ssh = self.term.get_connection()
+        self.channel = self.ssh.invoke_shell(term='xterm')
         WebTerminalHandler.tasks.append(MyThread(target=self.forward_outbound))
         WebTerminalHandler.clients.append(self)
 
@@ -363,7 +365,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                 self.term.vim_data = ''
                 self.term.data = ''
                 self.term.input_mode = False
-            self.term.channel.send(data['data'])
+            self.channel.send(data['data'])
 
     def on_close(self):
         logger.debug('Websocket: Close request')
@@ -386,9 +388,9 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             data = ''
             pre_timestamp = time.time()
             while True:
-                r, w, e = select.select([self.term.channel, sys.stdin], [], [])
-                if self.term.channel in r:
-                    recv = self.term.channel.recv(1024)
+                r, w, e = select.select([self.channel, sys.stdin], [], [])
+                if self.channel in r:
+                    recv = self.channel.recv(1024)
                     if not len(recv):
                         return
                     data += recv
@@ -407,8 +409,8 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                         data = ''
                     except UnicodeDecodeError:
                         pass
-        finally:
-            self.close()
+        except IndexError:
+            pass
 
 if __name__ == '__main__':
     tornado.options.parse_command_line()

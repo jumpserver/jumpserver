@@ -144,25 +144,17 @@ def perm_rule_edit(request):
 
     # 根据rule_id 取得rule对象
     rule_id = request.GET.get("id")
-    rule = PermRule.objects.get(id=rule_id)
+    rule = get_object(PermRule, id=rule_id)
 
-    if request.method == 'GET' and rule_id:
-        # 渲染数据, 获取所选的rule对象
-        rule_comment = rule.comment
-        users_select = rule.user.all()
-        user_groups_select = rule.user_group.all()
-        assets_select = rule.asset.all()
-        asset_groups_select = rule.asset_group.all()
-        roles_select = rule.role.all()
+    # 渲染数据, 获取所选的rule对象
 
-        users = User.objects.all()
-        user_groups = UserGroup.objects.all()
-        assets = Asset.objects.all()
-        asset_groups = AssetGroup.objects.all()
-        roles = PermRole.objects.all()
-        return my_render('jperm/perm_rule_edit.html', locals(), request)
+    users = User.objects.all()
+    user_groups = UserGroup.objects.all()
+    assets = Asset.objects.all()
+    asset_groups = AssetGroup.objects.all()
+    roles = PermRole.objects.all()
 
-    elif request.method == 'POST' and rule_id:
+    if request.method == 'POST' and rule_id:
         # 获取用户选择的 用户,用户组,资产,资产组,用户角色
         rule_name = request.POST.get('rule_name')
         rule_comment = request.POST.get("rule_comment")
@@ -174,8 +166,10 @@ def perm_rule_edit(request):
 
         assets_obj = [Asset.objects.get(id=asset_id) for asset_id in assets_select]
         asset_groups_obj = [AssetGroup.objects.get(id=group_id) for group_id in asset_groups_select]
-        # group_assets_obj = [asset for asset in [group.asset_set.all() for group in asset_groups_obj]]
-        # calc_assets = set(group_assets_obj) | set(assets_obj)
+        group_assets_obj = []
+        for asset_group in asset_groups_obj:
+            group_assets_obj.extend(list(asset_group.asset_set.all()))
+        calc_assets = set(group_assets_obj) | set(assets_obj)  # 授权资产和资产组包含的资产
 
         # 获取需要授权的用户列表
         users_obj = [User.objects.get(id=user_id) for user_id in users_select]
@@ -185,20 +179,30 @@ def perm_rule_edit(request):
 
         # 获取授予的角色列表
         roles_obj = [PermRole.objects.get(id=role_id) for role_id in roles_select]
+        need_push_asset = set()
+        try:
+            for role in roles_obj:
+                asset_no_push = get_role_push_host(role=role)[0]  # 获取某角色已经推送的资产
+                need_push_asset.update(set(calc_assets) - set(asset_no_push))
+                if need_push_asset:
+                    raise ServerError(u'没有推送角色 %s 的主机 %s'
+                                      % (role.name, ','.join([asset.hostname for asset in need_push_asset])))
 
-        # 仅授权成功的，写回数据库(授权规则,用户,用户组,资产,资产组,用户角色)
-        rule.user = users_obj
-        rule.user_group = user_groups_obj
-        rule.asset = assets_obj
-        rule.asset_group = asset_groups_obj
-        rule.role = roles_obj
-        rule.name = rule_name
-        rule.comment = rule.comment
-        rule.save()
+            # 仅授权成功的，写回数据库(授权规则,用户,用户组,资产,资产组,用户角色)
+            rule.user = users_obj
+            rule.user_group = user_groups_obj
+            rule.asset = assets_obj
+            rule.asset_group = asset_groups_obj
+            rule.role = roles_obj
+            rule.name = rule_name
+            rule.comment = rule.comment
+            rule.save()
+            msg = u"更新授权规则：%s成功" % rule.name
 
-        msg = u"更新授权规则：%s" % rule.name
+        except ServerError, e:
+            error = e
 
-    return HttpResponseRedirect('/jperm/rule/')
+    return my_render('jperm/perm_rule_edit.html', locals(), request)
 
 
 @require_role('admin')

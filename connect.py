@@ -78,6 +78,7 @@ class Tty(object):
         self.asset_name = asset.hostname
         self.ip = None
         self.port = 22
+        self.ssh = None
         self.channel = None
         self.asset = asset
         self.user = user
@@ -300,8 +301,7 @@ class Tty(object):
                                 username=connect_info.get('role_name'),
                                 password=connect_info.get('role_pass'),
                                 key_filename=role_key,
-                                look_for_keys=False,
-                                allow_agent=False)
+                                look_for_keys=False)
                     return ssh
                 except (paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException):
                     logger.warning(u'使用ssh key %s 失败, 尝试只使用密码' % role_key)
@@ -319,6 +319,7 @@ class Tty(object):
         except socket.error:
             raise ServerError('端口可能不对 Connect SSH Socket Port Error, Please Correct it.')
         else:
+            self.ssh = ssh
             return ssh
 
 

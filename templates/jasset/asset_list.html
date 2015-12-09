@@ -231,6 +231,7 @@
                     var dataArray = data.split(',');
                     if (dataArray.length == 1 && data != 'error'){
                         var title = 'Jumpserver Web Terminal' + '<span class="text-info"> '+ hostname +'</span>';
+                        console.log(new_url+data);
                         layer.open({
                             type: 2,
                             title: title,
