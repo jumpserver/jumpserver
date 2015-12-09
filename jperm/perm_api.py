@@ -43,13 +43,16 @@ def get_group_user_perm(ob):
         asset_groups = rule.asset_group.all()
         assets = rule.asset.all()
         perm_roles = rule.role.all()
+        group_assets = []
+        for asset_group in asset_groups:
+            group_assets.extend(asset_group.asset_set.all())
         # 获取一个规则授权的角色和对应主机
         for role in perm_roles:
-            if perm_role.get('role'):
-                perm_role[role]['asset'] = perm_role[role].get('asset', set()).union(set(assets))
+            if perm_role.get(role):
+                perm_role[role]['asset'] = perm_role[role].get('asset', set()).union(set(assets).union(set(group_assets)))
                 perm_role[role]['asset_group'] = perm_role[role].get('asset_group', set()).union(set(asset_groups))
             else:
-                perm_role[role] = {'asset': set(assets), 'asset_group': set(asset_groups)}
+                perm_role[role] = {'asset': set(assets).union(set(group_assets)), 'asset_group': set(asset_groups)}
 
         # 获取一个规则用户授权的资产
         for asset in assets:
@@ -161,23 +164,42 @@ def gen_resource(ob, perm=None):
         user = ob.get('user')
         if not perm:
             perm = get_group_user_perm(user)
-        roles = perm.get('role', {}).keys()
-        if role not in roles:
-            return {}
 
-        role_assets_all = perm.get('role').get(role).get('asset')
-        assets = set(role_assets_all) & set(asset_r)
+        if role:
+            roles = perm.get('role', {}).keys()  # 获取用户所有授权角色
+            if role not in roles:
+                return {}
 
-        for asset in assets:
-            asset_info = get_asset_info(asset)
-            info = {'hostname': asset.hostname,
-                    'ip': asset.ip,
-                    'port': asset_info.get('port', 22),
-                    'username': role.name,
-                    'password': CRYPTOR.decrypt(role.password),
-                    'ssh_key': get_role_key(user, role)
-                    }
-            res.append(info)
+            role_assets_all = perm.get('role').get(role).get('asset')  # 获取用户该角色所有授权主机
+            assets = set(role_assets_all) & set(asset_r)  # 获取用户提交中合法的主机
+
+            for asset in assets:
+                asset_info = get_asset_info(asset)
+                info = {'hostname': asset.hostname,
+                        'ip': asset.ip,
+                        'port': asset_info.get('port', 22),
+                        'username': role.name,
+                        'password': CRYPTOR.decrypt(role.password),
+                        'ssh_key': get_role_key(user, role)
+                        }
+                res.append(info)
+        else:
+            for asset, asset_info in perm.get('asset').items():
+                if asset not in asset_r:
+                    continue
+                asset_info = get_asset_info(asset)
+                try:
+                    role = sorted(list(perm.get('asset').get(asset).get('role')))[0]
+                except IndexError:
+                    continue
+                info = {'hostname': asset.hostname,
+                        'ip': asset.ip,
+                        'port': asset_info.get('port', 22),
+                        'username': role.name,
+                        'password': CRYPTOR.decrypt(role.password),
+                        'ssh_key': get_role_key(user, role)
+                        }
+                res.append(info)
 
     elif isinstance(ob, User):
         if not perm:
@@ -198,6 +220,7 @@ def gen_resource(ob, perm=None):
         for asset in ob:
             info = get_asset_info(asset)
             res.append(info)
+    logger.debug('生成res: %s' % res)
     return res
 
 
@@ -280,6 +303,7 @@ def get_role_push_host(role):
                                     'result': push.result}
     asset_no_push = set(asset_all) - set(asset_pushed.keys())
     return asset_pushed, asset_no_push
+
 
 if __name__ == "__main__":
     print get_role_info(1)

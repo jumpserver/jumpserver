@@ -8,7 +8,7 @@
             <div class="col-sm-4">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <span class="label label-primary"><b>授权规则</b></span>
+                        <span class="label label-primary"><b>{{ role.name }} -  授权规则</b></span>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -54,7 +54,7 @@
             <div class="col-sm-4">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <span class="label label-primary"><b>授权用户/用户组</b></span>
+                        <span class="label label-primary"><b>{{ role.name }} - 授权用户/用户组</b></span>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -100,7 +100,7 @@
             <div class="col-sm-4">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <span class="label label-primary"><b>授权主机/主机组</b></span>
+                        <span class="label label-primary"><b>{{ role.name }} - 授权主机/主机组</b></span>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -148,7 +148,7 @@
             <div class="col-sm-6">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <span class="label label-primary"><b>推送主机</b></span>
+                        <span class="label label-primary"><b>{{ role.name }} - 推送主机</b></span>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -175,7 +175,7 @@
                                     <thead>
                                         <tr>
                                             <th class="text-center">
-                                                <input type="checkbox" id="check_all" onclick="checkAll()">
+                                                <input type="checkbox" id="check_push" onclick="checkAll('check_push', 'asset_id')">
                                             </th>
                                             <th class="text-center">主机</th>
                                             <th class="text-center">密钥</th>
@@ -188,7 +188,7 @@
                                     {% for asset, info in pushed_asset.items %}
                                         <tr class="gradeX">
                                             <th class="text-center">
-                                                <input type="checkbox" name="checked" value="{{ asset.id }}">
+                                                <input type="checkbox" name="asset_id" value="{{ asset.id }}">
                                             </th>
                                             <td class="text-center"> {{ asset.hostname }} </td>
                                             <td class="text-center"> {{ info.key | yesno:"是,否,未知" }} </td>
@@ -212,7 +212,7 @@
             <div class="col-sm-4">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <span class="label label-danger"><b>未推送主机</b></span>
+                        <span class="label label-danger"><b>{{ role.name }} - 未推送主机</b></span>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -220,7 +220,6 @@
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                                 <i class="fa fa-wrench"></i>
                             </a>
-
                             <a class="close-link">
                                 <i class="fa fa-times"></i>
                             </a>
@@ -229,9 +228,13 @@
                     <div class="ibox-content">
                         <div>
                             <div class="text-left">
-                                <table class="table table-striped" id="ugedit" >
+                                <table class="table table-striped" >
+                                    <a class="btn btn-xs btn-primary push_muti"> 推送 </a>
                                     <thead>
                                         <tr>
+                                            <th class="text-center">
+                                                <input type="checkbox" id="check_no_push" onclick="checkAll('check_no_push', 'asset_no_push_id')">
+                                            </th>
                                             <th class="text-center">主机</th>
                                             <th class="text-center">IP</th>
                                         </tr>
@@ -239,6 +242,9 @@
                                     <tbody>
                                     {% for asset in need_push_asset %}
                                         <tr class="gradeX">
+                                            <th class="text-center">
+                                                <input type="checkbox" name="asset_no_push_id" value="{{ asset.id }}">
+                                            </th>
                                             <td class="text-center"> {{ asset.hostname }} </td>
                                             <td class="text-center"> {{ asset.ip }} </td>
                                         </tr>
@@ -276,10 +282,11 @@
         $('.del_muti').click(function(){
             var check_array = [];
             if (confirm("确定删除")) {
-                $(".gradeX input:checked").each(function() {
+                $(".gradeX input[name='asset_id']:checked").each(function() {
                     check_array.push($(this).attr("value"))
                 });
                 var url = '/jperm/role/recycle/?role_id={{ role.id }}&asset_id=' + check_array.join(',');
+                console.log(check_array);
                 $.get(url,
                       {},
                       function(data){
@@ -289,6 +296,15 @@
             }
             return false;
         });
+
+        $('.push_muti').click(function(){
+            var check_array = [];
+            $(".gradeX input[name='asset_no_push_id']:checked").each(function() {
+                check_array.push($(this).attr("value"))
+            });
+            var url = '/jperm/role/push/?id={{ role.id }}&asset_id=' + check_array.join(',');
+            $(this).attr('href', url)
+        })
 
     })
 </script>

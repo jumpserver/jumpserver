@@ -8,7 +8,7 @@ import sys
 import os.path
 import threading
 import datetime
-import urllib
+import re
 
 import tornado.ioloop
 import tornado.options
@@ -23,8 +23,8 @@ from tornado.options import define, options
 from pyinotify import WatchManager, Notifier, ProcessEvent, IN_DELETE, IN_CREATE, IN_MODIFY, AsyncNotifier
 import select
 
-from connect import Tty, User, Asset, PermRole, logger, get_object
-from connect import TtyLog, Log, Session, user_have_perm
+from connect import Tty, User, Asset, PermRole, logger, get_object, PermRole, gen_resource
+from connect import TtyLog, Log, Session, user_have_perm, get_group_user_perm, MyRunner, ExecLog
 
 try:
     import simplejson as json
@@ -67,22 +67,6 @@ def require_auth(role='user'):
             except AttributeError:
                 pass
             logger.warning('Websocket: Request auth failed.')
-        # asset_id = int(request.get_argument('id', 9999))
-        # print asset_id
-        # asset = Asset.objects.filter(id=asset_id)
-        # if asset:
-        #     asset = asset[0]
-        #     request.asset = asset
-        # else:
-        #     request.close()
-        #
-        # if user:
-        #     user = user[0]
-        #     request.user = user
-        #
-        # else:
-        #     print("No session user.")
-        #     request.close()
         return _deco2
     return _deco
 
@@ -138,6 +122,7 @@ class Application(tornado.web.Application):
             (r'/monitor', MonitorHandler),
             (r'/terminal', WebTerminalHandler),
             (r'/kill', WebTerminalKillHandler),
+            (r'/exec', ExecHandler),
         ]
 
         setting = {
@@ -206,7 +191,6 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
 class WebTty(Tty):
     def __init__(self, *args, **kwargs):
         super(WebTty, self).__init__(*args, **kwargs)
-        self.login_type = 'web'
         self.ws = None
         self.data = ''
         self.input_mode = False
@@ -225,6 +209,82 @@ class WebTerminalKillHandler(tornado.web.RequestHandler):
         logger.debug('Websocket: web terminal client num: %s' % len(WebTerminalHandler.clients))
 
 
+class ExecHandler(tornado.websocket.WebSocketHandler):
+    clients = []
+    tasks = []
+
+    def __init__(self, *args, **kwargs):
+        self.id = 0
+        self.user = None
+        self.role = None
+        self.runner = None
+        self.assets = []
+        self.perm = {}
+        self.remote_ip = ''
+        super(ExecHandler, self).__init__(*args, **kwargs)
+
+    def check_origin(self, origin):
+        return True
+
+    @require_auth('user')
+    def open(self):
+        logger.debug('Websocket: Open exec request')
+        role_name = self.get_argument('role', 'sb')
+        self.remote_ip = self.request.remote_ip
+        logger.debug('Web执行命令: 请求角色 %s' % role_name)
+        self.role = get_object(PermRole, name=role_name)
+        self.perm = get_group_user_perm(self.user)
+        roles = self.perm.get('role').keys()
+        if self.role not in roles:
+            self.write_message('No perm that role %s' % role_name)
+            self.close()
+        self.assets = self.perm.get('role').get(self.role).get('asset')
+
+        res = gen_resource({'user': self.user, 'asset': self.assets, 'role': self.role})
+        self.runner = MyRunner(res)
+        message = '有权限的主机: ' + ', '.join([asset.hostname for asset in self.assets])
+        self.__class__.clients.append(self)
+        self.write_message(message)
+
+    def on_message(self, message):
+        data = json.loads(message)
+        pattern = data.get('pattern', '')
+        command = data.get('command', '')
+        asset_name_str = ''
+        if pattern and command:
+            for inv in self.runner.inventory.get_hosts(pattern=pattern):
+                asset_name_str += '%s ' % inv.name
+            self.write_message('匹配主机: ' + asset_name_str)
+            self.write_message('<span style="color: yellow">Ansible> %s</span>\n\n' % command)
+            self.__class__.tasks.append(MyThread(target=self.run_cmd, args=(command, pattern)))
+            ExecLog(host=asset_name_str, cmd=command, user=self.user.username, remote_ip=self.remote_ip).save()
+
+        for t in self.__class__.tasks:
+            if t.is_alive():
+                continue
+            try:
+                t.setDaemon(True)
+                t.start()
+            except RuntimeError:
+                pass
+
+    def run_cmd(self, command, pattern):
+        self.runner.run('shell', command, pattern=pattern)
+        for k, v in self.runner.results.items():
+            for host, output in v.items():
+                if k == 'ok':
+                    header = "<span style='color: green'>[ %s => %s]</span>\n" % (host, 'Ok')
+                else:
+                    header = "<span style='color: red'>[ %s => %s]</span>\n" % (host, 'failed')
+                self.write_message(header)
+                self.write_message(output)
+
+        self.write_message('\n~o~ Task finished ~o~\n')
+
+    def on_close(self):
+        logger.debug('关闭web_exec请求')
+
+
 class WebTerminalHandler(tornado.websocket.WebSocketHandler):
     clients = []
     tasks = []
@@ -236,6 +296,8 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         self.log = None
         self.id = 0
         self.user = None
+        self.ssh = None
+        self.channel = None
         super(WebTerminalHandler, self).__init__(*args, **kwargs)
 
     def check_origin(self, origin):
@@ -250,7 +312,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         if asset:
             roles = user_have_perm(self.user, asset)
             logger.debug(roles)
-            logger.debug('rolename: %s' % role_name)
+            logger.debug('角色: %s' % role_name)
             login_role = ''
             for role in roles:
                 if role.name == role_name:
@@ -267,10 +329,10 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             return
         logger.debug('Websocket: request web terminal Host: %s User: %s Role: %s' % (asset.hostname, self.user.username,
                                                                                      login_role.name))
-        self.term = WebTty(self.user, asset, login_role)
+        self.term = WebTty(self.user, asset, login_role, login_type='web')
         self.term.remote_ip = self.request.remote_ip
-        self.term.get_connection()
-        self.term.channel = self.term.ssh.invoke_shell(term='xterm')
+        self.ssh = self.term.get_connection()
+        self.channel = self.ssh.invoke_shell(term='xterm')
         WebTerminalHandler.tasks.append(MyThread(target=self.forward_outbound))
         WebTerminalHandler.clients.append(self)
 
@@ -303,7 +365,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                 self.term.vim_data = ''
                 self.term.data = ''
                 self.term.input_mode = False
-            self.term.channel.send(data['data'])
+            self.channel.send(data['data'])
 
     def on_close(self):
         logger.debug('Websocket: Close request')
@@ -326,9 +388,9 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             data = ''
             pre_timestamp = time.time()
             while True:
-                r, w, e = select.select([self.term.channel, sys.stdin], [], [])
-                if self.term.channel in r:
-                    recv = self.term.channel.recv(1024)
+                r, w, e = select.select([self.channel, sys.stdin], [], [])
+                if self.channel in r:
+                    recv = self.channel.recv(1024)
                     if not len(recv):
                         return
                     data += recv
@@ -347,8 +409,8 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                         data = ''
                     except UnicodeDecodeError:
                         pass
-        finally:
-            self.close()
+        except IndexError:
+            pass
 
 if __name__ == '__main__':
     tornado.options.parse_command_line()

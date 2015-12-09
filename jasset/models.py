@@ -78,6 +78,7 @@ class Asset(models.Model):
     disk = models.CharField(max_length=128, blank=True, null=True, verbose_name=u'硬盘')
     system_type = models.CharField(max_length=32, blank=True, null=True, verbose_name=u"系统类型")
     system_version = models.CharField(max_length=8, blank=True, null=True, verbose_name=u"系统版本号")
+    system_arch = models.CharField(max_length=16, blank=True, null=True, verbose_name=u"系统平台")
     cabinet = models.CharField(max_length=32, blank=True, null=True, verbose_name=u'机柜号')
     position = models.IntegerField(blank=True, null=True, verbose_name=u'机器位置')
     number = models.CharField(max_length=32, blank=True, null=True, verbose_name=u'资产编号')

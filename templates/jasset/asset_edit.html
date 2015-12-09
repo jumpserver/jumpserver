@@ -5,7 +5,7 @@
 {% include 'nav_cat_bar.html' %}
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
-        <div class="col-lg-10">
+        <div class="col-sm-10">
             <div class="ibox float-e-margins">
                 <div id="ibox-content" class="ibox-title">
                     <h5> 修改资产基本信息 </h5>
@@ -45,6 +45,9 @@
 
                                         <div class="hr-line-dashed"></div>
                                         {{ af.remote_ip|bootstrap_horizontal }}
+
+                                        <div class="hr-line-dashed"></div>
+                                        {{ af.mac|bootstrap_horizontal }}
 
 {#                                        <div class="hr-line-dashed"></div>#}
 {#                                        {{ af.port|bootstrap_horizontal }}#}
@@ -104,6 +107,9 @@
 
                                         <div class="hr-line-dashed"></div>
                                         {{ af.system_version|bootstrap_horizontal }}
+
+                                        <div class="hr-line-dashed"></div>
+                                        {{ af.system_arch|bootstrap_horizontal }}
 
                                         <div class="hr-line-dashed"></div>
                                         {{ af.number|bootstrap_horizontal }}

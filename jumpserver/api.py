@@ -9,6 +9,7 @@ import hashlib
 import datetime
 import random
 import subprocess
+import uuid
 import json
 import logging
 
@@ -47,9 +48,16 @@ def set_log(level):
     return logger_f
 
 
+def list_drop_str(a_list, a_str):
+    for i in a_list:
+        if i == a_str:
+            a_list.remove(a_str)
+    return a_list
+
+
 def get_asset_info(asset):
     """
-    获取资产的相关账号端口信息
+    获取资产的相关管理账号端口等信息
     """
     default = get_object(Setting, name='default')
     info = {'hostname': asset.hostname, 'ip': asset.ip}
@@ -70,17 +78,6 @@ def get_asset_info(asset):
     return info
 
 
-def get_role(user, asset):
-    """
-    获取用户在这个资产上的授权角色列表
-    """
-    roles = []
-    rules = PermRule.objects.filter(user=user, asset=asset)
-    for rule in rules:
-        roles.extend(list(rule.role.all()))
-    return roles
-
-
 def get_role_key(user, role):
     """
     由于role的key的权限是所有人可以读的， ansible执行命令等要求为600，所以拷贝一份到特殊目录
@@ -95,7 +92,7 @@ def get_role_key(user, role):
         with open(os.path.join(role.key_path, 'id_rsa')) as fk:
             with open(user_role_key_path, 'w') as fu:
                 fu.write(fk.read())
-        logger.debug("创建新的用户角色key %s" % user_role_key_path)
+        logger.debug(u"创建新的用户角色key %s, Owner: %s" % (user_role_key_path, user.username))
         chown(user_role_key_path, user.username)
         os.chmod(user_role_key_path, 0600)
     return user_role_key_path
@@ -481,6 +478,11 @@ def http_error(request, emg):
 def my_render(template, data, request):
     return render_to_response(template, data, context_instance=RequestContext(request))
 
+
+def get_tmp_dir():
+    dir_name = os.path.join('/tmp', uuid.uuid4().hex)
+    mkdir(dir_name, mode=0777)
+    return dir_name
 
 CRYPTOR = PyCrypt(KEY)
 logger = set_log(LOG_LEVEL)

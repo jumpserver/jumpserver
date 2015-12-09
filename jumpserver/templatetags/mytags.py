@@ -7,7 +7,7 @@ import time
 from django import template
 from jperm.models import PermPush
 from jumpserver.api import *
-from jasset.models import AssetAlias
+from jperm.perm_api import get_group_user_perm
 
 register = template.Library()
 
@@ -237,7 +237,7 @@ def key_exist(username):
     """
     ssh key is exist or not
     """
-    if os.path.isfile(os.path.join(KEY_DIR, 'user', username)):
+    if os.path.isfile(os.path.join(KEY_DIR, 'user', username+'.pem')):
         return True
     else:
         return False
@@ -272,3 +272,35 @@ def get_push_info(push_id, arg):
             return [role.name for role in push.role.all()]
     else:
         return []
+
+
+@register.filter(name='get_cpu_core')
+def get_cpu_core(cpu_info):
+    cpu_core = cpu_info.split('* ')[1] if cpu_info and '*' in cpu_info else cpu_info
+    return cpu_core
+
+
+@register.filter(name='get_disk_info')
+def get_disk_info(disk_info):
+    try:
+        disk_size = 0
+        if disk_info:
+            disk_dic = ast.literal_eval(disk_info)
+            for disk, size in disk_dic.items():
+                disk_size += size
+            disk_size = int(disk_size)
+        else:
+            disk_size = ''
+    except Exception:
+        disk_size = ''
+    return disk_size
+
+
+@register.filter(name='user_perm_asset_num')
+def user_perm_asset_num(user_id):
+    user = get_object(User, id=user_id)
+    if user:
+        user_perm_info = get_group_user_perm(user)
+        return len(user_perm_info.get('asset').keys())
+    else:
+        return 0

@@ -129,8 +129,8 @@ def gen_ssh_key(username, password='',
     生成一个用户ssh密钥对
     """
     logger.debug('生成ssh key， 并设置authorized_keys')
-    private_key_file = os.path.join(key_dir, username)
-    mkdir(key_dir, mode=777)
+    private_key_file = os.path.join(key_dir, username+'.pem')
+    mkdir(key_dir, mode=0700)
     if os.path.isfile(private_key_file):
         os.unlink(private_key_file)
     ret = bash('echo -e  "y\n"|ssh-keygen -t rsa -f %s -b %s -P "%s"' % (private_key_file, length, password))
@@ -166,7 +166,7 @@ def user_add_mail(user, kwargs):
     mail_msg = u"""
     Hi, %s
         您的用户名： %s
-        您的角色： %s
+        您的权限： %s
         您的web登录密码： %s
         您的ssh密钥文件密码： %s
         密钥下载地址： %s/juser/down_key/?uuid=%s
@@ -195,9 +195,9 @@ def get_display_msg(user, password, ssh_key_pwd, ssh_key_login_need, send_mail_n
         用户名：%s
         密码：%s
         密钥密码：%s
-        密钥下载url: %s/juser/down_key/?id=%s
+        密钥下载url: %s/juser/down_key/?uuid=%s
         该账号密码可以登陆web和跳板机。
-        """ % (URL, user.username, password, ssh_key_pwd, URL, user.id)
+        """ % (URL, user.username, password, ssh_key_pwd, URL, user.uuid)
     else:
         msg = u"""
         跳板机地址： %s \n

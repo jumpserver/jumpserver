@@ -16,9 +16,9 @@ function check_all(form) {
     }
 }
 
-function checkAll(){
-    var checklist = document.getElementsByName ("checked");
-    if(document.getElementById("check_all").checked)
+function checkAll(id, name){
+    var checklist = document.getElementsByName(name);
+    if(document.getElementById(id).checked)
         {
         for(var i=0;i<checklist.length;i++)
         {

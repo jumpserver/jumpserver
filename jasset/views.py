@@ -6,8 +6,7 @@ from jumpserver.api import *
 from jumpserver.models import Setting
 from jasset.forms import AssetForm, IdcForm
 from jasset.models import Asset, IDC, AssetGroup, ASSET_TYPE, ASSET_STATUS
-from jperm.ansible_api import Tasks, MyRunner
-from jperm.perm_api import gen_resource
+from jperm.perm_api import get_group_asset_perm, get_group_user_perm
 
 
 @require_role('admin')
@@ -96,7 +95,9 @@ def group_list(request):
     header_title, path1, path2 = u'查看资产组', u'资产管理', u'查看资产组'
     keyword = request.GET.get('keyword', '')
     asset_group_list = AssetGroup.objects.all()
-
+    group_id = request.GET.get('id')
+    if group_id:
+        asset_group_list = asset_group_list.filter(id=group_id)
     if keyword:
         asset_group_list = asset_group_list.filter(Q(name__contains=keyword) | Q(comment__contains=keyword))
 
@@ -256,11 +257,13 @@ def asset_list(request):
     asset list view
     """
     header_title, path1, path2 = u'查看资产', u'资产管理', u'查看资产'
+    username = request.user.username
+    user_perm = request.session['role_id']
     idc_all = IDC.objects.filter()
     asset_group_all = AssetGroup.objects.all()
     asset_types = ASSET_TYPE
     asset_status = ASSET_STATUS
-
+    asset_id = request.GET.get('id')
     idc_name = request.GET.get('idc', '')
     group_name = request.GET.get('group', '')
     asset_type = request.GET.get('asset_type', '')
@@ -279,12 +282,19 @@ def asset_list(request):
         if idc:
             asset_find = Asset.objects.filter(idc=idc)
     else:
-        asset_find = Asset.objects.all()
+        if user_perm != 0:
+            asset_find = Asset.objects.all()
+        else:
+            user = get_object(User, username=username)
+            asset_perm = get_group_user_perm(user) if user else {'asset': ''}
+            asset_find = asset_perm['asset'].keys()
+            asset_group_all = list(asset_perm['asset_group'])
 
     if idc_name:
         asset_find = asset_find.filter(idc__name__contains=idc_name)
 
     if group_name:
+        print asset_find, type(asset_find)
         asset_find = asset_find.filter(group__name__contains=group_name)
 
     if asset_type:
@@ -292,6 +302,9 @@ def asset_list(request):
 
     if status:
         asset_find = asset_find.filter(status__contains=status)
+
+    if asset_id:
+        asset_find = asset_find.filter(id=asset_id)
 
     if keyword:
         asset_find = asset_find.filter(
@@ -318,7 +331,10 @@ def asset_list(request):
         smg = u'excel文件已生成，请点击下载!'
         return my_render('jasset/asset_excel_download.html', locals(), request)
     assets_list, p, assets, page_range, current_page, show_first, show_end = pages(asset_find, request)
-    return my_render('jasset/asset_list.html', locals(), request)
+    if user_perm != 0:
+        return my_render('jasset/asset_list.html', locals(), request)
+    else:
+        return my_render('jasset/asset_cu_list.html', locals(), request)
 
 
 @require_role('admin')
@@ -410,6 +426,18 @@ def asset_detail(request):
     header_title, path1, path2 = u'主机详细信息', u'资产管理', u'主机详情'
     asset_id = request.GET.get('id', '')
     asset = get_object(Asset, id=asset_id)
+    perm_info = get_group_asset_perm(asset)
+    log = Log.objects.filter(host=asset.hostname)
+    if perm_info:
+        user_perm = []
+        for perm, value in perm_info.items():
+            if perm == 'user':
+                for user, role_dic in value.items():
+                    user_perm.append([user, role_dic.get('role', '')])
+            elif perm == 'user_group' or perm == 'rule':
+                user_group_perm = value
+    print perm_info
+
     asset_record = AssetRecord.objects.filter(asset=asset).order_by('-alert_time')
 
     return my_render('jasset/asset_detail.html', locals(), request)

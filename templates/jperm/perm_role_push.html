@@ -9,7 +9,7 @@
     {% include 'nav_cat_bar.html' %}
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
-            <div class="col-lg-10">
+            <div class="col-sm-10">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
                         <h5>填写基本信息</h5>
@@ -45,7 +45,7 @@
                                 <div class="col-sm-8">
                                     <select name="assets" id="assets" data-placeholder="请选择资产" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for asset in assets %}
-                                            <option value="{{ asset.id }}" {% if asset in pushed_assets %}selected{% endif %}>{{ asset.hostname }}</option>
+                                            <option value="{{ asset.id }}" {% if asset in need_push_asset %}selected{% endif %}>{{ asset.hostname }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>

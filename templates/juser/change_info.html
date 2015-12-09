@@ -6,7 +6,7 @@
     {% include 'nav_cat_bar.html' %}
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
-            <div class="col-lg-10">
+            <div class="col-sm-10">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
                         <h5>编辑用户信息</h5>
@@ -45,7 +45,7 @@
                                 <div class="col-sm-8">
                                     <input id="password" name="password" placeholder="Password" type="password" class="form-control">
                                     <span class="help-block m-b-none">
-                                        登陆web的密码
+                                        登陆web的密码, 不修改请留空
                                     </span>
                                 </div>
                             </div>
@@ -88,10 +88,13 @@
 $('#userForm').validator({
     timely: 2,
     theme: "yellow_right_effect",
+    rules: {
+        check_pass: [/^\w+$/, '数字和字符']
+    },
 
     fields: {
         "password": {
-            rule: "length[6~50]",
+            rule: "length[6~50];check_pass",
             tip: "输入密码",
             ok: "",
             msg: {required: "必须填写!"}

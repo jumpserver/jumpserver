@@ -32,7 +32,7 @@
 
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-sm-12">
             <div class="ibox float-e-margins">
                 <div id="ibox-content" class="ibox-title">
                     <h5> 用户日志详细信息列表 </h5>
@@ -54,9 +54,10 @@
                         <ul class="nav nav-tabs">
                             <li><a href="/jlog/log_list/online/" class="text-center"><i class="fa fa-laptop"></i> 在线 </a></li>
                             <li class="active"><a href="/jlog/log_list/offline/" class="text-center"><i class="fa fa-bar-chart-o"></i> 历史记录 </a></li>
+                            <li><a href="/jlog/log_list/exec/" class="text-center"><i class="fa fa-bar-chart-o"></i> 命令记录 </a></li>
+                            <li><a href="/jlog/log_list/file/" class="text-center"><i class="fa fa-bar-chart-o"></i> 上传下载 </a></li>
                         </ul>
                     </div>
-                    <br/>
                     <form class="form-inline" action="" method="get">
                         <div class="form-group" id="date_5">
                             <div class="input-daterange input-group" id="datepicker">
@@ -87,7 +88,7 @@
                             <input id="cmd" name="cmd" placeholder="命令" type="text" class="form-control" value="{{ cmd }}" style="width: 200px;">
                         </div>
                         <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
-                                Search
+                                - 搜索 -
                         </button>
                     </form>
                     <div class="tab-content">

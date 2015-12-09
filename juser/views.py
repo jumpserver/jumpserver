@@ -4,22 +4,14 @@
 
 # import random
 # from Crypto.PublicKey import RSA
-import uuid as uuid_r
+import uuid
 from django.contrib.auth.decorators import login_required
 
 from django.db.models import Q
 from juser.user_api import *
+from jperm.perm_api import get_group_user_perm
 
 MAIL_FROM = EMAIL_HOST_USER
-
-@login_required(login_url='/login')
-def chg_role(request):
-    role = {'SU': 2, 'GA': 1, 'CU': 0}
-    if request.session['role_id'] > 0:
-        request.session['role_id'] = 0
-    elif request.session['role_id'] == 0:
-        request.session['role_id'] = role.get(request.user.role, 0)
-    return HttpResponseRedirect('/')
 
 
 @require_role(role='super')
@@ -96,8 +88,8 @@ def group_edit(request):
 
     if request.method == 'GET':
         group_id = request.GET.get('id', '')
-        # user_group = get_object(UserGroup, id=group_id)
-        user_group = UserGroup.objects.get(id=group_id)
+        user_group = get_object(UserGroup, id=group_id)
+        # user_group = UserGroup.objects.get(id=group_id)
         users_selected = User.objects.filter(group=user_group)
         users_remain = User.objects.filter(~Q(group=user_group))
         users_all = User.objects.all()
@@ -126,8 +118,9 @@ def group_edit(request):
                     if g == user_group:
                         continue
                     user.group.add(g)
-
-
+            user_group.name = group_name
+            user_group.comment = comment
+            user_group.save()
         except ServerError, e:
             error = e
         if not error:
@@ -140,7 +133,6 @@ def group_edit(request):
     return my_render('juser/group_edit.html', locals(), request)
 
 
-@login_required(login_url='/login')
 @require_role(role='super')
 def user_add(request):
     error = ''
@@ -157,11 +149,11 @@ def user_add(request):
         groups = request.POST.getlist('groups', [])
         admin_groups = request.POST.getlist('admin_groups', [])
         role = request.POST.get('role', 'CU')
-        uuid = uuid_r.uuid1()
+        uuid_r = uuid.uuid4().get_hex()
         ssh_key_pwd = PyCrypt.gen_rand_pass(16)
         extra = request.POST.getlist('extra', [])
         is_active = False if '0' in extra else True
-        ssh_key_login_need = True if '1' in extra else False
+        ssh_key_login_need = True
         send_mail_need = True if '2' in extra else False
 
         try:
@@ -179,7 +171,7 @@ def user_add(request):
             try:
                 user = db_add_user(username=username, name=name,
                                    password=password,
-                                   email=email, role=role, uuid=uuid,
+                                   email=email, role=role, uuid=uuid_r,
                                    groups=groups, admin_groups=admin_groups,
                                    ssh_key_pwd=ssh_key_pwd,
                                    is_active=is_active,
@@ -190,7 +182,7 @@ def user_add(request):
                     user_groups = []
                     for user_group_id in groups:
                         user_groups.extend(UserGroup.objects.filter(id=user_group_id))
-                    print user_groups
+
             except IndexError, e:
                 error = u'添加用户 %s 失败 %s ' % (username, e)
                 try:
@@ -230,24 +222,20 @@ def user_list(request):
 @require_role(role='user')
 def user_detail(request):
     header_title, path1, path2 = '用户详情', '用户管理', '用户详情'
-    # if request.session.get('role_id') == 0:
-    #     user_id = request.user.id
-    # else:
-    #     user_id = request.GET.get('id', '')
-    #     if request.session.get('role_id') == 1:
-    #         user, dept = get_session_user_dept(request)
-    #         if not validate(request, user=[user_id]):
-    #             return HttpResponseRedirect('/')
-    user_id = request.GET.get('id', '')
-    if not user_id:
+    if request.session.get('role_id') == 0:
+        user_id = request.user.id
+    else:
+        user_id = request.GET.get('id', '')
+
+    user = get_object(User, id=user_id)
+    if not user:
         return HttpResponseRedirect('/juser/user_list/')
-    user = User.objects.get(id=user_id)
-    # if user:
-    #     pass
-        # asset_group_permed = user.get_asset_group()
-        # logs_last = Log.objects.filter(user=user.name).order_by('-start_time')[0:10]
-        # logs_all = Log.objects.filter(user=user.name).order_by('-start_time')
-        # logs_num = len(logs_all)
+
+    user_perm_info = get_group_user_perm(user)
+    role_assets = user_perm_info.get('role')
+    user_log_ten = Log.objects.filter(user=user.username).order_by('id')[0:10]
+    user_log_last = Log.objects.filter(user=user.username).order_by('id')[0:50]
+    user_log_last_num = len(user_log_last)
 
     return my_render('juser/user_detail.html', locals(), request)
 
@@ -262,21 +250,20 @@ def user_del(request):
         user_id_list = user_ids.split(',')
     else:
         return HttpResponse('错误请求')
+
     for user_id in user_id_list:
         user = get_object(User, id=user_id)
-        if user:
-            # TODO: annotation by liuzheng, because useless for me
-            # assets = user_permed(user)
-            # result = _public_perm_api({'type': 'del_user', 'user': user, 'asset': assets})
-            # print result
+        if user and user.username != 'admin':
+            logger.debug(u"删除用户 %s " % user.username)
+            bash('userdel -r %s' % user.username)
             user.delete()
     return HttpResponse('删除成功')
 
 
 @require_role('admin')
 def send_mail_retry(request):
-    user_uuid = request.GET.get('uuid', '1')
-    user = get_object(User, uuid=user_uuid)
+    uuid_r = request.GET.get('uuid', '1')
+    user = get_object(User, uuid=uuid_r)
     msg = u"""
     跳板机地址： %s
     用户名：%s
@@ -305,36 +292,38 @@ def forget_password(request):
             """ % (user.name, URL, user.uuid, timestamp, hash_encode)
             send_mail('忘记跳板机密码', msg, MAIL_FROM, [email], fail_silently=False)
             msg = u'请登陆邮箱，点击邮件重设密码'
-            return HttpResponse(msg)
+            return http_success(request, msg)
         else:
             error = u'用户不存在或邮件地址错误'
 
     return render_to_response('juser/forget_password.html', locals())
 
 
+@require_role('user')
 def reset_password(request):
-    uuid = request.GET.get('uuid', '')
+    uuid_r = request.GET.get('uuid', '')
     timestamp = request.GET.get('timestamp', '')
     hash_encode = request.GET.get('hash', '')
-    action = '/juser/reset_password/?uuid=%s&timestamp=%s&hash=%s' % (uuid, timestamp, hash_encode)
+    action = '/juser/reset_password/?uuid=%s&timestamp=%s&hash=%s' % (uuid_r, timestamp, hash_encode)
 
     if request.method == 'POST':
         password = request.POST.get('password')
         password_confirm = request.POST.get('password_confirm')
+        print password, password_confirm
         if password != password_confirm:
             return HttpResponse('密码不匹配')
         else:
-            user = get_object(User, uuid=uuid)
+            user = get_object(User, uuid=uuid_r)
             if user:
                 user.password = PyCrypt.md5_crypt(password)
                 user.save()
-                return HttpResponse('密码重设成功')
+                return http_success(request, u'密码重设成功')
             else:
                 return HttpResponse('用户不存在')
 
-    if hash_encode == PyCrypt.md5_crypt(uuid + timestamp + KEY):
+    if hash_encode == PyCrypt.md5_crypt(uuid_r + timestamp + KEY):
         if int(time.time()) - int(timestamp) > 600:
-            return HttpResponse('链接已超时')
+            return http_error(request, u'链接已超时')
         else:
             return render_to_response('juser/reset_password.html', locals())
 
@@ -401,24 +390,15 @@ def user_edit(request):
             send_mail('您的信息已修改', msg, MAIL_FROM, [email], fail_silently=False)
 
         return HttpResponseRedirect('/juser/user_list/')
-
     return my_render('juser/user_edit.html', locals(), request)
 
 
-# @require_role(role='admin')
-def user_edit_adm(request):
-    pass
-
-
 def profile(request):
-    a = request.user.id
-    a = request.user.groups
-
     user_id = request.user.id
     if not user_id:
         return HttpResponseRedirect('/')
     user = User.objects.get(id=user_id)
-    return render_to_response('juser/profile.html', locals(), context_instance=RequestContext(request))
+    return my_render('juser/profile.html', locals(), request)
 
 
 def change_info(request):
@@ -436,26 +416,24 @@ def change_info(request):
 
         if '' in [name, email]:
             error = '不能为空'
-        if len(password) > 0 and len(password) < 6:
+
+        if len(password) < 6:
             error = '密码须大于6位'
 
         if not error:
-            # if password != user.password:
-            #     password = CRYPTOR.md5_crypt(password)
-
             User.objects.filter(id=user_id).update(name=name, email=email)
             if len(password) > 0:
                 user.set_password(password)
                 user.save()
             msg = '修改成功'
 
-    return render_to_response('juser/change_info.html', locals(), context_instance=RequestContext(request))
+    return my_render('juser/change_info.html', locals(), request)
 
 
 @require_role(role='user')
 def regen_ssh_key(request):
-    uuid = request.GET.get('uuid', '')
-    user = get_object(User, uuid=uuid)
+    uuid_r = request.GET.get('uuid', '')
+    user = get_object(User, uuid=uuid_r)
     if not user:
         return HttpResponse('没有该用户')
 
@@ -467,18 +445,17 @@ def regen_ssh_key(request):
 
 @require_role(role='user')
 def down_key(request):
-    user_id = ''
     if is_role_request(request, 'super'):
-        user_id = request.GET.get('id')
+        uuid_r = request.GET.get('uuid', '')
+    else:
+        uuid_r = request.user.uuid
 
-    if is_role_request(request, 'user'):
-        user_id = request.user.id
-
-    if user_id:
-        user = get_object(User, id=user_id)
+    if uuid_r:
+        user = get_object(User, uuid=uuid_r)
         if user:
             username = user.username
-            private_key_file = os.path.join(KEY_DIR, 'user', username)
+            private_key_file = os.path.join(KEY_DIR, 'user', username+'.pem')
+            print private_key_file
             if os.path.isfile(private_key_file):
                 f = open(private_key_file)
                 data = f.read()
@@ -486,13 +463,5 @@ def down_key(request):
                 response = HttpResponse(data, content_type='application/octet-stream')
                 response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(private_key_file)
                 return response
-
     return HttpResponse('No Key File. Contact Admin.')
-from jperm.perm_api import get_group_user_perm
-@require_role(role='user')
-def RunCommand(request):
-    if request.method == 'GET':
-        GUP = get_group_user_perm(request.user)
-        print GUP
-        assets = GUP.get('asset')
-        return render_to_response('juser/run_command.html', locals(), context_instance=RequestContext(request))
+
