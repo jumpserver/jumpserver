@@ -294,7 +294,6 @@ def asset_list(request):
         asset_find = asset_find.filter(idc__name__contains=idc_name)
 
     if group_name:
-        print asset_find, type(asset_find)
         asset_find = asset_find.filter(group__name__contains=group_name)
 
     if asset_type:
@@ -413,7 +412,7 @@ def asset_edit_batch(request):
             if alert_list:
                 recode_name = unicode(name) + ' - ' + u'批量'
                 AssetRecord.objects.create(asset=asset, username=recode_name, content=alert_list)
-        return HttpResponse('ok')
+        return my_render('jasset/asset_update_status.html', locals(), request)
 
     return my_render('jasset/asset_edit_batch.html', locals(), request)
 
