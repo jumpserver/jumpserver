@@ -34,9 +34,9 @@
                                 <div class="alert alert-success text-center">{{ msg }}</div>
                             {% endif %}
                             <div class="form-group">
-                                <label for="rulename" class="col-sm-2 control-label">授权名称<span class="red-fonts">*</span></label>
+                                <label for="name" class="col-sm-2 control-label">授权名称<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <input id="rulename" name="rulename" placeholder="Rule Name" type="text" class="form-control" value={{ rule.name }}>
+                                    <input id="name" name="name" placeholder="Rule Name" type="text" class="form-control" value={{ rule.name }}>
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
@@ -52,9 +52,9 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="usergroup" class="col-sm-2 control-label">用户组</label>
+                                <label for="user_group" class="col-sm-2 control-label">用户组</label>
                                 <div class="col-sm-8">
-                                    <select name="usergroup" id="usergroup" data-placeholder="请选择用户组" class="chosen-select form-control m-b" multiple  tabindex="2">
+                                    <select name="user_group" id="user_group" data-placeholder="请选择用户组" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for user_group in user_groups %}
                                             <option value="{{ user_group.id }}"{% if user_group in rule.user_group.all %} selected {% endif %}>{{ user_group.name }}</option>
                                         {% endfor %}
@@ -74,9 +74,9 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="assetgroup" id="assetgroup" class="col-sm-2 control-label">资产组</label>
+                                <label for="asset_group" id="asset_group" class="col-sm-2 control-label">资产组</label>
                                 <div class="col-sm-8">
-                                    <select name="assetgroup" data-placeholder="请选择资产组" class="chosen-select form-control m-b" multiple  tabindex="2">
+                                    <select name="asset_group" data-placeholder="请选择资产组" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for asset_group in asset_groups %}
                                             <option value="{{ asset_group.id }}"{% if asset_group in rule.asset_group.all %} selected {% endif %}>{{ asset_group.name }}</option>
                                         {% endfor %}
@@ -86,7 +86,7 @@
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
                                 <label for="role" class="col-sm-2 control-label">角色<span class="red-fonts">*</span></label>
-                                <div class="col-sm-8" id="role_name">
+                                <div class="col-sm-8">
                                     <select name="role" data-placeholder="请选择角色" class="chosen-select form-control m-b" multiple  tabindex="2">
                                          {% for role in roles %}
                                             <option value="{{ role.id }}"{% if role in rule.role.all %} selected {% endif %}>{{ role.name }}</option>
@@ -99,7 +99,7 @@
                             <div class="form-group">
                                 <label for="comment" class="col-sm-2 control-label">备注</label>
                                 <div class="col-sm-8">
-                                    <input id="rule_comment" name="rule_comment" placeholder="Rule Comment" type="text" class="form-control" value="{{ rule.comment }}">
+                                    <input id="comment" name="rule_comment" placeholder="Rule Comment" type="text" class="form-control" value="{{ rule.comment }}">
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
@@ -118,6 +118,7 @@
 {% endblock %}
 {% block self_footer_js %}
 <script>
+
 $('#ruleForm').validator({
     timely: 2,
     theme: "yellow_right_effect",
@@ -132,17 +133,17 @@ $('#ruleForm').validator({
     },
 
     fields: {
-        "rulename": {
+        "name": {
             rule: "required;check_name",
             tip: "输入规则名称",
             msg: {required: "规则名称必填"}
         },
-        "usergroup": {
+        "user_group": {
             rule: "required(check_user)",
             tip: "请选择用户组",
             msg: {required: "用户和用户组必选一个!"}
         },
-        "assetgroup": {
+        "asset_group": {
             rule: "required(check_asset)",
             tip: "输入资产组",
             msg: {required: "资产和资产组必选一个!"}

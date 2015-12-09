@@ -219,9 +219,9 @@
         });
 
         $('.conn').click(function(){
-            var url='/jperm/role/get/?id=' + $(this).attr('value');
+            var url='/jperm/role/get/?id=' + $(this).attr('value'); // 获取用户有权限的角色
             var href = $(this).attr('href');
-            var new_url = '/jlog/web_terminal/?id=' + $(this).attr('value') + '&role=';
+            var new_url = '/jlog/web_terminal/?id=' + $(this).attr('value') + '&role='; // webterminal socket url
             var hostname = $(this).closest('tr').find('.hostname a')[0].innerHTML;
             $.ajax({
                 type: 'GET',
@@ -229,6 +229,8 @@
                 data: {},
                 success: function(data){
                     var dataArray = data.split(',');
+                    console.log(data+'a');
+                    console.log(dataArray);
                     if (dataArray.length == 1 && data != 'error'){
                         var title = 'Jumpserver Web Terminal' + '<span class="text-info"> '+ hostname +'</span>';
                         console.log(new_url+data);
@@ -241,7 +243,7 @@
                             content: new_url+data
                         });
                         //window.open(new_url + data, '', 'location=no, resizeable=no, height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,status=no');
-                    } else if (dataArray.length == '1' && data == 'error'){
+                    } else if (data == 'error' || data == '' || data == null || data == undefined){
                         layer.alert('没有授权角色')
                     } else {
                         aUrl = '';
