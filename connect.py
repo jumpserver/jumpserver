@@ -14,6 +14,7 @@ import getpass
 import readline
 import django
 import paramiko
+import errno
 import struct, fcntl, signal, socket, select
 from io import open as copen
 import uuid
@@ -51,6 +52,7 @@ def color_print(msg, color='red', exits=False):
                  'green': '\033[1;32m%s\033[0m',
                  'yellow': '\033[1;33m%s\033[0m',
                  'red': '\033[1;31m%s\033[0m',
+                 'title': '\033[30;42m%s\033[0m',
                  'info': '\033[32m%s\033[0m'}
     msg = color_msg.get(color, 'red') % msg
     print msg
@@ -369,18 +371,30 @@ class SshTty(Tty):
             while True:
                 try:
                     r, w, e = select.select([self.channel, sys.stdin], [], [])
+                    flag = fcntl.fcntl(sys.stdin, fcntl.F_GETFL, 0)
+                    fcntl.fcntl(sys.stdin.fileno(), fcntl.F_SETFL, flag|os.O_NONBLOCK)
                 except Exception:
                     pass
 
                 if self.channel in r:
                     try:
-                        x = self.channel.recv(1024)
+                        x = self.channel.recv(10240)
                         if len(x) == 0:
                             break
                         if self.vim_flag:
                             self.vim_data += x
-                        sys.stdout.write(x)
-                        sys.stdout.flush()
+                        index = 0
+                        len_x = len(x)
+                        while index < len_x:
+                            try:
+                                n = os.write(sys.stdout.fileno(), x[index:])
+                                sys.stdout.flush()
+                                index += n
+                            except OSError as msg:
+                                if msg.errno == errno.EAGAIN:
+                                    continue
+                        #sys.stdout.write(x)
+                        #sys.stdout.flush()
                         now_timestamp = time.time()
                         log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(x)))
                         log_time_f.flush()
@@ -396,7 +410,7 @@ class SshTty(Tty):
                         pass
 
                 if sys.stdin in r:
-                    x = os.read(sys.stdin.fileno(), 1)
+                    x = os.read(sys.stdin.fileno(), 4096)
                     input_mode = True
                     if str(x) in ['\r', '\n', '\r\n']:
                         if self.vim_flag:
@@ -444,7 +458,7 @@ class SshTty(Tty):
         win_size = self.get_win_size()
         #self.channel = channel = ssh.invoke_shell(height=win_size[0], width=win_size[1], term='xterm')
         self.channel = channel = transport.open_session()
-        channel.get_pty(term='xterm',height=win_size[0],width=win_size[1])
+        channel.get_pty(term='xterm', height=win_size[0], width=win_size[1])
         channel.invoke_shell()
         try:
             signal.signal(signal.SIGWINCH, self.set_win_size)
@@ -511,13 +525,13 @@ class Nav(object):
             user_asset_search = user_asset_all
 
         self.search_result = dict(zip(range(len(user_asset_search)), user_asset_search))
-        color_print('[%-3s] %-15s  %-15s  %-5s  %-10s  %s' % ('ID', 'AssetName', 'IP', 'Port', 'Role', 'Comment'), 'info')
+        color_print('[%-3s] %-12s %-15s  %-5s  %-10s  %s' % ('ID', u'主机名', 'IP', u'端口', u'角色', u'备注'), 'title')
         for index, asset in self.search_result.items():
             # 获取该资产信息
             asset_info = get_asset_info(asset)
             # 获取该资产包含的角色
             role = [str(role.name) for role in self.user_perm.get('asset').get(asset).get('role')]
-            print '[%-3s] %-15s  %-15s  %-5s  %-10s  %s' % (index, asset.hostname, asset.ip, asset_info.get('port'),
+            print '[%-3s] %-15s %-15s  %-5s  %-10s  %s' % (index, asset.hostname, asset.ip, asset_info.get('port'),
                                                             role, asset.comment)
         print
 
@@ -526,12 +540,9 @@ class Nav(object):
         打印用户授权的资产组
         """
         user_asset_group_all = get_group_user_perm(self.user).get('asset_group', [])
-        color_print('[%-3s] %-15s %s' % ('ID', 'GroupName', 'Comment'), 'info')
+        color_print('[%-3s] %-20s %s' % ('ID', '组名', '备注'), 'title')
         for asset_group in user_asset_group_all:
-            if asset_group.comment:
-                print '[%-3s] %-15s %s' % (asset_group.id, asset_group.name, asset_group.comment)
-            else:
-                print '[%-3s] %-15s' % (asset_group.id, asset_group.name)
+            print '[%-3s] %-15s %s' % (asset_group.id, asset_group.name, asset_group.comment)
         print
 
     def exec_cmd(self):
