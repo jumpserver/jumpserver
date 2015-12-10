@@ -448,7 +448,6 @@ def perm_role_push(request):
             group_assets_obj.extend(asset_group.asset_set.all())
         calc_assets = list(set(assets_obj) | set(group_assets_obj))
         push_resource = gen_resource(calc_assets)
-        logger.debug('Push role res: %s' % push_resource)
 
         # 调用Ansible API 进行推送
         password_push = True if request.POST.get("use_password") else False
@@ -469,7 +468,8 @@ def perm_role_push(request):
         # 3. 推送sudo配置文件
         if password_push or key_push:
             sudo_list = set([sudo for sudo in role.sudo.all()])  # set(sudo1, sudo2, sudo3)
-            ret['sudo'] = task.push_sudo_file([role], sudo_list)
+            if sudo_list:
+                ret['sudo'] = task.push_sudo_file([role], sudo_list)
 
         logger.debug('推送role结果: %s' % ret)
         success_asset = {}
