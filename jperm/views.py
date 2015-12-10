@@ -23,6 +23,7 @@ logger = set_log(LOG_LEVEL, filename='jumpserver_perm.log')
 def perm_rule_list(request):
     """
     list rule page
+    授权规则列表
     """
     # 渲染数据
     header_title, path1, path2 = "授权规则", "规则管理", "查看规则"
@@ -46,6 +47,7 @@ def perm_rule_list(request):
 def perm_rule_detail(request):
     """
     rule detail page
+    授权详情
     """
     # 渲染数据
     header_title, path1, path2 = "授权规则", "规则管理", "规则详情"
@@ -54,14 +56,18 @@ def perm_rule_detail(request):
     rule_id = request.GET.get("id")
     rule_obj = PermRule.objects.get(id=rule_id)
     user_obj = rule_obj.user.all()
+    user_group_obj = rule_obj.user_group.all()
     asset_obj = rule_obj.asset.all()
+    asset_group_obj = rule_obj.asset_group.all()
     roles_name = [role.name for role in rule_obj.role.all()]
 
     # 渲染数据
     roles_name = ','.join(roles_name)
     rule = rule_obj
     users = user_obj
+    user_groups = user_group_obj
     assets = asset_obj
+    asset_groups = asset_group_obj
 
     return my_render('jperm/perm_rule_detail.html', locals(), request)
 
@@ -69,6 +75,7 @@ def perm_rule_detail(request):
 def perm_rule_add(request):
     """
     add rule page
+    添加授权
     """
     # 渲染数据
     header_title, path1, path2 = "授权规则", "规则管理", "添加规则"
@@ -116,8 +123,8 @@ def perm_rule_add(request):
             need_push_asset = set()
 
             for role in roles_obj:
-                asset_no_push = get_role_push_host(role=role)[0]  # 获取某角色已经推送的资产
-                need_push_asset.update(set(calc_assets) - set(asset_no_push))
+                asset_no_push = get_role_push_host(role=role)[1]  # 获取某角色已经推送的资产
+                need_push_asset.update(set(calc_assets) & set(asset_no_push))
                 if need_push_asset:
                     raise ServerError(u'没有推送角色 %s 的主机 %s'
                                       % (role.name, ','.join([asset.hostname for asset in need_push_asset])))
@@ -183,15 +190,13 @@ def perm_rule_edit(request):
             # 获取需要授权的用户列表
             users_obj = [User.objects.get(id=user_id) for user_id in users_select]
             user_groups_obj = [UserGroup.objects.get(id=group_id) for group_id in user_groups_select]
-            # group_users_obj = [user for user in [group.user_set.all() for group in user_groups_obj]]
-            # calc_users = set(group_users_obj) | set(users_obj)
 
             # 获取授予的角色列表
             roles_obj = [PermRole.objects.get(id=role_id) for role_id in roles_select]
             need_push_asset = set()
             for role in roles_obj:
-                asset_no_push = get_role_push_host(role=role)[0]  # 获取某角色已经推送的资产
-                need_push_asset.update(set(calc_assets) - set(asset_no_push))
+                asset_no_push = get_role_push_host(role=role)[1]  # 获取某角色已经推送的资产
+                need_push_asset.update(set(calc_assets) & set(asset_no_push))
                 if need_push_asset:
                     raise ServerError(u'没有推送角色 %s 的主机 %s'
                                       % (role.name, ','.join([asset.hostname for asset in need_push_asset])))

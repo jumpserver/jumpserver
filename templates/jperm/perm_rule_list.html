@@ -62,7 +62,7 @@
                         <tbody id="edittbody">
                         {% for rule in rules %}
                             <tr class="gradeX" id={{ rule.id }}>
-                                <td class="text-center"> {{ rule.name }} </td>
+                                <td class="text-center"> <a href="/jperm/perm_rule_detail/?id={{ rule.id }}" >{{ rule.name }}</a> </td>
                                 <td class="text-center">
                                     {{ rule | rule_member_count:"user" }}
                                 </td>
@@ -79,7 +79,6 @@
                                     {{ rule | rule_member_count:"role" }}
                                 </td>
                                 <td class="text-center">
-                                    <a href="/jperm/perm_rule_detail/?id={{ rule.id }}" class="btn btn-xs btn-primary">详情</a>
                                     <a href="/jperm/perm_rule_edit/?id={{ rule.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <button onclick="remove_rule({{ rule.id }})" class="btn btn-xs btn-danger">删除</button>
                                 </td>
