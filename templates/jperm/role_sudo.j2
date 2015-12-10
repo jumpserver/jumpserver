@@ -4,6 +4,9 @@
 real_file=/etc/sudoers
 tmp_file=$(mktemp /tmp/XXXXXXX)
 
+# Backup sudoers file
+cp ${sudo_file} ${sudo_file_bak}
+
 # Add Command Aliases
 add_cmd_alias() {
     sudo_file=$1
@@ -17,6 +20,7 @@ add_cmd_alias() {
 }
 
 
+# Add Command Aliases to role
 add_role_chosen() {
     sudo_file=$1
     {% for user, alias in sudo_user.items %}
@@ -27,6 +31,7 @@ add_role_chosen() {
         fi
     {% endfor %}
 }
+
 
 check_syntax(){
     visudo -c -f $1

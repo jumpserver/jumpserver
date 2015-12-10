@@ -323,11 +323,13 @@ class MyTask(MyRunner):
         """
         add a host user.
         """
+
         if password:
             encrypt_pass = sha512_crypt.encrypt(password)
             module_args = 'name=%s shell=/bin/bash password=%s' % (username, encrypt_pass)
         else:
             module_args = 'name=%s shell=/bin/bash' % username
+
         self.run("user", module_args, become=True)
 
         return self.results
@@ -359,8 +361,8 @@ class MyTask(MyRunner):
         """
         module_args = 'name=%s state=absent remove=yes move_home=yes force=yes' % username
         self.run("user", module_args, become=True)
-
         return self.results
+
 
     @staticmethod
     def gen_sudo_script(role_list, sudo_list):

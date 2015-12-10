@@ -24,61 +24,7 @@
 
                 <div class="ibox-content">
                     <form id="asset_form">
-                        <div class="col-sm-7" style="padding-left: 0px">
-                            <label>
-                                <select name="idc" class="form-control m-b input-sm" onchange="change_info()">
-                                    <option value="">机房</option>
-                                    {% for idc in idc_all %}
-                                        {% ifequal idc.name idc_name %}
-                                            <option value="{{idc.name}}" selected> {{ idc.name }}</option>
-                                        {% else %}
-                                            <option value="{{idc.name}}"> {{ idc.name }}</option>
-                                        {% endifequal %}
-                                    {% endfor %}
-                                </select>
-                            </label>
-
-                            <label>
-                                <select name="group" class="form-control m-b input-sm" onchange="change_info()">
-                                    <option value="">主机组</option>
-                                    {% for asset_group in asset_group_all %}
-                                        {% ifequal asset_group.name group_name %}
-                                            <option value="{{ asset_group.name }}" selected> {{ asset_group.name }} </option>
-                                        {% else %}
-                                            <option value="{{ asset_group.name }}"> {{ asset_group.name }} </option>
-                                        {% endifequal %}
-                                    {% endfor %}
-                                </select>
-                            </label>
-
-                            <label>
-                                <select name="asset_type" class="form-control m-b input-sm" onchange="change_info()">
-                                    <option value="">资产类型</option>
-                                    {% for type in asset_types %}
-                                        {% ifequal type.0|int2str asset_type %}
-                                            <option value="{{ type.0 }}" selected> {{ type.1 }}</option>
-                                        {% else %}
-                                            <option value="{{ type.0 }}"> {{ type.1 }}</option>
-                                        {% endifequal %}
-                                    {% endfor %}
-                                </select>
-                            </label>
-
-                            <label>
-                                <select name="status" class="form-control m-b input-sm" onchange="change_info()">
-                                    <option value="">资产状态</option>
-                                    {% for s in asset_status %}
-                                        {% ifequal s.0|int2str status %}
-                                            <option value="{{ s.0 }}" selected> {{ s.1 }}</option>
-                                        {% else %}
-                                            <option value="{{ s.0 }}"> {{ s.1 }}</option>
-                                        {% endifequal %}
-                                    {% endfor %}
-                                </select>
-                            </label>
-                        </div>
-
-                        <div class="col-sm-4" style="padding-right: 0">
+                        <div class="col-sm-4 col-sm-offset-8" style="padding-right: 0">
                              <div class="input-group inline-group">
                                 <input type="text" class="form-control m-b input-sm" id="search_input" name="keyword" value="{{ keyword }}" placeholder="Search">
                                 <input type="text" style="display: none">

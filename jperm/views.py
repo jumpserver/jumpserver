@@ -35,7 +35,7 @@ def perm_rule_list(request):
         rules_list = rules_list.filter(Q(name=keyword))
 
     rules_list, p, rules, page_range, current_page, show_first, show_end = pages(rules_list, request)
-        
+
     return my_render('jperm/perm_rule_list.html', locals(), request)
 
 
