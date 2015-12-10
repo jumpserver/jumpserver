@@ -259,23 +259,23 @@ def get_role_info(role_id, type="all"):
             asset_groups_obj.append(asset_group)
 
     if type == "all":
-        return {"rules": rule_push_obj,
-                "users": users_obj,
-                "user_groups": user_groups_obj,
-                "assets": assets_obj,
-                "asset_groups": asset_groups_obj,
+        return {"rules": set(rule_push_obj),
+                "users": set(users_obj),
+                "user_groups": set(user_groups_obj),
+                "assets": set(assets_obj),
+                "asset_groups": set(asset_groups_obj),
                 }
 
     elif type == "rule":
-        return rule_push_obj
+        return set(rule_push_obj)
     elif type == "user":
-        return users_obj
+        return set(users_obj)
     elif type == "user_group":
-        return user_groups_obj
+        return set(user_groups_obj)
     elif type == "asset":
-        return assets_obj
+        return set(assets_obj)
     elif type == "asset_group":
-        return asset_groups_obj
+        return set(asset_groups_obj)
     else:
         return u"不支持的查询"
 
