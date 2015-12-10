@@ -3,17 +3,20 @@
 from django.db.models import Q
 from paramiko import SSHException
 from jperm.perm_api import *
-from juser.user_api import gen_ssh_key
 
 from juser.models      import User, UserGroup
 from jasset.models     import Asset, AssetGroup
 from jperm.models      import PermRole, PermRule, PermSudo, PermPush
 from jumpserver.models import Setting
 
-from jperm.utils       import updates_dict, gen_keys, get_rand_pass
+from jperm.utils       import gen_keys
 from jperm.ansible_api import MyTask
 from jperm.perm_api    import get_role_info, get_role_push_host
 from jumpserver.api    import my_render, get_object, CRYPTOR
+
+# 设置PERM APP Log
+from jumpserver.settings import LOG_LEVEL
+logger = set_log(LOG_LEVEL, filename='jumpserver_perm.log')
 
 
 @require_role('admin')
@@ -89,6 +92,7 @@ def perm_rule_add(request):
 
         try:
             rule = get_object(PermRule, name=rule_name)
+
             if rule:
                 raise ServerError(u'授权规则 %s 已存在' % rule_name)
 
@@ -106,8 +110,6 @@ def perm_rule_add(request):
             # 获取需要授权的用户列表
             users_obj = [User.objects.get(id=user_id) for user_id in users_select]
             user_groups_obj = [UserGroup.objects.get(id=group_id) for group_id in user_groups_select]
-            # group_users_obj = [user for user in [group.user_set.all() for group in user_groups_obj]]
-            # calc_users = set(group_users_obj) | set(users_obj)
 
             # 获取授予的角色列表
             roles_obj = [PermRole.objects.get(id=role_id) for role_id in roles_select]
@@ -304,18 +306,29 @@ def perm_role_delete(request):
     if request.method == "POST":
         # 获取参数删除的role对象
         role_id = request.POST.get("id")
-        role = PermRole.objects.get(id=role_id)
+        role = get_object(PermRole, id=role_id)
         role_key = role.key_path
+        # 删除推送到主机上的role
+        recycle_assets = [push.asset for push in role.perm_push.all() if push.success]
+        logger.debug(u"delete role %s - delete_assets: %s" % (role.name, recycle_assets))
+        if recycle_assets:
+            recycle_resource = gen_resource(recycle_assets)
+            task = MyTask(recycle_resource)
+            msg = task.del_user(get_object(PermRole, id=role_id).name)
+            logger.info(u"delete role %s - execute delete user: %s" % (role.name, msg))
+            # TODO: 判断返回结果，处理异常
         # 删除存储的秘钥，以及目录
         key_files = os.listdir(role_key)
         for key_file in key_files:
             os.remove(os.path.join(role_key, key_file))
         os.rmdir(role_key)
-        # 数据库里删除记录
+        logger.info(u"delete role %s - delete role key directory: %s" % (role.name, role_key))
+        # 数据库里删除记录　TODO: 判断返回结果，处理异常
         role.delete()
         return HttpResponse(u"删除角色: %s" % role.name)
     else:
         return HttpResponse(u"不支持该操作")
+
 
 
 @require_role('admin')
@@ -609,15 +622,23 @@ def perm_sudo_delete(request):
 def perm_role_recycle(request):
     role_id = request.GET.get('role_id')
     asset_ids = request.GET.get('asset_id').split(',')
-    assets = []
+
+    # 仅有推送的角色才回收
+    assets = [get_object(Asset, id=asset_id) for asset_id in asset_ids]
+    recycle_assets = []
+    for asset in assets:
+        if True in [push.success for push in asset.perm_push.all()]:
+            recycle_assets.append(asset)
+    recycle_resource = gen_resource(recycle_assets)
+    task = MyTask(recycle_resource)
+    # TODO: 判断返回结果，处理异常
+    msg = task.del_user(get_object(PermRole, id=role_id).name)
+
     for asset_id in asset_ids:
         asset = get_object(Asset, id=asset_id)
         assets.append(asset)
         role = get_object(PermRole, id=role_id)
         PermPush.objects.filter(asset=asset, role=role).delete()
-
-    res = gen_resource(assets)
-    task = MyTask(res)
 
     return HttpResponse('删除成功')
 
