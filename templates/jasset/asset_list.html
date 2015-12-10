@@ -229,9 +229,10 @@
                 data: {},
                 success: function(data){
                     var dataArray = data.split(',');
-                    console.log(data+'a');
-                    console.log(dataArray);
-                    if (dataArray.length == 1 && data != 'error'){
+                    if (data == 'error' || data == '' || data == null || data == undefined){
+                        layer.alert('没有授权角色')
+                    }
+                    else if (dataArray.length == 1 && data != 'error'){
                         var title = 'Jumpserver Web Terminal' + '<span class="text-info"> '+ hostname +'</span>';
                         console.log(new_url+data);
                         layer.open({
@@ -242,9 +243,6 @@
                             area: ['628px', '452px'],
                             content: new_url+data
                         });
-                        //window.open(new_url + data, '', 'location=no, resizeable=no, height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,status=no');
-                    } else if (data == 'error' || data == '' || data == null || data == undefined){
-                        layer.alert('没有授权角色')
                     } else {
                         aUrl = '';
                         $.each(dataArray, function(index, value){
