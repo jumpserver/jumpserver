@@ -268,7 +268,7 @@ def send_mail_retry(request):
     跳板机地址： %s
     用户名：%s
     重设密码：%s/juser/forget_password/
-    请登录web重新生成key
+    请登录web点击个人信息页面重新生成ssh密钥
     """ % (URL, user.username, URL)
 
     try:
@@ -278,11 +278,14 @@ def send_mail_retry(request):
     return HttpResponse('发送成功')
 
 
+@defend_attack
 def forget_password(request):
     if request.method == 'POST':
+        defend_attack(request)
         email = request.POST.get('email', '')
         username = request.POST.get('username', '')
-        user = get_object(User, username=username, email=email)
+        name = request.POST.get('name', '')
+        user = get_object(User, username=username, email=email, name=name)
         if user:
             timestamp = int(time.time())
             hash_encode = PyCrypt.md5_crypt(str(user.uuid) + str(timestamp) + KEY)
@@ -393,6 +396,7 @@ def user_edit(request):
     return my_render('juser/user_edit.html', locals(), request)
 
 
+@require_role('user')
 def profile(request):
     user_id = request.user.id
     if not user_id:

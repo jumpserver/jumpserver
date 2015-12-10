@@ -484,5 +484,18 @@ def get_tmp_dir():
     mkdir(dir_name, mode=0777)
     return dir_name
 
+
+def defend_attack(func):
+    def _deco(request, *args, **kwargs):
+        if int(request.session.get('visit', 1)) > 5:
+            return HttpResponse('Forbidden', status=403)
+        request.session['visit'] = request.session.get('visit', 1) + 1
+        request.session.set_expiry(300)
+        logger.debug(request.session.get('visit'))
+        return func(request, *args, **kwargs)
+    return _deco
+
+
+
 CRYPTOR = PyCrypt(KEY)
 logger = set_log(LOG_LEVEL)

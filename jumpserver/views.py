@@ -164,6 +164,7 @@ def is_latest():
         pass
 
 
+@defend_attack
 def Login(request):
     """登录界面"""
     error = ''
@@ -207,11 +208,13 @@ def Login(request):
     return render_to_response('login.html', {'error': error})
 
 
+@require_role('user')
 def Logout(request):
     logout(request)
     return HttpResponseRedirect('/login/')
 
 
+@require_role('admin')
 def setting(request):
     header_title, path1 = '项目设置', '设置'
     setting_default = get_object(Setting, name='default')
