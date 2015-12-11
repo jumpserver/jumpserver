@@ -216,7 +216,8 @@ def print_prompt():
     3) Type \033[32mG/g\033[0m To Print The Server Groups You Available.
     4) Type \033[32mG/g(1-N)\033[0m To Print The Server Group Hosts You Available.
     5) Type \033[32mE/e\033[0m To Execute Command On Several Servers.
-    6) Type \033[32mQ/q\033[0m To Quit.
+    6) Type \033[32mE/e(1-N)\033[0m To Execute Command On select server group hosts.
+    7) Type \033[32mQ/q\033[0m To Quit.
     """
     print textwrap.dedent(msg)
 
@@ -314,12 +315,40 @@ def remote_exec_cmd(ip, port, username, password, cmd):
 
 
 def multi_remote_exec_cmd(hosts, username, cmd):
-    pool = Pool(processes=5)
+    pool = Pool(processes=10)
     for host in hosts:
-        username, password, ip, port = get_connect_item(username, host)
-        pool.apply_async(remote_exec_cmd, (ip, port, username, password, cmd))
+        remote_username, password, ip, port = get_connect_item(username, host)
+        pool.apply_async(remote_exec_cmd, (ip, port, remote_username, password, cmd))
     pool.close()
     pool.join()
+
+
+def exec_cmd_group_servers(username, gid):
+    group_attr = get_user_hostgroup(username)
+    groups = group_attr.keys()
+    hosts=[]
+    for g in groups:
+        if long(gid)==long(group_attr[g][0]):
+            hosts_attr = get_user_hostgroup_host(username, gid)
+            hosts = hosts_attr.keys()
+            color_print("You choosed server group: %s, include ips: %s" % (g, hosts), 'green')
+            color_print("Input the Command, The command will be Execute on servers, q/Q to quit.", 'green')
+            break
+
+    if hosts:
+        while True:
+            cmd = raw_input('\033[1;32mCmd(s): \033[0m')
+            if cmd in ['q', 'Q']:
+                break
+            exec_log_dir = os.path.join(LOG_DIR, 'exec_cmds')
+            if not os.path.isdir(exec_log_dir):
+                os.mkdir(exec_log_dir)
+                os.chmod(exec_log_dir, 0777)
+            filename = "%s/%s.log" % (exec_log_dir, time.strftime('%Y%m%d'))
+            f = open(filename, 'a')
+            f.write("DateTime: %s User: %s Host: %s Cmds: %s\n" %
+                    (time.strftime('%Y/%m/%d %H:%M:%S'), username, hosts, cmd))
+            multi_remote_exec_cmd(hosts, username, cmd)
 
 
 def exec_cmd_servers(username):
@@ -366,6 +395,7 @@ def exec_cmd_servers(username):
 if __name__ == '__main__':
     print_prompt()
     gid_pattern = re.compile(r'^g\d+$')
+    e_gid_pattern = re.compile(r'^e\d+$')
     try:
         while True:
             try:
@@ -387,6 +417,10 @@ if __name__ == '__main__':
                 continue
             elif option in ['E', 'e']:
                 exec_cmd_servers(LOGIN_NAME)
+            elif e_gid_pattern.match(option):
+                gid = option[1:].strip()
+                exec_cmd_group_servers(LOGIN_NAME, gid)
+                continue
             elif option in ['Q', 'q', 'exit']:
                 sys.exit()
             else:
