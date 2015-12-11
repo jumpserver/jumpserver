@@ -83,38 +83,31 @@
                         </div>
                     </div>
                     <div class="ibox-content">
-                            <div class="text-center" style="float: left;">
-                                <table class="table table-striped" id="ugedit" >
-                                   <thead>
-                                        <tr>
-                                            <th class="text-center">用户</th>
-                                        </tr>
-                                   </thead>
+                            <div class="text-center">
+                                <table class="table" id="agedit" >
+                                    <td class="text-navy text-left">用户</td>
+                                    <td class="text-navy text-right">用户组</td>
+                                    <tr>
+                                        <td>
+                                            <table class="table progress-striped text-left">
+                                            {% for user in users %}
+                                                <tr class="gradeX">
+                                                    <td> <a href="/jasset/asset_detail/?id={{ user.id }}">{{ user.name }}</a> </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </table>
+                                        </td>
+                                        <td>
+                                            <table class="table progress-striped text-right">
+                                            {% for group in user_groups %}
+                                                <tr class="gradeX-">
+                                                    <td> <a href="/jasset/asset_list/?group_id={{ group.id }}">{{ group.name }}</a> </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </table>
+                                        </td>
 
-                                <tbody>
-                                    {% for user in users %}
-                                        <tr class="gradeX">
-                                            <td class="text-center"> <a href="/juser/user_detail/?id={{ user.id }}">{{ user.name }}</a> </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                                </table>
-                            </div>
-                            <div class="text-center" style="float: right;">
-                                <table class="table table-striped" id="ugedit" >
-                                   <thead>
-                                        <tr>
-                                            <th class="text-center">用户组</th>
-                                        </tr>
-                                   </thead>
-
-                                <tbody>
-                                    {% for group in user_groups %}
-                                        <tr class="gradeX">
-                                            <td class="text-center"> <a href="/juser/user_list/?gid={{ group.id }}">{{ group.name }}</a> </td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
+                                    </tr>
                                 </table>
                             </div>
                     </div>
@@ -123,7 +116,7 @@
             <div class="col-sm-4">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <span class="label label-primary"><b>授权主机/主机组</b></span>
+                        <span class="label label-primary"><b>授权主机组/主机组</b></span>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -143,28 +136,31 @@
                         </div>
                     </div>
                     <div class="ibox-content">
-                            <div class="text-center" style="float:left;">
-                                <table class="table table-striped" id="agedit" >
-                                        <tr>
-                                            <th class="text-center">主机</th>
-                                        </tr>
-                                    {% for asset in assets %}
-                                        <tr class="gradeX">
-                                            <td class="text-center"> <a href="/jasset/asset_detail/?id={{ asset.id }}">{{ asset.ip }}</a> </td>
-                                        </tr>
-                                    {% endfor %}
-                                </table>
-                            </div>
-                            <div class="text-center" style="float:right;">
-                                <table class="table table-striped" id="agedit" >
-                                        <tr>
-                                            <th class="text-center">主机组</th>
-                                        </tr>
-                                    {% for group in asset_groups %}
-                                        <tr class="gradeX">
-                                            <td class="text-center"> <a href="/jasset/asset_list/?group_id={{ group.id }}">{{ group.name }}</a> </td>
-                                        </tr>
-                                    {% endfor %}
+                            <div class="text-center">
+                                <table class="table" id="agedit" >
+                                    <td class="text-navy text-left">主机</td>
+                                    <td class="text-navy text-right">主机组</td>
+                                    <tr>
+                                        <td>
+                                            <table class="table progress-striped text-left">
+                                            {% for asset in assets %}
+                                                <tr class="gradeX">
+                                                    <td> <a href="/jasset/asset_detail/?id={{ asset.id }}">{{ asset.ip }}</a> </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </table>
+                                        </td>
+                                        <td>
+                                            <table class="table progress-striped text-right">
+                                            {% for group in asset_groups %}
+                                                <tr class="gradeX-">
+                                                    <td> <a href="/jasset/asset_list/?group_id={{ group.id }}">{{ group.name }}</a> </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </table>
+                                        </td>
+
+                                    </tr>
                                 </table>
                             </div>
                     </div>
