@@ -302,7 +302,7 @@ def forget_password(request):
     return render_to_response('juser/forget_password.html', locals())
 
 
-@require_role('user')
+@defend_attack
 def reset_password(request):
     uuid_r = request.GET.get('uuid', '')
     timestamp = request.GET.get('timestamp', '')

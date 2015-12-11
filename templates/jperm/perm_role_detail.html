@@ -189,7 +189,8 @@
                         <div>
                             <div class="text-left">
                                 <table class="table table-striped" id="ugedit" >
-                                    <a class="btn btn-xs btn-danger del_muti"> 删除 </a>
+                                    <a class="btn btn-xs btn-danger del_muti"> 删除 </a><span> </span>
+                                    <a class="btn btn-xs btn-primary re_push"> 重新推送 </a>
                                     <thead>
                                         <tr>
                                             <th class="text-center">
@@ -318,6 +319,15 @@
         $('.push_muti').click(function(){
             var check_array = [];
             $(".gradeX input[name='asset_no_push_id']:checked").each(function() {
+                check_array.push($(this).attr("value"))
+            });
+            var url = '/jperm/role/push/?id={{ role.id }}&asset_id=' + check_array.join(',');
+            $(this).attr('href', url)
+        });
+
+        $('.re_push').click(function(){
+            var check_array = [];
+            $(".gradeX input[name='asset_id']:checked").each(function() {
                 check_array.push($(this).attr("value"))
             });
             var url = '/jperm/role/push/?id={{ role.id }}&asset_id=' + check_array.join(',');

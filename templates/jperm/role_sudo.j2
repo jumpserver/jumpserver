@@ -11,11 +11,13 @@ cp ${sudo_file} ${sudo_file_bak}
 add_cmd_alias() {
     sudo_file=$1
     {% for sudo_name, sudo_cmd in sudo_alias.items %}
-    if $(grep '^Cmnd_Alias {{ sudo_name }}' ${sudo_file} &> /dev/null); then
-        sed -i 's@^Cmnd_Alias.*{{ sudo_name }}.*@Cmnd_Alias {{ sudo_name }} = {{ sudo_cmd }}@g' ${sudo_file}
-    else
-        echo "Cmnd_Alias {{ sudo_name }} = {{ sudo_cmd }}" >> ${sudo_file}
-    fi
+        {% if sudo_name != 'ALL' %}
+        if $(grep '^Cmnd_Alias {{ sudo_name }}' ${sudo_file} &> /dev/null); then
+            sed -i 's@^Cmnd_Alias.*{{ sudo_name }}.*@Cmnd_Alias {{ sudo_name }} = {{ sudo_cmd }}@g' ${sudo_file}
+        else
+            echo "Cmnd_Alias {{ sudo_name }} = {{ sudo_cmd }}" >> ${sudo_file}
+        fi
+        {% endif %}
     {% endfor %}
 }
 

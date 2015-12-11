@@ -137,7 +137,7 @@ def gen_ssh_key(username, password='',
 
     if authorized_keys:
         auth_key_dir = os.path.join(home, username, '.ssh')
-        mkdir(auth_key_dir, mode=0700)
+        mkdir(auth_key_dir, username=username , mode=0700)
         authorized_key_file = os.path.join(auth_key_dir, 'authorized_keys')
         with open(private_key_file+'.pub') as pub_f:
             with open(authorized_key_file, 'w') as auth_f:
