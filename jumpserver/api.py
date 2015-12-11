@@ -487,13 +487,19 @@ def get_tmp_dir():
 
 def defend_attack(func):
     def _deco(request, *args, **kwargs):
-        if int(request.session.get('visit', 1)) > 5:
+        if int(request.session.get('visit', 1)) > 10:
+            logger.debug('请求次数: %s' % request.session.get('visit', 1))
             return HttpResponse('Forbidden', status=403)
         request.session['visit'] = request.session.get('visit', 1) + 1
         request.session.set_expiry(300)
         return func(request, *args, **kwargs)
     return _deco
 
+
+def get_mac_address():
+    node = uuid.getnode()
+    mac = uuid.UUID(int=node).hex[-12:]
+    return mac
 
 
 CRYPTOR = PyCrypt(KEY)
