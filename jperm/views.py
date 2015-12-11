@@ -53,21 +53,27 @@ def perm_rule_detail(request):
     header_title, path1, path2 = "授权规则", "规则管理", "规则详情"
 
     # 根据rule_id 取得rule对象
-    rule_id = request.GET.get("id")
-    rule_obj = PermRule.objects.get(id=rule_id)
-    user_obj = rule_obj.user.all()
-    user_group_obj = rule_obj.user_group.all()
-    asset_obj = rule_obj.asset.all()
-    asset_group_obj = rule_obj.asset_group.all()
-    roles_name = [role.name for role in rule_obj.role.all()]
+    try:
+        if request.method == "GET":
+            rule_id = request.GET.get("id")
+            if not rule_id:
+                raise ServerError("Rule Detail - no rule id get")
+            rule_obj = PermRule.objects.get(id=rule_id)
+            user_obj = rule_obj.user.all()
+            user_group_obj = rule_obj.user_group.all()
+            asset_obj = rule_obj.asset.all()
+            asset_group_obj = rule_obj.asset_group.all()
+            roles_name = [role.name for role in rule_obj.role.all()]
 
-    # 渲染数据
-    roles_name = ','.join(roles_name)
-    rule = rule_obj
-    users = user_obj
-    user_groups = user_group_obj
-    assets = asset_obj
-    asset_groups = asset_group_obj
+            # 渲染数据
+            roles_name = ','.join(roles_name)
+            rule = rule_obj
+            users = user_obj
+            user_groups = user_group_obj
+            assets = asset_obj
+            asset_groups = asset_group_obj
+    except ServerError, e:
+        logger.warning(e)
 
     return my_render('jperm/perm_rule_detail.html', locals(), request)
 
@@ -335,7 +341,6 @@ def perm_role_delete(request):
         return HttpResponse(u"不支持该操作")
 
 
-
 @require_role('admin')
 def perm_role_detail(request):
     """
@@ -350,20 +355,25 @@ def perm_role_detail(request):
     # 渲染数据
     header_title, path1, path2 = "系统角色", "角色管理", "角色详情"
 
-    if request.method == "GET":
-        role_id = request.GET.get("id")
-        role = get_object(PermRole, id=role_id)
-        role_info = get_role_info(role_id)
+    try:
+        if request.method == "GET":
+            role_id = request.GET.get("id")
+            if not role_id:
+                raise ServerError("not role id")
+            role = get_object(PermRole, id=role_id)
+            role_info = get_role_info(role_id)
 
-        # 渲染数据
-        rules = role_info.get("rules")
-        assets = role_info.get("assets")
-        asset_groups = role_info.get("asset_groups")
-        users = role_info.get("users")
-        user_groups = role_info.get("user_groups")
-        pushed_asset, need_push_asset = get_role_push_host(get_object(PermRole, id=role_id))
+            # 渲染数据
+            rules = role_info.get("rules")
+            assets = role_info.get("assets")
+            asset_groups = role_info.get("asset_groups")
+            users = role_info.get("users")
+            user_groups = role_info.get("user_groups")
+            pushed_asset, need_push_asset = get_role_push_host(get_object(PermRole, id=role_id))
+    except ServerError, e:
+        logger.warning(e)
 
-        return my_render('jperm/perm_role_detail.html', locals(), request)
+    return my_render('jperm/perm_role_detail.html', locals(), request)
 
 
 @require_role('admin')
