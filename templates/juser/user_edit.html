@@ -23,7 +23,7 @@
                         </div>
                     </div>
                     <div class="ibox-content">
-                        <form method="post" id="userForm" class="form-horizontal" action="/juser/user_edit/?id={{ user.id }}">
+                        <form method="post" id="userForm" class="form-horizontal" action="{% url 'user_edit' %}?id={{ user.id }}">
                             {% if error %}
                                 <div class="alert alert-warning text-center">{{ error }}</div>
                             {% endif %}

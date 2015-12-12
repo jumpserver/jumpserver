@@ -74,7 +74,7 @@
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    <a href="{% url 'user_edit' %}/?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a href="{% url 'user_edit' %}?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a value="{{ user.uuid }}" class="btn btn-xs btn-warning email">Email</a>
                                     <a value="{% url 'user_del' %}?id={{ user.id }}" class="btn btn-xs btn-danger del {% if user.username == 'admin' %} disabled {% endif %}">删除</a>
                                 </td>
