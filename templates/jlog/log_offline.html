@@ -52,10 +52,10 @@
                 <div class="ibox-content">
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
-                            <li><a href="/jlog/log_list/online/" class="text-center"><i class="fa fa-laptop"></i> 在线 </a></li>
-                            <li class="active"><a href="/jlog/log_list/offline/" class="text-center"><i class="fa fa-bar-chart-o"></i> 历史记录 </a></li>
-                            <li><a href="/jlog/log_list/exec/" class="text-center"><i class="fa fa-bar-chart-o"></i> 命令记录 </a></li>
-                            <li><a href="/jlog/log_list/file/" class="text-center"><i class="fa fa-bar-chart-o"></i> 上传下载 </a></li>
+                            <li><a href="{% url 'log_list' 'online' %}" class="text-center"><i class="fa fa-laptop"></i> 在线 </a></li>
+                            <li class="active"><a href="{% url 'log_list' 'offline' %}" class="text-center"><i class="fa fa-bar-chart-o"></i> 历史记录 </a></li>
+                            <li><a href="{% url 'log_list' 'exec' %}" class="text-center"><i class="fa fa-bar-chart-o"></i> 命令记录 </a></li>
+                            <li><a href="{% url 'log_list' 'file' %}" class="text-center"><i class="fa fa-bar-chart-o"></i> 上传下载 </a></li>
                         </ul>
                     </div>
                     <form class="form-inline" action="" method="get">
@@ -119,9 +119,9 @@
                                     <td class="text-center remote_ip"> {{ post.remote_ip }} </td>
                                     <td class="text-center"> {{ post.login_type }} </td>
                                     {% ifnotequal session_role_id 0 %}
-                                        <td class="text-center"><a href="/jlog/history/?id={{ post.id }}" class="log_command"> 统计 </a></td>
+                                        <td class="text-center"><a href="{% url 'log_history' %}?id={{ post.id }}" class="log_command"> 统计 </a></td>
                                     {% endifnotequal %}
-                                    <td class="text-center"><a value="/jlog/record/?id={{ post.id }}" class="log_record"> 回放 </a></td>
+                                    <td class="text-center"><a value="{% url 'log_record' %}?id={{ post.id }}" class="log_record"> 回放 </a></td>
                                     <td class="text-center start_time"> {{ post.start_time|date:"Y-m-d H:i:s"}} </td>
                                     <td class="text-center end_time"> {{ post.end_time|date:"Y-m-d H:i:s" }} </td>
                                 </tr>

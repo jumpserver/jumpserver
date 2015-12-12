@@ -169,7 +169,7 @@ def user_add_mail(user, kwargs):
         您的权限： %s
         您的web登录密码： %s
         您的ssh密钥文件密码： %s
-        密钥下载地址： %s/juser/down_key/?uuid=%s
+        密钥下载地址： %s/juser/key/down/?uuid=%s
         说明： 请登陆后再下载密钥！
     """ % (user.name, user.username, user_role.get(user.role, u'普通用户'),
            kwargs.get('password'), kwargs.get('ssh_key_pwd'), URL, user.uuid)
@@ -195,7 +195,7 @@ def get_display_msg(user, password, ssh_key_pwd, ssh_key_login_need, send_mail_n
         用户名：%s
         密码：%s
         密钥密码：%s
-        密钥下载url: %s/juser/down_key/?uuid=%s
+        密钥下载url: %s/juser/key/down/?uuid=%s
         该账号密码可以登陆web和跳板机。
         """ % (URL, user.username, password, ssh_key_pwd, URL, user.uuid)
     else:

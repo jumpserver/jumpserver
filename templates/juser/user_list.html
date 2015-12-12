@@ -24,7 +24,7 @@
 
                 <div class="ibox-content">
                     <div class="">
-                        <a href="/juser/user_add/" class="btn btn-sm btn-primary "> 添加用户 </a>
+                        <a href="{% url 'user_add' %}" class="btn btn-sm btn-primary "> 添加用户 </a>
                         <a id="del_btn" class="btn btn-sm btn-danger "> 删除所选 </a>
                         <form id="search_form" method="get" action="" class="pull-right mail-search">
                             <div class="input-group">
@@ -60,7 +60,7 @@
                                 <td class="text-center">
                                     <input type="checkbox" name="checked" value="{{ user.id }}">
                                 </td>
-                                <td class="text-center"><a href="../user_detail/?id={{ user.id }}">{{ user.username }}</a></td>
+                                <td class="text-center"><a href="{% url 'user_detail' %}?id={{ user.id }}">{{ user.username }}</a></td>
                                 <td class="text-center"> {{ user.name }} </td>
                                 <td class="text-center" title="{% for user_group in user.group.all %} {{ user_group.name }} {% endfor %}"> {{ user.group.all | groups2str  }} </td>
                                 <td class="text-center"> {{ user.id | get_role }}</td>
@@ -68,15 +68,15 @@
                                 <td class="text-center">{{ user.is_active | bool2str }}</td>
                                 <td class="text-center">
                                     {% if user.username|key_exist %}
-                                        <a  href="/juser/down_key/?uuid={{ user.uuid }}" >下载</a>
+                                        <a  href="{% url 'key_down' %}?uuid={{ user.uuid }}" >下载</a>
                                     {% else %}
                                         <span style="color: #586b7d">下载</span>
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
-                                    <a href="../user_edit/?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a href="{% url 'user_edit' %}/?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a value="{{ user.uuid }}" class="btn btn-xs btn-warning email">Email</a>
-                                    <a value="../user_del/?id={{ user.id }}" class="btn btn-xs btn-danger del {% if user.username == 'admin' %} disabled {% endif %}">删除</a>
+                                    <a value="{% url 'user_del' %}?id={{ user.id }}" class="btn btn-xs btn-danger del {% if user.username == 'admin' %} disabled {% endif %}">删除</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -124,7 +124,7 @@
                     check_array.push($(this).attr("value"))
                 });
                 console.log(check_array.join(","));
-                $.post("/juser/user_del/",
+                $.post("{% url 'user_del' %}",
                         {id: check_array.join(",")},
                         function(data){
                             $(".gradeX input:checked").closest("tr").remove();
@@ -136,7 +136,7 @@
         });
 
         $('.email').click(function(){
-            $.get('/juser/send_mail_retry/?uuid=' + $(this).attr('value'),
+            $.get('{% url "mail_retry" %}?uuid=' + $(this).attr('value'),
                     {},
                     function(data){
                         alert(data)

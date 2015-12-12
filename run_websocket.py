@@ -270,8 +270,11 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
 
     def run_cmd(self, command, pattern):
         self.runner.run('shell', command, pattern=pattern)
+        newline_pattern = re.compile(r'\n')
         for k, v in self.runner.results.items():
             for host, output in v.items():
+                output = newline_pattern.sub('<br />', output)
+                logger.debug(output)
                 if k == 'ok':
                     header = "<span style='color: green'>[ %s => %s]</span>\n" % (host, 'Ok')
                 else:

@@ -25,7 +25,7 @@
                 <div class="ibox-content">
                     <form id="asset_form">
                         <div class="col-sm-1" style="padding-left: 0">
-                            <a href="/jasset/asset_add/" class="btn btn-sm btn-primary "> 添加资产 </a>
+                            <a href="{% url 'asset_add' %}" class="btn btn-sm btn-primary "> 添加资产 </a>
                         </div>
 
                         <div class="col-sm-7" style="padding-left: 0px">
@@ -87,10 +87,10 @@
                                 <input type="text" class="form-control m-b input-sm" id="search_input" name="keyword" value="{{ keyword }}" placeholder="Search">
                                 <input type="text" style="display: none">
                                 <div class="input-group-btn">
-                                    <button id='search_btn' href="/jasset/asset_list/?search=true" type="button" class="btn btn-sm btn-primary search-btn"  onclick="change_info()">
+                                    <button id='search_btn' href="{% url 'asset_list' %}?search=true" type="button" class="btn btn-sm btn-primary search-btn"  onclick="change_info()">
                                         - 搜索 -
                                     </button>
-                                    <button type="button" href="/jasset/asset_list/?export=true" name="export" class="btn btn-sm btn-success search-btn-excel" onclick="return false">
+                                    <button type="button" href="{% url 'asset_list' %}?export=true" name="export" class="btn btn-sm btn-success search-btn-excel" onclick="return false">
                                         - 导出 -
                                     </button>
                                 </div>
@@ -121,7 +121,7 @@
                                     <td class="text-center" name="id" value="{{ asset.id }}" data-editable='false'>
                                         <input name="id" value="{{ asset.id }}" type="checkbox" class="i-checks">
                                     </td>
-                                    <td class="text-center hostname"> <a href="/jasset/asset_detail/?id={{ asset.id }}">{{ asset.hostname|default_if_none:"" }}</a></td>
+                                    <td class="text-center hostname"> <a href="{% url 'asset_detail' %}?id={{ asset.id }}">{{ asset.hostname|default_if_none:"" }}</a></td>
                                     <td class="text-center"> {{ asset.ip|default_if_none:"" }} </td>
                                     <td class="text-center"> {{ asset.idc.name|default_if_none:"" }} </td>
                                     <td class="text-center">{{ asset.group.all|group_str2 }}</td>
@@ -131,9 +131,9 @@
                                     <td class="text-center"> {{ asset.memory|default_if_none:"" }}{% if asset.memory %}G{% endif %}</td>
                                     <td class="text-center"> {{ asset.disk|get_disk_info }}{% if asset.memory %}G{% endif %}</td>
                                     <td class="text-center" data-editable='false'>
-                                        <a href="/jasset/asset_edit/?id={{ asset.id }}" class="btn btn-xs btn-info">编辑</a>
+                                        <a href="{% url 'asset_edit' %}?id={{ asset.id }}" class="btn btn-xs btn-info">编辑</a>
                                         <a value="{{ asset.id }}" class="conn btn btn-xs btn-warning">连接</a>
-                                        <a value="/jasset/asset_del/?id={{ asset.id }}" class="btn btn-xs btn-danger asset_del">删除</a>
+                                        <a value="{% url 'asset_del' %}?id={{ asset.id }}" class="btn btn-xs btn-danger asset_del">删除</a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -142,7 +142,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <input type="button" id="asset_del" class="btn btn-danger btn-sm"  name="del_button" value="删除"/>
-                                <a value="/jasset/asset_edit_batch/" type="button" class="btn btn-sm btn-warning iframe">修改</a>
+                                <a value="{% url 'asset_edit_batch' %}" type="button" class="btn btn-sm btn-warning iframe">修改</a>
                                 <input type="button" id="asset_update" class="btn btn-info btn-sm"  name="update_button" value="更新"/>
 {#                                <input type="button" id="asset_update_all" class="btn btn-primary btn-sm"  name="update_button" value="更新全部"/>#}
                                 <input type="button" id="exec_cmd" class="btn btn-sm btn-primary"  name="exec_cmd" value="执行命令"/>
@@ -174,8 +174,8 @@
         });
 
         $('#exec_cmd').click(function(){
-            var url = '/jperm/role/get/';
-            var new_url = '/exec_cmd/?role=';
+            var url = '{% url "role_get" %}';
+            var new_url = '{% url "exec_cmd" %}?role=';
             var check_array = [];
             $(".gradeX input:checked").closest('tr').find('.hostname a').each(function() {
                 check_array.push($(this).text())
@@ -194,7 +194,7 @@
                             title: title,
                             maxmin: true,
                             shade: false,
-                            area: ['800px', '600px'],
+                            area: ['725px', '600px'],
                             content: new_url+data+'&check_assets='+check_assets
                         });
                         //window.open(new_url + data, '', 'location=no, resizeable=no, height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,status=no');
@@ -219,9 +219,9 @@
         });
 
         $('.conn').click(function(){
-            var url='/jperm/role/get/?id=' + $(this).attr('value'); // 获取用户有权限的角色
+            var url='{% url "role_get" %}?id=' + $(this).attr('value'); // 获取用户有权限的角色
             var href = $(this).attr('href');
-            var new_url = '/jlog/web_terminal/?id=' + $(this).attr('value') + '&role='; // webterminal socket url
+            var new_url = '{% url "terminal" %}?id=' + $(this).attr('value') + '&role='; // webterminal socket url
             var hostname = $(this).closest('tr').find('.hostname a')[0].innerHTML;
             $.ajax({
                 type: 'GET',
@@ -338,7 +338,7 @@
             $.ajax({
                 type: "post",
                 data: {asset_id_all: asset_id_all},
-                url: "/jasset/asset_del/?arg=batch",
+                url: "{% url 'asset_del' %}?arg=batch",
                 success: function () {
                     parent.location.reload();
                 }
@@ -353,7 +353,7 @@
                 layer.msg('玩命更新中...', {time: 200000});
                 $.ajax({
                     type: "post",
-                    url: "/jasset/asset_update_batch/?arg=all",
+                    url: "{% url 'asset_update_batch' %}?arg=all",
                     success: function () {
                         parent.location.reload();
                     }
@@ -365,7 +365,7 @@
             $.ajax({
                 type: "post",
                 data: {asset_id_all: asset_id_all},
-                url: "/jasset/asset_update_batch/",
+                url: "{% url 'asset_add_batch' %}",
                 success: function () {
                     parent.location.reload();
                 }
@@ -386,7 +386,7 @@
 
     function change_info(){
         var args = $("#asset_form").serialize();
-        window.location = "/jasset/asset_list/?" + args
+        window.location = "{% url 'asset_list' %}?" + args
     }
 
     $("#search_input").keydown(function(e){

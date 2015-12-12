@@ -29,10 +29,10 @@
                                 <input type="text" class="form-control m-b input-sm" id="search_input" name="keyword" value="{{ keyword }}" placeholder="Search">
                                 <input type="text" style="display: none">
                                 <div class="input-group-btn">
-                                    <button id='search_btn' href="/jasset/asset_list/?search=true" type="button" class="btn btn-sm btn-primary search-btn"  onclick="change_info()">
+                                    <button id='search_btn' href="{% url 'asset_list' %}?search=true" type="button" class="btn btn-sm btn-primary search-btn"  onclick="change_info()">
                                         - 搜索 -
                                     </button>
-                                    <button type="button" href="/jasset/asset_list/?export=true" name="export" class="btn btn-sm btn-success search-btn-excel" onclick="return false">
+                                    <button type="button" href="{% url 'asset_list' %}?export=true" name="export" class="btn btn-sm btn-success search-btn-excel" onclick="return false">
                                         - 导出 -
                                     </button>
                                 </div>
@@ -63,7 +63,7 @@
                                     <td class="text-center" name="id" value="{{ asset.id }}" data-editable='false'>
                                         <input name="id" value="{{ asset.id }}" type="checkbox" class="i-checks">
                                     </td>
-                                    <td class="text-center hostname"> <a href="/jasset/asset_detail/?id={{ asset.id }}">{{ asset.hostname|default_if_none:"" }}</a></td>
+                                    <td class="text-center hostname"> <a href="{% url 'asset_detail' %}?id={{ asset.id }}">{{ asset.hostname|default_if_none:"" }}</a></td>
                                     <td class="text-center"> {{ asset.ip|default_if_none:"" }} </td>
                                     <td class="text-center"> {{ asset.idc.name|default_if_none:"" }} </td>
                                     <td class="text-center">{{ asset.group.all|group_str2 }}</td>

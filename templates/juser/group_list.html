@@ -25,7 +25,7 @@
 
                 <div class="ibox-content">
                     <div class="">
-                    <a href="/juser/group_add/" class="btn btn-sm btn-primary "> 添加用户组 </a>
+                    <a href="{% url 'user_group_add' %}" class="btn btn-sm btn-primary "> 添加用户组 </a>
                     <a id="del_btn" class="btn btn-sm btn-danger "> 删除所选 </a>
                     <form id="search_form" method="get" action="" class="pull-right mail-search">
                         <div class="input-group">
@@ -59,12 +59,12 @@
                                 </td>
                                 <td class="text-center"> {{ group.name }} </td>
                                 <td class="text-center">
-                                    <a href="/juser/user_list/?gid={{ group.id }}"> {{ group.id | members_count }}</a>
+                                    <a href="{% url 'user_list' %}?gid={{ group.id }}"> {{ group.id | members_count }}</a>
                                 </td>
                                 <td class="text-center"> {{ group.comment }} </td>
                                 <td class="text-center">
-                                    <a href="../group_edit/?id={{ group.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <a value="../group_del/?id={{ group.id }}" class="btn btn-xs btn-danger del">删除</a>
+                                    <a href="{% url 'user_group_edit' %}?id={{ group.id }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a value="{% url 'user_group_del' %}?id={{ group.id }}" class="btn btn-xs btn-danger del">删除</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -112,7 +112,7 @@
                 $(".gradeX input:checked").each(function() {
                     check_array.push($(this).attr("value"))
                 });
-                $.get("/juser/group_del/",
+                $.get("{% url 'user_group_del' %}",
                     {id: check_array.join(",")},
                     function(result){
                         alert(result);

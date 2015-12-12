@@ -127,14 +127,6 @@ def log_record(request):
             return HttpResponse('无日志记录!')
 
 
-@require_role('user')
-def web_terminal(request):
-    asset_id = request.GET.get('id')
-    role_name = request.GET.get('role')
-    web_terminal_uri = 'ws://%s/terminal?id=%s&role=%s' % (WEB_SOCKET_HOST, asset_id, role_name)
-    return render_to_response('jlog/web_terminal.html', locals())
-
-
 @require_role('admin')
 def log_detail(request, offset):
     log_id = request.GET.get('id')

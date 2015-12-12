@@ -81,7 +81,7 @@ def group_edit(request):
             db_update_group(id=group_id, name=name, comment=comment, asset_select=asset_select)
             smg = u"主机组 %s 添加成功" % name
 
-        return HttpResponseRedirect('/jasset/group_list')
+        return HttpResponseRedirect(reverse('asset_group_list'))
 
     return my_render('jasset/group_edit.html', locals(), request)
 
@@ -246,7 +246,7 @@ def asset_edit(request):
             else:
                 emg = u'主机 %s 修改失败' % ip
                 return my_render('jasset/error.html', locals(), request)
-            return HttpResponseRedirect('/jasset/asset_detail/?id=%s' % asset_id)
+            return HttpResponseRedirect(reverse('asset_detail')+'?id=%s' % asset_id)
 
     return my_render('jasset/asset_edit.html', locals(), request)
 
@@ -451,10 +451,10 @@ def asset_update(request):
     asset = get_object(Asset, id=asset_id)
     name = request.user.username
     if not asset:
-        return HttpResponseRedirect('/jasset/asset_detail/?id=%s' % asset_id)
+        return HttpResponseRedirect(reverse('asset_detail')+'?id=%s' % asset_id)
     else:
         asset_ansible_update([asset], name)
-    return HttpResponseRedirect('/jasset/asset_detail/?id=%s' % asset_id)
+    return HttpResponseRedirect(reverse('asset_detail')+'/?id=%s' % asset_id)
 
 
 @require_role('admin')
@@ -494,7 +494,7 @@ def idc_add(request):
             else:
                 idc_form.save()
                 smg = u'IDC: %s添加成功' % idc_name
-            return HttpResponseRedirect("/jasset/idc_list/")
+            return HttpResponseRedirect(reverse('idc_list'))
     else:
         idc_form = IdcForm()
     return my_render('jasset/idc_add.html', locals(), request)
@@ -528,7 +528,7 @@ def idc_edit(request):
         idc_form = IdcForm(request.POST, instance=idc)
         if idc_form.is_valid():
             idc_form.save()
-            return HttpResponseRedirect("/jasset/idc_list/")
+            return HttpResponseRedirect(reverse('idc_list'))
     else:
         idc_form = IdcForm(instance=idc)
         return my_render('jasset/idc_edit.html', locals(), request)
@@ -545,7 +545,7 @@ def idc_del(request):
     for idc_id in idc_id_list:
         IDC.objects.filter(id=idc_id).delete()
 
-    return HttpResponseRedirect('/jasset/idc_list/')
+    return HttpResponseRedirect(reverse('idc_list'))
 
 
 @require_role('admin')

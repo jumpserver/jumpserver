@@ -92,7 +92,7 @@
                                             <table class="table progress-striped text-left">
                                             {% for user in users %}
                                                 <tr class="gradeX">
-                                                    <td> <a href="/jasset/asset_detail/?id={{ user.id }}">{{ user.name }}</a> </td>
+                                                    <td> <a href="{% url 'asset_detail' %}?id={{ user.id }}">{{ user.name }}</a> </td>
                                                 </tr>
                                             {% endfor %}
                                             </table>
@@ -101,7 +101,7 @@
                                             <table class="table progress-striped text-right">
                                             {% for group in user_groups %}
                                                 <tr class="gradeX-">
-                                                    <td> <a href="/jasset/asset_list/?group_id={{ group.id }}">{{ group.name }}</a> </td>
+                                                    <td> <a href="{% url 'asset_list' %}?group_id={{ group.id }}">{{ group.name }}</a> </td>
                                                 </tr>
                                             {% endfor %}
                                             </table>
@@ -145,7 +145,7 @@
                                             <table class="table progress-striped text-left">
                                             {% for asset in assets %}
                                                 <tr class="gradeX">
-                                                    <td> <a href="/jasset/asset_detail/?id={{ asset.id }}">{{ asset.ip }}</a> </td>
+                                                    <td> <a href="{% url 'asset_list' %}?id={{ asset.id }}">{{ asset.ip }}</a> </td>
                                                 </tr>
                                             {% endfor %}
                                             </table>
@@ -154,7 +154,7 @@
                                             <table class="table progress-striped text-right">
                                             {% for group in asset_groups %}
                                                 <tr class="gradeX-">
-                                                    <td> <a href="/jasset/asset_list/?group_id={{ group.id }}">{{ group.name }}</a> </td>
+                                                    <td> <a href="{% url 'asset_list' %}?group_id={{ group.id }}">{{ group.name }}</a> </td>
                                                 </tr>
                                             {% endfor %}
                                             </table>

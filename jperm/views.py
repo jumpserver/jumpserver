@@ -140,7 +140,7 @@ def perm_rule_add(request):
             rule.save()
 
             msg = u"添加授权规则：%s" % rule.name
-            return HttpResponseRedirect('/jperm/rule/')
+            return HttpResponseRedirect(reverse('rule_list'))
         except ServerError, e:
             error = e
     return my_render('jperm/perm_rule_add.html', locals(), request)
@@ -296,7 +296,7 @@ def perm_role_add(request):
             role.save()
             role.sudo = sudos_obj
             msg = u"添加角色: %s" % name
-            return HttpResponseRedirect('/jperm/role/')
+            return HttpResponseRedirect(reverse('role_list'))
         except ServerError, e:
             error = e
 
@@ -414,7 +414,7 @@ def perm_role_edit(request):
 
             role.save()
             msg = u"更新系统角色： %s" % role.name
-            return HttpResponseRedirect('/jperm/role/')
+            return HttpResponseRedirect(reverse('role_list'))
         except ServerError, e:
             error = e
 

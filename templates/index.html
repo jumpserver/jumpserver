@@ -13,7 +13,7 @@
                     <h5>用户总数</h5>
                 </div>
                 <div class="ibox-content">
-                    <h1 class="no-margins"><a href="/juser/user_list/">{{ users.count}}</a></h1>
+                    <h1 class="no-margins"><a href="{% url 'user_list' %}">{{ users.count}}</a></h1>
                     <small>All user</small>
                 </div>
             </div>
@@ -25,7 +25,7 @@
                     <h5>主机总数</h5>
                 </div>
                 <div class="ibox-content">
-                    <h1 class="no-margins"><a href="/jasset/host_list/">{{ hosts.count }}</a></h1>
+                    <h1 class="no-margins"><a href="{% url 'asset_list' %}">{{ hosts.count }}</a></h1>
                     <small>All host</small>
                 </div>
             </div>
@@ -38,7 +38,7 @@
                     <h5>在线用户</h5>
                 </div>
                 <div class="ibox-content">
-                    <h1 class="no-margins"><a href="/jlog/log_list/online/"> <span id="online_users">{{ online_user | length }}</span></a></h1>
+                    <h1 class="no-margins"><a href="{% url 'log_list' 'online' %}"> <span id="online_users">{{ online_user | length }}</span></a></h1>
 {#                    <div class="stat-percent font-bold text-navy">{{ percent_online_user }} <i class="fa fa-level-up"></i></div>#}
                     <small>Online user</small>
                 </div>
@@ -52,7 +52,7 @@
                     <h5>已连接服务器</h5>
                 </div>
                 <div class="ibox-content">
-                        <h1 class="no-margins"><a href="/jlog/log_list/online/"> <span id="online_hosts">{{ online_host | length }}</span></a></h1>
+                        <h1 class="no-margins"><a href="{% url 'log_list' 'online' %}"> <span id="online_hosts">{{ online_host | length }}</span></a></h1>
                     <small>Connected host</small>
                 </div>
             </div>

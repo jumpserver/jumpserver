@@ -11,7 +11,7 @@
                     <div class="ibox-title">
                         <span class="text text-primary"><b>{{ asset.ip }}</b></span>
                         <div class="ibox-tools">
-                            <a class="" href="/jasset/asset_update/?id={{ asset.id }}">
+                            <a class="" href="{% url 'asset_update' %}?id={{ asset.id }}">
                                 <i class="fa fa-refresh"></i>
                             </a>
                             <a class="collapse-link">
@@ -200,13 +200,13 @@
                                         <td class="text-navy">系统角色</td>
                                         {% for perm in user_perm %}
                                             <tr>
-                                                <td class="text-navy"><a href="/juser/user_detail/?id={{ perm.0.id }}">{{ perm.0 }}</a></td>
+                                                <td class="text-navy"><a href="{% url 'user_detail' %}?id={{ perm.0.id }}">{{ perm.0 }}</a></td>
                                                 <td>
                                                     <table class="table">
                                                     {% if perm.1 %}
                                                          {% for role in perm.1 %}
                                                             <tr>
-                                                                <td class="text-navy"><a href="/jperm/role/perm_role_detail/?id={{ role.id }}">{{ role }}</a></td>
+                                                                <td class="text-navy"><a href="{% url 'role_detail' %}?id={{ role.id }}">{{ role }}</a></td>
                                                             </tr>
                                                          {% endfor %}
                                                     {% endif %}
@@ -224,7 +224,7 @@
                                             {% for user_group in user_group_perm %}
                                                 <tr>
                                                     <td class="text-navy">{{ user_group }}</td>
-                                                    <td class="text-navy"><a href="/juser/user_list/?gid={{ user_group.id }}">详情</a></td>
+                                                    <td class="text-navy"><a href="{% url 'user_group_list' %}?gid={{ user_group.id }}">详情</a></td>
                                                 </tr>
                                             {% endfor %}
                                         </table>
@@ -238,7 +238,7 @@
                                             {% for rule in user_rule_perm %}
                                                 <tr>
                                                     <td class="text-navy">{{ rule }}</td>
-                                                    <td class="text-navy"><a href="/jperm/perm_rule_detail/?id={{ rule.id }}">详情</a></td>
+                                                    <td class="text-navy"><a href="{% url 'rule_detail' %}/?id={{ rule.id }}">详情</a></td>
                                                 </tr>
                                             {% endfor %}
                                         </table>
@@ -251,7 +251,7 @@
                     </div>
                     <div class="ibox-title">
                         <h5>主机修改记录</h5>
-                        <a href="/jasset/asset_edit/?id={{ asset.id }}" data-toggle="tooltip" class="text-success pull-center" data-placement="bottom" title="修改">&nbsp&nbsp&nbsp&nbsp点击修改</a>
+                        <a href="{% url 'asset_edit' %}?id={{ asset.id }}" data-toggle="tooltip" class="text-success pull-center" data-placement="bottom" title="修改">&nbsp&nbsp&nbsp&nbsp点击修改</a>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>

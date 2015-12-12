@@ -15,7 +15,7 @@
         <div id="footer">
           <div class="content">
             <input type="text" id="pattern" value="{{ check_assets }}" placeholder="Ansible Pattern">
-            <input type="text" id="command" placeholder="Command to execute">
+            <input type="text" id="command" placeholder="Command to execute" onkeypress="if(event.keyCode==13){sendMessage()}">
             <input type="button" id="send_btn" value="Send" onclick="sendMessage()">
           </div>
         </div>
@@ -92,7 +92,7 @@
 {#    background-color: #ecf0f1;#}
 {#    border: #000 solid 5px;#}
     background: #000;
-    width: 800px;
+    width: 720px;
     box-shadow: rgba(0, 0, 0, 0.8) 2px 2px 20px;
     color: #fff;
   }
@@ -109,7 +109,7 @@
     position: fixed;
     bottom: 0;
     height: 50px;
-    width: 800px;
+    width: 720px;
 {#    border: #000 solid -10px;#}
     background-color: #2980b9;
   }
@@ -130,7 +130,7 @@
   }
 
   .content {
-    width: 800px;
+    width: 720px;
     margin-left: 5px;
   }
 
@@ -169,11 +169,11 @@
   }
 
   @media(max-width: 1000px) {
-    .content { width: 90%; }
+    .content { width: 100%; }
   }
 
   @media(max-width: 780px) {
-    #footer { height: 91px; }
+    #footer { height: 51px; }
     #chat_box { padding-bottom: 91px; }
 
     #user { width: 100%; }
@@ -192,6 +192,7 @@
     }
   }
 </style>
+
 </body>
 <div></div>
 <div></div>

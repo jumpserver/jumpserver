@@ -25,6 +25,7 @@ from jumpserver.models import Setting
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.mail import send_mail
+from django.core.urlresolvers import reverse
 
 
 def set_log(level, filename='jumpserver.log'):
@@ -265,15 +266,15 @@ def require_role(role='user'):
         def __deco(request, *args, **kwargs):
             request.session['pre_url'] = request.path
             if not request.user.is_authenticated():
-                return HttpResponseRedirect('/login/')
+                return HttpResponseRedirect(reverse('login'))
             if role == 'admin':
                 # if request.session.get('role_id', 0) < 1:
                 if request.user.role == 'CU':
-                    return HttpResponseRedirect('/')
+                    return HttpResponseRedirect(reverse('index'))
             elif role == 'super':
                 # if request.session.get('role_id', 0) < 2:
                 if request.user.role in ['CU', 'GA']:
-                    return HttpResponseRedirect('/')
+                    return HttpResponseRedirect(reverse('index'))
             return func(request, *args, **kwargs)
 
         return __deco
@@ -350,7 +351,7 @@ def view_splitter(request, su=None, adm=None):
     elif is_role_request(request, 'admin'):
         return adm(request)
     else:
-        return HttpResponseRedirect('/login/')
+        return HttpResponseRedirect(reverse('login'))
 
 
 def validate(request, user_group=None, user=None, asset_group=None, asset=None, edept=None):

@@ -51,7 +51,7 @@
                                     <tr>
                                         <td class="text-navy">key</td>
                                         {% if user.username|key_exist %}
-                                        <td><a  href="/juser/down_key/?id={{ user.id }}" >下载</a></td>
+                                        <td><a  href="{% url 'key_down' %}?id={{ user.id }}" >下载</a></td>
                                         {% else %}
                                         <td><span style="color: #586b7d">下载</span></td>
                                         {% endif %}
@@ -78,7 +78,7 @@
                                              <table class="table">
                                                  {% for group in user.group.all %}
                                                     <tr>
-                                                        <td><a href="/jperm/perm_edit/?id={{ group.id }}">{{ group.name }}</a></td>
+                                                        <td><a href="{% url 'user_group_list' %}?id={{ group.id }}">{{ group.name }}</a></td>
                                                     </tr>
                                                  {% endfor %}
                                              </table>
@@ -96,7 +96,7 @@
                                              <table class="table">
                                                  {% for group in  user_perm_info.asset_group.keys%}
                                                     <tr>
-                                                        <td><a href="/jasset/group_list/?id={{ group.id }}">{{ group.name }}</a></td>
+                                                        <td><a href="{% url 'user_group_list' %}?id={{ group.id }}">{{ group.name }}</a></td>
                                                     </tr>
                                                  {% endfor %}
                                              </table>
@@ -108,7 +108,7 @@
                                              <table class="table">
                                                  {% for rule in  user_perm_info.rule%}
                                                     <tr>
-                                                        <td><a href="/jperm/role/?id={{ rule.id }}">{{ rule.name }}</a></td>
+                                                        <td><a href="{% url 'role_list' %}?id={{ rule.id }}">{{ rule.name }}</a></td>
                                                     </tr>
                                                  {% endfor %}
                                              </table>
@@ -149,7 +149,7 @@
                                     <div class="col-xs-3 date">
                                         <i class="fa fa-info"></i>
                                         <b>
-                                            <a href="/jperm/role/&id={{ role.id }}">{{ role.name }}</a></b>
+                                            <a href="{% url 'role_list' %}?id={{ role.id }}">{{ role.name }}</a></b>
                                         <br>
                                         <small class="text-navy">共: {{ assets.asset | length }}台</small>
                                     </div>
@@ -158,7 +158,7 @@
                                             <strong>{{ role.comment }}</strong></p>
                                         <p>
                                             {% for asset in assets.asset %}
-                                                <a href="/jasset/asset_list/?id={{ asset.id }}">{{ asset.hostname }}</a><br>
+                                                <a href="{% url 'asset_list' %}?id={{ asset.id }}">{{ asset.hostname }}</a><br>
                                             {% endfor %}
                                         </p>
                                         <p></p>

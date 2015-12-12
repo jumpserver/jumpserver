@@ -25,7 +25,7 @@
 
                     <div class="ibox-content" style="line-height: 26px">
                         <span style="font-size: large">欢</span>迎使用<span class="text-navy"><b>Jumpserver</b></span>跳板机系统，
-                        首先需要 <b><a href="/juser/down_key/?id={{ user.id }}">下载</a></b> 登录跳板机的SSH密钥文件，然后导入到工具或者ssh命令指定密钥文件(确保密钥文件权限600)，输入收到的密钥密码，登录跳板机。
+                        首先需要 <b><a href="{% url 'key_down' %}?id={{ user.id }}">下载</a></b> 登录跳板机的SSH密钥文件，然后导入到工具或者ssh命令指定密钥文件(确保密钥文件权限600)，输入收到的密钥密码，登录跳板机。
                         登录后根据提示进行操作。跳板机web界面支持修改密码、个人信息和上传下载文件等功能，可以向管理员申请权限。
                     </div>
                 </div>

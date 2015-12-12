@@ -36,7 +36,7 @@
                                     {% for rule in rules %}
                                         <tr class="gradeX">
                                             <td class="text-left"> {{ rule.date_added | date:"Y-m-d H:i:s"}} </td>
-                                            <td class="text-right"> <a href="/jperm/perm_rule_detail/?id={{ rule.id }}">{{ rule.name }}</a> </td>
+                                            <td class="text-right"> <a href="{% url 'rule_detail' %}?id={{ rule.id }}">{{ rule.name }}</a> </td>
                                         </tr>
                                     {% endfor %}
                                 </table>
@@ -77,7 +77,7 @@
                                             <table class="table progress-striped text-left">
                                             {% for user in users %}
                                                 <tr class="gradeX">
-                                                    <td> <a href="/jasset/asset_detail/?id={{ user.id }}">{{ user.name }}</a> </td>
+                                                    <td> <a href="{% url 'asset_detail' %}?id={{ user.id }}">{{ user.name }}</a> </td>
                                                 </tr>
                                             {% endfor %}
                                             </table>
@@ -86,7 +86,7 @@
                                             <table class="table progress-striped text-right">
                                             {% for group in user_groups %}
                                                 <tr class="gradeX-">
-                                                    <td> <a href="/jasset/asset_list/?group_id={{ group.id }}">{{ group.name }}</a> </td>
+                                                    <td> <a href="{% url 'asset_list' %}?group_id={{ group.id }}">{{ group.name }}</a> </td>
                                                 </tr>
                                             {% endfor %}
                                             </table>
@@ -130,7 +130,7 @@
                                             <table class="table progress-striped text-left">
                                             {% for asset in assets %}
                                                 <tr class="gradeX">
-                                                    <td> <a href="/jasset/asset_detail/?id={{ asset.id }}">{{ asset.ip }}</a> </td>
+                                                    <td> <a href="{% url 'asset_detail' %}?id={{ asset.id }}">{{ asset.ip }}</a> </td>
                                                 </tr>
                                             {% endfor %}
                                             </table>
@@ -139,7 +139,7 @@
                                             <table class="table progress-striped text-right">
                                             {% for group in asset_groups %}
                                                 <tr class="gradeX-">
-                                                    <td> <a href="/jasset/asset_list/?group_id={{ group.id }}">{{ group.name }}</a> </td>
+                                                    <td> <a href="{% url 'asset_list' %}?group_id={{ group.id }}">{{ group.name }}</a> </td>
                                                 </tr>
                                             {% endfor %}
                                             </table>
@@ -207,7 +207,7 @@
                                             {% else %}
                                             <td class="text-center" style="color: #ec4758;cursor: help" title="{{ info.result }}" >{{ info.success | yesno:"成功,失败,未知" }} </td>
                                             {% endif %}
-                                            <td class="text-center" ><a class="fa fa-times del" href="/jperm/role/recycle/?role_id={{ role.id }}&asset_id={{ asset.id }}" style="color: #ec4758;"></a></td>
+                                            <td class="text-center" ><a class="fa fa-times del" href="{% url 'role_recycle' %}?role_id={{ role.id }}&asset_id={{ asset.id }}" style="color: #ec4758;"></a></td>
                                         </tr>
                                     {% endfor %}
                                     </tbody>

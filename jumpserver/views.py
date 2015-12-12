@@ -79,7 +79,7 @@ def get_count_by_date(date_li, item):
 @require_role(role='user')
 def index_cu(request):
     username = request.user.username
-    return HttpResponseRedirect('/juser/user_detail/')
+    return HttpResponseRedirect(reverse('user_detail'))
 
 
 @require_role(role='user')
@@ -169,7 +169,7 @@ def Login(request):
     """登录界面"""
     error = ''
     if request.user.is_authenticated():
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('index'))
     if request.method == 'GET':
         return render_to_response('login.html')
     else:
@@ -211,7 +211,7 @@ def Login(request):
 @require_role('user')
 def Logout(request):
     logout(request)
-    return HttpResponseRedirect('/login/')
+    return HttpResponseRedirect(reverse('index'))
 
 
 @require_role('admin')
@@ -343,3 +343,11 @@ def exec_cmd(request):
     check_assets = request.GET.get('check_assets', '')
     web_terminal_uri = 'ws://%s/exec?role=%s' % (WEB_SOCKET_HOST, role)
     return my_render('exec_cmd.html', locals(), request)
+
+
+@require_role('user')
+def web_terminal(request):
+    asset_id = request.GET.get('id')
+    role_name = request.GET.get('role')
+    web_terminal_uri = 'ws://%s/terminal?id=%s&role=%s' % (WEB_SOCKET_HOST, asset_id, role_name)
+    return render_to_response('jlog/web_terminal.html', locals())

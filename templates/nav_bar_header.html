@@ -22,7 +22,7 @@
                     {% for apply in apply_info %}
                         <li>
                             <div class="dropdown-messages-box">
-                                <a href="/jperm/apply_show/online/" class="pull-left">
+                                <a href="" class="pull-left">
                                     <img alt="image" class="img-circle" src="/static/img/a4.jpg">
                                 </a>
                                 <div class="media-body">
@@ -38,7 +38,7 @@
                     {% endfor %}
                         <li>
                             <div class="text-center link-block">
-                                <a href="/jperm/apply_show/online/">
+                                <a href="">
                                     <i class="fa fa-envelope"></i> <strong>Read All Messages</strong>
                                 </a>
                             </div>
@@ -71,7 +71,7 @@
 {#            </ul>#}
 {#        </li>#}
         <li>
-            <a href="/logout/">
+            <a href="{% url 'logout' %}">
                 <i class="fa fa-sign-out"></i> Log out
             </a>
         </li>
