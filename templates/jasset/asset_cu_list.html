@@ -110,8 +110,8 @@
         });
 
         $('#exec_cmd').click(function(){
-            var url = '/jperm/role/get/';
-            var new_url = '/exec_cmd/?role=';
+            var url = '{% url "role_get" %} ';
+            var new_url = '{% url "exec_cmd" %}?role=';
             var check_array = [];
             $(".gradeX input:checked").closest('tr').find('.hostname a').each(function() {
                 check_array.push($(this).text())
@@ -155,9 +155,9 @@
         });
 
         $('.conn').click(function(){
-            var url='/jperm/role/get/?id=' + $(this).attr('value');
+            var url='{% url "role_get" %}?id=' + $(this).attr('value');
             var href = $(this).attr('href');
-            var new_url = '/jlog/web_terminal/?id=' + $(this).attr('value') + '&role=';
+            var new_url = '{% url "terminal" %}?id=' + $(this).attr('value') + '&role=';
             var hostname = $(this).closest('tr').find('.hostname a')[0].innerHTML;
             $.ajax({
                 type: 'GET',
@@ -263,50 +263,6 @@
     });
 
 
-    $('#asset_del').click(function () {
-        var asset_id_all = getIDall();
-        if (asset_id_all == ''){
-            alert("请至少选择一行!");
-            return false;
-        }
-        if (confirm("确定删除?")) {
-            $.ajax({
-                type: "post",
-                data: {asset_id_all: asset_id_all},
-                url: "/jasset/asset_del/?arg=batch",
-                success: function () {
-                    parent.location.reload();
-                }
-            });
-        }
-    });
-
-    $('#asset_update').click(function () {
-        var asset_id_all = getIDall();
-        if (asset_id_all == ''){
-            if (confirm("更新全部资产信息?")) {
-                layer.msg('玩命更新中...', {time: 200000});
-                $.ajax({
-                    type: "post",
-                    url: "/jasset/asset_update_batch/?arg=all",
-                    success: function () {
-                        parent.location.reload();
-                    }
-                });
-            }
-        }
-        else {
-            layer.msg('玩命更新中...', {time: 200000});
-            $.ajax({
-                type: "post",
-                data: {asset_id_all: asset_id_all},
-                url: "/jasset/asset_update_batch/",
-                success: function () {
-                    parent.location.reload();
-                }
-            });
-        }
-    });
 
 {#    $('#asset_update_all').click(function () {#}
 {#        layer.msg('玩命更新中...', {time: 200000});#}
@@ -319,10 +275,6 @@
 {#        });#}
 {#    });#}
 
-    function change_info(){
-        var args = $("#asset_form").serialize();
-        window.location = "/jasset/asset_list/?" + args
-    }
 
     $("#search_input").keydown(function(e){
         if(e.keyCode==13){
