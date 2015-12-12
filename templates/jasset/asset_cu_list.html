@@ -159,14 +159,25 @@
             var href = $(this).attr('href');
             var new_url = '{% url "terminal" %}?id=' + $(this).attr('value') + '&role=';
             var hostname = $(this).closest('tr').find('.hostname a')[0].innerHTML;
+            var title = 'Jumpserver Web Terminal' + '<span class="text-info"> '+ hostname +'</span>';
             $.ajax({
                 type: 'GET',
                 url: url,
                 data: {},
                 success: function(data){
                     var dataArray = data.split(',');
-                    if (dataArray.length == 1 && data != 'error'){
-                        var title = 'Jumpserver Web Terminal' + '<span class="text-info"> '+ hostname +'</span>';
+                    if (data == 'error' || data == '' || data == null || data == undefined){
+                        layer.alert('没有授权角色')
+                    } else if (dataArray.length == 1 && data != 'error' && navigator.platform == 'Win32') {
+                        layer.open({
+                            type: 2,
+                            title: title,
+                            maxmin: true,
+                            shade: false,
+                            area: ['628px', '420px'],
+                            content: new_url + data
+                        });
+                    } else if (dataArray.length == 1 && data != 'error'){
                         layer.open({
                             type: 2,
                             title: title,
@@ -176,14 +187,11 @@
                             content: new_url+data
                         });
                         //window.open(new_url + data, '', 'location=no, resizeable=no, height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,status=no');
-                    } else if (dataArray.length == '1' && data == 'error'){
-                        layer.alert('没有授权角色')
                     } else {
                         aUrl = '';
                         $.each(dataArray, function(index, value){
                             aUrl += '<a onclick="windowOpen(this); return false" class="btn btn-xs btn-primary newa" href=' + new_url + value + ' value=' + hostname +  '>' + value  + '</a> '
                         });
-                        console.log(aUrl);
                         layer.alert(aUrl, {
                             skin: 'layui-layer-molv',
                             title: '多个角色，请选择一个连接',
