@@ -34,9 +34,9 @@
                                     <option value="">机房</option>
                                     {% for idc in idc_all %}
                                         {% ifequal idc.name idc_name %}
-                                            <option value="{{idc.name}}" selected> {{ idc.name }}</option>
+                                            <option value="{{idc.name}}" selected> {{ idc.name|slice:":20" }}</option>
                                         {% else %}
-                                            <option value="{{idc.name}}"> {{ idc.name }}</option>
+                                            <option value="{{idc.name}}"> {{ idc.name|slice:":20" }}</option>
                                         {% endifequal %}
                                     {% endfor %}
                                 </select>
@@ -47,9 +47,9 @@
                                     <option value="">主机组</option>
                                     {% for asset_group in asset_group_all %}
                                         {% ifequal asset_group.name group_name %}
-                                            <option value="{{ asset_group.name }}" selected> {{ asset_group.name }} </option>
+                                            <option value="{{ asset_group.name }}" selected> {{ asset_group.name|slice:":20" }} </option>
                                         {% else %}
-                                            <option value="{{ asset_group.name }}"> {{ asset_group.name }} </option>
+                                            <option value="{{ asset_group.name }}"> {{ asset_group.name|slice:":20" }} </option>
                                         {% endifequal %}
                                     {% endfor %}
                                 </select>
