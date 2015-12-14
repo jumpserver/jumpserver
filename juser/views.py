@@ -58,9 +58,13 @@ def group_list(request):
     header_title, path1, path2 = '查看用户组', '用户管理', '查看用户组'
     keyword = request.GET.get('search', '')
     user_group_list = UserGroup.objects.all().order_by('name')
+    group_id = request.GET.get('id', '')
 
     if keyword:
         user_group_list = user_group_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
+
+    if group_id:
+        user_group_list = user_group_list.filter(id=int(group_id))
 
     user_group_list, p, user_groups, page_range, current_page, show_first, show_end = pages(user_group_list, request)
     return my_render('juser/group_list.html', locals(), request)
@@ -124,7 +128,7 @@ def group_edit(request):
         except ServerError, e:
             error = e
         if not error:
-            return HttpResponseRedirect('/juser/group_list/')
+            return HttpResponseRedirect(reverse('user_group_list'))
         else:
             users_all = User.objects.all()
             users_selected = User.objects.filter(group=user_group)
@@ -229,7 +233,7 @@ def user_detail(request):
 
     user = get_object(User, id=user_id)
     if not user:
-        return HttpResponseRedirect('/juser/user_list/')
+        return HttpResponseRedirect(reverse('user_list'))
 
     user_perm_info = get_group_user_perm(user)
     role_assets = user_perm_info.get('role')
@@ -339,7 +343,7 @@ def user_edit(request):
     if request.method == 'GET':
         user_id = request.GET.get('id', '')
         if not user_id:
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect(reverse('index'))
 
         user_role = {'SU': u'超级管理员', 'CU': u'普通用户'}
         user = get_object(User, id=user_id)
@@ -364,7 +368,7 @@ def user_edit(request):
         if user_id:
             user = get_object(User, id=user_id)
         else:
-            return HttpResponseRedirect('/juser/user_list/')
+            return HttpResponseRedirect(reverse('user_list'))
 
         if password != '':
             password_decode = password
@@ -387,12 +391,12 @@ def user_edit(request):
                 地址：%s
                 用户名： %s
                 密码：%s (如果密码为None代表密码为原密码)
-                角色：%s
+                权限：：%s
 
             """ % (user.name, URL, user.username, password_decode, user_role.get(role_post, u''))
             send_mail('您的信息已修改', msg, MAIL_FROM, [email], fail_silently=False)
 
-        return HttpResponseRedirect('/juser/user_list/')
+        return HttpResponseRedirect(reverse('user_list'))
     return my_render('juser/user_edit.html', locals(), request)
 
 
@@ -400,7 +404,7 @@ def user_edit(request):
 def profile(request):
     user_id = request.user.id
     if not user_id:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('index'))
     user = User.objects.get(id=user_id)
     return my_render('juser/profile.html', locals(), request)
 
@@ -411,7 +415,7 @@ def change_info(request):
     user = User.objects.get(id=user_id)
     error = ''
     if not user:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('index'))
 
     if request.method == 'POST':
         name = request.POST.get('name', '')

@@ -110,7 +110,7 @@ def perm_rule_add(request):
                 raise ServerError(u'授权规则 %s 已存在' % rule_name)
 
             if not rule_name or not roles_select:
-                raise ServerError(u'角色名称和授权角色不能为空')
+                raise ServerError(u'系统用户名称和规则名称不能为空')
 
             # 获取需要授权的主机列表
             assets_obj = [Asset.objects.get(id=asset_id) for asset_id in assets_select]
@@ -132,7 +132,7 @@ def perm_rule_add(request):
                 asset_no_push = get_role_push_host(role=role)[1]  # 获取某角色已经推送的资产
                 need_push_asset.update(set(calc_assets) & set(asset_no_push))
                 if need_push_asset:
-                    raise ServerError(u'没有推送角色 %s 的主机 %s'
+                    raise ServerError(u'没有推送系统用户 %s 的主机 %s'
                                       % (role.name, ','.join([asset.hostname for asset in need_push_asset])))
 
             # 仅授权成功的，写回数据库(授权规则,用户,用户组,资产,资产组,用户角色)
@@ -146,7 +146,7 @@ def perm_rule_add(request):
             rule.save()
 
             msg = u"添加授权规则：%s" % rule.name
-            return HttpResponseRedirect('/jperm/rule/')
+            return HttpResponseRedirect(reverse('rule_list'))
         except ServerError, e:
             error = e
     return my_render('jperm/perm_rule_add.html', locals(), request)
@@ -181,10 +181,10 @@ def perm_rule_edit(request):
         assets_select = request.POST.getlist('asset', [])
         asset_groups_select = request.POST.getlist('asset_group', [])
         roles_select = request.POST.getlist('role', [])
-        print rule_name, roles_select
+
         try:
             if not rule_name or not roles_select:
-                raise ServerError(u'角色名称和授权角色不能为空')
+                raise ServerError(u'系统用户和关联系统用户不能为空')
 
             assets_obj = [Asset.objects.get(id=asset_id) for asset_id in assets_select]
             asset_groups_obj = [AssetGroup.objects.get(id=group_id) for group_id in asset_groups_select]
@@ -204,7 +204,7 @@ def perm_rule_edit(request):
                 asset_no_push = get_role_push_host(role=role)[1]  # 获取某角色已经推送的资产
                 need_push_asset.update(set(calc_assets) & set(asset_no_push))
                 if need_push_asset:
-                    raise ServerError(u'没有推送角色 %s 的主机 %s'
+                    raise ServerError(u'没有推送系统用户 %s 的主机 %s'
                                       % (role.name, ','.join([asset.hostname for asset in need_push_asset])))
 
                 # 仅授权成功的，写回数据库(授权规则,用户,用户组,资产,资产组,用户角色)
@@ -214,7 +214,7 @@ def perm_rule_edit(request):
                 rule.asset_group = asset_groups_obj
                 rule.role = roles_obj
             rule.name = rule_name
-            rule.comment = rule.comment
+            rule.comment = rule_comment
             rule.save()
             msg = u"更新授权规则：%s成功" % rule.name
 
@@ -247,7 +247,7 @@ def perm_role_list(request):
     list role page
     """
     # 渲染数据
-    header_title, path1, path2 = "系统角色", "角色管理", "查看角色"
+    header_title, path1, path2 = "系统用户", "系统用户管理", "查看系统用户"
 
     # 获取所有系统角色
     roles_list = PermRole.objects.all()
@@ -271,7 +271,7 @@ def perm_role_add(request):
     add role page
     """
     # 渲染数据
-    header_title, path1, path2 = "系统角色", "角色管理", "添加角色"
+    header_title, path1, path2 = "系统用户", "系统用户管理", "添加系统用户"
     sudos = PermSudo.objects.all()
 
     if request.method == "POST":
@@ -301,8 +301,8 @@ def perm_role_add(request):
             role = PermRole(name=name, comment=comment, password=encrypt_pass, key_path=key_path)
             role.save()
             role.sudo = sudos_obj
-            msg = u"添加角色: %s" % name
-            return HttpResponseRedirect('/jperm/role/')
+            msg = u"添加系统用户: %s" % name
+            return HttpResponseRedirect(reverse('role_list'))
         except ServerError, e:
             error = e
 
@@ -336,7 +336,7 @@ def perm_role_delete(request):
         logger.info(u"delete role %s - delete role key directory: %s" % (role.name, role_key))
         # 数据库里删除记录　TODO: 判断返回结果，处理异常
         role.delete()
-        return HttpResponse(u"删除角色: %s" % role.name)
+        return HttpResponse(u"删除系统用户: %s" % role.name)
     else:
         return HttpResponse(u"不支持该操作")
 
@@ -353,7 +353,7 @@ def perm_role_detail(request):
             '': [<User: user1>]}
     """
     # 渲染数据
-    header_title, path1, path2 = "系统角色", "角色管理", "角色详情"
+    header_title, path1, path2 = "系统用户", "系统用户管理", "系统用户详情"
 
     try:
         if request.method == "GET":
@@ -382,7 +382,7 @@ def perm_role_edit(request):
     edit role page
     """
     # 渲染数据
-    header_title, path1, path2 = "系统角色", "角色管理", "角色编辑"
+    header_title, path1, path2 = "系统用户", "系统用户管理", "系统用户编辑"
 
     # 渲染数据
     role_id = request.GET.get("id")
@@ -405,7 +405,7 @@ def perm_role_edit(request):
 
         try:
             if not role:
-                raise ServerError('角色用户不能存在')
+                raise ServerError('该系统用户不能存在')
 
             if role_password:
                 encrypt_pass = CRYPTOR.encrypt(role_password)
@@ -423,8 +423,8 @@ def perm_role_edit(request):
             role.sudo = role_sudos
 
             role.save()
-            msg = u"更新系统角色： %s" % role.name
-            return HttpResponseRedirect('/jperm/role/')
+            msg = u"更新系统用户： %s" % role.name
+            return HttpResponseRedirect(reverse('role_list'))
         except ServerError, e:
             error = e
 
@@ -437,7 +437,7 @@ def perm_role_push(request):
     the role push page
     """
     # 渲染数据
-    header_title, path1, path2 = "系统角色", "角色管理", "角色推送"
+    header_title, path1, path2 = "系统用户", "系统用户管理", "系统用户推送"
     role_id = request.GET.get('id')
     asset_ids = request.GET.get('asset_id')
     role = get_object(PermRole, id=role_id)
@@ -521,9 +521,9 @@ def perm_role_push(request):
                 func(is_password=password_push, is_public_key=key_push, role=role, asset=asset, success=True)
 
         if not failed_asset:
-            msg = u'角色 %s 推送成功[ %s ]' % (role.name, ','.join(success_asset.keys()))
+            msg = u'系统用户 %s 推送成功[ %s ]' % (role.name, ','.join(success_asset.keys()))
         else:
-            error = u'角色 %s 推送失败 [ %s ], 推送成功 [ %s ]' % (role.name,
+            error = u'系统用户 %s 推送失败 [ %s ], 推送成功 [ %s ]' % (role.name,
                                                                 ','.join(failed_asset.keys()),
                                                                 ','.join(success_asset.keys()))
     return my_render('jperm/perm_role_push.html', locals(), request)
@@ -628,7 +628,7 @@ def perm_sudo_delete(request):
         sudo = PermSudo.objects.get(id=sudo_id)
         # 数据库里删除记录
         sudo.delete()
-        return HttpResponse(u"删除角色: %s" % sudo.name)
+        return HttpResponse(u"删除系统用户: %s" % sudo.name)
     else:
         return HttpResponse(u"不支持该操作")
 

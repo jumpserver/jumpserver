@@ -46,7 +46,7 @@
                                         <td>{{ rule.date_added | date:"Y-m-d H:i:s"}}</td>
                                     </tr>
                                     <tr>
-                                        <td class="text-navy">角色</td>
+                                        <td class="text-navy">关联用户</td>
                                         <td>{{ roles_name }}</td>
 
                                     </tr>
@@ -83,36 +83,35 @@
                         </div>
                     </div>
                     <div class="ibox-content">
-                            <div class="text-center">
-                                <table class="table" id="agedit" >
-                                    <td class="text-navy text-left">用户</td>
-                                    <td class="text-navy text-right">用户组</td>
-                                    <tr>
-                                        <td>
-                                            <table class="table progress-striped text-left">
-                                            {% for user in users %}
-                                                <tr class="gradeX">
-                                                    <td> <a href="/jasset/asset_detail/?id={{ user.id }}">{{ user.name }}</a> </td>
-                                                </tr>
-                                            {% endfor %}
-                                            </table>
-                                        </td>
-                                        <td>
-                                            <table class="table progress-striped text-right">
-                                            {% for group in user_groups %}
-                                                <tr class="gradeX-">
-                                                    <td> <a href="/jasset/asset_list/?group_id={{ group.id }}">{{ group.name }}</a> </td>
-                                                </tr>
-                                            {% endfor %}
-                                            </table>
-                                        </td>
-
-                                    </tr>
-                                </table>
-                            </div>
+                        <div class="text-center">
+                            <table class="table" id="agedit" >
+                                <td class="text-navy text-left">用户</td>
+                                <td class="text-navy text-right">用户组</td>
+                                <tr>
+                                    <td>
+                                        <table class="table progress-striped text-left">
+                                        {% for user in users %}
+                                            <tr class="gradeX">
+                                                <td> <a href="{% url 'user_detail' %}?id={{ user.id }}">{{ user.name }}</a> </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table class="table progress-striped text-right">
+                                        {% for group in user_groups %}
+                                            <tr class="gradeX-">
+                                                <td> <a href="{% url 'user_group_list' %}?group_id={{ group.id }}">{{ group.name }}</a> </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
                     </div>
-                    </div>
-                    </div>
+                </div>
+            </div>
             <div class="col-sm-4">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
@@ -145,7 +144,7 @@
                                             <table class="table progress-striped text-left">
                                             {% for asset in assets %}
                                                 <tr class="gradeX">
-                                                    <td> <a href="/jasset/asset_detail/?id={{ asset.id }}">{{ asset.ip }}</a> </td>
+                                                    <td> <a href="{% url 'asset_detail' %}?id={{ asset.id }}">{{ asset.ip }}</a> </td>
                                                 </tr>
                                             {% endfor %}
                                             </table>
@@ -154,7 +153,7 @@
                                             <table class="table progress-striped text-right">
                                             {% for group in asset_groups %}
                                                 <tr class="gradeX-">
-                                                    <td> <a href="/jasset/asset_list/?group_id={{ group.id }}">{{ group.name }}</a> </td>
+                                                    <td> <a href="{% url 'asset_list' %}?group_id={{ group.id }}">{{ group.name }}</a> </td>
                                                 </tr>
                                             {% endfor %}
                                             </table>

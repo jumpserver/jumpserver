@@ -34,7 +34,7 @@
 
                 <div class="ibox-content">
                     <div class="">
-                    <a href="/jperm/perm_rule_add/" class="btn btn-sm btn-primary "> 添加规则 </a>
+                    <a href="{% url 'rule_add' %}" class="btn btn-sm btn-primary "> 添加规则 </a>
                     <form id="search_form" method="get" action="" class="pull-right mail-search">
                         <div class="input-group">
                             <input type="text" class="form-control input-sm" id="search_input" name="search" placeholder="Search">
@@ -55,14 +55,14 @@
                                 <th class="text-center">用户组</th>
                                 <th class="text-center">资产</th>
                                 <th class="text-center">资产组</th>
-                                <th class="text-center">角色</th>
+                                <th class="text-center">系统用户</th>
                                 <th class="text-center">操作</th>
                             </tr>
                         </thead>
                         <tbody id="edittbody">
                         {% for rule in rules %}
                             <tr class="gradeX" id={{ rule.id }}>
-                                <td class="text-center"> <a href="/jperm/perm_rule_detail/?id={{ rule.id }}" >{{ rule.name }}</a> </td>
+                                <td class="text-center"> <a href="{% url 'rule_detail' %}?id={{ rule.id }}" >{{ rule.name }}</a> </td>
                                 <td class="text-center">
                                     {{ rule | rule_member_count:"user" }}
                                 </td>
@@ -79,7 +79,7 @@
                                     {{ rule | rule_member_count:"role" }}
                                 </td>
                                 <td class="text-center">
-                                    <a href="/jperm/perm_rule_edit/?id={{ rule.id }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a href="{% url 'rule_edit' %}?id={{ rule.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <button onclick="remove_rule({{ rule.id }})" class="btn btn-xs btn-danger">删除</button>
                                 </td>
                             </tr>

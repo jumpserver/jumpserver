@@ -4,49 +4,49 @@
         <ul class="nav" id="side-menu">
             {% include 'nav_li_profile.html' %}
             <li id="index">
-               <a href="/"><i class="fa fa-dashboard"></i> <span class="nav-label">仪表盘</span><span class="label label-info pull-right"></span></a>
+               <a href="{% url 'index' %}"><i class="fa fa-dashboard"></i> <span class="nav-label">仪表盘</span><span class="label label-info pull-right"></span></a>
             </li>
             <li id="juser">
                 <a href="#"><i class="fa fa-group"></i> <span class="nav-label">用户管理</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
-                    <li class="group_list group_edit group_add"><a href="/juser/group_list/">查看用户组</a></li>
-                    <li class="user_list user_edit user_detail user_add"><a href="/juser/user_list/">查看用户<span class="label {% ifequal user_active_num user_total_num %}label-primary {% else %}label-warning {% endifequal %}pull-right">{{ user_active_num }}/{{ user_total_num }}</span></a></li>
+                    <li class="group"><a href="{% url 'user_group_list' %}">查看用户组</a></li>
+                    <li class="user"><a href="{% url 'user_list' %}">查看用户<span class="label {% ifequal user_active_num user_total_num %}label-primary {% else %}label-warning {% endifequal %}pull-right">{{ user_active_num }}/{{ user_total_num }}</span></a></li>
                 </ul>
             </li>
             <li id="jasset">
                 <a><i class="fa fa-inbox"></i> <span class="nav-label">资产管理</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
-                    <li class="group_list group_detail group_edit"><a href="/jasset/group_list/">查看资产组</a></li>
-                    <li class="asset_list asset_detail asset_edit asset_add asset_add_batch"><a href="/jasset/asset_list/">查看资产<span class="label label-info pull-right">{{ host_active_num }}/{{ host_total_num}}</span></a></li>
-                    <li class="idc_list idc_detail idc_edit"><a href="/jasset/idc_list/">查看机房</a></li>
+                    <li class="group"><a href="{% url 'asset_group_list' %}">查看资产组</a></li>
+                    <li class="asset"> <a href="{% url 'asset_list' %}">查看资产<span class="label label-info pull-right">{{ host_active_num }}/{{ host_total_num}}</span></a></li>
+                    <li class="idc"> <a href="{% url 'idc_list' %}">查看机房</a></li>
                 </ul>
             </li>
             <li id="jperm">
                 <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">授权管理</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
-                    <li class="rule perm_rule_add perm_rule_detail perm_rule_edit">
-                        <a href="/jperm/rule/">授权规则</a>
+                    <li class="sudo">
+                        <a class="sudo" href="{% url 'sudo_list' %}">Sudo</a>
                     </li>
                     <li class="role">
-                        <a href="/jperm/role/">系统角色</a>
+                        <a href="{% url 'role_list' %}">系统用户</a>
                     </li>
-                    <li class="sudo">
-                        <a href="/jperm/sudo/">Sudo命令</a>
+                    <li class="rule">
+                        <a href="{% url 'rule_list' %}">授权规则</a>
                     </li>
                 </ul>
             </li>
             <li id="jlog">
-               <a href="/jlog/log_list/online/"><i class="fa fa-files-o"></i> <span class="nav-label">日志审计</span><span class="label label-info pull-right"></span></a>
+               <a href="{% url 'log_list' 'online' %}"><i class="fa fa-files-o"></i> <span class="nav-label">日志审计</span><span class="label label-info pull-right"></span></a>
             </li>
             <li id="file">
                 <a href="#"><i class="fa fa-download"></i> <span class="nav-label">上传下载</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
-                    <li class="upload"><a href="/file/upload/">文件上传</a></li>
-                    <li class="download"><a href="/file/download/">文件下载</a></li>
+                    <li class="upload"><a href="{% url 'file_upload' %}">文件上传</a></li>
+                    <li class="download"><a href="{% url 'file_download' %}">文件下载</a></li>
                 </ul>
             </li>
             <li id="setting">
-                   <a href="/setting/"><i class="fa fa-gears"></i> <span class="nav-label">设置</span><span class="label label-info pull-right"></span></a>
+                   <a href="{% url 'setting' %}"><i class="fa fa-gears"></i> <span class="nav-label">设置</span><span class="label label-info pull-right"></span></a>
             </li>
             <li class="special_link">
                 <a href="http://www.jumpserver.org" target="_blank"><i class="fa fa-database"></i> <span class="nav-label">访问官网</span></a>
@@ -63,16 +63,16 @@
         <ul class="nav" id="side-menu">
             {% include 'nav_li_profile.html' %}
             <li id="juser">
-               <a href="/juser/user_detail/"><i class="fa fa-dashboard"></i> <span class="nav-label">仪表盘</span><span class="label label-info pull-right"></span></a>
+               <a href="{% url 'user_detail' %}"><i class="fa fa-dashboard"></i> <span class="nav-label">仪表盘</span><span class="label label-info pull-right"></span></a>
             </li>
             <li id="jasset">
-               <a href="/jasset/asset_list/"><i class="fa fa-inbox"></i> <span class="nav-label">查看主机</span><span class="label label-info pull-right"></span></a>
+               <a href="{% url 'asset_list' %}"><i class="fa fa-inbox"></i> <span class="nav-label">查看主机</span><span class="label label-info pull-right"></span></a>
             </li>
             <li id="file">
                 <a href="#"><i class="fa fa-download"></i> <span class="nav-label">上传下载</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
-                    <li class="upload"><a href="/file/upload/">文件上传</a></li>
-                    <li class="download"><a href="/file/download/">文件下载</a></li>
+                    <li class="upload"><a href="{% url 'file_upload' %}">文件上传</a></li>
+                    <li class="download"><a href="{% url 'file_download' %}">文件下载</a></li>
                 </ul>
             </li>
 

@@ -23,8 +23,8 @@
                 </div>
                 <div class="ibox-content">
                     <div class="">
-                        <a target="_blank" href="/jasset/group_add/" class="btn btn-sm btn-primary "> 添加主机组 </a>
-                        <a target="_blank" class="btn btn-sm btn-danger" id="del_check"> 删除所选 </a>
+                        <a href="{% url 'asset_group_add' %}" class="btn btn-sm btn-primary "> 添加主机组 </a>
+                        <a class="btn btn-sm btn-danger" id="del_check"> 删除所选 </a>
                         <form id="search_form" method="get" action="" class="pull-right mail-search">
                             <div class="input-group">
                                 <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
@@ -58,12 +58,12 @@
                                     <input name="id" value="{{ asset_group.id }}" type="checkbox" class="i-checks">
                                 </td>
                                 <td class="text-center"> {{ asset_group.name }} </td>
-                                <td class="text-center"> <a href="/jasset/asset_list/?group_id={{ asset_group.id }}">{{ asset_group.asset_set.count }}</a> </td>
+                                <td class="text-center"> <a href="{% url 'asset_list' %}?group_id={{ asset_group.id }}">{{ asset_group.asset_set.count }}</a> </td>
                                 <td class="text-center"> {{ asset_group.comment }} </td>
                                 <td class="text-center">
-                                    <a href="/jasset/asset_list/?group_id={{ asset_group.id }}" class="btn btn-xs btn-info">详情</a>
-                                    <a href="/jasset/group_edit/?id={{ asset_group.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <a value="/jasset/group_del/?id={{ asset_group.id }}" class="btn btn-xs btn-danger group_del">删除</a>
+                                    <a href="{% url 'asset_list' %}?group_id={{ asset_group.id }}" class="btn btn-xs btn-info">详情</a>
+                                    <a href="{% url 'asset_group_edit' %}?id={{ asset_group.id }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a value="{% url 'asset_group_del' %}?id={{ asset_group.id }}" class="btn btn-xs btn-danger group_del">删除</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -108,7 +108,7 @@
                     check_array.push($(this).attr('value'))
                 });
                 $.get(
-                        '/jasset/group_del/',
+                        '{% url "asset_group_del" %}',
                         {id: check_array.join(',')},
                         function(data){
                             $('tr.gradeX input:checked').closest('tr').remove();

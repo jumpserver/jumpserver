@@ -67,10 +67,10 @@
                 <div class="ibox-content">
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
-                            <li class="active"><a href="/jlog/log_list/online/" class="text-center"><i class="fa fa-laptop"></i> 在线 </a></li>
-                            <li><a href="/jlog/log_list/offline/" class="text-center"><i class="fa fa-bar-chart-o"></i> 历史记录 </a></li>
-                            <li><a href="/jlog/log_list/exec/" class="text-center"><i class="fa fa-bar-chart-o"></i> 命令记录 </a></li>
-                            <li><a href="/jlog/log_list/file/" class="text-center"><i class="fa fa-bar-chart-o"></i> 上传下载 </a></li>
+                            <li class="active"><a href="{% url 'log_list' 'online' %}" class="text-center"><i class="fa fa-laptop"></i> 在线 </a></li>
+                            <li><a href="{% url 'log_list' 'offline' %}" class="text-center"><i class="fa fa-bar-chart-o"></i> 历史记录 </a></li>
+                            <li><a href="{% url 'log_list' 'exec' %}" class="text-center"><i class="fa fa-bar-chart-o"></i> 命令记录 </a></li>
+                            <li><a href="{% url 'log_list' 'file' %}" class="text-center"><i class="fa fa-bar-chart-o"></i> 上传下载 </a></li>
                             <div class="" style="float: right">
                                 <form id="search_form" method="get" action="" class="pull-right mail-search">
                                     <div class="input-group">
@@ -108,7 +108,7 @@
                                     <td id="ip" class="text-center"> {{ post.host }} </td>
                                     <td id="remote_ip" class="text-center"> {{ post.remote_ip }} </td>
                                     <td class="text-center"> {{ post.login_type }} </td>
-                                    <td class="text-center"><a href="/jlog/history/?id={{ post.id }}" class="log_command"> 统计 </a></td>
+                                    <td class="text-center"><a href="{% url 'log_history' %}?id={{ post.id }}" class="log_command"> 统计 </a></td>
                                     <td class="text-center"><a class="monitor" file_path="{{ post.log_path }}"> 监控 </a></td>
                                     <td class="text-center"><input type="button" id="cut" class="btn btn-danger btn-xs"  name="cut" value="阻断" onclick='cut("{{ post.pid }}", "{{ post.login_type }}")' /></td>
                                     <td class="text-center" id="start_time"> {{ post.start_time|date:"Y-m-d H:i:s" }} </td>
@@ -207,13 +207,13 @@
        if (login_type=='web'){
            var g_url = '{{ web_kill_uri }}' + '?id=' + num;
        } else {
-           var g_url = "/jlog/log_kill/?id=" + num;
+           var g_url = "{% url 'log_kill' %} }?id=" + num;
        }
 
        $.ajax({
            type: "GET",
            url: g_url+"&sessionid={{ session_id }}",
-           success: window.open("/jlog/log_list/online/", "_self")
+           success: window.open("{% url 'log_list' 'online' %}", "_self")
        });
 
 }

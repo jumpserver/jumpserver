@@ -16,7 +16,7 @@
                     {% endif %}
                 </div>
                 <div class="ibox-title">
-                    <h5> 所有系统角色</h5>
+                    <h5> 所有系统用户</h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -31,8 +31,7 @@
                 </div>
                 <div class="ibox-content">
                     <div class="">
-                    <a  href="/jperm/role/perm_role_add/" class="btn btn-sm btn-primary "> 添加角色 </a>
-{#                    <a  href="/jperm/role/perm_role_push/" class="btn btn-sm btn-danger "> 推送角色 </a>#}
+                    <a  href="{% url 'role_add' %}" class="btn btn-sm btn-primary "> 添加系统用户 </a>
                     <form id="search_form" method="get" action="" class="pull-right mail-search">
                         <div class="input-group">
                             <input type="text" class="form-control input-sm" id="search_input" name="search" placeholder="Search">
@@ -56,12 +55,12 @@
                         <tbody id="edittbody">
                         {% for role in roles %}
                             <tr class="gradeX" id={{ role.id }}>
-                                <td class="text-center"><a href="/jperm/role/perm_role_detail/?id={{ role.id }}">{{ role.name }} </a></td>
+                                <td class="text-center"><a href="{% url 'role_detail' %}?id={{ role.id }}">{{ role.name }} </a></td>
                                 <td class="text-center"> {{ role | role_contain_which_sudos }} </td>
                                 <td class="text-center"> {{ role.date_added | date:"Y-m-d H:i:s"}} </td>
                                 <td class="text-center">
-                                    <a href="/jperm/role/perm_role_edit/?id={{ role.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <a href="/jperm/role/push/?id={{ role.id }}" class="btn btn-xs btn-warning">推送</a>
+                                    <a href="{% url 'role_edit' %}?id={{ role.id }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a href="{% url 'role_push' %}?id={{ role.id }}" class="btn btn-xs btn-warning">推送</a>
                                     <button onclick="remove_role({{ role.id }})" class="btn btn-xs btn-danger">删除</button>
                                 </td>
                             </tr>
@@ -88,7 +87,7 @@ function remove_role(role_id){
     if (confirm("确认删除")) {
         $.ajax({
            type: "POST",
-           url: "/jperm/role/perm_role_delete/",
+           url: "{% url 'role_del' %}",
            data: "id=" + role_id,
            success: function(msg){
                alert( "成功: " + msg );

@@ -1,27 +1,28 @@
 # -*- coding: utf-8 -*-
 
 
-from ansible.inventory.group   import Group
-from ansible.inventory.host    import Host
-from ansible.inventory         import Inventory
-from ansible.runner            import Runner
-from ansible.playbook          import PlayBook
-
-from ansible                   import callbacks
-from ansible                   import utils
-from passlib.hash              import sha512_crypt
-
-from utils                     import get_rand_pass
-from jumpserver.api            import logger
-
 from tempfile import NamedTemporaryFile
+import os.path
+
+from ansible.inventory.group import Group
+from ansible.inventory.host import Host
+from ansible.inventory import Inventory
+from ansible.runner import Runner
+from ansible.playbook import PlayBook
+from ansible import callbacks
+from ansible import utils
+import ansible.constants as C
+from passlib.hash import sha512_crypt
 from django.template.loader import get_template
 from django.template import Context
 
-import os.path
+from utils import get_rand_pass
+from jumpserver.api import logger
+
 
 API_DIR = os.path.dirname(os.path.abspath(__file__))
 ANSIBLE_DIR = os.path.join(API_DIR, 'playbooks')
+C.HOST_KEY_CHECKING = False
 
 
 class AnsibleError(StandardError):

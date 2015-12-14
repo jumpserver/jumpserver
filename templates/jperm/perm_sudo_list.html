@@ -32,7 +32,7 @@
 
                 <div class="ibox-content">
                     <div class="">
-                    <a  href="/jperm/sudo/perm_sudo_add/" class="btn btn-sm btn-primary "> 添加别名 </a>
+                    <a  href="{% url 'sudo_add' %}" class="btn btn-sm btn-primary "> 添加别名 </a>
                     <form id="search_form" method="get" action="" class="pull-right mail-search">
                         <div class="input-group">
                             <input type="text" class="form-control input-sm" id="search_input" name="search" placeholder="Search">
@@ -62,7 +62,7 @@
                                 <td class="text-center"> {{ sudo.date_added | date:"Y-m-d H:i:s"}} </td>
                                 <td class="text-center">
 {#                                    <a href="/jperm/sudo/perm_sudo_detail/?id={{ sudo.id }}" class="btn btn-xs btn-primary">详情</a>#}
-                                    <a href="/jperm/sudo/perm_sudo_edit/?id={{ sudo.id }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a href="{% url 'sudo_edit' %}?id={{ sudo.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <button onclick="remove_sudo({{ sudo.id }})" class="btn btn-xs btn-danger">删除</button>
                                 </td>
                             </tr>

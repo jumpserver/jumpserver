@@ -31,8 +31,8 @@
                     <div class="panel blank-panel">
                         <div class="panel-options">
                             <ul class="nav nav-tabs">
-                                <li><a href="/jasset/asset_add/" class="text-center"><i class="fa fa-laptop"></i> 单台添加 </a></li>
-                                <li class="active"><a href="/jasset/asset_add_batch/" class="text-center"><i class="fa fa-bar-chart-o"></i> 批量添加 </a></li>
+                                <li><a href="{% url 'asset_add' %}" class="text-center"><i class="fa fa-laptop"></i> 单台添加 </a></li>
+                                <li class="active"><a href="{% url 'asset_add_batch' %}" class="text-center"><i class="fa fa-bar-chart-o"></i> 批量添加 </a></li>
                             </ul>
                         </div>
                         <div class="panel-body">
@@ -44,14 +44,13 @@
                                     <div class="alert alert-success text-center">{{ smg }}</div>
                                 {% endif %}
                                 <p>请下载Excel文件, 按照格式填写主机信息, 上传导入. <a href="/static/files/excels/asset.xlsx">点击下载模板</a></p>
-                                <form action="/jasset/upload/" method="POST" enctype="multipart/form-data">
+                                <form action="{% url 'asset_upload' %}" method="POST" enctype="multipart/form-data">
                                     <div class="file-box">
                                         <input id='textfield' />
                                         <input type="button" class="btn btn-info btn-sm" name="file_name" value="点击选择文件">
                                         <input type="file" name="file_name" class="file" id="fileField" size="28" onchange="document.getElementById('textfield').value=this.value" />
                                         <button class="btn btn-primary btn-sm" type="submit">上传文件</button>
                                     </div>
-
                                 </form>
                             </div>
                         </div>

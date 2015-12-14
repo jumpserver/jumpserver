@@ -53,7 +53,7 @@
                             <div class="form-group">
                                 <label for="ssh_key_pwd" class="col-sm-2 control-label">SSH密钥</label>
                                 <div class="col-sm-8">
-                                    <a value="/juser/regen_ssh_key/?uuid={{ user.uuid }}" id="regen_ssh_key" class="form-control"> 重新生成</a>
+                                    <a value="{% url 'key_gen' %}?uuid={{ user.uuid }}" id="regen_ssh_key" class="form-control"> 重新生成</a>
                                     <span class="help-block m-b-none">
                                         重新生成密钥，需要重新下载并导入
                                     </span>

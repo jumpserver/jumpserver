@@ -25,6 +25,7 @@ from jumpserver.models import Setting
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.mail import send_mail
+from django.core.urlresolvers import reverse
 
 
 def set_log(level, filename='jumpserver.log'):
@@ -69,7 +70,8 @@ def get_asset_info(asset):
                 info['password'] = CRYPTOR.decrypt(default.field3)
             except ServerError:
                 pass
-            info['ssh_key'] = default.field4
+            if os.path.isfile(default.field4):
+                info['ssh_key'] = default.field4
     else:
         info['port'] = int(asset.port)
         info['username'] = asset.username
@@ -92,7 +94,7 @@ def get_role_key(user, role):
         with open(os.path.join(role.key_path, 'id_rsa')) as fk:
             with open(user_role_key_path, 'w') as fu:
                 fu.write(fk.read())
-        logger.debug(u"创建新的用户角色key %s, Owner: %s" % (user_role_key_path, user.username))
+        logger.debug(u"创建新的系统用户key %s, Owner: %s" % (user_role_key_path, user.username))
         chown(user_role_key_path, user.username)
         os.chmod(user_role_key_path, 0600)
     return user_role_key_path
@@ -265,15 +267,15 @@ def require_role(role='user'):
         def __deco(request, *args, **kwargs):
             request.session['pre_url'] = request.path
             if not request.user.is_authenticated():
-                return HttpResponseRedirect('/login/')
+                return HttpResponseRedirect(reverse('login'))
             if role == 'admin':
                 # if request.session.get('role_id', 0) < 1:
                 if request.user.role == 'CU':
-                    return HttpResponseRedirect('/')
+                    return HttpResponseRedirect(reverse('index'))
             elif role == 'super':
                 # if request.session.get('role_id', 0) < 2:
                 if request.user.role in ['CU', 'GA']:
-                    return HttpResponseRedirect('/')
+                    return HttpResponseRedirect(reverse('index'))
             return func(request, *args, **kwargs)
 
         return __deco
@@ -350,7 +352,7 @@ def view_splitter(request, su=None, adm=None):
     elif is_role_request(request, 'admin'):
         return adm(request)
     else:
-        return HttpResponseRedirect('/login/')
+        return HttpResponseRedirect(reverse('login'))
 
 
 def validate(request, user_group=None, user=None, asset_group=None, asset=None, edept=None):

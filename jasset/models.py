@@ -40,14 +40,14 @@ class AssetGroup(models.Model):
 
 class IDC(models.Model):
     name = models.CharField(max_length=32, verbose_name=u'机房名称')
-    bandwidth = models.CharField(max_length=32, blank=True, null=True, verbose_name=u'机房带宽')
-    linkman = models.CharField(max_length=16, blank=True, null=True, verbose_name=u'联系人')
-    phone = models.CharField(max_length=32, blank=True, null=True, verbose_name=u'联系电话')
-    address = models.CharField(max_length=128, blank=True, null=True, verbose_name=u"机房地址")
-    network = models.TextField(blank=True, null=True, verbose_name=u"IP地址段")
-    date_added = models.DateField(auto_now=True, null=True)
-    operator = models.CharField(max_length=32, blank=True, null=True, verbose_name=u"运营商")
-    comment = models.CharField(max_length=128, blank=True, null=True, verbose_name=u"备注")
+    bandwidth = models.CharField(max_length=32, blank=True, null=True, default='', verbose_name=u'机房带宽')
+    linkman = models.CharField(max_length=16, blank=True, null=True, default='', verbose_name=u'联系人')
+    phone = models.CharField(max_length=32, blank=True, null=True, default='', verbose_name=u'联系电话')
+    address = models.CharField(max_length=128, blank=True, null=True, default='', verbose_name=u"机房地址")
+    network = models.TextField(blank=True, null=True, default='', verbose_name=u"IP地址段")
+    date_added = models.DateField(auto_now=True, default='', null=True)
+    operator = models.CharField(max_length=32, blank=True, default='', null=True, verbose_name=u"运营商")
+    comment = models.CharField(max_length=128, blank=True, default='', null=True, verbose_name=u"备注")
 
     def __unicode__(self):
         return self.name

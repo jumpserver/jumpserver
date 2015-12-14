@@ -17,10 +17,6 @@
                             <i class="fa fa-wrench"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">未启用 1</a>
-                            </li>
-                            <li><a href="#">未启用 2</a>
-                            </li>
                         </ul>
                         <a class="close-link">
                             <i class="fa fa-times"></i>
@@ -29,7 +25,7 @@
                 </div>
                 <div class="ibox-content">
                     <div class="">
-                    <a target="_blank" href="/jasset/idc_add" class="btn btn-sm btn-primary "> 添加机房 </a>
+                    <a href="{% url 'idc_add' %}" class="btn btn-sm btn-primary "> 添加机房 </a>
                     <input type="button" id="del_check" class="btn btn-danger btn-sm"  name="del_button" value="删除所选"/>
                     <form id="search_form" method="get" action="" class="pull-right mail-search">
                         <div class="input-group">
@@ -63,15 +59,15 @@
                         {% for post in contacts.object_list  %}
                             <tr class="gradeX">
                                 <td class="text-center" name="j_id" value="{{ post.id }}" data-editable='false'><input name="id" value="{{ post.id }}" type="checkbox" class="i-checks"></td>
-                                <td class="text-center"> {{ post.name }} </td>
-                                <td class="text-center"> <a href="/jasset/asset_list/?idc_id={{ post.id }}">{{ post.asset_set.count }}</a> </td>
+                                <td class="text-center"> <a href="{% url 'asset_list' %}?idc_id={{ post.id }}">{{ post.name }}</a> </td>
+                                <td class="text-center"> <a href="{% url 'asset_list' %}?idc_id={{ post.id }}">{{ post.asset_set.count }}</a> </td>
                                 <td class="text-center"> {{ post.linkman }} </td>
                                 <td class="text-center"> {{ post.phone }} </td>
                                 <td class="text-center"> {{ post.comment }} </td>
                                 <td class="text-center">
-                                    <a href="/jasset/asset_list/?idc_id={{ post.id }}" class="iframe btn btn-xs btn-primary">详情</a>
-                                        <a href="/jasset/idc_edit/?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>
-                                        <a href="/jasset/idc_del/?id={{ post.id }}" class="btn btn-xs btn-danger idc_del">删除</a>
+
+                                    <a href="{% url 'idc_edit' %}?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a href="{% url 'idc_del' %}?id={{ post.id }}" class="btn btn-xs btn-danger idc_del">删除</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -91,7 +87,9 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block self_footer_js %}
 <script>
     $(document).ready(function(){
         $('.idc_del').click(function(){
@@ -103,7 +101,8 @@
                         function (data) {
                             row.remove();
                         }
-                )
+                );
+                return false
             }
         });
 
@@ -114,16 +113,15 @@
                     check_array.push($(this).attr('value'))
                 });
                 $.get(
-                        '/jasset/idc_del/',
+                        '{% url "idc_del" %}',
                         {id: check_array.join(',')},
                         function(data){
                             $('tr.gradeX input:checked').closest('tr').remove();
                         }
-                )
-
+                );
+                return false;
             }
         })
     });
 </script>
-
 {% endblock %}

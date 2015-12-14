@@ -79,7 +79,7 @@ def get_count_by_date(date_li, item):
 @require_role(role='user')
 def index_cu(request):
     username = request.user.username
-    return HttpResponseRedirect('/juser/user_detail/')
+    return HttpResponseRedirect(reverse('user_detail'))
 
 
 @require_role(role='user')
@@ -169,7 +169,7 @@ def Login(request):
     """登录界面"""
     error = ''
     if request.user.is_authenticated():
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('index'))
     if request.method == 'GET':
         return render_to_response('login.html')
     else:
@@ -211,7 +211,7 @@ def Login(request):
 @require_role('user')
 def Logout(request):
     logout(request)
-    return HttpResponseRedirect('/login/')
+    return HttpResponseRedirect(reverse('index'))
 
 
 @require_role('admin')
@@ -230,7 +230,10 @@ def setting(request):
             if '' in [username, port]:
                 return HttpResponse('所填内容不能为空, 且密码和私钥填一个')
             else:
-                private_key_path = os.path.join(BASE_DIR, 'keys/role_keys', 'default', 'default_private_key.pem')
+                private_key_dir = os.path.join(BASE_DIR, 'keys', 'default')
+                private_key_path = os.path.join(private_key_dir, 'admin_user.pem')
+                mkdir(private_key_dir)
+
                 if private_key:
                     with open(private_key_path, 'w') as f:
                             f.write(private_key)
@@ -343,3 +346,11 @@ def exec_cmd(request):
     check_assets = request.GET.get('check_assets', '')
     web_terminal_uri = 'ws://%s/exec?role=%s' % (WEB_SOCKET_HOST, role)
     return my_render('exec_cmd.html', locals(), request)
+
+
+@require_role('user')
+def web_terminal(request):
+    asset_id = request.GET.get('id')
+    role_name = request.GET.get('role')
+    web_terminal_uri = 'ws://%s/terminal?id=%s&role=%s' % (WEB_SOCKET_HOST, asset_id, role_name)
+    return render_to_response('jlog/web_terminal.html', locals())

@@ -29,10 +29,10 @@
                                 <input type="text" class="form-control m-b input-sm" id="search_input" name="keyword" value="{{ keyword }}" placeholder="Search">
                                 <input type="text" style="display: none">
                                 <div class="input-group-btn">
-                                    <button id='search_btn' href="/jasset/asset_list/?search=true" type="button" class="btn btn-sm btn-primary search-btn"  onclick="change_info()">
+                                    <button id='search_btn' href="{% url 'asset_list' %}?search=true" type="button" class="btn btn-sm btn-primary search-btn"  onclick="change_info()">
                                         - 搜索 -
                                     </button>
-                                    <button type="button" href="/jasset/asset_list/?export=true" name="export" class="btn btn-sm btn-success search-btn-excel" onclick="return false">
+                                    <button type="button" href="{% url 'asset_list' %}?export=true" name="export" class="btn btn-sm btn-success search-btn-excel" onclick="return false">
                                         - 导出 -
                                     </button>
                                 </div>
@@ -63,7 +63,7 @@
                                     <td class="text-center" name="id" value="{{ asset.id }}" data-editable='false'>
                                         <input name="id" value="{{ asset.id }}" type="checkbox" class="i-checks">
                                     </td>
-                                    <td class="text-center hostname"> <a href="/jasset/asset_detail/?id={{ asset.id }}">{{ asset.hostname|default_if_none:"" }}</a></td>
+                                    <td class="text-center hostname"> <a href="{% url 'asset_detail' %}?id={{ asset.id }}">{{ asset.hostname|default_if_none:"" }}</a></td>
                                     <td class="text-center"> {{ asset.ip|default_if_none:"" }} </td>
                                     <td class="text-center"> {{ asset.idc.name|default_if_none:"" }} </td>
                                     <td class="text-center">{{ asset.group.all|group_str2 }}</td>
@@ -110,8 +110,8 @@
         });
 
         $('#exec_cmd').click(function(){
-            var url = '/jperm/role/get/';
-            var new_url = '/exec_cmd/?role=';
+            var url = '{% url "role_get" %} ';
+            var new_url = '{% url "exec_cmd" %}?role=';
             var check_array = [];
             $(".gradeX input:checked").closest('tr').find('.hostname a').each(function() {
                 check_array.push($(this).text())
@@ -130,12 +130,12 @@
                             title: title,
                             maxmin: true,
                             shade: false,
-                            area: ['800px', '600px'],
+                            area: ['725px', '600px'],
                             content: new_url+data+'&check_assets='+check_assets
                         });
                         //window.open(new_url + data, '', 'location=no, resizeable=no, height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,status=no');
                     } else if (dataArray.length == '1' && data == 'error'){
-                        layer.alert('没有授权角色')
+                        layer.alert('没有授权系统用户')
                     } else {
                         aUrl = '';
                         $.each(dataArray, function(index, value){
@@ -143,7 +143,7 @@
                         });
                         layer.alert(aUrl, {
                             skin: 'layui-layer-molv',
-                            title: '多个角色，请选择一个连接',
+                            title: '授权多个系统用户，请选择一个连接',
                             shade: false,
                             closeBtn: 0
                         })
@@ -155,18 +155,29 @@
         });
 
         $('.conn').click(function(){
-            var url='/jperm/role/get/?id=' + $(this).attr('value');
+            var url='{% url "role_get" %}?id=' + $(this).attr('value');
             var href = $(this).attr('href');
-            var new_url = '/jlog/web_terminal/?id=' + $(this).attr('value') + '&role=';
+            var new_url = '{% url "terminal" %}?id=' + $(this).attr('value') + '&role=';
             var hostname = $(this).closest('tr').find('.hostname a')[0].innerHTML;
+            var title = 'Jumpserver Web Terminal' + '<span class="text-info"> '+ hostname +'</span>';
             $.ajax({
                 type: 'GET',
                 url: url,
                 data: {},
                 success: function(data){
                     var dataArray = data.split(',');
-                    if (dataArray.length == 1 && data != 'error'){
-                        var title = 'Jumpserver Web Terminal' + '<span class="text-info"> '+ hostname +'</span>';
+                    if (data == 'error' || data == '' || data == null || data == undefined){
+                        layer.alert('没有授权系统用户')
+                    } else if (dataArray.length == 1 && data != 'error' && navigator.platform == 'Win32') {
+                        layer.open({
+                            type: 2,
+                            title: title,
+                            maxmin: true,
+                            shade: false,
+                            area: ['628px', '420px'],
+                            content: new_url + data
+                        });
+                    } else if (dataArray.length == 1 && data != 'error'){
                         layer.open({
                             type: 2,
                             title: title,
@@ -176,17 +187,14 @@
                             content: new_url+data
                         });
                         //window.open(new_url + data, '', 'location=no, resizeable=no, height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,status=no');
-                    } else if (dataArray.length == '1' && data == 'error'){
-                        layer.alert('没有授权角色')
                     } else {
                         aUrl = '';
                         $.each(dataArray, function(index, value){
                             aUrl += '<a onclick="windowOpen(this); return false" class="btn btn-xs btn-primary newa" href=' + new_url + value + ' value=' + hostname +  '>' + value  + '</a> '
                         });
-                        console.log(aUrl);
                         layer.alert(aUrl, {
                             skin: 'layui-layer-molv',
-                            title: '多个角色，请选择一个连接',
+                            title: '授权多个系统用户，请选择一个连接',
                             shade: false,
                             closeBtn: 0
                         })
@@ -263,50 +271,6 @@
     });
 
 
-    $('#asset_del').click(function () {
-        var asset_id_all = getIDall();
-        if (asset_id_all == ''){
-            alert("请至少选择一行!");
-            return false;
-        }
-        if (confirm("确定删除?")) {
-            $.ajax({
-                type: "post",
-                data: {asset_id_all: asset_id_all},
-                url: "/jasset/asset_del/?arg=batch",
-                success: function () {
-                    parent.location.reload();
-                }
-            });
-        }
-    });
-
-    $('#asset_update').click(function () {
-        var asset_id_all = getIDall();
-        if (asset_id_all == ''){
-            if (confirm("更新全部资产信息?")) {
-                layer.msg('玩命更新中...', {time: 200000});
-                $.ajax({
-                    type: "post",
-                    url: "/jasset/asset_update_batch/?arg=all",
-                    success: function () {
-                        parent.location.reload();
-                    }
-                });
-            }
-        }
-        else {
-            layer.msg('玩命更新中...', {time: 200000});
-            $.ajax({
-                type: "post",
-                data: {asset_id_all: asset_id_all},
-                url: "/jasset/asset_update_batch/",
-                success: function () {
-                    parent.location.reload();
-                }
-            });
-        }
-    });
 
 {#    $('#asset_update_all').click(function () {#}
 {#        layer.msg('玩命更新中...', {time: 200000});#}
@@ -319,10 +283,6 @@
 {#        });#}
 {#    });#}
 
-    function change_info(){
-        var args = $("#asset_form").serialize();
-        window.location = "/jasset/asset_list/?" + args
-    }
 
     $("#search_input").keydown(function(e){
         if(e.keyCode==13){
