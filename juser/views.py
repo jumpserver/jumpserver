@@ -63,7 +63,7 @@ def group_list(request):
     if keyword:
         user_group_list = user_group_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
 
-    if id:
+    if group_id:
         user_group_list = user_group_list.filter(id=int(group_id))
 
     user_group_list, p, user_groups, page_range, current_page, show_first, show_end = pages(user_group_list, request)

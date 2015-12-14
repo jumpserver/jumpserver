@@ -116,25 +116,6 @@ def file_monitor(path='.', client=None):
             break
 
 
-class Application(tornado.web.Application):
-    def __init__(self):
-        handlers = [
-            (r'/monitor', MonitorHandler),
-            (r'/terminal', WebTerminalHandler),
-            (r'/kill', WebTerminalKillHandler),
-            (r'/exec', ExecHandler),
-        ]
-
-        setting = {
-            'cookie_secret': 'DFksdfsasdfkasdfFKwlwfsdfsa1204mx',
-            'template_path': os.path.join(os.path.dirname(__file__), 'templates'),
-            'static_path': os.path.join(os.path.dirname(__file__), 'static'),
-            'debug': True,
-        }
-
-        tornado.web.Application.__init__(self, handlers, **setting)
-
-
 class MonitorHandler(tornado.websocket.WebSocketHandler):
     clients = []
     threads = []
@@ -415,12 +396,32 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         except IndexError:
             pass
 
+
+class Application(tornado.web.Application):
+    def __init__(self):
+        handlers = [
+            (r'/monitor', MonitorHandler),
+            (r'/terminal', WebTerminalHandler),
+            (r'/kill', WebTerminalKillHandler),
+            (r'/exec', ExecHandler),
+        ]
+
+        setting = {
+            'cookie_secret': 'DFksdfsasdfkasdfFKwlwfsdfsa1204mx',
+            'template_path': os.path.join(os.path.dirname(__file__), 'templates'),
+            'static_path': os.path.join(os.path.dirname(__file__), 'static'),
+            'debug': False,
+        }
+
+        tornado.web.Application.__init__(self, handlers, **setting)
+
+
 if __name__ == '__main__':
     tornado.options.parse_command_line()
     app = Application()
     server = tornado.httpserver.HTTPServer(app)
     server.bind(options.port, options.host)
-    # server.listen(options.port)
-    server.start(num_processes=1)
+    #server.listen(options.port)
+    server.start(num_processes=10)
     print "Run server on %s:%s" % (options.host, options.port)
     tornado.ioloop.IOLoop.instance().start()
