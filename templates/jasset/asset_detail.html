@@ -197,7 +197,7 @@
                                         <table class="table">
                                         <p>授权用户信息</p>
                                         <td class="text-navy">授权用户</td>
-                                        <td class="text-navy">系统角色</td>
+                                        <td class="text-navy">关联用户</td>
                                         {% for perm in user_perm %}
                                             <tr>
                                                 <td class="text-navy"><a href="{% url 'user_detail' %}?id={{ perm.0.id }}">{{ perm.0 }}</a></td>

@@ -58,9 +58,13 @@ def group_list(request):
     header_title, path1, path2 = '查看用户组', '用户管理', '查看用户组'
     keyword = request.GET.get('search', '')
     user_group_list = UserGroup.objects.all().order_by('name')
+    group_id = request.GET.get('id', '')
 
     if keyword:
         user_group_list = user_group_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
+
+    if id:
+        user_group_list = user_group_list.filter(id=int(group_id))
 
     user_group_list, p, user_groups, page_range, current_page, show_first, show_end = pages(user_group_list, request)
     return my_render('juser/group_list.html', locals(), request)
@@ -387,7 +391,7 @@ def user_edit(request):
                 地址：%s
                 用户名： %s
                 密码：%s (如果密码为None代表密码为原密码)
-                角色：%s
+                权限：：%s
 
             """ % (user.name, URL, user.username, password_decode, user_role.get(role_post, u''))
             send_mail('您的信息已修改', msg, MAIL_FROM, [email], fail_silently=False)

@@ -70,7 +70,8 @@ def get_asset_info(asset):
                 info['password'] = CRYPTOR.decrypt(default.field3)
             except ServerError:
                 pass
-            info['ssh_key'] = default.field4
+            if os.path.isfile(default.field4):
+                info['ssh_key'] = default.field4
     else:
         info['port'] = int(asset.port)
         info['username'] = asset.username
@@ -93,7 +94,7 @@ def get_role_key(user, role):
         with open(os.path.join(role.key_path, 'id_rsa')) as fk:
             with open(user_role_key_path, 'w') as fu:
                 fu.write(fk.read())
-        logger.debug(u"创建新的用户角色key %s, Owner: %s" % (user_role_key_path, user.username))
+        logger.debug(u"创建新的系统用户key %s, Owner: %s" % (user_role_key_path, user.username))
         chown(user_role_key_path, user.username)
         os.chmod(user_role_key_path, 0600)
     return user_role_key_path

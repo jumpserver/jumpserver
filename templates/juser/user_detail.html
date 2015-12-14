@@ -53,7 +53,7 @@
                                         {% if user.username|key_exist %}
                                         <td><a  href="{% url 'key_down' %}?id={{ user.id }}" >下载</a></td>
                                         {% else %}
-                                        <td><span style="color: #586b7d">下载</span></td>
+                                        <td><span style="color: #586b7d">NoKey</span></td>
                                         {% endif %}
                                     </tr>
                                     <tr>
@@ -140,7 +140,7 @@
                     </div>
                     <div class="ibox-content ibox-heading">
                         <h3>用户的所有授权主机</h3>
-                        <small><i class="fa fa-map-marker"></i> 这里包含了用户授权角色和角色下的主机.</small>
+                        <small><i class="fa fa-map-marker"></i> 这里包含了用户授权的主机和其映射的系统用户.</small>
                     </div>
                     <div class="ibox-content inspinia-timeline">
                         {% for role, assets in role_assets.items %}
@@ -155,13 +155,13 @@
                                     </div>
                                     <div class="col-xs-7 content no-top-border">
                                         <p class="m-b-xs">
-                                            <strong>{{ role.comment }}</strong></p>
+                                            <strong>{{ role.comment }}</strong>
+                                        </p>
                                         <p>
                                             {% for asset in assets.asset %}
                                                 <a href="{% url 'asset_list' %}?id={{ asset.id }}">{{ asset.hostname }}</a><br>
                                             {% endfor %}
                                         </p>
-                                        <p></p>
                                     </div>
                                 </div>
                             </div>

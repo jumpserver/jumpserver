@@ -59,13 +59,13 @@
                         {% for post in contacts.object_list  %}
                             <tr class="gradeX">
                                 <td class="text-center" name="j_id" value="{{ post.id }}" data-editable='false'><input name="id" value="{{ post.id }}" type="checkbox" class="i-checks"></td>
-                                <td class="text-center"> {{ post.name }} </td>
+                                <td class="text-center"> <a href="{% url 'asset_list' %}?idc_id={{ post.id }}">{{ post.name }}</a> </td>
                                 <td class="text-center"> <a href="{% url 'asset_list' %}?idc_id={{ post.id }}">{{ post.asset_set.count }}</a> </td>
                                 <td class="text-center"> {{ post.linkman }} </td>
                                 <td class="text-center"> {{ post.phone }} </td>
                                 <td class="text-center"> {{ post.comment }} </td>
                                 <td class="text-center">
-                                    <a href="{% url 'asset_list' %}?idc_id={{ post.id }}" class="iframe btn btn-xs btn-primary">详情</a>
+
                                     <a href="{% url 'idc_edit' %}?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a href="{% url 'idc_del' %}?id={{ post.id }}" class="btn btn-xs btn-danger idc_del">删除</a>
                                 </td>

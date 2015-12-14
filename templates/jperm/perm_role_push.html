@@ -34,7 +34,7 @@
                                 <div class="alert alert-success text-center">{{ msg }}</div>
                             {% endif %}
                             <div class="form-group">
-                                <label for="role" class="col-sm-2 control-label">角色</label>
+                                <label for="role" class="col-sm-2 control-label">系统用户</label>
                                 <div class="col-sm-8">
                                     <input name="id" type="text" class="form-control" disabled value="{{ role.name }}">
                                 </div>
@@ -125,8 +125,8 @@ $('#pushForm').validator({
         },
         "roles": {
             rule: "required",
-            tip: "请选择角色",
-            msg: {required: "必须选择角色"}
+            tip: "请选择系统用户",
+            msg: {required: "必须选择系统用户"}
         }
     },
     valid: function(form) {

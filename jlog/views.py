@@ -133,7 +133,10 @@ def log_detail(request, offset):
     if offset == 'exec':
         log = get_object(ExecLog, id=log_id)
         assets_hostname = log.host.split(' ')
-        result = eval(str(log.result))
+        try:
+            result = eval(str(log.result))
+        except (SyntaxError, NameError):
+            result = {}
         return my_render('jlog/exec_detail.html', locals(), request)
     elif offset == 'file':
         log = get_object(FileLog, id=log_id)

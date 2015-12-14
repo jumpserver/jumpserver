@@ -21,7 +21,7 @@ import uuid
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
-    django.setup()
+    setup = django.setup()
 from django.contrib.sessions.models import Session
 from jumpserver.api import ServerError, User, Asset, PermRole, AssetGroup, get_object, mkdir, get_asset_info
 from jumpserver.api import logger, Log, TtyLog, get_role_key, CRYPTOR, bash, get_tmp_dir
@@ -526,7 +526,7 @@ class Nav(object):
             user_asset_search = user_asset_all
 
         self.search_result = dict(zip(range(len(user_asset_search)), user_asset_search))
-        color_print('[%-3s] %-12s %-15s  %-5s  %-10s  %s' % ('ID', u'主机名', 'IP', u'端口', u'角色', u'备注'), 'title')
+        color_print('[%-3s] %-12s %-15s  %-5s  %-10s  %s' % ('ID', u'主机名', 'IP', u'端口', u'系统用户', u'备注'), 'title')
         for index, asset in self.search_result.items():
             # 获取该资产信息
             asset_info = get_asset_info(asset)
@@ -556,13 +556,13 @@ class Nav(object):
 
             roles = self.user_perm.get('role').keys()
             if len(roles) > 1:  # 授权角色数大于1
-                color_print('[%-2s] %-15s' % ('ID', '角色'),  'info')
+                color_print('[%-2s] %-15s' % ('ID', '系统用户'),  'info')
                 role_check = dict(zip(range(len(roles)), roles))
 
                 for i, r in role_check.items():
                     print '[%-2s] %-15s' % (i, r.name)
                 print
-                print "请输入运行命令角色的ID, q退出"
+                print "请输入运行命令所关联系统用户的ID, q退出"
 
                 try:
                     role_id = raw_input("\033[1;32mRole>:\033[0m ").strip()
@@ -575,7 +575,7 @@ class Nav(object):
             elif len(roles) == 1:  # 授权角色数为1
                 role = roles[0]
             assets = list(self.user_perm.get('role', {}).get(role).get('asset'))  # 获取该用户，角色授权主机
-            print "该角色有权限的所有主机"
+            print "授权包含该系统用户的所有主机"
             for asset in assets:
                 print ' %s' % asset.hostname
             print
@@ -766,11 +766,11 @@ def main():
                     roles = nav.user_perm.get('asset').get(asset).get('role')
                     if len(roles) > 1:
                         role_check = dict(zip(range(len(roles)), roles))
-                        print "\033[32m[ID] 角色\033[0m"
+                        print "\033[32m[ID] 系统用户\033[0m"
                         for index, role in role_check.items():
                             print "[%-2s] %s" % (index, role.name)
                         print
-                        print "授权角色超过1个，请输入角色ID, q退出"
+                        print "授权系统用户超过1个，请输入ID, q退出"
                         try:
                             role_index = raw_input("\033[1;32mID>:\033[0m ").strip()
                             if role_index == 'q':

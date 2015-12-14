@@ -77,7 +77,7 @@
                                             <table class="table progress-striped text-left">
                                             {% for user in users %}
                                                 <tr class="gradeX">
-                                                    <td> <a href="{% url 'asset_detail' %}?id={{ user.id }}">{{ user.name }}</a> </td>
+                                                    <td> <a href="{% url 'user_detail' %}?id={{ user.id }}">{{ user.name }}</a> </td>
                                                 </tr>
                                             {% endfor %}
                                             </table>
@@ -86,7 +86,7 @@
                                             <table class="table progress-striped text-right">
                                             {% for group in user_groups %}
                                                 <tr class="gradeX-">
-                                                    <td> <a href="{% url 'asset_list' %}?group_id={{ group.id }}">{{ group.name }}</a> </td>
+                                                    <td> <a href="{% url 'user_group_list' %}?id={{ group.id }}">{{ group.name }}</a> </td>
                                                 </tr>
                                             {% endfor %}
                                             </table>

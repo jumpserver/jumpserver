@@ -199,7 +199,7 @@
                         });
                         //window.open(new_url + data, '', 'location=no, resizeable=no, height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,status=no');
                     } else if (dataArray.length == '1' && data == 'error'){
-                        layer.alert('没有授权角色')
+                        layer.alert('没有授权系统用户')
                     } else {
                         aUrl = '';
                         $.each(dataArray, function(index, value){
@@ -207,7 +207,7 @@
                         });
                         layer.alert(aUrl, {
                             skin: 'layui-layer-molv',
-                            title: '多个角色，请选择一个连接',
+                            title: '授权多个系统用户，请选择一个连接',
                             shade: false,
                             closeBtn: 0
                         })
@@ -230,7 +230,7 @@
                 success: function(data){
                     var dataArray = data.split(',');
                     if (data == 'error' || data == '' || data == null || data == undefined){
-                        layer.alert('没有授权角色')
+                        layer.alert('没有授权系统用户')
                     }
                     else if (dataArray.length == 1 && data != 'error' && navigator.platform == 'Win32'){
                         var title = 'Jumpserver Web Terminal' + '<span class="text-info"> '+ hostname +'</span>';
@@ -260,7 +260,7 @@
                         console.log(aUrl);
                         layer.alert(aUrl, {
                             skin: 'layui-layer-molv',
-                            title: '多个角色，请选择一个连接',
+                            title: '授权多个系统用户，请选择一个连接',
                             shade: false,
                             closeBtn: 0
                         })

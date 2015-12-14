@@ -70,7 +70,7 @@
                                     {% if user.username|key_exist %}
                                         <a  href="{% url 'key_down' %}?uuid={{ user.uuid }}" >下载</a>
                                     {% else %}
-                                        <span style="color: #586b7d">下载</span>
+                                        <span style="color: #586b7d">NoKey</span>
                                     {% endif %}
                                 </td>
                                 <td class="text-center">

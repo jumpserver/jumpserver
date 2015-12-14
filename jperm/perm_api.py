@@ -175,13 +175,17 @@ def gen_resource(ob, perm=None):
 
             for asset in assets:
                 asset_info = get_asset_info(asset)
+                role_key = get_role_key(user, role)
                 info = {'hostname': asset.hostname,
                         'ip': asset.ip,
                         'port': asset_info.get('port', 22),
                         'username': role.name,
-                        'password': CRYPTOR.decrypt(role.password),
-                        'ssh_key': get_role_key(user, role)
-                        }
+                        'password': CRYPTOR.decrypt(role.password)
+                       }
+
+                if os.path.isfile(role_key):
+                    info['ssh_key'] = role_key
+
                 res.append(info)
         else:
             for asset, asset_info in perm.get('asset').items():
@@ -192,13 +196,17 @@ def gen_resource(ob, perm=None):
                     role = sorted(list(perm.get('asset').get(asset).get('role')))[0]
                 except IndexError:
                     continue
+
+                role_key = get_role_key(user, role)
                 info = {'hostname': asset.hostname,
                         'ip': asset.ip,
                         'port': asset_info.get('port', 22),
                         'username': role.name,
                         'password': CRYPTOR.decrypt(role.password),
-                        'ssh_key': get_role_key(user, role)
                         }
+                if os.path.isfile(role_key):
+                    info['ssh_key'] = role_key
+
                 res.append(info)
 
     elif isinstance(ob, User):
@@ -214,8 +222,12 @@ def gen_resource(ob, perm=None):
                 continue
             info['username'] = role.name
             info['password'] = CRYPTOR.decrypt(role.password)
-            info['ssh_key'] = get_role_key(ob, role)
+
+            role_key = get_role_key(ob, role)
+            if os.path.isfile(role_key):
+                    info['ssh_key'] = role_key
             res.append(info)
+
     elif isinstance(ob, (list, QuerySet)):
         for asset in ob:
             info = get_asset_info(asset)

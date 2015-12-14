@@ -263,7 +263,6 @@ def asset_list(request):
     asset_group_all = AssetGroup.objects.all()
     asset_types = ASSET_TYPE
     asset_status = ASSET_STATUS
-    asset_id = request.GET.get('id')
     idc_name = request.GET.get('idc', '')
     group_name = request.GET.get('group', '')
     asset_type = request.GET.get('asset_type', '')
@@ -273,6 +272,7 @@ def asset_list(request):
     group_id = request.GET.get("group_id", '')
     idc_id = request.GET.get("idc_id", '')
     asset_id_all = request.GET.getlist("id", '')
+
     if group_id:
         group = get_object(AssetGroup, id=group_id)
         if group:
@@ -301,9 +301,6 @@ def asset_list(request):
 
     if status:
         asset_find = asset_find.filter(status__contains=status)
-
-    if asset_id:
-        asset_find = asset_find.filter(id=asset_id)
 
     if keyword:
         asset_find = asset_find.filter(

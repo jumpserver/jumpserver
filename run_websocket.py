@@ -231,7 +231,7 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
         logger.debug('Websocket: Open exec request')
         role_name = self.get_argument('role', 'sb')
         self.remote_ip = self.request.remote_ip
-        logger.debug('Web执行命令: 请求角色 %s' % role_name)
+        logger.debug('Web执行命令: 请求系统用户 %s' % role_name)
         self.role = get_object(PermRole, name=role_name)
         self.perm = get_group_user_perm(self.user)
         roles = self.perm.get('role').keys()
@@ -315,7 +315,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         if asset:
             roles = user_have_perm(self.user, asset)
             logger.debug(roles)
-            logger.debug('角色: %s' % role_name)
+            logger.debug('系统用户: %s' % role_name)
             login_role = ''
             for role in roles:
                 if role.name == role_name:
