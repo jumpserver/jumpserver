@@ -374,7 +374,7 @@
             $.ajax({
                 type: "post",
                 data: {asset_id_all: asset_id_all},
-                url: "{% url 'asset_add_batch' %}",
+                url: "{% url 'asset_update_batch' %}",
                 success: function () {
                     parent.location.reload();
                 }
