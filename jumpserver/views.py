@@ -357,4 +357,16 @@ def web_terminal(request):
 
 
 def install(request):
-    return render_to_response('test.html', locals())
+    return render_to_response('install.html', locals())
+
+
+def install_test(request, offset):
+    if offset == 'db':
+        db_host = request.GET.get('db_host')
+        db_port = request.GET.get('db_port')
+        db_user = request.GET.get('db_user')
+        db_pass = request.GET.get('db_pass')
+        db = request.GET.get('db')
+
+
+
