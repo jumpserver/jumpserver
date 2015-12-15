@@ -451,7 +451,7 @@ def asset_update(request):
         return HttpResponseRedirect(reverse('asset_detail')+'?id=%s' % asset_id)
     else:
         asset_ansible_update([asset], name)
-    return HttpResponseRedirect(reverse('asset_detail')+'/?id=%s' % asset_id)
+    return HttpResponseRedirect(reverse('asset_detail')+'?id=%s' % asset_id)
 
 
 @require_role('admin')

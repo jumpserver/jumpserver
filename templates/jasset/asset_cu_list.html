@@ -109,8 +109,8 @@
             }
         });
 
-        $('#exec_cmd').click(function(){
-            var url = '{% url "role_get" %} ';
+    $('#exec_cmd').click(function(){
+            var url = '{% url "role_get" %}';
             var new_url = '{% url "exec_cmd" %}?role=';
             var check_array = [];
             $(".gradeX input:checked").closest('tr').find('.hostname a').each(function() {
@@ -155,11 +155,10 @@
         });
 
         $('.conn').click(function(){
-            var url='{% url "role_get" %}?id=' + $(this).attr('value');
+            var url='{% url "role_get" %}?id=' + $(this).attr('value'); // 获取用户有权限的角色
             var href = $(this).attr('href');
-            var new_url = '{% url "terminal" %}?id=' + $(this).attr('value') + '&role=';
+            var new_url = '{% url "terminal" %}?id=' + $(this).attr('value') + '&role='; // webterminal socket url
             var hostname = $(this).closest('tr').find('.hostname a')[0].innerHTML;
-            var title = 'Jumpserver Web Terminal' + '<span class="text-info"> '+ hostname +'</span>';
             $.ajax({
                 type: 'GET',
                 url: url,
@@ -168,17 +167,19 @@
                     var dataArray = data.split(',');
                     if (data == 'error' || data == '' || data == null || data == undefined){
                         layer.alert('没有授权系统用户')
-                    } else if (dataArray.length == 1 && data != 'error' && navigator.platform == 'Win32') {
+                    }
+                    else if (dataArray.length == 1 && data != 'error' && navigator.platform == 'Win32'){
+                        var title = 'Jumpserver Web Terminal' + '<span class="text-info"> '+ hostname +'</span>';
                         layer.open({
                             type: 2,
                             title: title,
                             maxmin: true,
                             shade: false,
                             area: ['628px', '420px'],
-                            content: new_url + data
+                            content: new_url+data
                         });
-                    } else if (dataArray.length == 1 && data != 'error'){
-                        layer.open({
+                    }  else if (dataArray.length == 1 && data != 'error'){
+                       layer.open({
                             type: 2,
                             title: title,
                             maxmin: true,
@@ -186,12 +187,13 @@
                             area: ['628px', '452px'],
                             content: new_url+data
                         });
-                        //window.open(new_url + data, '', 'location=no, resizeable=no, height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,status=no');
-                    } else {
+                    }
+                    else {
                         aUrl = '';
                         $.each(dataArray, function(index, value){
                             aUrl += '<a onclick="windowOpen(this); return false" class="btn btn-xs btn-primary newa" href=' + new_url + value + ' value=' + hostname +  '>' + value  + '</a> '
                         });
+                        console.log(aUrl);
                         layer.alert(aUrl, {
                             skin: 'layui-layer-molv',
                             title: '授权多个系统用户，请选择一个连接',
@@ -209,27 +211,40 @@
         var new_url = $(a).attr('href');
         var hostname = $(a).attr('value');
         var title = 'Jumpserver Web Terminal - ' + '<span class="text-info"> '+ hostname +'</span>';
-        layer.open({
+        if (navigator.platform == 'Win32'){
+            layer.open({
+            type: 2,
+            title: title,
+            maxmin: true,
+            area: ['628px', '420px'],
+            shade: false,
+            content: new_url
+            });
+
+        } else {
+            layer.open({
             type: 2,
             title: title,
             maxmin: true,
             area: ['628px', '452px'],
             shade: false,
             content: new_url
-        });
+            });
+        }
+
         return false
     }
 
      function windowOpenExec(a){
-        var new_url = $(a).attr('href');
-        var title = 'Jumpserver Exec Terminal';
-        layer.open({
-            type: 2,
-            title: title,
-            maxmin: true,
-            area: ['800px', '600px'],
-            shade: false,
-            content: new_url
+         var new_url = $(a).attr('href');
+         var title = 'Jumpserver Exec Terminal';
+         layer.open({
+             type: 2,
+             title: title,
+             maxmin: true,
+             area: ['725px', '600px'],
+             shade: false,
+             content: new_url
         });
          console.log(new_url);
         return false

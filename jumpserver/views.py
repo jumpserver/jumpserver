@@ -354,3 +354,49 @@ def web_terminal(request):
     role_name = request.GET.get('role')
     web_terminal_uri = 'ws://%s/terminal?id=%s&role=%s' % (WEB_SOCKET_HOST, asset_id, role_name)
     return render_to_response('jlog/web_terminal.html', locals())
+
+
+def install(request):
+    return render_to_response('install.html', locals())
+
+
+def install_test(request, offset):
+    if request.method == 'post':
+        if offset == 'db':
+            import MySQLdb
+            db_host = request.GET.get('db_host')
+            db_port = int(request.GET.get('db_port'))
+            db_user = request.GET.get('db_user')
+            db_pass = request.GET.get('db_pass')
+            db = request.GET.get('db')
+
+            try:
+                conn = MySQLdb.connect(host=db_host, port=db_port, user=db_user, passwd=db_pass, db=db)
+            except Exception:
+                return HttpResponse('链接失败', status=500)
+            else:
+                return HttpResponse('连接成功')
+
+        elif offset == 'mail':
+            from smtplib import SMTP
+            smtp_host = request.GET.get('smtp_host')
+            smtp_port = request.GET.get('smtp_port')
+            mail_addr = request.GET.get('mail_addr')
+            mail_pass = request.GET.get('mail_pass')
+
+            try:
+                smtp = SMTP(smtp_host, port=smtp_port)
+                smtp.login(mail_addr, mail_pass)
+                smtp.sendmail(mail_addr, (mail_addr),
+                              '''From:%s\r\nTo:%s\r\nSubject:Jumpserver Mail Test!\r\n\r\n  Mail test passed!\r\n''')
+                smtp.quit()
+
+            except Exception:
+                return HttpResponse('测试失败', status=500)
+            else:
+                return HttpResponse(u'登陆 %s邮箱查看邮件' % mail_addr)
+    else:
+        print request.method
+        return HttpResponse('请求方法错误', status=500)
+
+

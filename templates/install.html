@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jumpserver Install</title>
+    <!-- <link href="css/bootstrap.min.css" rel="stylesheet"> -->
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <link href="font-awesome/css/font-awesome.css" rel="stylesheet"> -->
+    <!-- <link href="css/plugins/iCheck/custom.css" rel="stylesheet">  -->
+    <link href="/static/css/plugins/steps/jquery.steps.css" rel="stylesheet">
+    <!-- <link href="css/animate.css" rel="stylesheet"> -->
+    <!-- <link href="css/style.css" rel="stylesheet"> -->
+    <link href="/static/css/style.css" rel="stylesheet">
+    <style>
+        .wizard-big.wizard > .content {
+        min-height: 320px;
+    }
+    </style>
+</head>
+
+<body>
+    <div id="wrapper">
+        <div class="row" >
+            <div class="col-sm-12" >
+                <div class="ibox">
+                    <div class="ibox-title">
+                        <h5>向导</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content" style="height: 900px;">
+                        <h2>
+                            安装向导
+                        </h2>
+                        <p>
+                            请输入相关信息完成安装
+                        </p>
+
+                        <form id="form" action="#" class="wizard-big" >
+{#                            <h1>管理员账户</h1>#}
+{#                            <fieldset>#}
+{#                                <h2>管理员账号是首次登陆的账号</h2>#}
+{#                                <div class="row">#}
+{#                                      <div class="col-sm-6">#}
+{#                                          <div class="form-group">#}
+{#                                              <label>用户名  *</label>#}
+{#                                              <input id="username" name="username" type="text" class="form-control required" minlength="5" >#}
+{#                                          </div>#}
+{#                                          <div class="form-group">#}
+{#                                              <label>密码 *</label>#}
+{#                                              <input id="password" name="password" type="password" class="form-control required password" minlength="8">#}
+{#                                          </div>#}
+{#                                      </div>#}
+{#                                      <div class="col-sm-6">#}
+{#                                          <div class="form-group">#}
+{#                                              <label>邮件 *</label>#}
+{#                                              <input id="email" name="email" type="email" class="form-control required">#}
+{#                                          </div>#}
+{#                                          <div class="form-group">#}
+{#                                              <label>确认密码 *</label>#}
+{#                                              <input id="pass_confirm" name="pass_confirm" type="password" equalto="#password"  class="form-control required">#}
+{#                                          </div>#}
+{#                                      </div>#}
+{#                                    <div class="col-sm-4">#}
+{#                                        <div class="text-center">#}
+{#                                            <div style="margin-top: 20px">#}
+{#                                                <i class="fa fa-sign-in" style="font-size: 180px;color: #e5e5e5 "></i>#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </fieldset>#}
+                            <h1>数据库</h1>
+                            <fieldset>
+                                <h2>数据库连接信息</h2>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>地址 *</label>
+                                            <input id="db_host" name="db_host" type="text" class="form-control required">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>端口 *</label>
+                                            <input id="db_port" name="db_port" type="text" class="form-control required number">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>数据库 *</label>
+                                            <input id="db" name="db" type="text" class="form-control required">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>用户名 *</label>
+                                            <input id="db_user" name="db_user" type="text" class="form-control required">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>密码 *</label>
+                                            <input id="db_pass" name="db_pass" type="password" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <div></div>
+                                            <a id="db_btn" value="{% url 'install_test' 'db' %}" class="btn btn-sm btn-warning" style="float: right"> 测试连接 </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <h1>邮件设置</h1>
+                            <fieldset>
+                                 <h2>邮件设置</h2>
+                                <div class="row">
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>SMTP *</label>
+                                            <input id="smtp_host" name="smtp_host" type="text" class="form-control required">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>端口 *</label>
+                                            <input id="smtp_port" name="smtp_port" type="text" class="form-control required">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-6">
+                                        <div class="form-group">
+                                            <label>邮件地址 *</label>
+                                            <input id="mail_addr" name="mail_addr" type="text" class="form-control required">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>密码 *</label>
+                                            <input id="mail_pass" name="mail_pass" type="password" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <div></div>
+                                            <a id="mail_btn" href="{% url 'install_test' 'mail' %}" class="btn btn-sm btn-warning" style="float: right"> 测试邮件 </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+
+                            <h1>完成</h1>
+                            <fieldset>
+                                <h2>Terms and Conditions</h2>
+                                <input id="acceptTerms" name="acceptTerms" type="checkbox" class="required"> <label for="acceptTerms">I agree with the Terms and Conditions.</label>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- Mainly scripts -->
+    <!-- // <script src="js/jquery-2.1.1.js"></script> -->
+    <script src="/static/js/jquery-2.1.1.js"></script>
+    <script src="/static/js/bootstrap.min.js"></script>
+    <!-- // <script src="js/plugins/metisMenu/jquery.metisMenu.js"></script> -->
+    <script src="/static/js/plugins/metisMenu/jquery.metisMenu.js"></script>
+    <!-- // <script src="js/plugins/slimscroll/jquery.slimscroll.min.js"></script> -->
+
+    <!-- Custom and plugin javascript -->
+    <!-- // <script src="js/inspinia.js"></script> -->
+    <!-- // <script src="js/plugins/pace/pace.min.js"></script> -->
+
+    <!-- Steps -->
+    <script src="/static/js/plugins/steps/jquery.steps.min.js"></script>
+
+    <!-- Jquery Validate -->
+    <script src="/static/js/plugins/validate/jquery.validate.min.js"></script>
+
+
+    <script>
+        $(document).ready(function(){
+            // $("#wizard").steps();
+
+            $('#db_btn').click(function(){
+                console.log('hello');
+                var db_host = $('#db_host').val();
+                var db_port = $('#db_port').val();
+                var db_user = $('#db_user').val();
+                var db_pass = $('#db_pass').val();
+                $.post(
+                        $(this).attr('value'),
+                        {'db_host': db_host,
+                         'db_port': db_port,
+                         'db_user': db_user,
+                         'db_pass': db_pass
+                        },
+                        function(data, status){
+                          alert(data)
+                        }
+
+                );
+                return false;
+
+            });
+
+            $("#form").steps({
+                bodyTag: "fieldset",
+                onStepChanging: function (event, currentIndex, newIndex)
+                {
+                    // Always allow going backward even if the current step contains invalid fields!
+                    if (currentIndex > newIndex)
+                    {
+                        return true;
+                    }
+
+                    // Forbid suppressing "Warning" step if the user is to young
+                    if (newIndex === 3 && Number($("#age").val()) < 18)
+                    {
+                        return false;
+                    }
+
+                    var form = $(this);
+
+                    // Clean up if user went backward before
+                    if (currentIndex < newIndex)
+                    {
+                        // To remove error styles
+                        $(".body:eq(" + newIndex + ") label.error", form).remove();
+                        $(".body:eq(" + newIndex + ") .error", form).removeClass("error");
+                    }
+
+                    // Disable validation on fields that are disabled or hidden.
+                    form.validate().settings.ignore = ":disabled,:hidden";
+
+                    // Start validation; Prevent going forward if false
+                    return form.valid();
+                },
+                onStepChanged: function (event, currentIndex, priorIndex)
+                {
+                    // Suppress (skip) "Warning" step if the user is old enough.
+                    if (currentIndex === 2 && Number($("#age").val()) >= 18)
+                    {
+                        $(this).steps("next");
+                    }
+
+                    // Suppress (skip) "Warning" step if the user is old enough and wants to the previous step.
+                    if (currentIndex === 2 && priorIndex === 3)
+                    {
+                        $(this).steps("previous");
+                    }
+                },
+                onFinishing: function (event, currentIndex)
+                {
+                    var form = $(this);
+
+                    // Disable validation on fields that are disabled.
+                    // At this point it's recommended to do an overall check (mean ignoring only disabled fields)
+                    form.validate().settings.ignore = ":disabled";
+
+                    // Start validation; Prevent form submission if false
+                    return form.valid();
+                },
+                onFinished: function (event, currentIndex)
+                {
+                    var form = $(this);
+
+                    // Submit form input
+                    form.submit();
+                }
+            }).validate({
+                        errorPlacement: function (error, element)
+                        {
+                            element.before(error);
+                        },
+                        rules: {
+                            confirm: {
+                                equalTo: "#password"
+                            }
+                        }
+                    });
+       });
+    </script>
+
+</body>
+
+</html>

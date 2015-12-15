@@ -106,7 +106,7 @@ function remove_rule(rule_id){
     if (confirm("确认删除")) {
         $.ajax({
            type: "POST",
-           url: "/jperm/perm_rule_delete/",
+           url: "{% url 'rule_del' %}",
            data: "id=" + rule_id,
            success: function(msg){
                alert( "成功: " + msg );
