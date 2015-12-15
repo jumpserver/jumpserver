@@ -47,40 +47,39 @@
                         </p>
 
                         <form id="form" action="#" class="wizard-big" >
-                            <h1>管理员账户</h1>
-                            <fieldset>
-                                <h2>管理员账号是首次登陆的账号</h2>
-                                <div class="row">
-                                      <div class="col-sm-6">
-                                          <div class="form-group">
-                                              <label>用户名  *</label>
-                                              <input id="username" name="username" type="text" class="form-control required" minlength="5" >
-                                          </div>
-                                          <div class="form-group">
-                                              <label>密码 *</label>
-                                              <input id="password" name="password" type="password" class="form-control required password" minlength="8">
-                                          </div>
-                                      </div>
-                                      <div class="col-sm-6">
-                                          <div class="form-group">
-                                              <label>邮件 *</label>
-                                              <input id="email" name="email" type="email" class="form-control required">
-                                          </div>
-                                          <div class="form-group">
-                                              <label>确认密码 *</label>
-                                              <input id="pass_confirm" name="pass_confirm" type="password" equalto="#password"  class="form-control required">
-                                          </div>
-                                      </div>
-                                    <div class="col-sm-4">
-                                        <div class="text-center">
-                                            <div style="margin-top: 20px">
-                                                <i class="fa fa-sign-in" style="font-size: 180px;color: #e5e5e5 "></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </fieldset>
+{#                            <h1>管理员账户</h1>#}
+{#                            <fieldset>#}
+{#                                <h2>管理员账号是首次登陆的账号</h2>#}
+{#                                <div class="row">#}
+{#                                      <div class="col-sm-6">#}
+{#                                          <div class="form-group">#}
+{#                                              <label>用户名  *</label>#}
+{#                                              <input id="username" name="username" type="text" class="form-control required" minlength="5" >#}
+{#                                          </div>#}
+{#                                          <div class="form-group">#}
+{#                                              <label>密码 *</label>#}
+{#                                              <input id="password" name="password" type="password" class="form-control required password" minlength="8">#}
+{#                                          </div>#}
+{#                                      </div>#}
+{#                                      <div class="col-sm-6">#}
+{#                                          <div class="form-group">#}
+{#                                              <label>邮件 *</label>#}
+{#                                              <input id="email" name="email" type="email" class="form-control required">#}
+{#                                          </div>#}
+{#                                          <div class="form-group">#}
+{#                                              <label>确认密码 *</label>#}
+{#                                              <input id="pass_confirm" name="pass_confirm" type="password" equalto="#password"  class="form-control required">#}
+{#                                          </div>#}
+{#                                      </div>#}
+{#                                    <div class="col-sm-4">#}
+{#                                        <div class="text-center">#}
+{#                                            <div style="margin-top: 20px">#}
+{#                                                <i class="fa fa-sign-in" style="font-size: 180px;color: #e5e5e5 "></i>#}
+{#                                            </div>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                </div>#}
+{#                            </fieldset>#}
                             <h1>数据库</h1>
                             <fieldset>
                                 <h2>数据库连接信息</h2>
@@ -110,7 +109,7 @@
                                         </div>
                                         <div class="form-group">
                                             <div></div>
-                                            <a href="{% url 'user_add' %}" class="btn btn-sm btn-warning" style="float: right"> 测试连接 </a>
+                                            <a id="db_btn" value="{% url 'install_test' 'db' %}" class="btn btn-sm btn-warning" style="float: right"> 测试连接 </a>
                                         </div>
                                     </div>
                                 </div>
@@ -123,7 +122,7 @@
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label>SMTP *</label>
-                                            <input id="smtp" name="smtp" type="text" class="form-control required">
+                                            <input id="smtp_host" name="smtp_host" type="text" class="form-control required">
                                         </div>
                                         <div class="form-group">
                                             <label>端口 *</label>
@@ -137,11 +136,11 @@
                                         </div>
                                         <div class="form-group">
                                             <label>密码 *</label>
-                                            <input id="dbpass" name="dbpass" type="password" class="form-control">
+                                            <input id="mail_pass" name="mail_pass" type="password" class="form-control">
                                         </div>
                                         <div class="form-group">
                                             <div></div>
-                                            <a href="{% url 'user_add' %}" class="btn btn-sm btn-warning" style="float: right"> 测试邮件 </a>
+                                            <a id="mail_btn" href="{% url 'install_test' 'mail' %}" class="btn btn-sm btn-warning" style="float: right"> 测试邮件 </a>
                                         </div>
                                     </div>
                                 </div>
@@ -184,6 +183,29 @@
     <script>
         $(document).ready(function(){
             // $("#wizard").steps();
+
+            $('#db_btn').click(function(){
+                console.log('hello');
+                var db_host = $('#db_host').val();
+                var db_port = $('#db_port').val();
+                var db_user = $('#db_user').val();
+                var db_pass = $('#db_pass').val();
+                $.post(
+                        $(this).attr('value'),
+                        {'db_host': db_host,
+                         'db_port': db_port,
+                         'db_user': db_user,
+                         'db_pass': db_pass
+                        },
+                        function(data, status){
+                          alert(data)
+                        }
+
+                );
+                return false;
+
+            });
+
             $("#form").steps({
                 bodyTag: "fieldset",
                 onStepChanging: function (event, currentIndex, newIndex)

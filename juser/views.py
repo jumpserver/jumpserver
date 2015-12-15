@@ -295,7 +295,7 @@ def forget_password(request):
             hash_encode = PyCrypt.md5_crypt(str(user.uuid) + str(timestamp) + KEY)
             msg = u"""
             Hi %s, 请点击下面链接重设密码！
-            %s/juser/reset_password/?uuid=%s&timestamp=%s&hash=%s
+            %s/juser/password/reset/?uuid=%s&timestamp=%s&hash=%s
             """ % (user.name, URL, user.uuid, timestamp, hash_encode)
             send_mail('忘记跳板机密码', msg, MAIL_FROM, [email], fail_silently=False)
             msg = u'请登陆邮箱，点击邮件重设密码'
@@ -311,7 +311,7 @@ def reset_password(request):
     uuid_r = request.GET.get('uuid', '')
     timestamp = request.GET.get('timestamp', '')
     hash_encode = request.GET.get('hash', '')
-    action = '/juser/reset_password/?uuid=%s&timestamp=%s&hash=%s' % (uuid_r, timestamp, hash_encode)
+    action = '/juser/password/reset/?uuid=%s&timestamp=%s&hash=%s' % (uuid_r, timestamp, hash_encode)
 
     if request.method == 'POST':
         password = request.POST.get('password')
