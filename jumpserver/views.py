@@ -354,3 +354,7 @@ def web_terminal(request):
     role_name = request.GET.get('role')
     web_terminal_uri = 'ws://%s/terminal?id=%s&role=%s' % (WEB_SOCKET_HOST, asset_id, role_name)
     return render_to_response('jlog/web_terminal.html', locals())
+
+
+def install(request):
+    return render_to_response('test.html', locals())

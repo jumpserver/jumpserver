@@ -275,27 +275,40 @@
         var new_url = $(a).attr('href');
         var hostname = $(a).attr('value');
         var title = 'Jumpserver Web Terminal - ' + '<span class="text-info"> '+ hostname +'</span>';
-        layer.open({
+        if (navigator.platform == 'Win32'){
+            layer.open({
+            type: 2,
+            title: title,
+            maxmin: true,
+            area: ['628px', '420px'],
+            shade: false,
+            content: new_url
+            });
+
+        } else {
+            layer.open({
             type: 2,
             title: title,
             maxmin: true,
             area: ['628px', '452px'],
             shade: false,
             content: new_url
-        });
+            });
+        }
+
         return false
     }
 
      function windowOpenExec(a){
-        var new_url = $(a).attr('href');
-        var title = 'Jumpserver Exec Terminal';
-        layer.open({
-            type: 2,
-            title: title,
-            maxmin: true,
-            area: ['800px', '600px'],
-            shade: false,
-            content: new_url
+         var new_url = $(a).attr('href');
+         var title = 'Jumpserver Exec Terminal';
+         layer.open({
+             type: 2,
+             title: title,
+             maxmin: true,
+             area: ['725x', '600px'],
+             shade: false,
+             content: new_url
         });
          console.log(new_url);
         return false
