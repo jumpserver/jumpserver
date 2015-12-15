@@ -271,7 +271,7 @@ def send_mail_retry(request):
     msg = u"""
     跳板机地址： %s
     用户名：%s
-    重设密码：%s/juser/forget_password/
+    重设密码：%s/juser/password/forget/
     请登录web点击个人信息页面重新生成ssh密钥
     """ % (URL, user.username, URL)
 

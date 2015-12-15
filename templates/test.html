@@ -54,11 +54,11 @@
                                       <div class="col-sm-6">
                                           <div class="form-group">
                                               <label>用户名  *</label>
-                                              <input id="username" name="username" type="text" class="form-control required">
+                                              <input id="username" name="username" type="text" class="form-control required" minlength="8" >
                                           </div>
                                           <div class="form-group">
                                               <label>密码 *</label>
-                                              <input id="password" name="password" type="password" class="form-control required">
+                                              <input id="password" name="password" type="password" class="form-control required password">
                                           </div>
                                       </div>
                                       <div class="col-sm-6">
@@ -68,27 +68,9 @@
                                           </div>
                                           <div class="form-group">
                                               <label>确认密码 *</label>
-                                              <input id="password" name="password" type="password" class="form-control">
+                                              <input id="pass_confirm" name="pass_confirm" type="password" equalto="#password"  class="form-control">
                                           </div>
                                       </div>
-{#                                    <div class="col-sm-8" style="height: 100%">#}
-{#                                        <div class="form-group">#}
-{#                                            <label>Username *</label>#}
-{#                                            <input id="userName" name="userName" type="text" class="form-control required">#}
-{#                                        </div>#}
-{#                                        <div class="form-group">#}
-{#                                            <label>Password *</label>#}
-{#                                            <input id="password" name="password" type="password" class="form-control required">#}
-{#                                        </div>#}
-{#                                        <div class="form-group">#}
-{#                                            <label>Confirm Password *</label>#}
-{#                                            <input id="confirm" name="confirm" type="password" class="form-control required">#}
-{#                                        </div>#}
-{#                                        <div class="form-group">#}
-{#                                            <label>Email *</label>#}
-{#                                            <input id="email" name="email" type="text" class="form-control required">#}
-{#                                        </div>#}
-{#                                    </div>#}
                                     <div class="col-sm-4">
                                         <div class="text-center">
                                             <div style="margin-top: 20px">
@@ -141,21 +123,25 @@
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label>SMTP *</label>
-                                            <input id="host" name="host" type="text" class="form-control required">
+                                            <input id="smtp" name="smtp" type="text" class="form-control required">
                                         </div>
                                         <div class="form-group">
                                             <label>端口 *</label>
-                                            <input id="port" name="port" type="text" class="form-control required">
+                                            <input id="smtp_port" name="smtp_port" type="text" class="form-control required">
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label>邮件地址 *</label>
-                                            <input id="dbuser" name="dbuser" type="text" class="form-control required">
+                                            <input id="mail_addr" name="mail_addr" type="text" class="form-control required">
                                         </div>
                                         <div class="form-group">
                                             <label>密码 *</label>
                                             <input id="dbpass" name="dbpass" type="password" class="form-control">
+                                        </div>
+                                        <div class="form-group">
+                                            <div></div>
+                                            <a href="{% url 'user_add' %}" class="btn btn-sm btn-warning" style="float: right"> 测试邮件 </a>
                                         </div>
                                     </div>
                                 </div>
