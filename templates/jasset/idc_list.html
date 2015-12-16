@@ -67,7 +67,7 @@
                                 <td class="text-center">
 
                                     <a href="{% url 'idc_edit' %}?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <a href="{% url 'idc_del' %}?id={{ post.id }}" class="btn btn-xs btn-danger idc_del">删除</a>
+                                    <a value="{% url 'idc_del' %}?id={{ post.id }}" class="btn btn-xs btn-danger idc_del">删除</a>
                                 </td>
                             </tr>
                         {% endfor %}
