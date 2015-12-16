@@ -16,7 +16,7 @@ from passlib.hash import sha512_crypt
 from django.template.loader import get_template
 from django.template import Context
 
-from utils import get_rand_pass
+
 from jumpserver.api import logger
 
 
