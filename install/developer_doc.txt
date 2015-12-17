@@ -1,0 +1,36 @@
+# coding: utf8
+
+Jumpserver开发者文档
+
+开发规范：
+  1. 遵守PE8规范  1) 命名规范  2) 导入模块规范 3) 空行规范 4) 长度规范
+  2. 缩进统一4个空格
+  3. 变量命名明了易懂多个单词下划线隔开
+  4. 注释到位
+
+
+框架说明：
+  1. 项目名称 Jumpserver
+  2. APP:
+       juser 			用户管理
+       jasset 			资产管理(设备管理)
+       jpermission 		授权管理
+       jlog				日志管理
+  3. connect.py 		用户登录入口程序
+  4. logs        		日志保存目录
+  5. jumpserver.conf 	配置文件
+  6. docs               文档目录
+  7. static             静态文件目录
+  8. templates          模板目录
+
+
+connect.py逻辑说明：
+  用户登录系统，运行该脚本，p调用get_user_host函数查看有权限的服务器ip
+  输入部分IP，verify_connect匹配该部分ip,如果是匹配到多个，就显示ip
+                                      匹配到0了就显示没有权限或者主机，
+                                      匹配到1个则继续
+  查询该服务器是否支持ldap 如果是，获得ldap用户密码登陆
+                         如果否，查询授权表，查看该服务器授权的系统用户，并返回对应账号密码，登陆
+  connect函数是登陆函数，采用paramiko 使用channel登陆，posix_shell 来完成交互，并记录日志
+  signal模块来完成窗口改变导致的tty大小随之改变
+  PyCrypt是对称加密类

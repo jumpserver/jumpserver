@@ -1,0 +1,9 @@
+- model: juser.user
+  pk: 5000
+  fields:
+    username: admin
+    name: admin
+    password: pbkdf2_sha256$20000$jBIDGPB2j5JT$orxqGgzzjzykColYm1BswPjgHOiERjZkcgkuVIkD2Hc=
+    email: admin@jumpserver.org
+    role: SU
+    is_active: 1
