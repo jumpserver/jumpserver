@@ -361,6 +361,9 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             self.log.end_time = datetime.datetime.now()
             self.log.save()
             self.log_time_f.close()
+            print "1"
+            self.ssh.close()
+            print "2"
             self.close()
         except AttributeError:
             pass

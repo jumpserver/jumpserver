@@ -498,7 +498,8 @@ class Nav(object):
         6) 输入 \033[32mE/e\033[0m 批量执行命令.
         7) 输入 \033[32mU/u\033[0m 批量上传文件.
         8) 输入 \033[32mD/d\033[0m 批量下载文件.
-        9) 输入 \033[32mQ/q\033[0m 退出.
+        9) 输入 \033[32mH/h\033[0m 帮助.
+        0) 输入 \033[32mQ/q\033[0m 退出.
         """
         print textwrap.dedent(msg)
 
@@ -763,6 +764,8 @@ def main():
                 nav.upload()
             elif option in ['D', 'd']:
                 nav.download()
+            elif option in ['H', 'h']:
+                nav.print_nav()
             elif option in ['Q', 'q', 'exit']:
                 sys.exit()
             else:

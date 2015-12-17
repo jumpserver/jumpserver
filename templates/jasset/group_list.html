@@ -57,11 +57,10 @@
                                 <td class="text-center" name="id" value="{{ asset_group.id }}" data-editable='false'>
                                     <input name="id" value="{{ asset_group.id }}" type="checkbox" class="i-checks">
                                 </td>
-                                <td class="text-center"> {{ asset_group.name }} </td>
+                                <td class="text-center"><a href="{% url 'asset_list' %}?group_id={{ asset_group.id }}">{{ asset_group.name }} </a>  </td>
                                 <td class="text-center"> <a href="{% url 'asset_list' %}?group_id={{ asset_group.id }}">{{ asset_group.asset_set.count }}</a> </td>
                                 <td class="text-center"> {{ asset_group.comment }} </td>
                                 <td class="text-center">
-                                    <a href="{% url 'asset_list' %}?group_id={{ asset_group.id }}" class="btn btn-xs btn-info">详情</a>
                                     <a href="{% url 'asset_group_edit' %}?id={{ asset_group.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a value="{% url 'asset_group_del' %}?id={{ asset_group.id }}" class="btn btn-xs btn-danger group_del">删除</a>
                                 </td>
