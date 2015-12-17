@@ -2,7 +2,7 @@ import datetime
 
 from django.db import models
 from jasset.models import Asset, AssetGroup
-from juser.models  import User, UserGroup
+from juser.models import User, UserGroup
 
 
 class PermLog(models.Model):

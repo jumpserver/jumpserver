@@ -105,7 +105,7 @@
                                     {% endifnotequal %}
                                     <th class="text-center"> 录像 </th>
                                     <th class="text-center"> 登录时间 </th>
-                                    <th class="text-center"> 结束时间 </th>
+                                    <th class="text-center"> 时长</th>
 
                                 </tr>
                             </thead>
@@ -123,7 +123,7 @@
                                     {% endifnotequal %}
                                     <td class="text-center"><a value="{% url 'log_record' %}?id={{ post.id }}" class="log_record"> 回放 </a></td>
                                     <td class="text-center start_time"> {{ post.start_time|date:"Y-m-d H:i:s"}} </td>
-                                    <td class="text-center end_time"> {{ post.end_time|date:"Y-m-d H:i:s" }} </td>
+                                    <td class="text-center end_time"> {{ post.end_time|timeuntil:post.start_time }} </td>
                                 </tr>
                             {% endfor %}
                             </tbody>
