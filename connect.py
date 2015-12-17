@@ -90,8 +90,7 @@ def log_record(username, host):
     log_file_path = os.path.join(today_connect_log_dir, log_filename)
     dept_name = User.objects.get(username=username).dept.name
     pid = os.getpid()
-    pts = os.popen("ps axu | awk '$2==%s{ print $7 }'" % pid).read().strip()
-    ip_list = os.popen("who | awk '$2==\"%s\"{ print $5 }'" % pts).read().strip('()\n')
+    ip_list = os.popen("who -m | awk '{ print $5 }'").read().strip('()\n')
 
     if not os.path.isdir(today_connect_log_dir):
         try:
