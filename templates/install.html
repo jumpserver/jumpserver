@@ -46,40 +46,40 @@
                             请输入相关信息完成安装
                         </p>
 
-                        <form id="form" action="#" class="wizard-big" >
-{#                            <h1>管理员账户</h1>#}
-{#                            <fieldset>#}
-{#                                <h2>管理员账号是首次登陆的账号</h2>#}
-{#                                <div class="row">#}
-{#                                      <div class="col-sm-6">#}
-{#                                          <div class="form-group">#}
-{#                                              <label>用户名  *</label>#}
-{#                                              <input id="username" name="username" type="text" class="form-control required" minlength="5" >#}
-{#                                          </div>#}
-{#                                          <div class="form-group">#}
-{#                                              <label>密码 *</label>#}
-{#                                              <input id="password" name="password" type="password" class="form-control required password" minlength="8">#}
-{#                                          </div>#}
-{#                                      </div>#}
-{#                                      <div class="col-sm-6">#}
-{#                                          <div class="form-group">#}
-{#                                              <label>邮件 *</label>#}
-{#                                              <input id="email" name="email" type="email" class="form-control required">#}
-{#                                          </div>#}
-{#                                          <div class="form-group">#}
-{#                                              <label>确认密码 *</label>#}
-{#                                              <input id="pass_confirm" name="pass_confirm" type="password" equalto="#password"  class="form-control required">#}
-{#                                          </div>#}
-{#                                      </div>#}
-{#                                    <div class="col-sm-4">#}
-{#                                        <div class="text-center">#}
-{#                                            <div style="margin-top: 20px">#}
-{#                                                <i class="fa fa-sign-in" style="font-size: 180px;color: #e5e5e5 "></i>#}
-{#                                            </div>#}
-{#                                        </div>#}
-{#                                    </div>#}
-{#                                </div>#}
-{#                            </fieldset>#}
+                        <form id="form" action="{% url 'install' %}" method="post" class="wizard-big" >
+                            <h1>管理员账户</h1>
+                            <fieldset>
+                                <h2>管理员账号是首次登陆的账号</h2>
+                                <div class="row">
+                                      <div class="col-sm-6">
+                                          <div class="form-group">
+                                              <label>用户名  *</label>
+                                              <input id="username" name="username" type="text" class="form-control required" minlength="5" >
+                                          </div>
+                                          <div class="form-group">
+                                              <label>密码 *</label>
+                                              <input id="password" name="password" type="password" class="form-control required password" minlength="8">
+                                          </div>
+                                      </div>
+                                      <div class="col-sm-6">
+                                          <div class="form-group">
+                                              <label>邮件 *</label>
+                                              <input id="email" name="email" type="email" class="form-control required">
+                                          </div>
+                                          <div class="form-group">
+                                              <label>确认密码 *</label>
+                                              <input id="pass_confirm" name="pass_confirm" type="password" equalto="#password"  class="form-control required">
+                                          </div>
+                                      </div>
+                                    <div class="col-sm-4">
+                                        <div class="text-center">
+                                            <div style="margin-top: 20px">
+                                                <i class="fa fa-sign-in" style="font-size: 180px;color: #e5e5e5 "></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
                             <h1>数据库</h1>
                             <fieldset>
                                 <h2>数据库连接信息</h2>
@@ -87,29 +87,29 @@
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label>地址 *</label>
-                                            <input id="db_host" name="db_host" type="text" class="form-control required">
+                                            <input id="db_host" name="db_host" type="text" value="127.0.0.1" class="form-control required">
                                         </div>
                                         <div class="form-group">
                                             <label>端口 *</label>
-                                            <input id="db_port" name="db_port" type="text" class="form-control required number">
+                                            <input id="db_port" name="db_port" type="text" value="3306" class="form-control required number">
                                         </div>
                                         <div class="form-group">
                                             <label>数据库 *</label>
-                                            <input id="db" name="db" type="text" class="form-control required">
+                                            <input id="db" name="db" type="text" value="jumpserver" class="form-control required">
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label>用户名 *</label>
-                                            <input id="db_user" name="db_user" type="text" class="form-control required">
+                                            <input id="db_user" name="db_user" type="text" value="jumpserver" class="form-control required">
                                         </div>
                                         <div class="form-group">
                                             <label>密码 *</label>
-                                            <input id="db_pass" name="db_pass" type="password" class="form-control">
+                                            <input id="db_pass" name="db_pass" type="password" class="form-control required">
                                         </div>
                                         <div class="form-group">
                                             <div></div>
-                                            <a id="db_btn" value="{% url 'install_test' 'db' %}" class="btn btn-sm btn-warning" style="float: right"> 测试连接 </a>
+                                            <a id="db_btn" value="{% url 'install_test' 'db' %}" class="btn btn-sm btn-warning" style="float: right" onclick="db_test(this)"> 测试连接 </a>
                                         </div>
                                     </div>
                                 </div>
@@ -122,25 +122,25 @@
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label>SMTP *</label>
-                                            <input id="smtp_host" name="smtp_host" type="text" class="form-control required">
+                                            <input id="smtp_host" name="smtp_host" placeholder="smtp.qq.com" type="text" class="form-control required">
                                         </div>
                                         <div class="form-group">
                                             <label>端口 *</label>
-                                            <input id="smtp_port" name="smtp_port" type="text" class="form-control required">
+                                            <input id="smtp_port" name="smtp_port" value="25" type="text" class="form-control required">
                                         </div>
                                     </div>
                                     <div class="col-sm-6">
                                         <div class="form-group">
                                             <label>邮件地址 *</label>
-                                            <input id="mail_addr" name="mail_addr" type="text" class="form-control required">
+                                            <input id="mail_addr" name="mail_addr" placeholder="xxxx@qq.com" type="text" class="form-control required">
                                         </div>
                                         <div class="form-group">
                                             <label>密码 *</label>
-                                            <input id="mail_pass" name="mail_pass" type="password" class="form-control">
+                                            <input id="mail_pass" name="mail_pass" type="password" class="form-control required">
                                         </div>
                                         <div class="form-group">
                                             <div></div>
-                                            <a id="mail_btn" href="{% url 'install_test' 'mail' %}" class="btn btn-sm btn-warning" style="float: right"> 测试邮件 </a>
+                                            <a id="mail_btn" value="{% url 'install_test' 'mail' %}" class="btn btn-sm btn-warning" style="float: right" onclick="smtp_test(this)"> 测试邮件 </a>
                                         </div>
                                     </div>
                                 </div>
@@ -148,8 +148,8 @@
 
                             <h1>完成</h1>
                             <fieldset>
-                                <h2>Terms and Conditions</h2>
-                                <input id="acceptTerms" name="acceptTerms" type="checkbox" class="required"> <label for="acceptTerms">I agree with the Terms and Conditions.</label>
+                                <h2>确认信息</h2>
+                                <p id="confirm"></p>
                             </fieldset>
                         </form>
                     </div>
@@ -158,8 +158,6 @@
             </div>
         </div>
     </div>
-
-
 
     <!-- Mainly scripts -->
     <!-- // <script src="js/jquery-2.1.1.js"></script> -->
@@ -181,30 +179,76 @@
 
 
     <script>
-        $(document).ready(function(){
-            // $("#wizard").steps();
+        var db_test_valid = false;
+        var smtp_test_valid = false;
 
-            $('#db_btn').click(function(){
-                console.log('hello');
-                var db_host = $('#db_host').val();
-                var db_port = $('#db_port').val();
-                var db_user = $('#db_user').val();
-                var db_pass = $('#db_pass').val();
-                $.post(
-                        $(this).attr('value'),
-                        {'db_host': db_host,
-                         'db_port': db_port,
-                         'db_user': db_user,
-                         'db_pass': db_pass
-                        },
-                        function(data, status){
-                          alert(data)
-                        }
+        function db_test(t, alert_){
+            var valid = $(t).closest('form').valid();
+            if (valid == false){
+                console.log('Not valid');
+                return
+            }
+            var db_host = $('#db_host').val();
+            var db_port = $('#db_port').val();
+            var db_user = $('#db_user').val();
+            var db_pass = $('#db_pass').val();
+            var db = $('#db').val();
+            $.ajax({
+                url: $(t).attr('value'),
+                data: {'db_host': db_host,
+                    'db_port': db_port,
+                    'db_user': db_user,
+                    'db_pass': db_pass,
+                    'db': db },
+                success: function(data, status){
+                    db_test_valid = true;
+                    $('#db_btn').removeClass('btn-danger');
+                    $('#db_btn').addClass('btn-primary');
+                    alert(data)
+                },
+                error: function(data){
+                    $('#db_btn').addClass('btn-danger');
+                    alert(data.responseText)
+                }
+            });
+            return false;
+        }
 
-                );
-                return false;
+        function smtp_test(t){
+            var valid = $(t).closest('form').valid();
+            if (valid == false){
+                console.log('Not valid');
+                return
+            }
+            var smtp_host = $('#smtp_host').val();
+            var smtp_port = $('#smtp_port').val();
+            var mail_addr = $('#mail_addr').val();
+            var mail_pass = $('#mail_pass').val();
+            $.ajax({
+                url: $(t).attr('value'),
+                data: {
+                    'smtp_host': smtp_host,
+                    'smtp_port': smtp_port,
+                    'mail_addr': mail_addr,
+                    'mail_pass': mail_pass
+                },
+                success: function(data, status){
+                    smtp_test_valid = false;
+                    $('#smtp_btn').removeClass('btn-danger');
+                    $('#smtp_btn').addClass('btn-primary');
+                    alert(data)
+                },
+                error: function(data) {
+                    $('#smtp_btn').addClass('btn-danger');
+                    alert(data.responseText)
+                }
 
             });
+            return false;
+        }
+
+        $(document).ready(function(){
+            // $("#wizard").steps();
 
             $("#form").steps({
                 bodyTag: "fieldset",
@@ -217,11 +261,23 @@
                     }
 
                     // Forbid suppressing "Warning" step if the user is to young
-                    if (newIndex === 3 && Number($("#age").val()) < 18)
-                    {
-                        return false;
+                    if (newIndex === 2){
+                        if (db_test_valid == false) {
+                            $('#db_btn').removeClass('btn-warning');
+                            $('#db_btn').addClass('btn-danger');
+                            return false;
+                        }
+
                     }
 
+                    if (newIndex === 3){
+                        //if (smtp_test_valid == false){
+                        //    $('#smtp_btn').removeClass('btn-warning');
+                        //    $('#smtp_btn').addClass('btn-danger');
+                        //    return false;
+                        //}
+                        console.log('pass')
+                    }
                     var form = $(this);
 
                     // Clean up if user went backward before
@@ -250,6 +306,20 @@
                     if (currentIndex === 2 && priorIndex === 3)
                     {
                         $(this).steps("previous");
+                    }
+                        console.log(currentIndex + ';' + priorIndex);
+                    if (currentIndex === 3 && priorIndex === 2)
+                    {
+                        $('#confirm').html(
+                                '<span>' + '管理账号: ' + $('#username').val() + '<br/ >' +
+                                '<span>' + '管理邮箱: ' + $('#email').val() + '<br/ >' +
+                                '<span>' + '数据库地址: ' + $('#db_host').val() + '<br/ >' +
+                                '<span>' + '数据库端口: ' + $('#db_port').val() + '<br/ >' +
+                                '<span>' + '数据库账号: ' + $('#db_user').val() + '<br/ >' +
+                                '<span>' + 'SMTP地址: ' + $('#smtp_host').val() + '<br/ >' +
+                                '<span>' + 'SMTP端口: ' + $('#smtp_port').val() + '<br/ >' +
+                                '<span>' + '邮件账号: ' + $('#mail_addr').val() + '<br/ >'
+                        )
                     }
                 },
                 onFinishing: function (event, currentIndex)

@@ -698,6 +698,11 @@ class Nav(object):
                         file_path = raw_input("\033[1;32mPath>:\033[0m ").strip()
                         if file_path == 'q':
                             break
+
+                        if not file_path:
+                            print "文件路径为空"
+                            continue
+
                         runner.run('fetch', module_args='src=%s dest=%s' % (file_path, tmp_dir), pattern=pattern)
                         ret = runner.results
                         FileLog(user=self.user.name, host=asset_name_str, filename=file_path, type='download',
