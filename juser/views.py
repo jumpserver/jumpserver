@@ -425,9 +425,6 @@ def change_info(request):
         if '' in [name, email]:
             error = '不能为空'
 
-        if len(password) < 6:
-            error = '密码须大于6位'
-
         if not error:
             User.objects.filter(id=user_id).update(name=name, email=email)
             if len(password) > 0:
