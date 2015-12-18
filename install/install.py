@@ -126,7 +126,7 @@ class PreSetup(object):
             smtp.quit()
             return True
 
-        except (SMTPAuthenticationError, socket.timeout), e:
+        except (SMTPAuthenticationError, socket.timeout, socket.gaierror), e:
             color_print(e, 'red')
             return False
 

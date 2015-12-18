@@ -57,6 +57,7 @@ class Setup(object):
     def start(self):
         print "开始安装Jumpserver, 要求环境为 CentOS 6.5 x86_64"
         self._sync_db()
+        self._input_admin()
         self._create_admin()
 
 
