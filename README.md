@@ -4,21 +4,27 @@
 ###截图：
 
 * 首页
+
 ![webterminal](https://github.com/ibuler/static/raw/master/jumpserver3/index.png)
 
 * WebTerminal:
+
 ![webterminal](https://github.com/ibuler/static/raw/master/jumpserver3/terminal.gif)
 
 * Web Exec Command
+
 ![WebExecCommand](https://github.com/ibuler/static/raw/master/jumpserver3/web_exec.gif)
 
 * 录像回放
+
 ![录像](https://github.com/ibuler/static/raw/master/jumpserver3/record.gif)
 
 * 跳转和批量命令
+
 ![跳转](https://github.com/ibuler/static/raw/master/jumpserver3/connect.gif)
 
 * 命令统计
+
 ![跳转](https://github.com/ibuler/static/raw/master/jumpserver3/command.png)
 
 
