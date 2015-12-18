@@ -1,6 +1,25 @@
 #欢迎使用Jumpserver
 **Jumpserver**是一款由python编写开源的跳板机(堡垒机)系统，实现了跳板机应有的功能
 
+###截图：
+
+* 首页
+![webterminal](https://github.com/ibuler/static/raw/master/jumpserver3/index.png)
+
+* WebTerminal:
+![webterminal](https://github.com/ibuler/static/raw/master/jumpserver3/terminal.gif)
+
+* Web Exec Command
+![WebExecCommand](https://github.com/ibuler/static/raw/master/jumpserver3/web_exec.gif)
+
+* 录像回放
+![录像](https://github.com/ibuler/static/raw/master/jumpserver3/record.gif)
+
+* 跳转和批量命令
+![跳转](https://github.com/ibuler/static/raw/master/jumpserver3/connect.gif)
+
+* 命令统计
+![跳转](https://github.com/ibuler/static/raw/master/jumpserver3/command.png)
 
 
 > **统计管理** 统一管理用户 
@@ -17,7 +36,7 @@
 #### 资产管理 ####
 	负责资产管理，添加资产，编辑资产，建立IDC，建立用户组等
 #### 授权管理 ####
-	负责授权用户登录某些特定主机，授权sudo，查看授权申请
+	负责授权用户登录某些特定主机，授权sudo，建立系统用户
 #### 日志审计 ####
 	负责用户操作的审计，监控用户操作，统计用户操作记录，中断用户操作
 #### 上传下载 ####
@@ -27,8 +46,6 @@
 
 [demo站点](http://demo.jumpserver.org)
 
-[更新log](http://laoguang.blog.51cto.com/6013350/1635853)
-
-[部署文档](http://laoguang.blog.51cto.com/6013350/1636273)
+[文档](./docs)
 
 
