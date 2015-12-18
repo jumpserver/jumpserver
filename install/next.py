@@ -15,7 +15,7 @@ if django.get_version() != '1.6':
     setup = django.setup()
 
 from juser.user_api import db_add_user, server_add_user
-from connect import color_print
+from install import color_print
 
 
 class Setup(object):
