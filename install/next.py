@@ -77,22 +77,6 @@ class Setup(object):
         with open(conf_file, 'w') as f:
             conf.write(f)
 
-    @staticmethod
-    def _rpm_repo():
-        color_print('开始安装epel源', 'green')
-        bash('yum -y install epel-release')
-
-    @staticmethod
-    def _depend_rpm():
-        color_print('开始安装依赖rpm包', 'green')
-        bash('yum -y install git python-pip mysql-devel gcc automake autoconf python-devel vim sshpass')
-
-    @staticmethod
-    def _require_pip():
-        color_print('开始安装依赖pip包', 'green')
-        os.chdir(jms_dir)
-        bash('pip install -r install/requirements.txt')
-
     def _setup_mysql(self):
         color_print('开始安装设置mysql (请手动设置mysql安全)', 'green')
         bash('yum -y install mysql-server')
@@ -209,10 +193,6 @@ class Setup(object):
     def start(self):
         print "开始安装Jumpserver, 要求环境为 CentOS 6.5 x86_64"
         self._pull()
-        self._set_env()
-        self._rpm_repo()
-        self._depend_rpm()
-        self._require_pip()
         self._input_ip()
         self._input_mysql()
         self._input_smtp()
