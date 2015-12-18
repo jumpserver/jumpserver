@@ -24,14 +24,23 @@ class Setup(object):
     """
 
     def __init__(self):
-        self.admin_user = ''
-        self.admin_pass = ''
+        self.admin_user = 'admin'
+        self.admin_pass = 'Lov@wife'
 
     def _input_admin(self):
         while True:
-            self.admin_user = raw_input('请输入管理员用户名 [%s]: ' % self.admin_user).strip()
-            self.admin_pass = raw_input('请输入管理员密码: ').strip()
-            admin_pass_again = raw_input('请再次输入管理员密码: ').strip()
+            admin_user = raw_input('请输入管理员用户名 [%s]: ' % self.admin_user).strip()
+            admin_pass = raw_input('请输入管理员密码: [%s]: ' % self.admin_pass).strip()
+            admin_pass_again = raw_input('请再次输入管理员密码: [%s]: ' % self.admin_pass).strip()
+
+            if admin_user:
+                self.admin_user = admin_user
+
+            if not admin_pass_again:
+                admin_pass_again = self.admin_pass
+
+            if admin_pass:
+                self.admin_pass = admin_pass
 
             if self.admin_pass != admin_pass_again:
                 color_print('两次密码不相同请重新输入')
