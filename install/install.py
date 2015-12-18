@@ -80,9 +80,9 @@ class PreSetup(object):
         conf.set('db', 'host', self.db_host)
         conf.set('db', 'port', self.db_port)
         conf.set('db', 'user', self.db_user)
-        conf.set('db', 'pass', self.db_pass)
+        conf.set('db', 'password', self.db_pass)
         conf.set('db', 'database', self.db)
-        conf.set('websocket', 'web_socket_host', '%s: 3000' % self.ip)
+        conf.set('websocket', 'web_socket_host', '%s:3000' % self.ip)
         conf.set('mail', 'email_host', self.mail_host)
         conf.set('mail', 'email_port', self.mail_port)
         conf.set('mail', 'email_host_user', self.mail_addr)
@@ -207,7 +207,8 @@ class PreSetup(object):
         self._input_mysql()
         self._input_smtp()
         self.write_conf()
-        os.system('python next.py')
+        os.chdir(jms_dir)
+        os.system('python %s' % os.path.join(jms_dir, 'install/next.py'))
 
 
 if __name__ == '__main__':
