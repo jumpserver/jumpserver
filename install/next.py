@@ -47,18 +47,25 @@ class Setup(object):
     def _create_admin(self):
         db_add_user(username=self.admin_user, password=self.admin_pass, role='SU', name='admin', groups='',
                     admin_groups='', email='admin@jumpserver.org', uuid='MayBeYouAreTheFirstUser', is_active=True)
-        os.system('useradd %s' % self.admin_user)
+        os.system('id %s || useradd %s' % (self.admin_user, self.admin_user))
 
     @staticmethod
     def _cp_zzsh():
         os.chdir(jms_dir)
         shutil.copy('zzjumpserver.sh', '/etc/profile.d/')
 
+    @staticmethod
+    def _run_service():
+        os.system('sh %s start' % os.path.join(jms_dir, 'service.sh'))
+        color_print('安装成功，请访问web .')
+
     def start(self):
         print "开始安装Jumpserver, 要求环境为 CentOS 6.5 x86_64"
         self._sync_db()
         self._input_admin()
         self._create_admin()
+        self._cp_zzsh()
+        self._run_service()
 
 
 if __name__ == '__main__':
