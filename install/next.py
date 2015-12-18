@@ -47,7 +47,7 @@ class Setup(object):
     def _create_admin(self):
         db_add_user(username=self.admin_user, password=self.admin_pass, role='SU', name='admin', groups='',
                     admin_groups='', email='admin@jumpserver.org', uuid='MayBeYouAreTheFirstUser', is_active=True)
-        server_add_user(self.admin_user, self.admin_user, ssh_key_login_need=False)
+        os.system('useradd %s' % self.admin_user)
 
     @staticmethod
     def _cp_zzsh():
