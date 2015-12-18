@@ -5,21 +5,22 @@
 	iptables stop
 	selinux disable
 	
-####开始
-** 1. 安装git **
-    
-	yum -y install git
-	 
-** 2. 下载jumpserver **
 	
-    git clone https://github.com/ibuler/jumpserver.git
+####开始
+**1. 安装git**
+    
+> yum -y install git
+	 
+**2. 下载jumpserver**
+	
+> git clone https://github.com/ibuler/jumpserver.git
 
-** 3. 执行快速安装脚本 **
+**3. 执行快速安装脚本**
 
-	cd jumpserver/install && python install.py
+> cd jumpserver/install && python install.py
 
-> 根据提示输入相关信息，完成安装，完成安装后，请访问web，继续查看后续文档
 
+ *根据提示输入相关信息，完成安装，完成安装后，请访问web，继续查看后续文档*
 
 
 
