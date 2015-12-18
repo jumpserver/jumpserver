@@ -14,7 +14,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 if django.get_version() != '1.6':
     setup = django.setup()
 
-from juser.user_api import db_add_user, server_add_user
+from juser.user_api import db_add_user, get_object, User
 from install import color_print
 
 
@@ -25,7 +25,7 @@ class Setup(object):
 
     def __init__(self):
         self.admin_user = 'admin'
-        self.admin_pass = 'Lov@wife'
+        self.admin_pass = '5Lov@wife'
 
     def _input_admin(self):
         while True:
@@ -54,18 +54,22 @@ class Setup(object):
         execute_from_command_line(['manage.py', 'syncdb', '--noinput'])
 
     def _create_admin(self):
+        user = get_object(User, username=self.admin_user)
+        if user:
+            user.delete()
         db_add_user(username=self.admin_user, password=self.admin_pass, role='SU', name='admin', groups='',
                     admin_groups='', email='admin@jumpserver.org', uuid='MayBeYouAreTheFirstUser', is_active=True)
-        os.system('id %s || useradd %s' % (self.admin_user, self.admin_user))
+        os.system('id %s &> /dev/null || useradd %s' % (self.admin_user, self.admin_user))
 
     @staticmethod
     def _cp_zzsh():
-        os.chdir(jms_dir)
+        os.chdir(os.path.join(jms_dir, 'install'))
         shutil.copy('zzjumpserver.sh', '/etc/profile.d/')
 
     @staticmethod
     def _run_service():
         os.system('sh %s start' % os.path.join(jms_dir, 'service.sh'))
+        print
         color_print('安装成功，请访问web .')
 
     def start(self):
