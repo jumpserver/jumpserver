@@ -201,6 +201,12 @@ class PreSetup(object):
         self._rpm_repo()
         self._depend_rpm()
         self._require_pip()
+        self._set_env()
+        self._pull()
+        self._input_ip()
+        self._input_mysql()
+        self._input_smtp()
+        self.write_conf()
         os.system('python next.py')
 
 
