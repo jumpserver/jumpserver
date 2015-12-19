@@ -285,9 +285,13 @@ def asset_list(request):
         if user_perm != 0:
             asset_find = Asset.objects.all()
         else:
+            asset_id_all = []
             user = get_object(User, username=username)
             asset_perm = get_group_user_perm(user) if user else {'asset': ''}
-            asset_find = asset_perm['asset'].keys()
+            user_asset_perm = asset_perm['asset'].keys()
+            for asset in user_asset_perm:
+                asset_id_all.append(asset.id)
+            asset_find = Asset.objects.filter(pk__in=asset_id_all)
             asset_group_all = list(asset_perm['asset_group'])
 
     if idc_name:
@@ -309,10 +313,16 @@ def asset_list(request):
             Q(ip__contains=keyword) |
             Q(remote_ip__contains=keyword) |
             Q(comment__contains=keyword) |
+            Q(username__contains=keyword) |
             Q(group__name__contains=keyword) |
             Q(cpu__contains=keyword) |
             Q(memory__contains=keyword) |
-            Q(disk__contains=keyword))
+            Q(disk__contains=keyword) |
+            Q(brand__contains=keyword) |
+            Q(cabinet__contains=keyword) |
+            Q(sn__contains=keyword) |
+            Q(system_type__contains=keyword) |
+            Q(system_version__contains=keyword))
 
     if export:
         if asset_id_all:
