@@ -5,7 +5,7 @@
 
 * 首页
 
-![webterminal](https://github.com/ibuler/static/raw/master/jumpserver3/index.jpg)
+![webterminal](https://github.com/ibuler/static/raw/master/jumpserver3/index.jpeg)
 
 * Web Terminal:
 
