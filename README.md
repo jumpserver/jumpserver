@@ -52,6 +52,8 @@ Web批量执行命令
 
 [Jumpserver官网](http://www.jumpserver.org)
 
+[论坛](http://bbs.jumpserver.org)
+
 [demo站点](http://demo.jumpserver.org)
 
 ### 团队
