@@ -84,13 +84,6 @@ def log_kill(request):
     log = Log.objects.filter(pid=pid)
     if log:
         log = log[0]
-<<<<<<< HEAD
-        dept_name = log.dept_name
-        deptname = get_session_user_info(request)[4]
-        if is_group_admin(request) and dept_name != deptname:
-            return httperror(request, u'Kill失败, 您无权操作!')
-=======
->>>>>>> dev
         try:
             os.kill(int(pid), 9)
         except OSError:

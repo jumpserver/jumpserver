@@ -273,23 +273,11 @@ def get_push_info(push_id, arg):
     else:
         return []
 
-<<<<<<< HEAD
-@register.filter(name='sudo_cmd_count')
-def sudo_cmd_count(cmd_group_id):
-    cmd_group = CmdGroup.objects.filter(id=cmd_group_id)
-    cmds = []
-    if cmd_group:
-        cmd_group = cmd_group[0]
-        return len(set(cmd_group.cmd.split(',')))
-    else:
-        return 0
-=======
 
 @register.filter(name='get_cpu_core')
 def get_cpu_core(cpu_info):
     cpu_core = cpu_info.split('* ')[1] if cpu_info and '*' in cpu_info else cpu_info
     return cpu_core
->>>>>>> dev
 
 
 @register.filter(name='get_disk_info')

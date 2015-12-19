@@ -25,91 +25,6 @@ from jumpserver.models import Setting
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.mail import send_mail
-<<<<<<< HEAD
-import json
-
-
-BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-CONF = ConfigParser()
-CONF.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
-LOG_DIR = os.path.join(BASE_DIR, 'logs')
-SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys')
-SERVER_KEY_DIR = os.path.join(SSH_KEY_DIR, 'server')
-KEY = CONF.get('base', 'key')
-LOGIN_NAME = getpass.getuser()
-LDAP_ENABLE = CONF.getint('ldap', 'ldap_enable')
-SEND_IP = CONF.get('base', 'ip')
-SEND_PORT = CONF.get('base', 'port')
-MAIL_FROM = CONF.get('mail', 'email_host_user')
-
-
-class LDAPMgmt():
-    def __init__(self,
-                 host_url,
-                 base_dn,
-                 root_cn,
-                 root_pw):
-        self.ldap_host = host_url
-        self.ldap_base_dn = base_dn
-        self.conn = ldap.initialize(host_url)
-        self.conn.set_option(ldap.OPT_REFERRALS, 0)
-        self.conn.protocol_version = ldap.VERSION3
-        self.conn.simple_bind_s(root_cn, root_pw)
-
-    def list(self, filter, scope=ldap.SCOPE_SUBTREE, attr=None):
-        result = {}
-        try:
-            ldap_result = self.conn.search_s(self.ldap_base_dn, scope, filter, attr)
-            for entry in ldap_result:
-                name, data = entry
-                for k, v in data.items():
-                    print '%s: %s' % (k, v)
-                    result[k] = v
-            return result
-        except ldap.LDAPError, e:
-            print e
-
-    def add(self, dn, attrs):
-        try:
-            ldif = modlist.addModlist(attrs)
-            self.conn.add_s(dn, ldif)
-        except ldap.LDAPError, e:
-            print e
-
-    def modify(self, dn, attrs):
-        try:
-            attr_s = []
-            for k, v in attrs.items():
-                attr_s.append((2, k, v))
-            self.conn.modify_s(dn, attr_s)
-        except ldap.LDAPError, e:
-            print e
-
-    def delete(self, dn):
-        try:
-            self.conn.delete_s(dn)
-        except ldap.LDAPError, e:
-            print e
-
-    def decrypt(self, text):
-        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
-        try:
-            plain_text = cryptor.decrypt(a2b_hex(text))
-        except TypeError:
-            raise ServerError('Decrypt password error, TYpe error.')
-        return plain_text.rstrip('\0')
-
-
-if LDAP_ENABLE:
-    LDAP_HOST_URL = CONF.get('ldap', 'host_url')
-    LDAP_BASE_DN = CONF.get('ldap', 'base_dn')
-    LDAP_ROOT_DN = CONF.get('ldap', 'root_dn')
-    LDAP_ROOT_PW = CONF.get('ldap', 'root_pw')
-
-
-def md5_crypt(string):
-    return hashlib.new("md5", string).hexdigest()
-=======
 from django.core.urlresolvers import reverse
 
 
@@ -194,7 +109,6 @@ def chown(path, user, group=''):
         os.chown(path, uid, gid)
     except KeyError:
         pass
->>>>>>> dev
 
 
 def page_list_return(total, current=1):

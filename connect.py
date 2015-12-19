@@ -239,24 +239,6 @@ class Tty(object):
         today_connect_log_dir = os.path.join(tty_log_dir, date_start)
         log_file_path = os.path.join(today_connect_log_dir, '%s_%s_%s' % (self.username, self.asset_name, time_start))
 
-<<<<<<< HEAD
-def log_record(username, host):
-    """Logging user command and output."""
-    connect_log_dir = os.path.join(LOG_DIR, 'connect')
-    timestamp_start = int(time.time())
-    today = time.strftime('%Y%m%d', time.localtime(timestamp_start))
-    time_now = time.strftime('%H%M%S', time.localtime(timestamp_start))
-    today_connect_log_dir = os.path.join(connect_log_dir, today)
-    log_filename = '%s_%s_%s.log' % (username, host, time_now)
-    log_file_path = os.path.join(today_connect_log_dir, log_filename)
-    dept_name = User.objects.get(username=username).dept.name
-    pid = os.getpid()
-    pts = os.popen("ps axu | grep %s | grep -v grep | awk '{ print $7 }'" % pid).read().strip()
-    ip_list = os.popen("who | grep %s | awk '{ print $5 }'" % pts).read().strip('()\n')
-
-    if not os.path.isdir(today_connect_log_dir):
-=======
->>>>>>> dev
         try:
             mkdir(os.path.dirname(today_connect_log_dir), mode=0777)
             mkdir(today_connect_log_dir, mode=0777)
