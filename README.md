@@ -29,10 +29,10 @@ Web批量执行命令
 
 ### 文档
 
-* [访问wiki](./wiki)
-* [快速安装](./wiki/快速安装)
-* [名词解释](./wiki/名称解释)
-* [快速开始](./wiki/快速开始)
+* [访问wiki](https://github.com/ibuler/jumpserver/wiki)
+* [快速安装](https://github.com/ibuler/jumpserver/wiki/快速安装)
+* [名词解释](https://github.com/ibuler/jumpserver/wiki/名称解释)
+* [快速开始](https://github.com/ibuler/jumpserver/wiki/快速开始)
 
 ### 特点
 
