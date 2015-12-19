@@ -278,14 +278,13 @@ def excel_to_db(excel_file):
         data = xlrd.open_workbook(filename=None, file_contents=excel_file.read())
     except Exception, e:
         return False
-
     else:
         table = data.sheets()[0]
         rows = table.nrows
-        group_instance = []
         for row_num in range(1, rows):
             row = table.row_values(row_num)
             if row:
+                group_instance = []
                 ip, port, hostname, use_default_auth, username, password, group = row
                 if get_object(Asset, hostname=hostname):
                     continue
@@ -306,7 +305,6 @@ def excel_to_db(excel_file):
                         if group:
                             group_instance.append(group)
                     if group_instance:
-                        print group_instance
                         asset.group = group_instance
                     asset.save()
         return True
