@@ -24,7 +24,61 @@
 
                 <div class="ibox-content">
                     <form id="asset_form">
-                        <div class="col-sm-4 col-sm-offset-8" style="padding-right: 0">
+                        <div class="col-sm-7" style="padding-left: 0px">
+{#                            <label>#}
+{#                                <select name="idc" class="form-control m-b input-sm" onchange="change_info()">#}
+{#                                    <option value="">机房</option>#}
+{#                                    {% for idc in idc_all %}#}
+{#                                        {% ifequal idc.name idc_name %}#}
+{#                                            <option value="{{idc.name}}" selected> {{ idc.name|slice:":20" }}</option>#}
+{#                                        {% else %}#}
+{#                                            <option value="{{idc.name}}"> {{ idc.name|slice:":20" }}</option>#}
+{#                                        {% endifequal %}#}
+{#                                    {% endfor %}#}
+{#                                </select>#}
+{#                            </label>#}
+
+                            <label>
+                                <select name="group" class="form-control m-b input-sm" onchange="change_info()">
+                                    <option value="">主机组</option>
+                                    {% for asset_group in asset_group_all %}
+                                        {% ifequal asset_group.name group_name %}
+                                            <option value="{{ asset_group.name }}" selected> {{ asset_group.name|slice:":20" }} </option>
+                                        {% else %}
+                                            <option value="{{ asset_group.name }}"> {{ asset_group.name|slice:":20" }} </option>
+                                        {% endifequal %}
+                                    {% endfor %}
+                                </select>
+                            </label>
+
+                            <label>
+                                <select name="asset_type" class="form-control m-b input-sm" onchange="change_info()">
+                                    <option value="">资产类型</option>
+                                    {% for type in asset_types %}
+                                        {% ifequal type.0|int2str asset_type %}
+                                            <option value="{{ type.0 }}" selected> {{ type.1 }}</option>
+                                        {% else %}
+                                            <option value="{{ type.0 }}"> {{ type.1 }}</option>
+                                        {% endifequal %}
+                                    {% endfor %}
+                                </select>
+                            </label>
+
+                            <label>
+                                <select name="status" class="form-control m-b input-sm" onchange="change_info()">
+                                    <option value="">资产状态</option>
+                                    {% for s in asset_status %}
+                                        {% ifequal s.0|int2str status %}
+                                            <option value="{{ s.0 }}" selected> {{ s.1 }}</option>
+                                        {% else %}
+                                            <option value="{{ s.0 }}"> {{ s.1 }}</option>
+                                        {% endifequal %}
+                                    {% endfor %}
+                                </select>
+                            </label>
+                        </div>
+
+                        <div class="col-sm-4" style="padding-right: 0">
                              <div class="input-group inline-group">
                                 <input type="text" class="form-control m-b input-sm" id="search_input" name="keyword" value="{{ keyword }}" placeholder="Search">
                                 <input type="text" style="display: none">
@@ -70,7 +124,7 @@
 {#                                    <td class="text-center">{{ asset.cpu }}|{{ asset.memory }}|{{ asset.disk }}</td>#}
                                     <td class="text-center">{{ asset.system_type|default_if_none:"" }}{{ asset.system_version|default_if_none:"" }}</td>
                                     <td class="text-center"> {{ asset.cpu|get_cpu_core|default_if_none:"" }} </td>
-                                    <td class="text-center"> {{ asset.memory }}{% if asset.memory %}G{% endif %}</td>
+                                    <td class="text-center"> {{ asset.memory|default_if_none:"" }}{% if asset.memory %}G{% endif %} </td>
                                     <td class="text-center"> {{ asset.disk|get_disk_info }}{% if asset.memory %}G{% endif %}</td>
                                     <td class="text-center" data-editable='false'>
                                         <a value="{{ asset.id }}" class="conn btn btn-xs btn-warning">连接</a>
@@ -285,19 +339,10 @@
         });
     });
 
-
-
-{#    $('#asset_update_all').click(function () {#}
-{#        layer.msg('玩命更新中...', {time: 200000});#}
-{#        $.ajax({#}
-{#            type: "post",#}
-{#            url: "/jasset/asset_update_batch/?arg=all",#}
-{#            success: function () {#}
-{#                parent.location.reload();#}
-{#            }#}
-{#        });#}
-{#    });#}
-
+     function change_info(){
+        var args = $("#asset_form").serialize();
+        window.location = "{% url 'asset_list' %}?" + args
+    }
 
     $("#search_input").keydown(function(e){
         if(e.keyCode==13){
