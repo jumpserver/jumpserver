@@ -1,9 +1,9 @@
 <div class="row wrapper border-bottom white-bg page-heading">
-    <div class="col-lg-10">
+    <div class="col-sm-10">
         <h2>{{ header_title }}</h2>
         <ol class="breadcrumb">
             <li>
-                <a href="/">仪表盘</a>
+                <a href="{% url 'index' %}">仪表盘</a>
             </li>
             <li>
             {% if path1 %}
@@ -17,6 +17,6 @@
             {% endif %}
         </ol>
     </div>
-    <div class="col-lg-2">
+    <div class="col-sm-2">
     </div>
 </div>

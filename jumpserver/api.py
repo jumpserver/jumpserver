@@ -1,27 +1,31 @@
 # coding: utf-8
 
-
-from django.http import HttpResponseRedirect
-import json
-import os
-from ConfigParser import ConfigParser
-import getpass
+import os, sys, time, re
 from Crypto.Cipher import AES
+import crypt
+import pwd
 from binascii import b2a_hex, a2b_hex
-import ldap
-from ldap import modlist
 import hashlib
 import datetime
+import random
 import subprocess
+import uuid
+import json
+import logging
+
+from settings import *
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django.http import HttpResponse, Http404
+from django.template import RequestContext
+from juser.models import User, UserGroup
+from jlog.models import Log, TtyLog
+from jasset.models import Asset, AssetGroup
+from jperm.models import PermRule, PermRole
+from jumpserver.models import Setting
+from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
-from juser.models import User, UserGroup, DEPT
-from jasset.models import Asset, BisGroup, IDC
-from jlog.models import Log
-from jasset.models import AssetAlias
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
+<<<<<<< HEAD
 import json
 
 
@@ -105,64 +109,208 @@ if LDAP_ENABLE:
 
 def md5_crypt(string):
     return hashlib.new("md5", string).hexdigest()
+=======
+from django.core.urlresolvers import reverse
+
+
+def set_log(level, filename='jumpserver.log'):
+    """
+    return a log file object
+    根据提示设置log打印
+    """
+    log_file = os.path.join(LOG_DIR, filename)
+    if not os.path.isfile(log_file):
+        os.mknod(log_file)
+        os.chmod(log_file, 0777)
+    log_level_total = {'debug': logging.DEBUG, 'info': logging.INFO, 'warning': logging.WARN, 'error': logging.ERROR,
+                       'critical': logging.CRITICAL}
+    logger_f = logging.getLogger('jumpserver')
+    logger_f.setLevel(logging.DEBUG)
+    fh = logging.FileHandler(log_file)
+    fh.setLevel(log_level_total.get(level, logging.DEBUG))
+    formatter = logging.Formatter('%(asctime)s - %(filename)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    logger_f.addHandler(fh)
+    return logger_f
+
+
+def list_drop_str(a_list, a_str):
+    for i in a_list:
+        if i == a_str:
+            a_list.remove(a_str)
+    return a_list
+
+
+def get_asset_info(asset):
+    """
+    获取资产的相关管理账号端口等信息
+    """
+    default = get_object(Setting, name='default')
+    info = {'hostname': asset.hostname, 'ip': asset.ip}
+    if asset.use_default_auth:
+        if default:
+            info['port'] = int(default.field2)
+            info['username'] = default.field1
+            try:
+                info['password'] = CRYPTOR.decrypt(default.field3)
+            except ServerError:
+                pass
+            if os.path.isfile(default.field4):
+                info['ssh_key'] = default.field4
+    else:
+        info['port'] = int(asset.port)
+        info['username'] = asset.username
+        info['password'] = CRYPTOR.decrypt(asset.password)
+
+    return info
+
+
+def get_role_key(user, role):
+    """
+    由于role的key的权限是所有人可以读的， ansible执行命令等要求为600，所以拷贝一份到特殊目录
+    :param user:
+    :param role:
+    :return: self key path
+    """
+    user_role_key_dir = os.path.join(KEY_DIR, 'user')
+    user_role_key_path = os.path.join(user_role_key_dir, '%s_%s.pem' % (user.username, role.name))
+    mkdir(user_role_key_dir, mode=0777)
+    if not os.path.isfile(user_role_key_path):
+        with open(os.path.join(role.key_path, 'id_rsa')) as fk:
+            with open(user_role_key_path, 'w') as fu:
+                fu.write(fk.read())
+        logger.debug(u"创建新的系统用户key %s, Owner: %s" % (user_role_key_path, user.username))
+        chown(user_role_key_path, user.username)
+        os.chmod(user_role_key_path, 0600)
+    return user_role_key_path
+
+
+def chown(path, user, group=''):
+    if not group:
+        group = user
+    try:
+        uid = pwd.getpwnam(user).pw_uid
+        gid = pwd.getpwnam(group).pw_gid
+        os.chown(path, uid, gid)
+    except KeyError:
+        pass
+>>>>>>> dev
 
 
 def page_list_return(total, current=1):
+    """
+    page
+    分页，返回本次分页的最小页数到最大页数列表
+    """
     min_page = current - 2 if current - 4 > 0 else 1
     max_page = min_page + 4 if min_page + 4 < total else total
 
-    return range(min_page, max_page+1)
+    return range(min_page, max_page + 1)
 
 
-def pages(posts, r):
-    """分页公用函数"""
-    contact_list = posts
-    p = paginator = Paginator(contact_list, 10)
+def pages(post_objects, request):
+    """
+    page public function , return page's object tuple
+    分页公用函数，返回分页的对象元组
+    """
+    paginator = Paginator(post_objects, 20)
     try:
-        current_page = int(r.GET.get('page', '1'))
+        current_page = int(request.GET.get('page', '1'))
     except ValueError:
         current_page = 1
 
-    page_range = page_list_return(len(p.page_range), current_page)
+    page_range = page_list_return(len(paginator.page_range), current_page)
 
     try:
-        contacts = paginator.page(current_page)
+        page_objects = paginator.page(current_page)
     except (EmptyPage, InvalidPage):
-        contacts = paginator.page(paginator.num_pages)
+        page_objects = paginator.page(paginator.num_pages)
 
     if current_page >= 5:
         show_first = 1
     else:
         show_first = 0
-    if current_page <= (len(p.page_range) - 3):
+
+    if current_page <= (len(paginator.page_range) - 3):
         show_end = 1
     else:
         show_end = 0
 
-    return contact_list, p, contacts, page_range, current_page, show_first, show_end
+    # 所有对象， 分页器， 本页对象， 所有页码， 本页页码，是否显示第一页，是否显示最后一页
+    return post_objects, paginator, page_objects, page_range, current_page, show_first, show_end
 
 
 class PyCrypt(object):
-    """This class used to encrypt and decrypt password."""
+    """
+    This class used to encrypt and decrypt password.
+    加密类
+    """
 
     def __init__(self, key):
         self.key = key
         self.mode = AES.MODE_CBC
 
-    def encrypt(self, text):
-        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
-        length = 16
+    @staticmethod
+    def gen_rand_pass(length, especial=False):
+        """
+        random password
+        随机生成密码
+        """
+        salt_key = '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
+        symbol = '!@$%^&*()_'
+        salt_list = []
+        if especial:
+            for i in range(length - 4):
+                salt_list.append(random.choice(salt_key))
+            for i in range(4):
+                salt_list.append(random.choice(symbol))
+        else:
+            for i in range(length):
+                salt_list.append(random.choice(salt_key))
+        salt = ''.join(salt_list)
+        return salt
+
+    @staticmethod
+    def md5_crypt(string):
+        """
+        md5 encrypt method
+        md5非对称加密方法
+        """
+        return hashlib.new("md5", string).hexdigest()
+
+    @staticmethod
+    def gen_sha512(salt, password):
+        """
+        generate sha512 format password
+        生成sha512加密密码
+        """
+        return crypt.crypt(password, '$6$%s$' % salt)
+
+    def encrypt(self, passwd=None, length=32):
+        """
+        encrypt gen password
+        对称加密之加密生成密码
+        """
+        if not passwd:
+            passwd = self.gen_rand_pass()
+
+        cryptor = AES.new(self.key, self.mode, b'8122ca7d906ad5e1')
         try:
-            count = len(text)
+            count = len(passwd)
         except TypeError:
             raise ServerError('Encrypt password error, TYpe error.')
+
         add = (length - (count % length))
-        text += ('\0' * add)
-        ciphertext = cryptor.encrypt(text)
-        return b2a_hex(ciphertext)
+        passwd += ('\0' * add)
+        cipher_text = cryptor.encrypt(passwd)
+        return b2a_hex(cipher_text)
 
     def decrypt(self, text):
-        cryptor = AES.new(self.key, self.mode, b'0000000000000000')
+        """
+        decrypt pass base the same key
+        对称加密之解密，同一个加密随机数
+        """
+        cryptor = AES.new(self.key, self.mode, b'8122ca7d906ad5e1')
         try:
             plain_text = cryptor.decrypt(a2b_hex(text))
         except TypeError:
@@ -170,95 +318,103 @@ class PyCrypt(object):
         return plain_text.rstrip('\0')
 
 
-CRYPTOR = PyCrypt(KEY)
-
-
 class ServerError(Exception):
+    """
+    self define exception
+    自定义异常
+    """
     pass
 
 
 def get_object(model, **kwargs):
-    try:
-        the_object = model.objects.get(**kwargs)
-    except ObjectDoesNotExist:
-        raise ServerError('Object get %s failed.' % str(kwargs.values()))
+    """
+    use this function for query
+    使用改封装函数查询数据库
+    """
+    for value in kwargs.values():
+        if not value:
+            return None
+
+    the_object = model.objects.filter(**kwargs)
+    if len(the_object) == 1:
+        the_object = the_object[0]
+    else:
+        the_object = None
     return the_object
 
 
-def require_login(func):
-    """要求登录的装饰器"""
-    def _deco(request, *args, **kwargs):
-        if not request.session.get('user_id'):
-            return HttpResponseRedirect('/login/')
-        return func(request, *args, **kwargs)
+def require_role(role='user'):
+    """
+    decorator for require user role in ["super", "admin", "user"]
+    要求用户是某种角色 ["super", "admin", "user"]的装饰器
+    """
+
+    def _deco(func):
+        def __deco(request, *args, **kwargs):
+            request.session['pre_url'] = request.path
+            if not request.user.is_authenticated():
+                return HttpResponseRedirect(reverse('login'))
+            if role == 'admin':
+                # if request.session.get('role_id', 0) < 1:
+                if request.user.role == 'CU':
+                    return HttpResponseRedirect(reverse('index'))
+            elif role == 'super':
+                # if request.session.get('role_id', 0) < 2:
+                if request.user.role in ['CU', 'GA']:
+                    return HttpResponseRedirect(reverse('index'))
+            return func(request, *args, **kwargs)
+
+        return __deco
+
     return _deco
 
 
-def require_super_user(func):
-    def _deco(request, *args, **kwargs):
-        if not request.session.get('user_id'):
-            return HttpResponseRedirect('/login/')
-
-        if request.session.get('role_id', 0) != 2:
-            return HttpResponseRedirect('/')
-        return func(request, *args, **kwargs)
-    return _deco
-
-
-def require_admin(func):
-    def _deco(request, *args, **kwargs):
-        if not request.session.get('user_id'):
-            return HttpResponseRedirect('/login/')
-
-        if request.session.get('role_id', 0) < 1:
-            return HttpResponseRedirect('/')
-        return func(request, *args, **kwargs)
-    return _deco
-
-
-def is_super_user(request):
-    if request.session.get('role_id') == 2:
+def is_role_request(request, role='user'):
+    """
+    require this request of user is right
+    要求请求角色正确
+    """
+    role_all = {'user': 'CU', 'admin': 'GA', 'super': 'SU'}
+    if request.user.role == role_all.get(role, 'CU'):
         return True
     else:
         return False
 
 
-def is_group_admin(request):
-    if request.session.get('role_id') == 1:
-        return True
-    else:
-        return False
-
-
-def is_common_user(request):
-    if request.session.get('role_id') == 0:
-        return True
-    else:
-        return False
-
-
-@require_login
 def get_session_user_dept(request):
-    user_id = request.session.get('user_id', 0)
-    user = User.objects.filter(id=user_id)
-    if user:
-        user = user[0]
-        dept = user.dept
-        return user, dept
+    """
+    get department of the user in session
+    获取session中用户的部门
+    """
+    # user_id = request.session.get('user_id', 0)
+    # print '#' * 20
+    # print user_id
+    # user = User.objects.filter(id=user_id)
+    # if user:
+    #     user = user[0]
+    #     return user, None
+    return request.user, None
 
 
-@require_login
+@require_role
 def get_session_user_info(request):
-    user_id = request.session.get('user_id', 0)
-    user = User.objects.filter(id=user_id)
-    if user:
-        user = user[0]
-        dept = user.dept
-        return [user.id, user.username, user, dept.id, dept.name, dept]
+    """
+    get the user info of the user in session, for example id, username etc.
+    获取用户的信息
+    """
+    # user_id = request.session.get('user_id', 0)
+    # user = get_object(User, id=user_id)
+    # if user:
+    #     return [user.id, user.username, user]
+    return [request.user.id, request.user.username, request.user]
 
 
 def get_user_dept(request):
-    user_id = request.session.get('user_id')
+    """
+    get the user dept id
+    获取用户的部门id
+    """
+    user_id = request.user.id
     if user_id:
         user_dept = User.objects.get(id=user_id).dept
         return user_dept.id
@@ -273,129 +429,28 @@ def api_user(request):
 
 
 def view_splitter(request, su=None, adm=None):
-    if is_super_user(request):
+    """
+    for different user use different view
+    视图分页器
+    """
+    if is_role_request(request, 'super'):
         return su(request)
-    elif is_group_admin(request):
+    elif is_role_request(request, 'admin'):
         return adm(request)
     else:
-        return HttpResponseRedirect('/login/')
-
-
-def user_group_perm_asset_group_api(user_group):
-    asset_group_list = []
-    perm_list = user_group.perm_set.all()
-    for perm in perm_list:
-        asset_group_list.append(perm.asset_group)
-    return asset_group_list
-
-
-def user_perm_group_api(username):
-    if username:
-        user = User.objects.get(username=username)
-        perm_list = []
-        user_group_all = user.group.all()
-        for user_group in user_group_all:
-            perm_list.extend(user_group.perm_set.all())
-
-        asset_group_list = []
-        for perm in perm_list:
-            asset_group_list.append(perm.asset_group)
-        return asset_group_list
-
-
-def user_perm_group_hosts_api(gid):
-    hostgroup = BisGroup.objects.filter(id=gid)
-    if hostgroup:
-        return hostgroup[0].asset_set.all()
-    else:
-        return []
-
-
-def user_perm_asset_api(username):
-    user = User.objects.filter(username=username)
-    if user:
-        user = user[0]
-        asset_list = []
-        asset_group_list = user_perm_group_api(user)
-        for asset_group in asset_group_list:
-            asset_list.extend(asset_group.asset_set.all())
-        asset_list = list(set(asset_list))
-        return asset_list
-    else:
-        return []
-
-
-def asset_perm_api(asset):
-    if asset:
-        perm_list = []
-        asset_group_all = asset.bis_group.all()
-        for asset_group in asset_group_all:
-            perm_list.extend(asset_group.perm_set.all())
-
-        user_group_list = []
-        for perm in perm_list:
-            user_group_list.append(perm.user_group)
-
-        user_permed_list = []
-        for user_group in user_group_list:
-            user_permed_list.extend(user_group.user_set.all())
-        user_permed_list = list(set(user_permed_list))
-        return user_permed_list
-
-
-def get_user_host(username):
-    """Get the hosts of under the user control."""
-    hosts_attr = {}
-    asset_all = user_perm_asset_api(username)
-    user = User.objects.filter(username=username)
-    if user:
-        user = user[0]
-        for asset in asset_all:
-            alias = AssetAlias.objects.filter(user=user, host=asset)
-            if alias and alias[0].alias != '':
-                hosts_attr[asset.ip] = [asset.id, asset.ip, alias[0].alias]
-            else:
-                hosts_attr[asset.ip] = [asset.id, asset.ip, asset.comment]
-        return hosts_attr
-    else:
-        raise ServerError('User %s does not exit!' % username)
-
-
-def get_connect_item(username, ip):
-    asset = get_object(Asset, ip=ip)
-    port = int(asset.port)
-
-    if not asset.is_active:
-        raise ServerError('Host %s is not active.' % ip)
-
-    user = get_object(User, username=username)
-
-    if not user.is_active:
-        raise ServerError('User %s is not active.' % username)
-
-    login_type_dict = {
-        'L': user.ldap_pwd,
-    }
-
-    if asset.login_type in login_type_dict:
-        password = CRYPTOR.decrypt(login_type_dict[asset.login_type])
-        return username, password, ip, port
-
-    elif asset.login_type == 'M':
-        username = asset.username
-        password = CRYPTOR.decrypt(asset.password)
-        return username, password, ip, port
-
-    else:
-        raise ServerError('Login type is not in ["L", "M"]')
+        return HttpResponseRedirect(reverse('login'))
 
 
 def validate(request, user_group=None, user=None, asset_group=None, asset=None, edept=None):
+    """
+    validate the user request
+    判定用户请求是否合法
+    """
     dept = get_session_user_dept(request)[1]
     if edept:
         if dept.id != int(edept[0]):
             return False
-        
+
     if user_group:
         dept_user_groups = dept.usergroup_set.all()
         user_group_ids = []
@@ -480,39 +535,60 @@ def verify(request, user_group=None, user=None, asset_group=None, asset=None, ed
 
 
 def bash(cmd):
-    """执行bash命令"""
+    """
+    run a bash shell command
+    执行bash命令
+    """
     return subprocess.call(cmd, shell=True)
 
 
-def is_dir(dir_name, username='root', mode=0755):
+def mkdir(dir_name, username='', mode=0755):
+    """
+    insure the dir exist and mode ok
+    目录存在，如果不存在就建立，并且权限正确
+    """
     if not os.path.isdir(dir_name):
         os.makedirs(dir_name)
-        bash("chown %s:%s '%s'" % (username, username, dir_name))
-    os.chmod(dir_name, mode)
+        os.chmod(dir_name, mode)
+    if username:
+        chown(dir_name, username)
 
 
-def success(request, msg):
+def http_success(request, msg):
     return render_to_response('success.html', locals())
 
 
-def httperror(request, emg):
+def http_error(request, emg):
     message = emg
     return render_to_response('error.html', locals())
 
 
-def node_auth(request):
-    username = request.POST.get('username', ' ')
-    seed = request.POST.get('seed', ' ')
-    filename = request.POST.get('filename', ' ')
-    user = User.objects.filter(username=username, password=seed)
-    auth = 1
-    if not user:
-        auth = 0
-    if not filename.startswith('/opt/jumpserver/logs/connect/'):
-        auth = 0
-    if auth:
-        result = {'auth': {'username': username, 'result': 'success'}}
-    else:
-        result = {'auth': {'username': username, 'result': 'failed'}}
+def my_render(template, data, request):
+    return render_to_response(template, data, context_instance=RequestContext(request))
 
-    return HttpResponse(json.dumps(result, sort_keys=True, indent=2), content_type='application/json')
+
+def get_tmp_dir():
+    dir_name = os.path.join('/tmp', uuid.uuid4().hex)
+    mkdir(dir_name, mode=0777)
+    return dir_name
+
+
+def defend_attack(func):
+    def _deco(request, *args, **kwargs):
+        if int(request.session.get('visit', 1)) > 10:
+            logger.debug('请求次数: %s' % request.session.get('visit', 1))
+            return HttpResponse('Forbidden', status=403)
+        request.session['visit'] = request.session.get('visit', 1) + 1
+        request.session.set_expiry(300)
+        return func(request, *args, **kwargs)
+    return _deco
+
+
+def get_mac_address():
+    node = uuid.getnode()
+    mac = uuid.UUID(int=node).hex[-12:]
+    return mac
+
+
+CRYPTOR = PyCrypt(KEY)
+logger = set_log(LOG_LEVEL)

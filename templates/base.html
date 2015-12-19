@@ -2,7 +2,6 @@
 <html>
 
 <head>
-
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -11,8 +10,7 @@
     <link rel="shortcut icon" href="/static/img/facio.ico" type="image/x-icon">
     {% include 'link_css.html' %}
     {% include 'head_script.html' %}
-
-
+    {% block self_head_css_js %} {% endblock %}
 </head>
 
 <body>
@@ -30,4 +28,5 @@
 
 </body>
     {% include 'foot_script.html' %}
+    {% block self_footer_js %} {% endblock %}
 </html>

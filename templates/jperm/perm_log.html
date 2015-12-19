@@ -1,12 +1,14 @@
 {% extends 'base.html' %}
+{% load mytags %}
 {% block content %}
 {% include 'nav_cat_bar.html' %}
+
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-sm-10">
             <div class="ibox float-e-margins">
-                <div id="ibox-content" class="ibox-title">
-                    <h5> 用户权限申请详细信息列表 </h5>
+                <div class="ibox-title">
+                    <h5> 查看小组</h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -14,12 +16,6 @@
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                             <i class="fa fa-wrench"></i>
                         </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">未启用 1</a>
-                            </li>
-                            <li><a href="#">未启用 2</a>
-                            </li>
-                        </ul>
                         <a class="close-link">
                             <i class="fa fa-times"></i>
                         </a>
@@ -27,67 +23,66 @@
                 </div>
 
                 <div class="ibox-content">
-                    <div class="panel-options">
-                        <ul class="nav nav-tabs">
-                            <li><a href="/jperm/apply/online/" class="text-center"><i class="fa fa-laptop"></i> 未审批 </a></li>
-                            <li class="active"><a href="/jperm/apply/offline/" class="text-center"><i class="fa fa-bar-chart-o"></i> 已审批 </a></li>
-                            <li style="float: right">
-                                <form id="search_form" method="get" action="" class="pull-right mail-search">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
-                                        <input type="text" style="display: none">
-                                        <div class="input-group-btn">
-                                            <button id='search_btn' type="button" class="btn btn-sm btn-primary" onclick="log_search()">
-                                                Search
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </li>
-                        </ul>
-                    </div>
-                    <br/>
-                    <div class="tab-content">
-                        <table class="table table-striped table-bordered table-hover ">
-                            <thead>
-                                <tr>
-                                    <th class="text-center"> 申请人 </th>
-                                    <th class="text-center"> 所属部门 </th>
-                                    <th class="text-center"> 申请主机组 </th>
-                                    <th class="text-center"> 申请主机 </th>
-                                    <th class="text-center"> 申请时间 </th>
-                                    <th class="text-center"> 批准时间 </th>
-                                    <th class="text-center"> 备注 </th>
-
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% for post in contacts.object_list %}
-                                <tr class="gradeX">
-                                    <td class="text-center" id="username"> {{ post.applyer }} </td>
-                                    <td class="text-center" id="dept"> {{ post.dept }} </td>
-                                    <td class="text-center" id="ip"> {{ post.bisgroup }} </td>
-                                    <td class="text-center" id="remote_ip"> {{ post.asset }} </td>
-                                    <!--{% ifnotequal session_role_id 0 %}-->
-                                        <!--<td class="text-center"><a href="/jlog/history/?id={{ post.id }}" class="log_command"> 命令统计 </td>-->
-                                    <!--{% endifnotequal %}-->
-                                    <td class="text-center" id="start_time"> {{ post.date_add|date:"Y-m-d H:i:s"}} </td>
-                                    <td class="text-center" id="end_time"> {{ post.date_end|date:"Y-m-d H:i:s" }} </td>
-                                    <td class="text-center" id=""> {{ post.comment }} </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                        <div class="row">
-                            <div class="col-sm-6">
+                    <div class="">
+                    <form id="search_form" method="get" action="" class="pull-right mail-search">
+                        <div class="input-group">
+                            <input type="text" class="form-control input-sm" id="search_input" name="search" placeholder="Search">
+                            <div class="input-group-btn">
+                                <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                                    - 搜索 -
+                                </button>
                             </div>
-                            {% include 'paginator.html' %}
                         </div>
-                    </div>    
+                    </form>
+                    </div>
+
+                    <table class="table table-striped table-bordered table-hover " id="editable" >
+                        <thead>
+                            <tr>
+                                <th class="text-center">日期</th>
+                                <th class="text-center">动作</th>
+                                <th class="text-center">成功</th>
+                                <th class="text-center">完成</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for log in logs %}
+                            <tr class="gradeX">
+                                <td class="text-center"> {{ log.datetime | date:"Y-n-d G:i:s" }} </td>
+                                <td class="text-center"> {{ log.action }} </td>
+                                <td class="text-center">
+                                    <a class="log_result" value="{{ log.results }}">
+                                    {{ log.is_success | yesno:"是,否,为止" }}
+                                    </a>
+                                </td>
+                                <td class="text-center"> {{ log.is_finish | yesno:"是,否,为止" }} </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="dataTables_info" id="editable_info" role="status" aria-live="polite">
+                                Showing {{ users.start_index }} to {{ users.end_index }} of {{ p.count }} entries
+                            </div>
+                        </div>
+                        {% include 'paginator.html' %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+{% endblock %}
+
+{% block self_footer_js %}
+<script>
+$('document').ready(function(){
+    $('.log_result').click(function(){
+        alert($(this).attr('value'))
+    })
+})
+</script>
 
 {% endblock %}

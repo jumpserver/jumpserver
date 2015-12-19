@@ -180,7 +180,7 @@ function merge() {
 }
 
 /**
- * Take an array and turn into a hash with even number arguments as keys and odd numbers as
+ * Take an array and turn into a hash with even number arguments as role_keys and odd numbers as
  * values. Allows creating constants for commonly used style properties, attributes etc.
  * Avoid it in performance critical situations like looping
  */
@@ -448,7 +448,7 @@ dateFormat = function (format, timestamp, capitalize) {
 		lang = defaultOptions.lang,
 		langWeekdays = lang.weekdays,
 
-		// List all format keys. Custom formats can be added from the outside. 
+		// List all format role_keys. Custom formats can be added from the outside.
 		replacements = extend({
 
 			// Day
@@ -14895,7 +14895,7 @@ var AreaSeries = extendClass(Series, {
 				pointMap[points[i].x] = points[i];
 			}
 
-			// Sort the keys (#1651)
+			// Sort the role_keys (#1651)
 			for (x in stack) {
 				if (stack[x].total !== null) { // nulled after switching between grouping and not (#1651, #2336)
 					keys.push(+x);

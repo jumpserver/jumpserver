@@ -2,17 +2,19 @@
 # Author: Guanghongwei
 # Email: ibuler@qq.com
 
-import random
-from Crypto.PublicKey import RSA
-import crypt
+# import random
+# from Crypto.PublicKey import RSA
+import uuid
+from django.contrib.auth.decorators import login_required
 
-from django.shortcuts import render_to_response
 from django.db.models import Q
-from django.template import RequestContext
+from juser.user_api import *
+from jperm.perm_api import get_group_user_perm
 
-from jumpserver.api import *
+MAIL_FROM = EMAIL_HOST_USER
 
 
+<<<<<<< HEAD
 def gen_rand_pwd(num):
     """生成随机密码"""
     seed = "1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -333,718 +335,455 @@ def dept_user_ajax(request):
 
 
 @require_super_user
+=======
+@require_role(role='super')
+>>>>>>> dev
 def group_add(request):
+    """
+    group add view for route
+    添加用户组的视图
+    """
     error = ''
     msg = ''
-    header_title, path1, path2 = '添加小组', '用户管理', '添加小组'
+    header_title, path1, path2 = '添加用户组', '用户管理', '添加用户组'
     user_all = User.objects.all()
-    dept_all = DEPT.objects.all()
 
     if request.method == 'POST':
         group_name = request.POST.get('group_name', '')
-        dept_id = request.POST.get('dept_id', '')
         users_selected = request.POST.getlist('users_selected', '')
         comment = request.POST.get('comment', '')
 
         try:
-            if '' in [group_name, dept_id]:
-                error = u'组名 或 部门 不能为空'
-                raise AddError(error)
+            if not group_name:
+                error = u'组名 不能为空'
+                raise ServerError(error)
 
             if UserGroup.objects.filter(name=group_name):
                 error = u'组名已存在'
-                raise AddError(error)
-
-            dept = DEPT.objects.filter(id=dept_id)
-            if dept:
-                dept = dept[0]
-            else:
-                error = u'部门不存在'
-                raise AddError(error)
-
-            db_add_group(name=group_name, users=users_selected, dept=dept, comment=comment)
-        except AddError:
+                raise ServerError(error)
+            db_add_group(name=group_name, users_id=users_selected, comment=comment)
+        except ServerError:
             pass
         except TypeError:
-            error = u'保存小组失败'
+            error = u'添加小组失败'
         else:
             msg = u'添加组 %s 成功' % group_name
 
-    return render_to_response('juser/group_add.html', locals(), context_instance=RequestContext(request))
+    return my_render('juser/group_add.html', locals(), request)
 
 
-@require_admin
-def group_add_adm(request):
-    error = ''
-    msg = ''
-    header_title, path1, path2 = '添加小组', '用户管理', '添加小组'
-    user, dept = get_session_user_dept(request)
-    user_all = dept.user_set.all()
-
-    if request.method == 'POST':
-        group_name = request.POST.get('group_name', '')
-        users_selected = request.POST.getlist('users_selected', '')
-        comment = request.POST.get('comment', '')
-
-        try:
-            if not validate(request, user=users_selected):
-                raise AddError('没有某用户权限')
-            if '' in [group_name]:
-                error = u'组名不能为空'
-                raise AddError(error)
-
-            db_add_group(name=group_name, users=users_selected, dept=dept, comment=comment)
-        except AddError:
-            pass
-        except TypeError:
-            error = u'保存小组失败'
-        else:
-            msg = u'添加组 %s 成功' % group_name
-
-    return render_to_response('juser/group_add.html', locals(), context_instance=RequestContext(request))
-
-
-@require_super_user
+@require_role(role='super')
 def group_list(request):
-    header_title, path1, path2 = '查看小组', '用户管理', '查看小组'
+    """
+    list user group
+    用户组列表
+    """
+    header_title, path1, path2 = '查看用户组', '用户管理', '查看用户组'
     keyword = request.GET.get('search', '')
-    did = request.GET.get('did', '')
-    contact_list = UserGroup.objects.all().order_by('name')
-
-    if did:
-        dept = DEPT.objects.filter(id=did)
-        if dept:
-            dept = dept[0]
-            contact_list = dept.usergroup_set.all()
+    user_group_list = UserGroup.objects.all().order_by('name')
+    group_id = request.GET.get('id', '')
 
     if keyword:
-        contact_list = contact_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
+        user_group_list = user_group_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
 
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
-    return render_to_response('juser/group_list.html', locals(), context_instance=RequestContext(request))
+    if group_id:
+        user_group_list = user_group_list.filter(id=int(group_id))
 
-
-@require_admin
-def group_list_adm(request):
-    header_title, path1, path2 = '查看部门小组', '用户管理', '查看小组'
-    keyword = request.GET.get('search', '')
-    did = request.GET.get('did', '')
-    user, dept = get_session_user_dept(request)
-    contact_list = dept.usergroup_set.all().order_by('name')
-
-    if keyword:
-        contact_list = contact_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
-
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
-    return render_to_response('juser/group_list.html', locals(), context_instance=RequestContext(request))
+    user_group_list, p, user_groups, page_range, current_page, show_first, show_end = pages(user_group_list, request)
+    return my_render('juser/group_list.html', locals(), request)
 
 
-@require_admin
-def group_detail(request):
-    group_id = request.GET.get('id', None)
-    if not group_id:
-        return HttpResponseRedirect('/')
-    group = UserGroup.objects.get(id=group_id)
-    users = group.user_set.all()
-    return render_to_response('juser/group_detail.html', locals(), context_instance=RequestContext(request))
-
-
-@require_super_user
+@require_role(role='super')
 def group_del(request):
-    group_id = request.GET.get('id', '')
-    if not group_id:
-        return HttpResponseRedirect('/')
-    UserGroup.objects.filter(id=group_id).delete()
-    return HttpResponseRedirect('/juser/group_list/')
-
-
-@require_admin
-def group_del_adm(request):
-    group_id = request.GET.get('id', '')
-    if not validate(request, user_group=[group_id]):
-        return HttpResponseRedirect('/juser/group_list/')
-    if not group_id:
-        return HttpResponseRedirect('/')
-    UserGroup.objects.filter(id=group_id).delete()
-    return HttpResponseRedirect('/juser/group_list/')
-
-
-@require_admin
-def group_del_ajax(request):
-    group_ids = request.POST.get('group_ids')
-    group_ids = group_ids.split(',')
-    if request.session.get('role_id') == 1:
-        if not validate(request, user_group=group_ids):
-            return "error"
-    for group_id in group_ids:
+    """
+    del a group
+    删除用户组
+    """
+    group_ids = request.GET.get('id', '')
+    group_id_list = group_ids.split(',')
+    for group_id in group_id_list:
         UserGroup.objects.filter(id=group_id).delete()
+
     return HttpResponse('删除成功')
 
 
-def group_update_member(group_id, users_id_list):
-    group = UserGroup.objects.filter(id=group_id)
-    if group:
-        group = group[0]
-        group.user_set.clear()
-        for user_id in users_id_list:
-            user = User.objects.get(id=user_id)
-            group.user_set.add(user)
-
-
-@require_super_user
+@require_role(role='super')
 def group_edit(request):
     error = ''
     msg = ''
-    header_title, path1, path2 = '修改小组信息', '用户管理', '编辑小组'
+    header_title, path1, path2 = '编辑用户组', '用户管理', '编辑用户组'
+
     if request.method == 'GET':
         group_id = request.GET.get('id', '')
-        group = UserGroup.objects.filter(id=group_id)
-        if group:
-            group = group[0]
-            dept_all = DEPT.objects.all()
-            users_all = User.objects.all()
-            users_selected = group.user_set.all()
-            users = [user for user in users_all if user not in users_selected]
+        user_group = get_object(UserGroup, id=group_id)
+        # user_group = UserGroup.objects.get(id=group_id)
+        users_selected = User.objects.filter(group=user_group)
+        users_remain = User.objects.filter(~Q(group=user_group))
+        users_all = User.objects.all()
 
-        return render_to_response('juser/group_edit.html', locals(), context_instance=RequestContext(request))
-    else:
+    elif request.method == 'POST':
         group_id = request.POST.get('group_id', '')
         group_name = request.POST.get('group_name', '')
-        dept_id = request.POST.get('dept_id', '')
         comment = request.POST.get('comment', '')
         users_selected = request.POST.getlist('users_selected')
 
-        users = []
         try:
             if '' in [group_id, group_name]:
-                raise AddError('组名不能为空')
-            dept = DEPT.objects.filter(id=dept_id)
-            if dept:
-                dept = dept[0]
-            else:
-                raise AddError('部门不存在')
-            for user_id in users_selected:
-                users.extend(User.objects.filter(id=user_id))
+                raise ServerError('组名不能为空')
 
-            user_group = UserGroup.objects.filter(id=group_id)
-            if user_group:
-                user_group.update(name=group_name, comment=comment, dept=dept)
-                user_group = user_group[0]
-                user_group.user_set.clear()
-                user_group.user_set = users
-
-        except AddError, e:
+            if len(UserGroup.objects.filter(name=group_name)) > 1:
+                raise ServerError(u'%s 用户组已存在' % group_name)
+            # add user group
+            for user in User.objects.filter(id__in=users_selected):
+                user.group.add(UserGroup.objects.get(id=group_id))
+            # delete user group
+            user_group = UserGroup.objects.get(id=group_id)
+            for user in [user for user in User.objects.filter(group=user_group) if user not in User.objects.filter(id__in=users_selected)]:
+                user_group_all = user.group.all()
+                user.group.clear()
+                for g in user_group_all:
+                    if g == user_group:
+                        continue
+                    user.group.add(g)
+            user_group.name = group_name
+            user_group.comment = comment
+            user_group.save()
+        except ServerError, e:
             error = e
+        if not error:
+            return HttpResponseRedirect(reverse('user_group_list'))
+        else:
+            users_all = User.objects.all()
+            users_selected = User.objects.filter(group=user_group)
+            users_remain = User.objects.filter(~Q(group=user_group))
 
-        return HttpResponseRedirect('/juser/group_list/')
-
-
-@require_admin
-def group_edit_adm(request):
-    error = ''
-    msg = ''
-    header_title, path1, path2 = '修改小组信息', '用户管理', '编辑小组'
-    user, dept = get_session_user_dept(request)
-    if request.method == 'GET':
-        group_id = request.GET.get('id', '')
-        if not validate(request, user_group=[group_id]):
-            return HttpResponseRedirect('/juser/group_list/')
-        group = UserGroup.objects.filter(id=group_id)
-        if group:
-            group = group[0]
-            users_all = dept.user_set.all()
-            users_selected = group.user_set.all()
-            users = [user for user in users_all if user not in users_selected]
-
-        return render_to_response('juser/group_edit.html', locals(), context_instance=RequestContext(request))
-    else:
-        group_id = request.POST.get('group_id', '')
-        group_name = request.POST.get('group_name', '')
-        comment = request.POST.get('comment', '')
-        users_selected = request.POST.getlist('users_selected')
-
-        users = []
-        try:
-            if not validate(request, user=users_selected):
-                raise AddError(u'右侧非部门用户')
-
-            if not validate(request, user_group=[group_id]):
-                raise AddError(u'没有权限修改本组')
-
-            for user_id in users_selected:
-                users.extend(User.objects.filter(id=user_id))
-
-            user_group = UserGroup.objects.filter(id=group_id)
-            if user_group:
-                user_group.update(name=group_name, comment=comment, dept=dept)
-                user_group = user_group[0]
-                user_group.user_set.clear()
-                user_group.user_set = users
-
-        except AddError, e:
-            error = e
-
-        return HttpResponseRedirect('/juser/group_list/')
+    return my_render('juser/group_edit.html', locals(), request)
 
 
-@require_super_user
+@require_role(role='super')
 def user_add(request):
     error = ''
     msg = ''
     header_title, path1, path2 = '添加用户', '用户管理', '添加用户'
-    user_role = {'SU': u'超级管理员', 'DA': u'部门管理员', 'CU': u'普通用户'}
-    dept_all = DEPT.objects.all()
+    user_role = {'SU': u'超级管理员', 'CU': u'普通用户'}
     group_all = UserGroup.objects.all()
 
     if request.method == 'POST':
         username = request.POST.get('username', '')
-        password = gen_rand_pwd(16)
+        password = PyCrypt.gen_rand_pass(16)
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
-        dept_id = request.POST.get('dept_id')
         groups = request.POST.getlist('groups', [])
-        role_post = request.POST.get('role', 'CU')
-        ssh_key_pwd = gen_rand_pwd(16)
-        is_active = True if request.POST.get('is_active', '1') == '1' else False
-        ldap_pwd = gen_rand_pwd(16)
+        admin_groups = request.POST.getlist('admin_groups', [])
+        role = request.POST.get('role', 'CU')
+        uuid_r = uuid.uuid4().get_hex()
+        ssh_key_pwd = PyCrypt.gen_rand_pass(16)
+        extra = request.POST.getlist('extra', [])
+        is_active = False if '0' in extra else True
+        ssh_key_login_need = True
+        send_mail_need = True if '2' in extra else False
 
         try:
-            if '' in [username, password, ssh_key_pwd, name, groups, role_post, is_active]:
+            if '' in [username, password, ssh_key_pwd, name, role]:
                 error = u'带*内容不能为空'
-                raise AddError
-            user = User.objects.filter(username=username)
-            if user:
+                raise ServerError
+            check_user_is_exist = User.objects.filter(username=username)
+            if check_user_is_exist:
                 error = u'用户 %s 已存在' % username
-                raise AddError
+                raise ServerError
 
-            dept = DEPT.objects.filter(id=dept_id)
-            if dept:
-                dept = dept[0]
-            else:
-                error = u'部门不存在'
-                raise AddError(error)
-
-        except AddError:
+        except ServerError:
             pass
         else:
             try:
-                user = db_add_user(username=username,
-                                   password=md5_crypt(password),
-                                   name=name, email=email, dept=dept,
-                                   groups=groups, role=role_post,
-                                   ssh_key_pwd=md5_crypt(ssh_key_pwd),
-                                   ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
+                user = db_add_user(username=username, name=name,
+                                   password=password,
+                                   email=email, role=role, uuid=uuid_r,
+                                   groups=groups, admin_groups=admin_groups,
+                                   ssh_key_pwd=ssh_key_pwd,
                                    is_active=is_active,
                                    date_joined=datetime.datetime.now())
+                server_add_user(username, password, ssh_key_pwd, ssh_key_login_need)
+                user = get_object(User, username=username)
+                if groups:
+                    user_groups = []
+                    for user_group_id in groups:
+                        user_groups.extend(UserGroup.objects.filter(id=user_group_id))
 
-                server_add_user(username, password, ssh_key_pwd)
-                if LDAP_ENABLE:
-                    ldap_add_user(username, ldap_pwd)
-                mail_title = u'恭喜你的跳板机用户添加成功 Jumpserver'
-                mail_msg = """
-                Hi, %s
-                    您的用户名： %s
-                    您的部门: %s
-                    您的角色： %s
-                    您的web登录密码： %s
-                    您的ssh密钥文件密码： %s
-                    密钥下载地址： http://%s:%s/juser/down_key/?id=%s
-                    说明： 请登陆后再下载密钥！
-                """ % (name, username, dept.name, user_role.get(role_post, ''),
-                       password, ssh_key_pwd, SEND_IP, SEND_PORT, user.id)
-
-            except Exception, e:
+            except IndexError, e:
                 error = u'添加用户 %s 失败 %s ' % (username, e)
                 try:
                     db_del_user(username)
                     server_del_user(username)
-                    if LDAP_ENABLE:
-                        ldap_del_user(username)
                 except Exception:
                     pass
             else:
-                send_mail(mail_title, mail_msg, MAIL_FROM, [email], fail_silently=False)
-                msg = u'添加用户 %s 成功！ 用户密码已发送到 %s 邮箱！' % (username, email)
-    return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
+                if MAIL_ENABLE and send_mail_need:
+                    user_add_mail(user, kwargs=locals())
+                msg = get_display_msg(user, password, ssh_key_pwd, ssh_key_login_need, send_mail_need)
+    return my_render('juser/user_add.html', locals(), request)
 
 
-@require_admin
-def user_add_adm(request):
-    error = ''
-    msg = ''
-    header_title, path1, path2 = '添加用户', '用户管理', '添加用户'
-    user, dept = get_session_user_dept(request)
-    group_all = dept.usergroup_set.all()
-
-    if request.method == 'POST':
-        username = request.POST.get('username', '')
-        password = gen_rand_pwd(16)
-        name = request.POST.get('name', '')
-        email = request.POST.get('email', '')
-        groups = request.POST.getlist('groups', [])
-        ssh_key_pwd = gen_rand_pwd(16)
-        is_active = True if request.POST.get('is_active', '1') == '1' else False
-        ldap_pwd = gen_rand_pwd(16)
-
-        try:
-            if '' in [username, password, ssh_key_pwd, name, groups, is_active]:
-                error = u'带*内容不能为空'
-                raise AddError
-            user = User.objects.filter(username=username)
-            if user:
-                error = u'用户 %s 已存在' % username
-                raise AddError
-
-        except AddError:
-            pass
-        else:
-            try:
-                user = db_add_user(username=username,
-                                   password=md5_crypt(password),
-                                   name=name, email=email, dept=dept,
-                                   groups=groups, role='CU',
-                                   ssh_key_pwd=md5_crypt(ssh_key_pwd),
-                                   ldap_pwd=CRYPTOR.encrypt(ldap_pwd),
-                                   is_active=is_active,
-                                   date_joined=datetime.datetime.now())
-
-                server_add_user(username, password, ssh_key_pwd)
-                if LDAP_ENABLE:
-                    ldap_add_user(username, ldap_pwd)
-
-            except Exception, e:
-                error = u'添加用户 %s 失败 %s ' % (username, e)
-                try:
-                    db_del_user(username)
-                    server_del_user(username)
-                    if LDAP_ENABLE:
-                        ldap_del_user(username)
-                except Exception:
-                    pass
-            else:
-                mail_title = u'恭喜你的跳板机用户添加成功 Jumpserver'
-                mail_msg = """
-                Hi, %s
-                    您的用户名： %s
-                    您的部门: %s
-                    您的角色： %s
-                    您的web登录密码： %s
-                    您的ssh密钥文件密码： %s
-                    密钥下载地址： http://%s:%s/juser/down_key/?id=%s
-                    说明： 请登陆后再下载密钥！
-                """ % (name, username, dept.name, '普通用户',
-                       password, ssh_key_pwd, SEND_IP, SEND_PORT, user.id)
-                send_mail(mail_title, mail_msg, MAIL_FROM, [email], fail_silently=False)
-                msg = u'添加用户 %s 成功！ 用户密码已发送到 %s 邮箱！' % (username, email)
-
-    return render_to_response('juser/user_add.html', locals(), context_instance=RequestContext(request))
-
-
-@require_super_user
+@require_role(role='super')
 def user_list(request):
     user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
     header_title, path1, path2 = '查看用户', '用户管理', '用户列表'
     keyword = request.GET.get('keyword', '')
     gid = request.GET.get('gid', '')
-    did = request.GET.get('did', '')
-    contact_list = User.objects.all().order_by('name')
+    users_list = User.objects.all().order_by('username')
 
     if gid:
         user_group = UserGroup.objects.filter(id=gid)
         if user_group:
             user_group = user_group[0]
-            contact_list = user_group.user_set.all()
-
-    if did:
-        dept = DEPT.objects.filter(id=did)
-        if dept:
-            dept = dept[0]
-            contact_list = dept.user_set.all().order_by('name')
+            users_list = user_group.user_set.all()
 
     if keyword:
-        contact_list = contact_list.filter(Q(username__icontains=keyword) | Q(name__icontains=keyword)).order_by('name')
+        users_list = users_list.filter(Q(username__icontains=keyword) | Q(name__icontains=keyword)).order_by('username')
 
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
+    users_list, p, users, page_range, current_page, show_first, show_end = pages(users_list, request)
 
-    return render_to_response('juser/user_list.html', locals(), context_instance=RequestContext(request))
-
-
-@require_admin
-def user_list_adm(request):
-    user_role = {'SU': u'超级管理员', 'GA': u'组管理员', 'CU': u'普通用户'}
-    header_title, path1, path2 = '查看用户', '用户管理', '用户列表'
-    keyword = request.GET.get('keyword', '')
-    user, dept = get_session_user_dept(request)
-    gid = request.GET.get('gid', '')
-    contact_list = dept.user_set.all().order_by('name')
-
-    if gid:
-        if not validate(request, user_group=[gid]):
-            return HttpResponseRedirect('/juser/user_list/')
-        user_group = UserGroup.objects.filter(id=gid)
-        if user_group:
-            user_group = user_group[0]
-            contact_list = user_group.user_set.all()
-
-    if keyword:
-        contact_list = contact_list.filter(Q(username__icontains=keyword) | Q(name__icontains=keyword)).order_by('name')
-
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
-
-    return render_to_response('juser/user_list.html', locals(), context_instance=RequestContext(request))
+    return my_render('juser/user_list.html', locals(), request)
 
 
-@require_login
+@require_role(role='user')
 def user_detail(request):
-    header_title, path1, path2 = '查看用户', '用户管理', '用户详情'
+    header_title, path1, path2 = '用户详情', '用户管理', '用户详情'
     if request.session.get('role_id') == 0:
-        user_id = request.session.get('user_id')
+        user_id = request.user.id
     else:
         user_id = request.GET.get('id', '')
-        if request.session.get('role_id') == 1:
-            user, dept = get_session_user_dept(request)
-            if not validate(request, user=[user_id]):
-                return HttpResponseRedirect('/')
-    if not user_id:
-        return HttpResponseRedirect('/juser/user_list/')
 
-    user = User.objects.filter(id=user_id)
-    if user:
-        user = user[0]
-        asset_group_permed = user_perm_group_api(user)
-        logs_last = Log.objects.filter(user=user.name).order_by('-start_time')[0:10]
-        logs_all = Log.objects.filter(user=user.name).order_by('-start_time')
-        logs_num = len(logs_all)
+    user = get_object(User, id=user_id)
+    if not user:
+        return HttpResponseRedirect(reverse('user_list'))
 
-    return render_to_response('juser/user_detail.html', locals(), context_instance=RequestContext(request))
+    user_perm_info = get_group_user_perm(user)
+    role_assets = user_perm_info.get('role')
+    user_log_ten = Log.objects.filter(user=user.username).order_by('id')[0:10]
+    user_log_last = Log.objects.filter(user=user.username).order_by('id')[0:50]
+    user_log_last_num = len(user_log_last)
+
+    return my_render('juser/user_detail.html', locals(), request)
 
 
-@require_admin
+@require_role(role='admin')
 def user_del(request):
-    user_id = request.GET.get('id', '')
-    if not user_id:
-        return HttpResponseRedirect('/juser/user_list/')
+    if request.method == "GET":
+        user_ids = request.GET.get('id', '')
+        user_id_list = user_ids.split(',')
+    elif request.method == "POST":
+        user_ids = request.POST.get('id', '')
+        user_id_list = user_ids.split(',')
+    else:
+        return HttpResponse('错误请求')
 
-    if request.session.get('role_id', '') == '1':
-        if not validate(request, user=[user_id]):
-            return HttpResponseRedirect('/juser/user_list/')
-
-    user = User.objects.filter(id=user_id)
-    if user and user[0].username != 'admin':
-        user = user[0]
-        user.delete()
-        server_del_user(user.username)
-        if LDAP_ENABLE:
-            ldap_del_user(user.username)
-    return HttpResponseRedirect('/juser/user_list/')
-
-
-@require_admin
-def user_del_ajax(request):
-    user_ids = request.POST.get('ids')
-    user_ids = user_ids.split(',')
-    if request.session.get('role_id', '') == 1:
-        if not validate(request, user=user_ids):
-            return "error"
-    for user_id in user_ids:
-        user = User.objects.filter(id=user_id)
-        if user and user[0].username != 'admin':
-            user = user[0]
+    for user_id in user_id_list:
+        user = get_object(User, id=user_id)
+        if user and user.username != 'admin':
+            logger.debug(u"删除用户 %s " % user.username)
+            bash('userdel -r %s' % user.username)
             user.delete()
-            server_del_user(user.username)
-            if LDAP_ENABLE:
-                ldap_del_user(user.username)
-
     return HttpResponse('删除成功')
 
 
-@require_super_user
+@require_role('admin')
+def send_mail_retry(request):
+    uuid_r = request.GET.get('uuid', '1')
+    user = get_object(User, uuid=uuid_r)
+    msg = u"""
+    跳板机地址： %s
+    用户名：%s
+    重设密码：%s/juser/password/forget/
+    请登录web点击个人信息页面重新生成ssh密钥
+    """ % (URL, user.username, URL)
+
+    try:
+        send_mail(u'邮件重发', msg, MAIL_FROM, [user.email], fail_silently=False)
+    except IndexError:
+        return Http404
+    return HttpResponse('发送成功')
+
+
+@defend_attack
+def forget_password(request):
+    if request.method == 'POST':
+        defend_attack(request)
+        email = request.POST.get('email', '')
+        username = request.POST.get('username', '')
+        name = request.POST.get('name', '')
+        user = get_object(User, username=username, email=email, name=name)
+        if user:
+            timestamp = int(time.time())
+            hash_encode = PyCrypt.md5_crypt(str(user.uuid) + str(timestamp) + KEY)
+            msg = u"""
+            Hi %s, 请点击下面链接重设密码！
+            %s/juser/password/reset/?uuid=%s&timestamp=%s&hash=%s
+            """ % (user.name, URL, user.uuid, timestamp, hash_encode)
+            send_mail('忘记跳板机密码', msg, MAIL_FROM, [email], fail_silently=False)
+            msg = u'请登陆邮箱，点击邮件重设密码'
+            return http_success(request, msg)
+        else:
+            error = u'用户不存在或邮件地址错误'
+
+    return render_to_response('juser/forget_password.html', locals())
+
+
+@defend_attack
+def reset_password(request):
+    uuid_r = request.GET.get('uuid', '')
+    timestamp = request.GET.get('timestamp', '')
+    hash_encode = request.GET.get('hash', '')
+    action = '/juser/password/reset/?uuid=%s&timestamp=%s&hash=%s' % (uuid_r, timestamp, hash_encode)
+
+    if request.method == 'POST':
+        password = request.POST.get('password')
+        password_confirm = request.POST.get('password_confirm')
+        print password, password_confirm
+        if password != password_confirm:
+            return HttpResponse('密码不匹配')
+        else:
+            user = get_object(User, uuid=uuid_r)
+            if user:
+                user.password = PyCrypt.md5_crypt(password)
+                user.save()
+                return http_success(request, u'密码重设成功')
+            else:
+                return HttpResponse('用户不存在')
+
+    if hash_encode == PyCrypt.md5_crypt(uuid_r + timestamp + KEY):
+        if int(time.time()) - int(timestamp) > 600:
+            return http_error(request, u'链接已超时')
+        else:
+            return render_to_response('juser/reset_password.html', locals())
+
+    return http_error(request, u'错误请求')
+
+
+@require_role(role='super')
 def user_edit(request):
-    header_title, path1, path2 = '编辑用户', '用户管理', '用户编辑'
+    header_title, path1, path2 = '编辑用户', '用户管理', '编辑用户'
     if request.method == 'GET':
         user_id = request.GET.get('id', '')
         if not user_id:
-            return HttpResponseRedirect('/')
+            return HttpResponseRedirect(reverse('index'))
 
-        user_role = {'SU': u'超级管理员', 'DA': u'部门管理员', 'CU': u'普通用户'}
-        user = User.objects.filter(id=user_id)
-        dept_all = DEPT.objects.all()
+        user_role = {'SU': u'超级管理员', 'CU': u'普通用户'}
+        user = get_object(User, id=user_id)
         group_all = UserGroup.objects.all()
         if user:
-            user = user[0]
             groups_str = ' '.join([str(group.id) for group in user.group.all()])
+            admin_groups_str = ' '.join([str(admin_group.group.id) for admin_group in user.admingroup_set.all()])
 
     else:
-        user_id = request.POST.get('user_id', '')
+        user_id = request.GET.get('id', '')
         password = request.POST.get('password', '')
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
-        dept_id = request.POST.get('dept_id')
         groups = request.POST.getlist('groups', [])
         role_post = request.POST.get('role', 'CU')
-        ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
-        is_active = True if request.POST.get('is_active', '1') == '1' else False
-
-        user_role = {'SU': u'超级管理员', 'DA': u'部门管理员', 'CU': u'普通用户'}
-        dept = DEPT.objects.filter(id=dept_id)
-        if dept:
-            dept = dept[0]
-        else:
-            dept = DEPT.objects.get(id='2')
+        admin_groups = request.POST.getlist('admin_groups', [])
+        extra = request.POST.getlist('extra', [])
+        is_active = True if '0' in extra else False
+        email_need = True if '2' in extra else False
+        user_role = {'SU': u'超级管理员', 'GA': u'部门管理员', 'CU': u'普通用户'}
 
         if user_id:
-            user = User.objects.filter(id=user_id)
-            if user:
-                user = user[0]
+            user = get_object(User, id=user_id)
         else:
-            return HttpResponseRedirect('/juser/user_list/')
+            return HttpResponseRedirect(reverse('user_list'))
 
-        if password != user.password:
-            password = md5_crypt(password)
-
-        if ssh_key_pwd != user.ssh_key_pwd:
-            gen_ssh_key(user.username, ssh_key_pwd)
-            ssh_key_pwd = CRYPTOR.encrypt(ssh_key_pwd)
+        if password != '':
+            password_decode = password
+        else:
+            password_decode = None
 
         db_update_user(user_id=user_id,
                        password=password,
                        name=name,
                        email=email,
                        groups=groups,
-                       dept=dept,
+                       admin_groups=admin_groups,
                        role=role_post,
-                       is_active=is_active,
-                       ssh_key_pwd=ssh_key_pwd)
+                       is_active=is_active)
 
-        return HttpResponseRedirect('/juser/user_list/')
+        if email_need:
+            msg = u"""
+            Hi %s:
+                您的信息已修改，请登录跳板机查看详细信息
+                地址：%s
+                用户名： %s
+                密码：%s (如果密码为None代表密码为原密码)
+                权限：：%s
 
-    return render_to_response('juser/user_edit.html', locals(), context_instance=RequestContext(request))
+            """ % (user.name, URL, user.username, password_decode, user_role.get(role_post, u''))
+            send_mail('您的信息已修改', msg, MAIL_FROM, [email], fail_silently=False)
 
-
-@require_admin
-def user_edit_adm(request):
-    header_title, path1, path2 = '编辑用户', '用户管理', '用户编辑'
-    user, dept = get_session_user_dept(request)
-    if request.method == 'GET':
-        user_id = request.GET.get('id', '')
-        if not user_id:
-            return HttpResponseRedirect('/juser/user_list/')
-
-        if not validate(request, user=[user_id]):
-            return HttpResponseRedirect('/juser/user_list/')
-
-        user = User.objects.filter(id=user_id)
-        dept_all = DEPT.objects.all()
-        group_all = dept.usergroup_set.all()
-        if user:
-            user = user[0]
-            groups_str = ' '.join([str(group.id) for group in user.group.all()])
-
-    else:
-        user_id = request.POST.get('user_id', '')
-        password = request.POST.get('password', '')
-        name = request.POST.get('name', '')
-        email = request.POST.get('email', '')
-        groups = request.POST.getlist('groups', [])
-        ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
-        is_active = True if request.POST.get('is_active', '1') == '1' else False
-
-        if not validate(request, user=[user_id], user_group=groups):
-            return HttpResponseRedirect('/juser/user_edit/')
-        if user_id:
-            user = User.objects.filter(id=user_id)
-            if user:
-                user = user[0]
-        else:
-            return HttpResponseRedirect('/juser/user_list/')
-
-        if password != user.password:
-            password = md5_crypt(password)
-
-        if ssh_key_pwd != user.ssh_key_pwd:
-            ssh_key_pwd = CRYPTOR.encrypt(ssh_key_pwd)
-
-        db_update_user(user_id=user_id,
-                       password=password,
-                       name=name,
-                       email=email,
-                       groups=groups,
-                       is_active=is_active,
-                       ssh_key_pwd=ssh_key_pwd)
-
-        return HttpResponseRedirect('/juser/user_list/')
-
-    return render_to_response('juser/user_edit.html', locals(), context_instance=RequestContext(request))
+        return HttpResponseRedirect(reverse('user_list'))
+    return my_render('juser/user_edit.html', locals(), request)
 
 
+@require_role('user')
 def profile(request):
-    user_id = request.session.get('user_id')
+    user_id = request.user.id
     if not user_id:
-        return HttpResponseRedirect('/')
+        return HttpResponseRedirect(reverse('index'))
     user = User.objects.get(id=user_id)
-    return render_to_response('juser/profile.html', locals(), context_instance=RequestContext(request))
+    return my_render('juser/profile.html', locals(), request)
 
 
-def chg_info(request):
+def change_info(request):
     header_title, path1, path2 = '修改信息', '用户管理', '修改个人信息'
-    user_id = request.session.get('user_id')
-    user_set = User.objects.filter(id=user_id)
+    user_id = request.user.id
+    user = User.objects.get(id=user_id)
     error = ''
-    if user_set:
-        user = user_set[0]
-    else:
-        return HttpResponseRedirect('/')
+    if not user:
+        return HttpResponseRedirect(reverse('index'))
 
     if request.method == 'POST':
         name = request.POST.get('name', '')
         password = request.POST.get('password', '')
-        ssh_key_pwd = request.POST.get('ssh_key_pwd', '')
         email = request.POST.get('email', '')
 
-        if '' in [name, password, ssh_key_pwd, email]:
+        if '' in [name, email]:
             error = '不能为空'
 
-        if len(password) < 6 or len(ssh_key_pwd) < 6:
-            error = '密码须大于6位'
-
         if not error:
-            if password != user.password:
-                password = md5_crypt(password)
-
-            if ssh_key_pwd != user.ssh_key_pwd:
-                gen_ssh_key(user.username, ssh_key_pwd)
-                ssh_key_pwd = md5_crypt(ssh_key_pwd)
-
-            user_set.update(name=name, password=password, ssh_key_pwd=ssh_key_pwd, email=email)
+            User.objects.filter(id=user_id).update(name=name, email=email)
+            if len(password) > 0:
+                user.set_password(password)
+                user.save()
             msg = '修改成功'
 
-    return render_to_response('juser/chg_info.html', locals(), context_instance=RequestContext(request))
+    return my_render('juser/change_info.html', locals(), request)
 
 
+@require_role(role='user')
+def regen_ssh_key(request):
+    uuid_r = request.GET.get('uuid', '')
+    user = get_object(User, uuid=uuid_r)
+    if not user:
+        return HttpResponse('没有该用户')
+
+    username = user.username
+    ssh_key_pass = PyCrypt.gen_rand_pass(16)
+    gen_ssh_key(username, ssh_key_pass)
+    return HttpResponse('ssh密钥已生成，密码为 %s, 请到下载页面下载' % ssh_key_pass)
 
 
-
-@require_login
+@require_role(role='user')
 def down_key(request):
-    user_id = ''
-    if is_super_user(request):
-        user_id = request.GET.get('id')
+    if is_role_request(request, 'super'):
+        uuid_r = request.GET.get('uuid', '')
+    else:
+        uuid_r = request.user.uuid
 
-    if is_group_admin(request):
-        user_id = request.GET.get('id')
-        if not validate(request, user=[user_id]):
-            user_id = request.session.get('user_id')
-
-    if is_common_user(request):
-        user_id = request.session.get('user_id')
-
-    if user_id:
-        user = User.objects.filter(id=user_id)
+    if uuid_r:
+        user = get_object(User, uuid=uuid_r)
         if user:
-            user = user[0]
             username = user.username
-            private_key_dir = os.path.join(BASE_DIR, 'keys/jumpserver/')
-            private_key_file = os.path.join(private_key_dir, username+".pem")
+            private_key_file = os.path.join(KEY_DIR, 'user', username+'.pem')
+            print private_key_file
             if os.path.isfile(private_key_file):
                 f = open(private_key_file)
                 data = f.read()
@@ -1052,5 +791,5 @@ def down_key(request):
                 response = HttpResponse(data, content_type='application/octet-stream')
                 response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(private_key_file)
                 return response
-
     return HttpResponse('No Key File. Contact Admin.')
+

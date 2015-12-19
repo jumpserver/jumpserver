@@ -5,80 +5,90 @@
 
 <div class="wrapper wrapper-content" xmlns="http://www.w3.org/1999/html">
     <div class="row">
-        <div class="col-lg-8">
-            <div class="ibox float-e-margins">
-                <div class="ibox-title">
-                    <h5> 使用说明 </h5>
-                    <div class="ibox-tools">
-                        <a class="collapse-link">
-                            <i class="fa fa-chevron-up"></i>
-                        </a>
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="fa fa-wrench"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">未启用 1</a>
-                            </li>
-                            <li><a href="#">未启用 2</a>
-                            </li>
-                        </ul>
-                        <a class="close-link">
-                            <i class="fa fa-times"></i>
-                        </a>
+        <div class="col-sm-8">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5> 使用说明 </h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="ibox-content" style="line-height: 26px">
+                        <span style="font-size: large">欢</span>迎使用<span class="text-navy"><b>Jumpserver</b></span>跳板机系统，
+                        首先需要 <b><a href="{% url 'key_down' %}?id={{ user.id }}">下载</a></b> 登录跳板机的SSH密钥文件，然后导入到工具或者ssh命令指定密钥文件(确保密钥文件权限600)，输入收到的密钥密码，登录跳板机。
+                        登录后根据提示进行操作。跳板机web界面支持修改密码、个人信息和上传下载文件等功能，可以向管理员申请权限。
                     </div>
                 </div>
-
-                <div class="ibox-content" style="line-height: 26px">
-                    <span style="font-size: large">欢</span>迎使用<span class="text-navy"><b>Jumpserver</b></span>跳板机系统，
-                    首先需要 <b><a href="/juser/down_key/?id={{ user.id }}">下载</a></b> 登录跳板机的SSH密钥文件，然后导入到工具或者ssh命令指定密钥文件(确保密钥文件权限600)，输入收到的密钥密码，登录跳板机。
-                    登录后根据提示进行操作。跳板机web界面支持修改密码、个人信息和上传下载文件等功能，可以向管理员申请权限。
-                </div>
             </div>
+            <div class="col-sm-12">
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <h5>登录记录</h5>
+                            <div class="ibox-tools">
+                                <span class="label label-warning-light">最近登录</span>
+                               </div>
+                        </div>
+                        <div class="ibox-content">
+                            <div id="last">
+                                <div class="feed-activity-list" >
+                                    {% for log in logs_last %}
+                                        <div class="feed-element">
+                                            <a href="profile.html" class="pull-left">
+                                                <img alt="image" class="img-circle" src="/static/img/{{ session_role_id | to_avatar }}.png">
+                                            </a>
+                                            <div class="media-body ">
+{#                                                <small class="pull-right">{{ log.start_time|time_delta }}</small>#}
+                                                <small class="pull-right">{{ log.start_time }}</small>
+                                                <strong>{{ log.user }}</strong> 登录了 <span class="text-navy">{{ log.host }}. </span><br>
+                                                <small class="text-muted">{{ log.start_time|date:"Y-m-d H:i:s" }}</small>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                    {% if not logs_last %}
+                                        (暂无)
+                                    {% endif %}
+                                </div>
+                                {% if logs_num > 10 %}
+                                <button id="show" class="btn btn-primary btn-block m-t"><i class="fa fa-arrow-down"></i> Show All</button>
+                                {% endif %}
+                            </div>
 
-            <div class="ibox float-e-margins">
-                <div class="ibox-title">
-                    <h5> 已授权主机 </h5>
-                    <div class="ibox-tools">
-                        <div class="label label-primary float-left"><b>总共：{{ host_count }}</b></div>
-                        <a class="collapse-link">
-                            <i class="fa fa-chevron-up"></i>
-                        </a>
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="fa fa-wrench"></i>
-                        </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">未启用 1</a>
-                            </li>
-                            <li><a href="#">未启用 2</a>
-                            </li>
-                        </ul>
-                        <a class="close-link">
-                            <i class="fa fa-times"></i>
-                        </a>
+                            <div id="all" style="display: none">
+                                <div class="feed-activity-list" >
+                                    {% for log in logs_all %}
+                                        <div class="feed-element">
+                                            <a href="profile.html" class="pull-left">
+                                                <img alt="image" class="img-circle" src="/static/img/{{ session_role_id | to_avatar }}.png">
+                                            </a>
+                                            <div class="media-body ">
+                                                <small class="pull-right">{{ log.start_time }}</small>
+{#                                                <small class="pull-right">{{ log.start_time|time_delta }}</small>#}
+                                                <strong>{{ log.user }}</strong> 登录了 <span class="text-navy">{{ log.host }}. </span><br>
+                                                <small class="text-muted">{{ log.start_time|date:"Y-m-d H:i:s" }}</small>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <div class="ibox-content">
-                    <table class="table table-striped">
-                        {% for host_five in new_posts %}
-                        <tr>
-                            {% for host in host_five %}
-                            <td>{{ host.ip }}</td>
-                            {% endfor %}
-                        </tr>
-                        {% endfor %}
-                    </table>
-                    {% ifequal host_count 0 %}
-                        (空)
-                    {% endifequal %}
-                </div>
-            </div>
         </div>
 
-        <div class="col-lg-4">
+        <div class="col-sm-4">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
-                    <span class="label label-primary"><b>{{ user.name }}</b></span>
+                    <span class="label label-primary"><b>{{ user.username }}</b></span>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -114,12 +124,8 @@
                                     <td>{{ user.name }}</td>
                                 </tr>
                                 <tr>
-                                    <td class="text-navy">角色</td>
-                                    <td>{{ user.id | get_role }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="text-navy">部门</td>
-                                    <td>{{ user.dept.name }}</td>
+                                    <td class="text-navy">系统用户</td>
+                                    <td>{{ user.role }}</td>
                                 </tr>
                                 <tr>
                                     <td class="text-navy">Email</td>

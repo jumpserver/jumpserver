@@ -15,63 +15,11 @@
         </li>
         <li class="dropdown">
             <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
-                <i class="fa fa-envelope"></i>  <span class="label label-warning">{{ apply_info.count }}</span>
+                 <span class="m-r-sm text-muted welcome-message">帮助</span>
             </a>
-            <ul class="dropdown-menu dropdown-messages">
-                {% if apply_info %}
-                    {% for apply in apply_info %}
-                        <li>
-                            <div class="dropdown-messages-box">
-                                <a href="/jperm/apply_show/online/" class="pull-left">
-                                    <img alt="image" class="img-circle" src="/static/img/a4.jpg">
-                                </a>
-                                <div class="media-body">
-                                    <small class="pull-right text-navy">{{ apply.date_add|naturaltime }}</small>
-                                    <strong>{{ apply.applyer }}</strong><br>
-                                    <small class="text-muted">主机组: {{ apply.bisgroup|ast_to_list }}</small><br/>
-                                    <small class="text-muted">主机: {{ apply.asset|ast_to_list }}</small><br/>
-                                    <small class="text-muted">申请时间: {{ apply.date_add|date:"Y-m-d H:i:s" }}</small>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="divider"></li>
-                    {% endfor %}
-                        <li>
-                            <div class="text-center link-block">
-                                <a href="/jperm/apply_show/online/">
-                                    <i class="fa fa-envelope"></i> <strong>Read All Messages</strong>
-                                </a>
-                            </div>
-                        </li>
-                {% else %}
-                    <li>
-                        <div class="text-center link-block">
-                            <i class="fa fa-envelope"></i> <strong>(暂无申请)</strong>
-                        </div>
-                    </li>
-                {% endif %}
-            </ul>
         </li>
-{#        <li class="dropdown open">#}
-{#            <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#" aria-expanded="true">#}
-{#                <i class="fa fa-bell"></i>  <span class="label label-primary">0</span>#}
-{#            </a>#}
-{#            <ul class="dropdown-menu dropdown-alerts">#}
-{#                <li>#}
-{#                    <a href="mailbox.html">#}
-{#                        <div>#}
-{#                            <i class="fa fa-envelope"></i> <strong>(暂无告警)</strong>#}
-{#                            <i class="fa fa-envelope fa-fw"></i> You have 16 messages#}
-{#                            <span class="pull-right text-muted small">4 minutes ago</span>#}
-{#                        </div>#}
-{#                    </a>#}
-{#                </li>#}
-{#                <li class="divider"></li>#}
-{##}
-{#            </ul>#}
-{#        </li>#}
         <li>
-            <a href="/logout/">
+            <a href="{% url 'logout' %}">
                 <i class="fa fa-sign-out"></i> Log out
             </a>
         </li>

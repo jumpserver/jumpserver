@@ -1,144 +1,78 @@
-{% ifequal session_role_id 2 %}
+{% if request.session.role_id == 2 %}
 <nav class="navbar-default navbar-static-side" role="navigation">
     <div class="sidebar-collapse">
         <ul class="nav" id="side-menu">
             {% include 'nav_li_profile.html' %}
             <li id="index">
-               <a href="/"><i class="fa fa-th-large"></i> <span class="nav-label">仪表盘</span><span class="label label-info pull-right"></span></a>
+               <a href="{% url 'index' %}"><i class="fa fa-dashboard"></i> <span class="nav-label">仪表盘</span><span class="label label-info pull-right"></span></a>
             </li>
             <li id="juser">
-                <a href="#"><i class="fa fa-rebel"></i> <span class="nav-label">用户管理</span><span class="fa arrow"></span></a>
+                <a href="#"><i class="fa fa-group"></i> <span class="nav-label">用户管理</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
-                    <li class="dept_list dept_edit"><a href="/juser/dept_list/">查看部门</a></li>
-                    <li class="dept_add"><a href="/juser/dept_add/">添加部门</a></li>
-                    <li class="group_list group_edit"><a href="/juser/group_list/">查看小组</a></li>
-                    <li class="group_add"><a href="/juser/group_add/">添加小组</a></li>
-                    <li class="user_list user_edit user_detail"><a href="/juser/user_list/">查看用户<span class="label {% ifequal user_active_num user_total_num %}label-primary {% else %}label-warning {% endifequal %}pull-right">{{ user_active_num }}/{{ user_total_num }}</span></a></li>
-                    <li class="user_add"><a href="/juser/user_add/">添加用户</a></li>
+                    <li class="group"><a href="{% url 'user_group_list' %}">查看用户组</a></li>
+                    <li class="user"><a href="{% url 'user_list' %}">查看用户<span class="label {% ifequal user_active_num user_total_num %}label-primary {% else %}label-warning {% endifequal %}pull-right">{{ user_active_num }}/{{ user_total_num }}</span></a></li>
                 </ul>
             </li>
             <li id="jasset">
-                <a><i class="fa fa-cube"></i> <span class="nav-label">资产管理</span><span class="fa arrow"></span></a>
+                <a><i class="fa fa-inbox"></i> <span class="nav-label">资产管理</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
-                    <li class="host_add host_add_multi"><a href="/jasset/host_add/">添加资产</a></li>
-                    <li class="host_list host_detail host_edit"><a href="/jasset/host_list/">查看资产<span class="label label-info pull-right">{{ host_active_num }}/{{ host_total_num}}</span></a></li>
-                    <li class="idc_add"><a href="/jasset/idc_add/">添加IDC</a></li>
-                    <li class="idc_list idc_detail idc_edit"><a href="/jasset/idc_list/">查看IDC</a></li>
-                    <li class="group_add"><a href="/jasset/group_add/">添加主机组</a></li>
-                    <li class="group_list group_detail group_edit"><a href="/jasset/group_list/">查看主机组</a></li>
+                    <li class="group"><a href="{% url 'asset_group_list' %}">查看资产组</a></li>
+                    <li class="asset"> <a href="{% url 'asset_list' %}">查看资产<span class="label label-info pull-right">{{ host_active_num }}/{{ host_total_num}}</span></a></li>
+                    <li class="idc"> <a href="{% url 'idc_list' %}">查看机房</a></li>
                 </ul>
             </li>
             <li id="jperm">
                 <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">授权管理</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
-                    <li class="dept_perm_list dept_perm_edit">
-                        <a href="/jperm/dept_perm_list/">部门授权</a>
+                    <li class="sudo">
+                        <a class="sudo" href="{% url 'sudo_list' %}">Sudo</a>
                     </li>
-
-                    <li class="perm_list perm_edit perm_detail">
-                        <a href="/jperm/perm_list/">小组授权</a>
+                    <li class="role">
+                        <a href="{% url 'role_list' %}">系统用户</a>
                     </li>
-
-                    <li class="sudo_list sudo_edit sudo_add cmd_list cmd_edit cmd_add sudo_detail">
-                        <a href="/jperm/sudo_list/">Sudo授权</a>
+                    <li class="rule">
+                        <a href="{% url 'rule_list' %}">授权规则</a>
                     </li>
-                    <li class="apply_show online"><a href="/jperm/apply_show/online/">权限审批</a></li>
                 </ul>
             </li>
             <li id="jlog">
-               <a href="/jlog/log_list/online/"><i class="fa fa-files-o"></i> <span class="nav-label">日志审计</span><span class="label label-info pull-right"></span></a>
+               <a href="{% url 'log_list' 'online' %}"><i class="fa fa-files-o"></i> <span class="nav-label">日志审计</span><span class="label label-info pull-right"></span></a>
             </li>
-            <li class="special_link">
-                <a href="http://www.jumpserver.org" target="_blank"><i class="fa fa-database"></i> <span class="nav-label">访问官网</span></a>
-            </li>
-        </ul>
-
-    </div>
-</nav>
-{% endifequal %}
-{% ifequal session_role_id 1 %}
-<nav class="navbar-default navbar-static-side" role="navigation">
-    <div class="sidebar-collapse">
-        <ul class="nav" id="side-menu">
-            {% include 'nav_li_profile.html' %}
-            <li id="index">
-               <a href="/"><i class="fa fa-th-large"></i> <span class="nav-label">仪表盘</span><span class="label label-info pull-right"></span></a>
-            </li>
-            <li id="juser">
-                <a href="#"><i class="fa fa-rebel"></i> <span class="nav-label">用户管理</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level">
-                    <li class="dept_list dept_edit"><a href="/juser/dept_list/">查看部门</a></li>
-                    <li class="group_list group_edit"><a href="/juser/group_list/">查看小组</a></li>
-                    <li class="group_add"><a href="/juser/group_add/">添加小组</a></li>
-                    <li class="user_list user_detail"><a href="/juser/user_list/">查看用户<span class="label {% ifequal user_active_num user_total_num %}label-primary {% else %}label-warning {% endifequal %}pull-right">{{ user_active_num }}/{{ user_total_num }}</span></a></li>
-                    <li class="user_add"><a href="/juser/user_add/">添加用户</a></li>
-                </ul>
-            </li>
-            <li id="jasset">
-                <a><i class="fa fa-cube"></i> <span class="nav-label">资产管理</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level">
-                    <li class="host_add host_add_multi"><a href="/jasset/host_add/">添加资产</a></li>
-                    <li class="host_list host_detail host_edit"><a href="/jasset/host_list/">查看资产<span class="label label-info pull-right">{{ host_active_num }}/{{ host_total_num}}</span></a></li>
-                    <li class="idc_list idc_detail idc_edit"><a href="/jasset/idc_list/">查看IDC</a></li>
-                    <li class="group_add"><a href="/jasset/group_add/">添加主机组</a></li>
-                    <li class="group_list group_detail group_edit"><a href="/jasset/group_list/">查看主机组</a></li>
-                </ul>
-            </li>
-            <li id="jperm">
-                <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">授权管理</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level">
-                    <li class="perm_list perm_edit perm_detail">
-                        <a href="/jperm/perm_list/">小组授权</a>
-                    </li>
-
-                    <li class="sudo_list sudo_edit sudo_add cmd_list cmd_edit cmd_add sudo_detail">
-                        <a href="/jperm/sudo_list/">Sudo授权</a>
-                    </li>
-                    <li class="apply_show online"><a href="/jperm/apply_show/online/">权限审批</a></li>
-                </ul>
-            </li>
-            <li id="jlog">
-               <a href="/jlog/log_list/online/"><i class="fa fa-files-o"></i> <span class="nav-label">日志审计</span><span class="label label-info pull-right"></span></a>
-            </li>
-
-            <li class="special_link">
-                <a href="http://www.jumpserver.org" target="_blank"><i class="fa fa-database"></i> <span class="nav-label">访问官网</span></a>
-            </li>
-        </ul>
-    </div>
-</nav>
-{% endifequal %}
-
-{% ifequal session_role_id 0 %}
-<nav class="navbar-default navbar-static-side" role="navigation">
-    <div class="sidebar-collapse">
-        <ul class="nav" id="side-menu">
-            {% include 'nav_li_profile.html' %}
-            <li id="index">
-               <a href="/"><i class="fa fa-th-large"></i> <span class="nav-label">仪表盘</span><span class="label label-info pull-right"></span></a>
-            </li>
-            <li class="user_detail">
-               <a href="/juser/user_detail/?id={{ session_user_id }}"><i class="fa fa-rebel"></i> <span class="nav-label">个人信息</span><span class="label label-info pull-right"></span></a>
-            </li>
-            <li id="jasset">
-               <a href="/jasset/host_list/"><i class="fa fa-cube"></i> <span class="nav-label">查看主机</span><span class="label label-info pull-right"></span></a>
-            </li>
-             <li id="jperm">
-                <a><i class="fa fa-cube"></i> <span class="nav-label">权限申请</span><span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level">
-                    <li class="apply"><a href="/jperm/apply/">申请主机</a></li>
-                    <li class="apply_show online"><a href="/jperm/apply_show/online/">申请记录</a></li>
-                </ul>
-            </li>
-            <li id="jlog">
-               <a href="/jlog/log_list/online/"><i class="fa fa-files-o"></i> <span class="nav-label">登录历史</span><span class="label label-info pull-right"></span></a>
-            </li>
-
             <li id="file">
                 <a href="#"><i class="fa fa-download"></i> <span class="nav-label">上传下载</span><span class="fa arrow"></span></a>
                 <ul class="nav nav-second-level">
-                    <li class="upload"><a href="/file/upload/">文件上传</a></li>
-                    <li class="download"><a href="/file/download/">文件下载</a></li>
+                    <li class="upload"><a href="{% url 'file_upload' %}">文件上传</a></li>
+                    <li class="download"><a href="{% url 'file_download' %}">文件下载</a></li>
+                </ul>
+            </li>
+            <li id="setting">
+                   <a href="{% url 'setting' %}"><i class="fa fa-gears"></i> <span class="nav-label">设置</span><span class="label label-info pull-right"></span></a>
+            </li>
+            <li class="special_link">
+                <a href="http://www.jumpserver.org" target="_blank"><i class="fa fa-database"></i> <span class="nav-label">访问官网</span></a>
+            </li>
+        </ul>
+
+    </div>
+</nav>
+{% endif %}
+
+{% if request.session.role_id == 0 %}
+<nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="sidebar-collapse">
+        <ul class="nav" id="side-menu">
+            {% include 'nav_li_profile.html' %}
+            <li id="juser">
+               <a href="{% url 'user_detail' %}"><i class="fa fa-dashboard"></i> <span class="nav-label">仪表盘</span><span class="label label-info pull-right"></span></a>
+            </li>
+            <li id="jasset">
+               <a href="{% url 'asset_list' %}"><i class="fa fa-inbox"></i> <span class="nav-label">查看主机</span><span class="label label-info pull-right"></span></a>
+            </li>
+            <li id="file">
+                <a href="#"><i class="fa fa-download"></i> <span class="nav-label">上传下载</span><span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level">
+                    <li class="upload"><a href="{% url 'file_upload' %}">文件上传</a></li>
+                    <li class="download"><a href="{% url 'file_download' %}">文件下载</a></li>
                 </ul>
             </li>
 
@@ -148,4 +82,4 @@
         </ul>
     </div>
 </nav>
-{% endifequal %}
+{% endif %}

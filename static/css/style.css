@@ -2822,7 +2822,9 @@ body.body-small .footer.fixed {
 .table > thead > tr > td,
 .table > tbody > tr > td,
 .table > tfoot > tr > td {
-  border-top: 1px solid #e7eaec;
+  /*border-top: 1px solid #e7eaec;*/
+  border-bottom: 1px solid #e7eaec;
+  border-top: none;
   line-height: 1.42857;
   padding: 8px;
   vertical-align: top;
@@ -3516,8 +3518,8 @@ body.modal-open {
   z-index: 100;
 }
 .lockscreen.middle-box {
-  width: 200px;
-  margin-left: -100px;
+  width: 400px;
+  margin-left: -200px;
   margin-top: -190px;
 }
 .loginscreen.middle-box {
@@ -4562,3 +4564,10 @@ body.skin-3 {
 .red-fonts {
     color: #ed5565;
 }
+
+.form-group.required .control-label:after {
+  content: " *";
+  color: red;
+}
+
+.n-invalid {border: 1px solid #f00;}

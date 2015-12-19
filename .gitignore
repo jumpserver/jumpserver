@@ -1,7 +1,8 @@
 *.py[cod]
 .idea
 test.py
-
+.DS_Store
+db.sqlite3
 # C extensions
 *.so
 
@@ -36,8 +37,9 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
-node_modules
-logs
-keys
+*.log
+logs/*
+keys/*
 jumpserver.conf
 nohup.out
+tmp/*

@@ -1,12 +1,18 @@
 {% extends 'base.html' %}
+{% block self_head_css_js %}
+    <link href="/static/css/plugins/datepicker/datepicker3.css" rel="stylesheet">
+    <link href="/static/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <script src="/static/js/plugins/chosen/chosen.jquery.js"></script>
+{% endblock %}
 {% block content %}
 {% include 'nav_cat_bar.html' %}
+
 <style>
     .bootstrap-dialog-body  {
         background-color: rgba(0, 0, 0, 0);
     }
     .bootstrap-dialog-message {
-        background-color: rgba(0, 0, 0, 0);
+        color: #00FF00;
     }
     .modal-content {
         background-color: rgba(0, 0, 0, 0.6);
@@ -21,14 +27,12 @@
     .modal-header {
         background-color: #FFFFFF;
     }
-    .bootstrap-dialog-message {
-        color: #00FF00;
-        }
+
 </style>
 
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-sm-12">
             <div class="ibox float-e-margins">
                 <div id="ibox-content" class="ibox-title">
                     <h5> 用户日志详细信息列表 </h5>
@@ -39,12 +43,6 @@
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                             <i class="fa fa-wrench"></i>
                         </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">未启用 1</a>
-                            </li>
-                            <li><a href="#">未启用 2</a>
-                            </li>
-                        </ul>
                         <a class="close-link">
                             <i class="fa fa-times"></i>
                         </a>
@@ -54,52 +52,78 @@
                 <div class="ibox-content">
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
-                            <li><a href="/jlog/log_list/online/" class="text-center"><i class="fa fa-laptop"></i> 在线 </a></li>
-                            <li class="active"><a href="/jlog/log_list/offline/" class="text-center"><i class="fa fa-bar-chart-o"></i> 历史记录 </a></li>
-                            <li style="float: right">
-                                <form id="search_form" method="get" action="" class="pull-right mail-search">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
-                                        <input type="text" style="display: none">
-                                        <div class="input-group-btn">
-                                            <button id='search_btn' type="button" class="btn btn-sm btn-primary" onclick="log_search()">
-                                                Search
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </li>
+                            <li><a href="{% url 'log_list' 'online' %}" class="text-center"><i class="fa fa-laptop"></i> 在线 </a></li>
+                            <li class="active"><a href="{% url 'log_list' 'offline' %}" class="text-center"><i class="fa fa-bar-chart-o"></i> 登录历史</a></li>
+                            <li><a href="{% url 'log_list' 'exec' %}" class="text-center"><i class="fa fa-bar-chart-o"></i> 命令记录 </a></li>
+                            <li><a href="{% url 'log_list' 'file' %}" class="text-center"><i class="fa fa-bar-chart-o"></i> 上传下载 </a></li>
                         </ul>
                     </div>
-                    <br/>
+                    <form class="form-inline" action="" method="get">
+                        <div class="form-group" id="date_5">
+                            <div class="input-daterange input-group" id="datepicker">
+                                <input type="text" class="input-sm form-control" style="width: 100px;" name="start" value="{{ date_seven_day }}">
+                                <span class="input-group-addon">to</span>
+                                <input type="text" class="input-sm form-control" style="width: 100px;"  name="end" value="{{ date_now_str }}">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <select name="username" data-placeholder="用户名" class="chosen-select" multiple style="width:200px;" tabindex="2">
+                                    {% for username in username_all %}
+                                        <option value="{{ username }}"{% if username in username_list %}selected{% endif %}>{{ username }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="input-group">
+                                <select name="host" data-placeholder="主机" class="chosen-select" multiple style="width:200px;" tabindex="4">
+                                    {% for ip in ip_all %}
+                                    <option value="{{ ip }}" {% if ip in host_list %}selected{% endif %}>{{ ip }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <input id="cmd" name="cmd" placeholder="命令" type="text" class="form-control" value="{{ cmd }}" style="width: 200px;">
+                        </div>
+                        <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                                - 搜索 -
+                        </button>
+                    </form>
                     <div class="tab-content">
                         <table class="table table-striped table-bordered table-hover ">
                             <thead>
                                 <tr>
+                                    <th class="text-center"> ID </th>
                                     <th class="text-center"> 用户名 </th>
-                                    <th class="text-center"> 所属部门 </th>
                                     <th class="text-center"> 登录主机 </th>
                                     <th class="text-center"> 来源IP </th>
+                                    <th class="text-center"> 登陆方式 </th>
                                     {% ifnotequal session_role_id 0 %}
-                                        <th class="text-center"> 命令统计 </th>
+                                        <th class="text-center"> 命令 </th>
                                     {% endifnotequal %}
+                                    <th class="text-center"> 录像 </th>
                                     <th class="text-center"> 登录时间 </th>
-                                    <th class="text-center"> 结束时间 </th>
+                                    <th class="text-center"> 时长</th>
 
                                 </tr>
                             </thead>
                             <tbody>
+
                             {% for post in contacts.object_list %}
                                 <tr class="gradeX">
-                                    <td class="text-center" id="username"> {{ post.user }} </td>
-                                    <td class="text-center" id="dept"> {{ post.dept_name }} </td>
-                                    <td class="text-center" id="ip"> {{ post.host }} </td>
-                                    <td class="text-center" id="remote_ip"> {{ post.remote_ip }} </td>
+                                    <td class="text-center"> {{ post.id }} </td>
+                                    <td class="text-center username"> {{ post.user }} </td>
+                                    <td class="text-center ip"> {{ post.host }} </td>
+                                    <td class="text-center remote_ip"> {{ post.remote_ip }} </td>
+                                    <td class="text-center"> {{ post.login_type }} </td>
                                     {% ifnotequal session_role_id 0 %}
-                                        <td class="text-center"><a href="/jlog/history/?id={{ post.id }}" class="log_command"> 命令统计 </td>
+                                        <td class="text-center"><a href="{% url 'log_history' %}?id={{ post.id }}" class="log_command"> 统计 </a></td>
                                     {% endifnotequal %}
-                                    <td class="text-center" id="start_time"> {{ post.start_time|date:"Y-m-d H:i:s"}} </td>
-                                    <td class="text-center" id="end_time"> {{ post.end_time|date:"Y-m-d H:i:s" }} </td>
+                                    <td class="text-center"><a value="{% url 'log_record' %}?id={{ post.id }}" class="log_record"> 回放 </a></td>
+                                    <td class="text-center start_time"> {{ post.start_time|date:"Y-m-d H:i:s"}} </td>
+                                    <td class="text-center end_time"> {{ post.end_time|timeuntil:post.start_time }} </td>
                                 </tr>
                             {% endfor %}
                             </tbody>
@@ -116,28 +140,46 @@
     </div>
 </div>
 
-
-{#<script src="http://{{ web_socket_host }}/socket.io/socket.io.js"></script>#}
 <script>
-   $('.log_command').on('click',function(){
-       var url = $(this).attr('href');
-       var username = $('#username')[0].innerText;
-       var ip = $('#ip')[0].innerText;
-       var start_time = $('#start_time')[0].innerText;
-       var end_time = $('#end_time')[0].innerText;
-       var div_username = ' 用户名: '+'<span class="text-info">'+username+'' + '</span>';
-       var div_ip = ' 主机: '+'<span class="text-info">' + ip + '</span>';
-       var div_time = ' 开始时间: ' + '<span class="text-info">'+start_time +'</span>' + ' 结束时间: ' +'<span class="text-info">' + end_time + '</span'
-       var title = 'JumpServer命令统计 '+ div_username + div_ip + div_time;
-        $.ajax({url:url,success:function(data){
-        var tag = $('<div style="height: 500px;overflow: auto;background-color: rgba(0, 0, 0, 0);"></div>').html(data.replace(/\n/g,"<br />"));
-        BootstrapDialog.show({title: title, message:tag[0]});
+    $('.log_record').click(function(){
+        var url = $(this).attr('value');
+        //window.open(url, '播放', 'height=500, width=910, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');
+        var username = $(this).closest('tr').find('.username')[0].innerHTML;
+        var ip = $(this).closest('tr').find('.ip')[0].innerHTML;
+        var start_time = $(this).closest('tr').find('.start_time')[0].innerHTML;
+        var end_time = $(this).closest('tr').find('.end_time')[0].innerHTML;
+        var div_username = ' 用户名: '+'<span class="text-info">'+username+'' + '</span>';
+        var div_ip = ' 主机: '+'<span class="text-info">' + ip + '</span>';
+        var div_time = ' 时间: ' + '<span class="text-info">'+start_time +'</span>' +' - <span class="text-info">' + end_time + '</span>';
+        var title = 'JumpServer录像回放 '+ div_username + div_ip + div_time;
+        layer.open({
+            type: 2,
+            title: title,
+            maxmin: true,
+            shade: false,
+            area: ['800px', '520px'],
+            content: url
+        });
+        return false;
+    });
+
+    $('.log_command').on('click',function(){
+        var url = $(this).attr('href');
+        var username = $(this).closest('tr').find('.username')[0].innerHTML;
+        var ip = $(this).closest('tr').find('.ip')[0].innerHTML;
+        var start_time = $(this).closest('tr').find('.start_time')[0].innerHTML;
+        var end_time = $(this).closest('tr').find('.end_time')[0].innerHTML;
+        var div_username = ' 用户名: '+'<span class="text-info">'+username+'' + '</span>';
+        var div_ip = ' 主机: '+'<span class="text-info">' + ip + '</span>';
+        var div_time = ' 开始时间: ' + '<span class="text-info">'+start_time +'</span>' + ' 结束时间: ' +'<span class="text-info">' + end_time + '</span>';
+        var title = 'JumpServer命令统计 '+ div_username + div_ip + div_time;
+        $.ajax({url:url,
+                success:function(data){
+                    var tag = $('<div style="height: 500px;overflow: auto;background-color: rgba(0, 0, 0, 0);"></div>').html(data.replace(/\n/g,"<br />"));
+                    BootstrapDialog.show({title: title, message:tag[0]});
         }});
        return false;
     });
-    globalConfig = {
-        SOCKET_HOST: "{{ web_socket_host }}"
-    };
 
     function log_search(){
         $.ajax({
@@ -150,11 +192,33 @@
         });
     }
 
-    $("#search_input").keydown(function(e){
-        if(e.keyCode==13){
-            log_search()
-            }
-    })
+{#    $("#search_input").keydown(function(e){#}
+{#        if(e.keyCode==13){#}
+{#            log_search()#}
+{#            }#}
+{#    });#}
+
+    $('#date_5 .input-daterange').datepicker({
+            dateFormat: 'mm/dd/yy',
+            keyboardNavigation: false,
+            forceParse: false,
+            autoclose: true
+    });
+
+    var config = {
+                '.chosen-select'           : {},
+                '.chosen-select-deselect'  : {allow_single_deselect:true},
+                '.chosen-select-no-single' : {disable_search_threshold:10},
+                '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
+                '.chosen-select-width'     : {width:"95%"}
+            };
+    for (var selector in config) {
+        $(selector).chosen(config[selector]);
+    }
 
 </script>
+{% endblock %}
+{% block self_footer_js %}
+    <script src="/static/js/cropper/cropper.min.js"></script>
+    <script src="/static/js/datapicker/bootstrap-datepicker.js"></script>
 {% endblock %}

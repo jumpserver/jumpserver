@@ -1,184 +1,188 @@
-# coding: utf-8
-import sys
+# -*- coding: utf-8 -*-
 
-reload(sys)
-sys.setdefaultencoding('utf8')
-
-from django.shortcuts import render_to_response
-from django.template import RequestContext
-from jperm.models import Perm, SudoPerm, CmdGroup, Apply
 from django.db.models import Q
-from jumpserver.api import *
+from paramiko import SSHException
+from jperm.perm_api import *
+
+from juser.models      import User, UserGroup
+from jasset.models     import Asset, AssetGroup
+from jperm.models      import PermRole, PermRule, PermSudo, PermPush
+from jumpserver.models import Setting
+
+from jperm.utils       import gen_keys
+from jperm.ansible_api import MyTask
+from jperm.perm_api    import get_role_info, get_role_push_host
+from jumpserver.api    import my_render, get_object, CRYPTOR
+
+# 设置PERM APP Log
+from jumpserver.settings import LOG_LEVEL
+logger = set_log(LOG_LEVEL, filename='jumpserver_perm.log')
 
 
-def asset_cmd_groups_get(asset_groups_select='', cmd_groups_select=''):
-    asset_groups_select_list = []
-    cmd_groups_select_list = []
-
-    for asset_group_id in asset_groups_select:
-        asset_groups_select_list.extend(BisGroup.objects.filter(id=asset_group_id))
-
-    for cmd_group_id in cmd_groups_select:
-        cmd_groups_select_list.extend(CmdGroup.objects.filter(id=cmd_group_id))
-
-    return asset_groups_select_list, cmd_groups_select_list
-
-
-@require_admin
-def perm_add(request):
-    header_title, path1, path2 = u'主机授权添加', u'授权管理', u'授权添加'
-
-    if request.method == 'GET':
-        user_groups = UserGroup.objects.filter(id__gt=2)
-        asset_groups = BisGroup.objects.all()
-
-    else:
-        name = request.POST.get('name', '')
-        user_groups_select = request.POST.getlist('user_groups_select')
-        asset_groups_select = request.POST.getlist('asset_groups_select')
-        comment = request.POST.get('comment', '')
-
-        user_groups, asset_groups = user_asset_cmd_groups_get(user_groups_select, asset_groups_select, '')[0:2]
-
-        perm = Perm(name=name, comment=comment)
-        perm.save()
-
-        perm.user_group = user_groups
-        perm.asset_group = asset_groups
-        msg = '添加成功'
-    return render_to_response('jperm/perm_add.html', locals(), context_instance=RequestContext(request))
-
-
-def dept_add_asset(dept_id, asset_list):
-    dept = DEPT.objects.filter(id=dept_id)
-    if dept:
-        dept = dept[0]
-        new_perm_asset = []
-        for asset_id in asset_list:
-            asset = Asset.objects.filter(id=asset_id)
-            new_perm_asset.extend(asset)
-
-        dept.asset_set.clear()
-        dept.asset_set = new_perm_asset
-
-
-@require_super_user
-def dept_perm_edit(request):
-    header_title, path1, path2 = u'部门授权添加', u'授权管理', u'部门授权添加'
-    if request.method == 'GET':
-        dept_id = request.GET.get('id', '')
-        dept = DEPT.objects.filter(id=dept_id)
-        if dept:
-            dept = dept[0]
-            asset_all = Asset.objects.all()
-            asset_select = dept.asset_set.all()
-            assets = [asset for asset in asset_all if asset not in asset_select]
-    else:
-        dept_id = request.POST.get('dept_id')
-        asset_select = request.POST.getlist('asset_select')
-        dept_add_asset(dept_id, asset_select)
-        return HttpResponseRedirect('/jperm/dept_perm_list/')
-    return render_to_response('jperm/dept_perm_edit.html', locals(), context_instance=RequestContext(request))
-
-
-@require_super_user
-def perm_list(request):
-    header_title, path1, path2 = u'小组授权', u'授权管理', u'授权详情'
+@require_role('admin')
+def perm_rule_list(request):
+    """
+    list rule page
+    授权规则列表
+    """
+    # 渲染数据
+    header_title, path1, path2 = "授权规则", "规则管理", "查看规则"
+    # 获取所有规则
+    rules_list = PermRule.objects.all()
+    rule_id = request.GET.get('id')
+    # TODO: 搜索和分页
     keyword = request.GET.get('search', '')
-    uid = request.GET.get('uid', '')
-    agid = request.GET.get('agid', '')
+    if rule_id:
+        rules_list = rules_list.filter(id=rule_id)
+
     if keyword:
-        contact_list = UserGroup.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
-    else:
-        contact_list = UserGroup.objects.all().order_by('name')
+        rules_list = rules_list.filter(Q(name=keyword))
 
-    if uid:
-        user = User.objects.filter(id=uid)
-        print user
-        if user:
-            user = user[0]
-            contact_list = contact_list.filter(user=user)
+    rules_list, p, rules, page_range, current_page, show_first, show_end = pages(rules_list, request)
 
-    if agid:
-        contact_list_confirm = []
-        asset_group = BisGroup.objects.filter(id=agid)
-        if asset_group:
-            asset_group = asset_group[0]
-            for user_group in contact_list:
-                if asset_group in user_group_perm_asset_group_api(user_group):
-                    contact_list_confirm.append(user_group)
-            contact_list = contact_list_confirm
-
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
-    return render_to_response('jperm/perm_list.html', locals(), context_instance=RequestContext(request))
+    return my_render('jperm/perm_rule_list.html', locals(), request)
 
 
-@require_admin
-def perm_list_adm(request):
-    header_title, path1, path2 = u'小组授权', u'授权管理', u'授权详情'
-    keyword = request.GET.get('search', '')
-    uid = request.GET.get('uid', '')
-    agid = request.GET.get('agid', '')
-    user, dept = get_session_user_dept(request)
-    contact_list = dept.usergroup_set.all().order_by('name')
-    if keyword:
-        contact_list = contact_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
+@require_role('admin')
+def perm_rule_detail(request):
+    """
+    rule detail page
+    授权详情
+    """
+    # 渲染数据
+    header_title, path1, path2 = "授权规则", "规则管理", "规则详情"
 
-    if uid:
-        user = User.objects.filter(id=uid)
-        print user
-        if user:
-            user = user[0]
-            contact_list = contact_list.filter(user=user)
+    # 根据rule_id 取得rule对象
+    try:
+        if request.method == "GET":
+            rule_id = request.GET.get("id")
+            if not rule_id:
+                raise ServerError("Rule Detail - no rule id get")
+            rule_obj = PermRule.objects.get(id=rule_id)
+            user_obj = rule_obj.user.all()
+            user_group_obj = rule_obj.user_group.all()
+            asset_obj = rule_obj.asset.all()
+            asset_group_obj = rule_obj.asset_group.all()
+            roles_name = [role.name for role in rule_obj.role.all()]
 
-    if agid:
-        contact_list_confirm = []
-        asset_group = BisGroup.objects.filter(id=agid)
-        if asset_group:
-            asset_group = asset_group[0]
-            for user_group in contact_list:
-                if asset_group in user_group_perm_asset_group_api(user_group):
-                    contact_list_confirm.append(user_group)
-            contact_list = contact_list_confirm
+            # 渲染数据
+            roles_name = ','.join(roles_name)
+            rule = rule_obj
+            users = user_obj
+            user_groups = user_group_obj
+            assets = asset_obj
+            asset_groups = asset_group_obj
+    except ServerError, e:
+        logger.warning(e)
 
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
-    return render_to_response('jperm/perm_list.html', locals(), context_instance=RequestContext(request))
-
-
-@require_super_user
-def dept_perm_list(request):
-    header_title, path1, path2 = '查看部门', '授权管理', '部门授权'
-    keyword = request.GET.get('search')
-    if keyword:
-        contact_list = DEPT.objects.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword)).order_by('name')
-    else:
-        contact_list = DEPT.objects.filter(id__gt=2)
-
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
-
-    return render_to_response('jperm/dept_perm_list.html', locals(), context_instance=RequestContext(request))
+    return my_render('jperm/perm_rule_detail.html', locals(), request)
 
 
-def perm_group_update(user_group_id, asset_groups_id_list):
-    user_group = UserGroup.objects.filter(id=user_group_id)
-    if user_group:
-        user_group = user_group[0]
-        old_asset_group = [perm.asset_group for perm in user_group.perm_set.all()]
-        new_asset_group = []
+def perm_rule_add(request):
+    """
+    add rule page
+    添加授权
+    """
+    # 渲染数据
+    header_title, path1, path2 = "授权规则", "规则管理", "添加规则"
 
-        for asset_group_id in asset_groups_id_list:
-            new_asset_group.extend(BisGroup.objects.filter(id=asset_group_id))
+    # 渲染数据, 获取所有 用户,用户组,资产,资产组,用户角色, 用于添加授权规则
+    users = User.objects.all()
+    user_groups = UserGroup.objects.all()
+    assets = Asset.objects.all()
+    asset_groups = AssetGroup.objects.all()
+    roles = PermRole.objects.all()
 
-        del_asset_group = [asset_group for asset_group in old_asset_group if asset_group not in new_asset_group]
-        add_asset_group = [asset_group for asset_group in new_asset_group if asset_group not in old_asset_group]
+    if request.method == 'POST':
+        # 获取用户选择的 用户,用户组,资产,资产组,用户角色
+        users_select = request.POST.getlist('user', [])  # 需要授权用户
+        user_groups_select = request.POST.getlist('user_group', [])  # 需要授权用户组
+        assets_select = request.POST.getlist('asset', [])  # 需要授权资产
+        asset_groups_select = request.POST.getlist('asset_group', [])  # 需要授权资产组
+        roles_select = request.POST.getlist('role', [])  # 需要授权角色
+        rule_name = request.POST.get('name')
+        rule_comment = request.POST.get('comment')
 
-        for asset_group in del_asset_group:
-            Perm.objects.filter(user_group=user_group, asset_group=asset_group).delete()
+        try:
+            rule = get_object(PermRule, name=rule_name)
 
-        for asset_group in add_asset_group:
-            Perm(user_group=user_group, asset_group=asset_group).save()
+            if rule:
+                raise ServerError(u'授权规则 %s 已存在' % rule_name)
+
+            if not rule_name or not roles_select:
+                raise ServerError(u'系统用户名称和规则名称不能为空')
+
+            # 获取需要授权的主机列表
+            assets_obj = [Asset.objects.get(id=asset_id) for asset_id in assets_select]
+            asset_groups_obj = [AssetGroup.objects.get(id=group_id) for group_id in asset_groups_select]
+            group_assets_obj = []
+            for asset_group in asset_groups_obj:
+                group_assets_obj.extend(list(asset_group.asset_set.all()))
+            calc_assets = set(group_assets_obj) | set(assets_obj)  # 授权资产和资产组包含的资产
+
+            # 获取需要授权的用户列表
+            users_obj = [User.objects.get(id=user_id) for user_id in users_select]
+            user_groups_obj = [UserGroup.objects.get(id=group_id) for group_id in user_groups_select]
+
+            # 获取授予的角色列表
+            roles_obj = [PermRole.objects.get(id=role_id) for role_id in roles_select]
+            need_push_asset = set()
+
+            for role in roles_obj:
+                asset_no_push = get_role_push_host(role=role)[1]  # 获取某角色已经推送的资产
+                need_push_asset.update(set(calc_assets) & set(asset_no_push))
+                if need_push_asset:
+                    raise ServerError(u'没有推送系统用户 %s 的主机 %s'
+                                      % (role.name, ','.join([asset.hostname for asset in need_push_asset])))
+
+            # 仅授权成功的，写回数据库(授权规则,用户,用户组,资产,资产组,用户角色)
+            rule = PermRule(name=rule_name, comment=rule_comment)
+            rule.save()
+            rule.user = users_obj
+            rule.user_group = user_groups_obj
+            rule.asset = assets_obj
+            rule.asset_group = asset_groups_obj
+            rule.role = roles_obj
+            rule.save()
+
+            msg = u"添加授权规则：%s" % rule.name
+            return HttpResponseRedirect(reverse('rule_list'))
+        except ServerError, e:
+            error = e
+    return my_render('jperm/perm_rule_add.html', locals(), request)
 
 
+@require_role('admin')
+def perm_rule_edit(request):
+    """
+    edit rule page
+    """
+    # 渲染数据
+    header_title, path1, path2 = "授权规则", "规则管理", "添加规则"
+
+    # 根据rule_id 取得rule对象
+    rule_id = request.GET.get("id")
+    rule = get_object(PermRule, id=rule_id)
+
+    # 渲染数据, 获取所选的rule对象
+
+    users = User.objects.all()
+    user_groups = UserGroup.objects.all()
+    assets = Asset.objects.all()
+    asset_groups = AssetGroup.objects.all()
+    roles = PermRole.objects.all()
+
+    if request.method == 'POST' and rule_id:
+        # 获取用户选择的 用户,用户组,资产,资产组,用户角色
+        rule_name = request.POST.get('name')
+        rule_comment = request.POST.get("comment")
+        users_select = request.POST.getlist('user', [])
+        user_groups_select = request.POST.getlist('user_group', [])
+        assets_select = request.POST.getlist('asset', [])
+        asset_groups_select = request.POST.getlist('asset_group', [])
+        roles_select = request.POST.getlist('role', [])
+
+<<<<<<< HEAD
 @require_super_user
 def perm_edit(request):
     if request.method == 'GET':
@@ -278,234 +282,114 @@ def sudo_ldap_add(user_group, user_runas, asset_groups_select,
         asset_all = False
         for asset_group in asset_groups_select:
             assets.extend(asset_group.asset_set.all())
+=======
+        try:
+            if not rule_name or not roles_select:
+                raise ServerError(u'系统用户和关联系统用户不能为空')
 
-    if user_group.name == 'ALL':
-        user_all = True
-        users = []
-    else:
-        user_all = False
-        users = user_group.user_set.all()
+            assets_obj = [Asset.objects.get(id=asset_id) for asset_id in assets_select]
+            asset_groups_obj = [AssetGroup.objects.get(id=group_id) for group_id in asset_groups_select]
+            group_assets_obj = []
+            for asset_group in asset_groups_obj:
+                group_assets_obj.extend(list(asset_group.asset_set.all()))
+            calc_assets = set(group_assets_obj) | set(assets_obj)  # 授权资产和资产组包含的资产
 
-    for cmd_group in cmd_groups_select:
-        cmds.extend(cmd_group.cmd.split(','))
+            # 获取需要授权的用户列表
+            users_obj = [User.objects.get(id=user_id) for user_id in users_select]
+            user_groups_obj = [UserGroup.objects.get(id=group_id) for group_id in user_groups_select]
 
-    if user_all:
-        users_name = ['ALL']
-    else:
-        users_name = list(set([user.username for user in users]))
+            # 获取授予的角色列表
+            roles_obj = [PermRole.objects.get(id=role_id) for role_id in roles_select]
+            need_push_asset = set()
+            for role in roles_obj:
+                asset_no_push = get_role_push_host(role=role)[1]  # 获取某角色已经推送的资产
+                need_push_asset.update(set(calc_assets) & set(asset_no_push))
+                if need_push_asset:
+                    raise ServerError(u'没有推送系统用户 %s 的主机 %s'
+                                      % (role.name, ','.join([asset.hostname for asset in need_push_asset])))
 
-    if asset_all:
-        assets_ip = ['ALL']
-    else:
-        assets_ip = list(set([asset.ip for asset in assets]))
+                # 仅授权成功的，写回数据库(授权规则,用户,用户组,资产,资产组,用户角色)
+                rule.user = users_obj
+                rule.user_group = user_groups_obj
+                rule.asset = assets_obj
+                rule.asset_group = asset_groups_obj
+                rule.role = roles_obj
+            rule.name = rule_name
+            rule.comment = rule_comment
+            rule.save()
+            msg = u"更新授权规则：%s成功" % rule.name
+>>>>>>> dev
 
-    name = 'sudo%s' % user_group.id
-    sudo_dn = 'cn=%s,ou=Sudoers,%s' % (name, LDAP_BASE_DN)
-    sudo_attr = {'objectClass': ['top', 'sudoRole'],
-                 'cn': ['%s' % name],
-                 'sudoCommand': unicode2str(cmds),
-                 'sudoHost': unicode2str(assets_ip),
-                 'sudoOption': ['!authenticate'],
-                 'sudoRunAsUser': unicode2str(user_runas),
-                 'sudoUser': unicode2str(users_name)}
-    ldap_conn.delete(sudo_dn)
-    ldap_conn.add(sudo_dn, sudo_attr)
+        except ServerError, e:
+            error = e
 
-
-def sudo_update(user_group, user_runas, asset_groups_select, cmd_groups_select, comment):
-    asset_groups_select_list, cmd_groups_select_list = \
-        asset_cmd_groups_get(asset_groups_select, cmd_groups_select)
-    sudo_perm = user_group.sudoperm_set.all()
-    if sudo_perm:
-        sudo_perm.update(user_runas=user_runas, comment=comment)
-        sudo_perm = sudo_perm[0]
-        sudo_perm.asset_group = asset_groups_select_list
-        sudo_perm.cmd_group = cmd_groups_select_list
-    else:
-        sudo_perm = SudoPerm(user_group=user_group, user_runas=user_runas, comment=comment)
-        sudo_perm.save()
-        sudo_perm.asset_group = asset_groups_select_list
-        sudo_perm.cmd_group = cmd_groups_select_list
-
-    sudo_ldap_add(user_group, user_runas, asset_groups_select_list, cmd_groups_select_list)
+    return my_render('jperm/perm_rule_edit.html', locals(), request)
 
 
-@require_super_user
-def sudo_list(request):
-    header_title, path1, path2 = u'Sudo授权', u'权限管理', u'Sudo权限详情'
-    keyword = request.GET.get('search', '')
-    contact_list = UserGroup.objects.all().order_by('name')
-    if keyword:
-        contact_list = contact_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
-
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
-    return render_to_response('jperm/sudo_list.html', locals(), context_instance=RequestContext(request))
-
-
-@require_admin
-def sudo_list_adm(request):
-    header_title, path1, path2 = u'Sudo授权', u'权限管理', u'Sudo权限详情'
-    keyword = request.GET.get('search', '')
-    user, dept = get_session_user_dept(request)
-    contact_list = dept.usergroup_set.all().order_by('name')
-    if keyword:
-        contact_list = contact_list.filter(Q(name__icontains=keyword) | Q(comment__icontains=keyword))
-
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(contact_list, request)
-    return render_to_response('jperm/sudo_list.html', locals(), context_instance=RequestContext(request))
-
-
-@require_super_user
-def sudo_edit(request):
-    header_title, path1, path2 = u'Sudo授权', u'授权管理', u'Sudo授权'
-
-    if request.method == 'GET':
-        user_group_id = request.GET.get('id', '0')
-        user_group = UserGroup.objects.filter(id=user_group_id)
-        asset_group_all = BisGroup.objects.filter()
-        cmd_group_all = CmdGroup.objects.all()
-        if user_group:
-            user_group = user_group[0]
-            sudo_perm = user_group.sudoperm_set.all()
-            if sudo_perm:
-                sudo_perm = sudo_perm[0]
-                asset_group_permed = sudo_perm.asset_group.all()
-                cmd_group_permed = sudo_perm.cmd_group.all()
-                user_runas = sudo_perm.user_runas
-                comment = sudo_perm.comment
-            else:
-                asset_group_permed = []
-                cmd_group_permed = []
-
-            asset_groups = [asset_group for asset_group in asset_group_all if asset_group not in asset_group_permed]
-            cmd_groups = [cmd_group for cmd_group in cmd_group_all if cmd_group not in cmd_group_permed]
-
-    else:
-        user_group_id = request.POST.get('user_group_id', '')
-        users_runas = request.POST.get('runas') if request.POST.get('runas') else 'root'
-        asset_groups_select = request.POST.getlist('asset_groups_select')
-        cmd_groups_select = request.POST.getlist('cmd_groups_select')
-        comment = request.POST.get('comment', '')
-        user_group = UserGroup.objects.filter(id=user_group_id)
-        if user_group:
-            user_group = user_group[0]
-            if LDAP_ENABLE:
-                sudo_update(user_group, users_runas, asset_groups_select, cmd_groups_select, comment)
-                msg = '修改成功'
-
-        return HttpResponseRedirect('/jperm/sudo_list/')
-
-    return render_to_response('jperm/sudo_edit.html', locals(), context_instance=RequestContext(request))
-
-
-@require_admin
-def sudo_edit_adm(request):
-    header_title, path1, path2 = u'Sudo授权', u'授权管理', u'Sudo授权'
-    user, dept = get_session_user_dept(request)
-    if request.method == 'GET':
-        user_group_id = request.GET.get('id', '0')
-        if not validate(request, user_group=[user_group_id]):
-            return render_to_response('/jperm/sudo_list/')
-        user_group = UserGroup.objects.filter(id=user_group_id)
-        asset_group_all = dept.bisgroup_set.all()
-        cmd_group_all = dept.cmdgroup_set.all()
-        if user_group:
-            user_group = user_group[0]
-            sudo_perm = user_group.sudoperm_set.all()
-            if sudo_perm:
-                sudo_perm = sudo_perm[0]
-                asset_group_permed = sudo_perm.asset_group.all()
-                cmd_group_permed = sudo_perm.cmd_group.all()
-                user_runas = sudo_perm.user_runas
-                comment = sudo_perm.comment
-            else:
-                asset_group_permed = []
-                cmd_group_permed = []
-
-            asset_groups = [asset_group for asset_group in asset_group_all if asset_group not in asset_group_permed]
-            cmd_groups = [cmd_group for cmd_group in cmd_group_all if cmd_group not in cmd_group_permed]
-
-    else:
-        user_group_id = request.POST.get('user_group_id', '')
-        users_runas = request.POST.get('runas', 'root')
-        asset_groups_select = request.POST.getlist('asset_groups_select')
-        cmd_groups_select = request.POST.getlist('cmd_groups_select')
-        comment = request.POST.get('comment', '')
-        user_group = UserGroup.objects.filter(id=user_group_id)
-        if not validate(request, user_group=[user_group_id], asset_group=asset_groups_select):
-            return render_to_response('/jperm/sudo_list/')
-        if user_group:
-            user_group = user_group[0]
-            if LDAP_ENABLE:
-                sudo_update(user_group, users_runas, asset_groups_select, cmd_groups_select, comment)
-                msg = '修改成功'
-
-        return HttpResponseRedirect('/jperm/sudo_list/')
-    return render_to_response('jperm/sudo_edit.html', locals(), context_instance=RequestContext(request))
-
-
-@require_admin
-def sudo_detail(request):
-    header_title, path1, path2 = u'Sudo授权详情', u'授权管理', u'授权详情'
-    user_group_id = request.GET.get('id')
-    user_group = UserGroup.objects.filter(id=user_group_id)
-    if user_group:
-        asset_groups = []
-        cmd_groups = []
-        user_group = user_group[0]
-        users = user_group.user_set.all()
-        group_user_num = len(users)
-
-        for perm in user_group.sudoperm_set.all():
-            asset_groups.extend(perm.asset_group.all())
-            cmd_groups.extend(perm.cmd_group.all())
-
-        print asset_groups
-    return render_to_response('jperm/sudo_detail.html', locals(), context_instance=RequestContext(request))
-
-
-@require_admin
-def sudo_refresh(request):
-    sudo_perm_all = SudoPerm.objects.all()
-    for sudo_perm in sudo_perm_all:
-        user_group = sudo_perm.user_group
-        user_runas = sudo_perm.user_runas
-        asset_groups_select = sudo_perm.asset_group.all()
-        cmd_groups_select = sudo_perm.cmd_group.all()
-        sudo_ldap_add(user_group, user_runas, asset_groups_select, cmd_groups_select)
-    return HttpResponse('刷新sudo授权成功')
-
-
-@require_super_user
-def cmd_add(request):
-    header_title, path1, path2 = u'sudo命令添加', u'授权管理', u'命令组添加'
-    dept_all = DEPT.objects.all()
-
+@require_role('admin')
+def perm_rule_delete(request):
+    """
+    use to delete rule
+    :param request:
+    :return:
+    """
     if request.method == 'POST':
-        name = request.POST.get('name')
-        dept_id = request.POST.get('dept_id')
-        cmd = ','.join(request.POST.get('cmd').split('\n'))
-        comment = request.POST.get('comment')
-        dept = DEPT.objects.filter(id=dept_id)
+        # 根据rule_id 取得rule对象
+        rule_id = request.POST.get("id")
+        rule_obj = PermRule.objects.get(id=rule_id)
+        rule_obj.delete()
+        return HttpResponse(u"删除授权规则：%s" % rule_obj.name)
+    else:
+        return HttpResponse(u"不支持该操作")
+
+
+@require_role('admin')
+def perm_role_list(request):
+    """
+    list role page
+    """
+    # 渲染数据
+    header_title, path1, path2 = "系统用户", "系统用户管理", "查看系统用户"
+
+    # 获取所有系统角色
+    roles_list = PermRole.objects.all()
+    role_id = request.GET.get('id')
+    # TODO: 搜索和分页
+    keyword = request.GET.get('search', '')
+    if keyword:
+        roles_list = roles_list.filter(Q(name=keyword))
+
+    if role_id:
+        roles_list = roles_list.filter(id=role_id)
+
+    roles_list, p, roles, page_range, current_page, show_first, show_end = pages(roles_list, request)
+
+    return my_render('jperm/perm_role_list.html', locals(), request)
+
+
+@require_role('admin')
+def perm_role_add(request):
+    """
+    add role page
+    """
+    # 渲染数据
+    header_title, path1, path2 = "系统用户", "系统用户管理", "添加系统用户"
+    sudos = PermSudo.objects.all()
+
+    if request.method == "POST":
+        # 获取参数： name, comment
+        name = request.POST.get("role_name", "")
+        comment = request.POST.get("role_comment", "")
+        password = request.POST.get("role_password", "")
+        key_content = request.POST.get("role_key", "")
+        sudo_ids = request.POST.getlist('sudo_name')
 
         try:
-            if CmdGroup.objects.filter(name=name):
-                error = '%s 命令组已存在'
-                raise ServerError(error)
+            if get_object(PermRole, name=name):
+                raise ServerError('已经存在该用户 %s' % name)
+            default = get_object(Setting, name='default')
 
-            if not dept:
-                error = u"部门不能为空"
-                raise ServerError(error)
-        except ServerError, e:
-            pass
-        else:
-            dept = dept[0]
-            CmdGroup.objects.create(name=name, dept=dept, cmd=cmd, comment=comment)
-            msg = u'命令组添加成功'
-            return HttpResponseRedirect('/jperm/cmd_list/')
-
-    return render_to_response('jperm/sudo_cmd_add.html', locals(), context_instance=RequestContext(request))
-
+<<<<<<< HEAD
 
 @require_admin
 def cmd_add_adm(request):
@@ -564,252 +448,391 @@ def cmd_edit(request):
 
             if not cmd_group:
                 error = '没有该命令组'
+=======
+            if password:
+                encrypt_pass = CRYPTOR.encrypt(password)
+            else:
+                encrypt_pass = CRYPTOR.encrypt(CRYPTOR.gen_rand_pass(20))
+            # 生成随机密码，生成秘钥对
+            sudos_obj = [get_object(PermSudo, id=sudo_id) for sudo_id in sudo_ids]
+            if key_content:
+                key_path = gen_keys(key=key_content)
+            else:
+                key_path = gen_keys()
+            logger.debug('generate role key: %s' % key_path)
+            role = PermRole(name=name, comment=comment, password=encrypt_pass, key_path=key_path)
+            role.save()
+            role.sudo = sudos_obj
+            msg = u"添加系统用户: %s" % name
+            return HttpResponseRedirect(reverse('role_list'))
+>>>>>>> dev
         except ServerError, e:
-            pass
-        else:
-            cmd_group.update(name=name, cmd=cmd, dept=dept[0], comment=comment)
-            return HttpResponseRedirect('/jperm/cmd_list/')
-    return render_to_response('jperm/sudo_cmd_add.html', locals(), context_instance=RequestContext(request))
+            error = e
+
+    return my_render('jperm/perm_role_add.html', locals(), request)
 
 
-@require_admin
-def cmd_list(request):
-    header_title, path1, path2 = u'sudo命令查看', u'权限管理', u'Sudo命令添加'
-
-    if is_super_user(request):
-        cmd_groups = contact_list = CmdGroup.objects.all()
+@require_role('admin')
+def perm_role_delete(request):
+    """
+    delete role page
+    """
+    if request.method == "POST":
+        # 获取参数删除的role对象
+        role_id = request.POST.get("id")
+        role = get_object(PermRole, id=role_id)
+        role_key = role.key_path
+        # 删除推送到主机上的role
+        recycle_assets = [push.asset for push in role.perm_push.all() if push.success]
+        logger.debug(u"delete role %s - delete_assets: %s" % (role.name, recycle_assets))
+        if recycle_assets:
+            recycle_resource = gen_resource(recycle_assets)
+            task = MyTask(recycle_resource)
+            msg = task.del_user(get_object(PermRole, id=role_id).name)
+            logger.info(u"delete role %s - execute delete user: %s" % (role.name, msg))
+            # TODO: 判断返回结果，处理异常
+        # 删除存储的秘钥，以及目录
+        key_files = os.listdir(role_key)
+        for key_file in key_files:
+            os.remove(os.path.join(role_key, key_file))
+        os.rmdir(role_key)
+        logger.info(u"delete role %s - delete role key directory: %s" % (role.name, role_key))
+        # 数据库里删除记录　TODO: 判断返回结果，处理异常
+        role.delete()
+        return HttpResponse(u"删除系统用户: %s" % role.name)
     else:
-        user, dept = get_session_user_dept(request)
-        cmd_groups = contact_list = dept.cmdgroup_set.all()
-    p = paginator = Paginator(contact_list, 10)
+        return HttpResponse(u"不支持该操作")
+
+
+@require_role('admin')
+def perm_role_detail(request):
+    """
+    the role detail page
+        the role_info data like:
+            {'asset_groups': [],
+            'assets': [<Asset: 192.168.10.148>],
+            'rules': [<PermRule: PermRule object>],
+            '': [],
+            '': [<User: user1>]}
+    """
+    # 渲染数据
+    header_title, path1, path2 = "系统用户", "系统用户管理", "系统用户详情"
 
     try:
-        page = int(request.GET.get('page', '1'))
-    except ValueError:
-        page = 1
+        if request.method == "GET":
+            role_id = request.GET.get("id")
+            if not role_id:
+                raise ServerError("not role id")
+            role = get_object(PermRole, id=role_id)
+            role_info = get_role_info(role_id)
 
-    try:
-        contacts = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        contacts = paginator.page(paginator.num_pages)
-    return render_to_response('jperm/sudo_cmd_list.html', locals(), context_instance=RequestContext(request))
+            # 渲染数据
+            rules = role_info.get("rules")
+            assets = role_info.get("assets")
+            asset_groups = role_info.get("asset_groups")
+            users = role_info.get("users")
+            user_groups = role_info.get("user_groups")
+            pushed_asset, need_push_asset = get_role_push_host(get_object(PermRole, id=role_id))
+    except ServerError, e:
+        logger.warning(e)
+
+    return my_render('jperm/perm_role_detail.html', locals(), request)
 
 
-@require_admin
-def cmd_del(request):
-    cmd_group_id = request.GET.get('id')
-    cmd_group = CmdGroup.objects.filter(id=cmd_group_id)
+@require_role('admin')
+def perm_role_edit(request):
+    """
+    edit role page
+    """
+    # 渲染数据
+    header_title, path1, path2 = "系统用户", "系统用户管理", "系统用户编辑"
 
-    if cmd_group:
-        cmd_group[0].delete()
-    return HttpResponseRedirect('/jperm/cmd_list/')
+    # 渲染数据
+    role_id = request.GET.get("id")
+    role = PermRole.objects.get(id=role_id)
+    role_pass = CRYPTOR.decrypt(role.password)
+    sudo_all = PermSudo.objects.all()
+    role_sudos = role.sudo.all()
+    sudo_all = PermSudo.objects.all()
+    if request.method == "GET":
+        return my_render('jperm/perm_role_edit.html', locals(), request)
+
+    if request.method == "POST":
+        # 获取 POST 数据
+        role_name = request.POST.get("role_name")
+        role_password = request.POST.get("role_password")
+        role_comment = request.POST.get("role_comment")
+        role_sudo_names = request.POST.getlist("sudo_name")
+        role_sudos = [PermSudo.objects.get(id=sudo_id) for sudo_id in role_sudo_names]
+        key_content = request.POST.get("role_key", "")
+
+        try:
+            if not role:
+                raise ServerError('该系统用户不能存在')
+
+            if role_password:
+                encrypt_pass = CRYPTOR.encrypt(role_password)
+                role.password = encrypt_pass
+            # 生成随机密码，生成秘钥对
+            if key_content:
+                try:
+                    key_path = gen_keys(key=key_content, key_path_dir=role.key_path)
+                except SSHException:
+                    raise ServerError('输入的密钥不合法')
+                logger.debug('Recreate role key: %s' % role.key_path)
+            # 写入数据库
+            role.name = role_name
+            role.comment = role_comment
+            role.sudo = role_sudos
+
+            role.save()
+            msg = u"更新系统用户： %s" % role.name
+            return HttpResponseRedirect(reverse('role_list'))
+        except ServerError, e:
+            error = e
+
+    return my_render('jperm/perm_role_edit.html', locals(), request)
 
 
-@require_admin
-def cmd_detail(request):
-    cmd_ids = request.GET.get('id').split(',')
-    cmds = []
-    if len(cmd_ids) == 1:
-        if cmd_ids[0]:
-            cmd_id = cmd_ids[0]
+@require_role('admin')
+def perm_role_push(request):
+    """
+    the role push page
+    """
+    # 渲染数据
+    header_title, path1, path2 = "系统用户", "系统用户管理", "系统用户推送"
+    role_id = request.GET.get('id')
+    asset_ids = request.GET.get('asset_id')
+    role = get_object(PermRole, id=role_id)
+    assets = Asset.objects.all()
+    asset_groups = AssetGroup.objects.all()
+    if asset_ids:
+        need_push_asset = [get_object(Asset, id=asset_id) for asset_id in asset_ids.split(',')]
+
+    if request.method == "POST":
+        # 获取推荐角色的名称列表
+        # 计算出需要推送的资产列表
+        asset_ids = request.POST.getlist("assets")
+        asset_group_ids = request.POST.getlist("asset_groups")
+        assets_obj = [Asset.objects.get(id=asset_id) for asset_id in asset_ids]
+        asset_groups_obj = [AssetGroup.objects.get(id=asset_group_id) for asset_group_id in asset_group_ids]
+        group_assets_obj = []
+        for asset_group in asset_groups_obj:
+            group_assets_obj.extend(asset_group.asset_set.all())
+        calc_assets = list(set(assets_obj) | set(group_assets_obj))
+        push_resource = gen_resource(calc_assets)
+
+        # 调用Ansible API 进行推送
+        password_push = True if request.POST.get("use_password") else False
+        key_push = True if request.POST.get("use_publicKey") else False
+        task = MyTask(push_resource)
+        ret = {}
+
+        # 因为要先建立用户，所以password 是必选项，而push key是在 password也完成的情况下的 可选项
+        # 1. 以秘钥 方式推送角色
+        if key_push:
+            ret["pass_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
+            ret["key_push"] = task.push_key(role.name, os.path.join(role.key_path, 'id_rsa.pub'))
+
+        # 2. 推送账号密码
+        elif password_push:
+            ret["pass_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
+
+        # 3. 推送sudo配置文件
+        if password_push or key_push:
+            sudo_list = set([sudo for sudo in role.sudo.all()])  # set(sudo1, sudo2, sudo3)
+            if sudo_list:
+                ret['sudo'] = task.push_sudo_file([role], sudo_list)
+
+        logger.debug('推送role结果: %s' % ret)
+        success_asset = {}
+        failed_asset = {}
+        logger.debug(ret)
+        for push_type, result in ret.items():
+            if result.get('failed'):
+                for hostname, info in result.get('failed').items():
+                    if hostname in failed_asset.keys():
+                        if info in failed_asset.get(hostname):
+                            failed_asset[hostname] += info
+                    else:
+                        failed_asset[hostname] = info
+
+        for push_type, result in ret.items():
+            if result.get('ok'):
+                for hostname, info in result.get('ok').items():
+                    if hostname in failed_asset.keys():
+                        continue
+                    elif hostname in success_asset.keys():
+                        if str(info) in success_asset.get(hostname, ''):
+                            success_asset[hostname] += str(info)
+                    else:
+                        success_asset[hostname] = str(info)
+
+        # 推送成功 回写push表
+        for asset in calc_assets:
+            push_check = PermPush.objects.filter(role=role, asset=asset)
+            if push_check:
+                func = push_check.update
+            else:
+                def func(**kwargs):
+                    PermPush(**kwargs).save()
+
+            if failed_asset.get(asset.hostname):
+                func(is_password=password_push, is_public_key=key_push, role=role, asset=asset, success=False,
+                     result=failed_asset.get(asset.hostname))
+            else:
+                func(is_password=password_push, is_public_key=key_push, role=role, asset=asset, success=True)
+
+        if not failed_asset:
+            msg = u'系统用户 %s 推送成功[ %s ]' % (role.name, ','.join(success_asset.keys()))
         else:
-            cmd_id = 1
-        cmd_group = CmdGroup.objects.filter(id=cmd_id)
-        if cmd_group:
-            cmd_group = cmd_group[0]
-            cmds.extend(cmd_group.cmd.split(','))
-            cmd_group_name = cmd_group.name
+            error = u'系统用户 %s 推送失败 [ %s ], 推送成功 [ %s ]' % (role.name,
+                                                                ','.join(failed_asset.keys()),
+                                                                ','.join(success_asset.keys()))
+    return my_render('jperm/perm_role_push.html', locals(), request)
+
+
+@require_role('admin')
+def perm_sudo_list(request):
+    """
+    list sudo commands alias
+    :param request:
+    :return:
+    """
+    # 渲染数据
+    header_title, path1, path2 = "Sudo命令", "别名管理", "查看别名"
+
+    # 获取所有sudo 命令别名
+    sudos_list = PermSudo.objects.all()
+
+    # TODO: 搜索和分页
+    keyword = request.GET.get('search', '')
+    if keyword:
+        sudos_list = sudos_list.filter(Q(name=keyword))
+
+    sudos_list, p, sudos, page_range, current_page, show_first, show_end = pages(sudos_list, request)
+
+    return my_render('jperm/perm_sudo_list.html', locals(), request)
+
+
+@require_role('admin')
+def perm_sudo_add(request):
+    """
+    list sudo commands alias
+    :param request:
+    :return:
+    """
+    # 渲染数据
+    header_title, path1, path2 = "Sudo命令", "别名管理", "添加别名"
+
+    if request.method == "POST":
+        # 获取参数： name, comment
+        name = request.POST.get("sudo_name").strip().upper()
+        comment = request.POST.get("sudo_comment").strip()
+        commands = request.POST.get("sudo_commands").strip()
+
+        pattern = re.compile(r'[ \n,\r]')
+        commands = ', '.join(list_drop_str(pattern.split(commands), u''))
+        logger.debug(u'添加sudo %s: %s' % (name, commands))
+
+        if get_object(PermSudo, name=name):
+            error = 'Sudo别名 %s已经存在' % name
+        else:
+            sudo = PermSudo(name=name.strip(), comment=comment, commands=commands)
+            sudo.save()
+            msg = u"添加Sudo命令别名: %s" % name
+        # 渲染数据
+
+    return my_render('jperm/perm_sudo_add.html', locals(), request)
+
+
+@require_role('admin')
+def perm_sudo_edit(request):
+    """
+    list sudo commands alias
+    :param request:
+    :return:
+    """
+    # 渲染数据
+    header_title, path1, path2 = "Sudo命令", "别名管理", "编辑别名"
+
+    sudo_id = request.GET.get("id")
+    sudo = PermSudo.objects.get(id=sudo_id)
+
+    if request.method == "POST":
+        name = request.POST.get("sudo_name").upper()
+        commands = request.POST.get("sudo_commands")
+        comment = request.POST.get("sudo_comment")
+
+        pattern = re.compile(r'[ \n,\r]')
+        commands = ', '.join(list_drop_str(pattern.split(commands), u'')).strip()
+        logger.debug(u'添加sudo %s: %s' % (name, commands))
+
+        sudo.name = name.strip()
+        sudo.commands = commands
+        sudo.comment = comment
+        sudo.save()
+
+        msg = u"更新命令别名： %s" % name
+
+    return my_render('jperm/perm_sudo_edit.html', locals(), request)
+
+
+@require_role('admin')
+def perm_sudo_delete(request):
+    """
+    list sudo commands alias
+    :param request:
+    :return:
+    """
+    if request.method == "POST":
+        # 获取参数删除的role对象
+        sudo_id = request.POST.get("id")
+        sudo = PermSudo.objects.get(id=sudo_id)
+        # 数据库里删除记录
+        sudo.delete()
+        return HttpResponse(u"删除系统用户: %s" % sudo.name)
     else:
-        cmd_groups = []
-        for cmd_id in cmd_ids:
-            cmd_groups.extend(CmdGroup.objects.filter(id=cmd_id))
-        for cmd_group in cmd_groups:
-            cmds.extend(cmd_group.cmd.split(','))
-
-    cmds_str = ', '.join(cmds)
-
-    return render_to_response('jperm/sudo_cmd_detail.html', locals(), context_instance=RequestContext(request))
+        return HttpResponse(u"不支持该操作")
 
 
-@require_login
-def perm_apply(request):
-    """ 权限申请 """
-    header_title, path1, path2 = u'主机权限申请', u'权限管理', u'申请主机'
-    user_id, username = get_session_user_info(request)[0:2]
-    name = User.objects.get(id=user_id).username
-    dept_id, deptname, dept = get_session_user_info(request)[3:6]
-    perm_host = user_perm_asset_api(username)
-    all_host = Asset.objects.filter(dept=dept)
+@require_role('admin')
+def perm_role_recycle(request):
+    role_id = request.GET.get('role_id')
+    asset_ids = request.GET.get('asset_id').split(',')
 
-    perm_group = user_perm_group_api(username)
-    all_group = dept.bisgroup_set.all()
+    # 仅有推送的角色才回收
+    assets = [get_object(Asset, id=asset_id) for asset_id in asset_ids]
+    recycle_assets = []
+    for asset in assets:
+        if True in [push.success for push in asset.perm_push.all()]:
+            recycle_assets.append(asset)
+    recycle_resource = gen_resource(recycle_assets)
+    task = MyTask(recycle_resource)
+    # TODO: 判断返回结果，处理异常
+    msg = task.del_user(get_object(PermRole, id=role_id).name)
 
-    posts = [g for g in all_host if g not in perm_host]
-    egroup = [d for d in all_group if d not in perm_group]
+    for asset_id in asset_ids:
+        asset = get_object(Asset, id=asset_id)
+        assets.append(asset)
+        role = get_object(PermRole, id=role_id)
+        PermPush.objects.filter(asset=asset, role=role).delete()
 
-    dept_da = User.objects.filter(dept_id=dept_id, role='DA')
-    admin = User.objects.get(name='admin')
-
-    if request.method == 'POST':
-        applyer = request.POST.get('applyer')
-        dept = request.POST.get('dept')
-        da = request.POST.get('da')
-        group = request.POST.getlist('group')
-        hosts = request.POST.getlist('hosts')
-        comment = request.POST.get('comment')
-        if not da:
-            return httperror(request, u'请选择管理员!')
-        da = User.objects.get(id=da)
-        mail_address = da.email
-        mail_title = '%s - 权限申请' % username
-        group_lis = ', '.join(group)
-        hosts_lis = ', '.join(hosts)
-        time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        a = Apply.objects.create(applyer=applyer, admin=da, dept=dept, bisgroup=group, date_add=datetime.datetime.now(),
-                                 asset=hosts, status=0, comment=comment, read=0)
-        uuid = a.uuid
-        url = "http://%s:%s/jperm/apply_exec/?uuid=%s" % (SEND_IP, SEND_PORT, uuid)
-        mail_msg = """
-        Hi,%s:
-            有新的权限申请, 详情如下:
-                申请人: %s
-                申请主机组: %s
-                申请的主机: %s
-                申请时间: %s
-                申请说明: %s
-            请及时审批, 审批完成后, 点击以下链接或登录授权管理-权限审批页面点击确认键,告知申请人。
-
-            %s
-        """ % (da.username, applyer, group_lis, hosts_lis, time_now, comment, url)
-
-        send_mail(mail_title, mail_msg, MAIL_FROM, [mail_address], fail_silently=False)
-        smg = "提交成功,已发邮件至 %s 通知部门管理员。" % mail_address
-        return render_to_response('jperm/perm_apply.html', locals(), context_instance=RequestContext(request))
-    return render_to_response('jperm/perm_apply.html', locals(), context_instance=RequestContext(request))
+    return HttpResponse('删除成功')
 
 
-@require_admin
-def perm_apply_exec(request):
-    """ 确认权限 """
-    header_title, path1, path2 = u'主机权限申请', u'权限管理', u'审批完成'
-    uuid = request.GET.get('uuid')
-    user_id = request.session.get('user_id')
-    approver = User.objects.get(id=user_id).name
-    if uuid:
-        p_apply = Apply.objects.filter(uuid=str(uuid))
-        q_apply = Apply.objects.get(uuid=str(uuid))
-        if q_apply.status == 1:
-            smg = '此权限已经审批完成, 请勿重复审批, 十秒钟后返回首页'
-            return render_to_response('jperm/perm_apply_exec.html', locals(), context_instance=RequestContext(request))
-        else:
-            user = User.objects.get(username=q_apply.applyer)
-            mail_address = user.email
-            time_now = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            p_apply.update(status=1, approver=approver, date_end=time_now)
-            mail_title = '%s - 权限审批完成' % q_apply.applyer
-            mail_msg = """
-            Hi,%s:
-                您所申请的权限已由 %s 在 %s 审批完成, 请登录验证。
-            """ % (q_apply.applyer, q_apply.approver, time_now)
-            send_mail(mail_title, mail_msg, MAIL_FROM, [mail_address], fail_silently=False)
-            smg = '授权完成, 已邮件通知申请人, 十秒钟后返回首页'
-            return render_to_response('jperm/perm_apply_exec.html', locals(), context_instance=RequestContext(request))
+@require_role('user')
+def perm_role_get(request):
+    asset_id = request.GET.get('id', 0)
+    if asset_id:
+        asset = get_object(Asset, id=asset_id)
+        if asset:
+            role = user_have_perm(request.user, asset=asset)
+            logger.debug('#' + ','.join([i.name for i in role]) + '#')
+            return HttpResponse(','.join([i.name for i in role]))
     else:
-        smg = '没有此授权记录, 十秒钟后返回首页'
-        return render_to_response('jperm/perm_apply_exec.html', locals(), context_instance=RequestContext(request))
+        roles = get_group_user_perm(request.user).get('role').keys()
+        return HttpResponse(','.join(i.name for i in roles))
 
-
-def get_apply_posts(request, status, username, dept_name, keyword=None):
-    """ 获取申请记录 """
-    post_all = Apply.objects.filter(status=status).order_by('-date_add')
-    post_keyword_all = Apply.objects.filter(Q(applyer__contains=keyword) |
-                                            Q(approver__contains=keyword)) \
-        .filter(status=status).order_by('-date_add')
-
-    if is_super_user(request):
-        if keyword:
-            posts = post_keyword_all
-        else:
-            posts = post_all
-    elif is_group_admin(request):
-        if keyword:
-            posts = post_keyword_all.filter(dept=dept_name)
-        else:
-            posts = post_all.filter(dept=dept_name)
-    elif is_common_user(request):
-        if keyword:
-            posts = post_keyword_all.filter(applyer=username)
-        else:
-            posts = post_all.filter(applyer=username)
-
-    return posts
-
-
-@require_login
-def perm_apply_log(request, offset):
-    """ 申请记录 """
-    header_title, path1, path2 = u'权限申请记录', u'权限管理', u'申请记录'
-    keyword = request.GET.get('keyword', '')
-    user_id = get_session_user_info(request)[0]
-    username = User.objects.get(id=user_id).name
-    dept_name = get_session_user_info(request)[4]
-    status_dic = {'online': 0, 'offline': 1}
-    status = status_dic[offset]
-    posts = get_apply_posts(request, status, username, dept_name, keyword)
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-    return render_to_response('jperm/perm_log_%s.html' % offset, locals(), context_instance=RequestContext(request))
-
-
-@require_login
-def perm_apply_info(request):
-    """ 申请信息详情 """
-    uuid = request.GET.get('uuid', '')
-    post = Apply.objects.filter(uuid=uuid)
-    username = get_session_user_info(request)[1]
-    if post:
-        post = post[0]
-        if post.read == 0 and post.applyer != username:
-            post.read = 1
-            post.save()
-    else:
-        return httperror(request, u'没有这个申请记录!')
-
-    return render_to_response('jperm/perm_apply_info.html', locals(), context_instance=RequestContext(request))
-
-
-@require_admin
-def perm_apply_del(request):
-    """ 删除日志记录 """
-    uuid = request.GET.get('uuid')
-    u_apply = Apply.objects.filter(uuid=uuid)
-    if u_apply:
-        u_apply.delete()
-    return HttpResponseRedirect('/jperm/apply_show/online/')
-
-
-@require_login
-def perm_apply_search(request):
-    """ 申请搜索 """
-    keyword = request.GET.get('keyword')
-    offset = request.GET.get('env')
-    username = get_session_user_info(request)[1]
-    dept_name = get_session_user_info(request)[3]
-    status_dic = {'online': 0, 'offline': 1}
-    status = status_dic[offset]
-    posts = get_apply_posts(request, status, username, dept_name, keyword)
-    contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
-    return render_to_response('jperm/perm_apply_search.html', locals(), context_instance=RequestContext(request))
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return HttpResponse('error')
 
