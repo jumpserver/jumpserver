@@ -64,14 +64,13 @@ stop() {
 		else
 			echo_failure
 			echo
+            rm -f "$lockfile"
 		fi
 	else
 			echo_success
 			echo
 		
 	fi
-		
-	
 
 }
 
