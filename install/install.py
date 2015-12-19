@@ -192,15 +192,15 @@ class PreSetup(object):
     @staticmethod
     def _pull():
         color_print('开始更新jumpserver', 'green')
-        bash('git pull')
-        os.chdir(os.path.join(jms_dir, 'install'))
+        # bash('git pull')
+        os.chdir(jms_dir)
         os.chmod('logs', 0777)
         os.chmod('keys', 0777)
 
     def start(self):
-        self._rpm_repo()
-        self._depend_rpm()
-        self._require_pip()
+        # self._rpm_repo()
+        # self._depend_rpm()
+        # self._require_pip()
         self._set_env()
         self._input_ip()
         self._input_mysql()
