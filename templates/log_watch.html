@@ -1,0 +1,138 @@
+<html>
+<head>  
+<link href="http://cdn.bootcss.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="http://cdn.bootcss.com/bootstrap/3.2.0/css/bootstrap-theme.min.css" rel="stylesheet">
+<script src="http://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+<script src="http://cdn.bootcss.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script>
+    var wsUri = "ws://j:8080/send";
+    var ws;
+    function connect(){
+        ws = new WebSocket(wsUri);
+        ws.onopen = function(evt){ console.log(evt.data) };
+        ws.onclose = function(evt){ console.log(evt.data) };
+        ws.onmessage = function(evt){ console.log(evt.data) };
+        ws.onerror = function(evt){ console.log(evt.data) };
+
+        return ws;
+    }
+
+    function send() {
+        var data = {
+            input:$("#input_data").val()
+        };
+
+        console.log('hello');
+        ws.send(JSON.stringify(data));
+
+        $("#message").empty();
+        ws.onopen = function() {
+            ws.send(JSON.stringify(data));
+        };
+
+        $("#message").append('<div class="panel-body"><p>');
+        ws.onmessage = function(event) {
+            $("#message").append(JSON.parse(event.data).input + "<br>");
+        };
+
+        ws.onclose = function(event) {
+            $("#message").append('</p></div>');
+        };
+    }
+
+{#    function send() {#}
+{#        var ws = new WebSocket("ws://j:8080/send");#}
+{##}
+{#        var data = {#}
+{#            input:$("#input_data").val(),#}
+{#        };#}
+{##}
+{#        $("#message").empty();#}
+{#        ws.onopen = function() {#}
+{#            ws.send(JSON.stringify(data));#}
+{#        };#}
+{##}
+{#        $("#message").append('<div class="panel-body"><p>');#}
+{#        ws.onmessage = function(event) {#}
+{#            $("#message").append(JSON.parse(event.data).input + "<br>");#}
+{#        };#}
+{##}
+{#        ws.onclose = function(event) {#}
+{#            $("#message").append('</p></div>');#}
+{#        };#}
+{#    }#}
+
+    function disconnect(){
+        ws.close();
+    }
+
+</script>
+</head>
+<body>
+{#  <div id="test">#}
+{#  <form class="form-horizontal" role="form">#}
+{#    <div class="panel panel-default">#}
+{#      <div class="panel-heading">#}
+{#        <h5 class="panel-title">>>输入</h5>#}
+{#      </div>#}
+{#      <div class="panel-body">#}
+{#        <div class="form-group">#}
+{#          <div class="col-md-8">#}
+{#            <input type="text" class="form-control" id="input_data" value="">#}
+{#          </div>#}
+{#        </div>#}
+{#        <div class="form-group">#}
+{#          <div class="col-md-8">#}
+{#            <input type="button" class="btn btn-success" id="input_1_btn" onclick="connect();" value="连接" />#}
+{#            <input type="button" class="btn btn-success" id="input_btn" onclick="send();" value="查看" />#}
+{#            <input type="button" class="btn btn-success" id="input_2_btn" onclick="close();" value="关闭" />#}
+{#          </div>#}
+{#        </div>#}
+{#      </div>#}
+{#    </div>#}
+{#  </form>#}
+{#  <div class="panel panel-default">#}
+{#    <div class="panel-heading">#}
+{#      <h5 class="panel-title">>> 输出</h5>#}
+{#    </div>#}
+{#    <div class="panel-body">#}
+{#      <div id="message"></div>#}
+{#    </div>#}
+{#  </div>#}
+<div class="col-sm-12">
+    <div class="ibox float-e-margins">
+        <div class="ibox-title" style="border: solid">
+            <h5> 实时监控 </h5>
+            <div class="ibox-tools">
+                <a class="collapise-link">
+                    <i class="fa fa-chevron-up"></i>
+                </a>
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                    <i class="fa fa-wrench"></i>
+                </a>
+                <a class="close-link">
+                    <i class="fa fa-times"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="ibox-content blank-panel" style="background-color: #0b0b0b; color: #006621; height: 500px; padding: 20px;">
+            你好<br>
+            你好<br>
+            你好<br>
+            你好你好你好<br>
+            你好<br>
+            你好<br>
+            你好<br>
+            你好<br>
+            你好<br>
+            你好<br>
+
+
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
+</html>

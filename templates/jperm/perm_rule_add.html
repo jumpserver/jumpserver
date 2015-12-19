@@ -1,0 +1,178 @@
+{% extends 'base.html' %}
+{% block self_head_css_js %}
+    <link href="/static/css/plugins/datepicker/datepicker3.css" rel="stylesheet">
+    <link href="/static/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <script src="/static/js/plugins/chosen/chosen.jquery.js"></script>
+{% endblock %}
+{% load mytags %}
+{% block content %}
+    {% include 'nav_cat_bar.html' %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-10">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>填写基本信息</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <form method="post" id="ruleForm" class="form-horizontal" action="">
+                            {% if error %}
+                                <div class="alert alert-warning text-center">{{ error }}</div>
+                            {% endif %}
+                            {% if msg %}
+                                <div class="alert alert-success text-center">{{ msg }}</div>
+                            {% endif %}
+                            <div class="form-group">
+                                <label for="name" class="col-sm-2 control-label">授权名称<span class="red-fonts">*</span></label>
+                                <div class="col-sm-8">
+                                    <input id="name" name="name" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label for="user" class="col-sm-2 control-label">用户</label>
+                                <div class="col-sm-8">
+                                    <select name="user" id="user" data-placeholder="请选择用户" class="chosen-select form-control m-b" multiple  tabindex="2">
+                                        {% for user in users %}
+                                            <option value="{{ user.id }}">{{ user.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <span class="help-block m-b-none">用户和用户组必选一个</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="user_group" class="col-sm-2 control-label">用户组</label>
+                                <div class="col-sm-8">
+                                    <select name="user_group" id="user_group" data-placeholder="请选择用户组" class="chosen-select form-control m-b" multiple  tabindex="2">
+                                        {% for user_group in user_groups %}
+                                            <option value="{{ user_group.id }}">{{ user_group.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label for="asset" class="col-sm-2 control-label">资产</label>
+                                <div class="col-sm-8">
+                                    <select name="asset" id="asset" data-placeholder="请选择资产" class="chosen-select form-control m-b" multiple  tabindex="2">
+                                        {% for asset in assets %}
+                                            <option value="{{ asset.id }}">{{ asset.hostname }}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <span class="help-block m-b-none">资产和资产组必选一个</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="asset_group" id="asset_group" class="col-sm-2 control-label">资产组</label>
+                                <div class="col-sm-8">
+                                    <select name="asset_group" data-placeholder="请选择资产组" class="chosen-select form-control m-b" multiple  tabindex="2">
+                                        {% for asset_group in asset_groups %}
+                                            <option value="{{ asset_group.id }}">{{ asset_group.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label for="role" class="col-sm-2 control-label">系统用户<span class="red-fonts">*</span></label>
+                                <div class="col-sm-8"　id="role_name">
+                                    <select name="role" data-placeholder="请选择需要关联的系统用户" class="chosen-select form-control m-b" multiple  tabindex="2">
+                                        {% for role in roles %}
+                                            <option value="{{ role.id }}">{{ role.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label for="comment" class="col-sm-2 control-label">备注</label>
+                                <div class="col-sm-8">
+                                    <input id="comment" name="comment" type="text" class="form-control" {% if error %}value="{{ username }}" {% endif %}>
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <button class="btn btn-white" type="reset">取消</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit">确认保存</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block self_footer_js %}
+<script>
+$('#ruleForm').validator({
+    timely: 2,
+    theme: "yellow_right_effect",
+    rules: {
+        check_name: [/^\w{2,20}$/, '大小写字母数字和下划线,2-20位'],
+        check_user: function(){
+            return $('#user').val() == null
+        },
+        check_asset: function(){
+            return $('#asset').val() == null
+        }
+    },
+
+    fields: {
+        "name": {
+            rule: "required",
+            tip: "输入规则名称",
+            msg: {required: "规则名称必填"}
+        },
+        "user_group": {
+            rule: "required(check_user)",
+            tip: "请选择用户组",
+            msg: {required: "用户和用户组必选一个!"}
+        },
+        "asset_group": {
+            rule: "required(check_asset)",
+            tip: "输入资产组",
+            msg: {required: "资产和资产组必选一个!"}
+        },
+        "role": {
+            rule: "required",
+            tip: "请选择系统用户",
+            msg: {required: "必须选择系统用户"}
+        }
+    },
+    valid: function(form) {
+            form.submit();
+        }
+});
+
+
+var config = {
+                '.chosen-select'           : {},
+                '.chosen-select-deselect'  : {allow_single_deselect:true},
+                '.chosen-select-no-single' : {disable_search_threshold:10},
+                '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
+                '.chosen-select-width'     : {width:"95%"}
+            };
+
+for (var selector in config) {
+    $(selector).chosen(config[selector]);
+}
+
+</script>
+    <script src="/static/js/cropper/cropper.min.js"></script>
+    <script src="/static/js/datapicker/bootstrap-datepicker.js"></script>
+{% endblock %}
+

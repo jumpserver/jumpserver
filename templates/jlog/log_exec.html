@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% block self_head_css_js %}
+    <link href="/static/css/plugins/datepicker/datepicker3.css" rel="stylesheet">
+    <link href="/static/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <script src="/static/js/plugins/chosen/chosen.jquery.js"></script>
+{% endblock %}
+{% block content %}
+{% include 'nav_cat_bar.html' %}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div id="ibox-content" class="ibox-title">
+                    <h5> 批量命令日志 </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="ibox-content">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li><a href="{% url 'log_list' 'online' %}" class="text-center"><i class="fa fa-laptop"></i> 在线 </a></li>
+                            <li><a href="{% url 'log_list' 'offline' %}" class="text-center"><i class="fa fa-bar-chart-o"></i> 登录历史</a></li>
+                            <li class="active"><a href="{% url 'log_list' 'exec' %}" class="text-center"><i class="fa fa-bar-chart-o"></i> 命令记录 </a></li>
+                            <li><a href="{% url 'log_list' 'file' %}" class="text-center"><i class="fa fa-bar-chart-o"></i> 上传下载 </a></li>
+                            <div class="" style="float: right">
+                                <form id="search_form" method="get" action="" class="pull-right mail-search">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control input-sm" id="keyword" name="keyword" value="{{ keyword }}" placeholder="Search">
+                                        <div class="input-group-btn">
+                                            <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                                                -搜索-
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <table class="table table-striped table-bordered table-hover ">
+                            <thead>
+                                <tr>
+                                    <th class="text-center"> ID </th>
+                                    <th class="text-center"> 用户名 </th>
+                                    <th class="text-center"> 主机 </th>
+                                    <th class="text-center"> 命令 </th>
+                                    <th class="text-center"> 来源IP </th>
+                                    <th class="text-center"> 时间 </th>
+                                    <th class="text-center"> 详情 </th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                            {% for post in contacts.object_list %}
+                                <tr class="gradeX">
+                                    <td class="text-center"> {{ post.id }} </td>
+                                    <td class="text-center username"> {{ post.user }} </td>
+                                    <td class="text-center ip"> {{ post.host | truncatechars:30 }} </td>
+                                    <td class="text-center ip"> {{ post.cmd | truncatechars:30 }} </td>
+                                    <td class="text-center remote_ip"> {{ post.remote_ip }} </td>
+                                    <td class="text-center start_time"> {{ post.datetime|date:"Y-m-d H:i:s"}} </td>
+                                    <td class="text-center">
+                                        <a href="{% url 'log_detail' 'exec' %}?id={{ post.id }}" class="btn btn-xs btn-primary">详情</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-sm-6">
+                            </div>
+                            {% include 'paginator.html' %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function log_search(){
+        $.ajax({
+            type: "GET",
+            url: "/jlog/search/?env=offline",
+            data: $("#search_form").serialize(),
+            success: function (data) {
+                $(".tab-content").html(data);
+            }
+        });
+    }
+
+</script>
+{% endblock %}

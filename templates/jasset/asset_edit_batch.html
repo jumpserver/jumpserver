@@ -1,0 +1,166 @@
+<html>
+    <head>
+        <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/static/font-awesome/css/font-awesome.css" rel="stylesheet">
+        <link href="/static/css/plugins/iCheck/custom.css" rel="stylesheet">
+        <link href="/static/css/animate.css" rel="stylesheet">
+        <link href="/static/css/style.css" rel="stylesheet">
+
+        <script src="/static/js/jquery-2.1.1.js"></script>
+        <style>
+            body {background: #ffffff;}
+        </style>
+    </head>
+
+{% load bootstrap %}
+{% block content %}
+
+<body>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-10">
+            <div class="ibox float-e-margins">
+{#                <div class="ibox-title">#}
+{#                    <h5 class="text-center"> 填写修改主机信息. </h5>#}
+{#                    <div class="ibox-tools">#}
+{#                        <a class="collapse-link">#}
+{#                            <i class="fa fa-chevron-up"></i>#}
+{#                        </a>#}
+{#                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">#}
+{#                            <i class="fa fa-wrench"></i>#}
+{#                        </a>#}
+{#                        <ul class="dropdown-menu dropdown-user"></ul>#}
+{#                        <a class="close-link">#}
+{#                            <i class="fa fa-times"></i>#}
+{#                        </a>#}
+{#                    </div>#}
+{#                </div>#}
+
+            <div class="ibox-content">
+                <form class="form-horizontal" action="" id="signupForm"  method="post" name="horizontal" role="form" autocomplete="off">
+                {% csrf_token %}
+                    <input id="ids" style="display: none">
+                    {{ af.env|bootstrap_horizontal }}
+
+                    <div class="hr-line-dashed"></div>
+                    {{ af.idc|bootstrap_horizontal }}
+
+                    <div class="hr-line-dashed"></div>
+                    {{ af.port|bootstrap_horizontal }}
+
+                    <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                        <label for="j_group" class="col-sm-2 control-label">管理账号</label>
+                        <div class="col-sm-2">
+                            <div class="radio i-checks">
+                                <label>
+                                    <input type="radio" checked="" value="" id="no" name="use_default_auth" class="auth"><span> 不修改 </span>
+                                </label>
+                            </div>
+                            <div class="radio i-checks">
+                                <label>
+                                    <input type="radio" id="default" name="use_default_auth" class="auth" value="default"><span> 使用默认 </span>
+                                </label>
+                            </div>
+                            <div class="radio i-checks">
+                                <label>
+                                    <input type="radio" id="pass" name="use_default_auth" class="auth" value="user_passwd"><span> 用户名密码 </span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" id="admin_account" style="display: none">
+                        <label class="col-sm-2 control-label"> 管理用户名<span class="red-fonts"> *</span></label>
+                        <div class="col-sm-3">
+                            <input type="text" placeholder="Username" name="username" class="form-control">
+                        </div>
+                        <label class="col-sm-1 control-label"> 密码<span class="red-fonts">*</span> </label>
+                        <div class="col-sm-4">
+                            <input type="password" placeholder="Password" name="password" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="hr-line-dashed"></div>
+                    <div class="form-group">
+                        <label for="groups" class="col-sm-2 control-label">所属主机组</label>
+
+                        <div class="col-sm-3">
+                            <select id="groups" size="10" class="form-control m-b" multiple>
+                            {% for asset_group in asset_group_all %}
+                                    <option value="{{ asset_group.id }}">{{ asset_group.name }}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-1">
+                            <div class="btn-group" style="margin-top: 50px;">
+                                <button type="button" class="btn btn-white" onclick="move_right('groups', 'groups_selected')"><i class="fa fa-chevron-right"></i></button>
+                                <button type="button" class="btn btn-white" onclick="move_left('groups_selected', 'groups')"><i class="fa fa-chevron-left"></i> </button>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div>
+                                <select id="groups_selected" name="group" class="form-control m-b" size="10"  multiple>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="hr-line-dashed"></div>
+                    {{ af.cabinet|bootstrap_horizontal }}
+
+                    <div class="hr-line-dashed"></div>
+                    {{ af.comment|bootstrap_horizontal }}
+                    <div class="hr-line-dashed"></div>
+
+                   <div class="form-group">
+                       <div class="col-sm-4 col-sm-offset-5">
+                           <button class="btn btn-white" type="submit"> 重置 </button>
+                           <button class="btn btn-primary"> 提交 </button>
+                       </div>
+                   </div>
+                </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function() {
+        $('.auth').click(function(){
+            if ($(this).attr('id') == 'pass'){
+                $('#admin_account').css('display', 'block')
+            }
+            else {
+                $('#admin_account').css('display', 'none')
+            }
+        })
+    });
+
+    function move_left(from, to) {
+        $("#"+from+" option").each(function(){
+            if ( $(this).prop("selected") == true ) {
+                $("#"+to).append(this);
+                $(this).attr("selected",'false');
+            }
+            $(this).attr("selected",'true');
+        });
+    }
+    function move_right(from, to) {
+        $("#"+from+" option").each(function(){
+            if ( $(this).prop("selected") == true ) {
+                $("#"+to).append(this);
+            }
+
+        });
+    }
+
+    function move_all(from, to){
+        $("#"+from).children().each(function(){
+            $("#"+to).append(this);
+        });
+    }
+</script>
+{% endblock content %}
+</body>
+</html>
+

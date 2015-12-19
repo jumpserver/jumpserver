@@ -1,0 +1,13 @@
+{% for field in af_form %}
+<div class="alert alert-warning text-center"> {{ field.errors }}</div>
+{{ field.label_tag }}: {{ field }}
+{% endfor %}
+
+
+{% if af.errors %}
+<ul>
+{% for error in af.errors %}
+<li><strong>{{ error }}</strong></li>
+{% endfor %}
+</ul>
+{% endif %}

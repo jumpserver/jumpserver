@@ -1,0 +1,45 @@
+#!/bin/bash
+
+
+real_file=/etc/sudoers
+tmp_file=$(mktemp /tmp/XXXXXXX)
+
+# Backup sudoers file
+cp ${sudo_file} ${sudo_file_bak}
+
+# Add Command Aliases
+add_cmd_alias() {
+    sudo_file=$1
+    {% for sudo_name, sudo_cmd in sudo_alias.items %}
+        {% if sudo_name != 'ALL' %}
+        if $(grep '^Cmnd_Alias {{ sudo_name }}' ${sudo_file} &> /dev/null); then
+            sed -i 's@^Cmnd_Alias.*{{ sudo_name }}.*@Cmnd_Alias {{ sudo_name }} = {{ sudo_cmd }}@g' ${sudo_file}
+        else
+            echo "Cmnd_Alias {{ sudo_name }} = {{ sudo_cmd }}" >> ${sudo_file}
+        fi
+        {% endif %}
+    {% endfor %}
+}
+
+
+# Add Command Aliases to role
+add_role_chosen() {
+    sudo_file=$1
+    {% for user, alias in sudo_user.items %}
+        if $(grep '^{{ user }}.*' ${sudo_file} &> /dev/null); then
+            sed -i 's@^{{ user }}.*@{{ user }} ALL = (root) NOPASSWD: {{ alias }}@g' ${sudo_file}
+        else
+            echo "{{ user }} ALL = (root)  NOPASSWD: {{ alias }}"  >> ${sudo_file}
+        fi
+    {% endfor %}
+}
+
+
+check_syntax(){
+    visudo -c -f $1
+}
+
+cp $real_file $tmp_file && add_cmd_alias $tmp_file && add_role_chosen $tmp_file || exit 1
+check_syntax $tmp_file && add_cmd_alias $real_file && add_role_chosen $real_file && rm -f $tmp_file || exit 2
+check_syntax $real_file
+
