@@ -64,7 +64,7 @@ class PreSetup(object):
         self.db_host = '127.0.0.1'
         self.db_port = 3306
         self.db_user = 'jumpserver'
-        self.db_pass = 'mysql234'
+        self.db_pass = '5Lov@wife'
         self.db = 'jumpserver'
         self.mail_host = 'smtp.qq.com'
         self.mail_port = 25
@@ -93,6 +93,7 @@ class PreSetup(object):
 
     def _setup_mysql(self):
         color_print('开始安装设置mysql (请手动设置mysql安全)', 'green')
+        color_print('默认用户名: %s 密码密码: %s' % (self.db_user, self.db_pass), 'green')
         bash('yum -y install mysql-server')
         bash('service mysqld start')
         bash('mysql -e "create database %s default charset=utf8"' % self.db)
@@ -151,22 +152,21 @@ class PreSetup(object):
 
     def _input_mysql(self):
         while True:
-            db_host = raw_input('请输入数据库服务器IP [127.0.0.1]: ')
-            db_port = raw_input('请输入数据库服务器端口 [3306]: ')
-            db_user = raw_input('请输入数据库服务器用户 [root]: ')
-            db_pass = raw_input('请输入数据库服务器密码: ')
-            db = raw_input('请输入使用的数据库 [jumpserver]: ')
-
-            if db_host: self.db_host = db_host
-            if db_port: self.db_port = db_port
-            if db_user: self.db_user = db_user
-            if db_pass: self.db_pass = db_pass
-            if db: self.db = db
-
             mysql = raw_input('是否使用已经存在的数据库服务器? (y/n) [n]: ')
-
             if mysql != 'y':
                 self._setup_mysql()
+            else:
+                db_host = raw_input('请输入数据库服务器IP [127.0.0.1]: ')
+                db_port = raw_input('请输入数据库服务器端口 [3306]: ')
+                db_user = raw_input('请输入数据库服务器用户 [root]: ')
+                db_pass = raw_input('请输入数据库服务器密码: ')
+                db = raw_input('请输入使用的数据库 [jumpserver]: ')
+
+                if db_host: self.db_host = db_host
+                if db_port: self.db_port = db_port
+                if db_user: self.db_user = db_user
+                if db_pass: self.db_pass = db_pass
+                if db: self.db = db
 
             if self._test_db_conn():
                 break
@@ -176,9 +176,11 @@ class PreSetup(object):
     def _input_smtp(self):
         while True:
             self.mail_host = raw_input('请输入SMTP地址: ').strip()
-            self.mail_port = int(raw_input('请输入SMTP端口: ').strip())
+            mail_port = int(raw_input('请输入SMTP端口 [25]: ').strip())
             self.mail_addr = raw_input('请输入账户: ').strip()
             self.mail_pass = raw_input('请输入密码: ').strip()
+
+            if mail_port: self.mail_port = mail_port
 
             if self._test_mail():
                 color_print('\n\t请登陆邮箱查收邮件, 然后确认是否继续安装\n', 'green')
