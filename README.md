@@ -1,57 +1,68 @@
 #欢迎使用Jumpserver
-**Jumpserver**是一款由python编写开源的跳板机(堡垒机)系统，实现了跳板机应有的功能
+**Jumpserver** 是一款由python编写开源的跳板机(堡垒机)系统，实现了跳板机应有的功能
 
 ###截图：
 
-* 首页
+首页
  
 ![webterminal](https://github.com/ibuler/static/raw/master/jumpserver3/index.jpeg)
 
-* WebTerminal:
+WebTerminal:
 
 ![webterminal](https://github.com/ibuler/static/raw/master/jumpserver3/webTerminal.gif)
 
-* Web批量执行命令
+Web批量执行命令
 
 ![WebExecCommand](https://github.com/ibuler/static/raw/master/jumpserver3/webExec.gif)
 
-* 录像回放
+录像回放
 
 ![录像](https://github.com/ibuler/static/raw/master/jumpserver3/record.gif)
 
-* 跳转和批量命令
+跳转和批量命令
 
 ![跳转](https://github.com/ibuler/static/raw/master/jumpserver3/connect.gif)
 
-* 命令统计
+命令统计
 
 ![跳转](https://github.com/ibuler/static/raw/master/jumpserver3/command.png)
 
+### 文档
 
-> **统计管理** 统一管理用户 
-> 
-> **授权** 授权用户登录特定主机
-> 
-> **审计** 审计用户操作
-> 
-> **web管理** 漂亮的web管理界面
+* [访问wiki](./wiki)
+* [快速安装](./wiki/快速安装)
+* [名词解释](./wiki/名称解释)
+* [快速开始](./wiki/快速开始)
 
-## 主要模块
-#### 用户管理 ####
-	负责用户管理，添加用户，编辑用户，建立部门，建立用户组等
-#### 资产管理 ####
-	负责资产管理，添加资产，编辑资产，建立IDC，建立用户组等
-#### 授权管理 ####
-	负责授权用户登录某些特定主机，授权sudo，建立系统用户
-#### 日志审计 ####
-	负责用户操作的审计，监控用户操作，统计用户操作记录，中断用户操作
-#### 上传下载 ####
-	负责用户文件上传下载
+### 特点
 
-[官网](http://www.jumpserver.org)
+* 完全真开源，GPL授权
+* Python编写，容易再次开发
+* 实现了跳板机基本功能，认证、授权、审计
+* 集成了Ansible，批量命令等
+* 支持WebTerminal
+* Bootstrap编写，界面美观
+* 自动收集硬件信息
+* 录像回放
+* 命令搜索
+* 实时监控
+* 批量上传下载
+
+### 其它
+
+[Jumpserver官网](http://www.jumpserver.org)
 
 [demo站点](http://demo.jumpserver.org)
 
-[文档](./docs)
+### 团队
+
+* **广宏伟** ibuler
+* **王墉** halcyon
+* **陈尚委** 假想控
+* **喻茂峻** 紫川秀
+* **刘正** evanescunt
+* **柯连春** 遍地节操
+
+
 
 
