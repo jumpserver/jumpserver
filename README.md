@@ -1,24 +1,30 @@
 #欢迎使用Jumpserver
-**Jumpserver**是一款由ython、Django编写P档开源的跳板机(堡垒机)系统，实现了跳板机应有的基本功能
+**Jumpserver**是一款由python编写开源的跳板机(堡垒机)系统，实现了跳板机应有的功能
 
 ###截图：
 
 * 首页
+ 
 ![webterminal](https://github.com/ibuler/static/raw/master/jumpserver3/index.jpeg)
 
 * WebTerminal:
+
 ![webterminal](https://github.com/ibuler/static/raw/master/jumpserver3/webTerminal.gif)
 
-* Web Exec Command
+* Web批量执行命令
+
 ![WebExecCommand](https://github.com/ibuler/static/raw/master/jumpserver3/webExec.gif)
 
 * 录像回放
+
 ![录像](https://github.com/ibuler/static/raw/master/jumpserver3/record.gif)
 
 * 跳转和批量命令
+
 ![跳转](https://github.com/ibuler/static/raw/master/jumpserver3/connect.gif)
 
 * 命令统计
+
 ![跳转](https://github.com/ibuler/static/raw/master/jumpserver3/command.png)
 
 
@@ -47,6 +53,5 @@
 [demo站点](http://demo.jumpserver.org)
 
 [文档](./docs)
-
 
 
