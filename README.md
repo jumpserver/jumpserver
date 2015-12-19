@@ -7,11 +7,11 @@
 
 ![webterminal](https://github.com/ibuler/static/raw/master/jumpserver3/index.png)
 
-* WebTerminal:
+* Web Terminal:
 
 ![webterminal](https://github.com/ibuler/static/raw/master/jumpserver3/terminal.gif)
 
-* Web Exec Command
+* Web执行命令
 
 ![WebExecCommand](https://github.com/ibuler/static/raw/master/jumpserver3/web_exec.gif)
 
