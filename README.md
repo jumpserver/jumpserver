@@ -5,7 +5,7 @@
 
 首页
  
-![webterminal](https://github.com/ibuler/static/raw/master/jumpserver3/index.jpeg)
+![webterminal](https://github.com/ibuler/static/raw/master/jumpserver3/index.jpg)
 
 WebTerminal:
 
@@ -25,7 +25,7 @@ Web批量执行命令
 
 命令统计
 
-![跳转](https://github.com/ibuler/static/raw/master/jumpserver3/command.png)
+![跳转](https://github.com/ibuler/static/raw/master/jumpserver3/command.jpg)
 
 ### 文档
 
