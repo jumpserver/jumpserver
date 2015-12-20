@@ -11,6 +11,7 @@ import ConfigParser
 import socket
 import fcntl
 import struct
+import readline
 
 jms_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(jms_dir)
