@@ -93,7 +93,7 @@ class PreSetup(object):
 
     def _setup_mysql(self):
         color_print('开始安装设置mysql (请手动设置mysql安全)', 'green')
-        color_print('默认用户名: %s 密码密码: %s' % (self.db_user, self.db_pass), 'green')
+        color_print('默认用户名: %s 默认密码: %s' % (self.db_user, self.db_pass), 'green')
         bash('yum -y install mysql-server')
         bash('service mysqld start')
         bash('mysql -e "create database %s default charset=utf8"' % self.db)
@@ -152,8 +152,8 @@ class PreSetup(object):
 
     def _input_mysql(self):
         while True:
-            mysql = raw_input('是否使用已经存在的数据库服务器? (y/n) [n]: ')
-            if mysql != 'y':
+            mysql = raw_input('是否安装新的MySQL服务器? (y/n) [y]: ')
+            if mysql != 'n':
                 self._setup_mysql()
             else:
                 db_host = raw_input('请输入数据库服务器IP [127.0.0.1]: ')
@@ -176,11 +176,11 @@ class PreSetup(object):
     def _input_smtp(self):
         while True:
             self.mail_host = raw_input('请输入SMTP地址: ').strip()
-            mail_port = int(raw_input('请输入SMTP端口 [25]: ').strip())
+            mail_port = raw_input('请输入SMTP端口 [25]: ').strip()
             self.mail_addr = raw_input('请输入账户: ').strip()
             self.mail_pass = raw_input('请输入密码: ').strip()
 
-            if mail_port: self.mail_port = mail_port
+            if mail_port: self.mail_port = int(mail_port)
 
             if self._test_mail():
                 color_print('\n\t请登陆邮箱查收邮件, 然后确认是否继续安装\n', 'green')

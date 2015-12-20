@@ -29,6 +29,7 @@ class Setup(object):
 
     def _input_admin(self):
         while True:
+            print
             admin_user = raw_input('请输入管理员用户名 [%s]: ' % self.admin_user).strip()
             admin_pass = raw_input('请输入管理员密码: [%s]: ' % self.admin_pass).strip()
             admin_pass_again = raw_input('请再次输入管理员密码: [%s]: ' % self.admin_pass).strip()
