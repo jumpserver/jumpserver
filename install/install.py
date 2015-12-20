@@ -5,7 +5,6 @@ import subprocess
 import time
 import os
 import sys
-import smtplib
 import MySQLdb
 from smtplib import SMTP, SMTPAuthenticationError, SMTPConnectError
 import ConfigParser
@@ -190,14 +189,6 @@ class PreSetup(object):
                 else:
                     break
             print
-
-    @staticmethod
-    def _pull():
-        color_print('开始更新jumpserver', 'green')
-        # bash('git pull')
-        os.chdir(jms_dir)
-        os.chmod('logs', 0777)
-        os.chmod('keys', 0777)
 
     def start(self):
         # self._rpm_repo()
