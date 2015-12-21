@@ -89,7 +89,7 @@ class Setup(object):
     def _run_service():
         os.system('sh %s start' % os.path.join(jms_dir, 'service.sh'))
         print
-        color_print('安装成功，请访问web, 祝你使用愉快。请访问 https://github.com/ibuler/jumpserver 查看文档', 'green')
+        color_print('安装成功，请访问web, 祝你使用愉快。\n请访问 https://github.com/ibuler/jumpserver 查看文档', 'green')
 
     def start(self):
         print "开始安装Jumpserver, 要求环境为 CentOS 6.5 x86_64"
