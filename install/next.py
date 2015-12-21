@@ -7,6 +7,7 @@ import django
 from django.core.management import execute_from_command_line
 import shutil
 import urllib
+import socket
 
 jms_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(jms_dir)
@@ -18,6 +19,8 @@ if django.get_version() != '1.6':
 from juser.user_api import db_add_user, get_object, User
 from install import color_print
 from jumpserver.api import get_mac_address
+
+socket.setdefaulttimeout(2)
 
 
 class Setup(object):
@@ -33,8 +36,11 @@ class Setup(object):
     def _pull():
         color_print('开始更新jumpserver', 'green')
         # bash('git pull')
-        mac = get_mac_address()
-        version = urllib.urlopen('http://jumpserver.org/version/?id=%s' % mac)
+        try:
+            mac = get_mac_address()
+            version = urllib.urlopen('http://jumpserver.org/version/?id=%s' % mac)
+        except:
+            pass
         os.chdir(jms_dir)
         os.chmod('logs', 0777)
         os.chmod('keys', 0777)
