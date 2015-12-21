@@ -27,7 +27,7 @@ start() {
 	else
 		 daemon python $base_dir/manage.py runserver 0.0.0.0:80 &>> /tmp/jumpserver.log 2>&1 &
 		 daemon python $base_dir/run_websocket.py &> /dev/null 2>&1 &
-         sleep 2
+         sleep 4
 
 		 echo -n "$jump_start"
 		 nums=0
