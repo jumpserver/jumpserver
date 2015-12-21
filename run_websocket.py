@@ -33,7 +33,7 @@ except ImportError:
 
 
 define("port", default=3000, help="run on the given port", type=int)
-define("host", default='0.0.0.0', help="run port on", type=str)
+define("host", default='0.0.0.0', help="run port on given host", type=str)
 
 
 def require_auth(role='user'):
