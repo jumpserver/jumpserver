@@ -30,9 +30,10 @@ Web批量执行命令
 ### 文档
 
 * [访问wiki](https://github.com/ibuler/jumpserver/wiki)
-* [快速安装](https://github.com/ibuler/jumpserver/wiki/快速安装)
-* [名词解释](https://github.com/ibuler/jumpserver/wiki/名称解释)
-* [快速开始](https://github.com/ibuler/jumpserver/wiki/快速开始)
+* [快速安装](https://github.com/ibuler/jumpserver/wiki/Quickinstall)
+* [名词解释](https://github.com/ibuler/jumpserver/wiki/Termexplain)
+* [快速开始](https://github.com/ibuler/jumpserver/wiki/Quickstart)
+* [更新Log](https://github.com/ibuler/jumpserver/wiki/Changelog)
 
 ### 特点
 
