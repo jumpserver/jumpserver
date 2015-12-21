@@ -53,23 +53,17 @@ stop() {
 
 	echo -n $"Stopping ${PROC_NAME} service:"
 	
-	if [ -e $lockfile ];then
-		ps aux | grep -E 'manage.py|run_websocket.py' | grep -v grep | awk '{print $2}' | xargs kill -9 &> /dev/null
-		ret=$?
-		
-		if [ $ret -eq 0 ]; then
-			echo_success
-			echo
-            rm -f "$lockfile"
-		else
-			echo_failure
-			echo
-            rm -f "$lockfile"
-		fi
+	ps aux | grep -E 'manage.py|run_websocket.py' | grep -v grep | awk '{print $2}' | xargs kill -9 &> /dev/null
+	ret=$?
+
+	if [ $ret -eq 0 ]; then
+		echo_success
+		echo
+        rm -f "$lockfile"
 	else
-			echo_success
-			echo
-		
+		echo_failure
+		echo
+        rm -f "$lockfile"
 	fi
 
 }
