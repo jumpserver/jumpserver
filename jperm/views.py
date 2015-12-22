@@ -294,7 +294,10 @@ def perm_role_add(request):
             # 生成随机密码，生成秘钥对
             sudos_obj = [get_object(PermSudo, id=sudo_id) for sudo_id in sudo_ids]
             if key_content:
-                key_path = gen_keys(key=key_content)
+                try:
+                    key_path = gen_keys(key=key_content)
+                except SSHException, e:
+                    raise ServerError(e)
             else:
                 key_path = gen_keys()
             logger.debug('generate role key: %s' % key_path)
@@ -305,7 +308,6 @@ def perm_role_add(request):
             return HttpResponseRedirect(reverse('role_list'))
         except ServerError, e:
             error = e
-
     return my_render('jperm/perm_role_add.html', locals(), request)
 
 

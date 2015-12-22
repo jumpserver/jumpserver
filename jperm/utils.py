@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import random
 import os.path
 import shutil
 from paramiko import SSHException
@@ -8,9 +7,9 @@ from paramiko.rsakey import RSAKey
 from jumpserver.api import mkdir
 from uuid import uuid4
 from jumpserver.api import CRYPTOR
-from os import makedirs
 
-from tempfile import NamedTemporaryFile
+from jumpserver.api import logger
+
 
 from jumpserver.settings import KEY_DIR
 
@@ -55,9 +54,9 @@ def gen_keys(key="", key_path_dir=""):
         with open(key_file) as f:
             try:
                 key = RSAKey.from_private_key(f)
-            except SSHException:
+            except SSHException, e:
                 shutil.rmtree(key_path_dir, ignore_errors=True)
-                raise SSHException
+                raise SSHException(e)
     os.chmod(private_key, 0644)
 
     with open(public_key, 'w') as content_file:
