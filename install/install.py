@@ -6,7 +6,7 @@ import time
 import os
 import sys
 import MySQLdb
-from smtplib import SMTP, SMTPAuthenticationError, SMTPConnectError
+from smtplib import SMTP, SMTPAuthenticationError, SMTPConnectError, SMTPSenderRefused
 import ConfigParser
 import socket
 import fcntl
@@ -127,7 +127,7 @@ class PreSetup(object):
             smtp.quit()
             return True
 
-        except (SMTPAuthenticationError, socket.timeout, socket.gaierror), e:
+        except (SMTPAuthenticationError, socket.timeout, socket.gaierror, SMTPSenderRefused, SMTPConnectError), e:
             color_print(e, 'red')
             return False
 
