@@ -30,10 +30,9 @@ Web批量执行命令
 ### 文档
 
 * [访问wiki](https://github.com/ibuler/jumpserver/wiki)
-* [快速安装](https://github.com/ibuler/jumpserver/wiki/Quickinstall)
-* [名词解释](https://github.com/ibuler/jumpserver/wiki/Termexplain)
-* [快速开始](https://github.com/ibuler/jumpserver/wiki/Quickstart)
-* [更新Log](https://github.com/ibuler/jumpserver/wiki/Changelog)
+* [快速安装](https://github.com/ibuler/jumpserver/wiki/快速安装)
+* [名词解释](https://github.com/ibuler/jumpserver/wiki/名称解释)
+* [快速开始](https://github.com/ibuler/jumpserver/wiki/快速开始)
 
 ### 特点
 
@@ -59,15 +58,8 @@ Web批量执行命令
 
 ### 团队
 
-* **广宏伟** ibuler
-* **王墉** halcyon
-* **陈尚委** 假想控
-* **喻茂峻** 紫川秀
-* **刘正** evanescunt
-* **柯连春** 遍地节操
+![](https://github.com/ibuler/static/raw/master/jumpserver3/team.jpg)
 
 
-### 交流qq群 
-399218702 JumpServer 交流群2
 
-390139816 JumpServer 交流群(满)
+
