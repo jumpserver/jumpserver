@@ -93,7 +93,7 @@ $('#roleForm').validator({
     theme: "yellow_right_effect",
     rules: {
         check_name: [/^\w{2,20}$/, '大小写字母数字和下划线,2-20位'],
-        check_begin: [/^[\-]+BEGIN RSA PRIVATE KEY[\-]+/gm, '请填写正确的RSA Key'],
+        check_begin: [/^[\-]+BEGIN RSA PRIVATE KEY[\-]+/gm, 'RSA Key填写有误，请检查'],
 {#        either: function(){#}
 {#            return $('#role_password').val() == ''#}
 {#        }#}
@@ -107,8 +107,9 @@ $('#roleForm').validator({
             msg: {required: "系统用户名称必填"}
         },
         "role_key": {
-            rule: "required;check_begin",
-            tip: "请输入正确格式的RSA私钥"
+            rule: "check_begin",
+            ok: "",
+            empty: true
         },
 {#        "role_key": {#}
 {#            rule: "required(either)",#}

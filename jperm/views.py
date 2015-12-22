@@ -284,7 +284,7 @@ def perm_role_add(request):
 
         try:
             if get_object(PermRole, name=name):
-                raise ServerError('已经存在该用户 %s' % name)
+                raise ServerError(u'已经存在该用户 %s' % name)
             default = get_object(Setting, name='default')
 
             if password:
