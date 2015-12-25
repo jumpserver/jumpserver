@@ -29,7 +29,10 @@ def get_group_user_perm(ob):
     """
     perm = {}
     if isinstance(ob, User):
-        rule_all = PermRule.objects.filter(user=ob)
+        rule_all = set(PermRule.objects.filter(user=ob))
+        for user_group in ob.group.all():
+            rule_all = rule_all.union(set(PermRule.objects.filter(user_group=user_group)))
+
     elif isinstance(ob, UserGroup):
         rule_all = PermRule.objects.filter(user_group=ob)
     else:
@@ -80,6 +83,7 @@ def get_group_user_perm(ob):
                 else:
                     perm_asset[asset] = {'role': perm_asset_group[asset_group].get('role', set()),
                                          'rule': perm_asset_group[asset_group].get('rule', set())}
+    print perm
     return perm
 
 
