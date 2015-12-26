@@ -96,7 +96,7 @@ function remove_role(role_id){
            },
            error: function (msg) {
                console.log(msg);
-               alert("失败: " + msg)
+               alert("失败: " + msg.responseText)
            }
         });
     }
