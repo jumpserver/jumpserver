@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 
 from django.db.models import Q
+from django.http import HttpResponseBadRequest, HttpResponseNotAllowed
 from paramiko import SSHException
 from jperm.perm_api import *
 
-from juser.models      import User, UserGroup
-from jasset.models     import Asset, AssetGroup
-from jperm.models      import PermRole, PermRule, PermSudo, PermPush
+from juser.models import User, UserGroup
+from jasset.models import Asset, AssetGroup
+from jperm.models import PermRole, PermRule, PermSudo, PermPush
 from jumpserver.models import Setting
 
-from jperm.utils       import gen_keys
+from jperm.utils import gen_keys
 from jperm.ansible_api import MyTask
-from jperm.perm_api    import get_role_info, get_role_push_host
-from jumpserver.api    import my_render, get_object, CRYPTOR
+from jperm.perm_api import get_role_info, get_role_push_host
+from jumpserver.api import my_render, get_object, CRYPTOR
 
 # 设置PERM APP Log
 from jumpserver.settings import LOG_LEVEL
@@ -317,30 +318,43 @@ def perm_role_delete(request):
     delete role page
     """
     if request.method == "POST":
-        # 获取参数删除的role对象
-        role_id = request.POST.get("id")
-        role = get_object(PermRole, id=role_id)
-        role_key = role.key_path
-        # 删除推送到主机上的role
-        recycle_assets = [push.asset for push in role.perm_push.all() if push.success]
-        logger.debug(u"delete role %s - delete_assets: %s" % (role.name, recycle_assets))
-        if recycle_assets:
-            recycle_resource = gen_resource(recycle_assets)
-            task = MyTask(recycle_resource)
-            msg = task.del_user(get_object(PermRole, id=role_id).name)
-            logger.info(u"delete role %s - execute delete user: %s" % (role.name, msg))
-            # TODO: 判断返回结果，处理异常
-        # 删除存储的秘钥，以及目录
-        key_files = os.listdir(role_key)
-        for key_file in key_files:
-            os.remove(os.path.join(role_key, key_file))
-        os.rmdir(role_key)
-        logger.info(u"delete role %s - delete role key directory: %s" % (role.name, role_key))
-        # 数据库里删除记录　TODO: 判断返回结果，处理异常
-        role.delete()
-        return HttpResponse(u"删除系统用户: %s" % role.name)
-    else:
-        return HttpResponse(u"不支持该操作")
+        try:
+            # 获取参数删除的role对象
+            role_id = request.POST.get("id")
+            role = get_object(PermRole, id=role_id)
+            if not role:
+                logger.warning(u"Delete Role: %s not exist" % role.name)
+                raise ServerError(u"%s 无数据记录" % role.name)
+            role_key = role.key_path
+            # 删除推送到主机上的role
+            recycle_assets = [push.asset for push in role.perm_push.all() if push.success]
+            logger.debug(u"delete role %s - delete_assets: %s" % (role.name, recycle_assets))
+            if recycle_assets:
+                recycle_resource = gen_resource(recycle_assets)
+                task = MyTask(recycle_resource)
+                try:
+                    msg = task.del_user(get_object(PermRole, id=role_id).name)
+                except Exception, e:
+                    logger.warning(u"Recycle Role failed: %s" % e)
+                    raise ServerError(u"回收已推送的系统用户失败: %s" % e)
+                logger.info(u"delete role %s - execute delete user: %s" % (role.name, msg))
+                # TODO: 判断返回结果，处理异常
+            # 删除存储的秘钥，以及目录
+            try:
+                key_files = os.listdir(role_key)
+                for key_file in key_files:
+                    os.remove(os.path.join(role_key, key_file))
+                os.rmdir(role_key)
+            except OSError, e:
+                logger.warning(u"Delete Role: delete key error, %s" % e)
+                raise ServerError(u"删除系统用户key失败: %s" % e)
+            logger.info(u"delete role %s - delete role key directory: %s" % (role.name, role_key))
+            # 数据库里删除记录
+            role.delete()
+            return HttpResponse(u"删除系统用户: %s" % role.name)
+        except ServerError, e:
+            return HttpResponseBadRequest(u"删除失败, 原因：　%s" % e)
+    return HttpResponseNotAllowed(u"仅支持POST")
 
 
 @require_role('admin')
