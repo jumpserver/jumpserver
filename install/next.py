@@ -7,6 +7,7 @@ import django
 from django.core.management import execute_from_command_line
 import shutil
 import urllib
+import socket
 
 jms_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(jms_dir)
@@ -18,6 +19,8 @@ if django.get_version() != '1.6':
 from juser.user_api import db_add_user, get_object, User
 from install import color_print
 from jumpserver.api import get_mac_address
+
+socket.setdefaulttimeout(2)
 
 
 class Setup(object):
@@ -33,8 +36,11 @@ class Setup(object):
     def _pull():
         color_print('开始更新jumpserver', 'green')
         # bash('git pull')
-        mac = get_mac_address()
-        version = urllib.urlopen('http://jumpserver.org/version/?id=%s' % mac)
+        try:
+            mac = get_mac_address()
+            version = urllib.urlopen('http://jumpserver.org/version/?id=%s' % mac)
+        except:
+            pass
         os.chdir(jms_dir)
         os.chmod('logs', 0777)
         os.chmod('keys', 0777)
@@ -83,7 +89,7 @@ class Setup(object):
     def _run_service():
         os.system('sh %s start' % os.path.join(jms_dir, 'service.sh'))
         print
-        color_print('安装成功，请访问web, 祝你使用愉快。请访问 https://github.com/ibuler/jumpserver 查看文档')
+        color_print('安装成功，请访问web, 祝你使用愉快。\n请访问 https://github.com/ibuler/jumpserver 查看文档', 'green')
 
     def start(self):
         print "开始安装Jumpserver, 要求环境为 CentOS 6.5 x86_64"

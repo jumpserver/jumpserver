@@ -681,7 +681,7 @@ def perm_role_get(request):
         asset = get_object(Asset, id=asset_id)
         if asset:
             role = user_have_perm(request.user, asset=asset)
-            logger.debug('#' + ','.join([i.name for i in role]) + '#')
+            logger.debug(u'获取授权系统用户: ' + ','.join([i.name for i in role]))
             return HttpResponse(','.join([i.name for i in role]))
     else:
         roles = get_group_user_perm(request.user).get('role').keys()

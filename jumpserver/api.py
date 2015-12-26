@@ -165,7 +165,7 @@ class PyCrypt(object):
         self.mode = AES.MODE_CBC
 
     @staticmethod
-    def gen_rand_pass(length, especial=False):
+    def gen_rand_pass(length=16, especial=False):
         """
         random password
         随机生成密码

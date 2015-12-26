@@ -27,7 +27,7 @@ start() {
 	else
 		 daemon python $base_dir/manage.py runserver 0.0.0.0:80 &>> /tmp/jumpserver.log 2>&1 &
 		 daemon python $base_dir/run_websocket.py &> /dev/null 2>&1 &
-         sleep 2
+         sleep 4
 
 		 echo -n "$jump_start"
 		 nums=0
@@ -53,23 +53,17 @@ stop() {
 
 	echo -n $"Stopping ${PROC_NAME} service:"
 	
-	if [ -e $lockfile ];then
-		ps aux | grep -E 'manage.py|run_websocket.py' | grep -v grep | awk '{print $2}' | xargs kill -9 &> /dev/null
-		ret=$?
-		
-		if [ $ret -eq 0 ]; then
-			echo_success
-			echo
-            rm -f "$lockfile"
-		else
-			echo_failure
-			echo
-            rm -f "$lockfile"
-		fi
+	ps aux | grep -E 'manage.py|run_websocket.py' | grep -v grep | awk '{print $2}' | xargs kill -9 &> /dev/null
+	ret=$?
+
+	if [ $ret -eq 0 ]; then
+		echo_success
+		echo
+        rm -f "$lockfile"
 	else
-			echo_success
-			echo
-		
+		echo_failure
+		echo
+        rm -f "$lockfile"
 	fi
 
 }

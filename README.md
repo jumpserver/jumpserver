@@ -58,12 +58,7 @@ Web批量执行命令
 
 ### 团队
 
-* **广宏伟** ibuler
-* **王墉** halcyon
-* **陈尚委** 假想控
-* **喻茂峻** 紫川秀
-* **刘正** evanescunt
-* **柯连春** 遍地节操
+![](https://github.com/ibuler/static/raw/master/jumpserver3/team.jpg)
 
 
 
