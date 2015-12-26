@@ -44,28 +44,29 @@ def require_auth(role='user'):
             else:
                 session_key = request.get_argument('sessionid', '')
 
-            logger.debug(u'请求session_key: %s' % session_key)
+            logger.debug('Websocket: session_key: %s' % session_key)
             if session_key:
                 session = get_object(Session, session_key=session_key)
+                logger.debug('Websocket: session: %s' % session)
                 if session and datetime.datetime.now() < session.expire_date:
                     user_id = session.get_decoded().get('_auth_user_id')
                     user = get_object(User, id=user_id)
                     if user:
-                        logger.debug(u'用户 [ %s ] 请求websocket' % user.username)
+                        logger.debug('Websocket: user [ %s ] request websocket' % user.username)
                         request.user = user
                         if role == 'admin':
                             if user.role in ['SU', 'GA']:
                                 return func(request, *args, **kwargs)
-                            logger.debug(u'用户 [ %s ] 不是admin.' % user.username)
+                            logger.debug('Websocket: user [ %s ] is not admin.' % user.username)
                         else:
                             return func(request, *args, **kwargs)
                 else:
-                    logger.debug(u'session过期 %s' % session_key)
+                    logger.debug('Websocket: session expired: %s' % session_key)
             try:
                 request.close()
             except AttributeError:
                 pass
-            logger.warning('认证失败，非法请求')
+            logger.warning('Websocket: Request auth failed.')
         return _deco2
     return _deco
 
@@ -95,10 +96,10 @@ def file_monitor(path='.', client=None):
     notifier = AsyncNotifier(wm, EventHandler(client))
     wm.add_watch(path, mask, auto_add=True, rec=True)
     if not os.path.isfile(path):
-        logger.debug(u"文件 %s 不存在." % path)
+        logger.debug("File %s does not exist." % path)
         sys.exit(3)
     else:
-        logger.debug(u"开始监控文件 %s." % path)
+        logger.debug("Now starting monitor file %s." % path)
         global f
         f = open(path, 'r')
         st_size = os.stat(path)[6]
@@ -148,8 +149,8 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
             MonitorHandler.clients.remove(self)
             MonitorHandler.threads.remove(MonitorHandler.threads[client_index])
 
-        logger.debug(u"监控在线数量: %s, 线程数量: %s" % (len(MonitorHandler.clients),
-                                                       len(MonitorHandler.threads)))
+        logger.debug("Websocket: Monitor client num: %s, thread num: %s" % (len(MonitorHandler.clients),
+                                                                            len(MonitorHandler.threads)))
 
     def on_message(self, message):
         # 监控日志，发生变动发向客户端
@@ -159,7 +160,7 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
         # 客户端主动关闭
         # self.close()
 
-        logger.debug("监控请求关闭")
+        logger.debug("Websocket: Monitor client close request")
         try:
             client_index = MonitorHandler.clients.index(self)
             MonitorHandler.clients.remove(self)
@@ -183,10 +184,10 @@ class WebTerminalKillHandler(tornado.web.RequestHandler):
         Log.objects.filter(id=ws_id).update(is_finished=True)
         for ws in WebTerminalHandler.clients:
             if ws.id == int(ws_id):
-                logger.debug(u"终结logID %s" % ws_id)
+                logger.debug("Kill log id %s" % ws_id)
                 ws.log.save()
                 ws.close()
-        logger.debug(u'WebTerminal在线数量: %s' % len(WebTerminalHandler.clients))
+        logger.debug('Websocket: web terminal client num: %s' % len(WebTerminalHandler.clients))
 
 
 class ExecHandler(tornado.websocket.WebSocketHandler):
@@ -208,7 +209,7 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
 
     @require_auth('user')
     def open(self):
-        logger.debug('web批量命令执行请求')
+        logger.debug('Websocket: Open exec request')
         role_name = self.get_argument('role', 'sb')
         self.remote_ip = self.request.remote_ip
         logger.debug('Web执行命令: 请求系统用户 %s' % role_name)
@@ -254,6 +255,7 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
         for k, v in self.runner.results.items():
             for host, output in v.items():
                 output = newline_pattern.sub('<br />', output)
+                logger.debug(output)
                 if k == 'ok':
                     header = "<span style='color: green'>[ %s => %s]</span>\n" % (host, 'Ok')
                 else:
@@ -264,7 +266,7 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
         self.write_message('\n~o~ Task finished ~o~\n')
 
     def on_close(self):
-        logger.debug('关闭web批量命令请求')
+        logger.debug('关闭web_exec请求')
 
 
 class WebTerminalHandler(tornado.websocket.WebSocketHandler):
@@ -287,31 +289,30 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
 
     @require_auth('user')
     def open(self):
-        logger.debug('WebTerminal请求')
+        logger.debug('Websocket: Open request')
         role_name = self.get_argument('role', 'sb')
         asset_id = self.get_argument('id', 9999)
         asset = get_object(Asset, id=asset_id)
         if asset:
             roles = user_have_perm(self.user, asset)
-            logger.debug('请求系统用户: %s' % role_name)
+            logger.debug(roles)
+            logger.debug('系统用户: %s' % role_name)
             login_role = ''
             for role in roles:
                 if role.name == role_name:
                     login_role = role
                     break
             if not login_role:
-                logger.warning(u'在%s 这台主机上没有为用户%s 授权系统用户%s ' % (asset.hostname,
-                               self.user.username,
-                               role_name))
+                logger.warning('Websocket: Not that Role %s for Host: %s User: %s ' % (role_name, asset.hostname,
+                                                                                       self.user.username))
                 self.close()
                 return
         else:
-            logger.warning(u'没有授权该主机 %s' % asset_id)
+            logger.warning('Websocket: No that Host: %s User: %s ' % (asset_id, self.user.username))
             self.close()
             return
-        logger.debug('web terminal 请求主机: %s 用户: %s 系统用户: %s' % (asset.hostname,
-                     self.user.username,
-                     login_role.name))
+        logger.debug('Websocket: request web terminal Host: %s User: %s Role: %s' % (asset.hostname, self.user.username,
+                                                                                     login_role.name))
         self.term = WebTty(self.user, asset, login_role, login_type='web')
         self.term.remote_ip = self.request.remote_ip
         self.ssh = self.term.get_connection()
@@ -351,7 +352,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             self.channel.send(data['data'])
 
     def on_close(self):
-        logger.debug('关闭websocket请求')
+        logger.debug('Websocket: Close request')
         if self in WebTerminalHandler.clients:
             WebTerminalHandler.clients.remove(self)
         try:
@@ -360,9 +361,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             self.log.end_time = datetime.datetime.now()
             self.log.save()
             self.log_time_f.close()
-            print "1"
             self.ssh.close()
-            print "2"
             self.close()
         except AttributeError:
             pass
@@ -424,6 +423,6 @@ if __name__ == '__main__':
     server = tornado.httpserver.HTTPServer(app)
     server.bind(options.port, options.host)
     #server.listen(options.port)
-    #server.start(num_processes=5)
+    server.start(num_processes=5)
     print "Run server on %s:%s" % (options.host, options.port)
     tornado.ioloop.IOLoop.instance().start()

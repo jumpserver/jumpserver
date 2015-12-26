@@ -83,7 +83,6 @@ def get_group_user_perm(ob):
                 else:
                     perm_asset[asset] = {'role': perm_asset_group[asset_group].get('role', set()),
                                          'rule': perm_asset_group[asset_group].get('rule', set())}
-    print perm
     return perm
 
 
