@@ -157,7 +157,7 @@ class PreSetup(object):
                 self._setup_mysql()
             else:
                 db_host = raw_input('请输入数据库服务器IP [127.0.0.1]: ')
-                db_port = raw_input('请输入数据库服务器端口 [3306]: ')
+                db_port = int(raw_input('请输入数据库服务器端口 [3306]: '))
                 db_user = raw_input('请输入数据库服务器用户 [root]: ')
                 db_pass = raw_input('请输入数据库服务器密码: ')
                 db = raw_input('请输入使用的数据库 [jumpserver]: ')
