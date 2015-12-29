@@ -195,6 +195,8 @@ class PreSetup(object):
         # self._rpm_repo()
         # self._depend_rpm()
         # self._require_pip()
+        color_print('请务必先查看wiki https://github.com/ibuler/jumpserver/wiki/Quickinstall')
+        time.sleep(3)
         self._set_env()
         self._input_ip()
         self._input_mysql()
