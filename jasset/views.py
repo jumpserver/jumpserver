@@ -138,7 +138,7 @@ def asset_add(request):
         is_active = True if request.POST.get('is_active') == '1' else False
         use_default_auth = request.POST.get('use_default_auth', '')
         try:
-            if Asset.objects.filter(hostname=str(hostname)):
+            if Asset.objects.filter(hostname=unicode(hostname)):
                 error = u'该主机名 %s 已存在!' % hostname
                 raise ServerError(error)
 
