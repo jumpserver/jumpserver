@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+{% load mytags %}
+{% block content %}
+    {% include 'nav_cat_bar.html' %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-10">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>填写基本信息</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <form method="post" id="sudoForm" class="form-horizontal" action="">
+                            {% if error %}
+                                <div class="alert alert-warning text-center">{{ error }}</div>
+                            {% endif %}
+                            {% if msg %}
+                                <div class="alert alert-success text-center">{{ msg }}</div>
+                            {% endif %}
+                            <div class="form-group">
+                                <label for="sudo_name" class="col-sm-2 control-label">命令别名<span class="red-fonts">*</span></label>
+                                <div class="col-sm-8">
+                                    <input id="sudo_name" name="sudo_name" placeholder="Sudo Command Alias" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label for="sudo_commands" class="col-sm-2 control-label">系统命令<span class="red-fonts">*</span></label>
+                                <div class="col-sm-8">
+                                    <textarea id="sudo_commands" name="sudo_commands" class="form-control" rows="3" placeholder="/bin/grep, /bin/find"></textarea>
+                                    <span class="help-block m-b-none">sudo命令，逗号分隔, 不支持换行</span>
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <label for="sudo_comment" class="col-sm-2 control-label">备注</label>
+                                <div class="col-sm-8">
+                                    <input id="sudo_comment" name="sudo_comment" placeholder="Sudo Comment" type="text" class="form-control">
+                                </div>
+                            </div>
+                            <div class="hr-line-dashed"></div>
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <button class="btn btn-white" type="reset">取消</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit">确认保存</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block self_footer_js %}
+<script>
+$('#sudoForm').validator({
+    timely: 2,
+    theme: "yellow_right_effect",
+    rules: {
+        check_name: [/^\w{2,20}$/, '大写字母,2-20位']
+    },
+
+    fields: {
+        "sudo_name": {
+            rule: "required;check_name"
+        },
+        "sudo_runas": {
+            rule: "required;check_name"
+        },
+        "sudo_commands": {
+            rule: "required"
+        }
+    },
+    valid: function(form) {
+            form.submit();
+        }
+});
+</script>
+{% endblock %}
+

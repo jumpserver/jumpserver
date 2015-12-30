@@ -1,0 +1,328 @@
+{% extends 'base.html' %}
+{% load mytags %}
+
+{% block content %}
+    {% include 'nav_cat_bar.html' %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-primary"><b>{{ role.name }} -  授权规则</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#"></a>
+                                </li>
+                                <li><a href="#"></a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div>
+                            <div class="text-left">
+                                <table class="table" id="ugedit" >
+                                            <td class="text-navy text-left">时间</td>
+                                            <td class="text-navy text-right">名称</td>
+                                    {% for rule in rules %}
+                                        <tr class="gradeX">
+                                            <td class="text-left"> {{ rule.date_added | date:"Y-m-d H:i:s"}} </td>
+                                            <td class="text-right"> <a href="{% url 'rule_detail' %}?id={{ rule.id }}">{{ rule.name }}</a> </td>
+                                        </tr>
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-primary"><b>授权用户/用户组</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#"></a>
+                                </li>
+                                <li><a href="#"></a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                            <div class="text-center">
+                                <table class="table" id="agedit" >
+                                    <td class="text-navy text-left">用户</td>
+                                    <td class="text-navy text-right">用户组</td>
+                                    <tr>
+                                        <td>
+                                            <table class="table progress-striped text-left">
+                                            {% for user in users %}
+                                                <tr class="gradeX">
+                                                    <td> <a href="{% url 'user_detail' %}?id={{ user.id }}">{{ user.name }}</a> </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </table>
+                                        </td>
+                                        <td>
+                                            <table class="table progress-striped text-right">
+                                            {% for group in user_groups %}
+                                                <tr class="gradeX-">
+                                                    <td> <a href="{% url 'user_group_list' %}?id={{ group.id }}">{{ group.name }}</a> </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </table>
+                                        </td>
+
+                                    </tr>
+                                </table>
+                            </div>
+                    </div>
+                    </div>
+                    </div>
+            <div class="col-sm-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-primary"><b>授权主机组/主机组</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#"></a>
+                                </li>
+                                <li><a href="#"></a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="text-center">
+                            <table class="table" id="agedit" >
+                                <td class="text-navy text-left">主机</td>
+                                <td class="text-navy text-right">主机组</td>
+                                <tr>
+                                    <td>
+                                        <table class="table progress-striped text-left">
+                                        {% for asset in assets %}
+                                            <tr class="gradeX">
+                                                <td> <a href="{% url 'asset_detail' %}?id={{ asset.id }}">{{ asset.ip }}</a> </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table class="table progress-striped text-right">
+                                        {% for group in asset_groups %}
+                                            <tr class="gradeX-">
+                                                <td> <a href="{% url 'asset_list' %}?group_id={{ group.id }}">{{ group.name }}</a> </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-primary"><b>{{ role.name }} - 推送主机</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#"></a>
+                                </li>
+                                <li><a href="#"></a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div>
+                            <div class="text-left">
+                                <table class="table table-striped" id="ugedit" >
+                                    <a class="btn btn-xs btn-danger del_muti"> 删除 </a><span> </span>
+                                    <a class="btn btn-xs btn-primary re_push"> 重新推送 </a>
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">
+                                                <input type="checkbox" id="check_push" onclick="checkAll('check_push', 'asset_id')">
+                                            </th>
+                                            <th class="text-center">主机</th>
+                                            <th class="text-center">密钥</th>
+                                            <th class="text-center">密码</th>
+                                            <th class="text-center">结果</th>
+                                            <th class="text-center">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for asset, info in pushed_asset.items %}
+                                        <tr class="gradeX">
+                                            <th class="text-center">
+                                                <input type="checkbox" name="asset_id" value="{{ asset.id }}">
+                                            </th>
+                                            <td class="text-center"> {{ asset.hostname }} </td>
+                                            <td class="text-center"> {{ info.key | yesno:"是,否,未知" }} </td>
+                                            <td class="text-center"> {{ info.password | yesno:"是,否,未知" }} </td>
+                                            {% if info.success %}
+                                            <td class="text-center" style="color: #1ab394;" >{{ info.success | yesno:"成功,失败,未知" }} </td>
+                                            {% else %}
+                                            <td class="text-center" style="color: #ec4758;cursor: help" title="{{ info.result }}" >{{ info.success | yesno:"成功,失败,未知" }} </td>
+                                            {% endif %}
+                                            <td class="text-center" ><a class="fa fa-times del" href="{% url 'role_recycle' %}?role_id={{ role.id }}&asset_id={{ asset.id }}" style="color: #ec4758;"></a></td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-danger"><b>{{ role.name }} - 未推送主机</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div>
+                            <div class="text-left">
+                                <table class="table table-striped" >
+                                    <a class="btn btn-xs btn-primary push_muti"> 推送 </a>
+                                    <thead>
+                                        <tr>
+                                            <th class="text-center">
+                                                <input type="checkbox" id="check_no_push" onclick="checkAll('check_no_push', 'asset_no_push_id')">
+                                            </th>
+                                            <th class="text-center">主机</th>
+                                            <th class="text-center">IP</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for asset in need_push_asset %}
+                                        <tr class="gradeX">
+                                            <th class="text-center">
+                                                <input type="checkbox" name="asset_no_push_id" value="{{ asset.id }}">
+                                            </th>
+                                            <td class="text-center"> {{ asset.hostname }} </td>
+                                            <td class="text-center"> {{ asset.ip }} </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+{% block self_footer_js %}
+
+<script>
+    $(document).ready(function(){
+        $('.del').click(function(){
+            var url = $(this).attr('href');
+            $.get(
+                url,
+                {},
+                function(data){
+                    location.reload()
+                }
+
+            );
+            return false;
+        });
+
+        $('.del_muti').click(function(){
+            var check_array = [];
+            if (confirm("确定删除")) {
+                $(".gradeX input[name='asset_id']:checked").each(function() {
+                    check_array.push($(this).attr("value"))
+                });
+                var url = '/jperm/role/recycle/?role_id={{ role.id }}&asset_id=' + check_array.join(',');
+                console.log(check_array);
+                $.get(url,
+                      {},
+                      function(data){
+                         location.reload()
+                      }
+                )
+            }
+            return false;
+        });
+
+        $('.push_muti').click(function(){
+            var check_array = [];
+            $(".gradeX input[name='asset_no_push_id']:checked").each(function() {
+                check_array.push($(this).attr("value"))
+            });
+            var url = '/jperm/role/push/?id={{ role.id }}&asset_id=' + check_array.join(',');
+            $(this).attr('href', url)
+        });
+
+        $('.re_push').click(function(){
+            var check_array = [];
+            $(".gradeX input[name='asset_id']:checked").each(function() {
+                check_array.push($(this).attr("value"))
+            });
+            var url = '/jperm/role/push/?id={{ role.id }}&asset_id=' + check_array.join(',');
+            $(this).attr('href', url)
+        })
+
+    })
+</script>
+{% endblock %}

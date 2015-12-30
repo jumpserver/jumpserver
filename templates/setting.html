@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load mytags %}
+
+
+{% block content %}
+    {% include 'nav_cat_bar.html' %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-10">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5> 项目设置 </h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="ibox-content">
+                        <div class="panel blank-panel">
+                            <div class="panel-heading">
+                                <div class="panel-options">
+                                    <ul class="nav nav-tabs">
+                                        <li id="tab1" class="active"><a data-toggle="tab" href="#tab-default" aria-expanded="true">默认设置</a></li>
+{#                                        <li id="tab2" class=""><a data-toggle="tab" href="#tab-email" aria-expanded="true">邮箱设置</a></li>#}
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="panel-body">
+                                <div class="tab-content">
+                                    <div id="tab-default" class="tab-pane active">
+                                        <form method="post" id="settingForm" class="form-horizontal" action="">
+                                            {% if error %}
+                                                <div class="alert alert-warning text-center">{{ error }}</div>
+                                            {% endif %}
+                                            {% if msg %}
+                                                <div class="alert alert-success text-center">{{ msg }}</div>
+                                            {% endif %}
+                                            <div class="form-group">
+                                                <label for="username" class="col-sm-2 control-label">默认管理用户<span class="red-fonts">*</span></label>
+                                                <input name="setting" value="default" style="display: none">
+                                                <div class="col-sm-8">
+                                                    <input id="username" name="username" placeholder="Username" type="text" value="{{ setting_default.field1 }}" class="form-control">
+                                                    <span class="help-block m-b-none"> 管理账号是服务器存在的root等高权限账号(或拥有NOPASSWD: ALL sudo权限)，用来推送新建系统用户</span>
+                                                </div>
+                                            </div>
+                                            <div class="hr-line-dashed"></div>
+                                            <div class="form-group">
+                                                <label for="key" class="col-sm-2 control-label">默认密码</label>
+                                                <div class="col-sm-8">
+                                                    <input id="password" name="password" placeholder="Password" type="password" class="form-control">
+                                                    <span class="help-block m-b-none">如果不修改密码，请留空</span>
+                                                </div>
+                                            </div>
+                                            <div class="hr-line-dashed"></div>
+                                            <div class="form-group">
+                                                <label for="port" class="col-sm-2 control-label">默认ssh端口<span class="red-fonts">*</span></label>
+                                                <div class="col-sm-8">
+                                                    <input id="port" name="port" placeholder="Port" type="text" value="{{ setting_default.field2 }}" class="form-control">
+                                                </div>
+                                            </div>
+                                            <div class="hr-line-dashed"></div>
+                                            <div class="form-group">
+                                                <label for="key" class="col-sm-2 control-label">默认密钥</label>
+                                                <div class="col-sm-8">
+                                                    <textarea class="form-control" name="key" placeholder="请复制粘贴私钥" rows="10" style="font-size: 9px;"></textarea>
+                                                    <span class="help-block m-b-none">如果不修改密钥，请留空, 密钥密码必填一项</span>
+                                                </div>
+                                            </div>
+                                            <div class="hr-line-dashed"></div>
+                                            <div class="form-group">
+                                                <div class="col-sm-4 col-sm-offset-2">
+                                                    <button class="btn btn-white" type="reset">取消</button>
+                                                    <button id="submit_button" class="btn btn-primary" type="submit">确认保存</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+
+{#                                    <div id="tab-email" class="tab-pane">#}
+{#                                        <table class="table table-striped table-bordered table-hover " id="editable" >#}
+{#                                            <thead>#}
+{#                                                <tr>#}
+{#                                                    <th class="text-center">组名</th>#}
+{#                                                </tr>#}
+{#                                            </thead>#}
+{#                                        </table>#}
+{#                                    </div>#}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block self_footer_js %}
+<script>
+    $('#settingForm').validator({
+        timely: 2,
+        theme: "yellow_right_effect",
+        rules: {
+            check_name: [/^\w{2,20}$/, '大小写字母数字和下划线,2-20位'],
+            check_port: [/^\d{1,5}$/, '端口号不正确'],
+            either: function(){
+                return $('#password').val() == ''
+            }
+        },
+
+        fields: {
+            "username": {
+                rule: "required;check_name",
+                tip: "输入管理用户名",
+                ok: "",
+                msg: {required: "用户名称必填"}
+            },
+            "port": {
+                rule: "required;check_port",
+                tip: "输入端口号",
+                ok: "",
+                msg: {required: "端口号必填"}
+            }
+{#            "key": {#}
+{#                rule: "required(either)",#}
+{#                tip: "输入密钥",#}
+{#                ok: "",#}
+{#                msg: {required: "密码和密钥必填一个!"}#}
+{#            }#}
+        },
+        valid: function(form) {
+                form.submit();
+            }
+    })
+</script>
+{% endblock %}

@@ -1,18 +1,32 @@
 {% extends 'base.html' %}
-{% block content %}
-{% include 'nav_cat_bar.html' %}
-<style>
+{% block self_head_css_js %}
+    <style>
+    .terminal {
+        border: #000 solid 5px;
+        font-family: "Monaco", "DejaVu Sans Mono", "Liberation Mono", monospace;
+        font-size: 11px;
+        color: #f0f0f0;
+        background: rgba(0, 0, 0, 0.6);
+        width: 600px;
+        box-shadow: rgba(0, 0, 0, 0.6) 2px 2px 20px;
+    }
+
+    .reverse-video {
+        color: #000;
+        background: #f0f0f0;
+    }
+
     .bootstrap-dialog-body  {
         background-color: rgba(0, 0, 0, 0);
     }
     .bootstrap-dialog-message {
-        background-color: rgba(0, 0, 0, 0);
+        color: #00FF00;
     }
     .pre-class {
         background-color: rgba(0, 0, 0, 1);
     }
     .modal-content {
-        background-color: rgba(0, 0, 0, 0.6);
+        background-color: #000;
     }
     .modal-dialog {
         background-color: rgba(0, 0, 0, 0);
@@ -24,11 +38,16 @@
     .modal-header {
         background-color: #FFFFFF;
     }
-</style>
+    </style>
+    <script src="/static/js/term.js"></script>
+
+{% endblock %}
+{% block content %}
+{% include 'nav_cat_bar.html' %}
 
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-sm-12">
             <div class="ibox float-e-margins">
                 <div id="ibox-content" class="ibox-title">
                     <h5> 用户日志详细信息列表 </h5>
@@ -39,12 +58,6 @@
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                             <i class="fa fa-wrench"></i>
                         </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">未启用 1</a>
-                            </li>
-                            <li><a href="#">未启用 2</a>
-                            </li>
-                        </ul>
                         <a class="close-link">
                             <i class="fa fa-times"></i>
                         </a>
@@ -54,52 +67,51 @@
                 <div class="ibox-content">
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
-                            <li class="active"><a href="/jlog/log_list/online/" class="text-center"><i class="fa fa-laptop"></i> 在线 </a></li>
-                            <li><a href="/jlog/log_list/offline/" class="text-center"><i class="fa fa-bar-chart-o"></i> 历史记录 </a></li>
-                            <li style="float: right">
+                            <li class="active"><a href="{% url 'log_list' 'online' %}" class="text-center"><i class="fa fa-laptop"></i> 在线 </a></li>
+                            <li><a href="{% url 'log_list' 'offline' %}" class="text-center"><i class="fa fa-bar-chart-o"></i> 登录历史</a></li>
+                            <li><a href="{% url 'log_list' 'exec' %}" class="text-center"><i class="fa fa-bar-chart-o"></i> 命令记录 </a></li>
+                            <li><a href="{% url 'log_list' 'file' %}" class="text-center"><i class="fa fa-bar-chart-o"></i> 上传下载 </a></li>
+                            <div class="" style="float: right">
                                 <form id="search_form" method="get" action="" class="pull-right mail-search">
                                     <div class="input-group">
-                                        <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
-                                        <input type="text" style="display: none">
+                                        <input type="text" class="form-control input-sm" id="keyword" name="keyword" value="{{ keyword }}" placeholder="Search">
                                         <div class="input-group-btn">
-                                            <button id='search_btn' type="button" class="btn btn-sm btn-primary" onclick="log_search()">
-                                                Search
+                                            <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                                                -搜索-
                                             </button>
                                         </div>
                                     </div>
                                 </form>
-                            </li>
+                            </div>
                         </ul>
                     </div>
-                    <br/>
                     <div class="tab-content">
                         <table class="table table-striped table-bordered table-hover ">
                             <thead>
                                 <tr>
+                                    <th class="text-center"> ID </th>
                                     <th class="text-center"> 用户名 </th>
-                                    <th class="text-center"> 所属部门 </th>
                                     <th class="text-center"> 登录主机 </th>
                                     <th class="text-center"> 来源IP </th>
-                                    {% ifnotequal session_role_id 0 %}
-                                        <th class="text-center"> 实时监控 </th>
-                                        <th class="text-center"> 阻断 </th>
-                                    {% endifnotequal %}
+                                    <th class="text-center"> 登录方式 </th>
+                                    <th class="text-center"> 命令 </th>
+                                    <th class="text-center"> 实时监控 </th>
+                                    <th class="text-center"> 阻断 </th>
                                     <th class="text-center"> 登录时间 </th>
-
                                 </tr>
                             </thead>
                             <tbody>
                             {% for post in contacts.object_list %}
                                 <tr class="gradeX">
+                                    <td class="text-center">{{ post.id }}</td>
                                     <td id="username" class="text-center"> {{ post.user }} </td>
-                                    <td id="deptname" class="text-center"> {{ post.dept_name }} </td>
                                     <td id="ip" class="text-center"> {{ post.host }} </td>
                                     <td id="remote_ip" class="text-center"> {{ post.remote_ip }} </td>
-                                    {% ifnotequal session_role_id 0 %}
-                                        <td class="text-center"><a class="monitor" filename="{{ post.log_path }}"> 监控 </a></td>
-                                        <td class="text-center"><input type="button" id="cut" class="btn btn-danger btn-xs"  name="cut" value="阻断" onclick='cut("{{ post.pid }}")' /></td>
-                                    {% endifnotequal %}
-                                    <td class="text-center"> {{ post.start_time|date:"Y-m-d H:i:s" }} </td>
+                                    <td class="text-center"> {{ post.login_type }} </td>
+                                    <td class="text-center"><a href="{% url 'log_history' %}?id={{ post.id }}" class="log_command"> 统计 </a></td>
+                                    <td class="text-center"><a class="monitor" file_path="{{ post.log_path }}"> 监控 </a></td>
+                                    <td class="text-center"><input type="button" id="cut" class="btn btn-danger btn-xs"  name="cut" value="阻断" onclick='cut("{{ post.pid }}", "{{ post.login_type }}")' /></td>
+                                    <td class="text-center" id="start_time"> {{ post.start_time|date:"Y-m-d H:i:s" }} </td>
                                 </tr>
                             {% endfor %}
                             </tbody>
@@ -116,115 +128,92 @@
 </div>
 
 
-<script src="http://{{ web_socket_host }}/socket.io/socket.io.js"></script>
+{#<script src="http://{{ web_socket_host }}/socket.io/socket.io.js"></script>#}
 <script>
-   $.fn.webSocket = function(opt){
-    var st = {};
-    st = $.extend(st,opt);
-    var message = {};
-    var $this = $(this);
-    var genUid = function(){
-        return new Date().getTime()+""+Math.floor(Math.random()*899+100);
-    };
-    var init = function(e){
-        var socket = io.connect('ws://'+globalConfig.SOCKET_HOST);
-        var node = $(e.target);
-        message.id = genUid();
-        message.filename = node.attr('filename');
-        var username = $('#username')[0].innerText;
-        var ip = $('#ip')[0].innerText;
-        BootstrapDialog.show({message:function(){
-            var option, exsit_message;
-            var escapeString = function (html){
-                var elem = document.createElement('div');
-                var txt = document.createTextNode(html);
-                elem.appendChild(txt);
-                return elem.innerHTML;
-            };
-            var tag = $('<div id="log" style="height: 500px;overflow: auto;background-color: rgba(0, 0, 0, 0);"></div>');
+{#   $(document).ready(function(){#}
+{#       $('.monitor').click(function(){#}
+{#           window.open('/jlog/monitor/', '监控', 'height=500, width=910, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');#}
+{#        })#}
+{#   });#}
+    function init(obj){
+        var file_path = obj.attr('file_path');
+        var wsUri = '{{ web_monitor_uri }}';
+        var socket = new WebSocket(wsUri + '?file_path=' + file_path);
 
-            var username = "";
-            var seed = "";
-            document.cookie.split('; ').forEach(function(obj){
-                var info = obj.split('=');
-                if(info.length == 2 ){
-                    if(info[0] == 'username'){
-                        username = info[1];
-                    }else if(info[0] == 'seed'){
-                        seed = info[1];
-                    }
-                }
-            })
+        var term = new Terminal({
+              cols: 80,
+              rows: 24,
+              screenKeys: false
+        });
 
-            //告诉服务器端有用户登录
-            socket.emit('login', {userid:message.id, filename:message.filename,username:username,seed:seed});
-            socket.on('message',function(obj){
-                option = obj.option;
-                console.log(option+'so')
-                exsit_message = obj.content;
-                console.log(obj.content)
-                //去除log中的颜色控制字符
-                var regx =  /\x1B\[([0-9]{1,3}((;[0-9]{1,3})*)?)?[m|K]/g;
-//                tag.append('<p>'+escapeString(obj.content.replace(regx,''))+'</p>');
-                if (option == 'new') {
-//                    tag.append('<p style="margin: 2px">' + escapeString(obj.content) + '</p>');
-                    tag.append('<p  style="margin: 2px">'+escapeString(obj.content.replace(regx,' '))+'</p>');
-                } else if (option == 'exist') {
-                    tag.append('<pre>' + exsit_message + '</pre>');
-                }
-                tag.animate({ scrollTop: tag[0].scrollHeight}, 1);
-            });
-            tag[0].style.color = "#00FF00";
+        var tag = $('<div id="term" style="height:500px; overflow: auto;background-color: rgba(0, 0, 0, 0);border: none"></div>');
+            term.open();
+            term.resize(80, 24);
+
+        socket.onopen = function(evt){
+                socket.send('hello');
+                term.write('~.~ Connect WebSocket Success.~.~ \r\n');
+        };
+
+        window.onbeforeunload = function(){
+            socket.close()
+        };
+
+        var username = obj.closest('tr').find('#username').text();
+        var ip = obj.closest('tr').find('#ip').text();
+
+        BootstrapDialog.show({message: function(){
+            //服务器端认证
+{#            socket.send('login', {userid:message.id, filename:message.filename,username:username,seed:seed});#}
+            window.setTimeout(function(){
+                $('.terminal').detach().appendTo('#term');
+                socket.onmessage = function(evt){
+                term.write(evt.data);
+            }}, 1000);
+
             return tag[0];
-
         } ,
             title:'Jumpserver实时监控 '+' 登录用户名: '+'<span class="text-info">'+username+'</span>'+' 登录主机: '+'<span class="text-info">'+ip,
             onhide:function(){
-                socket.emit('disconnect');
+                socket.close();
         }});
     }
-    $this.on("click",function(e){
-        init(e);
-        return false;
-    });
-}
-   $('.log_command').on('click',function(){
-       var url = $(this).attr('href');
-        $.ajax({url:url,success:function(data){
-        BootstrapDialog.show({title:'命令统计',message:data});
-        }});
-       return false;
-    })
-   globalConfig = {
-        SOCKET_HOST: "{{ web_socket_host }}"
-   }
-   $(".monitor").webSocket()
 
-
-   function log_search(){
-        $.ajax({
-            type: "GET",
-            url: "/jlog/search/?env=online",
-            data: $("#search_form").serialize(),
-            success: function (data) {
-                $(".tab-content").html(data);
-            }
+    $(document).ready(function(){
+        $('.monitor').click(function(){
+            init($(this));
         });
-    }
 
-    $("#search_input").keydown(function(e){
-        if(e.keyCode==13){
-            log_search()
-            }
-    })
+        $('.log_command').on('click',function(){
+           var url = $(this).attr('href');
+           var username = $(this).closest('tr').find('#username').text();
+           var ip = $(this).closest('tr').find('#ip').text();
+           var start_time = $(this).closest('tr').find('#start_time').text();
+           var div_username = ' 用户名: '+'<span class="text-info">'+username+'' + '</span>';
+           var div_ip = ' 主机: '+'<span class="text-info">' + ip + '</span>';
+           var div_time = ' 开始时间: ' + '<span class="text-info">'+start_time +'</span>' + '</span>';
+           var title = 'JumpServer命令统计 '+ div_username + div_ip + div_time;
+            $.ajax({url:url,
+                    success:function(data){
+                        var tag = $('<div style="height: 500px;overflow: auto;background-color: rgba(0, 0, 0, 0);"></div>').html(data.replace(/\n/g,"<br />"));
+                        BootstrapDialog.show({title: title, message:tag[0]});
+            }});
+           return false;
+        });
+    });
 
-   function cut(num){
-      var g_url = "/jlog/log_kill/?id="+num;
+   function cut(num, login_type){
+       console.log(login_type);
+       if (login_type=='web'){
+           var g_url = '{{ web_kill_uri }}' + '?id=' + num;
+       } else {
+           var g_url = "{% url 'log_kill' %} }?id=" + num;
+       }
+
        $.ajax({
            type: "GET",
-           url: g_url,
-           success: window.open("/jlog/log_list/online/", "_self")
-//           error: window.open(g_url, "_self")
+           url: g_url+"&sessionid={{ session_id }}",
+           success: window.open("{% url 'log_list' 'online' %}", "_self")
        });
 
 }

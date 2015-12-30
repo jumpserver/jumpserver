@@ -4,7 +4,7 @@
     {% include 'nav_cat_bar.html' %}
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
-            <div class="col-lg-10">
+            <div class="col-sm-10">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
                         <h5>填写基本信息</h5>
@@ -15,17 +15,12 @@
                             <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                                 <i class="fa fa-wrench"></i>
                             </a>
-                            <ul class="dropdown-menu dropdown-user">
-                                <li><a href="#">未启用 1</a>
-                                </li>
-                                <li><a href="#">未启用 2</a>
-                                </li>
-                            </ul>
                             <a class="close-link">
                                 <i class="fa fa-times"></i>
                             </a>
                         </div>
                     </div>
+
                     <div class="ibox-content">
                         <form id="groupForm" method="post" class="form-horizontal" action="">
                             {% if error %}
@@ -35,27 +30,15 @@
                                 <div class="alert alert-success text-center">{{ msg }}</div>
                             {% endif %}
                             <div class="form-group">
-                                <label for="group_name" class="col-sm-2 control-label">组名<span class="red-fonts">*</span></label>
+                                <label for="group_name" class="col-sm-2 control-label">用户组名<span class="red-fonts">*</span></label>
                                 <div class="col-sm-8">
-                                    <input id="group_name" name="group_name" placeholder="Group name" type="text" class="form-control" value="{{ group_name }}">
+                                    <input id="group_name" name="group_name" placeholder="User Group Name" type="text" class="form-control" value="{{ group_name }}">
                                 </div>
                             </div>
-                            {% ifequal session_role_id 2 %}
+                            
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
-                                <label for="dept_id" class="col-sm-2 control-label">部门<span class="red-fonts">*</span></label>
-                                <div class="col-sm-8">
-                                    <select id="dept_id" name="dept_id" class="form-control m-b" onchange="change_dept(this.value)">
-                                        {% for dept in dept_all %}
-                                            <option value="{{ dept.id }}" selected>{{ dept.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                            {% endifequal %}
-                            <div class="hr-line-dashed"></div>
-                            <div class="form-group">
-                                <label for="users" class="col-lg-2 control-label">用户</label>
+                                <label for="users" class="col-sm-2 control-label">用户</label>
                                 <div class="col-sm-3">
                                     <select id="users" name="users" size="12" class="form-control m-b" multiple>
                                         {% for user in user_all %}
@@ -98,6 +81,9 @@
         </div>
     </div>
 
+{% endblock %}
+
+{% block self_footer_js %}
 <script>
 $('#groupForm').validator({
     timely: 2,
@@ -105,7 +91,7 @@ $('#groupForm').validator({
     fields: {
         "group_name": {
             rule: "required",
-            tip: "输入组名",
+            tip: "用户输入组名",
             ok: "",
             msg: {required: "必须填写!"}
         },
@@ -120,23 +106,6 @@ $('#groupForm').validator({
         form.submit();
     }
 });
-
-function change_type(type){
-    $.post('/juser/group_add_ajax/',
-           {'type': type},
-           function(data){
-               $('#users').html(data)
-           })
-}
-
-
-function change_dept(dept_id){
-    $.get('/juser/dept_user_ajax/',
-            {'id': dept_id},
-            function(data){
-                $('#users').html(data)
-            })
-}
 
 
 $(document).ready(function(){

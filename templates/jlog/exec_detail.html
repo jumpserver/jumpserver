@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load mytags %}
+{% block content %}
+    {% include 'nav_cat_bar.html' %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-primary"><b>{{ log.id }}</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div>
+                            <div class="text-left">
+                                <table class="table">
+                                    <tr>
+                                        <td class="text-navy">ID</td>
+                                        <td>{{ log.id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">用户名</td>
+                                        <td>{{ log.user }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">来源IP</td>
+                                        <td>{{ log.remote_ip }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">日期</td>
+                                        <td>{{ log.datetime|date:"Y-m-d H:i:s" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">主机</td>
+                                        <td>
+                                             <table class="table">
+                                                 {% for asset_name in assets_hostname  %}
+                                                     {% if asset_name %}
+                                                        <tr>
+                                                            <td>{{ asset_name }}</td>
+                                                        </tr>
+                                                    {% endif %}
+                                                 {% endfor %}
+                                             </table>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-8">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>结果</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content inspinia-timeline">
+                        <div>
+                            <div class="text-left">
+                                <table class="table">
+                                    <tr>
+                                        <td class="text-navy">命令</td>
+                                        <td>{{ log.cmd }}</td>
+                                    </tr>
+                                    {% for result, info in result.items %}
+                                        {% for host, msg in info.items %}
+                                            {% ifequal result 'failed' %}
+                                            <tr>
+                                                <td class="text-navy" style="color: #ed5565">{{ host }}</td>
+                                                <td>{{ msg }}</td>
+                                            </tr>
+                                            {% else %}
+                                            <tr>
+                                                <td class="text-navy">{{ host }}</td>
+                                                <td>{{ msg }}</td>
+                                            </tr>
+                                            {% endifequal %}
+                                        {% endfor %}
+                                    {% endfor %}
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+<script>
+    $(document).ready(function(){
+        $('#show').click(function(){
+            $('#last').css('display', 'none');
+            $('#all').css('display', 'block');
+        })
+    })
+</script>
+
+
+{% endblock %}

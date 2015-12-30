@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load mytags %}
+
+
+{% block content %}
+    {% include 'nav_cat_bar.html' %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+
+        <div class="row">
+            <div class="col-sm-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-primary"><b>{{ rule.name }}</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#"></a>
+                                </li>
+                                <li><a href="#"></a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div>
+                            <div class="text-left">
+                                <table class="table">
+                                    <tr>
+                                        <td class="text-navy">ID</td>
+                                        <td>{{ rule.id }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">名称</td>
+                                        <td>{{ rule.name }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">时间</td>
+                                        <td>{{ rule.date_added | date:"Y-m-d H:i:s"}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">关联用户</td>
+                                        <td>{{ roles_name }}</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">激活</td>
+                                        <td>是</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-primary"><b>授权用户/用户组</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#"></a>
+                                </li>
+                                <li><a href="#"></a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="text-center">
+                            <table class="table" id="agedit" >
+                                <td class="text-navy text-left">用户</td>
+                                <td class="text-navy text-right">用户组</td>
+                                <tr>
+                                    <td>
+                                        <table class="table progress-striped text-left">
+                                        {% for user in users %}
+                                            <tr class="gradeX">
+                                                <td> <a href="{% url 'user_detail' %}?id={{ user.id }}">{{ user.name }}</a> </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </table>
+                                    </td>
+                                    <td>
+                                        <table class="table progress-striped text-right">
+                                        {% for group in user_groups %}
+                                            <tr class="gradeX-">
+                                                <td> <a href="{% url 'user_group_list' %}?group_id={{ group.id }}">{{ group.name }}</a> </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-primary"><b>授权主机组/主机组</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-user">
+                                <li><a href="#"></a>
+                                </li>
+                                <li><a href="#"></a>
+                                </li>
+                            </ul>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                            <div class="text-center">
+                                <table class="table" id="agedit" >
+                                    <td class="text-navy text-left">主机</td>
+                                    <td class="text-navy text-right">主机组</td>
+                                    <tr>
+                                        <td>
+                                            <table class="table progress-striped text-left">
+                                            {% for asset in assets %}
+                                                <tr class="gradeX">
+                                                    <td> <a href="{% url 'asset_detail' %}?id={{ asset.id }}">{{ asset.ip }}</a> </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </table>
+                                        </td>
+                                        <td>
+                                            <table class="table progress-striped text-right">
+                                            {% for group in asset_groups %}
+                                                <tr class="gradeX-">
+                                                    <td> <a href="{% url 'asset_list' %}?group_id={{ group.id }}">{{ group.name }}</a> </td>
+                                                </tr>
+                                            {% endfor %}
+                                            </table>
+                                        </td>
+
+                                    </tr>
+                                </table>
+                            </div>
+                    </div>
+                    </div>
+                    </div>
+        </div>
+    </div>
+
+<script>
+    $(document).ready(function(){
+        $('#show').click(function(){
+            $('#last').css('display', 'none');
+            $('#all').css('display', 'block');
+        })
+    })
+</script>
+
+
+{% endblock %}

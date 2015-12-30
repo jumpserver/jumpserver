@@ -5,7 +5,7 @@
 
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
-        <div class="col-lg-10">
+        <div class="col-sm-10">
             <div class="ibox float-e-margins">
                 <div class="ibox-title">
                     <h5> 主机组详细信息列表</h5>
@@ -16,12 +16,6 @@
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                             <i class="fa fa-wrench"></i>
                         </a>
-                        <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">未启用 1</a>
-                            </li>
-                            <li><a href="#">未启用 2</a>
-                            </li>
-                        </ul>
                         <a class="close-link">
                             <i class="fa fa-times"></i>
                         </a>
@@ -29,48 +23,46 @@
                 </div>
                 <div class="ibox-content">
                     <div class="">
-                    <a target="_blank" href="/jasset/group_add" class="btn btn-sm btn-primary "> 添加主机组 </a>
-                    <form id="search_form" method="get" action="" class="pull-right mail-search">
-                        <div class="input-group">
-                            <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
-                            <input type="text" style="display: none">
-                            <div class="input-group-btn">
-                                <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
-                                    Search
-                                </button>
+                        <a href="{% url 'asset_group_add' %}" class="btn btn-sm btn-primary "> 添加主机组 </a>
+                        <a class="btn btn-sm btn-danger" id="del_check"> 删除所选 </a>
+                        <form id="search_form" method="get" action="" class="pull-right mail-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control input-sm" id="search_input" name="keyword" placeholder="Search">
+                                <input type="text" style="display: none">
+                                <div class="input-group-btn">
+                                    <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                                        - 搜索 -
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
                     </div>
 
                     <form id="contents_form" name="contents_form">
                     <table class="table table-striped table-bordered table-hover " id="editable" >
                         <thead>
                             <tr>
-                                <th class="text-center"><input id="checkall" type="checkbox" class="i-checks" name="checkall" value="checkall" data-editable='false' onclick="check_all('contents_form')"></th>
+                                <th class="text-center">
+                                    <input id="checkall" type="checkbox" class="i-checks" name="checkall" value="checkall" data-editable='false' onclick="check_all('contents_form')">
+                                </th>
                                 <th class="text-center"> 主机组名 </th>
-                                <th class="text-center"> 所属部门 </th>
                                 <th class="text-center"> 主机数量 </th>
                                 <th class="text-center"> 备注 </th>
                                 <th class="text-center"> 操作 </th>
                             </tr>
                         </thead>
                         <tbody>
-                        {% for post in contacts.object_list %}
+                        {% for asset_group in asset_groups.object_list %}
                             <tr class="gradeX">
-                                <td class="text-center" name="j_id" value="{{ post.id }}" data-editable='false'><input name="id" value="{{ post.id }}" type="checkbox" class="i-checks"></td>
-                                <td class="text-center"> {{ post.name }} </td>
-                                <td class="text-center"> {{ post.dept.name }} </td>
-                                {% ifequal session_role_id 2 %}
-                                    <td class="text-center"> <a href="/jasset/group_detail/?id={{ post.id }}">{{ post.asset_set.count }}</a> </td>
-                                {% else %}
-                                    <td class="text-center"> <a href="/jasset/group_detail/?id={{ post.id }}">{{ post|get_group_count:dept }}</a> </td>
-                                {% endifequal %}
-                                <td class="text-center"> {{ post.comment }} </td>
+                                <td class="text-center" name="id" value="{{ asset_group.id }}" data-editable='false'>
+                                    <input name="id" value="{{ asset_group.id }}" type="checkbox" class="i-checks">
+                                </td>
+                                <td class="text-center"><a href="{% url 'asset_list' %}?group_id={{ asset_group.id }}">{{ asset_group.name }} </a>  </td>
+                                <td class="text-center"> <a href="{% url 'asset_list' %}?group_id={{ asset_group.id }}">{{ asset_group.asset_set.count }}</a> </td>
+                                <td class="text-center"> {{ asset_group.comment }} </td>
                                 <td class="text-center">
-                                    <a href="/jasset/group_detail/?id={{ post.id }}" class="btn btn-xs btn-info">详情</a>
-                                    <a href="/jasset/group_edit/?id={{ post.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <a href="/jasset/group_del/?id={{ post.id }}" class="btn btn-xs btn-danger">删除</a>
+                                    <a href="{% url 'asset_group_edit' %}?id={{ asset_group.id }}" class="btn btn-xs btn-info">编辑</a>
+                                    <a value="{% url 'asset_group_del' %}?id={{ asset_group.id }}" class="btn btn-xs btn-danger group_del">删除</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -78,8 +70,9 @@
                     </table>
                     <div class="row">
                         <div class="col-sm-6">
-                            <input type="button" id="del_button" class="btn btn-danger btn-sm"  name="del_button" value="删除" onclick="del('contents_form')" />
-                            <!--<input type="button" id="alter_button" class="btn btn-warning btn-sm" name="alter_button" value="修改" onclick="alter('contents_form')" />-->
+                            <div class="dataTables_info" id="editable_info" role="status" aria-live="polite">
+                                Showing {{ asset_groups.start_index }} to {{ asset_groups.end_index }} of {{ p.count }} entries
+                            </div>
                         </div>
                         {% include 'paginator.html' %}
                     </div>
@@ -89,29 +82,41 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block self_footer_js %}
 <script>
-    function del(form) {
-    var checkboxes = document.getElementById(form);
-    var id_list = {};
-    var j = 0;
-    for (var i = 0; i < checkboxes.elements.length; i++) {
-        if (checkboxes.elements[i].type == "checkbox" && checkboxes.elements[i].checked == true && checkboxes.elements[i].value != "checkall") {
-            id_list[j] = checkboxes.elements[i].value;
-            j++;
-        }
-    }
-    if (confirm("确定删除")) {
-        $.ajax({
-            type: "POST",
-            url: "/jasset/group_del/?id=multi",
-            data: {"id_list": id_list, "len_list": j},
-            success: function (data) {
-                window.open("/jasset/group_list/", "_self");
+    $(document).ready(function(){
+        $('.group_del').click(function(){
+            var row = $(this).closest('tr');
+            if (confirm('确定删除')) {
+                $.get(
+                        $(this).attr('value'),
+                        {},
+                        function (data) {
+                            row.remove();
+                        }
+                )
             }
         });
-    }
-    }
+
+        $('#del_check').click(function(){
+            var check_array = [];
+            if (confirm('确定删除')){
+                $('tr.gradeX input:checked').each(function(){
+                    check_array.push($(this).attr('value'))
+                });
+                $.get(
+                        '{% url "asset_group_del" %}',
+                        {id: check_array.join(',')},
+                        function(data){
+                            $('tr.gradeX input:checked').closest('tr').remove();
+                        }
+                )
+
+            }
+        })
+    });
 </script>
 
 {% endblock %}

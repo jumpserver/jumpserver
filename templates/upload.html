@@ -1,11 +1,56 @@
 {% extends 'base.html' %}
 {% load mytags %}
+{% block self_head_css_js %}
+    <link href="/static/css/plugins/datepicker/datepicker3.css" rel="stylesheet">
+    <link href="/static/css/plugins/chosen/chosen.css" rel="stylesheet">
+    <script src="/static/js/plugins/chosen/chosen.jquery.js"></script>
+{% endblock %}
 {% block content %}
 {% include 'nav_cat_bar.html' %}
+ <style>
+     table {
+     display: table;
+     border-collapse: separate;
+     border-spacing: 2px;
+     border-color: grey;
+ }
 
+ tbody {
+     display: table-row-group;
+     vertical-align: middle;
+     border-color: inherit;
+ }
+
+ .table.border {
+     border: 1px solid #999;
+ }
+.table.hovered tbody tr:hover {
+    background-color: rgba(28,183,236,.1)
+}
+ tr {
+     display: table-row;
+     vertical-align: inherit;
+     border-color: inherit;
+ }
+
+ td, th {
+     display: table-cell;
+     vertical-align: inherit;
+ }
+
+ #hosts_list {
+     background-color: white;
+     background-image: none;
+     border-radius: 1px;
+     color: inherit;
+     display: block;
+     right: 23px;
+     left: 23px;
+ }
+ </style>
 <div class="wrapper wrapper-content animated fadeIn">
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-sm-10">
         <div class="ibox float-e-margins">
             <div class="ibox-title">
                 <h5>上传文件</h5>
@@ -13,28 +58,28 @@
                     <a class="collapse-link">
                         <i class="fa fa-chevron-up"></i>
                     </a>
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                        <i class="fa fa-wrench"></i>
-                    </a>
-                    <ul class="dropdown-menu dropdown-user">
-                        <li><a href="#">Config option 1</a>
-                        </li>
-                        <li><a href="#">Config option 2</a>
-                        </li>
-                    </ul>
                     <a class="close-link">
                         <i class="fa fa-times"></i>
                     </a>
                 </div>
             </div>
             <div class="ibox-content">
-                <div class="">
-                    <form id="my-awesome-dropzone" class="dropzone" action="#">
+                <div>
+                    <form id="my-awesome-dropzone" class="dropzone" action="">
+                        <div class="alert alert-warning text-center" id="error" style="display: none"></div>
+                        <div class="alert alert-success text-center" id="msg" style="display: none"></div>
                         <div class="dropzone-previews">
-                            <input id="hosts" name="hosts"  type="text" class="form-control" required="不能为空" placeholder="输入主机地址，逗号隔开，确保你有输入主机地址的权限" size="80%">
+                            <div class="form-group">
+                                <div class="col-sm-10">
+                                    <select name="asset_ids" id="assets" data-placeholder="请选择上传的主机" class="chosen-select form-control m-b" multiple  tabindex="2">
+                                        {% for asset in assets %}
+                                            <option value="{{ asset.id }}">{{ asset.hostname }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-primary pull-right">全部上传</button>
-                        <div></div>
                     </form>
                 </div>
                 <div>
@@ -45,13 +90,12 @@
     </div>
     </div>
 </div>
+{% endblock %}
 
-
+{% block self_footer_js %}
 <script>
     $(document).ready(function(){
-
         Dropzone.options.myAwesomeDropzone = {
-
             autoProcessQueue: false,
             uploadMultiple: true,
             parallelUploads: 100,
@@ -61,7 +105,6 @@
             // Dropzone settings
             init: function() {
                 var myDropzone = this;
-
                 this.element.querySelector("button[type=submit]").addEventListener("click", function(e) {
                     e.preventDefault();
                     e.stopPropagation();
@@ -70,15 +113,30 @@
                 this.on("sendingmultiple", function() {
                 });
                 this.on("successmultiple", function(files, response) {
-                    alert(response)
+                    $('#msg').css('display', 'block');
+                    $('#msg').html(response)
                 });
                 this.on("errormultiple", function(files, response) {
+                    $('#error').css('display', 'block');
+                    $('#error').html(response)
                 });
             }
 
         }
 
-   });
+    });
+
+var config = {
+            '.chosen-select'           : {},
+            '.chosen-select-deselect'  : {allow_single_deselect:true},
+            '.chosen-select-no-single' : {disable_search_threshold:10},
+            '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
+            '.chosen-select-width'     : {width:"95%"}
+        };
+
+for (var selector in config) {
+    $(selector).chosen(config[selector]);
+}
 
 $('#my-awesome-dropzone').validator({
     timely: 2,
@@ -86,7 +144,7 @@ $('#my-awesome-dropzone').validator({
     fields: {
         "hosts": {
             rule: "required",
-            tip: "输入上传的Host",
+            tip: "输入上传的主机",
             ok: "",
             msg: {required: "必须填写!"}
         }
@@ -96,6 +154,7 @@ $('#my-awesome-dropzone').validator({
     }
 });
 </script>
-
+<script src="/static/js/cropper/cropper.min.js"></script>
+<script src="/static/js/datapicker/bootstrap-datepicker.js"></script>
 
 {% endblock %}

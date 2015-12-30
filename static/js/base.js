@@ -16,6 +16,22 @@ function check_all(form) {
     }
 }
 
+function checkAll(id, name){
+    var checklist = document.getElementsByName(name);
+    if(document.getElementById(id).checked)
+        {
+        for(var i=0;i<checklist.length;i++)
+        {
+          checklist[i].checked = 1;
+        }
+    }else{
+        for(var j=0;j<checklist.length;j++)
+        {
+         checklist[j].checked = 0;
+        }
+    }
+}
+
 //提取指定行的数据，JSON格式
 function GetRowData(row){
     var rowData = {};
@@ -89,22 +105,31 @@ function move_left(from, to, from_o, to_o) {
 //}
 //
 
-function selectAll(){
-         var checklist = document.getElementsByName ("selected");
-            if(document.getElementById("select_all").checked)
-            {
-            for(var i=0;i<checklist.length;i++)
-            {
-              checklist[i].checked = 1;
-            }
-            }else{
-            for(var j=0;j<checklist.length;j++)
-            {
-             checklist[j].checked = 0;
-            }
-            }
+//function selectAllOption(){
+//         var checklist = document.getElementsByName ("selected");
+//            if(document.getElementById("select_all").checked)
+//            {
+//            for(var i=0;i<checklist.length;i++)
+//            {
+//              checklist[i].checked = 1;
+//            }
+//            }else{
+//            for(var j=0;j<checklist.length;j++)
+//            {
+//             checklist[j].checked = 0;
+//            }
+//            }
+//
+//        }
 
-        }
+
+function selectAll(){
+    // 选择该页面所有option
+    $('option').each(function(){
+        $(this).attr('selected', true)
+    })
+}
+
 
 //
 //function move_all(from, to){
@@ -119,3 +144,11 @@ function selectAll(){
 //        })
 //}
 
+function getIDall() {
+    var check_array = [];
+    $(".gradeX input:checked").each(function () {
+        var id = $(this).attr("value");
+        check_array.push(id);
+    });
+    return check_array.join(",");
+}

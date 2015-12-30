@@ -1,22 +1,20 @@
 from django.conf.urls import patterns, include, url
 
 
-urlpatterns = patterns('',
+urlpatterns = patterns('jumpserver.views',
     # Examples:
-    (r'^$', 'jumpserver.views.index'),
-    (r'^api/user/$', 'jumpserver.api.api_user'),
-    (r'^skin_config/$', 'jumpserver.views.skin_config'),
-    (r'^install/$', 'jumpserver.views.install'),
-    (r'^base/$', 'jumpserver.views.base'),
-    (r'^login/$', 'jumpserver.views.login'),
-    (r'^logout/$', 'jumpserver.views.logout'),
-    (r'^file/upload/$', 'jumpserver.views.upload'),
-    (r'^file/download/$', 'jumpserver.views.download'),
-    (r'^error/$', 'jumpserver.views.httperror'),
-    (r'^juser/', include('juser.urls')),
-    (r'^jasset/', include('jasset.urls')),
-    (r'^jlog/', include('jlog.urls')),
-    (r'^jperm/', include('jperm.urls')),
-    (r'^node_auth/', 'jumpserver.views.node_auth'),
-
+    url(r'^$', 'index', name='index'),
+    # url(r'^api/user/$', 'api_user'),
+    url(r'^skin_config/$', 'skin_config', name='skin_config'),
+    url(r'^login/$', 'Login', name='login'),
+    url(r'^logout/$', 'Logout', name='logout'),
+    url(r'^exec_cmd/$', 'exec_cmd', name='exec_cmd'),
+    url(r'^file/upload/$', 'upload', name='file_upload'),
+    url(r'^file/download/$', 'download', name='file_download'),
+    url(r'^setting', 'setting', name='setting'),
+    url(r'^terminal/$', 'web_terminal', name='terminal'),
+    url(r'^juser/', include('juser.urls')),
+    url(r'^jasset/', include('jasset.urls')),
+    url(r'^jlog/', include('jlog.urls')),
+    url(r'^jperm/', include('jperm.urls')),
 )

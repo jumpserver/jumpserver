@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 {% block content %}
+{% load bootstrap %}
 {% include 'nav_cat_bar.html' %}
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
-        <div class="col-lg-10">
+        <div class="col-sm-10">
             <div class="ibox float-e-margins">
                 <div id="ibox-content" class="ibox-title">
                     <h5> 填写IDC基本信息 </h5>
@@ -15,10 +16,6 @@
                             <i class="fa fa-wrench"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-user">
-                            <li><a href="#">未启用 1</a>
-                            </li>
-                            <li><a href="#">未启用 2</a>
-                            </li>
                         </ul>
                         <a class="close-link">
                             <i class="fa fa-times"></i>
@@ -34,14 +31,28 @@
                         <div class="alert alert-success text-center">{{ smg }}</div>
                     {% endif %}
                     <form id="assetForm" method="post" class="form-horizontal">
-                        <div class="form-group"><label class="col-sm-2 control-label"> IDC名 <span class="red-fonts">*</span></label>
-                            <div class="col-sm-8"><input type="text" value="{{ idc.name }}" placeholder="北京联通" name="j_idc" class="form-control"></div>
-                        </div>
+                        {{ idc_form.name|bootstrap_horizontal }}
 
                         <div class="hr-line-dashed"></div>
-                        <div class="form-group"><label class="col-sm-2 control-label"> 备注 </label>
-                            <div class="col-sm-8"><input type="text" value="{{ idc.comment }}" placeholder="核心联通机房" name="j_comment" class="form-control"></div>
-                        </div>
+                        {{ idc_form.bandwidth|bootstrap_horizontal }}
+
+                        <div class="hr-line-dashed"></div>
+                        {{ idc_form.operator|bootstrap_horizontal }}
+
+                        <div class="hr-line-dashed"></div>
+                        {{ idc_form.linkman|bootstrap_horizontal }}
+
+                        <div class="hr-line-dashed"></div>
+                        {{ idc_form.phone|bootstrap_horizontal }}
+
+                        <div class="hr-line-dashed"></div>
+                        {{ idc_form.address|bootstrap_horizontal }}
+
+                        <div class="hr-line-dashed"></div>
+                        {{ idc_form.network|bootstrap_horizontal }}
+
+                        <div class="hr-line-dashed"></div>
+                        {{ idc_form.comment|bootstrap_horizontal }}
 
                         <div class="hr-line-dashed"></div>
                         <div class="form-group">
@@ -58,22 +69,27 @@
 </div>
 
 <script>
-$('#assetForm').validator({
-    timely: 2,
-    theme: "yellow_right_effect",
-    fields: {
-        "j_idc": {
-            rule: "required",
-            tip: "输入IDC名",
-            ok: "",
-            msg: {required: "IDC名必须填写!"},
-            data: {'data-ok':"主机名可以使用", 'data-msg-required': '主机名已正确'}
+    var required_fields = ["id_name"];
+    required_fields.forEach(function(field) {
+        $('label[for="' + field + '"]').parent().addClass("required");
+    });
+
+    $('#assetForm').validator({
+        timely: 2,
+        theme: "yellow_right_effect",
+        fields: {
+            "j_idc": {
+                rule: "required",
+                tip: "输入IDC名",
+                ok: "",
+                msg: {required: "IDC名必须填写!"},
+                data: {'data-ok':"主机名可以使用", 'data-msg-required': '主机名已正确'}
+            }
+        },
+        valid: function(form) {
+            form.submit();
         }
-    },
-    valid: function(form) {
-        form.submit();
-    }
-});
+    });
 </script>
 
 {% endblock %}
