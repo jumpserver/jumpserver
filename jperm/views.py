@@ -539,7 +539,7 @@ def perm_role_push(request):
         if not failed_asset:
             msg = u'系统用户 %s 推送成功[ %s ]' % (role.name, ','.join(success_asset.keys()))
         else:
-            error = u'系统用户 %s 推送失败 [ %s ], 推送成功 [ %s ]' % (role.name,
+            error = u'系统用户 %s 推送失败 [ %s ], 推送成功 [ %s ] 进入系统用户详情，查看失败原因' % (role.name,
                                                                 ','.join(failed_asset.keys()),
                                                                 ','.join(success_asset.keys()))
     return my_render('jperm/perm_role_push.html', locals(), request)
