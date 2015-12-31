@@ -291,7 +291,7 @@ class Tty(object):
 
         # 发起ssh连接请求 Make a ssh connection
         ssh = paramiko.SSHClient()
-        ssh.load_system_host_keys()
+        #ssh.load_system_host_keys()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
             role_key = connect_info.get('role_key')
