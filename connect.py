@@ -800,7 +800,9 @@ def main():
                     color_print('请输入正确ID', 'red')
                 except ServerError, e:
                     color_print(e, 'red')
-    except IndexError:
+    except Exception, e:
+        color_print(e)
+        time.sleep(5)
         pass
 
 if __name__ == '__main__':
