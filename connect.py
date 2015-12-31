@@ -684,7 +684,7 @@ class Nav(object):
                     res = gen_resource({'user': self.user, 'asset': assets}, perm=self.user_perm)
                     runner = MyRunner(res)
                     asset_name_str = ''
-                    print "匹配用户:\n"
+                    print "匹配主机:\n"
                     for inv in runner.inventory.get_hosts(pattern=pattern):
                         asset_name_str += '%s ' % inv.name
                         print ' %s' % inv.name
