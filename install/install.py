@@ -127,8 +127,11 @@ class PreSetup(object):
             smtp.quit()
             return True
 
-        except (SMTPAuthenticationError, socket.timeout, socket.gaierror, SMTPSenderRefused, SMTPConnectError), e:
+        except Exception, e:
             color_print(e, 'red')
+            skip = raw_input('是否跳过(y/n) [n]? : ')
+            if skip == 'y':
+                return True
             return False
 
     @staticmethod
