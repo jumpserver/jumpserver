@@ -113,12 +113,12 @@ $('#userForm').validator({
 
 $("document").ready(function() {
     $("#regen_ssh_key").click(function () {
-        alert('申请已提交，请等待，请勿重复提交');
+        layer.alert('申请已提交，请等待，请勿重复提交');
         $.get(
                 $(this).attr('value'),
                 {},
                 function(data){
-                    alert(data)
+                    layer.alert(data)
                 }
         )
     })
