@@ -333,7 +333,13 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         data = json.loads(message)
         if not data:
             return
-        if data.get('data'):
+
+        if 'resize' in data.get('data'):
+            self.channel.resize_pty(
+                data.get('data').get('resize').get('cols', 80),
+                data.get('data').get('resize').get('rows', 24)
+            )
+        elif data.get('data'):
             self.term.input_mode = True
             if str(data['data']) in ['\r', '\n', '\r\n']:
                 if self.term.vim_flag:
@@ -350,6 +356,8 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                 self.term.data = ''
                 self.term.input_mode = False
             self.channel.send(data['data'])
+        else:
+            pass
 
     def on_close(self):
         logger.debug('Websocket: Close request')
