@@ -584,7 +584,7 @@ def perm_sudo_add(request):
         comment = request.POST.get("sudo_comment").strip()
         commands = request.POST.get("sudo_commands").strip()
 
-        pattern = re.compile(r'[ \n,\r]')
+        pattern = re.compile(r'[\n,\r]')
         commands = ', '.join(list_drop_str(pattern.split(commands), u''))
         logger.debug(u'添加sudo %s: %s' % (name, commands))
 
@@ -617,7 +617,7 @@ def perm_sudo_edit(request):
         commands = request.POST.get("sudo_commands")
         comment = request.POST.get("sudo_comment")
 
-        pattern = re.compile(r'[ \n,\r]')
+        pattern = re.compile(r'[\n,\r]')
         commands = ', '.join(list_drop_str(pattern.split(commands), u'')).strip()
         logger.debug(u'添加sudo %s: %s' % (name, commands))
 
