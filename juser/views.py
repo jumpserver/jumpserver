@@ -313,6 +313,12 @@ def reset_password(request):
     hash_encode = request.GET.get('hash', '')
     action = '/juser/password/reset/?uuid=%s&timestamp=%s&hash=%s' % (uuid_r, timestamp, hash_encode)
 
+    if hash_encode == PyCrypt.md5_crypt(uuid_r + timestamp + KEY):
+        if int(time.time()) - int(timestamp) > 600:
+            return http_error(request, u'链接已超时')
+    else:
+        return HttpResponse('hash校验失败')
+
     if request.method == 'POST':
         password = request.POST.get('password')
         password_confirm = request.POST.get('password_confirm')
@@ -328,11 +334,8 @@ def reset_password(request):
             else:
                 return HttpResponse('用户不存在')
 
-    if hash_encode == PyCrypt.md5_crypt(uuid_r + timestamp + KEY):
-        if int(time.time()) - int(timestamp) > 600:
-            return http_error(request, u'链接已超时')
-        else:
-            return render_to_response('juser/reset_password.html', locals())
+    else:
+        return render_to_response('juser/reset_password.html', locals())
 
     return http_error(request, u'错误请求')
 

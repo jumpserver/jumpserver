@@ -12,6 +12,8 @@ import socket
 import fcntl
 import struct
 import readline
+import random
+import string
 
 jms_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(jms_dir)
@@ -71,12 +73,15 @@ class PreSetup(object):
         self.mail_addr = 'hello@jumpserver.org'
         self.mail_pass = ''
         self.ip = ''
+        self.key = ''.join(random.choice(string.ascii_lowercase + string.digits) \
+                           for _ in range(16))
 
     def write_conf(self, conf_file=os.path.join(jms_dir, 'jumpserver.conf')):
         color_print('开始写入配置文件', 'green')
         conf = ConfigParser.ConfigParser()
         conf.read(conf_file)
         conf.set('base', 'url', 'http://%s' % self.ip)
+        conf.set('base', 'key', self.key)
         conf.set('db', 'host', self.db_host)
         conf.set('db', 'port', self.db_port)
         conf.set('db', 'user', self.db_user)
