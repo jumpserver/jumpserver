@@ -84,7 +84,7 @@
 
 <script>
 function remove_role(role_id){
-    if (confirm("确认删除")) {
+    if (confirm("对应资产上已推送的系统用户会被删除，包括其家目录，请谨慎操作!")) {
         $.ajax({
            type: "POST",
            url: "{% url 'role_del' %}",
