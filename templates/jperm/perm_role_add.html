@@ -92,15 +92,14 @@ $('#roleForm').validator({
     timely: 2,
     theme: "yellow_right_effect",
     rules: {
-        check_name: [/^\w{2,20}$/, '大小写字母数字和下划线,2-20位'],
-        check_name_root: [/[^rR][^oO][^oO][^tT]/, '禁止使用root用户作为系统用户，这样非常危险！'],
+        check_name: [/(?!root)^\w{2,20}$/i, '大小写字母数字和下划线,2-20位,并且非root'],
         check_begin: [/^[\-]+BEGIN RSA PRIVATE KEY[\-]+/gm, 'RSA Key填写有误，请检查'],
 
     },
 
     fields: {
         "role_name": {
-            rule: "required;check_name;check_name_root",
+            rule: "required;check_name",
             tip: "输入系统用户名称",
             ok: "",
             msg: {required: "系统用户名称必填"}
