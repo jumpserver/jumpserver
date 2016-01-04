@@ -230,15 +230,14 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
     def on_message(self, message):
         data = json.loads(message)
         pattern = data.get('pattern', '')
-        command = data.get('command', '')
-        asset_name_str = ''
-        if pattern and command:
+        self.command = data.get('command', '')
+        self.asset_name_str = ''
+        if pattern and self.command:
             for inv in self.runner.inventory.get_hosts(pattern=pattern):
-                asset_name_str += '%s ' % inv.name
-            self.write_message('匹配主机: ' + asset_name_str)
-            self.write_message('<span style="color: yellow">Ansible> %s</span>\n\n' % command)
-            self.__class__.tasks.append(MyThread(target=self.run_cmd, args=(command, pattern)))
-            ExecLog(host=asset_name_str, cmd=command, user=self.user.username, remote_ip=self.remote_ip).save()
+                self.asset_name_str += '%s ' % inv.name
+            self.write_message('匹配主机: ' + self.asset_name_str)
+            self.write_message('<span style="color: yellow">Ansible> %s</span>\n\n' % self.command)
+            self.__class__.tasks.append(MyThread(target=self.run_cmd, args=(self.command, pattern)))
 
         for t in self.__class__.tasks:
             if t.is_alive():
@@ -251,11 +250,12 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
 
     def run_cmd(self, command, pattern):
         self.runner.run('shell', command, pattern=pattern)
+        ExecLog(host=self.asset_name_str, cmd=self.command, user=self.user.username,
+                remote_ip=self.remote_ip, result=self.runner.results).save()
         newline_pattern = re.compile(r'\n')
         for k, v in self.runner.results.items():
             for host, output in v.items():
                 output = newline_pattern.sub('<br />', output)
-                logger.debug(output)
                 if k == 'ok':
                     header = "<span style='color: green'>[ %s => %s]</span>\n" % (host, 'Ok')
                 else:
@@ -333,7 +333,13 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         data = json.loads(message)
         if not data:
             return
-        if data.get('data'):
+
+        if 'resize' in data.get('data'):
+            self.channel.resize_pty(
+                data.get('data').get('resize').get('cols', 80),
+                data.get('data').get('resize').get('rows', 24)
+            )
+        elif data.get('data'):
             self.term.input_mode = True
             if str(data['data']) in ['\r', '\n', '\r\n']:
                 if self.term.vim_flag:
@@ -350,6 +356,8 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                 self.term.data = ''
                 self.term.input_mode = False
             self.channel.send(data['data'])
+        else:
+            pass
 
     def on_close(self):
         logger.debug('Websocket: Close request')

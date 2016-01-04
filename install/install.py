@@ -109,7 +109,7 @@ class PreSetup(object):
 
     def _test_db_conn(self):
         try:
-            MySQLdb.connect(host=self.db_host, port=self.db_port,
+            MySQLdb.connect(host=self.db_host, port=int(self.db_port),
                             user=self.db_user, passwd=self.db_pass, db=self.db)
             color_print('连接数据库成功', 'green')
             return True
@@ -127,8 +127,11 @@ class PreSetup(object):
             smtp.quit()
             return True
 
-        except (SMTPAuthenticationError, socket.timeout, socket.gaierror, SMTPSenderRefused, SMTPConnectError), e:
+        except Exception, e:
             color_print(e, 'red')
+            skip = raw_input('是否跳过(y/n) [n]? : ')
+            if skip == 'y':
+                return True
             return False
 
     @staticmethod
@@ -147,7 +150,7 @@ class PreSetup(object):
         bash('pip install -r requirements.txt')
 
     def _input_ip(self):
-        ip = raw_input('\n请输入您服务器的IP地址，用户浏览器可以访问 [%s]: ' % get_ip_addr())
+        ip = raw_input('\n请输入您服务器的IP地址，用户浏览器可以访问 [%s]: ' % get_ip_addr()).strip()
         self.ip = ip if ip else get_ip_addr()
 
     def _input_mysql(self):
@@ -156,11 +159,11 @@ class PreSetup(object):
             if mysql != 'n':
                 self._setup_mysql()
             else:
-                db_host = raw_input('请输入数据库服务器IP [127.0.0.1]: ')
-                db_port = int(raw_input('请输入数据库服务器端口 [3306]: '))
-                db_user = raw_input('请输入数据库服务器用户 [root]: ')
-                db_pass = raw_input('请输入数据库服务器密码: ')
-                db = raw_input('请输入使用的数据库 [jumpserver]: ')
+                db_host = raw_input('请输入数据库服务器IP [127.0.0.1]: ').strip()
+                db_port = raw_input('请输入数据库服务器端口 [3306]: ').strip()
+                db_user = raw_input('请输入数据库服务器用户 [root]: ').strip()
+                db_pass = raw_input('请输入数据库服务器密码: ').strip()
+                db = raw_input('请输入使用的数据库 [jumpserver]: ').strip()
 
                 if db_host: self.db_host = db_host
                 if db_port: self.db_port = db_port

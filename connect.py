@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # coding: utf-8
 
 import sys
@@ -290,7 +291,7 @@ class Tty(object):
 
         # 发起ssh连接请求 Make a ssh connection
         ssh = paramiko.SSHClient()
-        ssh.load_system_host_keys()
+        #ssh.load_system_host_keys()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
             role_key = connect_info.get('role_key')
@@ -527,7 +528,7 @@ class Nav(object):
             user_asset_search = user_asset_all
 
         self.search_result = dict(zip(range(len(user_asset_search)), user_asset_search))
-        color_print('[%-3s] %-12s %-15s  %-5s  %-10s  %s' % ('ID', u'主机名', 'IP', u'端口', u'系统用户', u'备注'), 'title')
+        color_print('[%-3s] %-12s %-15s  %-5s  %-10s  %s' % ('ID', '主机名', 'IP', '端口', '系统用户', '备注'), 'title')
         for index, asset in self.search_result.items():
             # 获取该资产信息
             asset_info = get_asset_info(asset)
@@ -684,7 +685,7 @@ class Nav(object):
                     res = gen_resource({'user': self.user, 'asset': assets}, perm=self.user_perm)
                     runner = MyRunner(res)
                     asset_name_str = ''
-                    print "匹配用户:\n"
+                    print "匹配主机:\n"
                     for inv in runner.inventory.get_hosts(pattern=pattern):
                         asset_name_str += '%s ' % inv.name
                         print ' %s' % inv.name
@@ -734,7 +735,7 @@ def main():
     主程序
     """
     if not login_user:  # 判断用户是否存在
-        color_print(u'没有该用户，或许你是以root运行的 No that user.', exits=True)
+        color_print('没有该用户，或许你是以root运行的 No that user.', exits=True)
 
     gid_pattern = re.compile(r'^g\d+$')
     nav = Nav(login_user)
@@ -799,7 +800,9 @@ def main():
                     color_print('请输入正确ID', 'red')
                 except ServerError, e:
                     color_print(e, 'red')
-    except IndexError:
+    except Exception, e:
+        color_print(e)
+        time.sleep(5)
         pass
 
 if __name__ == '__main__':

@@ -204,7 +204,7 @@
                                             {% if info.success %}
                                             <td class="text-center" style="color: #1ab394;" >{{ info.success | yesno:"成功,失败,未知" }} </td>
                                             {% else %}
-                                            <td class="text-center" style="color: #ec4758;cursor: help" title="{{ info.result }}" >{{ info.success | yesno:"成功,失败,未知" }} </td>
+                                            <td class="text-center push_failed" style="color: #ec4758;cursor: help" title="{{ info.result }}">{{ info.success | yesno:"成功,失败,未知" }} </td>
                                             {% endif %}
                                             <td class="text-center" ><a class="fa fa-times del" href="{% url 'role_recycle' %}?role_id={{ role.id }}&asset_id={{ asset.id }}" style="color: #ec4758;"></a></td>
                                         </tr>
@@ -321,7 +321,16 @@
             });
             var url = '/jperm/role/push/?id={{ role.id }}&asset_id=' + check_array.join(',');
             $(this).attr('href', url)
-        })
+        });
+
+        $('.push_failed').click(function() {
+            var fail_reason = $(this).attr('title');
+            layer.alert(fail_reason, {
+                skin: 'layui-layer-molv',
+                area: '500px'
+            })
+        });
+
 
     })
 </script>

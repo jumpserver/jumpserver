@@ -81,9 +81,9 @@ class Setup(object):
         os.system('id %s &> /dev/null || useradd %s' % (self.admin_user, self.admin_user))
 
     @staticmethod
-    def _cp_zzsh():
-        os.chdir(os.path.join(jms_dir, 'install'))
-        shutil.copy('zzjumpserver.sh', '/etc/profile.d/')
+    def _ensure_sh():
+        jshell = os.path.join(jms_dir, 'connect.py')
+        os.chmod(jshell, 0755)
 
     @staticmethod
     def _run_service():
@@ -97,7 +97,7 @@ class Setup(object):
         self._sync_db()
         self._input_admin()
         self._create_admin()
-        self._cp_zzsh()
+        self._ensure_sh()
         self._run_service()
 
 

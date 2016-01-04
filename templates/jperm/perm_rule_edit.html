@@ -67,7 +67,7 @@
                                 <div class="col-sm-8">
                                     <select name="asset" id="asset" data-placeholder="请选择资产" class="chosen-select form-control m-b" multiple  tabindex="2">
                                         {% for asset in assets %}
-                                            <option value="{{ asset.id }}"{% if asset in rule.asset.all %} selected {% endif %}>{{ asset.ip }}</option>
+                                            <option value="{{ asset.id }}"{% if asset in rule.asset.all %} selected {% endif %}>{{ asset.hostname }}</option>
                                         {% endfor %}
                                     </select>
                                     <span class="help-block m-b-none">资产和资产组必选一个</span>
