@@ -277,7 +277,7 @@ def perm_role_add(request):
 
     if request.method == "POST":
         # 获取参数： name, comment
-        name = request.POST.get("role_name", "")
+        name = request.POST.get("role_name", "").strip()
         comment = request.POST.get("role_comment", "")
         password = request.POST.get("role_password", "")
         key_content = request.POST.get("role_key", "")
@@ -286,6 +286,8 @@ def perm_role_add(request):
         try:
             if get_object(PermRole, name=name):
                 raise ServerError(u'已经存在该用户 %s' % name)
+            if name == "root":
+                raise ServerError(u'禁止使用root用户作为系统用户，这样非常危险！')
             default = get_object(Setting, name='default')
 
             if password:
@@ -423,6 +425,9 @@ def perm_role_edit(request):
             if not role:
                 raise ServerError('该系统用户不能存在')
 
+            if role_name == "root":
+                raise ServerError(u'禁止使用root用户作为系统用户，这样非常危险！')
+
             if role_password:
                 encrypt_pass = CRYPTOR.encrypt(role_password)
                 role.password = encrypt_pass
@@ -473,6 +478,7 @@ def perm_role_push(request):
         for asset_group in asset_groups_obj:
             group_assets_obj.extend(asset_group.asset_set.all())
         calc_assets = list(set(assets_obj) | set(group_assets_obj))
+
         push_resource = gen_resource(calc_assets)
 
         # 调用Ansible API 进行推送
