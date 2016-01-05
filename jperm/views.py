@@ -319,14 +319,37 @@ def perm_role_delete(request):
     """
     delete role page
     """
+    if request.method == "GET":
+        try:
+            # 获取参数删除的role对象
+            role_id = request.GET.get("id")
+            role = get_object(PermRole, id=role_id)
+            if not role:
+                logger.warning(u"Delete Role: role_id %s not exist" % role_id)
+                raise ServerError(u"role_id %s 无数据记录" % role_id)
+            # 删除推送到主机上的role
+            filter_type = request.GET.get("filter_type")
+            print filter_type
+            if filter_type:
+                if filter_type == "recycle_assets":
+                    recycle_assets = [push.asset for push in role.perm_push.all() if push.success]
+                    print recycle_assets
+                    recycle_assets_ip = ','.join([asset.ip for asset in recycle_assets])
+                    return HttpResponse(recycle_assets_ip)
+                else:
+                    return HttpResponse("no such filter_type: %s" % filter_type)
+            else:
+                return HttpResponse("filter_type: ?")
+        except ServerError, e:
+            return HttpResponse(e)
     if request.method == "POST":
         try:
             # 获取参数删除的role对象
             role_id = request.POST.get("id")
             role = get_object(PermRole, id=role_id)
             if not role:
-                logger.warning(u"Delete Role: %s not exist" % role.name)
-                raise ServerError(u"%s 无数据记录" % role.name)
+                logger.warning(u"Delete Role: role_id %s not exist" % role_id)
+                raise ServerError(u"role_id %s 无数据记录" % role_id)
             role_key = role.key_path
             # 删除推送到主机上的role
             recycle_assets = [push.asset for push in role.perm_push.all() if push.success]
