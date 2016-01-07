@@ -276,7 +276,7 @@ def get_push_info(push_id, arg):
 
 @register.filter(name='get_cpu_core')
 def get_cpu_core(cpu_info):
-    cpu_core = cpu_info.split('* ')[1] if cpu_info and '*' in cpu_info else cpu_info
+    cpu_core = cpu_info.split('* '[2] if cpu_info and '*' in cpu_info else cpu_info
     return cpu_core
 
 

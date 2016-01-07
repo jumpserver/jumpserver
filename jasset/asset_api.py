@@ -8,7 +8,11 @@ from jasset.models import ASSET_STATUS, ASSET_TYPE, ASSET_ENV, IDC, AssetRecord
 from jperm.ansible_api import MyRunner
 from jperm.perm_api import gen_resource
 from jumpserver.templatetags.mytags import get_disk_info
-
+import sys
+default_encoding = 'utf-8'
+if sys.getdefaultencoding() != default_encoding:
+    reload(sys)
+    sys.setdefaultencoding(default_encoding)
 
 def group_add_asset(group, asset_id=None, asset_ip=None):
     """
@@ -332,8 +336,9 @@ def get_ansible_asset_info(asset_ip, setup_info):
     mac = setup_info.get("ansible_default_ipv4").get("macaddress")
     brand = setup_info.get("ansible_product_name")
     cpu_type = setup_info.get("ansible_processor")[1]
-    cpu_cores = setup_info.get("ansible_processor_count")
-    cpu = cpu_type + ' * ' + unicode(cpu_cores)
+    cpu_count = setup_info.get("ansible_processor_count")
+    cpu_cores = setup_info.get("ansible_processor_cores")
+    cpu = cpu_type + ' * ' + unicode(cpu_count) + ' 颗 '  + ' * ' + unicode(cpu_cores) + ' 核 '
     memory = setup_info.get("ansible_memtotal_mb")
     try:
         memory_format = int(round((int(memory) / 1000), 0))
