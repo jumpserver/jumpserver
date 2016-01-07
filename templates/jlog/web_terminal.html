@@ -43,7 +43,12 @@
             }
 
             WSSHClient.prototype.connect = function(options) {
-                var endpoint = '{{ web_terminal_uri }}';
+                var protocol = "ws://";
+                if (window.location.protocol == 'https:') {
+                    protocol = 'wss://';
+                }
+
+                var endpoint = protocol + '{{ web_terminal_uri }}';
 
                 if (window.WebSocket) {
                     this._connection = new WebSocket(endpoint);
