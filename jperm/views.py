@@ -358,11 +358,13 @@ def perm_role_delete(request):
                 recycle_resource = gen_resource(recycle_assets)
                 task = MyTask(recycle_resource)
                 try:
-                    msg = task.del_user(get_object(PermRole, id=role_id).name)
+                    msg_del_user = task.del_user(get_object(PermRole, id=role_id).name)
+                    msg_del_sudo = task.del_user_sudo(get_object(PermRole, id=role_id).name)
                 except Exception, e:
                     logger.warning(u"Recycle Role failed: %s" % e)
                     raise ServerError(u"回收已推送的系统用户失败: %s" % e)
-                logger.info(u"delete role %s - execute delete user: %s" % (role.name, msg))
+                logger.info(u"delete role %s - execute delete user: %s" % (role.name, msg_del_user))
+                logger.info(u"delete role %s - execute delete sudo: %s" % (role.name, msg_del_sudo))
                 # TODO: 判断返回结果，处理异常
             # 删除存储的秘钥，以及目录
             try:

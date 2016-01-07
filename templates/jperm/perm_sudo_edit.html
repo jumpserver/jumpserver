@@ -112,7 +112,28 @@ var config = {
 for (var selector in config) {
     $(selector).chosen(config[selector]);
 }
+$('#sudoForm').validator({
+    timely: 2,
+    theme: "yellow_right_effect",
+    rules: {
+        check_name: [/^\w{2,20}$/, '大写字母,2-20位']
+    },
 
+    fields: {
+        "sudo_name": {
+            rule: "required;check_name"
+        },
+        "sudo_runas": {
+            rule: "required;check_name"
+        },
+        "sudo_commands": {
+            rule: "required"
+        }
+    },
+    valid: function(form) {
+            form.submit();
+        }
+});
 </script>
     <script src="/static/js/cropper/cropper.min.js"></script>
     <script src="/static/js/datapicker/bootstrap-datepicker.js"></script>
