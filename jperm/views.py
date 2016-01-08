@@ -358,11 +358,13 @@ def perm_role_delete(request):
                 recycle_resource = gen_resource(recycle_assets)
                 task = MyTask(recycle_resource)
                 try:
-                    msg = task.del_user(get_object(PermRole, id=role_id).name)
+                    msg_del_user = task.del_user(get_object(PermRole, id=role_id).name)
+                    msg_del_sudo = task.del_user_sudo(get_object(PermRole, id=role_id).name)
                 except Exception, e:
                     logger.warning(u"Recycle Role failed: %s" % e)
                     raise ServerError(u"回收已推送的系统用户失败: %s" % e)
-                logger.info(u"delete role %s - execute delete user: %s" % (role.name, msg))
+                logger.info(u"delete role %s - execute delete user: %s" % (role.name, msg_del_user))
+                logger.info(u"delete role %s - execute delete sudo: %s" % (role.name, msg_del_sudo))
                 # TODO: 判断返回结果，处理异常
             # 删除存储的秘钥，以及目录
             try:
@@ -606,25 +608,28 @@ def perm_sudo_add(request):
     """
     # 渲染数据
     header_title, path1, path2 = "Sudo命令", "别名管理", "添加别名"
+    try:
+        if request.method == "POST":
+            # 获取参数： name, comment
+            name = request.POST.get("sudo_name").strip().upper()
+            comment = request.POST.get("sudo_comment").strip()
+            commands = request.POST.get("sudo_commands").strip()
 
-    if request.method == "POST":
-        # 获取参数： name, comment
-        name = request.POST.get("sudo_name").strip().upper()
-        comment = request.POST.get("sudo_comment").strip()
-        commands = request.POST.get("sudo_commands").strip()
+            if not name or not commands:
+                raise ServerError(u"sudo name 和 commands是必填项!")
 
-        pattern = re.compile(r'[\n,\r]')
-        commands = ', '.join(list_drop_str(pattern.split(commands), u''))
-        logger.debug(u'添加sudo %s: %s' % (name, commands))
+            pattern = re.compile(r'[\n,\r]')
+            commands = ', '.join(list_drop_str(pattern.split(commands), u''))
+            logger.debug(u'添加sudo %s: %s' % (name, commands))
 
-        if get_object(PermSudo, name=name):
-            error = 'Sudo别名 %s已经存在' % name
-        else:
-            sudo = PermSudo(name=name.strip(), comment=comment, commands=commands)
-            sudo.save()
-            msg = u"添加Sudo命令别名: %s" % name
-        # 渲染数据
-
+            if get_object(PermSudo, name=name):
+                error = 'Sudo别名 %s已经存在' % name
+            else:
+                sudo = PermSudo(name=name.strip(), comment=comment, commands=commands)
+                sudo.save()
+                msg = u"添加Sudo命令别名: %s" % name
+    except ServerError, e:
+        error = e
     return my_render('jperm/perm_sudo_add.html', locals(), request)
 
 
@@ -641,22 +646,27 @@ def perm_sudo_edit(request):
     sudo_id = request.GET.get("id")
     sudo = PermSudo.objects.get(id=sudo_id)
 
-    if request.method == "POST":
-        name = request.POST.get("sudo_name").upper()
-        commands = request.POST.get("sudo_commands")
-        comment = request.POST.get("sudo_comment")
+    try:
+        if request.method == "POST":
+            name = request.POST.get("sudo_name").upper()
+            commands = request.POST.get("sudo_commands")
+            comment = request.POST.get("sudo_comment")
 
-        pattern = re.compile(r'[\n,\r]')
-        commands = ', '.join(list_drop_str(pattern.split(commands), u'')).strip()
-        logger.debug(u'添加sudo %s: %s' % (name, commands))
+            if not name or not commands:
+                raise ServerError(u"sudo name 和 commands是必填项!")
 
-        sudo.name = name.strip()
-        sudo.commands = commands
-        sudo.comment = comment
-        sudo.save()
+            pattern = re.compile(r'[\n,\r]')
+            commands = ', '.join(list_drop_str(pattern.split(commands), u'')).strip()
+            logger.debug(u'添加sudo %s: %s' % (name, commands))
 
-        msg = u"更新命令别名： %s" % name
+            sudo.name = name.strip()
+            sudo.commands = commands
+            sudo.comment = comment
+            sudo.save()
 
+            msg = u"更新命令别名： %s" % name
+    except ServerError, e:
+        error = e
     return my_render('jperm/perm_sudo_edit.html', locals(), request)
 
 
