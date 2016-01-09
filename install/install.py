@@ -110,6 +110,7 @@ class PreSetup(object):
     @staticmethod
     def _set_env():
         color_print('开始关闭防火墙和selinux', 'green')
+        os.system("export LANG='en_US.UTF-8' && sed -i 's/LANG=.*/LANG=en_US.UTF-8/g' /etc/sysconfig/i18n")
         bash('service iptables stop && chkconfig iptables off && setenforce 0')
 
     def _test_db_conn(self):
