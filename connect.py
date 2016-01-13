@@ -21,7 +21,7 @@ from io import open as copen
 import uuid
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
-if django.get_version() != '1.6':
+if not django.get_version().startswith('1.6'):
     setup = django.setup()
 from django.contrib.sessions.models import Session
 from jumpserver.api import ServerError, User, Asset, PermRole, AssetGroup, get_object, mkdir, get_asset_info
