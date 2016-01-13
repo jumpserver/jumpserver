@@ -33,7 +33,7 @@ from jperm.ansible_api import MyRunner
 from jlog.models import ExecLog, FileLog
 
 login_user = get_object(User, username=getpass.getuser())
-remote_ip = os.popen("who -m | awk '{ print $NF }'").read().strip('()\n')
+remote_ip = os.environ.get('SSH_CLIENT').split()[0]
 
 try:
     import termios
