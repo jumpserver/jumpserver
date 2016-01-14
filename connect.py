@@ -415,7 +415,10 @@ class SshTty(Tty):
                         pass
 
                 if sys.stdin in r:
-                    x = os.read(sys.stdin.fileno(), 4096)
+                    try:
+                        x = os.read(sys.stdin.fileno(), 4096)
+                    except OSError:
+                        pass
                     input_mode = True
                     if str(x) in ['\r', '\n', '\r\n']:
                         if self.vim_flag:
@@ -803,7 +806,7 @@ def main():
                     color_print('请输入正确ID', 'red')
                 except ServerError, e:
                     color_print(e, 'red')
-    except Exception, e:
+    except IndexError, e:
         color_print(e)
         time.sleep(5)
         pass
