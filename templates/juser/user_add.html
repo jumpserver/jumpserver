@@ -131,7 +131,7 @@ $('#userForm').validator({
     timely: 2,
     theme: "yellow_right_effect",
     rules: {
-        check_username: [/^\w{3,20}$/, '大小写字母数字和下划线'],
+        check_username: [/^[\w.]{3,20}$/, '大小写字母数字和下划线小数点'],
         type_m: function(element){
                     return  $("#M").is(":checked");
             }
