@@ -24,7 +24,7 @@ def log_list(request, offset):
 
     if offset == 'online':
         keyword = request.GET.get('keyword', '')
-        posts = Log.objects.filter(is_finished=False).order_by('-start_time')
+            posts = Log.objects.filter(is_finished=False).order_by('-start_time')
         if keyword:
             posts = posts.filter(Q(user__icontains=keyword) | Q(host__icontains=keyword) |
                                  Q(login_type_icontains=keyword))
@@ -67,7 +67,7 @@ def log_list(request, offset):
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
     web_monitor_uri = 'ws://%s/monitor' % WEB_SOCKET_HOST
-    web_kill_uri = 'http://%s/kill' % WEB_SOCKET_HOST
+    web_kill_uri = 'ws://%s/kill' % WEB_SOCKET_HOST
     session_id = request.session.session_key
     return render_to_response('jlog/log_%s.html' % offset, locals(), context_instance=RequestContext(request))
 
