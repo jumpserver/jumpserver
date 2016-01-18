@@ -205,17 +205,19 @@
    function cut(num, login_type){
        console.log(login_type);
        if (login_type=='web'){
-           var g_url = '{{ web_kill_uri }}' + '?id=' + num;
+           var g_url = '{{ web_kill_uri }}' + '?id=' + num + "&sessionid={{ session_id }}";
+           var socket = new WebSocket(g_url)
+           socket.onclose = function(){
+               window.open("{% url 'log_list' 'online' %}", "_self")
+           }
        } else {
-           var g_url = "{% url 'log_kill' %} }?id=" + num;
+           var g_url = "{% url 'log_kill' %} }?id=" + num + "&sessionid={{ session_id }}";
+           $.ajax({
+               type: "GET",
+               url: g_url,
+               success: window.open("{% url 'log_list' 'online' %}", "_self")
+           });
        }
-
-       $.ajax({
-           type: "GET",
-           url: g_url+"&sessionid={{ session_id }}",
-           success: window.open("{% url 'log_list' 'online' %}", "_self")
-       });
-
 }
 </script>
 {% endblock %}
