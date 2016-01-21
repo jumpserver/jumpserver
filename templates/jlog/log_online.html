@@ -136,8 +136,13 @@
 {#        })#}
 {#   });#}
     function init(obj){
+        var protocol = "ws://";
+        if (window.location.protocol == 'https:') {
+            protocol = 'wss://';
+        }
+
         var file_path = obj.attr('file_path');
-        var wsUri = '{{ web_monitor_uri }}';
+        var wsUri = protocol + '{{ web_monitor_uri }}';
         var socket = new WebSocket(wsUri + '?file_path=' + file_path);
 
         var term = new Terminal({
