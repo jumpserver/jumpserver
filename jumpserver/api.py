@@ -64,6 +64,7 @@ def get_asset_info(asset):
     info = {'hostname': asset.hostname, 'ip': asset.ip}
     if asset.use_default_auth:
         if default:
+            info['port'] = int(default.field2)
             info['username'] = default.field1
             try:
                 info['password'] = CRYPTOR.decrypt(default.field3)
@@ -74,8 +75,7 @@ def get_asset_info(asset):
     else:
         info['username'] = asset.username
         info['password'] = CRYPTOR.decrypt(asset.password)
-
-    info['port'] = int(asset.port)
+        info['port'] = int(asset.port)
 
     return info
 
