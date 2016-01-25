@@ -18,7 +18,7 @@ if django.get_version() != '1.6':
 
 from juser.user_api import db_add_user, get_object, User
 from install import color_print
-from jumpserver.api import get_mac_address
+from jumpserver.api import get_mac_address, bash
 
 socket.setdefaulttimeout(2)
 
@@ -83,6 +83,7 @@ class Setup(object):
     @staticmethod
     def _cp_zzsh():
         os.chdir(os.path.join(jms_dir, 'install'))
+        bash("sed -i 's#/opt/jumpserver#%s#g' zzjumpserver.sh" % jms_dir)
         shutil.copy('zzjumpserver.sh', '/etc/profile.d/')
 
     @staticmethod
