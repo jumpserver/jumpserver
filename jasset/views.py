@@ -227,7 +227,7 @@ def asset_edit(request):
                 if use_default_auth:
                     af_save.username = ''
                     af_save.password = ''
-                    af_save.port = None
+                    # af_save.port = None
                 else:
                     if password:
                         password_encode = CRYPTOR.encrypt(password)
