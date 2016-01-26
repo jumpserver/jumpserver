@@ -16,8 +16,8 @@ from jperm.perm_api import get_role_info, get_role_push_host
 from jumpserver.api import my_render, get_object, CRYPTOR
 
 # 设置PERM APP Log
-from jumpserver.settings import LOG_LEVEL
-logger = set_log(LOG_LEVEL, filename='jumpserver_perm.log')
+from jumpserver.api import logger
+#logger = set_log(LOG_LEVEL, filename='jumpserver_perm.log')
 
 
 @require_role('admin')
