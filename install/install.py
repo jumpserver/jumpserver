@@ -101,7 +101,7 @@ class PreSetup(object):
         color_print('默认用户名: %s 默认密码: %s' % (self.db_user, self.db_pass), 'green')
         bash('yum -y install mysql-server')
         bash('service mysqld start')
-		bash('chkconfig mysqld on')
+        bash('chkconfig mysqld on')
         bash('mysql -e "create database %s default charset=utf8"' % self.db)
         bash('mysql -e "grant all on %s.* to \'%s\'@\'%s\' identified by \'%s\'"' % (self.db,
                                                                                      self.db_user,
