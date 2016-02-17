@@ -83,8 +83,8 @@ class Setup(object):
     @staticmethod
     def _cp_zzsh():
         os.chdir(os.path.join(jms_dir, 'install'))
-        bash("sed -i 's#/opt/jumpserver#%s#g' zzjumpserver.sh" % jms_dir)
         shutil.copy('zzjumpserver.sh', '/etc/profile.d/')
+        bash("sed -i 's#/opt/jumpserver#%s#g' /etc/profile.d/zzjumpserver.sh" % jms_dir)
 
     @staticmethod
     def _run_service():

@@ -583,7 +583,8 @@ class Nav(object):
             elif len(roles) == 1:  # 授权角色数为1
                 role = roles[0]
             else:
-                color_print('当前用户未被授予角色，无法执行任何操作，如有疑问请联系管理员。', exits=True)
+                color_print('当前用户未被授予角色，无法执行任何操作，如有疑问请联系管理员。')
+                return
             assets = list(self.user_perm.get('role', {}).get(role).get('asset'))  # 获取该用户，角色授权主机
             print "授权包含该系统用户的所有主机"
             for asset in assets:
