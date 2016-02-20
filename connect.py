@@ -582,12 +582,15 @@ class Nav(object):
                     role = role_check[int(role_id)]
             elif len(roles) == 1:  # 授权角色数为1
                 role = roles[0]
+            else:
+                color_print('当前用户未被授予角色，无法执行任何操作，如有疑问请联系管理员。')
+                return
             assets = list(self.user_perm.get('role', {}).get(role).get('asset'))  # 获取该用户，角色授权主机
             print "授权包含该系统用户的所有主机"
             for asset in assets:
                 print ' %s' % asset.hostname
             print
-            print "请输入主机名或ansile支持的pattern, 多个主机:分隔, q退出"
+            print "请输入主机名或ansible支持的pattern, 多个主机:分隔, q退出"
             pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
             if pattern == 'q':
                 break
@@ -629,7 +632,7 @@ class Nav(object):
                 self.user_perm = get_group_user_perm(self.user)
             try:
                 print "进入批量上传模式"
-                print "请输入主机名或ansile支持的pattern, 多个主机:分隔 q退出"
+                print "请输入主机名或ansible支持的pattern, 多个主机:分隔 q退出"
                 pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
                 if pattern == 'q':
                     break
@@ -682,7 +685,7 @@ class Nav(object):
                 self.user_perm = get_group_user_perm(self.user)
             try:
                 print "进入批量下载模式"
-                print "请输入主机名或ansile支持的pattern, 多个主机:分隔,q退出"
+                print "请输入主机名或ansible支持的pattern, 多个主机:分隔,q退出"
                 pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
                 if pattern == 'q':
                     break
