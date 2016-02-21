@@ -1,3 +1,7 @@
+### 项目已迁移到 https://github.com/jumpserver/jumpserver 组织项目中，本仓库从今天起不再更新
+
+
+
 ## 写在前面
  - 目前本版本处于beta阶段，请不要用于生产环境，除非你知道你在做什么
  - 本版本暂时没加入LDAP接口，稳定版会将LDAP和无Agent方式抽象成API，2.x版本支持LDAP，请移步release中下载
