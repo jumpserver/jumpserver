@@ -243,8 +243,9 @@
                             area: ['628px', '420px'],
                             content: new_url+data
                         });
+                        window.open(new_url+data, '_blank', 'toolbar=yes, location=yes, scrollbars=yes, resizable=yes, copyhistory=yes, width=628, height=400')
                         */
-                        window.open(new_url+data, '', 'width=628px, height=380px')
+                        window.open(new_url+data, '', 'width=628px, height=380px');
                     }  else if (dataArray.length == 1 && data != 'error'){
                        /*layer.open({
                             type: 2,
@@ -255,7 +256,7 @@
                             content: new_url+data
                         });
                         */
-                        window.open(new_url+data, '', 'width=628px, height=440px')
+                        window.open(new_url+data, '_blank', 'toolbar=yes, location=yes, copyhistory=yes, scrollbars=yes, width=628, height=410');
 
                     }
                     else {
@@ -292,7 +293,7 @@
             content: new_url
             });
             */
-            window.open(new_url, '', 'height=628px, width=380px')
+            window.open(new_url, '_blank', 'toolbar=yes, location=yes, copyhistory=yes, scrollbars=yes, width=628, height=400')
 
         } else {
             /*
@@ -305,7 +306,7 @@
             content: new_url
             });
             */
-            window.open(new_url, '', 'height=628px, width=452px')
+            window.open(new_url, '_blank', 'toolbar=yes, location=yes, copyhistory=yes, scrollbars=yes, width=628, height=410');
         }
 
         return false
