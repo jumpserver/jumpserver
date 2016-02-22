@@ -36,7 +36,7 @@ add_role_chosen() {
 
 
 check_syntax(){
-    visudo -c -f $1
+    /usr/sbin/visudo -c -f $1
 }
 
 cp $real_file $tmp_file && add_cmd_alias $tmp_file && add_role_chosen $tmp_file || exit 1
