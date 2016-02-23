@@ -21,7 +21,7 @@ from io import open as copen
 import uuid
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
-if django.get_version() != '1.6':
+if not django.get_version().startswith('1.6'):
     setup = django.setup()
 from django.contrib.sessions.models import Session
 from jumpserver.api import ServerError, User, Asset, PermRole, AssetGroup, get_object, mkdir, get_asset_info
@@ -33,7 +33,10 @@ from jperm.ansible_api import MyRunner
 from jlog.models import ExecLog, FileLog
 
 login_user = get_object(User, username=getpass.getuser())
-remote_ip = os.popen("who -m | awk '{ print $NF }'").read().strip('()\n')
+try:
+    remote_ip = os.environ.get('SSH_CLIENT').split()[0]
+except (IndexError, AttributeError):
+    remote_ip = os.popen("who -m | awk '{ print $NF }'").read().strip('()\n')
 
 try:
     import termios
@@ -412,7 +415,10 @@ class SshTty(Tty):
                         pass
 
                 if sys.stdin in r:
-                    x = os.read(sys.stdin.fileno(), 4096)
+                    try:
+                        x = os.read(sys.stdin.fileno(), 4096)
+                    except OSError:
+                        pass
                     input_mode = True
                     if str(x) in ['\r', '\n', '\r\n']:
                         if self.vim_flag:
@@ -576,12 +582,15 @@ class Nav(object):
                     role = role_check[int(role_id)]
             elif len(roles) == 1:  # 授权角色数为1
                 role = roles[0]
+            else:
+                color_print('当前用户未被授予角色，无法执行任何操作，如有疑问请联系管理员。')
+                return
             assets = list(self.user_perm.get('role', {}).get(role).get('asset'))  # 获取该用户，角色授权主机
             print "授权包含该系统用户的所有主机"
             for asset in assets:
                 print ' %s' % asset.hostname
             print
-            print "请输入主机名或ansile支持的pattern, 多个主机:分隔, q退出"
+            print "请输入主机名或ansible支持的pattern, 多个主机:分隔, q退出"
             pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
             if pattern == 'q':
                 break
@@ -623,7 +632,7 @@ class Nav(object):
                 self.user_perm = get_group_user_perm(self.user)
             try:
                 print "进入批量上传模式"
-                print "请输入主机名或ansile支持的pattern, 多个主机:分隔 q退出"
+                print "请输入主机名或ansible支持的pattern, 多个主机:分隔 q退出"
                 pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
                 if pattern == 'q':
                     break
@@ -676,7 +685,7 @@ class Nav(object):
                 self.user_perm = get_group_user_perm(self.user)
             try:
                 print "进入批量下载模式"
-                print "请输入主机名或ansile支持的pattern, 多个主机:分隔,q退出"
+                print "请输入主机名或ansible支持的pattern, 多个主机:分隔,q退出"
                 pattern = raw_input("\033[1;32mPattern>:\033[0m ").strip()
                 if pattern == 'q':
                     break
@@ -800,7 +809,7 @@ def main():
                     color_print('请输入正确ID', 'red')
                 except ServerError, e:
                     color_print(e, 'red')
-    except Exception, e:
+    except IndexError, e:
         color_print(e)
         time.sleep(5)
         pass

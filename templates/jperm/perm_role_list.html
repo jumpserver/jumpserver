@@ -84,22 +84,43 @@
 
 <script>
 function remove_role(role_id){
-    if (confirm("确认删除")) {
-        $.ajax({
-           type: "POST",
-           url: "{% url 'role_del' %}",
-           data: "id=" + role_id,
-           success: function(msg){
-               alert( "成功: " + msg );
-               var del_row = $('tbody#edittbody>tr#' + role_id);
-               del_row.remove()
-           },
-           error: function (msg) {
-               console.log(msg);
-               alert("失败: " + msg.responseText)
-           }
-        });
-    }
+    $.ajax({
+        type: "GET",
+        url: "{% url 'role_del' %}",
+        data: {id: role_id, filter_type: 'recycle_assets'},
+        success: function(data) {
+            console.log(data)
+            if (data) {
+                msg = data + "的系统用户会被删除，包括其家目录，请谨慎操作!"
+            }
+            else {
+                msg = "该角色无已推送的系统用户, 可以安全删除"
+            }
+            if (confirm(msg)) {
+                $.ajax({
+                   type: "POST",
+                   url: "{% url 'role_del' %}",
+                   data: "id=" + role_id,
+                   success: function(msg){
+                       alert( "成功: " + msg );
+                       var del_row = $('tbody#edittbody>tr#' + role_id);
+                       del_row.remove()
+                   },
+                   error: function (msg) {
+                       console.log(msg);
+                       alert("失败: " + msg.responseText)
+                   }
+                });
+            }
+        },
+        error: function(error) {
+            alert(error)
+        },
+    });
+
+
+
+
 
 }
 </script>

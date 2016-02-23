@@ -23,7 +23,13 @@
 
 
 <script type="text/javascript">
-    var wsUri = "{{ web_terminal_uri }}"; //请求的websocket url
+
+    var protocol = "ws://";
+    if (window.location.protocol == 'https:') {
+        protocol = 'wss://';
+    }
+
+    var wsUri = protocol + "{{ web_terminal_uri }}"; //请求的websocket url
     var ws = new WebSocket(wsUri);
 
     function createSystemMessage(message) {

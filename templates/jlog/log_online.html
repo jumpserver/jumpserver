@@ -136,14 +136,20 @@
 {#        })#}
 {#   });#}
     function init(obj){
+        var protocol = "ws://";
+        if (window.location.protocol == 'https:') {
+            protocol = 'wss://';
+        }
+
         var file_path = obj.attr('file_path');
-        var wsUri = '{{ web_monitor_uri }}';
+        var wsUri = protocol + '{{ web_monitor_uri }}';
         var socket = new WebSocket(wsUri + '?file_path=' + file_path);
 
         var term = new Terminal({
-              cols: 80,
-              rows: 24,
-              screenKeys: false
+            cols: 80,
+            rows: 24,
+            screenKeys: false,
+            handler: function(){return false}
         });
 
         var tag = $('<div id="term" style="height:500px; overflow: auto;background-color: rgba(0, 0, 0, 0);border: none"></div>');
