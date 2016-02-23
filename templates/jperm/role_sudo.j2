@@ -13,7 +13,12 @@ add_cmd_alias() {
     {% for sudo_name, sudo_cmd in sudo_alias.items %}
         {% if sudo_name != 'ALL' %}
         if $(grep '^Cmnd_Alias \<{{ sudo_name }}\>' ${sudo_file} &> /dev/null); then
-            sed -i 's@^Cmnd_Alias \<{{ sudo_name }}\>.*@Cmnd_Alias {{ sudo_name }} = {{ sudo_cmd }}@g' ${sudo_file}
+            isbsd=$(uname -a | grep -i 'freebsd' &> /dev/null && echo "yes" || echo "no")
+            if [ $isbsd == "yes" ]; then
+                sed -i .bk 's@^Cmnd_Alias \<{{ sudo_name }}\>.*@Cmnd_Alias {{ sudo_name }} = {{ sudo_cmd }}@g' ${sudo_file}
+            else
+                sed -i 's@^Cmnd_Alias \<{{ sudo_name }}\>.*@Cmnd_Alias {{ sudo_name }} = {{ sudo_cmd }}@g' ${sudo_file}
+            fi
         else
             echo "Cmnd_Alias {{ sudo_name }} = {{ sudo_cmd }}" >> ${sudo_file}
         fi
@@ -27,7 +32,12 @@ add_role_chosen() {
     sudo_file=$1
     {% for user, alias in sudo_user.items %}
         if $(grep '^{{ user }}\>' ${sudo_file} &> /dev/null); then
-            sed -i 's@^{{ user }}\>.*@{{ user }} ALL = (root) NOPASSWD: {{ alias }}@g' ${sudo_file}
+            isbsd=$(uname -a | grep -i 'freebsd' &> /dev/null && echo "yes" || echo "no")
+            if [ $isbsd == "yes" ]; then
+                sed -i .bk 's@^{{ user }}\>.*@{{ user }} ALL = (root) NOPASSWD: {{ alias }}@g' ${sudo_file}
+            else
+                sed -i 's@^{{ user }}\>.*@{{ user }} ALL = (root) NOPASSWD: {{ alias }}@g' ${sudo_file}
+            fi
         else
             echo "{{ user }} ALL = (root)  NOPASSWD: {{ alias }}"  >> ${sudo_file}
         fi
