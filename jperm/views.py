@@ -621,7 +621,7 @@ def perm_sudo_add(request):
             pattern = re.compile(r'[\n,\r]')
             deal_commands = list_drop_str(pattern.split(commands), u'')
             for command in deal_commands:
-                if command.lower() == "all":
+                if command.strip().lower() == "all":
                     deal_commands.remove(command)
                     deal_commands.append(command.upper())
             commands = ', '.join(deal_commands)
@@ -663,7 +663,7 @@ def perm_sudo_edit(request):
             pattern = re.compile(r'[\n,\r]')
             deal_commands = list_drop_str(pattern.split(commands), u'')
             for command in deal_commands:
-                if command.lower() == "all":
+                if command.strip().lower() == "all":
                     deal_commands.remove(command)
                     deal_commands.append(command.upper())
             commands = ', '.join(deal_commands).strip()
