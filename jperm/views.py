@@ -619,7 +619,12 @@ def perm_sudo_add(request):
                 raise ServerError(u"sudo name 和 commands是必填项!")
 
             pattern = re.compile(r'[\n,\r]')
-            commands = ', '.join(list_drop_str(pattern.split(commands), u''))
+            deal_commands = list_drop_str(pattern.split(commands), u'')
+            for command in deal_commands:
+                if command.lower() == "all":
+                    deal_commands.remove(command)
+                    deal_commands.append(command.upper())
+            commands = ', '.join(deal_commands)
             logger.debug(u'添加sudo %s: %s' % (name, commands))
 
             if get_object(PermSudo, name=name):
@@ -656,7 +661,12 @@ def perm_sudo_edit(request):
                 raise ServerError(u"sudo name 和 commands是必填项!")
 
             pattern = re.compile(r'[\n,\r]')
-            commands = ', '.join(list_drop_str(pattern.split(commands), u'')).strip()
+            deal_commands = list_drop_str(pattern.split(commands), u'')
+            for command in deal_commands:
+                if command.lower() == "all":
+                    deal_commands.remove(command)
+                    deal_commands.append(command.upper())
+            commands = ', '.join(deal_commands).strip()
             logger.debug(u'添加sudo %s: %s' % (name, commands))
 
             sudo.name = name.strip()
