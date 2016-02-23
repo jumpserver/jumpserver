@@ -10,7 +10,7 @@ from jasset.models import Asset, AssetGroup
 from jperm.models import PermRole, PermRule, PermSudo, PermPush
 from jumpserver.models import Setting
 
-from jperm.utils import gen_keys
+from jperm.utils import gen_keys, trans_all
 from jperm.ansible_api import MyTask
 from jperm.perm_api import get_role_info, get_role_push_host
 from jumpserver.api import my_render, get_object, CRYPTOR
@@ -619,12 +619,9 @@ def perm_sudo_add(request):
                 raise ServerError(u"sudo name 和 commands是必填项!")
 
             pattern = re.compile(r'[\n,\r]')
-            deal_commands = list_drop_str(pattern.split(commands), u'')
-            for command in deal_commands:
-                if command.strip().lower() == "all":
-                    deal_commands.remove(command)
-                    deal_commands.append(command.upper())
-            commands = ', '.join(deal_commands)
+            deal_space_commands = list_drop_str(pattern.split(commands), u'')
+            deal_all_commands = map(trans_all, deal_space_commands)
+            commands = ', '.join(deal_all_commands)
             logger.debug(u'添加sudo %s: %s' % (name, commands))
 
             if get_object(PermSudo, name=name):
@@ -661,12 +658,9 @@ def perm_sudo_edit(request):
                 raise ServerError(u"sudo name 和 commands是必填项!")
 
             pattern = re.compile(r'[\n,\r]')
-            deal_commands = list_drop_str(pattern.split(commands), u'')
-            for command in deal_commands:
-                if command.strip().lower() == "all":
-                    deal_commands.remove(command)
-                    deal_commands.append(command.upper())
-            commands = ', '.join(deal_commands).strip()
+            deal_space_commands = list_drop_str(pattern.split(commands), u'')
+            deal_all_commands = map(trans_all, deal_space_commands)
+            commands = ', '.join(deal_all_commands).strip()
             logger.debug(u'添加sudo %s: %s' % (name, commands))
 
             sudo.name = name.strip()
