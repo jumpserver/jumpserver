@@ -1,5 +1,16 @@
 ### 项目已迁移到 https://github.com/jumpserver/jumpserver 组织项目中，本仓库从今天起不再更新
+### 已下载安装的项目请更改配置文件，使用新仓库更新
 
+> cd /opt/jumpserver/.git
+>
+> vim config
+>
+>[remote "origin"]
+>
+>        fetch = +refs/heads/*:refs/remotes/origin/*
+>
+>        url = https://github.com/jumpserver/jumpserver.git
+>
 
 
 ## 写在前面
