@@ -466,6 +466,7 @@ def down_key(request):
                 f.close()
                 response = HttpResponse(data, content_type='application/octet-stream')
                 response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(private_key_file)
+                os.unlink(private_key_file) # delete it
                 return response
     return HttpResponse('No Key File. Contact Admin.')
 
