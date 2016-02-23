@@ -41,9 +41,6 @@ class Setup(object):
             version = urllib.urlopen('http://jumpserver.org/version/?id=%s' % mac)
         except:
             pass
-        os.chdir(jms_dir)
-        os.chmod('logs', 0777)
-        os.chmod('keys', 0777)
 
     def _input_admin(self):
         while True:
@@ -81,16 +78,21 @@ class Setup(object):
         os.system('id %s &> /dev/null || useradd %s' % (self.admin_user, self.admin_user))
 
     @staticmethod
-    def _cp_zzsh():
-        os.chdir(os.path.join(jms_dir, 'install'))
-        shutil.copy('zzjumpserver.sh', '/etc/profile.d/')
-        bash("sed -i 's#/opt/jumpserver#%s#g' /etc/profile.d/zzjumpserver.sh" % jms_dir)
+    def _chmod_file():
+        os.chdir(jms_dir)
+        os.chmod('init.sh', 0755)
+        os.chmod('connect.py', 0755)
+        os.chmod('manage.py', 0755)
+        os.chmod('run_websocket.py', 0755)
+        os.chmod('service.sh', 0755)
+        os.chmod('logs', 0777)
+        os.chmod('keys', 0777)
 
     @staticmethod
     def _run_service():
         os.system('sh %s start' % os.path.join(jms_dir, 'service.sh'))
         print
-        color_print('安装成功，请访问web, 祝你使用愉快。\n请访问 https://github.com/ibuler/jumpserver 查看文档', 'green')
+        color_print('安装成功，请访问web, 祝你使用愉快。\n请访问 https://github.com/jumpserver/jumpserver 查看文档', 'green')
 
     def start(self):
         print "开始安装Jumpserver, 要求环境为 CentOS 6.5 x86_64"
@@ -98,7 +100,7 @@ class Setup(object):
         self._sync_db()
         self._input_admin()
         self._create_admin()
-        self._cp_zzsh()
+        self._chmod_file()
         self._run_service()
 
 
