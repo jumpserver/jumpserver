@@ -365,6 +365,16 @@ class MyTask(MyRunner):
         self.run("user", module_args, become=True)
         return self.results
 
+    def del_user_sudo(self, username):
+        """
+        delete a role sudo item
+        :param username:
+        :return:
+        """
+        module_args = "sed -i 's/^%s.*//' /etc/sudoers" % username
+        self.run("command", module_args, become=True)
+        return self.results
+
     @staticmethod
     def gen_sudo_script(role_list, sudo_list):
         # receive role_list = [role1, role2] sudo_list = [sudo1, sudo2]

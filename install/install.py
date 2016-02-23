@@ -12,6 +12,8 @@ import socket
 import fcntl
 import struct
 import readline
+import random
+import string
 
 jms_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(jms_dir)
@@ -71,12 +73,15 @@ class PreSetup(object):
         self.mail_addr = 'hello@jumpserver.org'
         self.mail_pass = ''
         self.ip = ''
+        self.key = ''.join(random.choice(string.ascii_lowercase + string.digits) \
+                           for _ in range(16))
 
     def write_conf(self, conf_file=os.path.join(jms_dir, 'jumpserver.conf')):
         color_print('开始写入配置文件', 'green')
         conf = ConfigParser.ConfigParser()
         conf.read(conf_file)
         conf.set('base', 'url', 'http://%s' % self.ip)
+        conf.set('base', 'key', self.key)
         conf.set('db', 'host', self.db_host)
         conf.set('db', 'port', self.db_port)
         conf.set('db', 'user', self.db_user)
@@ -96,6 +101,7 @@ class PreSetup(object):
         color_print('默认用户名: %s 默认密码: %s' % (self.db_user, self.db_pass), 'green')
         bash('yum -y install mysql-server')
         bash('service mysqld start')
+        bash('chkconfig mysqld on')
         bash('mysql -e "create database %s default charset=utf8"' % self.db)
         bash('mysql -e "grant all on %s.* to \'%s\'@\'%s\' identified by \'%s\'"' % (self.db,
                                                                                      self.db_user,
@@ -105,6 +111,7 @@ class PreSetup(object):
     @staticmethod
     def _set_env():
         color_print('开始关闭防火墙和selinux', 'green')
+        os.system("export LANG='en_US.UTF-8' && sed -i 's/LANG=.*/LANG=en_US.UTF-8/g' /etc/sysconfig/i18n")
         bash('service iptables stop && chkconfig iptables off && setenforce 0')
 
     def _test_db_conn(self):

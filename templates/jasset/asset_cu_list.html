@@ -224,6 +224,7 @@
                     }
                     else if (dataArray.length == 1 && data != 'error' && navigator.platform == 'Win32'){
                         var title = 'Jumpserver Web Terminal' + '<span class="text-info"> '+ hostname +'</span>';
+                        /*
                         layer.open({
                             type: 2,
                             title: title,
@@ -232,8 +233,11 @@
                             area: ['628px', '420px'],
                             content: new_url+data
                         });
+                        */
+                        window.open(new_url+data, '', 'width=628px, height=380px');
                     }  else if (dataArray.length == 1 && data != 'error'){
-                       layer.open({
+                        /*
+                        layer.open({
                             type: 2,
                             title: title,
                             maxmin: true,
@@ -241,6 +245,8 @@
                             area: ['628px', '452px'],
                             content: new_url+data
                         });
+                        */
+                        window.open(new_url+data, '', 'width=628px, height=452px')
                     }
                     else {
                         aUrl = '';
@@ -266,6 +272,7 @@
         var hostname = $(a).attr('value');
         var title = 'Jumpserver Web Terminal - ' + '<span class="text-info"> '+ hostname +'</span>';
         if (navigator.platform == 'Win32'){
+            /*
             layer.open({
             type: 2,
             title: title,
@@ -274,8 +281,11 @@
             shade: false,
             content: new_url
             });
+            */
+            window.open(new_url+data, '', 'width=628px, height=380px');
 
         } else {
+            /*
             layer.open({
             type: 2,
             title: title,
@@ -284,6 +294,8 @@
             shade: false,
             content: new_url
             });
+            */
+            window.open(new_url+data, '', 'width=628px, height=452px');
         }
 
         return false

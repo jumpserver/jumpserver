@@ -18,7 +18,7 @@ if django.get_version() != '1.6':
 
 from juser.user_api import db_add_user, get_object, User
 from install import color_print
-from jumpserver.api import get_mac_address
+from jumpserver.api import get_mac_address, bash
 
 socket.setdefaulttimeout(2)
 
@@ -81,9 +81,10 @@ class Setup(object):
         os.system('id %s &> /dev/null || useradd %s' % (self.admin_user, self.admin_user))
 
     @staticmethod
-    def _ensure_sh():
-        jshell = os.path.join(jms_dir, 'connect.py')
-        os.chmod(jshell, 0755)
+    def _cp_zzsh():
+        os.chdir(os.path.join(jms_dir, 'install'))
+        shutil.copy('zzjumpserver.sh', '/etc/profile.d/')
+        bash("sed -i 's#/opt/jumpserver#%s#g' /etc/profile.d/zzjumpserver.sh" % jms_dir)
 
     @staticmethod
     def _run_service():
@@ -97,7 +98,7 @@ class Setup(object):
         self._sync_db()
         self._input_admin()
         self._create_admin()
-        self._ensure_sh()
+        self._cp_zzsh()
         self._run_service()
 
 

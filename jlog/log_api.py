@@ -6,7 +6,10 @@ from contextlib import closing
 from io import open as copen
 from json import dumps
 from math import ceil
+import datetime
+import time
 import re
+import os
 from os.path import basename, dirname, exists, join
 from struct import unpack
 from subprocess import Popen
@@ -17,6 +20,7 @@ from jinja2 import FileSystemLoader, Template
 from jinja2.environment import Environment
 
 from jumpserver.api import BASE_DIR
+from jlog.models import Log
 
 
 DEFAULT_TEMPLATE = join(BASE_DIR, 'templates', 'jlog', 'static.jinja2')
@@ -74,4 +78,29 @@ def renderTemplate(script_path, time_file_path, dimensions=(24, 80), templatenam
 
     return rendered
 
+
+def kill_invalid_connection():
+    long_time_logs = []
+    unfinished_logs = Log.objects.filter(is_finished=False)
+    now = datetime.datetime.now()
+    now_timestamp = int(time.mktime(now.timetuple()))
+    for log in unfinished_logs:
+        if (now - log.start_time).days > 1:
+            long_time_logs.append(log)
+
+    for log in long_time_logs:
+        try:
+            log_file_mtime = int(os.stat(log.log_path).st_mtime)
+        except OSError:
+            log_file_mtime = 0
+
+        if (now_timestamp - log_file_mtime) > 3600:
+            try:
+                os.kill(int(log.pid), 9)
+            except OSError:
+                pass
+
+            log.is_finished = True
+            log.end_time = now
+            log.save()
 

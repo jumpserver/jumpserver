@@ -92,11 +92,9 @@ $('#roleForm').validator({
     timely: 2,
     theme: "yellow_right_effect",
     rules: {
-        check_name: [/^\w{2,20}$/, '大小写字母数字和下划线,2-20位'],
-        check_begin: [/^[\-]+BEGIN RSA PRIVATE KEY[\-]+/gm, 'RSA Key填写有误，请检查'],
-{#        either: function(){#}
-{#            return $('#role_password').val() == ''#}
-{#        }#}
+        check_name: [/(?!^root$)^[\w.]{2,20}$/i, '大小写字母数字和下划线小数点,2-20位,并且非root'],
+        check_begin: [/^[\-]+BEGIN R|DSA PRIVATE KEY[\-]+/gm, 'RSA|DSA Key填写有误，请检查']
+
     },
 
     fields: {
@@ -110,13 +108,8 @@ $('#roleForm').validator({
             rule: "check_begin",
             ok: "",
             empty: true
-        },
-{#        "role_key": {#}
-{#            rule: "required(either)",#}
-{#            tip: "输入密钥",#}
-{#            ok: "",#}
-{#            msg: {required: "密码和密钥必填一个!"}#}
-{#        }#}
+        }
+
     },
     valid: function(form) {
             form.submit();

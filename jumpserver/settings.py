@@ -152,5 +152,6 @@ STATIC_URL = '/static/'
 BOOTSTRAP_COLUMN_COUNT = 10
 
 CRONJOBS = [
-    ('0 1 * * *', 'jasset.asset_api.asset_ansible_update_all')
+    ('0 1 * * *', 'jasset.asset_api.asset_ansible_update_all'),
+    ('1 * * * *', 'jlog.log_api.kill_invalid_connection'),
 ]

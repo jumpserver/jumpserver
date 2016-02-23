@@ -311,13 +311,12 @@ def excel_to_db(excel_file):
 
 
 def get_ansible_asset_info(asset_ip, setup_info):
-    print asset_ip
+    print setup_info, '***'
     disk_need = {}
     disk_all = setup_info.get("ansible_devices")
     if disk_all:
         for disk_name, disk_info in disk_all.iteritems():
-            print disk_name, disk_info
-            if disk_name.startswith('sd') or disk_name.startswith('hd') or disk_name.startswith('vd'):
+            if disk_name.startswith('sd') or disk_name.startswith('hd') or disk_name.startswith('vd') or disk_name.startswith('xvd'):
                 disk_size = disk_info.get("size", '')
                 if 'M' in disk_size:
                     disk_format = round(float(disk_size[:-2]) / 1000, 0)
@@ -334,7 +333,7 @@ def get_ansible_asset_info(asset_ip, setup_info):
     mac = setup_info.get("ansible_default_ipv4").get("macaddress")
     brand = setup_info.get("ansible_product_name")
     cpu_type = setup_info.get("ansible_processor")[1]
-    cpu_cores = setup_info.get("ansible_processor_count")
+    cpu_cores = setup_info.get("ansible_processor_vcpus")
     cpu = cpu_type + ' * ' + unicode(cpu_cores)
     memory = setup_info.get("ansible_memtotal_mb")
     try:

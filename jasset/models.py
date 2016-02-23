@@ -75,7 +75,7 @@ class Asset(models.Model):
     brand = models.CharField(max_length=64, blank=True, null=True, verbose_name=u'硬件厂商型号')
     cpu = models.CharField(max_length=64, blank=True, null=True, verbose_name=u'CPU')
     memory = models.CharField(max_length=128, blank=True, null=True, verbose_name=u'内存')
-    disk = models.CharField(max_length=128, blank=True, null=True, verbose_name=u'硬盘')
+    disk = models.CharField(max_length=1024, blank=True, null=True, verbose_name=u'硬盘')
     system_type = models.CharField(max_length=32, blank=True, null=True, verbose_name=u"系统类型")
     system_version = models.CharField(max_length=8, blank=True, null=True, verbose_name=u"系统版本号")
     system_arch = models.CharField(max_length=16, blank=True, null=True, verbose_name=u"系统平台")

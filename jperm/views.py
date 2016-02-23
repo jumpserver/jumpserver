@@ -16,8 +16,8 @@ from jperm.perm_api import get_role_info, get_role_push_host
 from jumpserver.api import my_render, get_object, CRYPTOR
 
 # 设置PERM APP Log
-from jumpserver.settings import LOG_LEVEL
-logger = set_log(LOG_LEVEL, filename='jumpserver_perm.log')
+from jumpserver.api import logger
+#logger = set_log(LOG_LEVEL, filename='jumpserver_perm.log')
 
 
 @require_role('admin')
@@ -277,7 +277,7 @@ def perm_role_add(request):
 
     if request.method == "POST":
         # 获取参数： name, comment
-        name = request.POST.get("role_name", "")
+        name = request.POST.get("role_name", "").strip()
         comment = request.POST.get("role_comment", "")
         password = request.POST.get("role_password", "")
         key_content = request.POST.get("role_key", "")
@@ -286,6 +286,8 @@ def perm_role_add(request):
         try:
             if get_object(PermRole, name=name):
                 raise ServerError(u'已经存在该用户 %s' % name)
+            if name == "root":
+                raise ServerError(u'禁止使用root用户作为系统用户，这样非常危险！')
             default = get_object(Setting, name='default')
 
             if password:
@@ -317,14 +319,37 @@ def perm_role_delete(request):
     """
     delete role page
     """
+    if request.method == "GET":
+        try:
+            # 获取参数删除的role对象
+            role_id = request.GET.get("id")
+            role = get_object(PermRole, id=role_id)
+            if not role:
+                logger.warning(u"Delete Role: role_id %s not exist" % role_id)
+                raise ServerError(u"role_id %s 无数据记录" % role_id)
+            # 删除推送到主机上的role
+            filter_type = request.GET.get("filter_type")
+            print filter_type
+            if filter_type:
+                if filter_type == "recycle_assets":
+                    recycle_assets = [push.asset for push in role.perm_push.all() if push.success]
+                    print recycle_assets
+                    recycle_assets_ip = ','.join([asset.ip for asset in recycle_assets])
+                    return HttpResponse(recycle_assets_ip)
+                else:
+                    return HttpResponse("no such filter_type: %s" % filter_type)
+            else:
+                return HttpResponse("filter_type: ?")
+        except ServerError, e:
+            return HttpResponse(e)
     if request.method == "POST":
         try:
             # 获取参数删除的role对象
             role_id = request.POST.get("id")
             role = get_object(PermRole, id=role_id)
             if not role:
-                logger.warning(u"Delete Role: %s not exist" % role.name)
-                raise ServerError(u"%s 无数据记录" % role.name)
+                logger.warning(u"Delete Role: role_id %s not exist" % role_id)
+                raise ServerError(u"role_id %s 无数据记录" % role_id)
             role_key = role.key_path
             # 删除推送到主机上的role
             recycle_assets = [push.asset for push in role.perm_push.all() if push.success]
@@ -333,11 +358,13 @@ def perm_role_delete(request):
                 recycle_resource = gen_resource(recycle_assets)
                 task = MyTask(recycle_resource)
                 try:
-                    msg = task.del_user(get_object(PermRole, id=role_id).name)
+                    msg_del_user = task.del_user(get_object(PermRole, id=role_id).name)
+                    msg_del_sudo = task.del_user_sudo(get_object(PermRole, id=role_id).name)
                 except Exception, e:
                     logger.warning(u"Recycle Role failed: %s" % e)
                     raise ServerError(u"回收已推送的系统用户失败: %s" % e)
-                logger.info(u"delete role %s - execute delete user: %s" % (role.name, msg))
+                logger.info(u"delete role %s - execute delete user: %s" % (role.name, msg_del_user))
+                logger.info(u"delete role %s - execute delete sudo: %s" % (role.name, msg_del_sudo))
                 # TODO: 判断返回结果，处理异常
             # 删除存储的秘钥，以及目录
             try:
@@ -423,6 +450,9 @@ def perm_role_edit(request):
             if not role:
                 raise ServerError('该系统用户不能存在')
 
+            if role_name == "root":
+                raise ServerError(u'禁止使用root用户作为系统用户，这样非常危险！')
+
             if role_password:
                 encrypt_pass = CRYPTOR.encrypt(role_password)
                 role.password = encrypt_pass
@@ -473,6 +503,7 @@ def perm_role_push(request):
         for asset_group in asset_groups_obj:
             group_assets_obj.extend(asset_group.asset_set.all())
         calc_assets = list(set(assets_obj) | set(group_assets_obj))
+
         push_resource = gen_resource(calc_assets)
 
         # 调用Ansible API 进行推送
@@ -577,25 +608,28 @@ def perm_sudo_add(request):
     """
     # 渲染数据
     header_title, path1, path2 = "Sudo命令", "别名管理", "添加别名"
+    try:
+        if request.method == "POST":
+            # 获取参数： name, comment
+            name = request.POST.get("sudo_name").strip().upper()
+            comment = request.POST.get("sudo_comment").strip()
+            commands = request.POST.get("sudo_commands").strip()
 
-    if request.method == "POST":
-        # 获取参数： name, comment
-        name = request.POST.get("sudo_name").strip().upper()
-        comment = request.POST.get("sudo_comment").strip()
-        commands = request.POST.get("sudo_commands").strip()
+            if not name or not commands:
+                raise ServerError(u"sudo name 和 commands是必填项!")
 
-        pattern = re.compile(r'[ \n,\r]')
-        commands = ', '.join(list_drop_str(pattern.split(commands), u''))
-        logger.debug(u'添加sudo %s: %s' % (name, commands))
+            pattern = re.compile(r'[\n,\r]')
+            commands = ', '.join(list_drop_str(pattern.split(commands), u''))
+            logger.debug(u'添加sudo %s: %s' % (name, commands))
 
-        if get_object(PermSudo, name=name):
-            error = 'Sudo别名 %s已经存在' % name
-        else:
-            sudo = PermSudo(name=name.strip(), comment=comment, commands=commands)
-            sudo.save()
-            msg = u"添加Sudo命令别名: %s" % name
-        # 渲染数据
-
+            if get_object(PermSudo, name=name):
+                error = 'Sudo别名 %s已经存在' % name
+            else:
+                sudo = PermSudo(name=name.strip(), comment=comment, commands=commands)
+                sudo.save()
+                msg = u"添加Sudo命令别名: %s" % name
+    except ServerError, e:
+        error = e
     return my_render('jperm/perm_sudo_add.html', locals(), request)
 
 
@@ -612,22 +646,27 @@ def perm_sudo_edit(request):
     sudo_id = request.GET.get("id")
     sudo = PermSudo.objects.get(id=sudo_id)
 
-    if request.method == "POST":
-        name = request.POST.get("sudo_name").upper()
-        commands = request.POST.get("sudo_commands")
-        comment = request.POST.get("sudo_comment")
+    try:
+        if request.method == "POST":
+            name = request.POST.get("sudo_name").upper()
+            commands = request.POST.get("sudo_commands")
+            comment = request.POST.get("sudo_comment")
 
-        pattern = re.compile(r'[ \n,\r]')
-        commands = ', '.join(list_drop_str(pattern.split(commands), u'')).strip()
-        logger.debug(u'添加sudo %s: %s' % (name, commands))
+            if not name or not commands:
+                raise ServerError(u"sudo name 和 commands是必填项!")
 
-        sudo.name = name.strip()
-        sudo.commands = commands
-        sudo.comment = comment
-        sudo.save()
+            pattern = re.compile(r'[\n,\r]')
+            commands = ', '.join(list_drop_str(pattern.split(commands), u'')).strip()
+            logger.debug(u'添加sudo %s: %s' % (name, commands))
 
-        msg = u"更新命令别名： %s" % name
+            sudo.name = name.strip()
+            sudo.commands = commands
+            sudo.comment = comment
+            sudo.save()
 
+            msg = u"更新命令别名： %s" % name
+    except ServerError, e:
+        error = e
     return my_render('jperm/perm_sudo_edit.html', locals(), request)
 
 
