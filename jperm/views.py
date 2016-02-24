@@ -512,10 +512,10 @@ def perm_role_push(request):
         task = MyTask(push_resource)
         ret = {}
 
-        # 因为要先建立用户，所以password 是必选项，而push key是在 password也完成的情况下的 可选项
+        # 因为要先建立用户，而push key是在 password也完成的情况下的 可选项
         # 1. 以秘钥 方式推送角色
         if key_push:
-            ret["pass_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
+            ret["pass_push"] = task.add_user(role.name)
             ret["key_push"] = task.push_key(role.name, os.path.join(role.key_path, 'id_rsa.pub'))
 
         # 2. 推送账号密码

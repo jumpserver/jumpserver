@@ -28,7 +28,7 @@
                                 <div class="alert alert-warning text-center">{{ error }}</div>
                             {% endif %}
                             {% if msg %}
-                                <div class="alert alert-success text-center">{{ msg }}</div>
+                                <div class="alert alert-success">{{ msg | safe }}</div>
                             {% endif %}
                             <div class="form-group">
                                 <label for="username" class="col-sm-2 control-label">用户名<span class="red-fonts">*</span></label>
@@ -99,14 +99,9 @@
                                         <label><input type="checkbox" value="0" name="extra" >禁用 </label>
                                     </div>
                                 </div>
-{#                                <div class="col-sm-2">#}
-{#                                    <div class="checkbox i-checks">#}
-{#                                        <label><input type="checkbox" value="1" name="extra">ssh key登录 </label>#}
-{#                                    </div>#}
-{#                                </div>#}
                                 <div class="col-sm-2">
                                     <div class="checkbox i-checks">
-                                        <label><input type="checkbox" value="2" name="extra">发送邮件 </label>
+                                        <label><input type="checkbox" value="1" name="extra" checked>发送邮件 </label>
                                     </div>
                                 </div>
                             </div>
