@@ -175,7 +175,7 @@ def user_add(request):
                                    ssh_key_pwd=ssh_key_pwd,
                                    is_active=is_active,
                                    date_joined=datetime.datetime.now())
-                server_add_user(username, ssh_key_pwd)
+                server_add_user(username=username, ssh_key_pwd=ssh_key_pwd)
                 user = get_object(User, username=username)
                 if groups:
                     user_groups = []
@@ -192,7 +192,7 @@ def user_add(request):
             else:
                 if MAIL_ENABLE and send_mail_need:
                     user_add_mail(user, kwargs=locals())
-                msg = get_display_msg(user, password, ssh_key_pwd, send_mail_need)
+                msg = get_display_msg(user, password=password, ssh_key_pwd=ssh_key_pwd, send_mail_need=send_mail_need)
     return my_render('juser/user_add.html', locals(), request)
 
 

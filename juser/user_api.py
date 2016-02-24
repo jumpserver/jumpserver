@@ -183,7 +183,7 @@ def server_del_user(username):
     bash('userdel -r %s' % username)
 
 
-def get_display_msg(user, password, ssh_key_pwd, send_mail_need=False):
+def get_display_msg(user, password='', ssh_key_pwd='', send_mail_need=False):
     if send_mail_need:
         msg = u'添加用户 %s 成功！ 用户密码已发送到 %s 邮箱！' % (user.name, user.email)
     else:
