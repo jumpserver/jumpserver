@@ -57,20 +57,19 @@
                                             <label for="j_group" class="col-sm-2 control-label">管理账号 <span class="red-fonts">*</span></label>
                                             <div class="col-sm-2">
                                                 <div class="radio i-checks">
-                                                    <label>
+                                                    <label style="padding-left: 0">
                                                         <input type="checkbox" {% if asset.use_default_auth %} checked="checked" {% endif %} id="id_use_default_auth" name="use_default_auth"><span> 使用默认 </span>
                                                     </label>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group" id="admin_account" {% if asset.use_default_auth %} style="display: none" {% endif %}>
-                                            <div class="hr-line-dashed"></div>
-                                            <label class="col-sm-2 control-label"> 管理用户名 <span class="red-fonts">*</span> </label>
+                                            <label class="col-sm-2 control-label"> </label>
                                             <div class="col-sm-3">
                                                 <input type="text" value="{{ asset.username }}" name="username" class="form-control">
                                             </div>
 
-                                            <label class="col-sm-1 control-label"> 密码<span class="red-fonts">*</span> </label>
+                                            <label class="col-sm-1 control-label"> </label>
                                             <div class="col-sm-4">
                                                 <input type="password" value="" name="password" placeholder="不填写即不更改密码." class="form-control">
                                             </div>
