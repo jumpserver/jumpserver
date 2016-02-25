@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 from django.db.models import Q
 from django.http import HttpResponseBadRequest, HttpResponseNotAllowed
@@ -705,8 +706,14 @@ def perm_role_recycle(request):
             recycle_assets.append(asset)
     recycle_resource = gen_resource(recycle_assets)
     task = MyTask(recycle_resource)
-    # TODO: 判断返回结果，处理异常
-    msg = task.del_user(get_object(PermRole, id=role_id).name)
+    try:
+        msg_del_user = task.del_user(get_object(PermRole, id=role_id).name)
+        msg_del_sudo = task.del_user_sudo(get_object(PermRole, id=role_id).name)
+        logger.info("recycle user msg: %s" % msg_del_user)
+        logger.info("recycle sudo msg: %s" % msg_del_sudo)
+    except Exception, e:
+        logger.warning("Recycle Role failed: %s" % e)
+        raise ServerError(u"回收已推送的系统用户失败: %s" % e)
 
     for asset_id in asset_ids:
         asset = get_object(Asset, id=asset_id)
