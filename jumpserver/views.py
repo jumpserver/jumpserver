@@ -356,7 +356,7 @@ def web_terminal(request):
     if asset:
         print asset
         hostname = asset.hostname
-    web_terminal_uri = '%s/terminal?id=%s&role=%s' % (WEB_SOCKET_HOST, asset_id, role_name)
+    web_terminal_uri = '%s/ws/terminal?id=%s&role=%s' % (WEB_SOCKET_HOST, asset_id, role_name)
     return render_to_response('jlog/web_terminal.html', locals())
 
 
