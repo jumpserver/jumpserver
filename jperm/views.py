@@ -10,7 +10,7 @@ from jasset.models import Asset, AssetGroup
 from jperm.models import PermRole, PermRule, PermSudo, PermPush
 from jumpserver.models import Setting
 
-from jperm.utils import gen_keys
+from jperm.utils import gen_keys, trans_all
 from jperm.ansible_api import MyTask
 from jperm.perm_api import get_role_info, get_role_push_host
 from jumpserver.api import my_render, get_object, CRYPTOR
@@ -512,10 +512,10 @@ def perm_role_push(request):
         task = MyTask(push_resource)
         ret = {}
 
-        # 因为要先建立用户，所以password 是必选项，而push key是在 password也完成的情况下的 可选项
+        # 因为要先建立用户，而push key是在 password也完成的情况下的 可选项
         # 1. 以秘钥 方式推送角色
         if key_push:
-            ret["pass_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
+            ret["pass_push"] = task.add_user(role.name)
             ret["key_push"] = task.push_key(role.name, os.path.join(role.key_path, 'id_rsa.pub'))
 
         # 2. 推送账号密码
@@ -619,7 +619,9 @@ def perm_sudo_add(request):
                 raise ServerError(u"sudo name 和 commands是必填项!")
 
             pattern = re.compile(r'[\n,\r]')
-            commands = ', '.join(list_drop_str(pattern.split(commands), u''))
+            deal_space_commands = list_drop_str(pattern.split(commands), u'')
+            deal_all_commands = map(trans_all, deal_space_commands)
+            commands = ', '.join(deal_all_commands)
             logger.debug(u'添加sudo %s: %s' % (name, commands))
 
             if get_object(PermSudo, name=name):
@@ -656,7 +658,9 @@ def perm_sudo_edit(request):
                 raise ServerError(u"sudo name 和 commands是必填项!")
 
             pattern = re.compile(r'[\n,\r]')
-            commands = ', '.join(list_drop_str(pattern.split(commands), u'')).strip()
+            deal_space_commands = list_drop_str(pattern.split(commands), u'')
+            deal_all_commands = map(trans_all, deal_space_commands)
+            commands = ', '.join(deal_all_commands).strip()
             logger.debug(u'添加sudo %s: %s' % (name, commands))
 
             sudo.name = name.strip()

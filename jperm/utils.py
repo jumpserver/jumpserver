@@ -68,6 +68,12 @@ def gen_keys(key="", key_path_dir=""):
     return key_path_dir
 
 
+def trans_all(str):
+    if str.strip().lower() == "all":
+        return str.upper()
+    else:
+        return str
+
 if __name__ == "__main__":
     print gen_keys()
 
