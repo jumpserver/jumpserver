@@ -453,7 +453,6 @@ def down_key(request):
         uuid_r = request.GET.get('uuid', '')
     else:
         uuid_r = request.user.uuid
-
     if uuid_r:
         user = get_object(User, uuid=uuid_r)
         if user:
@@ -466,7 +465,8 @@ def down_key(request):
                 f.close()
                 response = HttpResponse(data, content_type='application/octet-stream')
                 response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(private_key_file)
-                os.unlink(private_key_file)
+                if request.user.role == 'CU':
+                    os.unlink(private_key_file)
                 return response
     return HttpResponse('No Key File. Contact Admin.')
 
