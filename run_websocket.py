@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # coding: utf-8
 
 import time
@@ -31,7 +32,7 @@ try:
 except ImportError:
     import json
 
-
+os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 define("port", default=3000, help="run on the given port", type=int)
 define("host", default='0.0.0.0', help="run port on given host", type=str)
 
@@ -425,12 +426,40 @@ class Application(tornado.web.Application):
         tornado.web.Application.__init__(self, handlers, **setting)
 
 
-if __name__ == '__main__':
-    tornado.options.parse_command_line()
-    app = Application()
-    server = tornado.httpserver.HTTPServer(app)
-    server.bind(options.port, options.host)
-    #server.listen(options.port)
-    server.start(num_processes=5)
-    print "Run server on %s:%s" % (options.host, options.port)
+def main():
+    from django.core.wsgi import get_wsgi_application
+    import tornado.wsgi
+    wsgi_app = get_wsgi_application()
+    container = tornado.wsgi.WSGIContainer(wsgi_app)
+    setting = {
+        'cookie_secret': 'DFksdfsasdfkasdfFKwlwfsdfsa1204mx',
+        'template_path': os.path.join(os.path.dirname(__file__), 'templates'),
+        'static_path': os.path.join(os.path.dirname(__file__), 'static'),
+        'debug': False,
+    }
+    tornado_app = tornado.web.Application(
+        [
+            # (r'/monitor', MonitorHandler),
+            (r'/terminal', WebTerminalHandler),
+            (r'/kill', WebTerminalKillHandler),
+            (r'/exec', ExecHandler),
+            (r"/static/(.*)", tornado.web.StaticFileHandler,
+             dict(path=os.path.join(os.path.dirname(__file__), "static"))),
+            ('.*', tornado.web.FallbackHandler, dict(fallback=container)),
+        ], **setting)
+
+    server = tornado.httpserver.HTTPServer(tornado_app)
+    server.listen(options.port)
+
     tornado.ioloop.IOLoop.instance().start()
+
+if __name__ == '__main__':
+    # tornado.options.parse_command_line()
+    # app = Application()
+    # server = tornado.httpserver.HTTPServer(app)
+    # server.bind(options.port, options.host)
+    # #server.listen(options.port)
+    # server.start(num_processes=5)
+    # print "Run server on %s:%s" % (options.host, options.port)
+    # tornado.ioloop.IOLoop.instance().start()
+    main()
