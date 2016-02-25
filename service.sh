@@ -9,10 +9,15 @@
 # Site: http://www.jumpserver.org
 # Author: Jumpserver Team
 
-. /etc/init.d/functions
+base_dir=$(dirname $0)
+
+. ${base_dir}/functions
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/node/bin
 
-base_dir=$(dirname $0)
+
+
+
+
 
 PROC_NAME="jumpsever"
 lockfile=/var/lock/subsys/${PROC_NAME}
