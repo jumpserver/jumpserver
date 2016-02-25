@@ -463,6 +463,10 @@ each(keys(Terminal.defaults), function(key) {
 Terminal.focus = null;
 
 Terminal.prototype.focus = function() {
+  if (this._textarea) {
+    this._textarea.focus();
+  }
+
   if (Terminal.focus === this) return;
 
   if (Terminal.focus) {
@@ -520,10 +524,6 @@ Terminal.prototype.initGlobal = function() {
 
   Terminal.bindCopy(document);
 
-  if (this.isMobile) {
-    this.fixMobile(document);
-  }
-
   if (this.useStyle) {
     Terminal.insertStyle(document, this.colors[256], this.colors[257]);
   }
@@ -540,6 +540,7 @@ Terminal.bindPaste = function(document) {
   on(window, 'paste', function(ev) {
     var term = Terminal.focus;
     if (!term) return;
+    if (term._textarea) return;
     if (ev.clipboardData) {
       term.send(ev.clipboardData.getData('text/plain'));
     } else if (term.context.clipboardData) {
@@ -566,7 +567,7 @@ Terminal.bindKeys = function(document) {
         || target === Terminal.focus.context
         || target === Terminal.focus.document
         || target === Terminal.focus.body
-        || target === Terminal._textarea
+        || target === Terminal.focus._textarea
         || target === Terminal.focus.parent) {
       return Terminal.focus.keyDown(ev);
     }
@@ -580,7 +581,7 @@ Terminal.bindKeys = function(document) {
         || target === Terminal.focus.context
         || target === Terminal.focus.document
         || target === Terminal.focus.body
-        || target === Terminal._textarea
+        || target === Terminal.focus._textarea
         || target === Terminal.focus.parent) {
       return Terminal.focus.keyPress(ev);
     }
@@ -593,6 +594,8 @@ Terminal.bindKeys = function(document) {
 
     var el = ev.target || ev.srcElement;
     if (!el) return;
+    if (!el.parentNode) return;
+    if (!el.parentNode.parentNode) return;
 
     do {
       if (el === Terminal.focus.element) return;
@@ -651,31 +654,68 @@ Terminal.bindCopy = function(document) {
  * Fix Mobile
  */
 
-Terminal.prototype.fixMobile = function(document) {
+Terminal.prototype.getTextarea = function(document) {
   var self = this;
 
   var textarea = document.createElement('textarea');
   textarea.style.position = 'absolute';
   textarea.style.left = '-32000px';
   textarea.style.top = '-32000px';
-  textarea.style.width = '0px';
-  textarea.style.height = '0px';
+  textarea.style.width = '100em';
+  textarea.style.height = '2em';
+  textarea.style.padding = '0';
   textarea.style.opacity = '0';
+  textarea.style.color = 'inherit';
+  textarea.style.font = 'inherit';
+  textarea.style.textIndent = '-1em'; /* Hide text cursor on IE */
   textarea.style.backgroundColor = 'transparent';
   textarea.style.borderStyle = 'none';
   textarea.style.outlineStyle = 'none';
   textarea.autocapitalize = 'none';
   textarea.autocorrect = 'off';
 
-  document.getElementsByTagName('body')[0].appendChild(textarea);
+  var onInputTimestamp;
 
-  Terminal._textarea = textarea;
+  var onInput = function(ev){
+    if(ev.timeStamp && ev.timeStamp === onInputTimestamp){
+      return;
+    }
+    onInputTimestamp = ev.timeStamp;
 
-  setTimeout(function() {
-    textarea.focus();
-  }, 1000);
+    var value = textarea.textContent || textarea.value;
+    if (typeof self.select.startPos !== 'undefined'){
+      self.select = {};
+      self.clearSelectedText();
+      self.refresh(0, self.rows - 1);
+    }
+    if (!self.compositionStatus) {
+      textarea.value = '';
+      textarea.textContent = '';
+      self.send(value);
+    }
+  };
 
-  if (this.isAndroid) {
+  on(textarea, 'compositionstart', function() {
+    textarea.style.opacity = "1.0";
+    textarea.style.textIndent = "0";
+    self.compositionStatus = true;
+  });
+  on(textarea, 'compositionend', function(ev) {
+    textarea.style.opacity = "0.0";
+    textarea.style.textIndent = "-1em";
+    self.compositionStatus = false;
+    setTimeout(function(){
+      onInput(ev); // for IE that does not trigger 'input' after the IME composition.
+    }, 1);
+  });
+
+  on(textarea, 'keydown', function(){
+    var value = textarea.textContent || textarea.value;
+  });
+
+  on(textarea, 'input', onInput);
+
+  if (Terminal.isAndroid) {
     on(textarea, 'change', function() {
       var value = textarea.textContent || textarea.value;
       textarea.value = '';
@@ -683,6 +723,7 @@ Terminal.prototype.fixMobile = function(document) {
       self.send(value + '\r');
     });
   }
+  return textarea;
 };
 
 /**
@@ -777,10 +818,152 @@ Terminal.prototype.open = function(parent) {
     this.element.appendChild(div);
     this.children.push(div);
   }
+
+  this._textarea = this.getTextarea(this.document);
+  this.element.appendChild(this._textarea);
+
   this.parent.appendChild(this.element);
+
+  this.select = {};
 
   // Draw the screen.
   this.refresh(0, this.rows - 1);
+
+
+  var updateSelect = function(){
+    var startPos = self.select.startPos;
+    var endPos = self.select.endPos;
+    if(endPos.y < startPos.y || (startPos.y == endPos.y && endPos.x < startPos.x)){
+      var tmp = startPos;
+      startPos = endPos;
+      endPos = tmp;
+    }
+    if (self.select.clicks === 2){
+      var j = i;
+      var isMark = function(ch){
+        var code = ch.charCodeAt(0);
+        return (code <= 0x2f) || (0x3a <= code && code <= 0x40) || (0x5b <= code && code < 0x60) || (0x7b <= code && code <= 0x7f);
+      }
+      while (startPos.x > 0 && !isMark(self.lines[startPos.y][startPos.x-1][1])){
+        startPos.x--;
+      }
+      while (endPos.x < self.cols && !isMark(self.lines[endPos.y][endPos.x][1])){
+        endPos.x++;
+      }
+    }else if(self.select.clicks === 3){
+      startPos.x = 0;
+      endPos.y ++;
+      endPos.x = 0;
+    }
+
+    if (startPos.x === endPos.x && startPos.y === endPos.y){
+      self.clearSelectedText();
+    }else{
+      var x2 = endPos.x;
+      var y2 = endPos.y;
+      x2 --;
+      if(x2<0){
+        y2--;
+        x2 = self.cols - 1;
+      }
+      self.selectText(startPos.x, x2, startPos.y, y2);
+    }
+  };
+  var copySelectToTextarea = function (){
+      var textarea = self._textarea;
+      if (textarea) {
+
+        if (self.select.startPos.x === self.select.endPos.x && self.select.startPos.y === self.select.endPos.y){
+          textarea.value = "";
+          textarea.select();
+          return;
+        }
+
+        var x2 = self.select.endPos.x;
+        var y2 = self.select.endPos.y;
+        x2 --;
+        if(x2<0){
+          y2--;
+          x2 = self.cols - 1;
+        }
+
+        var value = self.grabText(self.select.startPos.x, x2, self.select.startPos.y, y2);
+        textarea.value = value;
+        textarea.select();
+      }
+  };
+  on(this.element, 'mousedown', function(ev) {
+
+    if(ev.button === 2){
+
+      var r = self.element.getBoundingClientRect();
+
+      var x = ev.pageX - r.left  + self.element.offsetLeft;
+      var y = ev.pageY - r.top  + self.element.offsetTop;
+
+      self._textarea.style.left = x  + 'px';
+      self._textarea.style.top = y  + 'px';
+      return;
+    }
+
+    if (ev.button != 0){
+      return;
+    }
+    if (navigator.userAgent.indexOf("Trident")){
+      /* IE does not hold click number as "detail" property. */
+      if (self.select.timer){
+        self.select.clicks ++;
+        clearTimeout(self.select.timer);
+        self.select.timer = null;
+      }else{
+        self.select.clicks = 1;
+      }
+      self.select.timer = setTimeout(function(){
+        self.select.timer = null;
+      }, 600);
+    }else{
+      self.select.clicks = ev.detail;
+    }
+
+    if (! ev.shiftKey){
+      self.clearSelectedText();
+
+      self.select.startPos = self.getCoords(ev);
+      self.select.startPos.y += self.ydisp;
+    }
+    self.select.endPos = self.getCoords(ev);
+    self.select.endPos.y += self.ydisp;
+    updateSelect();
+    copySelectToTextarea();
+    self.refresh(0, self.rows - 1);
+    self.select.selecting = true;
+  });
+  on(this.element, 'mousemove', function(ev) {
+    if(self.select.selecting){
+      self.select.endPos = self.getCoords(ev);
+      self.select.endPos.y += self.ydisp;
+      updateSelect();
+      self.refresh(0, self.rows - 1);
+    }
+  });
+  on(document, 'mouseup', function(ev) {
+    if(ev.button === 2){
+
+      var r = self.element.getBoundingClientRect();
+
+      var x = ev.pageX - r.left  + self.element.offsetLeft;
+      var y = ev.pageY - r.top  + self.element.offsetTop;
+
+      self._textarea.style.left = x - 1  + 'px';
+      self._textarea.style.top = y - 1 + 'px';
+      return;
+    }
+    if(self.select.selecting){
+      self.select.selecting = false;
+      copySelectToTextarea();
+    }
+  });
+
 
   if (!('useEvents' in this.options) || this.options.useEvents) {
     // Initialize global actions that
@@ -799,9 +982,6 @@ Terminal.prototype.open = function(parent) {
     // to focus and paste behavior.
     on(this.element, 'focus', function() {
       self.focus();
-      if (self.isMobile) {
-        Terminal._textarea.focus();
-      }
     });
 
     // This causes slightly funky behavior.
@@ -851,6 +1031,7 @@ Terminal.prototype.open = function(parent) {
       // as well as the iPad fix.
       setTimeout(function() {
         self.element.focus();
+        self.focus();
       }, 100);
   }
 
@@ -866,6 +1047,55 @@ Terminal.prototype.open = function(parent) {
 Terminal.prototype.setRawMode = function(value) {
   this.isRaw = !!value;
 };
+
+Terminal.prototype.getCoords = function(ev) {
+  var x, y, w, h, el;
+
+  var self = this;
+
+  // ignore browsers without pageX for now
+  if (ev.pageX == null) return;
+
+  x = ev.pageX;
+  y = ev.pageY;
+  el = self.element;
+
+  x -= el.clientLeft;
+  y -= el.clientTop;
+
+  // should probably check offsetParent
+  // but this is more portable
+  while (el && el !== self.document.documentElement) {
+    x -= el.offsetLeft;
+    y -= el.offsetTop;
+    el = 'offsetParent' in el
+      ? el.offsetParent
+      : el.parentNode;
+  }
+
+  // convert to cols/rows
+  w = self.element.clientWidth;
+  h = self.element.clientHeight;
+  var cols = Math.floor((x / w) * self.cols);
+  var rows = Math.floor((y / h) * self.rows);
+
+  // be sure to avoid sending
+  // bad positions to the program
+  if (cols < 0) cols = 0;
+  if (cols > self.cols) cols = self.cols;
+  if (rows < 0) rows = 0;
+  if (rows > self.rows) rows = self.rows;
+
+  // xterm sends raw bytes and
+  // starts at 32 (SP) for each.
+  //x += 32;
+  //y += 32;
+
+  return {
+    x: cols,
+    y: rows,
+  };
+}
 
 // XTerm mouse events
 // http://invisible-island.net/xterm/ctlseqs/ctlseqs.html#Mouse%20Tracking
@@ -1271,7 +1501,12 @@ Terminal.prototype.refresh = function(start, end) {
     , row
     , parent;
 
+  var characterWidth = this.element.clientWidth / this.cols;
+  var characterHeight = this.element.clientHeight / this.rows;
+  var focused;
+
   if (end - start >= this.rows / 2) {
+    focused = (Terminal.focus == this);
     parent = this.element.parentNode;
     if (parent) parent.removeChild(this.element);
   }
@@ -1397,8 +1632,12 @@ Terminal.prototype.refresh = function(start, end) {
           if (ch <= ' ') {
             out += '&nbsp;';
           } else {
-            if (isWide(ch)) i++;
-            out += ch;
+            if (isWide(ch)) {
+              i++;
+              out += '<span style="display:inline-block; width:' + characterWidth * 2 + 'px; height:' + characterHeight + 'px; line-height:' + characterHeight + 'px;">' + ch + '</span>';
+            } else {
+              out += ch;
+            }
           }
           break;
       }
@@ -1413,7 +1652,23 @@ Terminal.prototype.refresh = function(start, end) {
     this.children[y].innerHTML = out;
   }
 
-  if (parent) parent.appendChild(this.element);
+  if (parent) {
+    parent.appendChild(this.element);
+    if (focused) {
+      this.focus();
+    }
+  }
+
+  if (this._textarea) {
+    var cursorElement = this.element.querySelector('.terminal-cursor');
+    if(cursorElement){
+      var cursor_x = cursorElement.offsetLeft;
+      var cursor_y = cursorElement.offsetTop;
+      this._textarea.style.left = cursor_x + 'px';
+      this._textarea.style.top = cursor_y + 'px';
+    }
+  }
+
 };
 
 Terminal.prototype._cursorBlink = function() {
@@ -2845,6 +3100,9 @@ Terminal.prototype.setgCharset = function(g, charset) {
 
 Terminal.prototype.keyPress = function(ev) {
   var key;
+  if (this._textarea) {
+    return;
+  }
 
   cancel(ev);
 
@@ -4962,18 +5220,18 @@ Terminal.prototype.copyText = function(text) {
   }, 1);
 };
 
-Terminal.prototype.selectText = function(x1, x2, y1, y2) {
-  var ox1
-    , ox2
-    , oy1
-    , oy2
-    , tmp
-    , x
-    , y
-    , xl
-    , attr;
-
+Terminal.prototype.clearSelectedText = function() {
   if (this._selected) {
+    var ox1
+      , ox2
+      , oy1
+      , oy2
+      , tmp
+      , x
+      , y
+      , xl
+      , attr;
+
     ox1 = this._selected.x1;
     ox2 = this._selected.x2;
     oy1 = this._selected.y1;
@@ -5013,9 +5271,20 @@ Terminal.prototype.selectText = function(x1, x2, y1, y2) {
         }
       }
     }
+    delete this._selected;
+  }
+};
 
-    y1 = this._selected.y1;
-    x1 = this._selected.x1;
+
+Terminal.prototype.selectText = function(x1, x2, y1, y2) {
+  var tmp
+    , x
+    , y
+    , xl
+    , attr;
+
+  if (this._selected) {
+    this.clearSelectedText();
   }
 
   y1 = Math.max(y1, 0);
@@ -5040,7 +5309,6 @@ Terminal.prototype.selectText = function(x1, x2, y1, y2) {
     x2 = x1;
     x1 = tmp;
   }
-
   for (y = y1; y <= y2; y++) {
     x = 0;
     xl = this.cols - 1;
@@ -5875,13 +6143,47 @@ function indexOf(obj, el) {
   return -1;
 }
 
+/* Ref: https://github.com/ajaxorg/ace/blob/0c66e1eda418477a9efbd0d3ef61698478cc607f/lib/ace/edit_session.js#L2434 */
+function isFullWidth(c) {
+    if (c < 0x1100)
+        return false;
+    return c >= 0x1100 && c <= 0x115F ||
+           c >= 0x11A3 && c <= 0x11A7 ||
+           c >= 0x11FA && c <= 0x11FF ||
+           c >= 0x2329 && c <= 0x232A ||
+           c >= 0x2E80 && c <= 0x2E99 ||
+           c >= 0x2E9B && c <= 0x2EF3 ||
+           c >= 0x2F00 && c <= 0x2FD5 ||
+           c >= 0x2FF0 && c <= 0x2FFB ||
+           c >= 0x3000 && c <= 0x303E ||
+           c >= 0x3041 && c <= 0x3096 ||
+           c >= 0x3099 && c <= 0x30FF ||
+           c >= 0x3105 && c <= 0x312D ||
+           c >= 0x3131 && c <= 0x318E ||
+           c >= 0x3190 && c <= 0x31BA ||
+           c >= 0x31C0 && c <= 0x31E3 ||
+           c >= 0x31F0 && c <= 0x321E ||
+           c >= 0x3220 && c <= 0x3247 ||
+           c >= 0x3250 && c <= 0x32FE ||
+           c >= 0x3300 && c <= 0x4DBF ||
+           c >= 0x4E00 && c <= 0xA48C ||
+           c >= 0xA490 && c <= 0xA4C6 ||
+           c >= 0xA960 && c <= 0xA97C ||
+           c >= 0xAC00 && c <= 0xD7A3 ||
+           c >= 0xD7B0 && c <= 0xD7C6 ||
+           c >= 0xD7CB && c <= 0xD7FB ||
+           c >= 0xF900 && c <= 0xFAFF ||
+           c >= 0xFE10 && c <= 0xFE19 ||
+           c >= 0xFE30 && c <= 0xFE52 ||
+           c >= 0xFE54 && c <= 0xFE66 ||
+           c >= 0xFE68 && c <= 0xFE6B ||
+           c >= 0xFF01 && c <= 0xFF60 ||
+           c >= 0xFFE0 && c <= 0xFFE6;
+};
+
 function isWide(ch) {
-  if (ch <= '\u3040') return false;
-  return (ch >= '\u3040' && ch <= '\u309f') || // Hiragana
-      (ch >= '\u30A0' && ch <= '\u30ff') || // Katakana
-      (ch >= '\u4E00' && ch <= '\u9FFF') || // CJK Unified ideographs
-      (ch >= '\uF900' && ch <= '\uFAFF') || // CJK Compatibility Ideographs
-      (ch >= '\uFF00' && ch <= '\uFFEF'); //Halfwidth and Fullwidth Forms of Katakana & Fullwidth ASCII variants
+  var c = ch.charCodeAt(0);
+  return isFullWidth(c);
 }
 
 function matchColor(r1, g1, b1) {
