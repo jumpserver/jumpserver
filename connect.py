@@ -746,6 +746,9 @@ def main():
     if not login_user:  # 判断用户是否存在
         color_print('没有该用户，或许你是以root运行的 No that user.', exits=True)
 
+    if not login_user.is_active:
+        color_print('您的用户已禁用，请联系管理员.', exits=True)
+
     gid_pattern = re.compile(r'^g\d+$')
     nav = Nav(login_user)
     nav.print_nav()
