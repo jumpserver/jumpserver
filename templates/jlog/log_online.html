@@ -213,14 +213,11 @@
        if (login_type=='web'){
            var g_url = '{{ web_kill_uri }}' + '?id=' + num;
        } else {
-           var g_url = "{% url 'log_kill' %} }?id=" + num;
+           var g_url = "{% url 'log_kill' %}?id=" + num;
        }
-
-       $.ajax({
-           type: "GET",
-           url: g_url+"&sessionid={{ session_id }}",
-           success: window.open("{% url 'log_list' 'online' %}", "_self")
-       });
+       $.get(g_url+"&sessionid={{ session_id }}", function () {
+           window.open("{% url 'log_list' 'online' %}", "_self")
+       })
 
 }
 </script>
