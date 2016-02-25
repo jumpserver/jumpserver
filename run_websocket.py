@@ -442,7 +442,7 @@ def main():
             (r'/monitor', MonitorHandler),
             (r'/ws/terminal', WebTerminalHandler),
             (r'/kill', WebTerminalKillHandler),
-            (r'/exec', ExecHandler),
+            (r'/ws/exec', ExecHandler),
             (r"/static/(.*)", tornado.web.StaticFileHandler,
              dict(path=os.path.join(os.path.dirname(__file__), "static"))),
             ('.*', tornado.web.FallbackHandler, dict(fallback=container)),

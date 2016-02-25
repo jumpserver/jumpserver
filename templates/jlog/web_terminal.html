@@ -48,7 +48,7 @@
                     protocol = 'wss://';
                 }
 
-                var endpoint = protocol + '{{ web_terminal_uri }}';
+                var endpoint = protocol + document.URL.match(RegExp('//(.*?)/'))[1] + '{{ web_terminal_uri }}';
 
                 if (window.WebSocket) {
                     this._connection = new WebSocket(endpoint);
