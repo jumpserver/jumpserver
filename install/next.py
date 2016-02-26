@@ -8,6 +8,8 @@ from django.core.management import execute_from_command_line
 import shutil
 import urllib
 import socket
+import subprocess
+
 
 jms_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(jms_dir)
@@ -75,7 +77,8 @@ class Setup(object):
             user.delete()
         db_add_user(username=self.admin_user, password=self.admin_pass, role='SU', name='admin', groups='',
                     admin_groups='', email='admin@jumpserver.org', uuid='MayBeYouAreTheFirstUser', is_active=True)
-        os.system('id %s &> /dev/null || useradd %s' % (self.admin_user, self.admin_user))
+        cmd = 'useradd %s' % self.admin_user
+        subprocess.call(cmd, shell=True)
 
     @staticmethod
     def _chmod_file():
