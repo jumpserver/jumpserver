@@ -523,7 +523,13 @@ class Nav(object):
             if gid_pattern.match(str_r):
                 gid = int(str_r.lstrip('g'))
                 # 获取资产组包含的资产
-                user_asset_search = get_object(AssetGroup, id=gid).asset_set.all()
+                asset_group = get_object(AssetGroup, id=gid)
+                if asset_group:
+                    user_asset_search = asset_group.asset_set.all()
+                else:
+                    color_print('没有该资产组或没有权限')
+                    return
+
             else:
                 # 匹配 ip, hostname, 备注
                 for asset in user_asset_all:
@@ -609,6 +615,9 @@ class Nav(object):
                     command = raw_input("\033[1;32mCmds>:\033[0m ").strip()
                     if command == 'q':
                         break
+                    elif not command:
+                        color_print('命令不能为空...')
+                        continue
                     runner.run('shell', command, pattern=pattern)
                     ExecLog(host=asset_name_str, user=self.user.username, cmd=command, remote_ip=remote_ip,
                             result=runner.results).save()
@@ -661,7 +670,7 @@ class Nav(object):
 
                     runner = MyRunner(res)
                     runner.run('copy', module_args='src=%s dest=%s directory_mode'
-                                                     % (tmp_dir, tmp_dir), pattern=pattern)
+                                                     % (tmp_dir, '/tmp'), pattern=pattern)
                     ret = runner.results
                     FileLog(user=self.user.name, host=asset_name_str, filename=filename_str,
                             remote_ip=remote_ip, type='upload', result=ret).save()
