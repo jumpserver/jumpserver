@@ -33,8 +33,9 @@ except ImportError:
     import json
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
-define("port", default=3000, help="run on the given port", type=int)
-define("host", default='0.0.0.0', help="run port on given host", type=str)
+from jumpserver.settings import IP, PORT
+define("port", default=PORT, help="run on the given port", type=int)
+define("host", default=IP, help="run port on given host", type=str)
 
 
 def require_auth(role='user'):
