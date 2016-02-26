@@ -5,15 +5,14 @@ import subprocess
 import time
 import os
 import sys
-import MySQLdb
 from smtplib import SMTP, SMTPAuthenticationError, SMTPConnectError, SMTPSenderRefused
 import ConfigParser
 import socket
-import fcntl
-import struct
-import readline
 import random
 import string
+
+import re
+import platform
 
 jms_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(jms_dir)
@@ -25,6 +24,13 @@ def bash(cmd):
     执行bash命令
     """
     return subprocess.call(cmd, shell=True)
+
+
+def valid_ip(ip):
+    if ('255' in ip) or (ip == "0.0.0.0"):
+        return False
+    else:
+        return True
 
 
 def color_print(msg, color='red', exits=False):
@@ -46,18 +52,17 @@ def color_print(msg, color='red', exits=False):
     return msg
 
 
-def get_ip_addr(ifname='eth0'):
+def get_ip_addr():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        return socket.inet_ntoa(fcntl.ioctl(
-            s.fileno(),
-            0x8915,
-            struct.pack('256s', ifname[:15])
-        )[20:24])
-    except:
-        ips = os.popen("LANG=C ifconfig | grep \"inet addr\" | grep -v \"127.0.0.1\" | awk -F \":\" '{print $2}' | awk '{print $1}'").readlines()
-        if len(ips) > 0:
-            return ips[0]
+        s.connect(("8.8.8.8", 80))
+        return s.getsockname()[0]
+    except Exception:
+        if_data = ''.join(os.popen("LANG=C ifconfig").readlines())
+        ips = re.findall(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', if_data, flags=re.MULTILINE)
+        ip = filter(valid_ip, ips)
+        if ip:
+            return ip[0]
     return ''
 
 
@@ -75,6 +80,17 @@ class PreSetup(object):
         self.ip = ''
         self.key = ''.join(random.choice(string.ascii_lowercase + string.digits) \
                            for _ in range(16))
+        self.dist = platform.dist()[0].lower()
+
+    @property
+    def _is_redhat(self):
+        if self.dist == "centos" or self.dist == "redhat":
+            return True
+
+    @property
+    def _is_ubuntu(self):
+        if self.dist == "ubuntu":
+            return True
 
     def write_conf(self, conf_file=os.path.join(jms_dir, 'jumpserver.conf')):
         color_print('开始写入配置文件', 'green')
@@ -99,22 +115,38 @@ class PreSetup(object):
     def _setup_mysql(self):
         color_print('开始安装设置mysql (请手动设置mysql安全)', 'green')
         color_print('默认用户名: %s 默认密码: %s' % (self.db_user, self.db_pass), 'green')
-        bash('yum -y install mysql-server')
-        bash('service mysqld start')
-        bash('chkconfig mysqld on')
-        bash('mysql -e "create database %s default charset=utf8"' % self.db)
-        bash('mysql -e "grant all on %s.* to \'%s\'@\'%s\' identified by \'%s\'"' % (self.db,
-                                                                                     self.db_user,
-                                                                                     self.db_host,
-                                                                                     self.db_pass))
+        if self._is_redhat:
+            bash('yum -y install mysql-server')
+            bash('service mysqld start')
+            bash('chkconfig mysqld on')
+            bash('mysql -e "create database %s default charset=utf8"' % self.db)
+            bash('mysql -e "grant all on %s.* to \'%s\'@\'%s\' identified by \'%s\'"' % (self.db,
+                                                                                         self.db_user,
+                                                                                         self.db_host,
+                                                                                         self.db_pass))
+        if self._is_ubuntu:
+            bash('echo mysql-server mysql-server/root_password select '' | debconf-set-selections')
+            bash('echo mysql-server mysql-server/root_password_again select '' | debconf-set-selections')
+            bash('apt-get -y install mysql-server')
+            bash('mysql -e "create database %s default charset=utf8"' % self.db)
+            bash('mysql -e "grant all on %s.* to \'%s\'@\'%s\' identified by \'%s\'"' % (self.db,
+                                                                                         self.db_user,
+                                                                                         self.db_host,
+                                                                                         self.db_pass))
 
-    @staticmethod
-    def _set_env():
+    def _set_env(self):
         color_print('开始关闭防火墙和selinux', 'green')
-        os.system("export LANG='en_US.UTF-8' && sed -i 's/LANG=.*/LANG=en_US.UTF-8/g' /etc/sysconfig/i18n")
-        bash('service iptables stop && chkconfig iptables off && setenforce 0')
+        if self._is_redhat:
+            os.system("export LANG='en_US.UTF-8' && sed -i 's/LANG=.*/LANG=en_US.UTF-8/g' /etc/sysconfig/i18n")
+            bash('service iptables stop && chkconfig iptables off && setenforce 0')
+        if self._is_ubuntu:
+            os.system("export LANG='en_US.UTF-8'")
+            bash("iptables -F")
+            bash('which selinux && setenforce 0')
 
     def _test_db_conn(self):
+        bash("pip install mysql-python")
+        import MySQLdb
         try:
             MySQLdb.connect(host=self.db_host, port=int(self.db_port),
                             user=self.db_user, passwd=self.db_pass, db=self.db)
@@ -141,15 +173,18 @@ class PreSetup(object):
                 return True
             return False
 
-    @staticmethod
-    def _rpm_repo():
-        color_print('开始安装epel源', 'green')
-        bash('yum -y install epel-release')
+    def _rpm_repo(self):
+        if self._is_redhat:
+            color_print('开始安装epel源', 'green')
+            bash('yum -y install epel-release')
 
-    @staticmethod
-    def _depend_rpm():
-        color_print('开始安装依赖rpm包', 'green')
-        bash('yum -y install git python-pip mysql-devel gcc automake autoconf python-devel vim sshpass')
+    def _depend_rpm(self):
+        color_print('开始安装依赖包', 'green')
+        if self._is_redhat:
+            bash('yum -y install git python-pip mysql-devel gcc automake autoconf python-devel vim sshpass')
+        if self._is_ubuntu:
+            bash("apt-get -y install git python-pip gcc automake autoconf vim sshpass libmysqld-dev python-all-dev")
+
 
     @staticmethod
     def _require_pip():
@@ -202,11 +237,11 @@ class PreSetup(object):
             print
 
     def start(self):
-        # self._rpm_repo()
-        # self._depend_rpm()
-        # self._require_pip()
         color_print('请务必先查看wiki https://github.com/ibuler/jumpserver/wiki/Quickinstall')
         time.sleep(3)
+        self._rpm_repo()
+        self._depend_rpm()
+        self._require_pip()
         self._set_env()
         self._input_ip()
         self._input_mysql()
