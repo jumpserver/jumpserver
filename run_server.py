@@ -33,8 +33,9 @@ except ImportError:
     import json
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
-define("port", default=3000, help="run on the given port", type=int)
-define("host", default='0.0.0.0', help="run port on given host", type=str)
+from jumpserver.settings import IP, PORT
+define("port", default=PORT, help="run on the given port", type=int)
+define("host", default=IP, help="run port on given host", type=str)
 
 
 def require_auth(role='user'):
@@ -317,6 +318,8 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         self.term = WebTty(self.user, asset, login_role, login_type='web')
         # self.term.remote_ip = self.request.remote_ip
         self.term.remote_ip = self.request.headers.get("X-Real-IP")
+        if not self.term.remote_ip:
+            self.term.remote_ip = self.request.remote_ip
         self.ssh = self.term.get_connection()
         self.channel = self.ssh.invoke_shell(term='xterm')
         WebTerminalHandler.tasks.append(MyThread(target=self.forward_outbound))
@@ -461,6 +464,6 @@ if __name__ == '__main__':
     # server.bind(options.port, options.host)
     # #server.listen(options.port)
     # server.start(num_processes=5)
-    # print "Run server on %s:%s" % (options.host, options.port)
     # tornado.ioloop.IOLoop.instance().start()
+    print "Run server on %s:%s" % (options.host, options.port)
     main()

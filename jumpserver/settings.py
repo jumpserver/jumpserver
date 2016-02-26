@@ -42,6 +42,8 @@ KEY = config.get('base', 'key')
 URL = config.get('base', 'url')
 LOG_LEVEL = config.get('base', 'log')
 WEB_SOCKET_URL = config.get('base', 'websocket_url')
+IP = config.get('base', 'ip')
+PORT = config.get('base', 'port')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
