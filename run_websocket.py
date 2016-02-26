@@ -317,6 +317,8 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         self.term = WebTty(self.user, asset, login_role, login_type='web')
         # self.term.remote_ip = self.request.remote_ip
         self.term.remote_ip = self.request.headers.get("X-Real-IP")
+        if not self.term.remote_ip:
+            self.term.remote_ip = self.request.remote_ip
         self.ssh = self.term.get_connection()
         self.channel = self.ssh.invoke_shell(term='xterm')
         WebTerminalHandler.tasks.append(MyThread(target=self.forward_outbound))
