@@ -824,7 +824,6 @@ def main():
     except IndexError, e:
         color_print(e)
         time.sleep(5)
-        pass
 
 if __name__ == '__main__':
     main()
