@@ -131,9 +131,9 @@ class PreSetup(object):
                                                                                          self.db_host,
                                                                                          self.db_pass))
         if self._is_ubuntu:
-            cmd1 = 'echo mysql-server mysql-server/root_password select '' | debconf-set-selections'
-            cmd2 = 'echo mysql-server mysql-server/root_password_again select '' | debconf-set-selections'
-            cmd3 = 'apt-get -y install mysql-server'
+            cmd1 = "echo mysql-server mysql-server/root_password select '' | debconf-set-selections"
+            cmd2 = "echo mysql-server mysql-server/root_password_again select '' | debconf-set-selections"
+            cmd3 = "apt-get -y install mysql-server"
             bash('%s; %s; %s' % (cmd1, cmd2, cmd3))
             bash('service mysql start')
             bash('mysql -e "create database %s default charset=utf8"' % self.db)
