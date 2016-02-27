@@ -94,8 +94,9 @@ class PreSetup(object):
             return True
 
     def check_platform(self):
-        if self._is_redhat or self._is_ubuntu:
-            raise ValueError(u"支持的平台: CentOS, RedHat, Fedora, Debian, Ubuntu, 暂不支持其他平台安装.")
+        if not (self._is_redhat or self._is_ubuntu):
+            print(u"支持的平台: CentOS, RedHat, Fedora, Debian, Ubuntu, 暂不支持其他平台安装.")
+            exit()
 
     def write_conf(self, conf_file=os.path.join(jms_dir, 'jumpserver.conf')):
         color_print('开始写入配置文件', 'green')
@@ -130,9 +131,10 @@ class PreSetup(object):
                                                                                          self.db_host,
                                                                                          self.db_pass))
         if self._is_ubuntu:
-            bash('echo mysql-server mysql-server/root_password select '' | debconf-set-selections')
-            bash('echo mysql-server mysql-server/root_password_again select '' | debconf-set-selections')
-            bash('apt-get -y install mysql-server')
+            cmd1 = 'echo mysql-server mysql-server/root_password select '' | debconf-set-selections'
+            cmd2 = 'echo mysql-server mysql-server/root_password_again select '' | debconf-set-selections'
+            cmd3 = 'apt-get -y install mysql-server'
+            bash('%s; %s; %s' % (cmd1, cmd2, cmd3))
             bash('service mysql start')
             bash('mysql -e "create database %s default charset=utf8"' % self.db)
             bash('mysql -e "grant all on %s.* to \'%s\'@\'%s\' identified by \'%s\'"' % (self.db,
