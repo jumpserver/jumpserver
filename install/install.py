@@ -13,6 +13,7 @@ import string
 
 import re
 import platform
+import shlex
 
 jms_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(jms_dir)
@@ -23,7 +24,7 @@ def bash(cmd):
     run a bash shell command
     执行bash命令
     """
-    return subprocess.call(cmd, shell=True)
+    return shlex.os.system(cmd)
 
 
 def valid_ip(ip):
@@ -84,13 +85,17 @@ class PreSetup(object):
 
     @property
     def _is_redhat(self):
-        if self.dist == "centos" or self.dist == "redhat":
+        if self.dist == "centos" or self.dist == "redhat" or self.dist == "federa":
             return True
 
     @property
     def _is_ubuntu(self):
-        if self.dist == "ubuntu":
+        if self.dist == "ubuntu" or self.dist == "debain":
             return True
+
+    def check_platform(self):
+        if self._is_redhat or self._is_ubuntu:
+            raise ValueError(u"支持的平台: CentOS, RedHat, Fedare, Debain, Ubuntu, 暂不支持其他平台安装.")
 
     def write_conf(self, conf_file=os.path.join(jms_dir, 'jumpserver.conf')):
         color_print('开始写入配置文件', 'green')
@@ -128,6 +133,7 @@ class PreSetup(object):
             bash('echo mysql-server mysql-server/root_password select '' | debconf-set-selections')
             bash('echo mysql-server mysql-server/root_password_again select '' | debconf-set-selections')
             bash('apt-get -y install mysql-server')
+            bash('service mysql start')
             bash('mysql -e "create database %s default charset=utf8"' % self.db)
             bash('mysql -e "grant all on %s.* to \'%s\'@\'%s\' identified by \'%s\'"' % (self.db,
                                                                                          self.db_user,

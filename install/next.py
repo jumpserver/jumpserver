@@ -5,7 +5,7 @@ import sys
 import os
 import django
 from django.core.management import execute_from_command_line
-import shutil
+import shlex
 import urllib
 import socket
 import subprocess
@@ -77,8 +77,8 @@ class Setup(object):
             user.delete()
         db_add_user(username=self.admin_user, password=self.admin_pass, role='SU', name='admin', groups='',
                     admin_groups='', email='admin@jumpserver.org', uuid='MayBeYouAreTheFirstUser', is_active=True)
-        cmd = 'useradd %s' % self.admin_user
-        subprocess.call(cmd, shell=True)
+        cmd = 'id %s 2> /dev/null 1> /dev/null || useradd %s' % (self.admin_user, self.admin_user)
+        shlex.os.system(cmd)
 
     @staticmethod
     def _chmod_file():
@@ -93,7 +93,8 @@ class Setup(object):
 
     @staticmethod
     def _run_service():
-        os.system('sh %s start' % os.path.join(jms_dir, 'service.sh'))
+        cmd = 'bash %s start' % os.path.join(jms_dir, 'service.sh')
+        shlex.os.system(cmd)
         print
         color_print('安装成功，请访问web, 祝你使用愉快。\n请访问 https://github.com/jumpserver/jumpserver 查看文档', 'green')
 
