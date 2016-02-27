@@ -191,7 +191,7 @@ class PreSetup(object):
         if self._is_redhat:
             bash('yum -y install git python-pip mysql-devel gcc automake autoconf python-devel vim sshpass')
         if self._is_ubuntu:
-            bash("apt-get -y install git python-pip gcc automake autoconf vim sshpass libmysqld-dev python-all-dev")
+            bash("apt-get -y --force-yes install git python-pip gcc automake autoconf vim sshpass libmysqld-dev python-all-dev")
 
 
     @staticmethod
