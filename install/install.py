@@ -85,17 +85,17 @@ class PreSetup(object):
 
     @property
     def _is_redhat(self):
-        if self.dist == "centos" or self.dist == "redhat" or self.dist == "federa":
+        if self.dist == "centos" or self.dist == "redhat" or self.dist == "fedora":
             return True
 
     @property
     def _is_ubuntu(self):
-        if self.dist == "ubuntu" or self.dist == "debain":
+        if self.dist == "ubuntu" or self.dist == "debian":
             return True
 
     def check_platform(self):
         if self._is_redhat or self._is_ubuntu:
-            raise ValueError(u"支持的平台: CentOS, RedHat, Fedare, Debain, Ubuntu, 暂不支持其他平台安装.")
+            raise ValueError(u"支持的平台: CentOS, RedHat, Fedora, Debian, Ubuntu, 暂不支持其他平台安装.")
 
     def write_conf(self, conf_file=os.path.join(jms_dir, 'jumpserver.conf')):
         color_print('开始写入配置文件', 'green')
@@ -245,6 +245,7 @@ class PreSetup(object):
     def start(self):
         color_print('请务必先查看wiki https://github.com/ibuler/jumpserver/wiki/Quickinstall')
         time.sleep(3)
+        self.check_platform()
         self._rpm_repo()
         self._depend_rpm()
         self._require_pip()
