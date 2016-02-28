@@ -232,7 +232,7 @@ class PreSetup(object):
             else:
                 db_host = raw_input('请输入数据库服务器IP [127.0.0.1]: ').strip()
                 db_port = raw_input('请输入数据库服务器端口 [3306]: ').strip()
-                db_user = raw_input('请输入数据库服务器用户 [root]: ').strip()
+                db_user = raw_input('请输入数据库服务器用户 [jumpserver]: ').strip()
                 db_pass = raw_input('请输入数据库服务器密码: ').strip()
                 db = raw_input('请输入使用的数据库 [jumpserver]: ').strip()
 
