@@ -97,13 +97,13 @@ class PreSetup(object):
         conf = ConfigParser.ConfigParser()
         conf.read(conf_file)
         conf.set('base', 'url', 'http://%s' % self.ip)
+        conf.set('base', 'websocket_url', 'ws://%s' % self.ip)
         conf.set('base', 'key', self.key)
         conf.set('db', 'host', self.db_host)
         conf.set('db', 'port', self.db_port)
         conf.set('db', 'user', self.db_user)
         conf.set('db', 'password', self.db_pass)
         conf.set('db', 'database', self.db)
-        conf.set('websocket', 'web_socket_host', '%s:3000' % self.ip)
         conf.set('mail', 'email_host', self.mail_host)
         conf.set('mail', 'email_port', self.mail_port)
         conf.set('mail', 'email_host_user', self.mail_addr)
@@ -237,7 +237,7 @@ class PreSetup(object):
             print
 
     def start(self):
-        color_print('请务必先查看wiki https://github.com/ibuler/jumpserver/wiki/Quickinstall')
+        color_print('请务必先查看wiki https://github.com/jumpserver/jumpserver/wiki')
         time.sleep(3)
         self._rpm_repo()
         self._depend_rpm()
