@@ -152,15 +152,18 @@ class PreSetup(object):
     def _set_env(self):
         color_print('开始关闭防火墙和selinux', 'green')
         if self._is_redhat:
-            os.system("export LANG='en_US.UTF-8' && sed -i 's/LANG=.*/LANG=en_US.UTF-8/g' /etc/sysconfig/i18n")
+            os.system("export LANG='en_US.UTF-8'")
             if self._is_centos7:
                 cmd1 = "systemctl status firewalld 2> /dev/null 1> /dev/null"
                 cmd2 = "systemctl stop firewalld"
                 cmd3 = "systemctl disable firewalld"
                 bash('%s && %s && %s' % (cmd1, cmd2, cmd3))
+                bash('localectl set-locale LANG=en_US.UTF-8')
                 bash('setenforce 0')
             else:
+                bash("sed -i 's/LANG=.*/LANG=en_US.UTF-8/g' /etc/sysconfig/i18n")
                 bash('service iptables stop && chkconfig iptables off && setenforce 0')
+
         if self._is_ubuntu:
             os.system("export LANG='en_US.UTF-8'")
             bash("which iptables && iptables -F")
