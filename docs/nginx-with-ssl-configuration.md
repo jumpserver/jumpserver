@@ -24,8 +24,8 @@ server {
   listen              443;
   listen              80;
   server_name         YOUR_DOMAIN;
-  ssl_certificate     /etc/nginx/certs/YOUR_DOMAIN_CRT.crt;
-  ssl_certificate_key /etc/nginx/certs/YOUR_DOMAIN_KEY.key;
+  ssl_certificate     YOUR_DOMAIN_CRT;
+  ssl_certificate_key YOUR_DOMAIN_KEY;
   ssl_protocols	TLSv1 TLSv1.1 TLSv1.2;
   ssl_ciphers	HIGH:!aNULL:!MD5;
   ssl_prefer_server_ciphers on;
