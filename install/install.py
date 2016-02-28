@@ -128,9 +128,14 @@ class PreSetup(object):
         color_print('开始安装设置mysql (请手动设置mysql安全)', 'green')
         color_print('默认用户名: %s 默认密码: %s' % (self.db_user, self.db_pass), 'green')
         if self._is_redhat:
-            bash('yum -y install mysql-server')
-            bash('service mysqld start')
-            bash('chkconfig mysqld on')
+            if self._is_centos7:
+                bash('yum -y install mariadb-server mariadb-devel')
+                bash('systemctl enable mariadb.service')
+                bash('systemctl start mariadb.service')
+            else:
+                bash('yum -y install mysql-server')
+                bash('service mysqld start')
+                bash('chkconfig mysqld on')
             bash('mysql -e "create database %s default charset=utf8"' % self.db)
             bash('mysql -e "grant all on %s.* to \'%s\'@\'%s\' identified by \'%s\'"' % (self.db,
                                                                                          self.db_user,
