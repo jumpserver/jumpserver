@@ -82,6 +82,7 @@ class PreSetup(object):
         self.key = ''.join(random.choice(string.ascii_lowercase + string.digits) \
                            for _ in range(16))
         self.dist = platform.dist()[0].lower()
+        self.version = platform.dist()[1]
 
     @property
     def _is_redhat(self):
@@ -90,10 +91,8 @@ class PreSetup(object):
 
     @property
     def _is_centos7(self):
-        version = platform.dist()[1]
-        if self._is_redhat:
-            if version.startswith("7"):
-                return True
+        if self.dist == "centos" and self.version.startswith("7"):
+            return True
 
     @property
     def _is_ubuntu(self):
