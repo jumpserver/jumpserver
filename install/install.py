@@ -89,6 +89,13 @@ class PreSetup(object):
             return True
 
     @property
+    def _is_centos7(self):
+        version = platform.dist()[1]
+        if self._is_redhat:
+            if version.startswith("7"):
+                return True
+
+    @property
     def _is_ubuntu(self):
         if self.dist == "ubuntu" or self.dist == "debian":
             return True
@@ -146,10 +153,17 @@ class PreSetup(object):
         color_print('开始关闭防火墙和selinux', 'green')
         if self._is_redhat:
             os.system("export LANG='en_US.UTF-8' && sed -i 's/LANG=.*/LANG=en_US.UTF-8/g' /etc/sysconfig/i18n")
-            bash('service iptables stop && chkconfig iptables off && setenforce 0')
+            if self._is_centos7:
+                cmd1 = "systemctl status firewalld 2> /dev/null 1> /dev/null"
+                cmd2 = "systemctl stop firewalld"
+                cmd3 = "systemctl disable firewalld"
+                bash('%s && %s && %s' % (cmd1, cmd2, cmd3))
+                bash('setenforce 0')
+            else:
+                bash('service iptables stop && chkconfig iptables off && setenforce 0')
         if self._is_ubuntu:
             os.system("export LANG='en_US.UTF-8'")
-            bash("iptables -F")
+            bash("which iptables && iptables -F")
             bash('which selinux && setenforce 0')
 
     def _test_db_conn(self):
@@ -189,9 +203,9 @@ class PreSetup(object):
     def _depend_rpm(self):
         color_print('开始安装依赖包', 'green')
         if self._is_redhat:
-            bash('yum -y install git python-pip mysql-devel gcc automake autoconf python-devel vim sshpass')
+            bash('yum -y install git python-pip mysql-devel gcc automake autoconf python-devel vim sshpass lrzsz readline-devel')
         if self._is_ubuntu:
-            bash("apt-get -y --force-yes install git python-pip gcc automake autoconf vim sshpass libmysqld-dev python-all-dev")
+            bash("apt-get -y --force-yes install git python-pip gcc automake autoconf vim sshpass libmysqld-dev python-all-dev lrzsz libreadline-dev")
 
 
     @staticmethod

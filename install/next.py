@@ -99,7 +99,7 @@ class Setup(object):
         color_print('安装成功，请访问web, 祝你使用愉快。\n请访问 https://github.com/jumpserver/jumpserver 查看文档', 'green')
 
     def start(self):
-        print "开始安装Jumpserver, 要求环境为 CentOS 6.5 x86_64"
+        print "开始安装Jumpserver ..."
         self._pull()
         self._sync_db()
         self._input_admin()
