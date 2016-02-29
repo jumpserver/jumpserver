@@ -80,15 +80,11 @@ def renderTemplate(script_path, time_file_path, dimensions=(24, 80), templatenam
 
 
 def kill_invalid_connection():
-    long_time_logs = []
     unfinished_logs = Log.objects.filter(is_finished=False)
     now = datetime.datetime.now()
     now_timestamp = int(time.mktime(now.timetuple()))
-    for log in unfinished_logs:
-        if (now - log.start_time).days > 1:
-            long_time_logs.append(log)
 
-    for log in long_time_logs:
+    for log in unfinished_logs:
         try:
             log_file_mtime = int(os.stat(log.log_path).st_mtime)
         except OSError:
