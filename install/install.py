@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import subprocess
 import time
 import os
 import sys
@@ -271,7 +270,7 @@ class PreSetup(object):
             print
 
     def start(self):
-        color_print('请务必先查看wiki https://github.com/ibuler/jumpserver/wiki/Quickinstall')
+        color_print('请务必先查看wiki https://github.com/jumpserver/jumpserver/wiki')
         time.sleep(3)
         self.check_platform()
         self._rpm_repo()
