@@ -168,7 +168,7 @@ class PreSetup(object):
                 cmd3 = "systemctl disable firewalld"
                 bash('%s && %s && %s' % (cmd1, cmd2, cmd3))
                 bash('localectl set-locale LANG=en_US.UTF-8')
-                bash('setenforce 0')
+                bash('which setenforce 2> /dev/null 1> /dev/null && setenforce 0')
             else:
                 bash("sed -i 's/LANG=.*/LANG=en_US.UTF-8/g' /etc/sysconfig/i18n")
                 bash('service iptables stop && chkconfig iptables off && setenforce 0')
