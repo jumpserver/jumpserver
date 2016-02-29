@@ -91,12 +91,17 @@ def kill_invalid_connection():
             log_file_mtime = 0
 
         if (now_timestamp - log_file_mtime) > 3600:
-            try:
-                os.kill(int(log.pid), 9)
-            except OSError:
-                pass
+            if log.login_type == 'ssh':
+                try:
+                    os.kill(int(log.pid), 9)
+                except OSError:
+                    pass
+            elif (now - log.start_time).days < 1:
+                continue
 
             log.is_finished = True
             log.end_time = now
             log.save()
+
+
 
