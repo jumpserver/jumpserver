@@ -1,7 +1,6 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import subprocess
 import time
 import os
 import sys
@@ -13,6 +12,7 @@ import string
 
 import re
 import platform
+import shlex
 
 jms_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(jms_dir)
@@ -23,7 +23,7 @@ def bash(cmd):
     run a bash shell command
     执行bash命令
     """
-    return subprocess.call(cmd, shell=True)
+    return shlex.os.system(cmd)
 
 
 def valid_ip(ip):
@@ -81,16 +81,32 @@ class PreSetup(object):
         self.key = ''.join(random.choice(string.ascii_lowercase + string.digits) \
                            for _ in range(16))
         self.dist = platform.dist()[0].lower()
+        self.version = platform.dist()[1]
 
     @property
     def _is_redhat(self):
-        if self.dist == "centos" or self.dist == "redhat":
+        if self.dist == "centos" or self.dist == "redhat" or self.dist == "fedora":
+            return True
+
+    @property
+    def _is_centos7(self):
+        if self.dist == "centos" and self.version.startswith("7"):
+            return True
+
+    @property
+    def _is_fedora_new(self):
+        if self.dist == "fedora" and int(self.version) >= 20:
             return True
 
     @property
     def _is_ubuntu(self):
-        if self.dist == "ubuntu":
+        if self.dist == "ubuntu" or self.dist == "debian":
             return True
+
+    def check_platform(self):
+        if not (self._is_redhat or self._is_ubuntu):
+            print(u"支持的平台: CentOS, RedHat, Fedora, Debian, Ubuntu, 暂不支持其他平台安装.")
+            exit()
 
     def write_conf(self, conf_file=os.path.join(jms_dir, 'jumpserver.conf')):
         color_print('开始写入配置文件', 'green')
@@ -116,18 +132,25 @@ class PreSetup(object):
         color_print('开始安装设置mysql (请手动设置mysql安全)', 'green')
         color_print('默认用户名: %s 默认密码: %s' % (self.db_user, self.db_pass), 'green')
         if self._is_redhat:
-            bash('yum -y install mysql-server')
-            bash('service mysqld start')
-            bash('chkconfig mysqld on')
+            if self._is_centos7 or self._is_fedora_new:
+                bash('yum -y install mariadb-server mariadb-devel')
+                bash('systemctl enable mariadb.service')
+                bash('systemctl start mariadb.service')
+            else:
+                bash('yum -y install mysql-server')
+                bash('service mysqld start')
+                bash('chkconfig mysqld on')
             bash('mysql -e "create database %s default charset=utf8"' % self.db)
             bash('mysql -e "grant all on %s.* to \'%s\'@\'%s\' identified by \'%s\'"' % (self.db,
                                                                                          self.db_user,
                                                                                          self.db_host,
                                                                                          self.db_pass))
         if self._is_ubuntu:
-            bash('echo mysql-server mysql-server/root_password select '' | debconf-set-selections')
-            bash('echo mysql-server mysql-server/root_password_again select '' | debconf-set-selections')
-            bash('apt-get -y install mysql-server')
+            cmd1 = "echo mysql-server mysql-server/root_password select '' | debconf-set-selections"
+            cmd2 = "echo mysql-server mysql-server/root_password_again select '' | debconf-set-selections"
+            cmd3 = "apt-get -y install mysql-server"
+            bash('%s; %s; %s' % (cmd1, cmd2, cmd3))
+            bash('service mysql start')
             bash('mysql -e "create database %s default charset=utf8"' % self.db)
             bash('mysql -e "grant all on %s.* to \'%s\'@\'%s\' identified by \'%s\'"' % (self.db,
                                                                                          self.db_user,
@@ -137,12 +160,22 @@ class PreSetup(object):
     def _set_env(self):
         color_print('开始关闭防火墙和selinux', 'green')
         if self._is_redhat:
-            os.system("export LANG='en_US.UTF-8' && sed -i 's/LANG=.*/LANG=en_US.UTF-8/g' /etc/sysconfig/i18n")
-            bash('service iptables stop && chkconfig iptables off && setenforce 0')
+            os.system("export LANG='en_US.UTF-8'")
+            if self._is_centos7 or self._is_fedora_new:
+                cmd1 = "systemctl status firewalld 2> /dev/null 1> /dev/null"
+                cmd2 = "systemctl stop firewalld"
+                cmd3 = "systemctl disable firewalld"
+                bash('%s && %s && %s' % (cmd1, cmd2, cmd3))
+                bash('localectl set-locale LANG=en_US.UTF-8')
+                bash('which setenforce 2> /dev/null 1> /dev/null && setenforce 0')
+            else:
+                bash("sed -i 's/LANG=.*/LANG=en_US.UTF-8/g' /etc/sysconfig/i18n")
+                bash('service iptables stop && chkconfig iptables off && setenforce 0')
+
         if self._is_ubuntu:
             os.system("export LANG='en_US.UTF-8'")
-            bash("iptables -F")
-            bash('which selinux && setenforce 0')
+            bash("which iptables && iptables -F")
+            bash('which setenforce && setenforce 0')
 
     def _test_db_conn(self):
         bash("pip install mysql-python")
@@ -181,9 +214,9 @@ class PreSetup(object):
     def _depend_rpm(self):
         color_print('开始安装依赖包', 'green')
         if self._is_redhat:
-            bash('yum -y install git python-pip mysql-devel gcc automake autoconf python-devel vim sshpass')
+            bash('yum -y install git python-pip mysql-devel rpm-build gcc automake autoconf python-devel vim sshpass lrzsz readline-devel')
         if self._is_ubuntu:
-            bash("apt-get -y install git python-pip gcc automake autoconf vim sshpass libmysqld-dev python-all-dev")
+            bash("apt-get -y --force-yes install git python-pip gcc automake autoconf vim sshpass libmysqld-dev python-all-dev lrzsz libreadline-dev")
 
 
     @staticmethod
@@ -239,6 +272,7 @@ class PreSetup(object):
     def start(self):
         color_print('请务必先查看wiki https://github.com/jumpserver/jumpserver/wiki')
         time.sleep(3)
+        self.check_platform()
         self._rpm_repo()
         self._depend_rpm()
         self._require_pip()
