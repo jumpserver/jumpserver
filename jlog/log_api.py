@@ -15,6 +15,7 @@ from struct import unpack
 from subprocess import Popen
 from sys import platform, prefix, stderr
 from tempfile import NamedTemporaryFile
+from jumpserver.api import logger
 
 from jinja2 import FileSystemLoader, Template
 from jinja2.environment import Environment
@@ -86,7 +87,7 @@ def kill_invalid_connection():
 
     for log in unfinished_logs:
         try:
-            log_file_mtime = int(os.stat(log.log_path).st_mtime)
+            log_file_mtime = int(os.stat('%s.log' % log.log_path).st_mtime)
         except OSError:
             log_file_mtime = 0
 
@@ -94,6 +95,7 @@ def kill_invalid_connection():
             if log.login_type == 'ssh':
                 try:
                     os.kill(int(log.pid), 9)
+
                 except OSError:
                     pass
             elif (now - log.start_time).days < 1:
@@ -102,6 +104,7 @@ def kill_invalid_connection():
             log.is_finished = True
             log.end_time = now
             log.save()
+            logger.warn('kill log %s' % log.log_path)
 
 
 
