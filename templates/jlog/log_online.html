@@ -136,13 +136,8 @@
 {#        })#}
 {#   });#}
     function init(obj){
-        var protocol = "ws://";
-        if (window.location.protocol == 'https:') {
-            protocol = 'wss://';
-        }
-
         var file_path = obj.attr('file_path');
-        var wsUri = protocol + '{{ web_monitor_uri }}';
+        var wsUri = '{{ web_monitor_url }}';
         var socket = new WebSocket(wsUri + '?file_path=' + file_path);
 
         var term = new Terminal({
@@ -211,7 +206,7 @@
    function cut(num, login_type){
        console.log(login_type);
        if (login_type=='web'){
-           var g_url = '{{ web_kill_uri }}' + '?id=' + num;
+           var g_url = '{{ web_kill_url }}' + '?id=' + num;
        } else {
            var g_url = "{% url 'log_kill' %}?id=" + num;
        }

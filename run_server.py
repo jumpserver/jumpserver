@@ -464,6 +464,6 @@ if __name__ == '__main__':
     # server.bind(options.port, options.host)
     # #server.listen(options.port)
     # server.start(num_processes=5)
-    # print "Run server on %s:%s" % (options.host, options.port)
     # tornado.ioloop.IOLoop.instance().start()
+    print "Run server on %s:%s" % (options.host, options.port)
     main()

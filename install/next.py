@@ -86,7 +86,7 @@ class Setup(object):
         os.chmod('init.sh', 0755)
         os.chmod('connect.py', 0755)
         os.chmod('manage.py', 0755)
-        os.chmod('run_websocket.py', 0755)
+        os.chmod('run_server.py', 0755)
         os.chmod('service.sh', 0755)
         os.chmod('logs', 0777)
         os.chmod('keys', 0777)
@@ -95,7 +95,7 @@ class Setup(object):
     def _run_service():
         os.system('sh %s start' % os.path.join(jms_dir, 'service.sh'))
         print
-        color_print('安装成功，请访问web, 祝你使用愉快。\n请访问 https://github.com/jumpserver/jumpserver 查看文档', 'green')
+        color_print('安装成功，请访问web, 祝你使用愉快。\n请访问 https://github.com/jumpserver/jumpserver/wiki 查看文档', 'green')
 
     def start(self):
         print "开始安装Jumpserver, 要求环境为 CentOS 6.5 x86_64"
