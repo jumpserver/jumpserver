@@ -41,7 +41,7 @@ define("host", default='0.0.0.0', help="run port on given host", type=str)
 def django_request_support(func):
     @functools.wraps(func)
     def _deco(*args, **kwargs):
-        request_started.send_robust()
+        request_started.send_robust(func)
         response = func(*args, **kwargs)
         request_finished.send_robust()
         return response
