@@ -43,7 +43,7 @@ def django_request_support(func):
     def _deco(*args, **kwargs):
         request_started.send_robust(func)
         response = func(*args, **kwargs)
-        request_finished.send_robust()
+        request_finished.send_robust(func)
         return response
     return _deco
 
