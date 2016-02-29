@@ -95,6 +95,11 @@ class PreSetup(object):
             return True
 
     @property
+    def _is_fedora_new(self):
+        if self.dist == "fedora" and int(self.version) >= 20:
+            return True
+
+    @property
     def _is_ubuntu(self):
         if self.dist == "ubuntu" or self.dist == "debian":
             return True
@@ -128,7 +133,7 @@ class PreSetup(object):
         color_print('开始安装设置mysql (请手动设置mysql安全)', 'green')
         color_print('默认用户名: %s 默认密码: %s' % (self.db_user, self.db_pass), 'green')
         if self._is_redhat:
-            if self._is_centos7:
+            if self._is_centos7 or self._is_fedora_new:
                 bash('yum -y install mariadb-server mariadb-devel')
                 bash('systemctl enable mariadb.service')
                 bash('systemctl start mariadb.service')
@@ -157,7 +162,7 @@ class PreSetup(object):
         color_print('开始关闭防火墙和selinux', 'green')
         if self._is_redhat:
             os.system("export LANG='en_US.UTF-8'")
-            if self._is_centos7:
+            if self._is_centos7 or self._is_fedora_new:
                 cmd1 = "systemctl status firewalld 2> /dev/null 1> /dev/null"
                 cmd2 = "systemctl stop firewalld"
                 cmd3 = "systemctl disable firewalld"
@@ -171,7 +176,7 @@ class PreSetup(object):
         if self._is_ubuntu:
             os.system("export LANG='en_US.UTF-8'")
             bash("which iptables && iptables -F")
-            bash('which selinux && setenforce 0')
+            bash('which setenforce && setenforce 0')
 
     def _test_db_conn(self):
         bash("pip install mysql-python")
