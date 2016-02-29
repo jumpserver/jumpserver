@@ -19,7 +19,7 @@ from tempfile import NamedTemporaryFile
 from jinja2 import FileSystemLoader, Template
 from jinja2.environment import Environment
 
-from jumpserver.api import BASE_DIR
+from jumpserver.api import BASE_DIR, logger
 from jlog.models import Log
 
 
@@ -80,27 +80,27 @@ def renderTemplate(script_path, time_file_path, dimensions=(24, 80), templatenam
 
 
 def kill_invalid_connection():
-    long_time_logs = []
     unfinished_logs = Log.objects.filter(is_finished=False)
     now = datetime.datetime.now()
     now_timestamp = int(time.mktime(now.timetuple()))
-    for log in unfinished_logs:
-        if (now - log.start_time).days > 1:
-            long_time_logs.append(log)
 
-    for log in long_time_logs:
+    for log in unfinished_logs:
         try:
-            log_file_mtime = int(os.stat(log.log_path).st_mtime)
+            log_file_mtime = int(os.stat('%s.log' % log.log_path).st_mtime)
         except OSError:
             log_file_mtime = 0
 
         if (now_timestamp - log_file_mtime) > 3600:
-            try:
-                os.kill(int(log.pid), 9)
-            except OSError:
-                pass
+            if log.login_type == 'ssh':
+                try:
+                    os.kill(int(log.pid), 9)
+                except OSError:
+                    pass
+            elif (now - log.start_time).days < 1:
+                continue
 
             log.is_finished = True
             log.end_time = now
             log.save()
+            logger.warn('kill log %s' % log.log_path)
 

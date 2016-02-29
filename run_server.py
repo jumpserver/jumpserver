@@ -8,8 +8,10 @@ import os
 import sys
 import os.path
 import threading
-import datetime
 import re
+import functools
+
+from django.core.signals import request_started, request_finished
 
 import tornado.ioloop
 import tornado.options
@@ -21,10 +23,10 @@ import tornado.httpclient
 from tornado.websocket import WebSocketClosedError
 
 from tornado.options import define, options
-from pyinotify import WatchManager, Notifier, ProcessEvent, IN_DELETE, IN_CREATE, IN_MODIFY, AsyncNotifier
+from pyinotify import WatchManager, ProcessEvent, IN_DELETE, IN_CREATE, IN_MODIFY, AsyncNotifier
 import select
 
-from connect import Tty, User, Asset, PermRole, logger, get_object, PermRole, gen_resource
+from connect import Tty, User, Asset, PermRole, logger, get_object, gen_resource
 from connect import TtyLog, Log, Session, user_have_perm, get_group_user_perm, MyRunner, ExecLog
 
 try:
@@ -36,6 +38,16 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 from jumpserver.settings import IP, PORT
 define("port", default=PORT, help="run on the given port", type=int)
 define("host", default=IP, help="run port on given host", type=str)
+
+
+def django_request_support(func):
+    @functools.wraps(func)
+    def _deco(*args, **kwargs):
+        request_started.send_robust(func)
+        response = func(*args, **kwargs)
+        request_finished.send_robust(func)
+        return response
+    return _deco
 
 
 def require_auth(role='user'):
@@ -58,6 +70,7 @@ def require_auth(role='user'):
                         request.user = user
                         if role == 'admin':
                             if user.role in ['SU', 'GA']:
+                                request_finished.send_robust()
                                 return func(request, *args, **kwargs)
                             logger.debug('Websocket: user [ %s ] is not admin.' % user.username)
                         else:
@@ -69,6 +82,7 @@ def require_auth(role='user'):
             except AttributeError:
                 pass
             logger.warning('Websocket: Request auth failed.')
+
         return _deco2
     return _deco
 
@@ -129,6 +143,7 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
+    @django_request_support
     @require_auth('admin')
     def open(self):
         # 获取监控的path
@@ -180,6 +195,7 @@ class WebTty(Tty):
 
 
 class WebTerminalKillHandler(tornado.web.RequestHandler):
+    @django_request_support
     @require_auth('admin')
     def get(self):
         ws_id = self.get_argument('id')
@@ -209,6 +225,7 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
+    @django_request_support
     @require_auth('user')
     def open(self):
         logger.debug('Websocket: Open exec request')
@@ -289,6 +306,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
+    @django_request_support
     @require_auth('user')
     def open(self):
         logger.debug('Websocket: Open request')
