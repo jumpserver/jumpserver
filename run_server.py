@@ -70,7 +70,6 @@ def require_auth(role='user'):
                         request.user = user
                         if role == 'admin':
                             if user.role in ['SU', 'GA']:
-                                request_finished.send_robust(func)
                                 return func(request, *args, **kwargs)
                             logger.debug('Websocket: user [ %s ] is not admin.' % user.username)
                         else:
