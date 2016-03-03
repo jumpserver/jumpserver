@@ -108,6 +108,12 @@ class PreSetup(object):
             print(u"支持的平台: CentOS, RedHat, Fedora, Debian, Ubuntu, 暂不支持其他平台安装.")
             exit()
 
+    @staticmethod
+    def check_bash_return(ret_code, error_msg):
+        if ret_code != 0:
+            color_print(error_msg, 'red')
+            exit()
+
     def write_conf(self, conf_file=os.path.join(jms_dir, 'jumpserver.conf')):
         color_print('开始写入配置文件', 'green')
         conf = ConfigParser.ConfigParser()
@@ -133,11 +139,15 @@ class PreSetup(object):
         color_print('默认用户名: %s 默认密码: %s' % (self.db_user, self.db_pass), 'green')
         if self._is_redhat:
             if self._is_centos7 or self._is_fedora_new:
-                bash('yum -y install mariadb-server mariadb-devel')
+                ret_code = bash('yum -y install mariadb-server mariadb-devel')
+                self.check_bash_return(ret_code, "安装mysql(mariadb)失败, 请检查安装源是否更新或手动安装！")
+
                 bash('systemctl enable mariadb.service')
                 bash('systemctl start mariadb.service')
             else:
-                bash('yum -y install mysql-server')
+                ret_code = bash('yum -y install mysql-server')
+                self.check_bash_return(ret_code, "安装mysql失败, 请检查安装源是否更新或手动安装！")
+
                 bash('service mysqld start')
                 bash('chkconfig mysqld on')
             bash('mysql -e "create database %s default charset=utf8"' % self.db)
@@ -149,7 +159,9 @@ class PreSetup(object):
             cmd1 = "echo mysql-server mysql-server/root_password select '' | debconf-set-selections"
             cmd2 = "echo mysql-server mysql-server/root_password_again select '' | debconf-set-selections"
             cmd3 = "apt-get -y install mysql-server"
-            bash('%s; %s; %s' % (cmd1, cmd2, cmd3))
+            ret_code = bash('%s; %s; %s' % (cmd1, cmd2, cmd3))
+            self.check_bash_return(ret_code, "安装mysql失败, 请检查安装源是否更新或手动安装！")
+
             bash('service mysql start')
             bash('mysql -e "create database %s default charset=utf8"' % self.db)
             bash('mysql -e "grant all on %s.* to \'%s\'@\'%s\' identified by \'%s\'"' % (self.db,
@@ -178,7 +190,6 @@ class PreSetup(object):
             bash('which setenforce && setenforce 0')
 
     def _test_db_conn(self):
-        bash("pip install mysql-python")
         import MySQLdb
         try:
             MySQLdb.connect(host=self.db_host, port=int(self.db_port),
@@ -214,15 +225,18 @@ class PreSetup(object):
     def _depend_rpm(self):
         color_print('开始安装依赖包', 'green')
         if self._is_redhat:
-            bash('yum -y install git python-pip mysql-devel rpm-build gcc automake autoconf python-devel vim sshpass lrzsz readline-devel')
+            cmd = 'yum -y install git python-pip mysql-devel rpm-build gcc automake autoconf python-devel vim sshpass lrzsz readline-devel'
+            ret_code = bash(cmd)
+            self.check_bash_return(ret_code, "安装依赖失败, 请检查安装源是否更新或手动安装！")
         if self._is_ubuntu:
-            bash("apt-get -y --force-yes install git python-pip gcc automake autoconf vim sshpass libmysqld-dev python-all-dev lrzsz libreadline-dev")
+            cmd = "apt-get -y --force-yes install git python-pip gcc automake autoconf vim sshpass libmysqld-dev python-all-dev lrzsz libreadline-dev"
+            ret_code = bash(cmd)
+            self.check_bash_return(ret_code, "安装依赖失败, 请检查安装源是否更新或手动安装！")
 
-
-    @staticmethod
-    def _require_pip():
+    def _require_pip(self):
         color_print('开始安装依赖pip包', 'green')
-        bash('pip install -r requirements.txt')
+        ret_code = bash('pip install -r requirements.txt')
+        self.check_bash_return(ret_code, "安装JumpServer 依赖的python库失败！")
 
     def _input_ip(self):
         ip = raw_input('\n请输入您服务器的IP地址，用户浏览器可以访问 [%s]: ' % get_ip_addr()).strip()
