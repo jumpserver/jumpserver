@@ -41,6 +41,10 @@ start() {
             ps axu | grep 'run_server' | grep -v 'grep' &> /dev/null
             if [ $? == '0' ];then
                 success "$jump_start"
+                if [ ! -e $lockfile ]; then
+                    lockfile_dir=`dirname $lockfile`
+                    mkdir -pv $lockfile_dir
+                fi
                 touch "$lockfile"
                 echo
             else
