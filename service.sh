@@ -42,7 +42,7 @@ start() {
             if [ $? == '0' ];then
                 success "$jump_start"
                 if [ ! -e $lockfile ]; then
-                    lockfile_dir=`basename $lockfile`
+                    lockfile_dir=`dirname $lockfile`
                     mkdir -pv $lockfile_dir
                 fi
                 touch "$lockfile"
