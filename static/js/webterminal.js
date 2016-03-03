@@ -13,7 +13,7 @@ WSSHClient.prototype._generateEndpoint = function (options) {
         var protocol = 'ws://';
     }
 
-    var endpoint = protocol + window.location.host + ':8080' + '/terminal';
+    var endpoint = protocol + document.URL.match(RegExp('//(.*?)/'))[1] + '/ws/terminal';
     return endpoint;
 };
 WSSHClient.prototype.connect = function (options) {
