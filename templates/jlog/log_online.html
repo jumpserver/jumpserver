@@ -128,17 +128,17 @@
 </div>
 
 
-{#<script src="http://{{ web_socket_host }}/socket.io/socket.io.js"></script>#}
 <script>
-{#   $(document).ready(function(){#}
-{#       $('.monitor').click(function(){#}
-{#           window.open('/jlog/monitor/', '监控', 'height=500, width=910, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');#}
-{#        })#}
-{#   });#}
     function init(obj){
+        if (window.location.protocol == 'https:') {
+            var protocol = 'wss://';
+        } else {
+            var protocol = 'ws://';
+        }
+
+        var endpoint = protocol + document.URL.match(RegExp('//(.*?)/'))[1] + '/monitor';
         var file_path = obj.attr('file_path');
-        var wsUri = '{{ web_monitor_url }}';
-        var socket = new WebSocket(wsUri + '?file_path=' + file_path);
+        var socket = new WebSocket(endpoint + '?file_path=' + file_path);
 
         var term = new Terminal({
             cols: 80,
@@ -165,7 +165,6 @@
 
         BootstrapDialog.show({message: function(){
             //服务器端认证
-{#            socket.send('login', {userid:message.id, filename:message.filename,username:username,seed:seed});#}
             window.setTimeout(function(){
                 $('.terminal').detach().appendTo('#term');
                 socket.onmessage = function(evt){
@@ -204,9 +203,11 @@
     });
 
    function cut(num, login_type){
-       console.log(login_type);
+       var protocol = window.location.protocol;
+       var endpoint = protocol + '//' +  document.URL.match(RegExp('//(.*?)/'))[1] + '/kill';
        if (login_type=='web'){
-           var g_url = '{{ web_kill_url }}' + '?id=' + num;
+           var g_url = endpoint + '?id=' + num;
+           console.log(g_url);
        } else {
            var g_url = "{% url 'log_kill' %}?id=" + num;
        }
