@@ -13,7 +13,7 @@ WSSHClient.prototype._generateEndpoint = function (options) {
         var protocol = 'ws://';
     }
 
-    var endpoint = protocol + document.URL.match(RegExp('//(.*?)/'))[1] + '/ws/terminal'+document.URL.match(/(\?.*)/);
+    var endpoint = protocol + document.URL.match(RegExp('//(.*?)/'))[1] + '/ws/terminal' + document.URL.match(/(\?.*)/);
     return endpoint;
 };
 WSSHClient.prototype.connect = function (options) {
@@ -55,10 +55,16 @@ WSSHClient.prototype.send = function (data) {
 
 function openTerminal(options) {
     var client = new WSSHClient();
-    var term = new Terminal(80, 24, function (key) {
-        client.send(key);
+    var term = new Terminal({
+        rows: rowHeight,
+        cols: colWidth,
+        useStyle: true,
+        screenKeys: true
     });
     term.open();
+    term.on('data', function (data) {
+        client.send(data)
+    });
     $('.terminal').detach().appendTo('#term');
     term.resize(80, 24);
     term.write('Connecting...');
