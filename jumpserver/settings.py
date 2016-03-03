@@ -41,7 +41,6 @@ SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys/role_keys')
 KEY = config.get('base', 'key')
 URL = config.get('base', 'url')
 LOG_LEVEL = config.get('base', 'log')
-WEB_SOCKET_URL = config.get('base', 'websocket_url')
 IP = config.get('base', 'ip')
 PORT = config.get('base', 'port')
 

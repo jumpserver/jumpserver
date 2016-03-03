@@ -119,7 +119,6 @@ class PreSetup(object):
         conf = ConfigParser.ConfigParser()
         conf.read(conf_file)
         conf.set('base', 'url', 'http://%s' % self.ip)
-        conf.set('base', 'websocket_url', 'ws://%s' % self.ip)
         conf.set('base', 'key', self.key)
         conf.set('db', 'host', self.db_host)
         conf.set('db', 'port', self.db_port)
