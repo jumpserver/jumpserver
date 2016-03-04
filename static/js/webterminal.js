@@ -85,7 +85,11 @@ function openTerminal(options) {
         term.write('Connection Reset By Peer');
     };
     sock.onmessage= function (data) {
-         term.write(JSON.parse(data.data)['data']);
+        try {
+            term.write(data)
+        } catch (e) {
+            term.write(JSON.parse(data.data)['data'])
+        }
     };
     sock.onerror= function () {
         term.write('Connection Reset By Peer');

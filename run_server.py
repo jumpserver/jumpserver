@@ -412,7 +412,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                     if self.term.vim_flag:
                         self.term.vim_data += recv
                     try:
-                        self.write_message(json.dumps({'data': data}))
+                        self.write_message(data)
                         now_timestamp = time.time()
                         self.log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
                         self.log_file_f.write(data)

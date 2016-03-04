@@ -384,9 +384,6 @@ class SshTty(Tty):
                 if self.channel in r:
                     try:
                         x = self.channel.recv(10240)
-                        print x
-                        print '===='
-                        print len(x)
                         if len(x) == 0:
                             break
                         if self.vim_flag:
