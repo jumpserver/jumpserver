@@ -32,6 +32,27 @@ from jperm.ansible_api import MyRunner
 # from jlog.log_api import escapeString
 from jlog.models import ExecLog, FileLog
 
+def _patched_exec_command(self,
+                          command,
+                          bufsize=-1,
+                          timeout=None,
+                          get_pty=False,
+                          stdin_binary=True,
+                          stdout_binary=False,
+                          stderr_binary=False):
+
+    chan = self._transport.open_session()
+    if get_pty:
+        chan.get_pty()
+    chan.settimeout(timeout)
+    chan.exec_command(command)
+    stdin = chan.makefile('wb' if stdin_binary else 'w', bufsize)
+    stdout = chan.makefile('rb' if stdin_binary else 'r', bufsize)
+    stderr = chan.makefile_stderr('rb' if stdin_binary else 'r', bufsize)
+    return stdin, stdout, stderr
+
+paramiko.SSHClient.exec_command = _patched_exec_command
+
 login_user = get_object(User, username=getpass.getuser())
 try:
     remote_ip = os.environ.get('SSH_CLIENT').split()[0]
