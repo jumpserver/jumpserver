@@ -131,7 +131,7 @@ $(document).ready(function () {
         var geom = resize();
         console.log(geom);
         term_client.term.resize(geom.cols, geom.rows);
-        term_client.client.send(JSON.stringify({'data':{'resize': {'rows': geom.rows, 'cols': geom.cols}});
+        term_client.client.send(JSON.stringify({'data':{'resize': {'rows': geom.rows, 'cols': geom.cols}}}));
         $('#ssh').show();
     }
 
