@@ -61,7 +61,7 @@ function openTerminal(options) {
         var protocol = 'ws://';
     }
 
-    var endpoint = protocol + document.URL.match(RegExp('//(.*?)/'))[1] + '/ws/terminal' + document.URL.match(/(\?.*)/);
+    var endpoint = protocol + document.URL.match(RegExp('//(.*?)/'))[1] + '/ws/terminal' + document.URL.match(/(\?.*)/)[1];
     var sock = new WebSocket(endpoint);
     //var client = new WSSHClient();
     var term = new Terminal({
@@ -131,7 +131,7 @@ $(document).ready(function () {
         var geom = resize();
         console.log(geom);
         term_client.term.resize(geom.cols, geom.rows);
-        term_client.client.send(JSON.stringify({'data':{'resize': {'rows': geom.rows, 'cols': geom.cols}}}));
+        term_client.client.send(JSON.stringify({'data':{'resize': {'rows': geom.rows, 'cols': geom.cols}});
         $('#ssh').show();
     }
 
