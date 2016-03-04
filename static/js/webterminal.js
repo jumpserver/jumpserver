@@ -1,8 +1,8 @@
 /**
  * Created by liuzheng on 3/3/16.
  */
-//var rowHeight = 1;
-//var colWidth = 1;
+var rowHeight = 1;
+var colWidth = 1;
 //function WSSHClient() {
 //}
 //WSSHClient.prototype._generateEndpoint = function (options) {
