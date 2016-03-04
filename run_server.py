@@ -460,7 +460,7 @@ def main():
     }
     tornado_app = tornado.web.Application(
         [
-            (r'/monitor', MonitorHandler),
+            (r'/ws/monitor', MonitorHandler),
             (r'/ws/terminal', WebTerminalHandler),
             (r'/kill', WebTerminalKillHandler),
             (r'/ws/exec', ExecHandler),
