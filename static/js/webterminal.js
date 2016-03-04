@@ -86,7 +86,7 @@ function openTerminal(options) {
     };
     sock.onmessage= function (data) {
         try {
-            term.write(data)
+            term.write(data.data)
         } catch (e) {
             term.write(JSON.parse(data.data)['data'])
         }
