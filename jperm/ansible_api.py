@@ -125,7 +125,7 @@ class MyRunner(MyInventory):
         self.results_raw = {}
 
     def run(self, module_name='shell', module_args='', timeout=10, forks=10, pattern='*',
-            become=False, become_method='sudo', become_user='root', become_pass=''):
+            become=False, become_method='sudo', become_user='root', become_pass='', transport='paramiko'):
         """
         run module from andible ad-hoc.
         module_name: ansible module_name
@@ -140,7 +140,8 @@ class MyRunner(MyInventory):
                      become=become,
                      become_method=become_method,
                      become_user=become_user,
-                     become_pass=become_pass
+                     become_pass=become_pass,
+                     transport=transport
                      )
         self.results_raw = hoc.run()
         logger.debug(self.results_raw)
