@@ -388,18 +388,8 @@ class SshTty(Tty):
                             break
                         if self.vim_flag:
                             self.vim_data += x
-                        index = 0
-                        len_x = len(x)
-                        while index < len_x:
-                            try:
-                                n = os.write(sys.stdout.fileno(), x[index:])
-                                sys.stdout.flush()
-                                index += n
-                            except OSError as msg:
-                                if msg.errno == errno.EAGAIN:
-                                    continue
-                        #sys.stdout.write(x)
-                        #sys.stdout.flush()
+                        sys.stdout.write(x)
+                        sys.stdout.flush()
                         now_timestamp = time.time()
                         log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(x)))
                         log_time_f.flush()
