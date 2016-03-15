@@ -338,7 +338,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         if not self.term.remote_ip:
             self.term.remote_ip = self.request.remote_ip
         self.ssh = self.term.get_connection()
-        self.channel = self.ssh.invoke_shell()
+        self.channel = self.ssh.invoke_shell(term='xterm')
         WebTerminalHandler.tasks.append(MyThread(target=self.forward_outbound))
         WebTerminalHandler.clients.append(self)
 
@@ -412,7 +412,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                     if self.term.vim_flag:
                         self.term.vim_data += recv
                     try:
-                        print chardet.detect(data)
+                        # print chardet.detect(data)
                         if chardet.detect(data)['encoding'] == 'GB2312':
                             data = data.decode('gb2312').encode('utf8')
                         self.write_message(data)
