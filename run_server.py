@@ -413,8 +413,8 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                         self.term.vim_data += recv
                     try:
                         print chardet.detect(data)
-                        if chardet.detect(data).encoding == 'GB2312':
-                            data = data.encode('gbk').decode('utf8')
+                        if chardet.detect(data)['encoding'] == 'GB2312':
+                            data = data.decode('gb2312').encode('utf8')
                         self.write_message(data)
                         now_timestamp = time.time()
                         self.log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
