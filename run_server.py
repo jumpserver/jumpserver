@@ -10,7 +10,7 @@ import os.path
 import threading
 import re
 import functools
-
+import chardet
 from django.core.signals import request_started, request_finished
 
 import tornado.ioloop
@@ -412,6 +412,9 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                     if self.term.vim_flag:
                         self.term.vim_data += recv
                     try:
+                        print chardet.detect(data)
+                        if chardet.detect(data).encoding == 'GB2312':
+                            data = data.encode('gbk').decode('utf8')
                         self.write_message(data)
                         now_timestamp = time.time()
                         self.log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
