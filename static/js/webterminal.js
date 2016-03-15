@@ -41,7 +41,7 @@ WSSHClient.prototype.connect = function (options) {
             options.onError(data.error);
         }
         else {
-            options.onData(data.data);
+            options.onData(data);
         }
     };
 
