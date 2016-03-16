@@ -41,7 +41,8 @@ SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys/role_keys')
 KEY = config.get('base', 'key')
 URL = config.get('base', 'url')
 LOG_LEVEL = config.get('base', 'log')
-WEB_SOCKET_HOST = config.get('websocket', 'web_socket_host')
+IP = config.get('base', 'ip')
+PORT = config.get('base', 'port')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/

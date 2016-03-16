@@ -153,8 +153,7 @@ def user_add(request):
         ssh_key_pwd = PyCrypt.gen_rand_pass(16)
         extra = request.POST.getlist('extra', [])
         is_active = False if '0' in extra else True
-        ssh_key_login_need = True
-        send_mail_need = True if '2' in extra else False
+        send_mail_need = True if '1' in extra else False
 
         try:
             if '' in [username, password, ssh_key_pwd, name, role]:
@@ -176,7 +175,7 @@ def user_add(request):
                                    ssh_key_pwd=ssh_key_pwd,
                                    is_active=is_active,
                                    date_joined=datetime.datetime.now())
-                server_add_user(username, password, ssh_key_pwd, ssh_key_login_need)
+                server_add_user(username=username, ssh_key_pwd=ssh_key_pwd)
                 user = get_object(User, username=username)
                 if groups:
                     user_groups = []
@@ -193,7 +192,7 @@ def user_add(request):
             else:
                 if MAIL_ENABLE and send_mail_need:
                     user_add_mail(user, kwargs=locals())
-                msg = get_display_msg(user, password, ssh_key_pwd, ssh_key_login_need, send_mail_need)
+                msg = get_display_msg(user, password=password, ssh_key_pwd=ssh_key_pwd, send_mail_need=send_mail_need)
     return my_render('juser/user_add.html', locals(), request)
 
 
@@ -361,7 +360,7 @@ def user_edit(request):
         admin_groups = request.POST.getlist('admin_groups', [])
         extra = request.POST.getlist('extra', [])
         is_active = True if '0' in extra else False
-        email_need = True if '2' in extra else False
+        email_need = True if '1' in extra else False
         user_role = {'SU': u'超级管理员', 'GA': u'部门管理员', 'CU': u'普通用户'}
 
         if user_id:
@@ -453,7 +452,6 @@ def down_key(request):
         uuid_r = request.GET.get('uuid', '')
     else:
         uuid_r = request.user.uuid
-
     if uuid_r:
         user = get_object(User, uuid=uuid_r)
         if user:
@@ -466,6 +464,8 @@ def down_key(request):
                 f.close()
                 response = HttpResponse(data, content_type='application/octet-stream')
                 response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(private_key_file)
+                if request.user.role == 'CU':
+                    os.unlink(private_key_file)
                 return response
     return HttpResponse('No Key File. Contact Admin.')
 

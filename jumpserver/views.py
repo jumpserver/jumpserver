@@ -286,7 +286,7 @@ def upload(request):
         res = gen_resource({'user': user, 'asset': asset_select})
         runner = MyRunner(res)
         runner.run('copy', module_args='src=%s dest=%s directory_mode'
-                                        % (upload_dir, upload_dir), pattern='*')
+                                        % (upload_dir, '/tmp'), pattern='*')
         ret = runner.results
         logger.debug(ret)
         FileLog(user=request.user.username, host=' '.join([asset.hostname for asset in asset_select]),
@@ -344,7 +344,7 @@ def download(request):
 def exec_cmd(request):
     role = request.GET.get('role')
     check_assets = request.GET.get('check_assets', '')
-    web_terminal_uri = '%s/exec?role=%s' % (WEB_SOCKET_HOST, role)
+    web_terminal_uri = '/ws/exec?role=%s' % (role)
     return my_render('exec_cmd.html', locals(), request)
 
 
@@ -354,9 +354,7 @@ def web_terminal(request):
     role_name = request.GET.get('role')
     asset = get_object(Asset, id=asset_id)
     if asset:
-        print asset
         hostname = asset.hostname
-    web_terminal_uri = '%s/terminal?id=%s&role=%s' % (WEB_SOCKET_HOST, asset_id, role_name)
     return render_to_response('jlog/web_terminal.html', locals())
 
 

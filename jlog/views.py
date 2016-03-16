@@ -9,7 +9,6 @@ from django.http import HttpResponseNotFound
 from jlog.log_api import renderTemplate
 
 from jlog.models import Log, ExecLog, FileLog
-from jumpserver.settings import WEB_SOCKET_HOST
 
 
 @require_role('admin')
@@ -66,8 +65,6 @@ def log_list(request, offset):
 
     contact_list, p, contacts, page_range, current_page, show_first, show_end = pages(posts, request)
 
-    web_monitor_uri = '%s/monitor' % WEB_SOCKET_HOST
-    web_kill_uri = 'http://%s/kill' % WEB_SOCKET_HOST
     session_id = request.session.session_key
     return render_to_response('jlog/log_%s.html' % offset, locals(), context_instance=RequestContext(request))
 

@@ -1,0 +1,594 @@
+# -*-Shell-script-*-
+#
+# functions	This file contains functions to be used by most or all
+#		shell scripts in the /etc/init.d directory.
+#
+
+TEXTDOMAIN=initscripts
+
+# Make sure umask is sane
+umask 022
+
+# Set up a default search path.
+PATH="/sbin:/usr/sbin:/bin:/usr/bin"
+export PATH
+
+if [ $PPID -ne 1 -a -z "$SYSTEMCTL_SKIP_REDIRECT" ] && \
+		( /bin/mountpoint -q /cgroup/systemd || /bin/mountpoint -q /sys/fs/cgroup/systemd ) ; then
+        case "$0" in
+        /etc/init.d/*|/etc/rc.d/init.d/*)
+		_use_systemctl=1
+		;;
+	esac
+fi
+
+systemctl_redirect () {
+	local s
+	local prog=${1##*/}
+        local command=$2
+        local options=""
+
+	case "$command" in
+	start)
+		s=$"Starting $prog (via systemctl): "
+		;;
+	stop)
+		s=$"Stopping $prog (via systemctl): "
+		;;
+	reload|try-reload)
+		s=$"Reloading $prog configuration (via systemctl): "
+		;;
+	restart|try-restart|condrestart)
+		s=$"Restarting $prog (via systemctl): "
+		;;
+	esac
+
+        if [ -n "$SYSTEMCTL_IGNORE_DEPENDENCIES" ] ; then
+                options="--ignore-dependencies"
+        fi
+
+	action "$s" /bin/systemctl $options $command "$prog.service"
+}
+
+# Get a sane screen width
+[ -z "${COLUMNS:-}" ] && COLUMNS=80
+
+if [ -z "${CONSOLETYPE:-}" ]; then
+  if [ -c "/dev/stderr" -a -r "/dev/stderr" ]; then
+    CONSOLETYPE="$(/sbin/consoletype < /dev/stderr 2>/dev/null)"
+  else
+    CONSOLETYPE="serial"
+  fi
+fi
+
+if [ -z "${NOLOCALE:-}" ] && [ -z "${LANGSH_SOURCED:-}" ] && [ -f /etc/sysconfig/i18n -o -f /etc/locale.conf ] ; then
+  . /etc/profile.d/lang.sh 2>/dev/null
+  # avoid propagating LANGSH_SOURCED any further
+  unset LANGSH_SOURCED
+fi
+
+# Read in our configuration
+if [ -z "${BOOTUP:-}" ]; then
+  if [ -f /etc/sysconfig/init ]; then
+      . /etc/sysconfig/init
+  else
+    # This all seem confusing? Look in /etc/sysconfig/init,
+    # or in /usr/share/doc/initscripts-*/sysconfig.txt
+    BOOTUP=color
+    RES_COL=60
+    MOVE_TO_COL="echo -en \\033[${RES_COL}G"
+    SETCOLOR_SUCCESS="echo -en \\033[1;32m"
+    SETCOLOR_FAILURE="echo -en \\033[1;31m"
+    SETCOLOR_WARNING="echo -en \\033[1;33m"
+    SETCOLOR_NORMAL="echo -en \\033[0;39m"
+    LOGLEVEL=1
+  fi
+  if [ "$CONSOLETYPE" = "serial" ]; then
+      BOOTUP=serial
+      MOVE_TO_COL=
+      SETCOLOR_SUCCESS=
+      SETCOLOR_FAILURE=
+      SETCOLOR_WARNING=
+      SETCOLOR_NORMAL=
+  fi
+fi
+
+# Check if any of $pid (could be plural) are running
+checkpid() {
+	local i
+
+	for i in $* ; do
+		[ -d "/proc/$i" ] && return 0
+	done
+	return 1
+}
+
+# __proc_pids {program} [pidfile]
+# Set $pid to pids from /var/run* for {program}.  $pid should be declared
+# local in the caller.
+# Returns LSB exit code for the 'status' action.
+__pids_var_run() {
+	local base=${1##*/}
+	local pid_file=${2:-/var/run/$base.pid}
+
+	pid=
+	if [ -f "$pid_file" ] ; then
+	        local line p
+
+		[ ! -r "$pid_file" ] && return 4 # "user had insufficient privilege"
+		while : ; do
+			read line
+			[ -z "$line" ] && break
+			for p in $line ; do
+				[ -z "${p//[0-9]/}" ] && [ -d "/proc/$p" ] && pid="$pid $p"
+			done
+		done < "$pid_file"
+
+	        if [ -n "$pid" ]; then
+	                return 0
+	        fi
+		return 1 # "Program is dead and /var/run pid file exists"
+	fi
+	return 3 # "Program is not running"
+}
+
+# Output PIDs of matching processes, found using pidof
+__pids_pidof() {
+	pidof -c -m -o $$ -o $PPID -o %PPID -x "$1" || \
+		pidof -c -m -o $$ -o $PPID -o %PPID -x "${1##*/}"
+}
+
+
+# A function to start a program.
+daemon() {
+	# Test syntax.
+	local gotbase= force= nicelevel corelimit
+	local pid base= user= nice= bg= pid_file=
+	local cgroup=
+	nicelevel=0
+	while [ "$1" != "${1##[-+]}" ]; do
+	  case $1 in
+	    '')    echo $"$0: Usage: daemon [+/-nicelevel] {program}"
+	           return 1;;
+	    --check)
+		   base=$2
+		   gotbase="yes"
+		   shift 2
+		   ;;
+	    --check=?*)
+	    	   base=${1#--check=}
+		   gotbase="yes"
+		   shift
+		   ;;
+	    --user)
+		   user=$2
+		   shift 2
+		   ;;
+	    --user=?*)
+	           user=${1#--user=}
+		   shift
+		   ;;
+	    --pidfile)
+		   pid_file=$2
+		   shift 2
+		   ;;
+	    --pidfile=?*)
+		   pid_file=${1#--pidfile=}
+		   shift
+		   ;;
+	    --force)
+	    	   force="force"
+		   shift
+		   ;;
+	    [-+][0-9]*)
+	    	   nice="nice -n $1"
+	           shift
+		   ;;
+	    *)     echo $"$0: Usage: daemon [+/-nicelevel] {program}"
+	           return 1;;
+	  esac
+	done
+
+        # Save basename.
+        [ -z "$gotbase" ] && base=${1##*/}
+
+        # See if it's already running. Look *only* at the pid file.
+	__pids_var_run "$base" "$pid_file"
+
+	[ -n "$pid" -a -z "$force" ] && return
+
+	# make sure it doesn't core dump anywhere unless requested
+	corelimit="ulimit -S -c ${DAEMON_COREFILE_LIMIT:-0}"
+	
+	# if they set NICELEVEL in /etc/sysconfig/foo, honor it
+	[ -n "${NICELEVEL:-}" ] && nice="nice -n $NICELEVEL"
+	
+	# if they set CGROUP_DAEMON in /etc/sysconfig/foo, honor it
+	if [ -n "${CGROUP_DAEMON}" ]; then
+		if [ ! -x /bin/cgexec ]; then
+			echo -n "Cgroups not installed"; warning
+			echo
+		else
+			cgroup="/bin/cgexec";
+			for i in $CGROUP_DAEMON; do
+				cgroup="$cgroup -g $i";
+			done
+		fi
+	fi
+
+	# Echo daemon
+        [ "${BOOTUP:-}" = "verbose" -a -z "${LSB:-}" ] && echo -n " $base"
+
+	# And start it up.
+	if [ -z "$user" ]; then
+	   $cgroup $nice /bin/bash -c "$corelimit >/dev/null 2>&1 ; $*"
+	else
+	   $cgroup $nice runuser -s /bin/bash $user -c "$corelimit >/dev/null 2>&1 ; $*"
+	fi
+
+	[ "$?" -eq 0 ] && success $"$base startup" || failure $"$base startup"
+}
+
+# A function to stop a program.
+killproc() {
+	local RC killlevel= base pid pid_file= delay try
+
+	RC=0; delay=3; try=0
+	# Test syntax.
+	if [ "$#" -eq 0 ]; then
+		echo $"Usage: killproc [-p pidfile] [ -d delay] {program} [-signal]"
+		return 1
+	fi
+	if [ "$1" = "-p" ]; then
+		pid_file=$2
+		shift 2
+	fi
+	if [ "$1" = "-d" ]; then
+		delay=$(echo $2 | awk -v RS=' ' -v IGNORECASE=1 '{if($1!~/^[0-9.]+[smhd]?$/) exit 1;d=$1~/s$|^[0-9.]*$/?1:$1~/m$/?60:$1~/h$/?60*60:$1~/d$/?24*60*60:-1;if(d==-1) exit 1;delay+=d*$1} END {printf("%d",delay+0.5)}')
+		if [ "$?" -eq 1 ]; then
+			echo $"Usage: killproc [-p pidfile] [ -d delay] {program} [-signal]"
+			return 1
+		fi
+		shift 2
+	fi
+        
+
+	# check for second arg to be kill level
+	[ -n "${2:-}" ] && killlevel=$2
+
+        # Save basename.
+        base=${1##*/}
+
+        # Find pid.
+	__pids_var_run "$1" "$pid_file"
+	RC=$?
+	if [ -z "$pid" ]; then
+		if [ -z "$pid_file" ]; then
+			pid="$(__pids_pidof "$1")"
+		else
+			[ "$RC" = "4" ] && { failure $"$base shutdown" ; return $RC ;}
+		fi
+	fi
+
+        # Kill it.
+        if [ -n "$pid" ] ; then
+                [ "$BOOTUP" = "verbose" -a -z "${LSB:-}" ] && echo -n "$base "
+		if [ -z "$killlevel" ] ; then
+		       if checkpid $pid 2>&1; then
+			   # TERM first, then KILL if not dead
+			   kill -TERM $pid >/dev/null 2>&1
+			   usleep 50000
+			   if checkpid $pid ; then
+				try=0
+				while [ $try -lt $delay ] ; do
+					checkpid $pid || break
+					sleep 1
+					let try+=1
+				done
+				if checkpid $pid ; then
+					kill -KILL $pid >/dev/null 2>&1
+					usleep 50000
+				fi
+			   fi
+		        fi
+			checkpid $pid
+			RC=$?
+			[ "$RC" -eq 0 ] && failure $"$base shutdown" || success $"$base shutdown"
+			RC=$((! $RC))
+		# use specified level only
+		else
+		        if checkpid $pid; then
+	                	kill $killlevel $pid >/dev/null 2>&1
+				RC=$?
+				[ "$RC" -eq 0 ] && success $"$base $killlevel" || failure $"$base $killlevel"
+			elif [ -n "${LSB:-}" ]; then
+				RC=7 # Program is not running
+			fi
+		fi
+	else
+		if [ -n "${LSB:-}" -a -n "$killlevel" ]; then
+			RC=7 # Program is not running
+		else
+			failure $"$base shutdown"
+			RC=0
+		fi
+	fi
+
+        # Remove pid file if any.
+	if [ -z "$killlevel" ]; then
+            rm -f "${pid_file:-/var/run/$base.pid}"
+	fi
+	return $RC
+}
+
+# A function to find the pid of a program. Looks *only* at the pidfile
+pidfileofproc() {
+	local pid
+
+	# Test syntax.
+	if [ "$#" = 0 ] ; then
+		echo $"Usage: pidfileofproc {program}"
+		return 1
+	fi
+
+	__pids_var_run "$1"
+	[ -n "$pid" ] && echo $pid
+	return 0
+}
+
+# A function to find the pid of a program.
+pidofproc() {
+	local RC pid pid_file=
+
+	# Test syntax.
+	if [ "$#" = 0 ]; then
+		echo $"Usage: pidofproc [-p pidfile] {program}"
+		return 1
+	fi
+	if [ "$1" = "-p" ]; then
+		pid_file=$2
+		shift 2
+	fi
+	fail_code=3 # "Program is not running"
+
+	# First try "/var/run/*.pid" files
+	__pids_var_run "$1" "$pid_file"
+	RC=$?
+	if [ -n "$pid" ]; then
+		echo $pid
+		return 0
+	fi
+
+	[ -n "$pid_file" ] && return $RC
+	__pids_pidof "$1" || return $RC
+}
+
+status() {
+	local base pid lock_file= pid_file=
+
+	# Test syntax.
+	if [ "$#" = 0 ] ; then
+		echo $"Usage: status [-p pidfile] {program}"
+		return 1
+	fi
+	if [ "$1" = "-p" ]; then
+		pid_file=$2
+		shift 2
+	fi
+	if [ "$1" = "-l" ]; then
+		lock_file=$2
+		shift 2
+	fi
+	base=${1##*/}
+
+	if [ "$_use_systemctl" = "1" ]; then
+		systemctl status ${0##*/}.service
+		return $?
+	fi
+
+	# First try "pidof"
+	__pids_var_run "$1" "$pid_file"
+	RC=$?
+	if [ -z "$pid_file" -a -z "$pid" ]; then
+		pid="$(__pids_pidof "$1")"
+	fi
+	if [ -n "$pid" ]; then
+	        echo $"${base} (pid $pid) is running..."
+	        return 0
+	fi
+
+	case "$RC" in
+		0)
+			echo $"${base} (pid $pid) is running..."
+			return 0
+			;;
+		1)
+	                echo $"${base} dead but pid file exists"
+	                return 1
+			;;
+		4)
+			echo $"${base} status unknown due to insufficient privileges."
+			return 4
+			;;
+	esac
+	if [ -z "${lock_file}" ]; then
+		lock_file=${base}
+	fi
+	# See if /var/lock/subsys/${lock_file} exists
+	if [ -f /var/lock/subsys/${lock_file} ]; then
+		echo $"${base} dead but subsys locked"
+		return 2
+	fi
+	echo $"${base} is stopped"
+	return 3
+}
+
+echo_success() {
+  [ "$BOOTUP" = "color" ] && $MOVE_TO_COL
+  echo -n "["
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_SUCCESS
+  echo -n $"  OK  "
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+  echo -n "]"
+  echo -ne "\r"
+  return 0
+}
+
+echo_failure() {
+  [ "$BOOTUP" = "color" ] && $MOVE_TO_COL
+  echo -n "["
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_FAILURE
+  echo -n $"FAILED"
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+  echo -n "]"
+  echo -ne "\r"
+  return 1
+}
+
+echo_passed() {
+  [ "$BOOTUP" = "color" ] && $MOVE_TO_COL
+  echo -n "["
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_WARNING
+  echo -n $"PASSED"
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+  echo -n "]"
+  echo -ne "\r"
+  return 1
+}
+
+echo_warning() {
+  [ "$BOOTUP" = "color" ] && $MOVE_TO_COL
+  echo -n "["
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_WARNING
+  echo -n $"WARNING"
+  [ "$BOOTUP" = "color" ] && $SETCOLOR_NORMAL
+  echo -n "]"
+  echo -ne "\r"
+  return 1
+}
+
+# Inform the graphical boot of our current state
+update_boot_stage() {
+  if [ -x /bin/plymouth ]; then
+      /bin/plymouth --update="$1"
+  fi
+  return 0
+}
+
+# Log that something succeeded
+success() {
+  [ "$BOOTUP" != "verbose" -a -z "${LSB:-}" ] && echo_success
+  return 0
+}
+
+# Log that something failed
+failure() {
+  local rc=$?
+  [ "$BOOTUP" != "verbose" -a -z "${LSB:-}" ] && echo_failure
+  [ -x /bin/plymouth ] && /bin/plymouth --details
+  return $rc
+}
+
+# Log that something passed, but may have had errors. Useful for fsck
+passed() {
+  local rc=$?
+  [ "$BOOTUP" != "verbose" -a -z "${LSB:-}" ] && echo_passed
+  return $rc
+}  
+
+# Log a warning
+warning() {
+  local rc=$?
+  [ "$BOOTUP" != "verbose" -a -z "${LSB:-}" ] && echo_warning
+  return $rc
+}  
+
+# Run some action. Log its output.
+action() {
+  local STRING rc
+
+  STRING=$1
+  echo -n "$STRING "
+  shift
+  "$@" && success $"$STRING" || failure $"$STRING"
+  rc=$?
+  echo
+  return $rc
+}
+
+# returns OK if $1 contains $2
+strstr() {
+  [ "${1#*$2*}" = "$1" ] && return 1
+  return 0
+}
+
+# Check whether file $1 is a backup or rpm-generated file and should be ignored
+is_ignored_file() {
+    case "$1" in
+	*~ | *.bak | *.orig | *.rpmnew | *.rpmorig | *.rpmsave)
+	    return 0
+	    ;;
+    esac
+    return 1
+}
+
+# Evaluate shvar-style booleans
+is_true() {
+    case "$1" in
+	[tT] | [yY] | [yY][eE][sS] | [tT][rR][uU][eE])
+	return 0
+	;;
+    esac
+    return 1
+}
+
+# Evaluate shvar-style booleans
+is_false() {
+    case "$1" in
+	[fF] | [nN] | [nN][oO] | [fF][aA][lL][sS][eE])
+	return 0
+	;;
+    esac
+    return 1
+}
+
+# Apply sysctl settings, including files in /etc/sysctl.d
+apply_sysctl() {
+    if [ -x /lib/systemd/systemd-sysctl ]; then
+	/lib/systemd/systemd-sysctl
+    else
+        for file in /usr/lib/sysctl.d/*.conf ; do
+            is_ignored_file "$file" && continue
+            [ -f /run/sysctl.d/${file##*/} ] && continue
+            [ -f /etc/sysctl.d/${file##*/} ] && continue
+            test -f "$file" && sysctl -e -p "$file" >/dev/null 2>&1
+        done
+        for file in /run/sysctl.d/*.conf ; do
+            is_ignored_file "$file" && continue
+            [ -f /etc/sysctl.d/${file##*/} ] && continue
+            test -f "$file" && sysctl -e -p "$file" >/dev/null 2>&1
+        done
+        for file in /etc/sysctl.d/*.conf ; do
+            is_ignored_file "$file" && continue
+            test -f "$file" && sysctl -e -p "$file" >/dev/null 2>&1
+        done
+        sysctl -e -p /etc/sysctl.conf >/dev/null 2>&1
+    fi
+}
+
+# A sed expression to filter out the files that is_ignored_file recognizes
+__sed_discard_ignored_files='/\(~\|\.bak\|\.orig\|\.rpmnew\|\.rpmorig\|\.rpmsave\)$/d'
+
+if [ "$_use_systemctl" = "1" ]; then
+        if  [ "x$1" = xstart -o \
+                "x$1" = xstop -o \
+                "x$1" = xrestart -o \
+                "x$1" = xreload -o \
+                "x$1" = xtry-restart -o \
+                "x$1" = xforce-reload -o \
+                "x$1" = xcondrestart ] ; then
+
+		systemctl_redirect $0 $1
+		exit $?
+	fi
+fi

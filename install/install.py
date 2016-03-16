@@ -1,19 +1,18 @@
 #!/usr/bin/python
 # coding: utf-8
 
-import subprocess
 import time
 import os
 import sys
-import MySQLdb
 from smtplib import SMTP, SMTPAuthenticationError, SMTPConnectError, SMTPSenderRefused
 import ConfigParser
 import socket
-import fcntl
-import struct
-import readline
 import random
 import string
+
+import re
+import platform
+import shlex
 
 jms_dir = os.path.dirname(os.path.abspath(os.path.dirname(__file__)))
 sys.path.append(jms_dir)
@@ -24,7 +23,14 @@ def bash(cmd):
     run a bash shell command
     执行bash命令
     """
-    return subprocess.call(cmd, shell=True)
+    return shlex.os.system(cmd)
+
+
+def valid_ip(ip):
+    if ('255' in ip) or (ip == "0.0.0.0"):
+        return False
+    else:
+        return True
 
 
 def color_print(msg, color='red', exits=False):
@@ -46,18 +52,17 @@ def color_print(msg, color='red', exits=False):
     return msg
 
 
-def get_ip_addr(ifname='eth0'):
+def get_ip_addr():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        return socket.inet_ntoa(fcntl.ioctl(
-            s.fileno(),
-            0x8915,
-            struct.pack('256s', ifname[:15])
-        )[20:24])
-    except:
-        ips = os.popen("LANG=C ifconfig | grep \"inet addr\" | grep -v \"127.0.0.1\" | awk -F \":\" '{print $2}' | awk '{print $1}'").readlines()
-        if len(ips) > 0:
-            return ips[0]
+        s.connect(("8.8.8.8", 80))
+        return s.getsockname()[0]
+    except Exception:
+        if_data = ''.join(os.popen("LANG=C ifconfig").readlines())
+        ips = re.findall(r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}', if_data, flags=re.MULTILINE)
+        ip = filter(valid_ip, ips)
+        if ip:
+            return ip[0]
     return ''
 
 
@@ -75,6 +80,39 @@ class PreSetup(object):
         self.ip = ''
         self.key = ''.join(random.choice(string.ascii_lowercase + string.digits) \
                            for _ in range(16))
+        self.dist = platform.dist()[0].lower()
+        self.version = platform.dist()[1]
+
+    @property
+    def _is_redhat(self):
+        if self.dist == "centos" or self.dist == "redhat" or self.dist == "fedora":
+            return True
+
+    @property
+    def _is_centos7(self):
+        if self.dist == "centos" and self.version.startswith("7"):
+            return True
+
+    @property
+    def _is_fedora_new(self):
+        if self.dist == "fedora" and int(self.version) >= 20:
+            return True
+
+    @property
+    def _is_ubuntu(self):
+        if self.dist == "ubuntu" or self.dist == "debian":
+            return True
+
+    def check_platform(self):
+        if not (self._is_redhat or self._is_ubuntu):
+            print(u"支持的平台: CentOS, RedHat, Fedora, Debian, Ubuntu, 暂不支持其他平台安装.")
+            exit()
+
+    @staticmethod
+    def check_bash_return(ret_code, error_msg):
+        if ret_code != 0:
+            color_print(error_msg, 'red')
+            exit()
 
     def write_conf(self, conf_file=os.path.join(jms_dir, 'jumpserver.conf')):
         color_print('开始写入配置文件', 'green')
@@ -87,7 +125,6 @@ class PreSetup(object):
         conf.set('db', 'user', self.db_user)
         conf.set('db', 'password', self.db_pass)
         conf.set('db', 'database', self.db)
-        conf.set('websocket', 'web_socket_host', '%s:3000' % self.ip)
         conf.set('mail', 'email_host', self.mail_host)
         conf.set('mail', 'email_port', self.mail_port)
         conf.set('mail', 'email_host_user', self.mail_addr)
@@ -99,22 +136,60 @@ class PreSetup(object):
     def _setup_mysql(self):
         color_print('开始安装设置mysql (请手动设置mysql安全)', 'green')
         color_print('默认用户名: %s 默认密码: %s' % (self.db_user, self.db_pass), 'green')
-        bash('yum -y install mysql-server')
-        bash('service mysqld start')
-        bash('chkconfig mysqld on')
-        bash('mysql -e "create database %s default charset=utf8"' % self.db)
-        bash('mysql -e "grant all on %s.* to \'%s\'@\'%s\' identified by \'%s\'"' % (self.db,
-                                                                                     self.db_user,
-                                                                                     self.db_host,
-                                                                                     self.db_pass))
+        if self._is_redhat:
+            if self._is_centos7 or self._is_fedora_new:
+                ret_code = bash('yum -y install mariadb-server mariadb-devel')
+                self.check_bash_return(ret_code, "安装mysql(mariadb)失败, 请检查安装源是否更新或手动安装！")
 
-    @staticmethod
-    def _set_env():
+                bash('systemctl enable mariadb.service')
+                bash('systemctl start mariadb.service')
+            else:
+                ret_code = bash('yum -y install mysql-server')
+                self.check_bash_return(ret_code, "安装mysql失败, 请检查安装源是否更新或手动安装！")
+
+                bash('service mysqld start')
+                bash('chkconfig mysqld on')
+            bash('mysql -e "create database %s default charset=utf8"' % self.db)
+            bash('mysql -e "grant all on %s.* to \'%s\'@\'%s\' identified by \'%s\'"' % (self.db,
+                                                                                         self.db_user,
+                                                                                         self.db_host,
+                                                                                         self.db_pass))
+        if self._is_ubuntu:
+            cmd1 = "echo mysql-server mysql-server/root_password select '' | debconf-set-selections"
+            cmd2 = "echo mysql-server mysql-server/root_password_again select '' | debconf-set-selections"
+            cmd3 = "apt-get -y install mysql-server"
+            ret_code = bash('%s; %s; %s' % (cmd1, cmd2, cmd3))
+            self.check_bash_return(ret_code, "安装mysql失败, 请检查安装源是否更新或手动安装！")
+
+            bash('service mysql start')
+            bash('mysql -e "create database %s default charset=utf8"' % self.db)
+            bash('mysql -e "grant all on %s.* to \'%s\'@\'%s\' identified by \'%s\'"' % (self.db,
+                                                                                         self.db_user,
+                                                                                         self.db_host,
+                                                                                         self.db_pass))
+
+    def _set_env(self):
         color_print('开始关闭防火墙和selinux', 'green')
-        os.system("export LANG='en_US.UTF-8' && sed -i 's/LANG=.*/LANG=en_US.UTF-8/g' /etc/sysconfig/i18n")
-        bash('service iptables stop && chkconfig iptables off && setenforce 0')
+        if self._is_redhat:
+            os.system("export LANG='en_US.UTF-8'")
+            if self._is_centos7 or self._is_fedora_new:
+                cmd1 = "systemctl status firewalld 2> /dev/null 1> /dev/null"
+                cmd2 = "systemctl stop firewalld"
+                cmd3 = "systemctl disable firewalld"
+                bash('%s && %s && %s' % (cmd1, cmd2, cmd3))
+                bash('localectl set-locale LANG=en_US.UTF-8')
+                bash('which setenforce 2> /dev/null 1> /dev/null && setenforce 0')
+            else:
+                bash("sed -i 's/LANG=.*/LANG=en_US.UTF-8/g' /etc/sysconfig/i18n")
+                bash('service iptables stop && chkconfig iptables off && setenforce 0')
+
+        if self._is_ubuntu:
+            os.system("export LANG='en_US.UTF-8'")
+            bash("which iptables && iptables -F")
+            bash('which setenforce && setenforce 0')
 
     def _test_db_conn(self):
+        import MySQLdb
         try:
             MySQLdb.connect(host=self.db_host, port=int(self.db_port),
                             user=self.db_user, passwd=self.db_pass, db=self.db)
@@ -141,20 +216,26 @@ class PreSetup(object):
                 return True
             return False
 
-    @staticmethod
-    def _rpm_repo():
-        color_print('开始安装epel源', 'green')
-        bash('yum -y install epel-release')
+    def _rpm_repo(self):
+        if self._is_redhat:
+            color_print('开始安装epel源', 'green')
+            bash('yum -y install epel-release')
 
-    @staticmethod
-    def _depend_rpm():
-        color_print('开始安装依赖rpm包', 'green')
-        bash('yum -y install git python-pip mysql-devel gcc automake autoconf python-devel vim sshpass')
+    def _depend_rpm(self):
+        color_print('开始安装依赖包', 'green')
+        if self._is_redhat:
+            cmd = 'yum -y install git python-pip mysql-devel rpm-build gcc automake autoconf python-devel vim sshpass lrzsz readline-devel'
+            ret_code = bash(cmd)
+            self.check_bash_return(ret_code, "安装依赖失败, 请检查安装源是否更新或手动安装！")
+        if self._is_ubuntu:
+            cmd = "apt-get -y --force-yes install git python-pip gcc automake autoconf vim sshpass libmysqld-dev python-all-dev lrzsz libreadline-dev"
+            ret_code = bash(cmd)
+            self.check_bash_return(ret_code, "安装依赖失败, 请检查安装源是否更新或手动安装！")
 
-    @staticmethod
-    def _require_pip():
+    def _require_pip(self):
         color_print('开始安装依赖pip包', 'green')
-        bash('pip install -r requirements.txt')
+        ret_code = bash('pip install -r requirements.txt')
+        self.check_bash_return(ret_code, "安装JumpServer 依赖的python库失败！")
 
     def _input_ip(self):
         ip = raw_input('\n请输入您服务器的IP地址，用户浏览器可以访问 [%s]: ' % get_ip_addr()).strip()
@@ -168,7 +249,7 @@ class PreSetup(object):
             else:
                 db_host = raw_input('请输入数据库服务器IP [127.0.0.1]: ').strip()
                 db_port = raw_input('请输入数据库服务器端口 [3306]: ').strip()
-                db_user = raw_input('请输入数据库服务器用户 [root]: ').strip()
+                db_user = raw_input('请输入数据库服务器用户 [jumpserver]: ').strip()
                 db_pass = raw_input('请输入数据库服务器密码: ').strip()
                 db = raw_input('请输入使用的数据库 [jumpserver]: ').strip()
 
@@ -202,11 +283,12 @@ class PreSetup(object):
             print
 
     def start(self):
-        # self._rpm_repo()
-        # self._depend_rpm()
-        # self._require_pip()
-        color_print('请务必先查看wiki https://github.com/ibuler/jumpserver/wiki/Quickinstall')
+        color_print('请务必先查看wiki https://github.com/jumpserver/jumpserver/wiki')
         time.sleep(3)
+        self.check_platform()
+        self._rpm_repo()
+        self._depend_rpm()
+        self._require_pip()
         self._set_env()
         self._input_ip()
         self._input_mysql()
