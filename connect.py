@@ -95,8 +95,18 @@ class Tty(object):
         self.ps1_pattern = re.compile('\[.*@.*\][\$#]\s')
         self.vim_pattern = re.compile(r'\Wvi[m]+\s.* | \Wfg\s.*', re.X)
         self.vim_data = ''
-        self.stream = pyte.ByteStream()
+        self.stream = None
         self.screen = None
+        self.__init_screen_stream()
+
+    def __init_screen_stream(self):
+        """
+        初始化虚拟屏幕和字符流
+        :return:
+        """
+        self.stream = pyte.ByteStream()
+        self.screen = pyte.Screen(80, 24)
+        self.stream.attach(self.screen)
 
     @staticmethod
     def is_output(strings):
@@ -125,12 +135,14 @@ class Tty(object):
                 result = match[-1].strip()
         return result
 
-    def deal_command(self):
+    def deal_command(self, data):
         """
         处理截获的命令
+        :param data: 要处理的命令
         :return:返回最后的处理结果
         """
         command = ''
+        self.stream.feed(data)
         # 从虚拟屏幕中获取处理后的数据
         for line in reversed(self.screen.buffer):
             line_data = "".join(map(operator.attrgetter("data"), line)).strip()
@@ -348,16 +360,15 @@ class SshTty(Tty):
                         # 这个是用来处理用户的复制操作
                         if input_str != x:
                             data += input_str
-                        self.stream.feed(data)
                         if self.vim_flag:
                             match = self.ps1_pattern.search(self.vim_data)
                             if match:
                                 self.vim_flag = False
-                                data = self.deal_command()[0:200]
+                                data = self.deal_command(data)[0:200]
                                 if len(data) > 0:
                                     TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
                         else:
-                            data = self.deal_command()[0:200]
+                            data = self.deal_command(data)[0:200]
                             if len(data) > 0:
                                 TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
                         data = ''
@@ -395,8 +406,6 @@ class SshTty(Tty):
         win_size = self.get_win_size()
         #self.channel = channel = ssh.invoke_shell(height=win_size[0], width=win_size[1], term='xterm')
         self.channel = channel = transport.open_session()
-        self.screen = pyte.Screen(win_size[1], win_size[0])
-        self.stream.attach(self.screen)
         channel.get_pty(term='xterm', height=win_size[0], width=win_size[1])
         channel.invoke_shell()
         try:
