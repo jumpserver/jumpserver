@@ -370,9 +370,11 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                         vim_data = self.term.deal_command(self.term.vim_data)[0:200]
                         if len(data) > 0:
                             TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=vim_data).save()
-
-                TtyLog(log=self.log, datetime=datetime.datetime.now(),
-                       cmd=self.term.deal_command(self.term.data)[0:200]).save()
+                else:
+                    vim_data = self.term.deal_command(self.term.vim_data)[0:200]
+                    if len(vim_data) > 0:
+                        TtyLog(log=self.log, datetime=datetime.datetime.now(),
+                               cmd=vim_data).save()
                 self.term.vim_data = ''
                 self.term.data = ''
                 self.term.input_mode = False
