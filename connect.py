@@ -102,7 +102,6 @@ class Tty(object):
     def __init_screen_stream(self):
         """
         初始化虚拟屏幕和字符流
-        :return:
         """
         self.stream = pyte.ByteStream()
         self.screen = pyte.Screen(80, 24)
