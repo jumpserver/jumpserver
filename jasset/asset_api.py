@@ -296,10 +296,7 @@ def excel_to_db(excel_file):
                                   hostname=hostname,
                                   use_default_auth=use_default_auth,
                                   username=username,
-                                  password=password_encode,
-                                  asset_type=asset_type,
-                                  status=status,
-                                  comment=comment
+                                  password=password_encode
                                   )
                     asset.save()
                     group_list = group.split('/')
@@ -313,6 +310,16 @@ def excel_to_db(excel_file):
                         idc_instance = get_object(IDC, name=idc_name)
                         if idc_instance:
                             asset.idc = idc_instance
+                    if asset_type:
+                        for asset_types in ASSET_TYPE:
+                            if asset_type == asset_types[1]:
+                                asset.asset_type = asset_types[0]
+                    if status:
+                        for statuses in ASSET_STATUS:
+                            if status == statuses[1]:
+                                asset.status = statuses[0]
+                    if comment:
+                        asset.comment = comment
                     asset.save()
         return True
 
