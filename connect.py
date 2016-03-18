@@ -92,8 +92,8 @@ class Tty(object):
         self.remote_ip = ''
         self.login_type = login_type
         self.vim_flag = False
-        self.ps1_pattern = re.compile('\[.*@.*\][\$#]\s')
-        self.vim_pattern = re.compile(r'\Wvi[m]+\s.* | \Wfg\s.*', re.X)
+        self.ps1_pattern = re.compile('\[?.*@.*\]?[\$#]\s')
+        self.vim_pattern = re.compile(r'\W?vi[m]?\s.* | \W?fg\s.*', re.X)
         self.vim_data = ''
         self.stream = None
         self.screen = None
@@ -141,25 +141,28 @@ class Tty(object):
         :return:返回最后的处理结果
         """
         command = ''
-        self.stream.feed(data)
-        # 从虚拟屏幕中获取处理后的数据
-        for line in reversed(self.screen.buffer):
-            line_data = "".join(map(operator.attrgetter("data"), line)).strip()
-            if len(line_data) > 0:
-                parser_result = self.command_parser(line_data)
-                if parser_result is not None:
-                    # 2个条件写一起会有错误的数据
-                    if len(parser_result) > 0:
-                        command = parser_result
-                else:
-                    command = line_data
-                break
-        if command != '':
-            # 判断用户输入的是否是vim 或者fg命令
-            if self.vim_pattern.search(command):
-                self.vim_flag = True
-        # 虚拟屏幕清空
-        self.screen.reset()
+        try:
+            self.stream.feed(data)
+            # 从虚拟屏幕中获取处理后的数据
+            for line in reversed(self.screen.buffer):
+                line_data = "".join(map(operator.attrgetter("data"), line)).strip()
+                if len(line_data) > 0:
+                    parser_result = self.command_parser(line_data)
+                    if parser_result is not None:
+                        # 2个条件写一起会有错误的数据
+                        if len(parser_result) > 0:
+                            command = parser_result
+                    else:
+                        command = line_data
+                    break
+            if command != '':
+                # 判断用户输入的是否是vim 或者fg命令
+                if self.vim_pattern.search(command):
+                    self.vim_flag = True
+            # 虚拟屏幕清空
+            self.screen.reset()
+        except Exception:
+            pass
         return command
 
     def get_log(self):
@@ -403,7 +406,7 @@ class SshTty(Tty):
         # 获取连接的隧道并设置窗口大小 Make a channel and set windows size
         global channel
         win_size = self.get_win_size()
-        #self.channel = channel = ssh.invoke_shell(height=win_size[0], width=win_size[1], term='xterm')
+        # self.channel = channel = ssh.invoke_shell(height=win_size[0], width=win_size[1], term='xterm')
         self.channel = channel = transport.open_session()
         channel.get_pty(term='xterm', height=win_size[0], width=win_size[1])
         channel.invoke_shell()
