@@ -1,3 +1,4 @@
+
 /**
  * Created by liuzheng on 3/3/16.
  */
@@ -35,12 +36,11 @@ WSSHClient.prototype.connect = function (options) {
     };
 
     this._connection.onmessage = function (evt) {
-        var data = JSON.parse(evt.data.toString());
-        if (data.error !== undefined) {
+        try{
+            options.onData(evt.data);
+        } catch (e) {
+            var data = JSON.parse(evt.data.toString());
             options.onError(data.error);
-        }
-        else {
-            options.onData(data.data);
         }
     };
 
