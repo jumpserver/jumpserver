@@ -519,12 +519,12 @@ def perm_role_push(request):
             ret["pass_push"] = task.add_user(role.name)
             ret["key_push"] = task.push_key(role.name, os.path.join(role.key_path, 'id_rsa.pub'))
 
-        # 2. 推送账号密码
-        elif password_push:
-            ret["pass_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
+        # 2. 推送账号密码 <为了安全 系统用户统一使用秘钥进行通信， 不再提供密码方式的推送>
+        # elif password_push:
+        #     ret["pass_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
 
         # 3. 推送sudo配置文件
-        if password_push or key_push:
+        if key_push:
             sudo_list = set([sudo for sudo in role.sudo.all()])  # set(sudo1, sudo2, sudo3)
             if sudo_list:
                 ret['sudo'] = task.push_sudo_file([role], sudo_list)
