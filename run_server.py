@@ -10,7 +10,6 @@ import os.path
 import threading
 import re
 import functools
-
 from django.core.signals import request_started, request_finished
 
 import tornado.ioloop
@@ -371,9 +370,10 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                         vim_data = self.term.deal_command(self.term.vim_data)[0:200]
                         if len(data) > 0:
                             TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=vim_data).save()
-
-                TtyLog(log=self.log, datetime=datetime.datetime.now(),
-                       cmd=self.term.deal_command(self.term.data)[0:200]).save()
+                vim_data = self.term.deal_command(self.term.vim_data)[0:200]
+                if len(vim_data) > 0:
+                    TtyLog(log=self.log, datetime=datetime.datetime.now(),
+                           cmd=vim_data).save()
                 self.term.vim_data = ''
                 self.term.data = ''
                 self.term.input_mode = False
@@ -412,7 +412,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                     if self.term.vim_flag:
                         self.term.vim_data += recv
                     try:
-                        self.write_message(json.dumps({'data': data}))
+                        self.write_message(data.decode('utf-8', 'replace'))
                         now_timestamp = time.time()
                         self.log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
                         self.log_file_f.write(data)
@@ -460,7 +460,7 @@ def main():
     }
     tornado_app = tornado.web.Application(
         [
-            (r'/monitor', MonitorHandler),
+            (r'/ws/monitor', MonitorHandler),
             (r'/ws/terminal', WebTerminalHandler),
             (r'/kill', WebTerminalKillHandler),
             (r'/ws/exec', ExecHandler),

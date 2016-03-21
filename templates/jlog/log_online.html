@@ -136,7 +136,7 @@
             var protocol = 'ws://';
         }
 
-        var endpoint = protocol + document.URL.match(RegExp('//(.*?)/'))[1] + '/monitor';
+        var endpoint = protocol + document.URL.match(RegExp('//(.*?)/'))[1] + '/ws/monitor';
         var file_path = obj.attr('file_path');
         var socket = new WebSocket(endpoint + '?file_path=' + file_path);
 
