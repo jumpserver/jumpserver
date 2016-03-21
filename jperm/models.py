@@ -26,7 +26,7 @@ class PermSudo(models.Model):
 class PermRole(models.Model):
     name = models.CharField(max_length=100, unique=True)
     comment = models.CharField(max_length=100, null=True, blank=True, default='')
-    password = models.CharField(max_length=100)
+    password = models.CharField(max_length=128)
     key_path = models.CharField(max_length=100)
     date_added = models.DateTimeField(auto_now=True)
     sudo = models.ManyToManyField(PermSudo, related_name='perm_role')
