@@ -4,7 +4,7 @@
 import time
 import os
 import sys
-from smtplib import SMTP, SMTPAuthenticationError, SMTPConnectError, SMTPSenderRefused
+from smtplib import SMTP, SMTP_SSL, SMTPAuthenticationError, SMTPConnectError, SMTPSenderRefused
 import ConfigParser
 import socket
 import random
@@ -201,7 +201,10 @@ class PreSetup(object):
 
     def _test_mail(self):
         try:
-            smtp = SMTP(self.mail_host, port=self.mail_port, timeout=2)
+            if self.mail_port == 465:
+                smtp = SMTP_SSL(self.mail_host, port=self.mail_port, timeout=2)
+            else:
+                smtp = SMTP(self.mail_host, port=self.mail_port, timeout=2)
             smtp.login(self.mail_addr, self.mail_pass)
             smtp.sendmail(self.mail_addr, (self.mail_addr, ),
                           '''From:%s\r\nTo:%s\r\nSubject:Jumpserver Mail Test!\r\n\r\n  Mail test passed!\r\n''' %
