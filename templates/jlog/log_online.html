@@ -149,6 +149,7 @@
 
         var tag = $('<div id="term" style="height:500px; overflow: auto;background-color: rgba(0, 0, 0, 0);border: none"></div>');
             term.open();
+            $('.terminal').hide();
             term.resize(80, 24);
 
         socket.onopen = function(evt){
@@ -167,6 +168,7 @@
             //服务器端认证
             window.setTimeout(function(){
                 $('.terminal').detach().appendTo('#term');
+                $('.terminal').show();
                 socket.onmessage = function(evt){
                 term.write(evt.data);
             }}, 1000);
