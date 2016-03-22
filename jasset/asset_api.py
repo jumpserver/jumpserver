@@ -288,6 +288,8 @@ def excel_to_db(excel_file):
                 ip, port, hostname, use_default_auth, username, password, group = row
                 if get_object(Asset, hostname=hostname):
                     continue
+                if isinstance(password, int) or isinstance(password, float):
+                    password = unicode(int(password))
                 use_default_auth = 1 if use_default_auth == u'默认' else 0
                 password_encode = CRYPTOR.encrypt(password) if password else ''
                 if hostname:
@@ -311,7 +313,6 @@ def excel_to_db(excel_file):
 
 
 def get_ansible_asset_info(asset_ip, setup_info):
-    print setup_info, '***'
     disk_need = {}
     disk_all = setup_info.get("ansible_devices")
     if disk_all:
