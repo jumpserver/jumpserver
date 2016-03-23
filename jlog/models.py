@@ -1,4 +1,6 @@
 from django.db import models
+from juser.models import User
+import time
 
 
 class Log(models.Model):
@@ -47,3 +49,13 @@ class FileLog(models.Model):
     datetime = models.DateTimeField(auto_now=True)
 
 
+class TermLog(models.Model):
+    user = models.ManyToManyField(User)
+    logPath = models.TextField()
+    filename = models.CharField(max_length=40)
+    logPWD = models.TextField()  # log zip file's
+    nick = models.TextField(null=True)  # log's nick name
+    log = models.TextField(null=True)
+    history = models.TextField(null=True)
+    timestamp = models.IntegerField(default=int(time.time()))
+    datetimestamp = models.DateTimeField(auto_now_add=True)

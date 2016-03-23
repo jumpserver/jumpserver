@@ -8,7 +8,10 @@ from jperm.perm_api import user_have_perm
 from django.http import HttpResponseNotFound
 from jlog.log_api import renderTemplate
 
-from jlog.models import Log, ExecLog, FileLog
+from jlog.models import Log, ExecLog, FileLog, TermLog
+from jumpserver.settings import LOG_DIR
+import zipfile
+import json
 
 
 @require_role('admin')
@@ -32,12 +35,13 @@ def log_list(request, offset):
         posts = ExecLog.objects.all().order_by('-id')
         keyword = request.GET.get('keyword', '')
         if keyword:
-            posts = posts.filter(Q(user__icontains=keyword)|Q(host__icontains=keyword)|Q(cmd__icontains=keyword))
+            posts = posts.filter(Q(user__icontains=keyword) | Q(host__icontains=keyword) | Q(cmd__icontains=keyword))
     elif offset == 'file':
         posts = FileLog.objects.all().order_by('-id')
         keyword = request.GET.get('keyword', '')
         if keyword:
-            posts = posts.filter(Q(user__icontains=keyword)|Q(host__icontains=keyword)|Q(filename__icontains=keyword))
+            posts = posts.filter(
+                Q(user__icontains=keyword) | Q(host__icontains=keyword) | Q(filename__icontains=keyword))
     else:
         posts = Log.objects.filter(is_finished=True).order_by('-start_time')
         username_all = set([log.user for log in Log.objects.all()])
@@ -144,3 +148,101 @@ def log_detail(request, offset):
         except (SyntaxError, NameError):
             result = {}
         return my_render('jlog/file_detail.html', locals(), request)
+
+
+import pyte
+
+
+class TermLogRecorder(object):
+    def __init__(self, user):
+        self.log = {}
+        self.user = user
+        self.recoderStartTime = time.time()
+        self.__init_screen_stream()
+        self.recoder = True
+        self._commands = []
+        self.vim_pattern = re.compile(r'\W?vi[m]?\s.* | \W?fg\s.*', re.X)
+        self._in_vim = False
+        self.CMD = {}
+
+    def __init_screen_stream(self):
+        """
+        初始化虚拟屏幕和字符流
+        """
+        self._stream = pyte.ByteStream()
+        self._screen = pyte.Screen(80, 24)
+        self._stream.attach(self._screen)
+
+    def _command(self):
+        self._commands = []
+        for i in self._screen.display:
+            if i.strip().__len__() > 0:
+                self._commands.append(i.strip())
+        self._screen.reset()
+        if not self._commands[-1] == '':
+            self.CMD[str(time.time())] = self._commands[-1]
+
+    def write(self, msg):
+        if self.recoder and (not self._in_vim):
+            if self._commands.__len__() == 0:
+                self._stream.feed(msg)
+            elif not self.vim_pattern.search(self._commands[-1]):
+                self._stream.feed(msg)
+            else:
+                self._in_vim = True
+                self._command()
+        else:
+            if self._in_vim:
+                if re.compile(r'\[\?1049', re.X).search(msg.decode('utf-8', 'replace')):
+                    self._in_vim = False
+                    self._commands.append('')
+                self._screen.reset()
+            else:
+                self._command()
+        self.log[str(time.time() - self.recoderStartTime)] = msg.decode('utf-8', 'replace')
+
+    def show(self):
+        return self._screen.display
+
+    def save(self, path=LOG_DIR):
+        date = datetime.datetime.now().strftime('%Y%m%d')
+        filename = str(uuid.uuid4())
+        filepath = os.path.join(path, 'tty', date, filename + '.zip')
+        while os.path.isfile(filepath):
+            filename = str(uuid.uuid4())
+            filepath = os.path.join(path, 'tty', date, filename + '.zip')
+        password = str(uuid.uuid4())
+        try:
+            zf = zipfile.ZipFile(filepath, 'w', zipfile.ZIP_DEFLATED)
+            zf.setpassword(password)
+            zf.writestr(filename, json.dumps(self.log))
+            zf.close()
+            record = TermLog.objects.create(logPath=filepath, logPWD=password, filename=filename,
+                                            history=json.dumps(self.CMD), timestamp=int(self.recoderStartTime))
+            record.user.add(self.user)
+        except:
+            record = TermLog.objects.create(logPath='locale', logPWD=password, log=json.dumps(self.log),
+                                            filename=filename, history=json.dumps(self.CMD),
+                                            timestamp=int(self.recoderStartTime))
+            record.user.add(self.user)
+
+    def list(self):
+        return TermLog.objects.filter(user=self.user.id)
+
+    def load(self, filename):
+        self.file = TermLog.objects.get(user=self.user.id, filename=filename)
+        if self.file.logPath == 'locale':
+            return self.file.log
+        else:
+            try:
+                zf = zipfile.ZipFile(self.file.logPath, 'r', zipfile.ZIP_DEFLATED)
+                zf.setpassword(self.file.logPWD)
+                self.data = zf.read(zf.namelist()[0])
+                return self.data
+            except KeyError:
+                return 'ERROR: Did not find %s file' % filename
+
+# @require_role('admin')
+# def test(request):
+#     tr = TermLogRecorder(request.user)
+#     return HttpResponse(tr.load(tr.list().all()[0].filename))
