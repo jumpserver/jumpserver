@@ -351,18 +351,18 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                 pass
 
     def on_message(self, message):
-        data = json.loads(message)
-        if not data:
+        jsondata = json.loads(message)
+        if not jsondata:
             return
 
-        if 'resize' in data.get('data'):
+        if 'resize' in jsondata.get('data'):
             self.channel.resize_pty(
-                data.get('data').get('resize').get('cols', 80),
-                data.get('data').get('resize').get('rows', 24)
+                jsondata.get('data').get('resize').get('cols', 80),
+                jsondata.get('data').get('resize').get('rows', 24)
             )
-        elif data.get('data'):
+        elif jsondata.get('data'):
             self.term.input_mode = True
-            if str(data['data']) in ['\r', '\n', '\r\n']:
+            if str(jsondata['data']) in ['\r', '\n', '\r\n']:
                 if self.term.vim_flag:
                     match = self.term.ps1_pattern.search(self.term.vim_data)
                     if match:
@@ -377,7 +377,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                 self.term.vim_data = ''
                 self.term.data = ''
                 self.term.input_mode = False
-            self.channel.send(data['data'])
+            self.channel.send(jsondata['data'])
         else:
             pass
 
