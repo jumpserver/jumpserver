@@ -12,6 +12,7 @@ from jlog.models import Log, ExecLog, FileLog, TermLog
 from jumpserver.settings import LOG_DIR
 import zipfile
 import json
+import pyte
 
 
 @require_role('admin')
@@ -150,17 +151,35 @@ def log_detail(request, offset):
         return my_render('jlog/file_detail.html', locals(), request)
 
 
-import pyte
-
-
 class TermLogRecorder(object):
+    """
+    TermLogRecorder
+    ---
+    Author: liuzheng <liuzheng712@gmail>
+    This class is use for record the terminal output log.
+        self.commands is pure commands list, it will have empty item '' because in vi/vim model , I made it log noting.
+        self.CMD is the command with timestamp, like this {'1458723794.88': u'ls', '1458723799.82': u'tree'}.
+        self.log is the all output with delta time log.
+        self.vim_pattern is the regexp for check vi/vim/fg model.
+    Usage:
+        recorder = TermLogRecorder(User)
+        recoder.write(messages)
+        recoder.save() # save all log into database
+        list = recoder.list() # will give a object about this user's all log info
+        recoder.load_full_log(filemane) # will get full log
+        recoder.load_history(filename) # will only get the command history list
+    """
+
     def __init__(self, user):
         self.log = {}
         self.user = user
         self.recoderStartTime = time.time()
         self.__init_screen_stream()
         self.recoder = True
-        self._commands = []
+        self.commands = []
+        self._lists = None
+        self.file = None
+        self._data = None
         self.vim_pattern = re.compile(r'\W?vi[m]?\s.* | \W?fg\s.*', re.X)
         self._in_vim = False
         self.CMD = {}
@@ -176,16 +195,16 @@ class TermLogRecorder(object):
     def _command(self):
         for i in self._screen.display:
             if i.strip().__len__() > 0:
-                self._commands.append(i.strip())
+                self.commands.append(i.strip())
                 if not i.strip() == '':
-                    self.CMD[str(time.time())] = self._commands[-1]
+                    self.CMD[str(time.time())] = self.commands[-1]
         self._screen.reset()
 
     def write(self, msg):
         if self.recoder and (not self._in_vim):
-            if self._commands.__len__() == 0:
+            if self.commands.__len__() == 0:
                 self._stream.feed(msg)
-            elif not self.vim_pattern.search(self._commands[-1]):
+            elif not self.vim_pattern.search(self.commands[-1]):
                 self._stream.feed(msg)
             else:
                 self._in_vim = True
@@ -194,18 +213,15 @@ class TermLogRecorder(object):
             if self._in_vim:
                 if re.compile(r'\[\?1049', re.X).search(msg.decode('utf-8', 'replace')):
                     self._in_vim = False
-                    self._commands.append('')
+                    self.commands.append('')
                 self._screen.reset()
             else:
                 self._command()
         # print "<<<<<<<<<<<<<<<<"
-        # print self._commands
+        # print self.commands
         # print self.CMD
         # print ">>>>>>>>>>>>>>>>"
         self.log[str(time.time() - self.recoderStartTime)] = msg.decode('utf-8', 'replace')
-
-    def show(self):
-        return self._screen.display
 
     def save(self, path=LOG_DIR):
         date = datetime.datetime.now().strftime('%Y%m%d')
@@ -230,22 +246,33 @@ class TermLogRecorder(object):
             record.user.add(self.user)
 
     def list(self):
-        return TermLog.objects.filter(user=self.user.id)
+        tmp = []
+        self._lists = TermLog.objects.filter(user=self.user.id)
+        for i in self._lists.all():
+            tmp.append(
+                {'filename': i.filename, 'locale': i.logPath == 'locale', 'nick': i.nick, 'timestamp': i.timestamp,
+                 'date': i.datetimestamp})
+        return tmp
 
-    def load(self, filename):
-        self.file = TermLog.objects.get(user=self.user.id, filename=filename)
+    def load_full_log(self, filename):
+        if self._lists:
+            self.file = self._lists.get(filename=filename)
+        else:
+            self.file = TermLog.objects.get(user=self.user.id, filename=filename)
         if self.file.logPath == 'locale':
             return self.file.log
         else:
             try:
                 zf = zipfile.ZipFile(self.file.logPath, 'r', zipfile.ZIP_DEFLATED)
                 zf.setpassword(self.file.logPWD)
-                self.data = zf.read(zf.namelist()[0])
-                return self.data
+                self._data = zf.read(zf.namelist()[0])
+                return self._data
             except KeyError:
                 return 'ERROR: Did not find %s file' % filename
 
-# @require_role('admin')
-# def test(request):
-#     tr = TermLogRecorder(request.user)
-#     return HttpResponse(tr.load(tr.list().all()[0].filename))
+    def load_history(self, filename):
+        if self._lists:
+            self.file = self._lists.get(filename=filename)
+        else:
+            self.file = TermLog.objects.get(user=self.user.id, filename=filename)
+        return self.file.history
