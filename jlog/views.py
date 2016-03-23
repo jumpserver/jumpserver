@@ -186,7 +186,7 @@ class TermLogRecorder(object):
 
     def __init_screen_stream(self):
         """
-        初始化虚拟屏幕和字符流
+        Initializing the virtual screen and the character stream
         """
         self._stream = pyte.ByteStream()
         self._screen = pyte.Screen(80, 24)
