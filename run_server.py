@@ -37,7 +37,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 from jumpserver.settings import IP, PORT
 define("port", default=PORT, help="run on the given port", type=int)
 define("host", default=IP, help="run port on given host", type=str)
-
+from jlog.views import TermLogRecorder
 
 def django_request_support(func):
     @functools.wraps(func)
@@ -63,6 +63,7 @@ def require_auth(role='user'):
                 logger.debug('Websocket: session: %s' % session)
                 if session and datetime.datetime.now() < session.expire_date:
                     user_id = session.get_decoded().get('_auth_user_id')
+                    request.user_id = user_id
                     user = get_object(User, id=user_id)
                     if user:
                         logger.debug('Websocket: user [ %s ] request websocket' % user.username)
@@ -311,6 +312,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         role_name = self.get_argument('role', 'sb')
         asset_id = self.get_argument('id', 9999)
         asset = get_object(Asset, id=asset_id)
+        self.termlog = TermLogRecorder(User.objects.get(id=self.user_id))
         if asset:
             roles = user_have_perm(self.user, asset)
             logger.debug(roles)
@@ -361,6 +363,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                 jsondata.get('data').get('resize').get('rows', 24)
             )
         elif jsondata.get('data'):
+            self.termlog.recoder = True
             self.term.input_mode = True
             if str(jsondata['data']) in ['\r', '\n', '\r\n']:
                 if self.term.vim_flag:
@@ -383,6 +386,8 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
 
     def on_close(self):
         logger.debug('Websocket: Close request')
+        print self.termlog.CMD
+        self.termlog.save()
         if self in WebTerminalHandler.clients:
             WebTerminalHandler.clients.remove(self)
         try:
@@ -413,6 +418,8 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                         self.term.vim_data += recv
                     try:
                         self.write_message(data.decode('utf-8', 'replace'))
+                        self.termlog.write(data)
+                        self.termlog.recoder = False
                         now_timestamp = time.time()
                         self.log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
                         self.log_file_f.write(data)
