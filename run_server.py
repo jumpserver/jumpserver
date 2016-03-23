@@ -367,13 +367,13 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                     match = self.term.ps1_pattern.search(self.term.vim_data)
                     if match:
                         self.term.vim_flag = False
-                        vim_data = self.term.deal_command(self.term.vim_data)[0:200]
+                        data = self.term.deal_command(self.term.data)[0:200]
                         if len(data) > 0:
-                            TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=vim_data).save()
-                vim_data = self.term.deal_command(self.term.vim_data)[0:200]
-                if len(vim_data) > 0:
+                            TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=data).save()
+                data = self.term.deal_command(self.term.data)[0:200]
+                if len(data) > 0:
                     TtyLog(log=self.log, datetime=datetime.datetime.now(),
-                           cmd=vim_data).save()
+                           cmd=data).save()
                 self.term.vim_data = ''
                 self.term.data = ''
                 self.term.input_mode = False
