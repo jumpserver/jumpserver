@@ -198,10 +198,10 @@ class TermLogRecorder(object):
                 self._screen.reset()
             else:
                 self._command()
-        print "<<<<<<<<<<<<<<<<"
-        print self._commands
-        print self.CMD
-        print ">>>>>>>>>>>>>>>>"
+        # print "<<<<<<<<<<<<<<<<"
+        # print self._commands
+        # print self.CMD
+        # print ">>>>>>>>>>>>>>>>"
         self.log[str(time.time() - self.recoderStartTime)] = msg.decode('utf-8', 'replace')
 
     def show(self):
