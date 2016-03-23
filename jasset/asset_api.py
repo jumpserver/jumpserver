@@ -290,6 +290,8 @@ def excel_to_db(excel_file):
                 ip, port, hostname, use_default_auth, username, password, group = row
                 if get_object(Asset, hostname=hostname):
                     continue
+                if isinstance(password, int) or isinstance(password, float):
+                    password = unicode(int(password))
                 use_default_auth = 1 if use_default_auth == u'默认' else 0
                 password_encode = CRYPTOR.encrypt(password) if password else ''
                 if hostname:
