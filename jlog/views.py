@@ -162,17 +162,25 @@ class TermLogRecorder(object):
         self.log is the all output with delta time log.
         self.vim_pattern is the regexp for check vi/vim/fg model.
     Usage:
-        recorder = TermLogRecorder(User)
+        recorder = TermLogRecorder(user=UserObject) # or recorder = TermLogRecorder(uid=UserID)
         recoder.write(messages)
         recoder.save() # save all log into database
+        # The following methods all have `user`,`uid`,args. Same as __init__
         list = recoder.list() # will give a object about this user's all log info
         recoder.load_full_log(filemane) # will get full log
         recoder.load_history(filename) # will only get the command history list
+        recoder.share_to(filename,user=UserObject) # or recoder.share_to(filename,uid=UserID). will share this commands to someone
+        recoder.unshare_to(filename,user=UserObject) # or recoder.unshare_to(filename,uid=UserID). will unshare this commands to someone
     """
 
-    def __init__(self, user):
+    def __init__(self, user=None, uid=None):
         self.log = {}
-        self.user = user
+        if isinstance(user, User):
+            self.user = user
+        elif uid:
+            self.user = User.objects.get(id=uid)
+        else:
+            self.user = None
         self.recoderStartTime = time.time()
         self.__init_screen_stream()
         self.recoder = True
@@ -227,6 +235,8 @@ class TermLogRecorder(object):
         date = datetime.datetime.now().strftime('%Y%m%d')
         filename = str(uuid.uuid4())
         filepath = os.path.join(path, 'tty', date, filename + '.zip')
+        if not os.path.isdir(os.path.join(path, 'tty', date)):
+            os.makedirs(os.path.join(path, 'tty', date), mode=0777)
         while os.path.isfile(filepath):
             filename = str(uuid.uuid4())
             filepath = os.path.join(path, 'tty', date, filename + '.zip')
@@ -238,41 +248,90 @@ class TermLogRecorder(object):
             zf.close()
             record = TermLog.objects.create(logPath=filepath, logPWD=password, filename=filename,
                                             history=json.dumps(self.CMD), timestamp=int(self.recoderStartTime))
-            record.user.add(self.user)
+            if self.user:
+                record.user.add(self.user)
         except:
             record = TermLog.objects.create(logPath='locale', logPWD=password, log=json.dumps(self.log),
                                             filename=filename, history=json.dumps(self.CMD),
                                             timestamp=int(self.recoderStartTime))
-            record.user.add(self.user)
+            if self.user:
+                record.user.add(self.user)
 
-    def list(self):
+    def list(self, user=None, uid=None):
         tmp = []
-        self._lists = TermLog.objects.filter(user=self.user.id)
-        for i in self._lists.all():
-            tmp.append(
-                {'filename': i.filename, 'locale': i.logPath == 'locale', 'nick': i.nick, 'timestamp': i.timestamp,
-                 'date': i.datetimestamp})
+        if isinstance(user, User):
+            user = user
+        elif uid:
+            user = User.objects.get(id=uid)
+        else:
+            user = self.user
+        if user:
+            self._lists = TermLog.objects.filter(user=user.id)
+            for i in self._lists.all():
+                tmp.append(
+                    {'filename': i.filename, 'locale': i.logPath == 'locale', 'nick': i.nick, 'timestamp': i.timestamp,
+                     'date': i.datetimestamp})
         return tmp
 
-    def load_full_log(self, filename):
-        if self._lists:
-            self.file = self._lists.get(filename=filename)
+    def load_full_log(self, filename, user=None, uid=None):
+        if isinstance(user, User):
+            user = user
+        elif uid:
+            user = User.objects.get(id=uid)
         else:
-            self.file = TermLog.objects.get(user=self.user.id, filename=filename)
-        if self.file.logPath == 'locale':
-            return self.file.log
-        else:
-            try:
-                zf = zipfile.ZipFile(self.file.logPath, 'r', zipfile.ZIP_DEFLATED)
-                zf.setpassword(self.file.logPWD)
-                self._data = zf.read(zf.namelist()[0])
-                return self._data
-            except KeyError:
-                return 'ERROR: Did not find %s file' % filename
+            user = self.user
+        if user:
+            if self._lists:
+                self.file = self._lists.get(filename=filename)
+            else:
+                self.file = TermLog.objects.get(user=user.id, filename=filename)
+            if self.file.logPath == 'locale':
+                return self.file.log
+            else:
+                try:
+                    zf = zipfile.ZipFile(self.file.logPath, 'r', zipfile.ZIP_DEFLATED)
+                    zf.setpassword(self.file.logPWD)
+                    self._data = zf.read(zf.namelist()[0])
+                    return self._data
+                except KeyError:
+                    return 'ERROR: Did not find %s file' % filename
+        return 'ERROR User(None)'
 
-    def load_history(self, filename):
-        if self._lists:
-            self.file = self._lists.get(filename=filename)
+    def load_history(self, filename, user=None, uid=None):
+        if isinstance(user, User):
+            user = user
+        elif uid:
+            user = User.objects.get(id=uid)
         else:
-            self.file = TermLog.objects.get(user=self.user.id, filename=filename)
-        return self.file.history
+            user = self.user
+        if user:
+            if self._lists:
+                self.file = self._lists.get(filename=filename)
+            else:
+                self.file = TermLog.objects.get(user=user.id, filename=filename)
+            return self.file.history
+        return 'ERROR User(None)'
+
+    def share_to(self, filename, user=None, uid=None):
+        if isinstance(user, User):
+            user = user
+        elif uid:
+            user = User.objects.get(id=uid)
+        else:
+            pass
+        if user:
+            TermLog.objects.get(filename=filename).user.add(user)
+            return True
+        return False
+
+    def unshare_to(self, filename, user=None, uid=None):
+        if isinstance(user, User):
+            user = user
+        elif uid:
+            user = User.objects.get(id=uid)
+        else:
+            pass
+        if user:
+            TermLog.objects.get(filename=filename).user.remove(user)
+            return True
+        return False
