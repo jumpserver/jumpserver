@@ -183,7 +183,7 @@ class TermLogRecorder(object):
             self.user = None
         self.recoderStartTime = time.time()
         self.__init_screen_stream()
-        self.recoder = True
+        self.recoder = False
         self.commands = []
         self._lists = None
         self.file = None

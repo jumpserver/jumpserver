@@ -35,9 +35,11 @@ except ImportError:
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 from jumpserver.settings import IP, PORT
+
 define("port", default=PORT, help="run on the given port", type=int)
 define("host", default=IP, help="run port on given host", type=str)
 from jlog.views import TermLogRecorder
+
 
 def django_request_support(func):
     @functools.wraps(func)
@@ -46,6 +48,7 @@ def django_request_support(func):
         response = func(*args, **kwargs)
         request_finished.send_robust(func)
         return response
+
     return _deco
 
 
@@ -83,6 +86,7 @@ def require_auth(role='user'):
             logger.warning('Websocket: Request auth failed.')
 
         return _deco2
+
     return _deco
 
 
@@ -340,6 +344,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             self.term.remote_ip = self.request.remote_ip
         self.ssh = self.term.get_connection()
         self.channel = self.ssh.invoke_shell(term='xterm')
+        self.channel.resize_pty(80, 24)
         WebTerminalHandler.tasks.append(MyThread(target=self.forward_outbound))
         WebTerminalHandler.clients.append(self)
 
@@ -421,7 +426,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                         self.termlog.write(data)
                         self.termlog.recoder = False
                         now_timestamp = time.time()
-                        self.log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
+                        self.log_time_f.write('%s %s\n' % (round(now_timestamp - pre_timestamp, 4), len(data)))
                         self.log_file_f.write(data)
                         pre_timestamp = now_timestamp
                         self.log_file_f.flush()
@@ -480,6 +485,7 @@ def main():
     server.listen(options.port)
 
     tornado.ioloop.IOLoop.instance().start()
+
 
 if __name__ == '__main__':
     # tornado.options.parse_command_line()

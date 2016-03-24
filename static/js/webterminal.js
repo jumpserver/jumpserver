@@ -104,13 +104,13 @@ $(document).ready(function () {
     $('#ssh').show();
     var term_client = openTerminal(options);
     console.log(rowHeight);
-
-    window.onresize = function () {
-        var geom = resize();
-        console.log(geom);
-        term_client.term.resize(geom.cols, geom.rows);
-        term_client.client.send({'resize': {'rows': geom.rows, 'cols': geom.cols}});
-        $('#ssh').show();
-    }
+    // by liuzheng712 because it will bring record bug
+    //window.onresize = function () {
+    //    var geom = resize();
+    //    console.log(geom);
+    //    term_client.term.resize(geom.cols, geom.rows);
+    //    term_client.client.send({'resize': {'rows': geom.rows, 'cols': geom.cols}});
+    //    $('#ssh').show();
+    //}
 
 });
