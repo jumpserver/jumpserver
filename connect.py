@@ -303,6 +303,7 @@ class SshTty(Tty):
         data = ''
         input_str = ''
         input_mode = False
+        vim_end_flag = False
         try:
             tty.setraw(sys.stdin.fileno())
             tty.setcbreak(sys.stdin.fileno())
@@ -363,12 +364,13 @@ class SshTty(Tty):
                         if input_str != x:
                             data += input_str
                         if self.vim_flag:
-                            match = self.ps1_pattern.search(self.vim_data)
+                            match = re.compile(r'\x1b\[\?1049', re.X).findall(self.vim_data)
                             if match:
-                                self.vim_flag = False
-                                data = self.deal_command(data)[0:200]
-                                if len(data) > 0:
-                                    TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
+                                if vim_end_flag or len(match) == 2:
+                                    self.vim_flag = False
+                                    vim_end_flag = False
+                                else:
+                                    vim_end_flag = True
                         else:
                             data = self.deal_command(data)[0:200]
                             if len(data) > 0:
