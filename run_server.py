@@ -344,7 +344,6 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             self.term.remote_ip = self.request.remote_ip
         self.ssh = self.term.get_connection()
         self.channel = self.ssh.invoke_shell(term='xterm')
-        self.channel.resize_pty(80, 24)
         WebTerminalHandler.tasks.append(MyThread(target=self.forward_outbound))
         WebTerminalHandler.clients.append(self)
 
