@@ -180,7 +180,7 @@ def server_del_user(username):
     delete a user from jumpserver linux system
     删除系统上的某用户
     """
-    bash('userdel -r %s' % username)
+    bash('userdel -r -f %s' % username)
 
 
 def get_display_msg(user, password='', ssh_key_pwd='', send_mail_need=False):
