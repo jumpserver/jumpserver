@@ -87,12 +87,12 @@ def db_update_user(**kwargs):
     admin_groups_post = kwargs.pop('admin_groups')
     user_id = kwargs.pop('user_id')
     user = User.objects.filter(id=user_id)
-    user_get = User.objects.get(id=user_id)
     if user:
-        pwd = kwargs.pop('password')
+        user_get = user[0]
+        password = kwargs.pop('password')
         user.update(**kwargs)
-        if pwd != '':
-            user_get.set_password(pwd)
+        if password.strip():
+            user_get.set_password(password)
             user_get.save()
     else:
         return None
@@ -180,7 +180,7 @@ def server_del_user(username):
     delete a user from jumpserver linux system
     删除系统上的某用户
     """
-    bash('userdel -r %s' % username)
+    bash('userdel -r -f %s' % username)
 
 
 def get_display_msg(user, password='', ssh_key_pwd='', send_mail_need=False):
