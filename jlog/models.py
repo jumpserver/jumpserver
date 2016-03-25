@@ -13,6 +13,19 @@ class Log(models.Model):
     pid = models.IntegerField()
     is_finished = models.BooleanField(default=False)
     end_time = models.DateTimeField(null=True)
+    '''
+    add by liuzheng
+    '''
+    userMM = models.ManyToManyField(User)
+    logPath = models.TextField()
+    filename = models.CharField(max_length=40)
+    logPWD = models.TextField()  # log zip file's
+    nick = models.TextField(null=True)  # log's nick name
+    log = models.TextField(null=True)
+    history = models.TextField(null=True)
+    timestamp = models.IntegerField(default=int(time.time()))
+    datetimestamp = models.DateTimeField(auto_now_add=True)
+
 
     def __unicode__(self):
         return self.log_path
