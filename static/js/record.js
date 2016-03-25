@@ -102,10 +102,9 @@ NgApp.controller('TerminalRecordCtrl', function ($scope, $http) {
             timer = setInterval(advance, TICK);
         };
 
-        var rc = textSize();
         var term = new Terminal({
-            rows: rc.y,
-            cols: rc.x,
+            rows: 80,
+            cols: 24,
             useStyle: true,
             screenKeys: true
         });
@@ -122,36 +121,3 @@ NgApp.controller('TerminalRecordCtrl', function ($scope, $http) {
     })
 
 })
-
-function textSize() {
-    var charSize = getCharSize();
-    var windowSize = getwindowSize();
-    var size = {
-        x: Math.floor(windowSize.width / charSize.width)
-        , y: Math.floor(windowSize.height / charSize.height)
-    };
-    if (size.x > 150)size.x = 150;
-    if (size.y > 35)size.y = 35;
-    size.x = 140;
-    size.y = 30;
-    return size;
-}
-function getCharSize() {
-    var $span = $("<span>", {text: "qwertyuiopasdfghjklzxcvbnm"});
-    $('body').append($span);
-    var size = {
-        width: $span.outerWidth() / 30
-        , height: $span.outerHeight() * 1.1
-    };
-    $span.remove();
-    return size;
-}
-function getwindowSize() {
-    var e = window,
-        a = 'inner';
-    if (!('innerWidth' in window )) {
-        a = 'client';
-        e = document.documentElement || document.body;
-    }
-    return {width: e[a + 'Width'] - 300, height: e[a + 'Height'] - 120};
-}
