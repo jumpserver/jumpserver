@@ -128,22 +128,17 @@
 </div>
 
 
-{#<script src="http://{{ web_socket_host }}/socket.io/socket.io.js"></script>#}
 <script>
-{#   $(document).ready(function(){#}
-{#       $('.monitor').click(function(){#}
-{#           window.open('/jlog/monitor/', '监控', 'height=500, width=910, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,resizeable=no,location=no,status=no');#}
-{#        })#}
-{#   });#}
     function init(obj){
-        var protocol = "ws://";
         if (window.location.protocol == 'https:') {
-            protocol = 'wss://';
+            var protocol = 'wss://';
+        } else {
+            var protocol = 'ws://';
         }
 
+        var endpoint = protocol + document.URL.match(RegExp('//(.*?)/'))[1] + '/ws/monitor';
         var file_path = obj.attr('file_path');
-        var wsUri = protocol + '{{ web_monitor_uri }}';
-        var socket = new WebSocket(wsUri + '?file_path=' + file_path);
+        var socket = new WebSocket(endpoint + '?file_path=' + file_path);
 
         var term = new Terminal({
             cols: 80,
@@ -154,6 +149,7 @@
 
         var tag = $('<div id="term" style="height:500px; overflow: auto;background-color: rgba(0, 0, 0, 0);border: none"></div>');
             term.open();
+            $('.terminal').hide();
             term.resize(80, 24);
 
         socket.onopen = function(evt){
@@ -170,9 +166,9 @@
 
         BootstrapDialog.show({message: function(){
             //服务器端认证
-{#            socket.send('login', {userid:message.id, filename:message.filename,username:username,seed:seed});#}
             window.setTimeout(function(){
                 $('.terminal').detach().appendTo('#term');
+                $('.terminal').show();
                 socket.onmessage = function(evt){
                 term.write(evt.data);
             }}, 1000);
@@ -209,19 +205,18 @@
     });
 
    function cut(num, login_type){
-       console.log(login_type);
+       var protocol = window.location.protocol;
+       var endpoint = protocol + '//' +  document.URL.match(RegExp('//(.*?)/'))[1] + '/kill';
        if (login_type=='web'){
-           var g_url = '{{ web_kill_uri }}' + '?id=' + num;
+           var g_url = endpoint + '?id=' + num;
+           console.log(g_url);
        } else {
-           var g_url = "{% url 'log_kill' %} }?id=" + num;
+           var g_url = "{% url 'log_kill' %}?id=" + num;
        }
 
-       $.ajax({
-           type: "GET",
-           url: g_url+"&sessionid={{ session_id }}",
-           success: window.open("{% url 'log_list' 'online' %}", "_self")
-       });
-
+       $.get(g_url+"&sessionid={{ session_id }}", function () {
+           window.open("{% url 'log_list' 'online' %}", "_self")
+       })
 }
 </script>
 {% endblock %}

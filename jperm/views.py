@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 from django.db.models import Q
 from django.http import HttpResponseBadRequest, HttpResponseNotAllowed
@@ -10,7 +11,7 @@ from jasset.models import Asset, AssetGroup
 from jperm.models import PermRole, PermRule, PermSudo, PermPush
 from jumpserver.models import Setting
 
-from jperm.utils import gen_keys
+from jperm.utils import gen_keys, trans_all
 from jperm.ansible_api import MyTask
 from jperm.perm_api import get_role_info, get_role_push_host
 from jumpserver.api import my_render, get_object, CRYPTOR
@@ -512,18 +513,18 @@ def perm_role_push(request):
         task = MyTask(push_resource)
         ret = {}
 
-        # 因为要先建立用户，所以password 是必选项，而push key是在 password也完成的情况下的 可选项
+        # 因为要先建立用户，而push key是在 password也完成的情况下的 可选项
         # 1. 以秘钥 方式推送角色
         if key_push:
-            ret["pass_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
+            ret["pass_push"] = task.add_user(role.name)
             ret["key_push"] = task.push_key(role.name, os.path.join(role.key_path, 'id_rsa.pub'))
 
-        # 2. 推送账号密码
-        elif password_push:
-            ret["pass_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
+        # 2. 推送账号密码 <为了安全 系统用户统一使用秘钥进行通信， 不再提供密码方式的推送>
+        # elif password_push:
+        #     ret["pass_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
 
         # 3. 推送sudo配置文件
-        if password_push or key_push:
+        if key_push:
             sudo_list = set([sudo for sudo in role.sudo.all()])  # set(sudo1, sudo2, sudo3)
             if sudo_list:
                 ret['sudo'] = task.push_sudo_file([role], sudo_list)
@@ -619,7 +620,9 @@ def perm_sudo_add(request):
                 raise ServerError(u"sudo name 和 commands是必填项!")
 
             pattern = re.compile(r'[\n,\r]')
-            commands = ', '.join(list_drop_str(pattern.split(commands), u''))
+            deal_space_commands = list_drop_str(pattern.split(commands), u'')
+            deal_all_commands = map(trans_all, deal_space_commands)
+            commands = ', '.join(deal_all_commands)
             logger.debug(u'添加sudo %s: %s' % (name, commands))
 
             if get_object(PermSudo, name=name):
@@ -656,7 +659,9 @@ def perm_sudo_edit(request):
                 raise ServerError(u"sudo name 和 commands是必填项!")
 
             pattern = re.compile(r'[\n,\r]')
-            commands = ', '.join(list_drop_str(pattern.split(commands), u'')).strip()
+            deal_space_commands = list_drop_str(pattern.split(commands), u'')
+            deal_all_commands = map(trans_all, deal_space_commands)
+            commands = ', '.join(deal_all_commands).strip()
             logger.debug(u'添加sudo %s: %s' % (name, commands))
 
             sudo.name = name.strip()
@@ -701,8 +706,14 @@ def perm_role_recycle(request):
             recycle_assets.append(asset)
     recycle_resource = gen_resource(recycle_assets)
     task = MyTask(recycle_resource)
-    # TODO: 判断返回结果，处理异常
-    msg = task.del_user(get_object(PermRole, id=role_id).name)
+    try:
+        msg_del_user = task.del_user(get_object(PermRole, id=role_id).name)
+        msg_del_sudo = task.del_user_sudo(get_object(PermRole, id=role_id).name)
+        logger.info("recycle user msg: %s" % msg_del_user)
+        logger.info("recycle sudo msg: %s" % msg_del_sudo)
+    except Exception, e:
+        logger.warning("Recycle Role failed: %s" % e)
+        raise ServerError(u"回收已推送的系统用户失败: %s" % e)
 
     for asset_id in asset_ids:
         asset = get_object(Asset, id=asset_id)

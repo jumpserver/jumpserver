@@ -9,6 +9,8 @@ from jperm.ansible_api import MyRunner
 from jperm.perm_api import gen_resource
 from jumpserver.templatetags.mytags import get_disk_info
 
+import traceback
+
 
 def group_add_asset(group, asset_id=None, asset_ip=None):
     """
@@ -333,9 +335,11 @@ def get_ansible_asset_info(asset_ip, setup_info):
     # ip = setup_info.get("ansible_default_ipv4").get("address")
     mac = setup_info.get("ansible_default_ipv4").get("macaddress")
     brand = setup_info.get("ansible_product_name")
-    cpu_type = setup_info.get("ansible_processor")[1]
-    cpu_cores = setup_info.get("ansible_processor_vcpus")
-    cpu = cpu_type + ' * ' + unicode(cpu_cores)
+    try:
+        cpu_type = setup_info.get("ansible_processor")[1]
+    except IndexError:
+        cpu_type = ' '.join(setup_info.get("ansible_processor")[0].split(' ')[:6])
+
     memory = setup_info.get("ansible_memtotal_mb")
     try:
         memory_format = int(round((int(memory) / 1000), 0))
@@ -343,7 +347,13 @@ def get_ansible_asset_info(asset_ip, setup_info):
         memory_format = memory
     disk = disk_need
     system_type = setup_info.get("ansible_distribution")
-    system_version = setup_info.get("ansible_distribution_version")
+    if system_type.lower() == "freebsd":
+        system_version = setup_info.get("ansible_distribution_release")
+        cpu_cores = setup_info.get("ansible_processor_count")
+    else:
+        system_version = setup_info.get("ansible_distribution_version")
+        cpu_cores = setup_info.get("ansible_processor_vcpus")
+    cpu = cpu_type + ' * ' + unicode(cpu_cores)
     system_arch = setup_info.get("ansible_architecture")
     # asset_type = setup_info.get("ansible_system")
     sn = setup_info.get("ansible_product_serial")
@@ -359,24 +369,31 @@ def asset_ansible_update(obj_list, name=''):
     for asset in obj_list:
         try:
             setup_info = ansible_asset_info['contacted'][asset.hostname]['ansible_facts']
-        except KeyError:
+            logger.debug("setup_info: %s" % setup_info)
+        except KeyError, e:
+            logger.error("获取setup_info失败: %s" % e)
             continue
         else:
-            asset_info = get_ansible_asset_info(asset.ip, setup_info)
-            other_ip, mac, cpu, memory, disk, sn, system_type, system_version, brand, system_arch = asset_info
-            asset_dic = {"other_ip": other_ip,
-                         "mac": mac,
-                         "cpu": cpu,
-                         "memory": memory,
-                         "disk": disk,
-                         "sn": sn,
-                         "system_type": system_type,
-                         "system_version": system_version,
-                         "system_arch": system_arch,
-                         "brand": brand
-                         }
+            try:
+                asset_info = get_ansible_asset_info(asset.ip, setup_info)
+                print asset_info
+                other_ip, mac, cpu, memory, disk, sn, system_type, system_version, brand, system_arch = asset_info
+                asset_dic = {"other_ip": other_ip,
+                             "mac": mac,
+                             "cpu": cpu,
+                             "memory": memory,
+                             "disk": disk,
+                             "sn": sn,
+                             "system_type": system_type,
+                             "system_version": system_version,
+                             "system_arch": system_arch,
+                             "brand": brand
+                             }
 
-            ansible_record(asset, asset_dic, name)
+                ansible_record(asset, asset_dic, name)
+            except Exception as e:
+                logger.error("save setup info failed! %s" % e)
+                traceback.print_exc()
 
 
 def asset_ansible_update_all():

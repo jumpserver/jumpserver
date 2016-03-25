@@ -50,24 +50,23 @@
 
                                         <div class="hr-line-dashed"></div>
                                         <div class="form-group">
-                                            <label for="j_group" class="col-sm-2 control-label">管理账号<span class="red-fonts"> *</span></label>
+                                            <label for="j_group" class="col-sm-2 control-label">管理用户<span class="red-fonts"> *</span></label>
                                             <div class="col-sm-2">
                                                 <div class="radio i-checks">
-                                                    <label>
+                                                    <label style="padding-left: 0">
                                                         <input type="checkbox" checked="checked" id="id_use_default_auth" name="use_default_auth"><span> 使用默认 </span>
                                                     </label>
                                                 </div>
                                             </div>
                                         </div>
-                                        <p class="col-sm-offset-2">Tips: 管理账号是服务器存在的root等高权限账号，用来推送新建系统用户</p>
+                                        <p class="col-sm-offset-2">Tips: 管理用户是服务器存在的root或拥有sudo的用户，用来推送系统用户</p>
                                         <div class="form-group" id="admin_account" style="display: none">
-                                            <div class="hr-line-dashed"></div>
-                                            <label class="col-sm-2 control-label"> 管理用户名<span class="red-fonts">*</span> </label>
+                                            <label class="col-sm-2 control-label"> <span class="red-fonts"></span> </label>
                                             <div class="col-sm-3">
                                                 <input type="text" placeholder="Username" name="username" class="form-control">
                                             </div>
 
-                                            <label class="col-sm-1 control-label"> 密码<span class="red-fonts">*</span> </label>
+                                            <label class="col-sm-1 control-label"> <span class="red-fonts"></span> </label>
                                             <div class="col-sm-4">
                                                 <input type="password" placeholder="Password" name="password" class="form-control">
                                             </div>

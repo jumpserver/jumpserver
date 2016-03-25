@@ -70,7 +70,7 @@
                                     {% if user.username|key_exist %}
                                         <a  href="{% url 'key_down' %}?uuid={{ user.uuid }}" >下载</a>
                                     {% else %}
-                                        <span style="color: #586b7d">NoKey</span>
+                                        <a href="#" onclick="genSSH('{{ user.username }}','{% url 'key_gen' %}?uuid={{ user.uuid }}')">NoKey GenOne?</a>
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
@@ -150,5 +150,13 @@
         });
         $('.shiftCheckbox').shiftcheckbox();
     });
+function genSSH(username, url) {
+    if (confirm('Are you sure to gen a sshkey for user ' + username)) {
+        $.get(url, function (data) {
+            alert(data);
+            location.reload()
+        })
+    }
+}
 </script>
 {% endblock %}

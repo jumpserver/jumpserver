@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # coding: utf-8
 
 import time
@@ -7,8 +8,9 @@ import os
 import sys
 import os.path
 import threading
-import datetime
 import re
+import functools
+from django.core.signals import request_started, request_finished
 
 import tornado.ioloop
 import tornado.options
@@ -20,10 +22,10 @@ import tornado.httpclient
 from tornado.websocket import WebSocketClosedError
 
 from tornado.options import define, options
-from pyinotify import WatchManager, Notifier, ProcessEvent, IN_DELETE, IN_CREATE, IN_MODIFY, AsyncNotifier
+from pyinotify import WatchManager, ProcessEvent, IN_DELETE, IN_CREATE, IN_MODIFY, AsyncNotifier
 import select
 
-from connect import Tty, User, Asset, PermRole, logger, get_object, PermRole, gen_resource
+from connect import Tty, User, Asset, PermRole, logger, get_object, gen_resource
 from connect import TtyLog, Log, Session, user_have_perm, get_group_user_perm, MyRunner, ExecLog
 
 try:
@@ -31,9 +33,20 @@ try:
 except ImportError:
     import json
 
+os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
+from jumpserver.settings import IP, PORT
+define("port", default=PORT, help="run on the given port", type=int)
+define("host", default=IP, help="run port on given host", type=str)
 
-define("port", default=3000, help="run on the given port", type=int)
-define("host", default='0.0.0.0', help="run port on given host", type=str)
+
+def django_request_support(func):
+    @functools.wraps(func)
+    def _deco(*args, **kwargs):
+        request_started.send_robust(func)
+        response = func(*args, **kwargs)
+        request_finished.send_robust(func)
+        return response
+    return _deco
 
 
 def require_auth(role='user'):
@@ -67,6 +80,7 @@ def require_auth(role='user'):
             except AttributeError:
                 pass
             logger.warning('Websocket: Request auth failed.')
+
         return _deco2
     return _deco
 
@@ -127,6 +141,7 @@ class MonitorHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
+    @django_request_support
     @require_auth('admin')
     def open(self):
         # 获取监控的path
@@ -178,6 +193,7 @@ class WebTty(Tty):
 
 
 class WebTerminalKillHandler(tornado.web.RequestHandler):
+    @django_request_support
     @require_auth('admin')
     def get(self):
         ws_id = self.get_argument('id')
@@ -207,6 +223,7 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
+    @django_request_support
     @require_auth('user')
     def open(self):
         logger.debug('Websocket: Open exec request')
@@ -287,6 +304,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
+    @django_request_support
     @require_auth('user')
     def open(self):
         logger.debug('Websocket: Open request')
@@ -314,7 +332,10 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         logger.debug('Websocket: request web terminal Host: %s User: %s Role: %s' % (asset.hostname, self.user.username,
                                                                                      login_role.name))
         self.term = WebTty(self.user, asset, login_role, login_type='web')
-        self.term.remote_ip = self.request.remote_ip
+        # self.term.remote_ip = self.request.remote_ip
+        self.term.remote_ip = self.request.headers.get("X-Real-IP")
+        if not self.term.remote_ip:
+            self.term.remote_ip = self.request.remote_ip
         self.ssh = self.term.get_connection()
         self.channel = self.ssh.invoke_shell(term='xterm')
         WebTerminalHandler.tasks.append(MyThread(target=self.forward_outbound))
@@ -330,32 +351,34 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                 pass
 
     def on_message(self, message):
-        data = json.loads(message)
-        if not data:
+        jsondata = json.loads(message)
+        if not jsondata:
             return
 
-        if 'resize' in data.get('data'):
+        if 'resize' in jsondata.get('data'):
             self.channel.resize_pty(
-                data.get('data').get('resize').get('cols', 80),
-                data.get('data').get('resize').get('rows', 24)
+                jsondata.get('data').get('resize').get('cols', 80),
+                jsondata.get('data').get('resize').get('rows', 24)
             )
-        elif data.get('data'):
+        elif jsondata.get('data'):
             self.term.input_mode = True
-            if str(data['data']) in ['\r', '\n', '\r\n']:
+            if str(jsondata['data']) in ['\r', '\n', '\r\n']:
                 if self.term.vim_flag:
-                    match = self.term.ps1_pattern.search(self.term.vim_data)
+                    match = re.compile(r'\x1b\[\?1049', re.X).findall(self.term.vim_data)
                     if match:
-                        self.term.vim_flag = False
-                        vim_data = self.term.deal_command(self.term.vim_data)[0:200]
-                        if len(data) > 0:
-                            TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=vim_data).save()
-
-                TtyLog(log=self.log, datetime=datetime.datetime.now(),
-                       cmd=self.term.deal_command(self.term.data)[0:200]).save()
+                        if self.term.vim_end_flag or len(match) == 2:
+                            self.term.vim_flag = False
+                            self.term.vim_end_flag = False
+                        else:
+                            self.term.vim_end_flag = True
+                else:
+                    result = self.term.deal_command(self.term.data)[0:200]
+                    if len(result) > 0:
+                        TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=result).save()
                 self.term.vim_data = ''
                 self.term.data = ''
                 self.term.input_mode = False
-            self.channel.send(data['data'])
+            self.channel.send(jsondata['data'])
         else:
             pass
 
@@ -390,7 +413,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                     if self.term.vim_flag:
                         self.term.vim_data += recv
                     try:
-                        self.write_message(json.dumps({'data': data}))
+                        self.write_message(data.decode('utf-8', 'replace'))
                         now_timestamp = time.time()
                         self.log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
                         self.log_file_f.write(data)
@@ -425,12 +448,40 @@ class Application(tornado.web.Application):
         tornado.web.Application.__init__(self, handlers, **setting)
 
 
-if __name__ == '__main__':
-    tornado.options.parse_command_line()
-    app = Application()
-    server = tornado.httpserver.HTTPServer(app)
-    server.bind(options.port, options.host)
-    #server.listen(options.port)
-    server.start(num_processes=5)
-    print "Run server on %s:%s" % (options.host, options.port)
+def main():
+    from django.core.wsgi import get_wsgi_application
+    import tornado.wsgi
+    wsgi_app = get_wsgi_application()
+    container = tornado.wsgi.WSGIContainer(wsgi_app)
+    setting = {
+        'cookie_secret': 'DFksdfsasdfkasdfFKwlwfsdfsa1204mx',
+        'template_path': os.path.join(os.path.dirname(__file__), 'templates'),
+        'static_path': os.path.join(os.path.dirname(__file__), 'static'),
+        'debug': False,
+    }
+    tornado_app = tornado.web.Application(
+        [
+            (r'/ws/monitor', MonitorHandler),
+            (r'/ws/terminal', WebTerminalHandler),
+            (r'/kill', WebTerminalKillHandler),
+            (r'/ws/exec', ExecHandler),
+            (r"/static/(.*)", tornado.web.StaticFileHandler,
+             dict(path=os.path.join(os.path.dirname(__file__), "static"))),
+            ('.*', tornado.web.FallbackHandler, dict(fallback=container)),
+        ], **setting)
+
+    server = tornado.httpserver.HTTPServer(tornado_app)
+    server.listen(options.port)
+
     tornado.ioloop.IOLoop.instance().start()
+
+if __name__ == '__main__':
+    # tornado.options.parse_command_line()
+    # app = Application()
+    # server = tornado.httpserver.HTTPServer(app)
+    # server.bind(options.port, options.host)
+    # #server.listen(options.port)
+    # server.start(num_processes=5)
+    # tornado.ioloop.IOLoop.instance().start()
+    print "Run server on %s:%s" % (options.host, options.port)
+    main()
