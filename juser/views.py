@@ -368,11 +368,6 @@ def user_edit(request):
         else:
             return HttpResponseRedirect(reverse('user_list'))
 
-        if password != '':
-            password_decode = password
-        else:
-            password_decode = None
-
         db_update_user(user_id=user_id,
                        password=password,
                        name=name,
@@ -391,7 +386,7 @@ def user_edit(request):
                 密码：%s (如果密码为None代表密码为原密码)
                 权限：：%s
 
-            """ % (user.name, URL, user.username, password_decode, user_role.get(role_post, u''))
+            """ % (user.name, URL, user.username, password, user_role.get(role_post, u''))
             send_mail('您的信息已修改', msg, MAIL_FROM, [email], fail_silently=False)
 
         return HttpResponseRedirect(reverse('user_list'))
