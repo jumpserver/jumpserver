@@ -7,7 +7,7 @@ from jperm.perm_api import user_have_perm
 from django.http import HttpResponseNotFound
 from jlog.log_api import renderTemplate
 
-from jlog.models import Log, ExecLog, FileLog
+from jlog.models import Log, ExecLog, FileLog,TermLog
 from jumpserver.settings import LOG_DIR
 import zipfile
 import json
@@ -136,9 +136,9 @@ def log_record(request):
     elif request.method == "POST":
         log_id = request.REQUEST.get('id', None)
         if log_id:
-            logs = TermLogRecorder(request.user)
-            log = Log.objects.get(id=int(log_id))
-            return HttpResponse(logs.load_full_log(log.filename))
+            TermL = TermLogRecorder(request.user)
+            log = TermLog.objects.get(id=int(log_id))
+            return HttpResponse(TermL.load_full_log(log.filename))
         else:
             return HttpResponse("ERROR")
     else:
@@ -261,16 +261,16 @@ class TermLogRecorder(object):
             zf.setpassword(password)
             zf.writestr(filename, json.dumps(self.log))
             zf.close()
-            record = Log.objects.create(logPath=filepath, logPWD=password, filename=filename,
+            record = TermLog.objects.create(logPath=filepath, logPWD=password, filename=filename,
                                             history=json.dumps(self.CMD), timestamp=int(self.recoderStartTime))
             if self.user:
-                record.userMM.add(self.user)
+                record.user.add(self.user)
         except:
-            record = Log.objects.create(logPath='locale', logPWD=password, log=json.dumps(self.log),
+            record = TermLog.objects.create(logPath='locale', logPWD=password, log=json.dumps(self.log),
                                             filename=filename, history=json.dumps(self.CMD),
                                             timestamp=int(self.recoderStartTime))
             if self.user:
-                record.userMM.add(self.user)
+                record.user.add(self.user)
 
     def list(self, user=None, uid=None):
         tmp = []
@@ -281,7 +281,7 @@ class TermLogRecorder(object):
         else:
             user = self.user
         if user:
-            self._lists = Log.objects.filter(user=user.id)
+            self._lists = TermLog.objects.filter(user=user.id)
             for i in self._lists.all():
                 tmp.append(
                     {'filename': i.filename, 'locale': i.logPath == 'locale', 'nick': i.nick, 'timestamp': i.timestamp,
@@ -299,7 +299,7 @@ class TermLogRecorder(object):
             if self._lists:
                 self.file = self._lists.get(filename=filename)
             else:
-                self.file = Log.objects.get(user=user.id, filename=filename)
+                self.file = TermLog.objects.get(user=user.id, filename=filename)
             if self.file.logPath == 'locale':
                 return self.file.log
             else:
@@ -323,7 +323,7 @@ class TermLogRecorder(object):
             if self._lists:
                 self.file = self._lists.get(filename=filename)
             else:
-                self.file = Log.objects.get(user=user.id, filename=filename)
+                self.file = TermLog.objects.get(user=user.id, filename=filename)
             return self.file.history
         return 'ERROR User(None)'
 
@@ -335,7 +335,7 @@ class TermLogRecorder(object):
         else:
             pass
         if user:
-            Log.objects.get(filename=filename).userMM.add(user)
+            TermLog.objects.get(filename=filename).user.add(user)
             return True
         return False
 
@@ -347,6 +347,6 @@ class TermLogRecorder(object):
         else:
             pass
         if user:
-            Log.objects.get(filename=filename).userMM.remove(user)
+            TermLog.objects.get(filename=filename).user.remove(user)
             return True
         return False

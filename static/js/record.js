@@ -103,17 +103,17 @@ NgApp.controller('TerminalRecordCtrl', function ($scope, $http) {
         };
 
         var term = new Terminal({
-            rows: 80,
-            cols: 24,
+            rows: 24,
+            cols: 80,
             useStyle: true,
             screenKeys: true
         });
         var timelist = [];
         for (var i in data) {
-            totalTime = totalTime > i ? totalTime : i;
+            totalTime = Math.max(totalTime, i);
             timelist.push(i);
         }
-        timelist = timelist.sort();
+        timelist = timelist.sort(function(a, b){return a-b});
         totalTime = totalTime * 1000;
         document.getElementById("afterScrubberText").innerHTML = buildTimeString(totalTime);
         term.open(document.getElementById('terminal'));

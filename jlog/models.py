@@ -16,15 +16,15 @@ class Log(models.Model):
     '''
     add by liuzheng
     '''
-    userMM = models.ManyToManyField(User)
-    logPath = models.TextField()
-    filename = models.CharField(max_length=40)
-    logPWD = models.TextField()  # log zip file's
-    nick = models.TextField(null=True)  # log's nick name
-    log = models.TextField(null=True)
-    history = models.TextField(null=True)
-    timestamp = models.IntegerField(default=int(time.time()))
-    datetimestamp = models.DateTimeField(auto_now_add=True)
+    # userMM = models.ManyToManyField(User)
+    # logPath = models.TextField()
+    # filename = models.CharField(max_length=40)
+    # logPWD = models.TextField()  # log zip file's
+    # nick = models.TextField(null=True)  # log's nick name
+    # log = models.TextField(null=True)
+    # history = models.TextField(null=True)
+    # timestamp = models.IntegerField(default=int(time.time()))
+    # datetimestamp = models.DateTimeField(auto_now_add=True)
 
 
     def __unicode__(self):
