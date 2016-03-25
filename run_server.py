@@ -371,12 +371,13 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             self.term.input_mode = True
             if str(jsondata['data']) in ['\r', '\n', '\r\n']:
                 if self.term.vim_flag:
-                    match = self.term.ps1_pattern.search(self.term.vim_data)
+                    match = re.compile(r'\x1b\[\?1049', re.X).findall(self.vim_data)
                     if match:
-                        self.term.vim_flag = False
-                        result = self.term.deal_command(self.term.data)[0:200]
-                        if len(result) > 0:
-                            TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=result).save()
+                        if self.term.vim_end_flag or len(match) == 2:
+                            self.term.vim_flag = False
+                            self.term.vim_end_flag = False
+                        else:
+                            self.term.vim_end_flag = True
                 else:
                     result = self.term.deal_command(self.term.data)[0:200]
                     if len(result) > 0:

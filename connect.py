@@ -92,7 +92,8 @@ class Tty(object):
         self.remote_ip = ''
         self.login_type = login_type
         self.vim_flag = False
-        self.ps1_pattern = re.compile('\[?.*@.*\]?[\$#]\s')
+        self.vim_end_flag = False
+        self.vim_end_pattern = re.compile(r'\x1b\[\?1049', re.X)
         self.vim_pattern = re.compile(r'\W?vi[m]?\s.* | \W?fg\s.*', re.X)
         self.vim_data = ''
         self.stream = None
@@ -122,7 +123,7 @@ class Tty(object):
         :return:返回去除PS1或者mysql字符串的结果
         """
         result = None
-        match = self.ps1_pattern.split(command)
+        match = re.compile('\[?.*@.*\]?[\$#]\s').split(command)
         if match:
             # 只需要最后的一个PS1后面的字符串
             result = match[-1].strip()
@@ -303,7 +304,6 @@ class SshTty(Tty):
         data = ''
         input_str = ''
         input_mode = False
-        vim_end_flag = False
         try:
             tty.setraw(sys.stdin.fileno())
             tty.setcbreak(sys.stdin.fileno())
@@ -334,8 +334,6 @@ class SshTty(Tty):
                             except OSError as msg:
                                 if msg.errno == errno.EAGAIN:
                                     continue
-                        #sys.stdout.write(x)
-                        #sys.stdout.flush()
                         now_timestamp = time.time()
                         log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(x)))
                         log_time_f.flush()
@@ -364,13 +362,13 @@ class SshTty(Tty):
                         if input_str != x:
                             data += input_str
                         if self.vim_flag:
-                            match = re.compile(r'\x1b\[\?1049', re.X).findall(self.vim_data)
+                            match = self.vim_end_pattern.findall(self.vim_data)
                             if match:
-                                if vim_end_flag or len(match) == 2:
+                                if self.vim_end_flag or len(match) == 2:
                                     self.vim_flag = False
-                                    vim_end_flag = False
+                                    self.vim_end_flag = False
                                 else:
-                                    vim_end_flag = True
+                                    self.vim_end_flag = True
                         else:
                             data = self.deal_command(data)[0:200]
                             if len(data) > 0:
