@@ -1,8 +1,7 @@
 # coding:utf-8
 from django.db.models import Q
 from django.template import RequestContext
-from django.shortcuts import render_to_response
-
+from django.shortcuts import render_to_response, render
 from jumpserver.api import *
 from jperm.perm_api import user_have_perm
 from django.http import HttpResponseNotFound
@@ -114,20 +113,36 @@ def log_history(request):
     return HttpResponse('无日志记录!')
 
 
+# @require_role('admin')
+# def log_record(request):
+#     log_id = request.GET.get('id', 0)
+#     log = Log.objects.filter(id=int(log_id))
+#     if log:
+#         log = log[0]
+#         log_file = log.log_path + '.log'
+#         log_time = log.log_path + '.time'
+#         if os.path.isfile(log_file) and os.path.isfile(log_time):
+#             content = renderTemplate(log_file, log_time)
+#             return HttpResponse(content)
+#         else:
+#             return HttpResponse('无日志记录!')
 @require_role('admin')
 def log_record(request):
-    log_id = request.GET.get('id', 0)
-    log = Log.objects.filter(id=int(log_id))
-    if log:
-        log = log[0]
-        log_file = log.log_path + '.log'
-        log_time = log.log_path + '.time'
-        if os.path.isfile(log_file) and os.path.isfile(log_time):
-            content = renderTemplate(log_file, log_time)
-            return HttpResponse(content)
+    """
+    Author: liuzheng712@gmail.com
+    """
+    if request.method == "GET":
+        return render(request, 'jlog/record.html')
+    elif request.method == "POST":
+        log_id = request.REQUEST.get('id', None)
+        if log_id:
+            logs = TermLogRecorder(request.user)
+            log = TermLog.objects.get(id=int(log_id))
+            return HttpResponse(logs.load_full_log(log.filename))
         else:
-            return HttpResponse('无日志记录!')
-
+            return HttpResponse("ERROR")
+    else:
+        return HttpResponse("ERROR METHOD!")
 
 @require_role('admin')
 def log_detail(request, offset):

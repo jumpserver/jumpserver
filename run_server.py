@@ -22,7 +22,7 @@ import tornado.httpclient
 from tornado.websocket import WebSocketClosedError
 
 from tornado.options import define, options
-# from pyinotify import WatchManager, ProcessEvent, IN_DELETE, IN_CREATE, IN_MODIFY, AsyncNotifier
+from pyinotify import WatchManager, ProcessEvent, IN_DELETE, IN_CREATE, IN_MODIFY, AsyncNotifier
 import select
 
 from connect import Tty, User, Asset, PermRole, logger, get_object, gen_resource
@@ -101,12 +101,12 @@ class MyThread(threading.Thread):
             pass
 
 
-# class EventHandler(ProcessEvent):
-#     def __init__(self, client=None):
-#         self.client = client
-#
-#     def process_IN_MODIFY(self, event):
-#         self.client.write_message(f.read())
+class EventHandler(ProcessEvent):
+    def __init__(self, client=None):
+        self.client = client
+
+    def process_IN_MODIFY(self, event):
+        self.client.write_message(f.read())
 
 
 def file_monitor(path='.', client=None):
