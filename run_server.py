@@ -364,7 +364,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             self.term.input_mode = True
             if str(jsondata['data']) in ['\r', '\n', '\r\n']:
                 if self.term.vim_flag:
-                    match = re.compile(r'\x1b\[\?1049', re.X).findall(self.vim_data)
+                    match = re.compile(r'\x1b\[\?1049', re.X).findall(self.term.vim_data)
                     if match:
                         if self.term.vim_end_flag or len(match) == 2:
                             self.term.vim_flag = False
