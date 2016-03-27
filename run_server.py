@@ -446,7 +446,7 @@ class MonitorHandler(WebTerminalHandler):
     @require_auth('user')
     def open(self):
         try:
-            self.returnlog = TermLogRecorder.loglist[int(self.get_argument('id'))]
+            self.returnlog = TermLogRecorder.loglist[self.get_argument('id')]
             self.returnlog.write_message = self.write_message
         except:
             self.write_message('Log is None')
