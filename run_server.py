@@ -399,6 +399,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             self.log_file_f.write('End time is %s' % datetime.datetime.now())
             self.log.is_finished = True
             self.log.end_time = datetime.datetime.now()
+            self.log.log_path = self.termlog.filename
             self.log.save()
             self.log_time_f.close()
             self.ssh.close()
