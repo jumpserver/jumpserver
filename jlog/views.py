@@ -229,7 +229,7 @@ class TermLogRecorder(object):
 
     def setid(self, id):
         self.id = id
-        TermLogRecorder.loglist[str(id)] = self
+        TermLogRecorder.loglist[str(id)] = [self]
 
     def write(self, msg):
         if self.recoder and (not self._in_vim):
@@ -284,7 +284,7 @@ class TermLogRecorder(object):
                                             timestamp=int(self.recoderStartTime))
             if self.user:
                 record.user.add(self.user)
-        TermLogRecorder.loglist[str(self.id)].remove(self)
+        del TermLogRecorder.loglist[str(self.id)]
 
     def list(self, user=None, uid=None):
         tmp = []
