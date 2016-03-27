@@ -284,7 +284,7 @@ class TermLogRecorder(object):
                                             timestamp=int(self.recoderStartTime))
             if self.user:
                 record.user.add(self.user)
-        TermLogRecorder.loglist[self.id].remove(self)
+        TermLogRecorder.loglist[str(self.id)].remove(self)
 
     def list(self, user=None, uid=None):
         tmp = []
