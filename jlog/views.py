@@ -206,6 +206,7 @@ class TermLogRecorder(object):
         self.commands = []
         self._lists = None
         self.file = None
+        self.filename = None
         self._data = None
         self.vim_pattern = re.compile(r'\W?vi[m]?\s.* | \W?fg\s.*', re.X)
         self._in_vim = False
