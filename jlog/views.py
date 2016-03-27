@@ -7,7 +7,7 @@ from jperm.perm_api import user_have_perm
 from django.http import HttpResponseNotFound
 from jlog.log_api import renderTemplate
 
-from jlog.models import Log, ExecLog, FileLog,TermLog
+from jlog.models import Log, ExecLog, FileLog, TermLog
 from jumpserver.settings import LOG_DIR
 import zipfile
 import json
@@ -137,12 +137,13 @@ def log_record(request):
         log_id = request.REQUEST.get('id', None)
         if log_id:
             TermL = TermLogRecorder(request.user)
-            log = TermLog.objects.get(id=int(log_id))
-            return HttpResponse(TermL.load_full_log(log.filename))
+            log = Log.objects.get(id=int(log_id))
+            return HttpResponse(TermL.load_full_log(filename=log.log_path))
         else:
             return HttpResponse("ERROR")
     else:
         return HttpResponse("ERROR METHOD!")
+
 
 @require_role('admin')
 def log_detail(request, offset):
@@ -186,10 +187,13 @@ class TermLogRecorder(object):
         recoder.load_history(filename) # will only get the command history list
         recoder.share_to(filename,user=UserObject) # or recoder.share_to(filename,uid=UserID). will share this commands to someone
         recoder.unshare_to(filename,user=UserObject) # or recoder.unshare_to(filename,uid=UserID). will unshare this commands to someone
+        recoder.setid(id) # registered this term with an id, for monitor
     """
+    loglist = dict()
 
     def __init__(self, user=None, uid=None):
         self.log = {}
+        self.id = 0
         if isinstance(user, User):
             self.user = user
         elif uid:
@@ -223,6 +227,9 @@ class TermLogRecorder(object):
                     self.CMD[str(time.time())] = self.commands[-1]
         self._screen.reset()
 
+    def setid(self, id):
+        TermLogRecorder.loglist[str(id)] = self
+
     def write(self, msg):
         if self.recoder and (not self._in_vim):
             if self.commands.__len__() == 0:
@@ -240,6 +247,10 @@ class TermLogRecorder(object):
                 self._screen.reset()
             else:
                 self._command()
+        try:
+            self.write_message(msg)
+        except:
+            pass
         # print "<<<<<<<<<<<<<<<<"
         # print self.commands
         # print self.CMD
@@ -249,6 +260,7 @@ class TermLogRecorder(object):
     def save(self, path=LOG_DIR):
         date = datetime.datetime.now().strftime('%Y%m%d')
         filename = str(uuid.uuid4())
+        self.filename = filename
         filepath = os.path.join(path, 'tty', date, filename + '.zip')
         if not os.path.isdir(os.path.join(path, 'tty', date)):
             os.makedirs(os.path.join(path, 'tty', date), mode=0777)
