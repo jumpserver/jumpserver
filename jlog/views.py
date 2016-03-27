@@ -228,6 +228,7 @@ class TermLogRecorder(object):
         self._screen.reset()
 
     def setid(self, id):
+        self.id = id
         TermLogRecorder.loglist[str(id)] = self
 
     def write(self, msg):
@@ -283,6 +284,7 @@ class TermLogRecorder(object):
                                             timestamp=int(self.recoderStartTime))
             if self.user:
                 record.user.add(self.user)
+        TermLogRecorder.loglist[self.id].remove(self)
 
     def list(self, user=None, uid=None):
         tmp = []
