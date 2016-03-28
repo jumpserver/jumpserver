@@ -22,7 +22,7 @@ import tornado.httpclient
 from tornado.websocket import WebSocketClosedError
 
 from tornado.options import define, options
-# from pyinotify import WatchManager, ProcessEvent, IN_DELETE, IN_CREATE, IN_MODIFY, AsyncNotifier
+from pyinotify import WatchManager, ProcessEvent, IN_DELETE, IN_CREATE, IN_MODIFY, AsyncNotifier
 import select
 
 from connect import Tty, User, Asset, PermRole, logger, get_object, gen_resource
@@ -101,41 +101,41 @@ class MyThread(threading.Thread):
             pass
 
 
-# class EventHandler(ProcessEvent):
-#     def __init__(self, client=None):
-#         self.client = client
-#
-#     def process_IN_MODIFY(self, event):
-#         self.client.write_message(f.read())
-#
-#
-# def file_monitor(path='.', client=None):
-#     wm = WatchManager()
-#     mask = IN_DELETE | IN_CREATE | IN_MODIFY
-#     notifier = AsyncNotifier(wm, EventHandler(client))
-#     wm.add_watch(path, mask, auto_add=True, rec=True)
-#     if not os.path.isfile(path):
-#         logger.debug("File %s does not exist." % path)
-#         sys.exit(3)
-#     else:
-#         logger.debug("Now starting monitor file %s." % path)
-#         global f
-#         f = open(path, 'r')
-#         st_size = os.stat(path)[6]
-#         f.seek(st_size)
-#
-#     while True:
-#         try:
-#             notifier.process_events()
-#             if notifier.check_events():
-#                 notifier.read_events()
-#         except KeyboardInterrupt:
-#             print "keyboard Interrupt."
-#             notifier.stop()
-#             break
+class EventHandler(ProcessEvent):
+    def __init__(self, client=None):
+        self.client = client
+
+    def process_IN_MODIFY(self, event):
+        self.client.write_message(f.read())
 
 
-class MonitorHandler_old(tornado.websocket.WebSocketHandler):
+def file_monitor(path='.', client=None):
+    wm = WatchManager()
+    mask = IN_DELETE | IN_CREATE | IN_MODIFY
+    notifier = AsyncNotifier(wm, EventHandler(client))
+    wm.add_watch(path, mask, auto_add=True, rec=True)
+    if not os.path.isfile(path):
+        logger.debug("File %s does not exist." % path)
+        sys.exit(3)
+    else:
+        logger.debug("Now starting monitor file %s." % path)
+        global f
+        f = open(path, 'r')
+        st_size = os.stat(path)[6]
+        f.seek(st_size)
+
+    while True:
+        try:
+            notifier.process_events()
+            if notifier.check_events():
+                notifier.read_events()
+        except KeyboardInterrupt:
+            print "keyboard Interrupt."
+            notifier.stop()
+            break
+
+
+class MonitorHandler(tornado.websocket.WebSocketHandler):
     clients = []
     threads = []
 
@@ -442,22 +442,22 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             pass
 
 
-class MonitorHandler(WebTerminalHandler):
-    @django_request_support
-    @require_auth('user')
-    def open(self):
-        try:
-            self.returnlog = TermLogRecorder.loglist[self.get_argument('id')]
-            self.returnlog.write_message = self.write_message
-        except:
-            self.write_message('Log is None')
-            self.close()
-
-    def on_message(self, message):
-        pass
-
-    def on_close(self):
-        self.close()
+# class MonitorHandler(WebTerminalHandler):
+#     @django_request_support
+#     @require_auth('user')
+#     def open(self):
+#         try:
+#             self.returnlog = TermLogRecorder.loglist[self.get_argument('id')]
+#             self.returnlog.write_message = self.write_message
+#         except:
+#             self.write_message('Log is None')
+#             self.close()
+#
+#     def on_message(self, message):
+#         pass
+#
+#     def on_close(self):
+#         self.close()
 
 
 class Application(tornado.web.Application):
