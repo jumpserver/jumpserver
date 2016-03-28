@@ -33,6 +33,7 @@ from jumpserver.settings import LOG_DIR
 from jperm.ansible_api import MyRunner
 # from jlog.log_api import escapeString
 from jlog.models import ExecLog, FileLog
+from jlog.views import TermLogRecorder
 
 login_user = get_object(User, username=getpass.getuser())
 try:
@@ -299,6 +300,8 @@ class SshTty(Tty):
         使用paramiko模块的channel，连接后端，进入交互式
         """
         log_file_f, log_time_f, log = self.get_log()
+        termlog = TermLogRecorder(User.objects.get(id=self.user.id))
+        termlog.setid(log.id)
         old_tty = termios.tcgetattr(sys.stdin)
         pre_timestamp = time.time()
         data = ''
@@ -335,6 +338,8 @@ class SshTty(Tty):
                                 if msg.errno == errno.EAGAIN:
                                     continue
                         now_timestamp = time.time()
+                        termlog.write(x)
+                        termlog.recoder = False
                         log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(x)))
                         log_time_f.flush()
                         log_file_f.write(x)
@@ -355,6 +360,7 @@ class SshTty(Tty):
                         x = os.read(sys.stdin.fileno(), 4096)
                     except OSError:
                         pass
+                    termlog.recoder = True
                     input_mode = True
                     input_str += x
                     if str(x) in ['\r', '\n', '\r\n']:
@@ -387,6 +393,8 @@ class SshTty(Tty):
             log_file_f.write('End time is %s' % datetime.datetime.now())
             log_file_f.close()
             log_time_f.close()
+            termlog.save()
+            log.filename = termlog.filename
             log.is_finished = True
             log.end_time = datetime.datetime.now()
             log.save()

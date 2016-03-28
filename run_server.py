@@ -35,8 +35,10 @@ except ImportError:
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 from jumpserver.settings import IP, PORT
+
 define("port", default=PORT, help="run on the given port", type=int)
 define("host", default=IP, help="run port on given host", type=str)
+from jlog.views import TermLogRecorder
 
 
 def django_request_support(func):
@@ -46,6 +48,7 @@ def django_request_support(func):
         response = func(*args, **kwargs)
         request_finished.send_robust(func)
         return response
+
     return _deco
 
 
@@ -63,6 +66,7 @@ def require_auth(role='user'):
                 logger.debug('Websocket: session: %s' % session)
                 if session and datetime.datetime.now() < session.expire_date:
                     user_id = session.get_decoded().get('_auth_user_id')
+                    request.user_id = user_id
                     user = get_object(User, id=user_id)
                     if user:
                         logger.debug('Websocket: user [ %s ] request websocket' % user.username)
@@ -82,6 +86,7 @@ def require_auth(role='user'):
             logger.warning('Websocket: Request auth failed.')
 
         return _deco2
+
     return _deco
 
 
@@ -311,6 +316,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
         role_name = self.get_argument('role', 'sb')
         asset_id = self.get_argument('id', 9999)
         asset = get_object(Asset, id=asset_id)
+        self.termlog = TermLogRecorder(User.objects.get(id=self.user_id))
         if asset:
             roles = user_have_perm(self.user, asset)
             logger.debug(roles)
@@ -361,6 +367,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                 jsondata.get('data').get('resize').get('rows', 24)
             )
         elif jsondata.get('data'):
+            self.termlog.recoder = True
             self.term.input_mode = True
             if str(jsondata['data']) in ['\r', '\n', '\r\n']:
                 if self.term.vim_flag:
@@ -384,12 +391,15 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
 
     def on_close(self):
         logger.debug('Websocket: Close request')
+        print self.termlog.CMD
+        self.termlog.save()
         if self in WebTerminalHandler.clients:
             WebTerminalHandler.clients.remove(self)
         try:
             self.log_file_f.write('End time is %s' % datetime.datetime.now())
             self.log.is_finished = True
             self.log.end_time = datetime.datetime.now()
+            self.log.filename = self.termlog.filename
             self.log.save()
             self.log_time_f.close()
             self.ssh.close()
@@ -400,6 +410,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
     def forward_outbound(self):
         self.log_file_f, self.log_time_f, self.log = self.term.get_log()
         self.id = self.log.id
+        self.termlog.setid(self.id)
         try:
             data = ''
             pre_timestamp = time.time()
@@ -414,8 +425,10 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                         self.term.vim_data += recv
                     try:
                         self.write_message(data.decode('utf-8', 'replace'))
+                        self.termlog.write(data)
+                        self.termlog.recoder = False
                         now_timestamp = time.time()
-                        self.log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(data)))
+                        self.log_time_f.write('%s %s\n' % (round(now_timestamp - pre_timestamp, 4), len(data)))
                         self.log_file_f.write(data)
                         pre_timestamp = now_timestamp
                         self.log_file_f.flush()
@@ -427,6 +440,24 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                         pass
         except IndexError:
             pass
+
+
+# class MonitorHandler(WebTerminalHandler):
+#     @django_request_support
+#     @require_auth('user')
+#     def open(self):
+#         try:
+#             self.returnlog = TermLogRecorder.loglist[self.get_argument('id')]
+#             self.returnlog.write_message = self.write_message
+#         except:
+#             self.write_message('Log is None')
+#             self.close()
+#
+#     def on_message(self, message):
+#         pass
+#
+#     def on_close(self):
+#         self.close()
 
 
 class Application(tornado.web.Application):
@@ -474,6 +505,7 @@ def main():
     server.listen(options.port)
 
     tornado.ioloop.IOLoop.instance().start()
+
 
 if __name__ == '__main__':
     # tornado.options.parse_command_line()
