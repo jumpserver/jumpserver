@@ -101,7 +101,7 @@ class EventHandler(ProcessEvent):
         self.client = client
 
     def process_IN_MODIFY(self, event):
-        self.client.write_message(f.read())
+        self.client.write_message(f.read().decode('utf-8', 'replace'))
 
 
 def file_monitor(path='.', client=None):
