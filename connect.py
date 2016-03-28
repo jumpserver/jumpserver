@@ -394,7 +394,7 @@ class SshTty(Tty):
             log_file_f.close()
             log_time_f.close()
             termlog.save()
-            log.log_path = termlog.filename
+            log.filename = termlog.filename
             log.is_finished = True
             log.end_time = datetime.datetime.now()
             log.save()

@@ -13,6 +13,7 @@ class Log(models.Model):
     pid = models.IntegerField()
     is_finished = models.BooleanField(default=False)
     end_time = models.DateTimeField(null=True)
+    filename = models.CharField(max_length=40)
     '''
     add by liuzheng
     '''

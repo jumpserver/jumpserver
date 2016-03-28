@@ -138,7 +138,7 @@ def log_record(request):
         if log_id:
             TermL = TermLogRecorder(request.user)
             log = Log.objects.get(id=int(log_id))
-            return HttpResponse(TermL.load_full_log(filename=log.log_path))
+            return HttpResponse(TermL.load_full_log(filename=log.filename))
         else:
             return HttpResponse("ERROR")
     else:
