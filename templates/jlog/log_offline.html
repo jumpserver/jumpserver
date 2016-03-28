@@ -8,6 +8,11 @@
 {% include 'nav_cat_bar.html' %}
 
 <style>
+    iframe {
+
+       overflow:hidden;
+
+    }
     .bootstrap-dialog-body  {
         background-color: rgba(0, 0, 0, 0);
     }
@@ -133,7 +138,7 @@
                             </div>
                             {% include 'paginator.html' %}
                         </div>
-                    </div>    
+                    </div>
                 </div>
             </div>
         </div>
@@ -157,7 +162,7 @@
             title: title,
             maxmin: true,
             shade: false,
-            area: ['800px', '520px'],
+            area: ['620px', '450px'],
             content: url
         });
         return false;
