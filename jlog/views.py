@@ -285,7 +285,10 @@ class TermLogRecorder(object):
                                             timestamp=int(self.recoderStartTime))
             if self.user:
                 record.user.add(self.user)
-        del TermLogRecorder.loglist[str(self.id)]
+        try:
+            del TermLogRecorder.loglist[str(self.id)]
+        except KeyError:
+            pass
 
     def list(self, user=None, uid=None):
         tmp = []
