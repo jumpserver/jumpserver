@@ -315,7 +315,6 @@ def excel_to_db(excel_file):
 
 
 def get_ansible_asset_info(asset_ip, setup_info):
-    print setup_info, '***'
     disk_need = {}
     disk_all = setup_info.get("ansible_devices")
     if disk_all:

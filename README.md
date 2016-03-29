@@ -1,6 +1,7 @@
 ## 写在前面
  - 目前本版本处于beta阶段，请不要用于生产环境，除非你知道你在做什么
  - 本版本暂时没加入LDAP接口，稳定版会将LDAP和无Agent方式抽象成API，2.x版本支持LDAP，请移步release中下载
+ - 版本号变更 2.0 -> 0.2版本 3.0 -> 0.3版本
 
 #欢迎使用Jumpserver
 **Jumpserver** 是一款由python编写开源的跳板机(堡垒机)系统，实现了跳板机应有的功能。基于ssh协议来管理，客户端无需安装agent。
@@ -39,11 +40,14 @@ Web批量执行命令
 
 ### 文档
 
-* [访问wiki](https://github.com/ibuler/jumpserver/wiki)
-* [快速安装](https://github.com/ibuler/jumpserver/wiki/Quickinstall)
-* [名词解释](https://github.com/ibuler/jumpserver/wiki/Termexplain)
-* [快速开始](https://github.com/ibuler/jumpserver/wiki/Quickstart)
-* [FAQ](https://github.com/ibuler/jumpserver/wiki/FAQs)
+* [访问wiki](https://github.com/jumpserver/jumpserver/wiki)
+* [概览](https://github.com/jumpserver/jumpserver/wiki/%E6%A6%82%E8%A7%88)
+* [名词解释](https://github.com/jumpserver/jumpserver/wiki/%E5%90%8D%E8%AF%8D%E8%A7%A3%E9%87%8A)
+* [常见问题](https://github.com/jumpserver/jumpserver/wiki/%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)
+* 安装基于：[RedHat 的系统](https://github.com/jumpserver/jumpserver/wiki/%E5%9F%BA%E4%BA%8E-RedHat-%E7%9A%84%E7%B3%BB%E7%BB%9F)，[Debian 的系统](https://github.com/jumpserver/jumpserver/wiki/%E5%9F%BA%E4%BA%8E-Debian-%E7%9A%84%E7%B3%BB%E7%BB%9F)
+* [快速开始](https://github.com/jumpserver/jumpserver/wiki/%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B)
+* [安装图解](https://github.com/jumpserver/jumpserver/wiki/%E5%AE%89%E8%A3%85%E5%9B%BE%E8%A7%A3)
+* [应用图解](https://github.com/jumpserver/jumpserver/wiki/%E5%BA%94%E7%94%A8%E5%9B%BE%E8%A7%A3)
 
 ### 特点
 
