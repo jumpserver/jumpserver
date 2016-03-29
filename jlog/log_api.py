@@ -90,13 +90,13 @@ def renderJSON(script_path, time_file_path):
                 offset = 0
                 for t in timing:
                     dt = scriptf.read(t[1])
-                    try:
-                        data = dt.encode('unicode_escape').decode('utf-8', 'ignore')
-                    except (UnicodeEncodeError, UnicodeDecodeError):
-                        data = dt.decode('utf-8', 'ignore')
+                    # try:
+                    #     data = dt.encode('unicode_escape').decode('utf-8', 'ignore')
+                    # except (UnicodeEncodeError, UnicodeDecodeError):
+                    #     data = dt.decode('utf-8', 'ignore')
                     # print ('###### (%s, %s)' % (t[1], repr(data)))
                     offset += t[0]
-                    ret[str(offset/float(1000))] = data
+                    ret[str(offset/float(1000))] = dt
     return dumps(ret)
 
 def kill_invalid_connection():
