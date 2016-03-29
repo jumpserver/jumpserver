@@ -96,7 +96,7 @@ def renderJSON(script_path, time_file_path):
                     #     data = dt.decode('utf-8', 'ignore')
                     # print ('###### (%s, %s)' % (t[1], repr(data)))
                     offset += t[0]
-                    ret[str(offset/float(1000))] = dt
+                    ret[str(offset/float(1000))] = dt.decode('utf-8', 'replace')
     return dumps(ret)
 
 def kill_invalid_connection():
