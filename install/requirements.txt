@@ -14,6 +14,6 @@ ansible==1.9.4
 pyinotify==0.9.6
 passlib==1.6.5
 argparse==1.4.0
-django_crontab==0.6.0
+django-crontab==0.6.0
 django-smtp-ssl==1.0
 pyte==0.5.2
