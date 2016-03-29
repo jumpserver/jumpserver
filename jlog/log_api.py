@@ -94,7 +94,7 @@ def renderJSON(script_path, time_file_path):
                     # print ('###### (%s, %s)' % (t[1], repr(data)))
                     offset += t[0]
                     ret[str(offset/float(1000))] = data
-    return json
+    return dumps(ret)
 
 def kill_invalid_connection():
     unfinished_logs = Log.objects.filter(is_finished=False)
