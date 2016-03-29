@@ -79,6 +79,14 @@ def renderTemplate(script_path, time_file_path, dimensions=(24, 80), templatenam
     return rendered
 
 
+def renderJSON(script_path, time_file_path):
+    with copen(script_path, encoding='utf-8', errors='replace', newline='\r\n') as scriptf:
+    # with open(script_path) as scriptf:
+        with open(time_file_path) as timef:
+            timing = getTiming(timef)
+            json = scriptToJSON(scriptf, timing)
+    return json
+
 def kill_invalid_connection():
     unfinished_logs = Log.objects.filter(is_finished=False)
     now = datetime.datetime.now()
