@@ -5,7 +5,7 @@ from django.shortcuts import render_to_response, render
 from jumpserver.api import *
 from jperm.perm_api import user_have_perm
 from django.http import HttpResponseNotFound
-from jlog.log_api import renderTemplate
+from jlog.log_api import renderJSON
 
 from jlog.models import Log, ExecLog, FileLog, TermLog
 from jumpserver.settings import LOG_DIR
@@ -138,7 +138,14 @@ def log_record(request):
         if log_id:
             TermL = TermLogRecorder(request.user)
             log = Log.objects.get(id=int(log_id))
-            return HttpResponse(TermL.load_full_log(filename=log.filename))
+            if len(log.filename) == 0:
+                log_file = log.log_path + '.log'
+                log_time = log.log_path + '.time'
+                if os.path.isfile(log_file) and os.path.isfile(log_time):
+                    content = renderJSON(log_file, log_time)
+                    return HttpResponse(content)
+            else:
+                return HttpResponse(TermL.load_full_log(filename=log.filename))
         else:
             return HttpResponse("ERROR")
     else:
