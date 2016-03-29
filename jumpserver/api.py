@@ -484,7 +484,8 @@ def my_render(template, data, request):
 
 
 def get_tmp_dir():
-    dir_name = os.path.join('/tmp', uuid.uuid4().hex)
+    seed = uuid.uuid4().hex[:4]
+    dir_name = os.path.join('/tmp', '%s-%s' % (datetime.datetime.now().strftime('%Y%m%d-%H%M%S'), seed))
     mkdir(dir_name, mode=0777)
     return dir_name
 

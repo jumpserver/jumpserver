@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html ng-app="NgApp" style=" overflow:hidden;">
+<head lang="en">
+    <title>Jumpserver 录像回放</title>
+    <script type="application/javascript" src='/static/js/jquery-2.1.1.js'></script>
+    <script type="application/javascript" src='/static/js/angular.min.js'></script>
+    <script type="application/javascript" src='/static/js/angular-route.min.js'></script>
+    <script type="application/javascript" src='/static/js/term.js'></script>
+</head>
+<body>
+{% csrf_token %}
+<div ng-controller="TerminalRecordCtrl">
+    <input type="button" value="Play/Pause" ng-click="pause(false);"/>
+    <input type="button" value="Restart" ng-click="restart(1);"/>
+    <span id="beforeScrubberText"></span>
+    <input id="scrubber" type="range" value="0" min=0 max=100
+           ng-mousedown="pause(true);" ng-mouseup="scrub();"/>
+    <span id="afterScrubberText"></span>
+    -5x <input id="speed" type="range" value="0" min=-5 max=5
+               ng-mouseup="setSpeed();"/> +5x
+    <div id="terminal"></div>
+</div>
+    <script type="application/javascript" src='/static/js/record.js'></script>
+
+</body>
+</html>

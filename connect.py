@@ -16,6 +16,8 @@ import readline
 import django
 import paramiko
 import errno
+import pyte
+import operator
 import struct, fcntl, signal, socket, select
 from io import open as copen
 import uuid
@@ -31,6 +33,7 @@ from jumpserver.settings import LOG_DIR
 from jperm.ansible_api import MyRunner
 # from jlog.log_api import escapeString
 from jlog.models import ExecLog, FileLog
+from jlog.views import TermLogRecorder
 
 login_user = get_object(User, username=getpass.getuser())
 try:
@@ -90,8 +93,21 @@ class Tty(object):
         self.remote_ip = ''
         self.login_type = login_type
         self.vim_flag = False
-        self.ps1_pattern = re.compile('\[.*@.*\][\$#]')
+        self.vim_end_flag = False
+        self.vim_end_pattern = re.compile(r'\x1b\[\?1049', re.X)
+        self.vim_pattern = re.compile(r'\W?vi[m]?\s.* | \W?fg\s.*', re.X)
         self.vim_data = ''
+        self.stream = None
+        self.screen = None
+        self.__init_screen_stream()
+
+    def __init_screen_stream(self):
+        """
+        初始化虚拟屏幕和字符流
+        """
+        self.stream = pyte.ByteStream()
+        self.screen = pyte.Screen(80, 24)
+        self.stream.attach(self.screen)
 
     @staticmethod
     def is_output(strings):
@@ -101,135 +117,55 @@ class Tty(object):
                 return True
         return False
 
-    @staticmethod
-    def remove_obstruct_char(cmd_str):
-        '''删除一些干扰的特殊符号'''
-        control_char = re.compile(r'\x07 | \x1b\[1P | \r ', re.X)
-        cmd_str = control_char.sub('',cmd_str.strip())
-        patch_char = re.compile('\x08\x1b\[C')      #删除方向左右一起的按键
-        while patch_char.search(cmd_str):
-            cmd_str = patch_char.sub('', cmd_str.rstrip())
-        return cmd_str
-
-    @staticmethod
-    def deal_backspace(match_str, result_command, pattern_str, backspace_num):
-        '''
-        处理删除确认键
-        '''
-        if backspace_num > 0:
-            if backspace_num > len(result_command):
-                result_command += pattern_str
-                result_command = result_command[0:-backspace_num]
-            else:
-                result_command = result_command[0:-backspace_num]
-                result_command += pattern_str
-        del_len = len(match_str)-3
-        if del_len > 0:
-            result_command = result_command[0:-del_len]
-        return result_command, len(match_str)
-    
-    @staticmethod
-    def deal_replace_char(match_str,result_command,backspace_num):
-        '''
-        处理替换命令
-        '''
-        str_lists = re.findall(r'(?<=\x1b\[1@)\w',match_str)
-        tmp_str =''.join(str_lists)
-        result_command_list = list(result_command)
-        if len(tmp_str) > 1:
-            result_command_list[-backspace_num:-(backspace_num-len(tmp_str))] = tmp_str
-        elif len(tmp_str) > 0:
-            if result_command_list[-backspace_num] == ' ':
-                result_command_list.insert(-backspace_num, tmp_str)
-            else:
-                result_command_list[-backspace_num] = tmp_str
-        result_command = ''.join(result_command_list)
-        return result_command, len(match_str)
-    
-    def remove_control_char(self, result_command):    
+    def command_parser(self, command):
         """
-        处理日志特殊字符
+        处理命令中如果有ps1或者mysql的特殊情况,极端情况下会有ps1和mysql
+        :param command:要处理的字符传
+        :return:返回去除PS1或者mysql字符串的结果
         """
-        control_char = re.compile(r"""
-                \x1b[ #%()*+\-.\/]. |
-                \r |                                               #匹配 回车符(CR)
-                (?:\x1b\[|\x9b) [ -?]* [@-~] |                     #匹配 控制顺序描述符(CSI)... Cmd
-                (?:\x1b\]|\x9d) .*? (?:\x1b\\|[\a\x9c]) | \x07 |   #匹配 操作系统指令(OSC)...终止符或振铃符(ST|BEL)
-                (?:\x1b[P^_]|[\x90\x9e\x9f]) .*? (?:\x1b\\|\x9c) | #匹配 设备控制串或私讯或应用程序命令(DCS|PM|APC)...终止符(ST)
-                \x1b.                                              #匹配 转义过后的字符
-                [\x80-\x9f] | (?:\x1b\]0.*) | \[.*@.*\][\$#] | (.*mysql>.*)      #匹配 所有控制字符
-                """, re.X)
-        result_command = control_char.sub('', result_command.strip())
- 
-        if not self.vim_flag:
-            if result_command.startswith('vi') or result_command.startswith('fg'):
-                self.vim_flag = True
-            return result_command.decode('utf8',"ignore")
+        result = None
+        match = re.compile('\[?.*@.*\]?[\$#]\s').split(command)
+        if match:
+            # 只需要最后的一个PS1后面的字符串
+            result = match[-1].strip()
         else:
-            return ''
+            # PS1没找到,查找mysql
+            match = re.split('mysql>\s', command)
+            if match:
+                # 只需要最后一个mysql后面的字符串
+                result = match[-1].strip()
+        return result
 
-    def deal_command(self, str_r):
+    def deal_command(self, data):
         """
-            处理命令中特殊字符
+        处理截获的命令
+        :param data: 要处理的命令
+        :return:返回最后的处理结果
         """
-        str_r = self.remove_obstruct_char(str_r)
-
-        result_command = ''             # 最后的结果
-        backspace_num = 0               # 光标移动的个数
-        reach_backspace_flag = False    # 没有检测到光标键则为true
-        pattern_str = ''
-        while str_r:
-            tmp = re.match(r'\s*\w+\s*', str_r)
-            if tmp:
-                str_r = str_r[len(str(tmp.group(0))):]
-                if reach_backspace_flag:
-                    pattern_str += str(tmp.group(0))
-                    continue
-                else:
-                    result_command += str(tmp.group(0))
-                    continue
-                
-            tmp = re.match(r'\x1b\[K[\x08]*', str_r)
-            if tmp:
-                result_command, del_len = self.deal_backspace(str(tmp.group(0)), result_command, pattern_str, backspace_num)
-                reach_backspace_flag = False
-                backspace_num = 0
-                pattern_str = ''
-                str_r = str_r[del_len:]
-                continue
-            
-            tmp = re.match(r'\x08+', str_r)
-            if tmp:
-                str_r = str_r[len(str(tmp.group(0))):]
-                if len(str_r) != 0:
-                    if reach_backspace_flag:
-                        result_command = result_command[0:-backspace_num] + pattern_str
-                        pattern_str = ''
+        command = ''
+        try:
+            self.stream.feed(data)
+            # 从虚拟屏幕中获取处理后的数据
+            for line in reversed(self.screen.buffer):
+                line_data = "".join(map(operator.attrgetter("data"), line)).strip()
+                if len(line_data) > 0:
+                    parser_result = self.command_parser(line_data)
+                    if parser_result is not None:
+                        # 2个条件写一起会有错误的数据
+                        if len(parser_result) > 0:
+                            command = parser_result
                     else:
-                        reach_backspace_flag = True
-                    backspace_num = len(str(tmp.group(0)))
-                    continue
-                else:
+                        command = line_data
                     break
-                
-            tmp = re.match(r'(\x1b\[1@\w)+', str_r)                           #处理替换的命令
-            if tmp:
-                result_command,del_len = self.deal_replace_char(str(tmp.group(0)), result_command, backspace_num)
-                str_r = str_r[del_len:]
-                backspace_num = 0
-                continue
-        
-            if reach_backspace_flag:
-                pattern_str += str_r[0]
-            else:
-                result_command += str_r[0]
-            str_r = str_r[1:]
-        
-        if backspace_num > 0:
-            result_command = result_command[0:-backspace_num] + pattern_str
-
-        result_command = self.remove_control_char(result_command)
-        return result_command
+            if command != '':
+                # 判断用户输入的是否是vim 或者fg命令
+                if self.vim_pattern.search(command):
+                    self.vim_flag = True
+            # 虚拟屏幕清空
+            self.screen.reset()
+        except Exception:
+            pass
+        return command
 
     def get_log(self):
         """
@@ -294,7 +230,7 @@ class Tty(object):
 
         # 发起ssh连接请求 Make a ssh connection
         ssh = paramiko.SSHClient()
-        #ssh.load_system_host_keys()
+        # ssh.load_system_host_keys()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         try:
             role_key = connect_info.get('role_key')
@@ -364,9 +300,12 @@ class SshTty(Tty):
         使用paramiko模块的channel，连接后端，进入交互式
         """
         log_file_f, log_time_f, log = self.get_log()
+        termlog = TermLogRecorder(User.objects.get(id=self.user.id))
+        termlog.setid(log.id)
         old_tty = termios.tcgetattr(sys.stdin)
         pre_timestamp = time.time()
         data = ''
+        input_str = ''
         input_mode = False
         try:
             tty.setraw(sys.stdin.fileno())
@@ -398,9 +337,9 @@ class SshTty(Tty):
                             except OSError as msg:
                                 if msg.errno == errno.EAGAIN:
                                     continue
-                        #sys.stdout.write(x)
-                        #sys.stdout.flush()
                         now_timestamp = time.time()
+                        termlog.write(x)
+                        termlog.recoder = False
                         log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(x)))
                         log_time_f.flush()
                         log_file_f.write(x)
@@ -411,6 +350,8 @@ class SshTty(Tty):
                         if input_mode and not self.is_output(x):
                             data += x
 
+                        input_str = ''
+
                     except socket.timeout:
                         pass
 
@@ -419,20 +360,27 @@ class SshTty(Tty):
                         x = os.read(sys.stdin.fileno(), 4096)
                     except OSError:
                         pass
+                    termlog.recoder = True
                     input_mode = True
+                    input_str += x
                     if str(x) in ['\r', '\n', '\r\n']:
+                        # 这个是用来处理用户的复制操作
+                        if input_str != x:
+                            data += input_str
                         if self.vim_flag:
-                            match = self.ps1_pattern.search(self.vim_data)
+                            match = self.vim_end_pattern.findall(self.vim_data)
                             if match:
-                                self.vim_flag = False
-                                data = self.deal_command(data)[0:200]
-                                if len(data) > 0:
-                                    TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
+                                if self.vim_end_flag or len(match) == 2:
+                                    self.vim_flag = False
+                                    self.vim_end_flag = False
+                                else:
+                                    self.vim_end_flag = True
                         else:
                             data = self.deal_command(data)[0:200]
                             if len(data) > 0:
                                 TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
                         data = ''
+                        input_str = ''
                         self.vim_data = ''
                         input_mode = False
 
@@ -445,6 +393,8 @@ class SshTty(Tty):
             log_file_f.write('End time is %s' % datetime.datetime.now())
             log_file_f.close()
             log_time_f.close()
+            termlog.save()
+            log.filename = termlog.filename
             log.is_finished = True
             log.end_time = datetime.datetime.now()
             log.save()
@@ -464,7 +414,7 @@ class SshTty(Tty):
         # 获取连接的隧道并设置窗口大小 Make a channel and set windows size
         global channel
         win_size = self.get_win_size()
-        #self.channel = channel = ssh.invoke_shell(height=win_size[0], width=win_size[1], term='xterm')
+        # self.channel = channel = ssh.invoke_shell(height=win_size[0], width=win_size[1], term='xterm')
         self.channel = channel = transport.open_session()
         channel.get_pty(term='xterm', height=win_size[0], width=win_size[1])
         channel.invoke_shell()
@@ -523,7 +473,13 @@ class Nav(object):
             if gid_pattern.match(str_r):
                 gid = int(str_r.lstrip('g'))
                 # 获取资产组包含的资产
-                user_asset_search = get_object(AssetGroup, id=gid).asset_set.all()
+                asset_group = get_object(AssetGroup, id=gid)
+                if asset_group:
+                    user_asset_search = asset_group.asset_set.all()
+                else:
+                    color_print('没有该资产组或没有权限')
+                    return
+
             else:
                 # 匹配 ip, hostname, 备注
                 for asset in user_asset_all:
@@ -609,6 +565,9 @@ class Nav(object):
                     command = raw_input("\033[1;32mCmds>:\033[0m ").strip()
                     if command == 'q':
                         break
+                    elif not command:
+                        color_print('命令不能为空...')
+                        continue
                     runner.run('shell', command, pattern=pattern)
                     ExecLog(host=asset_name_str, user=self.user.username, cmd=command, remote_ip=remote_ip,
                             result=runner.results).save()
@@ -661,7 +620,7 @@ class Nav(object):
 
                     runner = MyRunner(res)
                     runner.run('copy', module_args='src=%s dest=%s directory_mode'
-                                                     % (tmp_dir, tmp_dir), pattern=pattern)
+                                                     % (tmp_dir, '/tmp'), pattern=pattern)
                     ret = runner.results
                     FileLog(user=self.user.name, host=asset_name_str, filename=filename_str,
                             remote_ip=remote_ip, type='upload', result=ret).save()
@@ -746,6 +705,9 @@ def main():
     if not login_user:  # 判断用户是否存在
         color_print('没有该用户，或许你是以root运行的 No that user.', exits=True)
 
+    if not login_user.is_active:
+        color_print('您的用户已禁用，请联系管理员.', exits=True)
+
     gid_pattern = re.compile(r'^g\d+$')
     nav = Nav(login_user)
     nav.print_nav()
@@ -812,7 +774,6 @@ def main():
     except IndexError, e:
         color_print(e)
         time.sleep(5)
-        pass
 
 if __name__ == '__main__':
     main()

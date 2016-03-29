@@ -104,6 +104,10 @@ $('#roleForm').validator({
             ok: "",
             msg: {required: "系统用户名称必填"}
         },
+        "role_password": {
+            rule: "length[0~64]",
+            tip: "系统密码"
+        },
         "role_key": {
             rule: "check_begin",
             ok: "",

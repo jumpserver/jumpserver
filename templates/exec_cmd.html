@@ -29,7 +29,7 @@
         protocol = 'wss://';
     }
 
-    var wsUri = protocol + "{{ web_terminal_uri }}"; //请求的websocket url
+    var wsUri = protocol + document.URL.match(RegExp('//(.*?)/'))[1] + "{{ web_terminal_uri }}"; //请求的websocket url
     var ws = new WebSocket(wsUri);
 
     function createSystemMessage(message) {
@@ -82,7 +82,7 @@
 
 <style type="text/css">
   * {
-    font-family: "Monaco", "DejaVu Sans Mono", "Liberation Mono", monospace;
+    font-family: "Monaco", "Microsoft Yahei", "DejaVu Sans Mono", "Liberation Mono", monospace;
     font-size: 11px;
 
   }

@@ -15,12 +15,11 @@ from struct import unpack
 from subprocess import Popen
 from sys import platform, prefix, stderr
 from tempfile import NamedTemporaryFile
-from jumpserver.api import logger
 
 from jinja2 import FileSystemLoader, Template
 from jinja2.environment import Environment
 
-from jumpserver.api import BASE_DIR
+from jumpserver.api import BASE_DIR, logger
 from jlog.models import Log
 
 
@@ -104,3 +103,4 @@ def kill_invalid_connection():
             log.end_time = now
             log.save()
             logger.warn('kill log %s' % log.log_path)
+
