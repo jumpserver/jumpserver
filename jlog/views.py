@@ -341,7 +341,7 @@ class TermLogRecorder(object):
             if self._lists:
                 self.file = self._lists.get(filename=filename)
             else:
-                self.file = TermLog.objects.get(user=user.id, filename=filename)
+                self.file = TermLog.objects.get(filename=filename)
             return self.file.history
         return 'ERROR User(None)'
 
