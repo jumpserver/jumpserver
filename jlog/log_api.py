@@ -90,7 +90,10 @@ def renderJSON(script_path, time_file_path):
                 offset = 0
                 for t in timing:
                     dt = scriptf.read(t[1])
-                    data = escapeString(dt)
+                    try:
+                        data = dt.encode('unicode_escape').decode('utf-8', 'ignore')
+                    except (UnicodeEncodeError, UnicodeDecodeError):
+                        data = dt.decode('utf-8', 'ignore')
                     # print ('###### (%s, %s)' % (t[1], repr(data)))
                     offset += t[0]
                     ret[str(offset/float(1000))] = data
