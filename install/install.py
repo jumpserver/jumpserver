@@ -237,6 +237,7 @@ class PreSetup(object):
 
     def _require_pip(self):
         color_print('开始安装依赖pip包', 'green')
+        bash('pip uninstall -y pycrypto')
         ret_code = bash('pip install -r requirements.txt')
         self.check_bash_return(ret_code, "安装JumpServer 依赖的python库失败！")
 
