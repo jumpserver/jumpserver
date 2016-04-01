@@ -441,7 +441,6 @@ class Nav(object):
         self.perm_assets = sorted(self.user_perm.get('asset', []).keys(),
                                   key=lambda x: [int(num) for num in x.ip.split('.') if num.isdigit()])
         self.perm_asset_groups = self.user_perm.get('asset_group', [])
-        print self.perm_assets
 
     @staticmethod
     def print_nav():
