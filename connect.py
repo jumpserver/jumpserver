@@ -438,8 +438,10 @@ class Nav(object):
         self.user = user
         self.search_result = None
         self.user_perm = get_group_user_perm(self.user)
-        self.perm_assets = tuple(self.user_perm.get('asset', []))
+        self.perm_assets = sorted(self.user_perm.get('asset', []).keys(),
+                                  key=lambda x: [int(num) for num in x.ip.split('.') if num.isdigit()])
         self.perm_asset_groups = self.user_perm.get('asset_group', [])
+        print self.perm_assets
 
     @staticmethod
     def print_nav():
@@ -493,8 +495,6 @@ class Nav(object):
         else:
             # 如果没有输入就展现所有
             self.search_result = self.perm_assets
-
-        self.search_result = list(set(self.search_result))
 
     def print_search_result(self):
         color_print('[%-3s] %-12s %-15s  %-5s  %-10s  %s' % ('ID', '主机名', 'IP', '端口', '系统用户', '备注'), 'title')
