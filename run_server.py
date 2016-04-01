@@ -234,8 +234,8 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
         logger.debug('Websocket: Open exec request')
         role_name = self.get_argument('role', 'sb')
         self.term.remote_ip = self.request.headers.get("X-Real-IP")
-        if not self.term.remote_ip:
-            self.term.remote_ip = self.request.remote_ip
+        if not self.remote_ip:
+            self.remote_ip = self.request.remote_ip
         logger.debug('Web执行命令: 请求系统用户 %s' % role_name)
         self.role = get_object(PermRole, name=role_name)
         self.perm = get_group_user_perm(self.user)
