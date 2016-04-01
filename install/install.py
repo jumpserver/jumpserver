@@ -80,12 +80,12 @@ class PreSetup(object):
         self.ip = ''
         self.key = ''.join(random.choice(string.ascii_lowercase + string.digits) \
                            for _ in range(16))
-        self.dist = platform.dist()[0].lower()
-        self.version = platform.dist()[1]
+        self.dist = platform.linux_distribution(supported_dists=['system'])[0].lower()
+        self.version = platform.linux_distribution(supported_dists=['system'])[1]
 
     @property
     def _is_redhat(self):
-        if self.dist == "centos" or self.dist == "redhat" or self.dist == "fedora":
+        if self.dist == "centos" or self.dist == "redhat" or self.dist == "fedora" or self.dist == "amazon linux ami":
             return True
 
     @property
@@ -105,7 +105,7 @@ class PreSetup(object):
 
     def check_platform(self):
         if not (self._is_redhat or self._is_ubuntu):
-            print(u"支持的平台: CentOS, RedHat, Fedora, Debian, Ubuntu, 暂不支持其他平台安装.")
+            print(u"支持的平台: CentOS, RedHat, Fedora, Debian, Ubuntu, Amazon Linux, 暂不支持其他平台安装.")
             exit()
 
     @staticmethod

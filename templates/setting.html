@@ -109,7 +109,7 @@
         timely: 2,
         theme: "yellow_right_effect",
         rules: {
-            check_name: [/^\w{2,20}$/, '大小写字母数字和下划线,2-20位'],
+            check_name: [/^(\w|\-){2,20}$/, '大小写字母、数字、中划线和下划线，2-20位'],
             check_port: [/^\d{1,5}$/, '端口号不正确'],
             either: function(){
                 return $('#password').val() == ''
