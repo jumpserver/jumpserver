@@ -470,7 +470,7 @@ class Nav(object):
             gid = int(str_r.lstrip('g'))
             # 获取资产组包含的资产
             asset_group = get_object(AssetGroup, id=gid)
-            if asset_group:
+            if asset_group and asset_group in self.perm_asset_groups:
                 self.search_result = list(asset_group.asset_set.all())
             else:
                 color_print('没有该资产组或没有权限')
