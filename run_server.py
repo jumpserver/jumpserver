@@ -364,7 +364,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             return
 
         if 'resize' in jsondata.get('data'):
-            self.termlog.write(jsondata)
+            self.termlog.write(message)
             self.channel.resize_pty(
                 jsondata.get('data').get('resize').get('cols', 80),
                 jsondata.get('data').get('resize').get('rows', 24)
