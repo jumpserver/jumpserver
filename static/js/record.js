@@ -56,7 +56,12 @@ NgApp.controller('TerminalRecordCtrl', function ($scope, $http) {
             document.getElementById("beforeScrubberText").innerHTML = buildTimeString(time);
             for (; pos < timelist.length; pos++) {
                 if (timelist[pos] * 1000 <= time) {
-                    term.write(data[timelist[pos]]);
+                    try{
+                        var findResize = JSON.parse(data[timelist[pos]])['reszie'];
+                        term.resize(findResize['cols'], findResize['rows'])
+                    } catch (err) {
+                        term.write(data[timelist[pos]]);
+                    }
                 } else {
                     break;
                 }

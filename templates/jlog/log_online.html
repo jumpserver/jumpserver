@@ -173,8 +173,14 @@
                 $('.terminal').detach().appendTo('#term');
                 $('.terminal').show();
                 socket.onmessage = function(evt){
-                    term.write(evt.data);
-            }}, 1000);
+                    try {
+                        var findResize = JSON.parse(evt.data)['resize'];
+                        term.resize(findResize['cols'], findResize['rows'])
+                    } catch (err) {
+                        term.write(evt.data);
+                    }
+                }
+            }, 1000);
 
             return tag[0];
         } ,
