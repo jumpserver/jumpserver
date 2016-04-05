@@ -181,7 +181,7 @@ def server_del_user(username):
     删除系统上的某用户
     """
     bash('userdel -r -f %s' % username)
-    print('rm -f %s/%s_*.pem' % (os.path.join(KEY_DIR, 'user'), username))
+    logger.debug('rm -f %s/%s_*.pem' % (os.path.join(KEY_DIR, 'user'), username))
     bash('rm -f %s/%s_*.pem' % (os.path.join(KEY_DIR, 'user'), username))
 
 
