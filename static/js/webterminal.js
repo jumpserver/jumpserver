@@ -63,6 +63,8 @@ function openTerminal(options) {
         rowHeight = 24;
         colWidth = 80
     }
+    if(rowHeight){}else{rowHeight=24};
+    if(colWidth){}else{colWidth=80};
 
     var term = new Terminal({
         rows: rowHeight,
