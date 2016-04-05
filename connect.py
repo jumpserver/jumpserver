@@ -470,7 +470,7 @@ class Nav(object):
             gid = int(str_r.lstrip('g'))
             # 获取资产组包含的资产
             asset_group = get_object(AssetGroup, id=gid)
-            if asset_group:
+            if asset_group and asset_group in self.perm_asset_groups:
                 self.search_result = list(asset_group.asset_set.all())
             else:
                 color_print('没有该资产组或没有权限')
@@ -489,8 +489,10 @@ class Nav(object):
 
             except (ValueError, TypeError):
                 # 匹配 ip, hostname, 备注
-                self.search_result = [asset for asset in self.perm_assets if str_r in str(asset.ip)
-                                      or str_r in str(asset.hostname) or str_r in str(asset.comment)]
+                str_r = str_r.lower()
+                self.search_result = [asset for asset in self.perm_assets if str_r in str(asset.ip).lower()
+                                      or str_r in str(asset.hostname).lower()
+                                      or str_r in str(asset.comment).lower()]
         else:
             # 如果没有输入就展现所有
             self.search_result = self.perm_assets
@@ -532,8 +534,8 @@ class Nav(object):
                 color_print('没有映射用户', 'red')
                 return
 
-            ssh_tty = SshTty(login_user, asset, role)
             print('Connecting %s ...' % asset.hostname)
+            ssh_tty = SshTty(login_user, asset, role)
             ssh_tty.connect()
         except (KeyError, ValueError):
             color_print('请输入正确ID', 'red')
@@ -781,6 +783,7 @@ def main():
             else:
                 nav.search(option)
                 if len(nav.search_result) == 1:
+                    print('Only match Host:  %s ' % nav.search_result[0].hostname)
                     nav.try_connect()
                 else:
                     nav.print_search_result()
