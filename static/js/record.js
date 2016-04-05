@@ -57,8 +57,8 @@ NgApp.controller('TerminalRecordCtrl', function ($scope, $http) {
             for (; pos < timelist.length; pos++) {
                 if (timelist[pos] * 1000 <= time) {
                     try{
-                        var findResize = JSON.parse(data[timelist[pos]])['reszie'];
-                        term.resize(findResize['cols'], findResize['rows'])
+                        var findResize = JSON.parse(data[timelist[pos]])['data'];
+                        term.resize(findResize['resize']['cols'], findResize['resize']['rows'])
                     } catch (err) {
                         term.write(data[timelist[pos]]);
                     }

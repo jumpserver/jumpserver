@@ -174,8 +174,8 @@
                 $('.terminal').show();
                 socket.onmessage = function(evt){
                     try {
-                        var findResize = JSON.parse(evt.data)['resize'];
-                        term.resize(findResize['cols'], findResize['rows'])
+                        var findResize = JSON.parse(evt.data)['data'];
+                        term.resize(findResize['resize']['cols'], findResize['resize']['rows'])
                     } catch (err) {
                         term.write(evt.data);
                     }
