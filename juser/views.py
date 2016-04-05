@@ -254,7 +254,7 @@ def user_del(request):
         user = get_object(User, id=user_id)
         if user and user.username != 'admin':
             logger.debug(u"删除用户 %s " % user.username)
-            bash('userdel -r %s' % user.username)
+            server_del_user(user.username)
             user.delete()
     return HttpResponse('删除成功')
 

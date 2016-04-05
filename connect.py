@@ -436,10 +436,10 @@ class Nav(object):
     """
     def __init__(self, user):
         self.user = user
-        self.search_result = None
         self.user_perm = get_group_user_perm(self.user)
         self.perm_assets = sorted(self.user_perm.get('asset', []).keys(),
                                   key=lambda x: [int(num) for num in x.ip.split('.') if num.isdigit()])
+        self.search_result = self.perm_assets
         self.perm_asset_groups = self.user_perm.get('asset_group', [])
 
     @staticmethod
