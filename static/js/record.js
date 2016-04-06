@@ -108,8 +108,8 @@ NgApp.controller('TerminalRecordCtrl', function ($scope, $http) {
         };
 
         var term = new Terminal({
-            rows: 24,
-            cols: 80,
+            rows: 35,
+            cols: 100,
             useStyle: true,
             screenKeys: true
         });

@@ -60,11 +60,11 @@ function openTerminal(options) {
         rowHeight = localStorage.getItem('term-row');
         colWidth = localStorage.getItem('term-col');
     } catch (err) {
-        rowHeight = 24;
-        colWidth = 80
+        rowHeight = 35;
+        colWidth = 100
     }
-    if(rowHeight){}else{rowHeight=24};
-    if(colWidth){}else{colWidth=80};
+    if(rowHeight){}else{rowHeight=35};
+    if(colWidth){}else{colWidth=100};
 
     var term = new Terminal({
         rows: rowHeight,
@@ -128,8 +128,8 @@ $(document).ready(function () {
         $('#term-row')[0].value = localStorage.getItem('term-row');
         $('#term-col')[0].value = localStorage.getItem('term-col');
     } catch (err) {
-        $('#term-row')[0].value = 24;
-        $('#term-col')[0].value = 80;
+        $('#term-row')[0].value = 35;
+        $('#term-col')[0].value = 100;
     }
     $('#col-row').click(function () {
         var col = $('#term-col').val();
