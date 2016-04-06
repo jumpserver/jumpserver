@@ -436,10 +436,10 @@ class Nav(object):
     """
     def __init__(self, user):
         self.user = user
-        self.search_result = None
         self.user_perm = get_group_user_perm(self.user)
         self.perm_assets = sorted(self.user_perm.get('asset', []).keys(),
                                   key=lambda x: [int(num) for num in x.ip.split('.') if num.isdigit()])
+        self.search_result = self.perm_assets
         self.perm_asset_groups = self.user_perm.get('asset_group', [])
 
     @staticmethod
@@ -450,11 +450,11 @@ class Nav(object):
         """
         msg = """\n\033[1;32m###    欢迎使用Jumpserver开源跳板机系统   ### \033[0m
 
-        1) 输入 \033[32mID\033[0m 直接登录.
-        2) 输入 \033[32m/\033[0m + \033[32mIP, 主机名 or 备注 \033[0m搜索.
+        1) 输入 \033[32mID\033[0m 直接登录 或 输入\033[32m部分 IP,主机名,备注\033[0m 进行搜索登录(如果唯一).
+        2) 输入 \033[32m/\033[0m + \033[32mIP, 主机名 or 备注 \033[0m搜索. 如: /ip
         3) 输入 \033[32mP/p\033[0m 显示您有权限的主机.
         4) 输入 \033[32mG/g\033[0m 显示您有权限的主机组.
-        5) 输入 \033[32mG/g\033[0m\033[0m + \033[32m组ID\033[0m 显示该组下主机.
+        5) 输入 \033[32mG/g\033[0m\033[0m + \033[32m组ID\033[0m 显示该组下主机. 如: g1
         6) 输入 \033[32mE/e\033[0m 批量执行命令.
         7) 输入 \033[32mU/u\033[0m 批量上传文件.
         8) 输入 \033[32mD/d\033[0m 批量下载文件.
@@ -470,7 +470,7 @@ class Nav(object):
             gid = int(str_r.lstrip('g'))
             # 获取资产组包含的资产
             asset_group = get_object(AssetGroup, id=gid)
-            if asset_group:
+            if asset_group and asset_group in self.perm_asset_groups:
                 self.search_result = list(asset_group.asset_set.all())
             else:
                 color_print('没有该资产组或没有权限')
@@ -489,8 +489,10 @@ class Nav(object):
 
             except (ValueError, TypeError):
                 # 匹配 ip, hostname, 备注
-                self.search_result = [asset for asset in self.perm_assets if str_r in str(asset.ip)
-                                      or str_r in str(asset.hostname) or str_r in str(asset.comment)]
+                str_r = str_r.lower()
+                self.search_result = [asset for asset in self.perm_assets if str_r in str(asset.ip).lower()
+                                      or str_r in str(asset.hostname).lower()
+                                      or str_r in str(asset.comment).lower()]
         else:
             # 如果没有输入就展现所有
             self.search_result = self.perm_assets
@@ -532,8 +534,8 @@ class Nav(object):
                 color_print('没有映射用户', 'red')
                 return
 
-            ssh_tty = SshTty(login_user, asset, role)
             print('Connecting %s ...' % asset.hostname)
+            ssh_tty = SshTty(login_user, asset, role)
             ssh_tty.connect()
         except (KeyError, ValueError):
             color_print('请输入正确ID', 'red')
@@ -781,6 +783,7 @@ def main():
             else:
                 nav.search(option)
                 if len(nav.search_result) == 1:
+                    print('Only match Host:  %s ' % nav.search_result[0].hostname)
                     nav.try_connect()
                 else:
                     nav.print_search_result()
