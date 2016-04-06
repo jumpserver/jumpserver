@@ -25,7 +25,7 @@
             background: #f0f0f0;
         }
 
-        .clock {
+        .termChangBar {
             line-height: 1;
             margin: 0 auto;
             border: 1px solid #ffffff;
@@ -43,15 +43,13 @@
     <div id="term">
     </div>
 </div>
-<div class="clock">
-    <input type="number" min="80" placeholder="col" id="term-col"/>
-    <input type="number" min="24" placeholder="row" id="term-row"/>
+<div class="termChangBar">
+    <input type="number" min="100" value="100" placeholder="col" id="term-col"/>
+    <input type="number" min="35" value="35" placeholder="row" id="term-row"/>
     <button id="col-row">修改窗口大小</button>
 </div>
-<script type="application/javascript" src="/static/js/jquery-2.1.1.js">
-</script>
-<script type="application/javascript" src="/static/js/term.js">
-</script>
+<script type="application/javascript" src="/static/js/jquery-2.1.1.js"></script>
+<script type="application/javascript" src="/static/js/term.js"></script>
 <script type="application/javascript" src="/static/js/webterminal.js"></script>
 </body>
 </html>
