@@ -1,4 +1,3 @@
-
 /**
  * Created by liuzheng on 3/3/16.
  */
@@ -36,7 +35,7 @@ WSSHClient.prototype.connect = function (options) {
     };
 
     this._connection.onmessage = function (evt) {
-        try{
+        try {
             options.onData(evt.data);
         } catch (e) {
             var data = JSON.parse(evt.data.toString());
@@ -55,6 +54,25 @@ WSSHClient.prototype.send = function (data) {
 
 function openTerminal(options) {
     var client = new WSSHClient();
+    var rowHeight, colWidth;
+    try {
+        rowHeight = localStorage.getItem('term-row');
+        colWidth = localStorage.getItem('term-col');
+    } catch (err) {
+        rowHeight = 35;
+        colWidth = 100
+    }
+    if (rowHeight) {
+    } else {
+        rowHeight = 35
+    }
+    ;
+    if (colWidth) {
+    } else {
+        colWidth = 100
+    }
+    ;
+
     var term = new Terminal({
         rows: rowHeight,
         cols: colWidth,
@@ -66,7 +84,7 @@ function openTerminal(options) {
         client.send(data)
     });
     $('.terminal').detach().appendTo('#term');
-    term.resize(80, 24);
+    //term.resize(colWidth, rowHeight);
     term.write('Connecting...');
     client.connect($.extend(options, {
         onError: function (error) {
@@ -74,6 +92,7 @@ function openTerminal(options) {
         },
         onConnect: function () {
             // Erase our connecting message
+            client.send({'resize': {'rows': rowHeight, 'cols': colWidth}});
             term.write('\r');
         },
         onClose: function () {
@@ -83,20 +102,20 @@ function openTerminal(options) {
             term.write(data);
         }
     }));
-    rowHeight = 0.0 + 1.00 * $('.terminal').height() / 24;
-    colWidth = 0.0 + 1.00 * $('.terminal').width() / 80;
+    //rowHeight = 0.0 + 1.00 * $('.terminal').height() / 24;
+    //colWidth = 0.0 + 1.00 * $('.terminal').width() / 80;
     return {'term': term, 'client': client};
 }
 
-function resize() {
-    $('.terminal').css('width', window.innerWidth - 25);
-    console.log(window.innerWidth);
-    console.log(window.innerWidth - 10);
-    var rows = Math.floor(window.innerHeight / rowHeight) - 2;
-    var cols = Math.floor(window.innerWidth / colWidth) - 1;
-
-    return {rows: rows, cols: cols};
-}
+//function resize() {
+//    $('.terminal').css('width', window.innerWidth - 25);
+//    console.log(window.innerWidth);
+//    console.log(window.innerWidth - 10);
+//    var rows = Math.floor(window.innerHeight / rowHeight) - 2;
+//    var cols = Math.floor(window.innerWidth / colWidth) - 1;
+//
+//    return {rows: rows, cols: cols};
+//}
 
 $(document).ready(function () {
     var options = {};
@@ -112,5 +131,26 @@ $(document).ready(function () {
     //    term_client.client.send({'resize': {'rows': geom.rows, 'cols': geom.cols}});
     //    $('#ssh').show();
     //}
-
+    try {
+        $('#term-row')[0].value = localStorage.getItem('term-row');
+        $('#term-col')[0].value = localStorage.getItem('term-col');
+    } catch (err) {
+        $('#term-row')[0].value = 35;
+        $('#term-col')[0].value = 100;
+    }
+    $('#col-row').click(function () {
+        var col = $('#term-col').val();
+        var row = $('#term-row').val();
+        localStorage.setItem('term-col', col);
+        localStorage.setItem('term-row', row);
+        term_client.term.resize(col, row);
+        term_client.client.send({'resize': {'rows': row, 'cols': col}});
+        $('#ssh').show();
+    });
+    $(".terminal").mouseleave(function () {
+        $(".termChangBar").slideDown();
+    });
+    $(".terminal").mouseenter(function () {
+        $(".termChangBar").slideUp();
+    })
 });

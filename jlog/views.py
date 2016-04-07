@@ -224,7 +224,7 @@ class TermLogRecorder(object):
         Initializing the virtual screen and the character stream
         """
         self._stream = pyte.ByteStream()
-        self._screen = pyte.Screen(80, 24)
+        self._screen = pyte.Screen(100, 35)
         self._stream.attach(self._screen)
 
     def _command(self):
