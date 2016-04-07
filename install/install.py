@@ -85,7 +85,7 @@ class PreSetup(object):
 
     @property
     def _is_redhat(self):
-        if self.dist.startswith("centos") or self.dist == "redhat" or self.dist == "fedora" or self.dist == "amazon linux ami":
+        if self.dist.startswith("centos") or self.dist.startswith("red") or self.dist == "fedora" or self.dist == "amazon linux ami":
             return True
 
     @property
