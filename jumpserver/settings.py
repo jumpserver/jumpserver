@@ -49,6 +49,12 @@ LOG_LEVEL = config.get('base', 'log')
 IP = config.get('base', 'ip')
 PORT = config.get('base', 'port')
 
+# ======== Connect ==========
+try:
+    NAV_SORT_BY = config.get('connect', 'nav_sort_by')
+except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
+    NAV_SORT_BY = 'ip'
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
