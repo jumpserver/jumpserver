@@ -500,8 +500,9 @@ class Nav(object):
             except (ValueError, TypeError):
                 # 匹配 ip, hostname, 备注
                 str_r = str_r.lower()
-                self.search_result = [asset for asset in self.perm_assets if str_r in str(asset.ip).lower()
-                                      or str_r in str(asset.hostname).lower()
+                self.search_result = [asset for asset in self.perm_assets if str_r == str(asset.ip).lower()] or \
+                                     [asset for asset in self.perm_assets if str_r in str(asset.ip).lower() \
+                                      or str_r in str(asset.hostname).lower() \
                                       or str_r in str(asset.comment).lower()]
         else:
             # 如果没有输入就展现所有
