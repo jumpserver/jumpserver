@@ -326,7 +326,7 @@ def download(request):
         FileLog(user=request.user.username, host=' '.join([asset.hostname for asset in asset_select]),
                 filename=file_path, type='download', remote_ip=remote_ip, result=runner.results).save()
         logger.debug(runner.results)
-        os.chdir('/tmp')
+        # os.chdir('/tmp')
         tmp_dir_name = os.path.basename(upload_dir)
         tar_file = '%s.tar.gz' % upload_dir
         bash('tar czf %s %s' % (tar_file, tmp_dir_name))
