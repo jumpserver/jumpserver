@@ -328,7 +328,7 @@ def download(request):
         logger.debug(runner.results)
         # os.chdir('/tmp')
         tmp_dir_name = os.path.basename(upload_dir)
-        tar_file = '/tmp/%s.tar.gz' % upload_dir
+        tar_file = '%s.tar.gz' % upload_dir
         bash('tar czf %s %s' % (tar_file, tmp_dir_name))
         f = open(tar_file)
         data = f.read()
