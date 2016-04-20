@@ -290,6 +290,8 @@ def perm_role_add(request):
             if name == "root":
                 raise ServerError(u'禁止使用root用户作为系统用户，这样非常危险！')
             default = get_object(Setting, name='default')
+            if len(password) > 64:
+                raise ServerError(u'密码长度不能超过64位!')
 
             if password:
                 encrypt_pass = CRYPTOR.encrypt(password)
@@ -446,6 +448,8 @@ def perm_role_edit(request):
         role_sudo_names = request.POST.getlist("sudo_name")
         role_sudos = [PermSudo.objects.get(id=sudo_id) for sudo_id in role_sudo_names]
         key_content = request.POST.get("role_key", "")
+        if len(role_password) > 64:
+            raise ServerError(u'密码长度不能超过64位!')
 
         try:
             if not role:
