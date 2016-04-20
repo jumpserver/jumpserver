@@ -19,6 +19,7 @@ from jlog.models import Log, FileLog
 from jperm.perm_api import get_group_user_perm, gen_resource
 from jasset.models import Asset, IDC
 from jperm.ansible_api import MyRunner
+import zipfile
 
 
 def getDaysByNum(num):
@@ -328,13 +329,14 @@ def download(request):
         logger.debug(runner.results)
         # os.chdir('/tmp')
         tmp_dir_name = os.path.basename(upload_dir)
-        tar_file = '%s.tar.gz' % upload_dir
-        bash('tar czf %s %s' % (tar_file, tmp_dir_name))
-        f = open(tar_file)
+        file_zip = '/tmp/'+tmp_dir_name+'.zip'
+        zf = zipfile.ZipFile(file_zip, "a", zipfile.ZIP_DEFLATED, False)
+        zf.write(upload_dir)
+        f = open(file_zip)
         data = f.read()
         f.close()
         response = HttpResponse(data, content_type='application/octet-stream')
-        response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(tar_file)
+        response['Content-Disposition'] = 'attachment; filename=%s.zip' % tmp_dir_name
         return response
 
     return render_to_response('download.html', locals(), context_instance=RequestContext(request))
