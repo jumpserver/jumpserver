@@ -327,7 +327,6 @@ def download(request):
         FileLog(user=request.user.username, host=' '.join([asset.hostname for asset in asset_select]),
                 filename=file_path, type='download', remote_ip=remote_ip, result=runner.results).save()
         logger.debug(runner.results)
-        # os.chdir('/tmp')
         tmp_dir_name = os.path.basename(upload_dir)
         file_zip = '/tmp/'+tmp_dir_name+'.zip'
         zf = zipfile.ZipFile(file_zip, "a", zipfile.ZIP_DEFLATED, False)
