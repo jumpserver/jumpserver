@@ -66,12 +66,10 @@ function openTerminal(options) {
     } else {
         rowHeight = 35
     }
-    ;
     if (colWidth) {
     } else {
         colWidth = 100
     }
-    ;
 
     var term = new Terminal({
         rows: rowHeight,
