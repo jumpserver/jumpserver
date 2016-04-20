@@ -227,6 +227,9 @@ def setting(request):
             password = request.POST.get('password', '')
             private_key = request.POST.get('key', '')
 
+            if len(password) > 30:
+                return HttpResponse('秘密长度不能超过30位!')
+
             if '' in [username, port]:
                 return HttpResponse('所填内容不能为空, 且密码和私钥填一个')
             else:
