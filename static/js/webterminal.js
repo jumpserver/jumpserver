@@ -1,4 +1,3 @@
-
 /**
  * Created by liuzheng on 3/3/16.
  */
@@ -63,8 +62,14 @@ function openTerminal(options) {
         rowHeight = 35;
         colWidth = 100
     }
-    if(rowHeight){}else{rowHeight=35};
-    if(colWidth){}else{colWidth=100};
+    if (rowHeight) {
+    } else {
+        rowHeight = 35
+    }
+    if (colWidth) {
+    } else {
+        colWidth = 100
+    }
 
     var term = new Terminal({
         rows: rowHeight,
@@ -139,6 +144,11 @@ $(document).ready(function () {
         term_client.term.resize(col, row);
         term_client.client.send({'resize': {'rows': row, 'cols': col}});
         $('#ssh').show();
+    });
+    $(".terminal").mouseleave(function () {
+        $(".termChangBar").slideDown();
+    });
+    $(".terminal").mouseenter(function () {
+        $(".termChangBar").slideUp();
     })
-
 });
