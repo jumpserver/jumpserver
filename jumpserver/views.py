@@ -329,8 +329,12 @@ def download(request):
         logger.debug(runner.results)
         tmp_dir_name = os.path.basename(upload_dir)
         file_zip = '/tmp/'+tmp_dir_name+'.zip'
-        zf = zipfile.ZipFile(file_zip, "a", zipfile.ZIP_DEFLATED, False)
-        zf.write(upload_dir)
+        zf = zipfile.ZipFile(file_zip, "w", zipfile.ZIP_DEFLATED)
+        for dirname, subdirs, files in os.walk(upload_dir):
+            zf.write(dirname)
+            for filename in files:
+                zf.write(os.path.join(dirname, filename))
+        zf.close()
         f = open(file_zip)
         data = f.read()
         f.close()
