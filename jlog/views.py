@@ -240,6 +240,7 @@ class TermLogRecorder(object):
         TermLogRecorder.loglist[str(id)] = [self]
 
     def write(self, msg):
+        """
         if self.recoder and (not self._in_vim):
             if self.commands.__len__() == 0:
                 self._stream.feed(msg)
@@ -256,6 +257,7 @@ class TermLogRecorder(object):
                 self._screen.reset()
             else:
                 self._command()
+        """
         try:
             self.write_message(msg)
         except:
