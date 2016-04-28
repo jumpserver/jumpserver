@@ -135,13 +135,16 @@ def asset_add(request):
         af_post = AssetForm(request.POST)
         ip = request.POST.get('ip', '')
         hostname = request.POST.get('hostname', '')
+
         is_active = True if request.POST.get('is_active') == '1' else False
         use_default_auth = request.POST.get('use_default_auth', '')
         try:
             if Asset.objects.filter(hostname=unicode(hostname)):
                 error = u'该主机名 %s 已存在!' % hostname
                 raise ServerError(error)
-
+            if len(hostname) > 54:
+                error = u"主机名长度不能超过53位!"
+                raise ServerError(error)
         except ServerError:
             pass
         else:
@@ -219,34 +222,38 @@ def asset_edit(request):
             if asset_test and asset_id != unicode(asset_test.id):
                 emg = u'该主机名 %s 已存在!' % hostname
                 raise ServerError(emg)
-        except ServerError:
-            pass
-        else:
-            if af_post.is_valid():
-                af_save = af_post.save(commit=False)
-                if use_default_auth:
-                    af_save.username = ''
-                    af_save.password = ''
-                    # af_save.port = None
-                else:
-                    if password:
-                        password_encode = CRYPTOR.encrypt(password)
-                        af_save.password = password_encode
-                    else:
-                        af_save.password = password_old
-                af_save.is_active = True if is_active else False
-                af_save.save()
-                af_post.save_m2m()
-                # asset_new = get_object(Asset, id=asset_id)
-                # asset_diff_one(asset_old, asset_new)
-                info = asset_diff(af_post.__dict__.get('initial'), request.POST)
-                db_asset_alert(asset, username, info)
-
-                smg = u'主机 %s 修改成功' % ip
+            if len(hostname) > 54:
+                emg = u'主机名长度不能超过54位!'
+                raise ServerError(emg)
             else:
-                emg = u'主机 %s 修改失败' % ip
-                return my_render('jasset/error.html', locals(), request)
-            return HttpResponseRedirect(reverse('asset_detail')+'?id=%s' % asset_id)
+                if af_post.is_valid():
+                    af_save = af_post.save(commit=False)
+                    if use_default_auth:
+                        af_save.username = ''
+                        af_save.password = ''
+                        # af_save.port = None
+                    else:
+                        if password:
+                            password_encode = CRYPTOR.encrypt(password)
+                            af_save.password = password_encode
+                        else:
+                            af_save.password = password_old
+                    af_save.is_active = True if is_active else False
+                    af_save.save()
+                    af_post.save_m2m()
+                    # asset_new = get_object(Asset, id=asset_id)
+                    # asset_diff_one(asset_old, asset_new)
+                    info = asset_diff(af_post.__dict__.get('initial'), request.POST)
+                    db_asset_alert(asset, username, info)
+
+                    smg = u'主机 %s 修改成功' % ip
+                else:
+                    emg = u'主机 %s 修改失败' % ip
+                    raise ServerError(emg)
+        except ServerError as e:
+            error = e.message
+            return my_render('jasset/asset_edit.html', locals(), request)
+        return HttpResponseRedirect(reverse('asset_detail')+'?id=%s' % asset_id)
 
     return my_render('jasset/asset_edit.html', locals(), request)
 

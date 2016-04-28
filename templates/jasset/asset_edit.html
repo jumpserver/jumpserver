@@ -206,7 +206,7 @@
         },
         fields: {
             "hostname": {
-                rule: "required",
+                rule: "required;length[0~53]",
                 tip: "填写主机名",
                 ok: "",
                 msg: {required: "必须填写!"}
@@ -218,17 +218,17 @@
                 msg: {required: "必须填写!"}
             },
             "username": {
-                rule: "required(use_default_auth)",
+                rule: "required(use_default_auth);",
                 tip: "输入用户名",
                 ok: "",
                 msg: {required: "必须填写!"}
             },
-{#            "password": {#}
-{#                rule: "required(use_default_auth)",#}
-{#                tip: "输入密码",#}
-{#                ok: "",#}
-{#                msg: {required: "必须填写!"}#}
-{#            }#}
+            "password": {
+                rule: "length[0~64]",
+                tip: "输入密码",
+                ok: "",
+                empty: true
+            }
         },
         valid: function(form) {
             form.submit();
