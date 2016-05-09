@@ -508,16 +508,30 @@ class Nav(object):
             # 如果没有输入就展现所有
             self.search_result = self.perm_assets
 
+    @staticmethod
+    def truncate_str(str_, length=30):
+        str_ = str_.decode('utf-8')
+        if len(str_) > length:
+            return str_[:14] + '..' + str_[-14:]
+        else:
+            return str_
+
+    @staticmethod
+    def get_max_asset_property_length(assets, property_='hostname'):
+        return max([len(getattr(asset, property_)) for asset in assets])
+
     def print_search_result(self):
-        color_print('[%-3s] %-12s %-15s  %-5s  %-10s  %s' % ('ID', '主机名', 'IP', '端口', '系统用户', '备注'), 'title')
+        hostname_max_length = self.get_max_asset_property_length(self.search_result)
+        line = '[%-3s] %-16s %-5s  %-' + str(hostname_max_length) + 's %-10s %s'
+        color_print(line % ('ID', 'IP', 'Port', 'Hostname', 'SysUser', 'Comment'), 'title')
         if hasattr(self.search_result, '__iter__'):
             for index, asset in enumerate(self.search_result):
                 # 获取该资产信息
                 asset_info = get_asset_info(asset)
                 # 获取该资产包含的角色
                 role = [str(role.name) for role in self.user_perm.get('asset').get(asset).get('role')]
-                print '[%-3s] %-15s %-15s  %-5s  %-10s  %s' % (index, asset.hostname, asset.ip, asset_info.get('port'),
-                                                               role, asset.comment)
+                print line % (index, asset.ip, asset_info.get('port'),
+                              self.truncate_str(asset.hostname), str(role).replace("'", ''), asset.comment)
         print
 
     def try_connect(self):
