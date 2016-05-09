@@ -38,7 +38,7 @@ def perm_rule_list(request):
         rules_list = rules_list.filter(id=rule_id)
 
     if keyword:
-        rules_list = rules_list.filter(Q(name=keyword))
+        rules_list = rules_list.filter(Q(name__icontains=keyword))
 
     rules_list, p, rules, page_range, current_page, show_first, show_end = pages(rules_list, request)
 
