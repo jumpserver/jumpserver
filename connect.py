@@ -136,7 +136,7 @@ class Tty(object):
                 result = match[-1].strip()
         return result
 
-    def deal_command(self, data):
+    def deal_command(self, data=None):
         """
         处理截获的命令
         :param data: 要处理的命令
@@ -144,7 +144,8 @@ class Tty(object):
         """
         command = ''
         try:
-            self.stream.feed(data)
+            if data is not None:
+                self.stream.feed(data)
             # 从虚拟屏幕中获取处理后的数据
             for line in reversed(self.screen.buffer):
                 line_data = "".join(map(operator.attrgetter("data"), line)).strip()
@@ -161,10 +162,10 @@ class Tty(object):
                 # 判断用户输入的是否是vim 或者fg命令
                 if self.vim_pattern.search(command):
                     self.vim_flag = True
-            # 虚拟屏幕清空
-            self.screen.reset()
         except Exception:
             pass
+        # 虚拟屏幕清空
+        self.screen.reset()
         return command
 
     def get_log(self):
@@ -349,7 +350,8 @@ class SshTty(Tty):
 
                         if input_mode and not self.is_output(x):
                             data += x
-
+                        if input_mode and not self.is_output(x) and not self.vim_flag
+                            self.stream.feed(x)
                         input_str = ''
 
                     except socket.timeout:
@@ -367,6 +369,8 @@ class SshTty(Tty):
                         # 这个是用来处理用户的复制操作
                         if input_str != x:
                             data += input_str
+                            self.stream.feed(data)
+
                         if self.vim_flag:
                             match = self.vim_end_pattern.findall(self.vim_data)
                             if match:
@@ -376,7 +380,7 @@ class SshTty(Tty):
                                 else:
                                     self.vim_end_flag = True
                         else:
-                            data = self.deal_command(data)[0:200]
+                            data = self.deal_command()[0:200]
                             if len(data) > 0:
                                 TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
                         data = ''
@@ -406,7 +410,7 @@ class SshTty(Tty):
         """
         # 发起ssh连接请求 Make a ssh connection
         ssh = self.get_connection()
-        
+
         transport = ssh.get_transport()
         transport.set_keepalive(30)
         transport.use_compression(True)
@@ -422,7 +426,7 @@ class SshTty(Tty):
             signal.signal(signal.SIGWINCH, self.set_win_size)
         except:
             pass
-        
+
         self.posix_shell()
 
         # Shutdown channel socket
