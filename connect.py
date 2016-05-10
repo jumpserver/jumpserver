@@ -518,7 +518,10 @@ class Nav(object):
 
     @staticmethod
     def get_max_asset_property_length(assets, property_='hostname'):
-        return max([len(getattr(asset, property_)) for asset in assets])
+        try:
+            return max([len(getattr(asset, property_)) for asset in assets])
+        except ValueError:
+            return 30
 
     def print_search_result(self):
         hostname_max_length = self.get_max_asset_property_length(self.search_result)
