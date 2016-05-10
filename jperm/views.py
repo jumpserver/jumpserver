@@ -16,6 +16,7 @@ from jperm.ansible_api import MyTask
 from jperm.perm_api import get_role_info, get_role_push_host
 from jumpserver.api import my_render, get_object, CRYPTOR
 
+
 # 设置PERM APP Log
 from jumpserver.api import logger
 #logger = set_log(LOG_LEVEL, filename='jumpserver_perm.log')
@@ -416,6 +417,7 @@ def perm_role_detail(request):
             users = role_info.get("users")
             user_groups = role_info.get("user_groups")
             pushed_asset, need_push_asset = get_role_push_host(get_object(PermRole, id=role_id))
+
     except ServerError, e:
         logger.warning(e)
 

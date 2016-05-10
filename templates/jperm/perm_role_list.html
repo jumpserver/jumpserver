@@ -70,7 +70,7 @@
                     <div class="row">
                         <div class="col-sm-6">
                             <div class="dataTables_info" id="editable_info" role="status" aria-live="polite">
-                                Showing {{ users.start_index }} to {{ users.end_index }} of {{ p.count }} entries
+                                Showing {{ roles.start_index }} to {{ roles.end_index }} of {{ p.count }} entries
                             </div>
                         </div>
                         {% include 'paginator.html' %}
@@ -80,8 +80,6 @@
         </div>
     </div>
 </div>
-
-
 <script>
 function remove_role(role_id){
     $.ajax({
