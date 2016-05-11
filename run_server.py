@@ -373,15 +373,13 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             self.termlog.recoder = True
             self.term.input_mode = True
             if str(jsondata['data']) in ['\r', '\n', '\r\n']:
-                if self.term.vim_flag:
-                    match = re.compile(r'\x1b\[\?1049', re.X).findall(self.term.vim_data)
-                    if match:
-                        if self.term.vim_end_flag or len(match) == 2:
-                            self.term.vim_flag = False
-                            self.term.vim_end_flag = False
-                        else:
-                            self.term.vim_end_flag = True
-                else:
+                match = re.compile(r'\x1b\[\?1049', re.X).findall(self.term.vim_data)
+                if match:
+                    if self.term.vim_flag or len(match) == 2:
+                        self.term.vim_flag = False
+                    else:
+                        self.term.vim_flag = True
+                elif not self.term.vim_flag:
                     result = self.term.deal_command(self.term.data)[0:200]
                     if len(result) > 0:
                         TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=result).save()
@@ -424,8 +422,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                     if not len(recv):
                         return
                     data += recv
-                    if self.term.vim_flag:
-                        self.term.vim_data += recv
+                    self.term.vim_data += recv
                     try:
                         self.write_message(data.decode('utf-8', 'replace'))
                         self.termlog.write(data)
@@ -436,7 +433,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                         pre_timestamp = now_timestamp
                         self.log_file_f.flush()
                         self.log_time_f.flush()
-                        if self.term.input_mode and not self.term.is_output(data):
+                        if self.term.input_mode:
                             self.term.data += data
                         data = ''
                     except UnicodeDecodeError:
