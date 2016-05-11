@@ -305,7 +305,6 @@ class SshTty(Tty):
         old_tty = termios.tcgetattr(sys.stdin)
         pre_timestamp = time.time()
         data = ''
-        input_str = ''
         input_mode = False
         try:
             tty.setraw(sys.stdin.fileno())
@@ -325,8 +324,7 @@ class SshTty(Tty):
                         x = self.channel.recv(10240)
                         if len(x) == 0:
                             break
-                        if self.vim_flag:
-                            self.vim_data += x
+
                         index = 0
                         len_x = len(x)
                         while index < len_x:
@@ -347,10 +345,10 @@ class SshTty(Tty):
                         pre_timestamp = now_timestamp
                         log_file_f.flush()
 
-                        if input_mode and not self.is_output(x):
+                        if self.vim_flag:
+                            self.vim_data += x
+                        elif input_mode:
                             data += x
-
-                        input_str = ''
 
                     except socket.timeout:
                         pass
@@ -362,11 +360,7 @@ class SshTty(Tty):
                         pass
                     termlog.recoder = True
                     input_mode = True
-                    input_str += x
-                    if str(x) in ['\r', '\n', '\r\n']:
-                        # 这个是用来处理用户的复制操作
-                        if input_str != x:
-                            data += input_str
+                    if self.is_output(str(x)):
                         if self.vim_flag:
                             match = self.vim_end_pattern.findall(self.vim_data)
                             if match:
@@ -376,11 +370,13 @@ class SshTty(Tty):
                                 else:
                                     self.vim_end_flag = True
                         else:
+                            # 如果len(str(x)) > 1 说明是复制输入的
+                            if len(str(x)) > 1:
+                                data = x
                             data = self.deal_command(data)[0:200]
                             if len(data) > 0:
                                 TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
                         data = ''
-                        input_str = ''
                         self.vim_data = ''
                         input_mode = False
 
