@@ -180,8 +180,8 @@ class Tty(object):
         log_file_path = os.path.join(today_connect_log_dir, '%s_%s_%s' % (self.username, self.asset_name, time_start))
 
         try:
-            mkdir(os.path.dirname(today_connect_log_dir), mode=0777)
-            mkdir(today_connect_log_dir, mode=0777)
+            mkdir(os.path.dirname(today_connect_log_dir), mode=777)
+            mkdir(today_connect_log_dir, mode=777)
         except OSError:
             logger.debug('创建目录 %s 失败，请修改%s目录权限' % (today_connect_log_dir, tty_log_dir))
             raise ServerError('创建目录 %s 失败，请修改%s目录权限' % (today_connect_log_dir, tty_log_dir))
