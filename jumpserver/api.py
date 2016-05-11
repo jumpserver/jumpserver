@@ -91,7 +91,7 @@ def get_role_key(user, role):
     """
     user_role_key_dir = os.path.join(KEY_DIR, 'user')
     user_role_key_path = os.path.join(user_role_key_dir, '%s_%s.pem' % (user.username, role.name))
-    mkdir(user_role_key_dir, mode=0777)
+    mkdir(user_role_key_dir, mode=777)
     if not os.path.isfile(user_role_key_path):
         with open(os.path.join(role.key_path, 'id_rsa')) as fk:
             with open(user_role_key_path, 'w') as fu:
@@ -458,12 +458,12 @@ def bash(cmd):
     return subprocess.call(cmd, shell=True)
 
 
-def mkdir(dir_name, username='', mode=0755):
+def mkdir(dir_name, username='', mode=755):
     """
     insure the dir exist and mode ok
     目录存在，如果不存在就建立，并且权限正确
     """
-    cmd = 'mkdir -p %s && chmod %s %s' % (dir_name, mode, dir_name)
+    cmd = '[ ! -d %s ] && mkdir -p %s && chmod %s %s' % (dir_name, dir_name, mode, dir_name)
     bash(cmd)
     if username:
         chown(dir_name, username)
@@ -485,7 +485,7 @@ def my_render(template, data, request):
 def get_tmp_dir():
     seed = uuid.uuid4().hex[:4]
     dir_name = os.path.join('/tmp', '%s-%s' % (datetime.datetime.now().strftime('%Y%m%d-%H%M%S'), seed))
-    mkdir(dir_name, mode=0777)
+    mkdir(dir_name, mode=777)
     return dir_name
 
 
