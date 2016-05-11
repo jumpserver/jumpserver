@@ -585,7 +585,7 @@ class Nav(object):
                 print "请输入运行命令所关联系统用户的ID, q退出"
 
                 try:
-                    role_id = raw_input("\033[1;32mRole>:\033[0m ").strip()
+                    role_id = int(raw_input("\033[1;32mRole>:\033[0m ").strip())
                     if role_id == 'q':
                         break
                 except (IndexError, ValueError):
