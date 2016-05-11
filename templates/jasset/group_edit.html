@@ -57,7 +57,7 @@
                     {% if smg %}
                         <div class="alert alert-success text-center">{{ smg }}</div>
                     {% endif %}
-                    <form id="assetForm" method="post" class="form-horizontal">
+                    <form id="assetForm" method="post" class="form-horizontal" onkeydown="if(event.keyCode==13){return false;}">
                         <div class="form-group"><label class="col-sm-2 control-label"> 主机组名<span class="red-fonts">*</span></label>
                             <div class="col-sm-8" name="group_id" value="{{ group.id }}"><input type="text" value="{{ group.name }}" placeholder="Name" name="name" class="form-control"></div>
                         </div>
