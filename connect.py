@@ -93,9 +93,7 @@ class Tty(object):
         self.remote_ip = ''
         self.login_type = login_type
         self.vim_flag = False
-        self.vim_end_flag = False
         self.vim_end_pattern = re.compile(r'\x1b\[\?1049', re.X)
-        self.vim_pattern = re.compile(r'\W?vi[m]?\s.* | \W?fg\s.*', re.X)
         self.vim_data = ''
         self.stream = None
         self.screen = None
@@ -117,7 +115,8 @@ class Tty(object):
                 return True
         return False
 
-    def command_parser(self, command):
+    @staticmethod
+    def command_parser(command):
         """
         处理命令中如果有ps1或者mysql的特殊情况,极端情况下会有ps1和mysql
         :param command:要处理的字符传
@@ -157,14 +156,10 @@ class Tty(object):
                     else:
                         command = line_data
                     break
-            if command != '':
-                # 判断用户输入的是否是vim 或者fg命令
-                if self.vim_pattern.search(command):
-                    self.vim_flag = True
-            # 虚拟屏幕清空
-            self.screen.reset()
         except Exception:
             pass
+        # 虚拟屏幕清空
+        self.screen.reset()
         return command
 
     def get_log(self):
@@ -345,9 +340,8 @@ class SshTty(Tty):
                         pre_timestamp = now_timestamp
                         log_file_f.flush()
 
-                        if self.vim_flag:
-                            self.vim_data += x
-                        elif input_mode:
+                        self.vim_data += x
+                        if input_mode:
                             data += x
 
                     except socket.timeout:
@@ -361,20 +355,19 @@ class SshTty(Tty):
                     termlog.recoder = True
                     input_mode = True
                     if self.is_output(str(x)):
-                        if self.vim_flag:
-                            match = self.vim_end_pattern.findall(self.vim_data)
-                            if match:
-                                if self.vim_end_flag or len(match) == 2:
-                                    self.vim_flag = False
-                                    self.vim_end_flag = False
-                                else:
-                                    self.vim_end_flag = True
-                        else:
-                            # 如果len(str(x)) > 1 说明是复制输入的
-                            if len(str(x)) > 1:
-                                data = x
+                        # 如果len(str(x)) > 1 说明是复制输入的
+                        if len(str(x)) > 1:
+                            data = x
+                        match = self.vim_end_pattern.findall(self.vim_data)
+                        if match:
+                            if self.vim_flag or len(match) == 2:
+                                self.vim_flag = False
+                            else:
+                                self.vim_flag = True
+                        elif not self.vim_flag:
+                            self.vim_flag = False
                             data = self.deal_command(data)[0:200]
-                            if len(data) > 0:
+                            if data is not None:
                                 TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
                         data = ''
                         self.vim_data = ''
@@ -402,7 +395,7 @@ class SshTty(Tty):
         """
         # 发起ssh连接请求 Make a ssh connection
         ssh = self.get_connection()
-        
+
         transport = ssh.get_transport()
         transport.set_keepalive(30)
         transport.use_compression(True)
@@ -418,7 +411,7 @@ class SshTty(Tty):
             signal.signal(signal.SIGWINCH, self.set_win_size)
         except:
             pass
-        
+
         self.posix_shell()
 
         # Shutdown channel socket
