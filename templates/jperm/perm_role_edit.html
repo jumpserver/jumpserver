@@ -94,7 +94,7 @@ $('#roleForm').validator({
     timely: 2,
     theme: "yellow_right_effect",
     rules: {
-        check_name: [/(?!^root$)^\w{2,20}$/i, '大小写字母数字和下划线,2-20位,并且非root'],
+        check_name: [/(?!^root$)^[\w.]{2,20}$/i, '大小写字母数字和下划线小数点,2-20位,并且非root'],
         check_begin: [/^[\-]+BEGIN RSA PRIVATE KEY[\-]+/gm, 'RSA Key填写有误，请检查'],
 
     },
