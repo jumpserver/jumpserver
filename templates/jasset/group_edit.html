@@ -153,6 +153,7 @@
 });
 
     function on_submit(id){
+        search_ip('', 'asset_select', 'asset_select_total')  //提交之前清空过滤框
         $('#'+id+' option').each(
             function(){
                 $(this).prop('selected', true)
