@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 import ConfigParser
 import getpass
+from django_auth_ldap.config import LDAPSearch
 
 config = ConfigParser.ConfigParser()
 
@@ -167,3 +168,39 @@ CRONJOBS = [
     ('0 1 * * *', 'jasset.asset_api.asset_ansible_update_all'),
     ('*/10 * * * *', 'jlog.log_api.kill_invalid_connection'),
 ]
+
+
+# parse jumpserver ldap config
+
+LDAP_ENABLE = config.get('ldap', 'enable')
+LDAP_USER = config.get('ldap', 'user')
+LDAP_PASSWORD = config.get('ldap', 'password')
+LDAP_ORGANIZATION_DN = config.get('ldap', 'organization_dn')
+
+# settings from python-ldap
+
+OPT_REFERRALS = 8
+SCOPE_SUBTREE = 2
+
+# django ldap settings
+
+AUTHENTICATION_BACKENDS = ['django_auth_ldap.backend.LADPBackend',
+                           'django.contrib.auth.backends.ModelBackend'] if LDAP_ENABLE \
+    else ['django.contrib.auth.backends.ModelBackend']
+
+AUTH_LDAP_SERVER_URI = config.get('ldap', 'url')
+AUTH_LDAP_BIND_DN = "uid={0},{1}".format(LDAP_USER, LDAP_ORGANIZATION_DN)
+AUTH_LDAP_BIND_PASSWORD = config.get('ldap', 'password')
+AUTH_LDAP_USER_SEARCH = LDAPSearch(LDAP_ORGANIZATION_DN,
+                                   SCOPE_SUBTREE, "(uid=%()user)s")
+
+AUTH_LDAP_CONNECTION_OPTIONS = {
+    OPT_REFERRALS: 0
+}
+AUTH_LDAP_USER_ATTR_MAP = {
+    "user_id": "uid"
+}
+AUTH_LDAP_USER_FLAGS_BY_GROUP = {
+    "is_active": "cn=active,{0}".format(LDAP_ORGANIZATION_DN),
+    "is_superuser": "cn=superuser,{0}".format(LDAP_ORGANIZATION_DN)
+}
