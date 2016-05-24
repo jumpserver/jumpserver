@@ -184,7 +184,7 @@ SCOPE_SUBTREE = 2
 
 # django ldap settings
 
-AUTHENTICATION_BACKENDS = ['django_auth_ldap.backend.LADPBackend',
+AUTHENTICATION_BACKENDS = ['django_auth_ldap.backend.LDAPBackend',
                            'django.contrib.auth.backends.ModelBackend'] if LDAP_ENABLE \
     else ['django.contrib.auth.backends.ModelBackend']
 
