@@ -249,7 +249,7 @@ class Tty(object):
                         allow_agent=False,
                         look_for_keys=False)
 
-        except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
+        except (paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException):
             raise ServerError('认证失败 Authentication Error.')
         except socket.error:
             raise ServerError('端口可能不对 Connect SSH Socket Port Error, Please Correct it.')
