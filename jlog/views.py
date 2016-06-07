@@ -274,7 +274,7 @@ class TermLogRecorder(object):
         self.filename = filename
         filepath = os.path.join(path, 'tty', date, filename + '.zip')
         if not os.path.isdir(os.path.join(path, 'tty', date)):
-            os.makedirs(os.path.join(path, 'tty', date), mode=0777)
+            mkdir(os.path.join(path, 'tty', date), mode=777)
         while os.path.isfile(filepath):
             filename = str(uuid.uuid4())
             filepath = os.path.join(path, 'tty', date, filename + '.zip')
