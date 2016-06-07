@@ -55,6 +55,9 @@
                                 <div class="col-sm-3">
                                     <div>
                                         <select id="users_selected" name="users_selected" class="form-control m-b" size="12"  multiple>
+                                            {% for user in users_selected %}
+                                                <option value="{{ user }}">{{ user|to_name }}</option>
+                                            {% endfor %}
                                         </select>
                                     </div>
                                 </div>
