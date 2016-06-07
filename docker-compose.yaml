@@ -8,7 +8,7 @@ services:
       - "8888:80"
       - "2222:22"
     # environment:
-    #   - USE_MYSQL=true
+    #   - ENGINE=mysql
     #   - MYSQL_HOST=192.168.64.5
     #   - MYSQL_PORT=3306
     #   - MYSQL_USER=root
