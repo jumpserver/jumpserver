@@ -122,7 +122,7 @@ elif config.get('db', 'engine') == 'sqlite':
             'NAME': config.get('db', 'database'),
         }
     }
-else
+else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
