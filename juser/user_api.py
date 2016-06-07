@@ -151,7 +151,7 @@ def server_add_user(username, ssh_key_pwd=''):
     add a system user in jumpserver
     在jumpserver服务器上添加一个用户
     """
-    bash("useradd -s '%s' '%s'" % (os.path.join(BASE_DIR, 'init.sh'), username))
+    bash("adduser -s '%s' '%s'" % (os.path.join(BASE_DIR, 'init.sh'), username))
     gen_ssh_key(username, ssh_key_pwd)
 
 
