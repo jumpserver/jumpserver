@@ -154,6 +154,7 @@ def user_add(request):
         extra = request.POST.getlist('extra', [])
         is_active = False if '0' in extra else True
         send_mail_need = True if '1' in extra else False
+        ssh_key_expired_days = request.POST.get('ssh_key_expired_days', '')
 
         try:
             if '' in [username, password, ssh_key_pwd, name, role]:
@@ -174,7 +175,9 @@ def user_add(request):
                                    groups=groups, admin_groups=admin_groups,
                                    ssh_key_pwd=ssh_key_pwd,
                                    is_active=is_active,
-                                   date_joined=datetime.datetime.now())
+                                   date_joined=datetime.datetime.now(),
+                                   ssh_key_create_time=datetime.datetime.now(),
+                                   ssh_key_expired_days=ssh_key_expired_days)
                 server_add_user(username=username, ssh_key_pwd=ssh_key_pwd)
                 user = get_object(User, username=username)
                 if groups:
@@ -361,6 +364,7 @@ def user_edit(request):
         extra = request.POST.getlist('extra', [])
         is_active = True if '0' in extra else False
         email_need = True if '1' in extra else False
+        ssh_key_expired_days = request.POST.get('ssh_key_expired_days', '')
         user_role = {'SU': u'超级管理员', 'GA': u'部门管理员', 'CU': u'普通用户'}
 
         if user_id:
@@ -375,7 +379,8 @@ def user_edit(request):
                        groups=groups,
                        admin_groups=admin_groups,
                        role=role_post,
-                       is_active=is_active)
+                       is_active=is_active,
+                       ssh_key_expired_days=ssh_key_expired_days)
 
         if email_need:
             msg = u"""
@@ -440,6 +445,7 @@ def regen_ssh_key(request):
     username = user.username
     ssh_key_pass = PyCrypt.gen_rand_pass(16)
     gen_ssh_key(username, ssh_key_pass)
+    User.objects.filter(uuid=uuid_r).update(ssh_key_pwd=ssh_key_pass, ssh_key_create_time=datetime.datetime.now())
     return HttpResponse('ssh密钥已生成，密码为 %s, 请到下载页面下载' % ssh_key_pass)
 
 

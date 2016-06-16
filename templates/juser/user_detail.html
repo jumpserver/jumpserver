@@ -85,6 +85,18 @@
                                         </td>
                                     </tr>
                                     <tr>
+                                        <td class="text-navy">用户私钥生成时间</td>
+                                        <td>
+                                            {{ user.ssh_key_create_time |date:"Y-m-d H:i:s" }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-navy">私钥有效天数</td>
+                                        <td>
+                                            {{ user.ssh_key_expired_days }} 天
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <td class="text-navy">授权主机数量</td>
                                         <td>
                                             {{ user_perm_info.asset.keys | length }}

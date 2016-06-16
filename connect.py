@@ -760,6 +760,14 @@ def main():
     if not login_user.is_active:
         color_print('您的用户已禁用，请联系管理员.', exits=True)
 
+    if login_user.ssh_key_create_time != 0:
+        key_last_day = login_user.ssh_key_create_time + datetime.timedelta(days=login_user.ssh_key_expired_days)
+        key_over_time = (key_last_day - datetime.datetime.now()).days
+        if -1 < key_over_time < 6:
+            color_print('您的私钥将于 %s 过期，离过期还剩：%s 天，请务必在过期前登陆Web界面更换新的私钥。' % (key_last_day,key_over_time)) 
+        elif key_over_time < 0:
+            color_print('您的私钥已过期，请登陆Web界面重新生成新私钥.', exits=True)
+
     gid_pattern = re.compile(r'^g\d+$')
     nav = Nav(login_user)
     nav.print_nav()
