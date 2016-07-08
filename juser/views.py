@@ -323,7 +323,7 @@ def reset_password(request):
         else:
             user = get_object(User, uuid=uuid_r)
             if user:
-                user.password = PyCrypt.md5_crypt(password)
+                user.set_password(password)
                 user.save()
                 return http_success(request, u'密码重设成功')
             else:
