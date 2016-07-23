@@ -96,7 +96,7 @@ class Setup(object):
         cmd = 'bash %s start' % os.path.join(jms_dir, 'service.sh')
         shlex.os.system(cmd)
         print
-        color_print('安装成功，请访问web, 祝你使用愉快。\n请访问 https://github.com/jumpserver/jumpserver/wiki 查看文档', 'green')
+        color_print('安装成功，Web登录请访问http://ip:8000, 祝你使用愉快。\n请访问 https://github.com/jumpserver/jumpserver/wiki 查看文档', 'green')
 
     def start(self):
         print "开始安装Jumpserver ..."
