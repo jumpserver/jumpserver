@@ -333,7 +333,6 @@ def perm_role_delete(request):
                 raise ServerError(u"role_id %s 无数据记录" % role_id)
             # 删除推送到主机上的role
             filter_type = request.GET.get("filter_type")
-            print filter_type
             if filter_type:
                 if filter_type == "recycle_assets":
                     recycle_assets = [push.asset for push in role.perm_push.all() if push.success]
