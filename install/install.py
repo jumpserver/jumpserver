@@ -80,8 +80,8 @@ class PreSetup(object):
         self.ip = ''
         self.key = ''.join(random.choice(string.ascii_lowercase + string.digits) \
                            for _ in range(16))
-        self.dist = platform.linux_distribution(supported_dists=['system'])[0].lower()
-        self.version = platform.linux_distribution(supported_dists=['system'])[1]
+        self.dist = platform.linux_distribution()[0].lower()
+        self.version = platform.linux_distribution()[1]
 
     @property
     def _is_redhat(self):

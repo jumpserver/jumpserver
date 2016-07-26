@@ -502,7 +502,7 @@ def main():
         ], **setting)
 
     server = tornado.httpserver.HTTPServer(tornado_app)
-    server.listen(options.port)
+    server.listen(options.port, address=IP)
 
     tornado.ioloop.IOLoop.instance().start()
 

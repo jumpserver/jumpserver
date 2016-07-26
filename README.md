@@ -69,7 +69,7 @@ Web批量执行命令
 
 [demo站点](http://demo.jumpserver.org)
 
-交流群: 399218702
+交流群: 552054376
 
 ### 团队
 

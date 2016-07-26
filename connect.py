@@ -249,7 +249,7 @@ class Tty(object):
                         allow_agent=False,
                         look_for_keys=False)
 
-        except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
+        except (paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException):
             raise ServerError('认证失败 Authentication Error.')
         except socket.error:
             raise ServerError('端口可能不对 Connect SSH Socket Port Error, Please Correct it.')
@@ -585,7 +585,7 @@ class Nav(object):
                 print "请输入运行命令所关联系统用户的ID, q退出"
 
                 try:
-                    role_id = raw_input("\033[1;32mRole>:\033[0m ").strip()
+                    role_id = int(raw_input("\033[1;32mRole>:\033[0m ").strip())
                     if role_id == 'q':
                         break
                 except (IndexError, ValueError):

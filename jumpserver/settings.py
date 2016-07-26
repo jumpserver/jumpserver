@@ -19,12 +19,6 @@ BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 config.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
 KEY_DIR = os.path.join(BASE_DIR, 'keys')
 
-
-DB_HOST = config.get('db', 'host')
-DB_PORT = config.getint('db', 'port')
-DB_USER = config.get('db', 'user')
-DB_PASSWORD = config.get('db', 'password')
-DB_DATABASE = config.get('db', 'database')
 AUTH_USER_MODEL = 'juser.User'
 # mail config
 MAIL_ENABLE = config.get('mail', 'mail_enable')
@@ -104,24 +98,37 @@ WSGI_APPLICATION = 'jumpserver.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': DB_DATABASE,
-        'USER': DB_USER,
-        'PASSWORD': DB_PASSWORD,
-        'HOST': DB_HOST,
-        'PORT': DB_PORT,
+DATABASES = {}
+if config.get('db', 'engine') == 'mysql': 
+    DB_HOST = config.get('db', 'host')
+    DB_PORT = config.getint('db', 'port')
+    DB_USER = config.get('db', 'user')
+    DB_PASSWORD = config.get('db', 'password')
+    DB_DATABASE = config.get('db', 'database')
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': DB_DATABASE,
+            'USER': DB_USER,
+            'PASSWORD': DB_PASSWORD,
+            'HOST': DB_HOST,
+            'PORT': DB_PORT,
+        }
     }
-}
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
+elif config.get('db', 'engine') == 'sqlite':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': config.get('db', 'database'),
+        }
+    }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
+    }
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.auth.context_processors.auth',
     'django.core.context_processors.debug',
