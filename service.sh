@@ -28,6 +28,11 @@ PROC_NAME="jumpserver"
 lockfile=/var/lock/subsys/${PROC_NAME}
 
 start() {
+        if [ $(whoami) != 'root' ];then
+            echo "Must run it using 'root'"
+            exit 1
+        fi
+    
         jump_start=$"Starting ${PROC_NAME} service:"
         if [ -f $lockfile ];then
              echo -n "jumpserver is running..."
