@@ -29,7 +29,7 @@ lockfile=/var/lock/subsys/${PROC_NAME}
 
 start() {
         if [ $(whoami) != 'root' ];then
-            echo "Must run it using 'root'"
+            echo "Sorry, JMS must be run as root"
             exit 1
         fi
     
