@@ -1,5 +1,4 @@
 
 
 
-## 文档
- [参考](https://code.simcu.com/jumpserver/jumpserver/tree/master/docs)
+## [文档](https://code.simcu.com/jumpserver/jumpserver/tree/master/docs)
