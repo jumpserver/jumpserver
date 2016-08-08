@@ -12,7 +12,7 @@
 ├── LICENSE
 ├── README.md
 ├── install                         // 安装说明
-├── dashboard
+├── dashboard                       // 管理后台目录，也是各app所在目录
 │   └── assets                     // app目录
 │   │   ├── admin.py
 │   │   ├── apps.py               // 新版本django app设置文件
