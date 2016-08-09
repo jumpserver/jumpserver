@@ -1,6 +1,10 @@
 ## REST API规范约定
 
-这里仅考虑REST API的基本情况。
+这里仅考虑REST API的基本情况。参考 
+
+[RESTful API 设计指南](http://www.ruanyifeng.com/blog/2014/05/restful_api.html)
+
+[github api文档](https://developer.github.com/v3/)
 
 ### 协议
 
