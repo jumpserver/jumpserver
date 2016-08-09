@@ -38,5 +38,4 @@
 │   │    └── wsgi.py
 │   ├── manage.py
 │   ├── static                      // 项目静态资源目录
-│   └── templates                   // 项目模板目录
-```
+│   └── templates     
