@@ -31,10 +31,11 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'users.apps.AppConfig',
-    'assets.apps.AppConfig',
-    'perms.apps.AppConfig',
-    'audits.apps.AppConfig',
+    'users.apps.UsersConfig',
+    'assets.apps.AssetsConfig',
+    'perms.apps.PermsConfig',
+    'ops.apps.OpsConfig',
+    'audits.apps.AuditsConfig',
     # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

@@ -1,0 +1,50 @@
+<div class="row border-bottom">
+    <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+            <form role="search" class="navbar-form-custom" method="get" action="">
+                <div class="form-group">
+                    <input type="text" placeholder="输入搜索..." class="form-control" name="search" id="top-search">
+                </div>
+            </form>
+        </div>
+        <ul class="nav navbar-top-links navbar-right">
+            <li>
+                <span class="m-r-sm text-muted welcome-message">欢迎使用Jumpserver开源跳板机系统</span>
+            </li>
+            <li class="dropdown">
+                <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                     <span class="m-r-sm text-muted welcome-message">帮助</span>
+                </a>
+            </li>
+            <li>
+                <a href="">
+                    <i class="fa fa-sign-out"></i> Log out
+                </a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-sm-10">
+        <h2>{{ title }}</h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="">仪表盘</a>
+            </li>
+            <li>
+            {% if path1 %}
+                <a>{{ path1 }}</a>
+            {% endif %}
+            </li>
+            {% if path2 %}
+            <li class="active">
+                <strong>{{ path2 }}</strong>
+            </li>
+            {% endif %}
+        </ol>
+    </div>
+    <div class="col-sm-2">
+    </div>
+</div>
