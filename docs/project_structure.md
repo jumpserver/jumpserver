@@ -18,14 +18,14 @@
 │   │   ├── api.py                  // api文件
 │   │   ├── __init__.py
 │   │   ├── migrations              // models Migrations版本控制目录
-│   │       └── __init__.py
+│   │   │   └── __init__.py
 │   │   ├── models.py               // 数据模型目录
 │   │   ├── static                  // app下静态资源目录,如果需要
 │   │   │   └── assets              // 多一层目录，防止资源重名
-│   │   │        └── some_image.png
+│   │   │       └── some_image.png
 │   │   ├── templates               // app下模板目录
-│   │       └── assets              // 多一层目录，防止资源重名
-│   │           └── asset_list.html
+│   │   │   └── assets              // 多一层目录，防止资源重名
+│   │   │       └── asset_list.html
 │   │   ├── templatetags            // 模板标签目录
 │   │   ├── tests.py                // 测试用例文件
 │   │   ├── urls.py                 // urlconf文件
