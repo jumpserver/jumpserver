@@ -195,7 +195,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="1083" y="259" name="asset">
+<table x="1081" y="268" name="asset">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -290,7 +290,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="1276" y="389" name="idc">
+<table x="1298" y="391" name="idc">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -412,7 +412,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="716" y="578" name="sysuser">
+<table x="663" y="659" name="sysuser">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -468,7 +468,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="877" y="880" name="asset_sysuser">
+<table x="873" y="656" name="asset_sysuser">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -484,7 +484,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="1090" y="906" name="push_history">
+<table x="854" y="795" name="push_history">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -501,7 +501,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="908" y="1041" name="push_task">
+<table x="1077" y="886" name="push_task">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -520,6 +520,84 @@
 <row name="date_finished" null="1" autoincrement="0">
 <datatype>DATE</datatype>
 <default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>id</part>
+</key>
+</table>
+<table x="741" y="313" name="perm">
+<row name="id" null="1" autoincrement="1">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="date_expired" null="1" autoincrement="0">
+<datatype>CHAR</datatype>
+<default>NULL</default></row>
+<row name="comment" null="1" autoincrement="0">
+<datatype>CHAR</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>id</part>
+</key>
+</table>
+<table x="560" y="179" name="usergroup_perm">
+<row name="id" null="1" autoincrement="1">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="usergroup_id" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="usergroup" row="id" />
+</row>
+<row name="perm_id" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="perm" row="id" />
+</row>
+<key type="PRIMARY" name="">
+<part>id</part>
+</key>
+</table>
+<table x="566" y="409" name="user_perm">
+<row name="id" null="1" autoincrement="1">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="user_id" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="user" row="id" />
+</row>
+<row name="perm_id" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="perm" row="id" />
+</row>
+<key type="PRIMARY" name="">
+<part>id</part>
+</key>
+</table>
+<table x="867" y="176" name="assetgroup_perm">
+<row name="id" null="1" autoincrement="1">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="assetgroup_id" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="assetgroup" row="id" />
+</row>
+<row name="perm_id" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="perm" row="id" />
+</row>
+<key type="PRIMARY" name="">
+<part>id</part>
+</key>
+</table>
+<table x="877" y="406" name="asset_perm">
+<row name="id" null="1" autoincrement="1">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="asset_id" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="asset" row="id" />
+</row>
+<row name="perm_id" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="perm" row="id" />
+</row>
 <key type="PRIMARY" name="">
 <part>id</part>
 </key>
