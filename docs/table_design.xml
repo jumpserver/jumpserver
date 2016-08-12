@@ -412,7 +412,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="735" y="578" name="sysuser">
+<table x="732" y="571" name="sysuser">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -534,7 +534,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="741" y="313" name="perm">
+<table x="744" y="322" name="perm">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -548,7 +548,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="560" y="179" name="usergroup_perm">
+<table x="560" y="184" name="usergroup_perm">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -564,7 +564,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="566" y="409" name="user_perm">
+<table x="566" y="407" name="user_perm">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -580,7 +580,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="867" y="176" name="assetgroup_perm">
+<table x="868" y="184" name="assetgroup_perm">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -596,7 +596,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="871" y="414" name="asset_perm">
+<table x="872" y="411" name="asset_perm">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -612,7 +612,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="300" y="756" name="loginlog">
+<table x="297" y="753" name="loginlog">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -667,7 +667,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="473" y="748" name="proxylog">
+<table x="459" y="752" name="proxylog">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -708,7 +708,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="558" y="569" name="commandlog">
+<table x="575" y="575" name="commandlog">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -721,6 +721,43 @@
 <default>NULL</default></row>
 <row name="command" null="1" autoincrement="0">
 <datatype>CHAR</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>id</part>
+</key>
+</table>
+<table x="600" y="754" name="notice">
+<row name="id" null="1" autoincrement="1">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="to_user_id" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="user" row="id" />
+</row>
+<row name="from_user_id" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="user" row="id" />
+</row>
+<row name="notice_method" null="1" autoincrement="0">
+<datatype>CHAR</datatype>
+<default>NULL</default></row>
+<row name="type" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="title" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="detail" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="is_read" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="date_start" null="1" autoincrement="0">
+<datatype>DATETIME</datatype>
+<default>NULL</default></row>
+<row name="date_read" null="1" autoincrement="0">
+<datatype>TIME</datatype>
 <default>NULL</default></row>
 <key type="PRIMARY" name="">
 <part>id</part>
