@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- SQL XML created by WWW SQL Designer, https://github.com/ondras/wwwsqldesigner/ -->
-<!-- Active URL: http://ondras.zarovi.cz/sql/demo/?keyword=jumpserver -->
+<!-- Active URL: http://ondras.zarovi.cz/sql/demo/?keyword=default -->
 <sql>
 <datatypes db="mysql">
 	<group color="rgb(238,238,170)" label="Numeric">
@@ -127,6 +127,9 @@
 <row name="date_added" null="1" autoincrement="0">
 <datatype>DATETIME</datatype>
 <default>NULL</default></row>
+<row name="created_by" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
 <key type="PRIMARY" name="">
 <part>id</part>
 </key>
@@ -229,7 +232,7 @@
 <default>NULL</default></row>
 <row name="type" null="1" autoincrement="0">
 <datatype>INTEGER</datatype>
-<default>NULL</default><relation table="asset待定" row="id" />
+<default>NULL</default><relation table="assetextend" row="id" />
 </row>
 <row name="brand" null="1" autoincrement="0">
 <datatype>VARCHAR</datatype>
@@ -251,7 +254,7 @@
 <default>NULL</default></row>
 <row name="env" null="1" autoincrement="0">
 <datatype>INTEGER</datatype>
-<default>NULL</default><relation table="asset待定" row="id" />
+<default>NULL</default><relation table="assetextend" row="id" />
 </row>
 <row name="cpu" null="1" autoincrement="0">
 <datatype>VARCHAR</datatype>
@@ -276,7 +279,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="1278" y="684" name="asset待定">
+<table x="1278" y="684" name="assetextend">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -318,6 +321,9 @@
 <row name="comment" null="1" autoincrement="0">
 <datatype>VARCHAR</datatype>
 <default>NULL</default></row>
+<row name="created_by" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
 <row name="date_added" null="1" autoincrement="0">
 <datatype>DATETIME</datatype>
 <default>NULL</default></row>
@@ -325,7 +331,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="1269" y="220" name="asset_label">
+<table x="1269" y="220" name="assetlabel">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -335,8 +341,7 @@
 </row>
 <row name="key" null="1" autoincrement="0">
 <datatype>VARCHAR</datatype>
-<default>NULL</default><relation table="asset待定" row="id" />
-</row>
+<default>NULL</default></row>
 <row name="value" null="1" autoincrement="0">
 <datatype>VARCHAR</datatype>
 <default>NULL</default></row>
@@ -543,6 +548,12 @@
 <default>NULL</default></row>
 <row name="comment" null="1" autoincrement="0">
 <datatype>CHAR</datatype>
+<default>NULL</default></row>
+<row name="created_by" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="date_added" null="1" autoincrement="0">
+<datatype>TIME</datatype>
 <default>NULL</default></row>
 <key type="PRIMARY" name="">
 <part>id</part>
