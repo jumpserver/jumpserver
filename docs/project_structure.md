@@ -11,12 +11,12 @@
 ├── README.md
 ├── install                         // 安装说明
 ├── logs                            // 日志目录
-├── dashboard                       // 管理后台目录，也是各app所在目录
+├── apps                       // 管理后台目录，也是各app所在目录
 │   └── assets                      // app目录
 │   │   ├── admin.py
 │   │   ├── apps.py                 // 新版本django app设置文件
 │   │   ├── api.py                  // api文件
-│   │   ├── __init__.py
+│   │   ├── __init__.py             // 对外暴露的接口，放到该文件中，方便别的app引用
 │   │   ├── migrations              // models Migrations版本控制目录
 │   │   │   └── __init__.py
 │   │   ├── models.py               // 数据模型目录
