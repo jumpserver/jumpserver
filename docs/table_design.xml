@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!-- SQL XML created by WWW SQL Designer, https://github.com/ondras/wwwsqldesigner/ -->
-<!-- Active URL: http://ondras.zarovi.cz/sql/demo/?keyword=default -->
+<!-- Active URL: http://ondras.zarovi.cz/sql/demo/?keyword=jumpserver -->
 <sql>
 <datatypes db="mysql">
 	<group color="rgb(238,238,170)" label="Numeric">
@@ -100,7 +100,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="199" y="429" name="role">
+<table x="227" y="430" name="role">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -114,7 +114,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="400" y="98" name="usergroup">
+<table x="399" y="102" name="usergroup">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -131,7 +131,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="179" y="107" name="user_usergroup">
+<table x="159" y="181" name="user_usergroup">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -147,7 +147,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="199" y="586" name="permission">
+<table x="220" y="587" name="permission">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -165,7 +165,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="13" y="587" name="cententtype">
+<table x="28" y="582" name="cententtype">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -179,7 +179,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="12" y="428" name="role_permission">
+<table x="26" y="426" name="role_permission">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -276,7 +276,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="1287" y="722" name="asset待定">
+<table x="1278" y="684" name="asset待定">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -290,7 +290,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="1298" y="391" name="idc">
+<table x="1274" y="387" name="idc">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -344,7 +344,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="1080" y="92" name="assetgroup">
+<table x="1080" y="102" name="assetgroup">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -361,7 +361,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="1260" y="86" name="asset_assetgroup">
+<table x="1261" y="101" name="asset_assetgroup">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -377,7 +377,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="1281" y="875" name="adminuser">
+<table x="1272" y="806" name="adminuser">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -412,7 +412,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="663" y="659" name="sysuser">
+<table x="732" y="571" name="sysuser">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -468,7 +468,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="873" y="656" name="asset_sysuser">
+<table x="873" y="572" name="asset_sysuser">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -484,7 +484,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="889" y="886" name="taskhistory">
+<table x="870" y="743" name="taskhistory">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -534,7 +534,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="741" y="313" name="perm">
+<table x="744" y="322" name="perm">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -548,7 +548,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="560" y="179" name="usergroup_perm">
+<table x="560" y="184" name="usergroup_perm">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -564,7 +564,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="566" y="409" name="user_perm">
+<table x="566" y="407" name="user_perm">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -580,7 +580,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="867" y="176" name="assetgroup_perm">
+<table x="868" y="184" name="assetgroup_perm">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -596,7 +596,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="877" y="406" name="asset_perm">
+<table x="872" y="411" name="asset_perm">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -612,7 +612,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="401" y="777" name="loginlog">
+<table x="297" y="753" name="loginlog">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -641,17 +641,14 @@
 <part>id</part>
 </key>
 </table>
-<table x="241" y="792" name="adminlog">
+<table x="139" y="757" name="adminlog">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
 <row name="date_start" null="1" autoincrement="0">
 <datatype>DATETIME</datatype>
 <default>NULL</default></row>
-<row name="date_finished" null="1" autoincrement="0">
-<datatype>DATETIME</datatype>
-<default>NULL</default></row>
-<row name="user_name" null="1" autoincrement="0">
+<row name="username" null="1" autoincrement="0">
 <datatype>CHAR</datatype>
 <default>NULL</default></row>
 <row name="resource" null="1" autoincrement="0">
@@ -660,12 +657,110 @@
 <row name="action" null="1" autoincrement="0">
 <datatype>CHAR</datatype>
 <default>NULL</default></row>
-<row name="new field" null="1" autoincrement="0">
+<row name="detail" null="1" autoincrement="0">
+<datatype>CHAR</datatype>
+<default>NULL</default></row>
+<row name="description" null="1" autoincrement="0">
+<datatype>CHAR</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>id</part>
+</key>
+</table>
+<table x="459" y="752" name="proxylog">
+<row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="username" null="1" autoincrement="0">
+<datatype>CHAR</datatype>
+<default>NULL</default></row>
+<row name="hostname" null="1" autoincrement="0">
+<datatype>CHAR</datatype>
+<default>NULL</default></row>
+<row name="sysuser" null="1" autoincrement="0">
+<datatype>CHAR</datatype>
+<default>NULL</default></row>
+<row name="login_type" null="1" autoincrement="0">
+<datatype>CHAR</datatype>
+<default>NULL</default></row>
+<row name="refer_id" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="log_file" null="1" autoincrement="0">
+<datatype>CHAR</datatype>
+<default>NULL</default></row>
+<row name="login_ip" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="login_city" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="is_finished" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="date_start" null="1" autoincrement="0">
+<datatype>DATETIME</datatype>
+<default>NULL</default></row>
+<row name="date_finished" null="1" autoincrement="0">
+<datatype>DATETIME</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>id</part>
+</key>
+</table>
+<table x="575" y="575" name="commandlog">
+<row name="id" null="1" autoincrement="1">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="proxy_log" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="proxylog" row="id" />
+</row>
+<row name="date_start" null="1" autoincrement="0">
+<datatype>DATE</datatype>
+<default>NULL</default></row>
+<row name="command" null="1" autoincrement="0">
+<datatype>CHAR</datatype>
+<default>NULL</default></row>
+<key type="PRIMARY" name="">
+<part>id</part>
+</key>
+</table>
+<table x="600" y="754" name="notice">
+<row name="id" null="1" autoincrement="1">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="to_user_id" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="user" row="id" />
+</row>
+<row name="from_user_id" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="user" row="id" />
+</row>
+<row name="notice_method" null="1" autoincrement="0">
+<datatype>CHAR</datatype>
+<default>NULL</default></row>
+<row name="type" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="title" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="detail" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="is_read" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="date_start" null="1" autoincrement="0">
+<datatype>DATETIME</datatype>
+<default>NULL</default></row>
+<row name="date_read" null="1" autoincrement="0">
+<datatype>TIME</datatype>
 <default>NULL</default></row>
 <key type="PRIMARY" name="">
 <part>id</part>
 </key>
 </table>
 </sql>
-
