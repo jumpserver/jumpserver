@@ -18,5 +18,6 @@ from django.conf.urls import url, include
 
 urlpatterns = [
     url(r'^users/', include('users.urls')),
+    url(r'^assets/', include('assets.urls')),
     # url(r'^admin/', admin.site.urls),
 ]
