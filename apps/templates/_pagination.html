@@ -1,0 +1,57 @@
+{% if is_paginated %}
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="dataTables_info" id="editable_info" role="status" aria-live="polite">
+                Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ paginator.count }} entries
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="dataTables_paginate paging_simple_numbers" id="editable_paginate">
+                <ul class="pagination" style="margin-top: 0; float: right">
+                    {% if page_obj.has_previous %}
+                        <li class="paginate_button previous" aria-controls="editable" tabindex="0"
+                            id="editable_previous">
+                            <a class="page" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                        </li>
+                    {% endif %}
+                    <li class="paginate_button active" aria-controls="editable" tabindex="0">
+                        <a class="page" href="?page={{ page_obj.number }}" title="第{{ page_obj.number }}页">{{ page_obj.number }}</a>
+                    </li>
+                    {% if page_obj.has_next %}
+                        <li class="paginate_button next" aria-controls="editable" tabindex="0" id="editable_next">
+                            <a class="page" href="?page={{ page_obj.next_page_number }}">Next</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endif %}
+<script>
+    function sleep(n) { //n表示的毫秒数
+        var start = new Date().getTime();
+        while (true) if (new Date().getTime() - start > n) break;
+    }
+
+    $(document).ready(function () {
+        $('.page').click(function () {
+            var searchStr = location.search;
+            var old_href = $(this).attr('href').replace('?', '');
+            var searchArray = searchStr.split('&');
+
+            if (searchStr == '') {
+                searchStr = '?page=1'
+            }
+
+            if (searchStr.indexOf('page') >= 0) {
+                searchArray.pop();
+            }
+
+            searchArray.push(old_href);
+            if (searchArray.length > 1) {
+                $(this).attr('href', searchArray.join('&'));
+            }
+        })
+    });
+
+</script>
