@@ -760,7 +760,7 @@ def main():
     if not login_user.is_active:
         color_print('您的用户已禁用，请联系管理员.', exits=True)
 
-    if login_user.ssh_key_create_time != 0:
+    if login_user.ssh_key_expired_days != 0:
         key_last_day = login_user.ssh_key_create_time + datetime.timedelta(days=login_user.ssh_key_expired_days)
         key_over_time = (key_last_day - datetime.datetime.now()).days
         if -1 < key_over_time < 6:
