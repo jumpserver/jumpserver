@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     'perms.apps.PermsConfig',
     'ops.apps.OpsConfig',
     'audits.apps.AuditsConfig',
+    'common.apps.CommonConfig',
     'bootstrapform',
     # 'django.contrib.admin',
     'django.contrib.auth',

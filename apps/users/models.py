@@ -49,6 +49,12 @@ class UserGroup(models.Model):
     class Meta:
         db_table = 'usergroup'
 
+    @classmethod
+    def init(cls):
+        if not cls.objects.all():
+            group = cls(name='所有人', comment='所有人默认都在用户组', created_by='System')
+            group.save()
+
 
 class User(AbstractUser):
     username = models.CharField(max_length=20, unique=True, verbose_name='用户名', help_text='* required')
@@ -63,7 +69,7 @@ class User(AbstractUser):
     role = models.ForeignKey(Role, on_delete=models.PROTECT, verbose_name='角色')
     private_key = models.CharField(max_length=5000, blank=True, verbose_name='ssh私钥')  # ssh key max length 4096 bit
     public_key = models.CharField(max_length=1000, blank=True, verbose_name='公钥')
-    comment = models.CharField(max_length=200, blank=True, verbose_name='描述')
+    comment = models.TextField(max_length=200, blank=True, verbose_name='描述')
     created_by = models.CharField(max_length=30, default='')
     date_expired = models.DateTimeField(default=datetime.datetime.max, verbose_name='有效期')
 

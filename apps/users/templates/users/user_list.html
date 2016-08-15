@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load common_tags %}
 {% block content %}
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
@@ -63,9 +64,9 @@
                                 </td>
                                 <td class="text-center">{{ user.username }}</td>
                                 <td class="text-center">{{ user.role.name }}</td>
-                                <td class="text-center" title="{% for user_group in user.group.all %} {{ user_group.name }} {% endfor %}"> {{ user.group.all }} </td>
+                                <td class="text-center" title="{% for user_group in user.group.all %} {{ user_group.name }} {% endfor %}"> {{ user.groups.all|join_queryset_attr:"name" }} </td>
                                 <th class="text-center">{{ user.name }}</th>
-                                <td class="text-center">{{ user.name }}</td>
+                                <td class="text-center">{{ user.date_expired|is_expired|yesno:"过期, 有效, 分不清楚" }}</td>
                                 <td class="text-center">
                                     <a href="{% url 'users:user-edit' pk=user.id %}?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a href="{% url 'users:user-delete' pk=user.id %}?id={{ user.id }}" class="btn btn-xs btn-danger del {% if user.username == 'admin' %} disabled {% endif %}">删除</a>
