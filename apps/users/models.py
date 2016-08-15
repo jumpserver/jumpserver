@@ -51,9 +51,9 @@ class UserGroup(models.Model):
 
 
 class User(AbstractUser):
-    username = models.CharField(max_length=20, unique=True, verbose_name='用户名')
-    name = models.CharField(max_length=20, verbose_name='姓名')
-    email = models.EmailField(max_length=30, unique=True, verbose_name='邮件')
+    username = models.CharField(max_length=20, unique=True, verbose_name='用户名', help_text='* required')
+    name = models.CharField(max_length=20, verbose_name='姓名', help_text='* required')
+    email = models.EmailField(max_length=30, unique=True, verbose_name='邮件', help_text='* required')
     groups = models.ManyToManyField(UserGroup, verbose_name='用户组')
     avatar = models.ImageField(verbose_name='头像', blank=True)
     wechat = models.CharField(max_length=30, blank=True, verbose_name='微信')
@@ -65,7 +65,7 @@ class User(AbstractUser):
     public_key = models.CharField(max_length=1000, blank=True, verbose_name='公钥')
     comment = models.CharField(max_length=200, blank=True, verbose_name='描述')
     created_by = models.CharField(max_length=30, default='')
-    date_expired = models.DateTimeField(default=datetime.datetime.max)
+    date_expired = models.DateTimeField(default=datetime.datetime.max, verbose_name='有效期')
 
     class Meta:
         db_table = 'user'

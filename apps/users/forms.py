@@ -10,6 +10,6 @@ class UserForm(ModelForm):
         model = User
         fields = [
             'username', 'name', 'email', 'groups', 'wechat',
-            'phone', 'enable_2FA', 'role', 'comment',
+            'phone', 'enable_2FA', 'role', 'date_expired', 'comment',
         ]
 

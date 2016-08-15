@@ -37,7 +37,7 @@
 		<type label="SET" quote="" sql="SET" length="1"/>
 		<type label="Bit" quote="" sql="bit" length="0"/>
 	</group>
-</datatypes><table x="397" y="254" name="user">
+</datatypes><table x="399" y="254" name="user">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -71,9 +71,12 @@
 <row name="is_active" null="0" autoincrement="0">
 <datatype>INTEGER</datatype>
 <default>0</default></row>
-<row name="two_factor_auth" null="1" autoincrement="0">
+<row name="enable_2FA" null="1" autoincrement="0">
 <datatype>INTEGER</datatype>
 <default>0</default></row>
+<row name="secret_key_2FA" null="1" autoincrement="0">
+<datatype>CHAR</datatype>
+<default>NULL</default></row>
 <row name="role" null="1" autoincrement="0">
 <datatype>INTEGER</datatype>
 <default>NULL</default><relation table="role" row="id" />
@@ -86,6 +89,9 @@
 <default>NULL</default></row>
 <row name="public_key" null="1" autoincrement="0">
 <datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="comment" null="1" autoincrement="0">
+<datatype>CHAR</datatype>
 <default>NULL</default></row>
 <row name="date_joined" null="1" autoincrement="0">
 <datatype>DATETIME</datatype>
@@ -223,6 +229,10 @@
 <row name="password" null="1" autoincrement="0">
 <datatype>VARCHAR</datatype>
 <default>NULL</default></row>
+<row name="admin_user" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default><relation table="adminuser" row="id" />
+</row>
 <row name="idc" null="1" autoincrement="0">
 <datatype>INTEGER</datatype>
 <default>NULL</default><relation table="idc" row="id" />
@@ -265,16 +275,18 @@
 <row name="disk" null="1" autoincrement="0">
 <datatype>VARCHAR</datatype>
 <default>NULL</default></row>
+<row name="is_active" null="1" autoincrement="0">
+<datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="comment" null="1" autoincrement="0">
+<datatype>CHAR</datatype>
+<default>NULL</default></row>
 <row name="created_by" null="1" autoincrement="0">
 <datatype>VARCHAR</datatype>
 <default>NULL</default></row>
 <row name="date_added" null="1" autoincrement="0">
 <datatype>DATETIME</datatype>
 <default>NULL</default></row>
-<row name="admin_user" null="1" autoincrement="0">
-<datatype>INTEGER</datatype>
-<default>NULL</default><relation table="adminuser" row="id" />
-</row>
 <key type="PRIMARY" name="">
 <part>id</part>
 </key>
@@ -357,6 +369,9 @@
 <datatype>VARCHAR</datatype>
 <default>NULL</default></row>
 <row name="comment" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="created_by" null="1" autoincrement="0">
 <datatype>VARCHAR</datatype>
 <default>NULL</default></row>
 <row name="date_added" null="1" autoincrement="0">
@@ -519,7 +534,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="1080" y="886" name="task">
+<table x="1081" y="917" name="task">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -623,7 +638,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="297" y="753" name="loginlog">
+<table x="300" y="770" name="loginlog">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -652,7 +667,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="139" y="757" name="adminlog">
+<table x="139" y="772" name="adminlog">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -678,7 +693,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="459" y="752" name="proxylog">
+<table x="460" y="769" name="proxylog">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -775,3 +790,4 @@
 </key>
 </table>
 </sql>
+
