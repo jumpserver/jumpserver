@@ -58,7 +58,7 @@
                                     <input type="checkbox" name="checked" value="{{ user.id }}">
                                 </td>
                                 <td class="text-center">
-                                    <a href="{% url 'users:user-detail' pk=user.id %}?id={{ user.id }}">
+                                    <a href="{% url 'users:user-detail' pk=user.id %}">
                                         {{ user.name }}
                                     </a>
                                 </td>

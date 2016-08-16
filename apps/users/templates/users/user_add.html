@@ -1,4 +1,8 @@
 {% extends 'users/_user.html' %}
+{% load bootstrap %}
+{% block username %}
+    {{ form.username|bootstrap_horizontal }}
+{% endblock %}
 {% block password %}
     <h3>密码</h3>
     <div class="form-group">

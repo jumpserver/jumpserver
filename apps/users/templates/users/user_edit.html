@@ -1,4 +1,12 @@
 {% extends 'users/_user.html' %}
+{% block username %}
+    <div class="form-group">
+        <label for="{{ form.username.id_for_label }}" class="col-sm-2 control-label">用户名</label>
+        <div class="col-sm-9 controls" >
+            <input id="{{ form.username.id_for_label }}" name="username" type="text" value="{{ form.username.value }}" readonly class="form-control">
+        </div>
+    </div>
+{% endblock %}
 {% block password %}
     <h3>密码</h3>
     <div class="form-group">
