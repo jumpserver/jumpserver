@@ -4571,3 +4571,15 @@ body.skin-3 {
 }
 
 .n-invalid {border: 1px solid #f00;}
+
+.primary-panel {
+  border-color: #1ab394;
+  border-style: solid;
+  border-width: 1px
+}
+
+.info-panel {
+  border-color: #23c6c8;
+  border-style: solid;
+  border-width: 1px
+}
