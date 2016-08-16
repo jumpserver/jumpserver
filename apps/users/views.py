@@ -74,3 +74,8 @@ class UserDetailView(DeleteView):
     model = User
     template_name = 'users/user_detail.html'
     context_object_name = "user"
+
+    def get_context_data(self, **kwargs):
+        context = super(UserDetailView, self).get_context_data(**kwargs)
+        context.update({'path1': '用户管理', 'path2': '用户详情', 'title': '用户详情'})
+        return context
