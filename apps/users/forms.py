@@ -10,7 +10,7 @@ class UserForm(ModelForm):
     class Meta:
         model = User
         fields = [
-            'username', 'name', 'email', 'groups', 'wechat',
+            'username', 'name', 'email', 'groups', 'wechat', 'avatar',
             'phone', 'enable_2FA', 'role', 'date_expired', 'comment',
         ]
         # widgets = {

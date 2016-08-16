@@ -131,3 +131,4 @@ STATICFILES_DIRS = (
 
 AUTH_USER_MODEL = 'users.User'
 BOOTSTRAP_COLUMN_COUNT = 11
+MEDIA_ROOT = os.path.join(BASE_DIR, 'img').replace('\\', '/') + '/'
