@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load bootstrap %}
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/chosen/chosen.css" %}" rel="stylesheet">
+    <script href="{% static "js/plugins/chosen/chosen.jquery.min.js" %}" type="text/javascript"></script>
+{% endblock %}
 
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -24,7 +29,7 @@
                         <form method="post" id="userForm" class="form-horizontal" action="">
                             {% csrf_token %}
                             <h3>账户</h3>
-                            {{ form.username|bootstrap_horizontal }}
+                            {% block username %} {% endblock %}
                             {{ form.name|bootstrap_horizontal }}
                             {{ form.email|bootstrap_horizontal }}
                             {{ form.groups|bootstrap_horizontal }}
@@ -61,49 +66,19 @@
         </div>
     </div>
 {% endblock %}
-{% block self_footer_js %}
-
-<script>
-$('#userForm').validator({
-    timely: 2,
-    theme: "yellow_right_effect",
-    rules: {
-        check_username: [/^[\w.]{3,20}$/, '大小写字母数字和下划线小数点'],
-        type_m: function(element){
-                    return  $("#M").is(":checked");
-            }
-    },
-    fields: {
-        "username": {
-            rule: "required;check_username",
-            tip: "输入用户名",
-            ok: "",
-            msg: {required: "必须填写!"}
-        },
-        "password": {
-            rule: "required;length[6~50]",
-            tip: "输入密码",
-            ok: "",
-            msg: {required: "必须填写!"}
-        },
-        "name": {
-            rule: "required",
-            tip: "姓名",
-            ok: "",
-            msg: {required: "必须填写"}
-        },
-        "email": {
-            rule: "required",
-            tip: "Email",
-            ok: "",
-            msg: {required: "必须填写"}
-        }
-    },
-    valid: function(form) {
-        form.submit();
-    }
-});
-
-
+{% block custom_footer_js %}
+<script type="text/javascript">
+{#$(document).ready(function() {#}
+{#    var config = {#}
+{#        '.chosen-select': {},#}
+{#        '.chosen-select-deselect': {allow_single_deselect: true},#}
+{#        '.chosen-select-no-single': {disable_search_threshold: 10},#}
+{#        '.chosen-select-no-results': {no_results_text: 'Oops, nothing found!'},#}
+{#        '.chosen-select-width': {width: "95%"}#}
+{#    };#}
+{#    for (var selector in config) {#}
+{#        $(selector).chosen(config[selector]);#}
+{#    }#}
+{#})#}
 </script>
 {% endblock %}

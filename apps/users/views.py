@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.views.generic.detail import DetailView
 
 from .models import User, UserGroup, Role
 from .forms import UserForm
@@ -44,8 +45,8 @@ class UserAddView(CreateView):
 
     def form_valid(self, form):
         user = form.save()
-        password = form['password'].value()
-        user.set_password(password)
+        user.created_by = self.request.user.username or 'Admin'
+        user.save()
         return super(UserAddView, self).form_valid(form)
 
 
@@ -57,7 +58,19 @@ class UserUpdateView(UpdateView):
 
     def form_valid(self, form):
         user = form.save()
-        password = form['password'].value()
+        password = self.request.POST.get('password', '')
         if password:
             user.set_password(password)
         return super(UserUpdateView, self).form_valid(form)
+
+
+class UserDeleteView(DeleteView):
+    model = User
+    success_url = reverse_lazy('users:user-list')
+    template_name = 'users/user_delete_confirm.html'
+
+
+class UserDetailView(DeleteView):
+    model = User
+    template_name = 'users/user_detail.html'
+    context_object_name = "user"

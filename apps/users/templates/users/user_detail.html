@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+{% load common_tags %}
+{% load static %}
+{% block content %}
+
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+{#                <div class="ibox-content">#}
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="" class="text-center"><i class="fa fa-laptop"></i> 用户信息 </a></li>
+                            <li><a href="" class="text-center"><i class="fa fa-bar-chart-o"></i> 用户资产</a></li>
+                            <li><a href="" class="text-center"><i class="fa fa-bar-chart-o"></i> 登录记录 </a></li>
+                            <div class="" style="float: right">
+                                <form id="search_form" method="get" action="" class="pull-right mail-search">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control input-sm" id="keyword" name="keyword" value="{{ keyword }}" placeholder="Search">
+                                        <div class="input-group-btn">
+                                            <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                                                搜索
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0px;">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span class="label"><b>{{ user.name }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                            <li><a href="#"></a>
+                                            </li>
+                                            <li><a href="#"></a>
+                                            </li>
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr>
+                                            <td colspan="2">
+                                                <img src="{% static "img/root.png" %}" class="img-circle", width="64" height="64">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td width="20%"><b>姓名:</b></td>
+                                            <td>{{ user.name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>用户名:</b></td>
+                                            <td>{{ user.username }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>邮件:</b></td>
+                                            <td>{{ user.email }}</td>
+                                        </tr>
+                                        {% if user.phone %}
+                                        <tr>
+                                            <td><b>手机:</b></td>
+                                            <td>{{ user.phone }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        {% if user.wechat %}
+                                        <tr>
+                                            <td><b>微信:</b></td>
+                                            <td>{{ user.wechat }}</td>
+                                        </tr>
+                                        {% endif %}
+                                        <tr>
+                                            <td><b>角色:</b></td>
+                                            <td>{{ user.role.name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>有效期:</b></td>
+                                            <td>{{ user.date_expired|date:"Y-m-j H:i:s" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>创建者:</b></td>
+                                            <td>{{ user.created_by }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>创建日期:</b></td>
+                                            <td>{{ user.date_joined|date:"Y-m-j H:i:s" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>最后登录:</b></td>
+                                            <td>{{ user.last_login|date:"Y-m-j H:i:s" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>描述:</b></td>
+                                            <td>{{ user.comment }}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5" style="padding-left: 0px;">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title " style="background: #1ab394">
+                                    <span style="color: white">快速修改</span>
+                                    <div class="ibox-tools">
+                                    </div>
+                                </div>
+                                <div class="ibox-content" style="border-color: #1ab394; border-style: solid solid solid; border-width: 1px" >
+                                    <table class="table">
+                                        <tbody>
+                                        <tr>
+                                            <td colspan="2">
+                                                <img src="{% static "img/root.png" %}" class="img-circle" width="64" height="64">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td width="20%"><b>姓名:</b></td>
+                                            <td>{{ user.name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>描述:</b></td>
+                                            <td>{{ user.comment }}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title bg-primary">
+                                    <span class="label"><b>{{ user.name }}</b></span>
+                                    <div class="ibox-tools">
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr>
+                                            <td colspan="2">
+                                                <img src="{% static "img/root.png" %}" class="img-circle", width="64" height="64">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td width="20%"><b>姓名:</b></td>
+                                            <td>{{ user.name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><b>描述:</b></td>
+                                            <td>{{ user.comment }}</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
