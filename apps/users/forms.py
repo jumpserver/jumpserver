@@ -6,15 +6,23 @@ from django import forms
 from .models import User, UserGroup
 
 
-class UserForm(ModelForm):
+class UserAddForm(ModelForm):
     class Meta:
         model = User
         fields = [
-            'username', 'name', 'email', 'groups', 'wechat', 'avatar',
+            'username', 'name', 'email', 'groups', 'wechat',
             'phone', 'enable_2FA', 'role', 'date_expired', 'comment',
         ]
         # widgets = {
         #     'groups': forms.SelectMultiple(attrs={'class': 'chosen-select'})
         # }
 
+
+class UserUpdateForm(ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            'name', 'email', 'groups', 'wechat', 'avatar',
+            'phone', 'enable_2FA', 'role', 'date_expired', 'comment',
+        ]
 

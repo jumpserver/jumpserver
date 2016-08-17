@@ -125,10 +125,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+MEDIA_URL = '/media/'
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
 
 AUTH_USER_MODEL = 'users.User'
 BOOTSTRAP_COLUMN_COUNT = 11
-MEDIA_ROOT = os.path.join(BASE_DIR, 'img').replace('\\', '/') + '/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace('\\', '/') + '/'

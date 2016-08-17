@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.detail import DetailView
 
 from .models import User, UserGroup, Role
-from .forms import UserForm
+from .forms import UserAddForm, UserUpdateForm
 
 
 class UserListView(ListView):
@@ -33,7 +33,7 @@ class UserListView(ListView):
 
 class UserAddView(CreateView):
     model = User
-    form_class = UserForm
+    form_class = UserAddForm
     initial = {'role': Role.objects.get(name='User')}
     template_name = 'users/user_add.html'
     success_url = reverse_lazy('users:user-list')
@@ -52,16 +52,26 @@ class UserAddView(CreateView):
 
 class UserUpdateView(UpdateView):
     model = User
-    form_class = UserForm
+    form_class = UserUpdateForm
     template_name = 'users/user_edit.html'
+    context_object_name = 'user'
     success_url = reverse_lazy('users:user-list')
 
     def form_valid(self, form):
-        user = form.save()
+        username = self.object.username
+        user = form.save(commit=False)
+        user.username = username
+        user.save()
         password = self.request.POST.get('password', '')
         if password:
             user.set_password(password)
         return super(UserUpdateView, self).form_valid(form)
+
+    def form_invalid(self, form):
+        print(self.request.FILES)
+        print(form['avatar'].value())
+        print(form.errors)
+        return super(UserUpdateView, self).form_invalid(form)
 
 
 class UserDeleteView(DeleteView):
@@ -70,7 +80,7 @@ class UserDeleteView(DeleteView):
     template_name = 'users/user_delete_confirm.html'
 
 
-class UserDetailView(DeleteView):
+class UserDetailView(DetailView):
     model = User
     template_name = 'users/user_detail.html'
     context_object_name = "user"

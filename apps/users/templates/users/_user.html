@@ -26,7 +26,7 @@
                         </div>
                     </div>
                     <div class="ibox-content">
-                        <form method="post" id="userForm" class="form-horizontal" action="">
+                        <form method="post" id="userForm" class="form-horizontal" action="" enctype="multipart/form-data">
                             {% csrf_token %}
                             <h3>账户</h3>
                             {% block username %} {% endblock %}

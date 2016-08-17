@@ -1,22 +1,25 @@
 {% extends 'base.html' %}
 {% load common_tags %}
+{% load users_tags %}
 {% load static %}
-{% block content %}
 
-<div class="wrapper wrapper-content animated fadeInRight">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="ibox float-e-margins">
-{#                <div class="ibox-content">#}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    {#                <div class="ibox-content">#}
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
-                            <li class="active"><a href="" class="text-center"><i class="fa fa-laptop"></i> 用户信息 </a></li>
+                            <li class="active"><a href="" class="text-center"><i class="fa fa-laptop"></i> 用户信息 </a>
+                            </li>
                             <li><a href="" class="text-center"><i class="fa fa-bar-chart-o"></i> 用户资产</a></li>
                             <li><a href="" class="text-center"><i class="fa fa-bar-chart-o"></i> 登录记录 </a></li>
                             <div class="" style="float: right">
                                 <form id="search_form" method="get" action="" class="pull-right mail-search">
                                     <div class="input-group">
-                                        <input type="text" class="form-control input-sm" id="keyword" name="keyword" value="{{ keyword }}" placeholder="Search">
+                                        <input type="text" class="form-control input-sm" id="keyword" name="keyword"
+                                               value="{{ keyword }}" placeholder="Search">
                                         <div class="input-group-btn">
                                             <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
                                                 搜索
@@ -55,60 +58,60 @@
                                         <tbody>
                                         <tr>
                                             <td colspan="2">
-                                                <img src="{% static "img/root.png" %}" class="img-circle", width="64" height="64">
+                                                <img src="{{ user | user_avatar_url }}" class="img-circle" width="64"
+                                                     height="64">
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td width="20%"><b>姓名:</b></td>
-                                            <td>{{ user.name }}</td>
+                                            <td width="20%">姓名:</td>
+                                            <td><b>{{ user.name }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td><b>用户名:</b></td>
-                                            <td>{{ user.username }}</td>
+                                            <td>用户名:</td>
+                                            <td><b>{{ user.username }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td><b>邮件:</b></td>
-                                            <td>{{ user.email }}</td>
+                                            <td>邮件:</td>
+                                            <td><b>{{ user.email }}</b></td>
                                         </tr>
                                         {% if user.phone %}
-                                        <tr>
-                                            <td><b>手机:</b></td>
-                                            <td>{{ user.phone }}</td>
-                                        </tr>
+                                            <tr>
+                                                <td>手机:</td>
+                                                <td><b>{{ user.phone }}</b></td>
+                                            </tr>
                                         {% endif %}
                                         {% if user.wechat %}
-                                        <tr>
-                                            <td><b>微信:</b></td>
-                                            <td>{{ user.wechat }}</td>
-                                        </tr>
+                                            <tr>
+                                                <td>微信:</td>
+                                                <td><b>{{ user.wechat }}</b></td>
+                                            </tr>
                                         {% endif %}
                                         <tr>
-                                            <td><b>角色:</b></td>
-                                            <td>{{ user.role.name }}</td>
+                                            <td>角色:</td>
+                                            <td><b>{{ user.role.name }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td><b>有效期:</b></td>
-                                            <td>{{ user.date_expired|date:"Y-m-j H:i:s" }}</td>
+                                            <td>有效期:</td>
+                                            <td><b>{{ user.date_expired|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td><b>创建者:</b></td>
-                                            <td>{{ user.created_by }}</td>
+                                            <td>创建者:</td>
+                                            <td><b>{{ user.created_by }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td><b>创建日期:</b></td>
-                                            <td>{{ user.date_joined|date:"Y-m-j H:i:s" }}</td>
+                                            <td>创建日期:</td>
+                                            <td><b>{{ user.date_joined|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td><b>最后登录:</b></td>
-                                            <td>{{ user.last_login|date:"Y-m-j H:i:s" }}</td>
+                                            <td>最后登录:</td>
+                                            <td><b>{{ user.last_login|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td><b>描述:</b></td>
-                                            <td>{{ user.comment }}</td>
+                                            <td>描述:</td>
+                                            <td><b>{{ user.comment }}</b></td>
                                         </tr>
                                         </tbody>
                                     </table>
-
                                 </div>
                             </div>
                         </div>
@@ -119,21 +122,54 @@
                                     <div class="ibox-tools">
                                     </div>
                                 </div>
-                                <div class="ibox-content primary-panel" >
+                                <div class="ibox-content primary-panel">
                                     <table class="table">
                                         <tbody>
                                         <tr>
-                                            <td colspan="2">
-                                                <img src="{% static "img/root.png" %}" class="img-circle" width="64" height="64">
+                                            <td width="50%">Active:</td>
+                                            <td><span style="float: right">
+                                                <div class="switch">
+                                                    <div class="onoffswitch">
+                                                        <input type="checkbox" checked class="onoffswitch-checkbox"
+                                                               id="example1">
+                                                        <label class="onoffswitch-label" for="example1">
+                                                            <span class="onoffswitch-inner"></span>
+                                                            <span class="onoffswitch-switch"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>二次验证:</td>
+                                            <td><span style="float: right">
+                                                <div class="switch">
+                                                    <div class="onoffswitch">
+                                                        <input type="checkbox" class="onoffswitch-checkbox"
+                                                               id="example2">
+                                                        <label class="onoffswitch-label" for="example2">
+                                                            <span class="onoffswitch-inner"></span>
+                                                            <span class="onoffswitch-switch"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>重置密码:</td>
+                                            <td>
+                                                <span style="float: right">
+                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">重置</button>
+                                                </span>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td width="20%"><b>姓名:</b></td>
-                                            <td>{{ user.name }}</td>
-                                        </tr>
-                                        <tr>
-                                            <td><b>描述:</b></td>
-                                            <td>{{ user.comment }}</td>
+                                            <td class="no-borders">重置密钥:</td>
+                                            <td class="no-borders">
+                                                <span style="float: right">
+                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px;">重置</button>
+                                                </span>
+                                            </td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -150,16 +186,17 @@
                                     <table class="table">
                                         <tbody>
                                         <tr>
-                                            <td colspan="2">
-                                                <img src="{% static "img/root.png" %}" class="img-circle", width="64" height="64">
+                                            <td>
+                                                
                                             </td>
+
                                         </tr>
                                         <tr>
-                                            <td width="20%"><b>姓名:</b></td>
+                                            <td width="20%">姓名:</td>
                                             <td>{{ user.name }}</td>
                                         </tr>
                                         <tr>
-                                            <td><b>描述:</b></td>
+                                            <td>描述:</td>
                                             <td>{{ user.comment }}</td>
                                         </tr>
                                         </tbody>
@@ -172,6 +209,12 @@
             </div>
         </div>
     </div>
-</div>
+    </div>
 
+{% endblock %}
+{% block custom_footer_js %}
+    <script>
+        $(document).ready(function () {
+        })
+    </script>
 {% endblock %}

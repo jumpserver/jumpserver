@@ -3,7 +3,7 @@
     <div class="form-group">
         <label for="{{ form.username.id_for_label }}" class="col-sm-2 control-label">用户名</label>
         <div class="col-sm-9 controls" >
-            <input id="{{ form.username.id_for_label }}" name="username" type="text" value="{{ form.username.value }}" readonly class="form-control">
+            <input id="{{ form.username.id_for_label }}" name="username" type="text" value="{{ user.username }}" readonly class="form-control">
         </div>
     </div>
 {% endblock %}
