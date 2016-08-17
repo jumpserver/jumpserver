@@ -49,7 +49,6 @@
                             </div>
                             <div class="hr-line-dashed"></div>
                             <h3>信息</h3>
-                            {{ form.avatar|bootstrap_horizontal }}
                             {{ form.phone|bootstrap_horizontal }}
                             {{ form.wechat|bootstrap_horizontal }}
                             {{ form.comment|bootstrap_horizontal }}
@@ -67,7 +66,7 @@
         </div>
     </div>
 {% endblock %}
-{% block custom_footer_js %}
+{% block custom_foot_js %}
 <script type="text/javascript">
 {#$(document).ready(function() {#}
 {#    var config = {#}

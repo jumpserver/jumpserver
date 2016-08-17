@@ -3,6 +3,10 @@
 {% load users_tags %}
 {% load static %}
 
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/chosen/chosen.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/chosen/chosen.jquery.min.js" %}"></script>
+{% endblock %}
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
@@ -177,28 +181,38 @@
                             </div>
 
                             <div class="ibox float-e-margins">
-                                <div class="ibox-title bg-primary" style="background: #23c6c8">
+                                <div class="ibox-title bg-primary" style="background: #1ab394">
                                     <span style="color: white">用户组</span>
                                     <div class="ibox-tools">
                                     </div>
                                 </div>
-                                <div class="ibox-content info-panel">
+                                <div class="ibox-content primary-panel">
                                     <table class="table">
                                         <tbody>
-                                        <tr>
-                                            <td>
-                                                
-                                            </td>
+                                        <form>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <select data-placeholder="选择用户组" class="chosen-select" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for group in groups %}
+                                                        <option value="{{ group.id }}">{{ group.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
 
-                                        </tr>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <button type="button" class="btn btn-primary btn-small">添加到用户组</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+
+                                        {% for group in user.groups.all %}
                                         <tr>
-                                            <td width="20%">姓名:</td>
-                                            <td>{{ user.name }}</td>
+                                            <td width="40%"><b>{{ group.name }}</b></td>
+                                            <td></td>
                                         </tr>
-                                        <tr>
-                                            <td>描述:</td>
-                                            <td>{{ user.comment }}</td>
-                                        </tr>
+                                        {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>
@@ -212,9 +226,19 @@
     </div>
 
 {% endblock %}
-{% block custom_footer_js %}
+{% block custom_foot_js %}
     <script>
         $(document).ready(function () {
+            var config = {
+                '.chosen-select'           : {},
+                '.chosen-select-deselect'  : {allow_single_deselect:true},
+                '.chosen-select-no-single' : {disable_search_threshold:10},
+                '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
+                '.chosen-select-width'     : {width:"95%"}
+            };
+            for (var selector in config) {
+                $(selector).chosen(config[selector]);
+            }
         })
     </script>
 {% endblock %}

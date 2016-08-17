@@ -87,5 +87,6 @@ class UserDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(UserDetailView, self).get_context_data(**kwargs)
-        context.update({'path1': '用户管理', 'path2': '用户详情', 'title': '用户详情'})
+        groups = [group for group in UserGroup.objects.iterator() if group not in self.object.groups.iterator()]
+        context.update({'path1': '用户管理', 'path2': '用户详情', 'title': '用户详情', 'groups': groups})
         return context
