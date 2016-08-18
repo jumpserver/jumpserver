@@ -12,7 +12,7 @@ from .forms import UserAddForm, UserUpdateForm
 
 class UserListView(ListView):
     model = User
-    paginate_by = 10
+    paginate_by = 20
     context_object_name = 'user_list'
     template_name = 'users/user_list.html'
     ordering = '-date_joined'
@@ -20,9 +20,13 @@ class UserListView(ListView):
     def get_queryset(self):
         self.queryset = super(UserListView, self).get_queryset()
         self.keyword = keyword = self.request.GET.get('keyword', '')
+        self.sort = sort = self.request.GET.get('sort')
         if keyword:
             self.queryset = self.queryset.filter(Q(username__icontains=keyword) |
                                                  Q(name__icontains=keyword))
+
+        if sort:
+            self.queryset = self.queryset.order_by(sort)
         return self.queryset
 
     def get_context_data(self, **kwargs):

@@ -111,8 +111,8 @@
                                             <td><b>{{ user.last_login|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>描述:</td>
-                                            <td><b>{{ user.comment }}</b></td>
+                                            <td class="no-borders">描述:</td>
+                                            <td class="no-borders"><b>{{ user.comment }}</b></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -208,8 +208,10 @@
 
                                         {% for group in user.groups.all %}
                                         <tr>
-                                            <td width="40%"><b>{{ group.name }}</b></td>
-                                            <td></td>
+                                            <td width="40%"><b style="font-size: medium">{{ group.name }}</b></td>
+                                            <td>
+                                                <button class="btn btn-danger btn-sm" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                            </td>
                                         </tr>
                                         {% endfor %}
                                         </tbody>

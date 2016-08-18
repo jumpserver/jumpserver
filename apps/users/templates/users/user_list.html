@@ -42,12 +42,12 @@
                                 <th class="text-center">
                                     <input type="checkbox" id="check_all" onclick="checkAll('check_all', 'checked')">
                                 </th>
-                                <th class="text-center">姓名</th>
-                                <th class="text-center">用户名</th>
+                                <th class="text-center"><a href="{% url 'users:user-list' %}?sort=name">姓名</a></th>
+                                <th class="text-center"><a href="{% url 'users:user-list' %}?sort=username">用户名</a></th>
                                 <th class="text-center">角色</th>
                                 <th class="text-center">用户组</th>
                                 <th class="text-center">资产数量</th>
-                                <th class="text-center">有效</th>
+                                <th class="text-center"><a href="{% url 'users:user-list' %}?sort=date_expired">有效</a></th>
                                 <th class="text-center"></th>
                             </tr>
                         </thead>
@@ -66,7 +66,13 @@
                                 <td class="text-center">{{ user.role.name }}</td>
                                 <td class="text-center" title="{% for user_group in user.group.all %} {{ user_group.name }} {% endfor %}"> {{ user.groups.all|join_queryset_attr:"name" }} </td>
                                 <th class="text-center">{{ user.name }}</th>
-                                <td class="text-center">{{ user.date_expired|is_expired|yesno:"过期, 有效, 分不清楚" }}</td>
+                                <td class="text-center">
+                                    {% if user.date_expired|is_expired %}
+                                        <i class="fa fa-times text-danger"></i>
+                                    {% else %}
+                                        <i class="fa fa-check text-navy"></i>
+                                    {% endif %}
+                                </td>
                                 <td class="text-center">
                                     <a href="{% url 'users:user-edit' pk=user.id %}?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a href="{% url 'users:user-delete' pk=user.id %}?id={{ user.id }}" class="btn btn-xs btn-danger del {% if user.username == 'admin' %} disabled {% endif %}">删除</a>
