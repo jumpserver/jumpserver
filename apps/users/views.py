@@ -1,5 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.db.models import Q
 from django.views.generic.list import ListView
@@ -7,7 +8,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.detail import DetailView
 
 from .models import User, UserGroup, Role
-from .forms import UserAddForm, UserUpdateForm
+from .forms import UserAddForm, UserUpdateForm, UserGroupForm
 
 
 class UserListView(ListView):
@@ -71,12 +72,6 @@ class UserUpdateView(UpdateView):
             user.set_password(password)
         return super(UserUpdateView, self).form_valid(form)
 
-    def form_invalid(self, form):
-        print(self.request.FILES)
-        print(form['avatar'].value())
-        print(form.errors)
-        return super(UserUpdateView, self).form_invalid(form)
-
 
 class UserDeleteView(DeleteView):
     model = User
@@ -94,3 +89,61 @@ class UserDetailView(DetailView):
         groups = [group for group in UserGroup.objects.iterator() if group not in self.object.groups.iterator()]
         context.update({'path1': '用户管理', 'path2': '用户详情', 'title': '用户详情', 'groups': groups})
         return context
+
+
+class UserGroupListView(ListView):
+    model = UserGroup
+    paginate_by = 20
+    context_object_name = 'usergroup_list'
+    template_name = 'users/usergroup_list.html'
+    ordering = '-date_added'
+
+    def get_queryset(self):
+        self.queryset = super(UserGroupListView, self).get_queryset()
+        self.keyword = keyword = self.request.GET.get('keyword', '')
+        self.sort = sort = self.request.GET.get('sort')
+        if keyword:
+            self.queryset = self.queryset.filter(name__icontains=keyword)
+
+        if sort:
+            self.queryset = self.queryset.order_by(sort)
+        return self.queryset
+
+    def get_context_data(self, **kwargs):
+        context = super(UserGroupListView, self).get_context_data(**kwargs)
+        context.update({'path1': '用户管理', 'path2': '用户组列表', 'title': '用户组列表', 'keyword': self.keyword})
+        return context
+
+
+class UserGroupAddView(CreateView):
+    model = UserGroup
+    form_class = UserGroupForm
+    template_name = 'users/usergroup_add.html'
+    success_url = reverse_lazy('users:usergroup-list')
+
+    def get_context_data(self, **kwargs):
+        context = super(UserGroupAddView, self).get_context_data(**kwargs)
+        users = User.objects.all()
+        context.update({'path1': '用户管理', 'path2': '用户组添加', 'title': '用户组添加', 'users': users})
+        return context
+
+    def form_valid(self, form):
+        usergroup = form.save()
+        users_id_list = self.request.POST.getlist('users', [])
+        users = [get_object_or_404(User, id=user_id) for user_id in users_id_list]
+        usergroup.created_by = self.request.user.username or 'Admin'
+        usergroup.user_set.add(*tuple(users))
+        usergroup.save()
+        return super(UserGroupAddView, self).form_valid(form)
+
+
+class UserGroupUpdateView(UpdateView):
+    pass
+
+
+class UserGroupDetailView(DetailView):
+    pass
+
+
+class UserGroupDeleteView(DeleteView):
+    pass

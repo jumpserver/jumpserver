@@ -26,3 +26,10 @@ class UserUpdateForm(ModelForm):
             'phone', 'enable_2FA', 'role', 'date_expired', 'comment',
         ]
 
+
+class UserGroupForm(ModelForm):
+    class Meta:
+        model = UserGroup
+        fields = [
+            'name', 'comment',
+        ]

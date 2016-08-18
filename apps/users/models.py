@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 import datetime
-
+from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Permission
 from django.contrib.auth.models import Group as AbstractGroup
@@ -55,6 +55,24 @@ class UserGroup(models.Model):
             group = cls(name='所有人', comment='所有人默认都在用户组', created_by='System')
             group.save()
 
+    @classmethod
+    def generate_fake(cls, count=100):
+        from random import seed, randint, choice
+        import forgery_py
+        from django.db import IntegrityError
+
+        seed()
+        for i in range(count):
+            group = cls(name=forgery_py.name.full_name(),
+                        comment=forgery_py.lorem_ipsum.sentence(),
+                        created_by=choice(User.objects.all()).username
+                    )
+            try:
+                group.save()
+            except IntegrityError:
+                print('Error continue')
+                continue
+
 
 class User(AbstractUser):
     username = models.CharField(max_length=20, unique=True, verbose_name='用户名', help_text='* required')
@@ -71,7 +89,37 @@ class User(AbstractUser):
     public_key = models.CharField(max_length=1000, blank=True, verbose_name='公钥')
     comment = models.TextField(max_length=200, blank=True, verbose_name='描述')
     created_by = models.CharField(max_length=30, default='')
-    date_expired = models.DateTimeField(default=datetime.datetime.max, verbose_name='有效期')
+    date_expired = models.DateTimeField(default=timezone.now()+timezone.timedelta(days=365*70), verbose_name='有效期')
 
     class Meta:
         db_table = 'user'
+
+    @classmethod
+    def generate_fake(cls, count=100):
+        from random import seed, randint, choice
+        import forgery_py
+        from django.contrib.auth.hashers import make_password
+        from django.db import IntegrityError
+
+        seed()
+        for i in range(count):
+            user = cls(username=forgery_py.internet.user_name(True),
+                       email=forgery_py.internet.email_address(),
+                       name=forgery_py.name.full_name(),
+                       password=make_password(forgery_py.lorem_ipsum.word()),
+                       role=choice(Role.objects.all()),
+                       wechat=forgery_py.internet.user_name(True),
+                       comment=forgery_py.lorem_ipsum.sentence(),
+                       created_by=choice(cls.objects.all()).username,
+                    )
+            try:
+                user.save()
+            except IntegrityError:
+                print('Error continue')
+                continue
+            user.groups.add(choice(UserGroup.objects.all()))
+            user.save()
+
+
+
+
