@@ -981,6 +981,22 @@ button.dim:active:before {
   padding: 3px 20px 3px 5px;
   position: relative;
 }
+
+.chosen-container .chosen-results li.highlighted {
+    background-color: #1ab394;
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(20%, #1ab394), color-stop(90%, #1ab394));
+    /*background-image: -webkit-linear-gradient(#1ab394 20%, #2a62bc 100%);*/
+    /*background-image: -moz-linear-gradient(#1ab394 20%, #2a62bc 100%);*/
+    /*background-image: -o-linear-gradient(#1ab394 20%, #2a62bc 100%);*/
+    /*background-image: linear-gradient(#1ab394 20%, #2a62bc 100%);*/
+    color: #fff;
+}
+
+.chosen-container-active .chosen-choices {
+    border: 1px solid #1ab394;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
 /* PAGINATIN */
 .pagination > .active > a,
 .pagination > .active > span,

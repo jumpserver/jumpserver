@@ -60,7 +60,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=20, unique=True, verbose_name='用户名', help_text='* required')
     name = models.CharField(max_length=20, verbose_name='姓名', help_text='* required')
     email = models.EmailField(max_length=30, unique=True, verbose_name='邮件', help_text='* required')
-    groups = models.ManyToManyField(UserGroup, verbose_name='用户组')
+    groups = models.ManyToManyField(UserGroup, verbose_name='用户组', help_text='* required')
     avatar = models.ImageField(upload_to="avatar", verbose_name='头像')
     wechat = models.CharField(max_length=30, blank=True, verbose_name='微信')
     phone = models.CharField(max_length=20, blank=True, verbose_name='手机号')
