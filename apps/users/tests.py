@@ -16,10 +16,10 @@ def create_usergroup(name):
 def get_random_usergroup():
     pass
 
+
 def create_user(username, name, email, groups):
     pass
 
 
-
 class UserListViewTests(TestCase):
-
+    pass
