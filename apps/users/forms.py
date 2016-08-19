@@ -13,9 +13,17 @@ class UserAddForm(ModelForm):
             'username', 'name', 'email', 'groups', 'wechat',
             'phone', 'enable_2FA', 'role', 'date_expired', 'comment',
         ]
-        # widgets = {
-        #     'groups': forms.SelectMultiple(attrs={'class': 'chosen-select'})
-        # }
+
+        help_texts = {
+            'username': '* required',
+            'name': '* required',
+            'email': '* required',
+            'groups': '* required'
+        }
+
+        widgets = {
+            'groups': forms.SelectMultiple(attrs={'class': 'chosen-select', 'data-placeholder': '请选择用户组'})
+        }
 
 
 class UserUpdateForm(ModelForm):
@@ -26,6 +34,13 @@ class UserUpdateForm(ModelForm):
             'phone', 'enable_2FA', 'role', 'date_expired', 'comment',
         ]
 
+        help_texts = {
+            'username': '* required',
+            'name': '* required',
+            'email': '* required',
+            'groups': '* required'
+        }
+
 
 class UserGroupForm(ModelForm):
     class Meta:
@@ -33,3 +48,6 @@ class UserGroupForm(ModelForm):
         fields = [
             'name', 'comment',
         ]
+        help_texts = {
+            'name': '* required'
+        }

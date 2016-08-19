@@ -3,7 +3,7 @@
 {% load bootstrap %}
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/chosen/chosen.css" %}" rel="stylesheet">
-    <script href="{% static "js/plugins/chosen/chosen.jquery.min.js" %}" type="text/javascript"></script>
+    <script src="{% static "js/plugins/chosen/chosen.jquery.min.js" %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -67,18 +67,18 @@
     </div>
 {% endblock %}
 {% block custom_foot_js %}
-<script type="text/javascript">
-{#$(document).ready(function() {#}
-{#    var config = {#}
-{#        '.chosen-select': {},#}
-{#        '.chosen-select-deselect': {allow_single_deselect: true},#}
-{#        '.chosen-select-no-single': {disable_search_threshold: 10},#}
-{#        '.chosen-select-no-results': {no_results_text: 'Oops, nothing found!'},#}
-{#        '.chosen-select-width': {width: "95%"}#}
-{#    };#}
-{#    for (var selector in config) {#}
-{#        $(selector).chosen(config[selector]);#}
-{#    }#}
-{#})#}
-</script>
+    <script>
+        $(document).ready(function () {
+            var config = {
+                '.chosen-select'           : {},
+                '.chosen-select-deselect'  : {allow_single_deselect:true},
+                '.chosen-select-no-single' : {disable_search_threshold:10},
+                '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
+                '.chosen-select-width'     : {width:"95%"}
+            };
+            for (var selector in config) {
+                $(selector).chosen(config[selector]);
+            }
+        })
+    </script>
 {% endblock %}

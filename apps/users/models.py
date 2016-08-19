@@ -75,7 +75,7 @@ class UserGroup(models.Model):
 
 
 class User(AbstractUser):
-    username = models.CharField(max_length=20, unique=True, verbose_name='用户名', help_text='* required')
+    username = models.CharField(max_length=20, unique=True, verbose_name='用户名')
     name = models.CharField(max_length=20, verbose_name='姓名', help_text='* required')
     email = models.EmailField(max_length=30, unique=True, verbose_name='邮件', help_text='* required')
     groups = models.ManyToManyField(UserGroup, verbose_name='用户组', help_text='* required')
