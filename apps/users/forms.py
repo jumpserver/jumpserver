@@ -11,7 +11,7 @@ class UserAddForm(ModelForm):
         model = User
         fields = [
             'username', 'name', 'email', 'groups', 'wechat',
-            'phone', 'enable_2FA', 'role', 'date_expired', 'comment',
+            'phone', 'enable_otp', 'role', 'date_expired', 'comment',
         ]
 
         help_texts = {
@@ -31,7 +31,7 @@ class UserUpdateForm(ModelForm):
         model = User
         fields = [
             'name', 'email', 'groups', 'wechat', 'avatar',
-            'phone', 'enable_2FA', 'role', 'date_expired', 'comment',
+            'phone', 'enable_otp', 'role', 'date_expired', 'comment',
         ]
 
         help_texts = {

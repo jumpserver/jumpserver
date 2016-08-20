@@ -67,7 +67,7 @@
                                 <td class="text-center" title="{% for user_group in user.group.all %} {{ user_group.name }} {% endfor %}"> {{ user.groups.all|join_queryset_attr:"name" }} </td>
                                 <th class="text-center">{{ user.name }}</th>
                                 <td class="text-center">
-                                    {% if user.date_expired|is_expired %}
+                                    {% if user.is_expired %}
                                         <i class="fa fa-times text-danger"></i>
                                     {% else %}
                                         <i class="fa fa-check text-navy"></i>

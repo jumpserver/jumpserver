@@ -148,13 +148,22 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
-MEDIA_URL = '/media/'
+
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
 )
 
-AUTH_USER_MODEL = 'users.User'
-BOOTSTRAP_COLUMN_COUNT = 11
+# Media files (File, ImageField) will be save these
+
+MEDIA_URL = '/media/'
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace('\\', '/') + '/'
+
+# Custom User Auth model
+AUTH_USER_MODEL = 'users.User'
+
+# Use django-bootstrap-form to format template, input max width arg
+BOOTSTRAP_COLUMN_COUNT = 11
+
 
 

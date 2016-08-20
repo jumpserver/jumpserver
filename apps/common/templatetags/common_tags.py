@@ -14,14 +14,6 @@ def join_queryset_attr(queryset, attr, delimiter=', '):
 
 
 @register.filter
-def is_expired(datetime):
-    if datetime > timezone.now():
-        return False
-    else:
-        return True
-
-
-@register.filter
 def pagination_range(total_page, current_num=1, display=5):
     """Return Page range
 
