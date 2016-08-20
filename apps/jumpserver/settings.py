@@ -11,21 +11,32 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+import sys
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+sys.path.append(os.path.dirname(BASE_DIR))
+
+# Import project config setting
+try:
+    from config import config as env_config, env
+    CONFIG = env_config.get(env, 'default')()
+except ImportError:
+    CONFIG = type('_', (), {'__getattr__': None})()
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%xv'
+SECRET_KEY = CONFIG.SECRET_KEY or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = CONFIG.DEBUG or False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = CONFIG.ALLOWED_HOSTS or []
 
 
 # Application definition
@@ -80,12 +91,24 @@ WSGI_APPLICATION = 'jumpserver.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+if CONFIG.DB_ENGINE == 'sqlite':
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': CONFIG.DB_NAME or os.path.join(BASE_DIR, 'db.sqlite3'),
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.%s' % CONFIG.DB_ENGINE,
+            'NAME': CONFIG.DB_NAME,
+            'HOST': CONFIG.DB_HOST,
+            'PORT': CONFIG.DB_PORT,
+            'USER': CONFIG.DB_USERNAME,
+            'PASSWORD': CONFIG.DB_PASSWORD,
+        }
+    }
 
 
 # Password validation
@@ -133,3 +156,5 @@ STATICFILES_DIRS = (
 AUTH_USER_MODEL = 'users.User'
 BOOTSTRAP_COLUMN_COUNT = 11
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace('\\', '/') + '/'
+
+

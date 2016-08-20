@@ -3,7 +3,7 @@
 from django.forms import ModelForm
 from django import forms
 
-from .models import User, UserGroup
+from .models import User, UserGroup, Role
 
 
 class UserAddForm(ModelForm):

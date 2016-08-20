@@ -1,3 +1,4 @@
+{% load common_tags %}
 {% if is_paginated %}
     <div class="row">
         <div class="col-sm-6">
@@ -9,17 +10,24 @@
             <div class="dataTables_paginate paging_simple_numbers" id="editable_paginate">
                 <ul class="pagination" style="margin-top: 0; float: right">
                     {% if page_obj.has_previous %}
-                        <li class="paginate_button previous" aria-controls="editable" tabindex="0"
-                            id="editable_previous">
-                            <a class="page" href="?page={{ page_obj.previous_page_number }}">Previous</a>
+                        <li class="paginate_button previous" aria-controls="editable" tabindex="0" id="previous">
+                            <a data-page="next" href="?page={{ page_obj.previous_page_number}}">‹</a>
                         </li>
                     {% endif %}
-                    <li class="paginate_button active" aria-controls="editable" tabindex="0">
-                        <a class="page" href="?page={{ page_obj.number }}" title="第{{ page_obj.number }}页">{{ page_obj.number }}</a>
-                    </li>
+
+                    {% for page in paginator.num_pages|pagination_range:page_obj.number %}
+                        {% if page == page_obj.number %}
+                            <li class="paginate_button active" aria-controls="editable" tabindex="0">
+                        {% else %}
+                            <li class="paginate_button" aria-controls="editable" tabindex="0">
+                        {% endif %}
+                                <a class="page" href="?page={{ page }}" title="第{{ page }}页">{{ page }}</a>
+                            </li>
+                    {% endfor %}
+
                     {% if page_obj.has_next %}
-                        <li class="paginate_button next" aria-controls="editable" tabindex="0" id="editable_next">
-                            <a class="page" href="?page={{ page_obj.next_page_number }}">Next</a>
+                        <li class="paginate_button next" aria-controls="editable" tabindex="0" id="next">
+                            <a data-page="next" href="?page={{ page_obj.next_page_number }}">›</a>
                         </li>
                     {% endif %}
                 </ul>

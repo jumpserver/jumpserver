@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.detail import DetailView
+from django.conf import settings
 
 from .models import User, UserGroup, Role
 from .forms import UserAddForm, UserUpdateForm, UserGroupForm
@@ -13,7 +14,7 @@ from .forms import UserAddForm, UserUpdateForm, UserGroupForm
 
 class UserListView(ListView):
     model = User
-    paginate_by = 20
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'user_list'
     template_name = 'users/user_list.html'
     ordering = '-date_joined'
@@ -39,7 +40,6 @@ class UserListView(ListView):
 class UserAddView(CreateView):
     model = User
     form_class = UserAddForm
-    initial = {'role': Role.objects.get(name='User')}
     template_name = 'users/user_add.html'
     success_url = reverse_lazy('users:user-list')
 

@@ -3,6 +3,9 @@
 from __future__ import unicode_literals
 
 import datetime
+
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Permission
@@ -17,6 +20,9 @@ class Role(AbstractGroup):
 
     class Meta:
         db_table = 'role'
+
+    def init(self):
+        pass
 
     @classmethod
     def init(cls):
