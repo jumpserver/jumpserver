@@ -165,5 +165,5 @@ AUTH_USER_MODEL = 'users.User'
 # Use django-bootstrap-form to format template, input max width arg
 BOOTSTRAP_COLUMN_COUNT = 11
 
-
-
+# Init data or generate fake data source for development
+FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures'), ]
