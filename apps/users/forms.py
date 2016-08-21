@@ -3,7 +3,7 @@
 from django.forms import ModelForm
 from django import forms
 
-from .models import User, UserGroup, Role
+from .models import User, UserGroup
 
 
 class UserAddForm(ModelForm):
@@ -41,13 +41,19 @@ class UserUpdateForm(ModelForm):
             'groups': '* required'
         }
 
+        widgets = {
+            'groups': forms.SelectMultiple(attrs={'class': 'chosen-select', 'data-placeholder': '请选择用户组'}),
+        }
+
 
 class UserGroupForm(ModelForm):
     class Meta:
         model = UserGroup
+
         fields = [
             'name', 'comment',
         ]
+
         help_texts = {
             'name': '* required'
         }
