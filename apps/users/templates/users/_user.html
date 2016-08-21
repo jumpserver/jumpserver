@@ -46,7 +46,7 @@
                                 <div class="col-sm-9">
                                     <div class="input-group date">
                                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                        <input id="{{ form.date_expired.id_for_label }}" name="{{ form.data_expired.name }}" type="text" class="form-control" value="03/04/2014">
+                                        <input id="{{ form.date_expired.id_for_label }}" name="{{ form.date_expired.html_name }}" type="text" class="form-control" value="{{ form.date_expired.value|date:'m/d/Y' }}">
                                     </div>
                                 </div>
                              </div>
