@@ -3,6 +3,7 @@
 {% load bootstrap %}
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/chosen/chosen.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/datepicker/datepicker3.css" %}" rel="stylesheet">
     <script src="{% static "js/plugins/chosen/chosen.jquery.min.js" %}"></script>
 {% endblock %}
 
@@ -40,7 +41,15 @@
                             <div class="hr-line-dashed"></div>
                             <h3>角色安全</h3>
                             {{ form.role|bootstrap_horizontal }}
-                            {{ form.date_expired|bootstrap_horizontal }}
+                            <div class="form-group" id="date_5">
+                                <label for="{{ form.date_expired.id_for_label }}" class="col-sm-2 control-label">{{ form.date_expired.label }}</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group date">
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        <input id="{{ form.date_expired.id_for_label }}" name="{{ form.data_expired.name }}" type="text" class="form-control" value="03/04/2014">
+                                    </div>
+                                </div>
+                             </div>
                             <div class="form-group">
                                 <label for="{{ form.enable_otp.id_for_label }}" class="col-sm-2 control-label">二次验证</label>
                                 <div class="col-sm-8">
@@ -67,6 +76,7 @@
     </div>
 {% endblock %}
 {% block custom_foot_js %}
+    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
     <script>
         $(document).ready(function () {
             var config = {
@@ -79,6 +89,14 @@
             for (var selector in config) {
                 $(selector).chosen(config[selector]);
             }
+
+            $('.input-group.date').datepicker({
+                todayBtn: "linked",
+                keyboardNavigation: false,
+                forceParse: false,
+                calendarWeeks: true,
+                autoclose: true
+            });
         })
     </script>
 {% endblock %}

@@ -23,7 +23,7 @@
         
         cp config-example.py config.py
         
-        cd apps/ && python manage.py loaddata users  # 初始化数据
+        cd apps/ && python manage.py loaddata init  # 初始化数据
         
         python manage.py runserver 0.0.0.0:80
         
