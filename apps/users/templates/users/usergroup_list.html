@@ -64,8 +64,8 @@
                                 <td class="text-center">数量</td>
                                 <th class="text-center">{{ usergroup.comment|truncatewords:8 }}</th>
                                 <td class="text-center">
-                                    <a href="{% url 'users:usergroup-edit' pk=usergroup.id %}?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
-                                    <a href="{% url 'users:usergroup-delete' pk=usergroup.id %}?id={{ user.id }}" class="btn btn-xs btn-danger del">删除</a>
+                                    <a href="{% url 'users:usergroup-edit' pk=usergroup.id %}" class="btn btn-xs btn-info">编辑</a>
+                                    <a href="{% url 'users:usergroup-delete' pk=usergroup.id %}" class="btn btn-xs btn-danger del">删除</a>
                                 </td>
                             </tr>
                         {% endfor %}
