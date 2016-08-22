@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 
 import datetime
-
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from django.db import models
@@ -28,7 +27,7 @@ class Role(models.Model):
         db_table = 'role'
 
     @classmethod
-    def init(cls):
+    def initial(cls):
         roles = {
             'Administrator': {'permissions': Permission.objects.all(), 'comment': '管理员'},
             'User': {'permissions': [], 'comment': '用户'},
@@ -56,10 +55,10 @@ class UserGroup(models.Model):
         db_table = 'usergroup'
 
     @classmethod
-    def init(cls):
-        if not cls.objects.all():
-            group = cls(name='ALL', comment='Default usergroup for all user', created_by='System')
-            group.save()
+    def initial(cls):
+        group_or_create = cls.objects.get_or_create(name='All', comment='Default user group for all user',
+                                                    created_by='System')
+        return group_or_create[0]
 
     @classmethod
     def generate_fake(cls, count=100):
@@ -86,7 +85,7 @@ def date_expired_default():
 
 class User(AbstractUser):
     username = models.CharField(max_length=20, unique=True, verbose_name='用户名')
-    name = models.CharField(max_length=20, verbose_name='姓名')
+    name = models.CharField(max_length=20, blank=True, verbose_name='姓名')
     email = models.EmailField(max_length=30, unique=True, verbose_name='邮件')
     groups = models.ManyToManyField(UserGroup, verbose_name='用户组')
     avatar = models.ImageField(upload_to="avatar", verbose_name='头像')
@@ -101,8 +100,18 @@ class User(AbstractUser):
     date_expired = models.DateTimeField(default=date_expired_default, verbose_name='有效期')
     created_by = models.CharField(max_length=30, default='')
 
-    class Meta:
-        db_table = 'user'
+    @property
+    def password_raw(self):
+        raise AttributeError('Password raw is not readable attribute')
+
+    #: Use this attr to set user object password, example
+    #: user = User(username='example', password_raw='password', ...)
+    #: It's equal:
+    #: user = User(username='example', ...)
+    #: user.set_password('password')
+    @password_raw.setter
+    def password_raw(self, raw_password):
+        self.set_password(raw_password)
 
     def is_expired(self):
         if self.date_expired > timezone.now():
@@ -110,17 +119,31 @@ class User(AbstractUser):
         else:
             return True
 
+    def save(self, *args, **kwargs):
+        # If user not set name, it's default equal username
+        if not self.name:
+            self.name = self.username
+        super(User, self).save(args, **kwargs)
+
+        # Set user default group 'All'
+        group = UserGroup.initial()
+        self.groups.add(group)
+
+    class Meta:
+        db_table = 'user'
+
+    #: Use this method
     @classmethod
-    def init(cls):
+    def initial(cls):
         user = cls(username='admin',
                    email='admin@jumpserver.org',
                    name='Administrator',
-                   password=make_password('admin'),
+                   password_raw='admin',
                    role=Role.objects.get(name='Administrator'),
                    comment='Administrator is the super user of system',
                    created_by='System')
         user.save()
-        user.groups.add(UserGroup.objects.get(name='ALL'))
+        user.groups.add(UserGroup.initial())
 
     @classmethod
     def generate_fake(cls, count=100):
@@ -142,7 +165,7 @@ class User(AbstractUser):
             try:
                 user.save()
             except IntegrityError:
-                print('Error continue')
+                print('Duplicate Error, continue ...')
                 continue
             user.groups.add(choice(UserGroup.objects.all()))
             user.save()
@@ -150,8 +173,8 @@ class User(AbstractUser):
 
 def init_all_models():
     for model in (Role, UserGroup, User):
-        if hasattr(model, 'init'):
-            model.init()
+        if hasattr(model, 'initial'):
+            model.initial()
 
 
 def generate_fake():

@@ -16,7 +16,6 @@ class UserAddForm(ModelForm):
 
         help_texts = {
             'username': '* required',
-            'name': '* required',
             'email': '* required',
             'groups': '* required'
         }
