@@ -72,6 +72,10 @@ class UserUpdateView(UpdateView):
             user.set_password(password)
         return super(UserUpdateView, self).form_valid(form)
 
+    def form_invalid(self, form):
+        print(form.errors)
+        return super(UserUpdateView, self).form_invalid(form)
+
 
 class UserDeleteView(DeleteView):
     model = User

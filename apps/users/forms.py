@@ -29,13 +29,12 @@ class UserUpdateForm(ModelForm):
     class Meta:
         model = User
         fields = [
-            'name', 'email', 'groups', 'wechat', 'avatar',
+            'name', 'email', 'groups', 'wechat',
             'phone', 'enable_otp', 'role', 'date_expired', 'comment',
         ]
 
         help_texts = {
             'username': '* required',
-            'name': '* required',
             'email': '* required',
             'groups': '* required'
         }
