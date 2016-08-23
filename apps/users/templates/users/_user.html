@@ -2,9 +2,9 @@
 {% load static %}
 {% load bootstrap %}
 {% block custom_head_css_js %}
-    <link href="{% static "css/plugins/chosen/chosen.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
     <link href="{% static "css/plugins/datepicker/datepicker3.css" %}" rel="stylesheet">
-    <script src="{% static "js/plugins/chosen/chosen.jquery.min.js" %}"></script>
+    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -80,16 +80,7 @@
     <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
     <script>
         $(document).ready(function () {
-            var config = {
-                '.chosen-select'           : {},
-                '.chosen-select-deselect'  : {allow_single_deselect:true},
-                '.chosen-select-no-single' : {disable_search_threshold:10},
-                '.chosen-select-no-results': {no_results_text:'Oops, nothing found!'},
-                '.chosen-select-width'     : {width:"95%"}
-            };
-            for (var selector in config) {
-                $(selector).chosen(config[selector]);
-            }
+            $('.select2').select2();
 
             $('.input-group.date').datepicker({
                 todayBtn: "linked",

@@ -21,7 +21,7 @@ class UserAddForm(ModelForm):
         }
 
         widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'chosen-select', 'data-placeholder': '请选择用户组'}),
+            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': '请选择用户组'}),
         }
 
 
