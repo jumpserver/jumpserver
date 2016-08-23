@@ -1,15 +1,15 @@
-<li id="">
+<li id="index">
     <a href="">
         <i class="fa fa-dashboard"></i> <span class="nav-label">仪表盘</span><span class="label label-info pull-right"></span>
     </a>
 </li>
-<li id="">
+<li id="users">
     <a href="#">
         <i class="fa fa-group"></i> <span class="nav-label">用户管理</span><span class="fa arrow"></span>
     </a>
-    <ul class="nav nav-second-level">
-        <li class="group"><a href="{% url 'users:user-list' %}">用户列表</a></li>
-        <li class="user"><a href="{% url 'users:usergroup-list' %}">用户组列表</a></li>
+    <ul class="nav nav-second-level active">
+        <li class="user"><a href="{% url 'users:user-list' %}">用户列表</a></li>
+        <li class="usergroup"><a href="{% url 'users:usergroup-list' %}">用户组列表</a></li>
     </ul>
 </li>
 <li id="">
