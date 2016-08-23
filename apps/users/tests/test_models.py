@@ -1,33 +1,14 @@
 # ~*~ coding: utf-8 ~*~
 
-from random import choice
-import forgery_py
 
 from django.utils import timezone
 from django.shortcuts import reverse
 from django.test import TestCase, Client, TransactionTestCase
-from django.test.utils import setup_test_environment
-from django.db import IntegrityError, transaction
-from .models import User, UserGroup, Role, init_all_models
+from django.db import IntegrityError
+from users.models import User, UserGroup, Role, init_all_models
 from django.contrib.auth.models import Permission
-from django.conf import settings
 
-
-def gen_username():
-    return forgery_py.internet.user_name(True)
-
-
-def gen_email():
-    return forgery_py.internet.email_address()
-
-
-def gen_name():
-    return forgery_py.name.full_name()
-
-
-def get_role():
-    role = choice(Role.objects.all())
-    return role
+from .base import gen_name, gen_username, gen_email, get_role
 
 
 class UserModelTest(TransactionTestCase):
@@ -35,7 +16,7 @@ class UserModelTest(TransactionTestCase):
         init_all_models()
 
         # 创建一个用户用于测试
-        role = choice(Role.objects.all())
+        role = get_role()
         user = User(name='test', username='test', email='test@email.org', role=role)
         user.save()
 
@@ -46,7 +27,7 @@ class UserModelTest(TransactionTestCase):
 
     @property
     def role(self):
-        return choice(Role.objects.all())
+        return get_role()
 
     # 创建一个姓名一致的用户, 应该创建成功
     def test_user_name_duplicate(self):
@@ -61,20 +42,16 @@ class UserModelTest(TransactionTestCase):
     # 创建一个用户名一致的用户, 应该创建不成功
     def test_user_username_duplicate(self):
         user2 = User(username='test', email=gen_email(), role=self.role)
-        try:
+
+        with self.assertRaises(IntegrityError):
             user2.save()
-            self.assertTrue(0, 'Duplicate <username> allowed.')
-        except IntegrityError:
-            pass
 
     # 创建一个Email一致的用户,应该创建不成功
     def test_user_email_duplicate(self):
         user3 = User(username=gen_username(), email='test@email.org', role=self.role)
-        try:
+
+        with self.assertRaises(IntegrityError):
             user3.save()
-            self.assertTrue(0, 'Duplicate <email> allowed.')
-        except IntegrityError:
-            pass
 
     # 用户过期测试
     def test_user_was_expired(self):
@@ -86,7 +63,7 @@ class UserModelTest(TransactionTestCase):
 
     # 测试用户默认会输入All用户组
     def test_user_with_default_group(self):
-        role = choice(Role.objects.all())
+        role = get_role()
         user = User(username=gen_username(), email=gen_email(), role=role)
         user.save()
 
@@ -128,53 +105,5 @@ class RoleModelTestCase(TransactionTestCase):
 class UserGroupModelTestCase(TransactionTestCase):
     pass
 
-
-class UserListViewTests(TransactionTestCase):
-    def setUp(self):
-        init_all_models()
-
-    def test_a_new_user_in_list(self):
-        username = gen_username()
-        user = User(username=username, email=gen_email(), role=get_role())
-        user.save()
-        response = self.client.get(reverse('users:user-list'))
-
-        self.assertContains(response, username)
-
-    def test_list_view_with_admin_user(self):
-        response = self.client.get(reverse('users:user-list'))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Admin')
-        self.assertEqual(response.context['user_list'].count(), User.objects.all().count())
-
-    def test_pagination(self):
-        settings.CONFIG.DISPLAY_PER_PAGE = 10
-        User.generate_fake(count=20)
-        response = self.client.get(reverse('users:user-list'))
-        self.assertEqual(response.context['is_paginated'], True)
-
-
-class UserAddTests(TestCase):
-    def setUp(self):
-        init_all_models()
-
-    def test_add_a_new_user(self):
-        username = gen_username()
-        data = {
-            'username': username,
-            'comment': '',
-            'name': gen_name(),
-            'email': gen_email(),
-            'groups': [UserGroup.objects.first().id, ],
-            'role': get_role().id,
-            'date_expired': '2086-08-06 19:12:22',
-        }
-
-        response = self.client.post(reverse('users:user-add'), data)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], reverse('users:user-list'))
-
-        response = self.client.get(reverse('users:user-list'))
-        self.assertContains(response, username)
 
 
