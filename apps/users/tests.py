@@ -10,6 +10,7 @@ from django.test.utils import setup_test_environment
 from django.db import IntegrityError, transaction
 from .models import User, UserGroup, Role, init_all_models
 from django.contrib.auth.models import Permission
+from django.conf import settings
 
 
 def gen_username():
@@ -22,6 +23,11 @@ def gen_email():
 
 def gen_name():
     return forgery_py.name.full_name()
+
+
+def get_role():
+    role = choice(Role.objects.all())
+    return role
 
 
 class UserModelTest(TransactionTestCase):
@@ -123,18 +129,52 @@ class UserGroupModelTestCase(TransactionTestCase):
     pass
 
 
-class UserListViewTests(TestCase):
+class UserListViewTests(TransactionTestCase):
     def setUp(self):
         init_all_models()
-        User.generate_fake()
 
-    def test_list_view_with_one_user(self):
+    def test_a_new_user_in_list(self):
+        username = gen_username()
+        user = User(username=username, email=gen_email(), role=get_role())
+        user.save()
+        response = self.client.get(reverse('users:user-list'))
+
+        self.assertContains(response, username)
+
+    def test_list_view_with_admin_user(self):
         response = self.client.get(reverse('users:user-list'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'Admin')
-        self.assertQuerysetEqual(response.context['user_list'], [repr(user) for user in User.objects.all()])
+        self.assertEqual(response.context['user_list'].count(), User.objects.all().count())
 
     def test_pagination(self):
+        settings.CONFIG.DISPLAY_PER_PAGE = 10
+        User.generate_fake(count=20)
         response = self.client.get(reverse('users:user-list'))
-        self.assertContains(response.status_code, 200)
+        self.assertEqual(response.context['is_paginated'], True)
+
+
+class UserAddTests(TestCase):
+    def setUp(self):
+        init_all_models()
+
+    def test_add_a_new_user(self):
+        username = gen_username()
+        data = {
+            'username': username,
+            'comment': '',
+            'name': gen_name(),
+            'email': gen_email(),
+            'groups': [UserGroup.objects.first().id, ],
+            'role': get_role().id,
+            'date_expired': '2086-08-06 19:12:22',
+        }
+
+        response = self.client.post(reverse('users:user-add'), data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], reverse('users:user-list'))
+
+        response = self.client.get(reverse('users:user-list'))
+        self.assertContains(response, username)
+
 

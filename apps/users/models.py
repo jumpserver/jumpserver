@@ -130,13 +130,13 @@ class User(AbstractUser):
         # If user not set name, it's default equal username
         if not self.name:
             self.name = self.username
-        super(User, self).save(args, **kwargs)
+        super(User, self).save(*args, **kwargs)
         # Set user default group 'All'
         # Todo: It's have bug
         group = UserGroup.initial()
         if group not in self.groups.all():
             self.groups.add(group)
-            super(User, self).save(args, **kwargs)
+            # super(User, self).save(*args, **kwargs)
 
     class Meta:
         db_table = 'user'
