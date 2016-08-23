@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 import sys
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -22,10 +21,10 @@ sys.path.append(os.path.dirname(BASE_DIR))
 # Import project config setting
 try:
     from config import config as env_config, env
+
     CONFIG = env_config.get(env, 'default')()
 except ImportError:
     CONFIG = type('_', (), {'__getattr__': None})()
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
@@ -38,13 +37,13 @@ DEBUG = CONFIG.DEBUG or False
 
 ALLOWED_HOSTS = CONFIG.ALLOWED_HOSTS or []
 
-
 # Application definition
 
 INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'assets.apps.AssetsConfig',
     'perms.apps.PermsConfig',
+    'webterminal.apps.WebterminalConfig',
     'ops.apps.OpsConfig',
     'audits.apps.AuditsConfig',
     'common.apps.CommonConfig',
@@ -55,6 +54,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'ws4redis',
+
 ]
 
 MIDDLEWARE = [
@@ -80,13 +81,15 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.static',
+                'django.template.context_processors.request',
+                'ws4redis.context_processors.default',
             ],
         },
     },
 ]
 
 WSGI_APPLICATION = 'jumpserver.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
@@ -110,7 +113,6 @@ else:
         }
     }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
 
@@ -129,7 +131,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
@@ -142,7 +143,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -167,3 +167,27 @@ BOOTSTRAP_COLUMN_COUNT = 11
 
 # Init data or generate fake data source for development
 FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures'), ]
+
+# This setting is required to override the Django's main loop, when running in
+# development mode, such as ./manage runserver
+WSGI_APPLICATION = 'ws4redis.django_runserver.application'
+
+# URL that distinguishes websocket connections from normal requests
+WEBSOCKET_URL = '/ws/'
+# WebSocket Redis
+WS4REDIS_CONNECTION = {
+    'host': '127.0.0.1',
+    'port': 6379,
+    'db': 2,
+}
+
+# Set the number of seconds each message shall persited
+WS4REDIS_EXPIRE = 3600
+
+WS4REDIS_HEARTBEAT = 'love you'
+
+WS4REDIS_PREFIX = 'demo'
+
+SESSION_ENGINE = 'redis_sessions.session'
+
+SESSION_REDIS_PREFIX = 'session'
