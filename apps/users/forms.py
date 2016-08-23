@@ -21,7 +21,7 @@ class UserAddForm(ModelForm):
         }
 
         widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'chosen-select', 'data-placeholder': '请选择用户组'}),
+            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': '请选择用户组'}),
         }
 
 
@@ -29,19 +29,18 @@ class UserUpdateForm(ModelForm):
     class Meta:
         model = User
         fields = [
-            'name', 'email', 'groups', 'wechat', 'avatar',
+            'name', 'email', 'groups', 'wechat',
             'phone', 'enable_otp', 'role', 'date_expired', 'comment',
         ]
 
         help_texts = {
             'username': '* required',
-            'name': '* required',
             'email': '* required',
             'groups': '* required'
         }
 
         widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'chosen-select', 'data-placeholder': '请选择用户组'}),
+            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': '请选择用户组'}),
         }
 
 

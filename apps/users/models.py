@@ -7,6 +7,7 @@ from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Permission
+from django.db import OperationalError
 
 
 class Role(models.Model):
@@ -22,6 +23,12 @@ class Role(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def delete(self, using=None, keep_parents=False):
+        if self.user_set.all().count() > 0:
+            raise OperationalError('Role %s has some member, should not be delete.' % self.name)
+        else:
+            return super(Role, self).delete(using=using, keep_parents=keep_parents)
 
     class Meta:
         db_table = 'role'
@@ -56,7 +63,7 @@ class UserGroup(models.Model):
 
     @classmethod
     def initial(cls):
-        group_or_create = cls.objects.get_or_create(name='All', comment='Default user group for all user',
+        group_or_create = cls.objects.get_or_create(name='Default', comment='Default user group for all user',
                                                     created_by='System')
         return group_or_create[0]
 
@@ -93,7 +100,7 @@ class User(AbstractUser):
     phone = models.CharField(max_length=20, blank=True, verbose_name='手机号')
     enable_otp = models.BooleanField(default=False, verbose_name='启用二次验证')
     secret_key_otp = models.CharField(max_length=16, blank=True)
-    role = models.ForeignKey(Role, on_delete=models.PROTECT, verbose_name='角色')
+    role = models.ForeignKey(Role, on_delete=models.SET('None'), verbose_name='角色')
     private_key = models.CharField(max_length=5000, blank=True, verbose_name='ssh私钥')  # ssh key max length 4096 bit
     public_key = models.CharField(max_length=1000, blank=True, verbose_name='公钥')
     comment = models.TextField(max_length=200, blank=True, verbose_name='描述')
@@ -123,11 +130,13 @@ class User(AbstractUser):
         # If user not set name, it's default equal username
         if not self.name:
             self.name = self.username
-        super(User, self).save(args, **kwargs)
-
+        super(User, self).save(*args, **kwargs)
         # Set user default group 'All'
+        # Todo: It's have bug
         group = UserGroup.initial()
-        self.groups.add(group)
+        if group not in self.groups.all():
+            self.groups.add(group)
+            # super(User, self).save(*args, **kwargs)
 
     class Meta:
         db_table = 'user'

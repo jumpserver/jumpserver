@@ -1,11 +1,14 @@
 # ~*~ coding: utf-8 ~*~
 
-from django.shortcuts import get_object_or_404
+from __future__ import unicode_literals
+
+from django.shortcuts import get_object_or_404, reverse
 from django.urls import reverse_lazy
 from django.db.models import Q
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.detail import DetailView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.conf import settings
 
 from .models import User, UserGroup, Role
@@ -37,11 +40,12 @@ class UserListView(ListView):
         return context
 
 
-class UserAddView(CreateView):
+class UserAddView(SuccessMessageMixin, CreateView):
     model = User
     form_class = UserAddForm
     template_name = 'users/user_add.html'
     success_url = reverse_lazy('users:user-list')
+    success_message = '添加用户 <a href="%s">%s</a> 成功 .'
 
     def get_context_data(self, **kwargs):
         context = super(UserAddView, self).get_context_data(**kwargs)
@@ -53,6 +57,12 @@ class UserAddView(CreateView):
         user.created_by = self.request.user.username or 'Admin'
         user.save()
         return super(UserAddView, self).form_valid(form)
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % (
+            reverse_lazy('users:user-detail', kwargs={'pk': self.object.pk}),
+            self.object.name,
+        )
 
 
 class UserUpdateView(UpdateView):
@@ -71,6 +81,10 @@ class UserUpdateView(UpdateView):
         if password:
             user.set_password(password)
         return super(UserUpdateView, self).form_valid(form)
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return super(UserUpdateView, self).form_invalid(form)
 
 
 class UserDeleteView(DeleteView):
@@ -93,7 +107,7 @@ class UserDetailView(DetailView):
 
 class UserGroupListView(ListView):
     model = UserGroup
-    paginate_by = 20
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'usergroup_list'
     template_name = 'users/usergroup_list.html'
     ordering = '-date_added'

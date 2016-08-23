@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load common_tags %}
+{% block content %}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5> {{ path2 }} </h5>
+                    <div class="ibox-tools">
+                        <a class="collapise-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="ibox-content">
+                    <div class="">
+                        {# left button add #}
+                        {% block content_left_head %} {% endblock %}
+                        <form id="search_form" method="get" action="" class="pull-right mail-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="{{ keyword }}">
+                                <div class="input-group-btn">
+                                    <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                                        搜索
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <table class="table table-striped table-bordered table-hover " id="editable" >
+                        <thead>
+                            <tr>
+                                {% block table_head %} {% endblock %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% block table_body %} {% endblock %}
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <div class="col-sm-4">
+                            {# Update batch #}
+                            {% block content_bottom_left %} {% endblock %}
+                        </div>
+                        {% include '_pagination.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
