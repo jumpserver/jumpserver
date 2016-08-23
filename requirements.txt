@@ -1,3 +1,5 @@
-django==1.10
-pillow
-django-bootstrap-form
+Django==1.10
+django-bootstrap-form==3.2.1
+djangorestframework==3.4.5
+ForgeryPy==0.1
+Pillow==3.3.0
