@@ -23,6 +23,8 @@ sys.path.append(os.path.dirname(BASE_DIR))
 try:
     from config import config as env_config, env
     CONFIG = env_config.get(env, 'default')()
+    BROKER_URL = CONFIG.BROKER_URL
+
 except ImportError:
     CONFIG = type('_', (), {'__getattr__': None})()
 
@@ -55,6 +57,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'djcelery',
 ]
 
 MIDDLEWARE = [
