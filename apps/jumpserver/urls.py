@@ -25,6 +25,10 @@ urlpatterns = [
     # url(r'^admin/', admin.site.urls),
 ]
 
+urlpatterns += [
+    url(r'^api/users/', include('users.api_urls')),
+]
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
