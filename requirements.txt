@@ -1,3 +1,13 @@
-django==1.10
-pillow
-django-bootstrap-form
+Django==1.10
+django-bootstrap-form==3.2.1
+django-redis-sessions==0.5.6
+django-websocket-redis==0.4.6
+gevent==1.1.2
+greenlet==0.4.10
+logging==0.4.9.6
+Pillow==3.3.1
+pyte==0.5.2
+redis==2.10.5
+six==1.10.0
+wcwidth==0.1.7
+websocket-client==0.37.0
