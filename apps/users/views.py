@@ -107,7 +107,7 @@ class UserDetailView(DetailView):
 
 class UserGroupListView(ListView):
     model = UserGroup
-    paginate_by = 20
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'usergroup_list'
     template_name = 'users/usergroup_list.html'
     ordering = '-date_added'

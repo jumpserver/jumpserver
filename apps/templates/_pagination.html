@@ -1,40 +1,38 @@
 {% load common_tags %}
-{% if is_paginated %}
-    <div class="row">
-        <div class="col-sm-6">
-            <div class="dataTables_info" id="editable_info" role="status" aria-live="polite">
-                Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ paginator.count }} entries
-            </div>
-        </div>
-        <div class="col-sm-6">
-            <div class="dataTables_paginate paging_simple_numbers" id="editable_paginate">
-                <ul class="pagination" style="margin-top: 0; float: right">
-                    {% if page_obj.has_previous %}
-                        <li class="paginate_button previous" aria-controls="editable" tabindex="0" id="previous">
-                            <a data-page="next" href="?page={{ page_obj.previous_page_number}}">‹</a>
-                        </li>
-                    {% endif %}
+   {% if is_paginated %}
+   <div class="col-sm-4">
+       <div class="dataTables_info text-center" id="editable_info" role="status" aria-live="polite">
+           Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ paginator.count }} entries
+       </div>
+   </div>
+   <div class="col-sm-4">
+       <div class="dataTables_paginate paging_simple_numbers" id="editable_paginate">
+           <ul class="pagination" style="margin-top: 0; float: right">
+               {% if page_obj.has_previous %}
+                   <li class="paginate_button previous" aria-controls="editable" tabindex="0" id="previous">
+                       <a data-page="next" href="?page={{ page_obj.previous_page_number}}">‹</a>
+                   </li>
+               {% endif %}
 
-                    {% for page in paginator.num_pages|pagination_range:page_obj.number %}
-                        {% if page == page_obj.number %}
-                            <li class="paginate_button active" aria-controls="editable" tabindex="0">
-                        {% else %}
-                            <li class="paginate_button" aria-controls="editable" tabindex="0">
-                        {% endif %}
-                                <a class="page" href="?page={{ page }}" title="第{{ page }}页">{{ page }}</a>
-                            </li>
-                    {% endfor %}
+               {% for page in paginator.num_pages|pagination_range:page_obj.number %}
+                   {% if page == page_obj.number %}
+                       <li class="paginate_button active" aria-controls="editable" tabindex="0">
+                   {% else %}
+                       <li class="paginate_button" aria-controls="editable" tabindex="0">
+                   {% endif %}
+                           <a class="page" href="?page={{ page }}" title="第{{ page }}页">{{ page }}</a>
+                       </li>
+               {% endfor %}
 
-                    {% if page_obj.has_next %}
-                        <li class="paginate_button next" aria-controls="editable" tabindex="0" id="next">
-                            <a data-page="next" href="?page={{ page_obj.next_page_number }}">›</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
-        </div>
-    </div>
-{% endif %}
+               {% if page_obj.has_next %}
+                   <li class="paginate_button next" aria-controls="editable" tabindex="0" id="next">
+                       <a data-page="next" href="?page={{ page_obj.next_page_number }}">›</a>
+                   </li>
+               {% endif %}
+           </ul>
+       </div>
+   </div>
+   {% endif %}
 <script>
     function sleep(n) { //n表示的毫秒数
         var start = new Date().getTime();
