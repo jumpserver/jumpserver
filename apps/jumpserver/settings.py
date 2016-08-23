@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'ops.apps.OpsConfig',
     'audits.apps.AuditsConfig',
     'common.apps.CommonConfig',
+    'rest_framework',
     'bootstrapform',
     # 'django.contrib.admin',
     'django.contrib.auth',
@@ -168,6 +169,13 @@ BOOTSTRAP_COLUMN_COUNT = 11
 # Init data or generate fake data source for development
 FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures'), ]
 
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ],
+}
 # This setting is required to override the Django's main loop, when running in
 # development mode, such as ./manage runserver
 WSGI_APPLICATION = 'ws4redis.django_runserver.application'

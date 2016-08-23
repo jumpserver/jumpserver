@@ -11,3 +11,5 @@ redis==2.10.5
 six==1.10.0
 wcwidth==0.1.7
 websocket-client==0.37.0
+djangorestframework==3.4.5
+ForgeryPy==0.1
