@@ -14,3 +14,4 @@ migrations/
 .idea/
 db.sqlite3
 config.py
+*/migrations/*

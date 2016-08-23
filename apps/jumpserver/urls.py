@@ -17,11 +17,21 @@ from django.conf.urls import url, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic.base import TemplateView
+from django.http import HttpResponseRedirect
+
+
+def view(request, **kwargs):
+    if kwargs:
+        print kwargs
+    return HttpResponseRedirect('/' + kwargs["module"] + '/' + kwargs["version"] + '/' + kwargs["api"])
+
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='base.html')),
     url(r'^users/', include('users.urls')),
     url(r'^assets/', include('assets.urls')),
+    url(r'^terminal/', include('webterminal.urls')),
+    url(r'^api/(?P<version>.*)/(?P<module>.*)/(?P<api>.*)', view),
     # url(r'^admin/', admin.site.urls),
 ]
 
