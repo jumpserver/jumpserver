@@ -31,8 +31,8 @@
                             {% csrf_token %}
                             <h3>账户</h3>
                             {% block username %} {% endblock %}
-                            {{ form.name|bootstrap_horizontal }}
                             {{ form.email|bootstrap_horizontal }}
+                            {{ form.name|bootstrap_horizontal }}
                             {{ form.groups|bootstrap_horizontal }}
 
                             <div class="hr-line-dashed"></div>

@@ -2,7 +2,7 @@
    {% if is_paginated %}
    <div class="col-sm-4">
        <div class="dataTables_info text-center" id="editable_info" role="status" aria-live="polite">
-           Showing {{ page_obj.start_index }} to {{ page_obj.end_index }} of {{ paginator.count }} entries
+           {{ page_obj.start_index }} - {{ page_obj.end_index }} of {{ paginator.count }}
        </div>
    </div>
    <div class="col-sm-4">

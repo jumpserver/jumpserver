@@ -11,7 +11,7 @@ from django.views.generic.detail import DetailView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.conf import settings
 
-from .models import User, UserGroup, Role
+from .models import User, UserGroup
 from .forms import UserAddForm, UserUpdateForm, UserGroupForm
 
 
@@ -53,9 +53,10 @@ class UserAddView(SuccessMessageMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        user = form.save()
-        user.created_by = self.request.user.username or 'Admin'
+        user = form.save(commit=False)
+        user.created_by = self.request.user.username or 'System'
         user.save()
+        form.save_m2m()
         return super(UserAddView, self).form_valid(form)
 
     def get_success_message(self, cleaned_data):

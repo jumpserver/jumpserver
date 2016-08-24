@@ -17,7 +17,6 @@ class UserAddForm(ModelForm):
         help_texts = {
             'username': '* required',
             'email': '* required',
-            'groups': '* required'
         }
 
         widgets = {

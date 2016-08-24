@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # 
 
-from users.models import User, UserGroup, Role, init_all_models
+from users.models import User, UserGroup, init_all_models
 from django.shortcuts import reverse
 from django.test import TestCase, Client, TransactionTestCase
 
@@ -45,7 +45,7 @@ class UserAddTests(TestCase):
             'name': gen_name(),
             'email': gen_email(),
             'groups': [UserGroup.objects.first().id, ],
-            'role': get_role().id,
+            'role': get_role(),
             'date_expired': '2086-08-06 19:12:22',
         }
 

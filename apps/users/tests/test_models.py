@@ -3,9 +3,9 @@
 
 from django.utils import timezone
 from django.shortcuts import reverse
-from django.test import TestCase, Client, TransactionTestCase
+from django.test import TestCase, TransactionTestCase
 from django.db import IntegrityError
-from users.models import User, UserGroup, Role, init_all_models
+from users.models import User, UserGroup, init_all_models
 from django.contrib.auth.models import Permission
 
 from .base import gen_name, gen_username, gen_email, get_role
@@ -22,8 +22,6 @@ class UserModelTest(TransactionTestCase):
 
     def test_initial(self):
         self.assertEqual(User.objects.all().count(), 2)
-        self.assertEqual(Role.objects.all().count(), 3)
-        self.assertEqual(UserGroup.objects.all().count(), 1)
 
     @property
     def role(self):
@@ -32,7 +30,7 @@ class UserModelTest(TransactionTestCase):
     # 创建一个姓名一致的用户, 应该创建成功
     def test_user_name_duplicate(self):
         user1 = User(name='test', username=gen_username(), password_raw=gen_username(),
-                     email=gen_email(), role=self.role)
+                     email=gen_email())
         try:
             user1.save()
             user1.delete()
@@ -59,7 +57,7 @@ class UserModelTest(TransactionTestCase):
         user = User(name=gen_name(), username=gen_username(),
                     email=gen_email(), role=self.role, date_expired=date)
 
-        self.assertTrue(user.is_expired())
+        self.assertTrue(user.is_expired)
 
     # 测试用户默认会输入All用户组
     def test_user_with_default_group(self):
@@ -80,26 +78,6 @@ class UserModelTest(TransactionTestCase):
     def tearDown(self):
         User.objects.all().delete()
         UserGroup.objects.all().delete()
-        Role.objects.all().delete()
-
-
-class RoleModelTestCase(TransactionTestCase):
-    def setUp(self):
-        Role.objects.all().delete()
-        Role.initial()
-
-    def test_role_initial(self):
-        self.assertEqual(Role.objects.all().count(), 3)
-
-    def test_create_new_role(self):
-        role = Role(name=gen_name(), comment=gen_name()*3)
-        role.save()
-        role.permissions = Permission.objects.all()
-        role.save()
-
-        self.assertEqual(Role.objects.count(), 4)
-        role = Role.objects.last()
-        self.assertEqual(role.permissions.all().count(), Permission.objects.all().count())
 
 
 class UserGroupModelTestCase(TransactionTestCase):

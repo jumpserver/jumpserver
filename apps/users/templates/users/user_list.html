@@ -30,7 +30,7 @@
                  </a>
              </td>
              <td class="text-center">{{ user.username }}</td>
-             <td class="text-center">{{ user.role.name }}</td>
+             <td class="text-center">{{ user.get_role_display }}</td>
              <td class="text-center" title="{% for user_group in user.group.all %} {{ user_group.name }} {% endfor %}"> {{ user.groups.all|join_queryset_attr:"name" }} </td>
              <th class="text-center">{{ user.name }}</th>
              <td class="text-center">

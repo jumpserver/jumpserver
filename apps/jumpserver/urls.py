@@ -31,7 +31,7 @@ urlpatterns = [
     url(r'^users/', include('users.urls')),
     url(r'^assets/', include('assets.urls')),
     url(r'^terminal/', include('webterminal.urls')),
-    url(r'^api/(?P<version>.*)/(?P<module>.*)/(?P<api>.*)', view),
+    # url(r'^api/(?P<version>.*)/(?P<module>.*)/(?P<api>.*)', view),
     # url(r'^admin/', admin.site.urls),
 ]
 

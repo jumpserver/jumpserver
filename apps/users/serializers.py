@@ -3,13 +3,16 @@
 
 from rest_framework import serializers
 
-from .models import Role, User, UserGroup
+from .models import User, UserGroup
 
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        exclude = ['first_name', 'last_name', 'is_staff']
+        exclude = [
+            'password', 'first_name', 'last_name', 'is_staff', 'secret_key_otp',
+            'private_key', 'public_key',
+        ]
 
 
 class UserGroupSerializer(serializers.ModelSerializer):
@@ -18,7 +21,3 @@ class UserGroupSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class RoleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Role
-        fields = '__all__'

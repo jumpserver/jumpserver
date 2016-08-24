@@ -4,7 +4,7 @@
 from random import choice
 import forgery_py
 
-from users.models import User, UserGroup, Role, init_all_models
+from users.models import User, UserGroup, init_all_models
 
 
 def gen_username():
@@ -20,5 +20,5 @@ def gen_name():
 
 
 def get_role():
-    role = choice(Role.objects.all())
+    role = choice(dict(User.ROLE_CHOICES).keys())
     return role

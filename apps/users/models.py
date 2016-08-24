@@ -10,43 +10,43 @@ from django.contrib.auth.models import AbstractUser, Permission
 from django.db import OperationalError
 
 
-class Role(models.Model):
-    name = models.CharField('name', max_length=80, unique=True)
-    permissions = models.ManyToManyField(
-        Permission,
-        verbose_name='permissions',
-        blank=True,
-    )
-    date_added = models.DateTimeField(auto_now_add=True)
-    created_by = models.CharField(max_length=100)
-    comment = models.CharField(max_length=80, blank=True)
+# class Role(models.Model):
+#     name = models.CharField('name', max_length=80, unique=True)
+#     permissions = models.ManyToManyField(
+#         Permission,
+#         verbose_name='permissions',
+#         blank=True,
+#     )
+#     date_added = models.DateTimeField(auto_now_add=True)
+#     created_by = models.CharField(max_length=100)
+#     comment = models.CharField(max_length=80, blank=True)
+#
+#     def __unicode__(self):
+#         return self.name
+#
+#     def delete(self, using=None, keep_parents=False):
+#         if self.user_set.all().count() > 0:
+#             raise OperationalError('Role %s has some member, should not be delete.' % self.name)
+#         else:
+#             return super(Role, self).delete(using=using, keep_parents=keep_parents)
+#
+#     class Meta:
+#         db_table = 'role'
+#
+#     @classmethod
+#     def initial(cls):
+#         roles = {
+#             'Administrator': {'permissions': Permission.objects.all(), 'comment': '管理员'},
+#             'User': {'permissions': [], 'comment': '用户'},
+#             'Auditor': {'permissions': Permission.objects.filter(content_type__app_label='audits'),
+#                         'comment': '审计员'},
+#         }
 
-    def __unicode__(self):
-        return self.name
-
-    def delete(self, using=None, keep_parents=False):
-        if self.user_set.all().count() > 0:
-            raise OperationalError('Role %s has some member, should not be delete.' % self.name)
-        else:
-            return super(Role, self).delete(using=using, keep_parents=keep_parents)
-
-    class Meta:
-        db_table = 'role'
-
-    @classmethod
-    def initial(cls):
-        roles = {
-            'Administrator': {'permissions': Permission.objects.all(), 'comment': '管理员'},
-            'User': {'permissions': [], 'comment': '用户'},
-            'Auditor': {'permissions': Permission.objects.filter(content_type__app_label='audits'),
-                        'comment': '审计员'},
-        }
-
-        for role_name, props in roles.items():
-            if not cls.objects.filter(name=role_name):
-                role = cls.objects.create(name=role_name, comment=props.get('comment', ''), created_by='System')
-                if props.get('permissions'):
-                    role.permissions = props.get('permissions')
+#         for role_name, props in roles.items():
+#            if not cls.objects.filter(name=role_name):
+#                role = cls.objects.create(name=role_name, comment=props.get('comment', ''), created_by='System')
+#                if props.get('permissions'):
+#                    role.permissions = props.get('permissions')
 
 
 class UserGroup(models.Model):
@@ -91,20 +91,25 @@ def date_expired_default():
 
 
 class User(AbstractUser):
+    ROLE_CHOICES = (
+        ('Admin', '管理员'),
+        ('User', '用户'),
+    )
+
     username = models.CharField(max_length=20, unique=True, verbose_name='用户名')
     name = models.CharField(max_length=20, blank=True, verbose_name='姓名')
     email = models.EmailField(max_length=30, unique=True, verbose_name='邮件')
-    groups = models.ManyToManyField(UserGroup, verbose_name='用户组')
+    groups = models.ManyToManyField(UserGroup, blank=True, verbose_name='用户组')
+    role = models.CharField(choices=ROLE_CHOICES, default='User', max_length=10, blank=True, verbose_name='角色')
     avatar = models.ImageField(upload_to="avatar", verbose_name='头像')
     wechat = models.CharField(max_length=30, blank=True, verbose_name='微信')
     phone = models.CharField(max_length=20, blank=True, verbose_name='手机号')
     enable_otp = models.BooleanField(default=False, verbose_name='启用二次验证')
     secret_key_otp = models.CharField(max_length=16, blank=True)
-    role = models.ForeignKey(Role, on_delete=models.SET('None'), verbose_name='角色')
     private_key = models.CharField(max_length=5000, blank=True, verbose_name='ssh私钥')  # ssh key max length 4096 bit
     public_key = models.CharField(max_length=1000, blank=True, verbose_name='公钥')
     comment = models.TextField(max_length=200, blank=True, verbose_name='描述')
-    date_expired = models.DateTimeField(default=date_expired_default, verbose_name='有效期')
+    date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True, verbose_name='有效期')
     created_by = models.CharField(max_length=30, default='')
 
     @property
@@ -120,16 +125,43 @@ class User(AbstractUser):
     def password_raw(self, raw_password):
         self.set_password(raw_password)
 
+    @property
     def is_expired(self):
         if self.date_expired > timezone.now():
             return False
         else:
             return True
 
+    @property
+    def is_superuser(self):
+        if self.role == 'Admin':
+            return True
+        else:
+            return False
+
+    @is_superuser.setter
+    def is_superuser(self, value):
+        if value is True:
+            self.role = 'Admin'
+        else:
+            self.role = 'User'
+
+    @property
+    def is_staff(self):
+        if self.is_authenticated and self.is_active and not self.is_expired:
+            return True
+        else:
+            return False
+
+    @is_staff.setter
+    def is_staff(self, value):
+        pass
+
     def save(self, *args, **kwargs):
         # If user not set name, it's default equal username
         if not self.name:
             self.name = self.username
+
         super(User, self).save(*args, **kwargs)
         # Set user default group 'All'
         # Todo: It's have bug
@@ -148,7 +180,7 @@ class User(AbstractUser):
                    email='admin@jumpserver.org',
                    name='Administrator',
                    password_raw='admin',
-                   role=Role.objects.get(name='Administrator'),
+                   role='Admin',
                    comment='Administrator is the super user of system',
                    created_by='System')
         user.save()
@@ -166,11 +198,11 @@ class User(AbstractUser):
                        email=forgery_py.internet.email_address(),
                        name=forgery_py.name.full_name(),
                        password=make_password(forgery_py.lorem_ipsum.word()),
-                       role=choice(Role.objects.all()),
+                       role=choice(dict(User.ROLE_CHOICES).keys()),
                        wechat=forgery_py.internet.user_name(True),
                        comment=forgery_py.lorem_ipsum.sentence(),
                        created_by=choice(cls.objects.all()).username,
-                    )
+                   )
             try:
                 user.save()
             except IntegrityError:
@@ -181,12 +213,12 @@ class User(AbstractUser):
 
 
 def init_all_models():
-    for model in (Role, UserGroup, User):
+    for model in (UserGroup, User):
         if hasattr(model, 'initial'):
             model.initial()
 
 
 def generate_fake():
-    for model in (Role, UserGroup, User):
+    for model in (UserGroup, User):
         if hasattr(model, 'generate_fake'):
             model.generate_fake()
