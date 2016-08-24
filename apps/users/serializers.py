@@ -10,8 +10,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         exclude = [
-            'password', 'first_name', 'last_name', 'is_staff', 'secret_key_otp',
-            'private_key', 'public_key',
+            'password', 'first_name', 'last_name', 'secret_key_otp',
+            'private_key', 'public_key', 'avatar',
         ]
 
 
