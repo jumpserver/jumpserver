@@ -28,19 +28,19 @@
 
 <div class="row wrapper border-bottom white-bg page-heading">
     <div class="col-sm-10">
-        <h2>{{ title }}</h2>
+        <h2></h2>
         <ol class="breadcrumb">
             <li>
                 <a href="">仪表盘</a>
             </li>
             <li>
-            {% if path1 %}
-                <a>{{ path1 }}</a>
+            {% if app %}
+                <a>{{ app }}</a>
             {% endif %}
             </li>
-            {% if path2 %}
+            {% if action %}
             <li class="active">
-                <strong>{{ path2 }}</strong>
+                <strong>{{ action }}</strong>
             </li>
             {% endif %}
         </ol>

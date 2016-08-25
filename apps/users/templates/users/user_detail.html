@@ -134,8 +134,11 @@
                                             <td><span style="float: right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
-                                                        <input type="checkbox" checked class="onoffswitch-checkbox"
-                                                               id="example1">
+                                                        {% if user.is_active %}
+                                                        <input type="checkbox" checked class="onoffswitch-checkbox" id="example1">
+                                                        {% else %}
+                                                        <input type="checkbox" class="onoffswitch-checkbox" id="example1">
+                                                        {% endif %}
                                                         <label class="onoffswitch-label" for="example1">
                                                             <span class="onoffswitch-inner"></span>
                                                             <span class="onoffswitch-switch"></span>

@@ -36,7 +36,7 @@ class UserListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(UserListView, self).get_context_data(**kwargs)
-        context.update({'path1': '用户管理', 'path2': '用户列表', 'title': '用户列表', 'keyword': self.keyword})
+        context.update({'app': '用户管理', 'action': '用户列表', 'keyword': self.keyword})
         return context
 
 
@@ -49,7 +49,7 @@ class UserAddView(SuccessMessageMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super(UserAddView, self).get_context_data(**kwargs)
-        context.update({'path1': '用户管理', 'path2': '用户添加', 'title': '用户添加'})
+        context.update({'app': '用户管理', 'action': '用户添加'})
         return context
 
     def form_valid(self, form):
@@ -87,6 +87,11 @@ class UserUpdateView(UpdateView):
         print(form.errors)
         return super(UserUpdateView, self).form_invalid(form)
 
+    def get_context_data(self, **kwargs):
+        context = super(UserUpdateView, self).get_context_data(**kwargs)
+        context.update({'app': '用户管理', 'action': '用户编辑'})
+        return context
+
 
 class UserDeleteView(DeleteView):
     model = User
@@ -102,7 +107,7 @@ class UserDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super(UserDetailView, self).get_context_data(**kwargs)
         groups = [group for group in UserGroup.objects.iterator() if group not in self.object.groups.iterator()]
-        context.update({'path1': '用户管理', 'path2': '用户详情', 'title': '用户详情', 'groups': groups})
+        context.update({'app': '用户管理', 'action': '用户详情', 'groups': groups})
         return context
 
 
@@ -126,7 +131,7 @@ class UserGroupListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super(UserGroupListView, self).get_context_data(**kwargs)
-        context.update({'path1': '用户管理', 'path2': '用户组列表', 'title': '用户组列表', 'keyword': self.keyword})
+        context.update({'app': '用户管理', 'action': '用户组列表', 'keyword': self.keyword})
         return context
 
 
@@ -139,7 +144,7 @@ class UserGroupAddView(CreateView):
     def get_context_data(self, **kwargs):
         context = super(UserGroupAddView, self).get_context_data(**kwargs)
         users = User.objects.all()
-        context.update({'path1': '用户管理', 'path2': '用户组添加', 'title': '用户组添加', 'users': users})
+        context.update({'app': '用户管理', 'action': '用户组添加', 'users': users})
         return context
 
     def form_valid(self, form):
