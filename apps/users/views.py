@@ -28,9 +28,11 @@ class UserLoginView(FormView):
             return HttpResponseRedirect(reverse('users:user-list'))
         return super(UserLoginView, self).get(request, *args, **kwargs)
 
-    # def post(self, request, *args, **kwargs):
-    #     print(self.request.user)
-    #     return HttpResponseRedirect('/')
+    def post(self, request, *args, **kwargs):
+        print(self.request.user)
+        print(request.POST)
+        print(request.session.session_key)
+        return HttpResponseRedirect('/')
 
     def form_valid(self, form):
         username = form.cleaned_data.get('username', '')

@@ -148,7 +148,7 @@ class User(AbstractUser):
 
     @property
     def is_staff(self):
-        if self.is_authenticated and self.is_active and not self.is_expired:
+        if self.is_authenticated and self.is_active and not self.is_expired and self.is_superuser:
             return True
         else:
             return False

@@ -231,13 +231,19 @@
             var status = $(obj).prop('checked');
 
             $.ajax({
-{#                url: "{% url 'users:user-detail-api' pk=user.id %}",#}
-                url: "{% url 'users:login' %}",
-                type: "POST",
+                url: "{% url 'users:user-detail-api' pk=user.id %}",
+{#                url: "{% url 'users:login' %}",#}
+                type: "PUT",
                 data: {
                     'username': "{{ user.username }}",
                     'email': "{{ user.email }}",
                     'is_active': status
+                },
+                success: function (data, status) {
+                    console.log(data)
+                },
+                error: function () {
+                    console.log('error')
                 }
             })
         }

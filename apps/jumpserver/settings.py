@@ -173,12 +173,12 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly',
+        'rest_framework.permissions.IsAdminUser',
     ),
-    # 'DEFAULT_AUTHENTICATION_CLASSES': (
-    #     'rest_framework.authentication.BasicAuthentication',
-    #     'rest_framework.authentication.SessionAuthentication',
-    # ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
 }
 # This setting is required to override the Django's main loop, when running in
 # development mode, such as ./manage runserver
