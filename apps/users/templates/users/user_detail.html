@@ -62,8 +62,7 @@
                                         <tbody>
                                         <tr>
                                             <td colspan="2">
-                                                <img src="{{ user | user_avatar_url }}" class="img-circle" width="64"
-                                                     height="64">
+                                                <img src="{{ user | user_avatar_url }}" class="img-circle" width="64" height="64">
                                             </td>
                                         </tr>
                                         <tr>
@@ -134,12 +133,8 @@
                                             <td><span style="float: right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
-                                                        {% if user.is_active %}
-                                                        <input type="checkbox" checked class="onoffswitch-checkbox" id="example1">
-                                                        {% else %}
-                                                        <input type="checkbox" class="onoffswitch-checkbox" id="example1">
-                                                        {% endif %}
-                                                        <label class="onoffswitch-label" for="example1">
+                                                        <input type="checkbox" {% if user.is_active %} checked {% endif %}  class="onoffswitch-checkbox" id="is_active" onchange="switch_user_status(this)">
+                                                        <label class="onoffswitch-label" for="is_active">
                                                             <span class="onoffswitch-inner"></span>
                                                             <span class="onoffswitch-switch"></span>
                                                         </label>
@@ -232,6 +227,20 @@
 {% endblock %}
 {% block custom_foot_js %}
     <script>
+        function switch_user_status(obj) {
+            var status = $(obj).prop('checked');
+
+            $.ajax({
+{#                url: "{% url 'users:user-detail-api' pk=user.id %}",#}
+                url: "{% url 'users:login' %}",
+                type: "POST",
+                data: {
+                    'username': "{{ user.username }}",
+                    'email': "{{ user.email }}",
+                    'is_active': status
+                }
+            })
+        }
         $(document).ready(function () {
             $('.select2').select2();
         })

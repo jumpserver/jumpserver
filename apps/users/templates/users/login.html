@@ -1,0 +1,48 @@
+{% load static %}
+{% load bootstrap %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> JumpServer </title>
+    <link rel="shortcut icon" href="{% static "img/facio.ico" %}" type="image/x-icon">
+    {% include '_head_css_js.html' %}
+    <link href="{% static "css/style.css" %}" rel="stylesheet">
+    <script src="{% static "js/base.js" %}"></script>
+</head>
+
+<body class="gray-bg">
+    <div class="middle-box text-center loginscreen  animated fadeInDown">
+        <div>
+            <div>
+                <h1 class="logo-name"><img src="{% static "/img/logo.png" %}"></h1>
+            </div>
+            {% if error %}
+                <div class="alert alert-danger text-center">{{ error }}</div>
+            {% endif %}
+            <h2>Welcome to Jumpserver</h2>
+            <form class="m-t" role="form" method="post" action="">
+                {% csrf_token %}
+                <div class="form-group">
+                    <input id="{{ form.username.id_for_label }}" name="{{ form.username.html_name }}" type="text" value="{{ user.username }}" class="form-control" placeholder="Username">
+                </div>
+
+                <div class="form-group">
+                    <input id="{{ form.password.id_for_label }}" name="{{ form.password.html_name }}" type="password" value="{{ user.password }}" class="form-control" placeholder="Password">
+                </div>
+
+                <button type="submit" class="btn btn-primary block full-width m-b">Login</button>
+
+                <a href=""><small>Forgot password? </small></a>
+            </form>
+            <p class="m-t"> <small><b>Copyright</b> Jumpserver.org Organization © 2014-2015</small> </p>
+        </div>
+    </div>
+
+    {% include '_foot_js.html' %}
+
+</body>
+
+</html>

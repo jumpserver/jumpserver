@@ -1,12 +1,13 @@
 from django.conf.urls import url
 
-from .views import UserListView, UserAddView, UserUpdateView, UserDeleteView, UserDetailView
+from .views import UserListView, UserAddView, UserUpdateView, UserDeleteView, UserDetailView, UserLoginView
 from .views import UserGroupListView, UserGroupAddView, UserGroupUpdateView, UserGroupDeleteView, UserGroupDetailView
 import api
 
 app_name = 'users'
 
 urlpatterns = [
+    url(r'^login/$', UserLoginView.as_view(), name='login'),
     url(r'^users/$', UserListView.as_view(), name='user-list'),
     url(r'^users/(?P<pk>[0-9]+)/$', UserDetailView.as_view(), name='user-detail'),
     url(r'^users/add/$', UserAddView.as_view(), name='user-add'),

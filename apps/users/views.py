@@ -2,17 +2,50 @@
 
 from __future__ import unicode_literals
 
-from django.shortcuts import get_object_or_404, reverse
+from django.shortcuts import get_object_or_404, reverse, render
+from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.db.models import Q
+from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView, ProcessFormView, FormView
 from django.views.generic.detail import DetailView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.conf import settings
+from django.contrib.auth import authenticate, login, logout
 
 from .models import User, UserGroup
-from .forms import UserAddForm, UserUpdateForm, UserGroupForm
+from .forms import UserAddForm, UserUpdateForm, UserGroupForm, UserLoginForm
+
+
+class UserLoginView(FormView):
+    template_name = 'users/login.html'
+    form_class = UserLoginForm
+    success_url = reverse_lazy('users:user-list')
+
+    def get(self, request, *args, **kwargs):
+        if self.request.user.is_staff:
+            return HttpResponseRedirect(reverse('users:user-list'))
+        return super(UserLoginView, self).get(request, *args, **kwargs)
+
+    # def post(self, request, *args, **kwargs):
+    #     print(self.request.user)
+    #     return HttpResponseRedirect('/')
+
+    def form_valid(self, form):
+        username = form.cleaned_data.get('username', '')
+        password = form.cleaned_data.get('password', '')
+
+        user = authenticate(username=username, password=password)
+        if user is not None and user.is_staff:
+            login(self.request, user)
+            return HttpResponseRedirect(self.success_url)
+
+        return render(self.request, self.template_name, context={'form': form, 'error': '密码错误'})
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return super(UserLoginView, self).form_invalid(form)
 
 
 class UserListView(ListView):
