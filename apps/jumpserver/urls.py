@@ -20,24 +20,22 @@ from django.views.generic.base import TemplateView
 from django.http import HttpResponseRedirect
 
 
-def view(request, **kwargs):
-    if kwargs:
-        print kwargs
-    return HttpResponseRedirect('/' + kwargs["module"] + '/' + kwargs["version"] + '/' + kwargs["api"])
+# def view(request, **kwargs):
+#     if kwargs:
+#         print kwargs
+#     return HttpResponseRedirect('/' + kwargs["module"] + '/' + kwargs["version"] + '/' + kwargs["api"])
 
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='base.html')),
-    url(r'^users/', include('users.urls')),
+    url(r'^(api/)?users/', include('users.urls')),
     url(r'^assets/', include('assets.urls')),
     url(r'^terminal/', include('webterminal.urls')),
-    # url(r'^api/(?P<version>.*)/(?P<module>.*)/(?P<api>.*)', view),
-    # url(r'^admin/', admin.site.urls),
 ]
 
-urlpatterns += [
-    url(r'^api/users/', include('users.api_urls')),
-]
+#urlpatterns += [
+#    url(r'^api/users/', include('users.api_urls')),
+#]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

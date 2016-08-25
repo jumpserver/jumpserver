@@ -26,7 +26,7 @@
                     {{ usergroup.name }}
                 </a>
             </td>
-            <td class="text-center">{{ usergroup.user_set.all|length }}</td>
+            <td class="text-center">{{ usergroup.users.all|length }}</td>
             <td class="text-center">数量</td>
             <th class="text-center">{{ usergroup.comment|truncatewords:8 }}</th>
             <td class="text-center">

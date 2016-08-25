@@ -25,7 +25,7 @@ from django.db import OperationalError
 #         return self.name
 #
 #     def delete(self, using=None, keep_parents=False):
-#         if self.user_set.all().count() > 0:
+#         if self.users.all().count() > 0:
 #             raise OperationalError('Role %s has some member, should not be delete.' % self.name)
 #         else:
 #             return super(Role, self).delete(using=using, keep_parents=keep_parents)
@@ -99,7 +99,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=20, unique=True, verbose_name='用户名')
     name = models.CharField(max_length=20, blank=True, verbose_name='姓名')
     email = models.EmailField(max_length=30, unique=True, verbose_name='邮件')
-    groups = models.ManyToManyField(UserGroup, blank=True, verbose_name='用户组')
+    groups = models.ManyToManyField(UserGroup, related_name='users', blank=True, verbose_name='用户组')
     role = models.CharField(choices=ROLE_CHOICES, default='User', max_length=10, blank=True, verbose_name='角色')
     avatar = models.ImageField(upload_to="avatar", verbose_name='头像')
     wechat = models.CharField(max_length=30, blank=True, verbose_name='微信')

@@ -7,6 +7,8 @@ from .models import User, UserGroup
 
 
 class UserSerializer(serializers.ModelSerializer):
+    groups = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='users:usergroup-detail-api')
+
     class Meta:
         model = User
         exclude = [
@@ -16,6 +18,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserGroupSerializer(serializers.ModelSerializer):
+    users = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='users:user-detail-api')
+
     class Meta:
         model = UserGroup
         fields = '__all__'

@@ -147,7 +147,7 @@ class UserGroupAddView(CreateView):
         users_id_list = self.request.POST.getlist('users', [])
         users = [get_object_or_404(User, id=user_id) for user_id in users_id_list]
         usergroup.created_by = self.request.user.username or 'Admin'
-        usergroup.user_set.add(*tuple(users))
+        usergroup.users.add(*tuple(users))
         usergroup.save()
         return super(UserGroupAddView, self).form_valid(form)
 

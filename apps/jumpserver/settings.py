@@ -182,6 +182,7 @@ WSGI_APPLICATION = 'ws4redis.django_runserver.application'
 
 # URL that distinguishes websocket connections from normal requests
 WEBSOCKET_URL = '/ws/'
+
 # WebSocket Redis
 WS4REDIS_CONNECTION = {
     'host': '127.0.0.1',
