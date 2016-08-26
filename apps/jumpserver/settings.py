@@ -15,8 +15,9 @@ import sys
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PROJECT_DIR = os.path.dirname(BASE_DIR)
 
-sys.path.append(os.path.dirname(BASE_DIR))
+sys.path.append(PROJECT_DIR)
 
 # Import project config setting
 try:
@@ -34,6 +35,10 @@ SECRET_KEY = CONFIG.SECRET_KEY or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = CONFIG.DEBUG or False
+
+
+# LOG LEVEL
+LOG_LEVEL = 'DEBUG' if DEBUG else CONFIG.LOG_LEVEL or 'WARNING'
 
 ALLOWED_HOSTS = CONFIG.ALLOWED_HOSTS or []
 
@@ -131,6 +136,70 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# Logging setting
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'main': {
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+            'format': '%(asctime)s [%(module)s %(levelname)s] %(message)s',
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        'null': {
+            'level': 'DEBUG',
+            'class': 'logging.NullHandler',
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'main'
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'formatter': 'main',
+            'filename': os.path.join(PROJECT_DIR, 'logs', 'jumpserver.log')
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['null'],
+            'propagate': False,
+            'level': LOG_LEVEL,
+        },
+        'django.request': {
+            'handlers': ['console', 'file'],
+            'level': LOG_LEVEL,
+            'propagate': False,
+        },
+        'django.server': {
+            'handlers': ['console', 'file'],
+            'level': LOG_LEVEL,
+            'propagate': False,
+        },
+        'jumpserver': {
+            'handlers': ['console', 'file'],
+            'level': LOG_LEVEL,
+        },
+        'jumpserver.users.api': {
+            'handlers': ['console', 'file'],
+            'level': LOG_LEVEL,
+        },
+        'jumpserver.users.view': {
+            'handlers': ['console', 'file'],
+            'level': LOG_LEVEL,
+        }
+    }
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/

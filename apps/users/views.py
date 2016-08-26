@@ -2,6 +2,8 @@
 
 from __future__ import unicode_literals
 
+import logging
+
 from django.shortcuts import get_object_or_404, reverse, render
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -18,6 +20,9 @@ from .models import User, UserGroup
 from .forms import UserAddForm, UserUpdateForm, UserGroupForm, UserLoginForm
 
 
+logger = logging.getLogger('jumpserver.users.views')
+
+
 class UserLoginView(FormView):
     template_name = 'users/login.html'
     form_class = UserLoginForm
@@ -28,12 +33,6 @@ class UserLoginView(FormView):
             return HttpResponseRedirect(reverse('users:user-list'))
         return super(UserLoginView, self).get(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        print(self.request.user)
-        print(request.POST)
-        print(request.session.session_key)
-        return HttpResponseRedirect('/')
-
     def form_valid(self, form):
         username = form.cleaned_data.get('username', '')
         password = form.cleaned_data.get('password', '')
@@ -43,10 +42,11 @@ class UserLoginView(FormView):
             login(self.request, user)
             return HttpResponseRedirect(self.success_url)
 
+        logger.warning('Login user [%(username)s] password error' % {'username': username})
         return render(self.request, self.template_name, context={'form': form, 'error': '密码错误'})
 
     def form_invalid(self, form):
-        print(form.errors)
+        logger.warning('Login form commit invalid.')
         return super(UserLoginView, self).form_invalid(form)
 
 
