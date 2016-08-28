@@ -10,7 +10,7 @@
                     <strong class="font-bold"> {{ request.user.name }}<span style="color: #8095a8"></span></strong>
                 </span>
                 <span class="text-muted text-xs block">
-                     {{ role | default:'普通用户' }}<b class="caret"></b>
+                     {{ request.user.get_role_display | default:'普通用户' }}<b class="caret"></b>
                 </span>
             </span>
         </a>

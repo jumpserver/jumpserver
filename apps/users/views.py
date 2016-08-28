@@ -16,6 +16,7 @@ from django.contrib.auth import authenticate, login, logout
 
 from .models import User, UserGroup
 from .forms import UserAddForm, UserUpdateForm, UserGroupForm, UserLoginForm
+from .utils import AdminUserRequiredMixin
 
 
 class UserLoginView(FormView):
@@ -27,12 +28,6 @@ class UserLoginView(FormView):
         if self.request.user.is_staff:
             return HttpResponseRedirect(reverse('users:user-list'))
         return super(UserLoginView, self).get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        print(self.request.user)
-        print(request.POST)
-        print(request.session.session_key)
-        return HttpResponseRedirect('/')
 
     def form_valid(self, form):
         username = form.cleaned_data.get('username', '')
@@ -50,7 +45,7 @@ class UserLoginView(FormView):
         return super(UserLoginView, self).form_invalid(form)
 
 
-class UserListView(ListView):
+class UserListView(AdminUserRequiredMixin, ListView):
     model = User
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'user_list'
@@ -75,7 +70,7 @@ class UserListView(ListView):
         return context
 
 
-class UserAddView(SuccessMessageMixin, CreateView):
+class UserAddView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = User
     form_class = UserAddForm
     template_name = 'users/user_add.html'
@@ -101,7 +96,7 @@ class UserAddView(SuccessMessageMixin, CreateView):
         )
 
 
-class UserUpdateView(UpdateView):
+class UserUpdateView(AdminUserRequiredMixin, UpdateView):
     model = User
     form_class = UserUpdateForm
     template_name = 'users/user_edit.html'
@@ -128,13 +123,13 @@ class UserUpdateView(UpdateView):
         return context
 
 
-class UserDeleteView(DeleteView):
+class UserDeleteView(AdminUserRequiredMixin, DeleteView):
     model = User
     success_url = reverse_lazy('users:user-list')
     template_name = 'users/user_delete_confirm.html'
 
 
-class UserDetailView(DetailView):
+class UserDetailView(AdminUserRequiredMixin, DetailView):
     model = User
     template_name = 'users/user_detail.html'
     context_object_name = "user"
@@ -146,7 +141,7 @@ class UserDetailView(DetailView):
         return context
 
 
-class UserGroupListView(ListView):
+class UserGroupListView(AdminUserRequiredMixin, ListView):
     model = UserGroup
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'usergroup_list'
@@ -170,7 +165,7 @@ class UserGroupListView(ListView):
         return context
 
 
-class UserGroupAddView(CreateView):
+class UserGroupAddView(AdminUserRequiredMixin, CreateView):
     model = UserGroup
     form_class = UserGroupForm
     template_name = 'users/usergroup_add.html'
