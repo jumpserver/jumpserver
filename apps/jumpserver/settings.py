@@ -114,7 +114,7 @@ else:
             'NAME': CONFIG.DB_NAME,
             'HOST': CONFIG.DB_HOST,
             'PORT': CONFIG.DB_PORT,
-            'USER': CONFIG.DB_USERNAME,
+            'USER': CONFIG.DB_USER,
             'PASSWORD': CONFIG.DB_PASSWORD,
         }
     }
@@ -263,7 +263,7 @@ WS4REDIS_CONNECTION = {
     'db': 2,
 }
 
-# Set the number of seconds each message shall persited
+# Set the number of seconds each message shall persisted
 WS4REDIS_EXPIRE = 3600
 
 WS4REDIS_HEARTBEAT = 'love you'
