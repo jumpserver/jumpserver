@@ -28,7 +28,8 @@ class UserDetailDeleteUpdateApi(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
 
     def put(self, request, *args, **kwargs):
-        logger.debug(request.META)
+        for k, v in request.META.items():
+            logger.debug("%s --> %s" % (k, v))
         return super(UserDetailDeleteUpdateApi, self).put(request, *args, **kwargs)
 
     # def get(self, request, *args, **kwargs):
