@@ -7,7 +7,7 @@ from rest_framework import generics, mixins, status, permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .serializers import UserSerializer, UserGroupSerializer
+from .serializers import UserSerializer, UserGroupSerializer, UserActiveSerializer
 from .models import User, UserGroup
 
 
@@ -18,24 +18,20 @@ class UserListAddApi(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    # permission_classes = (
-    #     permissions.DenyAll,
-    # )
-
 
 class UserDetailDeleteUpdateApi(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-    def put(self, request, *args, **kwargs):
-        for k, v in request.META.items():
-            logger.debug("%s --> %s" % (k, v))
-        return super(UserDetailDeleteUpdateApi, self).put(request, *args, **kwargs)
 
-    # def get(self, request, *args, **kwargs):
-    #     print("hello world")
-    #     print(request.user)
-    #     return super(UserDetailDeleteUpdateApi, self).get(request, *args, **kwargs)
+class UserActiveApi(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserActiveSerializer
+
+    # def put(self, request, *args, **kwargs):
+    #     for k, v in request.META.items():
+    #         logger.debug("%s --> %s" % (k, v))
+    #     return super(UserActiveApi, self).put(request, *args, **kwargs)
 
 
 class UserGroupListAddApi(generics.ListCreateAPIView):
