@@ -1,3 +1,6 @@
 django==1.10
+celery==3.1.23
+ansible==2.1.1.0
+
 pillow
 django-bootstrap-form
