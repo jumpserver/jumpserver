@@ -32,6 +32,10 @@ class UserDetailDeleteUpdateApi(generics.RetrieveUpdateDestroyAPIView):
             logger.debug("%s --> %s" % (k, v))
         return super(UserDetailDeleteUpdateApi, self).put(request, *args, **kwargs)
 
+    def delete(self, request, *args, **kwargs):
+        print(self.request.data)
+        return super(UserDetailDeleteUpdateApi, self).delete(request, *args, **kwargs)
+
     # def get(self, request, *args, **kwargs):
     #     print("hello world")
     #     print(request.user)
