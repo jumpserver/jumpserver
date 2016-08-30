@@ -13,3 +13,4 @@ wcwidth==0.1.7
 websocket-client==0.37.0
 djangorestframework==3.4.5
 ForgeryPy==0.1
+paramiko==2.0.2

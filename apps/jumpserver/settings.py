@@ -96,7 +96,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'jumpserver.wsgi.application'
+# WSGI_APPLICATION = 'jumpserver.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
@@ -230,9 +230,6 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace('\\', '/') + '/'
 
-# Custom User Auth model
-AUTH_USER_MODEL = 'users.User'
-
 # Use django-bootstrap-form to format template, input max width arg
 BOOTSTRAP_COLUMN_COUNT = 11
 
@@ -275,3 +272,7 @@ WS4REDIS_PREFIX = 'demo'
 SESSION_ENGINE = 'redis_sessions.session'
 
 SESSION_REDIS_PREFIX = 'session'
+
+# Custom User Auth model
+AUTH_USER_MODEL = 'users.User'
+

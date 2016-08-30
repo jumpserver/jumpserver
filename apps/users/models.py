@@ -10,9 +10,8 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, Permission
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from rest_framework.authtoken.models import Token
 from django.db import IntegrityError
-
+from rest_framework.authtoken.models import Token
 
 
 # class Role(models.Model):
@@ -250,5 +249,8 @@ def generate_fake():
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
     if created:
-        Token.objects.create(user=instance)
+        try:
+            Token.objects.create(user=instance)
+        except IntegrityError:
+            pass
 

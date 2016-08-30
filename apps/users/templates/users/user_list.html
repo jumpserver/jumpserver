@@ -42,7 +42,7 @@
              </td>
              <td class="text-center">
                  <a href="{% url 'users:user-edit' pk=user.id %}" class="btn btn-xs btn-info">编辑</a>
-                 <a href="{% url 'users:user-delete' pk=user.id %}" class="btn btn-xs btn-danger del {% if user.username == 'admin' %} disabled {% endif %}">删除</a>
+                 <a href="{% url 'users:user-delete' pk=user.id %}" class="btn btn-xs btn-danger del {% if user.id == request.user.id or user.username == 'admin' %} disabled {% endif %}">删除</a>
              </td>
          </tr>
      {% endfor %}
