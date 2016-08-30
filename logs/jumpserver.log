@@ -1,0 +1,437 @@
+2016-08-29 22:25:16 [django_runserver INFO] Websocket support is enabled
+2016-08-29 22:55:32 [basehttp INFO] "GET /users/users/1/ HTTP/1.1" 200 21309
+2016-08-29 22:55:33 [basehttp INFO] "GET /static/css/plugins/select2/select2.min.css HTTP/1.1" 304 0
+2016-08-29 22:55:33 [basehttp INFO] "GET /static/js/plugins/select2/select2.full.min.js HTTP/1.1" 304 0
+2016-08-29 22:55:33 [basehttp INFO] "GET /static/css/style.css HTTP/1.1" 304 0
+2016-08-29 22:55:33 [basehttp INFO] "GET /media/avatar/default/default6.png HTTP/1.1" 304 0
+2016-08-29 22:55:51 [basehttp INFO] "GET /users/users/1/ HTTP/1.1" 200 21309
+2016-08-29 23:23:35 [basehttp INFO] "GET /users/users/1/ HTTP/1.1" 200 21309
+2016-08-29 23:23:35 [basehttp INFO] - Broken pipe from ('192.168.152.1', 10771)
+
+2016-08-29 23:23:35 [basehttp INFO] "GET /users/users/1/ HTTP/1.1" 200 21309
+2016-08-29 23:24:19 [basehttp INFO] "GET /users/users/ HTTP/1.1" 200 13320
+2016-08-29 23:24:22 [basehttp INFO] "GET /users/users/add/ HTTP/1.1" 200 15616
+2016-08-29 23:24:23 [basehttp INFO] "GET /static/css/plugins/datepicker/datepicker3.css HTTP/1.1" 304 0
+2016-08-29 23:24:23 [basehttp INFO] "GET /static/js/plugins/datapicker/bootstrap-datepicker.js HTTP/1.1" 304 0
+2016-08-29 23:24:42 [basehttp INFO] "POST /users/users/add/ HTTP/1.1" 302 0
+2016-08-29 23:24:43 [basehttp INFO] "GET /users/users/ HTTP/1.1" 200 14426
+2016-08-29 23:24:49 [basehttp INFO] "GET /users/users/2/ HTTP/1.1" 200 21241
+2016-08-29 23:24:49 [basehttp INFO] "GET /media/avatar/default/default5.png HTTP/1.1" 304 0
+2016-08-29 23:24:51 [api DEBUG] wsgi.multiprocess --> False
+2016-08-29 23:24:51 [api DEBUG] wsgi.multiprocess --> False
+2016-08-29 23:24:51 [api DEBUG] RUN_MAIN --> true
+2016-08-29 23:24:51 [api DEBUG] RUN_MAIN --> true
+2016-08-29 23:24:51 [api DEBUG] HTTP_REFERER --> http://m/users/users/2/
+2016-08-29 23:24:51 [api DEBUG] HTTP_REFERER --> http://m/users/users/2/
+2016-08-29 23:24:51 [api DEBUG] HTTP_ACCEPT_LANGUAGE --> zh-CN,zh;q=0.8,en;q=0.6,pt;q=0.4,zh-TW;q=0.2
+2016-08-29 23:24:51 [api DEBUG] HTTP_ACCEPT_LANGUAGE --> zh-CN,zh;q=0.8,en;q=0.6,pt;q=0.4,zh-TW;q=0.2
+2016-08-29 23:24:51 [api DEBUG] SERVER_PROTOCOL --> HTTP/1.1
+2016-08-29 23:24:51 [api DEBUG] SERVER_PROTOCOL --> HTTP/1.1
+2016-08-29 23:24:51 [api DEBUG] SERVER_SOFTWARE --> WSGIServer/0.1 Python/2.7.12
+2016-08-29 23:24:51 [api DEBUG] SERVER_SOFTWARE --> WSGIServer/0.1 Python/2.7.12
+2016-08-29 23:24:51 [api DEBUG] SCRIPT_NAME --> 
+2016-08-29 23:24:51 [api DEBUG] SCRIPT_NAME --> 
+2016-08-29 23:24:51 [api DEBUG] LESSOPEN --> |/usr/bin/lesspipe.sh %s
+2016-08-29 23:24:51 [api DEBUG] LESSOPEN --> |/usr/bin/lesspipe.sh %s
+2016-08-29 23:24:51 [api DEBUG] HTTP_X_CSRFTOKEN --> DNCBjEYS8DU3r76ViaGkjcWab1maXEhW7uDqYQcSeIgq26QtGknMhCgJbfpHQMe8
+2016-08-29 23:24:51 [api DEBUG] HTTP_X_CSRFTOKEN --> DNCBjEYS8DU3r76ViaGkjcWab1maXEhW7uDqYQcSeIgq26QtGknMhCgJbfpHQMe8
+2016-08-29 23:24:51 [api DEBUG] SSH_CLIENT --> 192.168.152.1 62321 22
+2016-08-29 23:24:51 [api DEBUG] SSH_CLIENT --> 192.168.152.1 62321 22
+2016-08-29 23:24:51 [api DEBUG] CVS_RSH --> ssh
+2016-08-29 23:24:51 [api DEBUG] CVS_RSH --> ssh
+2016-08-29 23:24:51 [api DEBUG] LOGNAME --> root
+2016-08-29 23:24:51 [api DEBUG] LOGNAME --> root
+2016-08-29 23:24:51 [api DEBUG] USER --> root
+2016-08-29 23:24:51 [api DEBUG] USER --> root
+2016-08-29 23:24:51 [api DEBUG] HTTP_ORIGIN --> http://m
+2016-08-29 23:24:51 [api DEBUG] HTTP_ORIGIN --> http://m
+2016-08-29 23:24:51 [api DEBUG] PATH --> /root/env2.7/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/node/bin:/root/bin
+2016-08-29 23:24:51 [api DEBUG] PATH --> /root/env2.7/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/node/bin:/root/bin
+2016-08-29 23:24:51 [api DEBUG] QUERY_STRING --> 
+2016-08-29 23:24:51 [api DEBUG] QUERY_STRING --> 
+2016-08-29 23:24:51 [api DEBUG] HOME --> /root
+2016-08-29 23:24:51 [api DEBUG] HOME --> /root
+2016-08-29 23:24:51 [api DEBUG] PS1 --> (env2.7) [\u@\h \W]\$ 
+2016-08-29 23:24:51 [api DEBUG] PS1 --> (env2.7) [\u@\h \W]\$ 
+2016-08-29 23:24:51 [api DEBUG] wsgi.errors --> <open file '<stderr>', mode 'w' at 0x7f9a0c5781e0>
+2016-08-29 23:24:51 [api DEBUG] wsgi.errors --> <open file '<stderr>', mode 'w' at 0x7f9a0c5781e0>
+2016-08-29 23:24:51 [api DEBUG] LANG --> en_US.UTF-8
+2016-08-29 23:24:51 [api DEBUG] LANG --> en_US.UTF-8
+2016-08-29 23:24:51 [api DEBUG] HISTCONTROL --> ignoredups
+2016-08-29 23:24:51 [api DEBUG] HISTCONTROL --> ignoredups
+2016-08-29 23:24:51 [api DEBUG] TERM --> xterm
+2016-08-29 23:24:51 [api DEBUG] TERM --> xterm
+2016-08-29 23:24:51 [api DEBUG] SHELL --> /bin/bash
+2016-08-29 23:24:51 [api DEBUG] SHELL --> /bin/bash
+2016-08-29 23:24:51 [api DEBUG] VIRTUALENVWRAPPER_PYTHON --> /usr/local/bin/python3
+2016-08-29 23:24:51 [api DEBUG] VIRTUALENVWRAPPER_PYTHON --> /usr/local/bin/python3
+2016-08-29 23:24:51 [api DEBUG] HTTP_COOKIE --> sessionid=9zmb3etjbixqmga4wc5ihvyy006m7alz; csrftoken=DNCBjEYS8DU3r76ViaGkjcWab1maXEhW7uDqYQcSeIgq26QtGknMhCgJbfpHQMe8
+2016-08-29 23:24:51 [api DEBUG] HTTP_COOKIE --> sessionid=9zmb3etjbixqmga4wc5ihvyy006m7alz; csrftoken=DNCBjEYS8DU3r76ViaGkjcWab1maXEhW7uDqYQcSeIgq26QtGknMhCgJbfpHQMe8
+2016-08-29 23:24:51 [api DEBUG] SERVER_NAME --> localhost.localdomain
+2016-08-29 23:24:51 [api DEBUG] SERVER_NAME --> localhost.localdomain
+2016-08-29 23:24:51 [api DEBUG] REMOTE_ADDR --> 192.168.152.1
+2016-08-29 23:24:51 [api DEBUG] REMOTE_ADDR --> 192.168.152.1
+2016-08-29 23:24:51 [api DEBUG] SHLVL --> 1
+2016-08-29 23:24:51 [api DEBUG] SHLVL --> 1
+2016-08-29 23:24:51 [api DEBUG] G_BROKEN_FILENAMES --> 1
+2016-08-29 23:24:51 [api DEBUG] G_BROKEN_FILENAMES --> 1
+2016-08-29 23:24:51 [api DEBUG] HISTSIZE --> 1000
+2016-08-29 23:24:51 [api DEBUG] HISTSIZE --> 1000
+2016-08-29 23:24:51 [api DEBUG] wsgi.url_scheme --> http
+2016-08-29 23:24:51 [api DEBUG] wsgi.url_scheme --> http
+2016-08-29 23:24:51 [api DEBUG] SERVER_PORT --> 80
+2016-08-29 23:24:51 [api DEBUG] SERVER_PORT --> 80
+2016-08-29 23:24:51 [api DEBUG] CONTENT_LENGTH --> 61
+2016-08-29 23:24:51 [api DEBUG] CONTENT_LENGTH --> 61
+2016-08-29 23:24:51 [api DEBUG] WORKON_HOME --> /root/workspaces
+2016-08-29 23:24:51 [api DEBUG] WORKON_HOME --> /root/workspaces
+2016-08-29 23:24:51 [api DEBUG] HTTP_CONNECTION --> keep-alive
+2016-08-29 23:24:51 [api DEBUG] HTTP_CONNECTION --> keep-alive
+2016-08-29 23:24:51 [api DEBUG] HTTP_X_REQUESTED_WITH --> XMLHttpRequest
+2016-08-29 23:24:51 [api DEBUG] HTTP_X_REQUESTED_WITH --> XMLHttpRequest
+2016-08-29 23:24:51 [api DEBUG] wsgi.file_wrapper --> wsgiref.util.FileWrapper
+2016-08-29 23:24:51 [api DEBUG] wsgi.file_wrapper --> wsgiref.util.FileWrapper
+2016-08-29 23:24:51 [api DEBUG] VIRTUAL_ENV --> /root/env2.7
+2016-08-29 23:24:51 [api DEBUG] VIRTUAL_ENV --> /root/env2.7
+2016-08-29 23:24:51 [api DEBUG] CSRF_COOKIE --> DNCBjEYS8DU3r76ViaGkjcWab1maXEhW7uDqYQcSeIgq26QtGknMhCgJbfpHQMe8
+2016-08-29 23:24:51 [api DEBUG] CSRF_COOKIE --> DNCBjEYS8DU3r76ViaGkjcWab1maXEhW7uDqYQcSeIgq26QtGknMhCgJbfpHQMe8
+2016-08-29 23:24:51 [api DEBUG] wsgi.input --> <socket._fileobject object at 0x7f99f7a417d0>
+2016-08-29 23:24:51 [api DEBUG] wsgi.input --> <socket._fileobject object at 0x7f99f7a417d0>
+2016-08-29 23:24:51 [api DEBUG] VIRTUALENVWRAPPER_WORKON_CD --> 1
+2016-08-29 23:24:51 [api DEBUG] VIRTUALENVWRAPPER_WORKON_CD --> 1
+2016-08-29 23:24:51 [api DEBUG] HTTP_HOST --> m
+2016-08-29 23:24:51 [api DEBUG] HTTP_HOST --> m
+2016-08-29 23:24:51 [api DEBUG] wsgi.multithread --> True
+2016-08-29 23:24:51 [api DEBUG] wsgi.multithread --> True
+2016-08-29 23:24:51 [api DEBUG] TZ --> Asia/Shanghai
+2016-08-29 23:24:51 [api DEBUG] TZ --> Asia/Shanghai
+2016-08-29 23:24:51 [api DEBUG] _ --> /root/env2.7/bin/python
+2016-08-29 23:24:51 [api DEBUG] _ --> /root/env2.7/bin/python
+2016-08-29 23:24:51 [api DEBUG] HTTP_ACCEPT --> */*
+2016-08-29 23:24:51 [api DEBUG] HTTP_ACCEPT --> */*
+2016-08-29 23:24:51 [api DEBUG] VIRTUALENVWRAPPER_PROJECT_FILENAME --> .project
+2016-08-29 23:24:51 [api DEBUG] VIRTUALENVWRAPPER_PROJECT_FILENAME --> .project
+2016-08-29 23:24:51 [api DEBUG] SSH_CONNECTION --> 192.168.152.1 62321 192.168.152.129 22
+2016-08-29 23:24:51 [api DEBUG] SSH_CONNECTION --> 192.168.152.1 62321 192.168.152.129 22
+2016-08-29 23:24:51 [api DEBUG] wsgi.version --> (1, 0)
+2016-08-29 23:24:51 [api DEBUG] wsgi.version --> (1, 0)
+2016-08-29 23:24:51 [api DEBUG] VIRTUALENVWRAPPER_HOOK_DIR --> /root/workspaces
+2016-08-29 23:24:51 [api DEBUG] VIRTUALENVWRAPPER_HOOK_DIR --> /root/workspaces
+2016-08-29 23:24:51 [api DEBUG] GATEWAY_INTERFACE --> CGI/1.1
+2016-08-29 23:24:51 [api DEBUG] GATEWAY_INTERFACE --> CGI/1.1
+2016-08-29 23:24:51 [api DEBUG] wsgi.run_once --> False
+2016-08-29 23:24:51 [api DEBUG] wsgi.run_once --> False
+2016-08-29 23:24:51 [api DEBUG] SSH_TTY --> /dev/pts/3
+2016-08-29 23:24:51 [api DEBUG] SSH_TTY --> /dev/pts/3
+2016-08-29 23:24:51 [api DEBUG] OLDPWD --> /opt/jumpserver
+2016-08-29 23:24:51 [api DEBUG] OLDPWD --> /opt/jumpserver
+2016-08-29 23:24:51 [api DEBUG] HOSTNAME --> localhost.localdomain
+2016-08-29 23:24:51 [api DEBUG] HOSTNAME --> localhost.localdomain
+2016-08-29 23:24:51 [api DEBUG] HTTP_USER_AGENT --> Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36
+2016-08-29 23:24:51 [api DEBUG] HTTP_USER_AGENT --> Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36
+2016-08-29 23:24:51 [api DEBUG] VIRTUALENVWRAPPER_SCRIPT --> /usr/local/bin/virtualenvwrapper.sh
+2016-08-29 23:24:51 [api DEBUG] VIRTUALENVWRAPPER_SCRIPT --> /usr/local/bin/virtualenvwrapper.sh
+2016-08-29 23:24:51 [api DEBUG] PWD --> /opt/jumpserver/apps
+2016-08-29 23:24:51 [api DEBUG] PWD --> /opt/jumpserver/apps
+2016-08-29 23:24:51 [api DEBUG] REQUEST_METHOD --> PUT
+2016-08-29 23:24:51 [api DEBUG] REQUEST_METHOD --> PUT
+2016-08-29 23:24:51 [api DEBUG] DJANGO_SETTINGS_MODULE --> jumpserver.settings
+2016-08-29 23:24:51 [api DEBUG] DJANGO_SETTINGS_MODULE --> jumpserver.settings
+2016-08-29 23:24:51 [api DEBUG] CONTENT_TYPE --> application/x-www-form-urlencoded; charset=UTF-8
+2016-08-29 23:24:51 [api DEBUG] CONTENT_TYPE --> application/x-www-form-urlencoded; charset=UTF-8
+2016-08-29 23:24:51 [api DEBUG] MAIL --> /var/spool/mail/root
+2016-08-29 23:24:51 [api DEBUG] MAIL --> /var/spool/mail/root
+2016-08-29 23:24:51 [api DEBUG] LS_COLORS --> rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;05;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lz=01;31:*.xz=01;31:*.bz2=01;31:*.tbz=01;31:*.tbz2=01;31:*.bz=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.axa=01;36:*.oga=01;36:*.spx=01;36:*.xspf=01;36:
+2016-08-29 23:24:51 [api DEBUG] LS_COLORS --> rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;05;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lz=01;31:*.xz=01;31:*.bz2=01;31:*.tbz=01;31:*.tbz2=01;31:*.bz=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.axa=01;36:*.oga=01;36:*.spx=01;36:*.xspf=01;36:
+2016-08-29 23:24:51 [api DEBUG] REMOTE_HOST --> 
+2016-08-29 23:24:51 [api DEBUG] REMOTE_HOST --> 
+2016-08-29 23:24:51 [api DEBUG] HTTP_ACCEPT_ENCODING --> gzip, deflate, sdch
+2016-08-29 23:24:51 [api DEBUG] HTTP_ACCEPT_ENCODING --> gzip, deflate, sdch
+2016-08-29 23:24:51 [api DEBUG] PATH_INFO --> /users/v1/users/2/
+2016-08-29 23:24:51 [api DEBUG] PATH_INFO --> /users/v1/users/2/
+2016-08-29 23:24:51 [basehttp INFO] "PUT /users/v1/users/2/ HTTP/1.1" 200 347
+2016-08-29 23:24:52 [basehttp INFO] "GET /users/users/2/ HTTP/1.1" 200 21232
+2016-08-29 23:24:52 [basehttp INFO] "GET /static/css/font-awesome.css HTTP/1.1" 304 0
+2016-08-29 23:24:52 [basehttp INFO] "GET /static/js/jquery-2.1.1.js HTTP/1.1" 304 0
+2016-08-29 23:24:52 [basehttp INFO] "GET /static/css/style.css HTTP/1.1" 304 0
+2016-08-29 23:24:52 [basehttp INFO] "GET /static/css/bootstrap.min.css HTTP/1.1" 304 0
+2016-08-29 23:24:52 [basehttp INFO] "GET /static/css/plugins/select2/select2.min.css HTTP/1.1" 304 0
+2016-08-29 23:24:52 [basehttp INFO] "GET /static/css/plugins/vaildator/jquery.validator.css HTTP/1.1" 304 0
+2016-08-29 23:24:52 [basehttp INFO] "GET /static/js/bootstrap.min.js HTTP/1.1" 304 0
+2016-08-29 23:24:52 [basehttp INFO] "GET /static/js/plugins/select2/select2.full.min.js HTTP/1.1" 304 0
+2016-08-29 23:24:52 [basehttp INFO] "GET /static/js/plugins/metisMenu/jquery.metisMenu.js HTTP/1.1" 304 0
+2016-08-29 23:24:52 [basehttp INFO] "GET /static/js/base.js HTTP/1.1" 304 0
+2016-08-29 23:24:52 [basehttp INFO] "GET /static/js/inspinia.js HTTP/1.1" 304 0
+2016-08-29 23:24:52 [basehttp INFO] "GET /media/avatar/default/default5.png HTTP/1.1" 304 0
+2016-08-29 23:24:52 [basehttp INFO] "GET /static/img/root.png HTTP/1.1" 304 0
+2016-08-29 23:24:53 [basehttp INFO] "GET /static/css/patterns/header-profile.png HTTP/1.1" 304 0
+2016-08-29 23:24:53 [basehttp INFO] "GET /static/img/facio.ico HTTP/1.1" 200 1628
+2016-08-29 23:27:27 [basehttp INFO] "GET /users/users/ HTTP/1.1" 200 14254
+2016-08-29 23:36:39 [django_runserver INFO] Websocket support is enabled
+2016-08-29 23:36:44 [django_runserver INFO] Websocket support is enabled
+2016-08-29 23:37:14 [django_runserver INFO] Websocket support is enabled
+2016-08-29 23:40:28 [django_runserver INFO] Websocket support is enabled
+2016-08-29 23:41:34 [django_runserver INFO] Websocket support is enabled
+2016-08-29 23:49:22 [django_runserver INFO] Websocket support is enabled
+2016-08-29 23:49:29 [django_runserver INFO] Websocket support is enabled
+2016-08-29 23:50:50 [django_runserver INFO] Websocket support is enabled
+2016-08-29 23:51:29 [django_runserver INFO] Websocket support is enabled
+2016-08-29 23:51:45 [django_runserver INFO] Websocket support is enabled
+2016-08-29 23:52:37 [django_runserver INFO] Websocket support is enabled
+2016-08-29 23:53:13 [django_runserver INFO] Websocket support is enabled
+2016-08-29 23:53:41 [basehttp INFO] "GET /users/users/ HTTP/1.1" 200 14254
+2016-08-29 23:53:41 [basehttp INFO] "GET /static/css/plugins/vaildator/jquery.validator.css HTTP/1.1" 304 0
+2016-08-29 23:53:41 [basehttp INFO] "GET /static/css/font-awesome.css HTTP/1.1" 304 0
+2016-08-29 23:53:41 [basehttp INFO] "GET /static/css/bootstrap.min.css HTTP/1.1" 304 0
+2016-08-29 23:53:41 [basehttp INFO] "GET /static/css/style.css HTTP/1.1" 304 0
+2016-08-29 23:53:41 [basehttp INFO] "GET /static/js/jquery-2.1.1.js HTTP/1.1" 304 0
+2016-08-29 23:53:41 [basehttp INFO] "GET /static/js/bootstrap.min.js HTTP/1.1" 304 0
+2016-08-29 23:53:41 [basehttp INFO] "GET /static/js/base.js HTTP/1.1" 304 0
+2016-08-29 23:53:41 [basehttp INFO] "GET /static/js/plugins/metisMenu/jquery.metisMenu.js HTTP/1.1" 304 0
+2016-08-29 23:53:41 [basehttp INFO] "GET /static/js/inspinia.js HTTP/1.1" 304 0
+2016-08-29 23:53:41 [basehttp INFO] "GET /static/img/root.png HTTP/1.1" 304 0
+2016-08-29 23:53:42 [basehttp INFO] "GET /static/css/patterns/header-profile.png HTTP/1.1" 304 0
+2016-08-29 23:53:42 [basehttp INFO] "GET /static/fonts/fontawesome-webfont.woff?v=4.2.0 HTTP/1.1" 304 0
+2016-08-29 23:53:42 [basehttp INFO] "GET /static/img/facio.ico HTTP/1.1" 200 1628
+2016-08-29 23:53:43 [basehttp INFO] "GET /users/users/2/ HTTP/1.1" 200 21141
+2016-08-29 23:53:55 [basehttp WARNING] "PUT /users/v1/users/2/active HTTP/1.1" 405 40
+2016-08-29 23:54:12 [basehttp INFO] "GET /users/users/2/ HTTP/1.1" 200 21141
+2016-08-29 23:54:13 [basehttp INFO] "GET /static/css/font-awesome.css HTTP/1.1" 304 0
+2016-08-29 23:54:13 [basehttp INFO] "GET /static/css/bootstrap.min.css HTTP/1.1" 304 0
+2016-08-29 23:54:13 [basehttp INFO] "GET /static/js/jquery-2.1.1.js HTTP/1.1" 304 0
+2016-08-29 23:54:13 [basehttp INFO] "GET /static/css/plugins/vaildator/jquery.validator.css HTTP/1.1" 304 0
+2016-08-29 23:54:13 [basehttp INFO] "GET /static/css/style.css HTTP/1.1" 304 0
+2016-08-29 23:54:13 [basehttp INFO] "GET /static/js/bootstrap.min.js HTTP/1.1" 304 0
+2016-08-29 23:54:13 [basehttp INFO] "GET /static/css/plugins/select2/select2.min.css HTTP/1.1" 304 0
+2016-08-29 23:54:13 [basehttp INFO] "GET /static/js/plugins/select2/select2.full.min.js HTTP/1.1" 304 0
+2016-08-29 23:54:13 [basehttp INFO] "GET /static/js/plugins/metisMenu/jquery.metisMenu.js HTTP/1.1" 304 0
+2016-08-29 23:54:13 [basehttp INFO] "GET /static/js/inspinia.js HTTP/1.1" 304 0
+2016-08-29 23:54:13 [basehttp INFO] "GET /static/js/base.js HTTP/1.1" 304 0
+2016-08-29 23:54:13 [basehttp INFO] "GET /static/img/root.png HTTP/1.1" 304 0
+2016-08-29 23:54:13 [basehttp INFO] "GET /media/avatar/default/default5.png HTTP/1.1" 304 0
+2016-08-29 23:54:13 [basehttp INFO] "GET /static/css/patterns/header-profile.png HTTP/1.1" 304 0
+2016-08-29 23:54:13 [basehttp INFO] "GET /static/img/facio.ico HTTP/1.1" 200 1628
+2016-08-29 23:54:15 [basehttp INFO] "GET /users/users/2/ HTTP/1.1" 200 21141
+2016-08-29 23:54:15 [basehttp INFO] "GET /static/css/bootstrap.min.css HTTP/1.1" 304 0
+2016-08-29 23:54:15 [basehttp INFO] "GET /static/css/plugins/vaildator/jquery.validator.css HTTP/1.1" 304 0
+2016-08-29 23:54:15 [basehttp INFO] "GET /static/css/plugins/select2/select2.min.css HTTP/1.1" 304 0
+2016-08-29 23:54:15 [basehttp INFO] "GET /static/css/font-awesome.css HTTP/1.1" 304 0
+2016-08-29 23:54:15 [basehttp INFO] "GET /static/css/style.css HTTP/1.1" 304 0
+2016-08-29 23:54:15 [basehttp INFO] "GET /static/js/jquery-2.1.1.js HTTP/1.1" 304 0
+2016-08-29 23:54:15 [basehttp INFO] "GET /static/js/bootstrap.min.js HTTP/1.1" 304 0
+2016-08-29 23:54:15 [basehttp INFO] "GET /static/js/plugins/select2/select2.full.min.js HTTP/1.1" 304 0
+2016-08-29 23:54:15 [basehttp INFO] "GET /static/js/base.js HTTP/1.1" 304 0
+2016-08-29 23:54:15 [basehttp INFO] "GET /static/js/inspinia.js HTTP/1.1" 304 0
+2016-08-29 23:54:15 [basehttp INFO] "GET /static/js/plugins/metisMenu/jquery.metisMenu.js HTTP/1.1" 304 0
+2016-08-29 23:54:15 [basehttp INFO] "GET /static/img/root.png HTTP/1.1" 304 0
+2016-08-29 23:54:15 [basehttp INFO] "GET /media/avatar/default/default5.png HTTP/1.1" 304 0
+2016-08-29 23:54:16 [basehttp INFO] "GET /static/css/patterns/header-profile.png HTTP/1.1" 304 0
+2016-08-29 23:54:16 [basehttp INFO] "GET /static/img/facio.ico HTTP/1.1" 200 1628
+2016-08-29 23:55:00 [django_runserver INFO] Websocket support is enabled
+2016-08-29 23:55:09 [django_runserver INFO] Websocket support is enabled
+2016-08-29 23:55:24 [django_runserver INFO] Websocket support is enabled
+2016-08-29 23:55:28 [basehttp INFO] "GET /users/users/2/ HTTP/1.1" 200 21141
+2016-08-29 23:55:28 [basehttp INFO] "GET /static/css/bootstrap.min.css HTTP/1.1" 304 0
+2016-08-29 23:55:28 [basehttp INFO] "GET /static/css/plugins/vaildator/jquery.validator.css HTTP/1.1" 304 0
+2016-08-29 23:55:28 [basehttp INFO] "GET /static/js/jquery-2.1.1.js HTTP/1.1" 304 0
+2016-08-29 23:55:28 [basehttp INFO] "GET /static/css/font-awesome.css HTTP/1.1" 304 0
+2016-08-29 23:55:28 [basehttp INFO] "GET /static/css/style.css HTTP/1.1" 304 0
+2016-08-29 23:55:28 [basehttp INFO] "GET /static/css/plugins/select2/select2.min.css HTTP/1.1" 304 0
+2016-08-29 23:55:28 [basehttp INFO] "GET /static/js/plugins/select2/select2.full.min.js HTTP/1.1" 304 0
+2016-08-29 23:55:28 [basehttp INFO] "GET /static/js/bootstrap.min.js HTTP/1.1" 304 0
+2016-08-29 23:55:28 [basehttp INFO] "GET /static/js/inspinia.js HTTP/1.1" 304 0
+2016-08-29 23:55:28 [basehttp INFO] "GET /static/js/plugins/metisMenu/jquery.metisMenu.js HTTP/1.1" 304 0
+2016-08-29 23:55:28 [basehttp INFO] "GET /static/js/base.js HTTP/1.1" 304 0
+2016-08-29 23:55:28 [basehttp INFO] "GET /static/img/root.png HTTP/1.1" 304 0
+2016-08-29 23:55:28 [basehttp INFO] "GET /media/avatar/default/default5.png HTTP/1.1" 304 0
+2016-08-29 23:55:28 [basehttp INFO] "GET /static/css/patterns/header-profile.png HTTP/1.1" 304 0
+2016-08-29 23:55:28 [basehttp INFO] "GET /static/img/facio.ico HTTP/1.1" 200 1628
+2016-08-29 23:55:31 [api DEBUG] wsgi.multiprocess --> False
+2016-08-29 23:55:31 [api DEBUG] wsgi.multiprocess --> False
+2016-08-29 23:55:31 [api DEBUG] RUN_MAIN --> true
+2016-08-29 23:55:31 [api DEBUG] RUN_MAIN --> true
+2016-08-29 23:55:31 [api DEBUG] HTTP_REFERER --> http://m/users/users/2/
+2016-08-29 23:55:31 [api DEBUG] HTTP_REFERER --> http://m/users/users/2/
+2016-08-29 23:55:31 [api DEBUG] HTTP_ACCEPT_LANGUAGE --> zh-CN,zh;q=0.8,en;q=0.6,pt;q=0.4,zh-TW;q=0.2
+2016-08-29 23:55:31 [api DEBUG] HTTP_ACCEPT_LANGUAGE --> zh-CN,zh;q=0.8,en;q=0.6,pt;q=0.4,zh-TW;q=0.2
+2016-08-29 23:55:31 [api DEBUG] SERVER_PROTOCOL --> HTTP/1.1
+2016-08-29 23:55:31 [api DEBUG] SERVER_PROTOCOL --> HTTP/1.1
+2016-08-29 23:55:31 [api DEBUG] SERVER_SOFTWARE --> WSGIServer/0.1 Python/2.7.12
+2016-08-29 23:55:31 [api DEBUG] SERVER_SOFTWARE --> WSGIServer/0.1 Python/2.7.12
+2016-08-29 23:55:31 [api DEBUG] SCRIPT_NAME --> 
+2016-08-29 23:55:31 [api DEBUG] SCRIPT_NAME --> 
+2016-08-29 23:55:31 [api DEBUG] LESSOPEN --> |/usr/bin/lesspipe.sh %s
+2016-08-29 23:55:31 [api DEBUG] LESSOPEN --> |/usr/bin/lesspipe.sh %s
+2016-08-29 23:55:31 [api DEBUG] HTTP_X_CSRFTOKEN --> DNCBjEYS8DU3r76ViaGkjcWab1maXEhW7uDqYQcSeIgq26QtGknMhCgJbfpHQMe8
+2016-08-29 23:55:31 [api DEBUG] HTTP_X_CSRFTOKEN --> DNCBjEYS8DU3r76ViaGkjcWab1maXEhW7uDqYQcSeIgq26QtGknMhCgJbfpHQMe8
+2016-08-29 23:55:31 [api DEBUG] SSH_CLIENT --> 192.168.152.1 62321 22
+2016-08-29 23:55:31 [api DEBUG] SSH_CLIENT --> 192.168.152.1 62321 22
+2016-08-29 23:55:31 [api DEBUG] CVS_RSH --> ssh
+2016-08-29 23:55:31 [api DEBUG] CVS_RSH --> ssh
+2016-08-29 23:55:31 [api DEBUG] LOGNAME --> root
+2016-08-29 23:55:31 [api DEBUG] LOGNAME --> root
+2016-08-29 23:55:31 [api DEBUG] USER --> root
+2016-08-29 23:55:31 [api DEBUG] USER --> root
+2016-08-29 23:55:31 [api DEBUG] HTTP_ORIGIN --> http://m
+2016-08-29 23:55:31 [api DEBUG] HTTP_ORIGIN --> http://m
+2016-08-29 23:55:31 [api DEBUG] PATH --> /root/env2.7/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/node/bin:/root/bin
+2016-08-29 23:55:31 [api DEBUG] PATH --> /root/env2.7/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/opt/node/bin:/root/bin
+2016-08-29 23:55:31 [api DEBUG] QUERY_STRING --> 
+2016-08-29 23:55:31 [api DEBUG] QUERY_STRING --> 
+2016-08-29 23:55:31 [api DEBUG] HOME --> /root
+2016-08-29 23:55:31 [api DEBUG] HOME --> /root
+2016-08-29 23:55:31 [api DEBUG] PS1 --> (env2.7) [\u@\h \W]\$ 
+2016-08-29 23:55:31 [api DEBUG] PS1 --> (env2.7) [\u@\h \W]\$ 
+2016-08-29 23:55:31 [api DEBUG] wsgi.errors --> <open file '<stderr>', mode 'w' at 0x7ff5863aa1e0>
+2016-08-29 23:55:31 [api DEBUG] wsgi.errors --> <open file '<stderr>', mode 'w' at 0x7ff5863aa1e0>
+2016-08-29 23:55:31 [api DEBUG] LANG --> en_US.UTF-8
+2016-08-29 23:55:31 [api DEBUG] LANG --> en_US.UTF-8
+2016-08-29 23:55:31 [api DEBUG] HISTCONTROL --> ignoredups
+2016-08-29 23:55:31 [api DEBUG] HISTCONTROL --> ignoredups
+2016-08-29 23:55:31 [api DEBUG] TERM --> xterm
+2016-08-29 23:55:31 [api DEBUG] TERM --> xterm
+2016-08-29 23:55:31 [api DEBUG] SHELL --> /bin/bash
+2016-08-29 23:55:31 [api DEBUG] SHELL --> /bin/bash
+2016-08-29 23:55:31 [api DEBUG] VIRTUALENVWRAPPER_PYTHON --> /usr/local/bin/python3
+2016-08-29 23:55:31 [api DEBUG] VIRTUALENVWRAPPER_PYTHON --> /usr/local/bin/python3
+2016-08-29 23:55:31 [api DEBUG] HTTP_COOKIE --> sessionid=9zmb3etjbixqmga4wc5ihvyy006m7alz; csrftoken=DNCBjEYS8DU3r76ViaGkjcWab1maXEhW7uDqYQcSeIgq26QtGknMhCgJbfpHQMe8
+2016-08-29 23:55:31 [api DEBUG] HTTP_COOKIE --> sessionid=9zmb3etjbixqmga4wc5ihvyy006m7alz; csrftoken=DNCBjEYS8DU3r76ViaGkjcWab1maXEhW7uDqYQcSeIgq26QtGknMhCgJbfpHQMe8
+2016-08-29 23:55:31 [api DEBUG] SERVER_NAME --> localhost.localdomain
+2016-08-29 23:55:31 [api DEBUG] SERVER_NAME --> localhost.localdomain
+2016-08-29 23:55:31 [api DEBUG] REMOTE_ADDR --> 192.168.152.1
+2016-08-29 23:55:31 [api DEBUG] REMOTE_ADDR --> 192.168.152.1
+2016-08-29 23:55:31 [api DEBUG] SHLVL --> 1
+2016-08-29 23:55:31 [api DEBUG] SHLVL --> 1
+2016-08-29 23:55:31 [api DEBUG] G_BROKEN_FILENAMES --> 1
+2016-08-29 23:55:31 [api DEBUG] G_BROKEN_FILENAMES --> 1
+2016-08-29 23:55:31 [api DEBUG] HISTSIZE --> 1000
+2016-08-29 23:55:31 [api DEBUG] HISTSIZE --> 1000
+2016-08-29 23:55:31 [api DEBUG] wsgi.url_scheme --> http
+2016-08-29 23:55:31 [api DEBUG] wsgi.url_scheme --> http
+2016-08-29 23:55:31 [api DEBUG] SERVER_PORT --> 80
+2016-08-29 23:55:31 [api DEBUG] SERVER_PORT --> 80
+2016-08-29 23:55:31 [api DEBUG] CONTENT_LENGTH --> 14
+2016-08-29 23:55:31 [api DEBUG] CONTENT_LENGTH --> 14
+2016-08-29 23:55:31 [api DEBUG] WORKON_HOME --> /root/workspaces
+2016-08-29 23:55:31 [api DEBUG] WORKON_HOME --> /root/workspaces
+2016-08-29 23:55:31 [api DEBUG] HTTP_CONNECTION --> keep-alive
+2016-08-29 23:55:31 [api DEBUG] HTTP_CONNECTION --> keep-alive
+2016-08-29 23:55:31 [api DEBUG] HTTP_X_REQUESTED_WITH --> XMLHttpRequest
+2016-08-29 23:55:31 [api DEBUG] HTTP_X_REQUESTED_WITH --> XMLHttpRequest
+2016-08-29 23:55:31 [api DEBUG] wsgi.file_wrapper --> wsgiref.util.FileWrapper
+2016-08-29 23:55:31 [api DEBUG] wsgi.file_wrapper --> wsgiref.util.FileWrapper
+2016-08-29 23:55:31 [api DEBUG] VIRTUAL_ENV --> /root/env2.7
+2016-08-29 23:55:31 [api DEBUG] VIRTUAL_ENV --> /root/env2.7
+2016-08-29 23:55:31 [api DEBUG] CSRF_COOKIE --> DNCBjEYS8DU3r76ViaGkjcWab1maXEhW7uDqYQcSeIgq26QtGknMhCgJbfpHQMe8
+2016-08-29 23:55:31 [api DEBUG] CSRF_COOKIE --> DNCBjEYS8DU3r76ViaGkjcWab1maXEhW7uDqYQcSeIgq26QtGknMhCgJbfpHQMe8
+2016-08-29 23:55:31 [api DEBUG] wsgi.input --> <socket._fileobject object at 0x7ff5758f62d0>
+2016-08-29 23:55:31 [api DEBUG] wsgi.input --> <socket._fileobject object at 0x7ff5758f62d0>
+2016-08-29 23:55:31 [api DEBUG] VIRTUALENVWRAPPER_WORKON_CD --> 1
+2016-08-29 23:55:31 [api DEBUG] VIRTUALENVWRAPPER_WORKON_CD --> 1
+2016-08-29 23:55:31 [api DEBUG] HTTP_HOST --> m
+2016-08-29 23:55:31 [api DEBUG] HTTP_HOST --> m
+2016-08-29 23:55:31 [api DEBUG] wsgi.multithread --> True
+2016-08-29 23:55:31 [api DEBUG] wsgi.multithread --> True
+2016-08-29 23:55:31 [api DEBUG] TZ --> Asia/Shanghai
+2016-08-29 23:55:31 [api DEBUG] TZ --> Asia/Shanghai
+2016-08-29 23:55:31 [api DEBUG] _ --> /root/env2.7/bin/python
+2016-08-29 23:55:31 [api DEBUG] _ --> /root/env2.7/bin/python
+2016-08-29 23:55:31 [api DEBUG] HTTP_ACCEPT --> */*
+2016-08-29 23:55:31 [api DEBUG] HTTP_ACCEPT --> */*
+2016-08-29 23:55:31 [api DEBUG] VIRTUALENVWRAPPER_PROJECT_FILENAME --> .project
+2016-08-29 23:55:31 [api DEBUG] VIRTUALENVWRAPPER_PROJECT_FILENAME --> .project
+2016-08-29 23:55:31 [api DEBUG] SSH_CONNECTION --> 192.168.152.1 62321 192.168.152.129 22
+2016-08-29 23:55:31 [api DEBUG] SSH_CONNECTION --> 192.168.152.1 62321 192.168.152.129 22
+2016-08-29 23:55:31 [api DEBUG] wsgi.version --> (1, 0)
+2016-08-29 23:55:31 [api DEBUG] wsgi.version --> (1, 0)
+2016-08-29 23:55:31 [api DEBUG] VIRTUALENVWRAPPER_HOOK_DIR --> /root/workspaces
+2016-08-29 23:55:31 [api DEBUG] VIRTUALENVWRAPPER_HOOK_DIR --> /root/workspaces
+2016-08-29 23:55:31 [api DEBUG] GATEWAY_INTERFACE --> CGI/1.1
+2016-08-29 23:55:31 [api DEBUG] GATEWAY_INTERFACE --> CGI/1.1
+2016-08-29 23:55:31 [api DEBUG] wsgi.run_once --> False
+2016-08-29 23:55:31 [api DEBUG] wsgi.run_once --> False
+2016-08-29 23:55:31 [api DEBUG] SSH_TTY --> /dev/pts/3
+2016-08-29 23:55:31 [api DEBUG] SSH_TTY --> /dev/pts/3
+2016-08-29 23:55:31 [api DEBUG] OLDPWD --> /opt/jumpserver
+2016-08-29 23:55:31 [api DEBUG] OLDPWD --> /opt/jumpserver
+2016-08-29 23:55:31 [api DEBUG] HOSTNAME --> localhost.localdomain
+2016-08-29 23:55:31 [api DEBUG] HOSTNAME --> localhost.localdomain
+2016-08-29 23:55:31 [api DEBUG] HTTP_USER_AGENT --> Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36
+2016-08-29 23:55:31 [api DEBUG] HTTP_USER_AGENT --> Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/52.0.2743.116 Safari/537.36
+2016-08-29 23:55:31 [api DEBUG] VIRTUALENVWRAPPER_SCRIPT --> /usr/local/bin/virtualenvwrapper.sh
+2016-08-29 23:55:31 [api DEBUG] VIRTUALENVWRAPPER_SCRIPT --> /usr/local/bin/virtualenvwrapper.sh
+2016-08-29 23:55:31 [api DEBUG] PWD --> /opt/jumpserver/apps
+2016-08-29 23:55:31 [api DEBUG] PWD --> /opt/jumpserver/apps
+2016-08-29 23:55:31 [api DEBUG] REQUEST_METHOD --> PUT
+2016-08-29 23:55:31 [api DEBUG] REQUEST_METHOD --> PUT
+2016-08-29 23:55:31 [api DEBUG] DJANGO_SETTINGS_MODULE --> jumpserver.settings
+2016-08-29 23:55:31 [api DEBUG] DJANGO_SETTINGS_MODULE --> jumpserver.settings
+2016-08-29 23:55:31 [api DEBUG] CONTENT_TYPE --> application/x-www-form-urlencoded; charset=UTF-8
+2016-08-29 23:55:31 [api DEBUG] CONTENT_TYPE --> application/x-www-form-urlencoded; charset=UTF-8
+2016-08-29 23:55:31 [api DEBUG] MAIL --> /var/spool/mail/root
+2016-08-29 23:55:31 [api DEBUG] MAIL --> /var/spool/mail/root
+2016-08-29 23:55:31 [api DEBUG] LS_COLORS --> rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;05;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lz=01;31:*.xz=01;31:*.bz2=01;31:*.tbz=01;31:*.tbz2=01;31:*.bz=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.axa=01;36:*.oga=01;36:*.spx=01;36:*.xspf=01;36:
+2016-08-29 23:55:31 [api DEBUG] LS_COLORS --> rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:mi=01;05;37;41:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lz=01;31:*.xz=01;31:*.bz2=01;31:*.tbz=01;31:*.tbz2=01;31:*.bz=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=01;36:*.au=01;36:*.flac=01;36:*.mid=01;36:*.midi=01;36:*.mka=01;36:*.mp3=01;36:*.mpc=01;36:*.ogg=01;36:*.ra=01;36:*.wav=01;36:*.axa=01;36:*.oga=01;36:*.spx=01;36:*.xspf=01;36:
+2016-08-29 23:55:31 [api DEBUG] REMOTE_HOST --> 
+2016-08-29 23:55:31 [api DEBUG] REMOTE_HOST --> 
+2016-08-29 23:55:31 [api DEBUG] HTTP_ACCEPT_ENCODING --> gzip, deflate, sdch
+2016-08-29 23:55:31 [api DEBUG] HTTP_ACCEPT_ENCODING --> gzip, deflate, sdch
+2016-08-29 23:55:31 [api DEBUG] PATH_INFO --> /users/v1/users/2/active
+2016-08-29 23:55:31 [api DEBUG] PATH_INFO --> /users/v1/users/2/active
+2016-08-29 23:55:31 [basehttp INFO] "PUT /users/v1/users/2/active HTTP/1.1" 200 18
+2016-08-29 23:56:48 [django_runserver INFO] Websocket support is enabled
+2016-08-29 23:56:51 [basehttp INFO] "PUT /users/v1/users/2/active HTTP/1.1" 200 19
+2016-08-29 23:56:56 [basehttp INFO] "GET /users/users/2/ HTTP/1.1" 200 21141
+2016-08-29 23:56:56 [basehttp INFO] "GET /static/css/bootstrap.min.css HTTP/1.1" 304 0
+2016-08-29 23:56:56 [basehttp INFO] "GET /static/css/plugins/vaildator/jquery.validator.css HTTP/1.1" 304 0
+2016-08-29 23:56:57 [basehttp INFO] "GET /static/css/font-awesome.css HTTP/1.1" 304 0
+2016-08-29 23:56:57 [basehttp INFO] "GET /static/css/style.css HTTP/1.1" 304 0
+2016-08-29 23:56:57 [basehttp INFO] "GET /static/css/plugins/select2/select2.min.css HTTP/1.1" 304 0
+2016-08-29 23:56:57 [basehttp INFO] "GET /static/js/jquery-2.1.1.js HTTP/1.1" 304 0
+2016-08-29 23:56:57 [basehttp INFO] "GET /static/js/plugins/select2/select2.full.min.js HTTP/1.1" 304 0
+2016-08-29 23:56:57 [basehttp INFO] "GET /static/js/base.js HTTP/1.1" 304 0
+2016-08-29 23:56:57 [basehttp INFO] "GET /static/js/plugins/metisMenu/jquery.metisMenu.js HTTP/1.1" 304 0
+2016-08-29 23:56:57 [basehttp INFO] "GET /static/js/inspinia.js HTTP/1.1" 304 0
+2016-08-29 23:56:57 [basehttp INFO] "GET /static/img/root.png HTTP/1.1" 304 0
+2016-08-29 23:56:57 [basehttp INFO] "GET /static/js/bootstrap.min.js HTTP/1.1" 304 0
+2016-08-29 23:56:57 [basehttp INFO] "GET /media/avatar/default/default5.png HTTP/1.1" 304 0
+2016-08-29 23:56:57 [basehttp INFO] "GET /static/css/patterns/header-profile.png HTTP/1.1" 304 0
+2016-08-29 23:56:57 [basehttp INFO] "GET /static/img/facio.ico HTTP/1.1" 200 1628
+2016-08-29 23:56:58 [basehttp INFO] "PUT /users/v1/users/2/active HTTP/1.1" 200 18
+2016-08-29 23:57:00 [basehttp INFO] "GET /users/users/2/ HTTP/1.1" 200 21150
+2016-08-29 23:57:01 [basehttp INFO] "GET /static/css/font-awesome.css HTTP/1.1" 304 0
+2016-08-29 23:57:01 [basehttp INFO] "GET /static/js/jquery-2.1.1.js HTTP/1.1" 304 0
+2016-08-29 23:57:01 [basehttp INFO] "GET /static/css/plugins/vaildator/jquery.validator.css HTTP/1.1" 304 0
+2016-08-29 23:57:01 [basehttp INFO] "GET /static/css/plugins/select2/select2.min.css HTTP/1.1" 304 0
+2016-08-29 23:57:01 [basehttp INFO] "GET /static/css/bootstrap.min.css HTTP/1.1" 304 0
+2016-08-29 23:57:01 [basehttp INFO] "GET /static/css/style.css HTTP/1.1" 304 0
+2016-08-29 23:57:01 [basehttp INFO] "GET /static/js/base.js HTTP/1.1" 304 0
+2016-08-29 23:57:01 [basehttp INFO] "GET /static/js/plugins/metisMenu/jquery.metisMenu.js HTTP/1.1" 304 0
+2016-08-29 23:57:01 [basehttp INFO] "GET /static/js/inspinia.js HTTP/1.1" 304 0
+2016-08-29 23:57:01 [basehttp INFO] "GET /static/img/root.png HTTP/1.1" 304 0
+2016-08-29 23:57:01 [basehttp INFO] "GET /static/js/plugins/select2/select2.full.min.js HTTP/1.1" 304 0
+2016-08-29 23:57:01 [basehttp INFO] "GET /media/avatar/default/default5.png HTTP/1.1" 304 0
+2016-08-29 23:57:01 [basehttp INFO] "GET /static/js/bootstrap.min.js HTTP/1.1" 304 0
+2016-08-29 23:57:01 [basehttp INFO] "GET /static/css/patterns/header-profile.png HTTP/1.1" 304 0
+2016-08-29 23:57:01 [basehttp INFO] "GET /static/img/facio.ico HTTP/1.1" 200 1628
+2016-08-29 23:57:12 [basehttp INFO] "PUT /users/v1/users/2/active HTTP/1.1" 200 19
+2016-08-29 23:57:13 [basehttp INFO] "PUT /users/v1/users/2/active HTTP/1.1" 200 18
+2016-08-29 23:57:40 [django_runserver INFO] Websocket support is enabled
+2016-08-29 23:58:27 [basehttp INFO] "GET /users/users/2/ HTTP/1.1" 200 21150
+2016-08-29 23:58:27 [basehttp INFO] - Broken pipe from ('192.168.152.1', 12228)
+
+2016-08-29 23:58:27 [basehttp INFO] "GET /users/users/2/ HTTP/1.1" 200 21150
+2016-08-30 00:03:09 [django_runserver INFO] Websocket support is enabled
+2016-08-30 00:03:28 [django_runserver INFO] Websocket support is enabled
+2016-08-30 00:06:00 [base WARNING] Not Found: /users/v1/users/
+2016-08-30 00:06:00 [basehttp WARNING] "GET /users/v1/users/ HTTP/1.1" 404 5607
+2016-08-30 00:06:28 [base WARNING] Not Found: /api/users/v1/users/
+2016-08-30 00:06:28 [basehttp WARNING] "GET /api/users/v1/users/ HTTP/1.1" 404 5619
+2016-08-30 00:06:42 [basehttp WARNING] "GET /api/users/v1/users HTTP/1.1" 401 39
+2016-08-30 00:07:03 [basehttp INFO] "GET /api/users/v1/users HTTP/1.1" 200 756
+2016-08-30 00:07:08 [basehttp INFO] "GET /api/users/v1/users HTTP/1.1" 200 756
+2016-08-30 00:07:16 [basehttp WARNING] "GET /api/users/v1/users HTTP/1.1" 401 58
+2016-08-30 00:07:32 [basehttp WARNING] "GET /api/users/v1/users HTTP/1.1" 401 58
+2016-08-30 00:07:33 [basehttp WARNING] "GET /api/users/v1/users HTTP/1.1" 401 58
+2016-08-30 00:08:54 [django_runserver INFO] Websocket support is enabled
+2016-08-30 00:09:11 [basehttp INFO] "GET /api/users/v1/users HTTP/1.1" 200 756

@@ -231,12 +231,9 @@
             var status = $(obj).prop('checked');
 
             $.ajax({
-                url: "{% url 'users:user-detail-api' pk=user.id %}",
-{#                url: "{% url 'users:login' %}",#}
+                url: "{% url 'users:user-active-api' pk=user.id %}",
                 type: "PUT",
                 data: {
-                    'username': "{{ user.username }}",
-                    'email': "{{ user.email }}",
                     'is_active': status
                 },
                 success: function (data, status) {

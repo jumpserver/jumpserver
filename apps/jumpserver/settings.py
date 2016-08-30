@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'audits.apps.AuditsConfig',
     'common.apps.CommonConfig',
     'rest_framework',
+    'rest_framework.authtoken',
     'bootstrapform',
     # 'django.contrib.admin',
     'django.contrib.auth',
@@ -247,6 +248,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
 }
 # This setting is required to override the Django's main loop, when running in

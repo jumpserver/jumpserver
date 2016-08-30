@@ -15,3 +15,4 @@ migrations/
 db.sqlite3
 config.py
 */migrations/*
+*.log
