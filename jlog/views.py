@@ -134,7 +134,7 @@ def log_record(request):
     if request.method == "GET":
         return render(request, 'jlog/record.html')
     elif request.method == "POST":
-        log_id = request.REQUEST.get('id', None)
+        log_id = request.GET.get('id', None)
         if log_id:
             TermL = TermLogRecorder(request.user)
             log = Log.objects.get(id=int(log_id))
