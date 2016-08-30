@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 import os
+import json
 from ansible.executor.task_queue_manager import TaskQueueManager
 from ansible.inventory import Inventory, Host, Group
 from ansible.vars import VariableManager
@@ -10,6 +11,7 @@ from ansible.executor import playbook_executor
 from ansible.utils.display import Display
 from ansible.playbook.play import Play
 import ansible.constants as default_config
+from ansible.plugins.callback import CallbackBase
 
 
 class AnsibleError(StandardError):
@@ -142,7 +144,7 @@ class MyInventory(object):
                 if key not in ["name", "port", "ip", "username", "password", "key"]:
                     host.set_variable(key, value)
             for g in self.groups:
-                if g.name == asset['group']:
+                if g.name == asset.get('group', 'default'):
                     g.add_host(host)
 
     def validate(self):
@@ -151,6 +153,7 @@ class MyInventory(object):
     def gen_inventory(self):
         self.validate()
         i = Inventory(loader=self.loader, variable_manager=self.variable_manager, host_list=[])
+        self.__gen_group()
         for g in self.groups:
             i.add_group(g)
         self.variable_manager.set_inventory(i)
@@ -223,7 +226,7 @@ class PlayBookRunner(object):
 class ADHocRunner(object):
     """ADHoc接口
     """
-    def __init__(self, inventory, config, play_data, become_pass, verbosity=0):
+    def __init__(self, inventory, config, become_pass=None, verbosity=0):
         """
         :param inventory: myinventory实例
         :param config: Config实例
@@ -251,22 +254,34 @@ class ADHocRunner(object):
         self.options.become_user = 'root'
         self.passwords = {'become_pass': become_pass}
 
+        # 初始化callback插件
+        # self.results_callback = ResultCallback()
+
         # 初始化Play
-        self.play = Play().load(play_data, variable_manager=inventory.variable_manager, loader=inventory.loader)
+        play_source = {
+            "name": "Ansible Play",
+            "hosts": "*",
+            "gather_facts": "no",
+            "tasks": [
+                dict(action=dict(module='shell', args='id'), register='shell_out'),
+                dict(action=dict(module='debug', args=dict(msg='{{shell_out.stdout}}')))
+            ]
+        }
 
-        self.inventory = inventory.inventory
+        self.play = Play().load(play_source, variable_manager=inventory.variable_manager, loader=inventory.loader)
+        self.inventory = inventory
 
-    def run(self, play_data):
+    def run(self):
         """执行ADHoc 记录日志，　处理结果
         """
         tqm = None
+        # TODO:日志和结果分析
         try:
-
-        # TODO:　日志和结果分析
             tqm = TaskQueueManager(
-                inventory=self.inventory,
+                inventory=self.inventory.inventory,
                 variable_manager=self.inventory.variable_manager,
                 loader=self.inventory.loader,
+                stdout_callback=default_config.DEFAULT_STDOUT_CALLBACK,
                 options=self.options,
                 passwords=self.passwords
             )
@@ -276,3 +291,20 @@ class ADHocRunner(object):
         finally:
             if tqm:
                 tqm.cleanup()
+
+
+if __name__ == "__main__":
+    conf = Config()
+    assets = [{
+                "name": "localhost",
+                "ip": "localhost",
+                "port": "22",
+                "username": "yumaojun",
+                "password": "xxx",
+                "key": "asset_private_key",
+    }]
+    inv = MyInventory(*assets)
+    print inv.inventory.get_group('default').get_hosts()
+    hoc = ADHocRunner(inv, conf, 'xxx')
+    hoc.run()
+
