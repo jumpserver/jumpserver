@@ -3,11 +3,16 @@
 from __future__ import unicode_literals
 
 import datetime
+from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import AbstractUser, Permission
-from django.db import OperationalError
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from rest_framework.authtoken.models import Token
+from django.db import IntegrityError
+
 
 
 # class Role(models.Model):
@@ -170,10 +175,28 @@ class User(AbstractUser):
             self.groups.add(group)
             # super(User, self).save(*args, **kwargs)
 
+    @property
+    def token(self):
+        return self.get_token()
+
+    def get_token(self):
+        try:
+            token = Token.objects.get(user=self)
+            return token.key
+        except Token.DoesNotExist:
+            return ''
+
+    def set_token(self):
+        try:
+            return Token.objects.create(user=self)
+        except IntegrityError:
+            Token.objects.filter(user=self).delete()
+            return Token.objects.create(user=self)
+
     class Meta:
         db_table = 'user'
 
-    #: Use this method
+    #: Use this method initial user
     @classmethod
     def initial(cls):
         user = cls(username='admin',
@@ -222,3 +245,10 @@ def generate_fake():
     for model in (UserGroup, User):
         if hasattr(model, 'generate_fake'):
             model.generate_fake()
+
+
+@receiver(post_save, sender=settings.AUTH_USER_MODEL)
+def create_auth_token(sender, instance=None, created=False, **kwargs):
+    if created:
+        Token.objects.create(user=instance)
+
