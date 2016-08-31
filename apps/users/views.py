@@ -14,41 +14,13 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView, Proces
 from django.views.generic.detail import DetailView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.conf import settings
-from django.contrib.auth import authenticate, login, logout
 
 from .models import User, UserGroup
 from .forms import UserAddForm, UserUpdateForm, UserGroupForm, UserLoginForm
-from .utils import AdminUserRequiredMixin, ssh_key_gen
+from .utils import AdminUserRequiredMixin, ssh_key_gen, user_add_success_next
 
 
 logger = logging.getLogger('jumpserver.users.views')
-
-
-# class UserLoginView(FormView):
-#     template_name = 'users/login.html'
-#     form_class = UserLoginForm
-#     success_url = reverse_lazy('users:user-list')
-#
-#     def get(self, request, *args, **kwargs):
-#         if self.request.user.is_staff:
-#             return HttpResponseRedirect(reverse('users:user-list'))
-#         return super(UserLoginView, self).get(request, *args, **kwargs)
-#
-#     def form_valid(self, form):
-#         username = form.cleaned_data.get('username', '')
-#         password = form.cleaned_data.get('password', '')
-#
-#         user = authenticate(username=username, password=password)
-#         if user is not None and user.is_staff:
-#             login(self.request, user)
-#             return HttpResponseRedirect(self.success_url)
-#
-#         logger.warning('Login user [%(username)s] password error' % {'username': username})
-#         return render(self.request, self.template_name, context={'form': form, 'error': '密码错误'})
-#
-#     def form_invalid(self, form):
-#         logger.warning('Login form commit invalid.')
-#         return super(UserLoginView, self).form_invalid(form)
 
 
 class UserListView(AdminUserRequiredMixin, ListView):
@@ -92,7 +64,9 @@ class UserAddView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         user = form.save(commit=False)
         user.created_by = self.request.user.username or 'System'
         user.save()
-        form.save_m2m()
+
+        user_add_success_next(user)
+
         return super(UserAddView, self).form_valid(form)
 
     def get_success_message(self, cleaned_data):

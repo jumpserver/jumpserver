@@ -15,6 +15,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
     DISPLAY_PER_PAGE = 20
+    SITE_URL = 'http://m'
     ALLOWED_HOSTS = ['*']
     DEBUG = False
     LOG_LEVEL = 'DEBUG'

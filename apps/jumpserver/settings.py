@@ -39,6 +39,10 @@ SECRET_KEY = CONFIG.SECRET_KEY or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj
 DEBUG = CONFIG.DEBUG or False
 
 
+# Absolute url for some case, for example email link
+SITE_URL = CONFIG.SITE_URL or 'http://localhost'
+
+
 # LOG LEVEL
 LOG_LEVEL = 'DEBUG' if DEBUG else CONFIG.LOG_LEVEL or 'WARNING'
 
