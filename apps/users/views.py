@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404, reverse, render
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.db.models import Q
-from django.views.generic.base import TemplateResponseMixin
+from django.views.generic.base import View
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView, ProcessFormView, FormView
 from django.views.generic.detail import DetailView
@@ -202,4 +202,12 @@ class UserGroupDetailView(DetailView):
 
 
 class UserGroupDeleteView(DeleteView):
+    pass
+
+
+class UserForgetPasswordView(View):
+    pass
+
+
+class UserRestPasswordView(View):
     pass
