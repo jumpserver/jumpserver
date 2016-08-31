@@ -17,12 +17,20 @@ class Config:
     DISPLAY_PER_PAGE = 20
     ALLOWED_HOSTS = ['*']
     DEBUG = False
+    LOG_LEVEL = 'DEBUG'
     DATABASE_ENGINE = 'sqlite3'
     HTTP_LISTEN_HOST = '127.0.0.1'
     HTTP_LISTEN_PORT = 8000
     REDIS_HOST = '127.0.0.1'
     REDIS_PORT = 6379
     REDIS_PASSWORD = ''
+    EMAIL_HOST = ''
+    EMAIL_PORT = 25
+    EMAIL_HOST_USER = ''
+    EMAIL_HOST_PASSWORD = ''
+    EMAIL_USE_SSL = False  # If port is 465, set True
+    EMAIL_USE_TLS = False  # If port is 587, set True
+    EMAIL_SUBJECT_PREFIX = '[Jumpserver] '
 
     def __init__(self):
         pass
