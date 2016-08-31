@@ -3,18 +3,18 @@
 Jumpserver use celery to run task async. Using redis as the broker, so
 you should run a redis instance
 
-1. Run redis
+* Run redis
 ```
 # yum -y install redis 
 or
 # docker run -name jumpserver-redis -d -p 6379:6379 redis redis-server
 ```
 
+* Write tasks in app_name/tasks.py
 
-2. Write tasks in app_name/tasks.py
-
-ops/tasks.py
 ```
+ops/tasks.py
+
 from __future__ import absolute_import
 
 import time
@@ -30,17 +30,26 @@ def longtime_add(x, y):
     return x + y
 ```
 
-3. Run celery in development 
+* Run celery in development 
 ```
 # cd apps
 # celery -A common worker -l info 
 ```
 
-4. Test using task
+* Test using task
 ```
 # ./manage.py shell
-> from ops.tasks import longtime_add
-> res = longtime_add.delay(1, 2)
-> res.get()
+>>> from ops.tasks import longtime_add
+>>> res = longtime_add.delay(1, 2)
+>>> res.get()
 ```
 
+### celery usage of jumpserver
+Jumpserver use celery to run task async. Using redis as the broker, so you should run a redis instance, Let’s start it
+
+**Run redis server **
+'' $ yum -y install redis
+'' or
+'' $ docker run -name jumpserver-redis -d -p 6379:6379 redis redis-server
+
+**
