@@ -20,6 +20,9 @@ class Config:
     DATABASE_ENGINE = 'sqlite3'
     HTTP_LISTEN_HOST = '127.0.0.1'
     HTTP_LISTEN_PORT = 8000
+    REDIS_HOST = '127.0.0.1'
+    REDIS_PORT = 6379
+    REDIS_PASSWORD = ''
 
     def __init__(self):
         pass

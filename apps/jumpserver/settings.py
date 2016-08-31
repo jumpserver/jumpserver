@@ -257,8 +257,8 @@ WEBSOCKET_URL = '/ws/'
 
 # WebSocket Redis
 WS4REDIS_CONNECTION = {
-    'host': '127.0.0.1',
-    'port': 6379,
+    'host': CONFIG.REDIS_HOST or '127.0.0.1',
+    'port': CONFIG.REDIS_PORT or 6379,
     'db': 2,
 }
 
@@ -276,3 +276,11 @@ SESSION_REDIS_PREFIX = 'session'
 # Custom User Auth model
 AUTH_USER_MODEL = 'users.User'
 
+# Celery using redis as broker
+BROKER_URL = 'redis://%(password)s%(host)s:%(port)s/3' % {
+    'password': CONFIG.REDIS_PASSWORD + ':' if CONFIG.REDIS_PASSWORD else '',
+    'host': CONFIG.REDIS_HOST or '127.0.0.1',
+    'port': CONFIG.REDIS_PORT or 6379,
+}
+
+CELERY_RESULT_BACKEND = BROKER_URL
