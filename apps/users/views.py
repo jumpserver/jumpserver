@@ -18,7 +18,7 @@ from django.contrib.auth import authenticate, login, logout
 
 from .models import User, UserGroup
 from .forms import UserAddForm, UserUpdateForm, UserGroupForm, UserLoginForm
-from .utils import AdminUserRequiredMixin
+from .utils import AdminUserRequiredMixin, ssh_key_gen
 
 
 logger = logging.getLogger('jumpserver.users.views')

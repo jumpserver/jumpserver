@@ -113,6 +113,8 @@ class User(AbstractUser):
     private_key = models.CharField(max_length=5000, blank=True, verbose_name='ssh私钥')  # ssh key max length 4096 bit
     public_key = models.CharField(max_length=1000, blank=True, verbose_name='公钥')
     comment = models.TextField(max_length=200, blank=True, verbose_name='描述')
+    confirmed = models.BooleanField(default=False)
+    date_confirmed = models.DateField(blank=True, null=True, verbose_name='确认时间')
     date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True, verbose_name='有效期')
     created_by = models.CharField(max_length=30, default='')
 
