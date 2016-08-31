@@ -1,6 +1,5 @@
 ## Celery usage 
 
-----
 
 Jumpserver use celery to run task async. Using redis as the broker, so
 you should run a redis instance
