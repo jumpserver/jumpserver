@@ -75,6 +75,14 @@ class UserModelTest(TransactionTestCase):
         self.assertTrue(user.check_password(password))
         self.assertFalse(user.check_password(password*2))
 
+    def test_user_reset_password(self):
+        user = User.objects.first()
+        token = User.generate_reset_token(user.email)
+        new_password = gen_username()
+        User.reset_password(token, new_password)
+        user_ = User.objects.get(id=user.id)
+        self.assertTrue(user_.check_password(new_password))
+
     def tearDown(self):
         User.objects.all().delete()
         UserGroup.objects.all().delete()

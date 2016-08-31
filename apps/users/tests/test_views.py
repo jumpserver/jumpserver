@@ -12,6 +12,7 @@ from .base import gen_username, gen_name, gen_email, get_role
 class UserListViewTests(TransactionTestCase):
     def setUp(self):
         init_all_models()
+        self.client.login(username='admin', password='admin')
 
     def test_a_new_user_in_list(self):
         username = gen_username()
@@ -32,10 +33,14 @@ class UserListViewTests(TransactionTestCase):
         response = self.client.get(reverse('users:user-list'))
         self.assertEqual(response.context['is_paginated'], True)
 
+    def tearDown(self):
+        self.client.logout()
+
 
 class UserAddTests(TestCase):
     def setUp(self):
         init_all_models()
+        self.client.login(username='admin', password='admin')
 
     def test_add_a_new_user(self):
         username = gen_username()
@@ -55,4 +60,7 @@ class UserAddTests(TestCase):
 
         response = self.client.get(reverse('users:user-list'))
         self.assertContains(response, username)
+
+    def tearDown(self):
+        self.client.logout()
 

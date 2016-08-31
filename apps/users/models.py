@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 import datetime
+
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
@@ -13,6 +14,7 @@ from django.dispatch import receiver
 from django.db import IntegrityError
 from rest_framework.authtoken.models import Token
 
+from django.core import signing
 
 # class Role(models.Model):
 #     name = models.CharField('name', max_length=80, unique=True)
@@ -113,8 +115,6 @@ class User(AbstractUser):
     private_key = models.CharField(max_length=5000, blank=True, verbose_name='ssh私钥')  # ssh key max length 4096 bit
     public_key = models.CharField(max_length=1000, blank=True, verbose_name='公钥')
     comment = models.TextField(max_length=200, blank=True, verbose_name='描述')
-    confirmed = models.BooleanField(default=False)
-    date_confirmed = models.DateField(blank=True, null=True, verbose_name='确认时间')
     date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True, verbose_name='有效期')
     created_by = models.CharField(max_length=30, default='')
 
@@ -177,22 +177,43 @@ class User(AbstractUser):
             # super(User, self).save(*args, **kwargs)
 
     @property
-    def token(self):
-        return self.get_token()
+    def private_token(self):
+        return self.get_private_token()
 
-    def get_token(self):
+    def get_private_token(self):
         try:
             token = Token.objects.get(user=self)
-            return token.key
         except Token.DoesNotExist:
-            return ''
+            token = Token.objects.create(user=self)
 
-    def set_token(self):
+        return token.key
+
+    def refresh_private_token(self):
+        Token.objects.filter(user=self).delete()
+        return Token.objects.create(user=self)
+
+    @classmethod
+    def generate_reset_token(cls, email):
         try:
-            return Token.objects.create(user=self)
-        except IntegrityError:
-            Token.objects.filter(user=self).delete()
-            return Token.objects.create(user=self)
+            user = cls.objects.get(email=email)
+            return signing.dumps({'reset': user.id, 'email': user.email})
+        except cls.DoesNotExist:
+            return None
+
+    @classmethod
+    def reset_password(cls, token, new_password, max_age=3600):
+        try:
+            data = signing.loads(token, max_age=max_age)
+            user_id = data.get('reset', None)
+            user_email = data.get('email', '')
+            user = cls.objects.get(id=user_id, email=user_email)
+            user.set_password(new_password)
+            user.save()
+            return True
+
+        except signing.BadSignature, cls.DoesNotExist:
+            pass
+        return False
 
     class Meta:
         db_table = 'user'
