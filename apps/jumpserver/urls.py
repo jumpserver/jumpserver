@@ -27,7 +27,7 @@ from django.http import HttpResponseRedirect
 
 
 urlpatterns = [
-    url(r'^$', TemplateView.as_view(template_name='base.html')),
+    url(r'^$', TemplateView.as_view(template_name='base.html'), name='index'),
     url(r'^(api/)?users/', include('users.urls')),
     url(r'^assets/', include('assets.urls')),
     url(r'^terminal/', include('webterminal.urls')),

@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 import sys
 
+from django.urls import reverse_lazy
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -97,6 +99,8 @@ TEMPLATES = [
 ]
 
 # WSGI_APPLICATION = 'jumpserver.wsgi.application'
+
+LOGIN_REDIRECT_URL = reverse_lazy('index')
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases

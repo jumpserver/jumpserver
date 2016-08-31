@@ -24,31 +24,31 @@ from .utils import AdminUserRequiredMixin, ssh_key_gen
 logger = logging.getLogger('jumpserver.users.views')
 
 
-class UserLoginView(FormView):
-    template_name = 'users/login.html'
-    form_class = UserLoginForm
-    success_url = reverse_lazy('users:user-list')
-
-    def get(self, request, *args, **kwargs):
-        if self.request.user.is_staff:
-            return HttpResponseRedirect(reverse('users:user-list'))
-        return super(UserLoginView, self).get(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        username = form.cleaned_data.get('username', '')
-        password = form.cleaned_data.get('password', '')
-
-        user = authenticate(username=username, password=password)
-        if user is not None and user.is_staff:
-            login(self.request, user)
-            return HttpResponseRedirect(self.success_url)
-
-        logger.warning('Login user [%(username)s] password error' % {'username': username})
-        return render(self.request, self.template_name, context={'form': form, 'error': '密码错误'})
-
-    def form_invalid(self, form):
-        logger.warning('Login form commit invalid.')
-        return super(UserLoginView, self).form_invalid(form)
+# class UserLoginView(FormView):
+#     template_name = 'users/login.html'
+#     form_class = UserLoginForm
+#     success_url = reverse_lazy('users:user-list')
+#
+#     def get(self, request, *args, **kwargs):
+#         if self.request.user.is_staff:
+#             return HttpResponseRedirect(reverse('users:user-list'))
+#         return super(UserLoginView, self).get(request, *args, **kwargs)
+#
+#     def form_valid(self, form):
+#         username = form.cleaned_data.get('username', '')
+#         password = form.cleaned_data.get('password', '')
+#
+#         user = authenticate(username=username, password=password)
+#         if user is not None and user.is_staff:
+#             login(self.request, user)
+#             return HttpResponseRedirect(self.success_url)
+#
+#         logger.warning('Login user [%(username)s] password error' % {'username': username})
+#         return render(self.request, self.template_name, context={'form': form, 'error': '密码错误'})
+#
+#     def form_invalid(self, form):
+#         logger.warning('Login form commit invalid.')
+#         return super(UserLoginView, self).form_invalid(form)
 
 
 class UserListView(AdminUserRequiredMixin, ListView):
