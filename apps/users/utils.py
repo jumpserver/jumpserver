@@ -84,7 +84,38 @@ def user_add_success_next(user):
     """ % {
         'name': user.name,
         'rest_password_url': reverse('users:reset-password', external=True),
-        'rest_password_token': User.generate_reset_token(user.email),
+        'rest_password_token': user.generate_reset_token(),
+        'forget_password_url': reverse('users:forget-password', external=True),
+        'email': user.email,
+        'login_url': reverse('users:login', external=True),
+    }
+
+    send_mail_async.delay(subject, message, recipient_list, html_message=message)
+
+
+def send_reset_password_mail(user):
+    subject = '重设密码'
+    recipient_list = [user.email]
+    message = """
+    您好 %(name)s:
+    </br>
+    您好，请点击下面链接重置密码, 如果不是您申请的, 请关注账号安全
+    </br>
+    <a href="%(rest_password_url)s?token=%(rest_password_token)s">请点击这里设置密码</a>
+    </br>
+    这个链接有效期1小时, 超过时间您可以 <a href="%(forget_password_url)s?email=%(email)s">重新申请</a>
+
+    </br>
+    ---
+
+    </br>
+    <a href="%(login_url)s">直接登录</a>
+
+    </br>
+    """ % {
+        'name': user.name,
+        'rest_password_url': reverse('users:reset-password', external=True),
+        'rest_password_token': user.generate_reset_token(),
         'forget_password_url': reverse('users:forget-password', external=True),
         'email': user.email,
         'login_url': reverse('users:login', external=True),

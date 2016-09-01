@@ -193,13 +193,8 @@ class User(AbstractUser):
         Token.objects.filter(user=self).delete()
         return Token.objects.create(user=self)
 
-    @classmethod
-    def generate_reset_token(cls, email):
-        try:
-            user = cls.objects.get(email=email)
-            return signing.dumps({'reset': user.id, 'email': user.email})
-        except cls.DoesNotExist:
-            return None
+    def generate_reset_token(self):
+        return signing.dumps({'reset': self.id, 'email': self.email})
 
     @classmethod
     def reset_password(cls, token, new_password, max_age=3600):

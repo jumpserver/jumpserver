@@ -4,20 +4,23 @@ from __future__ import unicode_literals
 
 import logging
 
-from django.shortcuts import get_object_or_404, reverse, render
+from django.shortcuts import get_object_or_404, reverse, render, Http404
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.db.models import Q
-from django.views.generic.base import View
+from django.views.generic.base import View, TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView, ProcessFormView, FormView
 from django.views.generic.detail import DetailView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.conf import settings
+from django.http import HttpResponseRedirect
+
+from common.utils import get_object_or_none
 
 from .models import User, UserGroup
 from .forms import UserAddForm, UserUpdateForm, UserGroupForm, UserLoginForm
-from .utils import AdminUserRequiredMixin, ssh_key_gen, user_add_success_next
+from .utils import AdminUserRequiredMixin, ssh_key_gen, user_add_success_next, send_reset_password_mail
 
 
 logger = logging.getLogger('jumpserver.users.views')
@@ -179,9 +182,58 @@ class UserGroupDeleteView(DeleteView):
     pass
 
 
-class UserForgetPasswordView(View):
-    pass
+class UserForgetPasswordView(TemplateView):
+    template_name = 'users/forget_password.html'
+
+    def post(self, request, *args, **kwargs):
+        email = request.POST.get('email')
+        print(email)
+        user = get_object_or_none(User, email=email)
+        if not user:
+            return self.get(request, errors='邮件地址错误,请重新输入')
+        else:
+            send_reset_password_mail(user)
+            return HttpResponseRedirect(reverse('users:forget-password-sendmail-success'))
 
 
-class UserRestPasswordView(View):
-    pass
+class UserForgetPasswordSendmailSuccessView(TemplateView):
+    template_name = 'common/flash_message_standalone.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'title': '发送重置邮件',
+            'messages': '发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)',
+            'redirect_url': reverse('users:login'),
+        }
+        kwargs.update(context)
+        return super(UserForgetPasswordSendmailSuccessView, self).get_context_data(**kwargs)
+
+
+class UserResetPasswordSuccessView(TemplateView):
+    template_name = 'common/flash_message_standalone.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'title': '重设密码成功',
+            'messages': '密码重置成功, 请返回登录页面登录系统',
+            'redirect_url': reverse('users:login'),
+        }
+        kwargs.update(context)
+        return super(UserResetPasswordSuccessView, self).get_context_data(**kwargs)
+
+
+class UserResetPasswordView(TemplateView):
+    template_name = 'users/reset_password.html'
+
+    def post(self, request, *args, **kwargs):
+        password = request.POST.get('password')
+        password_confirm = request.POST.get('password-confirm')
+        token = request.GET.get('token')
+
+        if password != password_confirm:
+            return self.get(request, errors='两次密码不匹配')
+
+        if not User.reset_password(token, password):
+            return self.get(request, errors='Token不正确或已过期')
+
+        return HttpResponseRedirect(reverse('users:reset-password-success'))

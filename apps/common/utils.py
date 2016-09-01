@@ -12,6 +12,13 @@ def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, ex
 
     if external:
         url = settings.SITE_URL.strip('/') + url
-
     return url
+
+
+def get_object_or_none(model, **kwargs):
+    try:
+        obj = model.objects.get(**kwargs)
+    except model.DoesNotExist:
+        obj = None
+    return obj
 

@@ -58,3 +58,9 @@ th a {
    border: 1px solid #1ab394 !important;
    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3) !important;
 }
+
+.passwordBox2 {
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 100px 20px 20px 20px;
+}
