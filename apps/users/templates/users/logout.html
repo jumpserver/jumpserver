@@ -1,7 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
-
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,24 +22,14 @@
                         <img src="{% static 'img/logo.png' %}" style="margin: auto" width="82" height="82">
                         <h2 style="display: inline">Jumpserver</h2>
                     </div>
-                    {% if errors %}
                     <p>
-                        <div class="alert alert-danger">
-                            {{ errors }}
-                        </div>
-                    </p>
-                    {% endif %}
-
-                    {% if messages %}
-                        <p>
                         <div class="alert alert-success" id="messages">
-                            {{ messages }}
+                            退出登录成功
                         </div>
                     </p>
-                    {% endif %}
                     <div class="row">
                         <div class="col-lg-3">
-                                <a href="{{ redirect_url }}" class="btn btn-primary block full-width m-b">返回</a>
+                                <a href="{% url "users:login" %}" class="btn btn-primary block full-width m-b">返回</a>
                         </div>
                     </div>
                 </div>
@@ -58,20 +47,18 @@
     </div>
 </body>
 <script>
-    var time=5;
+    var time=2;
     function redirect_page() {
         if (time >= 0) {
-            var messages = '{{ messages }}， <b>' + time +'</b> ...';
+            var messages = '退出登录成功，<b>' + time +'</b> 秒后 返回到登录页面 ';
             $('#messages').html(messages);
             time--;
             setTimeout(redirect_page, 1000);
         }
         else {
-            window.location.href = "{{ redirect_url }}";
+            window.location.href = "{% url 'users:login' %}";
         }
     }
-    {% if auto_redirect %}
     window.onload = redirect_page
-    {% endif %}
 </script>
 </html>

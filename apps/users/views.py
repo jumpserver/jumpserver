@@ -15,7 +15,7 @@ from django.views.generic.detail import DetailView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.conf import settings
 from django.http import HttpResponseRedirect
-from django.contrib.auth import views as auth_view, authenticate, login
+from django.contrib.auth import views as auth_view, authenticate, login, logout
 
 from common.utils import get_object_or_none
 
@@ -34,8 +34,11 @@ class UserLoginView(FormView):
 
     def get(self, request, *args, **kwargs):
         if self.request.user.is_staff:
-            return redirect(request.GET.get(self.redirect_field_name, reverse('index')))
-        return super(UserLoginView, self).get(request, *args, **kwargs)
+            return redirect(request.POST.get(self.redirect_field_name, reverse('index')))
+        # Todo: Django have bug, lose context issue: https://github.com/django/django/pull/7202
+        # so we jump it and use origin method render_to_response
+        # return super(UserLoginView, self).get(request, *args, **kwargs)
+        return self.render_to_response(self.get_context_data(**kwargs))
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
@@ -49,6 +52,25 @@ class UserLoginView(FormView):
 
         login(request, user)
         return redirect(request.GET.get(self.redirect_field_name, reverse('index')))
+
+
+class UserLogoutView(TemplateView):
+    template_name = 'common/flash_message_standalone.html'
+
+    def get(self, request, *args, **kwargs):
+        logout(request)
+
+        return super(UserLogoutView, self).get(request)
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'title': '退出登录成功',
+            'messages': '退出登录成功， 返回登录页面',
+            'redirect_url': reverse('users:login'),
+            'auto_redirect': True,
+        }
+        kwargs.update(context)
+        return super(UserLogoutView, self).get_context_data(**kwargs)
 
 
 class UserListView(AdminUserRequiredMixin, ListView):
@@ -239,8 +261,9 @@ class UserResetPasswordSuccessView(TemplateView):
     def get_context_data(self, **kwargs):
         context = {
             'title': '重设密码成功',
-            'messages': '密码重置成功, 请返回登录页面登录系统',
+            'messages': '密码重置成功, 返回登录页面 ',
             'redirect_url': reverse('users:login'),
+            'auto_redirect': True,
         }
         kwargs.update(context)
         return super(UserResetPasswordSuccessView, self).get_context_data(**kwargs)
@@ -263,7 +286,7 @@ class UserResetPasswordView(TemplateView):
         token = request.GET.get('token')
 
         if password != password_confirm:
-            return self.get(request, errors='两次密码不匹配')
+            return self.get(request, errors='两次密码不一致')
 
         user = User.validate_reset_token(token)
         if not user:

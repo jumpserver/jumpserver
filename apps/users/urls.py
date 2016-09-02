@@ -1,5 +1,6 @@
 from django.conf.urls import url, include
 from django.contrib.auth import views as auth_views
+from django.urls import reverse_lazy
 
 import views
 import api
@@ -8,7 +9,7 @@ app_name = 'users'
 
 urlpatterns = [
     url(r'^login$', views.UserLoginView.as_view(), name='login'),
-    url(r'^logout$', auth_views.logout, {'template_name': 'users/login.html'}, name='logout'),
+    url(r'^logout$', views.UserLogoutView.as_view(), name='logout'),
     url(r'^captcha/', include('captcha.urls')),
     url(r'^password/forget$', views.UserForgetPasswordView.as_view(), name='forget-password'),
     url(r'^password/forget/sendmail-success$',
