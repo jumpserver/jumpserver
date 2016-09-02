@@ -187,7 +187,6 @@ class UserForgetPasswordView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         email = request.POST.get('email')
-        print(email)
         user = get_object_or_none(User, email=email)
         if not user:
             return self.get(request, errors='邮件地址错误,请重新输入')
@@ -225,6 +224,14 @@ class UserResetPasswordSuccessView(TemplateView):
 class UserResetPasswordView(TemplateView):
     template_name = 'users/reset_password.html'
 
+    def get(self, request, *args, **kwargs):
+        token = request.GET.get('token')
+        user = User.validate_reset_token(token)
+
+        if not user:
+            kwargs.update({'errors': 'Token不正确或已过期'})
+        return super(UserResetPasswordView, self).get(request, *args, **kwargs)
+
     def post(self, request, *args, **kwargs):
         password = request.POST.get('password')
         password_confirm = request.POST.get('password-confirm')
@@ -233,7 +240,9 @@ class UserResetPasswordView(TemplateView):
         if password != password_confirm:
             return self.get(request, errors='两次密码不匹配')
 
-        if not User.reset_password(token, password):
+        user = User.validate_reset_token(token)
+        if not user:
             return self.get(request, errors='Token不正确或已过期')
 
+        user.reset_password(password)
         return HttpResponseRedirect(reverse('users:reset-password-success'))

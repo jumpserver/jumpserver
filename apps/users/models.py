@@ -197,19 +197,20 @@ class User(AbstractUser):
         return signing.dumps({'reset': self.id, 'email': self.email})
 
     @classmethod
-    def reset_password(cls, token, new_password, max_age=3600):
+    def validate_reset_token(cls, token, max_age=3600):
         try:
             data = signing.loads(token, max_age=max_age)
             user_id = data.get('reset', None)
             user_email = data.get('email', '')
             user = cls.objects.get(id=user_id, email=user_email)
-            user.set_password(new_password)
-            user.save()
-            return True
 
         except signing.BadSignature, cls.DoesNotExist:
-            pass
-        return False
+            user = None
+        return user
+
+    def reset_password(self, new_password):
+        self.set_password(new_password)
+        self.save()
 
     class Meta:
         db_table = 'user'

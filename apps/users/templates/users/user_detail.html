@@ -60,7 +60,7 @@
                                 <div class="ibox-content">
                                     <table class="table">
                                         <tbody>
-                                        <tr>
+                                        <tr class="no-borders-tr">
                                             <td colspan="2">
                                                 <img src="{{ user | user_avatar_url }}" class="img-circle" width="64" height="64">
                                             </td>
@@ -119,16 +119,14 @@
                             </div>
                         </div>
                         <div class="col-sm-5" style="padding-left: 0px;">
-                            <div class="ibox float-e-margins">
-                                <div class="ibox-title " style="background: #1ab394">
-                                    <span style="color: white">快速修改</span>
-                                    <div class="ibox-tools">
-                                    </div>
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> 快速修改
                                 </div>
-                                <div class="ibox-content primary-panel">
+                                <div class="panel-body">
                                     <table class="table">
                                         <tbody>
-                                        <tr>
+                                        <tr class="no-borders-tr">
                                             <td width="50%">Active:</td>
                                             <td><span style="float: right">
                                                 <div class="switch">
@@ -166,8 +164,8 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td class="no-borders">重置密钥:</td>
-                                            <td class="no-borders">
+                                            <td>重置密钥:</td>
+                                            <td>
                                                 <span style="float: right">
                                                     <button type="button" class="btn btn-primary btn-xs" style="width: 54px;">重置</button>
                                                 </span>
@@ -178,13 +176,11 @@
                                 </div>
                             </div>
 
-                            <div class="ibox float-e-margins">
-                                <div class="ibox-title bg-primary" style="background: #1ab394">
-                                    <span style="color: white">用户组</span>
-                                    <div class="ibox-tools">
-                                    </div>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> 用户组
                                 </div>
-                                <div class="ibox-content primary-panel">
+                                <div class="panel-body">
                                     <table class="table">
                                         <tbody>
                                         <form>
@@ -199,7 +195,7 @@
                                             </tr>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-primary btn-small">添加到用户组</button>
+                                                    <button type="button" class="btn btn-info btn-small">添加到用户组</button>
                                                 </td>
                                             </tr>
                                         </form>

@@ -9,17 +9,25 @@
 
 .n-invalid {border: 1px solid #f00;}
 
-.primary-panel {
-  border-color: #1ab394;
-  border-style: solid;
-  border-width: 1px
+
+.primary-panel .ibox-title {
+  color: #ffffff;
+  background-color: #1AB394;
 }
 
-.info-panel {
-  border-color: #23c6c8;
-  border-style: solid;
-  border-width: 1px
+.primary-panel .ibox-content {
+  border: 1px solid #1AB394;
 }
+
+.info-panel .ibox-title {
+  color: #ffffff;
+  background-color: #23c6c8;
+}
+
+.info-panel .ibox-content {
+  border: 1px solid #23c6c8;;
+}
+
 
 th a {
   color: #676a6c;
@@ -63,4 +71,8 @@ th a {
   max-width: 660px;
   margin: 0 auto;
   padding: 100px 20px 20px 20px;
+}
+
+.no-borders-tr td {
+  border-top: none !important;
 }
