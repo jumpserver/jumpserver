@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.conf.urls import url, include
 from django.contrib.auth import views as auth_views
 
 import views
@@ -7,8 +7,9 @@ import api
 app_name = 'users'
 
 urlpatterns = [
-    url(r'^login$', auth_views.login, {'template_name': 'users/login.html'}, name='login'),
+    url(r'^login$', views.UserLoginView.as_view(), name='login'),
     url(r'^logout$', auth_views.logout, {'template_name': 'users/login.html'}, name='logout'),
+    url(r'^captcha/', include('captcha.urls')),
     url(r'^password/forget$', views.UserForgetPasswordView.as_view(), name='forget-password'),
     url(r'^password/forget/sendmail-success$',
         views.UserForgetPasswordSendmailSuccessView.as_view(), name='forget-password-sendmail-success'),

@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 
 import logging
 
-from django.shortcuts import get_object_or_404, reverse, render, Http404
+from django.shortcuts import get_object_or_404, reverse, render, Http404, redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.db.models import Q
@@ -15,6 +15,7 @@ from django.views.generic.detail import DetailView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.conf import settings
 from django.http import HttpResponseRedirect
+from django.contrib.auth import views as auth_view, authenticate, login
 
 from common.utils import get_object_or_none
 
@@ -24,6 +25,30 @@ from .utils import AdminUserRequiredMixin, ssh_key_gen, user_add_success_next, s
 
 
 logger = logging.getLogger('jumpserver.users.views')
+
+
+class UserLoginView(FormView):
+    template_name = 'users/login.html'
+    form_class = UserLoginForm
+    redirect_field_name = 'next'
+
+    def get(self, request, *args, **kwargs):
+        if self.request.user.is_staff:
+            return redirect(request.GET.get(self.redirect_field_name, reverse('index')))
+        return super(UserLoginView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        form = self.get_form()
+        username = form['username'].value()
+        password = form['password'].value()
+
+        user = authenticate(username=username, password=password)
+        if user is None:
+            kwargs.update({'errors': '账号密码不正确'})
+            return self.get(request, *args, **kwargs)
+
+        login(request, user)
+        return redirect(request.GET.get(self.redirect_field_name, reverse('index')))
 
 
 class UserListView(AdminUserRequiredMixin, ListView):
