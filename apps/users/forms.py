@@ -2,21 +2,15 @@
 
 from django.forms import ModelForm
 from django import forms
+from captcha.fields import CaptchaField
 
 from .models import User, UserGroup
-
-
-# class UserLoginForm(ModelForm):
-#     class Meta:
-#         model = User
-#         fields = [
-#             "email", "password"
-#         ]
 
 
 class UserLoginForm(forms.Form):
     username = forms.CharField(label='用户名', max_length=100)
     password = forms.CharField(label='密码', widget=forms.PasswordInput, max_length=100)
+    # captcha = CaptchaField()
 
 
 class UserAddForm(ModelForm):
