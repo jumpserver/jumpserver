@@ -33,7 +33,3 @@ def pagination_range(total_page, current_num=1, display=5):
     end = start + display if start + display <= total_page else total_page + 1
 
     return range(start, end)
-
-
-
-

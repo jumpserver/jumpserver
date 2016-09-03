@@ -42,11 +42,11 @@ class AssetExtend(models.Model):
 
 
 class Asset(models.Model):
-    ip = models.CharField(max_length=32, blank=True, verbose_name="主机IP")
+    ip = models.CharField(max_length=32, blank=True, verbose_name="资产IP")
     other_ip = models.CharField(max_length=255, blank=True, verbose_name="其他IP")
     remote_card_ip = models.CharField(max_length=16, blank=True, verbose_name=u'远控卡IP')
     hostname = models.CharField(max_length=128, unique=True, blank=True, verbose_name=u"主机名")
-    port = models.IntegerField(blank=True, verbose_name=u"端口号")
+    port = models.IntegerField(blank=True, verbose_name=u"端口")
     group = models.ManyToManyField(AssetGroup, blank=True, verbose_name=u"所属主机组")
     username = models.CharField(max_length=16, blank=True, verbose_name=u"管理用户名")
     password = models.CharField(max_length=256, blank=True, verbose_name=u"密码")
@@ -58,12 +58,12 @@ class Asset(models.Model):
     disk = models.CharField(max_length=1024, blank=True, verbose_name=u'硬盘')
     os = models.CharField(max_length=128, blank=True, verbose_name=u'系统信息')
     cabinet_no = models.CharField(max_length=32, blank=True, verbose_name=u'机柜号')
-    cabinet_pos = models.IntegerField(max_length=4, null=True, blank=True, verbose_name=u'机器位置')
+    cabinet_pos = models.IntegerField(null=True, blank=True, verbose_name=u'资产位置')
     number = models.CharField(max_length=32, blank=True, unique=True, verbose_name=u'资产编号')
     status = models.ManyToManyField(AssetExtend, blank=True,
-                                    related_name="asset_status_extend", verbose_name="机器状态")
+                                    related_name="asset_status_extend", verbose_name="资产状态")
     type = models.ManyToManyField(AssetExtend, blank=True,
-                                  related_name="asset_type_extend", verbose_name="机器类型")
+                                  related_name="asset_type_extend", verbose_name="资产类型")
     env = models.ManyToManyField(AssetExtend, blank=True,
                                  related_name="asset_env_extend", verbose_name="所属主机组环境")
     sn = models.CharField(max_length=128, blank=True, unique=True, verbose_name=u"SN编号")
