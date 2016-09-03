@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 import logging
 
 from django.shortcuts import get_object_or_404, reverse, render, Http404, redirect
-from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
 from django.db.models import Q
@@ -68,8 +67,8 @@ class UserLogoutView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'title': '退出登录成功',
-            'messages': '退出登录成功， 返回登录页面',
+            'title': _('Logout success'),
+            'messages': _('Logout success, return login page'),
             'redirect_url': reverse('users:login'),
             'auto_redirect': True,
         }
@@ -98,7 +97,7 @@ class UserListView(AdminUserRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(UserListView, self).get_context_data(**kwargs)
-        context.update({'app': '用户管理', 'action': '用户列表', 'keyword': self.keyword})
+        context.update({'app': _('Users'), 'action': _('User list'), 'keyword': self.keyword})
         return context
 
 
@@ -107,11 +106,11 @@ class UserAddView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     form_class = UserAddForm
     template_name = 'users/user_add.html'
     success_url = reverse_lazy('users:user-list')
-    success_message = '添加用户 <a href="%s">%s</a> 成功 .'
+    success_message = _('Create user<a href="%s">%s</a> success.')
 
     def get_context_data(self, **kwargs):
         context = super(UserAddView, self).get_context_data(**kwargs)
-        context.update({'app': '用户管理', 'action': '用户添加'})
+        context.update({'app': _('Users'), 'action': _('Create user')})
         return context
 
     def form_valid(self, form):
@@ -153,7 +152,7 @@ class UserUpdateView(AdminUserRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(UserUpdateView, self).get_context_data(**kwargs)
-        context.update({'app': '用户管理', 'action': '用户编辑'})
+        context.update({'app': _('Users'), 'action': _('Edit user')})
         return context
 
 
@@ -171,7 +170,7 @@ class UserDetailView(AdminUserRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super(UserDetailView, self).get_context_data(**kwargs)
         groups = [group for group in UserGroup.objects.iterator() if group not in self.object.groups.iterator()]
-        context.update({'app': '用户管理', 'action': '用户详情', 'groups': groups})
+        context.update({'app': _('Users'), 'action': _('User detail'), 'groups': groups})
         return context
 
 
@@ -195,7 +194,7 @@ class UserGroupListView(AdminUserRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(UserGroupListView, self).get_context_data(**kwargs)
-        context.update({'app': '用户管理', 'action': '用户组列表', 'keyword': self.keyword})
+        context.update({'app': _('Users'), 'action': _('Usergroup list'), 'keyword': self.keyword})
         return context
 
 
@@ -208,7 +207,7 @@ class UserGroupAddView(AdminUserRequiredMixin, CreateView):
     def get_context_data(self, **kwargs):
         context = super(UserGroupAddView, self).get_context_data(**kwargs)
         users = User.objects.all()
-        context.update({'app': '用户管理', 'action': '用户组添加', 'users': users})
+        context.update({'app': _('Users'), 'action': _('Create usergroup'), 'users': users})
         return context
 
     def form_valid(self, form):
@@ -240,7 +239,7 @@ class UserForgetPasswordView(TemplateView):
         email = request.POST.get('email')
         user = get_object_or_none(User, email=email)
         if not user:
-            return self.get(request, errors='邮件地址错误,请重新输入')
+            return self.get(request, errors=_('Email address invalid, input again'))
         else:
             send_reset_password_mail(user)
             return HttpResponseRedirect(reverse('users:forget-password-sendmail-success'))
@@ -251,8 +250,8 @@ class UserForgetPasswordSendmailSuccessView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'title': '发送重置邮件',
-            'messages': '发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)',
+            'title': _('Send reset password message'),
+            'messages': _('Send reset password mail success, login your mail box and follow it '),
             'redirect_url': reverse('users:login'),
         }
         kwargs.update(context)
@@ -264,8 +263,8 @@ class UserResetPasswordSuccessView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'title': '重设密码成功',
-            'messages': '密码重置成功, 返回登录页面 ',
+            'title': _('Reset password success'),
+            'messages': _('Reset password success, return to login page'),
             'redirect_url': reverse('users:login'),
             'auto_redirect': True,
         }
@@ -281,7 +280,7 @@ class UserResetPasswordView(TemplateView):
         user = User.validate_reset_token(token)
 
         if not user:
-            kwargs.update({'errors': 'Token不正确或已过期'})
+            kwargs.update({'errors': _('Token invalid or expired')})
         return super(UserResetPasswordView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
@@ -290,11 +289,11 @@ class UserResetPasswordView(TemplateView):
         token = request.GET.get('token')
 
         if password != password_confirm:
-            return self.get(request, errors='两次密码不一致')
+            return self.get(request, errors=_('Password not same'))
 
         user = User.validate_reset_token(token)
         if not user:
-            return self.get(request, errors='Token不正确或已过期')
+            return self.get(request, errors=_('Token invalid or expired'))
 
         user.reset_password(password)
         return HttpResponseRedirect(reverse('users:reset-password-success'))

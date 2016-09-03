@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load static %}
 {% load bootstrap %}
 {% block custom_head_css_js %}
@@ -13,7 +14,7 @@
             <div class="col-sm-12">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h5>填写用户信息</h5>
+                        <h5>{% trans 'Create user' %}</h5>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -29,7 +30,7 @@
                     <div class="ibox-content">
                         <form method="post" id="userForm" class="form-horizontal" action="" enctype="multipart/form-data">
                             {% csrf_token %}
-                            <h3>账户</h3>
+                            <h3>{% trans 'Account' %}</h3>
                             {% block username %} {% endblock %}
                             {{ form.email|bootstrap_horizontal }}
                             {{ form.name|bootstrap_horizontal }}
@@ -39,7 +40,7 @@
                             {% block password %} {% endblock %}
 
                             <div class="hr-line-dashed"></div>
-                            <h3>角色安全</h3>
+                            <h3>{% trans 'Security and Role' %}</h3>
                             {{ form.role|bootstrap_horizontal }}
                             <div class="form-group {% if form.date_expired.errors %} has-error {% endif %}" id="date_5">
                                 <label for="{{ form.date_expired.id_for_label }}" class="col-sm-2 control-label">{{ form.date_expired.label }}</label>
@@ -52,21 +53,21 @@
                                 </div>
                              </div>
                             <div class="form-group">
-                                <label for="{{ form.enable_otp.id_for_label }}" class="col-sm-2 control-label">二次验证</label>
+                                <label for="{{ form.enable_otp.id_for_label }}" class="col-sm-2 control-label">{% trans 'Enable OTP' %}</label>
                                 <div class="col-sm-8">
                                     {{ form.enable_otp }}
                                 </div>
                             </div>
                             <div class="hr-line-dashed"></div>
-                            <h3>信息</h3>
+                            <h3>{% trans 'Profile' %}</h3>
                             {{ form.phone|bootstrap_horizontal }}
                             {{ form.wechat|bootstrap_horizontal }}
                             {{ form.comment|bootstrap_horizontal }}
                             <div class="hr-line-dashed"></div>
                             <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-2">
-                                    <button class="btn btn-white" type="reset">取消</button>
-                                    <button id="submit_button" class="btn btn-primary" type="submit">确认保存</button>
+                                    <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Commit' %}</button>
                                 </div>
                             </div>
                         </form>

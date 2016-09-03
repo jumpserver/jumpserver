@@ -215,7 +215,7 @@ LOGGING = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'en_US'
 
 TIME_ZONE = 'Asia/Shanghai'
 
@@ -224,6 +224,9 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+# I18N translation
+LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'),]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -245,7 +248,6 @@ BOOTSTRAP_COLUMN_COUNT = 11
 
 # Init data or generate fake data source for development
 FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures'), ]
-
 
 # Email config
 EMAIL_HOST = CONFIG.EMAIL_HOST
