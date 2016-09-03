@@ -80,6 +80,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 ]
 
 ROOT_URLCONF = 'jumpserver.urls'
@@ -307,3 +308,5 @@ CELERY_RESULT_BACKEND = BROKER_URL
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
 CAPTCHA_IMAGE_SIZE = (75, 33)
 CAPTCHA_FOREGROUND_COLOR = '#001100'
+
+#

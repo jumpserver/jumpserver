@@ -7,6 +7,7 @@ import logging
 from django.shortcuts import get_object_or_404, reverse, render, Http404, redirect
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
+from django.utils.translation import ugettext as _
 from django.db.models import Q
 from django.views.generic.base import View, TemplateView
 from django.views.generic.list import ListView
@@ -50,7 +51,7 @@ class UserLoginView(FormView):
 
         user = authenticate(username=username, password=password)
         if user is None:
-            kwargs.update({'errors': '账号密码不正确'})
+            kwargs.update({'errors': _('Username or password invalid')})
             return self.get(request, *args, **kwargs)
 
         login(request, user)
