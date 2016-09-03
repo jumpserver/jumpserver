@@ -10,6 +10,14 @@
     {% include '_head_css_js.html' %}
     <link href="{% static "css/jumpserver.css" %}" rel="stylesheet">
     <script src="{% static "js/jumpserver.js" %}"></script>
+    <style>
+        .captcha {
+            float: right;
+        }
+        #id_captcha_1 {
+
+        }
+    </style>
 </head>
 
 <body class="gray-bg">
@@ -43,7 +51,9 @@
                     <form class="m-t" role="form" method="post" action="{% url 'users:login' %}">
                         {% csrf_token %}
                         {% if form.errors %}
-                            <p class="red-fonts">{{ form.errors }}</p>
+                            {% if 'captcha' in form.errors %}
+                                <p class="red-fonts">验证码错误</p>
+                            {% endif %}
                         {% endif %}
                         {% if errors %}
                             <p class="red-fonts">{{ errors }}</p>
@@ -53,6 +63,9 @@
                         </div>
                         <div class="form-group">
                             <input type="password" class="form-control" name="{{ form.password.html_name }}" placeholder="Password" required="">
+                        </div>
+                        <div>
+                            {{ form.captcha }}
                         </div>
                         <button type="submit" class="btn btn-primary block full-width m-b">Login</button>
 
@@ -78,7 +91,6 @@
             </div>
         </div>
     </div>
-
 </body>
 
 </html>

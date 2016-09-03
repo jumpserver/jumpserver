@@ -10,7 +10,6 @@ app_name = 'users'
 urlpatterns = [
     url(r'^login$', views.UserLoginView.as_view(), name='login'),
     url(r'^logout$', views.UserLogoutView.as_view(), name='logout'),
-    url(r'^captcha/', include('captcha.urls')),
     url(r'^password/forget$', views.UserForgetPasswordView.as_view(), name='forget-password'),
     url(r'^password/forget/sendmail-success$',
         views.UserForgetPasswordSendmailSuccessView.as_view(), name='forget-password-sendmail-success'),

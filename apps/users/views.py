@@ -42,6 +42,9 @@ class UserLoginView(FormView):
 
     def post(self, request, *args, **kwargs):
         form = self.get_form()
+        if not form.is_valid():
+            return self.form_invalid(form)
+
         username = form['username'].value()
         password = form['password'].value()
 
