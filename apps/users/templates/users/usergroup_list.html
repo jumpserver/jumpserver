@@ -1,0 +1,58 @@
+{% extends '_list_base.html' %}
+{% load common_tags %}
+{% block content_left_head %}
+     <a href="{% url 'users:usergroup-add' %}" class="btn btn-sm btn-primary "> 添加用户组 </a>
+{% endblock %}
+
+{% block table_head %}
+     <th class="text-center">
+         <input type="checkbox" id="check_all" onclick="checkAll('check_all', 'checked')">
+     </th>
+     <th class="text-center"><a href="{% url 'users:usergroup-list' %}?sort=name">名称</a></th>
+     <th class="text-center">用户数量</th>
+     <th class="text-center">资产数量</th>
+     <th class="text-center">描述</th>
+     <th class="text-center"></th>
+{% endblock %}
+
+{% block table_body %}
+    {% for usergroup in usergroup_list %}
+        <tr class="gradeX">
+            <td class="text-center">
+                <input type="checkbox" name="checked" value="{{ usergroup.id }}">
+            </td>
+            <td class="text-center">
+                <a href="{% url 'users:usergroup-detail' pk=usergroup.id %}">
+                    {{ usergroup.name }}
+                </a>
+            </td>
+            <td class="text-center">{{ usergroup.users.all|length }}</td>
+            <td class="text-center">数量</td>
+            <th class="text-center">{{ usergroup.comment|truncatewords:8 }}</th>
+            <td class="text-center">
+                <a href="{% url 'users:usergroup-edit' pk=usergroup.id %}" class="btn btn-xs btn-info">编辑</a>
+                <a href="{% url 'users:usergroup-delete' pk=usergroup.id %}" class="btn btn-xs btn-danger del">删除</a>
+            </td>
+        </tr>
+    {% endfor %}
+{% endblock  %}
+
+{% block content_bottom_left %}
+    <form id="" method="get" action="" class=" mail-search">
+        <div class="input-group">
+            <select class="form-control m-b" style="width: auto">
+                <option>批量删除</option>
+                <option>批量更新</option>
+                <option>批量禁用</option>
+                <option>批量导出</option>
+            </select>
+
+            <div class="input-group-btn pull-left" style="padding-left: 5px;">
+                <button id='search_btn' type="submit" style="height: 32px;"  class="btn btn-sm btn-primary">
+                 确认
+                </button>
+            </div>
+        </div>
+   </form>
+{% endblock %}
+

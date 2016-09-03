@@ -2,7 +2,11 @@
     <div class="sidebar-collapse">
         <ul class="nav" id="side-menu">
             {% include '_user_profile.html' %}
-            {% include '_nav.html' %}
+            {% if request.user.is_superuser %}
+                {% include '_nav.html' %}
+            {% else %}
+                {% include '_nav_user.html' %}
+            {% endif %}
         </ul>
     </div>
 </nav>

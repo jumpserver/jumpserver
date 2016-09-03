@@ -1,29 +1,11 @@
 {% load static %}
 <!-- Mainly scripts -->
 <script src="{% static "js/plugins/metisMenu/jquery.metisMenu.js" %}"></script>
-{#<script src="{% static "js/plugins/slimscroll/jquery.slimscroll.min.js" %}"></script>#}
-{#<script src="{% static "js/bootstrap-dialog.js" %}"></script>#}
-{#<script src="{% static "js/mindmup-editabletable.js" %}"></script>#}
-{#<script src="{% static "js/plugins/fullcalendar/moment.min.js" %}"></script>#}
-{#<script src="{% static "js/plugins/fullcalendar/fullcalendar.min.js" %}"></script>#}
 
 <!-- Custom and plugin javascript -->
 <script src="{% static "js/inspinia.js" %}"></script>
-{#<script src="{% static "js/plugins/pace/pace.min.js" %}"></script>#}
+<script src="{% static "js/jumpserver.js" %}"></script>
 
-<!-- Peity -->
-{#<script src="{% static "js/plugins/peity/jquery.peity.min.js" %}"></script>#}
-{#<script src="{% static "js/demo/peity-demo.js" %}"></script>#}
-
-<script src="{% static "js/base.js" %}"></script>
-
-<!-- pop windows layer-->
-{#<script src="{% static "js/layer/layer.js" %}"></script>#}
-
-<!-- highcharts -->
-{#<script src="{% static "js/highcharts/highcharts.js" %}"></script>#}
-
-{#<script src="{% static "js/dropzone/dropzone.js" %}"></script>#}
 <!-- active menu -->
 <script>
     var url_array = document.location.pathname.split("/");
@@ -35,4 +17,37 @@
         $("#"+s1).addClass('active');
         $('#'+s1+' .'+s2).addClass('active');
     }
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    var csrftoken = getCookie('csrftoken');
+    var sessionid = getCookie('sessionid');
+
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+{#                xhr.setRequestHeader("sessionid", sessionid);#}
+            }
+        }
+    });
 </script>

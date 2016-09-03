@@ -31,6 +31,13 @@
 │   │   ├── urls.py                 // urlconf文件
 │   │   ├── utils.py                // 将views和api可复用的代码放在这里, api和views只是请求和返回不同
 │   │   └── views.py                // views文件
+│   ├── common 
+│   │   ├── templatetags            // 通用template tag
+│   │   ├── utils.py                // 通用的函数方法
+│   │   └── views.py                
+│   ├── fixtures                     // 初始化数据目录
+│   │   ├── init.json               // 初始化项目数据库
+│   │   └── fake.json               // 生成大量测试数据
 │   ├── jumpserver                  // 项目设置目录
 │   │    ├── __init__.py
 │   │    ├── settings.py            // 项目设置文件

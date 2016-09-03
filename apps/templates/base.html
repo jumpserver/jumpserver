@@ -11,6 +11,8 @@
     <link rel="shortcut icon" href={% static "img/facio.ico" %} type="image/x-icon">
     {% include '_head_css_js.html' %}
     {% block custom_head_css_js %} {% endblock %}
+    <link href="{% static "css/jumpserver.css" %}" rel="stylesheet">
+    <script src="{% static "js/jumpserver.js" %}"></script>
 </head>
 
 <body>
@@ -18,6 +20,7 @@
     {% include '_left_side_bar.html' %}
     <div id="page-wrapper" class="gray-bg">
         {% include '_header_bar.html' %}
+        {% include '_message.html' %}
         {% block content %}{% endblock %}
         {% include '_footer.html' %}
     </div>
@@ -25,5 +28,5 @@
 
 </body>
 {% include '_foot_js.html' %}
-{% block custom_footer_js %} {% endblock %}
+{% block custom_foot_js %} {% endblock %}
 </html>

@@ -14,10 +14,29 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf.urls import url, include
-#from django.contrib import admin
+from django.conf import settings
+from django.conf.urls.static import static
+from django.views.generic.base import TemplateView
+from django.http import HttpResponseRedirect
+
+
+# def view(request, **kwargs):
+#     if kwargs:
+#         print kwargs
+#     return HttpResponseRedirect('/' + kwargs["module"] + '/' + kwargs["version"] + '/' + kwargs["api"])
+
 
 urlpatterns = [
-    url(r'^users/', include('users.urls')),
+    url(r'^$', TemplateView.as_view(template_name='base.html'), name='index'),
+    url(r'^(api/)?users/', include('users.urls')),
     url(r'^assets/', include('assets.urls')),
-    # url(r'^admin/', admin.site.urls),
+    url(r'^terminal/', include('webterminal.urls')),
 ]
+
+#urlpatterns += [
+#    url(r'^api/users/', include('users.api_urls')),
+#]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
