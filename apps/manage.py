@@ -5,11 +5,9 @@ import errno
 
 if __name__ == "__main__":
     try:
-        os.makedirs('./logs')
-    except OSError as exc: # Python > 2.5 (except OSError, exec: for Python < 2.5)
-        if exc.errno == errno.EEXIST and os.path.isdir('./logs'):
-            pass
-        else: raise
+        os.makedirs('../logs')
+    except:
+        pass
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "jumpserver.settings")
     try:
