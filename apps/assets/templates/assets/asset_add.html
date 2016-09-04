@@ -24,45 +24,33 @@
                     <div class="panel blank-panel">
                         <div class="panel-body">
                             <div class="tab-content">
-                                <div id="tab-1" class="ibox float-e-margins tab-pane active">
-                                    {% if error %}
-                                        <div class="alert alert-warning text-center">{{ error }}</div>
-                                    {% endif %}
-                                    {% if msg %}
-                                        <div class="alert alert-success text-center">{{ msg }}</div>
-                                    {% endif %}
-
+                                <div id="tab-1" class="ibox float-e-margins tab-pane active"></div>
                                     <form id="assetForm" method="post" class="form-horizontal">
                                         {% csrf_token %}
-                                        <h2 class="widget-head-color-box">基本信息</h2>
+                                        <h3 class="widget-head-color-box">基本信息</h3>
 
                                         {{ form.hostname|bootstrap_horizontal }}
 
-                                        <div class="hr-line-dashed"></div>
                                         {{ form.ip|bootstrap_horizontal }}
-{#                                        <p class="col-sm-offset-2">Tips: 如果IP地址不填写, IP默认会设置与主机名一致</p>#}
 
                                         <div class="form-group" id="id_port">
-                                            <div class="hr-line-dashed"></div>
                                             <label class="col-sm-2 control-label">端口</label>
                                             <div class="col-sm-9">
                                                 <input type="text" placeholder="" name="port" class="form-control">
                                             </div>
                                         </div>
 
-{#                                        <div class="form-group" id="id_type">#}
-{#                                            <div class="hr-line-dashed"></div>#}
-{#                                            <label class="col-sm-2 control-label">资产类型</label>#}
-{#                                            <div class="col-sm-9">#}
-{#                                                <input type="text" placeholder="" name="type" class="form-control">#}
-{#                                            </div>#}
-{#                                        </div>#}
+                                        <div class="form-group" id="id_type">
+                                            <label class="col-sm-2 control-label">资产类型</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" placeholder="" name="type" class="form-control">
+                                            </div>
+                                        </div>
 
-                                        <div class="hr-line-dashed"></div>
                                         {{ form.comment|bootstrap_horizontal }}
 
                                         <div class="hr-line-dashed"></div>
-                                        <h2>关联资产用户</h2>
+                                        <h3>关联资产用户</h3>
                                         <div class="form-group">
                                             <label for="j_group" class="col-sm-2 control-label">管理用户</label>
                                             <div class="col-sm-9">
@@ -73,7 +61,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="form-group" id="id_port">
+                                        <div class="form-group" id="id_manager_user">
                                             <div class="col-sm-offset-2 col-sm-9">
                                                 <input type="text" placeholder="请选择管理用户" name="manager_user" class="form-control">
                                             </div>
@@ -81,7 +69,6 @@
                                         <p class="col-sm-offset-2">Tips: 管理用户是服务器存在的root或拥有sudo的用户，用来推送系统用户</p>
 
                                         <div class="form-group">
-                                            <div class="hr-line-dashed"></div>
                                             <label for="system_user" class="col-sm-2 control-label">系统用户</label>
                                             <div class="col-sm-9">
                                                 <input type="text" placeholder="" name="system_user" class="form-control">
@@ -89,14 +76,13 @@
                                         </div>
 
                                         <div class="hr-line-dashed"></div>
-                                        <h2>所属</h2>
+                                        <h3>所属</h3>
                                         {{ form.idc|bootstrap_horizontal }}
 
-                                        <div class="hr-line-dashed"></div>
                                         {{ form.group|bootstrap_horizontal }}
 
                                         <div class="hr-line-dashed"></div>
-                                        <h2>标签</h2>
+                                        <h3>标签</h3>
 
                                         <div class="hr-line-dashed"></div>
                                         <div class="form-group">
@@ -118,84 +104,84 @@
 {% endblock %}
 
 {% block self_footer_js %}
-<script>
-    $('document').ready(function(){
-        var check_default = "{{ default_setting.name }}";
-        console.log(check_default);
-        if (check_default != 'default'){
-            $('#id_use_default_auth').attr('disabled', true);
-            $('#id_use_default_auth').attr('checked', false);
-            $('#admin_account').css('display', 'block');
-        } else {
-            $('#id_use_default_auth').click(function(){
-                if ($(this).is(':checked')){
-                    $('#admin_account').css('display', 'none');
-                }
-                else {
-                    $('#admin_account').css('display', 'block');
-                }
-            })
-        }
-
-    });
-
-    var required_fields = ["id_ip", "id_hostname", "id_port"];
-    required_fields.forEach(function(field) {
-        $('label[for="' + field + '"]').parent().addClass("required");
-    });
-
-    $('#assetForm').validator({
-        timely: 2,
-        theme: "yellow_right_effect",
-        rules: {
-            check_ip: [/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])){3}$/, 'ip地址不正确'],
-            check_port: [/^\d{1,5}$/, '端口号不正确'],
-            use_default_auth: function() {
-                var str1 = $("#id_use_default_auth").is(":checked");
-                if (str1 == true){
-                    var decide = false;
-                } else {
-                    var decide = true;
-                }
-                return decide}
-        },
-        fields: {
-            "ip": {
-                rule: "check_ip;",
-                tip: "输入IP",
-                ok: "",
-                msg: {required: "必须填写!"}
-            },
-            "hostname": {
-                rule: "required;length[0~53]",
-                tip: "填写主机名",
-                ok: "",
-                msg: {required: "必须填写!"}
-            },
-            "port": {
-                rule: "required",
-                tip: "输入端口号",
-                ok: "",
-                msg: {required: "必须填写!"}
-            },
-            "username": {
-                rule: "required(use_default_auth)",
-                tip: "输入用户名",
-                ok: "",
-                msg: {required: "必须填写!"}
-            },
-            "password": {
-                rule: "required(use_default_auth);length[0~64]",
-                tip: "输入密码",
-                ok: "",
-                msg: {required: "必须填写!"}
-            }
-        },
-        valid: function(form) {
-            form.submit();
-        }
-    });
-
-</script>
+{#<script>#}
+{#    $('document').ready(function(){#}
+{#        var check_default = "{{ default_setting.name }}";#}
+{#        console.log(check_default);#}
+{#        if (check_default != 'default'){#}
+{#            $('#id_use_default_auth').attr('disabled', true);#}
+{#            $('#id_use_default_auth').attr('checked', false);#}
+{#            $('#admin_account').css('display', 'block');#}
+{#        } else {#}
+{#            $('#id_use_default_auth').click(function(){#}
+{#                if ($(this).is(':checked')){#}
+{#                    $('#admin_account').css('display', 'none');#}
+{#                }#}
+{#                else {#}
+{#                    $('#admin_account').css('display', 'block');#}
+{#                }#}
+{#            })#}
+{#        }#}
+{##}
+{#    });#}
+{##}
+{#    var required_fields = ["id_ip", "id_hostname", "id_port"];#}
+{#    required_fields.forEach(function(field) {#}
+{#        $('label[for="' + field + '"]').parent().addClass("required");#}
+{#    });#}
+{##}
+{#    $('#assetForm').validator({#}
+{#        timely: 2,#}
+{#        theme: "yellow_right_effect",#}
+{#        rules: {#}
+{#            check_ip: [/^(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])(\.(\d{1,2}|1\d\d|2[0-4]\d|25[0-5])){3}$/, 'ip地址不正确'],#}
+{#            check_port: [/^\d{1,5}$/, '端口号不正确'],#}
+{#            use_default_auth: function() {#}
+{#                var str1 = $("#id_use_default_auth").is(":checked");#}
+{#                if (str1 == true){#}
+{#                    var decide = false;#}
+{#                } else {#}
+{#                    var decide = true;#}
+{#                }#}
+{#                return decide}#}
+{#        },#}
+{#        fields: {#}
+{#            "ip": {#}
+{#                rule: "check_ip;",#}
+{#                tip: "输入IP",#}
+{#                ok: "",#}
+{#                msg: {required: "必须填写!"}#}
+{#            },#}
+{#            "hostname": {#}
+{#                rule: "required;length[0~53]",#}
+{#                tip: "填写主机名",#}
+{#                ok: "",#}
+{#                msg: {required: "必须填写!"}#}
+{#            },#}
+{#            "port": {#}
+{#                rule: "required",#}
+{#                tip: "输入端口号",#}
+{#                ok: "",#}
+{#                msg: {required: "必须填写!"}#}
+{#            },#}
+{#            "username": {#}
+{#                rule: "required(use_default_auth)",#}
+{#                tip: "输入用户名",#}
+{#                ok: "",#}
+{#                msg: {required: "必须填写!"}#}
+{#            },#}
+{#            "password": {#}
+{#                rule: "required(use_default_auth);length[0~64]",#}
+{#                tip: "输入密码",#}
+{#                ok: "",#}
+{#                msg: {required: "必须填写!"}#}
+{#            }#}
+{#        },#}
+{#        valid: function(form) {#}
+{#            form.submit();#}
+{#        }#}
+{#    });#}
+{##}
+{#</script>#}
 
 {% endblock %}
