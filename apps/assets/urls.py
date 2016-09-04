@@ -4,7 +4,6 @@ import views
 # from .api import (
 #     AssetGroupViewSet, AssetViewSet, IDCViewSet
 # )
-import views
 # from rest_framework import routers
 # router = routers.DefaultRouter()
 # router.register(r'assetgroup', AssetGroupViewSet)
