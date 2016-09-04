@@ -119,7 +119,7 @@ class User(AbstractUser):
     is_first_login = models.BooleanField(default=False)
     date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True,
                                         verbose_name=_('Date expired'))
-    created_by = models.CharField(max_length=30, default='')
+    created_by = models.CharField(max_length=30, default='', verbose_name=_('Created by'))
 
     @property
     def password_raw(self):
