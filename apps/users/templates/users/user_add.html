@@ -1,14 +1,15 @@
 {% extends 'users/_user.html' %}
+{% load i18n %}
 {% load bootstrap %}
 {% block username %}
     {{ form.username|bootstrap_horizontal }}
 {% endblock %}
 {% block password %}
-    <h3>密码</h3>
+    <h3>{% trans 'Password' %}</h3>
     <div class="form-group">
-        <label class="col-sm-2 control-label">密码</label>
+        <label class="col-sm-2 control-label">{% trans 'Password' %}</label>
         <div class="col-sm-8 controls" >
-            生成重置密码连接，通过邮件发送给用户
+            {% trans 'Reset link will be generated and sent to the user. ' %}
         </div>
     </div>
 {% endblock %}

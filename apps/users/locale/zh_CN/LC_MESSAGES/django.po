@@ -1,0 +1,379 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-09-04 17:31+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: users/forms.py:12 users/models.py:106 users/templates/users/login.html:57
+#: users/templates/users/user_detail.html:73
+#: users/templates/users/user_edit.html:5
+#: users/templates/users/user_list.html:13
+msgid "Username"
+msgstr ""
+
+#: users/forms.py:13 users/templates/users/login.html:60
+#: users/templates/users/reset_password.html:52
+#: users/templates/users/user_add.html:8 users/templates/users/user_add.html:10
+#: users/templates/users/user_edit.html:12
+#: users/templates/users/user_edit.html:14
+msgid "Password"
+msgstr ""
+
+#: users/forms.py:31 users/forms.py:50
+msgid "Join usergroups"
+msgstr ""
+
+#: users/models.py:60 users/models.py:107
+#: users/templates/users/user_detail.html:69
+#: users/templates/users/user_list.html:12
+msgid "Name"
+msgstr ""
+
+#: users/models.py:61 users/models.py:118
+#: users/templates/users/user_detail.html:113
+msgid "Comment"
+msgstr ""
+
+#: users/models.py:102 users/models.py:225
+msgid "Administrator"
+msgstr ""
+
+#: users/models.py:103
+msgid "User"
+msgstr ""
+
+#: users/models.py:108 users/templates/users/user_detail.html:77
+msgid "Email"
+msgstr ""
+
+#: users/models.py:109 users/templates/users/user_detail.html:181
+#: users/templates/users/user_list.html:15
+msgid "Usergroup"
+msgstr ""
+
+#: users/models.py:110 users/templates/users/user_detail.html:93
+#: users/templates/users/user_list.html:14
+msgid "Role"
+msgstr ""
+
+#: users/models.py:111
+msgid "Avatar"
+msgstr ""
+
+#: users/models.py:112 users/templates/users/user_detail.html:88
+msgid "Wechat"
+msgstr ""
+
+#: users/models.py:113 users/templates/users/user_detail.html:82
+msgid "Phone"
+msgstr ""
+
+#: users/models.py:114 users/templates/users/_user.html:56
+msgid "Enable OTP"
+msgstr ""
+
+#: users/models.py:116
+msgid "ssh private key"
+msgstr ""
+
+#: users/models.py:117
+msgid "ssh public key"
+msgstr ""
+
+#: users/models.py:121 users/templates/users/user_detail.html:97
+msgid "Date expired"
+msgstr ""
+
+#: users/models.py:122 users/templates/users/user_detail.html:101
+msgid "Created by"
+msgstr ""
+
+#: users/models.py:228
+msgid "Administrator is the super user of system"
+msgstr ""
+
+#: users/models.py:229
+msgid "System"
+msgstr ""
+
+#: users/templates/users/_user.html:17 users/templates/users/user_list.html:5
+#: users/views.py:113
+msgid "Create user"
+msgstr ""
+
+#: users/templates/users/_user.html:33
+msgid "Account"
+msgstr ""
+
+#: users/templates/users/_user.html:43
+msgid "Security and Role"
+msgstr ""
+
+#: users/templates/users/_user.html:62
+msgid "Profile"
+msgstr ""
+
+#: users/templates/users/_user.html:69
+#: users/templates/users/user_detail.html:162
+#: users/templates/users/user_detail.html:170
+msgid "Reset"
+msgstr ""
+
+#: users/templates/users/_user.html:70
+#: users/templates/users/forget_password.html:44
+#: users/templates/users/user_list.html:63
+msgid "Commit"
+msgstr ""
+
+#: users/templates/users/forget_password.html:26
+msgid "Forget password"
+msgstr ""
+
+#: users/templates/users/forget_password.html:33
+msgid "Input your email, that will send a mail to your"
+msgstr ""
+
+#: users/templates/users/login.html:45 users/templates/users/login.html:65
+msgid "Login"
+msgstr ""
+
+#: users/templates/users/login.html:50
+msgid "Captcha invalid"
+msgstr ""
+
+#: users/templates/users/reset_password.html:45
+#: users/templates/users/user_detail.html:159 users/utils.py:98
+msgid "Reset password"
+msgstr ""
+
+#: users/templates/users/reset_password.html:55
+msgid "Password again"
+msgstr ""
+
+#: users/templates/users/reset_password.html:57
+msgid "Setting"
+msgstr ""
+
+#: users/templates/users/user_add.html:12
+msgid "Reset link will be generated and sent to the user. "
+msgstr ""
+
+#: users/templates/users/user_delete_confirm.html:6
+msgid "Confirm delete"
+msgstr ""
+
+#: users/templates/users/user_detail.html:18 users/views.py:173
+msgid "User detail"
+msgstr ""
+
+#: users/templates/users/user_detail.html:20
+msgid "User assets"
+msgstr ""
+
+#: users/templates/users/user_detail.html:21
+msgid "User log"
+msgstr ""
+
+#: users/templates/users/user_detail.html:29
+msgid "Search"
+msgstr ""
+
+#: users/templates/users/user_detail.html:105
+msgid "Date joined"
+msgstr ""
+
+#: users/templates/users/user_detail.html:109
+msgid "Last login"
+msgstr ""
+
+#: users/templates/users/user_detail.html:124
+msgid "Quick modify"
+msgstr ""
+
+#: users/templates/users/user_detail.html:167
+msgid "Reset ssh key"
+msgstr ""
+
+#: users/templates/users/user_detail.html:189
+msgid "Select usergroups"
+msgstr ""
+
+#: users/templates/users/user_detail.html:198
+msgid "Add"
+msgstr ""
+
+#: users/templates/users/user_list.html:16
+msgid "Asset num"
+msgstr ""
+
+#: users/templates/users/user_list.html:17
+msgid "Active"
+msgstr ""
+
+#: users/templates/users/user_list.html:44
+msgid "Edit"
+msgstr ""
+
+#: users/templates/users/user_list.html:45
+msgid "Delete"
+msgstr ""
+
+#: users/templates/users/user_list.html:55
+msgid "Delete selected"
+msgstr ""
+
+#: users/templates/users/user_list.html:56
+msgid "Update selected"
+msgstr ""
+
+#: users/templates/users/user_list.html:57
+msgid "Deactive selected"
+msgstr ""
+
+#: users/templates/users/user_list.html:58
+msgid "Export selected"
+msgstr ""
+
+#: users/utils.py:47
+msgid "Begin to generate ssh private key ..."
+msgstr ""
+
+#: users/utils.py:59
+msgid "Finish to generate ssh private key ..."
+msgstr ""
+
+#: users/utils.py:63
+msgid "These is error when generate ssh key."
+msgstr ""
+
+#: users/utils.py:67
+msgid "Create account successfully"
+msgstr ""
+
+#: users/utils.py:69
+#, python-format
+msgid ""
+"\n"
+"    Hello %(name)s:\n"
+"    </br>\n"
+"    Your account has been created successfully\n"
+"    </br>\n"
+"    <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">click "
+"here to set your password</a>\n"
+"    </br>\n"
+"    This link is valid for 1 hour. After it expires, <a href="
+"\"%(forget_password_url)s?email=%(email)s\">request new one</a>\n"
+"\n"
+"    </br>\n"
+"    ---\n"
+"\n"
+"    </br>\n"
+"    <a href=\"%(login_url)s\">Login direct</a>\n"
+"\n"
+"    </br>\n"
+"    "
+msgstr ""
+
+#: users/utils.py:100
+#, python-format
+msgid ""
+"\n"
+"    Hello %(name)s:\n"
+"    </br>\n"
+"    Please click the link below to reset your password, if not your request, "
+"concern your account security\n"
+"    </br>\n"
+"    <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">Click "
+"here reset password</a>\n"
+"    </br>\n"
+"    This link is valid for 1 hour. After it expires, <a href="
+"\"%(forget_password_url)s?email=%(email)s\">request new one<</a>\n"
+"\n"
+"    </br>\n"
+"    ---\n"
+"\n"
+"    </br>\n"
+"    <a href=\"%(login_url)s\">Login direct</a>\n"
+"\n"
+"    </br>\n"
+"    "
+msgstr ""
+
+#: users/views.py:53
+msgid "Username or password invalid"
+msgstr ""
+
+#: users/views.py:70
+msgid "Logout success"
+msgstr ""
+
+#: users/views.py:71
+msgid "Logout success, return login page"
+msgstr ""
+
+#: users/views.py:100 users/views.py:113 users/views.py:155 users/views.py:173
+#: users/views.py:197 users/views.py:210
+msgid "Users"
+msgstr ""
+
+#: users/views.py:100
+msgid "User list"
+msgstr ""
+
+#: users/views.py:109
+#, python-format
+msgid "Create user<a href=\"%s\">%s</a> success."
+msgstr ""
+
+#: users/views.py:155
+msgid "Edit user"
+msgstr ""
+
+#: users/views.py:197
+msgid "Usergroup list"
+msgstr ""
+
+#: users/views.py:210
+msgid "Create usergroup"
+msgstr ""
+
+#: users/views.py:242
+msgid "Email address invalid, input again"
+msgstr ""
+
+#: users/views.py:253
+msgid "Send reset password message"
+msgstr ""
+
+#: users/views.py:254
+msgid "Send reset password mail success, login your mail box and follow it "
+msgstr ""
+
+#: users/views.py:266
+msgid "Reset password success"
+msgstr ""
+
+#: users/views.py:267
+msgid "Reset password success, return to login page"
+msgstr ""
+
+#: users/views.py:283 users/views.py:296
+msgid "Token invalid or expired"
+msgstr ""
+
+#: users/views.py:292
+msgid "Password not same"
+msgstr ""

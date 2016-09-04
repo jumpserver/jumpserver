@@ -12,6 +12,7 @@ from django.contrib.auth.models import AbstractUser, Permission
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.db import IntegrityError
+from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
 
 from django.core import signing
@@ -56,8 +57,8 @@ from django.core import signing
 
 
 class UserGroup(models.Model):
-    name = models.CharField(max_length=100, unique=True, verbose_name='组名称')
-    comment = models.TextField(blank=True, verbose_name='描述')
+    name = models.CharField(max_length=100, unique=True, verbose_name=_('Name'))
+    comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_added = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=100)
 
@@ -98,26 +99,27 @@ def date_expired_default():
 
 class User(AbstractUser):
     ROLE_CHOICES = (
-        ('Admin', '管理员'),
-        ('User', '用户'),
+        ('Admin', _('Administrator')),
+        ('User', _('User')),
     )
 
-    username = models.CharField(max_length=20, unique=True, verbose_name='用户名')
-    name = models.CharField(max_length=20, blank=True, verbose_name='姓名')
-    email = models.EmailField(max_length=30, unique=True, verbose_name='邮件')
-    groups = models.ManyToManyField(UserGroup, related_name='users', blank=True, verbose_name='用户组')
-    role = models.CharField(choices=ROLE_CHOICES, default='User', max_length=10, blank=True, verbose_name='角色')
-    avatar = models.ImageField(upload_to="avatar", verbose_name='头像')
-    wechat = models.CharField(max_length=30, blank=True, verbose_name='微信')
-    phone = models.CharField(max_length=20, blank=True, verbose_name='手机号')
-    enable_otp = models.BooleanField(default=False, verbose_name='启用二次验证')
+    username = models.CharField(max_length=20, unique=True, verbose_name=_('Username'))
+    name = models.CharField(max_length=20, blank=True, verbose_name=_('Name'))
+    email = models.EmailField(max_length=30, unique=True, verbose_name=_('Email'))
+    groups = models.ManyToManyField(UserGroup, related_name='users', blank=True, verbose_name=_('Usergroup'))
+    role = models.CharField(choices=ROLE_CHOICES, default='User', max_length=10, blank=True, verbose_name=_('Role'))
+    avatar = models.ImageField(upload_to="avatar", verbose_name=_('Avatar'))
+    wechat = models.CharField(max_length=30, blank=True, verbose_name=_('Wechat'))
+    phone = models.CharField(max_length=20, blank=True, verbose_name=_('Phone'))
+    enable_otp = models.BooleanField(default=False, verbose_name=_('Enable OTP'))
     secret_key_otp = models.CharField(max_length=16, blank=True)
-    private_key = models.CharField(max_length=5000, blank=True, verbose_name='ssh私钥')  # ssh key max length 4096 bit
-    public_key = models.CharField(max_length=1000, blank=True, verbose_name='公钥')
-    comment = models.TextField(max_length=200, blank=True, verbose_name='描述')
+    private_key = models.CharField(max_length=5000, blank=True, verbose_name=_('ssh private key'))
+    public_key = models.CharField(max_length=1000, blank=True, verbose_name=_('ssh public key'))
+    comment = models.TextField(max_length=200, blank=True, verbose_name=_('Comment'))
     is_first_login = models.BooleanField(default=False)
-    date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True, verbose_name='有效期')
-    created_by = models.CharField(max_length=30, default='')
+    date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True,
+                                        verbose_name=_('Date expired'))
+    created_by = models.CharField(max_length=30, default='', verbose_name=_('Created by'))
 
     @property
     def password_raw(self):
@@ -204,7 +206,7 @@ class User(AbstractUser):
             user_email = data.get('email', '')
             user = cls.objects.get(id=user_id, email=user_email)
 
-        except signing.BadSignature, cls.DoesNotExist:
+        except (signing.BadSignature, cls.DoesNotExist):
             user = None
         return user
 
@@ -220,11 +222,11 @@ class User(AbstractUser):
     def initial(cls):
         user = cls(username='admin',
                    email='admin@jumpserver.org',
-                   name='Administrator',
+                   name=_('Administrator'),
                    password_raw='admin',
                    role='Admin',
-                   comment='Administrator is the super user of system',
-                   created_by='System')
+                   comment=_('Administrator is the super user of system'),
+                   created_by=_('System'))
         user.save()
         user.groups.add(UserGroup.initial())
 

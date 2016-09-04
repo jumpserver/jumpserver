@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'bootstrapform',
+    'captcha',
     # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -79,6 +80,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',
 ]
 
 ROOT_URLCONF = 'jumpserver.urls'
@@ -213,7 +215,7 @@ LOGGING = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'zh_CN'
 
 TIME_ZONE = 'Asia/Shanghai'
 
@@ -222,6 +224,9 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+# I18N translation
+LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'),]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -243,7 +248,6 @@ BOOTSTRAP_COLUMN_COUNT = 11
 
 # Init data or generate fake data source for development
 FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures'), ]
-
 
 # Email config
 EMAIL_HOST = CONFIG.EMAIL_HOST
@@ -302,3 +306,9 @@ BROKER_URL = 'redis://%(password)s%(host)s:%(port)s/3' % {
 }
 
 CELERY_RESULT_BACKEND = BROKER_URL
+
+# Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
+CAPTCHA_IMAGE_SIZE = (75, 33)
+CAPTCHA_FOREGROUND_COLOR = '#001100'
+
+#

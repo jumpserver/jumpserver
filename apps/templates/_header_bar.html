@@ -1,20 +1,21 @@
+{% load i18n %}
 <div class="row border-bottom">
     <nav class="navbar navbar-static-top white-bg" role="navigation" style="margin-bottom: 0">
         <div class="navbar-header">
             <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
             <form role="search" class="navbar-form-custom" method="get" action="">
                 <div class="form-group">
-                    <input type="text" placeholder="输入搜索..." class="form-control" name="search" id="top-search">
+                    <input type="text" placeholder="{% trans 'Search' %}..." class="form-control" name="search" id="top-search">
                 </div>
             </form>
         </div>
         <ul class="nav navbar-top-links navbar-right">
             <li>
-                <span class="m-r-sm text-muted welcome-message">欢迎使用Jumpserver开源跳板机系统</span>
+                <span class="m-r-sm text-muted welcome-message">{% trans 'Welcome use Jumpserver system' %}</span>
             </li>
             <li class="dropdown">
                 <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
-                     <span class="m-r-sm text-muted welcome-message">帮助</span>
+                     <span class="m-r-sm text-muted welcome-message">{% trans 'Help' %}</span>
                 </a>
             </li>
             <li>
@@ -31,7 +32,7 @@
         <h2></h2>
         <ol class="breadcrumb">
             <li>
-                <a href="">仪表盘</a>
+                <a href="">{% trans 'Home' %}</a>
             </li>
             <li>
             {% if app %}

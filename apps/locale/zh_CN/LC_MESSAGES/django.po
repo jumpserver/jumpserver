@@ -1,0 +1,515 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-09-04 17:31+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: assets/models.py:9 assets/models.py:21
+msgid "Name"
+msgstr "名称"
+
+#: assets/models.py:10 assets/models.py:29 assets/models.py:71
+msgid "Created by"
+msgstr "创建者"
+
+#: assets/models.py:11 assets/models.py:30 assets/models.py:74
+msgid "Comment"
+msgstr "备注"
+
+#: assets/models.py:22
+msgid "Bandwidth"
+msgstr "带宽"
+
+#: assets/models.py:23
+msgid "Contact"
+msgstr "联系人"
+
+#: assets/models.py:24
+msgid "Phone"
+msgstr "手机"
+
+#: assets/models.py:25
+msgid "Address"
+msgstr "地址"
+
+#: assets/models.py:26
+msgid "Network"
+msgstr "网络"
+
+#: assets/models.py:27 assets/models.py:73
+msgid "Date added"
+msgstr "加入日期"
+
+#: assets/models.py:28
+msgid "Operator"
+msgstr "运营商"
+
+#: assets/models.py:37 assets/models.py:54 templates/_nav.html:23
+msgid "IDC"
+msgstr "机房"
+
+#: assets/models.py:46
+msgid "IP"
+msgstr ""
+
+#: assets/models.py:47
+msgid "Other IP"
+msgstr ""
+
+#: assets/models.py:48
+msgid "Remote card IP"
+msgstr ""
+
+#: assets/models.py:49
+msgid "Hostname"
+msgstr "用户名"
+
+#: assets/models.py:50
+msgid "Port"
+msgstr "端口"
+
+#: assets/models.py:51
+msgid "Asset groups"
+msgstr "用户组"
+
+#: assets/models.py:52
+#, fuzzy
+#| msgid "Edit user"
+msgid "Admin user"
+msgstr "编辑用户"
+
+#: assets/models.py:53
+msgid "Admin password"
+msgstr "管理员密码"
+
+#: assets/models.py:55
+msgid "Mac address"
+msgstr "Mac地址"
+
+#: assets/models.py:56
+msgid "Brand"
+msgstr "品牌"
+
+#: assets/models.py:57
+msgid "CPU"
+msgstr "CPU"
+
+#: assets/models.py:58
+msgid "Memory"
+msgstr "内存"
+
+#: assets/models.py:59
+msgid "Disk"
+msgstr "硬盘"
+
+#: assets/models.py:60
+msgid "OS"
+msgstr "操作系统"
+
+#: assets/models.py:61
+msgid "Cabinet number"
+msgstr "机柜编号"
+
+#: assets/models.py:62
+msgid "Cabinet position"
+msgstr "机柜层号"
+
+#: assets/models.py:63
+msgid "Asset number"
+msgstr "资产编号"
+
+#: assets/models.py:65
+msgid "Asset status"
+msgstr "资产状态"
+
+#: assets/models.py:67
+msgid "Asset type"
+msgstr "系统类型"
+
+#: assets/models.py:69
+msgid "Asset environment"
+msgstr "资产环境"
+
+#: assets/models.py:70
+msgid "Serial number"
+msgstr "序列号"
+
+#: assets/models.py:72
+msgid "Is active"
+msgstr "是否激活"
+
+#: templates/_header_bar.html:8
+msgid "Search"
+msgstr "搜索"
+
+#: templates/_header_bar.html:14
+msgid "Welcome use Jumpserver system"
+msgstr "欢迎使用Jumpserver开源跳板机系统"
+
+#: templates/_header_bar.html:18
+msgid "Help"
+msgstr "帮助"
+
+#: templates/_header_bar.html:35 templates/_nav.html:4
+msgid "Home"
+msgstr "仪表盘"
+
+#: templates/_nav.html:9
+msgid "Users"
+msgstr "用户管理"
+
+#: templates/_nav.html:12
+msgid "User"
+msgstr "用户"
+
+#: templates/_nav.html:13
+msgid "Usergroup"
+msgstr "用户组"
+
+#: templates/_nav.html:18
+msgid "Assets"
+msgstr "资产管理"
+
+#: templates/_nav.html:21
+msgid "Asset"
+msgstr "资产"
+
+#: templates/_nav.html:22
+msgid "Assetgroup"
+msgstr "用户组"
+
+#: templates/_nav.html:24
+#, fuzzy
+#| msgid "Asset admin"
+msgid "Assetadmin"
+msgstr "管理用户"
+
+#: templates/_nav.html:25
+#, fuzzy
+#| msgid "Asset user"
+msgid "Assetuser"
+msgstr "系统用户"
+
+#: templates/_nav.html:26
+msgid "Label"
+msgstr "标签"
+
+#: templates/_nav.html:30
+msgid "Perms"
+msgstr "权限管理"
+
+#: templates/_nav.html:33
+msgid "Perm"
+msgstr "权限"
+
+#: templates/_nav.html:36
+msgid "Create perm"
+msgstr "创建权限"
+
+#: templates/_nav.html:42
+msgid "Audits"
+msgstr "审计"
+
+#: templates/_nav.html:47
+msgid "File"
+msgstr "文件"
+
+#: templates/_nav.html:50
+msgid "File upload"
+msgstr "文件上传"
+
+#: templates/_nav.html:51
+msgid "File download"
+msgstr "文件下载"
+
+#: templates/_nav.html:56
+msgid "Settings"
+msgstr "设置"
+
+#: templates/_nav.html:61
+msgid "Visit us"
+msgstr "访问官网"
+
+#: templates/_user_profile.html:19
+msgid "Profile"
+msgstr "个人信息"
+
+#: templates/_user_profile.html:21
+msgid "Logout"
+msgstr "注销登录"
+
+#: templates/captcha/image.html:3
+msgid "Play CAPTCHA as audio file"
+msgstr ""
+
+#~ msgid "Asset user"
+#~ msgstr "系统用户"
+
+#~ msgid "Password"
+#~ msgstr "密码"
+
+#~ msgid "Join usergroups"
+#~ msgstr "添加到用户组"
+
+#~ msgid "Administrator"
+#~ msgstr "管理员"
+
+#~ msgid "Email"
+#~ msgstr "邮件"
+
+#~ msgid "Role"
+#~ msgstr "角色"
+
+#~ msgid "Avatar"
+#~ msgstr "头像"
+
+#~ msgid "Wechat"
+#~ msgstr "微信"
+
+#~ msgid "Enable OTP"
+#~ msgstr "二次验证"
+
+#~ msgid "ssh private key"
+#~ msgstr "ssh密钥"
+
+#~ msgid "ssh public key"
+#~ msgstr "ssh公钥"
+
+#~ msgid "Date expired"
+#~ msgstr "失效日期"
+
+#~ msgid "Administrator is the super user of system"
+#~ msgstr "Administrator是初始的超级管理员"
+
+#~ msgid "System"
+#~ msgstr "系统"
+
+#~ msgid "Create user"
+#~ msgstr "创建用户"
+
+#~ msgid "Account"
+#~ msgstr "账户"
+
+#~ msgid "Security and Role"
+#~ msgstr "角色安全"
+
+#~ msgid "Reset"
+#~ msgstr "重置"
+
+#~ msgid "Commit"
+#~ msgstr "提交"
+
+#~ msgid "Forget password"
+#~ msgstr "忘记密码"
+
+#~ msgid "Input your email, that will send a mail to your"
+#~ msgstr "输入您的邮箱, 将会发一封重置短信邮件到您的邮箱中"
+
+#~ msgid "Login"
+#~ msgstr "登录"
+
+#~ msgid "Captcha invalid"
+#~ msgstr "验证码错误"
+
+#~ msgid "Password again"
+#~ msgstr "再次输入密码"
+
+#~ msgid "Setting"
+#~ msgstr "设置"
+
+#~ msgid "Reset link will be generated and sent to the user. "
+#~ msgstr "生成重置密码连接，通过邮件发送给用户"
+
+#~ msgid "Confirm delete"
+#~ msgstr "确认删除"
+
+#~ msgid "User detail"
+#~ msgstr "用户详情"
+
+#~ msgid "User assets"
+#~ msgstr "用户资产"
+
+#~ msgid "User log"
+#~ msgstr "登录日志"
+
+#~ msgid "Last login"
+#~ msgstr "最后登录"
+
+#~ msgid "Quick modify"
+#~ msgstr "快速修改"
+
+#~ msgid "Reset ssh key"
+#~ msgstr "重置密钥"
+
+#~ msgid "Select usergroups"
+#~ msgstr "选择用户组"
+
+#~ msgid "Add"
+#~ msgstr "添加"
+
+#~ msgid "Edit"
+#~ msgstr "编辑"
+
+#~ msgid "Delete"
+#~ msgstr "删除"
+
+#~ msgid "Delete selected"
+#~ msgstr "批量删除"
+
+#~ msgid "Update selected"
+#~ msgstr "批量更新"
+
+#~ msgid "Deactive selected"
+#~ msgstr "禁用所选"
+
+#~ msgid "Export selected"
+#~ msgstr "批量导出"
+
+#~ msgid "Begin to generate ssh private key ..."
+#~ msgstr "开始生成ssh密钥"
+
+#~ msgid "Finish to generate ssh private key ..."
+#~ msgstr "生成ssh密钥成功"
+
+#~ msgid "These is error when generate ssh key."
+#~ msgstr "创建密钥失败"
+
+#~ msgid "Create account successfully"
+#~ msgstr "创建账户成功"
+
+#~ msgid ""
+#~ "\n"
+#~ "    Hello %(name)s:\n"
+#~ "    </br>\n"
+#~ "    Your account has been created successfully\n"
+#~ "    </br>\n"
+#~ "    <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">click "
+#~ "here to set your password</a>\n"
+#~ "    </br>\n"
+#~ "    This link is valid for 1 hour. After it expires, <a href="
+#~ "\"%(forget_password_url)s?email=%(email)s\">request new one</a>\n"
+#~ "\n"
+#~ "    </br>\n"
+#~ "    ---\n"
+#~ "\n"
+#~ "    </br>\n"
+#~ "    <a href=\"%(login_url)s\">Login direct</a>\n"
+#~ "\n"
+#~ "    </br>\n"
+#~ "    "
+#~ msgstr ""
+#~ "\n"
+#~ "    你好 %(name)s:\n"
+#~ "    </br>\n"
+#~ "    恭喜您，您的账号已经创建成功    </br>\n"
+#~ "     <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">请点"
+#~ "击这里设置密码</a>    </br>\n"
+#~ "    这个链接有效期1小时, 超过时间您可以 <a href=\"%(forget_password_url)s?"
+#~ "email=%(email)s\">重新申请</a>\n"
+#~ "\n"
+#~ "    </br>\n"
+#~ "    ---\n"
+#~ "\n"
+#~ "    </br>\n"
+#~ "    <a href=\"%(login_url)s\">Login direct</a>\n"
+#~ "\n"
+#~ "    </br>\n"
+#~ "    "
+
+#~ msgid ""
+#~ "\n"
+#~ "    Hello %(name)s:\n"
+#~ "    </br>\n"
+#~ "    Please click the link below to reset your password, if not your "
+#~ "request, concern your account security\n"
+#~ "    </br>\n"
+#~ "    <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">Click "
+#~ "here reset password</a>\n"
+#~ "    </br>\n"
+#~ "    This link is valid for 1 hour. After it expires, <a href="
+#~ "\"%(forget_password_url)s?email=%(email)s\">request new one<</a>\n"
+#~ "\n"
+#~ "    </br>\n"
+#~ "    ---\n"
+#~ "\n"
+#~ "    </br>\n"
+#~ "    <a href=\"%(login_url)s\">Login direct</a>\n"
+#~ "\n"
+#~ "    </br>\n"
+#~ "    "
+#~ msgstr ""
+#~ "\n"
+#~ "    您好 %(name)s:\n"
+#~ "    </br>\n"
+#~ "    请点击下面链接重置密码， 如果不是您申请的，请关注账号安全\n"
+#~ "    </br>\n"
+#~ "    <a href=\"%(rest_password_url)s?token=%(rest_password_token)s\">请点击"
+#~ "这里设置密码 /a>\n"
+#~ "    </br>\n"
+#~ "    这个链接有效期1小时, 超过时间您可以<a href=\"%(forget_password_url)s?"
+#~ "email=%(email)s\">重新申请</a>\n"
+#~ "\n"
+#~ "    </br>\n"
+#~ "    ---\n"
+#~ "\n"
+#~ "    </br>\n"
+#~ "    <a href=\"%(login_url)s\">直接登录</a>\n"
+#~ "\n"
+#~ "    </br>\n"
+#~ "    "
+
+#~ msgid "Username or password invalid"
+#~ msgstr "用户名或密码错误"
+
+#~ msgid "Logout success"
+#~ msgstr "退出登录成功"
+
+#~ msgid "Logout success, return login page"
+#~ msgstr "退出登录成功，返回到登录页面"
+
+#~ msgid "User list"
+#~ msgstr "用户列表"
+
+#~ msgid "Create user<a href=\"%s\">%s</a> success."
+#~ msgstr "创建用户<a href=\"%s\">%s</a> 成功"
+
+#~ msgid "Usergroup list"
+#~ msgstr "用户组列表"
+
+#~ msgid "Create usergroup"
+#~ msgstr "创建用户组"
+
+#~ msgid "Email address invalid, input again"
+#~ msgstr "邮箱地址错误，重新输入"
+
+#~ msgid "Send reset password message"
+#~ msgstr "发送重置密码邮件"
+
+#~ msgid "Send reset password mail success, login your mail box and follow it "
+#~ msgstr ""
+#~ "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
+
+#~ msgid "Reset password success"
+#~ msgstr "重置密码成功"
+
+#~ msgid "Reset password success, return to login page"
+#~ msgstr "重置密码成功，返回到登录页面"
+
+#~ msgid "Token invalid or expired"
+#~ msgstr "Token错误或失效"
+
+#~ msgid "Password not same"
+#~ msgstr "密码不一致"

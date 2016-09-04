@@ -1,16 +1,17 @@
 {% extends 'users/_user.html' %}
+{% load i18n %}
 {% block username %}
     <div class="form-group">
-        <label for="{{ form.username.id_for_label }}" class="col-sm-2 control-label">用户名</label>
+        <label for="{{ form.username.id_for_label }}" class="col-sm-2 control-label">{% trans 'Username' %}</label>
         <div class="col-sm-9 controls" >
             <input id="{{ form.username.id_for_label }}" name="{{ form.username.html_name }}" type="text" value="{{ user.username }}" readonly class="form-control">
         </div>
     </div>
 {% endblock %}
 {% block password %}
-    <h3>密码</h3>
+    <h3>{% trans 'Password' %}</h3>
     <div class="form-group">
-        <label for="password" class="col-sm-2 control-label">密码</label>
+        <label for="password" class="col-sm-2 control-label">{% trans 'Password' %}</label>
         <div class="col-sm-9 controls" >
             <input id="password" name="password" type="password" class="form-control">
         </div>
