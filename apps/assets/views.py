@@ -37,7 +37,8 @@ class AssetDetailView(DetailView):
 
 
 class AssetGroupAddView(CreateView):
-    pass
+    model = AssetGroup
+    template_name = 'assets/assetgroup_add.html'
 
 
 class AssetGroupListView(ListView):
