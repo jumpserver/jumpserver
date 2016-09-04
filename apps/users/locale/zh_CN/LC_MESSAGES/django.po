@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-04 12:20+0800\n"
+"POT-Creation-Date: 2016-09-04 17:31+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -97,6 +97,10 @@ msgstr ""
 msgid "Date expired"
 msgstr ""
 
+#: users/models.py:122 users/templates/users/user_detail.html:101
+msgid "Created by"
+msgstr ""
+
 #: users/models.py:228
 msgid "Administrator is the super user of system"
 msgstr ""
@@ -131,7 +135,7 @@ msgstr ""
 #: users/templates/users/_user.html:70
 #: users/templates/users/forget_password.html:44
 #: users/templates/users/user_list.html:63
-msgid "Commit"
+msgid "Submit"
 msgstr ""
 
 #: users/templates/users/forget_password.html:26
@@ -185,10 +189,6 @@ msgstr ""
 
 #: users/templates/users/user_detail.html:29
 msgid "Search"
-msgstr ""
-
-#: users/templates/users/user_detail.html:101
-msgid "Created by"
 msgstr ""
 
 #: users/templates/users/user_detail.html:105

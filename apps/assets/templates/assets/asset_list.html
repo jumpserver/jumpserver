@@ -6,7 +6,7 @@
         <div class="col-sm-12">
             <div class="ibox float-e-margins" id="all">
                 <div class="ibox-title">
-                    <h5> 主机详细信息列表</h5>
+                    <h5> 资产列表</h5>
                     <div class="ibox-tools">
                         <a class="collapse-link">
                             <i class="fa fa-chevron-up"></i>
@@ -102,14 +102,11 @@
                                         <input id="checkall" type="checkbox" class="i-checks" name="checkall" value="checkall" data-editable='false' onclick="check_all('asset_form')">
                                     </th>
                                     <th class="text-center"> 主机名 </th>
-                                    <th class="text-center" name="ip"> IP地址 </th>
-                                    <th class="text-center"> IDC </th>
-                                    <th class="text-center"> 所属主机组 </th>
-{#                                    <th class="text-center"> 配置信息 </th>#}
-                                    <th class="text-center"> 操作系统 </th>
-                                    <th class="text-center"> cpu核数 </th>
-                                    <th class="text-center"> 内存 </th>
-                                    <th class="text-center"> 硬盘 </th>
+                                    <th class="text-center" name="ip"> IP </th>
+                                    <th class="text-center"> 类型 </th>
+                                    <th class="text-center"> 配置 </th>
+                                    <th class="text-center"> 资产组 </th>
+                                    <th class="text-center"> 状态 </th>
                                     <th class="text-center"> 操作 </th>
                                 </tr>
                             </thead>
@@ -119,15 +116,18 @@
                                     <td class="text-center" name="id" value="{{ asset.id }}" data-editable='false'>
                                         <input name="id" value="{{ asset.id }}" type="checkbox" class="i-checks">
                                     </td>
-                                    <td class="text-center hostname"> <a href="{% url 'assets:asset-detail' %}?id={{ asset.id }}">{{ asset.hostname|default_if_none:"" }}</a></td>
-                                    <td class="text-center"> {{ asset.ip|default_if_none:"" }} </td>
-                                    <td class="text-center"> {{ asset.idc.name|default_if_none:"" }} </td>
-{#                                    <td class="text-center">{{ asset.group.all|group_str2 }}</td>#}
-{#                                    <td class="text-center">{{ asset.cpu }}|{{ asset.memory }}|{{ asset.disk }}</td>#}
-                                    <td class="text-center">{{ asset.system_type|default_if_none:"" }}{{ asset.system_version|default_if_none:"" }}</td>
-                                    <td class="text-center"> {{ asset.cpu|default_if_none:"" }} </td>
-                                    <td class="text-center"> {{ asset.memory|default_if_none:"" }}{% if asset.memory %}G{% endif %}</td>
-                                    <td class="text-center"> {{ asset.disk }}{% if asset.disk %}G{% endif %}</td>
+                                    <td class="text-center"> {{ asset.hostname }} </td>
+                                    <td class="text-center"> {{ asset.ip }} </td>
+                                    <td class="text-center">{{ asset.system_type }}</td>
+                                    <td class="text-center"> {{ asset.cpu }} | {{ asset.memory }} | {{ asset.disk }}</td>
+                                    <td class="text-center"> {% for group in asset.group.all %} {{ group.name }} {% endfor %}</td>
+                                    <td class="text-center">
+                                        {% if asset.is_active %}
+                                            <i class="fa fa-circle text-navy"></i>
+                                        {% else %}
+                                            <i class="fa fa-circle text-danger"></i>
+                                        {% endif %}
+                                    </td>
                                     <td class="text-center" data-editable='false'>
 {#                                        <a href="{% url 'asset_edit' %}?id={{ asset.id }}" class="btn btn-xs btn-info">编辑</a>#}
                                         <a value="{{ asset.id }}" class="conn btn btn-xs btn-warning">连接</a>
@@ -145,7 +145,7 @@
 {#                                <input type="button" id="asset_update_all" class="btn btn-primary btn-sm"  name="update_button" value="更新全部"/>#}
                                 <input type="button" id="exec_cmd" class="btn btn-sm btn-primary"  name="exec_cmd" value="执行命令"/>
                             </div>
-{#                            {% include 'paginator.html' %}#}
+                            {% include '_pagination.html' %}
                         </div>
                     </form>
                 </div>

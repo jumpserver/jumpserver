@@ -29,5 +29,3 @@ class UserGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserGroup
         fields = '__all__'
-
-

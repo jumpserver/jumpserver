@@ -18,8 +18,8 @@
         <i class="fa fa-inbox"></i> <span class="nav-label">{% trans 'Assets' %}</span><span class="fa arrow"></span>
     </a>
     <ul class="nav nav-second-level">
-        <li class=""><a href="">{% trans 'Asset' %}</a></li>
-        <li class=""><a href="">{% trans 'Assetgroup' %}</a></li>
+        <li class="{% url 'assets:asset-list' %}"><a href="">{% trans 'Asset' %}</a></li>
+        <li class=""><a href="{% url 'assets:assetgroup-list' %}">{% trans 'Assetgroup' %}</a></li>
         <li class=""><a href="">{% trans 'IDC' %}</a></li>
         <li class=""><a href="">{% trans 'Assetadmin' %}</a></li>
         <li class=""><a href="">{% trans 'Assetuser' %}</a></li>

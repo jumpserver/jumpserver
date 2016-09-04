@@ -21,4 +21,3 @@ def get_object_or_none(model, **kwargs):
     except model.DoesNotExist:
         obj = None
     return obj
-

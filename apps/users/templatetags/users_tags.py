@@ -36,6 +36,3 @@ def user_avatar_url(user):
             default_avatar = default_avatar_list[len(user.username) % len(default_avatar_list)]
             return os.path.join(settings.MEDIA_URL, 'avatar', 'default',  default_avatar)
     return 'https://www.gravatar.com/avatar/c6812ab450230979465d7bf288eadce2a?s=120&d=identicon'
-
-
-
