@@ -114,12 +114,12 @@ class Asset(models.Model):
     cabinet_no = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Cabinet number'))
     cabinet_pos = models.IntegerField(null=True, blank=True, verbose_name=_('Cabinet position'))
     number = models.CharField(max_length=32, null=True, blank=True, unique=True, verbose_name=_('Asset number'))
-    status = models.ManyToManyField(AssetExtend, null=True, blank=True,
-                                    related_name="asset_status_extend", verbose_name=_('Asset status'))
-    type = models.ManyToManyField(AssetExtend, null=True, blank=True,
-                                  related_name="asset_type_extend", verbose_name=_('Asset type'))
-    env = models.ManyToManyField(AssetExtend, null=True, blank=True,
-                                 related_name="asset_env_extend", verbose_name=_('Asset environment'))
+    status = models.ForeignKey(AssetExtend, related_name="asset_extend_status", null=True,
+                               blank=True, verbose_name=_('Asset status'))
+    type = models.ForeignKey(AssetExtend, related_name="asset_extend_type", null=True,
+                             blank=True, verbose_name=_('Asset type'))
+    env = models.ForeignKey(AssetExtend, related_name="asset_extend_env", null=True,
+                            blank=True, verbose_name=_('Asset environment'))
     sn = models.CharField(max_length=128, null=True, blank=True, unique=True, verbose_name=_('Serial number'))
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
