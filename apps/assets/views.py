@@ -1,28 +1,11 @@
-from django.views.generic import (
-    TemplateView, ListView
-)
+from __future__ import absolute_import, unicode_literals
 
+from django.views.generic import TemplateView, ListView
+from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from django.urls import reverse_lazy
-
-
-from django.views.generic.edit import (
-    CreateView, DeleteView, FormView, UpdateView
-)
-
-
-from django.views.generic.detail import (
-    DetailView
-)
-
-
-from .models import (
-    Asset, AssetGroup, IDC, AssetExtend
-)
-
-
-from .forms import (
-    AssetForm,
-)
+from django.views.generic.detail import DetailView
+from .models import Asset, AssetGroup, IDC, AssetExtend
+from .forms import AssetForm
 
 
 class AssetAddView(CreateView):
@@ -32,7 +15,7 @@ class AssetAddView(CreateView):
     success_url = reverse_lazy('assets:asset-list')
 
 
-class AssetEdit():
+class AssetEditView(UpdateView):
     pass
 
 
@@ -52,3 +35,22 @@ class AssetDetailView(DetailView):
     context_object_name = 'asset'
     template_name = 'assets/asset_detail.html'
 
+
+class AssetGroupAddView(CreateView):
+    pass
+
+
+class AssetGroupListView(ListView):
+    pass
+
+
+class AssetGroupDetailView(DetailView):
+    pass
+
+
+class AssetGroupEditView(UpdateView):
+    pass
+
+
+class AssetGroupDeleteView(DeleteView):
+    pass
