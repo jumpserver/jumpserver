@@ -11,7 +11,7 @@
 ├── README.md
 ├── install                         // 安装说明
 ├── logs                            // 日志目录
-├── apps                       // 管理后台目录，也是各app所在目录
+├── apps                            // 管理后台目录，也是各app所在目录
 │   └── assets                      // app目录
 │   │   ├── admin.py
 │   │   ├── apps.py                 // 新版本django app设置文件
@@ -35,7 +35,7 @@
 │   │   ├── templatetags            // 通用template tag
 │   │   ├── utils.py                // 通用的函数方法
 │   │   └── views.py                
-│   ├── fixtures                     // 初始化数据目录
+│   ├── fixtures                    // 初始化数据目录
 │   │   ├── init.json               // 初始化项目数据库
 │   │   └── fake.json               // 生成大量测试数据
 │   ├── jumpserver                  // 项目设置目录
@@ -45,5 +45,6 @@
 │   │    └── wsgi.py
 │   ├── manage.py
 │   ├── static                      // 项目静态资源目录
+│   ├── static                      // 项目多语言目录
 │   └── templates                   // 项目模板目录
 ```
