@@ -8,6 +8,7 @@ import logging
 from paramiko.rsakey import RSAKey
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.urls import reverse_lazy
+from django.utils.translation import ugettext as _
 
 from common.tasks import send_mail_async
 from common.utils import reverse
@@ -43,7 +44,7 @@ def ssh_key_gen(length=2048, password=None, username='root', hostname=None):
     f = StringIO.StringIO()
 
     try:
-        logger.debug('Begin to generate ssh private key ...')
+        logger.debug(_('Begin to generate ssh private key ...'))
         private_key_obj = RSAKey.generate(length)
         private_key_obj.write_private_key(f, password=password)
         private_key = f.getvalue()
@@ -55,33 +56,33 @@ def ssh_key_gen(length=2048, password=None, username='root', hostname=None):
             'hostname': hostname,
         }
 
-        logger.debug('Finish to generate ssh private key ...')
+        logger.debug(_('Finish to generate ssh private key ...'))
         return private_key, public_key
 
     except IOError:
-        raise IOError('These is error when generate ssh key.')
+        raise IOError(_('These is error when generate ssh key.'))
 
 
 def user_add_success_next(user):
-    subject = '您的用户创建成功'
+    subject = _('Create account successfully')
     recipient_list = [user.email]
-    message = """
-    您好 %(name)s:
+    message = _("""
+    Hello %(name)s:
     </br>
-    恭喜您，您的账号已经创建成功.
+    Your account has been created successfully
     </br>
-    <a href="%(rest_password_url)s?token=%(rest_password_token)s">请点击这里设置密码</a>
+    <a href="%(rest_password_url)s?token=%(rest_password_token)s">click here to set your password</a>
     </br>
-    这个链接有效期1小时, 超过时间您可以 <a href="%(forget_password_url)s?email=%(email)s">重新申请</a>
+    This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>
 
     </br>
     ---
 
     </br>
-    <a href="%(login_url)s">直接登录</a>
+    <a href="%(login_url)s">Login direct</a>
 
     </br>
-    """ % {
+    """) % {
         'name': user.name,
         'rest_password_url': reverse('users:reset-password', external=True),
         'rest_password_token': user.generate_reset_token(),
@@ -94,25 +95,25 @@ def user_add_success_next(user):
 
 
 def send_reset_password_mail(user):
-    subject = '重设密码'
+    subject = _('Reset password')
     recipient_list = [user.email]
-    message = """
-    您好 %(name)s:
+    message = _("""
+    Hello %(name)s:
     </br>
-    您好，请点击下面链接重置密码, 如果不是您申请的, 请关注账号安全
+    Please click the link below to reset your password, if not your request, concern your account security
     </br>
-    <a href="%(rest_password_url)s?token=%(rest_password_token)s">请点击这里设置密码</a>
+    <a href="%(rest_password_url)s?token=%(rest_password_token)s">Click here reset password</a>
     </br>
-    这个链接有效期1小时, 超过时间您可以 <a href="%(forget_password_url)s?email=%(email)s">重新申请</a>
+    This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one<</a>
 
     </br>
     ---
 
     </br>
-    <a href="%(login_url)s">直接登录</a>
+    <a href="%(login_url)s">Login direct</a>
 
     </br>
-    """ % {
+    """) % {
         'name': user.name,
         'rest_password_url': reverse('users:reset-password', external=True),
         'rest_password_token': user.generate_reset_token(),

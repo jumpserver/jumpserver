@@ -23,6 +23,7 @@ class Config:
     # It's used to identify your site, When we send a create mail to user, we only know login url is /login/
     # But we should know the absolute url like: http://jms.jumpserver.org/login/, so SITE_URL is
     # HTTP_PROTOCOL://HOST[:PORT]
+    # Todo: May be use :method: get_current_site more  grace, bug restful api unknown ok or not
     SITE_URL = 'http://localhost'
 
     # Django security setting, if your disable debug model, you should setting that
@@ -52,7 +53,7 @@ class Config:
     # When Django start it will bind this host and port
     # ./manage.py runserver 127.0.0.1:8080
     # Todo: Gunicorn or uwsgi run may be use it
-    HTTP_LISTEN_HOST = '127.0.0.1'
+    HTTP_LISTEN_HOST = '0.0.0.0'
     HTTP_LISTEN_PORT = 8080
 
     # Use Redis as broker for celery and web socket

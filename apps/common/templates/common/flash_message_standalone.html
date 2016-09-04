@@ -33,7 +33,7 @@
 
                     {% if messages %}
                         <p>
-                        <div class="alert alert-success">
+                        <div class="alert alert-success" id="messages">
                             {{ messages }}
                         </div>
                     </p>
@@ -52,9 +52,26 @@
                 Copyright Jumpserver.org
             </div>
             <div class="col-md-6 text-right">
-               <small>© 2014-2016</small>
+               <small>2014-2016</small>
             </div>
         </div>
     </div>
 </body>
+<script>
+    var time=5;
+    function redirect_page() {
+        if (time >= 0) {
+            var messages = '{{ messages }}， <b>' + time +'</b> ...';
+            $('#messages').html(messages);
+            time--;
+            setTimeout(redirect_page, 1000);
+        }
+        else {
+            window.location.href = "{{ redirect_url }}";
+        }
+    }
+    {% if auto_redirect %}
+    window.onload = redirect_page;
+    {% endif %}
+</script>
 </html>

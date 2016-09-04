@@ -2,6 +2,7 @@
 {% load common_tags %}
 {% load users_tags %}
 {% load static %}
+{% load i18n %}
 
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
@@ -12,13 +13,12 @@
         <div class="row">
             <div class="col-sm-12">
                 <div class="ibox float-e-margins">
-                    {#                <div class="ibox-content">#}
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
-                            <li class="active"><a href="" class="text-center"><i class="fa fa-laptop"></i> 用户信息 </a>
+                            <li class="active"><a href="" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User detail' %} </a>
                             </li>
-                            <li><a href="" class="text-center"><i class="fa fa-bar-chart-o"></i> 用户资产</a></li>
-                            <li><a href="" class="text-center"><i class="fa fa-bar-chart-o"></i> 登录记录 </a></li>
+                            <li><a href="" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'User assets' %}</a></li>
+                            <li><a href="" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'User log' %}</a></li>
                             <div class="" style="float: right">
                                 <form id="search_form" method="get" action="" class="pull-right mail-search">
                                     <div class="input-group">
@@ -26,7 +26,7 @@
                                                value="{{ keyword }}" placeholder="Search">
                                         <div class="input-group-btn">
                                             <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
-                                                搜索
+                                                {% trans 'Search' %}
                                             </button>
                                         </div>
                                     </div>
@@ -66,52 +66,52 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td width="20%">姓名:</td>
+                                            <td width="20%">{% trans 'Name' %}:</td>
                                             <td><b>{{ user.name }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>用户名:</td>
+                                            <td>{% trans 'Username' %}:</td>
                                             <td><b>{{ user.username }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>邮件:</td>
+                                            <td>{% trans 'Email' %}:</td>
                                             <td><b>{{ user.email }}</b></td>
                                         </tr>
                                         {% if user.phone %}
                                             <tr>
-                                                <td>手机:</td>
+                                                <td>{% trans 'Phone' %}:</td>
                                                 <td><b>{{ user.phone }}</b></td>
                                             </tr>
                                         {% endif %}
                                         {% if user.wechat %}
                                             <tr>
-                                                <td>微信:</td>
+                                                <td>{% trans 'Wechat' %}:</td>
                                                 <td><b>{{ user.wechat }}</b></td>
                                             </tr>
                                         {% endif %}
                                         <tr>
-                                            <td>角色:</td>
+                                            <td>{% trans 'Role' %}:</td>
                                             <td><b>{{ user.get_role_display }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>有效期:</td>
+                                            <td>{% trans 'Date expired' %}:</td>
                                             <td><b>{{ user.date_expired|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>创建者:</td>
+                                            <td>{% trans 'Created by' %}:</td>
                                             <td><b>{{ user.created_by }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>创建日期:</td>
+                                            <td>{% trans 'Date joined' %}:</td>
                                             <td><b>{{ user.date_joined|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>最后登录:</td>
+                                            <td>{% trans 'Last login' %}:</td>
                                             <td><b>{{ user.last_login|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td class="no-borders">描述:</td>
-                                            <td class="no-borders"><b>{{ user.comment }}</b></td>
+                                            <td>{% trans 'Comment' %}:</td>
+                                            <td><b>{{ user.comment }}</b></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -121,7 +121,7 @@
                         <div class="col-sm-5" style="padding-left: 0px;">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> 快速修改
+                                    <i class="fa fa-info-circle"></i> {% trans 'Quick modify' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table">
@@ -156,18 +156,18 @@
                                             </span></td>
                                         </tr>
                                         <tr>
-                                            <td>重置密码:</td>
+                                            <td>{% trans 'Reset password' %}:</td>
                                             <td>
                                                 <span style="float: right">
-                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">重置</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Reset' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>重置密钥:</td>
+                                            <td>{% trans 'Reset ssh key' %}:</td>
                                             <td>
                                                 <span style="float: right">
-                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px;">重置</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px;">{% trans 'Reset' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
@@ -178,7 +178,7 @@
 
                             <div class="panel panel-info">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> 用户组
+                                    <i class="fa fa-info-circle"></i> {% trans 'Usergroup' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table">
@@ -186,7 +186,7 @@
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="选择用户组" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Select usergroups' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for group in groups %}
                                                         <option value="{{ group.id }}">{{ group.name }}</option>
                                                         {% endfor %}
@@ -195,7 +195,7 @@
                                             </tr>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-small">添加到用户组</button>
+                                                    <button type="button" class="btn btn-info btn-small">{% trans 'Add' %}</button>
                                                 </td>
                                             </tr>
                                         </form>

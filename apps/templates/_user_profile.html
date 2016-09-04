@@ -1,4 +1,5 @@
 {% load static %}
+{% load i18n %}
 <li class="nav-header">
     <div class="dropdown profile-element">
         <span>
@@ -10,15 +11,14 @@
                     <strong class="font-bold"> {{ request.user.name }}<span style="color: #8095a8"></span></strong>
                 </span>
                 <span class="text-muted text-xs block">
-                     {{ request.user.get_role_display | default:'普通用户' }}<b class="caret"></b>
+                     {{ request.user.get_role_display | default:"{% trans 'User' %}" }}<b class="caret"></b>
                 </span>
             </span>
         </a>
         <ul class="dropdown-menu animated fadeInRight m-t-xs">
-            <li><a value="">个人信息</a></li>
-            <li><a href="">修改信息</a></li>
+            <li><a value="">{% trans 'Profile' %}</a></li>
             <li class="divider"></li>
-            <li><a href="">注销</a></li>
+            <li><a href="">{% trans 'Logout' %}</a></li>
         </ul>
     </div>
     <div class="logo-element">

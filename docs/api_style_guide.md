@@ -21,13 +21,14 @@ https://example.org/api/
 
 ### 版本
 
-将API的版本号放入URL
+将API的版本号放入URL中, 由于一个项目多个app所以Jumpserver使用以下风格,
+将版本号放到app后面
 
 ```
-https://example.com/api/v1/
+https://example.com/api/:app:/:version:/:resource:
+https://example.com/api/assets/v1.0/assets [GET, POST]
+https://example.com/api/assets/v1.0/assets/1 [GET, PUT, DELETE]
 ```
-
-另一种做法是，将版本号放在HTTP头信息中，但不如放入URL方便和直观。Github采用这种做法。
 
 
 ### 路径
@@ -37,11 +38,11 @@ https://example.com/api/v1/
 举例来说 cmdb中的assets列表, idc列表
 
 ```
-https://example.com/api/v1/assets
-https://example.com/api/v1/assetgroups
-https://example.com/api/v1/assetgroups/:id/assets
-https://example.com/api/v1/assets/:id
-https://example.com/api/v1/idcs
+https://example.com/api/:app:/:version:/:resource:
+
+https://example.com/api/assets/v1.0/assets [GET, POST]
+https://example.com/api/assets/v1.0/assets/1 [GET, PUT, DELETE]
+https://example.com/api/assets/v1.0/idcs [GET, POST]
 ```
 
 一般性的增删查改(CRUD)API，完全使用HTTP method加上url提供的语义，url中的可变部分（比如上面提到的<role_id>）
