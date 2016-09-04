@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-04 12:20+0800\n"
+"POT-Creation-Date: 2016-09-04 17:31+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,140 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: assets/models.py:9 assets/models.py:21
+msgid "Name"
+msgstr "名称"
+
+#: assets/models.py:10 assets/models.py:29 assets/models.py:71
+msgid "Created by"
+msgstr "创建者"
+
+#: assets/models.py:11 assets/models.py:30 assets/models.py:74
+msgid "Comment"
+msgstr "备注"
+
+#: assets/models.py:22
+msgid "Bandwidth"
+msgstr "带宽"
+
+#: assets/models.py:23
+msgid "Contact"
+msgstr "联系人"
+
+#: assets/models.py:24
+msgid "Phone"
+msgstr "手机"
+
+#: assets/models.py:25
+msgid "Address"
+msgstr "地址"
+
+#: assets/models.py:26
+msgid "Network"
+msgstr "网络"
+
+#: assets/models.py:27 assets/models.py:73
+msgid "Date added"
+msgstr "加入日期"
+
+#: assets/models.py:28
+msgid "Operator"
+msgstr "运营商"
+
+#: assets/models.py:37 assets/models.py:54 templates/_nav.html:23
+msgid "IDC"
+msgstr "机房"
+
+#: assets/models.py:46
+msgid "IP"
+msgstr ""
+
+#: assets/models.py:47
+msgid "Other IP"
+msgstr ""
+
+#: assets/models.py:48
+msgid "Remote card IP"
+msgstr ""
+
+#: assets/models.py:49
+msgid "Hostname"
+msgstr "用户名"
+
+#: assets/models.py:50
+msgid "Port"
+msgstr "端口"
+
+#: assets/models.py:51
+msgid "Asset groups"
+msgstr "用户组"
+
+#: assets/models.py:52
+#, fuzzy
+#| msgid "Edit user"
+msgid "Admin user"
+msgstr "编辑用户"
+
+#: assets/models.py:53
+msgid "Admin password"
+msgstr "管理员密码"
+
+#: assets/models.py:55
+msgid "Mac address"
+msgstr "Mac地址"
+
+#: assets/models.py:56
+msgid "Brand"
+msgstr "品牌"
+
+#: assets/models.py:57
+msgid "CPU"
+msgstr "CPU"
+
+#: assets/models.py:58
+msgid "Memory"
+msgstr "内存"
+
+#: assets/models.py:59
+msgid "Disk"
+msgstr "硬盘"
+
+#: assets/models.py:60
+msgid "OS"
+msgstr "操作系统"
+
+#: assets/models.py:61
+msgid "Cabinet number"
+msgstr "机柜编号"
+
+#: assets/models.py:62
+msgid "Cabinet position"
+msgstr "机柜层号"
+
+#: assets/models.py:63
+msgid "Asset number"
+msgstr "资产编号"
+
+#: assets/models.py:65
+msgid "Asset status"
+msgstr "资产状态"
+
+#: assets/models.py:67
+msgid "Asset type"
+msgstr "系统类型"
+
+#: assets/models.py:69
+msgid "Asset environment"
+msgstr "资产环境"
+
+#: assets/models.py:70
+msgid "Serial number"
+msgstr "序列号"
+
+#: assets/models.py:72
+msgid "Is active"
+msgstr "是否激活"
 
 #: templates/_header_bar.html:8
 msgid "Search"
@@ -57,16 +191,16 @@ msgstr "资产"
 msgid "Assetgroup"
 msgstr "用户组"
 
-#: templates/_nav.html:23
-msgid "IDC"
-msgstr "机房"
-
 #: templates/_nav.html:24
-msgid "Asset admin"
+#, fuzzy
+#| msgid "Asset admin"
+msgid "Assetadmin"
 msgstr "管理用户"
 
 #: templates/_nav.html:25
-msgid "Asset user"
+#, fuzzy
+#| msgid "Asset user"
+msgid "Assetuser"
 msgstr "系统用户"
 
 #: templates/_nav.html:26
@@ -121,21 +255,14 @@ msgstr "注销登录"
 msgid "Play CAPTCHA as audio file"
 msgstr ""
 
-#~ msgid "Username"
-#~ msgstr "用户名"
+#~ msgid "Asset user"
+#~ msgstr "系统用户"
 
 #~ msgid "Password"
 #~ msgstr "密码"
 
-#, fuzzy
 #~ msgid "Join usergroups"
 #~ msgstr "添加到用户组"
-
-#~ msgid "Name"
-#~ msgstr "名称"
-
-#~ msgid "Comment"
-#~ msgstr "备注"
 
 #~ msgid "Administrator"
 #~ msgstr "管理员"
@@ -151,9 +278,6 @@ msgstr ""
 
 #~ msgid "Wechat"
 #~ msgstr "微信"
-
-#~ msgid "Phone"
-#~ msgstr "手机"
 
 #~ msgid "Enable OTP"
 #~ msgstr "二次验证"
@@ -200,9 +324,6 @@ msgstr ""
 #~ msgid "Captcha invalid"
 #~ msgstr "验证码错误"
 
-#~ msgid "Reset password"
-#~ msgstr "重置密码"
-
 #~ msgid "Password again"
 #~ msgstr "再次输入密码"
 
@@ -224,12 +345,6 @@ msgstr ""
 #~ msgid "User log"
 #~ msgstr "登录日志"
 
-#~ msgid "Created by"
-#~ msgstr "创建者"
-
-#~ msgid "Date joined"
-#~ msgstr "加入日期"
-
 #~ msgid "Last login"
 #~ msgstr "最后登录"
 
@@ -244,12 +359,6 @@ msgstr ""
 
 #~ msgid "Add"
 #~ msgstr "添加"
-
-#~ msgid "Asset num"
-#~ msgstr "资产数量"
-
-#~ msgid "Active"
-#~ msgstr "有效"
 
 #~ msgid "Edit"
 #~ msgstr "编辑"
@@ -376,9 +485,6 @@ msgstr ""
 
 #~ msgid "Create user<a href=\"%s\">%s</a> success."
 #~ msgstr "创建用户<a href=\"%s\">%s</a> 成功"
-
-#~ msgid "Edit user"
-#~ msgstr "编辑用户"
 
 #~ msgid "Usergroup list"
 #~ msgstr "用户组列表"
