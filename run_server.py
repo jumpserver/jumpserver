@@ -19,7 +19,7 @@ apps_dir = os.path.join(BASE_DIR, 'apps')
 
 
 def start_django():
-    http_host = CONFIG.HTTP_LISTEN_HOST or 'locahost'
+    http_host = CONFIG.HTTP_LISTEN_HOST or '127.0.0.1'
     http_port = CONFIG.HTTP_LISTEN_PORT or '8080'
     os.chdir(apps_dir)
     print('start django')
