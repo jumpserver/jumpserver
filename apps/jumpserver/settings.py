@@ -215,7 +215,7 @@ LOGGING = {
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 
-LANGUAGE_CODE = 'zh_CN'
+LANGUAGE_CODE = 'en_US'
 
 TIME_ZONE = 'Asia/Shanghai'
 

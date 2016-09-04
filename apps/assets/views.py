@@ -1,6 +1,7 @@
 # coding:utf-8
 from __future__ import absolute_import, unicode_literals
 
+from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView, ListView
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
@@ -10,7 +11,7 @@ from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateVi
 from django.urls import reverse_lazy
 from django.views.generic.detail import DetailView
 from .models import Asset, AssetGroup, IDC, AssetExtend
-from .forms import AssetForm
+from .forms import AssetForm, AssetGroupForm
 
 from .utils import AdminUserRequiredMixin
 
@@ -49,11 +50,31 @@ class AssetDetailView(DetailView):
 
 class AssetGroupAddView(CreateView):
     model = AssetGroup
+    form_class = AssetGroupForm
     template_name = 'assets/assetgroup_add.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Assets'),
+            'action': _('Create asset group'),
+            'assets': Asset.objects.all(),
+        }
+        kwargs.update(context)
+        return super(AssetGroupAddView, self).get_context_data(**kwargs)
 
 
 class AssetGroupListView(ListView):
-    pass
+    model = AssetGroup
+    context_object_name = 'assetgroups'
+    template_name = 'assets/assetgroup_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Assets'),
+            'action': _('Asset group list')
+        }
+        kwargs.update(context)
+        return super(AssetGroupListView, self).get_context_data(**kwargs)
 
 
 class AssetGroupDetailView(DetailView):
