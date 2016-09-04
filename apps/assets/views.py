@@ -1,7 +1,9 @@
+# coding:utf-8
+from __future__ import absolute_import, unicode_literals
+
 from django.views.generic import TemplateView, ListView
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
-from __future__ import absolute_import, unicode_literals
 
 from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
