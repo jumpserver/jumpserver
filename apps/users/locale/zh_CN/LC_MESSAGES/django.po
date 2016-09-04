@@ -135,7 +135,7 @@ msgstr ""
 #: users/templates/users/_user.html:70
 #: users/templates/users/forget_password.html:44
 #: users/templates/users/user_list.html:63
-msgid "Commit"
+msgid "Submit"
 msgstr ""
 
 #: users/templates/users/forget_password.html:26

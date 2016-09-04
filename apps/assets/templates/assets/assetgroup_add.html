@@ -36,7 +36,7 @@
                                 <div class="col-sm-9">
                                     <select name="assets" id="assets" data-placeholder="{% trans 'Select asset' %}" class="select2 form-control m-b" multiple  tabindex="2">
                                         {% for asset in assets %}
-                                            <option value="{{ asset.id }}">{{ asset.hostname }}</option>
+                                            <option value="{{ asset.id }}">{{ asset.ip }}:{{ asset.port }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -46,8 +46,8 @@
 
                             <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-2">
-                                    <button class="btn btn-white" type="reset">取消</button>
-                                    <button id="submit_button" class="btn btn-primary" type="submit">确认保存</button>
+                                    <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
                                 </div>
                             </div>
                         </form>

@@ -52,6 +52,7 @@ class AssetGroupAddView(CreateView):
     model = AssetGroup
     form_class = AssetGroupForm
     template_name = 'assets/assetgroup_add.html'
+    success_url = reverse_lazy('assets:assetgroup-list')
 
     def get_context_data(self, **kwargs):
         context = {

@@ -19,18 +19,18 @@
      {% for assetgroup in assetgroups %}
          <tr class="gradeX">
              <td class="text-center">
-                 <input type="checkbox" name="checked" value="{{ user.id }}">
+                 <input type="checkbox" name="checked" value="{{ assetgroup.id }}">
              </td>
              <td class="text-center">
-                 <a href="{% url 'assets:assetgroup-detail' pk=user.id %}">
+                 <a href="{% url 'assets:assetgroup-detail' pk=assetgroup.id %}">
                      {{ assetgroup.name }}
                  </a>
              </td>
-             <td class="text-center">{{ assetgroup.comment }}</td>
+             <td class="text-center">{{ assetgroup.asset_set.count }}</td>
              <td class="text-center">{{ assetgroup.comment }}</td>
              <td class="text-center">
-                 <a href="{% url 'users:user-edit' pk=user.id %}" class="btn btn-xs btn-info">{% trans 'Edit' %}</a>
-                 <a href="{% url 'users:user-delete' pk=user.id %}" class="btn btn-xs btn-danger del {% if user.id == request.user.id or user.username == 'admin' %} disabled {% endif %}">{% trans 'Delete' %}</a>
+                 <a href="{% url 'assets:assetgroup-edit' pk=assetgroup.id %}" class="btn btn-xs btn-info">{% trans 'Edit' %}</a>
+                 <a href="{% url 'assets:assetgroup-delete' pk=assetgroup.id %}" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
              </td>
          </tr>
      {% endfor %}
@@ -48,7 +48,7 @@
 
             <div class="input-group-btn pull-left" style="padding-left: 5px;">
                 <button id='search_btn' type="submit" style="height: 32px;"  class="btn btn-sm btn-primary">
-                 {% trans 'Commit' %}
+                 {% trans 'Submit' %}
                 </button>
             </div>
 

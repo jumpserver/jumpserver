@@ -22,7 +22,7 @@ urlpatterns = [
     url(r'^assetgroup$', views.AssetGroupListView.as_view(), name='assetgroup-list'),
     url(r'^assetgroup/add$', views.AssetGroupAddView.as_view(), name='assetgroup-add'),
     url(r'^assetgroup/(?P<pk>[0-9]+)$', views.AssetGroupDetailView.as_view(), name='assetgroup-detail'),
-    url(r'^assetgroup/(?P<pk>[0-9]+)$/edit', views.AssetGroupEditView.as_view(), name='assetgroup-edit'),
+    url(r'^assetgroup/(?P<pk>[0-9]+)/edit$', views.AssetGroupEditView.as_view(), name='assetgroup-edit'),
     url(r'^assetgroup/(?P<pk>[0-9]+)/delete$', views.AssetGroupDeleteView.as_view(), name='assetgroup-delete'),
     # url(r'^api/v1.0/', include(router.urls)),
 ]

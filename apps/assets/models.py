@@ -130,8 +130,12 @@ class Asset(models.Model):
     def __unicode__(self):
         return self.ip
 
+    def initial(self):
+        pass
+
     class Meta:
         db_table = 'asset'
+        index_together = ('ip', 'port')
 
 
 class Label(models.Model):
