@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 {% load bootstrap %}
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
@@ -12,7 +13,7 @@
             <div class="col-sm-12">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h5>填写用户组信息</h5>
+                        <h5>{% trans 'Create user group' %}</h5>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>

@@ -128,7 +128,7 @@ class Asset(models.Model):
     comment = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
-        return self.ip
+        return '%(ip)s:%(port)d' % {'ip': self.ip, 'port': self.port}
 
     def initial(self):
         pass
