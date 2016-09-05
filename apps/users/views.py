@@ -120,10 +120,6 @@ class UserAddView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         user_add_success_next(user)
         return super(UserAddView, self).form_valid(form)
 
-    def form_invalid(self, form):
-        print(form.errors)
-        return super(UserAddView, self).form_invalid(form)
-
     def get_success_message(self, cleaned_data):
         return self.success_message % (
             reverse_lazy('users:user-detail', kwargs={'pk': self.object.pk}),
