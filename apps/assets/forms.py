@@ -21,7 +21,10 @@ class AssetForm(forms.ModelForm):
 
 
 class AssetGroupForm(forms.ModelForm):
-    assets = forms.ModelMultipleChoiceField(queryset=Asset.objects.all())
+    assets = forms.ModelMultipleChoiceField(queryset=Asset.objects.all(),
+                                            widget=forms.SelectMultiple(attrs={
+                                                'class': 'select2',
+                                                'data-placeholder': _('Select assets')}))
 
     def __init__(self, *args, **kwargs):
         if kwargs.get('instance'):
