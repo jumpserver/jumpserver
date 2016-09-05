@@ -28,7 +28,7 @@ class UserAddForm(ModelForm):
         }
 
         widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Join usergroups')}),
+            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Join user groups')}),
         }
 
 
