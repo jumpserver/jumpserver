@@ -6,18 +6,19 @@
 <script src="{% static "js/inspinia.js" %}"></script>
 <script src="{% static "js/jumpserver.js" %}"></script>
 
-<!-- active menu -->
 <script>
+    <!-- active menu -->
     var url_array = document.location.pathname.split("/");
-    s1 = url_array[1];
-    s2 = url_array[2];
-    if (s1 == ''){
+    app = url_array[1];
+    resource = url_array[2];
+    if (app == ''){
         $('#index').addClass('active')
     } else {
-        $("#"+s1).addClass('active');
-        $('#'+s1+' #'+s2).addClass('active');
+        $("#"+app).addClass('active');
+        $('#'+app+' #'+resource).addClass('active');
     }
 
+    <!-- ajax set cookie -->
     function getCookie(name) {
         var cookieValue = null;
         if (document.cookie && document.cookie !== '') {
@@ -46,8 +47,10 @@
         beforeSend: function(xhr, settings) {
             if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
                 xhr.setRequestHeader("X-CSRFToken", csrftoken);
-{#                xhr.setRequestHeader("sessionid", sessionid);#}
             }
         }
     });
+
+    <!-- textarea rows -->
+    $('textarea').attr('rows', 5)
 </script>
