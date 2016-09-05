@@ -116,8 +116,7 @@ class UserDetailView(AdminUserRequiredMixin, DetailView):
     context_object_name = "user"
 
     def get_context_data(self, **kwargs):
-        groups = [
-            group for group in UserGroup.objects.iterator() if group not in self.object.groups.iterator()]
+        groups = [group for group in UserGroup.objects.iterator() if group not in self.object.groups.iterator()]
         context = {'app': _('Users'), 'action': _('User detail'), 'groups': groups}
         kwargs.update(context)
         return super(UserDetailView, self).get_context_data(**kwargs)
