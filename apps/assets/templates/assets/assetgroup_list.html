@@ -26,7 +26,7 @@
                      {{ assetgroup.name }}
                  </a>
              </td>
-             <td class="text-center">{{ assetgroup.asset_set.count }}</td>
+             <td class="text-center">{{ assetgroup.assets.count }}</td>
              <td class="text-center">{{ assetgroup.comment }}</td>
              <td class="text-center">
                  <a href="{% url 'assets:assetgroup-edit' pk=assetgroup.id %}" class="btn btn-xs btn-info">{% trans 'Edit' %}</a>

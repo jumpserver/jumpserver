@@ -6,7 +6,6 @@ from django.utils.translation import gettext_lazy as _
 
 
 class AssetForm(forms.ModelForm):
-
     class Meta:
         model = Asset
 
@@ -22,6 +21,20 @@ class AssetForm(forms.ModelForm):
 
 
 class AssetGroupForm(forms.ModelForm):
+    assets = forms.ModelMultipleChoiceField(queryset=Asset.objects.all())
+
+    def __init__(self, *args, **kwargs):
+        if kwargs.get('instance'):
+            initial = kwargs.get('initial', {})
+            initial['assets'] = kwargs['instance'].assets.all()
+        super(AssetGroupForm, self).__init__(*args, **kwargs)
+
+    def _save_m2m(self):
+        super(AssetGroupForm, self)._save_m2m()
+        assets = self.cleaned_data['assets']
+        self.instance.assets.clear()
+        self.instance.assets.add(*tuple(assets))
+
     class Meta:
         model = AssetGroup
         fields = [

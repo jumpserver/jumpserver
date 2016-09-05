@@ -30,6 +30,7 @@
                         <form method="post" id="userForm" class="form-horizontal" action="" >
                             {% csrf_token %}
                             {{ form.name|bootstrap_horizontal }}
+{#                            {{ form.assets|bootstrap_horizontal }}#}
 
                             <div class="form-group">
                                 <label for="users" class="col-sm-2 control-label">{% trans 'Asset' %}</label>

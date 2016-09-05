@@ -103,7 +103,7 @@ class Asset(models.Model):
     remote_card_ip = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Remote card IP'))
     hostname = models.CharField(max_length=128, unique=True, null=True, blank=True, verbose_name=_('Hostname'))
     port = models.IntegerField(null=True, blank=True, verbose_name=_('Port'))
-    groups = models.ManyToManyField(AssetGroup, null=True, blank=True, verbose_name=_('Asset groups'))
+    groups = models.ManyToManyField(AssetGroup, related_name='assets', verbose_name=_('Asset groups'))
     username = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Admin user'))
     password = models.CharField(max_length=256, null=True, blank=True, verbose_name=_("Admin password"))
     admin_user = models.ForeignKey(AdminUser, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("Admin user"))
