@@ -117,10 +117,12 @@ class UserAddView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         user = form.save(commit=False)
         user.created_by = self.request.user.username or 'System'
         user.save()
-
         user_add_success_next(user)
-
         return super(UserAddView, self).form_valid(form)
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return super(UserAddView, self).form_invalid(form)
 
     def get_success_message(self, cleaned_data):
         return self.success_message % (
