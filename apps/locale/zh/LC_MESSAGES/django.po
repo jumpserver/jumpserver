@@ -6,20 +6,18 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
+"Project-Id-Version: Jumpserver 0.3.3\n"
+"Report-Msgid-Bugs-To: ibuler@qq.com\n"
 "POT-Creation-Date: 2016-09-05 12:13+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"Last-Translator: ibuler <ibuler@qq.com>\n"
+"Language-Team: Jumpserver team<ibuler@qq.com>\n"
+"Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: assets/forms.py:20
-#, fuzzy
-#| msgid "Join usergroups"
 msgid "Join assetgroups"
 msgstr "添加到用户组"
 
@@ -77,21 +75,19 @@ msgstr "运营商"
 
 #: assets/models.py:40 assets/models.py:142
 msgid "KEY"
-msgstr ""
+msgstr "KEY"
 
 #: assets/models.py:41 assets/models.py:143
 msgid "VALUE"
-msgstr ""
+msgstr "VALUE"
 
 #: assets/models.py:55 assets/models.py:77 users/forms.py:12
 #: users/models.py:106 users/templates/users/login.html:58
 #: users/templates/users/user_detail.html:73
 #: users/templates/users/user_edit.html:5
 #: users/templates/users/user_list.html:13
-#, fuzzy
-#| msgid "User"
 msgid "Username"
-msgstr "用户"
+msgstr "用户名"
 
 #: assets/models.py:56 assets/models.py:78 users/forms.py:13
 #: users/templates/users/login.html:61
@@ -103,40 +99,36 @@ msgid "Password"
 msgstr "密码"
 
 #: assets/models.py:57 assets/models.py:80
-#, fuzzy
-#| msgid "ssh private key"
 msgid "SSH private key"
 msgstr "ssh密钥"
 
 #: assets/models.py:58 assets/models.py:82
 msgid "As default"
-msgstr ""
+msgstr "默认使用"
 
 #: assets/models.py:59 assets/models.py:84
 msgid "Auto update pass/key"
-msgstr ""
+msgstr "自动更新密码/密钥"
 
 #: assets/models.py:79
 msgid "Protocol"
-msgstr ""
+msgstr "协议"
 
 #: assets/models.py:81
-#, fuzzy
-#| msgid "ssh public key"
 msgid "SSH public key"
 msgstr "ssh公钥"
 
 #: assets/models.py:83
 msgid "Auto push"
-msgstr ""
+msgstr "自动推送"
 
 #: assets/models.py:85
 msgid "Sudo"
-msgstr ""
+msgstr "Sudo"
 
 #: assets/models.py:86
 msgid "Shell"
-msgstr ""
+msgstr "Shell"
 
 #: assets/models.py:87 templates/_header_bar.html:35 templates/_nav.html:4
 msgid "Home"
@@ -144,19 +136,19 @@ msgstr "仪表盘"
 
 #: assets/models.py:88
 msgid "Uid"
-msgstr ""
+msgstr "Uid"
 
 #: assets/models.py:101
 msgid "IP"
-msgstr ""
+msgstr "IP"
 
 #: assets/models.py:102
 msgid "Other IP"
-msgstr ""
+msgstr "其它IP"
 
 #: assets/models.py:103
 msgid "Remote card IP"
-msgstr ""
+msgstr "远控卡IP"
 
 #: assets/models.py:104
 msgid "Hostname"
@@ -171,26 +163,16 @@ msgid "Asset groups"
 msgstr "用户组"
 
 #: assets/models.py:107
-#, fuzzy
-#| msgid "Edit user"
 msgid "Admin user"
-msgstr "编辑用户"
+msgstr "管理用户"
 
 #: assets/models.py:108
 msgid "Admin password"
 msgstr "管理员密码"
 
-#: assets/models.py:109
-#, fuzzy
-#| msgid "Edit user"
-msgid "Admin User"
-msgstr "编辑用户"
-
 #: assets/models.py:110
-#, fuzzy
-#| msgid "User"
 msgid "Sys User"
-msgstr "用户"
+msgstr "系统用户"
 
 #: assets/models.py:111 templates/_nav.html:23
 msgid "IDC"
@@ -259,16 +241,12 @@ msgstr "资产"
 
 #: assets/templates/assets/assetgroup_add.html:16
 #: assets/templates/assets/assetgroup_list.html:5 assets/views.py:60
-#, fuzzy
-#| msgid "Create usergroup"
 msgid "Create asset group"
-msgstr "创建用户组"
+msgstr "创建资产组"
 
 #: assets/templates/assets/assetgroup_add.html:37
-#, fuzzy
-#| msgid "Select usergroups"
 msgid "Select asset"
-msgstr "选择用户组"
+msgstr "选择资产"
 
 #: assets/templates/assets/assetgroup_add.html:49
 #: users/templates/users/_user.html:70
@@ -283,14 +261,12 @@ msgstr "重置"
 #: users/templates/users/forget_password.html:44
 #: users/templates/users/user_list.html:63
 msgid "Submit"
-msgstr ""
+msgstr "提交"
 
 #: assets/templates/assets/assetgroup_list.html:13
 #: users/templates/users/user_list.html:16
-#, fuzzy
-#| msgid "Asset number"
 msgid "Asset num"
-msgstr "资产编号"
+msgstr "资产数量"
 
 #: assets/templates/assets/assetgroup_list.html:32
 #: users/templates/users/user_list.html:44
@@ -327,18 +303,14 @@ msgid "Assets"
 msgstr "资产管理"
 
 #: assets/views.py:75
-#, fuzzy
-#| msgid "Asset groups"
 msgid "Asset group list"
-msgstr "用户组"
+msgstr "资产组列表"
 
 #: templates/_header_bar.html:8 users/templates/users/user_detail.html:29
 msgid "Search"
 msgstr "搜索"
 
 #: templates/_header_bar.html:14
-#, fuzzy
-#| msgid "Welcome use Jumpserver system"
 msgid "Welcome to use Jumpserver system"
 msgstr "欢迎使用Jumpserver开源跳板机系统"
 
@@ -360,22 +332,6 @@ msgstr "用户"
 #: users/templates/users/user_list.html:15
 msgid "Usergroup"
 msgstr "用户组"
-
-#: templates/_nav.html:22
-msgid "Assetgroup"
-msgstr "用户组"
-
-#: templates/_nav.html:24
-#, fuzzy
-#| msgid "Asset admin"
-msgid "Assetadmin"
-msgstr "管理用户"
-
-#: templates/_nav.html:25
-#, fuzzy
-#| msgid "Asset user"
-msgid "Assetuser"
-msgstr "系统用户"
 
 #: templates/_nav.html:26
 msgid "Label"
@@ -509,10 +465,8 @@ msgstr "验证码错误"
 
 #: users/templates/users/reset_password.html:45
 #: users/templates/users/user_detail.html:159 users/utils.py:98
-#, fuzzy
-#| msgid "Reset password success"
 msgid "Reset password"
-msgstr "重置密码成功"
+msgstr "重置密码"
 
 #: users/templates/users/reset_password.html:55
 msgid "Password again"
@@ -543,10 +497,8 @@ msgid "User log"
 msgstr "登录日志"
 
 #: users/templates/users/user_detail.html:105
-#, fuzzy
-#| msgid "Date expired"
 msgid "Date joined"
-msgstr "失效日期"
+msgstr "创建日期"
 
 #: users/templates/users/user_detail.html:109
 msgid "Last login"
@@ -569,10 +521,8 @@ msgid "Add"
 msgstr "添加"
 
 #: users/templates/users/user_list.html:17
-#, fuzzy
-#| msgid "Is active"
 msgid "Active"
-msgstr "是否激活"
+msgstr "激活"
 
 #: users/utils.py:47
 msgid "Begin to generate ssh private key ..."
@@ -697,8 +647,6 @@ msgid "Create user<a href=\"%s\">%s</a> success."
 msgstr "创建用户<a href=\"%s\">%s</a> 成功"
 
 #: users/views.py:159
-#, fuzzy
-#| msgid "Edit user"
 msgid "Edit user"
 msgstr "编辑用户"
 
@@ -738,9 +686,3 @@ msgstr "Token错误或失效"
 #: users/views.py:296
 msgid "Password not same"
 msgstr "密码不一致"
-
-#~ msgid "Asset user"
-#~ msgstr "系统用户"
-
-#~ msgid "Commit"
-#~ msgstr "提交"
