@@ -19,9 +19,15 @@
                 </a>
             </li>
             <li>
+                {% if user.is_authenticated %}
                 <a href="{% url 'users:logout' %}">
-                    <i class="fa fa-sign-out"></i> Log out
+                    <i class="fa fa-sign-out"></i>{% trans 'Log out' %}
                 </a>
+                {% else %}
+                <a href="{% url 'users:login' %}">
+                    <i class="fa fa-sign-in"></i>{% trans 'Log in' %}
+                </a>
+                {% endif %}
             </li>
         </ul>
     </nav>
