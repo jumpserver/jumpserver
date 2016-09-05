@@ -416,7 +416,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             data = ''
             pre_timestamp = time.time()
             while True:
-                r, w, e = select.select([self.channel, sys.stdin], [], [])
+                r, w, e = select.select([self.channel], [], [])
                 if self.channel in r:
                     recv = self.channel.recv(1024)
                     if not len(recv):
