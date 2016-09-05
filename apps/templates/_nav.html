@@ -9,30 +9,30 @@
         <i class="fa fa-group"></i> <span class="nav-label">{% trans 'Users' %}</span><span class="fa arrow"></span>
     </a>
     <ul class="nav nav-second-level active">
-        <li class="user"><a href="{% url 'users:user-list' %}">{% trans 'User' %}</a></li>
-        <li class="usergroup"><a href="{% url 'users:usergroup-list' %}">{% trans 'Usergroup' %}</a></li>
+        <li id="user"><a href="{% url 'users:user-list' %}">{% trans 'User' %}</a></li>
+        <li id="usergroup"><a href="{% url 'users:usergroup-list' %}">{% trans 'User group' %}</a></li>
     </ul>
 </li>
-<li id="">
+<li id="assets">
     <a>
         <i class="fa fa-inbox"></i> <span class="nav-label">{% trans 'Assets' %}</span><span class="fa arrow"></span>
     </a>
     <ul class="nav nav-second-level">
-        <li class="{% url 'assets:asset-list' %}"><a href="">{% trans 'Asset' %}</a></li>
-        <li class=""><a href="{% url 'assets:assetgroup-list' %}">{% trans 'Assetgroup' %}</a></li>
-        <li class=""><a href="">{% trans 'IDC' %}</a></li>
-        <li class=""><a href="">{% trans 'Assetadmin' %}</a></li>
-        <li class=""><a href="">{% trans 'Assetuser' %}</a></li>
-        <li class=""><a href="">{% trans 'Label' %}</a></li>
+        <li id="asset"><a href="{% url 'assets:asset-list' %}">{% trans 'Asset' %}</a></li>
+        <li id="assetgroup"><a href="{% url 'assets:assetgroup-list' %}">{% trans 'Asset group' %}</a></li>
+        <li id="idc"><a href="">{% trans 'IDC' %}</a></li>
+        <li id="admin-user"><a href="">{% trans 'Admin user' %}</a></li>
+        <li id="system-user"><a href="">{% trans 'System user' %}</a></li>
+        <li id=""><a href="">{% trans 'Label' %}</a></li>
     </ul>
 </li>
 <li id="">
     <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">{% trans 'Perms' %}</span><span class="fa arrow"></span></a>
     <ul class="nav nav-second-level">
-        <li class="sudo">
+        <li id="sudo">
             <a class="sudo" href="">{% trans 'Perm' %}</a>
         </li>
-        <li class="role">
+        <li id="role">
             <a href="">{% trans 'Create perm' %}</a>
         </li>
     </ul>
@@ -47,8 +47,8 @@
         <i class="fa fa-download"></i> <span class="nav-label">{% trans 'File' %}</span><span class="fa arrow"></span>
     </a>
     <ul class="nav nav-second-level">
-        <li class="upload"><a href="">{% trans 'File upload' %}</a></li>
-        <li class="download"><a href="">{% trans 'File download' %}</a></li>
+        <li id="upload"><a href="">{% trans 'File upload' %}</a></li>
+        <li id="download"><a href="">{% trans 'File download' %}</a></li>
     </ul>
 </li>
 <li id="">
