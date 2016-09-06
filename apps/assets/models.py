@@ -24,7 +24,7 @@ class IDC(models.Model):
     phone = models.CharField(max_length=32, blank=True, verbose_name=_('Phone'))
     address = models.CharField(max_length=128, blank=True, verbose_name=_("Address"))
     network = models.TextField(blank=True, verbose_name=_('Network'))
-    date_added = models.DateField(auto_now=True, null=True, verbose_name=_('Date added'))
+    date_created = models.DateField(auto_now=True, null=True, verbose_name=_('Date added'))
     operator = models.CharField(max_length=32, blank=True, verbose_name=_('Operator'))
     created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
@@ -40,7 +40,7 @@ class AssetExtend(models.Model):
     key = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('KEY'))
     value = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('VALUE'))
     created_by = models.CharField(max_length=32, blank=True, verbose_name=_("Created by"))
-    date_added = models.DateTimeField(auto_now=True, null=True, blank=True)
+    date_created = models.DateTimeField(auto_now=True, null=True, blank=True)
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
@@ -57,7 +57,7 @@ class AdminUser(models.Model):
     private_key = models.CharField(max_length=4096, null=True, blank=True, verbose_name=_('SSH private key'))
     is_default = models.BooleanField(default=True, verbose_name=_('As default'))
     auto_update = models.BooleanField(default=True, verbose_name=_('Auto update pass/key'))
-    date_added = models.DateTimeField(auto_now=True, null=True, blank=True)
+    date_created = models.DateTimeField(auto_now=True, null=True, blank=True)
     create_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
@@ -86,7 +86,7 @@ class SysUser(models.Model):
     shell = models.CharField(max_length=64,  blank=True, verbose_name=_('Shell'))
     home = models.CharField(max_length=64, blank=True, verbose_name=_('Home'))
     uid = models.IntegerField(blank=True, verbose_name=_('Uid'))
-    date_added = models.DateTimeField(auto_now=True, null=True)
+    date_created = models.DateTimeField(auto_now=True, null=True)
     create_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
     comment = models.CharField(max_length=128, blank=True, verbose_name=_('Comment'))
 
@@ -124,7 +124,7 @@ class Asset(models.Model):
     sn = models.CharField(max_length=128, null=True, blank=True, unique=True, verbose_name=_('Serial number'))
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
-    date_added = models.DateTimeField(auto_now=True, null=True, blank=True, verbose_name=_('Date added'))
+    date_created = models.DateTimeField(auto_now=True, null=True, blank=True, verbose_name=_('Date added'))
     comment = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
@@ -143,7 +143,7 @@ class Label(models.Model):
     value = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('VALUE'))
     asset = models.ForeignKey(Asset, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_('Asset'))
     created_by = models.CharField(max_length=32, blank=True, verbose_name=_("Created by"))
-    date_added = models.DateTimeField(auto_now=True, null=True)
+    date_created = models.DateTimeField(auto_now=True, null=True)
     comment = models.CharField(max_length=128, blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):

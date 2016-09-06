@@ -169,7 +169,7 @@ class UserGroupListView(AdminUserRequiredMixin, ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'user_group_list'
     template_name = 'users/user_group_list.html'
-    ordering = '-date_added'
+    ordering = '-date_created'
 
     def get_queryset(self):
         self.queryset = super(UserGroupListView, self).get_queryset()

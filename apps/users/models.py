@@ -24,7 +24,7 @@ from django.core import signing
 #         verbose_name='permissions',
 #         blank=True,
 #     )
-#     date_added = models.DateTimeField(auto_now_add=True)
+#     date_created = models.DateTimeField(auto_now_add=True)
 #     created_by = models.CharField(max_length=100)
 #     comment = models.CharField(max_length=80, blank=True)
 #
@@ -59,7 +59,7 @@ from django.core import signing
 class UserGroup(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name=_('Name'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
-    date_added = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=100)
 
     def __unicode__(self):
