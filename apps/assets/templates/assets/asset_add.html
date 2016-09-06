@@ -38,12 +38,14 @@
 
                                         {{ form.ip|bootstrap_horizontal }}
 
-                                        <div class="form-group" id="id_port">
-                                            <label class="col-sm-2 control-label">端口</label>
-                                            <div class="col-sm-9">
-                                                <input type="text" placeholder="" name="port" class="form-control">
-                                            </div>
-                                        </div>
+                                        {{ form.port|bootstrap_horizontal }}
+
+{#                                        <div class="form-group" id="id_port">#}
+{#                                            <label class="col-sm-2 control-label">端口</label>#}
+{#                                            <div class="col-sm-9">#}
+{#                                                <input type="text" placeholder="" name="port" class="form-control">#}
+{#                                            </div>#}
+{#                                        </div>#}
 
 {#                                        <div class="form-group" id="id_type">#}
 {#                                            <label class="col-sm-2 control-label">资产类型</label>#}
