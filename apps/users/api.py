@@ -3,11 +3,9 @@
 
 import logging
 
-from rest_framework import generics, mixins, status, permissions
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from rest_framework import generics
 
-from .serializers import UserSerializer, UserGroupSerializer, UserActiveSerializer
+from .serializers import UserSerializer, UserGroupSerializer, UserActiveSerializer, UserAttributeSerializer
 from .models import User, UserGroup
 
 
@@ -52,3 +50,7 @@ class UserGroupDetailDeleteUpdateApi(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupSerializer
 
+
+class UserAttributeApi(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserAttributeSerializer

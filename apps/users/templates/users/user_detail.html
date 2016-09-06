@@ -223,6 +223,20 @@
 {% endblock %}
 {% block custom_foot_js %}
     <script>
+function api_update_attr(url, body, method, success, error) {
+  $.ajax({
+    url: url,
+    type: method || "PATCH",
+    data: body
+  }).done(function(data) {
+    if (typeof success ==== 'function') {
+      return success(data)
+    } else {
+      
+    }
+      
+  })
+}
         function switch_user_status(obj) {
             var status = $(obj).prop('checked');
 
