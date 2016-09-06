@@ -54,7 +54,7 @@ class UserAddTests(TestCase):
             'date_expired': '2086-08-06 19:12:22',
         }
 
-        response = self.client.post(reverse('users:user-add'), data)
+        response = self.client.post(reverse('users:user-create'), data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], reverse('users:user-list'))
 

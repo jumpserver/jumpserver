@@ -14,7 +14,7 @@ class UserLoginForm(forms.Form):
     captcha = CaptchaField()
 
 
-class UserAddForm(ModelForm):
+class UserCreateForm(ModelForm):
     class Meta:
         model = User
         fields = [
@@ -28,7 +28,7 @@ class UserAddForm(ModelForm):
         }
 
         widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Join usergroups')}),
+            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Join user groups')}),
         }
 
 

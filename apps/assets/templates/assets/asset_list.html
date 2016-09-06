@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% block content %}
 
 <div class="wrapper wrapper-content animated fadeInRight">
@@ -23,7 +24,7 @@
                 <div class="ibox-content">
                     <form id="asset_form">
                         <div class="col-sm-1" style="padding-left: 0">
-                            <a href="{% url 'assets:asset-add' %}" class="btn btn-sm btn-primary "> 添加资产 </a>
+                            <a href="{% url 'assets:asset-create' %}" class="btn btn-sm btn-primary "> {% trans 'Create asset' %}</a>
                         </div>
 
                         <div class="col-sm-7" style="padding-left: 0px">

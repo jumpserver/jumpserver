@@ -66,7 +66,7 @@ class UserGroup(models.Model):
         return self.name
 
     class Meta:
-        db_table = 'usergroup'
+        db_table = 'user-group'
 
     @classmethod
     def initial(cls):

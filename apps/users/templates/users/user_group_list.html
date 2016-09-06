@@ -1,14 +1,15 @@
 {% extends '_list_base.html' %}
+{% load i18n %}
 {% load common_tags %}
 {% block content_left_head %}
-     <a href="{% url 'users:usergroup-add' %}" class="btn btn-sm btn-primary "> 添加用户组 </a>
+     <a href="{% url 'users:user-group-create' %}" class="btn btn-sm btn-primary "> 添加用户组 </a>
 {% endblock %}
 
 {% block table_head %}
      <th class="text-center">
          <input type="checkbox" id="check_all" onclick="checkAll('check_all', 'checked')">
      </th>
-     <th class="text-center"><a href="{% url 'users:usergroup-list' %}?sort=name">名称</a></th>
+     <th class="text-center"><a href="{% url 'users:user-group-list' %}?sort=name">名称</a></th>
      <th class="text-center">用户数量</th>
      <th class="text-center">资产数量</th>
      <th class="text-center">描述</th>
@@ -16,22 +17,22 @@
 {% endblock %}
 
 {% block table_body %}
-    {% for usergroup in usergroup_list %}
+    {% for user_group in user_group_list %}
         <tr class="gradeX">
             <td class="text-center">
-                <input type="checkbox" name="checked" value="{{ usergroup.id }}">
+                <input type="checkbox" name="checked" value="{{ user_group.id }}">
             </td>
             <td class="text-center">
-                <a href="{% url 'users:usergroup-detail' pk=usergroup.id %}">
-                    {{ usergroup.name }}
+                <a href="{% url 'users:user-group-detail' pk=user_group.id %}">
+                    {{ user_group.name }}
                 </a>
             </td>
-            <td class="text-center">{{ usergroup.users.all|length }}</td>
+            <td class="text-center">{{ user_group.users.all|length }}</td>
             <td class="text-center">数量</td>
-            <th class="text-center">{{ usergroup.comment|truncatewords:8 }}</th>
+            <th class="text-center">{{ user_group.comment|truncatewords:8 }}</th>
             <td class="text-center">
-                <a href="{% url 'users:usergroup-edit' pk=usergroup.id %}" class="btn btn-xs btn-info">编辑</a>
-                <a href="{% url 'users:usergroup-delete' pk=usergroup.id %}" class="btn btn-xs btn-danger del">删除</a>
+                <a href="{% url 'users:user-group-update' pk=user_group.id %}" class="btn btn-xs btn-info">编辑</a>
+                <a href="{% url 'users:user-group-delete' pk=user_group.id %}" class="btn btn-xs btn-danger del">删除</a>
             </td>
         </tr>
     {% endfor %}

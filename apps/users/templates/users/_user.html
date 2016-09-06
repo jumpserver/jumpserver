@@ -47,11 +47,12 @@
                                 <div class="col-sm-9">
                                     <div class="input-group date">
                                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                        <input id="{{ form.date_expired.id_for_label }}" name="{{ form.date_expired.html_name }}" type="text" class="form-control" value="{{ form.date_expired.value|date:'m/d/Y' }}">
+                                        <input id="{{ form.date_expired.id_for_label }}" name="{{ form.date_expired.html_name }}" type="text" class="form-control" value="{{ form.date_expired.value|date:'Y-m-d' }}">
                                     </div>
                                     <span class="help-block ">{{ form.date_expired.errors }}</span>
                                 </div>
                              </div>
+{#                            {{ form.date_expired|bootstrap_horizontal }}#}
                             <div class="form-group">
                                 <label for="{{ form.enable_otp.id_for_label }}" class="col-sm-2 control-label">{% trans 'Enable OTP' %}</label>
                                 <div class="col-sm-8">
@@ -67,7 +68,7 @@
                             <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-2">
                                     <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
-                                    <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Commit' %}</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
                                 </div>
                             </div>
                         </form>
@@ -84,6 +85,7 @@
             $('.select2').select2();
 
             $('.input-group.date').datepicker({
+                format: "yyyy-mm-dd",
                 todayBtn: "linked",
                 keyboardNavigation: false,
                 forceParse: false,

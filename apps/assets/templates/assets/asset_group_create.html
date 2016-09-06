@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load static %}
 {% load bootstrap %}
 {% block custom_head_css_js %}
@@ -12,7 +13,7 @@
             <div class="col-sm-12">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h5>填写用户组信息</h5>
+                        <h5>{% trans 'Create asset group' %}</h5>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -29,24 +30,25 @@
                         <form method="post" id="userForm" class="form-horizontal" action="" >
                             {% csrf_token %}
                             {{ form.name|bootstrap_horizontal }}
+                            {{ form.assets|bootstrap_horizontal }}
 
-                            <div class="form-group">
-                                <label for="users" class="col-sm-2 control-label">用户</label>
-                                <div class="col-sm-9">
-                                    <select name="users" id="users" data-placeholder="选择用户" class="select2 form-control m-b" multiple  tabindex="2">
-                                        {% for user in users %}
-                                            <option value="{{ user.id }}">{{ user.name }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
+{#                            <div class="form-group">#}
+{#                                <label for="users" class="col-sm-2 control-label">{% trans 'Asset' %}</label>#}
+{#                                <div class="col-sm-9">#}
+{#                                    <select name="assets" id="assets" data-placeholder="{% trans 'Select asset' %}" class="select2 form-control m-b" multiple  tabindex="2">#}
+{#                                        {% for asset in assets %}#}
+{#                                            <option value="{{ asset.id }}">{{ asset.ip }}:{{ asset.port }}</option>#}
+{#                                        {% endfor %}#}
+{#                                    </select>#}
+{#                                </div>#}
+{#                            </div>#}
 
                             {{ form.comment|bootstrap_horizontal }}
 
                             <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-2">
-                                    <button class="btn btn-white" type="reset">取消</button>
-                                    <button id="submit_button" class="btn btn-primary" type="submit">确认保存</button>
+                                    <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
                                 </div>
                             </div>
                         </form>

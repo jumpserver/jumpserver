@@ -2,35 +2,35 @@
 {% load i18n %}
 {% load common_tags %}
 {% block content_left_head %}
-    <a href="{% url 'assets:assetgroup-add' %}" class="btn btn-sm btn-primary "> {% trans "Create asset group" %} </a>
+    <a href="{% url 'assets:asset-group-create' %}" class="btn btn-sm btn-primary "> {% trans "Create asset group" %} </a>
 {% endblock %}
 
 {% block table_head %}
     <th class="text-center">
         <input type="checkbox" id="check_all" onclick="checkAll('check_all', 'checked')">
     </th>
-    <th class="text-center"><a href="{% url 'assets:assetgroup-list' %}?sort=name">{% trans 'Name' %}</a></th>
+    <th class="text-center"><a href="{% url 'assets:asset-group-list' %}?sort=name">{% trans 'Name' %}</a></th>
     <th class="text-center">{% trans 'Asset num' %}</th>
-    <th class="text-center"><a href="{% url 'assets:assetgroup-list' %}?sort=date_expired">{% trans 'Comment' %}</a></th>
+    <th class="text-center"><a href="{% url 'assets:asset-group-list' %}?sort=date_expired">{% trans 'Comment' %}</a></th>
     <th class="text-center"></th>
 {% endblock %}
 
 {% block table_body %}
-     {% for assetgroup in assetgroups %}
+     {% for asset_group in asset_group_list %}
          <tr class="gradeX">
              <td class="text-center">
-                 <input type="checkbox" name="checked" value="{{ user.id }}">
+                 <input type="checkbox" name="checked" value="{{ asset_group.id }}">
              </td>
              <td class="text-center">
-                 <a href="{% url 'assets:assetgroup-detail' pk=user.id %}">
-                     {{ assetgroup.name }}
+                 <a href="{% url 'assets:asset-group-detail' pk=asset_group.id %}">
+                     {{ asset_group.name }}
                  </a>
              </td>
-             <td class="text-center">{{ assetgroup.comment }}</td>
-             <td class="text-center">{{ assetgroup.comment }}</td>
+             <td class="text-center">{{ asset_group.assets.count }}</td>
+             <td class="text-center">{{ asset_group.comment }}</td>
              <td class="text-center">
-                 <a href="{% url 'users:user-edit' pk=user.id %}" class="btn btn-xs btn-info">{% trans 'Edit' %}</a>
-                 <a href="{% url 'users:user-delete' pk=user.id %}" class="btn btn-xs btn-danger del {% if user.id == request.user.id or user.username == 'admin' %} disabled {% endif %}">{% trans 'Delete' %}</a>
+                 <a href="{% url 'assets:asset-group-update' pk=asset_group.id %}" class="btn btn-xs btn-info">{% trans 'Edit' %}</a>
+                 <a href="{% url 'assets:asset-group-delete' pk=asset_group.id %}" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
              </td>
          </tr>
      {% endfor %}
@@ -48,12 +48,10 @@
 
             <div class="input-group-btn pull-left" style="padding-left: 5px;">
                 <button id='search_btn' type="submit" style="height: 32px;"  class="btn btn-sm btn-primary">
-                 {% trans 'Commit' %}
+                 {% trans 'Submit' %}
                 </button>
             </div>
 
         </div>
    </form>
 {% endblock %}
-
-

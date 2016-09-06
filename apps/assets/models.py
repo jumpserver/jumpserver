@@ -14,7 +14,7 @@ class AssetGroup(models.Model):
         return self.name
 
     class Meta:
-        db_table = 'assetgroup'
+        db_table = 'asset_group'
 
 
 class IDC(models.Model):
@@ -128,10 +128,14 @@ class Asset(models.Model):
     comment = models.CharField(max_length=128, blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
-        return self.ip
+        return '%(ip)s:%(port)d' % {'ip': self.ip, 'port': self.port}
+
+    def initial(self):
+        pass
 
     class Meta:
         db_table = 'asset'
+        index_together = ('ip', 'port')
 
 
 class Label(models.Model):

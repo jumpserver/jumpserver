@@ -3,7 +3,7 @@
 ## 语言框架
 1. Python 2.7 由于ansible目前不支持python3
 2. Django 1.10 (最新版本)
-3. Terminal Websocket使用go实现
+3. Terminal Websocket使用go实现 (未来)
 
 
 ## Django规范
@@ -32,7 +32,8 @@ Python方面大致的风格，我们采用pocoo的[Style Guidance](http://www.po
 
 #### 最大行长度
 
-按PEP8规范，Python一般限制最大79个字符, 如果有必要最多84个字符
+按PEP8规范，Python一般限制最大79个字符, 但是Django的命名,url等通常比较长,
+而且21世纪都是宽屏了,所以我们限制最大120字符
 
 **补充说明：HTML代码不受此规范约束。**
 
