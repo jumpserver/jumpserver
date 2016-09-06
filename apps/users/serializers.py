@@ -17,13 +17,6 @@ class UserSerializer(serializers.ModelSerializer):
         ]
 
 
-class UserActiveSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = ['is_active']
-
-
 class UserGroupSerializer(serializers.ModelSerializer):
     users = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='users:user-detail-api')
 

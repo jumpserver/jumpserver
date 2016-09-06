@@ -38,7 +38,7 @@
                         <div class="col-sm-7" style="padding-left: 0px;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span class="label"><b>{{ user.name }}</b></span>
+                                    <span class="label"><b>{{ user_object.name }}</b></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -62,56 +62,56 @@
                                         <tbody>
                                         <tr class="no-borders-tr">
                                             <td colspan="2">
-                                                <img src="{{ user | user_avatar_url }}" class="img-circle" width="64" height="64">
+                                                <img src="{{ user_object | user_avatar_url }}" class="img-circle" width="64" height="64">
                                             </td>
                                         </tr>
                                         <tr>
                                             <td width="20%">{% trans 'Name' %}:</td>
-                                            <td><b>{{ user.name }}</b></td>
+                                            <td><b>{{ user_object.name }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Username' %}:</td>
-                                            <td><b>{{ user.username }}</b></td>
+                                            <td><b>{{ user_object.username }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Email' %}:</td>
-                                            <td><b>{{ user.email }}</b></td>
+                                            <td><b>{{ user_object.email }}</b></td>
                                         </tr>
-                                        {% if user.phone %}
+                                        {% if user_object.phone %}
                                             <tr>
                                                 <td>{% trans 'Phone' %}:</td>
-                                                <td><b>{{ user.phone }}</b></td>
+                                                <td><b>{{ user_object.phone }}</b></td>
                                             </tr>
                                         {% endif %}
-                                        {% if user.wechat %}
+                                        {% if user_object.wechat %}
                                             <tr>
                                                 <td>{% trans 'Wechat' %}:</td>
-                                                <td><b>{{ user.wechat }}</b></td>
+                                                <td><b>{{ user_object.wechat }}</b></td>
                                             </tr>
                                         {% endif %}
                                         <tr>
                                             <td>{% trans 'Role' %}:</td>
-                                            <td><b>{{ user.get_role_display }}</b></td>
+                                            <td><b>{{ user_object.get_role_display }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Date expired' %}:</td>
-                                            <td><b>{{ user.date_expired|date:"Y-m-j H:i:s" }}</b></td>
+                                            <td><b>{{ user_object.date_expired|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Created by' %}:</td>
-                                            <td><b>{{ user.created_by }}</b></td>
+                                            <td><b>{{ user_object.created_by }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Date joined' %}:</td>
-                                            <td><b>{{ user.date_joined|date:"Y-m-j H:i:s" }}</b></td>
+                                            <td><b>{{ user_object.date_joined|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Last login' %}:</td>
-                                            <td><b>{{ user.last_login|date:"Y-m-j H:i:s" }}</b></td>
+                                            <td><b>{{ user_object.last_login|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Comment' %}:</td>
-                                            <td><b>{{ user.comment }}</b></td>
+                                            <td><b>{{ user_object.comment }}</b></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -131,7 +131,7 @@
                                             <td><span style="float: right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
-                                                        <input type="checkbox" {% if user.is_active %} checked {% endif %}  class="onoffswitch-checkbox" id="is_active" onchange="switch_user_status(this)">
+                                                        <input type="checkbox" {% if user_object.is_active %} checked {% endif %}  class="onoffswitch-checkbox" id="is_active">
                                                         <label class="onoffswitch-label" for="is_active">
                                                             <span class="onoffswitch-inner"></span>
                                                             <span class="onoffswitch-switch"></span>
@@ -145,9 +145,9 @@
                                             <td><span style="float: right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
-                                                        <input type="checkbox" class="onoffswitch-checkbox"
-                                                               id="example2">
-                                                        <label class="onoffswitch-label" for="example2">
+                                                        <input type="checkbox" class="onoffswitch-checkbox" {% if user_object.enable_otp %} checked {% endif %}
+                                                               id="enable_otp">
+                                                        <label class="onoffswitch-label" for="enable_otp">
                                                             <span class="onoffswitch-inner"></span>
                                                             <span class="onoffswitch-switch"></span>
                                                         </label>
@@ -200,7 +200,7 @@
                                             </tr>
                                         </form>
 
-                                        {% for group in user.groups.all %}
+                                        {% for group in user_object.groups.all %}
                                         <tr>
                                             <td ><b>{{ group.name }}</b></td>
                                             <td>
@@ -222,40 +222,26 @@
 
 {% endblock %}
 {% block custom_foot_js %}
-    <script>
-function api_update_attr(url, body, method, success, error) {
-  $.ajax({
-    url: url,
-    type: method || "PATCH",
-    data: body
-  }).done(function(data) {
-    if (typeof success ==== 'function') {
-      return success(data)
-    } else {
-      
-    }
-      
-  })
-}
-        function switch_user_status(obj) {
-            var status = $(obj).prop('checked');
-
-            $.ajax({
-                url: "{% url 'users:user-active-api' pk=user.id %}",
-                type: "PUT",
-                data: {
-                    'is_active': status
-                },
-                success: function (data, status) {
-                    console.log(data)
-                },
-                error: function () {
-                    console.log('error')
-                }
-            })
-        }
-        $(document).ready(function () {
-            $('.select2').select2();
-        })
-    </script>
+<script>
+$(document).ready(function () {
+  $('.select2').select2();
+});
+$(document).on('click', '#is_active', function(){
+  var the_url = "{% url 'users:user-patch-api' pk=user_object.id %}";
+  var checked = !$(this).prop('checked');
+  var body = {'is_active': checked };
+  var success = function(data) {
+    toastr.success('{% trans "Update success!" %}')
+  }
+  APIUpdateAttr(the_url, body, success);
+}).on('click', '#enable_otp', function(){
+  var the_url = "{% url 'users:user-patch-api' pk=user_object.id %}";
+  var checked = !$(this).prop('checked');
+  var body = {'enable_otp': checked };
+  var success = function(data) {
+    toastr.success('{% trans "Update success!" %}')
+  }
+  APIUpdateAttr(the_url, body, success);
+});
+</script>
 {% endblock %}

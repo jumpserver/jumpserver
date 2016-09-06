@@ -152,3 +152,24 @@ function getIDall() {
     });
     return check_array.join(",");
 }
+
+function APIUpdateAttr(url, body, success, error, method) {
+  $.ajax({
+    url: url,
+    type: method || "PATCH",
+    data: body
+  }).done(function(data, textStatue, jqXHR) {
+    if (typeof success === 'function') {
+      return success(data)
+    } else {
+      toastr.success('Update Success!')
+    }
+  }).fail(function(jqXHR, textStatue, errorThrown) {
+    if (typeof error === 'function') {
+      return error(errorThrown)
+    } else {
+      toastr.error('Error occurred while updating.')
+    }
+  })
+  return true;
+}
