@@ -1,20 +1,23 @@
 # ~*~ coding: utf-8 ~*~
 
-from django.forms import ModelForm
 from django import forms
-from captcha.fields import CaptchaField
+from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import gettext_lazy as _
+
+from captcha.fields import CaptchaField
 
 from .models import User, UserGroup
 
 
-class UserLoginForm(forms.Form):
+class UserLoginForm(AuthenticationForm):
     username = forms.CharField(label=_('Username'), max_length=100)
-    password = forms.CharField(label=_('Password'), widget=forms.PasswordInput, max_length=100)
+    password = forms.CharField(
+        label=_('Password'), widget=forms.PasswordInput, max_length=100,
+        strip=False)
     captcha = CaptchaField()
 
 
-class UserCreateForm(ModelForm):
+class UserCreateForm(forms.ModelForm):
     class Meta:
         model = User
         fields = [
@@ -32,7 +35,8 @@ class UserCreateForm(ModelForm):
         }
 
 
-class UserUpdateForm(ModelForm):
+class UserUpdateForm(forms.ModelForm):
+
     class Meta:
         model = User
         fields = [
@@ -47,11 +51,12 @@ class UserUpdateForm(ModelForm):
         }
 
         widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Join usergroups')}),
+            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Join user groups')}),
         }
 
 
-class UserGroupForm(ModelForm):
+class UserGroupForm(forms.ModelForm):
+
     class Meta:
         model = UserGroup
 

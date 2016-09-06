@@ -45,10 +45,9 @@
                         {% if form.errors %}
                             {% if 'captcha' in form.errors %}
                                 <p class="red-fonts">{% trans 'Captcha invalid' %}</p>
+                            {% else %}
+                                <p class="red-fonts">{{ form.non_field_errors.as_text }}</p>
                             {% endif %}
-                        {% endif %}
-                        {% if errors %}
-                            <p class="red-fonts">{{ errors }}</p>
                         {% endif %}
                         <div class="form-group">
                             <input type="text" class="form-control" name="{{ form.username.html_name }}" placeholder="{% trans 'Username' %}" required="">
@@ -61,8 +60,8 @@
                         </div>
                         <button type="submit" class="btn btn-primary block full-width m-b">{% trans 'Login' %}</button>
 
-                        <a href="{% url 'users:forget-password' %}">
-                            <small>Forgot password?</small>
+                        <a href="{% url 'users:forgot-password' %}">
+                            <small>{% trans 'Forgot password' %}?</small>
                         </a>
 
                         <p class="text-muted text-center">
@@ -84,7 +83,4 @@
         </div>
     </div>
 </body>
-
 </html>
-
-

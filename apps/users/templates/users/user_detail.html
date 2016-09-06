@@ -178,7 +178,7 @@
 
                             <div class="panel panel-info">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Usergroup' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'User group' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table">
@@ -186,7 +186,7 @@
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Select usergroups' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Join user groups' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for group in groups %}
                                                         <option value="{{ group.id }}">{{ group.name }}</option>
                                                         {% endfor %}
@@ -195,7 +195,7 @@
                                             </tr>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-small">{% trans 'Add' %}</button>
+                                                    <button type="button" class="btn btn-info btn-small">{% trans 'Join' %}</button>
                                                 </td>
                                             </tr>
                                         </form>

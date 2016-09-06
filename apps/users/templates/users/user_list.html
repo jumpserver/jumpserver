@@ -12,7 +12,7 @@
     <th class="text-center"><a href="{% url 'users:user-list' %}?sort=name">{% trans 'Name' %}</a></th>
     <th class="text-center"><a href="{% url 'users:user-list' %}?sort=username">{% trans 'Username' %}</a></th>
     <th class="text-center">{% trans 'Role' %}</th>
-    <th class="text-center">{% trans 'Usergroup' %}</th>
+    <th class="text-center">{% trans 'User group' %}</th>
     <th class="text-center">{% trans 'Asset num' %}</th>
     <th class="text-center"><a href="{% url 'users:user-list' %}?sort=date_expired">{% trans 'Active' %}</a></th>
     <th class="text-center"></th>
@@ -34,14 +34,14 @@
              <td class="text-center" title="{% for user_group in user.group.all %} {{ user_group.name }} {% endfor %}"> {{ user.groups.all|join_queryset_attr:"name" }} </td>
              <th class="text-center">{{ user.name }}</th>
              <td class="text-center">
-                 {% if user.is_expired %}
+                 {% if user.is_expired and user.is_active %}
                      <i class="fa fa-times text-danger"></i>
                  {% else %}
                      <i class="fa fa-check text-navy"></i>
                  {% endif %}
              </td>
              <td class="text-center">
-                 <a href="{% url 'users:user-update' pk=user.id %}" class="btn btn-xs btn-info">{% trans 'Edit' %}</a>
+                 <a href="{% url 'users:user-update' pk=user.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
                  <a href="{% url 'users:user-delete' pk=user.id %}" class="btn btn-xs btn-danger del {% if user.id == request.user.id or user.username == 'admin' %} disabled {% endif %}">{% trans 'Delete' %}</a>
              </td>
          </tr>

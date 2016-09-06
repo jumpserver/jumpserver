@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-05 20:18+0800\n"
+"POT-Creation-Date: 2016-09-06 15:08+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -17,12 +17,20 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: assets/forms.py:20
-msgid "Join assetgroups"
-msgstr "添加到用户组"
+#: assets/forms.py:19
+msgid "Select asset groups"
+msgstr "添加到资产组"
+
+#: assets/forms.py:25 assets/models.py:144 templates/_nav.html:21
+msgid "Asset"
+msgstr "资产"
+
+#: assets/forms.py:28
+msgid "Select assets"
+msgstr "选择资产"
 
 #: assets/models.py:9 assets/models.py:21 assets/models.py:54
-#: assets/models.py:76 assets/templates/assets/assetgroup_list.html:12
+#: assets/models.py:76 assets/templates/assets/asset_group_list.html:12
 #: users/models.py:60 users/models.py:107
 #: users/templates/users/user_detail.html:69
 #: users/templates/users/user_list.html:12
@@ -38,7 +46,7 @@ msgstr "创建者"
 
 #: assets/models.py:11 assets/models.py:30 assets/models.py:44
 #: assets/models.py:62 assets/models.py:91 assets/models.py:128
-#: assets/models.py:147 assets/templates/assets/assetgroup_list.html:14
+#: assets/models.py:147 assets/templates/assets/asset_group_list.html:14
 #: users/models.py:61 users/models.py:118
 #: users/templates/users/user_detail.html:113
 msgid "Comment"
@@ -81,20 +89,21 @@ msgstr "KEY"
 msgid "VALUE"
 msgstr "VALUE"
 
-#: assets/models.py:55 assets/models.py:77 users/forms.py:12
-#: users/models.py:106 users/templates/users/login.html:54
+#: assets/models.py:55 assets/models.py:77 users/forms.py:13
+#: users/models.py:106 users/templates/users/login.html:53
 #: users/templates/users/user_detail.html:73
-#: users/templates/users/user_edit.html:5
 #: users/templates/users/user_list.html:13
+#: users/templates/users/user_update.html:6
 msgid "Username"
 msgstr "用户名"
 
-#: assets/models.py:56 assets/models.py:78 users/forms.py:13
-#: users/templates/users/login.html:57
+#: assets/models.py:56 assets/models.py:78 users/forms.py:15
+#: users/templates/users/login.html:56
 #: users/templates/users/reset_password.html:52
-#: users/templates/users/user_add.html:8 users/templates/users/user_add.html:10
-#: users/templates/users/user_edit.html:12
-#: users/templates/users/user_edit.html:14
+#: users/templates/users/user_create.html:8
+#: users/templates/users/user_create.html:10
+#: users/templates/users/user_update.html:13
+#: users/templates/users/user_update.html:15
 msgid "Password"
 msgstr "密码"
 
@@ -130,7 +139,7 @@ msgstr "Sudo"
 msgid "Shell"
 msgstr "Shell"
 
-#: assets/models.py:87 templates/_header_bar.html:35 templates/_nav.html:4
+#: assets/models.py:87 templates/_header_bar.html:41 templates/_nav.html:4
 msgid "Home"
 msgstr "仪表盘"
 
@@ -169,6 +178,10 @@ msgstr "管理用户"
 #: assets/models.py:108
 msgid "Admin password"
 msgstr "管理员密码"
+
+#: assets/models.py:110
+msgid "System User"
+msgstr "系统用户"
 
 #: assets/models.py:111 templates/_nav.html:23
 msgid "IDC"
@@ -230,75 +243,72 @@ msgstr "序列号"
 msgid "Is active"
 msgstr "是否激活"
 
-#: assets/models.py:144 assets/templates/assets/assetgroup_add.html:35
-#: templates/_nav.html:21
-msgid "Asset"
-msgstr "资产"
-
-#: assets/templates/assets/assetgroup_add.html:16
-#: assets/templates/assets/assetgroup_list.html:5 assets/views.py:60
+#: assets/templates/assets/asset_group_create.html:16
+#: assets/templates/assets/asset_group_list.html:5 assets/views.py:60
+#: assets/views.py:98
 msgid "Create asset group"
 msgstr "创建资产组"
 
-#: assets/templates/assets/assetgroup_add.html:37
-msgid "Select asset"
-msgstr "选择资产"
-
-#: assets/templates/assets/assetgroup_add.html:49
+#: assets/templates/assets/asset_group_create.html:50
 #: users/templates/users/_user.html:70
 #: users/templates/users/user_detail.html:162
 #: users/templates/users/user_detail.html:170
 msgid "Reset"
 msgstr "重置"
 
-#: assets/templates/assets/assetgroup_add.html:50
-#: assets/templates/assets/assetgroup_list.html:51
+#: assets/templates/assets/asset_group_create.html:51
+#: assets/templates/assets/asset_group_list.html:51
 #: users/templates/users/_user.html:71
-#: users/templates/users/forget_password.html:44
+#: users/templates/users/forgot_password.html:44
 #: users/templates/users/user_list.html:63
 msgid "Submit"
 msgstr "提交"
 
-#: assets/templates/assets/assetgroup_list.html:13
+#: assets/templates/assets/asset_group_list.html:13
 #: users/templates/users/user_list.html:16
 msgid "Asset num"
 msgstr "资产数量"
 
-#: assets/templates/assets/assetgroup_list.html:32
+#: assets/templates/assets/asset_group_list.html:32
 #: users/templates/users/user_list.html:44
-msgid "Edit"
-msgstr "编辑"
+msgid "Update"
+msgstr "更新"
 
-#: assets/templates/assets/assetgroup_list.html:33
+#: assets/templates/assets/asset_group_list.html:33
 #: users/templates/users/user_list.html:45
 msgid "Delete"
 msgstr "删除"
 
-#: assets/templates/assets/assetgroup_list.html:43
+#: assets/templates/assets/asset_group_list.html:43
 #: users/templates/users/user_list.html:55
 msgid "Delete selected"
 msgstr "批量删除"
 
-#: assets/templates/assets/assetgroup_list.html:44
+#: assets/templates/assets/asset_group_list.html:44
 #: users/templates/users/user_list.html:56
 msgid "Update selected"
 msgstr "批量更新"
 
-#: assets/templates/assets/assetgroup_list.html:45
+#: assets/templates/assets/asset_group_list.html:45
 #: users/templates/users/user_list.html:57
 msgid "Deactive selected"
 msgstr "禁用所选"
 
-#: assets/templates/assets/assetgroup_list.html:46
+#: assets/templates/assets/asset_group_list.html:46
 #: users/templates/users/user_list.html:58
 msgid "Export selected"
 msgstr "批量导出"
 
-#: assets/views.py:59 assets/views.py:74 templates/_nav.html:18
+#: assets/templates/assets/asset_list.html:27
+msgid "Create asset"
+msgstr "创建资产"
+
+#: assets/views.py:59 assets/views.py:78 assets/views.py:97
+#: templates/_nav.html:18
 msgid "Assets"
 msgstr "资产管理"
 
-#: assets/views.py:75
+#: assets/views.py:79
 msgid "Asset group list"
 msgstr "资产组列表"
 
@@ -314,16 +324,27 @@ msgstr "欢迎使用Jumpserver开源跳板机系统"
 msgid "Help"
 msgstr "帮助"
 
-#: templates/_nav.html:9 users/views.py:100 users/views.py:113
-#: users/views.py:153 users/views.py:170 users/views.py:195 users/views.py:208
+#: templates/_header_bar.html:24 templates/_user_profile.html:21
+msgid "Logout"
+msgstr "注销登录"
+
+#: templates/_header_bar.html:28 users/templates/users/login.html:42
+#: users/templates/users/login.html:61
+msgid "Login"
+msgstr "登录"
+
+#: templates/_nav.html:9 users/views.py:50 users/views.py:63 users/views.py:103
+#: users/views.py:120 users/views.py:145 users/views.py:158
 msgid "Users"
 msgstr "用户管理"
 
-#: templates/_nav.html:12 users/models.py:103
+#: templates/_nav.html:12 templates/_user_profile.html:14 users/models.py:103
 msgid "User"
 msgstr "用户"
 
-#: templates/_nav.html:13
+#: templates/_nav.html:13 users/models.py:109
+#: users/templates/users/user_detail.html:181
+#: users/templates/users/user_list.html:15
 msgid "User group"
 msgstr "用户组"
 
@@ -379,10 +400,6 @@ msgstr "访问官网"
 msgid "Profile"
 msgstr "个人信息"
 
-#: templates/_user_profile.html:21
-msgid "Logout"
-msgstr "注销登录"
-
 #: templates/captcha/image.html:3
 msgid "Play CAPTCHA as audio file"
 msgstr ""
@@ -391,7 +408,8 @@ msgstr ""
 msgid "Captcha"
 msgstr "验证码"
 
-#: users/forms.py:31 users/forms.py:50
+#: users/forms.py:34 users/forms.py:54
+#: users/templates/users/user_detail.html:189
 msgid "Join user groups"
 msgstr "添加到用户组"
 
@@ -402,11 +420,6 @@ msgstr "管理员"
 #: users/models.py:108 users/templates/users/user_detail.html:77
 msgid "Email"
 msgstr "邮件"
-
-#: users/models.py:109 users/templates/users/user_detail.html:181
-#: users/templates/users/user_list.html:15
-msgid "Usergroup"
-msgstr "用户组"
 
 #: users/models.py:110 users/templates/users/user_detail.html:93
 #: users/templates/users/user_list.html:14
@@ -446,7 +459,7 @@ msgid "System"
 msgstr "系统"
 
 #: users/templates/users/_user.html:17 users/templates/users/user_list.html:5
-#: users/views.py:113
+#: users/views.py:63
 msgid "Create user"
 msgstr "创建用户"
 
@@ -458,17 +471,14 @@ msgstr "账户"
 msgid "Security and Role"
 msgstr "角色安全"
 
-#: users/templates/users/forget_password.html:26
-msgid "Forget password"
+#: users/templates/users/forgot_password.html:26
+#: users/templates/users/login.html:64
+msgid "Forgot password"
 msgstr "忘记密码"
 
-#: users/templates/users/forget_password.html:33
+#: users/templates/users/forgot_password.html:33
 msgid "Input your email, that will send a mail to your"
 msgstr "输入您的邮箱, 将会发一封重置短信邮件到您的邮箱中"
-
-#: users/templates/users/login.html:42 users/templates/users/login.html:62
-msgid "Login"
-msgstr "登录"
 
 #: users/templates/users/login.html:47
 msgid "Captcha invalid"
@@ -487,7 +497,7 @@ msgstr "再次输入密码"
 msgid "Setting"
 msgstr "设置"
 
-#: users/templates/users/user_add.html:12
+#: users/templates/users/user_create.html:12
 msgid "Reset link will be generated and sent to the user. "
 msgstr "生成重置密码连接，通过邮件发送给用户"
 
@@ -495,7 +505,7 @@ msgstr "生成重置密码连接，通过邮件发送给用户"
 msgid "Confirm delete"
 msgstr "确认删除"
 
-#: users/templates/users/user_detail.html:18 users/views.py:170
+#: users/templates/users/user_detail.html:18 users/views.py:120
 msgid "User detail"
 msgstr "用户详情"
 
@@ -523,17 +533,30 @@ msgstr "快速修改"
 msgid "Reset ssh key"
 msgstr "重置密钥"
 
-#: users/templates/users/user_detail.html:189
-msgid "Select usergroups"
-msgstr "选择用户组"
-
 #: users/templates/users/user_detail.html:198
-msgid "Add"
-msgstr "添加"
+msgid "Join"
+msgstr "加入"
+
+#: users/templates/users/user_group_create.html:16 users/views.py:158
+msgid "Create user group"
+msgstr "创建用户组"
 
 #: users/templates/users/user_list.html:17
+#, fuzzy
 msgid "Active"
 msgstr "激活"
+
+#: users/templates/users/user_update.html:3 users/views.py:103
+msgid "Update user"
+msgstr "编辑用户"
+
+#: users/urls.py:23
+msgid "Logout success"
+msgstr "退出登录成功"
+
+#: users/urls.py:24
+msgid "Logout success, return login page"
+msgstr "退出登录成功，返回到登录页面"
 
 #: users/utils.py:47
 msgid "Begin to generate ssh private key ..."
@@ -636,69 +659,47 @@ msgstr ""
 "    </br>\n"
 "    "
 
-#: users/views.py:53
-msgid "Username or password invalid"
-msgstr "用户名或密码错误"
-
-#: users/views.py:70
-msgid "Logout success"
-msgstr "退出登录成功"
-
-#: users/views.py:71
-msgid "Logout success, return login page"
-msgstr "退出登录成功，返回到登录页面"
-
-#: users/views.py:100
+#: users/views.py:50
 msgid "User list"
 msgstr "用户列表"
 
-#: users/views.py:109
+#: users/views.py:59
 #, python-format
-msgid "Create user<a href=\"%s\">%s</a> success."
-msgstr "创建用户<a href=\"%s\">%s</a> 成功"
+msgid "Create user <a href=\"%s\">%s</a> success."
+msgstr "创建用户 <a href=\"%s\">%s</a> 成功"
 
-#: users/views.py:153
-msgid "Edit user"
-msgstr "编辑用户"
-
-#: users/views.py:195
-msgid "Usergroup list"
+#: users/views.py:145
+msgid "User group list"
 msgstr "用户组列表"
 
-#: users/views.py:208
-msgid "Create usergroup"
-msgstr "创建用户组"
-
-#: users/views.py:240
+#: users/views.py:190
 msgid "Email address invalid, input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views.py:251
+#: users/views.py:201
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views.py:252
+#: users/views.py:202
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views.py:264
+#: users/views.py:214
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views.py:265
+#: users/views.py:215
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views.py:281 users/views.py:294
+#: users/views.py:231 users/views.py:244
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views.py:290
+#: users/views.py:240
 msgid "Password not same"
 msgstr "密码不一致"
 
-#, fuzzy
-#~| msgid "Asset groups"
-#~ msgid "Assetgroup"
-#~ msgstr "用户组"
+#~ msgid "Username or password invalid"
+#~ msgstr "用户名或密码错误"

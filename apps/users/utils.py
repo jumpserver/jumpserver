@@ -86,7 +86,7 @@ def user_add_success_next(user):
         'name': user.name,
         'rest_password_url': reverse('users:reset-password', external=True),
         'rest_password_token': user.generate_reset_token(),
-        'forget_password_url': reverse('users:forget-password', external=True),
+        'forget_password_url': reverse('users:forgot-password', external=True),
         'email': user.email,
         'login_url': reverse('users:login', external=True),
     }
@@ -117,7 +117,7 @@ def send_reset_password_mail(user):
         'name': user.name,
         'rest_password_url': reverse('users:reset-password', external=True),
         'rest_password_token': user.generate_reset_token(),
-        'forget_password_url': reverse('users:forget-password', external=True),
+        'forget_password_url': reverse('users:forgot-password', external=True),
         'email': user.email,
         'login_url': reverse('users:login', external=True),
     }

@@ -16,7 +16,7 @@ class AssetForm(forms.ModelForm):
         ]
 
         widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Join assetgroups')}),
+            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Select asset groups')}),
         }
 
 

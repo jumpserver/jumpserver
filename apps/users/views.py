@@ -4,76 +4,26 @@ from __future__ import unicode_literals
 
 import logging
 
-from django.shortcuts import get_object_or_404, reverse, render, Http404, redirect
+from django.conf import settings
+from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import Q
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404, reverse
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
-from django.db.models import Q
-from django.views.generic.base import View, TemplateView
+from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView, ProcessFormView, FormView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.detail import DetailView
-from django.contrib.messages.views import SuccessMessageMixin
-from django.conf import settings
-from django.http import HttpResponseRedirect
-from django.contrib.auth import views as auth_view, authenticate, login, logout
 
 from common.utils import get_object_or_none
 
 from .models import User, UserGroup
 from .forms import UserCreateForm, UserUpdateForm, UserGroupForm, UserLoginForm
-from .utils import AdminUserRequiredMixin, ssh_key_gen, user_add_success_next, send_reset_password_mail
+from .utils import AdminUserRequiredMixin, user_add_success_next, send_reset_password_mail
 
 
 logger = logging.getLogger('jumpserver.users.views')
-
-
-class UserLoginView(FormView):
-    template_name = 'users/login.html'
-    form_class = UserLoginForm
-    redirect_field_name = 'next'
-
-    def get(self, request, *args, **kwargs):
-        if self.request.user.is_staff:
-            return redirect(request.POST.get(self.redirect_field_name, reverse('index')))
-        # Todo: Django have bug, lose context issue: https://github.com/django/django/pull/7202
-        # so we jump it and use origin method render_to_response
-        # return super(UserLoginView, self).get(request, *args, **kwargs)
-        return self.render_to_response(self.get_context_data(**kwargs))
-
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if not form.is_valid():
-            return self.form_invalid(form)
-
-        username = form['username'].value()
-        password = form['password'].value()
-
-        user = authenticate(username=username, password=password)
-        if user is None:
-            kwargs.update({'errors': _('Username or password invalid')})
-            return self.get(request, *args, **kwargs)
-
-        login(request, user)
-        return redirect(request.GET.get(self.redirect_field_name, reverse('index')))
-
-
-class UserLogoutView(TemplateView):
-    template_name = 'common/flash_message_standalone.html'
-
-    def get(self, request, *args, **kwargs):
-        logout(request)
-
-        return super(UserLogoutView, self).get(request)
-
-    def get_context_data(self, **kwargs):
-        context = {
-            'title': _('Logout success'),
-            'messages': _('Logout success, return login page'),
-            'redirect_url': reverse('users:login'),
-            'auto_redirect': True,
-        }
-        kwargs.update(context)
-        return super(UserLogoutView, self).get_context_data(**kwargs)
 
 
 class UserListView(AdminUserRequiredMixin, ListView):
@@ -106,7 +56,7 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     form_class = UserCreateForm
     template_name = 'users/user_create.html'
     success_url = reverse_lazy('users:user-list')
-    success_message = _('Create user<a href="%s">%s</a> success.')
+    success_message = _('Create user <a href="%s">%s</a> success.')
 
     def get_context_data(self, **kwargs):
         context = super(UserCreateView, self).get_context_data(**kwargs)
@@ -150,7 +100,7 @@ class UserUpdateView(AdminUserRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(UserUpdateView, self).get_context_data(**kwargs)
-        context.update({'app': _('Users'), 'action': _('Edit user')})
+        context.update({'app': _('Users'), 'action': _('Update user')})
         return context
 
 
@@ -192,7 +142,7 @@ class UserGroupListView(AdminUserRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(UserGroupListView, self).get_context_data(**kwargs)
-        context.update({'app': _('Users'), 'action': _('Usergroup list'), 'keyword': self.keyword})
+        context.update({'app': _('Users'), 'action': _('User group list'), 'keyword': self.keyword})
         return context
 
 
@@ -230,8 +180,8 @@ class UserGroupDeleteView(DeleteView):
     pass
 
 
-class UserForgetPasswordView(TemplateView):
-    template_name = 'users/forget_password.html'
+class UserForgotPasswordView(TemplateView):
+    template_name = 'users/forgot_password.html'
 
     def post(self, request, *args, **kwargs):
         email = request.POST.get('email')
@@ -240,10 +190,10 @@ class UserForgetPasswordView(TemplateView):
             return self.get(request, errors=_('Email address invalid, input again'))
         else:
             send_reset_password_mail(user)
-            return HttpResponseRedirect(reverse('users:forget-password-sendmail-success'))
+            return HttpResponseRedirect(reverse('users:forgot-password-sendmail-success'))
 
 
-class UserForgetPasswordSendmailSuccessView(TemplateView):
+class UserForgotPasswordSendmailSuccessView(TemplateView):
     template_name = 'common/flash_message_standalone.html'
 
     def get_context_data(self, **kwargs):
@@ -253,7 +203,7 @@ class UserForgetPasswordSendmailSuccessView(TemplateView):
             'redirect_url': reverse('users:login'),
         }
         kwargs.update(context)
-        return super(UserForgetPasswordSendmailSuccessView, self).get_context_data(**kwargs)
+        return super(UserForgotPasswordSendmailSuccessView, self).get_context_data(**kwargs)
 
 
 class UserResetPasswordSuccessView(TemplateView):

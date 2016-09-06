@@ -8,7 +8,7 @@
         <a data-toggle="dropdown" class="dropdown-toggle" href="#">
             <span class="clear">
                 <span class="block m-t-xs">
-                    <strong class="font-bold"> {{ request.user.name }}<span style="color: #8095a8"></span></strong>
+                    <strong class="font-bold"> {{ user.name }}<span style="color: #8095a8"></span></strong>
                 </span>
                 <span class="text-muted text-xs block">
                      {{ request.user.get_role_display | default:_('User') }}<b class="caret"></b>
