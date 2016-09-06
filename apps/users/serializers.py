@@ -30,3 +30,11 @@ class UserAttributeSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['avatar', 'wechat', 'phone', 'enable_otp', 'comment', 'is_active', 'name']
+
+
+class UserGroupEditSerializer(serializers.ModelSerializer):
+    groups = serializers.PrimaryKeyRelatedField(many=True, queryset=UserGroup.objects.all())
+
+    class Meta:
+        model = User
+        fields = ['id', 'groups']

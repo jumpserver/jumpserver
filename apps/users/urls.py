@@ -36,4 +36,6 @@ urlpatterns += [
     url(r'^v1/user-groups$', api.UserGroupListAddApi.as_view(), name='user-group-list-api'),
     url(r'^v1/user-groups/(?P<pk>[0-9]+)$',
         api.UserGroupDetailDeleteUpdateApi.as_view(), name='user-group-detail-api'),
+    url(r'^v1/user-groups/(?P<pk>[0-9]+)/edit$',
+        api.UserGroupEditApi.as_view(), name='user-group-edit-api'),
 ]
