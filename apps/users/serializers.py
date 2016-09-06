@@ -18,6 +18,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserActiveSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
         fields = ['is_active']
@@ -29,3 +30,10 @@ class UserGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserGroup
         fields = '__all__'
+
+
+class UserAttributeSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['avatar', 'wechat', 'phone', 'enable_otp', 'comment', 'is_active', 'name']
