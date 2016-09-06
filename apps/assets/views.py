@@ -6,6 +6,8 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, ListView
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
+from django.conf import settings
+from django.db.models import Q
 from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from django.urls import reverse_lazy
@@ -70,20 +72,45 @@ class AssetGroupCreateView(CreateView):
 
 class AssetGroupListView(ListView):
     model = AssetGroup
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'asset_group_list'
     template_name = 'assets/asset_group_list.html'
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Assets'),
-            'action': _('Asset group list')
+            'action': _('Asset group list'),
+            'keyword': self.request.GET.get('keyword', '')
         }
         kwargs.update(context)
         return super(AssetGroupListView, self).get_context_data(**kwargs)
 
+    def get_queryset(self):
+        self.queryset = super(AssetGroupListView, self).get_queryset()
+        self.keyword = keyword = self.request.GET.get('keyword', '')
+        self.sort = sort = self.request.GET.get('sort', '-date_created')
+
+        if keyword:
+            self.queryset = self.queryset.filter(Q(name__icontains=keyword) |
+                                                 Q(comment__icontains=keyword))
+
+        if sort:
+            self.queryset = self.queryset.order_by(sort)
+        return self.queryset
+
 
 class AssetGroupDetailView(DetailView):
-    pass
+    template_name = 'assets/asset_group_detail.html'
+    model = AssetGroup
+    context_object_name = 'asset_group'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Assets'),
+            'action': _('Asset group detail')
+        }
+        kwargs.update(context)
+        return super(AssetGroupDetailView, self).get_context_data(**kwargs)
 
 
 class AssetGroupUpdateView(UpdateView):
@@ -103,4 +130,6 @@ class AssetGroupUpdateView(UpdateView):
 
 
 class AssetGroupDeleteView(DeleteView):
-    pass
+    template_name = 'assets/delete_confirm.html'
+    model = AssetGroup
+    success_url = reverse_lazy('assets:asset-group-list')

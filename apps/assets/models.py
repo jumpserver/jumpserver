@@ -2,19 +2,10 @@
 from __future__ import unicode_literals, absolute_import
 
 from django.db import models
+import logging
 from django.utils.translation import ugettext_lazy as _
 
-
-class AssetGroup(models.Model):
-    name = models.CharField(max_length=64, unique=True, null=True, blank=True, verbose_name=_('Name'))
-    created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
-    comment = models.TextField(blank=True, verbose_name=_('Comment'))
-
-    def __unicode__(self):
-        return self.name
-
-    class Meta:
-        db_table = 'asset_group'
+logger = logging.getLogger(__name__)
 
 
 class IDC(models.Model):
@@ -24,7 +15,7 @@ class IDC(models.Model):
     phone = models.CharField(max_length=32, blank=True, verbose_name=_('Phone'))
     address = models.CharField(max_length=128, blank=True, verbose_name=_("Address"))
     network = models.TextField(blank=True, verbose_name=_('Network'))
-    date_created = models.DateField(auto_now=True, null=True, verbose_name=_('Date added'))
+    date_created = models.DateTimeField(auto_now=True, null=True, verbose_name=_('Date added'))
     operator = models.CharField(max_length=32, blank=True, verbose_name=_('Operator'))
     created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
@@ -47,7 +38,7 @@ class AssetExtend(models.Model):
         return self.name
 
     class Meta:
-        db_table = 'assetextend'
+        db_table = 'asset_extend'
 
 
 class AdminUser(models.Model):
@@ -65,10 +56,10 @@ class AdminUser(models.Model):
         return self.name
 
     class Meta:
-        db_table = 'adminuser'
+        db_table = 'admin_user'
 
 
-class SysUser(models.Model):
+class SystemUser(models.Model):
     PROTOCOL_CHOICES = (
         ('ssh', 'ssh'),
         ('telnet', 'telnet'),
@@ -94,7 +85,44 @@ class SysUser(models.Model):
         return self.name
 
     class Meta:
-        db_table = 'sysuser'
+        db_table = 'system_user'
+
+
+class AssetGroup(models.Model):
+    name = models.CharField(max_length=64, unique=True, verbose_name=_('Name'))
+    system_users = models.ManyToManyField(SystemUser, related_name='asset_groups', blank=True)
+    created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
+    date_created = models.DateTimeField(auto_now=True, null=True, verbose_name=_('Date added'))
+    comment = models.TextField(blank=True, verbose_name=_('Comment'))
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'asset_group'
+
+    @classmethod
+    def initial(cls):
+        asset_group = cls(name=_('Default'), commont=_('Default asset group'))
+        asset_group.save()
+
+    @classmethod
+    def generate_fake(cls, count=100):
+        from random import seed
+        import forgery_py
+        from django.db import IntegrityError
+
+        seed()
+        for i in range(count):
+            group = cls(name=forgery_py.name.full_name(),
+                        comment=forgery_py.lorem_ipsum.sentence(),
+                        created_by='Fake')
+            try:
+                group.save()
+                logger.debug('Generate fake asset group: %s' % group.name)
+            except IntegrityError:
+                print('Error continue')
+                continue
 
 
 class Asset(models.Model):
@@ -106,8 +134,8 @@ class Asset(models.Model):
     groups = models.ManyToManyField(AssetGroup, related_name='assets', verbose_name=_('Asset groups'))
     username = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Admin user'))
     password = models.CharField(max_length=256, null=True, blank=True, verbose_name=_("Admin password"))
-    admin_user = models.ForeignKey(AdminUser, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("Admin user"))
-    sys_user = models.ManyToManyField(SysUser, null=True, blank=True, verbose_name=_("System User"))
+    admin_user = models.ForeignKey(AdminUser, null=True, on_delete=models.SET_NULL, verbose_name=_("Admin user"))
+    system_user = models.ManyToManyField(SystemUser, blank=True, verbose_name=_("System User"))
     idc = models.ForeignKey(IDC, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_('IDC'))
     mac_addr = models.CharField(max_length=20, null=True, blank=True, verbose_name=_("Mac address"))
     brand = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Brand'))
