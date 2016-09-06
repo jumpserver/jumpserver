@@ -7,7 +7,7 @@ from .models import User, UserGroup
 
 
 class UserSerializer(serializers.ModelSerializer):
-    groups = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='users:usergroup-detail-api')
+    groups = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='users:user-group-detail-api')
 
     class Meta:
         model = User

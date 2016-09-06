@@ -14,7 +14,7 @@ class UserLoginForm(forms.Form):
     captcha = CaptchaField()
 
 
-class UserAddForm(ModelForm):
+class UserCreateForm(ModelForm):
     class Meta:
         model = User
         fields = [

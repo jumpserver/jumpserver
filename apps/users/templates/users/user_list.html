@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load common_tags %}
 {% block content_left_head %}
-    <a href="{% url 'users:user-add' %}" class="btn btn-sm btn-primary "> {% trans "Create user" %} </a>
+    <a href="{% url 'users:user-create' %}" class="btn btn-sm btn-primary "> {% trans "Create user" %} </a>
 {% endblock %}
 
 {% block table_head %}
@@ -41,7 +41,7 @@
                  {% endif %}
              </td>
              <td class="text-center">
-                 <a href="{% url 'users:user-edit' pk=user.id %}" class="btn btn-xs btn-info">{% trans 'Edit' %}</a>
+                 <a href="{% url 'users:user-update' pk=user.id %}" class="btn btn-xs btn-info">{% trans 'Edit' %}</a>
                  <a href="{% url 'users:user-delete' pk=user.id %}" class="btn btn-xs btn-danger del {% if user.id == request.user.id or user.username == 'admin' %} disabled {% endif %}">{% trans 'Delete' %}</a>
              </td>
          </tr>

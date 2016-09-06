@@ -20,7 +20,7 @@ from django.contrib.auth import views as auth_view, authenticate, login, logout
 from common.utils import get_object_or_none
 
 from .models import User, UserGroup
-from .forms import UserAddForm, UserUpdateForm, UserGroupForm, UserLoginForm
+from .forms import UserCreateForm, UserUpdateForm, UserGroupForm, UserLoginForm
 from .utils import AdminUserRequiredMixin, ssh_key_gen, user_add_success_next, send_reset_password_mail
 
 
@@ -101,15 +101,15 @@ class UserListView(AdminUserRequiredMixin, ListView):
         return context
 
 
-class UserAddView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
+class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = User
-    form_class = UserAddForm
-    template_name = 'users/user_add.html'
+    form_class = UserCreateForm
+    template_name = 'users/user_create.html'
     success_url = reverse_lazy('users:user-list')
     success_message = _('Create user<a href="%s">%s</a> success.')
 
     def get_context_data(self, **kwargs):
-        context = super(UserAddView, self).get_context_data(**kwargs)
+        context = super(UserCreateView, self).get_context_data(**kwargs)
         context.update({'app': _('Users'), 'action': _('Create user')})
         return context
 
@@ -118,7 +118,7 @@ class UserAddView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         user.created_by = self.request.user.username or 'System'
         user.save()
         user_add_success_next(user)
-        return super(UserAddView, self).form_valid(form)
+        return super(UserCreateView, self).form_valid(form)
 
     def get_success_message(self, cleaned_data):
         return self.success_message % (
@@ -130,7 +130,7 @@ class UserAddView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
 class UserUpdateView(AdminUserRequiredMixin, UpdateView):
     model = User
     form_class = UserUpdateForm
-    template_name = 'users/user_edit.html'
+    template_name = 'users/user_update.html'
     context_object_name = 'user'
     success_url = reverse_lazy('users:user-list')
 
@@ -175,8 +175,8 @@ class UserDetailView(AdminUserRequiredMixin, DetailView):
 class UserGroupListView(AdminUserRequiredMixin, ListView):
     model = UserGroup
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    context_object_name = 'usergroup_list'
-    template_name = 'users/usergroup_list.html'
+    context_object_name = 'user_group_list'
+    template_name = 'users/user_group_list.html'
     ordering = '-date_added'
 
     def get_queryset(self):
@@ -196,26 +196,26 @@ class UserGroupListView(AdminUserRequiredMixin, ListView):
         return context
 
 
-class UserGroupAddView(AdminUserRequiredMixin, CreateView):
+class UserGroupCreateView(AdminUserRequiredMixin, CreateView):
     model = UserGroup
     form_class = UserGroupForm
-    template_name = 'users/usergroup_add.html'
-    success_url = reverse_lazy('users:usergroup-list')
+    template_name = 'users/user_group_create.html'
+    success_url = reverse_lazy('users:user-group-list')
 
     def get_context_data(self, **kwargs):
-        context = super(UserGroupAddView, self).get_context_data(**kwargs)
+        context = super(UserGroupCreateView, self).get_context_data(**kwargs)
         users = User.objects.all()
-        context.update({'app': _('Users'), 'action': _('Create usergroup'), 'users': users})
+        context.update({'app': _('Users'), 'action': _('Create user group'), 'users': users})
         return context
 
     def form_valid(self, form):
-        usergroup = form.save()
+        user_group = form.save()
         users_id_list = self.request.POST.getlist('users', [])
         users = [get_object_or_404(User, id=user_id) for user_id in users_id_list]
-        usergroup.created_by = self.request.user.username or 'Admin'
-        usergroup.users.add(*tuple(users))
-        usergroup.save()
-        return super(UserGroupAddView, self).form_valid(form)
+        user_group.created_by = self.request.user.username or 'Admin'
+        user_group.users.add(*tuple(users))
+        user_group.save()
+        return super(UserGroupCreateView, self).form_valid(form)
 
 
 class UserGroupUpdateView(UpdateView):

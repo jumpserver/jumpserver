@@ -14,7 +14,7 @@ class AssetGroup(models.Model):
         return self.name
 
     class Meta:
-        db_table = 'assetgroup'
+        db_table = 'asset_group'
 
 
 class IDC(models.Model):
