@@ -11,7 +11,7 @@
                     <strong class="font-bold"> {{ user.name }}<span style="color: #8095a8"></span></strong>
                 </span>
                 <span class="text-muted text-xs block">
-                     {{ user.get_role_display | default:{% trans 'User' %} }}<b class="caret"></b>
+                     {{ user.get_role_display | default:_('User') }}<b class="caret"></b>
                 </span>
             </span>
         </a>

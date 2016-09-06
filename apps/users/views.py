@@ -5,25 +5,67 @@ from __future__ import unicode_literals
 import logging
 
 from django.conf import settings
+from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.messages.views import SuccessMessageMixin
 from django.db.models import Q
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, reverse
-from django.urls import reverse_lazy
+from django.shortcuts import get_object_or_404, reverse, redirect
+from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
+from django.urls import reverse_lazy
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView
 from django.views.generic.detail import DetailView
 
 from common.utils import get_object_or_none
 
 from .models import User, UserGroup
-from .forms import UserAddForm, UserUpdateForm, UserGroupForm
+from .forms import UserAddForm, UserUpdateForm, UserGroupForm, UserLoginForm
 from .utils import AdminUserRequiredMixin, user_add_success_next, send_reset_password_mail
 
 
 logger = logging.getLogger('jumpserver.users.views')
+
+
+@method_decorator(sensitive_post_parameters(), name='dispatch')
+@method_decorator(csrf_protect, name='dispatch')
+@method_decorator(never_cache, name='dispatch')
+class UserLoginView(FormView):
+    template_name = 'users/login.html'
+    form_class = UserLoginForm
+    redirect_field_name = 'next'
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_staff:
+            return redirect(request.POST.get(self.redirect_field_name, reverse('index')))
+        return self.render_to_response(self.get_context_data(**kwargs))
+
+    def form_valid(self, form):
+        auth_login(self.request, form.get_user())
+        return redirect(self.request.POST.get(self.redirect_field_name, reverse('index')))
+
+
+@method_decorator(never_cache, name='dispatch')
+class UserLogoutView(TemplateView):
+    template_name = 'common/flash_message_standalone.html'
+
+    def get(self, request, *args, **kwargs):
+        auth_logout(request)
+        return super(UserLogoutView, self).get(request)
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'title': _('Logout success'),
+            'messages': _('Logout success, return login page'),
+            'redirect_url': reverse('users:login'),
+            'auto_redirect': True,
+        }
+        kwargs.update(context)
+        return super(UserLogoutView, self).get_context_data(**kwargs)
 
 
 class UserListView(AdminUserRequiredMixin, ListView):
@@ -56,7 +98,7 @@ class UserAddView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     form_class = UserAddForm
     template_name = 'users/user_add.html'
     success_url = reverse_lazy('users:user-list')
-    success_message = _('Create user<a href="%s">%s</a> success.')
+    success_message = _('Create user <a href="%s">%s</a> success.')
 
     def get_context_data(self, **kwargs):
         context = super(UserAddView, self).get_context_data(**kwargs)
