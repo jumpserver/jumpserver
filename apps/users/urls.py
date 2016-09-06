@@ -1,35 +1,16 @@
 from django.conf.urls import url
-from django.contrib.auth import views as auth_views
-from django.utils.translation import ugettext as _
 
 import views
 import api
-from .forms import UserLoginForm
 
 app_name = 'users'
 
 urlpatterns = [
-    url(r'^login$',
-        auth_views.login,
-        {'template_name': "users/login.html",
-         'authentication_form': UserLoginForm,
-         'redirect_authenticated_user': True},
-        name='login'),
-    url(r'^logout$',
-        auth_views.logout,
-        {
-            "template_name": "common/flash_message_standalone.html",
-            "extra_context": {
-                'title': _('Logout success'),
-                'messages': _('Logout success, return login page'),
-                'redirect_url': '/users/login',
-                'auto_redirect': True,
-            }
-        },
-        name='logout'),
-    url(r'^password/forgot$', views.UserForgotPasswordView.as_view(), name='forgot-password'),
-    url(r'^password/forgot/sendmail-success$',
-        views.UserForgotPasswordSendmailSuccessView.as_view(), name='forgot-password-sendmail-success'),
+    url(r'^login$', views.UserLoginView.as_view(), name='login'),
+    url(r'^logout$', views.UserLogoutView.as_view(), name='logout'),
+    url(r'^password/forget$', views.UserForgotPasswordView.as_view(), name='forget-password'),
+    url(r'^password/forget/sendmail-success$',
+        views.UserForgotPasswordSendmailSuccessView.as_view(), name='forget-password-sendmail-success'),
     url(r'^password/reset$', views.UserResetPasswordView.as_view(), name='reset-password'),
     url(r'^password/reset/success$', views.UserResetPasswordSuccessView.as_view(),
         name='reset-password-success'),
