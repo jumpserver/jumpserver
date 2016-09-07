@@ -153,23 +153,29 @@ function getIDall() {
     return check_array.join(",");
 }
 
-function APIUpdateAttr(url, body, success, error, method) {
+function APIUpdateAttr(props) {
+  // props = {url: .., body: , success: , error: , method: ,}
+  props = props || {};
   $.ajax({
-    url: url,
-    type: method || "PATCH",
-    data: body
+    url: props.url,
+    type: props.method || "PATCH",
+    data: props.body,
+    contentType: props.content_type || "application/json; charset=utf-8",
+    dataType: props.data_type || "json",
   }).done(function(data, textStatue, jqXHR) {
-    if (typeof success === 'function') {
-      return success(data)
+    if (typeof props.success === 'function') {
+      return props.success(data)
     } else {
       toastr.success('Update Success!')
     }
   }).fail(function(jqXHR, textStatue, errorThrown) {
-    if (typeof error === 'function') {
-      return error(errorThrown)
+    if (typeof props.error === 'function') {
+      return props.error(errorThrown)
     } else {
       toastr.error('Error occurred while updating.')
     }
   })
   return true;
 }
+
+var jumpserver = new Object();

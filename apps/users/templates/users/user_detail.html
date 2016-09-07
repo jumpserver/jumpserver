@@ -181,31 +181,31 @@
                                     <i class="fa fa-info-circle"></i> {% trans 'User group' %}
                                 </div>
                                 <div class="panel-body">
-                                    <table class="table">
+                                    <table class="table group_edit">
                                         <tbody>
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Join user groups' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Join user groups' %}" id="slct_groups" class="select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for group in groups %}
-                                                        <option value="{{ group.id }}">{{ group.name }}</option>
+                                                        <option value="{{ group.id }}" id="opt_{{ group.id }}">{{ group.name }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-small">{% trans 'Join' %}</button>
+                                                    <button type="button" class="btn btn-info btn-small" id="btn_add_user_group">{% trans 'Join' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
 
                                         {% for group in user_object.groups.all %}
                                         <tr>
-                                            <td ><b>{{ group.name }}</b></td>
-                                            <td>
-                                                <button class="btn btn-danger btn-sm" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
-                                            </td>
+                                          <td ><b class="bdg_user_group" data-gid={{ group.id }}>{{ group.name }}</b></td>
+                                          <td>
+                                              <button class="btn btn-danger btn-sm btn_delete_user_group" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                          </td>
                                         </tr>
                                         {% endfor %}
                                         </tbody>
@@ -223,8 +223,43 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
+jumpserver.selected_groups = new Object();
+function updateUserGroups(user_groups) {
+  var the_url = "{% url 'users:user-group-edit-api' pk=user_object.id%}";
+  var body = {
+    id: {{ user_object.id }},
+    groups: Object.assign([], user_groups)
+  };
+  var success = function(data) {
+    // remove all the selected groups from select > option and rendered ul element;
+    $('.select2-selection__rendered').empty();
+    $('#slct_groups').val('');
+    $.map(jumpserver.selected_groups, function(group_name, index){
+      $('#opt_' + index).remove();
+      // change tr html of user groups.
+      $('.group_edit tbody').append(
+        '<tr>' +
+          '<td><b class="bdg_user_group" data-gid="' + index + '">' + group_name + '</b></td>' +
+          '<td><button class="btn btn-danger btn-sm btn_delete_user_group" type="button" style="float: right;"><i class="fa fa-minus"></i></button></td>' +
+        '</tr>'
+      )
+    });
+    // clear jumpserver.selected_groups
+    jumpserver.selected_groups = {};
+    toastr.success('{% trans "Update success!" %}')
+  }
+  APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success, method: 'PUT'});
+
+}
 $(document).ready(function () {
-  $('.select2').select2();
+  $('.select2').select2()
+  .on('select2:select', function(evt, params) {
+    var data = evt.params.data;
+    jumpserver.selected_groups[data.id] = data.text;
+  }).on('select2:unselect', function(evt) {
+    var data = evt.params.data;
+    delete jumpserver.selected_groups[data.id]
+  })
 });
 $(document).on('click', '#is_active', function(){
   var the_url = "{% url 'users:user-patch-api' pk=user_object.id %}";
@@ -233,7 +268,7 @@ $(document).on('click', '#is_active', function(){
   var success = function(data) {
     toastr.success('{% trans "Update success!" %}')
   }
-  APIUpdateAttr(the_url, body, success);
+  APIUpdateAttr({ url: the_url, body: body, success: success});
 }).on('click', '#enable_otp', function(){
   var the_url = "{% url 'users:user-patch-api' pk=user_object.id %}";
   var checked = !$(this).prop('checked');
@@ -241,7 +276,33 @@ $(document).on('click', '#is_active', function(){
   var success = function(data) {
     toastr.success('{% trans "Update success!" %}')
   }
-  APIUpdateAttr(the_url, body, success);
-});
+  APIUpdateAttr({ url: the_url, body: body, success: success});
+}).on('click', '#btn_add_user_group', function(){
+  if (Object.keys(jumpserver.selected_groups).length === 0) {
+    return false;
+  }
+  var user_groups = $('.bdg_user_group').map(function(){
+    return $(this).data('gid');
+  }).get();
+  $.map(jumpserver.selected_groups, function(value, index){
+    user_groups.push(parseInt(index));
+    $('#opt_' + index).remove();
+  });
+  updateUserGroups(user_groups)
+}).on('click', '.btn_delete_user_group', function(){
+  var $this = $(this);
+  var $tr = $this.closest('tr');
+  var $badge = $tr.find('.bdg_user_group');
+  var gid = $badge.data('gid');
+  var group_name = $badge.html() || $badge.text();
+  $('#slct_groups').append(
+    '<option value="' + gid + '" id="opt_' + gid + '">' + group_name + '</option>'
+  );
+  $tr.remove();
+  var user_groups = $('.bdg_user_group').map(function(){
+    return $(this).data('gid');
+  }).get();
+  updateUserGroups(user_groups)
+})
 </script>
 {% endblock %}
