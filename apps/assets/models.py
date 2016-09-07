@@ -26,6 +26,30 @@ class IDC(models.Model):
     class Meta:
         db_table = 'idc'
 
+    @classmethod
+    def generate_fake(cls, count=100):
+        from random import seed, choice
+        import forgery_py
+        from django.db import IntegrityError
+
+        seed()
+        for i in range(count):
+            idc = cls(name=forgery_py.name.full_name(),
+                      bandwidth='200M',
+                      contact=forgery_py.name.full_name(),
+                      phone=forgery_py.address.phone(),
+                      address=forgery_py.address.city() + forgery_py.address.street_address(),
+                      network="192.168.1.10/24\n192.168.1.20",
+                      operator=choice(['北京联通', '北京电信', 'BGP全网通']),
+                      comment=forgery_py.lorem_ipsum.sentence(),
+                      created_by='Fake')
+            try:
+                idc.save()
+                logger.debug('Generate fake asset group: %s' % idc.name)
+            except IntegrityError:
+                print('Error continue')
+                continue
+
 
 class AssetExtend(models.Model):
     key = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('KEY'))
