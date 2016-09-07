@@ -28,7 +28,7 @@
                         </div>
                     </div>
                     <div class="ibox-content">
-                        <form method="post" id="userForm" class="form-horizontal" action="" enctype="multipart/form-data">
+                        <form method="post" class="form-horizontal" action="" enctype="multipart/form-data">
                             {% csrf_token %}
                             <h3>{% trans 'Account' %}</h3>
                             {% block username %} {% endblock %}

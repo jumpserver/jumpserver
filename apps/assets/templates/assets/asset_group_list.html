@@ -27,7 +27,7 @@
                  </a>
              </td>
              <td class="text-center">{{ asset_group.assets.count }}</td>
-             <td class="text-center">{{ asset_group.comment }}</td>
+             <td class="text-center">{{ asset_group.comment|truncatewords:8 }}</td>
              <td class="text-center">
                  <a href="{% url 'assets:asset-group-update' pk=asset_group.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
                  <a href="{% url 'assets:asset-group-delete' pk=asset_group.id %}" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>

@@ -16,6 +16,7 @@ urlpatterns = [
         name='reset-password-success'),
     url(r'^user$', views.UserListView.as_view(), name='user-list'),
     url(r'^user/(?P<pk>[0-9]+)$', views.UserDetailView.as_view(), name='user-detail'),
+    url(r'^user/(?P<pk>[0-9]+)/assets-perm$', views.UserDetailView.as_view(), name='user-detail'),
     url(r'^user/create$', views.UserCreateView.as_view(), name='user-create'),
     url(r'^user/(?P<pk>[0-9]+)/update$', views.UserUpdateView.as_view(), name='user-update'),
     url(r'^user/(?P<pk>[0-9]+)/delete$', views.UserDeleteView.as_view(), name='user-delete'),

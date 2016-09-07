@@ -1,0 +1,35 @@
+{% extends '_list_base.html' %}
+{% load i18n %}
+{% load common_tags %}
+{% block content_left_head %}
+    <a href="{% url 'assets:idc-create' %}" class="btn btn-sm btn-primary "> {% trans "Create IDC" %} </a>
+{% endblock %}
+
+{% block table_head %}
+    <th class="text-center">{% trans 'ID' %}</th>
+    <th class="text-center"><a href="{% url 'assets:idc-list' %}?sort=name">{% trans 'Name' %}</a></th>
+    <th class="text-center">{% trans 'Asset num' %}</th>
+    <th class="text-center">{% trans 'Bandwidth' %}</th>
+    <th class="text-center">{% trans 'Contact' %}</th>
+    <th class="text-center">{% trans 'Phone' %}</th>
+    <th class="text-center">{% trans 'Address' %}</th>
+    <th class="text-center"></th>
+{% endblock %}
+
+{% block table_body %}
+     {% for idc in idc_list %}
+         <tr class="gradeX">
+             <td class="text-center">{{ idc.id }}</td>
+             <td class="text-center">{{ idc.name }}</td>
+             <td class="text-center">{{ idc.assets.count }}</td>
+             <td class="text-center">{{ idc.bandwidth }}</td>
+             <td class="text-center">{{ idc.contact }}</td>
+             <td class="text-center">{{ idc.phone }}</td>
+             <td class="text-center">{{ idc.address }}</td>
+             <td class="text-center">
+                 <a href="{% url 'assets:idc-update' pk=idc.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
+                 <a href="{% url 'assets:idc-delete' pk=idc.id %}" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
+             </td>
+         </tr>
+     {% endfor %}
+{% endblock %}

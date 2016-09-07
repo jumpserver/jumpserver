@@ -19,19 +19,6 @@
                             </li>
                             <li><a href="" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'User assets' %}</a></li>
                             <li><a href="" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'User log' %}</a></li>
-                            <div class="" style="float: right">
-                                <form id="search_form" method="get" action="" class="pull-right mail-search">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control input-sm" id="keyword" name="keyword"
-                                               value="{{ keyword }}" placeholder="Search">
-                                        <div class="input-group-btn">
-                                            <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
-                                                {% trans 'Search' %}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            </div>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -118,7 +105,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-5" style="padding-left: 0px;">
+                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Quick modify' %}

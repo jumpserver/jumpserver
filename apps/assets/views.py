@@ -6,13 +6,15 @@ from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, ListView
 from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
+from django.conf import settings
+from django.db.models import Q
 from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from django.urls import reverse_lazy
-from django.views.generic.detail import DetailView
+from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from .models import Asset, AssetGroup, IDC, AssetExtend
-from .forms import AssetForm, AssetGroupForm
+from .forms import AssetForm, AssetGroupForm, IDCForm
 from .utils import AdminUserRequiredMixin
 
 
@@ -54,6 +56,8 @@ class AssetGroupCreateView(CreateView):
     template_name = 'assets/asset_group_create.html'
     success_url = reverse_lazy('assets:asset-group-list')
 
+    # Todo: Asset group create template select assets so hard, need be resolve next
+
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Assets'),
@@ -70,20 +74,52 @@ class AssetGroupCreateView(CreateView):
 
 class AssetGroupListView(ListView):
     model = AssetGroup
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'asset_group_list'
     template_name = 'assets/asset_group_list.html'
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Assets'),
-            'action': _('Asset group list')
+            'action': _('Asset group list'),
+            'keyword': self.request.GET.get('keyword', '')
         }
         kwargs.update(context)
         return super(AssetGroupListView, self).get_context_data(**kwargs)
 
+    def get_queryset(self):
+        self.queryset = super(AssetGroupListView, self).get_queryset()
+        self.keyword = keyword = self.request.GET.get('keyword', '')
+        self.sort = sort = self.request.GET.get('sort', '-date_created')
 
-class AssetGroupDetailView(DetailView):
-    pass
+        if keyword:
+            self.queryset = self.queryset.filter(Q(name__icontains=keyword) |
+                                                 Q(comment__icontains=keyword))
+
+        if sort:
+            self.queryset = self.queryset.order_by(sort)
+        return self.queryset
+
+
+class AssetGroupDetailView(SingleObjectMixin, ListView):
+    template_name = 'assets/asset_group_detail.html'
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=AssetGroup.objects.all())
+        return super(AssetGroupDetailView, self).get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return self.object.assets.all()
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Assets'),
+            'action': _('Asset group detail'),
+            'asset_group': self.object,
+        }
+        kwargs.update(context)
+        return super(AssetGroupDetailView, self).get_context_data(**kwargs)
 
 
 class AssetGroupUpdateView(UpdateView):
@@ -103,4 +139,62 @@ class AssetGroupUpdateView(UpdateView):
 
 
 class AssetGroupDeleteView(DeleteView):
+    template_name = 'assets/delete_confirm.html'
+    model = AssetGroup
+    success_url = reverse_lazy('assets:asset-group-list')
+
+
+class IDCListView(ListView):
+    model = IDC
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    context_object_name = 'idc_list'
+    template_name = 'assets/idc_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Assets'),
+            'action': _('IDC list'),
+            'keyword': self.request.GET.get('keyword', '')
+        }
+        kwargs.update(context)
+        return super(IDCListView, self).get_context_data(**kwargs)
+
+    def get_queryset(self):
+        self.queryset = super(IDCListView, self).get_queryset()
+        self.keyword = keyword = self.request.GET.get('keyword', '')
+        self.sort = sort = self.request.GET.get('sort', '-date_created')
+
+        if keyword:
+            self.queryset = self.queryset.filter(Q(name__icontains=keyword) |
+                                                 Q(comment__icontains=keyword))
+
+        if sort:
+            self.queryset = self.queryset.order_by(sort)
+        return self.queryset
+
+
+class IDCCreateView(CreateView):
+    model = IDC
+    form_class = IDCForm
+    template_name = 'assets/idc_create.html'
+    success_url = reverse_lazy('assets:idc-list')
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'assets',
+            'action': 'Create IDC'
+        }
+        kwargs.update(context)
+        return super(IDCCreateView, self).get_context_data(**kwargs)
+
+
+class IDCUpdateView(UpdateView):
+    pass
+
+
+class IDCDetailView(DetailView):
+    pass
+
+
+class IDCDeleteView(DeleteView):
     pass
