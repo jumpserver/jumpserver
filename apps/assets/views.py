@@ -13,9 +13,9 @@ from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateVi
 from django.urls import reverse_lazy
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
-from .models import Asset, AssetGroup, IDC, AssetExtend
+from .models import Asset, AssetGroup, IDC, AssetExtend, AdminUser, SystemUser
 from .forms import AssetForm, AssetGroupForm, IDCForm
-from .utils import AdminUserRequiredMixin
+from .hands import AdminUserRequiredMixin
 
 
 class AssetCreateView(CreateView):
@@ -50,7 +50,7 @@ class AssetDetailView(DetailView):
     template_name = 'assets/asset_detail.html'
 
 
-class AssetGroupCreateView(CreateView):
+class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
     model = AssetGroup
     form_class = AssetGroupForm
     template_name = 'assets/asset_group_create.html'
@@ -72,7 +72,7 @@ class AssetGroupCreateView(CreateView):
         return super(AssetGroupCreateView, self).form_valid(form)
 
 
-class AssetGroupListView(ListView):
+class AssetGroupListView(AdminUserRequiredMixin, ListView):
     model = AssetGroup
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'asset_group_list'
@@ -101,7 +101,7 @@ class AssetGroupListView(ListView):
         return self.queryset
 
 
-class AssetGroupDetailView(SingleObjectMixin, ListView):
+class AssetGroupDetailView(SingleObjectMixin, AdminUserRequiredMixin, ListView):
     template_name = 'assets/asset_group_detail.html'
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
 
@@ -122,7 +122,7 @@ class AssetGroupDetailView(SingleObjectMixin, ListView):
         return super(AssetGroupDetailView, self).get_context_data(**kwargs)
 
 
-class AssetGroupUpdateView(UpdateView):
+class AssetGroupUpdateView(AdminUserRequiredMixin, UpdateView):
     model = AssetGroup
     form_class = AssetGroupForm
     template_name = 'assets/asset_group_create.html'
@@ -138,13 +138,13 @@ class AssetGroupUpdateView(UpdateView):
         return super(AssetGroupUpdateView, self).get_context_data(**kwargs)
 
 
-class AssetGroupDeleteView(DeleteView):
+class AssetGroupDeleteView(AdminUserRequiredMixin, DeleteView):
     template_name = 'assets/delete_confirm.html'
     model = AssetGroup
     success_url = reverse_lazy('assets:asset-group-list')
 
 
-class IDCListView(ListView):
+class IDCListView(AdminUserRequiredMixin, ListView):
     model = IDC
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'idc_list'
@@ -173,7 +173,7 @@ class IDCListView(ListView):
         return self.queryset
 
 
-class IDCCreateView(CreateView):
+class IDCCreateView(AdminUserRequiredMixin, CreateView):
     model = IDC
     form_class = IDCForm
     template_name = 'assets/idc_create.html'
@@ -188,13 +188,59 @@ class IDCCreateView(CreateView):
         return super(IDCCreateView, self).get_context_data(**kwargs)
 
 
-class IDCUpdateView(UpdateView):
+class IDCUpdateView(AdminUserRequiredMixin, UpdateView):
     pass
 
 
-class IDCDetailView(DetailView):
+class IDCDetailView(AdminUserRequiredMixin, DetailView):
     pass
 
 
-class IDCDeleteView(DeleteView):
+class IDCDeleteView(AdminUserRequiredMixin, DeleteView):
+    pass
+
+
+class AdminUserListView(AdminUserRequiredMixin, ListView):
+    model = AdminUser
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    context_object_name = 'admin_user_list'
+    template_name = 'assets/admin_user_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Assets'),
+            'action': _('Admin user list'),
+            'keyword': self.request.GET.get('keyword', '')
+        }
+        kwargs.update(context)
+        return super(AdminUserListView, self).get_context_data(**kwargs)
+
+    def get_queryset(self):
+        # Todo: Default group by lose asset connection num
+        self.queryset = super(AdminUserListView, self).get_queryset()
+        self.keyword = keyword = self.request.GET.get('keyword', '')
+        self.sort = sort = self.request.GET.get('sort', '-date_created')
+
+        if keyword:
+            self.queryset = self.queryset.filter(Q(name__icontains=keyword) |
+                                                 Q(comment__icontains=keyword))
+
+        if sort:
+            self.queryset = self.queryset.order_by(sort)
+        return self.queryset
+
+
+class AdminUserCreateView(AdminUserRequiredMixin, CreateView):
+    pass
+
+
+class AdminUserUpdateView(AdminUserRequiredMixin, UpdateView):
+    pass
+
+
+class AdminUserDetailView(AdminUserRequiredMixin, DetailView):
+    pass
+
+
+class AdminUserDeleteView(AdminUserRequiredMixin, DeleteView):
     pass
