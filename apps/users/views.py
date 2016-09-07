@@ -155,10 +155,10 @@ class UserDeleteView(AdminUserRequiredMixin, DeleteView):
 class UserDetailView(AdminUserRequiredMixin, DetailView):
     model = User
     template_name = 'users/user_detail.html'
-    context_object_name = "user"
+    context_object_name = "user_object"
 
     def get_context_data(self, **kwargs):
-        groups = [group for group in UserGroup.objects.iterator() if group not in self.object.groups.iterator()]
+        groups = UserGroup.objects.exclude(id__in=self.object.groups.all())
         context = {'app': _('Users'), 'action': _('User detail'), 'groups': groups}
         kwargs.update(context)
         return super(UserDetailView, self).get_context_data(**kwargs)

@@ -3,54 +3,54 @@
 <script src="{% static "js/plugins/metisMenu/jquery.metisMenu.js" %}"></script>
 
 <!-- Custom and plugin javascript -->
+<script src="{% static "js/plugins/toastr/toastr.min.js" %}"></script>
 <script src="{% static "js/inspinia.js" %}"></script>
-<script src="{% static "js/jumpserver.js" %}"></script>
-
 <script>
-    <!-- active menu -->
-    var url_array = document.location.pathname.split("/");
-    app = url_array[1];
-    resource = url_array[2];
-    if (app == ''){
-        $('#index').addClass('active')
-    } else {
-        $("#"+app).addClass('active');
-        $('#'+app+' #'+resource).addClass('active');
-    }
+// active menu
+var url_array = document.location.pathname.split("/");
+app = url_array[1];
+resource = url_array[2];
+if (app == ''){
+    $('#index').addClass('active')
+} else {
+    $("#"+app).addClass('active');
+    $('#'+app+' #'+resource).addClass('active');
+}
 
-    <!-- ajax set cookie -->
-    function getCookie(name) {
-        var cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            var cookies = document.cookie.split(';');
-            for (var i = 0; i < cookies.length; i++) {
-                var cookie = jQuery.trim(cookies[i]);
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
+// ajax set cookie
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
             }
         }
-        return cookieValue;
     }
+    return cookieValue;
+}
 
-    var csrftoken = getCookie('csrftoken');
-    var sessionid = getCookie('sessionid');
+var csrftoken = getCookie('csrftoken');
+var sessionid = getCookie('sessionid');
 
-    function csrfSafeMethod(method) {
-        // these HTTP methods do not require CSRF protection
-        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-    }
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
 
-    $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken);
         }
-    });
+    }
+});
 
-    <!-- textarea rows -->
-    $('textarea').attr('rows', 5)
+// textarea rows
+$('textarea').attr('rows', 5)
 </script>
+<script src="{% static "js/jumpserver.js" %}"></script>

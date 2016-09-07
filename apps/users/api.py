@@ -3,11 +3,9 @@
 
 import logging
 
-from rest_framework import generics, mixins, status, permissions
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from rest_framework import generics
 
-from .serializers import UserSerializer, UserGroupSerializer, UserActiveSerializer
+from .serializers import UserSerializer, UserGroupSerializer, UserAttributeSerializer, UserGroupEditSerializer
 from .models import User, UserGroup
 
 
@@ -33,16 +31,6 @@ class UserDetailDeleteUpdateApi(generics.RetrieveUpdateDestroyAPIView):
     #     return super(UserDetailDeleteUpdateApi, self).get(request, *args, **kwargs)
 
 
-class UserActiveApi(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserActiveSerializer
-
-    # def put(self, request, *args, **kwargs):
-    #     for k, v in request.META.items():
-    #         logger.debug("%s --> %s" % (k, v))
-    #     return super(UserActiveApi, self).put(request, *args, **kwargs)
-
-
 class UserGroupListAddApi(generics.ListCreateAPIView):
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupSerializer
@@ -52,3 +40,12 @@ class UserGroupDetailDeleteUpdateApi(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserGroup.objects.all()
     serializer_class = UserGroupSerializer
 
+
+class UserAttributeApi(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserAttributeSerializer
+
+
+class UserGroupEditApi(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserGroupEditSerializer
