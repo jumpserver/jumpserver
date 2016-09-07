@@ -21,7 +21,7 @@
         <li id="asset"><a href="{% url 'assets:asset-list' %}">{% trans 'Asset' %}</a></li>
         <li id="asset-group"><a href="{% url 'assets:asset-group-list' %}">{% trans 'Asset group' %}</a></li>
         <li id="idc"><a href="{% url 'assets:idc-list' %}">{% trans 'IDC' %}</a></li>
-        <li id="admin-user"><a href="">{% trans 'Admin user' %}</a></li>
+        <li id="admin-user"><a href="{% url 'assets:admin-user-list' %}">{% trans 'Admin user' %}</a></li>
         <li id="system-user"><a href="">{% trans 'System user' %}</a></li>
         <li id=""><a href="">{% trans 'Label' %}</a></li>
     </ul>
@@ -30,10 +30,10 @@
     <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">{% trans 'Perms' %}</span><span class="fa arrow"></span></a>
     <ul class="nav nav-second-level">
         <li id="sudo">
-            <a class="sudo" href="">{% trans 'Perm' %}</a>
+            <a class="sudo" href="">{% trans 'User perm' %}</a>
         </li>
         <li id="role">
-            <a href="">{% trans 'Create perm' %}</a>
+            <a href="">{% trans 'User group perm' %}</a>
         </li>
     </ul>
 </li>

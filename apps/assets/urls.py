@@ -28,5 +28,10 @@ urlpatterns = [
     url(r'^idc/(?P<pk>[0-9]+)$', views.IDCDetailView.as_view(), name='idc-detail'),
     url(r'^idc/(?P<pk>[0-9]+)/update', views.IDCUpdateView.as_view(), name='idc-update'),
     url(r'^idc/(?P<pk>[0-9]+)/delete$', views.IDCDeleteView.as_view(), name='idc-delete'),
+    url(r'^admin-user$', views.AdminUserListView.as_view(), name='admin-user-list'),
+    url(r'^admin-user/create$', views.AdminUserCreateView.as_view(), name='admin-user-create'),
+    url(r'^admin-user/(?P<pk>[0-9]+)$', views.AdminUserDetailView.as_view(), name='admin-user-detail'),
+    url(r'^admin-user/(?P<pk>[0-9]+)/update', views.AdminUserUpdateView.as_view(), name='admin-user-update'),
+    url(r'^admin-user/(?P<pk>[0-9]+)/delete$', views.AdminUserDeleteView.as_view(), name='admin-user-delete'),
     # url(r'^api/v1.0/', include(router.urls)),
 ]

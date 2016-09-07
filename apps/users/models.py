@@ -14,46 +14,9 @@ from django.dispatch import receiver
 from django.db import IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
-
 from django.core import signing
 
-# class Role(models.Model):
-#     name = models.CharField('name', max_length=80, unique=True)
-#     permissions = models.ManyToManyField(
-#         Permission,
-#         verbose_name='permissions',
-#         blank=True,
-#     )
-#     date_created = models.DateTimeField(auto_now_add=True)
-#     created_by = models.CharField(max_length=100)
-#     comment = models.CharField(max_length=80, blank=True)
-#
-#     def __unicode__(self):
-#         return self.name
-#
-#     def delete(self, using=None, keep_parents=False):
-#         if self.users.all().count() > 0:
-#             raise OperationalError('Role %s has some member, should not be delete.' % self.name)
-#         else:
-#             return super(Role, self).delete(using=using, keep_parents=keep_parents)
-#
-#     class Meta:
-#         db_table = 'role'
-#
-#     @classmethod
-#     def initial(cls):
-#         roles = {
-#             'Administrator': {'permissions': Permission.objects.all(), 'comment': '管理员'},
-#             'User': {'permissions': [], 'comment': '用户'},
-#             'Auditor': {'permissions': Permission.objects.filter(content_type__app_label='audits'),
-#                         'comment': '审计员'},
-#         }
-
-#         for role_name, props in roles.items():
-#            if not cls.objects.filter(name=role_name):
-#                role = cls.objects.create(name=role_name, comment=props.get('comment', ''), created_by='System')
-#                if props.get('permissions'):
-#                    role.permissions = props.get('permissions')
+from common.utils import encrypt, decrypt
 
 
 class UserGroup(models.Model):
@@ -64,6 +27,11 @@ class UserGroup(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def has_member(self, user):
+        if user in self.users.all():
+            return True
+        return False
 
     class Meta:
         db_table = 'user-group'
@@ -113,8 +81,8 @@ class User(AbstractUser):
     phone = models.CharField(max_length=20, blank=True, verbose_name=_('Phone'))
     enable_otp = models.BooleanField(default=False, verbose_name=_('Enable OTP'))
     secret_key_otp = models.CharField(max_length=16, blank=True)
-    private_key = models.CharField(max_length=5000, blank=True, verbose_name=_('ssh private key'))
-    public_key = models.CharField(max_length=1000, blank=True, verbose_name=_('ssh public key'))
+    _private_key = models.CharField(max_length=5000, blank=True, verbose_name=_('ssh private key'))
+    _public_key = models.CharField(max_length=1000, blank=True, verbose_name=_('ssh public key'))
     comment = models.TextField(max_length=200, blank=True, verbose_name=_('Comment'))
     is_first_login = models.BooleanField(default=False)
     date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True,
@@ -131,8 +99,8 @@ class User(AbstractUser):
     #: user = User(username='example', ...)
     #: user.set_password('password')
     @password_raw.setter
-    def password_raw(self, raw_password):
-        self.set_password(raw_password)
+    def password_raw(self, password_raw_):
+        self.set_password(password_raw_)
 
     @property
     def is_expired(self):
@@ -140,6 +108,22 @@ class User(AbstractUser):
             return False
         else:
             return True
+
+    @property
+    def private_key(self):
+        return decrypt(self._private_key)
+
+    @private_key.setter
+    def private_key(self, private_key_raw):
+        self._private_key = encrypt(private_key_raw)
+
+    @property
+    def public_key(self):
+        return decrypt(self._public_key)
+
+    @public_key.setter
+    def public_key(self, public_key_raw):
+        self._public_key = encrypt(public_key_raw)
 
     @property
     def is_superuser(self):
@@ -197,6 +181,11 @@ class User(AbstractUser):
 
     def generate_reset_token(self):
         return signing.dumps({'reset': self.id, 'email': self.email})
+
+    def is_member_of(self, user_group):
+        if user_group in self.groups.all():
+            return True
+        return False
 
     @classmethod
     def validate_reset_token(cls, token, max_age=3600):

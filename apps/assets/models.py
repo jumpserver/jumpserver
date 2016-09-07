@@ -5,6 +5,8 @@ from django.db import models
 import logging
 from django.utils.translation import ugettext_lazy as _
 
+from common.utils import encrypt, decrypt
+
 logger = logging.getLogger(__name__)
 
 
@@ -26,6 +28,30 @@ class IDC(models.Model):
     class Meta:
         db_table = 'idc'
 
+    @classmethod
+    def generate_fake(cls, count=100):
+        from random import seed, choice
+        import forgery_py
+        from django.db import IntegrityError
+
+        seed()
+        for i in range(count):
+            idc = cls(name=forgery_py.name.full_name(),
+                      bandwidth='200M',
+                      contact=forgery_py.name.full_name(),
+                      phone=forgery_py.address.phone(),
+                      address=forgery_py.address.city() + forgery_py.address.street_address(),
+                      network="192.168.1.10/24\n192.168.1.20",
+                      operator=choice(['北京联通', '北京电信', 'BGP全网通']),
+                      comment=forgery_py.lorem_ipsum.sentence(),
+                      created_by='Fake')
+            try:
+                idc.save()
+                logger.debug('Generate fake asset group: %s' % idc.name)
+            except IntegrityError:
+                print('Error continue')
+                continue
+
 
 class AssetExtend(models.Model):
     key = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('KEY'))
@@ -44,19 +70,63 @@ class AssetExtend(models.Model):
 class AdminUser(models.Model):
     name = models.CharField(max_length=128, unique=True, null=True, blank=True, verbose_name=_('Name'))
     username = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Username'))
-    password = models.CharField(max_length=256, null=True, blank=True, verbose_name=_('Password'))
-    private_key = models.CharField(max_length=4096, null=True, blank=True, verbose_name=_('SSH private key'))
-    is_default = models.BooleanField(default=True, verbose_name=_('As default'))
-    auto_update = models.BooleanField(default=True, verbose_name=_('Auto update pass/key'))
-    date_created = models.DateTimeField(auto_now=True, null=True, blank=True)
-    create_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
+    _password = models.CharField(max_length=256, null=True, blank=True, verbose_name=_('Password'))
+    _private_key = models.CharField(max_length=4096, null=True, blank=True, verbose_name=_('SSH private key'))
+    _public_key = models.CharField(max_length=4096, null=True, blank=True, verbose_name=_('SSH public key'))
+    as_default = models.BooleanField(default=True, verbose_name=_('As default'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
+    date_created = models.DateTimeField(auto_now=True, null=True, blank=True)
+    created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
 
     def __unicode__(self):
         return self.name
 
+    @property
+    def password(self):
+        return decrypt(self._password)
+
+    @password.setter
+    def password(self, password_raw):
+        self._password = encrypt(password_raw)
+
+    @property
+    def private_key(self):
+        return decrypt(self._private_key)
+
+    @private_key.setter
+    def private_key(self, private_key_raw):
+        self._private_key = encrypt(private_key_raw)
+
+    @property
+    def public_key(self):
+        return decrypt(self._public_key)
+
+    @public_key.setter
+    def public_key(self, public_key_raw):
+        self._public_key = encrypt(public_key_raw)
+
     class Meta:
         db_table = 'admin_user'
+
+    @classmethod
+    def generate_fake(cls, count=100):
+        from random import seed, choice
+        import forgery_py
+        from django.db import IntegrityError
+
+        seed()
+        for i in range(count):
+            obj = cls(name=forgery_py.name.full_name(),
+                      username=forgery_py.internet.user_name(),
+                      password=forgery_py.lorem_ipsum.word(),
+                      comment=forgery_py.lorem_ipsum.sentence(),
+                      created_by='Fake')
+            try:
+                obj.save()
+                logger.debug('Generate fake asset group: %s' % obj.name)
+            except IntegrityError:
+                print('Error continue')
+                continue
 
 
 class SystemUser(models.Model):
@@ -78,7 +148,7 @@ class SystemUser(models.Model):
     home = models.CharField(max_length=64, blank=True, verbose_name=_('Home'))
     uid = models.IntegerField(blank=True, verbose_name=_('Uid'))
     date_created = models.DateTimeField(auto_now=True, null=True)
-    create_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
+    created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
     comment = models.CharField(max_length=128, blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
@@ -199,3 +269,7 @@ class Label(models.Model):
     class Meta:
         db_table = 'label'
 
+
+def generate_fake():
+    for cls in (Asset, AssetGroup, IDC):
+        cls.generate_fake()
