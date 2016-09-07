@@ -45,6 +45,9 @@ class AssetGroupForm(forms.ModelForm):
         fields = [
             "name", "comment"
         ]
+        help_texts = {
+            'name': '* required',
+        }
 
 
 class IdcForm(forms.ModelForm):

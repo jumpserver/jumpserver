@@ -165,6 +165,25 @@ class Asset(models.Model):
         db_table = 'asset'
         index_together = ('ip', 'port')
 
+    @classmethod
+    def generate_fake(cls, count=100):
+        from random import seed
+        import forgery_py
+        from django.db import IntegrityError
+
+        seed()
+        for i in range(count):
+            asset = cls(ip='%s.%s.%s.%s' % tuple([forgery_py.forgery.basic.text(length=3, digits=True)
+                                                  for i in range(0, 4)]),
+                        port=22,
+                        created_by='Fake')
+            try:
+                asset.save()
+                logger.debug('Generate fake asset : %s' % asset.ip)
+            except IntegrityError:
+                print('Error continue')
+                continue
+
 
 class Label(models.Model):
     key = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('KEY'))

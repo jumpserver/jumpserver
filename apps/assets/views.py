@@ -11,7 +11,7 @@ from django.db.models import Q
 from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from django.urls import reverse_lazy
-from django.views.generic.detail import DetailView
+from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from .models import Asset, AssetGroup, IDC, AssetExtend
 from .forms import AssetForm, AssetGroupForm
@@ -56,6 +56,8 @@ class AssetGroupCreateView(CreateView):
     template_name = 'assets/asset_group_create.html'
     success_url = reverse_lazy('assets:asset-group-list')
 
+    # Todo: Asset group create template select assets so hard, need be resolve next
+
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Assets'),
@@ -99,15 +101,22 @@ class AssetGroupListView(ListView):
         return self.queryset
 
 
-class AssetGroupDetailView(DetailView):
+class AssetGroupDetailView(SingleObjectMixin, ListView):
     template_name = 'assets/asset_group_detail.html'
-    model = AssetGroup
-    context_object_name = 'asset_group'
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=AssetGroup.objects.all())
+        return super(AssetGroupDetailView, self).get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return self.object.assets.all()
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Assets'),
-            'action': _('Asset group detail')
+            'action': _('Asset group detail'),
+            'asset_group': self.object,
         }
         kwargs.update(context)
         return super(AssetGroupDetailView, self).get_context_data(**kwargs)
