@@ -78,3 +78,34 @@ class IDCForm(forms.ModelForm):
             'network': forms.Textarea(
                 attrs={'placeholder': '192.168.1.0/24\n192.168.2.0/24'})
         }
+
+
+class AdminUser(forms.ModelForm):
+    assets = forms.ModelMultipleChoiceField(queryset=Asset.objects.all(),
+                                            label=_('Asset'),
+                                            required=False,
+                                            widget=forms.SelectMultiple(
+                                                attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
+                                            )
+    password = forms.CharField(widget=forms.PasswordInput, max_length=100, strip=True)
+
+    def __init__(self, *args, **kwargs):
+        if kwargs.get('instance'):
+            initial = kwargs.get('initial', {})
+            initial['assets'] = kwargs['instance'].assets.all()
+        super(AdminUser, self).__init__(*args, **kwargs)
+
+    def _save_m2m(self):
+        super(AdminUser, self)._save_m2m()
+        assets = self.cleaned_data['assets']
+        self.instance.assets.clear()
+        self.instance.assets.add(*tuple(assets))
+
+    class Meta:
+        model = IDC
+        fields = ['name', "username", 'as_default', 'comment']
+        widgets = {
+            'name': forms.TextInput(attrs={'placeholder': _('Name')}),
+            'network': forms.Textarea(
+                attrs={'placeholder': '192.168.1.0/24\n192.168.2.0/24'})
+        }
