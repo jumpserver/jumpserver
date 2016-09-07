@@ -136,7 +136,7 @@ class Asset(models.Model):
     password = models.CharField(max_length=256, null=True, blank=True, verbose_name=_("Admin password"))
     admin_user = models.ForeignKey(AdminUser, null=True, on_delete=models.SET_NULL, verbose_name=_("Admin user"))
     system_user = models.ManyToManyField(SystemUser, blank=True, verbose_name=_("System User"))
-    idc = models.ForeignKey(IDC, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_('IDC'))
+    idc = models.ForeignKey(IDC, null=True, related_name='assets', on_delete=models.SET_NULL, verbose_name=_('IDC'))
     mac_addr = models.CharField(max_length=20, null=True, blank=True, verbose_name=_("Mac address"))
     brand = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Brand'))
     cpu = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('CPU'))

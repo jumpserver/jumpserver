@@ -50,12 +50,31 @@ class AssetGroupForm(forms.ModelForm):
         }
 
 
-class IdcForm(forms.ModelForm):
+class IDCForm(forms.ModelForm):
+    assets = forms.ModelMultipleChoiceField(queryset=Asset.objects.all(),
+                                            label=_('Asset'),
+                                            required=False,
+                                            widget=forms.SelectMultiple(
+                                                attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
+                                            )
+
+    def __init__(self, *args, **kwargs):
+        if kwargs.get('instance'):
+            initial = kwargs.get('initial', {})
+            initial['assets'] = kwargs['instance'].assets.all()
+        super(IDCForm, self).__init__(*args, **kwargs)
+
+    def _save_m2m(self):
+        super(IDCForm, self)._save_m2m()
+        assets = self.cleaned_data['assets']
+        self.instance.assets.clear()
+        self.instance.assets.add(*tuple(assets))
+
     class Meta:
         model = IDC
         fields = ['name', "bandwidth", "operator", 'contact', 'phone', 'address', 'network', 'comment']
         widgets = {
-            'name': forms.TextInput(attrs={'placeholder': 'Name'}),
+            'name': forms.TextInput(attrs={'placeholder': _('Name')}),
             'network': forms.Textarea(
                 attrs={'placeholder': '192.168.1.0/24\n192.168.2.0/24'})
         }

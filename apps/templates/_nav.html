@@ -20,7 +20,7 @@
     <ul class="nav nav-second-level">
         <li id="asset"><a href="{% url 'assets:asset-list' %}">{% trans 'Asset' %}</a></li>
         <li id="asset-group"><a href="{% url 'assets:asset-group-list' %}">{% trans 'Asset group' %}</a></li>
-        <li id="idc"><a href="">{% trans 'IDC' %}</a></li>
+        <li id="idc"><a href="{% url 'assets:idc-list' %}">{% trans 'IDC' %}</a></li>
         <li id="admin-user"><a href="">{% trans 'Admin user' %}</a></li>
         <li id="system-user"><a href="">{% trans 'System user' %}</a></li>
         <li id=""><a href="">{% trans 'Label' %}</a></li>

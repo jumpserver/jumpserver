@@ -13,7 +13,7 @@
             <div class="col-sm-12">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h5>{% trans 'Create asset group' %}</h5>
+                        <h5>{% trans 'Create idc' %}</h5>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -31,6 +31,12 @@
                             {% csrf_token %}
                             {{ form.name|bootstrap_horizontal }}
                             {{ form.assets|bootstrap_horizontal }}
+                            {{ form.bandwidth|bootstrap_horizontal }}
+                            {{ form.operator|bootstrap_horizontal }}
+                            {{ form.contact|bootstrap_horizontal }}
+                            {{ form.phone|bootstrap_horizontal }}
+                            {{ form.address|bootstrap_horizontal }}
+                            {{ form.network|bootstrap_horizontal }}
                             {{ form.comment|bootstrap_horizontal }}
 
                             <div class="form-group">
