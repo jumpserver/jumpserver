@@ -277,6 +277,7 @@ class AdminUserDetailView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
         self.object  = self.get_object(queryset=AdminUser.objects.all())
         return super(AdminUserDetailView, self).get(request, *args, **kwargs)
 
+    # Todo: queryset default order by connectivity, need ops support
     def get_queryset(self):
         return self.object.assets.all()
 

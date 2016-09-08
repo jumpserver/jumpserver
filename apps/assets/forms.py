@@ -21,6 +21,7 @@ class AssetForm(forms.ModelForm):
 
 
 class AssetGroupForm(forms.ModelForm):
+    # See AdminUserForm comment same it
     assets = forms.ModelMultipleChoiceField(queryset=Asset.objects.all(),
                                             label=_('Asset'),
                                             required=False,
@@ -51,6 +52,7 @@ class AssetGroupForm(forms.ModelForm):
 
 
 class IDCForm(forms.ModelForm):
+    # See AdminUserForm comment same it
     assets = forms.ModelMultipleChoiceField(queryset=Asset.objects.all(),
                                             label=_('Asset'),
                                             required=False,
@@ -81,29 +83,35 @@ class IDCForm(forms.ModelForm):
 
 
 class AdminUserForm(forms.ModelForm):
+    # Admin user assets define, let user select, save it in form not in view
     assets = forms.ModelMultipleChoiceField(queryset=Asset.objects.all(),
                                             label=_('Asset'),
                                             required=False,
                                             widget=forms.SelectMultiple(
                                                 attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
                                             )
+    # Form field name can not start with `_`, so redefine it,
     password = forms.CharField(widget=forms.PasswordInput, max_length=100, min_length=8, strip=True,
                                help_text=_('If also set private key, use that first'), required=False)
+    # Need use upload private key file except paste private key content
     private_key_file = forms.FileField(required=False)
 
     def __init__(self, *args, **kwargs):
+        # When update a admin user instance, initial it
         if kwargs.get('instance'):
             initial = kwargs.get('initial', {})
             initial['assets'] = kwargs['instance'].assets.all()
         super(AdminUserForm, self).__init__(*args, **kwargs)
 
     def _save_m2m(self):
+        # Save assets relation with admin user
         super(AdminUserForm, self)._save_m2m()
         assets = self.cleaned_data['assets']
         self.instance.assets.clear()
         self.instance.assets.add(*tuple(assets))
 
     def save(self, commit=True):
+        # Because we define custom field, so we need rewrite :method: `save`
         admin_user = super(AdminUserForm, self).save(commit=commit)
         password = self.cleaned_data['password']
         private_key_file = self.cleaned_data['private_key_file']
@@ -111,6 +119,7 @@ class AdminUserForm(forms.ModelForm):
         if password:
             admin_user.password = password
             print(password)
+        # Todo: Validate private key file, and generate public key
         if private_key_file:
             print(private_key_file)
             admin_user.private_key = private_key_file.read()
