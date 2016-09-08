@@ -83,6 +83,13 @@
     <script>
         $(document).ready(function () {
             $('.select2').select2();
+
+            if ($('#'+'{{ form.protocol.id_for_label }}').val() == 'telnet') {
+                $('#'+'{{ form.auto_generate_key.id_for_label }}').closest('.form-group').remove();
+                $('#'+'{{ form.private_key_file.id_for_label }}').closest('.form-group').remove();
+                $('#'+'{{ form.auto_push.id_for_label }}').closest('.form-group').remove();
+                $('#'+'{{ form.auto_update.id_for_label }}').closest('.form-group').remove();
+            }
         })
     </script>
 {% endblock %}
