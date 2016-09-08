@@ -41,12 +41,17 @@ class UserLoginView(FormView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_staff:
-            return redirect(request.POST.get(self.redirect_field_name, reverse('index')))
-        return self.render_to_response(self.get_context_data(**kwargs))
+            return redirect(self.get_success_url())
+        return super(UserLoginView, self).get(request, *args, **kwargs)
 
     def form_valid(self, form):
         auth_login(self.request, form.get_user())
-        return redirect(self.request.POST.get(self.redirect_field_name, reverse('index')))
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        return self.request.POST.get(
+            self.redirect_field_name,
+            self.request.GET.get(self.redirect_field_name, reverse('index')))
 
 
 @method_decorator(never_cache, name='dispatch')

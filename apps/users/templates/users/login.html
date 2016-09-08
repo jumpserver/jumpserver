@@ -40,7 +40,7 @@
             <div class="col-md-6">
                 <div class="ibox-content">
                     <div><img src="{% static 'img/logo.png' %}" width="82" height="82"> <span class="font-bold text-center" style="font-size: 32px; font-family: inherit">{% trans 'Login' %}</span></div>
-                    <form class="m-t" role="form" method="post" action="{% url 'users:login' %}">
+                    <form class="m-t" role="form" method="post" action="">
                         {% csrf_token %}
                         {% if form.errors %}
                             {% if 'captcha' in form.errors %}
