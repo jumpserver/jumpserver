@@ -1,0 +1,43 @@
+{% extends '_list_base.html' %}
+{% load i18n %}
+{% load common_tags %}
+{% block content_left_head %}
+    <a href="{% url 'assets:system-user-create' %}" class="btn btn-sm btn-primary "> {% trans "Create system user" %} </a>
+{% endblock %}
+
+{% block table_head %}
+    <th class="text-center">{% trans 'ID' %}</th>
+    <th class="text-center"><a href="{% url 'assets:system-user-list' %}?sort=name">{% trans 'Name' %}</a></th>
+    <th class="text-center"><a href="{% url 'assets:system-user-list' %}?sort=username">{% trans 'Username' %}</a></th>
+    <th class="text-center">{% trans 'Asset num' %}</th>
+    <th class="text-center">{% trans 'Asset group num' %}</th>
+    <th class="text-center">{% trans 'Lost connection' %}</th>
+    <th class="text-center">{% trans 'Comment' %}</th>
+    <th class="text-center"></th>
+{% endblock %}
+
+{% block table_body %}
+     {% for system_user in system_user_list %}
+         <tr class="gradeX">
+             <td class="text-center">{{ system_user.id }}</td>
+             <td>
+                 <a href="{% url 'assets:system-user-detail' pk=system_user.id %}">
+                     {{ system_user.name }}
+                 </a>
+             </td>
+             <td class="text-center">{{ system_user.username }}</td>
+             <td class="text-center">{{ system_user.assets.count }}</td>
+             <td class="text-center">{{ system_user.asset_groups.count }}</td>
+             <td class="text-center">{{ system_user.assets.count }}</td>
+             <td class="text-center">{{ system_user.comment|truncatewords:8 }}</td>
+             <td class="text-center">
+                 <!-- Todo: Click script button will paste a url to clipboard like: curl http://url/system_user_create.sh | bash -->
+                 <a href="{% url 'assets:system-user-update' pk=system_user.id %}" class="btn btn-xs btn-primary">{% trans 'Script' %}</a>
+                 <!-- Todo: Click refresh button will run a task to test admin user could connect asset or not immediately -->
+                 <a href="{% url 'assets:system-user-update' pk=system_user.id %}" class="btn btn-xs btn-warning">{% trans 'Refresh' %}</a>
+                 <a href="{% url 'assets:system-user-update' pk=system_user.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
+                 <a href="{% url 'assets:system-user-delete' pk=system_user.id %}" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
+             </td>
+         </tr>
+     {% endfor %}
+{% endblock %}

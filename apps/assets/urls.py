@@ -33,5 +33,10 @@ urlpatterns = [
     url(r'^admin-user/(?P<pk>[0-9]+)$', views.AdminUserDetailView.as_view(), name='admin-user-detail'),
     url(r'^admin-user/(?P<pk>[0-9]+)/update', views.AdminUserUpdateView.as_view(), name='admin-user-update'),
     url(r'^admin-user/(?P<pk>[0-9]+)/delete$', views.AdminUserDeleteView.as_view(), name='admin-user-delete'),
+    url(r'^system-user$', views.SystemUserListView.as_view(), name='system-user-list'),
+    url(r'^system-user/create$', views.SystemUserCreateView.as_view(), name='system-user-create'),
+    url(r'^system-user/(?P<pk>[0-9]+)$', views.SystemUserDetailView.as_view(), name='system-user-detail'),
+    url(r'^system-user/(?P<pk>[0-9]+)/update', views.SystemUserUpdateView.as_view(), name='system-user-update'),
+    url(r'^system-user/(?P<pk>[0-9]+)/delete$', views.SystemUserDeleteView.as_view(), name='system-user-delete'),
     # url(r'^api/v1.0/', include(router.urls)),
 ]
