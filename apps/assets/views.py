@@ -213,7 +213,7 @@ class AdminUserListView(AdminUserRequiredMixin, ListView):
         return super(AdminUserListView, self).get_context_data(**kwargs)
 
     def get_queryset(self):
-        # Todo: Default group by lose asset connection num
+        # Todo: Default order by lose asset connection num
         self.queryset = super(AdminUserListView, self).get_queryset()
         self.keyword = keyword = self.request.GET.get('keyword', '')
         self.sort = sort = self.request.GET.get('sort', '-date_created')
@@ -230,7 +230,7 @@ class AdminUserListView(AdminUserRequiredMixin, ListView):
 class AdminUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = AdminUser
     form_class = AdminUserForm
-    template_name = 'assets/admin_user_create.html'
+    template_name = 'assets/admin_user_create_update.html'
     success_url = reverse_lazy('assets:admin-user-list')
     success_message = _('Create admin user <a href="%s">%s</a> successfully.')
 
@@ -250,12 +250,46 @@ class AdminUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
 
 
 class AdminUserUpdateView(AdminUserRequiredMixin, UpdateView):
-    pass
+    model = AdminUser
+    form_class = AdminUserForm
+    template_name = 'assets/admin_user_create_update.html'
+    success_message = _('Update admin user <a href="%s">%s</a> successfully.')
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'assets',
+            'action': 'Update admin user'
+        }
+        kwargs.update(context)
+        return super(AdminUserUpdateView, self).get_context_data(**kwargs)
+
+    def get_success_url(self):
+        success_url = reverse_lazy('assets:admin-user-detail', pk=self.object.pk)
+        return success_url
 
 
-class AdminUserDetailView(AdminUserRequiredMixin, DetailView):
-    pass
+class AdminUserDetailView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    template_name = 'assets/admin_user_detail.html'
+    context_object_name = 'admin_user'
+
+    def get(self, request, *args, **kwargs):
+        self.object  = self.get_object(queryset=AdminUser.objects.all())
+        return super(AdminUserDetailView, self).get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return self.object.assets.all()
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'assets',
+            'action': 'Admin user detail'
+        }
+        kwargs.update(context)
+        return super(AdminUserDetailView, self).get_context_data(**kwargs)
 
 
 class AdminUserDeleteView(AdminUserRequiredMixin, DeleteView):
-    pass
+    model = AdminUser
+    template_name = 'assets/delete_confirm.html'
+    success_url = 'assets:admin-user-list'
