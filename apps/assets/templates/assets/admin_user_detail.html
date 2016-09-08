@@ -17,14 +17,14 @@
                         <ul class="nav nav-tabs">
                             <li class="active"><a href="" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
                             </li>
-                            <li><a href="" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Asset group perm' %}</a></li>
+                            <li><a href="" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Associate assets' %}</a></li>
                         </ul>
                     </div>
                     <div class="tab-content">
                         <div class="col-sm-7" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span class="label"><b>{{ asset_group.name }}</b></span>
+                                    <span class="label"><b>{{ admin_user.name }}</b></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -48,11 +48,15 @@
                                         <tbody>
                                         <tr class="no-borders-tr">
                                             <td>{% trans 'Name' %}:</td>
-                                            <td><b>{{ asset_group.name }}</b></td>
+                                            <td><b>{{ admin_user.name }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Username' %}:</td>
+                                            <td><b>{{ admin_user.username }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Date created' %}:</td>
-                                            <td><b>{{ asset_group.date_created }}</b></td>
+                                            <td><b>{{ admin_user.date_created }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Created by' %}:</td>
@@ -60,7 +64,7 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Comment' %}:</td>
-                                            <td><b>{{ asset_group.comment }}</b></td>
+                                            <td><b>{{ admin_user.comment }}</b></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -69,7 +73,7 @@
 
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span style="float: left"></span>{% trans 'Asset list of ' %} <b>{{ asset_group.name }}</b></span>
+                                    <span style="float: left">{% trans 'Asset list of ' %} <b>{{ admin_user.name }}</b></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -118,43 +122,37 @@
                         <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Associate system user' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Quick update' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table">
                                         <tbody>
                                         <tr class="no-borders-tr">
-                                            <td width="50%">{% trans 'repush system user' %}:</td>
+                                            <td width="50%">{% trans 'Get install script' %}:</td>
                                             <td>
                                                 <span style="float: right">
-                                                    <button class="btn btn-danger btn-xs" type="button"><i class="fa fa-refresh"></i></button>
+                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Get' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
-                                        <form>
-                                            <tr class="no-borders-tr">
-                                                <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select system user' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for group in groups %}
-                                                            <option value="{{ group.id }}">{{ group.name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                            <tr class="no-borders-tr">
-                                                <td colspan="2">
-                                                    <button type="button" class="btn btn-primary btn-sm">{% trans 'Associate' %}</button>
-                                                </td>
-                                            </tr>
-                                        </form>
-                                        {% for group in user.groups.all %}
+
                                         <tr>
-                                            <td ><b>{{ group.name }}</b></td>
+                                            <td width="50%">{% trans 'Retest asset connectivity' %}:</td>
                                             <td>
-                                                <button class="btn btn-danger btn-xs" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                                <span style="float: right">
+                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Start' %}</button>
+                                                </span>
                                             </td>
                                         </tr>
-                                        {% endfor %}
+
+                                        <tr>
+                                            <td width="50%">{% trans 'Reset private key' %}:</td>
+                                            <td>
+                                                <span style="float: right">
+                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Reset' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -162,7 +160,7 @@
 
                             <div class="panel panel-info">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Add asset to this group' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Replace asset admin user with this' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table">
@@ -170,7 +168,7 @@
                                         <form>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select asset user' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Select asset' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for group in groups %}
                                                             <option value="{{ group.id }}">{{ group.name }}</option>
                                                         {% endfor %}
@@ -179,23 +177,14 @@
                                             </tr>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <button type="button" class="btn btn-info btn-sm">{% trans 'Add' %}</button>
+                                                    <button type="button" class="btn btn-info btn-sm">{% trans 'Replace' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
-                                        {% for group in user.groups.all %}
-                                        <tr>
-                                            <td ><b>{{ group.name }}</b></td>
-                                            <td>
-                                                <button class="btn btn-danger btn-xs" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
-
                         </div>
                     </div>
                 </div>
@@ -226,6 +215,6 @@
 {#        }#}
         $(document).ready(function () {
             $('.select2').select2();
-        })
+        });
     </script>
 {% endblock %}
