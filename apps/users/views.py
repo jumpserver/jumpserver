@@ -98,7 +98,7 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     form_class = UserCreateForm
     template_name = 'users/user_create.html'
     success_url = reverse_lazy('users:user-list')
-    success_message = _('Create user <a href="%s">%s</a> success.')
+    success_message = _('Create user <a href="%s">%s</a> successfully.')
 
     def get_context_data(self, **kwargs):
         context = super(UserCreateView, self).get_context_data(**kwargs)

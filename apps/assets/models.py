@@ -68,15 +68,15 @@ class AssetExtend(models.Model):
 
 
 class AdminUser(models.Model):
-    name = models.CharField(max_length=128, unique=True, null=True, blank=True, verbose_name=_('Name'))
-    username = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Username'))
-    _password = models.CharField(max_length=256, null=True, blank=True, verbose_name=_('Password'))
-    _private_key = models.CharField(max_length=4096, null=True, blank=True, verbose_name=_('SSH private key'))
-    _public_key = models.CharField(max_length=4096, null=True, blank=True, verbose_name=_('SSH public key'))
-    as_default = models.BooleanField(default=True, verbose_name=_('As default'))
+    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
+    username = models.CharField(max_length=16, verbose_name=_('Username'))
+    _password = models.CharField(max_length=256, blank=True, verbose_name=_('Password'))
+    _private_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH private key'))
+    _public_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
+    as_default = models.BooleanField(default=False, verbose_name=_('As default'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
-    date_created = models.DateTimeField(auto_now=True, null=True, blank=True)
-    created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
+    date_created = models.DateTimeField(auto_now=True, null=True)
+    created_by = models.CharField(max_length=32, null=True, verbose_name=_('Created by'))
 
     def __unicode__(self):
         return self.name
@@ -110,7 +110,7 @@ class AdminUser(models.Model):
 
     @classmethod
     def generate_fake(cls, count=100):
-        from random import seed, choice
+        from random import seed
         import forgery_py
         from django.db import IntegrityError
 
@@ -204,10 +204,11 @@ class Asset(models.Model):
     groups = models.ManyToManyField(AssetGroup, related_name='assets', verbose_name=_('Asset groups'))
     username = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Admin user'))
     password = models.CharField(max_length=256, null=True, blank=True, verbose_name=_("Admin password"))
-    admin_user = models.ForeignKey(AdminUser, null=True, on_delete=models.SET_NULL, verbose_name=_("Admin user"))
+    admin_user = models.ForeignKey(AdminUser, null=True, related_name='assets',
+                                   on_delete=models.SET_NULL, verbose_name=_("Admin user"))
     system_user = models.ManyToManyField(SystemUser, blank=True, verbose_name=_("System User"))
     idc = models.ForeignKey(IDC, null=True, related_name='assets', on_delete=models.SET_NULL, verbose_name=_('IDC'))
-    mac_addr = models.CharField(max_length=20, null=True, blank=True, verbose_name=_("Mac address"))
+    mac_address = models.CharField(max_length=20, null=True, blank=True, verbose_name=_("Mac address"))
     brand = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Brand'))
     cpu = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('CPU'))
     memory = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Memory'))

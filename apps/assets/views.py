@@ -2,19 +2,16 @@
 from __future__ import absolute_import, unicode_literals
 
 from django.utils.translation import ugettext as _
-from django.shortcuts import get_object_or_404
-from django.views.generic import TemplateView, ListView
-from django.urls import reverse_lazy
-from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from django.conf import settings
 from django.db.models import Q
 from django.views.generic import TemplateView, ListView
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from django.urls import reverse_lazy
+from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from .models import Asset, AssetGroup, IDC, AssetExtend, AdminUser, SystemUser
-from .forms import AssetForm, AssetGroupForm, IDCForm
+from .forms import AssetForm, AssetGroupForm, IDCForm, AdminUserForm
 from .hands import AdminUserRequiredMixin
 
 
@@ -230,8 +227,26 @@ class AdminUserListView(AdminUserRequiredMixin, ListView):
         return self.queryset
 
 
-class AdminUserCreateView(AdminUserRequiredMixin, CreateView):
-    pass
+class AdminUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
+    model = AdminUser
+    form_class = AdminUserForm
+    template_name = 'assets/admin_user_create.html'
+    success_url = reverse_lazy('assets:admin-user-list')
+    success_message = _('Create admin user <a href="%s">%s</a> successfully.')
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'assets',
+            'action': 'Create admin user'
+        }
+        kwargs.update(context)
+        return super(AdminUserCreateView, self).get_context_data(**kwargs)
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % (
+            reverse_lazy('assets:admin-user-detail', kwargs={'pk': self.object.pk}),
+            self.object.name,
+        )
 
 
 class AdminUserUpdateView(AdminUserRequiredMixin, UpdateView):
