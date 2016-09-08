@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load bootstrap %}
+
+{% block custom_head_css_js %}
+{{ wizard.form.media }}
+<link href="{% static 'css/plugins/steps/jquery.steps.css' %}" rel="stylesheet">
+{% endblock %}
+{% block content %}
+<div class="wrapper wrapper-content animated fadeInRight">
+  <div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title">
+                <h5>Basic Wizzard</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-wrench"></i>
+                    </a>
+                    <a class="close-link">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+              <div class="wizard">
+                <div class="steps clearfix">
+                  <ul role="tablist">
+                    {% for step in wizard.steps.all %}
+                    <li role="tab" class="{% ifequal step wizard.steps.first %}first{% endifequal %} {% ifequal step wizard.steps.current %}current{% else %}disabled{% endifequal %} {% ifequal step wizard.steps.last %}last{% endifequal %}"
+                     aria-disabled="false" aria-selected="true">
+                     <a aria-controls="wizard-p-{{ step }}" href="#wizard-h-{{ step }}" id="wizard-t-{{ step }}"><span class="number">{% trans 'Step' %} {{ step }}</span></a>
+                    </li>
+                    {% endfor %}
+                  </ul>
+                </div>
+                <div class="content clearfix">
+                  <form action="" method="post" class="form col-lg-8 p-m">
+                    {% csrf_token %}
+                        {{ wizard.management_form }}
+                        {% if wizard.form.forms %}
+                            {{ wizard.form.management_form }}
+                            {% for form in wizard.form.forms %}
+                                {{ form|bootstrap }}
+                            {% endfor %}
+                        {% else %}
+                            {{ wizard.form|bootstrap }}
+                        {% endif %}
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                {% if wizard.steps.prev %}
+                <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}">{% trans "first step" %}</button>
+                <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "prev step" %}</button>
+                {% endif %}
+                <input type="submit" value="{% trans "submit" %}"/>
+              </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -18,6 +18,7 @@ class UserLoginForm(AuthenticationForm):
 
 
 class UserCreateForm(forms.ModelForm):
+
     class Meta:
         model = User
         fields = [
@@ -67,3 +68,14 @@ class UserGroupForm(forms.ModelForm):
         help_texts = {
             'name': '* required'
         }
+
+
+class UserInfoForm(forms.Form):
+    name = forms.CharField(max_length=20)
+    wechat = forms.CharField(max_length=30)
+    phone = forms.CharField(max_length=20)
+    enable_otp = forms.BooleanField()
+
+
+class UserKeyForm(forms.Form):
+    private_key = forms.CharField(max_length=5000, widget=forms.Textarea)

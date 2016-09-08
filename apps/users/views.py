@@ -7,9 +7,10 @@ import logging
 from django.conf import settings
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.messages.views import SuccessMessageMixin
+from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, reverse, redirect
+from django.shortcuts import get_object_or_404, reverse, redirect, render
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.urls import reverse_lazy
@@ -21,10 +22,12 @@ from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView
 from django.views.generic.detail import DetailView
 
+from formtools.wizard.views import SessionWizardView
+
 from common.utils import get_object_or_none
 
 from .models import User, UserGroup
-from .forms import UserCreateForm, UserUpdateForm, UserGroupForm, UserLoginForm
+from .forms import (UserCreateForm, UserUpdateForm, UserGroupForm, UserLoginForm, UserInfoForm, UserKeyForm)
 from .utils import AdminUserRequiredMixin, user_add_success_next, send_reset_password_mail
 
 
@@ -49,6 +52,9 @@ class UserLoginView(FormView):
         return redirect(self.get_success_url())
 
     def get_success_url(self):
+        if self.request.user.is_first_login:
+            return '/firstlogin'
+
         return self.request.POST.get(
             self.redirect_field_name,
             self.request.GET.get(self.redirect_field_name, reverse('index')))
@@ -292,3 +298,18 @@ class UserResetPasswordView(TemplateView):
 
         user.reset_password(password)
         return HttpResponseRedirect(reverse('users:reset-password-success'))
+
+
+class UserFirstLoginView(SessionWizardView):
+    template_name = 'users/first_login.html'
+    form_list = [UserInfoForm, UserKeyForm]
+    file_storage = default_storage
+
+    def done(self, form_list, form_dict, **kwargs):
+        print form_list
+        return redirect(reverse('index'))
+
+    def get_context_data(self, **kwargs):
+        context = super(UserFirstLoginView, self).get_context_data(**kwargs)
+        context.update({'app': _('Users'), 'action': _('First Login')})
+        return context
