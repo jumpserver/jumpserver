@@ -335,8 +335,8 @@ class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVi
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'assets',
-            'action': 'Create system user'
+            'app': _('Assets'),
+            'action': _('Create system user'),
         }
         kwargs.update(context)
         return super(SystemUserCreateView, self).get_context_data(**kwargs)
@@ -356,8 +356,8 @@ class SystemUserUpdateView(AdminUserRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'assets',
-            'action': 'Update system user'
+            'app': _('Assets'),
+            'action': _('Update system user')
         }
         kwargs.update(context)
         return super(SystemUserUpdateView, self).get_context_data(**kwargs)
@@ -367,10 +367,68 @@ class SystemUserUpdateView(AdminUserRequiredMixin, UpdateView):
         return success_url
 
 
-class SystemUserDetailView(DetailView):
-    pass
+class SystemUserDetailView(AdminUserRequiredMixin, DetailView):
+    template_name = 'assets/system_user_detail.html'
+    context_object_name = 'system_user'
+    model = SystemUser
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Assets'),
+            'action': _('System user detail')
+        }
+        kwargs.update(context)
+        return super(SystemUserDetailView, self).get_context_data(**kwargs)
 
 
-class SystemUserDeleteView(DeleteView):
-    pass
+class SystemUserDeleteView(AdminUserRequiredMixin, DeleteView):
+    model = SystemUser
+    template_name = 'assets/delete_confirm.html'
+    success_url = 'assets:system-user-list'
+
+
+class SystemUserAssetView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    template_name = 'assets/system_user_asset.html'
+    context_object_name = 'system_user'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=SystemUser.objects.all())
+        return super(SystemUserAssetView, self).get(request, *args, **kwargs)
+
+    # Todo: queryset default order by connectivity, need ops support
+    def get_queryset(self):
+        return self.object.assets.all()
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'assets',
+            'action': 'System user asset',
+            'assets': self.get_queryset(),
+        }
+        kwargs.update(context)
+        return super(SystemUserAssetView, self).get_context_data(**kwargs)
+
+
+class SystemUserAssetGroupView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    template_name = 'assets/system_user_asset_group.html'
+    context_object_name = 'system_user'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=SystemUser.objects.all())
+        return super(SystemUserAssetGroupView, self).get(request, *args, **kwargs)
+
+    # Todo: queryset default order by connectivity, need ops support
+    def get_queryset(self):
+        return self.object.asset_groups.all()
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'assets',
+            'action': 'System user asset group',
+            'asset_groups': self.get_queryset(),
+        }
+        kwargs.update(context)
+        return super(SystemUserAssetGroupView, self).get_context_data(**kwargs)
 

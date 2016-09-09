@@ -38,5 +38,8 @@ urlpatterns = [
     url(r'^system-user/(?P<pk>[0-9]+)$', views.SystemUserDetailView.as_view(), name='system-user-detail'),
     url(r'^system-user/(?P<pk>[0-9]+)/update', views.SystemUserUpdateView.as_view(), name='system-user-update'),
     url(r'^system-user/(?P<pk>[0-9]+)/delete$', views.SystemUserDeleteView.as_view(), name='system-user-delete'),
+    url(r'^system-user/(?P<pk>[0-9]+)/asset$', views.SystemUserAssetView.as_view(), name='system-user-asset'),
+    url(r'^system-user/(?P<pk>[0-9]+)/asset-group$', views.SystemUserAssetGroupView.as_view(),
+        name='system-user-asset-group'),
     # url(r'^api/v1.0/', include(router.urls)),
 ]

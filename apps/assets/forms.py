@@ -155,7 +155,7 @@ class SystemUserForm(forms.ModelForm):
                                                       attrs={'class': 'select2',
                                                              'data-placeholder': _('Select asset groups')})
                                                   )
-    auto_generate_key = forms.BooleanField(required=True, initial=True)
+    auto_generate_key = forms.BooleanField(initial=True)
     # Form field name can not start with `_`, so redefine it,
     password = forms.CharField(widget=forms.PasswordInput, max_length=100, min_length=8, strip=True,
                                help_text=_('If also set private key, use that first'), required=False)

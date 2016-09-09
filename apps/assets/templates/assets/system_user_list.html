@@ -11,7 +11,7 @@
     <th class="text-center"><a href="{% url 'assets:system-user-list' %}?sort=username">{% trans 'Username' %}</a></th>
     <th class="text-center">{% trans 'Asset num' %}</th>
     <th class="text-center">{% trans 'Asset group num' %}</th>
-    <th class="text-center">{% trans 'Lost connection' %}</th>
+    <th class="text-center">{% trans 'Unavailable' %}</th>
     <th class="text-center">{% trans 'Comment' %}</th>
     <th class="text-center"></th>
 {% endblock %}
@@ -29,7 +29,7 @@
              <td class="text-center">{{ system_user.assets.count }}</td>
              <td class="text-center">{{ system_user.asset_groups.count }}</td>
              <td class="text-center">{{ system_user.assets.count }}</td>
-             <td class="text-center">{{ system_user.comment|truncatewords:8 }}</td>
+             <td class="text-center">{{ system_user.comment|truncatewords:4 }}</td>
              <td class="text-center">
                  <!-- Todo: Click script button will paste a url to clipboard like: curl http://url/system_user_create.sh | bash -->
                  <a href="{% url 'assets:system-user-update' pk=system_user.id %}" class="btn btn-xs btn-primary">{% trans 'Script' %}</a>
