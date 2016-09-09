@@ -4,6 +4,7 @@ import os, sys, time, re
 from Crypto.Cipher import AES
 import crypt
 import pwd
+import grp
 from binascii import b2a_hex, a2b_hex
 import hashlib
 import datetime
@@ -107,7 +108,7 @@ def chown(path, user, group=''):
         group = user
     try:
         uid = pwd.getpwnam(user).pw_uid
-        gid = pwd.getpwnam(group).pw_gid
+        gid = grp.getgrnam(group).gr_gid
         os.chown(path, uid, gid)
     except KeyError:
         pass
