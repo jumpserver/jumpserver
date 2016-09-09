@@ -305,7 +305,7 @@ class SystemUserListView(AdminUserRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Assets'),
-            'action': _('Admin user list'),
+            'action': _('System user list'),
             'keyword': self.request.GET.get('keyword', '')
         }
         kwargs.update(context)
@@ -348,8 +348,23 @@ class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVi
         )
 
 
-class SystemUserUpdateView(UpdateView):
-    pass
+class SystemUserUpdateView(AdminUserRequiredMixin, UpdateView):
+    model = SystemUser
+    form_class = SystemUserForm
+    template_name = 'assets/system_user_create_update.html'
+    success_message = _('Update system user <a href="%s">%s</a> successfully.')
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'assets',
+            'action': 'Update system user'
+        }
+        kwargs.update(context)
+        return super(SystemUserUpdateView, self).get_context_data(**kwargs)
+
+    def get_success_url(self):
+        success_url = reverse_lazy('assets:system-user-detail', pk=self.object.pk)
+        return success_url
 
 
 class SystemUserDetailView(DetailView):

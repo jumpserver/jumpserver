@@ -132,7 +132,6 @@ class AdminUser(models.Model):
 class SystemUser(models.Model):
     PROTOCOL_CHOICES = (
         ('ssh', 'ssh'),
-        ('telnet', 'telnet'),
     )
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     username = models.CharField(max_length=16, verbose_name=_('Username'))
