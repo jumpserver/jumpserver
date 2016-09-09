@@ -61,7 +61,24 @@ class AssetExtend(models.Model):
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
-        return self.name
+        return '%(key)s: %(value)s' % {'key': self.key, 'value': self.value}
+
+    @classmethod
+    def initial(cls):
+        for k, v in (
+                (_('status'), _('In use')),
+                (_('status'), _('Out of use')),
+                (_('type'), _('Server')),
+                (_('type'), _('VM')),
+                (_('type'), _('Switch')),
+                (_('type'), _('Router')),
+                (_('type'), _('Firewall')),
+                (_('type'), _('Storage')),
+                (_('env'), _('Production')),
+                (_('env'), _('Development')),
+                (_('env'), _('Testing')),
+                ):
+            cls.objects.create(key=k, value=v, created_by='System')
 
     class Meta:
         db_table = 'asset_extend'
