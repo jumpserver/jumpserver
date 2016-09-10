@@ -71,11 +71,20 @@ class UserGroupForm(forms.ModelForm):
 
 
 class UserInfoForm(forms.Form):
-    name = forms.CharField(max_length=20)
-    wechat = forms.CharField(max_length=30)
-    phone = forms.CharField(max_length=20)
-    enable_otp = forms.BooleanField()
+    name = forms.CharField(max_length=20, label=_('name'))
+    avatar = forms.ImageField(label=_('avatar'), required=False)
+    wechat = forms.CharField(max_length=30, label=_('wechat'), required=False)
+    phone = forms.CharField(max_length=20, label=_('phone'), required=False)
+    enable_otp = forms.BooleanField(required=False, label=_('enable otp'))
 
 
 class UserKeyForm(forms.Form):
-    private_key = forms.CharField(max_length=5000, widget=forms.Textarea)
+    private_key = forms.CharField(max_length=5000, widget=forms.Textarea, label=_('private key'))
+
+    def clean_private_key(self):
+        from users.utils import validate_ssh_pk
+        ssh_pk = self.cleaned_data['private_key']
+        checked, reason = validate_ssh_pk(ssh_pk)
+        if not checked:
+            raise forms.ValidationError(_('Not a valid ssh private key.'))
+        return ssh_pk

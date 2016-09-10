@@ -13,16 +13,13 @@
     <div class="col-lg-12">
         <div class="ibox">
             <div class="ibox-title">
-                <h5>Basic Wizzard</h5>
+              <h5>{% trans 'First Login' %}</h5>
                 <div class="ibox-tools">
                     <a class="collapse-link">
                         <i class="fa fa-chevron-up"></i>
                     </a>
                     <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                         <i class="fa fa-wrench"></i>
-                    </a>
-                    <a class="close-link">
-                        <i class="fa fa-times"></i>
                     </a>
                 </div>
             </div>
@@ -33,36 +30,51 @@
                     {% for step in wizard.steps.all %}
                     <li role="tab" class="{% ifequal step wizard.steps.first %}first{% endifequal %} {% ifequal step wizard.steps.current %}current{% else %}disabled{% endifequal %} {% ifequal step wizard.steps.last %}last{% endifequal %}"
                      aria-disabled="false" aria-selected="true">
-                     <a aria-controls="wizard-p-{{ step }}" href="#wizard-h-{{ step }}" id="wizard-t-{{ step }}"><span class="number">{% trans 'Step' %} {{ step }}</span></a>
+                     <a href="javascript:void(0)"><span class="number">{% trans 'Step' %} {{ step }}</span></a>
                     </li>
                     {% endfor %}
                   </ul>
                 </div>
                 <div class="content clearfix">
-                  <form action="" method="post" class="form col-lg-8 p-m">
+                  <form action="" method="post" class="form col-lg-8 p-m" id="fl_form">
                     {% csrf_token %}
-                        {{ wizard.management_form }}
-                        {% if wizard.form.forms %}
-                            {{ wizard.form.management_form }}
-                            {% for form in wizard.form.forms %}
-                                {{ form|bootstrap }}
-                            {% endfor %}
-                        {% else %}
-                            {{ wizard.form|bootstrap }}
-                        {% endif %}
-                      </div>
-                    </div>
+                    {{ wizard.management_form }}
+                    {% if wizard.form.forms %}
+                        {{ wizard.form.management_form }}
+                        {% for form in wizard.form.forms %}
+                            {{ form|bootstrap }}
+                        {% endfor %}
+                    {% else %}
+                        {{ wizard.form|bootstrap }}
+                    {% endif %}
                   </form>
                 </div>
-                {% if wizard.steps.prev %}
-                <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}">{% trans "first step" %}</button>
-                <button name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "prev step" %}</button>
-                {% endif %}
-                <input type="submit" value="{% trans "submit" %}"/>
+                <div class="actions clearfix">
+                  <ul>
+                    {% if wizard.steps.prev %}
+                    <li><a class="fl_goto" data-goto="{{ wizard.steps.first }}">{% trans "first step" %}</a></li>
+                    <li><a class="fl_goto" name="wizard_goto_step" data-goto="{{ wizard.steps.prev }}">{% trans "prev step" %}</a></li>
+                    {% endif %}
+                    <li><a id="fl_submit">{% trans "submit" %}</a></li>
+                  </ul>
+                </div>
               </div>
             </div>
         </div>
     </div>
   </div>
 </div>
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+$(document).on('click', ".fl_goto", function(){
+  var $form = $('#fl_form');
+  $('<input />', {'name': 'wizard_goto_step', 'value': $(this).data('goto'), 'type': 'hidden'}).appendTo($form);
+  $form.submit();
+  return false;
+}).on('click', '#fl_submit', function(){
+  $('#fl_form').submit();
+  return false;
+})
+</script>
 {% endblock %}

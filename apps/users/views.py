@@ -6,11 +6,12 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import login as auth_login, logout as auth_logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, reverse, redirect, render
+from django.shortcuts import get_object_or_404, reverse, redirect
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.urls import reverse_lazy
@@ -53,7 +54,7 @@ class UserLoginView(FormView):
 
     def get_success_url(self):
         if self.request.user.is_first_login:
-            return '/firstlogin'
+            return reverse('users:user-first-login')
 
         return self.request.POST.get(
             self.redirect_field_name,
@@ -300,16 +301,40 @@ class UserResetPasswordView(TemplateView):
         return HttpResponseRedirect(reverse('users:reset-password-success'))
 
 
-class UserFirstLoginView(SessionWizardView):
+class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
     template_name = 'users/first_login.html'
     form_list = [UserInfoForm, UserKeyForm]
     file_storage = default_storage
 
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated() and not request.user.is_first_login:
+            return redirect(reverse('index'))
+        return super(UserFirstLoginView, self).dispatch(request, *args, **kwargs)
+
     def done(self, form_list, form_dict, **kwargs):
-        print form_list
+        user = self.request.user
+        for form in form_list:
+            for field in form:
+                if field.value():
+                    setattr(user, field.name, field.value())
+                if field.name == 'enable_otp':
+                    user.enable_otp = field.value()
+        user.is_first_login = False
+        user.save()
         return redirect(reverse('index'))
 
     def get_context_data(self, **kwargs):
         context = super(UserFirstLoginView, self).get_context_data(**kwargs)
         context.update({'app': _('Users'), 'action': _('First Login')})
         return context
+
+    def get_form_initial(self, step):
+        user = self.request.user
+        if step == '0':
+            return {
+                'name': user.name or user.username,
+                'enable_otp': user.enable_otp or True,
+                'wechat': user.wechat or '',
+                'phone': user.phone or ''
+            }
+        return super(UserFirstLoginView, self).get_form_initial(step)
