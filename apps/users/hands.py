@@ -10,5 +10,5 @@
     :license: GPL v2, see LICENSE for more details.
 """
 
-
+from users.utils import AdminUserRequiredMixin
 

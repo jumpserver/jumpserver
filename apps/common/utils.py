@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 from django.shortcuts import reverse as dj_reverse
 from django.conf import settings
 from django.core import signing
+from django.utils import timezone
 
 
 def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, external=False):
@@ -31,3 +32,11 @@ def encrypt(*args, **kwargs):
 def decrypt(*args, **kwargs):
     return signing.loads(*args, **kwargs)
 
+
+def date_expired_default():
+    try:
+        years = int(settings.CONFIG.DEFAULT_EXPIRED_YEARS)
+    except TypeError:
+        years = 70
+
+    return timezone.now() + timezone.timedelta(days=365 * years)

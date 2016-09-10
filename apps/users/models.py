@@ -14,7 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from rest_framework.authtoken.models import Token
 
-from common.utils import encrypt, decrypt
+from common.utils import encrypt, decrypt, date_expired_default
 
 
 class UserGroup(models.Model):
@@ -56,10 +56,6 @@ class UserGroup(models.Model):
             except IntegrityError:
                 print('Error continue')
                 continue
-
-
-def date_expired_default():
-    return timezone.now() + timezone.timedelta(days=365 * 70)
 
 
 class User(AbstractUser):
