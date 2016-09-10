@@ -108,6 +108,7 @@ TEMPLATES = [
 # WSGI_APPLICATION = 'jumpserver.wsgi.application'
 
 LOGIN_REDIRECT_URL = reverse_lazy('index')
+LOGIN_URL = reverse_lazy('users:login')
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
@@ -227,7 +228,7 @@ USE_L10N = True
 USE_TZ = True
 
 # I18N translation
-LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'),]
+LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'), ]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/

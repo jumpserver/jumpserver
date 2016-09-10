@@ -17,3 +17,4 @@ paramiko==2.0.2
 celery==3.1.23
 ansible==2.1.1.0
 django-simple-captcha==0.5.2
+django-formtools==1.0

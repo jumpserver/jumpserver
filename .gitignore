@@ -1,6 +1,7 @@
 .DS_Store
 *.pyc
 *.pyo
+*.swp
 env
 env*
 dist
