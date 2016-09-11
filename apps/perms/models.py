@@ -9,70 +9,34 @@ from assets.models import Asset, AssetGroup, SystemUser
 from common.utils import date_expired_default
 
 
-class PermUserAsset(models.Model):
+class AssetPermission(models.Model):
     ACTION_CHOICE = (
         ('1', 'Allow'),
         ('0', 'Deny'),
     )
 
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
+    users = models.ManyToManyField(User, related_name='asset_permissions')
+    user_groups = models.ManyToManyField(UserGroup, related_name='asset_permissions')
+    assets = models.ManyToManyField(Asset, related_name='granted_by_permissions', blank=True)
+    asset_groups = models.ManyToManyField(AssetGroup, related_name='granted_by_permissions', blank=True)
+    system_users = models.ManyToManyField(SystemUser, related_name='granted_by_permissions')
     action = models.CharField(choices=ACTION_CHOICE, max_length=8, default='1')
-    assets = models.ManyToManyField(Asset, blank=True)
-    asset_groups = models.ManyToManyField(AssetGroup,  blank=True)
-    system_users = models.ManyToManyField(SystemUser,  blank=True)
+    is_active = models.BooleanField(default=True)
     date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_('Date expired'))
     created_by = models.CharField(max_length=128, blank=True)
     date_created = models.DateTimeField(auto_now=True)
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
 
     def __unicode__(self):
-        return '%(id)s: %(user)s %(action)s' % {
-            'id': self.id,
-            'user': self.user.username,
-            'action': self.action,
-        }
+        return '%(name)s: %(action)s' % {'name': self.name, 'action': self.action}
 
     @property
-    def is_expired(self):
-        if self.date_expired > timezone.now():
-            return False
-        else:
+    def is_valid(self):
+        if self.date_expired < timezone.now() and is_active:
             return True
+        return True
 
     class Meta:
-        db_table = 'perm_user_asset'
-
-
-class PermUserGroupAsset(models.Model):
-    ACTION_CHOICES = (
-        ('0', 'Deny'),
-        ('1', 'Allow'),
-    )
-
-    user_group = models.ForeignKey(User,  on_delete=models.CASCADE)
-    action = models.CharField(choices=ACTION_CHOICES, max_length=8, default='1')
-    assets = models.ManyToManyField(Asset, blank=True)
-    asset_groups = models.ManyToManyField(AssetGroup, blank=True)
-    system_users = models.ManyToManyField(SystemUser, blank=True)
-    date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_('Date expired'))
-    created_by = models.CharField(max_length=128)
-    date_created = models.DateTimeField(auto_now=True)
-    comment = models.TextField(verbose_name=_('Comment'))
-
-    def __unicode__(self):
-        return '%(id)s: %(user)s %(action)s' % {
-            'id': self.id,
-            'user': self.user_group.name,
-            'action': self.action,
-        }
-
-    @property
-    def is_expired(self):
-        if self.date_expired > timezone.now():
-            return False
-        else:
-            return True
-
-    class Meta:
-        db_table = 'perm_user_group_asset'
+        db_table = 'asset_permission'
 

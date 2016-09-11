@@ -12,33 +12,40 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from .hands import AdminUserRequiredMixin, User, UserGroup
-from .models import PermUserAsset, PermUserGroupAsset
-from .forms import PermUserAssetForm
+from .models import AssetPermission
+from .forms import AssetPermissionForm
 
 
-class PermUserListView(AdminUserRequiredMixin, ListView):
-    model = User
+class UserAssetPermissionListView(AdminUserRequiredMixin, ListView):
+    model = AssetPermission
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    context_object_name = 'user_list'
-    template_name = 'perms/perm_user_list.html'
+    context_object_name = 'asset_permission_list'
+    template_name = 'perms/asset_permission_list.html'
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Perms'),
-            'action': _('Perms user list'),
+            'action': _('Asset permission list'),
             'keyword': self.request.GET.get('keyword', '')
         }
         kwargs.update(context)
-        return super(PermUserListView, self).get_context_data(**kwargs)
+        return super(UserAssetPermissionListView, self).get_context_data(**kwargs)
 
     def get_queryset(self):
         # Todo: Default order by lose asset connection num
-        self.queryset = super(PermUserListView, self).get_queryset()
+        self.queryset = super(UserAssetPermissionListView, self).get_queryset()
         self.keyword = keyword = self.request.GET.get('keyword', '')
-        self.sort = sort = self.request.GET.get('sort', '-date_joined')
+        self.sort = sort = self.request.GET.get('sort', '-date_created')
 
         if keyword:
-            self.queryset = self.queryset.filter(Q(name__icontains=keyword) |
+            self.queryset = self.queryset.filter(Q(users__name__icontains=keyword) |
+                                                 Q(users__username__icontains=keyword) |
+                                                 Q(user_groups__name__icontains=keyword) |
+                                                 Q(assets__ip__icontains=keyword) |
+                                                 Q(assets__hostname__icontains=keyword) |
+                                                 Q(system_users__username_icontains=keyword) |
+                                                 Q(system_users__name_icontains=keyword) |
+                                                 Q(asset_groups__name__icontains=keyword) |
                                                  Q(comment__icontains=keyword))
 
         if sort:
@@ -46,57 +53,25 @@ class PermUserListView(AdminUserRequiredMixin, ListView):
         return self.queryset
 
 
-class PermUserAssetListView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    context_object_name = 'perm_user_asset_list'
-    template_name = 'perms/perm_user_asset_list.html'
-    model = User
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=User.objects.all())
-        return super(PermUserAssetListView, self).get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = {
-            'app': _('Assets'),
-            'action': _('User perm asset list'),
-            'keyword': self.request.GET.get('keyword', '')
-        }
-        kwargs.update(context)
-        return super(PermUserAssetListView, self).get_context_data(**kwargs)
-
-    def get_queryset(self):
-        self.queryset = self.object.permuserasset_set.all()
-        return self.queryset
-
-
-class PermUserAssetCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
-    model = PermUserAsset
-    form_class = PermUserAssetForm
-    template_name = 'perms/perm_user_asset_create_update.html'
-    success_url = reverse_lazy('perms:perm-user-list')
-    success_message = _('Create user asset perm <a href="%s">%s</a> successfully.')
-
-    def get_initial(self):
-        return {'user': self.get_object(queryset=User.objects.all())}
-
-    def form_invalid(self, form):
-        print(form.errors)
-        return super(PermUserAssetCreateView, self).form_invalid(form)
+class UserAssetPermissionCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
+    model = AssetPermission
+    form_class = AssetPermissionForm
+    template_name = 'perms/asset_permission_create.html'
+    success_url = reverse_lazy('perms:asset-permission-list')
+    success_message = _('Create asset <a href="%s"> %s </a> perm successfully.')
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Perms'),
-            'action': _('Create user asset perm'),
-            'user': self.get_object(queryset=User.objects.all()),
+            'action': _('Create asset permission'),
         }
         kwargs.update(context)
-        return super(PermUserAssetCreateView, self).get_context_data(**kwargs)
+        return super(UserAssetPermissionCreateView, self).get_context_data(**kwargs)
 
-    def get_success_message(self, cleaned_data):
-        return self.success_message % (
-            reverse_lazy('perms:perm-user-asset-list', kwargs={'pk': self.object.user.id})
-        )
+    # def get_success_message(self, cleaned_data):
+    #     return self.success_message % (
+    #         reverse_lazy('perms:asset-permission-list', kwargs={'pk': self.object.pk})
+        # )
 
 
 # class PermUserAssetUpdateView(AdminUserRequiredMixin, UpdateView):

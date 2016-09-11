@@ -84,7 +84,7 @@ class UserListView(AdminUserRequiredMixin, ListView):
     model = User
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'user_list'
-    template_name = 'users/user_list.html'
+    template_name = 'users/asset_permission_list.html'
     ordering = '-date_joined'
 
     def get_queryset(self):

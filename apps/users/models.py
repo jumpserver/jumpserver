@@ -32,7 +32,7 @@ class UserGroup(models.Model):
         return False
 
     class Meta:
-        db_table = 'user-group'
+        db_table = 'user_group'
 
     @classmethod
     def initial(cls):

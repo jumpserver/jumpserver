@@ -26,15 +26,15 @@
         <li id=""><a href="">{% trans 'Label' %}</a></li>
     </ul>
 </li>
-<li id="">
+<li id="perms">
     <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">{% trans 'Perms' %}</span><span class="fa arrow"></span></a>
     <ul class="nav nav-second-level">
-        <li id="sudo">
-            <a class="sudo" href="{% url 'perms:perm-user-list' %}">{% trans 'User perm' %}</a>
+        <li id="asset-permission">
+            <a href="{% url 'perms:asset-permission-list' %}">{% trans 'Asset permission' %}</a>
         </li>
-        <li id="role">
-            <a href="">{% trans 'User group perm' %}</a>
-        </li>
+{#        <li id="user-group">#}
+{#            <a href="">{% trans 'User group perm' %}</a>#}
+{#        </li>#}
     </ul>
 </li>
 <li id="">
