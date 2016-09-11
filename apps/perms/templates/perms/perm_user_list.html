@@ -1,0 +1,72 @@
+{% extends '_list_base.html' %}
+{% load i18n %}
+{% load common_tags %}
+{% block content_left_head %}
+{% endblock %}
+
+{% block table_head %}
+    <th class="text-center">
+        <input type="checkbox" id="check_all" onclick="checkAll('check_all', 'checked')">
+    </th>
+    <th class="text-center"><a href="{% url 'users:user-list' %}?sort=name">{% trans 'Name' %}</a></th>
+    <th class="text-center"><a href="{% url 'users:user-list' %}?sort=username">{% trans 'Username' %}</a></th>
+    <th class="text-center">{% trans 'User group' %}</th>
+    <th class="text-center">{% trans 'Asset available' %}</th>
+    <th class="text-center">{% trans 'Asset unavailable' %}</th>
+    <th class="text-center">{% trans 'Asset group' %}</th>
+    <th class="text-center">{% trans 'System user' %}</th>
+    <th class="text-center"><a href="{% url 'users:user-list' %}?sort=date_expired">{% trans 'Active' %}</a></th>
+    <th class="text-center"></th>
+{% endblock %}
+
+{% block table_body %}
+     {% for user in user_list %}
+         <tr class="gradeX">
+             <td class="text-center">
+                 <input type="checkbox" name="checked" value="{{ user.id }}">
+             </td>
+             <td class="text-center">
+                 <a href="{% url 'users:user-detail' pk=user.id %}">
+                     {{ user.name }}
+                 </a>
+             </td>
+             <td class="text-center">{{ user.username }}</td>
+             <td class="text-center">{{ user.get_role_display }}</td>
+             <td class="text-center" title="{% for user_group in user.group.all %} {{ user_group.name }} {% endfor %}"> {{ user.groups.all|join_queryset_attr:"name" }} </td>
+             <th class="text-center">{{ user.name }}</th>
+             <td class="text-center">
+                 {% if user.is_expired and user.is_active %}
+                     <i class="fa fa-times text-danger"></i>
+                 {% else %}
+                     <i class="fa fa-check text-navy"></i>
+                 {% endif %}
+             </td>
+             <td class="text-center">
+                 <a href="{% url 'users:user-update' pk=user.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
+                 <a href="{% url 'users:user-delete' pk=user.id %}" class="btn btn-xs btn-danger del {% if user.id == request.user.id or user.username == 'admin' %} disabled {% endif %}">{% trans 'Delete' %}</a>
+             </td>
+         </tr>
+     {% endfor %}
+{% endblock %}
+
+{% block content_bottom_left %}
+    <form id="" method="get" action="" class=" mail-search">
+        <div class="input-group">
+            <select class="form-control m-b" style="width: auto">
+                <option>{% trans 'Delete selected' %}</option>
+                <option>{% trans 'Update selected' %}</option>
+                <option>{% trans 'Deactive selected' %}</option>
+                <option>{% trans 'Export selected' %}</option>
+            </select>
+
+            <div class="input-group-btn pull-left" style="padding-left: 5px;">
+                <button id='search_btn' type="submit" style="height: 32px;"  class="btn btn-sm btn-primary">
+                 {% trans 'Submit' %}
+                </button>
+            </div>
+
+        </div>
+   </form>
+{% endblock %}
+
+

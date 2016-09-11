@@ -1,32 +1,37 @@
 # ~*~ coding: utf-8 ~*~
+
 from rest_framework import serializers
-from .models import (
-    AssetGroup,Asset,IDC,AssetExtend
-)
-from rest_framework import viewsets,serializers
+from rest_framework import viewsets, serializers
+
+from .models import AssetGroup, Asset, IDC, AssetExtend
+
 
 class AssetGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssetGroup
-        #exclude = [
-            #'password', 'first_name', 'last_name', 'secret_key_otp',
-            #'private_key', 'public_key', 'avatar',
-        #]
+        # exclude = [
+        #     'password', 'first_name', 'last_name', 'secret_key_otp',
+        #     'private_key', 'public_key', 'avatar',
+        # ]
+
 
 class AssetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Asset
-        #fields = ('id', 'title', 'code', 'linenos', 'language', 'style')
+        # fields = ('id', 'title', 'code', 'linenos', 'language', 'style')
+
 
 class IDCSerializer(serializers.ModelSerializer):
     class Meta:
         model = IDC
-        #fields = ('id', 'title', 'code', 'linenos', 'language', 'style')
+        # fields = ('id', 'title', 'code', 'linenos', 'language', 'style')
 
 
 class AssetGroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows AssetGroup to be viewed or edited.
+    """ API endpoint that allows AssetGroup to be viewed or edited.
+
+    some other comment
+
     """
     queryset = AssetGroup.objects.all()
     serializer_class = AssetGroupSerializer
