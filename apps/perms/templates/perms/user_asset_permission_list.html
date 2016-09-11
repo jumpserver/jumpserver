@@ -9,34 +9,33 @@
     <th class="text-center">
         <input type="checkbox" id="check_all" onclick="checkAll('check_all', 'checked')">
     </th>
-    <th class="text-center"><a href="{% url 'users:user-list' %}?sort=name">{% trans 'Name' %}</a></th>
-    <th class="text-center"><a href="{% url 'users:user-list' %}?sort=username">{% trans 'Username' %}</a></th>
-    <th class="text-center">{% trans 'Role' %}</th>
-    <th class="text-center">{% trans 'Asset num' %}</th>
-    <th class="text-center">{% trans 'Asset group' %}</th>
-    <th class="text-center">{% trans 'System user' %}</th>
-    <th class="text-center"><a href="{% url 'users:user-list' %}?sort=date_expired">{% trans 'Active' %}</a></th>
+    <th class="text-center"><a href="{% url 'perms:user-permission-list' %}?sort=name">{% trans 'Name' %}</a></th>
+    <th class="text-center"><a href="{% url 'perms:user-permission-list' %}?sort=username">{% trans 'Username' %}</a></th>
+    <th class="text-center">{% trans 'Asset count' %}</th>
+    <th class="text-center">{% trans 'Asset group count' %}</th>
+    <th class="text-center">{% trans 'System user count' %}</th>
+    <th class="text-center"><a href="{% url 'users:user-list' %}?sort=date_expired">{% trans 'Is expired' %}</a></th>
     <th class="text-center"></th>
 {% endblock %}
 
 {% block table_body %}
-     {% for user in user_list %}
+     {% for permission in user_permission_list %}
          <tr class="gradeX">
              <td class="text-center">
-                 <input type="checkbox" name="checked" value="{{ user.id }}">
+                 <input type="checkbox" name="checked" value="{{ permission.id }}">
              </td>
              <td class="text-center">
-                 <a href="{% url 'users:user-detail' pk=user.id %}">
-                     {{ user.name }}
+                 <a href="">
+                     {{ permission.user.name }}
                  </a>
              </td>
-             <td class="text-center">{{ user.username }}</td>
-             <td class="text-center">{{ user.get_role_display }}</td>
-             <th class="text-center">35/40</th>
-             <th class="text-center">20</th>
-             <th class="text-center">3</th>
+             <td class="text-center">{{ permission.user.username }}</td>
+             <td class="text-center">{{ permission.assets.count }}</td>
+             <td class="text-center">{{ permission.asset_groups.count }}</td>
+             <td class="text-center">{{ permission.system_users.count }}</td>
+             <td class="text-center">{{ permission.is_expired }}</td>
              <td class="text-center">
-                 <a href="{% url 'perms:perm-user-asset-create' pk=user.id %}" class="btn btn-xs btn-info">{% trans 'Create perm' %}</a>
+                 <a href="{% url 'perms:user-asset-permission-create' pk=user.id %}" class="btn btn-xs btn-info">{% trans 'Create perm' %}</a>
                  <a href="{% url 'users:user-delete' pk=user.id %}" class="btn btn-xs btn-danger del {% if user.id == request.user.id or user.username == 'admin' %} disabled {% endif %}">{% trans 'Flush' %}</a>
              </td>
          </tr>
