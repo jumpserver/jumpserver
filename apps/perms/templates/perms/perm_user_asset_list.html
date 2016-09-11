@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load common_tags %}
 {% block content_left_head %}
-    <a href="{% url 'users:user-create' %}" class="btn btn-sm btn-primary "> {% trans "Batch create perm " %} </a>
+    <a href="{% url 'users:user-create' %}" class="btn btn-sm btn-primary "> {% trans "Create perm " %} </a>
 {% endblock %}
 
 {% block table_head %}
@@ -20,7 +20,7 @@
 {% endblock %}
 
 {% block table_body %}
-     {% for user in user_list %}
+     {% for perm in page_obj %}
          <tr class="gradeX">
              <td class="text-center">
                  <input type="checkbox" name="checked" value="{{ user.id }}">

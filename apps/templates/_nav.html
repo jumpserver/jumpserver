@@ -30,7 +30,7 @@
     <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">{% trans 'Perms' %}</span><span class="fa arrow"></span></a>
     <ul class="nav nav-second-level">
         <li id="sudo">
-            <a class="sudo" href="">{% trans 'User perm' %}</a>
+            <a class="sudo" href="{% url 'perms:perm-user-list' %}">{% trans 'User perm' %}</a>
         </li>
         <li id="role">
             <a href="">{% trans 'User group perm' %}</a>

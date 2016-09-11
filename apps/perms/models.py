@@ -23,7 +23,7 @@ class PermUserAsset(models.Model):
     date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_('Date expired'))
     created_by = models.CharField(max_length=128, blank=True)
     date_created = models.DateTimeField(auto_now=True)
-    comment = models.TextField(verbose_name=_('Comment'))
+    comment = models.TextField(verbose_name=_('Comment'), blank=True)
 
     def __unicode__(self):
         return '%(id)s: %(user)s %(action)s' % {
