@@ -43,8 +43,8 @@
              {% endif %}
              </td>
              <td class="text-center">
-                 <a href="" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
-                 <a href="" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
+                 <a href="{% url 'perms:asset-permission-update' pk=permission.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
+                 <a href="{% url 'perms:asset-permission-delete' pk=permission.id %}" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
              </td>
          </tr>
      {% endfor %}

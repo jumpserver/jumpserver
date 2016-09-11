@@ -16,7 +16,7 @@ from .models import AssetPermission
 from .forms import AssetPermissionForm
 
 
-class UserAssetPermissionListView(AdminUserRequiredMixin, ListView):
+class AssetPermissionListView(AdminUserRequiredMixin, ListView):
     model = AssetPermission
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'asset_permission_list'
@@ -29,11 +29,11 @@ class UserAssetPermissionListView(AdminUserRequiredMixin, ListView):
             'keyword': self.request.GET.get('keyword', '')
         }
         kwargs.update(context)
-        return super(UserAssetPermissionListView, self).get_context_data(**kwargs)
+        return super(AssetPermissionListView, self).get_context_data(**kwargs)
 
     def get_queryset(self):
         # Todo: Default order by lose asset connection num
-        self.queryset = super(UserAssetPermissionListView, self).get_queryset()
+        self.queryset = super(AssetPermissionListView, self).get_queryset()
         self.keyword = keyword = self.request.GET.get('keyword', '')
         self.sort = sort = self.request.GET.get('sort', '-date_created')
 
@@ -53,12 +53,12 @@ class UserAssetPermissionListView(AdminUserRequiredMixin, ListView):
         return self.queryset
 
 
-class UserAssetPermissionCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
+class AssetPermissionCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = AssetPermission
     form_class = AssetPermissionForm
-    template_name = 'perms/asset_permission_create.html'
+    template_name = 'perms/asset_permission_create_update.html'
     success_url = reverse_lazy('perms:asset-permission-list')
-    success_message = _('Create asset <a href="%s"> %s </a> perm successfully.')
+    success_message = _('Create asset permission <a href="%s"> %s </a> successfully.')
 
     def get_context_data(self, **kwargs):
         context = {
@@ -66,48 +66,49 @@ class UserAssetPermissionCreateView(AdminUserRequiredMixin, SuccessMessageMixin,
             'action': _('Create asset permission'),
         }
         kwargs.update(context)
-        return super(UserAssetPermissionCreateView, self).get_context_data(**kwargs)
+        return super(AssetPermissionCreateView, self).get_context_data(**kwargs)
 
-    # def get_success_message(self, cleaned_data):
-    #     return self.success_message % (
-    #         reverse_lazy('perms:asset-permission-list', kwargs={'pk': self.object.pk})
-        # )
+    def get_success_message(self, cleaned_data):
+        return self.success_message % (
+            reverse_lazy('perms:asset-permission-detail', kwargs={'pk': self.object.pk}),
+            self.object.name,
+        )
 
 
-# class PermUserAssetUpdateView(AdminUserRequiredMixin, UpdateView):
-#     model = PermUserAsset
-#     form_class = PermUserAssetForm
-#     template_name = 'assets/system_user_create_update.html'
-#     success_message = _('Update system user <a href="%s">%s</a> successfully.')
-#
-#     def get_context_data(self, **kwargs):
-#         context = {
-#             'app': _('Assets'),
-#             'action': _('Update system user')
-#         }
-#         kwargs.update(context)
-#         return super(PermUserAssetUpdateView, self).get_context_data(**kwargs)
-#
-#     def get_success_url(self):
-#         success_url = reverse_lazy('assets:system-user-detail', pk=self.object.pk)
-#         return success_url
-#
-#
-# class PermUserAssetDetailView(AdminUserRequiredMixin, DetailView):
-#     template_name = 'assets/system_user_detail.html'
-#     context_object_name = 'system_user'
-#     model = PermUserAsset
-#
-#     def get_context_data(self, **kwargs):
-#         context = {
-#             'app': _('Assets'),
-#             'action': _('System user detail')
-#         }
-#         kwargs.update(context)
-#         return super(PermUserAssetDetailView, self).get_context_data(**kwargs)
-#
-#
-# class PermUserAssetDeleteView(AdminUserRequiredMixin, DeleteView):
-#     model = PermUserAsset
-#     template_name = 'assets/delete_confirm.html'
-#     success_url = 'assets:system-user-list'
+class AssetPermissionUpdateView(AdminUserRequiredMixin, UpdateView):
+    model = AssetPermission
+    form_class = AssetPermissionForm
+    template_name = 'perms/asset_permission_create_update.html'
+    success_message = _('Update asset permission <a href="%s"> %s </a> successfully.')
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Perms'),
+            'action': _('Update asset permission')
+        }
+        kwargs.update(context)
+        return super(AssetPermissionUpdateView, self).get_context_data(**kwargs)
+
+    def get_success_url(self):
+        success_url = reverse_lazy('perms:asset-permission-detail', kwargs={'pk': self.object.pk})
+        return success_url
+
+
+class AssetPermissionDetailView(AdminUserRequiredMixin, DetailView):
+    template_name = 'assets/system_user_detail.html'
+    context_object_name = 'system_user'
+    model = AssetPermission
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Assets'),
+            'action': _('System user detail')
+        }
+        kwargs.update(context)
+        return super(AssetPermissionDetailView, self).get_context_data(**kwargs)
+
+
+class AssetPermissionDeleteView(AdminUserRequiredMixin, DeleteView):
+    model = AssetPermission
+    template_name = 'perms/delete_confirm.html'
+    success_url = reverse_lazy('perms:asset-permission-list')
