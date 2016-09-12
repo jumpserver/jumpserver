@@ -82,7 +82,6 @@ class UserListView(AdminUserRequiredMixin, ListView):
         if keyword:
             self.queryset = self.queryset.filter(Q(username__icontains=keyword) |
                                                  Q(name__icontains=keyword))
-
         if sort:
             self.queryset = self.queryset.order_by(sort)
         return self.queryset

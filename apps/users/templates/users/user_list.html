@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block table_body %}
-     {% for user in user_list %}
+     {% for user in object_list %}
          <tr class="gradeX">
              <td class="text-center">
                  <input type="checkbox" name="checked" value="{{ user.id }}">
