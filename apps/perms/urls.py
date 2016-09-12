@@ -14,5 +14,9 @@ urlpatterns = [
         name='asset-permission-detail'),
     url(r'^asset-permission/(?P<pk>[0-9]+)/delete$', views.AssetPermissionDeleteView.as_view(),
         name='asset-permission-delete'),
+    url(r'^asset-permission/(?P<pk>[0-9]+)/user$', views.AssetPermissionUserListView.as_view(),
+        name='asset-permission-user-list'),
+    url(r'^asset-permission/(?P<pk>[0-9]+)/asset$', views.AssetPermissionAssetListView.as_view(),
+        name='asset-permission-asset-list'),
 ]
 

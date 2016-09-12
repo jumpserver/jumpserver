@@ -11,7 +11,7 @@ from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
-from .hands import AdminUserRequiredMixin, User, UserGroup
+from .hands import AdminUserRequiredMixin, User, UserGroup, SystemUser
 from .models import AssetPermission
 from .forms import AssetPermissionForm
 
@@ -95,14 +95,17 @@ class AssetPermissionUpdateView(AdminUserRequiredMixin, UpdateView):
 
 
 class AssetPermissionDetailView(AdminUserRequiredMixin, DetailView):
-    template_name = 'assets/system_user_detail.html'
-    context_object_name = 'system_user'
+    template_name = 'perms/asset_permission_detail.html'
+    context_object_name = 'asset_permission'
     model = AssetPermission
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Assets'),
-            'action': _('System user detail')
+            'app': _('Perms'),
+            'action': _('Asset permission detail'),
+            'system_users_remain': [system_user for system_user in SystemUser.objects.all()
+                                    if system_user not in self.object.system_users.all()],
+            'system_users': self.object.system_users.all(),
         }
         kwargs.update(context)
         return super(AssetPermissionDetailView, self).get_context_data(**kwargs)
@@ -112,3 +115,32 @@ class AssetPermissionDeleteView(AdminUserRequiredMixin, DeleteView):
     model = AssetPermission
     template_name = 'perms/delete_confirm.html'
     success_url = reverse_lazy('perms:asset-permission-list')
+
+
+class AssetPermissionUserListView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
+    template_name = 'perms/asset_permission_user_list.html'
+    context_object_name = 'asset_permission'
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=AssetPermission.objects.all())
+        return super(AssetPermissionUserListView, self).get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return self.object.users.all()
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Perms'),
+            'action': _('Asset permission user list'),
+            'users_remain': [user for user in User.objects.all() if user not in self.get_queryset()],
+            'user_groups': self.object.user_groups.all(),
+            'user_groups_remain': [user_group for user_group in UserGroup.objects.all()
+                                   if user_group not in self.object.user_groups.all()]
+        }
+        kwargs.update(context)
+        return super(AssetPermissionUserListView, self).get_context_data(**kwargs)
+
+
+class AssetPermissionAssetListView(AdminUserRequiredMixin, ListView):
+    pass

@@ -20,31 +20,31 @@
 {% endblock %}
 
 {% block table_body %}
-     {% for permission in asset_permission_list %}
+     {% for asset_permission in asset_permission_list %}
          <tr class="gradeX">
              <td class="text-center">
-                 <input type="checkbox" name="checked" value="{{ permission.id }}">
+                 <input type="checkbox" name="checked" value="{{ asset_permission.id }}">
              </td>
              <td class="text-center">
-                 <a href="">
-                     {{ permission.name }}
+                 <a href="{% url 'perms:asset-permission-detail' pk=asset_permission.id %}">
+                     {{ asset_permission.name }}
                  </a>
              </td>
-             <td class="text-center">{{ permission.users.count}}</td>
-             <td class="text-center">{{ permission.user_groups.count}}</td>
-             <td class="text-center">{{ permission.assets.count }}</td>
-             <td class="text-center">{{ permission.asset_groups.count }}</td>
-             <td class="text-center">{{ permission.system_users.count }}</td>
+             <td class="text-center">{{ asset_permission.users.count}}</td>
+             <td class="text-center">{{ asset_permission.user_groups.count}}</td>
+             <td class="text-center">{{ asset_permission.assets.count }}</td>
+             <td class="text-center">{{ asset_permission.asset_groups.count }}</td>
+             <td class="text-center">{{ asset_permission.system_users.count }}</td>
              <td class="text-center">
-             {% if permission.is_valid %}
+             {% if asset_permission.is_valid %}
                  <i class="fa fa-check text-navy"></i>
              {% else %}
                  <i class="fa fa-times text-danger"></i>
              {% endif %}
              </td>
              <td class="text-center">
-                 <a href="{% url 'perms:asset-permission-update' pk=permission.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
-                 <a href="{% url 'perms:asset-permission-delete' pk=permission.id %}" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
+                 <a href="{% url 'perms:asset-permission-update' pk=asset_permission.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
+                 <a href="{% url 'perms:asset-permission-delete' pk=asset_permission.id %}" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
              </td>
          </tr>
      {% endfor %}
