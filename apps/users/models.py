@@ -2,19 +2,17 @@
 
 from __future__ import unicode_literals
 
-import datetime
-
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
-from django.utils import timezone
-from django.db import models
-from django.contrib.auth.models import AbstractUser, Permission
+from django.contrib.auth.models import AbstractUser
+from django.core import signing
+from django.db import models, IntegrityError
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.db import IntegrityError
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+
 from rest_framework.authtoken.models import Token
-from django.core import signing
 
 from common.utils import encrypt, decrypt
 
@@ -44,16 +42,15 @@ class UserGroup(models.Model):
 
     @classmethod
     def generate_fake(cls, count=100):
-        from random import seed, randint, choice
+        from random import seed, choice
         import forgery_py
-        from django.db import IntegrityError
 
         seed()
         for i in range(count):
             group = cls(name=forgery_py.name.full_name(),
                         comment=forgery_py.lorem_ipsum.sentence(),
                         created_by=choice(User.objects.all()).username
-                    )
+                        )
             try:
                 group.save()
             except IntegrityError:
@@ -84,7 +81,7 @@ class User(AbstractUser):
     _private_key = models.CharField(max_length=5000, blank=True, verbose_name=_('ssh private key'))
     _public_key = models.CharField(max_length=1000, blank=True, verbose_name=_('ssh public key'))
     comment = models.TextField(max_length=200, blank=True, verbose_name=_('Comment'))
-    is_first_login = models.BooleanField(default=False)
+    is_first_login = models.BooleanField(default=True)
     date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True,
                                         verbose_name=_('Date expired'))
     created_by = models.CharField(max_length=30, default='', verbose_name=_('Created by'))
@@ -235,7 +232,7 @@ class User(AbstractUser):
                        wechat=forgery_py.internet.user_name(True),
                        comment=forgery_py.lorem_ipsum.sentence(),
                        created_by=choice(cls.objects.all()).username,
-                   )
+                       )
             try:
                 user.save()
             except IntegrityError:
@@ -264,4 +261,3 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
             Token.objects.create(user=instance)
         except IntegrityError:
             pass
-

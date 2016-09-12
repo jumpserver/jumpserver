@@ -6,7 +6,9 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth import login as auth_login, logout as auth_logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
+from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, reverse, redirect
@@ -21,10 +23,12 @@ from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView
 from django.views.generic.detail import DetailView
 
+from formtools.wizard.views import SessionWizardView
+
 from common.utils import get_object_or_none
 
 from .models import User, UserGroup
-from .forms import UserCreateForm, UserUpdateForm, UserGroupForm, UserLoginForm
+from .forms import (UserCreateForm, UserUpdateForm, UserGroupForm, UserLoginForm, UserInfoForm, UserKeyForm)
 from .utils import AdminUserRequiredMixin, user_add_success_next, send_reset_password_mail
 
 
@@ -41,12 +45,20 @@ class UserLoginView(FormView):
 
     def get(self, request, *args, **kwargs):
         if request.user.is_staff:
-            return redirect(request.POST.get(self.redirect_field_name, reverse('index')))
-        return self.render_to_response(self.get_context_data(**kwargs))
+            return redirect(self.get_success_url())
+        return super(UserLoginView, self).get(request, *args, **kwargs)
 
     def form_valid(self, form):
         auth_login(self.request, form.get_user())
-        return redirect(self.request.POST.get(self.redirect_field_name, reverse('index')))
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        if self.request.user.is_first_login:
+            return reverse('users:user-first-login')
+
+        return self.request.POST.get(
+            self.redirect_field_name,
+            self.request.GET.get(self.redirect_field_name, reverse('index')))
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -97,7 +109,7 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     form_class = UserCreateForm
     template_name = 'users/user_create.html'
     success_url = reverse_lazy('users:user-list')
-    success_message = _('Create user <a href="%s">%s</a> success.')
+    success_message = _('Create user <a href="%s">%s</a> successfully.')
 
     def get_context_data(self, **kwargs):
         context = super(UserCreateView, self).get_context_data(**kwargs)
@@ -286,3 +298,42 @@ class UserResetPasswordView(TemplateView):
 
         user.reset_password(password)
         return HttpResponseRedirect(reverse('users:reset-password-success'))
+
+
+class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
+    template_name = 'users/first_login.html'
+    form_list = [UserInfoForm, UserKeyForm]
+    file_storage = default_storage
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated() and not request.user.is_first_login:
+            return redirect(reverse('index'))
+        return super(UserFirstLoginView, self).dispatch(request, *args, **kwargs)
+
+    def done(self, form_list, form_dict, **kwargs):
+        user = self.request.user
+        for form in form_list:
+            for field in form:
+                if field.value():
+                    setattr(user, field.name, field.value())
+                if field.name == 'enable_otp':
+                    user.enable_otp = field.value()
+        user.is_first_login = False
+        user.save()
+        return redirect(reverse('index'))
+
+    def get_context_data(self, **kwargs):
+        context = super(UserFirstLoginView, self).get_context_data(**kwargs)
+        context.update({'app': _('Users'), 'action': _('First Login')})
+        return context
+
+    def get_form_initial(self, step):
+        user = self.request.user
+        if step == '0':
+            return {
+                'name': user.name or user.username,
+                'enable_otp': user.enable_otp or True,
+                'wechat': user.wechat or '',
+                'phone': user.phone or ''
+            }
+        return super(UserFirstLoginView, self).get_form_initial(step)

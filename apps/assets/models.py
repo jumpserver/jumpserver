@@ -61,22 +61,39 @@ class AssetExtend(models.Model):
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
-        return self.name
+        return '%(key)s: %(value)s' % {'key': self.key, 'value': self.value}
+
+    @classmethod
+    def initial(cls):
+        for k, v in (
+                (_('status'), _('In use')),
+                (_('status'), _('Out of use')),
+                (_('type'), _('Server')),
+                (_('type'), _('VM')),
+                (_('type'), _('Switch')),
+                (_('type'), _('Router')),
+                (_('type'), _('Firewall')),
+                (_('type'), _('Storage')),
+                (_('env'), _('Production')),
+                (_('env'), _('Development')),
+                (_('env'), _('Testing')),
+                ):
+            cls.objects.create(key=k, value=v, created_by='System')
 
     class Meta:
         db_table = 'asset_extend'
 
 
 class AdminUser(models.Model):
-    name = models.CharField(max_length=128, unique=True, null=True, blank=True, verbose_name=_('Name'))
-    username = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Username'))
-    _password = models.CharField(max_length=256, null=True, blank=True, verbose_name=_('Password'))
-    _private_key = models.CharField(max_length=4096, null=True, blank=True, verbose_name=_('SSH private key'))
-    _public_key = models.CharField(max_length=4096, null=True, blank=True, verbose_name=_('SSH public key'))
-    as_default = models.BooleanField(default=True, verbose_name=_('As default'))
+    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
+    username = models.CharField(max_length=16, verbose_name=_('Username'))
+    _password = models.CharField(max_length=256, blank=True, verbose_name=_('Password'))
+    _private_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH private key'))
+    _public_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
+    as_default = models.BooleanField(default=False, verbose_name=_('As default'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
-    date_created = models.DateTimeField(auto_now=True, null=True, blank=True)
-    created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
+    date_created = models.DateTimeField(auto_now=True, null=True)
+    created_by = models.CharField(max_length=32, null=True, verbose_name=_('Created by'))
 
     def __unicode__(self):
         return self.name
@@ -110,7 +127,7 @@ class AdminUser(models.Model):
 
     @classmethod
     def generate_fake(cls, count=100):
-        from random import seed, choice
+        from random import seed
         import forgery_py
         from django.db import IntegrityError
 
@@ -132,30 +149,73 @@ class AdminUser(models.Model):
 class SystemUser(models.Model):
     PROTOCOL_CHOICES = (
         ('ssh', 'ssh'),
-        ('telnet', 'telnet'),
     )
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
-    username = models.CharField(max_length=16, blank=True, verbose_name=_('Username'))
-    password = models.CharField(max_length=256, blank=True, verbose_name=_('Password'))
-    protocol = models.CharField(max_length=16, default='ssh', verbose_name=_('Protocol'))
-    private_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH private key'))
-    public_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
-    is_default = models.BooleanField(default=True, verbose_name=_('As default'))
+    username = models.CharField(max_length=16, verbose_name=_('Username'))
+    _password = models.CharField(max_length=256, blank=True, verbose_name=_('Password'))
+    protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
+    _private_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH private key'))
+    _public_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
+    as_default = models.BooleanField(default=False, verbose_name=_('As default'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
     auto_update = models.BooleanField(default=True, verbose_name=_('Auto update pass/key'))
-    sudo = models.TextField(max_length=4096, blank=True, verbose_name=_('Sudo'))
-    shell = models.CharField(max_length=64,  blank=True, verbose_name=_('Shell'))
+    sudo = models.TextField(max_length=4096, default='/user/bin/whoami', verbose_name=_('Sudo'))
+    shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
     home = models.CharField(max_length=64, blank=True, verbose_name=_('Home'))
-    uid = models.IntegerField(blank=True, verbose_name=_('Uid'))
-    date_created = models.DateTimeField(auto_now=True, null=True)
+    uid = models.IntegerField(null=True, blank=True, verbose_name=_('Uid'))
+    date_created = models.DateTimeField(auto_now=True)
     created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
-    comment = models.CharField(max_length=128, blank=True, verbose_name=_('Comment'))
+    comment = models.TextField(max_length=128, blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
         return self.name
 
+    @property
+    def password(self):
+        return decrypt(self._password)
+
+    @password.setter
+    def password(self, password_raw):
+        self._password = encrypt(password_raw)
+
+    @property
+    def private_key(self):
+        return decrypt(self._private_key)
+
+    @private_key.setter
+    def private_key(self, private_key_raw):
+        self._private_key = encrypt(private_key_raw)
+
+    @property
+    def public_key(self):
+        return decrypt(self._public_key)
+
+    @public_key.setter
+    def public_key(self, public_key_raw):
+        self._public_key = encrypt(public_key_raw)
+
     class Meta:
         db_table = 'system_user'
+
+    @classmethod
+    def generate_fake(cls, count=100):
+        from random import seed
+        import forgery_py
+        from django.db import IntegrityError
+
+        seed()
+        for i in range(count):
+            obj = cls(name=forgery_py.name.full_name(),
+                      username=forgery_py.internet.user_name(),
+                      password=forgery_py.lorem_ipsum.word(),
+                      comment=forgery_py.lorem_ipsum.sentence(),
+                      created_by='Fake')
+            try:
+                obj.save()
+                logger.debug('Generate fake asset group: %s' % obj.name)
+            except IntegrityError:
+                print('Error continue')
+                continue
 
 
 class AssetGroup(models.Model):
@@ -204,10 +264,11 @@ class Asset(models.Model):
     groups = models.ManyToManyField(AssetGroup, related_name='assets', verbose_name=_('Asset groups'))
     username = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Admin user'))
     password = models.CharField(max_length=256, null=True, blank=True, verbose_name=_("Admin password"))
-    admin_user = models.ForeignKey(AdminUser, null=True, on_delete=models.SET_NULL, verbose_name=_("Admin user"))
-    system_user = models.ManyToManyField(SystemUser, blank=True, verbose_name=_("System User"))
+    admin_user = models.ForeignKey(AdminUser, null=True, related_name='assets',
+                                   on_delete=models.SET_NULL, verbose_name=_("Admin user"))
+    system_user = models.ManyToManyField(SystemUser, blank=True, related_name='assets', verbose_name=_("System User"))
     idc = models.ForeignKey(IDC, null=True, related_name='assets', on_delete=models.SET_NULL, verbose_name=_('IDC'))
-    mac_addr = models.CharField(max_length=20, null=True, blank=True, verbose_name=_("Mac address"))
+    mac_address = models.CharField(max_length=20, null=True, blank=True, verbose_name=_("Mac address"))
     brand = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Brand'))
     cpu = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('CPU'))
     memory = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Memory'))
@@ -226,7 +287,7 @@ class Asset(models.Model):
     comment = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
-        return '%(ip)s:%(port)d' % {'ip': self.ip, 'port': self.port}
+        return '%(ip)s:%(port)s' % {'ip': self.ip, 'port': self.port}
 
     def initial(self):
         pass

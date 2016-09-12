@@ -20,7 +20,7 @@
          <tr class="gradeX">
              <td class="text-center">{{ admin_user.id }}</td>
              <td>
-                 <a href="{% url 'users:user-detail' pk=user.id %}">
+                 <a href="{% url 'assets:admin-user-detail' pk=admin_user.id %}">
                      {{ admin_user.name }}
                  </a>
              </td>
