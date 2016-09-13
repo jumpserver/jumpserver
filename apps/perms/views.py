@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 
 from __future__ import unicode_literals, absolute_import
+import functools
 
 from django.utils.translation import ugettext as _
 from django.conf import settings
@@ -11,6 +12,7 @@ from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
+from common.utils import search_object_attr
 from .hands import AdminUserRequiredMixin, User, UserGroup, SystemUser
 from .models import AssetPermission
 from .forms import AssetPermissionForm
@@ -124,10 +126,19 @@ class AssetPermissionUserListView(AdminUserRequiredMixin, SingleObjectMixin, Lis
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=AssetPermission.objects.all())
+        self.keyword = keyword = self.request.GET.get('keyword', '')
         return super(AssetPermissionUserListView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
-        return self.object.users.all()
+        print(self.keyword)
+        queryset = self.object.get_granted_users()
+
+        if self.keyword:
+            search_func = functools.partial(search_object_attr, value=self.keyword,
+                                            attr_list=['name', 'username', 'email'],
+                                            ignore_case=True)
+            queryset = filter(search_func, queryset[:])
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = {

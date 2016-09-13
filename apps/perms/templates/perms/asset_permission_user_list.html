@@ -28,6 +28,16 @@
                                 <a href="{% url 'perms:asset-permission-asset-list' pk=asset_permission.id  %}" class="text-center">
                                 <i class="fa fa-bar-chart-o"></i> {% trans 'Assets and asset gruops' %}</a>
                             </li>
+                            <form id="search_form" method="get" action="" class="pull-right mail-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="">
+                                <div class="input-group-btn">
+                                    <button id="search_btn" type="submit" class="btn btn-sm btn-primary">
+                                        搜索
+                                    </button>
+                                </div>
+                            </div>
+                            </form>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -43,10 +53,6 @@
                                             <i class="fa fa-wrench"></i>
                                         </a>
                                         <ul class="dropdown-menu dropdown-user">
-                                            <li><a href="#"></a>
-                                            </li>
-                                            <li><a href="#"></a>
-                                            </li>
                                         </ul>
                                         <a class="close-link">
                                             <i class="fa fa-times"></i>
@@ -60,7 +66,8 @@
                                                 <th>{% trans 'Name' %}</th>
                                                 <th>{% trans 'Username' %}</th>
                                                 <th>{% trans 'Email' %}</th>
-                                                <th>{% trans 'Active' %}</th>
+                                                <th>{% trans 'Is valid' %}</th>
+                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -77,6 +84,9 @@
                                                     {% endif %}
                                                 </td>
 
+                                                <td>
+                                                    <button class="btn btn-danger btn-xs btn_delete_user_group {% if user.inherited %} disabled {% endif %}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                                </td>
                                             </tr>
                                             {% endfor %}
                                         </tbody>
