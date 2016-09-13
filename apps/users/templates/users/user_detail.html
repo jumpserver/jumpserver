@@ -22,7 +22,7 @@
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-sm-7" style="padding-left: 0px;">
+                        <div class="col-sm-7" style="padding-left: 0">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
                                     <span class="label"><b>{{ user_object.name }}</b></span>
@@ -108,7 +108,7 @@
                         <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Quick update' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Quick modify' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table">
@@ -191,7 +191,7 @@
                                         <tr>
                                           <td ><b class="bdg_user_group" data-gid={{ group.id }}>{{ group.name }}</b></td>
                                           <td>
-                                              <button class="btn btn-danger btn-xs btn_delete_user_group" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                              <button class="btn btn-danger btn-sm btn_delete_user_group" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                           </td>
                                         </tr>
                                         {% endfor %}
@@ -205,12 +205,10 @@
             </div>
         </div>
     </div>
-    </div>
-
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-jumpserver.selected_groups = new Object();
+jumpserver.selected_groups = {};
 function updateUserGroups(user_groups) {
   var the_url = "{% url 'users:user-group-edit-api' pk=user_object.id%}";
   var body = {
@@ -234,36 +232,35 @@ function updateUserGroups(user_groups) {
     // clear jumpserver.selected_groups
     jumpserver.selected_groups = {};
     toastr.success('{% trans "Update success!" %}')
-  }
+  };
   APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success, method: 'PUT'});
 
 }
 $(document).ready(function () {
   $('.select2').select2()
-  .on('select2:select', function(evt, params) {
+  .on('select2:select', function(evt) {
     var data = evt.params.data;
     jumpserver.selected_groups[data.id] = data.text;
   }).on('select2:unselect', function(evt) {
     var data = evt.params.data;
     delete jumpserver.selected_groups[data.id]
   })
-});
-$(document).on('click', '#is_active', function(){
+}).on('click', '#is_active', function(){
   var the_url = "{% url 'users:user-patch-api' pk=user_object.id %}";
   var checked = !$(this).prop('checked');
   var body = {'is_active': checked };
-  var success = function(data) {
+  var success = function() {
     toastr.success('{% trans "Update success!" %}')
-  }
-  APIUpdateAttr({ url: the_url, body: body, success: success});
+  };
+  APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success});
 }).on('click', '#enable_otp', function(){
   var the_url = "{% url 'users:user-patch-api' pk=user_object.id %}";
   var checked = !$(this).prop('checked');
   var body = {'enable_otp': checked };
-  var success = function(data) {
+  var success = function() {
     toastr.success('{% trans "Update success!" %}')
-  }
-  APIUpdateAttr({ url: the_url, body: body, success: success});
+  };
+  APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success});
 }).on('click', '#btn_add_user_group', function(){
   if (Object.keys(jumpserver.selected_groups).length === 0) {
     return false;
@@ -290,6 +287,6 @@ $(document).on('click', '#is_active', function(){
     return $(this).data('gid');
   }).get();
   updateUserGroups(user_groups)
-})
+});
 </script>
 {% endblock %}
