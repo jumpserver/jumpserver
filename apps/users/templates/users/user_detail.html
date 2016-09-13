@@ -6,7 +6,9 @@
 
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
     <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
 {% endblock %}
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -114,8 +116,8 @@
                                     <table class="table">
                                         <tbody>
                                         <tr class="no-borders-tr">
-                                            <td width="50%">Active:</td>
-                                            <td><span style="float: right">
+                                          <td width="50%">{% trans 'Active' %}:</td>
+                                            <td><span class="pull-right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
                                                         <input type="checkbox" {% if user_object.is_active %} checked {% endif %}  class="onoffswitch-checkbox" id="is_active">
@@ -128,8 +130,8 @@
                                             </span></td>
                                         </tr>
                                         <tr>
-                                            <td>二次验证:</td>
-                                            <td><span style="float: right">
+                                          <td>{% trans 'Enable OTP' %}:</td>
+                                            <td><span class="pull-right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
                                                         <input type="checkbox" class="onoffswitch-checkbox" {% if user_object.enable_otp %} checked {% endif %}
@@ -145,16 +147,16 @@
                                         <tr>
                                             <td>{% trans 'Reset password' %}:</td>
                                             <td>
-                                                <span style="float: right">
-                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Reset' %}</button>
+                                                <span class="pull-right">
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_password" style="width: 54px">{% trans 'Reset' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Reset ssh key' %}:</td>
                                             <td>
-                                                <span style="float: right">
-                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px;">{% trans 'Reset' %}</button>
+                                                <span class="pull-right">
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_pk" style="width: 54px;" data-toggle="modal" data-target="#user_reset_pk_modal">{% trans 'Reset' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
@@ -191,7 +193,7 @@
                                         <tr>
                                           <td ><b class="bdg_user_group" data-gid={{ group.id }}>{{ group.name }}</b></td>
                                           <td>
-                                              <button class="btn btn-danger btn-sm btn_delete_user_group" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                              <button class="btn btn-danger pull-right btn-sm btn_delete_user_group" type="button"><i class="fa fa-minus"></i></button>
                                           </td>
                                         </tr>
                                         {% endfor %}
@@ -205,6 +207,7 @@
             </div>
         </div>
     </div>
+    {% include 'users/_user_reset_pk_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
@@ -225,13 +228,13 @@ function updateUserGroups(user_groups) {
       $('.group_edit tbody').append(
         '<tr>' +
           '<td><b class="bdg_user_group" data-gid="' + index + '">' + group_name + '</b></td>' +
-          '<td><button class="btn btn-danger btn-sm btn_delete_user_group" type="button" style="float: right;"><i class="fa fa-minus"></i></button></td>' +
+          '<td><button class="btn btn-danger btn-sm pull-right btn_delete_user_group" type="button"><i class="fa fa-minus"></i></button></td>' +
         '</tr>'
       )
     });
     // clear jumpserver.selected_groups
     jumpserver.selected_groups = {};
-    toastr.success('{% trans "Update success!" %}')
+    toastr.success('{% trans "UserGroup Update Success!" %}')
   };
   APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success, method: 'PUT'});
 
@@ -249,18 +252,14 @@ $(document).ready(function () {
   var the_url = "{% url 'users:user-patch-api' pk=user_object.id %}";
   var checked = !$(this).prop('checked');
   var body = {'is_active': checked };
-  var success = function() {
-    toastr.success('{% trans "Update success!" %}')
-  };
-  APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success});
+  var success = '{% trans "Update Successfully!" %}';
+  APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success_message: success});
 }).on('click', '#enable_otp', function(){
   var the_url = "{% url 'users:user-patch-api' pk=user_object.id %}";
   var checked = !$(this).prop('checked');
   var body = {'enable_otp': checked };
-  var success = function() {
-    toastr.success('{% trans "Update success!" %}')
-  };
-  APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success});
+  var success = '{% trans "Update Successfully!" %}';
+  APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success_message: success});
 }).on('click', '#btn_add_user_group', function(){
   if (Object.keys(jumpserver.selected_groups).length === 0) {
     return false;
@@ -287,6 +286,56 @@ $(document).ready(function () {
     return $(this).data('gid');
   }).get();
   updateUserGroups(user_groups)
+}).on('click', '#btn_reset_password', function(){
+  function doReset() {
+    var the_url = '{% url "users:user-reset-password-api" pk=user_object.id %}';
+    var body = {};
+    var success = function() {
+      var msg = "{% trans 'E-mail sent successfully. An e-mail has been sent to the user\'s mailbox.' %}";
+      swal("{% trans 'Password-Reset' %}", msg, "success");
+    }
+    APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success});
+  }
+  swal({
+    title: "{% trans 'Are you sure?' %}",
+    text: "{% trans 'This will reset the user\'s password.' %}",
+    type: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#DD6B55",
+    confirmButtonText: "{% trans 'Confirm' %}",
+    closeOnConfirm: false
+    }, function () {
+      doReset();
+    }
+  );
+}).on('click', '#btn_user_reset_pk', function(){
+  var $this = $(this);
+  var pk = $('#txt_pk').val();
+  var the_url = '{% url "users:user-reset-pk-api" pk=user_object.id %}';
+  var body = {'_private_key': pk};
+  var success = function() {
+    $('#txt_pk').val('');
+    $this.closest('.modal').modal('hide');
+    var msg = "{% trans 'Successfully updated the SSH private key.' %}";
+    swal("{% trans 'User SSH Private Key Reset' %}", msg, "success");
+  };
+  var fail = function() {
+    var msg = "{% trans 'Failed to update the user\'s SSH private key.' %}";
+    swal({
+      title: "{% trans 'User SSH Private Key Reset' %}",
+      text: msg,
+      type: "error",
+      showCancelButton: false,
+      confirmButtonColor: "#DD6B55",
+      confirmButtonText: "{% trans 'Confirm' %}",
+      closeOnConfirm: true
+      }, function () {
+        $('#txt_pk').focus();
+      }
+    );
+  }
+  APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success, error: fail});
+
 });
 </script>
 {% endblock %}

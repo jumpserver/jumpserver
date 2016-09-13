@@ -4,10 +4,10 @@
 var checked=false;
 function check_all(form) {
     var checkboxes = document.getElementById(form);
-    if (checked == false) {
-        checked = true
+    if (checked === false) {
+        checked = true;
     } else {
-        checked = false
+        checked = false;
     }
     for (var i = 0; i < checkboxes.elements.length; i++) {
         if (checkboxes.elements[i].type == "checkbox") {
@@ -51,13 +51,13 @@ function GetRowData(row){
 //此函数用于在多选提交时至少要选择一行
 function GetTableDataBox() {
     var tabProduct = document.getElementById("editable");
-    var tableData = new Array();
-    var returnData = new Array();
+    var tableData = [];
+    var returnData = [];
     var checkboxes = document.getElementById("contents_form");
-    var id_list = new Array();
+    var id_list = [];
     len = checkboxes.elements.length;
     for (var i=0; i < len; i++) {
-        if (checkboxes.elements[i].type == "checkbox" && checkboxes.elements[i].checked == true && checkboxes.elements[i].value != "checkall") {
+        if (checkboxes.elements[i].type == "checkbox" && checkboxes.elements[i].checked === true && checkboxes.elements[i].value != "checkall") {
             id_list.push(i);
          }
         }
@@ -67,7 +67,7 @@ function GetTableDataBox() {
         tableData.push(GetRowData(tabProduct.rows[id_list[i]]));
     }
 
-    if (id_list.length == 0){
+    if (id_list.length === 0){
         alert('请至少选择一行！');
     }
     returnData.push(tableData);
@@ -77,7 +77,7 @@ function GetTableDataBox() {
 
 function move(from, to, from_o, to_o) {
     $("#" + from + " option").each(function () {
-        if ($(this).prop("selected") == true) {
+        if ($(this).prop("selected") === true) {
             $("#" + to).append(this);
             if( typeof from_o !== 'undefined'){
                 $("#"+to_o).append($("#"+from_o +" option[value='"+this.value+"']"));
@@ -88,7 +88,7 @@ function move(from, to, from_o, to_o) {
 
 function move_left(from, to, from_o, to_o) {
     $("#" + from + " option").each(function () {
-        if ($(this).prop("selected") == true) {
+        if ($(this).prop("selected") === true) {
             $("#" + to).append(this);
             if( typeof from_o !== 'undefined'){
                 $("#"+to_o).append($("#"+from_o +" option[value='"+this.value+"']"));
@@ -126,8 +126,8 @@ function move_left(from, to, from_o, to_o) {
 function selectAll(){
     // 选择该页面所有option
     $('option').each(function(){
-        $(this).attr('selected', true)
-    })
+        $(this).attr('selected', true);
+    });
 }
 
 
@@ -156,6 +156,8 @@ function getIDall() {
 function APIUpdateAttr(props) {
   // props = {url: .., body: , success: , error: , method: ,}
   props = props || {};
+  success_message = props.success_message || 'Update Successfully!';
+  fail_message = props.fail_message || 'Error occurred while updating.';
   $.ajax({
     url: props.url,
     type: props.method || "PATCH",
@@ -164,18 +166,18 @@ function APIUpdateAttr(props) {
     dataType: props.data_type || "json",
   }).done(function(data, textStatue, jqXHR) {
     if (typeof props.success === 'function') {
-      return props.success(data)
+      return props.success(data);
     } else {
-      toastr.success('Update Success!')
+      toastr.success(success_message);
     }
   }).fail(function(jqXHR, textStatue, errorThrown) {
     if (typeof props.error === 'function') {
-      return props.error(errorThrown)
+      return props.error(errorThrown);
     } else {
-      toastr.error('Error occurred while updating.')
+      toastr.error(fail_message);
     }
-  })
+  });
   return true;
 }
 
-var jumpserver = new Object();
+var jumpserver = {};
