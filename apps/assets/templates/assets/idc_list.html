@@ -28,8 +28,6 @@
              <td class="text-center">{{ idc.address }}</td>
              <td class="text-center">
                  <a href="{% url 'assets:idc-update' pk=idc.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
-                 <!--<a id="idc_del" href="{% url 'assets:idc-delete' pk=idc.id %}" class="btn btn-xs btn-danger idc_del" onclick='return confirm("是否确认删除 {{ u.username }} 吗？")'>{% trans 'Delete' %}</a>-->
-                 <!--<a id="idc_del" href="{% url 'assets:idc-delete' pk=idc.id %}" class="btn btn-xs btn-danger idc_del" onclick='return confirm("是否确认删除 {{ u.username }} 吗？")'>{% trans 'Delete' %}</a>-->
                  <a onclick="obj_del(this,'{{ idc.name }}','{% url 'assets:idc-delete' idc.id %}')" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
              </td>
          </tr>
@@ -39,7 +37,32 @@
 <script>
 
 
-
+//删除提示样式二,可以选用。
+function obj_del2(obj,name,url){
+//alert(local);
+    top.$.jBox.confirm("您确定要删除【"+name+"】吗?", "系统提示",function (c, d, e) {
+        if (c == "ok") {
+            //loading("正在提交，请稍等...");
+          $.ajax({
+            type : "post",
+            url : url,
+            data : {
+           // idc_id : idc_id
+            },
+            success : function(data) {
+            //   alert('删除成功！')
+              $(obj).parent().parent().remove();
+            },
+            dataType : "text"
+          });
+        }
+    }, {buttonsFocus: 1,
+        draggable: false,
+        showClose: false});
+    top.$(".jbox-body .jbox-icon").css("top", "35px");
+    top.$(".jbox-button-panel").css("height", "35px");
+    return false
+}
 
 
 
