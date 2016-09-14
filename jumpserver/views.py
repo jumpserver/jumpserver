@@ -21,6 +21,8 @@ from jasset.models import Asset, IDC
 from jperm.ansible_api import MyRunner
 import zipfile
 
+from .forms import LoginForm
+
 
 def getDaysByNum(num):
     """
@@ -172,41 +174,35 @@ def Login(request):
     if request.user.is_authenticated():
         return HttpResponseRedirect(reverse('index'))
     if request.method == 'GET':
-        return render_to_response('login.html')
+        form = LoginForm()
+        return render_to_response('login.html', {'error': error, 'form': form})
     else:
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        if username and password:
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                if user.is_active:
-                    login(request, user)
-                    # c = {}
-                    # c.update(csrf(request))
-                    # request.session['csrf_token'] = str(c.get('csrf_token'))
-        # user_filter = User.objects.filter(username=username)
-        # if user_filter:
-        #     user = user_filter[0]
-        #     if PyCrypt.md5_crypt(password) == user.password:
-        #         request.session['user_id'] = user.id
-        #         user_filter.update(last_login=datetime.datetime.now())
-                    if user.role == 'SU':
-                        request.session['role_id'] = 2
-                    elif user.role == 'GA':
-                        request.session['role_id'] = 1
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            human = True
+            username = request.POST.get('username')
+            password = request.POST.get('password')
+            if username and password:
+                user = authenticate(username=username, password=password)
+                if user is not None:
+                    if user.is_active:
+                        login(request, user)
+                        if user.role == 'SU':
+                            request.session['role_id'] = 2
+                        elif user.role == 'GA':
+                            request.session['role_id'] = 1
+                        else:
+                            request.session['role_id'] = 0
+                        return HttpResponseRedirect(request.session.get('pre_url', '/'))
                     else:
-                        request.session['role_id'] = 0
-                    return HttpResponseRedirect(request.session.get('pre_url', '/'))
-                # response.set_cookie('username', username, expires=604800)
-                # response.set_cookie('seed', PyCrypt.md5_crypt(password), expires=604800)
-                # return response
+                        error = '用户未激活'
                 else:
-                    error = '用户未激活'
+                    error = '用户名或密码错误'
             else:
                 error = '用户名或密码错误'
         else:
-            error = '用户名或密码错误'
-    return render_to_response('login.html', {'error': error})
+            error = '验证码错误'
+    return render_to_response('login.html', {'error': error, 'form': form})
 
 
 @require_role('user')
