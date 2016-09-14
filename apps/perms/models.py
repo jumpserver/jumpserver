@@ -55,7 +55,7 @@ class AssetPermission(models.Model):
             return []
 
     def get_granted_assets(self):
-        return list(self.assets.all() or []) | set(self.get_granted_asset_groups_member())
+        return list(set(self.assets.all() or []) | set(self.get_granted_asset_groups_member()))
 
     def get_granted_asset_groups_member(self):
         combine_assets = functools.partial(combine_seq, callback=AssetPermission.set_inherit)

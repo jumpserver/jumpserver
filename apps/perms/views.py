@@ -13,7 +13,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from common.utils import search_object_attr
-from .hands import AdminUserRequiredMixin, User, UserGroup, SystemUser
+from .hands import AdminUserRequiredMixin, User, UserGroup, SystemUser, Asset, AssetGroup
 from .models import AssetPermission
 from .forms import AssetPermissionForm
 
@@ -28,7 +28,7 @@ class AssetPermissionListView(AdminUserRequiredMixin, ListView):
         context = {
             'app': _('Perms'),
             'action': _('Asset permission list'),
-            'keyword': self.request.GET.get('keyword', '')
+            'keyword': self.keyword,
         }
         kwargs.update(context)
         return super(AssetPermissionListView, self).get_context_data(**kwargs)
@@ -40,16 +40,16 @@ class AssetPermissionListView(AdminUserRequiredMixin, ListView):
         self.sort = sort = self.request.GET.get('sort', '-date_created')
 
         if keyword:
-            self.queryset = self.queryset.filter(Q(users__name__icontains=keyword) |
-                                                 Q(users__username__icontains=keyword) |
-                                                 Q(user_groups__name__icontains=keyword) |
-                                                 Q(assets__ip__icontains=keyword) |
-                                                 Q(assets__hostname__icontains=keyword) |
-                                                 Q(system_users__username_icontains=keyword) |
-                                                 Q(system_users__name_icontains=keyword) |
+            self.queryset = self.queryset.filter(Q(users__name__contains=keyword) |
+                                                 Q(users__username__contains=keyword) |
+                                                 Q(user_groups__name__contains=keyword) |
+                                                 Q(assets__ip__contains=keyword) |
+                                                 Q(assets__hostname__contains=keyword) |
+                                                 Q(system_users__username__icontains=keyword) |
+                                                 Q(system_users__name__icontains=keyword) |
                                                  Q(asset_groups__name__icontains=keyword) |
-                                                 Q(comment__icontains=keyword))
-
+                                                 Q(comment__icontains=keyword) |
+                                                 Q(name__icontains=keyword)).distinct()
         if sort:
             self.queryset = self.queryset.order_by(sort)
         return self.queryset
@@ -126,32 +126,64 @@ class AssetPermissionUserListView(AdminUserRequiredMixin, SingleObjectMixin, Lis
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=AssetPermission.objects.all())
-        self.keyword = keyword = self.request.GET.get('keyword', '')
+        self.keyword = self.request.GET.get('keyword', '')
         return super(AssetPermissionUserListView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
-        print(self.keyword)
         queryset = self.object.get_granted_users()
-
         if self.keyword:
             search_func = functools.partial(search_object_attr, value=self.keyword,
-                                            attr_list=['name', 'username', 'email'],
+                                            attr_list=['username', 'name', 'email'],
                                             ignore_case=True)
-            queryset = filter(search_func, queryset[:])
+            queryset = filter(search_func, queryset)
         return queryset
 
     def get_context_data(self, **kwargs):
+        users_granted = self.get_queryset()
+        user_groups_granted = self.object.user_groups.all()
         context = {
             'app': _('Perms'),
             'action': _('Asset permission user list'),
-            'users_remain': [user for user in User.objects.all() if user not in self.get_queryset()],
+            'users_remain': [user for user in User.objects.all() if user not in users_granted],
             'user_groups': self.object.user_groups.all(),
             'user_groups_remain': [user_group for user_group in UserGroup.objects.all()
-                                   if user_group not in self.object.user_groups.all()]
+                                   if user_group not in user_groups_granted],
+            'keyword': self.keyword,
         }
         kwargs.update(context)
         return super(AssetPermissionUserListView, self).get_context_data(**kwargs)
 
 
-class AssetPermissionAssetListView(AdminUserRequiredMixin, ListView):
-    pass
+class AssetPermissionAssetListView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
+    template_name = 'perms/asset_permission_asset_list.html'
+    context_object_name = 'asset_permission'
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=AssetPermission.objects.all())
+        self.keyword = self.request.GET.get('keyword', '')
+        return super(AssetPermissionAssetListView, self).get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        queryset = self.object.get_granted_assets()
+        if self.keyword:
+            search_func = functools.partial(search_object_attr, value=self.keyword,
+                                            attr_list=['hostname', 'ip'],
+                                            ignore_case=True)
+            queryset = filter(search_func, queryset)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        assets_granted = self.get_queryset()
+        asset_groups_granted = self.object.user_groups.all()
+        context = {
+            'app': _('Perms'),
+            'action': _('Asset permission asset list'),
+            'assets_remain': (asset for asset in Asset.objects.all() if asset not in assets_granted),
+            'asset_groups': self.object.asset_groups.all(),
+            'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all()
+                                    if asset_group not in asset_groups_granted],
+            'keyword': self.keyword,
+        }
+        kwargs.update(context)
+        return super(AssetPermissionAssetListView, self).get_context_data(**kwargs)

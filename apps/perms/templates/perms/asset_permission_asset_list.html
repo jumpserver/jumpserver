@@ -28,6 +28,16 @@
                                 <a href="{% url 'perms:asset-permission-asset-list' pk=asset_permission.id  %}" class="text-center">
                                 <i class="fa fa-bar-chart-o"></i> {% trans 'Assets and asset gruops' %}</a>
                             </li>
+                            <form id="search_form" method="get" action="" class="pull-right mail-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="{{ keyword }}">
+                                <div class="input-group-btn">
+                                    <button id="search_btn" type="submit" class="btn btn-sm btn-primary">
+                                        搜索
+                                    </button>
+                                </div>
+                            </div>
+                            </form>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -61,13 +71,13 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for user in page_obj %}
+                                            {% for asset in page_obj %}
                                             <tr>
-                                                <td>{{ user.name }}</td>
-                                                <td>{{ user.username }}</td>
-                                                <td>{{ user.email }}</td>
+                                                <td>{{ asset.hostname }}</td>
+                                                <td>{{ asset.ip }}</td>
+                                                <td>{{ user.port }}</td>
                                                 <td>
-                                                    {% if user.is_expired and user.is_active %}
+                                                    {% if asset.is_active %}
                                                     <i class="fa fa-times text-danger"></i>
                                                     {% else %}
                                                     <i class="fa fa-check text-navy"></i>
@@ -90,7 +100,7 @@
                         <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Add user to asset permission' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Add asset to this permission' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table">
@@ -98,9 +108,9 @@
                                         <form>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select user' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for user in users_remain %}
-                                                            <option value="{{ user.id }}">{{ user.name }}: {{ user.username }}</option>
+                                                    <select data-placeholder="{% trans 'Select asset ' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for asset in asset_remain %}
+                                                            <option value="{{ asset.id }}">{{ asset.hostname }}: {{ asset.ip }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
@@ -118,7 +128,7 @@
 
                             <div class="panel panel-info">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Add user group to asset permission' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Add asset group to this permission' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table group_edit">
@@ -126,9 +136,9 @@
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Select user groups' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for user_group in user_groups_remain %}
-                                                        <option value="{{ user_group.id }}" id="opt_{{ user_group.id }}">{{ user_group.name }}</option>
+                                                    <select data-placeholder="{% trans 'Select asset groups' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for asset_group in asset_groups_remain %}
+                                                        <option value="{{ asset_group.id }}">{{ asset_group.name }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
@@ -140,9 +150,9 @@
                                             </tr>
                                         </form>
 
-                                        {% for user_group in user_groups %}
+                                        {% for asset_group in asset_groups %}
                                         <tr>
-                                          <td ><b class="bdg_user_group" data-gid={{ user_group.id }}>{{ user_group.name }}</b></td>
+                                          <td ><b class="bdg_user_group" data-gid={{ asset_group.id }}>{{ asset_group.name }}</b></td>
                                           <td>
                                               <button class="btn btn-danger btn-xs btn_delete_user_group" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                           </td>

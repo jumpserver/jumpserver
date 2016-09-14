@@ -1,3 +1,18 @@
+# Common app 
+
+Common app provide common view, function or others.
+
+Common app shouldn't rely on other apps, because It may lead to cycle 
+import.
+
+If your want to implement some function or class, you should think 
+whether other app use or not. If yes, You should make in common.
+
+If the ability more relate to your app tightness, It's mean your app 
+provide this ability, not common, You should write it on your app utils.
+
+
+
 ## Celery usage 
 
 
