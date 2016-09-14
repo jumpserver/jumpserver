@@ -35,6 +35,8 @@ urlpatterns += [
         api.UserDetailDeleteUpdateApi.as_view(), name='user-detail-api'),
     url(r'^v1/users/(?P<pk>[0-9]+)/patch$',
         api.UserAttributeApi.as_view(), name='user-patch-api'),
+    url(r'^v1/users/(?P<pk>\d+)/reset-password/$', api.UserResetPasswordApi.as_view(), name='user-reset-password-api'),
+    url(r'^v1/users/(?P<pk>\d+)/reset-pk/$', api.UserResetPKApi.as_view(), name='user-reset-pk-api'),
     url(r'^v1/user-groups$', api.UserGroupListAddApi.as_view(), name='user-group-list-api'),
     url(r'^v1/user-groups/(?P<pk>[0-9]+)$',
         api.UserGroupDetailDeleteUpdateApi.as_view(), name='user-group-detail-api'),

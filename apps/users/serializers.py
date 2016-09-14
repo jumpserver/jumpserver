@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 #
 
+from django.utils.translation import ugettext_lazy as _
+
 from rest_framework import serializers
 
 from .models import User, UserGroup
@@ -38,3 +40,17 @@ class UserGroupEditSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'groups']
+
+
+class UserPKUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ['id', '_private_key']
+
+    def validate__private_key(self, value):
+        from users.utils import validate_ssh_pk
+        checked, reason = validate_ssh_pk(value)
+        if not checked:
+            raise serializers.ValidationError(_('Not a valid ssh private key.'))
+        return value

@@ -10,7 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.files.storage import default_storage
 from django.db.models import Q
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect,HttpResponse
 from django.shortcuts import get_object_or_404, reverse, redirect
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -94,7 +94,6 @@ class UserListView(AdminUserRequiredMixin, ListView):
         if keyword:
             self.queryset = self.queryset.filter(Q(username__icontains=keyword) |
                                                  Q(name__icontains=keyword))
-
         if sort:
             self.queryset = self.queryset.order_by(sort)
         return self.queryset
@@ -163,6 +162,19 @@ class UserDeleteView(AdminUserRequiredMixin, DeleteView):
     success_url = reverse_lazy('users:user-list')
     template_name = 'users/user_delete_confirm.html'
 
+    def delete(self, request, *args, **kwargs):
+        """
+        Calls the delete() method on the fetched object and then
+        redirects to the success URL.
+        """
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        if self.object.name == "admin" or self.object.id == request.session.get('_auth_user_id'):
+            pass
+        else:
+            self.object.delete()
+
+        return HttpResponseRedirect(success_url)
 
 class UserDetailView(AdminUserRequiredMixin, DetailView):
     model = User

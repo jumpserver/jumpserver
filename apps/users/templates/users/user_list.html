@@ -19,7 +19,7 @@
 {% endblock %}
 
 {% block table_body %}
-     {% for user in user_list %}
+     {% for user in object_list %}
          <tr class="gradeX">
              <td class="text-center">
                  <input type="checkbox" name="checked" value="{{ user.id }}">
@@ -42,7 +42,8 @@
              </td>
              <td class="text-center">
                  <a href="{% url 'users:user-update' pk=user.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
-                 <a href="{% url 'users:user-delete' pk=user.id %}" class="btn btn-xs btn-danger del {% if user.id == request.user.id or user.username == 'admin' %} disabled {% endif %}">{% trans 'Delete' %}</a>
+                 <!--<a href="{% url 'users:user-delete' pk=user.id %}" class="btn btn-xs btn-danger del {% if user.id == request.user.id or user.username == 'admin' %} disabled {% endif %}">{% trans 'Delete' %}</a>-->
+                 <a onclick="obj_del(this,'{{ user.name }}','{% url 'users:user-delete' user.id %}')" class="btn btn-xs btn-danger del {% if user.id == request.user.id or user.username == 'admin' %} disabled {% endif %}">{% trans 'Delete' %}</a>
              </td>
          </tr>
      {% endfor %}

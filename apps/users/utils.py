@@ -5,6 +5,7 @@ import logging
 import os
 import re
 
+from django.conf import settings
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
@@ -121,6 +122,8 @@ def send_reset_password_mail(user):
         'email': user.email,
         'login_url': reverse('users:login', external=True),
     }
+    if settings.DEBUG:
+        logger.debug(message)
 
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 

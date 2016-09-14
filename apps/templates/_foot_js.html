@@ -1,3 +1,4 @@
+{% load i18n %}
 {% load static %}
 <!-- Mainly scripts -->
 <script src="{% static "js/plugins/metisMenu/jquery.metisMenu.js" %}"></script>
@@ -52,5 +53,36 @@ $.ajaxSetup({
 
 // textarea rows
 $('textarea').attr('rows', 5)
+
+
+
+//Sweet Alert for Delete
+function obj_del(obj,name,url){
+    swal({
+        title: "{% trans 'Are you sure delete ??' %}",
+        //text: "You will not be able to recover this imaginary file!",
+        text: "【"+name+"】",
+        type: "warning",
+        showCancelButton: true,
+        cancelButtonText: "{% trans 'Cancel' %}",
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "{% trans 'Yes, delete it!' %}",
+        closeOnConfirm: false
+    }, function () {
+        $.ajax({
+            type : "post",
+            url : url,
+            data : {
+           // idc_id : idc_id
+            },
+            success : function(data) {
+            swal("{% trans 'Deleted!' %}", "【"+name+"】"+"{% trans 'has been deleted.' %}", "success");
+            $(obj).parent().parent().remove();
+            },
+            dataType : "text"
+            });
+    });
+}
+
 </script>
 <script src="{% static "js/jumpserver.js" %}"></script>
