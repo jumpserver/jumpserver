@@ -28,8 +28,20 @@
              <td class="text-center">{{ idc.address }}</td>
              <td class="text-center">
                  <a href="{% url 'assets:idc-update' pk=idc.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
-                 <a href="{% url 'assets:idc-delete' pk=idc.id %}" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
+                 <!--<a id="idc_del" href="{% url 'assets:idc-delete' pk=idc.id %}" class="btn btn-xs btn-danger idc_del" onclick='return confirm("是否确认删除 {{ u.username }} 吗？")'>{% trans 'Delete' %}</a>-->
+                 <!--<a id="idc_del" href="{% url 'assets:idc-delete' pk=idc.id %}" class="btn btn-xs btn-danger idc_del" onclick='return confirm("是否确认删除 {{ u.username }} 吗？")'>{% trans 'Delete' %}</a>-->
+                 <a onclick="obj_del(this,'{{ idc.name }}','{% url 'assets:idc-delete' idc.id %}')" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
              </td>
          </tr>
      {% endfor %}
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+
+
+
+
+
+
+</script>
 {% endblock %}

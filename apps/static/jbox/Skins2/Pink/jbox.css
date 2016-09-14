@@ -1,0 +1,41 @@
+@charset "utf-8";
+
+*:focus {outline: none;}
+/* fade */
+.jbox-fade{background-color:#000000;}
+/* drag */
+.jbox-drag{border:1px dashed #bf0058;}
+/* jbox */
+div.jbox {padding:0px;border:none;font-size:12px;}
+/* border */
+div.jbox .jbox-border{background: none repeat scroll 0 0 #000000;filter:alpha(opacity=20);-moz-opacity:0.2;opacity:0.2;}
+/* container */
+div.jbox .jbox-container{background-color:#ffffff;border:1px solid #999999;}
+/* title-panel */
+div.jbox .jbox-title-panel{background: #bf0058;background: -webkit-gradient(linear, left top, left bottom, from(#c61a69), to(#990046));background: -moz-linear-gradient(top,  #c61a69,  #990046);filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#c61a69', endColorstr='#990046');border-bottom:1px solid #999999;}
+div.jbox .jbox-title{font-weight:bold;color:#ffffff;}
+div.jbox .jbox-title-icon{background:url(images/jbox-title-icon.gif) no-repeat scroll 3px 5px transparent;}
+div.jbox .jbox-close,div.jbox .jbox-close-hover{background:url(images/jbox-close1.gif) no-repeat scroll 0px 0px transparent;}
+div.jbox .jbox-close-hover{background-position:-16px 0;}
+/* content */
+div.jbox .jbox-content{min-height:24px;line-height:18px;color:#444444;}
+div.jbox .jbox-content-loading{background-color:#E6E6E6;}
+div.jbox .jbox-content-loading-image{background:url(images/jbox-content-loading.gif) no-repeat bottom center;}
+/* button-panel */
+div.jbox .jbox-button-panel{border-top:1px solid #CCCCCC;background-color: #EEEEEE;}
+div.jbox .jbox-bottom-text{text-indent:10px;color:#444444;}
+div.jbox .jbox-button{background: #bf0058;background: -webkit-gradient(linear, left top, left bottom, from(#c61a69), to(#990046));background: -moz-linear-gradient(top,  #c61a69,  #990046);filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#c61a69', endColorstr='#990046');border:#5f002c 1px solid;color:#fff;border-radius:3px 3px 3px 3px;margin:1px 7px 0px 0px;height:22px;cursor:default;}
+div.jbox .jbox-button-hover{background: #bf0058;background: -webkit-gradient(linear, left top, left bottom, from(#bf0058), to(#730035));background: -moz-linear-gradient(top,  #bf0058,  #730035);filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#bf0058', endColorstr='#730035');}
+div.jbox .jbox-button-active{background: -webkit-gradient(linear, left top, left bottom, from(#730035), to(#bf0058));background: -moz-linear-gradient(top,  #730035,  #bf0058);filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#730035', endColorstr='#bf0058');}
+div.jbox-warning .jbox .jbox-button-panel{background-color: #FFFFFF;}
+/* tip-color */
+div.jbox .jbox-tip-color{background: #bf0058;background: -webkit-gradient(linear, left top, left bottom, from(#bf0058), to(#730035));background: -moz-linear-gradient(top,  #bf0058,  #730035);filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#bf0058', endColorstr='#730035');border-color:#5f002c;border-radius:3px 3px 3px 3px;color:#fff;}
+/* icons */
+div.jbox span.jbox-icon{background:url(images/jbox-icons.png) no-repeat scroll 0 0 transparent;_background:url(images/jbox-icons-ie6.gif) no-repeat scroll 0 0 transparent;}
+div.jbox span.jbox-icon-info {background-position:0 0;}
+div.jbox span.jbox-icon-question {background-position:-36px 0;}
+div.jbox span.jbox-icon-success {background-position:-72px 0;}
+div.jbox span.jbox-icon-warning {background-position:-108px 0;}
+div.jbox span.jbox-icon-error {background-position:-144px 0;}
+div.jbox span.jbox-icon-none {display: none; overflow:hidden;}
+div.jbox span.jbox-icon-loading {background:url(images/jbox-loading1.gif) no-repeat scroll 0 0 transparent;}

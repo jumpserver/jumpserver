@@ -186,16 +186,25 @@ class IDCCreateView(AdminUserRequiredMixin, CreateView):
 
 
 class IDCUpdateView(AdminUserRequiredMixin, UpdateView):
-    pass
-
+    model = IDC
+    form_class = IDCForm
+    template_name = 'assets/idc_create.html'
+    context_object_name = 'IDC'
+    success_url = reverse_lazy('assets:idc-list')
+    def form_valid(self, form):
+        IDC = form.save(commit=False)
+        IDC.save()
+        return super(IDCUpdateView, self).form_valid(form)
 
 class IDCDetailView(AdminUserRequiredMixin, DetailView):
     pass
 
 
-class IDCDeleteView(AdminUserRequiredMixin, DeleteView):
-    pass
 
+class IDCDeleteView(AdminUserRequiredMixin, DeleteView):
+    model = IDC
+    template_name = 'assets/delete_confirm.html'
+    success_url = reverse_lazy('assets:idc-list')
 
 class AdminUserListView(AdminUserRequiredMixin, ListView):
     model = AdminUser
@@ -293,7 +302,7 @@ class AdminUserDetailView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
 class AdminUserDeleteView(AdminUserRequiredMixin, DeleteView):
     model = AdminUser
     template_name = 'assets/delete_confirm.html'
-    success_url = 'assets:admin-user-list'
+    success_url = reverse_lazy('assets:admin-user-list')
 
 
 class SystemUserListView(AdminUserRequiredMixin, ListView):
@@ -384,7 +393,7 @@ class SystemUserDetailView(AdminUserRequiredMixin, DetailView):
 class SystemUserDeleteView(AdminUserRequiredMixin, DeleteView):
     model = SystemUser
     template_name = 'assets/delete_confirm.html'
-    success_url = 'assets:system-user-list'
+    success_url = reverse_lazy('assets:system-user-list')
 
 
 class SystemUserAssetView(AdminUserRequiredMixin, SingleObjectMixin, ListView):

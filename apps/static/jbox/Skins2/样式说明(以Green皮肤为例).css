@@ -1,0 +1,44 @@
+@charset "utf-8";
+/*
+  提示：CSS 样式只允许修改颜色属性，或图片的地址（图片大小要和默认的一致）。border:dotted solid double dashed
+*/
+*:focus {outline: none;}
+/* fade */
+.jbox-fade{background-color:#000000;} /* 隔离层 */
+/* drag */
+.jbox-drag{border:1px dashed #89C01D;} /* 拖动边框 */
+/* jbox */
+div.jbox {padding:0px;border:none;font-size:12px;} /* 窗口基本样式，主要是字体 */
+/* border */
+div.jbox .jbox-border{background: none repeat scroll 0 0 #000000;filter:alpha(opacity=20);-moz-opacity:0.2;opacity:0.2;} /* 窗口外边框样式 */
+/* container */
+div.jbox .jbox-container{background-color:#ffffff;border:1px solid #999999;} /* 窗口容器，背景与内边框在此设置 */
+/* title-panel */
+div.jbox .jbox-title-panel{background: #86ae00;background: -webkit-gradient(linear, left top, left bottom, from(#92b61a), to(#6b8b00));background: -moz-linear-gradient(top,  #92b61a,  #6b8b00);filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#92b61a', endColorstr='#6b8b00');border-bottom:1px solid #999999;} /* 标题面板，不想要底边框请设置为0 */
+div.jbox .jbox-title{font-weight:bold;color:#ffffff;} /* 标题字体 */
+div.jbox .jbox-title-icon{background:url(images/jbox-title-icon.gif) no-repeat scroll 3px 5px transparent;} /* 标题图标 */
+div.jbox .jbox-close,div.jbox .jbox-close-hover{background:url(images/jbox-close1.gif) no-repeat scroll 0px 0px transparent;} /* 标题关闭按钮 */
+div.jbox .jbox-close-hover{background-position:-16px 0;}
+/* content */
+div.jbox .jbox-content{min-height:24px;line-height:18px;color:#444444;} /* 窗口内容 */
+div.jbox .jbox-content-loading{background-color:#E6E6E6;} /* ajax或iframe请求时的loading层 */
+div.jbox .jbox-content-loading-image{background:url(images/jbox-content-loading.gif) no-repeat bottom center;} /* ajax或iframe请求时的loading层中间的动态图片 */
+/* button-panel */
+div.jbox-warning .jbox .jbox-button-panel{background-color: #FFFFFF;} /* 未关闭窗口时点击隔离层时，按钮面板的背景闪动色 */
+div.jbox .jbox-button-panel{border-top:1px solid #CCCCCC;background-color: #EEEEEE;} /* 按钮面板，不想要顶边框请设置为0 */
+div.jbox .jbox-bottom-text{text-indent:10px;color:#444444;} /* 按钮左边字体 */
+ /* 以下按钮样式 */
+div.jbox .jbox-button{background: #86ae00;background: -webkit-gradient(linear, left top, left bottom, from(#92b61a), to(#6b8b00));background: -moz-linear-gradient(top,  #92b61a,  #6b8b00);filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#92b61a', endColorstr='#6b8b00');border:#435700 1px solid;color:#fff;border-radius:3px 3px 3px 3px;margin:1px 7px 0px 0px;height:22px;cursor:default;}
+div.jbox .jbox-button-hover{background: #86ae00;background: -webkit-gradient(linear, left top, left bottom, from(#86ae00), to(#506800));background: -moz-linear-gradient(top,  #86ae00,  #506800);filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#86ae00', endColorstr='#506800');}
+div.jbox .jbox-button-active{background: -webkit-gradient(linear, left top, left bottom, from(#506800), to(#86ae00));background: -moz-linear-gradient(top,  #506800,  #86ae00);filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#506800', endColorstr='#86ae00');}
+/* tip-color */
+div.jbox .jbox-tip-color{background: #86ae00;background: -webkit-gradient(linear, left top, left bottom, from(#86ae00), to(#506800));background: -moz-linear-gradient(top,  #86ae00,  #506800);filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#86ae00', endColorstr='#506800');border-color:#435700;border-radius:3px 3px 3px 3px;color:#fff;} /* 提示层颜色 */
+/* icons */
+div.jbox span.jbox-icon{background:url(images/jbox-icons.png) no-repeat scroll 0 0 transparent;_background:url(images/jbox-icons-ie6.gif) no-repeat scroll 0 0 transparent;} /* 以下图标样式 */
+div.jbox span.jbox-icon-info {background-position:0 0;}
+div.jbox span.jbox-icon-question {background-position:-36px 0;}
+div.jbox span.jbox-icon-success {background-position:-72px 0;}
+div.jbox span.jbox-icon-warning {background-position:-108px 0;}
+div.jbox span.jbox-icon-error {background-position:-144px 0;}
+div.jbox span.jbox-icon-none {display: none; overflow:hidden;}
+div.jbox span.jbox-icon-loading {background:url(images/jbox-loading1.gif) no-repeat scroll 0 0 transparent;}

@@ -34,7 +34,7 @@
                  <!-- Todo: Click refresh button will run a task to test admin user could connect asset or not immediately -->
                  <a href="{% url 'assets:admin-user-update' pk=admin_user.id %}" class="btn btn-xs btn-warning">{% trans 'Refresh' %}</a>
                  <a href="{% url 'assets:admin-user-update' pk=admin_user.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
-                 <a href="{% url 'assets:admin-user-delete' pk=admin_user.id %}" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
+                 <a onclick="obj_del(this,'{{ admin_user.name }}','{% url 'assets:admin-user-delete' admin_user.id %}')" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
              </td>
          </tr>
      {% endfor %}
