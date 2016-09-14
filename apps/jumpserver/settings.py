@@ -108,7 +108,6 @@ TEMPLATES = [
 # WSGI_APPLICATION = 'jumpserver.wsgi.application'
 
 LOGIN_REDIRECT_URL = reverse_lazy('index')
-LOGIN_URL = reverse_lazy('users:login')
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
@@ -228,7 +227,7 @@ USE_L10N = True
 USE_TZ = True
 
 # I18N translation
-LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'), ]
+LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'),]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
@@ -281,11 +280,9 @@ WEBSOCKET_URL = '/ws/'
 
 # WebSocket Redis
 WS4REDIS_CONNECTION = {
-    #'host': CONFIG.REDIS_HOST or '127.0.0.1',
-    # 'port': CONFIG.REDIS_PORT or 6379,
-    'host': '192.168.1.190',
-    'port':  6379,
-    'db': 3,
+    'host': CONFIG.REDIS_HOST or '127.0.0.1',
+    'port': CONFIG.REDIS_PORT or 6379,
+    'db': 2,
 }
 
 # Set the number of seconds each message shall persisted
@@ -299,23 +296,14 @@ SESSION_ENGINE = 'redis_sessions.session'
 
 SESSION_REDIS_PREFIX = 'session'
 
-
-
-SESSION_REDIS_HOST = '192.168.1.190'
-SESSION_REDIS_PORT = 6379
-SESSION_REDIS_DB = 0
-SESSION_REDIS_PASSWORD = ''
-
-
 # Custom User Auth model
 AUTH_USER_MODEL = 'users.User'
 
 # Celery using redis as broker
-# BROKER_URL = 'redis://%(password)s%(host)s:%(port)s/3' % {
 BROKER_URL = 'redis://%(password)s%(host)s:%(port)s/3' % {
     'password': CONFIG.REDIS_PASSWORD + ':' if CONFIG.REDIS_PASSWORD else '',
     'host': CONFIG.REDIS_HOST or '127.0.0.1',
-    'port': CONFIG.REDIS_PORT or 63790,
+    'port': CONFIG.REDIS_PORT or 6379,
 }
 
 CELERY_RESULT_BACKEND = BROKER_URL
