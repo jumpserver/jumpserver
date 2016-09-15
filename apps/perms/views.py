@@ -60,7 +60,6 @@ class AssetPermissionCreateView(AdminUserRequiredMixin, SuccessMessageMixin, Cre
     form_class = AssetPermissionForm
     template_name = 'perms/asset_permission_create_update.html'
     success_url = reverse_lazy('perms:asset-permission-list')
-    success_message = _('Create asset permission <a href="%s"> %s </a> successfully.')
 
     def get_context_data(self, **kwargs):
         context = {
@@ -71,10 +70,12 @@ class AssetPermissionCreateView(AdminUserRequiredMixin, SuccessMessageMixin, Cre
         return super(AssetPermissionCreateView, self).get_context_data(**kwargs)
 
     def get_success_message(self, cleaned_data):
-        return self.success_message % (
-            reverse_lazy('perms:asset-permission-detail', kwargs={'pk': self.object.pk}),
-            self.object.name,
-        )
+        success_message = _('Create asset permission <a href="%s"> %s </a> successfully.' %
+                            (
+                                reverse_lazy('perms:asset-permission-detail', kwargs={'pk': self.object.pk}),
+                                self.object.name,
+                            ))
+        return success_message
 
 
 class AssetPermissionUpdateView(AdminUserRequiredMixin, UpdateView):

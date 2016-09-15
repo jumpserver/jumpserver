@@ -124,33 +124,66 @@ function move_left(from, to, from_o, to_o) {
 
 
 function selectAll(){
-    // 选择该页面所有option
+    // Select all check box
     $('option').each(function(){
         $(this).attr('selected', true);
     });
 }
 
 
-//
-//function move_all(from, to){
-//    $("#"+from).children().each(function(){
-//        $("#"+to).append(this);
-//    });
-//}
+// function getIDall() {
+//     var check_array = [];
+//     $(".gradeX input:checked").each(function () {
+//         var id = $(this).attr("value");
+//         check_array.push(id);
+//     });
+//     return check_array.join(",");
+// }
 
-//function commit_select(form_array){
-//    $('#{0} option'.format(form_array)).each(function(){
-//        $(this).prop('selected', true)
-//        })
-//}
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 
-function getIDall() {
-    var check_array = [];
-    $(".gradeX input:checked").each(function () {
-        var id = $(this).attr("value");
-        check_array.push(id);
+function csrfSafeMethod(method) {
+    // these HTTP methods do not require CSRF protection
+    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+}
+
+function setAjaxCSRFToken() {
+    var csrftoken = getCookie('csrftoken');
+    var sessionid = getCookie('sessionid');
+
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
     });
-    return check_array.join(",");
+}
+
+function activeNav() {
+    var url_array = document.location.pathname.split("/");
+    var app = url_array[1];
+    var resource = url_array[2];
+    if (app == ''){
+        $('#index').addClass('active')
+    } else {
+        $("#" + app).addClass('active');
+        $('#' + app + ' #' + resource).addClass('active');
+    }
 }
 
 function APIUpdateAttr(props) {
@@ -158,6 +191,7 @@ function APIUpdateAttr(props) {
   props = props || {};
   success_message = props.success_message || 'Update Successfully!';
   fail_message = props.fail_message || 'Error occurred while updating.';
+
   $.ajax({
     url: props.url,
     type: props.method || "PATCH",

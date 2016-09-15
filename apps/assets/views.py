@@ -173,7 +173,7 @@ class IDCListView(AdminUserRequiredMixin, ListView):
 class IDCCreateView(AdminUserRequiredMixin, CreateView):
     model = IDC
     form_class = IDCForm
-    template_name = 'assets/idc_create.html'
+    template_name = 'assets/idc_create_update.html'
     success_url = reverse_lazy('assets:idc-list')
 
     def get_context_data(self, **kwargs):
@@ -188,23 +188,25 @@ class IDCCreateView(AdminUserRequiredMixin, CreateView):
 class IDCUpdateView(AdminUserRequiredMixin, UpdateView):
     model = IDC
     form_class = IDCForm
-    template_name = 'assets/idc_create.html'
-    context_object_name = 'IDC'
+    template_name = 'assets/idc_create_update.html'
+    context_object_name = 'idc'
     success_url = reverse_lazy('assets:idc-list')
+
     def form_valid(self, form):
-        IDC = form.save(commit=False)
-        IDC.save()
+        idc = form.save(commit=False)
+        idc.save()
         return super(IDCUpdateView, self).form_valid(form)
+
 
 class IDCDetailView(AdminUserRequiredMixin, DetailView):
     pass
-
 
 
 class IDCDeleteView(AdminUserRequiredMixin, DeleteView):
     model = IDC
     template_name = 'assets/delete_confirm.html'
     success_url = reverse_lazy('assets:idc-list')
+
 
 class AdminUserListView(AdminUserRequiredMixin, ListView):
     model = AdminUser
@@ -241,7 +243,6 @@ class AdminUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
     form_class = AdminUserForm
     template_name = 'assets/admin_user_create_update.html'
     success_url = reverse_lazy('assets:admin-user-list')
-    success_message = _('Create admin user <a href="%s">%s</a> successfully.')
 
     def get_context_data(self, **kwargs):
         context = {
@@ -252,17 +253,18 @@ class AdminUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
         return super(AdminUserCreateView, self).get_context_data(**kwargs)
 
     def get_success_message(self, cleaned_data):
-        return self.success_message % (
-            reverse_lazy('assets:admin-user-detail', kwargs={'pk': self.object.pk}),
-            self.object.name,
-        )
+        success_message = _('Create admin user <a href="%s">%s</a> successfully.' %
+                            (
+                                reverse_lazy('assets:admin-user-detail', kwargs={'pk': self.object.pk}),
+                                self.object.name,
+                            ))
+        return success_message
 
 
 class AdminUserUpdateView(AdminUserRequiredMixin, UpdateView):
     model = AdminUser
     form_class = AdminUserForm
     template_name = 'assets/admin_user_create_update.html'
-    success_message = _('Update admin user <a href="%s">%s</a> successfully.')
 
     def get_context_data(self, **kwargs):
         context = {
@@ -340,7 +342,6 @@ class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVi
     form_class = SystemUserForm
     template_name = 'assets/system_user_create_update.html'
     success_url = reverse_lazy('assets:system-user-list')
-    success_message = _('Create system user <a href="%s">%s</a> successfully.')
 
     def get_context_data(self, **kwargs):
         context = {
@@ -351,10 +352,13 @@ class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVi
         return super(SystemUserCreateView, self).get_context_data(**kwargs)
 
     def get_success_message(self, cleaned_data):
-        return self.success_message % (
-            reverse_lazy('assets:system-user-detail', kwargs={'pk': self.object.pk}),
-            self.object.name,
-        )
+        success_message = _('Create system user <a href="%s">%s</a> successfully.' %
+                            (
+                                reverse_lazy('assets:system-user-detail', kwargs={'pk': self.object.pk}),
+                                self.object.name,
+                            ))
+
+        return self.success_message
 
 
 class SystemUserUpdateView(AdminUserRequiredMixin, UpdateView):

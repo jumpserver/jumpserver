@@ -28,7 +28,7 @@
              <td class="text-center">{{ idc.address }}</td>
              <td class="text-center">
                  <a href="{% url 'assets:idc-update' pk=idc.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
-                 <a onclick="obj_del(this,'{{ idc.name }}','{% url 'assets:idc-delete' idc.id %}')" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
+                 <a onclick="objectDelete(this, '{{ idc.name }}', '{% url 'assets:idc-delete' idc.id %}')" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
              </td>
          </tr>
      {% endfor %}

@@ -6,62 +6,23 @@
 <!-- Custom and plugin javascript -->
 <script src="{% static "js/plugins/toastr/toastr.min.js" %}"></script>
 <script src="{% static "js/inspinia.js" %}"></script>
+<script src="{% static "js/jumpserver.js" %}"></script>
 <script>
-// active menu
-var url_array = document.location.pathname.split("/");
-app = url_array[1];
-resource = url_array[2];
-if (app == ''){
-    $('#index').addClass('active')
-} else {
-    $("#"+app).addClass('active');
-    $('#'+app+' #'+resource).addClass('active');
-}
+    activeNav();
+    $(document).ready(function(){
+        setAjaxCSRFToken();
 
-// ajax set cookie
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-var csrftoken = getCookie('csrftoken');
-var sessionid = getCookie('sessionid');
-
-function csrfSafeMethod(method) {
-    // these HTTP methods do not require CSRF protection
-    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-}
-
-$.ajaxSetup({
-    beforeSend: function(xhr, settings) {
-        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-        }
-    }
-});
-
-// textarea rows
-$('textarea').attr('rows', 5)
+        // Set textarea rows five
+        $('textarea').attr('rows', 5);
+    });
 
 
-
-//Sweet Alert for Delete
-function obj_del(obj,name,url){
+// Sweet Alert for Delete
+// Todo: Change name to objectDelete(obj, name, url)
+function objectDelete(obj, name, url){
     swal({
-        title: "{% trans 'Are you sure delete ??' %}",
-        //text: "You will not be able to recover this imaginary file!",
-        text: "【"+name+"】",
+        title: "{% trans 'Are you sure delete ?' %}",
+        text: "【" + name + "】",
         type: "warning",
         showCancelButton: true,
         cancelButtonText: "{% trans 'Cancel' %}",
@@ -73,16 +34,14 @@ function obj_del(obj,name,url){
             type : "post",
             url : url,
             data : {
-           // idc_id : idc_id
             },
+            dataType : "text",
             success : function(data) {
-            swal("{% trans 'Deleted!' %}", "【"+name+"】"+"{% trans 'has been deleted.' %}", "success");
-            $(obj).parent().parent().remove();
-            },
-            dataType : "text"
-            });
+                swal("{% trans 'Deleted!' %}", "【"+name+"】"+"{% trans 'has been deleted.' %}", "success");
+                $(obj).parent().parent().remove();
+            }
+        })
     });
 }
 
 </script>
-<script src="{% static "js/jumpserver.js" %}"></script>
