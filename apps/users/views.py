@@ -2,8 +2,6 @@
 
 from __future__ import unicode_literals
 
-import logging
-
 from django.conf import settings
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -51,10 +49,6 @@ class UserLoginView(FormView):
     def form_valid(self, form):
         auth_login(self.request, form.get_user())
         return redirect(self.get_success_url())
-
-    def form_invalid(self, form):
-        logger.debug(form.errors)
-        return super(UserLoginView, self).form_invalid(form)
 
     def get_success_url(self):
         if self.request.user.is_first_login:

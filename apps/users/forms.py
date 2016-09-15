@@ -79,12 +79,22 @@ class UserInfoForm(forms.Form):
 
 
 class UserKeyForm(forms.Form):
-    private_key = forms.CharField(max_length=5000, widget=forms.Textarea, label=_('private key'))
+    public_key = forms.CharField(
+        label=_('ssh public key'), max_length=5000,
+        widget=forms.Textarea(attrs={'placeholder': _('ssh-rsa AAAA...')}),
+        help_text=_('Paste your id_ras.pub here.'))
 
-    def clean_private_key(self):
-        from users.utils import validate_ssh_pk
-        ssh_pk = self.cleaned_data['private_key']
-        checked, reason = validate_ssh_pk(ssh_pk)
-        if not checked:
-            raise forms.ValidationError(_('Not a valid ssh private key.'))
-        return ssh_pk
+    def clean_public_key(self):
+        from sshpubkeys import SSHKey
+        from sshpubkeys.exceptions import InvalidKeyException
+        public_key = self.cleaned_data['public_key']
+        ssh = SSHKey(public_key)
+        try:
+            ssh.parse()
+        except InvalidKeyException as e:
+            print e
+            raise forms.ValidationError(_('Not a valid ssh public key'))
+        except NotImplementedError as e:
+            print e
+            raise forms.ValidationError(_('Not a valid ssh public key'))
+        return public_key
