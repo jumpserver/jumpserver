@@ -10,7 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.files.storage import default_storage
 from django.db.models import Q
-from django.http import HttpResponseRedirect,HttpResponse
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, reverse, redirect
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -25,14 +25,14 @@ from django.views.generic.detail import DetailView
 
 from formtools.wizard.views import SessionWizardView
 
-from common.utils import get_object_or_none
+from common.utils import get_object_or_none, get_logger
 
 from .models import User, UserGroup
-from .forms import (UserCreateForm, UserUpdateForm, UserGroupForm, UserLoginForm, UserInfoForm, UserKeyForm)
+from .forms import UserCreateForm, UserUpdateForm, UserGroupForm, UserLoginForm, UserInfoForm, UserKeyForm
 from .utils import AdminUserRequiredMixin, user_add_success_next, send_reset_password_mail
 
 
-logger = logging.getLogger('jumpserver.users.views')
+logger = get_logger(__name__)
 
 
 @method_decorator(sensitive_post_parameters(), name='dispatch')
@@ -51,6 +51,10 @@ class UserLoginView(FormView):
     def form_valid(self, form):
         auth_login(self.request, form.get_user())
         return redirect(self.get_success_url())
+
+    def form_invalid(self, form):
+        logger.debug(form.errors)
+        return super(UserLoginView, self).form_invalid(form)
 
     def get_success_url(self):
         if self.request.user.is_first_login:
@@ -176,6 +180,7 @@ class UserDeleteView(AdminUserRequiredMixin, DeleteView):
 
         return HttpResponseRedirect(success_url)
 
+
 class UserDetailView(AdminUserRequiredMixin, DetailView):
     model = User
     template_name = 'users/user_detail.html'
@@ -249,7 +254,7 @@ class UserGroupDeleteView(DeleteView):
 class UserForgotPasswordView(TemplateView):
     template_name = 'users/forgot_password.html'
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         email = request.POST.get('email')
         user = get_object_or_none(User, email=email)
         if not user:

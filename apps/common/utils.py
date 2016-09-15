@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 from six import string_types
 from itertools import chain
 import string
+import logging
 
 from django.shortcuts import reverse as dj_reverse
 from django.conf import settings
@@ -97,3 +98,5 @@ def search_object_attr(obj, value='', attr_list=None, ignore_case=False):
     return False
 
 
+def get_logger(name=None):
+    return logging.getLogger('jumpserver.%s' % name)

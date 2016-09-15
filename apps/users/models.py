@@ -11,7 +11,6 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-
 from rest_framework.authtoken.models import Token
 
 from common.utils import encrypt, decrypt, date_expired_default
@@ -240,13 +239,13 @@ class User(AbstractUser):
 
 def init_all_models():
     for model in (UserGroup, User):
-        if hasattr(model, 'initial'):
+        if hasattr(model, b'initial'):
             model.initial()
 
 
 def generate_fake():
     for model in (UserGroup, User):
-        if hasattr(model, 'generate_fake'):
+        if hasattr(model, b'generate_fake'):
             model.generate_fake()
 
 
