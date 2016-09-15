@@ -214,4 +214,30 @@ function APIUpdateAttr(props) {
   return true;
 }
 
+// Sweet Alert for Delete
+function objectDelete(obj, name, url){
+    swal({
+        title: 'Are you sure delete ?',
+        text: "【" + name + "】",
+        type: "warning",
+        showCancelButton: true,
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: 'Yes, delete it!',
+        closeOnConfirm: false
+    }, function () {
+        $.ajax({
+            type : "post",
+            url : url,
+            data : {
+            },
+            dataType : "text",
+            success : function(data) {
+                swal('Deleted!' , "【"+name+"】"+"has been deleted.", "success");
+                $(obj).parent().parent().remove();
+            }
+        })
+    });
+}
+
 var jumpserver = {};
