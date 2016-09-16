@@ -10,5 +10,7 @@
     :license: GPL v2, see LICENSE for more details.
 """
 
+from perms.models import AssetPermission
+
 
 

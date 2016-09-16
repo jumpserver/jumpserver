@@ -2,8 +2,6 @@
 
 from __future__ import unicode_literals
 
-import logging
-
 from django.conf import settings
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -20,7 +18,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView, SingleObjectMixin, FormMixin
 from django.views.generic.detail import DetailView
 
 from formtools.wizard.views import SessionWizardView
@@ -28,8 +26,10 @@ from formtools.wizard.views import SessionWizardView
 from common.utils import get_object_or_none, get_logger
 
 from .models import User, UserGroup
-from .forms import UserCreateForm, UserUpdateForm, UserGroupForm, UserLoginForm, UserInfoForm, UserKeyForm
+from .forms import UserCreateForm, UserUpdateForm, UserGroupForm, UserLoginForm, UserInfoForm, UserKeyForm, \
+    UserPrivateAssetPermissionForm
 from .utils import AdminUserRequiredMixin, user_add_success_next, send_reset_password_mail
+
 
 
 logger = get_logger(__name__)
@@ -355,3 +355,43 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
                 'phone': user.phone or ''
             }
         return super(UserFirstLoginView, self).get_form_initial(step)
+
+
+class UserAssetPermissionView(AdminUserRequiredMixin, FormMixin, SingleObjectMixin, ListView):
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    template_name = 'users/user_asset_permission.html'
+    context_object_name = 'user_object'
+    form_class = UserPrivateAssetPermissionForm
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=User.objects.all())
+        return super(UserAssetPermissionView, self).get(request, *args, **kwargs)
+
+    def get_asset_permission_inherit_from_user_group(self):
+        asset_permissions = set()
+        user_groups = self.object.groups.all()
+
+        for user_group in user_groups:
+            for asset_permission in user_group.asset_permissions.all():
+                setattr(asset_permission, 'is_inherit_from_user_groups', True)
+                setattr(asset_permission, 'inherit_from_user_groups',
+                        getattr(asset_permission, b'inherit_from_user_groups', set()).add(user_group))
+                asset_permissions.add(asset_permission)
+        return asset_permissions
+
+    def get_queryset(self):
+        asset_permissions = set(self.object.asset_permissions.all()) \
+                            | self.get_asset_permission_inherit_from_user_group()
+        return list(asset_permissions)
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'Users',
+            'action': 'User asset permissions',
+        }
+        kwargs.update(context)
+        return super(UserAssetPermissionView, self).get_context_data(**kwargs)
+
+
+class UserAssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
+    pass

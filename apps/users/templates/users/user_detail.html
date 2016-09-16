@@ -18,11 +18,13 @@
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
                             <li class="active">
-                                <a href="" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User detail' %} </a>
+                                <a href="{% url 'users:user-detail' pk=user_object.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User detail' %} </a>
                             </li>
-                            <li><a href="" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Asset permission list' %}</a></li>
-                            <li><a href="" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a></li>
-                            <li><a href="" class="text-center"><i class="fa fa-calculator-o"></i> {% trans 'Login history' %}</a></li>
+                            <li>
+                                <a href="{% url 'users:user-asset-permission' pk=user_object.id %}" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Asset permission list' %}</a>
+                            </li>
+                            <li><a href="{% url 'users:user-granted-asset' pk=user_object.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a></li>
+                            <li><a href="{% url 'users:user-login-history' pk=user_object.id %}" class="text-center"><i class="fa fa-calculator-o"></i> {% trans 'Login history' %}</a></li>
                         </ul>
                     </div>
                     <div class="tab-content">

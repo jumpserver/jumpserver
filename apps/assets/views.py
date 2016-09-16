@@ -358,7 +358,7 @@ class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVi
                                 self.object.name,
                             ))
 
-        return self.success_message
+        return success_message
 
 
 class SystemUserUpdateView(AdminUserRequiredMixin, UpdateView):
