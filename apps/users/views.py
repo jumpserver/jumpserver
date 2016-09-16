@@ -2,67 +2,69 @@
 
 from __future__ import unicode_literals
 
-import logging
-
-from django.shortcuts import get_object_or_404, reverse, render, Http404, redirect
-from django.urls import reverse_lazy
-from django.utils.translation import ugettext as _
-from django.db.models import Q
-from django.views.generic.base import View, TemplateView
-from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView, ProcessFormView, FormView
-from django.views.generic.detail import DetailView
-from django.contrib.messages.views import SuccessMessageMixin
 from django.conf import settings
+from django.contrib.auth import login as auth_login, logout as auth_logout
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
+from django.core.files.storage import default_storage
+from django.db.models import Q
 from django.http import HttpResponseRedirect
-from django.contrib.auth import views as auth_view, authenticate, login, logout
+from django.shortcuts import get_object_or_404, reverse, redirect
+from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext as _
+from django.urls import reverse_lazy
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
+from django.views.generic.base import TemplateView
+from django.views.generic.list import ListView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView
+from django.views.generic.detail import DetailView
 
-from common.utils import get_object_or_none
+from formtools.wizard.views import SessionWizardView
+
+from common.utils import get_object_or_none, get_logger
 
 from .models import User, UserGroup
-from .forms import UserCreateForm, UserUpdateForm, UserGroupForm, UserLoginForm
-from .utils import AdminUserRequiredMixin, ssh_key_gen, user_add_success_next, send_reset_password_mail
+from .forms import UserCreateForm, UserUpdateForm, UserGroupForm, UserLoginForm, UserInfoForm, UserKeyForm
+from .utils import AdminUserRequiredMixin, user_add_success_next, send_reset_password_mail
 
 
-logger = logging.getLogger('jumpserver.users.views')
+logger = get_logger(__name__)
 
 
+@method_decorator(sensitive_post_parameters(), name='dispatch')
+@method_decorator(csrf_protect, name='dispatch')
+@method_decorator(never_cache, name='dispatch')
 class UserLoginView(FormView):
     template_name = 'users/login.html'
     form_class = UserLoginForm
     redirect_field_name = 'next'
 
     def get(self, request, *args, **kwargs):
-        if self.request.user.is_staff:
-            return redirect(request.POST.get(self.redirect_field_name, reverse('index')))
-        # Todo: Django have bug, lose context issue: https://github.com/django/django/pull/7202
-        # so we jump it and use origin method render_to_response
-        # return super(UserLoginView, self).get(request, *args, **kwargs)
-        return self.render_to_response(self.get_context_data(**kwargs))
+        if request.user.is_staff:
+            return redirect(self.get_success_url())
+        return super(UserLoginView, self).get(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
-        form = self.get_form()
-        if not form.is_valid():
-            return self.form_invalid(form)
+    def form_valid(self, form):
+        auth_login(self.request, form.get_user())
+        return redirect(self.get_success_url())
 
-        username = form['username'].value()
-        password = form['password'].value()
+    def get_success_url(self):
+        if self.request.user.is_first_login:
+            return reverse('users:user-first-login')
 
-        user = authenticate(username=username, password=password)
-        if user is None:
-            kwargs.update({'errors': _('Username or password invalid')})
-            return self.get(request, *args, **kwargs)
-
-        login(request, user)
-        return redirect(request.GET.get(self.redirect_field_name, reverse('index')))
+        return self.request.POST.get(
+            self.redirect_field_name,
+            self.request.GET.get(self.redirect_field_name, reverse('index')))
 
 
+@method_decorator(never_cache, name='dispatch')
 class UserLogoutView(TemplateView):
     template_name = 'common/flash_message_standalone.html'
 
     def get(self, request, *args, **kwargs):
-        logout(request)
-
+        auth_logout(request)
         return super(UserLogoutView, self).get(request)
 
     def get_context_data(self, **kwargs):
@@ -80,7 +82,7 @@ class UserListView(AdminUserRequiredMixin, ListView):
     model = User
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'user_list'
-    template_name = 'users/user_list.html'
+    template_name = 'users/asset_permission_list.html'
     ordering = '-date_joined'
 
     def get_queryset(self):
@@ -90,7 +92,6 @@ class UserListView(AdminUserRequiredMixin, ListView):
         if keyword:
             self.queryset = self.queryset.filter(Q(username__icontains=keyword) |
                                                  Q(name__icontains=keyword))
-
         if sort:
             self.queryset = self.queryset.order_by(sort)
         return self.queryset
@@ -106,7 +107,7 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     form_class = UserCreateForm
     template_name = 'users/user_create.html'
     success_url = reverse_lazy('users:user-list')
-    success_message = _('Create user<a href="%s">%s</a> success.')
+    success_message = _('Create user <a href="%s">%s</a> successfully.')
 
     def get_context_data(self, **kwargs):
         context = super(UserCreateView, self).get_context_data(**kwargs)
@@ -150,7 +151,7 @@ class UserUpdateView(AdminUserRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(UserUpdateView, self).get_context_data(**kwargs)
-        context.update({'app': _('Users'), 'action': _('Edit user')})
+        context.update({'app': _('Users'), 'action': _('Update user')})
         return context
 
 
@@ -159,14 +160,28 @@ class UserDeleteView(AdminUserRequiredMixin, DeleteView):
     success_url = reverse_lazy('users:user-list')
     template_name = 'users/user_delete_confirm.html'
 
+    def delete(self, request, *args, **kwargs):
+        """
+        Calls the delete() method on the fetched object and then
+        redirects to the success URL.
+        """
+        self.object = self.get_object()
+        success_url = self.get_success_url()
+        if self.object.name == "admin" or self.object.id == request.session.get('_auth_user_id'):
+            pass
+        else:
+            self.object.delete()
+
+        return HttpResponseRedirect(success_url)
+
 
 class UserDetailView(AdminUserRequiredMixin, DetailView):
     model = User
     template_name = 'users/user_detail.html'
-    context_object_name = "user"
+    context_object_name = "user_object"
 
     def get_context_data(self, **kwargs):
-        groups = [group for group in UserGroup.objects.iterator() if group not in self.object.groups.iterator()]
+        groups = UserGroup.objects.exclude(id__in=self.object.groups.all())
         context = {'app': _('Users'), 'action': _('User detail'), 'groups': groups}
         kwargs.update(context)
         return super(UserDetailView, self).get_context_data(**kwargs)
@@ -177,7 +192,7 @@ class UserGroupListView(AdminUserRequiredMixin, ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'user_group_list'
     template_name = 'users/user_group_list.html'
-    ordering = '-date_added'
+    ordering = '-date_created'
 
     def get_queryset(self):
         self.queryset = super(UserGroupListView, self).get_queryset()
@@ -192,7 +207,7 @@ class UserGroupListView(AdminUserRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = super(UserGroupListView, self).get_context_data(**kwargs)
-        context.update({'app': _('Users'), 'action': _('Usergroup list'), 'keyword': self.keyword})
+        context.update({'app': _('Users'), 'action': _('User group list'), 'keyword': self.keyword})
         return context
 
 
@@ -230,20 +245,20 @@ class UserGroupDeleteView(DeleteView):
     pass
 
 
-class UserForgetPasswordView(TemplateView):
-    template_name = 'users/forget_password.html'
+class UserForgotPasswordView(TemplateView):
+    template_name = 'users/forgot_password.html'
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         email = request.POST.get('email')
         user = get_object_or_none(User, email=email)
         if not user:
             return self.get(request, errors=_('Email address invalid, input again'))
         else:
             send_reset_password_mail(user)
-            return HttpResponseRedirect(reverse('users:forget-password-sendmail-success'))
+            return HttpResponseRedirect(reverse('users:forgot-password-sendmail-success'))
 
 
-class UserForgetPasswordSendmailSuccessView(TemplateView):
+class UserForgotPasswordSendmailSuccessView(TemplateView):
     template_name = 'common/flash_message_standalone.html'
 
     def get_context_data(self, **kwargs):
@@ -253,7 +268,7 @@ class UserForgetPasswordSendmailSuccessView(TemplateView):
             'redirect_url': reverse('users:login'),
         }
         kwargs.update(context)
-        return super(UserForgetPasswordSendmailSuccessView, self).get_context_data(**kwargs)
+        return super(UserForgotPasswordSendmailSuccessView, self).get_context_data(**kwargs)
 
 
 class UserResetPasswordSuccessView(TemplateView):
@@ -295,3 +310,42 @@ class UserResetPasswordView(TemplateView):
 
         user.reset_password(password)
         return HttpResponseRedirect(reverse('users:reset-password-success'))
+
+
+class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
+    template_name = 'users/first_login.html'
+    form_list = [UserInfoForm, UserKeyForm]
+    file_storage = default_storage
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated() and not request.user.is_first_login:
+            return redirect(reverse('index'))
+        return super(UserFirstLoginView, self).dispatch(request, *args, **kwargs)
+
+    def done(self, form_list, form_dict, **kwargs):
+        user = self.request.user
+        for form in form_list:
+            for field in form:
+                if field.value():
+                    setattr(user, field.name, field.value())
+                if field.name == 'enable_otp':
+                    user.enable_otp = field.value()
+        user.is_first_login = False
+        user.save()
+        return redirect(reverse('index'))
+
+    def get_context_data(self, **kwargs):
+        context = super(UserFirstLoginView, self).get_context_data(**kwargs)
+        context.update({'app': _('Users'), 'action': _('First Login')})
+        return context
+
+    def get_form_initial(self, step):
+        user = self.request.user
+        if step == '0':
+            return {
+                'name': user.name or user.username,
+                'enable_otp': user.enable_otp or True,
+                'wechat': user.wechat or '',
+                'phone': user.phone or ''
+            }
+        return super(UserFirstLoginView, self).get_form_initial(step)

@@ -1,5 +1,6 @@
 {% extends 'users/_user.html' %}
 {% load i18n %}
+{% block user_template_title %}{% trans "Update user" %}{% endblock %}
 {% block username %}
     <div class="form-group">
         <label for="{{ form.username.id_for_label }}" class="col-sm-2 control-label">{% trans 'Username' %}</label>

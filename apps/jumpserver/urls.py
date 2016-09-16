@@ -17,7 +17,6 @@ from django.conf.urls import url, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic.base import TemplateView
-from django.http import HttpResponseRedirect
 
 
 urlpatterns = [
@@ -25,6 +24,7 @@ urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='base.html'), name='index'),
     url(r'^(api/)?users/', include('users.urls')),
     url(r'^assets/', include('assets.urls')),
+    url(r'^perms/', include('perms.urls')),
     url(r'^terminal/', include('webterminal.urls')),
 ]
 

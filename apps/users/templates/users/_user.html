@@ -14,7 +14,7 @@
             <div class="col-sm-12">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h5>{% trans 'Create user' %}</h5>
+                        <h5>{% block user_template_title %}{% trans 'Create user' %}{% endblock %}</h5>
                         <div class="ibox-tools">
                             <a class="collapse-link">
                                 <i class="fa fa-chevron-up"></i>
@@ -28,7 +28,7 @@
                         </div>
                     </div>
                     <div class="ibox-content">
-                        <form method="post" id="userForm" class="form-horizontal" action="" enctype="multipart/form-data">
+                        <form method="post" class="form-horizontal" action="" enctype="multipart/form-data">
                             {% csrf_token %}
                             <h3>{% trans 'Account' %}</h3>
                             {% block username %} {% endblock %}

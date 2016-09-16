@@ -38,6 +38,7 @@ th a {
    color: white;
  }
 
+.select2-selection--single,
 .select2-selection--multiple {
    border: 1px solid #e5e6e7 !important;
    cursor: text !important;

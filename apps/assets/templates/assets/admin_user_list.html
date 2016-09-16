@@ -1,0 +1,41 @@
+{% extends '_list_base.html' %}
+{% load i18n %}
+{% load common_tags %}
+{% block content_left_head %}
+    <a href="{% url 'assets:admin-user-create' %}" class="btn btn-sm btn-primary "> {% trans "Create admin user" %} </a>
+{% endblock %}
+
+{% block table_head %}
+    <th class="text-center">{% trans 'ID' %}</th>
+    <th class="text-center"><a href="{% url 'assets:admin-user-list' %}?sort=name">{% trans 'Name' %}</a></th>
+    <th class="text-center"><a href="{% url 'assets:admin-user-list' %}?sort=username">{% trans 'Username' %}</a></th>
+    <th class="text-center">{% trans 'Asset num' %}</th>
+    <th class="text-center">{% trans 'Lost connection' %}</th>
+    <th class="text-center">{% trans 'Comment' %}</th>
+    <th class="text-center"></th>
+{% endblock %}
+
+{% block table_body %}
+     {% for admin_user in admin_user_list %}
+         <tr class="gradeX">
+             <td class="text-center">{{ admin_user.id }}</td>
+             <td>
+                 <a href="{% url 'assets:admin-user-detail' pk=admin_user.id %}">
+                     {{ admin_user.name }}
+                 </a>
+             </td>
+             <td class="text-center">{{ admin_user.username }}</td>
+             <td class="text-center">{{ admin_user.assets.count }}</td>
+             <td class="text-center">{{ admin_user.assets.count }}</td>
+             <td class="text-center">{{ admin_user.comment|truncatewords:8 }}</td>
+             <td class="text-center">
+                 <!-- Todo: Click script button will paste a url to clipboard like: curl http://url/admin_user_create.sh | bash -->
+                 <a href="{% url 'assets:admin-user-update' pk=admin_user.id %}" class="btn btn-xs btn-primary">{% trans 'Script' %}</a>
+                 <!-- Todo: Click refresh button will run a task to test admin user could connect asset or not immediately -->
+                 <a href="{% url 'assets:admin-user-update' pk=admin_user.id %}" class="btn btn-xs btn-warning">{% trans 'Refresh' %}</a>
+                 <a href="{% url 'assets:admin-user-update' pk=admin_user.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
+                 <a onclick="obj_del(this,'{{ admin_user.name }}','{% url 'assets:admin-user-delete' admin_user.id %}')" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
+             </td>
+         </tr>
+     {% endfor %}
+{% endblock %}
