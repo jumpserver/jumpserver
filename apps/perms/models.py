@@ -39,31 +39,39 @@ class AssetPermission(models.Model):
         return True
 
     @staticmethod
-    def set_inherit(obj):
+    def set_inherited(obj, inherited_from=None):
         setattr(obj, 'inherited', True)
+        setattr(obj, 'inherited_from', inherited_from)
+        return obj
+
+    @staticmethod
+    def set_non_inherited(obj):
+        setattr(obj, 'inherited', False)
         return obj
 
     def get_granted_users(self):
-        return list(set(self.users.all() or []) | set(self.get_granted_user_groups_member()))
+        users_granted_direct = map(self.set_non_inherited, self.users.all())
+        return list(set(users_granted_direct) | self.get_granted_user_groups_member())
 
     def get_granted_user_groups_member(self):
-        combine_users = functools.partial(combine_seq, callback=AssetPermission.set_inherit)
-        try:
-            return functools.reduce(combine_users, [user_group.users.all()
-                                                    for user_group in self.user_groups.iterator()])
-        except TypeError:
-            return []
+        users = set()
+        for user_group in self.user_groups.all():
+            for user in user_group.users.all():
+                user = self.set_inherited(user, inherited_from=user_group)
+                users.add(user)
+        return users
 
     def get_granted_assets(self):
-        return list(set(self.assets.all() or []) | set(self.get_granted_asset_groups_member()))
+        assets_granted_direct = map(self.set_non_inherited, self.assets.all())
+        return list(set(assets_granted_direct or []) | self.get_granted_asset_groups_member())
 
     def get_granted_asset_groups_member(self):
-        combine_assets = functools.partial(combine_seq, callback=AssetPermission.set_inherit)
-        try:
-            return functools.reduce(combine_assets, [asset_group.users.all()
-                                                     for asset_group in self.asset_groups.iterator()])
-        except TypeError:
-            return []
+        assets = set()
+        for asset_group in self.asset_groups.all():
+            for asset in asset_group.assets.all():
+                asset = self.set_inherited(asset, inherited_from=asset_group)
+                assets.add(asset)
+        return assets
 
     class Meta:
         db_table = 'asset_permission'
