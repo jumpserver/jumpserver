@@ -23,7 +23,9 @@ class AssetCreateView(CreateView):
     success_url = reverse_lazy('assets:asset-list')
 
     def form_invalid(self, form):
-        print(form.errors)
+        asset = form.save(commit=False)
+        asset.is_active = 1
+        asset.save()
         return super(AssetCreateView, self).form_invalid(form)
 
 

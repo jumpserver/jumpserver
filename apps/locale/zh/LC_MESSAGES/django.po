@@ -152,7 +152,7 @@ msgstr "远控卡IP"
 
 #: assets/models.py:104
 msgid "Hostname"
-msgstr "用户名"
+msgstr "主机名"
 
 #: assets/models.py:105
 msgid "Port"

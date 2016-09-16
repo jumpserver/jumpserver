@@ -117,11 +117,14 @@ class Asset(models.Model):
     os = models.CharField(max_length=128, blank=True, verbose_name=_('OS'))
     cabinet_no = models.CharField(max_length=32, blank=True, verbose_name=_('Cabinet number'))
     cabinet_pos = models.IntegerField(null=True, blank=True, verbose_name=_('Cabinet position'))
-    number = models.CharField(max_length=32, blank=True, unique=True, verbose_name=_('Asset number'))
-    status = models.ForeignKey(AssetExtend, null=True, blank=True, related_name="asset_status_extend", verbose_name=_('Asset status'))
-    type = models.ForeignKey(AssetExtend, null=True, blank=True, related_name="asset_type_extend", verbose_name=_('Asset type'))
-    env = models.ForeignKey(AssetExtend, null=True, blank=True, related_name="asset_env_extend", verbose_name=_('Asset environment'))
-    sn = models.CharField(max_length=128, blank=True, unique=True, verbose_name=_('Serial number'))
+    number = models.CharField(max_length=32, blank=True, verbose_name=_('Asset number'))
+    status = models.ForeignKey(AssetExtend, null=True, blank=True,
+                               related_name="asset_status_extend", verbose_name=_('Asset status'))
+    type = models.ForeignKey(AssetExtend, null=True, blank=True,
+                             related_name="asset_type_extend", verbose_name=_('Asset type'))
+    env = models.ForeignKey(AssetExtend, null=True, blank=True,
+                            related_name="asset_env_extend", verbose_name=_('Asset environment'))
+    sn = models.CharField(max_length=128, blank=True, verbose_name=_('Serial number'))
     created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     date_added = models.DateTimeField(auto_now=True, null=True, verbose_name=_('Date added'))
