@@ -81,10 +81,6 @@
                                             <td><b>{{ asset_permission.get_action_display }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Is active' %}:</td>
-                                            <td><b>{{ asset_permission.is_active|yesno:'Yes, No, Unkown' }}</b></td>
-                                        </tr>
-                                        <tr>
                                             <td>{% trans 'Date expired' %}:</td>
                                             <td><b>{{ asset_permission.date_expired }}</b></td>
                                         </tr>

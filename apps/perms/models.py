@@ -11,18 +11,12 @@ from common.utils import date_expired_default, combine_seq
 
 
 class AssetPermission(models.Model):
-    ACTION_CHOICE = (
-        ('1', 'Allow'),
-        ('0', 'Deny'),
-    )
-
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     users = models.ManyToManyField(User, related_name='asset_permissions', blank=True)
     user_groups = models.ManyToManyField(UserGroup, related_name='asset_permissions', blank=True)
     assets = models.ManyToManyField(Asset, related_name='granted_by_permissions', blank=True)
     asset_groups = models.ManyToManyField(AssetGroup, related_name='granted_by_permissions', blank=True)
     system_users = models.ManyToManyField(SystemUser, related_name='granted_by_permissions')
-    action = models.CharField(choices=ACTION_CHOICE, max_length=8, default='1')
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_('Date expired'))
     created_by = models.CharField(max_length=128, blank=True, verbose_name=_('Created by'))
