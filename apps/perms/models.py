@@ -24,7 +24,7 @@ class AssetPermission(models.Model):
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
 
     def __unicode__(self):
-        return '%(name)s: %(action)s' % {'name': self.name, 'action': self.action}
+        return self.name
 
     @property
     def is_valid(self):
