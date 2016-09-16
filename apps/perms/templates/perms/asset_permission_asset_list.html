@@ -26,7 +26,7 @@
                             </li>
                             <li class="active">
                                 <a href="{% url 'perms:asset-permission-asset-list' pk=asset_permission.id  %}" class="text-center">
-                                <i class="fa fa-bar-chart-o"></i> {% trans 'Assets and asset gruops' %}</a>
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'Assets and asset groups' %}</a>
                             </li>
                             <form id="search_form" method="get" action="" class="pull-right mail-search">
                             <div class="input-group">
@@ -85,7 +85,7 @@
                                                 </td>
 
                                                 <td>
-                                                    <button class="btn btn-danger btn-xs btn_delete_user_group" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                                    <button title="{{ asset.inherit_from_asset_groups }}" class="btn btn-danger btn-xs {% if asset.is_inherit_from_asset_groups %} disabled {% endif %}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                                 </td>
                                             </tr>
                                             {% endfor %}

@@ -26,7 +26,7 @@
                             </li>
                             <li>
                                 <a href="{% url 'perms:asset-permission-asset-list' pk=asset_permission.id  %}" class="text-center">
-                                <i class="fa fa-bar-chart-o"></i> {% trans 'Assets and asset gruops' %}</a>
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'Assets and asset groups' %}</a>
                             </li>
                         </ul>
                     </div>
@@ -75,10 +75,6 @@
                                         <tr>
                                             <td>{% trans 'System user count' %}:</td>
                                             <td><b>{{ asset_permission.system_users.count }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Action' %}:</td>
-                                            <td><b>{{ asset_permission.get_action_display }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Date expired' %}:</td>

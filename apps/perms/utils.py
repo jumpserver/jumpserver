@@ -73,10 +73,6 @@ def get_user_granted_asset_groups_inherit_from_user_groups(user):
     :return: {asset_group: {system_user1, }, asset_group2: {system_user1, system_user2]}
     """
     asset_groups = {}
-
-    if not isinstance(user, User):
-        return asset_groups
-
     user_groups = user.groups.all()
     asset_permissions = set()
 
@@ -140,7 +136,7 @@ def get_user_granted_assets_direct(user):
 
 
 def get_user_granted_assets_inherit_from_user_groups(user):
-    """Return all assets granted of the user
+    """Return assets granted of the user inherit from user groups
 
     :param user: Instance of :class: ``User``
     :return: {asset1: {system_user1, system_user2}, asset2: {...}}
@@ -160,6 +156,11 @@ def get_user_granted_assets_inherit_from_user_groups(user):
 
 
 def get_user_granted_assets(user):
+    """Return assets granted of the user inherit from user groups
+
+    :param user: Instance of :class: ``User``
+    :return: {asset1: {system_user1, system_user2}, asset2: {...}}
+    """
     assets_direct = get_user_granted_assets_direct(user)
     assets_inherited = get_user_granted_assets_inherit_from_user_groups(user)
     assets = assets_inherited

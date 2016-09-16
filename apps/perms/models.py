@@ -32,38 +32,29 @@ class AssetPermission(models.Model):
             return True
         return True
 
-    @staticmethod
-    def set_inherited(obj, inherited_from=None):
-        setattr(obj, 'inherited', True)
-        setattr(obj, 'inherited_from', inherited_from)
-        return obj
-
-    @staticmethod
-    def set_non_inherited(obj):
-        setattr(obj, 'inherited', False)
-        return obj
-
     def get_granted_users(self):
-        users_granted_direct = map(self.set_non_inherited, self.users.all())
-        return list(set(users_granted_direct) | self.get_granted_user_groups_member())
+        return list(set(self.users.all()) | self.get_granted_user_groups_member())
 
     def get_granted_user_groups_member(self):
         users = set()
         for user_group in self.user_groups.all():
             for user in user_group.users.all():
-                user = self.set_inherited(user, inherited_from=user_group)
+                setattr(user, 'is_inherit_from_user_groups', True)
+                setattr(user, 'inherit_from_user_groups',
+                        getattr(user, b'inherit_from_user_groups', set()).add(user_group))
                 users.add(user)
         return users
 
     def get_granted_assets(self):
-        assets_granted_direct = map(self.set_non_inherited, self.assets.all())
-        return list(set(assets_granted_direct or []) | self.get_granted_asset_groups_member())
+        return list(set(self.assets.all()) | self.get_granted_asset_groups_member())
 
     def get_granted_asset_groups_member(self):
         assets = set()
         for asset_group in self.asset_groups.all():
             for asset in asset_group.assets.all():
-                asset = self.set_inherited(asset, inherited_from=asset_group)
+                setattr(asset, 'is_inherit_from_asset_groups', True)
+                setattr(asset, 'inherit_from_asset_groups',
+                        getattr(asset, b'inherit_from_user_groups', set()).add(asset_group))
                 assets.add(asset)
         return assets
 
