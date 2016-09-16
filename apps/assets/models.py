@@ -194,6 +194,21 @@ class SystemUser(models.Model):
     def public_key(self, public_key_raw):
         self._public_key = encrypt(public_key_raw)
 
+    def get_assets_inherit_from_asset_groups(self):
+        assets = set()
+        asset_groups = self.asset_groups.all()
+        for asset_group in asset_groups:
+            for asset in asset_group.assets.all():
+                setattr(asset, 'is_inherit_from_asset_groups', True)
+                setattr(asset, 'inherit_from_asset_groups',
+                        getattr(asset, b'inherit_from_asset_groups', set()).add(asset_group))
+                assets.add(asset)
+        return assets
+
+    def get_assets(self):
+        assets = set(self.assets.all()) | self.get_assets_inherit_from_asset_groups()
+        return list(assets)
+
     class Meta:
         db_table = 'system_user'
 

@@ -365,7 +365,6 @@ class SystemUserUpdateView(AdminUserRequiredMixin, UpdateView):
     model = SystemUser
     form_class = SystemUserForm
     template_name = 'assets/system_user_create_update.html'
-    success_message = _('Update system user <a href="%s">%s</a> successfully.')
 
     def get_context_data(self, **kwargs):
         context = {
@@ -376,7 +375,7 @@ class SystemUserUpdateView(AdminUserRequiredMixin, UpdateView):
         return super(SystemUserUpdateView, self).get_context_data(**kwargs)
 
     def get_success_url(self):
-        success_url = reverse_lazy('assets:system-user-detail', pk=self.object.pk)
+        success_url = reverse_lazy('assets:system-user-detail', kwargs={'pk': self.object.pk})
         return success_url
 
 
@@ -409,39 +408,47 @@ class SystemUserAssetView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
         self.object = self.get_object(queryset=SystemUser.objects.all())
         return super(SystemUserAssetView, self).get(request, *args, **kwargs)
 
+    def get_asset_groups(self):
+        return self.object.asset_groups.all()
+
     # Todo: queryset default order by connectivity, need ops support
     def get_queryset(self):
-        return self.object.assets.all()
+        return list(self.object.get_assets())
 
     def get_context_data(self, **kwargs):
+        asset_groups = self.get_asset_groups()
+        assets = self.get_queryset()
         context = {
             'app': 'assets',
             'action': 'System user asset',
-            'assets': self.get_queryset(),
+            'assets_remain': [asset for asset in Asset.objects.all() if asset not in assets],
+            'asset_groups': asset_groups,
+            'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all()
+                                    if asset_group not in asset_groups]
         }
         kwargs.update(context)
         return super(SystemUserAssetView, self).get_context_data(**kwargs)
 
 
-class SystemUserAssetGroupView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    template_name = 'assets/system_user_asset_group.html'
-    context_object_name = 'system_user'
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=SystemUser.objects.all())
-        return super(SystemUserAssetGroupView, self).get(request, *args, **kwargs)
-
+# class SystemUserAssetGroupView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
+#     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+#     template_name = 'assets/system_user_asset_group.html'
+#     context_object_name = 'system_user'
+#
+#     def get(self, request, *args, **kwargs):
+#         self.object = self.get_object(queryset=SystemUser.objects.all())
+#         return super(SystemUserAssetGroupView, self).get(request, *args, **kwargs)
+#
     # Todo: queryset default order by connectivity, need ops support
-    def get_queryset(self):
-        return self.object.asset_groups.all()
-
-    def get_context_data(self, **kwargs):
-        context = {
-            'app': 'assets',
-            'action': 'System user asset group',
-            'asset_groups': self.get_queryset(),
-        }
-        kwargs.update(context)
-        return super(SystemUserAssetGroupView, self).get_context_data(**kwargs)
+    # def get_queryset(self):
+    #     return self.object.asset_groups.all()
+    #
+    # def get_context_data(self, **kwargs):
+    #     context = {
+    #         'app': 'assets',
+    #         'action': 'System user asset group',
+    #         'asset_groups': self.get_queryset(),
+    #     }
+    #     kwargs.update(context)
+    #     return super(SystemUserAssetGroupView, self).get_context_data(**kwargs)
 
