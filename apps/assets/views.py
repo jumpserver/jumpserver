@@ -33,7 +33,6 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
         context = super(AssetCreateView, self).get_context_data(**kwargs)
         context.update({'admin_users': AdminUser.objects.all()})
         assert isinstance(context, object)
-        print(context)
         return context
 
 
