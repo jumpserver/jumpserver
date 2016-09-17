@@ -1,0 +1,59 @@
+{% extends '_base_create_update.html' %}
+{% load static %}
+{% load bootstrap %}
+{% load i18n %}
+
+{% block custom_head_css_js_create %}
+    <link href="{% static "css/plugins/inputTags.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/inputTags.jquery.min.js" %}"></script>
+{% endblock %}
+
+{% block form %}
+    <form action="" method="post" class="form-horizontal">
+    {% csrf_token %}
+    <h3>{% trans 'Basic' %}</h3>
+    {{ form.hostname|bootstrap_horizontal }}
+    {{ form.ip|bootstrap_horizontal }}
+    {{ form.port|bootstrap_horizontal }}
+    {{ form.type|bootstrap_horizontal }}
+
+    <div class="hr-line-dashed"></div>
+    <h3>{% trans 'Group' %}</h3>
+    {{ form.idc|bootstrap_horizontal }}
+    {{ form.groups|bootstrap_horizontal }}
+
+    <div class="hr-line-dashed"></div>
+    <h3>{% trans 'Asset user' %}</h3>
+    {{ form.admin_user|bootstrap_horizontal }}
+    {{ form.system_users|bootstrap_horizontal }}
+
+    <div class="hr-line-dashed"></div>
+    <h3>{% trans 'Other' %}</h3>
+    <div class="form-group">
+        <label for="tags" class="col-sm-2 control-label">Tags</label>
+        <div class="col-sm-9 col-lg-9 " style="background-color: #fff">
+             <input id="tags" name="tags" type="text" class="form-control">
+                <p class="help-block" >{% trans 'Tips: Use `,` split' %}</p>
+         </div>
+    </div>
+    {{ form.comment|bootstrap_horizontal }}
+
+    <div class="hr-line-dashed"></div>
+    <div class="form-group">
+        <div class="col-sm-4 col-sm-offset-2">
+            <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+            <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+        </div>
+    </div>
+
+</form>
+{% endblock %}
+
+{% block custom_foot_js %}
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+            $('#tags').inputTags();
+        })
+    </script>
+{% endblock %}

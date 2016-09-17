@@ -5,20 +5,42 @@ from .models import IDC, Asset, AssetGroup, AdminUser, SystemUser
 from django.utils.translation import gettext_lazy as _
 
 
-class AssetForm(forms.ModelForm):
+# class AssetForm(forms.ModelForm):
+#     class Meta:
+#         model = Asset
+#
+#         fields = [
+#             'ip', 'other_ip', 'remote_card_ip', 'hostname', 'port', 'groups', 'username', 'password',
+#             'idc', 'mac_address', 'brand', 'cpu', 'memory', 'disk', 'os', 'cabinet_no', 'cabinet_pos',
+#             'number', 'status', 'type', 'env', 'sn', 'is_active', 'comment', 'admin_user', 'system_users'
+#         ]
+#
+#         widgets = {
+#             'groups': forms.SelectMultiple(attrs={'class': 'select2-groups', 'data-placeholder': _('Select asset groups')}),
+#             'system_user': forms.SelectMultiple(attrs={'class': 'select2-system-user', 'data-placeholder': _('Select asset system user')}),
+#             'admin_user': forms.SelectMultiple(attrs={'class': 'select2-admin-user', 'data-placeholder': _('Select asset admin user')}),
+        # }
+#
+
+class AssetCreateForm(forms.ModelForm):
     class Meta:
         model = Asset
 
         fields = [
-            "ip", "other_ip", "remote_card_ip", "hostname", "port", "groups", "username", "password",
-            "idc", "mac_address", "brand", "cpu", "memory", "disk", "os", "cabinet_no", "cabinet_pos",
-            "number", "status", "type", "env", "sn", "is_active", "comment", "admin_user", "system_users"
+            'hostname', 'ip', 'port', 'type', 'zone', 'comment', 'admin_user', 'system_users', 'idc', 'groups'
         ]
 
         widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'select2-groups', 'data-placeholder': _('Select asset groups')}),
-            'system_user': forms.SelectMultiple(attrs={'class': 'select2-system-user', 'data-placeholder': _('Select asset system user')}),
-            # 'admin_user': forms.SelectMultiple(attrs={'class': 'select2-admin-user', 'data-placeholder': _('Select asset admin user')}),
+            'groups': forms.SelectMultiple(attrs={'class': 'select2',
+                                                  'data-placeholder': _('Select asset groups')}),
+            'system_users': forms.SelectMultiple(attrs={'class': 'select2',
+                                                        'data-placeholder': _('Select asset system users')}),
+            'admin_user': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select asset admin user')}),
+        }
+        help_texts = {
+            'hostname': '* required',
+            'ip': '* required',
+            'type': '* required',
         }
 
 

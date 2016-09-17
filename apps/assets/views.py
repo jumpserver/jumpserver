@@ -10,15 +10,30 @@ from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
-from .models import Asset, AssetGroup, IDC, AssetExtend, AdminUser, SystemUser, Label
-from .forms import AssetForm, AssetGroupForm, IDCForm, AdminUserForm, SystemUserForm
+from .models import Asset, AssetGroup, IDC, AssetExtend, AdminUser, SystemUser, Tag
+from .forms import AssetCreateForm, AssetGroupForm, IDCForm, AdminUserForm, SystemUserForm
 from .hands import AdminUserRequiredMixin
+
+
+class AssetListView(ListView):
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    model = Asset
+    context_object_name = 'asset_list'
+    template_name = 'assets/asset_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'Assets',
+            'action': 'Asset list',
+        }
+        kwargs.update(context)
+        return super(AssetListView, self).get_context_data(**kwargs)
 
 
 class AssetCreateView(AdminUserRequiredMixin, CreateView):
     model = Asset
-    form_class = AssetForm
-    template_name = 'assets/asset_create.html'
+    form_class = AssetCreateForm
+    template_name = 'assets/asset_create_update.html'
     success_url = reverse_lazy('assets:asset-list')
 
     def form_valid(self, form):
@@ -26,14 +41,15 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
         key = self.request.POST.get('key', '')
         value = self.request.POST.get('value', '')
         asset.save()
-        Label.objects.create(key=key, value=value, asset=asset)
         return super(AssetCreateView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
-        context = super(AssetCreateView, self).get_context_data(**kwargs)
-        context.update({'admin_users': AdminUser.objects.all()})
-        assert isinstance(context, object)
-        return context
+        context = {
+            'app': 'Assets',
+            'action': 'Create asset',
+        }
+        kwargs.update(context)
+        return super(AssetCreateView, self).get_context_data(**kwargs)
 
 
 class AssetUpdateView(UpdateView):
@@ -43,12 +59,6 @@ class AssetUpdateView(UpdateView):
 class AssetDeleteView(DeleteView):
     model = Asset
     success_url = reverse_lazy('assets:asset-list')
-
-
-class AssetListView(ListView):
-    model = Asset
-    context_object_name = 'assets'
-    template_name = 'assets/asset_list.html'
 
 
 class AssetDetailView(DetailView):

@@ -1,6 +1,7 @@
 {% extends 'users/_user.html' %}
 {% load i18n %}
 {% load bootstrap %}
+{% block user_template_title %}{% trans "Create user" %}{% endblock %}
 {% block username %}
     {{ form.username|bootstrap_horizontal }}
 {% endblock %}
