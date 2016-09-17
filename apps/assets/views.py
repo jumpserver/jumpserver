@@ -10,22 +10,31 @@ from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
-from .models import Asset, AssetGroup, IDC, AssetExtend, AdminUser, SystemUser
+from .models import Asset, AssetGroup, IDC, AssetExtend, AdminUser, SystemUser, Label
 from .forms import AssetForm, AssetGroupForm, IDCForm, AdminUserForm, SystemUserForm
 from .hands import AdminUserRequiredMixin
 
 
-class AssetCreateView(CreateView):
+class AssetCreateView(AdminUserRequiredMixin, CreateView):
     model = Asset
     form_class = AssetForm
     template_name = 'assets/asset_create.html'
     success_url = reverse_lazy('assets:asset-list')
 
-    def form_invalid(self, form):
+    def form_valid(self, form):
         asset = form.save(commit=False)
-        asset.is_active = 1
+        key = self.request.POST.get('key', '')
+        value = self.request.POST.get('value', '')
         asset.save()
-        return super(AssetCreateView, self).form_invalid(form)
+        Label.objects.create(key=key, value=value, asset=asset)
+        return super(AssetCreateView, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super(AssetCreateView, self).get_context_data(**kwargs)
+        context.update({'admin_users': AdminUser.objects.all()})
+        assert isinstance(context, object)
+        print(context)
+        return context
 
 
 class AssetUpdateView(UpdateView):

@@ -117,7 +117,7 @@
                                     <td class="text-center" name="id" value="{{ asset.id }}" data-editable='false'>
                                         <input name="id" value="{{ asset.id }}" type="checkbox" class="i-checks">
                                     </td>
-                                    <td class="text-center"> {{ asset.hostname }} </td>
+                                    <td class="text-center"> <a href="{% url 'assets:asset-detail' pk=asset.id %}">{{ asset.hostname }}</a></td>
                                     <td class="text-center"> {{ asset.ip }} </td>
                                     <td class="text-center">{{ asset.system_type }}</td>
                                     <td class="text-center"> {{ asset.cpu }} | {{ asset.memory }} | {{ asset.disk }}</td>

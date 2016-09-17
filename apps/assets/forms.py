@@ -12,11 +12,13 @@ class AssetForm(forms.ModelForm):
         fields = [
             "ip", "other_ip", "remote_card_ip", "hostname", "port", "groups", "username", "password",
             "idc", "mac_address", "brand", "cpu", "memory", "disk", "os", "cabinet_no", "cabinet_pos",
-            "number", "status", "type", "env", "sn", "is_active", "comment"
+            "number", "status", "type", "env", "sn", "is_active", "comment", "admin_user", "system_user"
         ]
 
         widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Select asset groups')}),
+            'groups': forms.SelectMultiple(attrs={'class': 'select2-groups', 'data-placeholder': _('Select asset groups')}),
+            'system_user': forms.SelectMultiple(attrs={'class': 'select2-system-user', 'data-placeholder': _('Select asset system user')}),
+            # 'admin_user': forms.SelectMultiple(attrs={'class': 'select2-admin-user', 'data-placeholder': _('Select asset admin user')}),
         }
 
 
