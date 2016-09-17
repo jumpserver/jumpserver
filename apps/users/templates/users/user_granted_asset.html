@@ -74,7 +74,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for asset in object_list %}
+                                            {% for asset, system_users in object_list %}
                                             <tr class="gradeX">
                                                 <td class="text-center">
                                                     <a href="{% url 'assets:asset-detail' pk=asset.id %}">
@@ -83,7 +83,7 @@
                                                 </td>
                                                 <td class="text-center">{{ asset.ip }}</td>
                                                 <td class="text-center">{{ asset.port }}</td>
-                                                <td class="text-center">{{ assets.asset }}</td>
+                                                <td class="text-center">{{ system_users|join_attr:"name" }}</td>
                                                 <td class="text-center">
                                                 {% if asset.is_valid %}
                                                     <i class="fa fa-check text-navy"></i>
@@ -92,8 +92,7 @@
                                                 {% endif %}
                                                 </td>
                                                 <td>
-                                                    <button class="btn btn-danger btn-xs btn_delete_user_group {% if not asset.is_valid %} disabled {% endif %}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
-                                                </td>
+                                                    <button class="btn btn-danger btn-xs btn_delete_user_group {% if asset.is_inherit_from_user_groups or asset.is_inherit_from_asset_groups %} disabled {% endif %}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                                 </td>
                                             </tr>
                                             {% endfor %}
@@ -134,7 +133,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for asset_group in asset_groups %}
+                                            {% for asset_group, system_users in asset_groups %}
                                             <tr class="gradeX">
                                                 <td class="text-center">
                                                     <a href="{% url 'assets:asset-group-detail' pk=asset_group.id %}">
@@ -142,9 +141,9 @@
                                                     </a>
                                                 </td>
                                                 <td class="text-center">{{ asset_group.assets.count }}</td>
-                                                <td class="text-center">{{ asset_group.name }}</td>
+                                                <td class="text-center">{{ system_users|join_attr:"name" }}</td>
                                                 <td>
-                                                    <button class="btn btn-danger btn-xs btn_delete_user_group {% if not asset.is_valid %} disabled {% endif %}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                                    <button class="btn btn-danger btn-xs btn_delete_user_group {% if not asset_group.is_inherit_from_user_groups %} disabled {% endif %}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                                 </td>
                                             </tr>
                                             {% endfor %}

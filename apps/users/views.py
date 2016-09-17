@@ -427,15 +427,20 @@ class UserGrantedAssetView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
         return super(UserGrantedAssetView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
-        self.assets_granted = get_user_granted_assets(self.object)
-        return self.assets_granted.keys()
+        # Convert format from {'asset': ['system_users'], ..} to
+        #     [('asset', ['system_users']), ('asset', ['system_users']))
+        assets_granted = [(asset, system_users) for asset, system_users in
+                          get_user_granted_assets(self.object).items()]
+
+        return assets_granted
 
     def get_context_data(self, **kwargs):
+        asset_groups = [(asset_group, system_users) for asset_group, system_users in
+                        get_user_granted_asset_groups(self.object).items()]
         context = {
             'app': 'User',
             'action': 'User granted asset',
-            'asset_groups': get_user_granted_asset_groups(self.object),
-            'assets': self.assets_granted,
+            'asset_groups': asset_groups,
         }
         kwargs.update(context)
         return super(UserGrantedAssetView, self).get_context_data(**kwargs)
