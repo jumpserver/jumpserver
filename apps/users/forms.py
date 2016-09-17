@@ -3,10 +3,10 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import gettext_lazy as _
-
 from captcha.fields import CaptchaField
 
 from .models import User, UserGroup
+from .hands import AssetPermission
 
 
 class UserLoginForm(AuthenticationForm):
@@ -25,12 +25,10 @@ class UserCreateForm(forms.ModelForm):
             'username', 'name', 'email', 'groups', 'wechat',
             'phone', 'enable_otp', 'role', 'date_expired', 'comment',
         ]
-
         help_texts = {
             'username': '* required',
             'email': '* required',
         }
-
         widgets = {
             'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Join user groups')}),
         }
@@ -44,13 +42,11 @@ class UserUpdateForm(forms.ModelForm):
             'name', 'email', 'groups', 'wechat',
             'phone', 'enable_otp', 'role', 'date_expired', 'comment',
         ]
-
         help_texts = {
             'username': '* required',
             'email': '* required',
             'groups': '* required'
         }
-
         widgets = {
             'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Join user groups')}),
         }
@@ -60,11 +56,9 @@ class UserGroupForm(forms.ModelForm):
 
     class Meta:
         model = UserGroup
-
         fields = [
             'name', 'comment',
         ]
-
         help_texts = {
             'name': '* required'
         }
@@ -98,3 +92,27 @@ class UserKeyForm(forms.Form):
             print e
             raise forms.ValidationError(_('Not a valid ssh public key'))
         return public_key
+
+
+class UserPrivateAssetPermissionForm(forms.ModelForm):
+
+    def save(self, commit=True):
+        self.instance = super(UserPrivateAssetPermissionForm, self).save(commit=commit)
+        self.instance.private_for = 'U'
+        self.instance.users = [self.user]
+        self.instance.save()
+        return self.instance
+
+    class Meta:
+        model = AssetPermission
+        fields = [
+            'assets', 'asset_groups', 'system_users', 'private_for', 'name',
+        ]
+        widgets = {
+            'assets': forms.SelectMultiple(attrs={'class': 'select2',
+                                                  'data-placeholder': _('Select assets')}),
+            'asset_groups': forms.SelectMultiple(attrs={'class': 'select2',
+                                                        'data-placeholder': _('Select asset groups')}),
+            'system_users': forms.SelectMultiple(attrs={'class': 'select2',
+                                                        'data-placeholder': _('Select system users')}),
+        }

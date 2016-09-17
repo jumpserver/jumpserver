@@ -11,18 +11,19 @@ from common.utils import date_expired_default, combine_seq
 
 
 class AssetPermission(models.Model):
-    ACTION_CHOICE = (
-        ('1', 'Allow'),
-        ('0', 'Deny'),
+    PRIVATE_FOR_CHOICE = (
+        ('N', 'None'),
+        ('U', 'user'),
+        ('G', 'user group'),
     )
-
-    name = models.CharField(max_length=128, verbose_name=_('Name'))
+    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     users = models.ManyToManyField(User, related_name='asset_permissions', blank=True)
     user_groups = models.ManyToManyField(UserGroup, related_name='asset_permissions', blank=True)
     assets = models.ManyToManyField(Asset, related_name='granted_by_permissions', blank=True)
     asset_groups = models.ManyToManyField(AssetGroup, related_name='granted_by_permissions', blank=True)
     system_users = models.ManyToManyField(SystemUser, related_name='granted_by_permissions')
-    action = models.CharField(choices=ACTION_CHOICE, max_length=8, default='1')
+    private_for = models.CharField(choices=PRIVATE_FOR_CHOICE, max_length=1, default='N', blank=True,
+                                   verbose_name=_('Private for'))
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_('Date expired'))
     created_by = models.CharField(max_length=128, blank=True, verbose_name=_('Created by'))
@@ -30,7 +31,7 @@ class AssetPermission(models.Model):
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
 
     def __unicode__(self):
-        return '%(name)s: %(action)s' % {'name': self.name, 'action': self.action}
+        return self.name
 
     @property
     def is_valid(self):
@@ -38,32 +39,31 @@ class AssetPermission(models.Model):
             return True
         return True
 
-    @staticmethod
-    def set_inherit(obj):
-        setattr(obj, 'inherited', True)
-        return obj
-
     def get_granted_users(self):
-        return list(set(self.users.all() or []) | set(self.get_granted_user_groups_member()))
+        return list(set(self.users.all()) | self.get_granted_user_groups_member())
 
     def get_granted_user_groups_member(self):
-        combine_users = functools.partial(combine_seq, callback=AssetPermission.set_inherit)
-        try:
-            return functools.reduce(combine_users, [user_group.users.all()
-                                                    for user_group in self.user_groups.iterator()])
-        except TypeError:
-            return []
+        users = set()
+        for user_group in self.user_groups.all():
+            for user in user_group.users.all():
+                setattr(user, 'is_inherit_from_user_groups', True)
+                setattr(user, 'inherit_from_user_groups',
+                        getattr(user, b'inherit_from_user_groups', set()).add(user_group))
+                users.add(user)
+        return users
 
     def get_granted_assets(self):
-        return list(set(self.assets.all() or []) | set(self.get_granted_asset_groups_member()))
+        return list(set(self.assets.all()) | self.get_granted_asset_groups_member())
 
     def get_granted_asset_groups_member(self):
-        combine_assets = functools.partial(combine_seq, callback=AssetPermission.set_inherit)
-        try:
-            return functools.reduce(combine_assets, [asset_group.users.all()
-                                                     for asset_group in self.asset_groups.iterator()])
-        except TypeError:
-            return []
+        assets = set()
+        for asset_group in self.asset_groups.all():
+            for asset in asset_group.assets.all():
+                setattr(asset, 'is_inherit_from_asset_groups', True)
+                setattr(asset, 'inherit_from_asset_groups',
+                        getattr(asset, b'inherit_from_user_groups', set()).add(asset_group))
+                assets.add(asset)
+        return assets
 
     class Meta:
         db_table = 'asset_permission'

@@ -12,7 +12,7 @@ class AssetForm(forms.ModelForm):
         fields = [
             "ip", "other_ip", "remote_card_ip", "hostname", "port", "groups", "username", "password",
             "idc", "mac_address", "brand", "cpu", "memory", "disk", "os", "cabinet_no", "cabinet_pos",
-            "number", "status", "type", "env", "sn", "is_active", "comment", "admin_user", "system_user"
+            "number", "status", "type", "env", "sn", "is_active", "comment", "admin_user", "system_users"
         ]
 
         widgets = {

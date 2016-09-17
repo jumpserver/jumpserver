@@ -19,10 +19,7 @@
                                 <a href="{% url 'assets:system-user-detail' pk=system_user.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
                             </li>
                             <li class="active"><a href="{% url 'assets:system-user-asset' pk=system_user.id %}" class="text-center">
-                                <i class="fa fa-bar-chart-o"></i> {% trans 'Associate assets' %}</a>
-                            </li>
-                            <li><a href="{% url 'assets:system-user-asset-group' pk=system_user.id %}" class="text-center">
-                                <i class="fa fa-bar-chart-o"></i> {% trans 'Associate asset groups' %}</a>
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'Associate assets and asset groups' %}</a>
                             </li>
                         </ul>
                     </div>
@@ -30,7 +27,7 @@
                         <div class="col-sm-7" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span style="float: left">{% trans 'Asset list of ' %} <b>{{ admin_user.name }}</b></span>
+                                    <span style="float: left">{% trans 'Assets attached of ' %} <b>{{ system_user.name }} </b><span class="badge">{{ paginator.count }}</span></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -52,7 +49,8 @@
                                                 <th>{% trans 'Hostname' %}</th>
                                                 <th>{% trans 'IP' %}</th>
                                                 <th>{% trans 'Port' %}</th>
-                                                <th>{% trans 'Alive' %}</th>
+                                                <th>{% trans 'Reachable' %}</th>
+                                                <th></th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -61,7 +59,12 @@
                                                 <td>{{ asset.hostname }}</td>
                                                 <td>{{ asset.ip }}</td>
                                                 <td>{{ asset.port }}</td>
-                                                <td>Alive</td>
+                                                <td>
+                                                    <i class="fa fa-check text-navy"></i>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-danger pull-right btn-xs {% if asset.is_inherit_from_asset_groups %} disabled {% endif %}" type="button"><i class="fa fa-minus"></i></button>
+                                                </td>
                                             </tr>
                                             {% endfor %}
                                         </tbody>
@@ -75,7 +78,7 @@
                         <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Add asset to this system user' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Attach to assets ' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table">
@@ -84,7 +87,7 @@
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
                                                     <select data-placeholder="{% trans 'Select asset' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for asset in assets %}
+                                                        {% for asset in assets_remain %}
                                                             <option value="{{ asset.id }}">{{ asset.ip}}:{{ asset.port }}</option>
                                                         {% endfor %}
                                                     </select>
@@ -92,10 +95,47 @@
                                             </tr>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <button type="button" class="btn btn-primary btn-sm">{% trans 'Add' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-sm">{% trans 'Attach' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Attach to asset groups' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table group_edit">
+                                        <tbody>
+                                        <form>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <select data-placeholder="{% trans 'Add asset group' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for asset_group in asset_groups_remain %}
+                                                        <option value="{{ asset_group.id }}">{{ asset_group.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <button type="button" class="btn btn-info btn-sm" id="btn_add_user_group">{% trans 'Attach' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+
+                                        {% for asset_group in asset_groups %}
+                                        <tr>
+                                          <td ><b data-gid={{ asset_group.id }}>{{ asset_group.name }}</b></td>
+                                          <td>
+                                              <button class="btn btn-danger pull-right btn-xs" type="button"><i class="fa fa-minus"></i></button>
+                                          </td>
+                                        </tr>
+                                        {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>

@@ -33,3 +33,13 @@ def pagination_range(total_page, current_num=1, display=5):
     end = start + display if start + display <= total_page else total_page + 1
 
     return range(start, end)
+
+
+@register.filter
+def join_attr(seq, attr=None, sep=None):
+    if sep is None:
+        sep = ', '
+    if attr is not None:
+        seq = [getattr(obj, attr) for obj in seq]
+    print(seq)
+    return sep.join(seq)

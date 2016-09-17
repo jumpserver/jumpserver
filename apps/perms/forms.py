@@ -14,7 +14,7 @@ class AssetPermissionForm(forms.ModelForm):
         model = AssetPermission
         fields = [
             'name', 'users', 'user_groups', 'assets', 'asset_groups',
-            'system_users', 'action', 'is_active', 'date_expired', 'comment',
+            'system_users', 'is_active', 'date_expired', 'comment',
         ]
         widgets = {
             'users': forms.SelectMultiple(attrs={'class': 'select2',

@@ -194,6 +194,21 @@ class SystemUser(models.Model):
     def public_key(self, public_key_raw):
         self._public_key = encrypt(public_key_raw)
 
+    def get_assets_inherit_from_asset_groups(self):
+        assets = set()
+        asset_groups = self.asset_groups.all()
+        for asset_group in asset_groups:
+            for asset in asset_group.assets.all():
+                setattr(asset, 'is_inherit_from_asset_groups', True)
+                setattr(asset, 'inherit_from_asset_groups',
+                        getattr(asset, b'inherit_from_asset_groups', set()).add(asset_group))
+                assets.add(asset)
+        return assets
+
+    def get_assets(self):
+        assets = set(self.assets.all()) | self.get_assets_inherit_from_asset_groups()
+        return list(assets)
+
     class Meta:
         db_table = 'system_user'
 
@@ -266,8 +281,8 @@ class Asset(models.Model):
     password = models.CharField(max_length=256, null=True, blank=True, verbose_name=_("Admin password"))
     admin_user = models.ForeignKey(AdminUser, null=True, blank=True, related_name='assets',
                                    on_delete=models.SET_NULL, verbose_name=_("Admin user"))
-    system_user = models.ManyToManyField(SystemUser, blank=True, related_name='assets', verbose_name=_("System User"))
-    idc = models.ForeignKey(IDC, null=True, blank=True, related_name='assets', on_delete=models.SET_NULL, verbose_name=_('IDC'))
+    system_users = models.ManyToManyField(SystemUser, blank=True, related_name='assets', verbose_name=_("System User"))
+    idc = models.ForeignKey(IDC, null=True, related_name='assets', on_delete=models.SET_NULL, verbose_name=_('IDC'))
     mac_address = models.CharField(max_length=20, null=True, blank=True, verbose_name=_("Mac address"))
     brand = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Brand'))
     cpu = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('CPU'))
@@ -301,7 +316,7 @@ class Asset(models.Model):
 
     @classmethod
     def generate_fake(cls, count=100):
-        from random import seed
+        from random import seed, choice
         import forgery_py
         from django.db import IntegrityError
 
@@ -309,10 +324,14 @@ class Asset(models.Model):
         for i in range(count):
             asset = cls(ip='%s.%s.%s.%s' % tuple([forgery_py.forgery.basic.text(length=3, digits=True)
                                                   for i in range(0, 4)]),
+                        admin_user=choice(AdminUser.objects.all()),
+                        idc=choice(IDC.objects.all()),
                         port=22,
                         created_by='Fake')
             try:
                 asset.save()
+                asset.system_users = [choice(SystemUser.objects.all()) for i in range(3)]
+                asset.groups = [choice(AssetGroup.objects.all()) for i in range(3)]
                 logger.debug('Generate fake asset : %s' % asset.ip)
             except IntegrityError:
                 print('Error continue')
@@ -335,5 +354,5 @@ class Label(models.Model):
 
 
 def generate_fake():
-    for cls in (Asset, AssetGroup, IDC):
+    for cls in (AssetGroup, IDC, AdminUser, SystemUser, Asset):
         cls.generate_fake()

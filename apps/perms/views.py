@@ -120,15 +120,15 @@ class AssetPermissionDeleteView(AdminUserRequiredMixin, DeleteView):
     success_url = reverse_lazy('perms:asset-permission-list')
 
 
-class AssetPermissionUserListView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
-    template_name = 'perms/asset_permission_user_list.html'
+class AssetPermissionUserView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
+    template_name = 'perms/asset_permission_user.html'
     context_object_name = 'asset_permission'
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=AssetPermission.objects.all())
         self.keyword = self.request.GET.get('keyword', '')
-        return super(AssetPermissionUserListView, self).get(request, *args, **kwargs)
+        return super(AssetPermissionUserView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = self.object.get_granted_users()
@@ -152,18 +152,18 @@ class AssetPermissionUserListView(AdminUserRequiredMixin, SingleObjectMixin, Lis
             'keyword': self.keyword,
         }
         kwargs.update(context)
-        return super(AssetPermissionUserListView, self).get_context_data(**kwargs)
+        return super(AssetPermissionUserView, self).get_context_data(**kwargs)
 
 
-class AssetPermissionAssetListView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
-    template_name = 'perms/asset_permission_asset_list.html'
+class AssetPermissionAssetView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
+    template_name = 'perms/asset_permission_asset.html'
     context_object_name = 'asset_permission'
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=AssetPermission.objects.all())
         self.keyword = self.request.GET.get('keyword', '')
-        return super(AssetPermissionAssetListView, self).get(request, *args, **kwargs)
+        return super(AssetPermissionAssetView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
         queryset = self.object.get_granted_assets()
@@ -187,4 +187,4 @@ class AssetPermissionAssetListView(AdminUserRequiredMixin, SingleObjectMixin, Li
             'keyword': self.keyword,
         }
         kwargs.update(context)
-        return super(AssetPermissionAssetListView, self).get_context_data(**kwargs)
+        return super(AssetPermissionAssetView, self).get_context_data(**kwargs)
