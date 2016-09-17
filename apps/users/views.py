@@ -28,7 +28,7 @@ from .models import User, UserGroup
 from .forms import UserCreateForm, UserUpdateForm, UserGroupForm, UserLoginForm, UserInfoForm, UserKeyForm, \
     UserPrivateAssetPermissionForm
 from .utils import AdminUserRequiredMixin, user_add_success_next, send_reset_password_mail
-from .hands import AssetPermission
+from .hands import AssetPermission, get_user_granted_asset_groups, get_user_granted_assets
 
 
 logger = get_logger(__name__)
@@ -416,3 +416,26 @@ class UserAssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
     def get_success_url(self):
         return reverse('users:user-asset-permission', kwargs={'pk': self.user_object.id})
 
+
+class UserGrantedAssetView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    template_name = 'users/user_granted_asset.html'
+    context_object_name = 'user_object'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=User.objects.all())
+        return super(UserGrantedAssetView, self).get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        self.assets_granted = get_user_granted_assets(self.object)
+        return self.assets_granted.keys()
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'User',
+            'action': 'User granted asset',
+            'asset_groups': get_user_granted_asset_groups(self.object),
+            'assets': self.assets_granted,
+        }
+        kwargs.update(context)
+        return super(UserGrantedAssetView, self).get_context_data(**kwargs)
