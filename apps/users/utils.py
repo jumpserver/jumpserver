@@ -128,6 +128,28 @@ def send_reset_password_mail(user):
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
 
+def send_reset_ssh_key_mail(user):
+    subject = _('SSH Key Reset')
+    recipient_list = [user.email]
+    message = _("""
+    Hello %(name)s:
+    </br>
+    Your ssh public key has been reset by site administrator.
+    Please login and reset your ssh public key.
+    </br>
+    <a href="%(login_url)s">Login direct</a>
+
+    </br>
+    """) % {
+        'name': user.name,
+        'login_url': reverse('users:login', external=True),
+    }
+    if settings.DEBUG:
+        logger.debug(message)
+
+    send_mail_async.delay(subject, message, recipient_list, html_message=message)
+
+
 def validate_ssh_pk(text):
     """
     Expects a SSH private key as string.

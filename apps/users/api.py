@@ -6,7 +6,6 @@ import logging
 from rest_framework import generics
 
 from .serializers import UserSerializer, UserGroupSerializer, UserAttributeSerializer, UserGroupEditSerializer
-from .serializers import UserPKUpdateSerializer
 from .models import User, UserGroup
 
 
@@ -60,15 +59,20 @@ class UserResetPasswordApi(generics.UpdateAPIView):
         # Note: we are not updating the user object here.
         # We just do the reset-password staff.
         user = self.get_object()
+        import uuid
+        user.password_raw = str(uuid.uuid4())
+        user.save()
         from .utils import send_reset_password_mail
         send_reset_password_mail(user)
 
 
 class UserResetPKApi(generics.UpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserPKUpdateSerializer
+    serializer_class = UserGroupEditSerializer
 
     def perform_update(self, serializer):
         user = self.get_object()
-        user.private_key = serializer.validated_data['_private_key']
+        user._public_key = ''
         user.save()
+        from .utils import send_reset_ssh_key_mail
+        send_reset_ssh_key_mail(user)

@@ -156,7 +156,7 @@
                                             <td>{% trans 'Reset ssh key' %}:</td>
                                             <td>
                                                 <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_pk" style="width: 54px;" data-toggle="modal" data-target="#user_reset_pk_modal">{% trans 'Reset' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_pk" style="width: 54px;">{% trans 'Reset' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
@@ -207,7 +207,6 @@
             </div>
         </div>
     </div>
-    {% include 'users/_user_reset_pk_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
@@ -308,34 +307,28 @@ $(document).ready(function () {
       doReset();
     }
   );
-}).on('click', '#btn_user_reset_pk', function(){
-  var $this = $(this);
-  var pk = $('#txt_pk').val();
-  var the_url = '{% url "users:user-reset-pk-api" pk=user_object.id %}';
-  var body = {'_private_key': pk};
-  var success = function() {
-    $('#txt_pk').val('');
-    $this.closest('.modal').modal('hide');
-    var msg = "{% trans 'Successfully updated the SSH private key.' %}";
-    swal("{% trans 'User SSH Private Key Reset' %}", msg, "success");
-  };
-  var fail = function() {
-    var msg = "{% trans 'Failed to update the user\'s SSH private key.' %}";
-    swal({
-      title: "{% trans 'User SSH Private Key Reset' %}",
-      text: msg,
-      type: "error",
-      showCancelButton: false,
-      confirmButtonColor: "#DD6B55",
-      confirmButtonText: "{% trans 'Confirm' %}",
-      closeOnConfirm: true
-      }, function () {
-        $('#txt_pk').focus();
-      }
-    );
+}).on('click', '#btn_reset_pk', function(){
+  function doReset() {
+    var the_url = '{% url "users:user-reset-pk-api" pk=user_object.id %}';
+    var body = {};
+    var success = function() {
+      var msg = "{% trans 'The reset-ssh-public-key E-mail has been sent successfully. Please inform the user to update his new ssh public key.' %}";
+      swal("{% trans 'SSH-Public-Key Reset' %}", msg, "success");
+    }
+    APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success});
   }
-  APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success, error: fail});
-
+  swal({
+    title: "{% trans 'Are you sure?' %}",
+    text: "{% trans 'This will reset the user\'s public key.' %}",
+    type: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#DD6B55",
+    confirmButtonText: "{% trans 'Confirm' %}",
+    closeOnConfirm: false
+    }, function () {
+      doReset();
+    }
+  );
 });
 </script>
 {% endblock %}
