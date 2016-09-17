@@ -54,10 +54,10 @@ class IDC(models.Model):
 
 
 class AssetExtend(models.Model):
-    key = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('KEY'))
-    value = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('VALUE'))
+    key = models.CharField(max_length=64, verbose_name=_('KEY'))
+    value = models.CharField(max_length=64, verbose_name=_('VALUE'))
     created_by = models.CharField(max_length=32, blank=True, verbose_name=_("Created by"))
-    date_created = models.DateTimeField(auto_now=True, null=True, blank=True)
+    date_created = models.DateTimeField(auto_now=True, null=True)
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
@@ -77,11 +77,13 @@ class AssetExtend(models.Model):
                 (_('env'), _('Production')),
                 (_('env'), _('Development')),
                 (_('env'), _('Testing')),
+                (_('zone'), _('Default')),
                 ):
             cls.objects.create(key=k, value=v, created_by='System')
 
     class Meta:
         db_table = 'asset_extend'
+        index_together = ('key', 'value')
 
 
 class AdminUser(models.Model):
@@ -248,7 +250,7 @@ class AssetGroup(models.Model):
 
     @classmethod
     def initial(cls):
-        asset_group = cls(name=_('Default'), commont=_('Default asset group'))
+        asset_group = cls(name=_('Default'), comment=_('Default asset group'))
         asset_group.save()
 
     @classmethod
@@ -271,6 +273,10 @@ class AssetGroup(models.Model):
 
 
 class Asset(models.Model):
+    STATUS_DEFAULT = AssetExtend.objects.get_or_create(key='status', value=_('In use'))
+    TYPE_DEFAULT = AssetExtend.objects.get_or_create(key='type', value=_('Server'))
+    ZONE_DEFAULT = AssetExtend.objects.get_or_create(key='zone', value=_('Default'))
+
     ip = models.CharField(max_length=32, verbose_name=_('IP'))
     other_ip = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Other IP'))
     remote_card_ip = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Remote card IP'))
@@ -291,13 +297,13 @@ class Asset(models.Model):
     cabinet_pos = models.IntegerField(null=True, blank=True, verbose_name=_('Cabinet position'))
     number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
     status = models.ForeignKey(AssetExtend, null=True, blank=True, related_name="status_asset",
-                               verbose_name=_('Asset status'))
-    type = models.ForeignKey(AssetExtend, null=True, blank=True, related_name="type_asset",
-                             verbose_name=_('Asset type'))
-    env = models.ForeignKey(AssetExtend, null=True, blank=True, related_name="env_asset",
-                            verbose_name=_('Asset environment'))
-    zone = models.ForeignKey(AssetExtend, null=True, blank=True, related_name="zone_asset",
-                             verbose_name=_('Asset zone'))
+                               default=STATUS_DEFAULT, verbose_name=_('Asset status'))
+    type = models.ForeignKey(AssetExtend, null=True, limit_choices_to={'key': 'type'},
+                             default=TYPE_DEFAULT, related_name="type_asset", verbose_name=_('Asset type'))
+    env = models.ForeignKey(AssetExtend, null=True, limit_choices_to={'key': 'env'},
+                            related_name="env_asset", verbose_name=_('Asset environment'))
+    zone = models.ForeignKey(AssetExtend, null=True, limit_choices_to={'key': 'zone'}, default=ZONE_DEFAULT,
+                             related_name="zone_asset", verbose_name=_('Asset zone'))
     sn = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Serial number'))
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
@@ -350,6 +356,11 @@ class Tag(models.Model):
 
     class Meta:
         db_table = 'label'
+
+
+def initial():
+    for cls in (AssetExtend, AssetGroup):
+        cls.initial()
 
 
 def generate_fake():

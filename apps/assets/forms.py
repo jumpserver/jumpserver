@@ -40,7 +40,6 @@ class AssetCreateForm(forms.ModelForm):
         help_texts = {
             'hostname': '* required',
             'ip': '* required',
-            'type': '* required',
         }
 
 
