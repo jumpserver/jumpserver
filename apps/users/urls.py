@@ -18,6 +18,8 @@ urlpatterns = [
     url(r'^user/(?P<pk>[0-9]+)$', views.UserDetailView.as_view(), name='user-detail'),
     url(r'^user/(?P<pk>[0-9]+)/asset-permission$', views.UserAssetPermissionView.as_view(),
         name='user-asset-permission'),
+    url(r'^user/(?P<pk>[0-9]+)/asset-permission/create$', views.UserAssetPermissionCreateView.as_view(),
+        name='user-asset-permission-create'),
     url(r'^user/(?P<pk>[0-9]+)/asset-granted', views.UserDetailView.as_view(), name='user-granted-asset'),
     url(r'^user/(?P<pk>[0-9]+)/login-history', views.UserDetailView.as_view(), name='user-login-history'),
     url(r'^first-login/$', views.UserFirstLoginView.as_view(), name='user-first-login'),

@@ -18,18 +18,17 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView, SingleObjectMixin, FormMixin
+from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView, SingleObjectMixin, \
+    FormMixin, ModelFormMixin, ProcessFormView, BaseCreateView
 from django.views.generic.detail import DetailView
-
 from formtools.wizard.views import SessionWizardView
 
 from common.utils import get_object_or_none, get_logger
-
 from .models import User, UserGroup
 from .forms import UserCreateForm, UserUpdateForm, UserGroupForm, UserLoginForm, UserInfoForm, UserKeyForm, \
     UserPrivateAssetPermissionForm
 from .utils import AdminUserRequiredMixin, user_add_success_next, send_reset_password_mail
-
+from .hands import AssetPermission
 
 
 logger = get_logger(__name__)
@@ -394,4 +393,26 @@ class UserAssetPermissionView(AdminUserRequiredMixin, FormMixin, SingleObjectMix
 
 
 class UserAssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
-    pass
+    form_class = UserPrivateAssetPermissionForm
+    model = AssetPermission
+
+    def get(self, request, *args, **kwargs):
+        user_object = self.get_object(queryset=User.objects.all())
+        return redirect(reverse('users:user-asset-permission', kwargs={'pk': user_object.id}))
+
+    def post(self, request, *args, **kwargs):
+        self.user_object = self.get_object(queryset=User.objects.all())
+        return super(UserAssetPermissionCreateView, self).post(request, *args, **kwargs)
+
+    def get_form(self, form_class=None):
+        form = super(UserAssetPermissionCreateView, self).get_form(form_class=form_class)
+        form.user = self.user_object
+        return form
+
+    def form_invalid(self, form):
+        print(form.errors)
+        return redirect(reverse('users:user-asset-permission', kwargs={'pk': self.user_object.id}))
+
+    def get_success_url(self):
+        return reverse('users:user-asset-permission', kwargs={'pk': self.user_object.id})
+

@@ -44,7 +44,7 @@
                         <div class="col-sm-7" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span style="float: left">{% trans 'Asset permission of ' %} <b>{{ user.name }}</b></span>
+                                    <span style="float: left">{% trans 'Asset permission of ' %} <b>{{ user_object.name }}</b></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -115,31 +115,35 @@
                                     <i class="fa fa-info-circle"></i> {% trans 'Quick create permission for user' %}
                                 </div>
                                 <div class="panel-body">
-                                    <form>
+                                    <form method="post" action="{% url 'users:user-asset-permission-create' pk=user_object.id %}">
                                         <table class="table">
                                             <tbody>
-                                            {% csrf_token %}
-                                            <tr class="no-borders-tr">
-                                                <td colspan="1" style="padding-top: 0">
-                                                    {{ form.assets|bootstrap }}
-                                                </td>
-                                            </tr>
-                                            <tr class="no-borders-tr">
-                                                <td colspan="1" style="padding-top: 0">
-                                                    {{ form.asset_groups|bootstrap }}
-                                                </td>
-                                            </tr>
-                                            <tr class="no-borders-tr">
-                                                <td colspan="1" style="padding-top: 0">
-                                                    {{ form.system_users|bootstrap }}
-                                                </td>
-                                            </tr>
-                                            <tr class="no-borders-tr">
-                                                <td>
-                                                    <button type="button"
-                                                            class="btn btn-primary btn-sm">{% trans 'Submit' %}</button>
-                                                </td>
-                                            </tr>
+                                                {% csrf_token %}
+                                                <tr class="no-borders-tr">
+                                                    <td colspan="1" style="padding-top: 0">
+                                                        {{ form.name|bootstrap }}
+                                                    </td>
+                                                </tr>
+                                                <tr class="no-borders-tr">
+                                                    <td colspan="1" style="padding-top: 0">
+                                                        {{ form.assets|bootstrap }}
+                                                    </td>
+                                                </tr>
+                                                <tr class="no-borders-tr">
+                                                    <td colspan="1" style="padding-top: 0">
+                                                        {{ form.asset_groups|bootstrap }}
+                                                    </td>
+                                                </tr>
+                                                <tr class="no-borders-tr">
+                                                    <td colspan="1" style="padding-top: 0">
+                                                        {{ form.system_users|bootstrap }}
+                                                    </td>
+                                                </tr>
+                                                <tr class="no-borders-tr">
+                                                    <td>
+                                                        <button type="submit" class="btn btn-primary btn-sm">{% trans 'Submit' %}</button>
+                                                    </td>
+                                                </tr>
                                             </tbody>
                                         </table>
                                     </form>
