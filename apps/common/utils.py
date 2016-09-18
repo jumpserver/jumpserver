@@ -100,3 +100,10 @@ def search_object_attr(obj, value='', attr_list=None, ignore_case=False):
 
 def get_logger(name=None):
     return logging.getLogger('jumpserver.%s' % name)
+
+
+def int_seq(seq):
+    try:
+        return map(int, seq)
+    except ValueError:
+        return seq

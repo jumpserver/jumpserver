@@ -1,7 +1,7 @@
 # coding:utf-8
 from django import forms
 
-from .models import IDC, Asset, AssetGroup, AdminUser, SystemUser
+from .models import IDC, Asset, AssetGroup, AdminUser, SystemUser, Tag
 from django.utils.translation import gettext_lazy as _
 
 
@@ -23,13 +23,35 @@ from django.utils.translation import gettext_lazy as _
 #
 
 class AssetCreateForm(forms.ModelForm):
+    tags = forms.CharField(label=_('Tags'), widget=forms.TextInput(attrs={'id': 'tags'}),
+                           help_text='Use `,` split')
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance')
+
+        if instance:
+            initial = kwargs.get('initial', {})
+            tags = Tag.objects.filter(asset=instance)
+            tags_value = ','.join([tag.value for tag in tags])
+            initial['tags'] = tags_value
+        super(AssetCreateForm, self).__init__(*args, **kwargs)
+
+    def _save_m2m(self):
+        tags = self.cleaned_data['tags']
+
+        if tags:
+            value_list = tags.split(',')
+            self.instance.tags.all().delete()
+            Tag.objects.bulk_create(
+                [Tag(value=value) for value in value_list]
+            )
+
     class Meta:
         model = Asset
 
         fields = [
-            'hostname', 'ip', 'port', 'type', 'zone', 'comment', 'admin_user', 'system_users', 'idc', 'groups'
+            'hostname', 'ip', 'port', 'type', 'comment', 'admin_user', 'system_users', 'idc', 'groups'
         ]
-
         widgets = {
             'groups': forms.SelectMultiple(attrs={'class': 'select2',
                                                   'data-placeholder': _('Select asset groups')}),

@@ -10,6 +10,8 @@ from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
+
+from common.utils import int_seq
 from .models import Asset, AssetGroup, IDC, AssetExtend, AdminUser, SystemUser, Tag
 from .forms import AssetCreateForm, AssetGroupForm, IDCForm, AdminUserForm, SystemUserForm
 from .hands import AdminUserRequiredMixin
@@ -20,6 +22,11 @@ class AssetListView(ListView):
     model = Asset
     context_object_name = 'asset_list'
     template_name = 'assets/asset_list.html'
+
+    def get_queryset(self):
+        queryset = super(AssetListView, self).get_queryset()
+        queryset = sorted(queryset, key=lambda asset: int_seq(asset.ip.split('.')))
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = {
@@ -36,12 +43,10 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
     template_name = 'assets/asset_create_update.html'
     success_url = reverse_lazy('assets:asset-list')
 
-    def form_valid(self, form):
-        asset = form.save(commit=False)
-        key = self.request.POST.get('key', '')
-        value = self.request.POST.get('value', '')
-        asset.save()
-        return super(AssetCreateView, self).form_valid(form)
+    # def form_valid(self, form):
+    #     asset = form.save()
+    #     print(self.request.POST.get('tags'))
+    #     return super(AssetCreateView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = {
@@ -58,6 +63,7 @@ class AssetUpdateView(UpdateView):
 
 class AssetDeleteView(DeleteView):
     model = Asset
+    template_name = 'assets/delete_confirm.html'
     success_url = reverse_lazy('assets:asset-list')
 
 

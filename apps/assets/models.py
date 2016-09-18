@@ -1,6 +1,7 @@
 # coding:utf-8
 from __future__ import unicode_literals, absolute_import
 
+import functools
 from django.db import models
 import logging
 from django.utils.translation import ugettext_lazy as _
@@ -24,6 +25,10 @@ class IDC(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @classmethod
+    def initial(cls):
+        return cls.objects.get_or_create(name=_('Default'), created_by=_('System'), comment=_('Default IDC'))[0]
 
     class Meta:
         db_table = 'idc'
@@ -77,13 +82,12 @@ class AssetExtend(models.Model):
                 (_('env'), _('Production')),
                 (_('env'), _('Development')),
                 (_('env'), _('Testing')),
-                (_('zone'), _('Default')),
                 ):
             cls.objects.create(key=k, value=v, created_by='System')
 
     class Meta:
         db_table = 'asset_extend'
-        index_together = ('key', 'value')
+        unique_together = ('key', 'value')
 
 
 class AdminUser(models.Model):
@@ -272,12 +276,16 @@ class AssetGroup(models.Model):
                 continue
 
 
-class Asset(models.Model):
-    STATUS_DEFAULT = AssetExtend.objects.get_or_create(key='status', value=_('In use'))
-    TYPE_DEFAULT = AssetExtend.objects.get_or_create(key='type', value=_('Server'))
-    ZONE_DEFAULT = AssetExtend.objects.get_or_create(key='zone', value=_('Default'))
+def get_default_extend(key, value):
+    return AssetExtend.objects.get_or_create(key=key, value=value)[0]
 
-    ip = models.CharField(max_length=32, verbose_name=_('IP'))
+
+def get_default_idc():
+    return IDC.initial()
+
+
+class Asset(models.Model):
+    ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'))
     other_ip = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Other IP'))
     remote_card_ip = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Remote card IP'))
     hostname = models.CharField(max_length=128, blank=True, verbose_name=_('Hostname'))
@@ -286,7 +294,9 @@ class Asset(models.Model):
     admin_user = models.ForeignKey(AdminUser, null=True, blank=True, related_name='assets',
                                    on_delete=models.SET_NULL, verbose_name=_("Admin user"))
     system_users = models.ManyToManyField(SystemUser, blank=True, related_name='assets', verbose_name=_("System User"))
-    idc = models.ForeignKey(IDC, null=True, related_name='assets', on_delete=models.SET_NULL, verbose_name=_('IDC'))
+    idc = models.ForeignKey(IDC, null=True, related_name='assets',
+                            on_delete=models.SET_NULL, verbose_name=_('IDC'),
+                            default=get_default_idc)
     mac_address = models.CharField(max_length=20, null=True, blank=True, verbose_name=_("Mac address"))
     brand = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Brand'))
     cpu = models.CharField(max_length=64,  null=True, blank=True, verbose_name=_('CPU'))
@@ -296,14 +306,15 @@ class Asset(models.Model):
     cabinet_no = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Cabinet number'))
     cabinet_pos = models.IntegerField(null=True, blank=True, verbose_name=_('Cabinet position'))
     number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
-    status = models.ForeignKey(AssetExtend, null=True, blank=True, related_name="status_asset",
-                               default=STATUS_DEFAULT, verbose_name=_('Asset status'))
+    status = models.ForeignKey(AssetExtend, null=True, blank=True,
+                               related_name="status_asset", verbose_name=_('Asset status'),
+                               default=functools.partial(get_default_extend, 'status', 'In use'))
     type = models.ForeignKey(AssetExtend, null=True, limit_choices_to={'key': 'type'},
-                             default=TYPE_DEFAULT, related_name="type_asset", verbose_name=_('Asset type'))
+                             related_name="type_asset", verbose_name=_('Asset type'),
+                             default=functools.partial(get_default_extend, 'type','Server'))
     env = models.ForeignKey(AssetExtend, null=True, limit_choices_to={'key': 'env'},
-                            related_name="env_asset", verbose_name=_('Asset environment'))
-    zone = models.ForeignKey(AssetExtend, null=True, limit_choices_to={'key': 'zone'}, default=ZONE_DEFAULT,
-                             related_name="zone_asset", verbose_name=_('Asset zone'))
+                            related_name="env_asset", verbose_name=_('Asset environment'),
+                            default=functools.partial(get_default_extend, 'env', 'Production'))
     sn = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Serial number'))
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
@@ -318,7 +329,7 @@ class Asset(models.Model):
 
     class Meta:
         db_table = 'asset'
-        index_together = ('ip', 'port')
+        unique_together = ('ip', 'port')
 
     @classmethod
     def generate_fake(cls, count=100):
@@ -345,17 +356,15 @@ class Asset(models.Model):
 
 
 class Tag(models.Model):
-    key = models.CharField(max_length=64, blank=True, verbose_name=_('KEY'))
     value = models.CharField(max_length=64, verbose_name=_('VALUE'))
-    asset = models.ForeignKey(Asset, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_('Asset'))
-    created_by = models.CharField(max_length=32, blank=True, verbose_name=_("Created by"))
-    date_created = models.DateTimeField(auto_now=True, null=True)
+    asset = models.ForeignKey(Asset, related_name='tags', on_delete=models.CASCADE, verbose_name=_('Asset'))
 
     def __unicode__(self):
-        return self.key
+        return self.value
 
     class Meta:
-        db_table = 'label'
+        db_table = 'tag'
+        unique_together = ('value', 'asset')
 
 
 def initial():
@@ -366,3 +375,8 @@ def initial():
 def generate_fake():
     for cls in (AssetGroup, IDC, AdminUser, SystemUser, Asset):
         cls.generate_fake()
+
+
+def flush_all():
+    for cls in (AssetGroup, AssetExtend, IDC, AdminUser, SystemUser, Asset):
+        cls.objects.all().delete()

@@ -41,8 +41,8 @@
                  {% endif %}
              </td>
              <td class="text-center">
-                 <a href="{% url 'assets:asset-update' pk=user.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
-                 <a href="{% url 'assets:asset-delete' pk=user.id %}" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>-
+                 <a href="{% url 'assets:asset-update' pk=asset.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
+                 <a href="{% url 'assets:asset-delete' pk=asset.id %}" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>-
 {#                 <a href="{% url '' %}">{% trans 'Delete' %}</a>#}
              </td>
          </tr>
