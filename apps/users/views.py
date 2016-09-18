@@ -133,7 +133,7 @@ class UserUpdateView(AdminUserRequiredMixin, UpdateView):
     model = User
     form_class = UserUpdateForm
     template_name = 'users/user_update.html'
-    context_object_name = 'user'
+    context_object_name = 'user_object'
     success_url = reverse_lazy('users:user-list')
 
     def form_valid(self, form):
@@ -145,10 +145,6 @@ class UserUpdateView(AdminUserRequiredMixin, UpdateView):
         if password:
             user.set_password(password)
         return super(UserUpdateView, self).form_valid(form)
-
-    def form_invalid(self, form):
-        print(form.errors)
-        return super(UserUpdateView, self).form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = super(UserUpdateView, self).get_context_data(**kwargs)
@@ -238,8 +234,14 @@ class UserGroupUpdateView(UpdateView):
     pass
 
 
-class UserGroupDetailView(DetailView):
-    pass
+class UserGroupDetailView(AdminUserRequiredMixin, DetailView):
+    model = UserGroup
+    template_name = 'users/user_group_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = {'app': _('Users'), 'action': _('User Group Detail')}
+        kwargs.update(context)
+        return super(UserGroupDetailView, self).get_context_data(**kwargs)
 
 
 class UserGroupDeleteView(DeleteView):
