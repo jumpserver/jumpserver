@@ -211,124 +211,147 @@
 {% block custom_foot_js %}
 <script>
 jumpserver.selected_groups = {};
-function updateUserGroups(user_groups) {
-  var the_url = "{% url 'users:user-group-edit-api' pk=user_object.id%}";
-  var body = {
-    id: {{ user_object.id }},
-    groups: Object.assign([], user_groups)
-  };
-  var success = function(data) {
-    // remove all the selected groups from select > option and rendered ul element;
-    $('.select2-selection__rendered').empty();
-    $('#slct_groups').val('');
-    $.map(jumpserver.selected_groups, function(group_name, index){
-      $('#opt_' + index).remove();
-      // change tr html of user groups.
-      $('.group_edit tbody').append(
-        '<tr>' +
-          '<td><b class="bdg_user_group" data-gid="' + index + '">' + group_name + '</b></td>' +
-          '<td><button class="btn btn-danger btn-sm pull-right btn_delete_user_group" type="button"><i class="fa fa-minus"></i></button></td>' +
-        '</tr>'
-      )
-    });
-    // clear jumpserver.selected_groups
-    jumpserver.selected_groups = {};
-    toastr.success('{% trans "UserGroup Update Success!" %}')
-  };
-  APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success, method: 'PUT'});
 
+function updateUserGroups(user_groups) {
+    var the_url = "{% url 'users:user-group-edit-api' pk=user_object.id %}";
+    var body = {
+        id: {{ user_object.id }},
+        groups: Object.assign([], user_groups)
+    };
+    var success = function(data) {
+        // remove all the selected groups from select > option and rendered ul element;
+        $('.select2-selection__rendered').empty();
+        $('#slct_groups').val('');
+        $.map(jumpserver.selected_groups, function(group_name, index) {
+            $('#opt_' + index).remove();
+            // change tr html of user groups.
+            $('.group_edit tbody').append(
+                '<tr>' +
+                '<td><b class="bdg_user_group" data-gid="' + index + '">' + group_name + '</b></td>' +
+                '<td><button class="btn btn-danger btn-sm pull-right btn_delete_user_group" type="button"><i class="fa fa-minus"></i></button></td>' +
+                '</tr>'
+            )
+        });
+        // clear jumpserver.selected_groups
+        jumpserver.selected_groups = {};
+        toastr.success('{% trans "UserGroup Update Success!" %}')
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success: success,
+        method: 'PUT'
+    });
 }
-$(document).ready(function () {
-  $('.select2').select2()
-  .on('select2:select', function(evt) {
-    var data = evt.params.data;
-    jumpserver.selected_groups[data.id] = data.text;
-  }).on('select2:unselect', function(evt) {
-    var data = evt.params.data;
-    delete jumpserver.selected_groups[data.id]
-  })
-}).on('click', '#is_active', function(){
-  var the_url = "{% url 'users:user-patch-api' pk=user_object.id %}";
-  var checked = !$(this).prop('checked');
-  var body = {'is_active': checked };
-  var success = '{% trans "Update Successfully!" %}';
-  APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success_message: success});
-}).on('click', '#enable_otp', function(){
-  var the_url = "{% url 'users:user-patch-api' pk=user_object.id %}";
-  var checked = !$(this).prop('checked');
-  var body = {'enable_otp': checked };
-  var success = '{% trans "Update Successfully!" %}';
-  APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success_message: success});
-}).on('click', '#btn_add_user_group', function(){
-  if (Object.keys(jumpserver.selected_groups).length === 0) {
-    return false;
-  }
-  var user_groups = $('.bdg_user_group').map(function(){
-    return $(this).data('gid');
-  }).get();
-  $.map(jumpserver.selected_groups, function(value, index){
-    user_groups.push(parseInt(index));
-    $('#opt_' + index).remove();
-  });
-  updateUserGroups(user_groups)
-}).on('click', '.btn_delete_user_group', function(){
-  var $this = $(this);
-  var $tr = $this.closest('tr');
-  var $badge = $tr.find('.bdg_user_group');
-  var gid = $badge.data('gid');
-  var group_name = $badge.html() || $badge.text();
-  $('#slct_groups').append(
-    '<option value="' + gid + '" id="opt_' + gid + '">' + group_name + '</option>'
-  );
-  $tr.remove();
-  var user_groups = $('.bdg_user_group').map(function(){
-    return $(this).data('gid');
-  }).get();
-  updateUserGroups(user_groups)
-}).on('click', '#btn_reset_password', function(){
-  function doReset() {
-    var the_url = '{% url "users:user-reset-password-api" pk=user_object.id %}';
-    var body = {};
-    var success = function() {
-      var msg = "{% trans 'E-mail sent successfully. An e-mail has been sent to the user\'s mailbox.' %}";
-      swal("{% trans 'Password-Reset' %}", msg, "success");
+$(document).ready(function() {
+    $('.select2').select2()
+        .on('select2:select', function(evt) {
+            var data = evt.params.data;
+            jumpserver.selected_groups[data.id] = data.text;
+        }).on('select2:unselect', function(evt) {
+            var data = evt.params.data;
+            delete jumpserver.selected_groups[data.id]
+        })
+}).on('click', '#is_active', function() {
+    var the_url = "{% url 'users:user-patch-api' pk=user_object.id %}";
+    var checked = !$(this).prop('checked');
+    var body = {
+        'is_active': checked
+    };
+    var success = '{% trans "Update Successfully!" %}';
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success_message: success
+    });
+}).on('click', '#enable_otp', function() {
+    var the_url = "{% url 'users:user-patch-api' pk=user_object.id %}";
+    var checked = !$(this).prop('checked');
+    var body = {
+        'enable_otp': checked
+    };
+    var success = '{% trans "Update Successfully!" %}';
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success_message: success
+    });
+}).on('click', '#btn_add_user_group', function() {
+    if (Object.keys(jumpserver.selected_groups).length === 0) {
+        return false;
     }
-    APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success});
-  }
-  swal({
-    title: "{% trans 'Are you sure?' %}",
-    text: "{% trans 'This will reset the user\'s password.' %}",
-    type: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#DD6B55",
-    confirmButtonText: "{% trans 'Confirm' %}",
-    closeOnConfirm: false
-    }, function () {
-      doReset();
+    var user_groups = $('.bdg_user_group').map(function() {
+        return $(this).data('gid');
+    }).get();
+    $.map(jumpserver.selected_groups, function(value, index) {
+        user_groups.push(parseInt(index));
+        $('#opt_' + index).remove();
+    });
+    updateUserGroups(user_groups)
+}).on('click', '.btn_delete_user_group', function() {
+    var $this = $(this);
+    var $tr = $this.closest('tr');
+    var $badge = $tr.find('.bdg_user_group');
+    var gid = $badge.data('gid');
+    var group_name = $badge.html() || $badge.text();
+    $('#slct_groups').append(
+        '<option value="' + gid + '" id="opt_' + gid + '">' + group_name + '</option>'
+    );
+    $tr.remove();
+    var user_groups = $('.bdg_user_group').map(function() {
+        return $(this).data('gid');
+    }).get();
+    updateUserGroups(user_groups)
+}).on('click', '#btn_reset_password', function() {
+    function doReset() {
+        var the_url = '{% url "users:user-reset-password-api" pk=user_object.id %}';
+        var body = {};
+        var success = function() {
+            var msg = "{% trans 'E-mail sent successfully. An e-mail has been sent to the user\'s mailbox.' %}";
+            swal("{% trans 'Password-Reset' %}", msg, "success");
+        };
+        APIUpdateAttr({
+            url: the_url,
+            body: JSON.stringify(body),
+            success: success
+        });
     }
-  );
-}).on('click', '#btn_reset_pk', function(){
-  function doReset() {
-    var the_url = '{% url "users:user-reset-pk-api" pk=user_object.id %}';
-    var body = {};
-    var success = function() {
-      var msg = "{% trans 'The reset-ssh-public-key E-mail has been sent successfully. Please inform the user to update his new ssh public key.' %}";
-      swal("{% trans 'SSH-Public-Key Reset' %}", msg, "success");
+    swal({
+        title: "{% trans 'Are you sure?' %}",
+        text: "{% trans 'This will reset the user\'s password.' %}",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "{% trans 'Confirm' %}",
+        closeOnConfirm: false
+    }, function() {
+        doReset();
+    });
+}).on('click', '#btn_reset_pk', function() {
+    function doReset() {
+        var the_url = '{% url "users:user-reset-pk-api" pk=user_object.id %}';
+        var body = {};
+        var success = function() {
+            var msg = "{% trans 'The reset-ssh-public-key E-mail has been sent successfully. Please inform the user to update his new ssh public key.' %}";
+            swal("{% trans 'SSH-Public-Key Reset' %}", msg, "success");
+        };
+        APIUpdateAttr({
+            url: the_url,
+            body: JSON.stringify(body),
+            success: success
+        });
     }
-    APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success});
-  }
-  swal({
-    title: "{% trans 'Are you sure?' %}",
-    text: "{% trans 'This will reset the user\'s public key.' %}",
-    type: "warning",
-    showCancelButton: true,
-    confirmButtonColor: "#DD6B55",
-    confirmButtonText: "{% trans 'Confirm' %}",
-    closeOnConfirm: false
-    }, function () {
-      doReset();
-    }
-  );
+    swal({
+        title: "{% trans 'Are you sure?' %}",
+        text: "{% trans 'This will reset the user\'s public key.' %}",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "{% trans 'Confirm' %}",
+        closeOnConfirm: false
+    }, function() {
+        doReset();
+    });
 });
 </script>
 {% endblock %}
