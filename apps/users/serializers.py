@@ -46,11 +46,18 @@ class UserPKUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', '_private_key']
+        fields = ['id', '_public_key']
 
-    def validate__private_key(self, value):
-        from users.utils import validate_ssh_pk
-        checked, reason = validate_ssh_pk(value)
-        if not checked:
-            raise serializers.ValidationError(_('Not a valid ssh private key.'))
+    def validate__public_key(self, value):
+        from sshpubkeys import SSHKey
+        from sshpubkeys.exceptions import InvalidKeyException
+        ssh = SSHKey(value)
+        try:
+            ssh.parse()
+        except InvalidKeyException as e:
+            print e
+            raise serializers.ValidationError(_('Not a valid ssh public key'))
+        except NotImplementedError as e:
+            print e
+            raise serializers.ValidationError(_('Not a valid ssh public key'))
         return value

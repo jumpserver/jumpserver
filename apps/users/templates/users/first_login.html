@@ -3,10 +3,12 @@
 {% load i18n %}
 {% load bootstrap %}
 
+
 {% block custom_head_css_js %}
 {{ wizard.form.media }}
 <link href="{% static 'css/plugins/steps/jquery.steps.css' %}" rel="stylesheet">
 {% endblock %}
+{% block first_login_message %}{% endblock %}
 {% block content %}
 <div class="wrapper wrapper-content animated fadeInRight">
   <div class="row">

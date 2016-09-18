@@ -19,7 +19,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView, SingleObjectMixin, \
-    FormMixin, ModelFormMixin, ProcessFormView, BaseCreateView
+    FormMixin
 from django.views.generic.detail import DetailView
 from formtools.wizard.views import SessionWizardView
 
@@ -332,6 +332,7 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
                 if field.name == 'enable_otp':
                     user.enable_otp = field.value()
         user.is_first_login = False
+        user.is_public_key_valid = True
         user.save()
         return redirect(reverse('index'))
 
@@ -350,6 +351,16 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
                 'phone': user.phone or ''
             }
         return super(UserFirstLoginView, self).get_form_initial(step)
+
+    def get_form(self, step=None, data=None, files=None):
+        form = super(UserFirstLoginView, self).get_form(step, data, files)
+
+        if step is None:
+            step = self.steps.current
+
+        if step == '1':
+            form.user = self.request.user
+        return form
 
 
 class UserAssetPermissionView(AdminUserRequiredMixin, FormMixin, SingleObjectMixin, ListView):
@@ -376,7 +387,7 @@ class UserAssetPermissionView(AdminUserRequiredMixin, FormMixin, SingleObjectMix
 
     def get_queryset(self):
         asset_permissions = set(self.object.asset_permissions.all()) \
-                            | self.get_asset_permission_inherit_from_user_group()
+            | self.get_asset_permission_inherit_from_user_group()
         return list(asset_permissions)
 
     def get_context_data(self, **kwargs):

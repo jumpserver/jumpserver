@@ -1,4 +1,4 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -20,6 +20,25 @@
     <div id="page-wrapper" class="gray-bg">
         {% include '_header_bar.html' %}
         {% include '_message.html' %}
+        {% block first_login_message %}
+            {% if user.is_authenticated and user.is_first_login %}
+            <div class="alert alert-danger" style="margin: 20px auto 0px">
+                {% url 'users:user-first-login' as the_url %}
+                {% blocktrans %}
+                Your information was incomplete. Please click <a href="{{ the_url }}"> this link </a>to complete your information.
+                {% endblocktrans %}
+            </div>
+            {% endif %}
+        {% endblock %}
+        {% block update_public_key_message %}
+            {% if user.is_authenticated and not user.is_public_key_valid %}
+            <div class="alert alert-danger" style="margin: 20px auto 0px">
+                {% blocktrans %}
+                Your ssh-public-key has been expired. Please click <a href="#"> this link </a>to  update your ssh-public-key.
+                {% endblocktrans %}
+            </div>
+            {% endif %}
+        {% endblock %}
         {% block content %}{% endblock %}
         {% include '_footer.html' %}
     </div>

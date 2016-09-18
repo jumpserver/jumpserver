@@ -160,6 +160,14 @@
                                                 </span>
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <td>{% trans 'Update ssh key' %}:</td>
+                                            <td>
+                                                <span class="pull-right">
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_update_pk" style="width: 54px;"  data-toggle="modal" data-target="#user_update_pk_modal">{% trans 'Update' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -207,6 +215,7 @@
             </div>
         </div>
     </div>
+    {% include 'users/_user_update_pk_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
@@ -352,6 +361,33 @@ $(document).ready(function() {
     }, function() {
         doReset();
     });
+}).on('click', '#btn_user_update_pk', function(){
+    var $this = $(this);
+    var pk = $('#txt_pk').val();
+    var the_url = '{% url "users:user-update-pk-api" pk=user_object.id %}';
+    var body = {'_public_key': pk};
+    var success = function() {
+        $('#txt_pk').val('');
+        $this.closest('.modal').modal('hide');
+        var msg = "{% trans 'Successfully updated the SSH public key.' %}";
+        swal("{% trans 'User SSH Public Key Update' %}", msg, "success");
+    };
+    var fail = function() {
+        var msg = "{% trans 'Failed to update the user\'s SSH public key.' %}";
+        swal({
+            title: "{% trans 'User SSH Public Key Update' %}",
+            text: msg,
+            type: "error",
+            showCancelButton: false,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "{% trans 'Confirm' %}",
+            closeOnConfirm: true
+            }, function () {
+              $('#txt_pk').focus();
+            }
+        );
+    }
+    APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success, error: fail});
 });
 </script>
 {% endblock %}
