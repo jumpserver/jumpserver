@@ -40,7 +40,7 @@ class UserGroup(NoDeleteModelMixin):
         return True
 
     class Meta:
-        db_table = 'user-group'
+        db_table = 'user_group'
 
     @classmethod
     def initial(cls):
