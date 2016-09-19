@@ -1,5 +1,10 @@
 {% extends '_list_base.html' %}
-{% load i18n %}
+{% load i18n static %}
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+{% endblock %}
+
 {% block content_left_head %}
 <a href="{% url 'users:user-group-create' %}" class="btn btn-sm btn-primary ">{% trans "Add User Group" %}</a>
 {% endblock %}
@@ -30,8 +35,9 @@
             <td class="text-center">999</td>
             <th class="text-center">{{ user_group.comment|truncatewords:8 }}</th>
             <td class="text-center">
-                <a href="{% url 'users:user-group-update' pk=user_group.id %}" class="btn btn-xs btn-info">编辑</a>
-                <a href="{% url 'users:user-group-delete' pk=user_group.id %}" class="btn btn-xs btn-danger del">删除</a>
+                <a href="{% url 'users:user-group-update' pk=user_group.id %}" class="btn btn-xs btn-info">{% trans "Edit" %}</a>
+                <a href="javascript:void(0)" data-gid="{{ user_group.id }}"
+                    class="btn btn-xs btn-danger del {% ifequal user_group.name 'Default' %}disabled{% else %}btn_delete_user_group{% endifequal %}">{% trans "Delete" %}</a>
             </td>
         </tr>
     {% endfor %}
@@ -52,3 +58,42 @@
    </form>
 {% endblock %}
 
+{% block custom_foot_js %}
+<script>
+$(document).on('click', '.btn_delete_user_group', function(){
+    var $this = $(this);
+    function doDelete() {
+        var group_id = $this.data('gid');
+        var the_url = "{% url 'users:user-group-delete-api' 99991937 %}".replace('99991937', group_id);
+        var body = {};
+        var success = function() {
+            var msg = "{% trans 'Group Deleted.' %}";
+            swal("{% trans 'Group Delete' %}", msg, "success");
+            $this.closest('tr.gradeX').remove();
+        };
+        var fail = function() {
+            var msg = "{% trans 'Group Deleting failed.' %}";
+            swal("{% trans 'Group Delete' %}", msg, "error");
+        }
+        APIUpdateAttr({
+            url: the_url,
+            body: JSON.stringify(body),
+            method: 'DELETE',
+            success: success,
+            error: fail
+        });
+    }
+    swal({
+        title: "{% trans 'Are you sure?' %}",
+        text: "{% trans 'This will delete the selected group, but will not remove any user in this group.' %}",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "{% trans 'Confirm' %}",
+        closeOnConfirm: false
+    }, function() {
+        doDelete();
+    });
+})
+</script>
+{% endblock %}

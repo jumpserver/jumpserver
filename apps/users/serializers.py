@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
@@ -25,6 +24,13 @@ class UserGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserGroup
         fields = '__all__'
+
+
+class GroupEditSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserGroup
+        fields = ['id', 'name', 'comment', 'date_created', 'created_by']
 
 
 class UserAttributeSerializer(serializers.ModelSerializer):

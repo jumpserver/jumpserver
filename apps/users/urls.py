@@ -22,8 +22,7 @@ urlpatterns = [
         name='user-asset-permission-create'),
     url(r'^user/(?P<pk>[0-9]+)/granted-asset', views.UserGrantedAssetView.as_view(), name='user-granted-asset'),
     url(r'^user/(?P<pk>[0-9]+)/login-history', views.UserDetailView.as_view(), name='user-login-history'),
-    url(r'^first-login/$', views.UserFirstLoginView.as_view(), name='user-first-login'),
-    url(r'^user/(?P<pk>[0-9]+)/assets-perm$', views.UserDetailView.as_view(), name='user-detail'),
+    url(r'^first-login/$', views.UserFirstLoginView.as_view(), name='user-first-login'),    url(r'^user/(?P<pk>[0-9]+)/assets-perm$', views.UserDetailView.as_view(), name='user-detail'),
     url(r'^user/create$', views.UserCreateView.as_view(), name='user-create'),
     url(r'^user/(?P<pk>[0-9]+)/update$', views.UserUpdateView.as_view(), name='user-update'),
     url(r'^user/(?P<pk>[0-9]+)/delete$', views.UserDeleteView.as_view(), name='user-delete'),
@@ -31,7 +30,6 @@ urlpatterns = [
     url(r'^user-group/(?P<pk>[0-9]+)$', views.UserGroupDetailView.as_view(), name='user-group-detail'),
     url(r'^user-group/create$', views.UserGroupCreateView.as_view(), name='user-group-create'),
     url(r'^user-group/(?P<pk>[0-9]+)/update$', views.UserGroupUpdateView.as_view(), name='user-group-update'),
-    url(r'^user-group/(?P<pk>[0-9]+)/delete$', views.UserGroupDeleteView.as_view(), name='user-group-delete'),
 ]
 
 
@@ -49,4 +47,6 @@ urlpatterns += [
         api.UserGroupDetailDeleteUpdateApi.as_view(), name='user-group-detail-api'),
     url(r'^v1/user-groups/(?P<pk>[0-9]+)/edit$',
         api.UserGroupEditApi.as_view(), name='user-group-edit-api'),
+    url(r'^v1/user-groups/(?P<pk>[0-9]+)/delete/$', api.GroupDeleteApi.as_view(),
+        name='user-group-delete-api'),
 ]

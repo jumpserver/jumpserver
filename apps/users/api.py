@@ -6,7 +6,7 @@ import logging
 from rest_framework import generics
 
 from .serializers import UserSerializer, UserGroupSerializer, UserAttributeSerializer, UserGroupEditSerializer, \
-    UserPKUpdateSerializer
+    GroupEditSerializer, UserPKUpdateSerializer
 from .models import User, UserGroup
 
 
@@ -87,3 +87,8 @@ class UserUpdatePKApi(generics.UpdateAPIView):
         user = self.get_object()
         user.private_key = serializer.validated_data['_public_key']
         user.save()
+
+
+class GroupDeleteApi(generics.DestroyAPIView):
+    queryset = UserGroup.objects.all()
+    serializer_class = GroupEditSerializer
