@@ -3,6 +3,11 @@
 {% load bootstrap %}
 {% load i18n %}
 
+{% block custom_head_css_js_create %}
+    <link href="{% static "css/plugins/inputTags.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/inputTags.jquery.min.js" %}"></script>
+{% endblock %}
+
 {% block form %}
     <form action="" method="post" class="form-horizontal">
     {% csrf_token %}
@@ -23,7 +28,30 @@
     {{ form.system_users|bootstrap_horizontal }}
 
     <div class="hr-line-dashed"></div>
+    <h3>{% trans 'Hardware' %}</h3>
+    {{ form.sn|bootstrap_horizontal }}
+    {{ form.brand|bootstrap_horizontal }}
+    {{ form.cpu|bootstrap_horizontal }}
+    {{ form.memory|bootstrap_horizontal }}
+    {{ form.disk|bootstrap_horizontal }}
+    {{ form.mac_address|bootstrap_horizontal }}
+
+    <div class="hr-line-dashed"></div>
+    <h3>{% trans 'Configuration' %}</h3>
+    {{ form.number|bootstrap_horizontal }}
+    {{ form.other_ip|bootstrap_horizontal }}
+    {{ form.remote_card_ip|bootstrap_horizontal }}
+    {{ form.os|bootstrap_horizontal }}
+
+    <div class="hr-line-dashed"></div>
+    <h3>{% trans 'Location' %}</h3>
+    {{ form.cabinet_no|bootstrap_horizontal }}
+    {{ form.cabinet_pos|bootstrap_horizontal }}
+
+    <div class="hr-line-dashed"></div>
     <h3>{% trans 'Other' %}</h3>
+    {{ form.status|bootstrap_horizontal }}
+    {{ form.env|bootstrap_horizontal }}
     {{ form.tags|bootstrap_horizontal }}
     {{ form.comment|bootstrap_horizontal }}
 
@@ -42,7 +70,12 @@
     <script>
         $(document).ready(function () {
             $('.select2').select2();
-            $('#tags').inputTags();
+{#            $('#tags').inputTags({#}
+{#                tags: [{% for tag in form.tags.value %} {{ tag|safe }}, {% endfor %}]#}
+{#            });#}
+            $('#tags').inputTags(
+
+            );
         })
     </script>
 {% endblock %}

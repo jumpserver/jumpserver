@@ -1,24 +1,69 @@
 # coding:utf-8
 from django import forms
 
-from .models import IDC, Asset, AssetGroup, AdminUser, SystemUser
+from .models import IDC, Asset, AssetGroup, AdminUser, SystemUser, Tag
 from django.utils.translation import gettext_lazy as _
 
 
-class AssetForm(forms.ModelForm):
+# class AssetForm(forms.ModelForm):
+#     class Meta:
+#         model = Asset
+#
+#         fields = [
+#             'ip', 'other_ip', 'remote_card_ip', 'hostname', 'port', 'groups', 'username', 'password',
+#             'idc', 'mac_address', 'brand', 'cpu', 'memory', 'disk', 'os', 'cabinet_no', 'cabinet_pos',
+#             'number', 'status', 'type', 'env', 'sn', 'is_active', 'comment', 'admin_user', 'system_users'
+#         ]
+#
+#         widgets = {
+#             'groups': forms.SelectMultiple(attrs={'class': 'select2-groups', 'data-placeholder': _('Select asset groups')}),
+#             'system_user': forms.SelectMultiple(attrs={'class': 'select2-system-user', 'data-placeholder': _('Select asset system user')}),
+#             'admin_user': forms.SelectMultiple(attrs={'class': 'select2-admin-user', 'data-placeholder': _('Select asset admin user')}),
+        # }
+#
+
+class AssetCreateForm(forms.ModelForm):
+    tags = forms.CharField(label=_('Tags'), widget=forms.TextInput(attrs={'id': 'tags'}),
+                           required=False, help_text='Use `,` split')
+
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get('instance', None)
+
+        if instance:
+            initial = kwargs.get('initial', {})
+            tags = instance.tags.all()
+            initial['tags'] = ",".join([tag.value for tag in tags])
+            print(kwargs.get('initial'))
+        super(AssetCreateForm, self).__init__(*args, **kwargs)
+
+    def _save_m2m(self):
+        tags = self.cleaned_data['tags']
+
+        if tags:
+            value_list = tags.split(',')
+            self.instance.tags.all().delete()
+            Tag.objects.bulk_create(
+                [Tag(value=value, asset=self.instance) for value in value_list]
+            )
+
     class Meta:
         model = Asset
 
         fields = [
-            "ip", "other_ip", "remote_card_ip", "hostname", "port", "groups", "username", "password",
-            "idc", "mac_address", "brand", "cpu", "memory", "disk", "os", "cabinet_no", "cabinet_pos",
-            "number", "status", "type", "env", "sn", "is_active", "comment", "admin_user", "system_users"
+            'hostname', 'ip', 'port', 'type', 'comment', 'admin_user', 'system_users', 'idc', 'groups',
+            'other_ip', 'remote_card_ip', 'mac_address', 'brand', 'cpu', 'memory', 'disk', 'os', 'cabinet_no',
+            'cabinet_pos', 'number', 'status', 'env', 'sn',
         ]
-
         widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'select2-groups', 'data-placeholder': _('Select asset groups')}),
-            'system_users': forms.SelectMultiple(attrs={'class': 'select2-system-user', 'data-placeholder': _('Select asset system user')}),
-            # 'admin_user': forms.SelectMultiple(attrs={'class': 'select2-admin-user', 'data-placeholder': _('Select asset admin user')}),
+            'groups': forms.SelectMultiple(attrs={'class': 'select2',
+                                                  'data-placeholder': _('Select asset groups')}),
+            'system_users': forms.SelectMultiple(attrs={'class': 'select2',
+                                                        'data-placeholder': _('Select asset system users')}),
+            'admin_user': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select asset admin user')}),
+        }
+        help_texts = {
+            'hostname': '* required',
+            'ip': '* required',
         }
 
 
@@ -32,7 +77,7 @@ class AssetGroupForm(forms.ModelForm):
                                             )
 
     def __init__(self, *args, **kwargs):
-        if kwargs.get('instance'):
+        if kwargs.get('instance', None):
             initial = kwargs.get('initial', {})
             initial['assets'] = kwargs['instance'].assets.all()
         super(AssetGroupForm, self).__init__(*args, **kwargs)

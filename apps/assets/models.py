@@ -1,6 +1,7 @@
 # coding:utf-8
 from __future__ import unicode_literals, absolute_import
 
+import functools
 from django.db import models
 import logging
 from django.utils.translation import ugettext_lazy as _
@@ -25,6 +26,10 @@ class IDC(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @classmethod
+    def initial(cls):
+        return cls.objects.get_or_create(name=_('Default'), created_by=_('System'), comment=_('Default IDC'))[0]
 
     class Meta:
         db_table = 'idc'
@@ -55,10 +60,10 @@ class IDC(models.Model):
 
 
 class AssetExtend(models.Model):
-    key = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('KEY'))
-    value = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('VALUE'))
+    key = models.CharField(max_length=64, verbose_name=_('KEY'))
+    value = models.CharField(max_length=64, verbose_name=_('VALUE'))
     created_by = models.CharField(max_length=32, blank=True, verbose_name=_("Created by"))
-    date_created = models.DateTimeField(auto_now=True, null=True, blank=True)
+    date_created = models.DateTimeField(auto_now=True, null=True)
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
@@ -83,6 +88,7 @@ class AssetExtend(models.Model):
 
     class Meta:
         db_table = 'asset_extend'
+        unique_together = ('key', 'value')
 
 
 class AdminUser(models.Model):
@@ -249,7 +255,7 @@ class AssetGroup(models.Model):
 
     @classmethod
     def initial(cls):
-        asset_group = cls(name=_('Default'), commont=_('Default asset group'))
+        asset_group = cls(name=_('Default'), comment=_('Default asset group'))
         asset_group.save()
 
     @classmethod
@@ -271,49 +277,68 @@ class AssetGroup(models.Model):
                 continue
 
 
+def get_default_extend(key, value):
+    try:
+        return AssetExtend.objects.get_or_create(key=key, value=value)[0]
+    except:
+        return None
+
+
+def get_default_idc():
+    return IDC.initial()
+
+
 class Asset(models.Model):
-    ip = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('IP'))
+    ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'))
     other_ip = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Other IP'))
     remote_card_ip = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Remote card IP'))
-    hostname = models.CharField(max_length=128, unique=True, null=True, blank=True, verbose_name=_('Hostname'))
-    port = models.IntegerField(default=22, null=True, blank=True, verbose_name=_('Port'))
+    hostname = models.CharField(max_length=128, blank=True, verbose_name=_('Hostname'))
+    port = models.IntegerField(default=22, verbose_name=_('Port'))
     groups = models.ManyToManyField(AssetGroup, blank=True, related_name='assets', verbose_name=_('Asset groups'))
-    username = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Admin user'))
-    password = models.CharField(max_length=256, null=True, blank=True, verbose_name=_("Admin password"))
     admin_user = models.ForeignKey(AdminUser, null=True, blank=True, related_name='assets',
                                    on_delete=models.SET_NULL, verbose_name=_("Admin user"))
     system_users = models.ManyToManyField(SystemUser, blank=True, related_name='assets', verbose_name=_("System User"))
-    idc = models.ForeignKey(IDC, null=True, related_name='assets', on_delete=models.SET_NULL, verbose_name=_('IDC'))
+    idc = models.ForeignKey(IDC, null=True, related_name='assets',
+                            on_delete=models.SET_NULL, verbose_name=_('IDC'),)
+                            # default=get_default_idc)
     mac_address = models.CharField(max_length=20, null=True, blank=True, verbose_name=_("Mac address"))
     brand = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Brand'))
-    cpu = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('CPU'))
+    cpu = models.CharField(max_length=64,  null=True, blank=True, verbose_name=_('CPU'))
     memory = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Memory'))
     disk = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_('Disk'))
     os = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('OS'))
     cabinet_no = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Cabinet number'))
     cabinet_pos = models.IntegerField(null=True, blank=True, verbose_name=_('Cabinet position'))
     number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
-    status = models.ForeignKey(AssetExtend, null=True, blank=True, related_name="asset_status_extend",
-                               verbose_name=_('Asset status'))
-    type = models.ForeignKey(AssetExtend, null=True, blank=True, related_name="asset_type_extend",
-                             verbose_name=_('Asset type'))
-    env = models.ForeignKey(AssetExtend, null=True, blank=True, related_name="asset_env_extend",
-                            verbose_name=_('Asset environment'))
+    status = models.ForeignKey(AssetExtend, null=True, blank=True,
+                               related_name="status_asset", verbose_name=_('Asset status'),)
+                               # default=functools.partial(get_default_extend, 'status', 'In use'))
+    type = models.ForeignKey(AssetExtend, null=True, limit_choices_to={'key': 'type'},
+                             related_name="type_asset", verbose_name=_('Asset type'),)
+                             # default=functools.partial(get_default_extend, 'type','Server'))
+    env = models.ForeignKey(AssetExtend, blank=True, null=True, limit_choices_to={'key': 'env'},
+                            related_name="env_asset", verbose_name=_('Asset environment'),)
+                            # default=functools.partial(get_default_extend, 'env', 'Production'))
     sn = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Serial number'))
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     date_created = models.DateTimeField(auto_now=True, null=True, blank=True, verbose_name=_('Date added'))
-    comment = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Comment'))
+    comment = models.TextField(max_length=128, null=True, blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
         return '%(ip)s:%(port)s' % {'ip': self.ip, 'port': self.port}
 
-    def initial(self):
-        pass
+    def is_valid(self):
+        warning = ''
+        if not self.is_active:
+            warning += ' inactive'
+        else:
+            return True, ''
+        return False, warning
 
     class Meta:
         db_table = 'asset'
-        index_together = ('ip', 'port')
+        unique_together = ('ip', 'port')
 
     @classmethod
     def generate_fake(cls, count=100):
@@ -323,8 +348,8 @@ class Asset(models.Model):
 
         seed()
         for i in range(count):
-            asset = cls(ip='%s.%s.%s.%s' % tuple([forgery_py.forgery.basic.text(length=3, digits=True)
-                                                  for i in range(0, 4)]),
+            asset = cls(ip='%s.%s.%s.%s' % (i, i, i, i),
+                        hostname=forgery_py.internet.user_name(True),
                         admin_user=choice(AdminUser.objects.all()),
                         idc=choice(IDC.objects.all()),
                         port=22,
@@ -339,21 +364,28 @@ class Asset(models.Model):
                 continue
 
 
-class Label(models.Model):
-    key = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('KEY'))
-    value = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('VALUE'))
-    asset = models.ForeignKey(Asset, null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_('Asset'))
-    created_by = models.CharField(max_length=32, blank=True, verbose_name=_("Created by"))
-    date_created = models.DateTimeField(auto_now=True, null=True)
-    comment = models.CharField(max_length=128, blank=True, verbose_name=_('Comment'))
+class Tag(models.Model):
+    value = models.CharField(max_length=64, verbose_name=_('VALUE'))
+    asset = models.ForeignKey(Asset, related_name='tags', on_delete=models.CASCADE, verbose_name=_('Asset'))
 
     def __unicode__(self):
-        return self.key
+        return self.value
 
     class Meta:
-        db_table = 'label'
+        db_table = 'tag'
+        unique_together = ('value', 'asset')
+
+
+def init_all_models():
+    for cls in (AssetExtend, AssetGroup):
+        cls.initial()
 
 
 def generate_fake():
     for cls in (AssetGroup, IDC, AdminUser, SystemUser, Asset):
         cls.generate_fake()
+
+
+def flush_all():
+    for cls in (AssetGroup, AssetExtend, IDC, AdminUser, SystemUser, Asset):
+        cls.objects.all().delete()

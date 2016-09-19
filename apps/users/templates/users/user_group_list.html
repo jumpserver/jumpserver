@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends '_list_base.html' %}
 {% load i18n static %}
 {% block custom_head_css_js %}
@@ -5,6 +6,11 @@
     <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
 {% endblock %}
 
+=======
+{% extends '_base_list.html' %}
+{% load i18n %}
+{% load common_tags %}
+>>>>>>> asset
 {% block content_left_head %}
 <a href="{% url 'users:user-group-create' %}" class="btn btn-sm btn-primary ">{% trans "Add User Group" %}</a>
 {% endblock %}

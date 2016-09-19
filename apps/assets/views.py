@@ -10,51 +10,95 @@ from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.shortcuts import get_object_or_404, reverse, redirect
-from .models import Asset, AssetGroup, IDC, AssetExtend, AdminUser, SystemUser, Label
-from .forms import AssetForm, AssetGroupForm, IDCForm, AdminUserForm, SystemUserForm
+
+from common.utils import int_seq
+from .models import Asset, AssetGroup, IDC, AssetExtend, AdminUser, SystemUser, Tag
+from .forms import AssetCreateForm, AssetGroupForm, IDCForm, AdminUserForm, SystemUserForm
 from .hands import AdminUserRequiredMixin
+
+
+class AssetListView(AdminUserRequiredMixin, ListView):
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    model = Asset
+    context_object_name = 'asset_list'
+    template_name = 'assets/asset_list.html'
+
+    def get_queryset(self):
+        queryset = super(AssetListView, self).get_queryset()
+        queryset = sorted(queryset, key=self.sorted_by_valid_and_ip)
+        return queryset
+
+    @staticmethod
+    def sorted_by_valid_and_ip(asset):
+        ip_list = int_seq(asset.ip.split('.'))
+        ip_list.insert(0, asset.is_valid()[0])
+        return ip_list
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'Assets',
+            'action': 'Asset list',
+        }
+        kwargs.update(context)
+        return super(AssetListView, self).get_context_data(**kwargs)
 
 
 class AssetCreateView(AdminUserRequiredMixin, CreateView):
     model = Asset
-    form_class = AssetForm
+    form_class = AssetCreateForm
     template_name = 'assets/asset_create.html'
     success_url = reverse_lazy('assets:asset-list')
 
-    def form_valid(self, form):
-        asset = form.save(commit=False)
-        key = self.request.POST.get('key', '')
-        value = self.request.POST.get('value', '')
-        asset.save()
-        Label.objects.create(key=key, value=value, asset=asset)
-        return super(AssetCreateView, self).form_valid(form)
+    def form_invalid(self, form):
+        print(form.errors)
+        return super(AssetCreateView, self).form_invalid(form)
 
     def get_context_data(self, **kwargs):
-        context = super(AssetCreateView, self).get_context_data(**kwargs)
-        context.update({'admin_users': AdminUser.objects.all()})
-        assert isinstance(context, object)
-        return context
+        context = {
+            'app': 'Assets',
+            'action': 'Create asset',
+        }
+        kwargs.update(context)
+        return super(AssetCreateView, self).get_context_data(**kwargs)
 
 
-class AssetUpdateView(UpdateView):
-    pass
+class AssetUpdateView(AdminUserRequiredMixin, UpdateView):
+    model = Asset
+    form_class = AssetCreateForm
+    template_name = 'assets/asset_update.html'
+    success_url = reverse_lazy('assets:asset-list')
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'Assets',
+            'action': 'Update asset',
+        }
+        kwargs.update(context)
+        return super(AssetUpdateView, self).get_context_data(**kwargs)
 
 
 class AssetDeleteView(DeleteView):
     model = Asset
+    template_name = 'assets/delete_confirm.html'
     success_url = reverse_lazy('assets:asset-list')
-
-
-class AssetListView(ListView):
-    model = Asset
-    context_object_name = 'assets'
-    template_name = 'assets/asset_list.html'
 
 
 class AssetDetailView(DetailView):
     model = Asset
     context_object_name = 'asset'
     template_name = 'assets/asset_detail.html'
+
+    def get_context_data(self, **kwargs):
+        asset_groups = self.object.groups.all()
+        context = {
+            'app': 'Assets',
+            'action': 'Asset detail',
+            'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all()
+                                   if asset_group not in asset_groups],
+            'asset_groups': asset_groups,
+        }
+        kwargs.update(context)
+        return super(AssetDetailView, self).get_context_data(**kwargs)
 
 
 class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):

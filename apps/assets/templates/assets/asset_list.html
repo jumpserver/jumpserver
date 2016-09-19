@@ -1,431 +1,71 @@
-{% extends 'base.html' %}
+{% extends '_base_list.html' %}
 {% load i18n %}
-{% block content %}
+{% load common_tags %}
+{% block content_left_head %}
+    <a href="{% url 'assets:asset-create' %}" class="btn btn-sm btn-primary "> {% trans "Create asset" %} </a>
+{% endblock %}
 
-<div class="wrapper wrapper-content animated fadeInRight">
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="ibox float-e-margins" id="all">
-                <div class="ibox-title">
-                    <h5> 资产列表</h5>
-                    <div class="ibox-tools">
-                        <a class="collapse-link">
-                            <i class="fa fa-chevron-up"></i>
-                        </a>
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="fa fa-wrench"></i>
-                        </a>
-                        <a class="close-link">
-                            <i class="fa fa-times"></i>
-                        </a>
-                    </div>
-                </div>
+{% block table_head %}
+    <th class="text-center">
+        <input type="checkbox" id="check_all" onclick="checkAll('check_all', 'checked')">
+    </th>
+    <th class="text-center"><a href="{% url 'assets:asset-list' %}?sort=hostname">{% trans 'Hostname' %}</a></th>
+    <th class="text-center"><a href="{% url 'assets:asset-list' %}?sort=username">{% trans 'IP' %}</a></th>
+    <th class="text-center">{% trans 'Port' %}</th>
+    <th class="text-center">{% trans 'Type' %}</th>
+    <th class="text-center">{% trans 'Hardware' %}</th>
+    <th class="text-center">{% trans 'Valid' %}</th>
+    <th class="text-center"></th>
+{% endblock %}
 
-                <div class="ibox-content">
-                    <form id="asset_form">
-                        <div class="col-sm-1" style="padding-left: 0">
-                            <a href="{% url 'assets:asset-create' %}" class="btn btn-sm btn-primary "> {% trans 'Create asset' %}</a>
-                        </div>
+{% block table_body %}
+     {% for asset in asset_list %}
+         <tr class="gradeX">
+             <td class="text-center">
+                 <input type="checkbox" name="checked" value="{{ asset.id }}">
+             </td>
+             <td class="text-center">
+                 <a href="{% url 'assets:asset-detail' pk=user.id %}">
+                     {{ asset.hostname }}
+                 </a>
+             </td>
+             <td class="text-center">{{ asset.ip }}</td>
+             <td class="text-center">{{ asset.port }}</td>
+             <td class="text-center">{{ asset.type }}</td>
+             <td class="text-center">{{ asset.cpu }} {{ asset.memory }} {{ asset.disk }} </td>
+             <td class="text-center">
+                 {% if asset.is_valid.0 %}
+                     <i class="fa fa-check text-navy"></i>
+                 {% else %}
+                     <i class="fa fa-times text-danger"></i>
+                 {% endif %}
+             </td>
+             <td class="text-center">
+                 <a href="{% url 'assets:asset-update' pk=asset.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
+                 <a href="{% url 'assets:asset-delete' pk=asset.id %}" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>-
+{#                 <a href="{% url '' %}">{% trans 'Delete' %}</a>#}
+             </td>
+         </tr>
+     {% endfor %}
+{% endblock %}
 
-                        <div class="col-sm-7" style="padding-left: 0px">
-                            <label>
-                                <select name="idc" class="form-control m-b input-sm" onchange="change_info()">
-                                    <option value="">机房</option>
-                                    {% for idc in idc_all %}
-                                        {% ifequal idc.name idc_name %}
-                                            <option value="{{idc.name}}" selected> {{ idc.name|slice:":20" }}</option>
-                                        {% else %}
-                                            <option value="{{idc.name}}"> {{ idc.name|slice:":20" }}</option>
-                                        {% endifequal %}
-                                    {% endfor %}
-                                </select>
-                            </label>
+{% block content_bottom_left %}
+    <form id="" method="get" action="" class=" mail-search">
+        <div class="input-group">
+            <select class="form-control m-b" style="width: auto">
+                <option>{% trans 'Delete selected' %}</option>
+                <option>{% trans 'Update selected' %}</option>
+                <option>{% trans 'Deactive selected' %}</option>
+                <option>{% trans 'Export selected' %}</option>
+            </select>
 
-                            <label>
-                                <select name="group" class="form-control m-b input-sm" onchange="change_info()">
-                                    <option value="">主机组</option>
-                                    {% for asset_group in asset_group_all %}
-                                        {% ifequal asset_group.name group_name %}
-                                            <option value="{{ asset_group.name }}" selected> {{ asset_group.name|slice:":20" }} </option>
-                                        {% else %}
-                                            <option value="{{ asset_group.name }}"> {{ asset_group.name|slice:":20" }} </option>
-                                        {% endifequal %}
-                                    {% endfor %}
-                                </select>
-                            </label>
-
-                            <label>
-                                <select name="asset_type" class="form-control m-b input-sm" onchange="change_info()">
-                                    <option value="">资产类型</option>
-{#                                    {% for type in asset_types %}#}
-{#                                        {% ifequal type.0|int2str asset_type %}#}
-{#                                            <option value="{{ type.0 }}" selected> {{ type.1 }}</option>#}
-{#                                        {% else %}#}
-{#                                            <option value="{{ type.0 }}"> {{ type.1 }}</option>#}
-{#                                        {% endifequal %}#}
-{#                                    {% endfor %}#}
-                                </select>
-                            </label>
-
-                            <label>
-                                <select name="status" class="form-control m-b input-sm" onchange="change_info()">
-                                    <option value="">资产状态</option>
-{#                                    {% for s in asset_status %}#}
-{#                                        {% ifequal s.0|int2str status %}#}
-{#                                            <option value="{{ s.0 }}" selected> {{ s.1 }}</option>#}
-{#                                        {% else %}#}
-{#                                            <option value="{{ s.0 }}"> {{ s.1 }}</option>#}
-{#                                        {% endifequal %}#}
-{#                                    {% endfor %}#}
-                                </select>
-                            </label>
-                        </div>
-
-                        <div class="col-sm-4" style="padding-right: 0">
-                             <div class="input-group inline-group">
-                                <input type="text" class="form-control m-b input-sm" id="search_input" name="keyword" value="{{ keyword }}" placeholder="Search">
-                                <input type="text" style="display: none">
-                                <div class="input-group-btn">
-                                    <button id='search_btn' href="{% url 'assets:asset-list' %}?search=true" type="button" class="btn btn-sm btn-primary search-btn"  onclick="change_info()">
-                                        - 搜索 -
-                                    </button>
-                                    <button type="button" href="{% url 'assets:asset-list' %}?export=true" name="export" class="btn btn-sm btn-success search-btn-excel" onclick="return false">
-                                        - 导出 -
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <div id="export"></div>
-                        <table class="table table-striped table-bordered table-hover " id="editable" name="editable">
-                            <thead>
-                                <tr>
-                                    <th class="text-center">
-                                        <input id="checkall" type="checkbox" class="i-checks" name="checkall" value="checkall" data-editable='false' onclick="check_all('asset_form')">
-                                    </th>
-                                    <th class="text-center"> 主机名 </th>
-                                    <th class="text-center" name="ip"> IP </th>
-                                    <th class="text-center"> 类型 </th>
-                                    <th class="text-center"> 配置 </th>
-                                    <th class="text-center"> 资产组 </th>
-                                    <th class="text-center"> 状态 </th>
-                                    <th class="text-center"> 操作 </th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% for asset in assets %}
-                                <tr class="gradeX">
-                                    <td class="text-center" name="id" value="{{ asset.id }}" data-editable='false'>
-                                        <input name="id" value="{{ asset.id }}" type="checkbox" class="i-checks">
-                                    </td>
-                                    <td class="text-center"> <a href="{% url 'assets:asset-detail' pk=asset.id %}">{{ asset.hostname }}</a></td>
-                                    <td class="text-center"> {{ asset.ip }} </td>
-                                    <td class="text-center">{{ asset.system_type }}</td>
-                                    <td class="text-center"> {{ asset.cpu }} | {{ asset.memory }} | {{ asset.disk }}</td>
-                                    <td class="text-center"> {% for group in asset.group.all %} {{ group.name }} {% endfor %}</td>
-                                    <td class="text-center">
-                                        {% if asset.is_active %}
-                                            <i class="fa fa-circle text-navy"></i>
-                                        {% else %}
-                                            <i class="fa fa-circle text-danger"></i>
-                                        {% endif %}
-                                    </td>
-                                    <td class="text-center" data-editable='false'>
-{#                                        <a href="{% url 'asset_edit' %}?id={{ asset.id }}" class="btn btn-xs btn-info">编辑</a>#}
-                                        <a value="{{ asset.id }}" class="conn btn btn-xs btn-warning">连接</a>
-{#                                        <a value="{% url 'asset_del' %}?id={{ asset.id }}" class="btn btn-xs btn-danger asset_del">删除</a>#}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <input type="button" id="asset_del" class="btn btn-danger btn-sm"  name="del_button" value="删除"/>
-{#                                <a value="{% url 'asset_edit_batch' %}" type="button" class="btn btn-sm btn-warning iframe">修改</a>#}
-                                <input type="button" id="asset_update" class="btn btn-info btn-sm"  name="update_button" value="更新"/>
-{#                                <input type="button" id="asset_update_all" class="btn btn-primary btn-sm"  name="update_button" value="更新全部"/>#}
-                                <input type="button" id="exec_cmd" class="btn btn-sm btn-primary"  name="exec_cmd" value="执行命令"/>
-                            </div>
-                            {% include '_pagination.html' %}
-                        </div>
-                    </form>
-                </div>
+            <div class="input-group-btn pull-left" style="padding-left: 5px;">
+                <button id='search_btn' type="submit" style="height: 32px;"  class="btn btn-sm btn-primary">
+                 {% trans 'Submit' %}
+                </button>
             </div>
+
         </div>
-    </div>
-</div>
+   </form>
 {% endblock %}
 
-{% block self_footer_js %}
-<script>
-    $(document).ready(function(){
-        $('.asset_del').click(function(){
-            var row = $(this).closest('tr');
-            if (confirm("确定删除?")) {
-                $.get(
-                        $(this).attr('value'),
-                        {},
-                        function (data) {
-                            row.remove()
-                        }
-                )
-            }
-        });
-
-        $('#exec_cmd').click(function(){
-            var url = '{% url "role_get" %}';
-            var new_url = '{% url "exec_cmd" %}?role=';
-            var check_array = [];
-            $(".gradeX input:checked").closest('tr').find('.hostname a').each(function() {
-                check_array.push($(this).text())
-            });
-            check_assets = check_array.join(':');
-            $.ajax({
-                type: 'GET',
-                url: url,
-                data: {},
-                success: function(data){
-                    var dataArray = data.split(',');
-                    if (dataArray.length == 1 && data != 'error'){
-                        var title = 'Jumpserver Exec Terminal';
-                        layer.open({
-                            type: 2,
-                            title: title,
-                            maxmin: true,
-                            shade: false,
-                            area: ['725px', '600px'],
-                            content: new_url+data+'&check_assets='+check_assets
-                        });
-                        //window.open(new_url + data, '', 'location=no, resizeable=no, height=410, width=625, top=89px, left=99px,toolbar=no,menubar=no,scrollbars=auto,status=no');
-                    } else if (dataArray.length == '1' && data == 'error'){
-                        layer.alert('没有授权系统用户')
-                    } else {
-                        aUrl = '';
-                        $.each(dataArray, function(index, value){
-                            aUrl += '<a onclick="windowOpenExec(this); return false" class="btn btn-xs btn-primary newa" href=' + new_url + value  + '&check_assets=' + check_assets + '>' + value  + '</a> '
-                        });
-                        layer.alert(aUrl, {
-                            skin: 'layui-layer-molv',
-                            title: '授权多个系统用户，请选择一个连接',
-                            shade: false,
-                            closeBtn: 0
-                        })
-                    }
-                }
-            });
-            return false
-
-        });
-
-        $('.conn').click(function(){
-            var url='{% url "role_get" %}?id=' + $(this).attr('value'); // 获取用户有权限的角色
-            var href = $(this).attr('href');
-            var new_url = '{% url "terminal" %}?id=' + $(this).attr('value') + '&role='; // webterminal socket url
-            var hostname = $(this).closest('tr').find('.hostname a')[0].innerHTML;
-            $.ajax({
-                type: 'GET',
-                url: url,
-                data: {},
-                success: function(data){
-                    var dataArray = data.split(',');
-                    if (data == 'error' || data == '' || data == null || data == undefined){
-                        layer.alert('没有授权系统用户')
-                    }
-                    else if (dataArray.length == 1 && data != 'error' && navigator.platform == 'Win32'){
-                        /*
-                        var title = 'Jumpserver Web Terminal' + '<span class="text-info"> '+ hostname +'</span>';
-                        layer.open({
-                            type: 2,
-                            title: title,
-                            maxmin: true,
-                            shade: false,
-                            area: ['628px', '420px'],
-                            content: new_url+data
-                        });
-                        window.open(new_url+data, '_blank', 'toolbar=yes, location=yes, scrollbars=yes, resizable=yes, copyhistory=yes, width=628, height=400')
-                        */
-                         window.open(new_url+data, "_blank");
-                    }  else if (dataArray.length == 1 && data != 'error'){
-                       /*layer.open({
-                            type: 2,
-                            title: title,
-                            maxmin: true,
-                            shade: false,
-                            area: ['628px', '452px'],
-                            content: new_url+data
-                        });
-                        */
-                        window.open(new_url+data, '_blank');
-                    }
-                    else {
-                        aUrl = '';
-                        $.each(dataArray, function(index, value){
-                            aUrl += '<a onclick="windowOpen(this); return false" class="btn btn-xs btn-primary newa" href=' + new_url + value + ' value=' + hostname +  '>' + value  + '</a> '
-                        });
-                        console.log(aUrl);
-                        layer.alert(aUrl, {
-                            skin: 'layui-layer-molv',
-                            title: '授权多个系统用户，请选择一个连接',
-                            shade: false,
-                            closeBtn: 0
-                        })
-                    }
-                }
-            });
-            return false
-        });
-    });
-
-    function windowOpen(a){
-        var new_url = $(a).attr('href');
-        var hostname = $(a).attr('value');
-        var title = 'Jumpserver Web Terminal - ' + '<span class="text-info"> '+ hostname +'</span>';
-        if (navigator.platform == 'Win32'){
-            /*
-            layer.open({
-            type: 2,
-            title: title,
-            maxmin: true,
-            area: ['628px', '420px'],
-            shade: false,
-            content: new_url
-            });
-            */
-            window.open(new_url, '_blank')
-
-        } else {
-            /*
-            layer.open({
-            type: 2,
-            title: title,
-            maxmin: true,
-            area: ['628px', '452px'],
-            shade: false,
-            content: new_url
-            });
-            */
-            window.open(new_url, '_blank');
-        }
-
-        return false
-    }
-
-     function windowOpenExec(a){
-         var new_url = $(a).attr('href');
-         var title = 'Jumpserver Exec Terminal';
-         layer.open({
-             type: 2,
-             title: title,
-             maxmin: true,
-             area: ['725px', '600px'],
-             shade: false,
-             content: new_url
-        });
-        return false
-    }
-
-    $(".iframe").on('click', function(){
-        var asset_id_all = getIDall();
-        if (asset_id_all == ''){
-            alert("请至少选择一行!");
-            return false;
-        }
-        var url= $(this).attr("value") + '?asset_id_all=' + asset_id_all;
-        parent.layer.open({
-            type: 2,
-            title: 'JumpServer - 批量修改主机',
-            maxmin: true,
-            shift: 'top',
-            border: [2, 0.3, '#1AB394'],
-            shade: [0.5, '#000000'],
-            area: ['800px', '600px'],
-            shadeClose: true,
-            content: url,
-            cancel: function(){
-                location.replace(location.href);
-            }
-        });
-    });
-
-    $('.search-btn-excel').unbind('click').bind('click',function(){
-        var url= $(this).attr("href");
-        $.ajax({
-            type: "GET",
-            url: url,
-            data: $("#asset_form").serialize(),
-            success: function (data) {
-                $("#export").html(data);
-            }
-        });
-    });
-
-
-    $('#asset_del').click(function () {
-        var asset_id_all = getIDall();
-        if (asset_id_all == ''){
-            alert("请至少选择一行!");
-            return false;
-        }
-        if (confirm("确定删除?")) {
-            $.ajax({
-                type: "post",
-                data: {asset_id_all: asset_id_all},
-                url: "{% url 'asset_del' %}?arg=batch",
-                success: function () {
-                    parent.location.reload();
-                }
-            });
-        }
-    });
-
-    $('#asset_update').click(function () {
-        var asset_id_all = getIDall();
-        if (asset_id_all == ''){
-            if (confirm("更新全部资产信息?")) {
-                layer.msg('玩命更新中...', {time: 200000});
-                $.ajax({
-                    type: "post",
-                    url: "{% url 'asset_update_batch' %}?arg=all",
-                    success: function () {
-                        parent.location.reload();
-                    }
-                });
-            }
-        }
-        else {
-            layer.msg('玩命更新中...', {time: 200000});
-            $.ajax({
-                type: "post",
-                data: {asset_id_all: asset_id_all},
-                url: "{% url 'asset_update_batch' %}",
-                success: function () {
-                    parent.location.reload();
-                }
-            });
-        }
-    });
-
-{#    $('#asset_update_all').click(function () {#}
-{#        layer.msg('玩命更新中...', {time: 200000});#}
-{#        $.ajax({#}
-{#            type: "post",#}
-{#            url: "/jasset/asset_update_batch/?arg=all",#}
-{#            success: function () {#}
-{#                parent.location.reload();#}
-{#            }#}
-{#        });#}
-{#    });#}
-
-    function change_info(){
-        var args = $("#asset_form").serialize();
-        window.location = "{% url 'asset_list' %}?" + args
-    }
-
-    $("#search_input").keydown(function(e){
-        if(e.keyCode==13){
-            change_info()
-            }
-    });
-</script>
-
-{% endblock %}
