@@ -9,7 +9,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.core.files.storage import default_storage
 from django.db.models import Q
 from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, reverse, redirect
+from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.urls import reverse_lazy
@@ -21,6 +21,7 @@ from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView, SingleObjectMixin, \
     FormMixin
 from django.views.generic.detail import DetailView
+
 from formtools.wizard.views import SessionWizardView
 
 from common.utils import get_object_or_none, get_logger
@@ -223,15 +224,40 @@ class UserGroupCreateView(AdminUserRequiredMixin, CreateView):
     def form_valid(self, form):
         user_group = form.save()
         users_id_list = self.request.POST.getlist('users', [])
-        users = [get_object_or_404(User, id=user_id) for user_id in users_id_list]
+        users = User.objects.filter(id__in=users_id_list)
         user_group.created_by = self.request.user.username or 'Admin'
-        user_group.users.add(*tuple(users))
+        user_group.users.add(*users)
         user_group.save()
         return super(UserGroupCreateView, self).form_valid(form)
 
 
-class UserGroupUpdateView(UpdateView):
-    pass
+class UserGroupUpdateView(AdminUserRequiredMixin, UpdateView):
+    model = UserGroup
+    form_class = UserGroupForm
+    template_name = 'users/user_group_create.html'
+    success_url = reverse_lazy('users:user-group-list')
+
+    def get_context_data(self, **kwargs):
+        self.object = self.get_object()
+        context = super(UserGroupUpdateView, self).get_context_data(**kwargs)
+        users = User.objects.all()
+        group_users = ",".join([str(u.id) for u in self.object.users.all()])
+        context.update({
+            'app': _('Users'),
+            'action': _('Update User Group'),
+            'users': users,
+            'group_users': group_users
+        })
+        return context
+
+    def form_valid(self, form):
+        user_group = form.save()
+        users_id_list = self.request.POST.getlist('users', [])
+        users = User.objects.filter(id__in=users_id_list)
+        user_group.users.clear()
+        user_group.users.add(*users)
+        user_group.save()
+        return super(UserGroupUpdateView, self).form_valid(form)
 
 
 class UserGroupDetailView(AdminUserRequiredMixin, DetailView):
