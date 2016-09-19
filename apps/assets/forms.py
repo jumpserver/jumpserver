@@ -24,16 +24,16 @@ from django.utils.translation import gettext_lazy as _
 
 class AssetCreateForm(forms.ModelForm):
     tags = forms.CharField(label=_('Tags'), widget=forms.TextInput(attrs={'id': 'tags'}),
-                           help_text='Use `,` split')
+                           required=False, help_text='Use `,` split')
 
     def __init__(self, *args, **kwargs):
-        instance = kwargs.get('instance')
+        instance = kwargs.get('instance', None)
 
         if instance:
             initial = kwargs.get('initial', {})
-            tags = Tag.objects.filter(asset=instance)
-            tags_value = ','.join([tag.value for tag in tags])
-            initial['tags'] = tags_value
+            tags = instance.tags.all()
+            initial['tags'] = ",".join([tag.value for tag in tags])
+            print(kwargs.get('initial'))
         super(AssetCreateForm, self).__init__(*args, **kwargs)
 
     def _save_m2m(self):
@@ -43,14 +43,16 @@ class AssetCreateForm(forms.ModelForm):
             value_list = tags.split(',')
             self.instance.tags.all().delete()
             Tag.objects.bulk_create(
-                [Tag(value=value) for value in value_list]
+                [Tag(value=value, asset=self.instance) for value in value_list]
             )
 
     class Meta:
         model = Asset
 
         fields = [
-            'hostname', 'ip', 'port', 'type', 'comment', 'admin_user', 'system_users', 'idc', 'groups'
+            'hostname', 'ip', 'port', 'type', 'comment', 'admin_user', 'system_users', 'idc', 'groups',
+            'other_ip', 'remote_card_ip', 'mac_address', 'brand', 'cpu', 'memory', 'disk', 'os', 'cabinet_no',
+            'cabinet_pos', 'number', 'status', 'env', 'sn',
         ]
         widgets = {
             'groups': forms.SelectMultiple(attrs={'class': 'select2',
@@ -75,7 +77,7 @@ class AssetGroupForm(forms.ModelForm):
                                             )
 
     def __init__(self, *args, **kwargs):
-        if kwargs.get('instance'):
+        if kwargs.get('instance', None):
             initial = kwargs.get('initial', {})
             initial['assets'] = kwargs['instance'].assets.all()
         super(AssetGroupForm, self).__init__(*args, **kwargs)

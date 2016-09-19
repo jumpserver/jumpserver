@@ -277,7 +277,10 @@ class AssetGroup(models.Model):
 
 
 def get_default_extend(key, value):
-    return AssetExtend.objects.get_or_create(key=key, value=value)[0]
+    try:
+        return AssetExtend.objects.get_or_create(key=key, value=value)[0]
+    except:
+        return None
 
 
 def get_default_idc():
@@ -295,8 +298,8 @@ class Asset(models.Model):
                                    on_delete=models.SET_NULL, verbose_name=_("Admin user"))
     system_users = models.ManyToManyField(SystemUser, blank=True, related_name='assets', verbose_name=_("System User"))
     idc = models.ForeignKey(IDC, null=True, related_name='assets',
-                            on_delete=models.SET_NULL, verbose_name=_('IDC'),
-                            default=get_default_idc)
+                            on_delete=models.SET_NULL, verbose_name=_('IDC'),)
+                            # default=get_default_idc)
     mac_address = models.CharField(max_length=20, null=True, blank=True, verbose_name=_("Mac address"))
     brand = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Brand'))
     cpu = models.CharField(max_length=64,  null=True, blank=True, verbose_name=_('CPU'))
@@ -307,14 +310,14 @@ class Asset(models.Model):
     cabinet_pos = models.IntegerField(null=True, blank=True, verbose_name=_('Cabinet position'))
     number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
     status = models.ForeignKey(AssetExtend, null=True, blank=True,
-                               related_name="status_asset", verbose_name=_('Asset status'),
-                               default=functools.partial(get_default_extend, 'status', 'In use'))
+                               related_name="status_asset", verbose_name=_('Asset status'),)
+                               # default=functools.partial(get_default_extend, 'status', 'In use'))
     type = models.ForeignKey(AssetExtend, null=True, limit_choices_to={'key': 'type'},
-                             related_name="type_asset", verbose_name=_('Asset type'),
-                             default=functools.partial(get_default_extend, 'type','Server'))
-    env = models.ForeignKey(AssetExtend, null=True, limit_choices_to={'key': 'env'},
-                            related_name="env_asset", verbose_name=_('Asset environment'),
-                            default=functools.partial(get_default_extend, 'env', 'Production'))
+                             related_name="type_asset", verbose_name=_('Asset type'),)
+                             # default=functools.partial(get_default_extend, 'type','Server'))
+    env = models.ForeignKey(AssetExtend, blank=True, null=True, limit_choices_to={'key': 'env'},
+                            related_name="env_asset", verbose_name=_('Asset environment'),)
+                            # default=functools.partial(get_default_extend, 'env', 'Production'))
     sn = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Serial number'))
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
@@ -324,8 +327,13 @@ class Asset(models.Model):
     def __unicode__(self):
         return '%(ip)s:%(port)s' % {'ip': self.ip, 'port': self.port}
 
-    def initial(self):
-        pass
+    def is_valid(self):
+        warning = ''
+        if not self.is_active:
+            warning += ' inactive'
+        else:
+            return True, ''
+        return False, warning
 
     class Meta:
         db_table = 'asset'
@@ -367,7 +375,7 @@ class Tag(models.Model):
         unique_together = ('value', 'asset')
 
 
-def initial():
+def init_all_models():
     for cls in (AssetExtend, AssetGroup):
         cls.initial()
 

@@ -25,7 +25,7 @@
                  <input type="checkbox" name="checked" value="{{ asset.id }}">
              </td>
              <td class="text-center">
-                 <a href="{% url 'users:user-detail' pk=user.id %}">
+                 <a href="{% url 'assets:asset-detail' pk=user.id %}">
                      {{ asset.hostname }}
                  </a>
              </td>
@@ -34,10 +34,10 @@
              <td class="text-center">{{ asset.type }}</td>
              <td class="text-center">{{ asset.cpu }} {{ asset.memory }} {{ asset.disk }} </td>
              <td class="text-center">
-                 {% if asset.is_expired %}
-                     <i class="fa fa-times text-danger"></i>
-                 {% else %}
+                 {% if asset.is_valid.0 %}
                      <i class="fa fa-check text-navy"></i>
+                 {% else %}
+                     <i class="fa fa-times text-danger"></i>
                  {% endif %}
              </td>
              <td class="text-center">

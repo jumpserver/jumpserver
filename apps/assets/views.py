@@ -17,7 +17,7 @@ from .forms import AssetCreateForm, AssetGroupForm, IDCForm, AdminUserForm, Syst
 from .hands import AdminUserRequiredMixin
 
 
-class AssetListView(ListView):
+class AssetListView(AdminUserRequiredMixin, ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     model = Asset
     context_object_name = 'asset_list'
@@ -25,8 +25,14 @@ class AssetListView(ListView):
 
     def get_queryset(self):
         queryset = super(AssetListView, self).get_queryset()
-        queryset = sorted(queryset, key=lambda asset: int_seq(asset.ip.split('.')))
+        queryset = sorted(queryset, key=self.sorted_by_valid_and_ip)
         return queryset
+
+    @staticmethod
+    def sorted_by_valid_and_ip(asset):
+        ip_list = int_seq(asset.ip.split('.'))
+        ip_list.insert(0, asset.is_valid()[0])
+        return ip_list
 
     def get_context_data(self, **kwargs):
         context = {
@@ -40,13 +46,12 @@ class AssetListView(ListView):
 class AssetCreateView(AdminUserRequiredMixin, CreateView):
     model = Asset
     form_class = AssetCreateForm
-    template_name = 'assets/asset_create_update.html'
+    template_name = 'assets/asset_create.html'
     success_url = reverse_lazy('assets:asset-list')
 
-    # def form_valid(self, form):
-    #     asset = form.save()
-    #     print(self.request.POST.get('tags'))
-    #     return super(AssetCreateView, self).form_valid(form)
+    def form_invalid(self, form):
+        print(form.errors)
+        return super(AssetCreateView, self).form_invalid(form)
 
     def get_context_data(self, **kwargs):
         context = {
@@ -57,8 +62,19 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
         return super(AssetCreateView, self).get_context_data(**kwargs)
 
 
-class AssetUpdateView(UpdateView):
-    pass
+class AssetUpdateView(AdminUserRequiredMixin, UpdateView):
+    model = Asset
+    form_class = AssetCreateForm
+    template_name = 'assets/asset_update.html'
+    success_url = reverse_lazy('assets:asset-list')
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'Assets',
+            'action': 'Update asset',
+        }
+        kwargs.update(context)
+        return super(AssetUpdateView, self).get_context_data(**kwargs)
 
 
 class AssetDeleteView(DeleteView):
@@ -71,6 +87,18 @@ class AssetDetailView(DetailView):
     model = Asset
     context_object_name = 'asset'
     template_name = 'assets/asset_detail.html'
+
+    def get_context_data(self, **kwargs):
+        asset_groups = self.object.groups.all()
+        context = {
+            'app': 'Assets',
+            'action': 'Asset detail',
+            'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all()
+                                   if asset_group not in asset_groups],
+            'asset_groups': asset_groups,
+        }
+        kwargs.update(context)
+        return super(AssetDetailView, self).get_context_data(**kwargs)
 
 
 class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
