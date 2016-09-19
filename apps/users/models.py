@@ -4,19 +4,22 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
+from django.utils import timezone
+from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.core import signing
-from django.db import models, IntegrityError
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.utils import timezone
+from django.db import IntegrityError
 from django.utils.translation import ugettext_lazy as _
+from django.core import signing
+
 from rest_framework.authtoken.models import Token
 
 from common.utils import encrypt, decrypt, date_expired_default
+from common.mixins import NoDeleteModelMixin
 
 
-class UserGroup(models.Model):
+class UserGroup(NoDeleteModelMixin):
     name = models.CharField(max_length=100, unique=True, verbose_name=_('Name'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True)
@@ -30,14 +33,20 @@ class UserGroup(models.Model):
             return True
         return False
 
+    def delete(self):
+        if self.name != 'Default':
+            self.users.clear()
+            return super(UserGroup, self).delete()
+        return True
+
     class Meta:
-        db_table = 'user_group'
+        db_table = 'user-group'
 
     @classmethod
     def initial(cls):
-        group_or_create = cls.objects.get_or_create(name='Default', comment='Default user group for all user',
-                                                    created_by='System')
-        return group_or_create[0]
+        group, created = cls.objects.get_or_create(name='Default', comment='Default user group for all user',
+                                                   created_by='System')
+        return group
 
     @classmethod
     def generate_fake(cls, count=100):
@@ -48,8 +57,7 @@ class UserGroup(models.Model):
         for i in range(count):
             group = cls(name=forgery_py.name.full_name(),
                         comment=forgery_py.lorem_ipsum.sentence(),
-                        created_by=choice(User.objects.all()).username
-                        )
+                        created_by=choice(User.objects.all()).username)
             try:
                 group.save()
             except IntegrityError:
@@ -76,7 +84,7 @@ class User(AbstractUser):
     _private_key = models.CharField(max_length=5000, blank=True, verbose_name=_('ssh private key'))
     _public_key = models.CharField(max_length=1000, blank=True, verbose_name=_('ssh public key'))
     comment = models.TextField(max_length=200, blank=True, verbose_name=_('Comment'))
-    is_first_login = models.BooleanField(default=True)
+    is_first_login = models.BooleanField(default=False)
     date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True,
                                         verbose_name=_('Date expired'))
     created_by = models.CharField(max_length=30, default='', verbose_name=_('Created by'))
@@ -143,17 +151,13 @@ class User(AbstractUser):
         pass
 
     def save(self, *args, **kwargs):
-        # If user not set name, it's default equal username
         if not self.name:
             self.name = self.username
 
         super(User, self).save(*args, **kwargs)
-        # Set user default group 'All'
-        # Todo: It's have bug
+        # Add the current user to the default group.
         group = UserGroup.initial()
-        if group not in self.groups.all():
-            self.groups.add(group)
-            # super(User, self).save(*args, **kwargs)
+        self.groups.add(group)
 
     @property
     def private_token(self):
@@ -226,8 +230,7 @@ class User(AbstractUser):
                        role=choice(dict(User.ROLE_CHOICES).keys()),
                        wechat=forgery_py.internet.user_name(True),
                        comment=forgery_py.lorem_ipsum.sentence(),
-                       created_by=choice(cls.objects.all()).username,
-                       )
+                       created_by=choice(cls.objects.all()).username)
             try:
                 user.save()
             except IntegrityError:
@@ -239,13 +242,13 @@ class User(AbstractUser):
 
 def init_all_models():
     for model in (UserGroup, User):
-        if hasattr(model, b'initial'):
+        if hasattr(model, 'initial'):
             model.initial()
 
 
 def generate_fake():
     for model in (UserGroup, User):
-        if hasattr(model, b'generate_fake'):
+        if hasattr(model, 'generate_fake'):
             model.generate_fake()
 
 

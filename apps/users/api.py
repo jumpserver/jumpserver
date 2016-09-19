@@ -5,7 +5,8 @@ import logging
 
 from rest_framework import generics
 
-from .serializers import UserSerializer, UserGroupSerializer, UserAttributeSerializer, UserGroupEditSerializer
+from .serializers import UserSerializer, UserGroupSerializer, UserAttributeSerializer, UserGroupEditSerializer, \
+    GroupEditSerializer, UserPKUpdateSerializer
 from .models import User, UserGroup
 
 
@@ -72,7 +73,22 @@ class UserResetPKApi(generics.UpdateAPIView):
 
     def perform_update(self, serializer):
         user = self.get_object()
-        user._public_key = ''
+        user.is_public_key_valid = False
         user.save()
         from .utils import send_reset_ssh_key_mail
         send_reset_ssh_key_mail(user)
+
+
+class UserUpdatePKApi(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserPKUpdateSerializer
+
+    def perform_update(self, serializer):
+        user = self.get_object()
+        user.private_key = serializer.validated_data['_public_key']
+        user.save()
+
+
+class GroupDeleteApi(generics.DestroyAPIView):
+    queryset = UserGroup.objects.all()
+    serializer_class = GroupEditSerializer

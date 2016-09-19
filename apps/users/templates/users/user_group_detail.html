@@ -1,0 +1,111 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="{% url 'users:user-group-detail' pk=object.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User Group Detail' %} </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span class="label"><b>{{ object.name }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr>
+                                            <td width="20%">{% trans 'Name' %}:</td>
+                                            <td><b>{{ object.name }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Comment' %}:</td>
+                                            <td><b>{{ object.comment }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Created at:' %}:</td>
+                                            <td><b>{{ object.date_created }}</b></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Quick modify' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr class="no-borders-tr">
+                                          <td width="50%">{% trans 'Active' %}:</td>
+                                            <td><span class="pull-right">
+                                                <div class="switch">
+                                                    <div class="onoffswitch">
+                                                        <input type="checkbox" {% if user_object.is_active %} checked {% endif %}  class="onoffswitch-checkbox" id="is_active">
+                                                        <label class="onoffswitch-label" for="is_active">
+                                                            <span class="onoffswitch-inner"></span>
+                                                            <span class="onoffswitch-switch"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </span></td>
+                                        </tr>
+                                        <tr>
+                                          <td>{% trans 'Enable OTP' %}:</td>
+                                            <td><span class="pull-right">
+                                                <div class="switch">
+                                                    <div class="onoffswitch">
+                                                        <input type="checkbox" class="onoffswitch-checkbox" {% if user_object.enable_otp %} checked {% endif %}
+                                                               id="enable_otp">
+                                                        <label class="onoffswitch-label" for="enable_otp">
+                                                            <span class="onoffswitch-inner"></span>
+                                                            <span class="onoffswitch-switch"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Reset password' %}:</td>
+                                            <td>
+                                                <span class="pull-right">
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_password" style="width: 54px">{% trans 'Reset' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

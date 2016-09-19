@@ -1,0 +1,8 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% block modal_id %}user_update_pk_modal{% endblock %}
+{% block modal_title%}{% trans "Update User SSH Public Key" %}{% endblock %}
+{% block modal_body %}
+<textarea id="txt_pk" class="form-control" cols="30" rows="10" placeholder="ssh-rsa AAAAB3NzaC1yc2EAA....."></textarea>
+{% endblock %}
+{% block modal_confirm_id %}btn_user_update_pk{% endblock %}

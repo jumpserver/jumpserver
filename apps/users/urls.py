@@ -31,7 +31,6 @@ urlpatterns = [
     url(r'^user-group/(?P<pk>[0-9]+)$', views.UserGroupDetailView.as_view(), name='user-group-detail'),
     url(r'^user-group/create$', views.UserGroupCreateView.as_view(), name='user-group-create'),
     url(r'^user-group/(?P<pk>[0-9]+)/update$', views.UserGroupUpdateView.as_view(), name='user-group-update'),
-    url(r'^user-group/(?P<pk>[0-9]+)/delete$', views.UserGroupDeleteView.as_view(), name='user-group-delete'),
 ]
 
 
@@ -43,9 +42,12 @@ urlpatterns += [
         api.UserAttributeApi.as_view(), name='user-patch-api'),
     url(r'^v1/users/(?P<pk>\d+)/reset-password/$', api.UserResetPasswordApi.as_view(), name='user-reset-password-api'),
     url(r'^v1/users/(?P<pk>\d+)/reset-pk/$', api.UserResetPKApi.as_view(), name='user-reset-pk-api'),
+    url(r'^v1/users/(?P<pk>\d+)/update-pk/$', api.UserUpdatePKApi.as_view(), name='user-update-pk-api'),
     url(r'^v1/user-groups$', api.UserGroupListAddApi.as_view(), name='user-group-list-api'),
     url(r'^v1/user-groups/(?P<pk>[0-9]+)$',
         api.UserGroupDetailDeleteUpdateApi.as_view(), name='user-group-detail-api'),
     url(r'^v1/user-groups/(?P<pk>[0-9]+)/edit$',
         api.UserGroupEditApi.as_view(), name='user-group-edit-api'),
+    url(r'^v1/user-groups/(?P<pk>[0-9]+)/delete/$', api.GroupDeleteApi.as_view(),
+        name='user-group-delete-api'),
 ]

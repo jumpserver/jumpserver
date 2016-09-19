@@ -79,9 +79,11 @@ class UserKeyForm(forms.Form):
         help_text=_('Paste your id_ras.pub here.'))
 
     def clean_public_key(self):
+        public_key = self.cleaned_data['public_key']
+        if self.user._public_key and public_key == self.user.public_key:
+            raise forms.ValidationError(_('Public key should not be the same as your old one.'))
         from sshpubkeys import SSHKey
         from sshpubkeys.exceptions import InvalidKeyException
-        public_key = self.cleaned_data['public_key']
         ssh = SSHKey(public_key)
         try:
             ssh.parse()

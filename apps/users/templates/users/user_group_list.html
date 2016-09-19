@@ -1,18 +1,22 @@
 {% extends '_list_base.html' %}
-{% load i18n %}
-{% load common_tags %}
+{% load i18n static %}
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+{% endblock %}
+
 {% block content_left_head %}
-     <a href="{% url 'users:user-group-create' %}" class="btn btn-sm btn-primary "> 添加用户组 </a>
+<a href="{% url 'users:user-group-create' %}" class="btn btn-sm btn-primary ">{% trans "Add User Group" %}</a>
 {% endblock %}
 
 {% block table_head %}
      <th class="text-center">
          <input type="checkbox" id="check_all" onclick="checkAll('check_all', 'checked')">
      </th>
-     <th class="text-center"><a href="{% url 'users:user-group-list' %}?sort=name">名称</a></th>
-     <th class="text-center">用户数量</th>
-     <th class="text-center">资产数量</th>
-     <th class="text-center">描述</th>
+     <th class="text-center"><a href="{% url 'users:user-group-list' %}?sort=name">{% trans "Name" %}</a></th>
+     <th class="text-center">{% trans "User Amount" %}</th>
+     <th class="text-center">{% trans "Asset Amount" %}</th>
+     <th class="text-center">{% trans "Comment" %}</th>
      <th class="text-center"></th>
 {% endblock %}
 
@@ -27,12 +31,13 @@
                     {{ user_group.name }}
                 </a>
             </td>
-            <td class="text-center">{{ user_group.users.all|length }}</td>
-            <td class="text-center">数量</td>
+            <td class="text-center">{{ user_group.users.count }}</td>
+            <td class="text-center">999</td>
             <th class="text-center">{{ user_group.comment|truncatewords:8 }}</th>
             <td class="text-center">
-                <a href="{% url 'users:user-group-update' pk=user_group.id %}" class="btn btn-xs btn-info">编辑</a>
-                <a href="{% url 'users:user-group-delete' pk=user_group.id %}" class="btn btn-xs btn-danger del">删除</a>
+                <a href="{% url 'users:user-group-update' pk=user_group.id %}" class="btn btn-xs btn-info">{% trans "Edit" %}</a>
+                <a href="javascript:void(0)" data-gid="{{ user_group.id }}"
+                    class="btn btn-xs btn-danger del {% ifequal user_group.name 'Default' %}disabled{% else %}btn_delete_user_group{% endifequal %}">{% trans "Delete" %}</a>
             </td>
         </tr>
     {% endfor %}
@@ -42,18 +47,53 @@
     <form id="" method="get" action="" class=" mail-search">
         <div class="input-group">
             <select class="form-control m-b" style="width: auto">
-                <option>批量删除</option>
-                <option>批量更新</option>
-                <option>批量禁用</option>
-                <option>批量导出</option>
+                <option>{% trans "Bulk Update" %}</option>
+                <option>{% trans "Bulk Export" %}</option>
+                <option>{% trans "Bulk Update" %}</option>
             </select>
-
             <div class="input-group-btn pull-left" style="padding-left: 5px;">
-                <button id='search_btn' type="submit" style="height: 32px;"  class="btn btn-sm btn-primary">
-                 确认
-                </button>
+                <button id='search_btn' type="submit" style="height: 32px;"  class="btn btn-sm btn-primary">{% trans "Confirm" %}</button>
             </div>
         </div>
    </form>
 {% endblock %}
 
+{% block custom_foot_js %}
+<script>
+$(document).on('click', '.btn_delete_user_group', function(){
+    var $this = $(this);
+    function doDelete() {
+        var group_id = $this.data('gid');
+        var the_url = "{% url 'users:user-group-delete-api' 99991937 %}".replace('99991937', group_id);
+        var body = {};
+        var success = function() {
+            var msg = "{% trans 'Group Deleted.' %}";
+            swal("{% trans 'Group Delete' %}", msg, "success");
+            $this.closest('tr.gradeX').remove();
+        };
+        var fail = function() {
+            var msg = "{% trans 'Group Deleting failed.' %}";
+            swal("{% trans 'Group Delete' %}", msg, "error");
+        }
+        APIUpdateAttr({
+            url: the_url,
+            body: JSON.stringify(body),
+            method: 'DELETE',
+            success: success,
+            error: fail
+        });
+    }
+    swal({
+        title: "{% trans 'Are you sure?' %}",
+        text: "{% trans 'This will delete the selected group, but will not remove any user in this group.' %}",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "{% trans 'Confirm' %}",
+        closeOnConfirm: false
+    }, function() {
+        doDelete();
+    });
+})
+</script>
+{% endblock %}
