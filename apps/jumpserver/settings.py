@@ -297,6 +297,15 @@ SESSION_ENGINE = 'redis_sessions.session'
 
 SESSION_REDIS_PREFIX = 'session'
 
+SESSION_REDIS_HOST = CONFIG.REDIS_HOST
+
+SESSION_REDIS_PORT = CONFIG.REDIS_PORT
+
+SESSION_REDIS_PASSWORD = CONFIG.REDIS_PASSWORD
+
+SESSION_REDIS_DB = CONFIG.REDIS_DB
+
+
 # Custom User Auth model
 AUTH_USER_MODEL = 'users.User'
 
@@ -306,7 +315,6 @@ BROKER_URL = 'redis://%(password)s%(host)s:%(port)s/3' % {
     'host': CONFIG.REDIS_HOST or '127.0.0.1',
     'port': CONFIG.REDIS_PORT or 6379,
 }
-
 CELERY_RESULT_BACKEND = BROKER_URL
 
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
@@ -314,5 +322,4 @@ CAPTCHA_IMAGE_SIZE = (75, 33)
 CAPTCHA_FOREGROUND_COLOR = '#001100'
 
 #
-SESSION_COOKIE_AGE = 10800  # 3 hours
-SESSION_SAVE_EVERY_REQUEST = True
+

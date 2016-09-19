@@ -6,50 +6,75 @@
     <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
     <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
 {% endblock %}
-
 {% block content %}
-    <div class="wrapper wrapper-content animated fadeInRight">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="ibox float-e-margins">
-                    <div class="ibox-title">
-                        <h5>{% trans 'Create asset group' %}</h5>
-                        <div class="ibox-tools">
-                            <a class="collapse-link">
-                                <i class="fa fa-chevron-up"></i>
-                            </a>
-                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                <i class="fa fa-wrench"></i>
-                            </a>
-                            <a class="close-link">
-                                <i class="fa fa-times"></i>
-                            </a>
-                        </div>
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-10">
+            <div class="ibox float-e-margins">
+                <div id="ibox-content" class="ibox-title">
+                    <h5> {{ action }}</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
                     </div>
-                    <div class="ibox-content">
-                        <form method="post" class="form-horizontal" action="" >
-                            {% csrf_token %}
-                            {{ form.name|bootstrap_horizontal }}
-                            {{ form.assets|bootstrap_horizontal }}
-                            {{ form.comment|bootstrap_horizontal }}
+                </div>
 
+                <div class="ibox-content">
+                    <div class="panel blank-panel">
+                        <div class="panel-body">
+                            <div class="tab-content">
+                                <div id="tab-1" class="ibox float-e-margins tab-pane active"></div>
+                                    <form id="IDCForm" method="post" class="form-horizontal">
+                                        {% csrf_token %}
+                                        <h3 class="widget-head-color-box">资产组信息</h3>
+                                        {{ form.name|bootstrap_horizontal }}
+                                        {{ form.comment|bootstrap_horizontal }}
+                                        <div class="hr-line-dashed"></div>
+                                        <h3 class="widget-head-color-box">资产</h3>
                             <div class="form-group">
-                                <div class="col-sm-4 col-sm-offset-2">
-                                    <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
-                                    <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+                                <label for="assets" class="col-sm-2 control-label">资产</label>
+                                <div class="col-sm-9">
+                                    <select name="assets" id="assets" data-placeholder="选择资产" class="select2 form-control m-b" multiple  tabindex="2">
+                                        {% for asset in assets %}
+                                            <option value="{{ asset.id }}">{{ asset.hostname }}</option>
+                                        {% endfor %}
+                                    </select>
                                 </div>
                             </div>
-                        </form>
+                                        <!--{{ form.name|bootstrap_horizontal }}-->
+                                        <div class="hr-line-dashed"></div>
+                                        <h3 class="widget-head-color-box">资产用户</h3>
+                                        {{ form.system_users|bootstrap_horizontal }}
+                                        <div class="form-group">
+                                            <div class="col-sm-4 col-sm-offset-5">
+                                                <button class="btn btn-white" type="reset"> 重置 </button>
+                                                <button class="btn btn-primary" type="submit"> 提交 </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 {% endblock %}
+
 {% block custom_foot_js %}
     <script>
         $(document).ready(function () {
             $('.select2').select2();
+            $('.select2-system-user').select2();
         })
     </script>
 {% endblock %}

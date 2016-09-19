@@ -48,7 +48,7 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Date created' %}:</td>
-                                            <td><b>{{ asset_group.date_created }}</b></td>
+                                            <td><b>{{ asset_group.date_created|date:"Y-m-d H:i:s" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Created by' %}:</td>

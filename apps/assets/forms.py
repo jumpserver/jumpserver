@@ -17,7 +17,7 @@ class AssetForm(forms.ModelForm):
 
         widgets = {
             'groups': forms.SelectMultiple(attrs={'class': 'select2-groups', 'data-placeholder': _('Select asset groups')}),
-            'system_user': forms.SelectMultiple(attrs={'class': 'select2-system-user', 'data-placeholder': _('Select asset system user')}),
+            'system_users': forms.SelectMultiple(attrs={'class': 'select2-system-user', 'data-placeholder': _('Select asset system user')}),
             # 'admin_user': forms.SelectMultiple(attrs={'class': 'select2-admin-user', 'data-placeholder': _('Select asset admin user')}),
         }
 
@@ -46,8 +46,13 @@ class AssetGroupForm(forms.ModelForm):
     class Meta:
         model = AssetGroup
         fields = [
-            "name", "comment"
+            "name", "comment","system_users"
         ]
+        widgets = {
+            'name' : forms.TextInput(attrs={}),
+            'system_users': forms.SelectMultiple(attrs={'class': 'select2-system-user', 'data-placeholder': _('Select asset system user')}),
+
+        }
         help_texts = {
             'name': '* required',
         }
@@ -76,11 +81,13 @@ class IDCForm(forms.ModelForm):
 
     class Meta:
         model = IDC
-        fields = ['name', "bandwidth", "operator", 'contact', 'phone', 'address', 'network', 'comment']
+        fields = ['name', "bandwidth", "operator", 'contact', 'phone', 'address', 'intranet', 'extranet','comment']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
-            'network': forms.Textarea(
-                attrs={'placeholder': '192.168.1.0/24\n192.168.2.0/24'})
+            'intranet': forms.Textarea(
+                attrs={'placeholder': 'IP段之间用逗号隔开，如：192.168.1.0/24,192.168.1.0/24'}),
+            'extranet': forms.Textarea(
+                attrs={'placeholder': 'IP段之间用逗号隔开，如：201.1.32.1/24,202.2.32.1/24'})
         }
 
 

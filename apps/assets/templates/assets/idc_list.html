@@ -6,26 +6,31 @@
 {% endblock %}
 
 {% block table_head %}
-    <th class="text-center">{% trans 'ID' %}</th>
+    <th class="text-center">
+        <input type="checkbox" id="check_all" onclick="checkAll('check_all', 'checked')">
+    </th>
+{#    <th class="text-center">{% trans 'ID' %}</th>#}
     <th class="text-center"><a href="{% url 'assets:idc-list' %}?sort=name">{% trans 'Name' %}</a></th>
     <th class="text-center">{% trans 'Asset num' %}</th>
-    <th class="text-center">{% trans 'Bandwidth' %}</th>
+{#    <th class="text-center">{% trans 'Bandwidth' %}</th>#}
     <th class="text-center">{% trans 'Contact' %}</th>
     <th class="text-center">{% trans 'Phone' %}</th>
-    <th class="text-center">{% trans 'Address' %}</th>
-    <th class="text-center"></th>
+{#    <th class="text-center">{% trans 'Address' %}</th>#}
+    <th class="text-center">{% trans 'operation' %}</th>
 {% endblock %}
 
 {% block table_body %}
      {% for idc in idc_list %}
          <tr class="gradeX">
-             <td class="text-center">{{ idc.id }}</td>
+             <td class="text-center">
+                 <input type="checkbox" name="checked" value="{{ idc.id }}">
+             </td>
              <td class="text-center">{{ idc.name }}</td>
              <td class="text-center">{{ idc.assets.count }}</td>
-             <td class="text-center">{{ idc.bandwidth }}</td>
+{#             <td class="text-center">{{ idc.bandwidth }}</td>#}
              <td class="text-center">{{ idc.contact }}</td>
              <td class="text-center">{{ idc.phone }}</td>
-             <td class="text-center">{{ idc.address }}</td>
+{#             <td class="text-center">{{ idc.address }}</td>#}
              <td class="text-center">
                  <a href="{% url 'assets:idc-update' pk=idc.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
                  <a onclick="objectDelete(this, '{{ idc.name }}', '{% url 'assets:idc-delete' idc.id %}')" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
@@ -36,35 +41,6 @@
 {% block custom_foot_js %}
 <script>
 
-
-//删除提示样式二,可以选用。
-function obj_del2(obj,name,url){
-//alert(local);
-    top.$.jBox.confirm("您确定要删除【"+name+"】吗?", "系统提示",function (c, d, e) {
-        if (c == "ok") {
-            //loading("正在提交，请稍等...");
-          $.ajax({
-            type : "post",
-            url : url,
-            data : {
-           // idc_id : idc_id
-            },
-            success : function(data) {
-            //   alert('删除成功！')
-              $(obj).parent().parent().remove();
-            },
-            dataType : "text"
-          });
-        }
-    }, {buttonsFocus: 1,
-        draggable: false,
-        showClose: false});
-    top.$(".jbox-body .jbox-icon").css("top", "35px");
-    top.$(".jbox-button-panel").css("height", "35px");
-    return false
-}
-
-
-
 </script>
 {% endblock %}
+

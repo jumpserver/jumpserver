@@ -9,7 +9,7 @@ from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateVi
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
-
+from django.shortcuts import get_object_or_404, reverse, redirect
 from .models import Asset, AssetGroup, IDC, AssetExtend, AdminUser, SystemUser, Label
 from .forms import AssetForm, AssetGroupForm, IDCForm, AdminUserForm, SystemUserForm
 from .hands import AdminUserRequiredMixin
@@ -70,14 +70,20 @@ class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
             'app': _('Assets'),
             'action': _('Create asset group'),
             'assets': Asset.objects.all(),
+            # 'systemusers':SystemUser.objects.all(),
         }
         kwargs.update(context)
         return super(AssetGroupCreateView, self).get_context_data(**kwargs)
 
-    def form_valid(self, form):
-        print(form.data)
-        return super(AssetGroupCreateView, self).form_valid(form)
 
+    def form_valid(self, form):
+        asset_group = form.save()
+        assets_id_list = self.request.POST.getlist('assets', [])
+        assets = [get_object_or_404(Asset, id=asset_id) for asset_id in assets_id_list]
+        asset_group.created_by = self.request.user.username or 'Admin'
+        asset_group.assets.add(*tuple(assets))
+        asset_group.save()
+        return super(AssetGroupCreateView, self).form_valid(form)
 
 class AssetGroupListView(AdminUserRequiredMixin, ListView):
     model = AssetGroup
@@ -127,6 +133,7 @@ class AssetGroupDetailView(SingleObjectMixin, AdminUserRequiredMixin, ListView):
         }
         kwargs.update(context)
         return super(AssetGroupDetailView, self).get_context_data(**kwargs)
+
 
 
 class AssetGroupUpdateView(AdminUserRequiredMixin, UpdateView):
@@ -188,12 +195,18 @@ class IDCCreateView(AdminUserRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'assets',
-            'action': 'Create IDC'
+            'app': _('assets'),
+            'action': _('Create IDC'),
         }
         kwargs.update(context)
         return super(IDCCreateView, self).get_context_data(**kwargs)
 
+    def form_valid(self, form):
+        IDC = form.save(commit=False)
+        IDC.created_by = self.request.user.username or 'System'
+        IDC.save()
+        # IDC_add_success_next(user)
+        return super(IDCCreateView, self).form_valid(form)
 
 class IDCUpdateView(AdminUserRequiredMixin, UpdateView):
     model = IDC
@@ -206,6 +219,14 @@ class IDCUpdateView(AdminUserRequiredMixin, UpdateView):
         idc = form.save(commit=False)
         idc.save()
         return super(IDCUpdateView, self).form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('assets'),
+            'action': _('Update IDC'),
+        }
+        kwargs.update(context)
+        return super(IDCUpdateView, self).get_context_data(**kwargs)
 
 
 class IDCDetailView(AdminUserRequiredMixin, DetailView):
