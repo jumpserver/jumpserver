@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'assets.apps.AssetsConfig',
     'perms.apps.PermsConfig',
-    'webterminal.apps.WebterminalConfig',
+    'terminal.apps.TerminalConfig',
     'ops.apps.OpsConfig',
     'audits.apps.AuditsConfig',
     'common.apps.CommonConfig',
