@@ -66,21 +66,23 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-jumpserver.bulk_delete = function(){
-
-}
 $(document).on('click', '#btn_bulk_update', function(){
     var action = $('#slct_bulk_update').val();
-    var id_list = $('.ipt_bulk_update:checked').map(function(){return {'id': $(this).val()}}).get();
-    console.log(id_list);
+    var id_list = $('.ipt_bulk_update:checked').map(function(){return {'id': parseInt($(this).val())}}).get();
+    var the_url = "{% url 'users:user-bulk-update-api' %}";
     function doDeactive() {
-        var body = $.each(id_list, function(dict, index) {
-        })    
+        var body = $.each(id_list, function(index, user_object) {
+            user_object['is_active'] = false;
+        });
+        APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(body)});
     };
     switch(action) {
         case 'deactive':
-            
-    }
+            doDeactive();
+            break;
+        default:
+            break;
+    };
 })
 </script>
 {% endblock %}

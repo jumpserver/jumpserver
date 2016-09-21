@@ -75,3 +75,5 @@ class UserBulkUpdateSerializer(BulkSerializerMixin, serializers.ModelSerializer)
     class Meta(object):
         model = User
         list_serializer_class = BulkListSerializer
+        fields = ['id', 'is_active', 'username', 'name', 'email', 'role', 'avatar',
+                  'enable_otp', 'comment', 'groups']
