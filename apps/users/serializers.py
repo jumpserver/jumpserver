@@ -3,6 +3,7 @@
 from django.utils.translation import ugettext_lazy as _
 
 from rest_framework import serializers
+from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin
 
 from .models import User, UserGroup
 
@@ -67,3 +68,10 @@ class UserPKUpdateSerializer(serializers.ModelSerializer):
             print e
             raise serializers.ValidationError(_('Not a valid ssh public key'))
         return value
+
+
+class UserBulkUpdateSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+
+    class Meta(object):
+        model = User
+        list_serializer_class = BulkListSerializer
