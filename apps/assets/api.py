@@ -1,8 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 
 from rest_framework import serializers
-from rest_framework import viewsets, serializers
-
+from rest_framework import viewsets, serializers,generics
 from .models import AssetGroup, Asset, IDC, AssetExtend
 
 
@@ -45,9 +44,11 @@ class AssetViewSet(viewsets.ModelViewSet):
     serializer_class = AssetSerializer
 
 
-class IDCViewSet(viewsets.ModelViewSet):
+class IDCViewSet(viewsets.ReadOnlyModelViewSet):
     """
     API endpoint that allows IDC to be viewed or edited.
     """
     queryset = IDC.objects.all()
     serializer_class = IDCSerializer
+
+

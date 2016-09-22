@@ -37,18 +37,16 @@
                                         {{ form.name|bootstrap_horizontal }}
                                         {{ form.comment|bootstrap_horizontal }}
                                         <div class="hr-line-dashed"></div>
-                                        <h3 class="widget-head-color-box">资产</h3>
-                            <div class="form-group">
-                                <label for="assets" class="col-sm-2 control-label">资产</label>
-                                <div class="col-sm-9">
-                                    <select name="assets" id="assets" data-placeholder="选择资产" class="select2 form-control m-b" multiple  tabindex="2">
-                                        {% for asset in assets %}
-                                            <option value="{{ asset.id }}">{{ asset.hostname }}</option>
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                                        <!--{{ form.name|bootstrap_horizontal }}-->
+                                        <h3 class="widget-head-color-box">资产数量</h3>
+                                            <div class="form-group">
+                                                <label for="assets" class="col-sm-2 control-label">已有</label>
+                                                    <div class="col-sm-9" id="div1">
+                                                        <button type="button" class="btn btn-info btn-rounded" id="add_asset">
+                                                          0
+                                                        </button>
+                                                       <!--<input type="text" value="" name="id_list" id="id_list"/>-->
+                                                    </div>
+                                            </div>
                                         <div class="hr-line-dashed"></div>
                                         <h3 class="widget-head-color-box">资产用户</h3>
                                         {{ form.system_users|bootstrap_horizontal }}
@@ -56,6 +54,7 @@
                                             <div class="col-sm-4 col-sm-offset-5">
                                                 <button class="btn btn-white" type="reset"> 重置 </button>
                                                 <button class="btn btn-primary" type="submit"> 提交 </button>
+                                                <div id='box2'> </div>
                                             </div>
                                         </div>
                                     </form>
@@ -68,13 +67,64 @@
         </div>
     </div>
 </div>
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog modal-lg">
+      <div class="modal-content" id="box">
+        <!--此部分为主体内容，将远程加载进来-->
+      </div>
+   </div>
+</div>
+
 {% endblock %}
 
 {% block custom_foot_js %}
-    <script>
-        $(document).ready(function () {
-            $('.select2').select2();
-            $('.select2-system-user').select2();
-        })
-    </script>
+<script type="text/javascript">
+    $(function(){
+        $("#id_list").val("");
+    });
+    $(document).ready(function () {
+        $('.select2').select2();
+        $('.select2-system-user').select2();
+    })
+
+    $('#add_asset').on('click',function(){
+        //$('#box2').load("{% url 'assets:asset-modal-list' %}");
+        $('#modal').modal('show');
+    });
+
+    $('#modal').modal({
+        show:false,
+        remote:"{% url 'assets:asset-modal-list' %}",
+    });
+
+    $('#modal').on('show.bs.modal',function(){
+        //alert('当调用show方法时，立即触发；')
+    });
+
+    $('#modal').on('shown.bs.modal',function(){
+        //alert('当弹窗完全加载完后，再触发；')
+    });
+
+    $('#modal').on('hide.bs.modal',function(){
+        //alert('当关闭时，立即触发；')
+    });
+
+    $('#modal').on('hidden.bs.modal',function(){
+        //alert('当关完全关闭后，再触发；')
+    });
+
+    $('#modal').on('loaded.bs.modal',function(){
+        //alert('当远程数据加载完毕后，再触发；')
+    });
+
+    $('#save-btn').on('click',function(){
+        alert('点击保存按钮时触发；')
+        $('#modal').modal('hide');
+    });
+
+</script>
+
+
 {% endblock %}

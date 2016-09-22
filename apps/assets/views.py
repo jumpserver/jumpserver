@@ -100,6 +100,11 @@ class AssetDetailView(DetailView):
         kwargs.update(context)
         return super(AssetDetailView, self).get_context_data(**kwargs)
 
+class AssetModalListView(AdminUserRequiredMixin, ListView):
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    model = Asset
+    context_object_name = 'asset_modal_list'
+    template_name = 'assets/asset_modal_list.html'
 
 class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
     model = AssetGroup
@@ -119,11 +124,22 @@ class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
         kwargs.update(context)
         return super(AssetGroupCreateView, self).get_context_data(**kwargs)
 
+    # def form_valid(self, form):
+    #     asset_group = form.save()
+    #     assets_id_list = self.request.POST.getlist('assets', [])
+    #     assets = [get_object_or_404(Asset, id=asset_id) for asset_id in assets_id_list]
+    #     asset_group.created_by = self.request.user.username or 'Admin'
+    #     asset_group.assets.add(*tuple(assets))
+    #     asset_group.save()
+    #     return super(AssetGroupCreateView, self).form_valid(form)
+
+
 
     def form_valid(self, form):
         asset_group = form.save()
         assets_id_list = self.request.POST.getlist('assets', [])
-        assets = [get_object_or_404(Asset, id=asset_id) for asset_id in assets_id_list]
+        assets = [get_object_or_404(Asset, id=int(asset_id)) for asset_id in assets_id_list]
+        print assets
         asset_group.created_by = self.request.user.username or 'Admin'
         asset_group.assets.add(*tuple(assets))
         asset_group.save()
@@ -281,6 +297,7 @@ class IDCDeleteView(AdminUserRequiredMixin, DeleteView):
     model = IDC
     template_name = 'assets/delete_confirm.html'
     success_url = reverse_lazy('assets:idc-list')
+
 
 
 class AdminUserListView(AdminUserRequiredMixin, ListView):
@@ -526,4 +543,6 @@ class SystemUserAssetView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
     #     }
     #     kwargs.update(context)
     #     return super(SystemUserAssetGroupView, self).get_context_data(**kwargs)
+
+
 

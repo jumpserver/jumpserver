@@ -1,0 +1,66 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h4 class="modal-title" id="myModalLabel">分配/回收资产</h4>
+</div>
+<div class="modal-body">
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th class="text-center">
+                    <input type="checkbox" id="check_all" onclick="checkAll('check_all', 'checked')">
+                </th>
+                <th>资产名称</th>
+                <th>IP</th>
+                <th>硬件类型</th>
+                <th>资产组</th>
+                <th>部门</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for asset in asset_modal_list %}
+            <tr>
+                <td class="text-center">
+                    <input type="checkbox" name="checked" value="{{ asset.id }}">
+                </td>
+                <td>{{ asset.hostname }}</td>
+                <td>{{ asset.ip }}</td>
+                <td>虚拟机</td>
+                <td>网络设备</td>
+                <td>微信事业部</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" id="close-btn">
+        关闭
+    </button>
+    <button type="button" class="btn btn-primary" id="save-btn">
+        保存
+    </button>
+</div>
+
+<script type="text/javascript">
+
+    $('#close-btn').on('click',function(){
+        //alert('点击关闭按钮时触发；')
+        $('#modal').modal('hide');
+    });
+
+    $('#save-btn').on('click',function(){
+       // alert('点击保存按钮时触发2；')
+        var box = $("input[name='checked']:checked");
+        var size=box.length;
+        $("#add_asset").text(size);
+        var ids=[];
+        $("#div1").find("input").remove();
+        for(var i=0;i<box.length;i++){
+            var value = $(box[i]).val();
+            $("#div1").append("<input type='hidden' name='assets' value='"+value+"'>");
+        }
+        $('#modal').modal('hide');
+
+    });
+
+</script>
