@@ -6,10 +6,13 @@
 import base64
 from binascii import hexlify
 import os
-import socket
 import sys
 import threading
 import traceback
+import tty
+import termios
+import struct, fcntl, signal, socket, select
+import errno
 
 import paramiko
 from paramiko.py3compat import b, u, decodebytes
@@ -20,7 +23,7 @@ paramiko.util.log_to_file('demo_server.log')
 host_key = paramiko.RSAKey(filename='test_rsa.key')
 
 
-class Server(paramiko.ServerInterface):
+class SSHService(paramiko.ServerInterface):
     # 'data' is the output of base64.encodestring(str(key))
     # (using the "user_rsa_key" files)
     data = (b'AAAAB3NzaC1yc2EAAAABIwAAAIEAyO4it3fHlmGZWJaGrfeHOVY7RWO3P9M7hp'
@@ -68,11 +71,19 @@ class SSHServer:
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((self.host, self.port))
+        self.server_ssh = None
+        self.server_chan = None
 
-    @staticmethod
-    def handle_ssh_request(client, addr):
+    def connect(self):
+        ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(hostname='127.0.0.1', port=22, username='root', password='redhat')
+        self.server_ssh = ssh
+        self.server_chan = channel = ssh.invoke_shell(term='xterm')
+        return channel
+
+    def handle_ssh_request(self, client, addr):
         print('Got a connection!')
-
         try:
             t = paramiko.Transport(client, gss_kex=False)
             t.set_gss_host(socket.getfqdn(""))
@@ -82,35 +93,45 @@ class SSHServer:
                 print('(Failed to load moduli -- gex will be unsupported.)')
                 raise
             t.add_server_key(host_key)
-            server = Server()
-            server.add_prompt(">>")
+            service = SSHService()
             try:
-                t.start_server(server=server)
+                t.start_server(server=service)
             except paramiko.SSHException:
                 print('*** SSH negotiation failed.')
                 return
 
+            chan = t.accept(20)
+
+            if chan is None:
+                print('*** No channel.')
+                return
+            print('Authenticated!')
+
+            chan.settimeout(100)
+
+            chan.send('\r\n\r\nWelcome to my dorky little BBS!\r\n\r\n')
+            chan.send('We are on fire all the time!  Hooray!  Candy corn for everyone!\r\n')
+            chan.send('Happy birthday to Robot Dave!\r\n\r\n')
+            server_chan = self.connect()
+            if not service.event.is_set():
+                print('*** Client never asked for a shell.')
+                return
             while True:
-                # wait for auth
-                chan = t.accept(20)
-                if chan is None:
-                    print('*** No channel.')
-                    return
-                print('Authenticated!')
+                r, w, e = select.select([server_chan, chan], [], [])
 
-                server.event.wait(10)
-                if not server.event.is_set():
-                    print('*** Client never asked for a shell.')
-                    return
+                if chan in r:
+                    recv_data = chan.recv(1024).decode('utf8')
+                    print("From client: " + repr(recv_data))
+                    if len(recv_data) == 0:
+                        break
+                    server_chan.send(recv_data)
 
-                chan.send('\r\n\r\nWelcome to my dorky little BBS!\r\n\r\n')
-                chan.send('We are on fire all the time!  Hooray!  Candy corn for everyone!\r\n')
-                chan.send('Happy birthday to Robot Dave!\r\n\r\n')
-                chan.send('Username: ')
-                f = chan.makefile('rU')
-                username = f.readline().strip('\r\n')
-                chan.send('\r\nI don\'t like you, ' + username + '.\r\n')
-                chan.close()
+                if server_chan in r:
+                    recv_data = server_chan.recv(1024).decode('utf8')
+                    print("From server: " + repr(recv_data))
+                    if len(recv_data) == 0:
+                        break
+                    chan.send(recv_data)
 
         except Exception as e:
             print('*** Caught exception: ' + str(e.__class__) + ': ' + str(e))
@@ -127,7 +148,7 @@ class SSHServer:
             try:
                 client, addr = self.sock.accept()
                 print('Listening for connection ...')
-                threading.Thread(target=self.handle_ssh_request, args=(client, addr)).start()
+                threading.Thread(target=self.handle_ssh_request, args=( client, addr)).start()
             except Exception as e:
                 print('*** Bind failed: ' + str(e))
                 traceback.print_exc()
