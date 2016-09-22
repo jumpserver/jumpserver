@@ -116,22 +116,41 @@ class SSHServer:
             if not service.event.is_set():
                 print('*** Client never asked for a shell.')
                 return
+            server_data = []
+            input_mode = True
             while True:
                 r, w, e = select.select([server_chan, chan], [], [])
 
+
                 if chan in r:
                     recv_data = chan.recv(1024).decode('utf8')
-                    print("From client: " + repr(recv_data))
+                    # print("From client: " + repr(recv_data))
                     if len(recv_data) == 0:
                         break
                     server_chan.send(recv_data)
 
                 if server_chan in r:
                     recv_data = server_chan.recv(1024).decode('utf8')
-                    print("From server: " + repr(recv_data))
+                    # print("From server: " + repr(recv_data))
                     if len(recv_data) == 0:
                         break
                     chan.send(recv_data)
+                    if len(recv_data) > 20:
+                        server_data.append('...')
+                    else:
+                        server_data.append(recv_data)
+                    try:
+                        if repr(server_data[-2]) == u'\r\n':
+                            result = server_data.pop()
+                            server_data.pop()
+                            command = ''.join(server_data)
+                            server_data = []
+                            print(">>> Command: %s" % command)
+                            print(result)
+                    except IndexError:
+                        pass
+                print(server_data)
+
 
         except Exception as e:
             print('*** Caught exception: ' + str(e.__class__) + ': ' + str(e))
