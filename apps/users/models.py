@@ -215,6 +215,11 @@ class User(AbstractUser):
         user.save()
         user.groups.add(UserGroup.initial())
 
+    def delete(self):
+        if self.is_superuser:
+            return
+        return super(User, self).delete()
+
     @classmethod
     def generate_fake(cls, count=100):
         from random import seed, choice
