@@ -3,8 +3,10 @@
 {% load static %}
 {% load bootstrap %}
 {% block custom_head_css_js %}
-    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
-    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+    <link href="{% static 'css/plugins/dataTables/datatables.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/dataTables/datatables.min.js' %}"></script>
 {% endblock %}
 {% block content %}
 <div class="wrapper wrapper-content animated fadeInRight">
@@ -39,12 +41,9 @@
                                         <div class="hr-line-dashed"></div>
                                         <h3 class="widget-head-color-box">资产数量</h3>
                                             <div class="form-group">
-                                                <label for="assets" class="col-sm-2 control-label">已有</label>
-                                                    <div class="col-sm-9" id="div1">
-                                                        <button type="button" class="btn btn-info btn-rounded" id="add_asset">
-                                                          0
-                                                        </button>
-                                                       <!--<input type="text" value="" name="id_list" id="id_list"/>-->
+                                                <label class="col-sm-2 control-label">已选</label>
+                                                    <div class="col-sm-9" id="asset_sed">
+                                                        <input type="text" class=" form-control" id="add_asset" value="{{ assets_count }}">
                                                     </div>
                                             </div>
                                         <div class="hr-line-dashed"></div>
@@ -81,22 +80,20 @@
 
 {% block custom_foot_js %}
 <script type="text/javascript">
-    $(function(){
-        $("#id_list").val("");
-    });
     $(document).ready(function () {
         $('.select2').select2();
         $('.select2-system-user').select2();
     })
 
     $('#add_asset').on('click',function(){
-        //$('#box2').load("{% url 'assets:asset-modal-list' %}");
         $('#modal').modal('show');
     });
 
     $('#modal').modal({
-        show:false,
-        remote:"{% url 'assets:asset-modal-list' %}",
+        show: false,
+        backdrop: 'static',
+        keyboard: 'false',
+        remote:"{% url 'assets:asset-modal-list' %}?group_id={{ group_id }}",
     });
 
     $('#modal').on('show.bs.modal',function(){
@@ -119,12 +116,5 @@
         //alert('当远程数据加载完毕后，再触发；')
     });
 
-    $('#save-btn').on('click',function(){
-        alert('点击保存按钮时触发；')
-        $('#modal').modal('hide');
-    });
-
 </script>
-
-
 {% endblock %}
