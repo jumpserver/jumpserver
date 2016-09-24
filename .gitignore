@@ -14,6 +14,5 @@ _mailinglist
 .idea/
 db.sqlite3
 config.py
-!migrations/__init__.py
-migrations/
+migrations/[01]*
 *.log
