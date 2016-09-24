@@ -91,7 +91,7 @@ class AssetGroupForm(forms.ModelForm):
     class Meta:
         model = AssetGroup
         fields = [
-            "name", "comment","system_users"
+            "name", "comment","system_users",
         ]
         widgets = {
             'name' : forms.TextInput(attrs={}),

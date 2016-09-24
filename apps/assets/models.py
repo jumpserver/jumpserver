@@ -47,7 +47,6 @@ class IDC(models.Model):
                       contact=forgery_py.name.full_name(),
                       phone=forgery_py.address.phone(),
                       address=forgery_py.address.city() + forgery_py.address.street_address(),
-                      network="192.168.1.10/24\n192.168.1.20",
                       operator=choice(['北京联通', '北京电信', 'BGP全网通']),
                       comment=forgery_py.lorem_ipsum.sentence(),
                       created_by='Fake')

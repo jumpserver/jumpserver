@@ -1,6 +1,7 @@
 # coding:utf-8
 from django.conf.urls import url, include
 import views
+import api
 # from .api import (
 #     AssetGroupViewSet, AssetViewSet, IDCViewSet
 # )
@@ -19,6 +20,7 @@ urlpatterns = [
     url(r'^asset/(?P<pk>[0-9]+)$', views.AssetDetailView.as_view(), name='asset-detail'),
     url(r'^asset/(?P<pk>[0-9]+)/update', views.AssetUpdateView.as_view(), name='asset-update'),
     url(r'^asset/(?P<pk>[0-9]+)/delete$', views.AssetDeleteView.as_view(), name='asset-delete'),
+    url(r'^asset-modal$', views.AssetModalListView.as_view(), name='asset-modal-list'),
 
     # Resource asset group url
     url(r'^asset-group$', views.AssetGroupListView.as_view(), name='asset-group-list'),
@@ -50,5 +52,13 @@ urlpatterns = [
     url(r'^system-user/(?P<pk>[0-9]+)/asset$', views.SystemUserAssetView.as_view(), name='system-user-asset'),
     # url(r'^system-user/(?P<pk>[0-9]+)/asset-group$', views.SystemUserAssetGroupView.as_view(),
     #     name='system-user-asset-group'),
-    # url(r'^api/v1.0/', include(router.urls)),
+
 ]
+
+urlpatterns += [
+    #json
+    url(r'^v1/assets/$', api.AssetViewSet.as_view({'get':'list'}), name='assets-list-api'),
+    url(r'^v1/idc/$', api.IDCViewSet.as_view({'get':'list'}), name='idc-list-json'),
+]
+
+

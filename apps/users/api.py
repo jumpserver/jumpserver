@@ -4,9 +4,10 @@
 import logging
 
 from rest_framework import generics
+from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 
 from .serializers import UserSerializer, UserGroupSerializer, UserAttributeSerializer, UserGroupEditSerializer, \
-    GroupEditSerializer, UserPKUpdateSerializer
+    GroupEditSerializer, UserPKUpdateSerializer, UserBulkUpdateSerializer
 from .models import User, UserGroup
 
 
@@ -92,3 +93,21 @@ class UserUpdatePKApi(generics.UpdateAPIView):
 class GroupDeleteApi(generics.DestroyAPIView):
     queryset = UserGroup.objects.all()
     serializer_class = GroupEditSerializer
+
+
+class UserBulkUpdateApi(ListBulkCreateUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserBulkUpdateSerializer
+
+    def filter_queryset(self, queryset):
+        id_list = self.request.query_params.get('id__in')
+        if id_list:
+            import json
+            try:
+                ids = json.loads(id_list)
+            except Exception as e:
+                logger.error(str(e))
+                return queryset
+            if isinstance(ids, list):
+                queryset = queryset.filter(id__in=ids)
+        return queryset

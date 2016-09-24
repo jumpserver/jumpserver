@@ -1,72 +1,207 @@
 {% extends '_base_list.html' %}
-{% load i18n %}
+{% load i18n static %}
+{% get_current_language as LANGUAGE_CODE %}
 {% load common_tags %}
 {% block content_left_head %}
     <a href="{% url 'users:user-create' %}" class="btn btn-sm btn-primary "> {% trans "Create user" %} </a>
 {% endblock %}
-
-{% block table_head %}
-    <th class="text-center">
-        <input type="checkbox" id="check_all" onclick="checkAll('check_all', 'checked')">
-    </th>
-    <th class="text-center"><a href="{% url 'users:user-list' %}?sort=name">{% trans 'Name' %}</a></th>
-    <th class="text-center"><a href="{% url 'users:user-list' %}?sort=username">{% trans 'Username' %}</a></th>
-    <th class="text-center">{% trans 'Role' %}</th>
-    <th class="text-center">{% trans 'User group' %}</th>
-    <th class="text-center">{% trans 'Asset num' %}</th>
-    <th class="text-center"><a href="{% url 'users:user-list' %}?sort=date_expired">{% trans 'Active' %}</a></th>
-    <th class="text-center"></th>
+{% block table_search %}{% endblock %}
+{% block table_container %}
+<table class="table table-striped table-bordered table-hover " id="user_list_table" >
+    <thead>
+        <tr>
+            <th></th>
+            <th class="text-center">{% trans 'Name' %}</a></th>
+            <th class="text-center">{% trans 'Username' %}</a></th>
+            <th class="text-center">{% trans 'Role' %}</th>
+            <th class="text-center">{% trans 'User group' %}</th>
+            <th class="text-center">{% trans 'Asset num' %}</th>
+            <th class="text-center">{% trans 'Active' %}</a></th>
+            <th class="text-center">{% trans 'Action' %}</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
 {% endblock %}
-
-{% block table_body %}
-     {% for user in object_list %}
-         <tr class="gradeX">
-             <td class="text-center">
-                 <input type="checkbox" name="checked" value="{{ user.id }}">
-             </td>
-             <td class="text-center">
-                 <a href="{% url 'users:user-detail' pk=user.id %}">
-                     {{ user.name }}
-                 </a>
-             </td>
-             <td class="text-center">{{ user.username }}</td>
-             <td class="text-center">{{ user.get_role_display }}</td>
-             <td class="text-center" title="{% for user_group in user.group.all %} {{ user_group.name }} {% endfor %}"> {{ user.groups.all|join_queryset_attr:"name" }} </td>
-             <th class="text-center">{{ user.name }}</th>
-             <td class="text-center">
-                 {% if user.is_expired and user.is_active %}
-                     <i class="fa fa-times text-danger"></i>
-                 {% else %}
-                     <i class="fa fa-check text-navy"></i>
-                 {% endif %}
-             </td>
-             <td class="text-center">
-                 <a href="{% url 'users:user-update' pk=user.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
-                 <!--<a href="{% url 'users:user-delete' pk=user.id %}" class="btn btn-xs btn-danger del {% if user.id == request.user.id or user.username == 'admin' %} disabled {% endif %}">{% trans 'Delete' %}</a>-->
-                 <a onclick="obj_del(this,'{{ user.name }}','{% url 'users:user-delete' user.id %}')" class="btn btn-xs btn-danger del {% if user.id == request.user.id or user.username == 'admin' %} disabled {% endif %}">{% trans 'Delete' %}</a>
-             </td>
-         </tr>
-     {% endfor %}
-{% endblock %}
-
 {% block content_bottom_left %}
-    <form id="" method="get" action="" class=" mail-search">
         <div class="input-group">
-            <select class="form-control m-b" style="width: auto">
-                <option>{% trans 'Delete selected' %}</option>
-                <option>{% trans 'Update selected' %}</option>
-                <option>{% trans 'Deactive selected' %}</option>
-                <option>{% trans 'Export selected' %}</option>
+            <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+                <option value="delete">{% trans 'Delete selected' %}</option>
+                <option value="update">{% trans 'Update selected' %}</option>
+                <option value="deactive">{% trans 'Deactive selected' %}</option>
             </select>
-
             <div class="input-group-btn pull-left" style="padding-left: 5px;">
-                <button id='search_btn' type="submit" style="height: 32px;"  class="btn btn-sm btn-primary">
+                <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
                  {% trans 'Submit' %}
                 </button>
             </div>
-
         </div>
-   </form>
 {% endblock %}
-
+{% block custom_foot_js %}
+<script>
+$(document).ready(function(){
+    $('#user_list_table').DataTable({
+        dom: '<"html5buttons"B>lftip',
+        language: {
+            url: "{% static 'js/plugins/dataTables/i18n/language_code.json' %}".replace('language_code', '{{ LANGUAGE_CODE }}')
+        },
+        buttons: [
+            {extend: 'excel',
+                exportOptions: {
+                    modifier: {
+                        selected: true
+                    }
+                }
+            },
+            {extend: 'pdf',
+                exportOptions: {
+                    modifier: {
+                        selected: true
+                    }
+                }
+            },
+            {extend: 'print',
+                customize: function (win){
+                    $(win.document.body).addClass('white-bg');
+                    $(win.document.body).css('font-size', '10px');
+                    $(win.document.body).find('table')
+                        .addClass('compact')
+                        .css('font-size', 'inherit');
+                }
+            }
+        ],
+        columnDefs: [
+            {orderable: false, className: 'select-checkbox', targets: 0},
+            {className: 'text-center', targets: [1, 2, 3, 4, 5, 6, 7]},
+            {targets: 7,
+             createdCell: function (td, cellData, rowData) {
+                var update_btn = '<a href="{% url "users:user-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
+                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
+                if (rowData.role === 'Admin') {
+                    $(td).html(update_btn)
+                } else {
+                    $(td).html(update_btn + del_btn)
+                }
+             }
+            },
+            {targets: 6,
+             createdCell: function (td, cellData) {
+                if (!cellData) {
+                    $(td).html('<i class="fa fa-times text-danger"></i>')
+                } else {
+                    $(td).html('<i class="fa fa-check text-navy"></i>')
+                }
+             }}
+        ],
+        select: {style: 'multi'},
+        ajax: {
+            url: '{% url "users:user-bulk-update-api" %}',
+            dataSrc: ""
+        },
+        columns: [
+            {data: function(){return ""} },
+            {data: "name" },
+            {data: "username" },
+            {data: "get_role_display" },
+            {data: "group_display" },
+            {data: function(){return 999} },
+            {data: "active_display" },
+            {data: "id" }
+        ]
+    });
+}).on('click', '#btn_bulk_update', function(){
+    var action = $('#slct_bulk_update').val();
+    var $data_table = $('#user_list_table').DataTable()
+    var id_list = [];
+    var plain_id_list = [];
+    $data_table.rows({selected: true}).every(function(){
+        id_list.push({id: this.data().id});
+        plain_id_list.push(this.data().id);
+    });
+    if (id_list === []) {
+        return false;
+    };
+    var the_url = "{% url 'users:user-bulk-update-api' %}";
+    function doDeactive() {
+        var body = $.each(id_list, function(index, user_object) {
+            user_object['is_active'] = false;
+        });
+        APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(body)});
+        $data_table.ajax.reload();
+    }
+    function doDelete() {
+        swal({
+            title: "{% trans 'Are you sure?' %}",
+            text: "{% trans 'This will delete the selected users !!!' %}",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "{% trans 'Confirm' %}",
+            closeOnConfirm: false
+        }, function() {
+            var success = function() {
+                var msg = "{% trans 'User Deleted.' %}";
+                swal("{% trans 'User Delete' %}", msg, "success");
+                $('#user_list_table').DataTable().ajax.reload();
+            };
+            var fail = function() {
+                var msg = "{% trans 'User Deleting failed.' %}";
+                swal("{% trans 'User Delete' %}", msg, "error");
+            };
+            var url_delete = the_url + '?id__in=' + JSON.stringify(plain_id_list);
+            APIUpdateAttr({url: url_delete, method: 'DELETE', success: success, error: fail});
+        });
+    }
+    function doUpdate() {}
+    switch(action) {
+        case 'deactive':
+            doDeactive();
+            break;
+        case 'delete':
+            doDelete();
+            break;
+        case 'update':
+            doUpdate();
+            break;
+        default:
+            break;
+    }
+}).on('click', '.btn_user_delete', function(){
+    var $this = $(this);
+    function doDelete() {
+        var uid = $this.data('uid');
+        var the_url = '{% url "users:user-patch-api" pk=99991937 %}'.replace('99991937', uid);
+        var body = {};
+        var success = function() {
+            var msg = "{% trans 'User Deleted.' %}";
+            swal("{% trans 'User Delete' %}", msg, "success");
+            $('#user_list_table').DataTable().ajax.reload();
+        };
+        var fail = function() {
+            var msg = "{% trans 'User Deleting failed.' %}";
+            swal("{% trans 'User Delete' %}", msg, "error");
+        }
+        APIUpdateAttr({
+            url: the_url,
+            body: JSON.stringify(body),
+            method: 'DELETE',
+            success: success,
+            error: fail
+        });
+    }
+    swal({
+        title: "{% trans 'Are you sure?' %}",
+        text: "{% trans 'This will delete the selected user.' %}",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "{% trans 'Confirm' %}",
+        closeOnConfirm: false
+    }, function() {
+        doDelete();
+    });
+})
+</script>
+{% endblock %}
 

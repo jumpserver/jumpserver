@@ -9,13 +9,10 @@
     <th class="text-center">
         <input type="checkbox" id="check_all" onclick="checkAll('check_all', 'checked')">
     </th>
-{#    <th class="text-center">{% trans 'ID' %}</th>#}
     <th class="text-center"><a href="{% url 'assets:idc-list' %}?sort=name">{% trans 'Name' %}</a></th>
     <th class="text-center">{% trans 'Asset num' %}</th>
-{#    <th class="text-center">{% trans 'Bandwidth' %}</th>#}
     <th class="text-center">{% trans 'Contact' %}</th>
     <th class="text-center">{% trans 'Phone' %}</th>
-{#    <th class="text-center">{% trans 'Address' %}</th>#}
     <th class="text-center">{% trans 'operation' %}</th>
 {% endblock %}
 
