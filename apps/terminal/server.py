@@ -1,21 +1,38 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # 
+import sys
+import os
+import django
 
+BASE_DIR = os.path.dirname(__file__)
+APP_DIR = os.path.abspath(os.path.dirname(BASE_DIR))
+sys.path.append(APP_DIR)
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
+
+try:
+    django.setup()
+except IndexError:
+    pass
 
 import base64
 from binascii import hexlify
-import os
 import sys
 import threading
 import traceback
 import tty
 import termios
-import struct, fcntl, signal, socket, select
+import struct
+import fcntl
+import signal
+import socket
+import select
 import errno
-
 import paramiko
 from paramiko.py3compat import b, u, decodebytes
+
+from .hands import ssh_key_gen
 
 
 paramiko.util.log_to_file('demo_server.log')
@@ -24,16 +41,35 @@ host_key = paramiko.RSAKey(filename='test_rsa.key')
 
 
 class SSHService(paramiko.ServerInterface):
-    # 'data' is the output of base64.encodestring(str(key))
-    # (using the "user_rsa_key" files)
-    data = (b'AAAAB3NzaC1yc2EAAAABIwAAAIEAyO4it3fHlmGZWJaGrfeHOVY7RWO3P9M7hp'
-            b'fAu7jJ2d7eothvfeuoRFtJwhUmZDluRdFyhFY/hFAh76PJKGAusIqIQKlkJxMC'
-            b'KDqIexkgHAfID/6mqvmnSJf0b5W8v5h2pI/stOSwTQ+pxVhwJ9ctYDhRSlF0iT'
-            b'UWT10hcuO4Ks8=')
-    good_pub_key = paramiko.RSAKey(data=decodebytes(data))
+    # data = (b'AAAAB3NzaC1yc2EAAAABIwAAAIEAyO4it3fHlmGZWJaGrfeHOVY7RWO3P9M7hp'
+    #         b'fAu7jJ2d7eothvfeuoRFtJwhUmZDluRdFyhFY/hFAh76PJKGAusIqIQKlkJxMC'
+    #         b'KDqIexkgHAfID/6mqvmnSJf0b5W8v5h2pI/stOSwTQ+pxVhwJ9ctYDhRSlF0iT'
+    #         b'UWT10hcuO4Ks8=')
+    # good_pub_key = paramiko.RSAKey(data=decodebytes(data))
+
+    ssh_key_path = os.path.join(BASE_DIR, 'keys', 'ssh_host_key')
+    ssh_pub_key_path = ssh_key_path + '.pub'
 
     def __init__(self):
         self.event = threading.Event()
+
+    @classmethod
+    def get_host_key(cls):
+        if os.path.isfile(cls.ssh_pub_key_path):
+            with open(cls.ssh_pub_key_path) as f:
+                ssh_pub_key = f.read()
+        else:
+            ssh_key, ssh_pub_key = cls.host_key_gen()
+        return ssh_pub_key
+
+    @classmethod
+    def host_key_gen(cls):
+        ssh_key, ssh_pub_key = ssh_key_gen()
+        with open(cls.ssh_key_path, 'w') as f:
+            with open(cls.ssh_pub_key_path, 'w') as f2:
+                f.write(ssh_key)
+                f2.write(ssh_pub_key)
+        return ssh_key, ssh_pub_key
 
     def check_channel_request(self, kind, chanid):
         if kind == 'session':
@@ -41,7 +77,6 @@ class SSHService(paramiko.ServerInterface):
         return paramiko.OPEN_FAILED_ADMINISTRATIVELY_PROHIBITED
 
     def check_auth_password(self, username, password):
-        print(username, password)
         if (username == 'robey') and (password == 'foo'):
             return paramiko.AUTH_SUCCESSFUL
         return paramiko.AUTH_FAILED
@@ -151,7 +186,6 @@ class SSHServer:
                         pass
                 print(server_data)
 
-
         except Exception as e:
             print('*** Caught exception: ' + str(e.__class__) + ': ' + str(e))
             traceback.print_exc()
@@ -167,7 +201,7 @@ class SSHServer:
             try:
                 client, addr = self.sock.accept()
                 print('Listening for connection ...')
-                threading.Thread(target=self.handle_ssh_request, args=( client, addr)).start()
+                threading.Thread(target=self.handle_ssh_request, args=(client, addr)).start()
             except Exception as e:
                 print('*** Bind failed: ' + str(e))
                 traceback.print_exc()
