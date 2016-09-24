@@ -11,9 +11,8 @@ build
 _mailinglist
 .tox
 .cache/
-migrations/
 .idea/
 db.sqlite3
 config.py
-*/migrations/*
+migrations/0*
 *.log
