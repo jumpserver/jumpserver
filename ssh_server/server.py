@@ -21,7 +21,7 @@ import django
 from paramiko.py3compat import b, u, decodebytes
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-APP_DIR = os.path.dirname(BASE_DIR)
+APP_DIR = os.path.join(os.path.dirname(BASE_DIR), 'apps')
 sys.path.append(APP_DIR)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 
@@ -32,7 +32,7 @@ except IndexError:
 
 from django.conf import settings
 from common.utils import get_logger
-from hands import ssh_key_gen, check_user_is_valid
+from users.utils import ssh_key_gen, check_user_is_valid
 
 logger = get_logger(__name__)
 
@@ -45,7 +45,7 @@ class SSHService(paramiko.ServerInterface):
     # good_pub_key = paramiko.RSAKey(data=decodebytes(data))
     # host_key = paramiko.RSAKey(filename='test_rsa.key')
 
-    host_key_path = os.path.join(BASE_DIR, 'keys', 'host_rsa_key')
+    host_key_path = os.path.join(BASE_DIR, 'host_rsa_key')
 
     def __init__(self):
         self.event = threading.Event()
@@ -211,7 +211,9 @@ class SSHServer:
             try:
                 client, addr = self.sock.accept()
                 print('Listening for connection ...')
-                threading.Thread(target=self.handle_ssh_request, args=(client, addr)).start()
+                t = threading.Thread(target=self.handle_ssh_request, args=(client, addr))
+                t.daemon = True
+                t.start()
             except Exception as e:
                 print('*** Bind failed: ' + str(e))
                 traceback.print_exc()
