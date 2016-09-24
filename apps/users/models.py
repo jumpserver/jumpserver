@@ -110,6 +110,12 @@ class User(AbstractUser):
             return True
 
     @property
+    def is_valid(self):
+        if self.is_active and not self.is_expired:
+            return True
+        return False
+
+    @property
     def private_key(self):
         return decrypt(self._private_key)
 

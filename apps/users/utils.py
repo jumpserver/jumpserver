@@ -13,7 +13,8 @@ from django.utils.translation import ugettext as _
 from paramiko.rsakey import RSAKey
 
 from common.tasks import send_mail_async
-from common.utils import reverse
+from common.utils import reverse, get_object_or_none
+from .models import User
 
 
 try:
@@ -203,3 +204,20 @@ def validate_ssh_pk(text):
         return optionState(text[1:])
 
     return startState([n.strip() for n in text.splitlines()])
+
+
+def check_user_is_valid(**kwargs):
+    password = kwargs.pop('password', None)
+    public_key = kwargs.pop('public_key', None)
+    user = get_object_or_none(User, **kwargs)
+
+    if password and not user.check_password(password):
+        user = None
+
+    if public_key and not user.public_key == public_key:
+        user = None
+
+    if user and user.is_valid:
+        return user
+
+    return None

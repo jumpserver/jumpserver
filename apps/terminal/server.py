@@ -3,19 +3,6 @@
 # 
 import sys
 import os
-import django
-
-BASE_DIR = os.path.dirname(__file__)
-APP_DIR = os.path.abspath(os.path.dirname(BASE_DIR))
-sys.path.append(APP_DIR)
-
-os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
-
-try:
-    django.setup()
-except IndexError:
-    pass
-
 import base64
 from binascii import hexlify
 import sys
@@ -30,14 +17,24 @@ import socket
 import select
 import errno
 import paramiko
+import django
 from paramiko.py3compat import b, u, decodebytes
 
-from .hands import ssh_key_gen
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+APP_DIR = os.path.dirname(BASE_DIR)
+sys.path.append(APP_DIR)
+os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
 
+try:
+    django.setup()
+except IndexError:
+    pass
 
-paramiko.util.log_to_file('demo_server.log')
+from django.conf import settings
+from common.utils import get_logger
+from hands import ssh_key_gen, check_user_is_valid
 
-host_key = paramiko.RSAKey(filename='test_rsa.key')
+logger = get_logger(__name__)
 
 
 class SSHService(paramiko.ServerInterface):
@@ -46,30 +43,31 @@ class SSHService(paramiko.ServerInterface):
     #         b'KDqIexkgHAfID/6mqvmnSJf0b5W8v5h2pI/stOSwTQ+pxVhwJ9ctYDhRSlF0iT'
     #         b'UWT10hcuO4Ks8=')
     # good_pub_key = paramiko.RSAKey(data=decodebytes(data))
+    # host_key = paramiko.RSAKey(filename='test_rsa.key')
 
-    ssh_key_path = os.path.join(BASE_DIR, 'keys', 'ssh_host_key')
-    ssh_pub_key_path = ssh_key_path + '.pub'
+    host_key_path = os.path.join(BASE_DIR, 'keys', 'host_rsa_key')
 
     def __init__(self):
         self.event = threading.Event()
+        self.user = None
+
+    @classmethod
+    def host_key(cls):
+        return cls.get_host_key()
 
     @classmethod
     def get_host_key(cls):
-        if os.path.isfile(cls.ssh_pub_key_path):
-            with open(cls.ssh_pub_key_path) as f:
-                ssh_pub_key = f.read()
-        else:
-            ssh_key, ssh_pub_key = cls.host_key_gen()
-        return ssh_pub_key
+        logger.debug("Get ssh server host key")
+        if not os.path.isfile(cls.host_key_path):
+            cls.host_key_gen()
+        return paramiko.RSAKey(filename=cls.host_key_path)
 
     @classmethod
     def host_key_gen(cls):
+        logger.debug("Generate ssh server host key")
         ssh_key, ssh_pub_key = ssh_key_gen()
-        with open(cls.ssh_key_path, 'w') as f:
-            with open(cls.ssh_pub_key_path, 'w') as f2:
-                f.write(ssh_key)
-                f2.write(ssh_pub_key)
-        return ssh_key, ssh_pub_key
+        with open(cls.host_key_path, 'w') as f:
+            f.write(ssh_key)
 
     def check_channel_request(self, kind, chanid):
         if kind == 'session':
@@ -77,18 +75,30 @@ class SSHService(paramiko.ServerInterface):
         return paramiko.OPEN_FAILED_ADMINISTRATIVELY_PROHIBITED
 
     def check_auth_password(self, username, password):
-        if (username == 'robey') and (password == 'foo'):
+        self.user = check_user_is_valid(username=username, password=password)
+        if self.user:
+            logger.info('User: %s password auth passed' % username)
             return paramiko.AUTH_SUCCESSFUL
+        else:
+            logger.warning('User: %s password auth failed' % username)
         return paramiko.AUTH_FAILED
 
-    def check_auth_publickey(self, username, key):
-        print('Auth attempt with key: ' + u(hexlify(key.get_fingerprint())))
-        if (username == 'robey') and (key == self.good_pub_key):
+    def check_auth_publickey(self, username, public_key):
+        self.user = check_user_is_valid(username=username, public_key=public_key)
+        if self.user:
+            logger.info('User: %s public key auth passed' % username)
             return paramiko.AUTH_SUCCESSFUL
+        else:
+            logger.warning('User: %s public key auth failed' % username)
         return paramiko.AUTH_FAILED
 
     def get_allowed_auths(self, username):
-        return 'password,publickey'
+        auth_method_list = []
+        if settings.CONFIG.SSH_PASSWORD_AUTH:
+            auth_method_list.append('password')
+        if settings.CONFIG.SSH_PUBLICK_KEY_AUTH:
+            auth_method_list.append('publickey')
+        return ','.join(auth_method_list)
 
     def check_channel_shell_request(self, channel):
         self.event.set()
@@ -100,7 +110,7 @@ class SSHService(paramiko.ServerInterface):
 
 
 class SSHServer:
-    def __init__(self, host, port):
+    def __init__(self, host='127.0.0.1', port=2200):
         self.host = host
         self.port = port
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -118,58 +128,57 @@ class SSHServer:
         return channel
 
     def handle_ssh_request(self, client, addr):
-        print('Got a connection!')
+        logger.info("Get connection from " + str(addr))
         try:
-            t = paramiko.Transport(client, gss_kex=False)
-            t.set_gss_host(socket.getfqdn(""))
+            transport = paramiko.Transport(client, gss_kex=False)
+            transport.set_gss_host(socket.getfqdn(""))
             try:
-                t.load_server_moduli()
+                transport.load_server_moduli()
             except:
-                print('(Failed to load moduli -- gex will be unsupported.)')
+                logger.warning('(Failed to load moduli -- gex will be unsupported.)')
                 raise
-            t.add_server_key(host_key)
+
+            transport.add_server_key(SSHService.get_host_key())
             service = SSHService()
             try:
-                t.start_server(server=service)
+                transport.start_server(server=service)
             except paramiko.SSHException:
                 print('*** SSH negotiation failed.')
                 return
 
-            chan = t.accept(20)
-
-            if chan is None:
+            channel = transport.accept(20)
+            if channel is None:
                 print('*** No channel.')
                 return
             print('Authenticated!')
 
-            chan.settimeout(100)
+            channel.settimeout(100)
 
-            chan.send('\r\n\r\nWelcome to my dorky little BBS!\r\n\r\n')
-            chan.send('We are on fire all the time!  Hooray!  Candy corn for everyone!\r\n')
-            chan.send('Happy birthday to Robot Dave!\r\n\r\n')
-            server_chan = self.connect()
+            channel.send('\r\n\r\nWelcome to my dorky little BBS!\r\n\r\n')
+            channel.send('We are on fire all the time!  Hooray!  Candy corn for everyone!\r\n')
+            channel.send('Happy birthday to Robot Dave!\r\n\r\n')
+            server_channel = self.connect()
             if not service.event.is_set():
                 print('*** Client never asked for a shell.')
                 return
             server_data = []
             input_mode = True
             while True:
-                r, w, e = select.select([server_chan, chan], [], [])
+                r, w, e = select.select([server_channel, channel], [], [])
 
-
-                if chan in r:
-                    recv_data = chan.recv(1024).decode('utf8')
+                if channel in r:
+                    recv_data = channel.recv(1024).decode('utf8')
                     # print("From client: " + repr(recv_data))
                     if len(recv_data) == 0:
                         break
-                    server_chan.send(recv_data)
+                    server_channel.send(recv_data)
 
-                if server_chan in r:
-                    recv_data = server_chan.recv(1024).decode('utf8')
+                if server_channel in r:
+                    recv_data = server_channel.recv(1024).decode('utf8')
                     # print("From server: " + repr(recv_data))
                     if len(recv_data) == 0:
                         break
-                    chan.send(recv_data)
+                    channel.send(recv_data)
                     if len(recv_data) > 20:
                         server_data.append('...')
                     else:
@@ -190,13 +199,14 @@ class SSHServer:
             print('*** Caught exception: ' + str(e.__class__) + ': ' + str(e))
             traceback.print_exc()
             try:
-                t.close()
+                transport.close()
             except:
                 pass
             sys.exit(1)
 
     def listen(self):
         self.sock.listen(5)
+        print('Start ssh server %(host)s:%(port)s' % {'host': self.host, 'port': self.port})
         while True:
             try:
                 client, addr = self.sock.accept()
@@ -209,7 +219,7 @@ class SSHServer:
 
 
 if __name__ == '__main__':
-    server = SSHServer('', 2200)
+    server = SSHServer(host='', port=2200)
     try:
         server.listen()
     except KeyboardInterrupt:
