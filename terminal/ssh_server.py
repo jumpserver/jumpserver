@@ -186,15 +186,13 @@ class Navigation:
 
 
 class JumpServer:
+    backend_server_pools = []
+    backend_channel_pools = []
+    client_channel_pools = []
+
     def __init__(self):
         self.listen_host = '0.0.0.0'
         self.listen_port = 2222
-        self.username = None
-        self.backend_host = None
-        self.backend_port = None
-        self.backend_username = None
-        self.backend_channel = None
-        self.client_channel = None
         self.sock = None
 
     def display_navigation(self, username, client_channel):
@@ -220,7 +218,8 @@ class JumpServer:
         except paramiko.SSHException:
             logger.warning('SSH negotiation failed.')
 
-        self.client_channel = client_channel = transport.accept(20)
+        client_channel = transport.accept(20)
+        self.__class__.client_channel_pools.append(client_channel)
         if client_channel is None:
             logger.warning('No channel get.')
             raise SSHServerException('No channel get.')
@@ -232,7 +231,9 @@ class JumpServer:
 
     def get_backend_channel(self, host, port, username):
         backend_server = BackendServer(host, port, username)
-        self.backend_channel = backend_channel = backend_server.connect()
+        backend_channel = backend_server.connect()
+        self.__class__.backend_server_pools.append(backend_server)
+        self.__class__.backend_channel_pools.append(backend_channel)
         if not backend_channel:
             logger.warning('Connect %(username)s@%(host)s:%(port)s failed' % {
                 'username': username,
@@ -249,26 +250,23 @@ class JumpServer:
         })
         try:
             client_channel = self.get_client_channel(client, addr)
-            host, port, username = self.display_navigation(self.username, client_channel)
+            host, port, username = self.display_navigation('root', client_channel)
             backend_channel = self.get_backend_channel(host, port, username)
-
-            print(client_channel.get_id(), backend_channel.get_id())
 
             while True:
                 r, w, x = select.select([client_channel, backend_channel], [], [])
 
                 if client_channel in r:
-                    data_client = client_channel.recv(1024)
-                    logger.info(data_client)
-                    if len(data_client) == 0:
+                    client_data = client_channel.recv(1024)
+                    if len(client_data) == 0:
                         break
-                    backend_channel.send(data_client)
+                    backend_channel.send(client_data)
 
                 if backend_channel in r:
-                    data_server = backend_channel.recv(1024)
-                    if len(data_server) == 0:
+                    backend_data = backend_channel.recv(1024)
+                    if len(backend_data) == 0:
                         break
-                    client_channel.send(data_server)
+                    client_channel.send(backend_data)
 
                     # if len(recv_data) > 20:
                     #     server_data.append('...')
@@ -301,7 +299,7 @@ class JumpServer:
         while True:
             try:
                 client, addr = self.sock.accept()
-                t = process.Process(target=self.handle_ssh_request, args=(client, addr))
+                t = threading.Thread(target=self.handle_ssh_request, args=(client, addr))
                 t.daemon = True
                 t.start()
             except Exception as e:
