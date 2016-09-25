@@ -15,3 +15,5 @@ def get_logger(name):
     return logging.getLogger('jumpserver.%s' % name)
 
 
+class SSHServerException(Exception):
+    pass
