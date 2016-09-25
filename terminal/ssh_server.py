@@ -11,7 +11,7 @@ import time
 from binascii import hexlify
 import sys
 import threading
-from multiprocessing import process
+from multiprocessing.process import Process
 import traceback
 import tty
 import termios
@@ -126,6 +126,9 @@ class SSHServer(paramiko.ServerInterface):
     def check_channel_shell_request(self, channel):
         self.event.set()
         self.__class__.channel_pools.append(channel)
+        channel.username = self.username
+        channel.addr = self.addr
+
         return True
 
     def check_channel_pty_request(self, channel, term, width, height, pixelwidth,
@@ -150,12 +153,15 @@ class BackendServer:
         ssh.connect(hostname=self.host, port=self.port, username=self.username, password=self.host_password,
                     pkey=self.host_private_key, look_for_keys=False, allow_agent=True, compress=True, timeout=timeout)
         self.channel = channel = ssh.invoke_shell(term=term, width=width, height=height)
-        logger.info('Connect %(username)s@%(host)s:%(port)s successfully' % {
+        logger.info('Connect backend server %(username)s@%(host)s:%(port)s successfully' % {
             'username': self.username,
             'host': self.host,
             'port': self.port,
         })
         channel.settimeout(100)
+        channel.host = self.host
+        channel.port = self.port
+        channel.username = self.username
         return channel
 
     @property
@@ -175,7 +181,8 @@ class Navigation:
     def display_banner(self):
         client_channel = self.client_channel
         client_channel.send('\r\n\r\n\t\tWelcome to use Jumpserver open source system !\r\n\r\n')
-        client_channel.send('If use find some bug please contact us <ibuler@qq.com>\r\n')
+        client_channel.send('If you find some bug please contact us <ibuler@qq.com>\r\n')
+        client_channel.send('See more at https://www.jumpserver.org\r\n')
         # client_channel.send(self.username)
 
     def display(self):
@@ -211,7 +218,6 @@ class JumpServer:
 
         transport.add_server_key(SSHServer.get_host_key())
         ssh_server = SSHServer(client, addr)
-        self.username = ssh_server.username
 
         try:
             transport.start_server(server=ssh_server)
@@ -259,12 +265,20 @@ class JumpServer:
                 if client_channel in r:
                     client_data = client_channel.recv(1024)
                     if len(client_data) == 0:
+                        logger.info('Logout from ssh server %(host)s: %(username)s' % {
+                            'host': addr[0],
+                            'username': client_channel.username,
+                        })
                         break
                     backend_channel.send(client_data)
 
                 if backend_channel in r:
                     backend_data = backend_channel.recv(1024)
                     if len(backend_data) == 0:
+                        logger.info('Logout from backend server %(host)s: %(username)s' % {
+                            'host': backend_channel.host,
+                            'username': backend_channel.username,
+                        })
                         break
                     client_channel.send(backend_data)
 
@@ -281,8 +295,9 @@ class JumpServer:
                 #     except IndexError:
                 #         pass
 
+        # Todo: catch other exception
         except IndexError:
-            logger.info('Close with server %s from %s' % ('127.0.0.1', '127.0.0.1'))
+            logger.info('Close with server %s from %s' % (addr[0], addr[1]))
             sys.exit(100)
 
     def listen(self):
@@ -299,9 +314,9 @@ class JumpServer:
         while True:
             try:
                 client, addr = self.sock.accept()
-                t = threading.Thread(target=self.handle_ssh_request, args=(client, addr))
-                t.daemon = True
-                t.start()
+                process = Process(target=self.handle_ssh_request, args=(client, addr))
+                process.daemon = True
+                process.start()
             except Exception as e:
                 logger.error('Bind failed: ' + str(e))
                 traceback.print_exc()
