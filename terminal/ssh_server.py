@@ -37,14 +37,7 @@ from users.utils import ssh_key_gen, check_user_is_valid
 logger = get_logger(__name__)
 
 
-class SSHService(paramiko.ServerInterface):
-    # data = (b'AAAAB3NzaC1yc2EAAAABIwAAAIEAyO4it3fHlmGZWJaGrfeHOVY7RWO3P9M7hp'
-    #         b'fAu7jJ2d7eothvfeuoRFtJwhUmZDluRdFyhFY/hFAh76PJKGAusIqIQKlkJxMC'
-    #         b'KDqIexkgHAfID/6mqvmnSJf0b5W8v5h2pI/stOSwTQ+pxVhwJ9ctYDhRSlF0iT'
-    #         b'UWT10hcuO4Ks8=')
-    # good_pub_key = paramiko.RSAKey(data=decodebytes(data))
-    # host_key = paramiko.RSAKey(filename='test_rsa.key')
-
+class SSHServerInterface(paramiko.ServerInterface):
     host_key_path = os.path.join(BASE_DIR, 'host_rsa_key')
 
     def __init__(self):
@@ -138,10 +131,10 @@ class SSHServer:
                 logger.warning('(Failed to load moduli -- gex will be unsupported.)')
                 raise
 
-            transport.add_server_key(SSHService.get_host_key())
-            service = SSHService()
+            transport.add_server_key(SSHServerInterface.get_host_key())
+            ssh_interface = SSHServerInterface()
             try:
-                transport.start_server(server=service)
+                transport.start_server(server=ssh_interface)
             except paramiko.SSHException:
                 print('*** SSH negotiation failed.')
                 return
@@ -158,7 +151,7 @@ class SSHServer:
             channel.send('We are on fire all the time!  Hooray!  Candy corn for everyone!\r\n')
             channel.send('Happy birthday to Robot Dave!\r\n\r\n')
             server_channel = self.connect()
-            if not service.event.is_set():
+            if not ssh_interface.event.is_set():
                 print('*** Client never asked for a shell.')
                 return
             server_data = []
