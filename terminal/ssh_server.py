@@ -124,11 +124,40 @@ class SSHServerInterface(paramiko.ServerInterface):
         return True
 
     def check_channel_window_change_request(self, channel, width, height, pixelwidth, pixelheight):
-        logger.info('Change window size %s * %s' % (width, height))
-        logger.info('Change length %s ' % len(self.__class__.channel_pools))
-        for channel in self.__class__.channel_pools:
-            channel.send("Hello world")
         return True
+
+
+class BackendServer:
+    def __init__(self, host, port, username):
+        self.host = host
+        self.port = port
+        self.username = username
+        self.ssh = None
+        self.channel = None
+
+    def connect(self, term='xterm', width=80, height=24):
+        self.ssh = ssh = paramiko.SSHClient()
+        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        ssh.connect(hostname=self.host, port=self.port, username=self.username, password=self.host_password,
+                    pkey=self.host_private_key, look_for_keys=False, allow_agent=True, compress=True)
+        self.channel = channel = ssh.invoke_shell(term=term, width=width, height=height)
+        return channel
+
+    @property
+    def host_password(self):
+        return 'redhat'
+
+    @property
+    def host_private_key(self):
+        return 'redhat'
+
+
+class Navigation:
+    def __init__(self, username):
+        self.username = username
+
+    def display(self):
+        pass
 
 
 class SSHServer:
@@ -142,13 +171,14 @@ class SSHServer:
         self.server_channel = None
         self.client_channel = None
 
-    def connect(self):
-        ssh = paramiko.SSHClient()
-        ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(hostname='127.0.0.1', port=22, username='root', password='redhat')
-        self.server_ssh = ssh
-        self.server_channel = channel = ssh.invoke_shell(term='xterm')
-        return channel
+    def invoke_with_backend(self):
+        pass
+
+    def display_navigation(self):
+        pass
+
+    def make_client_channel(self):
+        pass
 
     def handle_ssh_request(self, client, addr):
         logger.info("Get connection from %(host)s:%(port)s" % {
@@ -173,6 +203,8 @@ class SSHServer:
                 return
 
             self.client_channel = client_channel = transport.accept(20)
+            # self.client_channel = client_channel = transport.open_session()
+            # client_channel.get_pty(term='xterm')
             if client_channel is None:
                 print('*** No channel.')
                 return
@@ -219,9 +251,8 @@ class SSHServer:
                 #         pass
 
         except Exception:
-            client_channel.close()
-            server_channel.close()
             logger.info('Close with server %s from %s' % ('127.0.0.1', '127.0.0.1'))
+            sys.exit(100)
 
     def listen(self):
         self.sock.listen(5)
