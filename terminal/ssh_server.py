@@ -126,8 +126,8 @@ class SSHServerInterface(paramiko.ServerInterface):
     def check_channel_window_change_request(self, channel, width, height, pixelwidth, pixelheight):
         logger.info('Change window size %s * %s' % (width, height))
         logger.info('Change length %s ' % len(self.__class__.channel_pools))
-        # for channel in self.__class__.channel_pools:
-        #     channel.send("Hello world")
+        for channel in self.__class__.channel_pools:
+            channel.send("Hello world")
         return True
 
 
