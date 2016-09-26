@@ -216,7 +216,7 @@ class User(AbstractUser):
         user.groups.add(UserGroup.initial())
 
     def delete(self):
-        if self.is_superuser:
+        if self.pk == 1:
             return
         return super(User, self).delete()
 

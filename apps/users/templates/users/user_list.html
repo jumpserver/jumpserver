@@ -10,7 +10,9 @@
 <table class="table table-striped table-bordered table-hover " id="user_list_table" >
     <thead>
         <tr>
-            <th></th>
+            <th class="text-center">
+                <div class="checkbox checkbox-success"><input id="" type="checkbox" class="ipt_check_all"><label></label></div>
+            </th>
             <th class="text-center">{% trans 'Name' %}</a></th>
             <th class="text-center">{% trans 'Username' %}</a></th>
             <th class="text-center">{% trans 'Role' %}</th>
@@ -40,12 +42,14 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
+jumpserver.checked = false;
 $(document).ready(function(){
-    $('#user_list_table').DataTable({
+    var table = $('#user_list_table').DataTable({
         dom: '<"html5buttons"B>lftip',
         language: {
             url: "{% static 'js/plugins/dataTables/i18n/language_code.json' %}".replace('language_code', '{{ LANGUAGE_CODE }}')
         },
+        order: [[ 1, 'asc' ]],
         buttons: [
             {extend: 'excel',
                 exportOptions: {
@@ -72,13 +76,16 @@ $(document).ready(function(){
             }
         ],
         columnDefs: [
-            {orderable: false, className: 'select-checkbox', targets: 0},
-            {className: 'text-center', targets: [1, 2, 3, 4, 5, 6, 7]},
+            {targets: 0, orderable: false,
+             createdCell: function(td) {
+                $(td).html('<div class="checkbox checkbox-success"><input type="checkbox" class="ipt_check"><label></label></div>');
+            }},
+            {className: 'text-center', targets: [0, 1, 2, 3, 4, 5, 6, 7]},
             {targets: 7,
              createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "users:user-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
-                if (rowData.role === 'Admin') {
+                if (rowData.id === 1) {
                     $(td).html(update_btn)
                 } else {
                     $(td).html(update_btn + del_btn)
@@ -92,7 +99,14 @@ $(document).ready(function(){
                 } else {
                     $(td).html('<i class="fa fa-check text-navy"></i>')
                 }
-             }}
+             }
+            },
+            {targets: 2,
+             createdCell: function (td, cellData, rowData) {
+                var detail_btn = '<a href="{% url "users:user-detail" pk=99991937 %}">' + cellData + '</a>';
+                $(td).html(detail_btn.replace('99991937', rowData.id));
+             }
+            }
         ],
         select: {style: 'multi'},
         ajax: {
@@ -109,6 +123,13 @@ $(document).ready(function(){
             {data: "active_display" },
             {data: "id" }
         ]
+    });
+    table.on('select', function(e, dt, type, indexes) {
+        var $node = table[ type ]( indexes ).nodes().to$();
+        $node.find('input.ipt_check').prop('checked', true);
+    }).on('deselect', function(e, dt, type, indexes) {
+        var $node = table[ type ]( indexes ).nodes().to$();
+        $node.find('input.ipt_check').prop('checked', false);
     });
 }).on('click', '#btn_bulk_update', function(){
     var action = $('#slct_bulk_update').val();
@@ -201,6 +222,16 @@ $(document).ready(function(){
     }, function() {
         doDelete();
     });
+}).on('click', '.ipt_check_all', function(){
+    if (!jumpserver.checked) {
+        $(this).closest('table').find('.ipt_check').prop('checked', true);
+        jumpserver.checked = true;
+        $('#user_list_table').DataTable().rows().select();
+    } else {
+        $(this).closest('table').find('.ipt_check').prop('checked', false);
+        jumpserver.checked = false;
+        $('#user_list_table').DataTable().rows().deselect();
+    }
 })
 </script>
 {% endblock %}
