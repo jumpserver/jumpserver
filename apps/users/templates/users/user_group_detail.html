@@ -7,6 +7,18 @@
     <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
     <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
     <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+    <style>
+.label {
+    font-size: 14px;
+    line-height: 2.5;
+}
+.label .remove {
+    color: #fff;
+}
+.label span {
+    color: #5e5e5e;
+}
+    </style>
 {% endblock %}
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -46,8 +58,16 @@
                                             <td><b>{{ object.comment }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Created at:' %}:</td>
+                                            <td>{% trans 'Created at' %}:</td>
                                             <td><b>{{ object.date_created }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Users' %}:</td>
+                                            <td style="line-height: 2">
+                                            {% for user in object.users.all %}
+                                            <span class="label m-l-xs"><a href="{{ user.get_absolute_url }}"><span>{{ user.name }}</span></a><a data-uid="{{ user.id }}" class="btn_remove"><i class="remove fa fa-times-circle"></i></a></span>
+                                            {% endfor %}
+                                            </td>
                                         </tr>
                                     </table>
                                 </div>
@@ -108,4 +128,19 @@
             </div>
         </div>
     </div>
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+$(document).on('click', '.btn_remove', function(){
+    var $this = $(this);
+    var uid = $this.data('uid');
+    var the_url = '{% url "users:delete-user-from-group-api" pk=object.id uid=99991937 %}'.replace('99991937', uid);
+    var success = function(){
+        $this.closest('.label').remove();
+    };
+    var error = function(){};
+    APIUpdateAttr({url: the_url, body: "{}", method: "DELETE", success: success, error: error});
+    return false;
+})
+</script>
 {% endblock %}

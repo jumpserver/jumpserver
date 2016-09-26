@@ -4,14 +4,14 @@ from __future__ import unicode_literals
 
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
-from django.utils import timezone
-from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core import signing
+from django.db import models, IntegrityError
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.db import IntegrityError
 from django.utils.translation import ugettext_lazy as _
-from django.core import signing
+from django.utils import timezone
+from django.shortcuts import reverse
 
 from rest_framework.authtoken.models import Token
 
@@ -101,6 +101,9 @@ class User(AbstractUser):
     @password_raw.setter
     def password_raw(self, password_raw_):
         self.set_password(password_raw_)
+
+    def get_absolute_url(self):
+        return reverse('users:user-detail', args=(self.id,))
 
     @property
     def is_expired(self):

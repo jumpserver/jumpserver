@@ -3,7 +3,10 @@
 
 import logging
 
-from rest_framework import generics
+from django.shortcuts import get_object_or_404
+
+from rest_framework import generics, status
+from rest_framework.response import Response
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 
 from .serializers import UserSerializer, UserGroupSerializer, UserAttributeSerializer, UserGroupEditSerializer, \
@@ -26,11 +29,6 @@ class UserDetailDeleteUpdateApi(generics.RetrieveUpdateDestroyAPIView):
     def delete(self, request, *args, **kwargs):
         print(self.request.data)
         return super(UserDetailDeleteUpdateApi, self).delete(request, *args, **kwargs)
-
-    # def get(self, request, *args, **kwargs):
-    #     print("hello world")
-    #     print(request.user)
-    #     return super(UserDetailDeleteUpdateApi, self).get(request, *args, **kwargs)
 
 
 class UserGroupListAddApi(generics.ListCreateAPIView):
@@ -111,3 +109,18 @@ class UserBulkUpdateApi(ListBulkCreateUpdateDestroyAPIView):
             if isinstance(ids, list):
                 queryset = queryset.filter(id__in=ids)
         return queryset
+
+
+class DeleteUserFromGroupApi(generics.DestroyAPIView):
+    queryset = UserGroup.objects.all()
+    serializer_class = GroupEditSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        group = self.get_object()
+        self.perform_destroy(group, **kwargs)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def perform_destroy(self, instance, **kwargs):
+        user_id = kwargs.get('uid')
+        user = get_object_or_404(User, id=user_id)
+        instance.users.remove(user)
