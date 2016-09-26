@@ -73,6 +73,7 @@ class UserPKUpdateSerializer(serializers.ModelSerializer):
 class UserBulkUpdateSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     group_display = serializers.SerializerMethodField()
     active_display = serializers.SerializerMethodField()
+    groups = serializers.PrimaryKeyRelatedField(many=True, queryset=UserGroup.objects.all())
 
     class Meta(object):
         model = User

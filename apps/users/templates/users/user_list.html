@@ -80,7 +80,8 @@ $(document).ready(function(){
             {targets: 0, orderable: false,
              createdCell: function(td) {
                 $(td).html('<div class="checkbox checkbox-success"><input type="checkbox" class="ipt_check"><label></label></div>');
-            }},
+             }
+            },
             {className: 'text-center', targets: [0, 1, 2, 3, 4, 5, 6, 7]},
             {targets: 7,
              createdCell: function (td, cellData, rowData) {
@@ -247,7 +248,30 @@ $(document).ready(function(){
     if (json_data.groups != undefined) {
         body.groups = json_data.groups;
     }
-    console.log(body)
+    if (typeof body.groups === 'string') {
+        body.groups = [parseInt(body.groups)]
+    } else if(typeof body.groups === 'array') {
+        new_groups = body.groups.map(Number);
+        body.groups = new_groups;
+    }
+    var $data_table = $('#user_list_table').DataTable()
+    var post_list = [];
+    $data_table.rows({selected: true}).every(function(){
+        var content = Object.assign({id: this.data().id}, body);
+        post_list.push(content);
+    });
+    if (post_list === []) {
+        return false;
+    };
+    var the_url = "{% url 'users:user-bulk-update-api' %}";
+    var success = function() {
+        var msg = "{% trans 'The selected users has been updated successfully.' %}";
+        swal("{% trans 'User Updated' %}", msg, "success");
+        $('#user_list_table').DataTable().ajax.reload();
+        jumpserver.checked = false;
+    }
+    APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(post_list), success: success});
+    $('#user_bulk_update_modal').modal('hide');
 })
 </script>
 {% endblock %}

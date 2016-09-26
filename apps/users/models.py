@@ -156,8 +156,9 @@ class User(AbstractUser):
 
         super(User, self).save(*args, **kwargs)
         # Add the current user to the default group.
-        group = UserGroup.initial()
-        self.groups.add(group)
+        if not self.groups.count():
+            group = UserGroup.initial()
+            self.groups.add(group)
 
     @property
     def private_token(self):
