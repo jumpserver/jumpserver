@@ -275,6 +275,8 @@ class JumpServer:
                 if backend_channel in r:
                     backend_data = backend_channel.recv(1024)
                     if len(backend_data) == 0:
+                        client_channel.send('Disconnect from %s \r\n' % backend_channel.host)
+                        client_channel.close()
                         logger.info('Logout from backend server %(host)s: %(username)s' % {
                             'host': backend_channel.host,
                             'username': backend_channel.username,

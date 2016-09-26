@@ -43,10 +43,11 @@ class Config:
             },
             'file': {
                 'level': 'DEBUG',
-                'class': 'logging.FileHandler',
+                'class': 'logging.handlers.TimedRotatingFileHandler',
                 'formatter': 'main',
-                'mode': 'a',
                 'filename': os.path.join(LOG_DIR, LOG_FILENAME),
+                'when': 'D',
+                'backupCount': 10,
             },
         },
         'loggers': {
