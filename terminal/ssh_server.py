@@ -36,7 +36,7 @@ except IndexError:
 
 from django.conf import settings
 from users.utils import ssh_key_gen, check_user_is_valid
-from utils import get_logger, SSHServerException
+from utils import get_logger, SSHServerException, control_char
 
 
 logger = get_logger(__name__)
@@ -48,6 +48,7 @@ class SSHServer(paramiko.ServerInterface):
 
     def __init__(self, client, addr):
         self.event = threading.Event()
+        self.change_window_size_event = threading.Event()
         self.client = client
         self.addr = addr
         self.username = None
@@ -133,9 +134,15 @@ class SSHServer(paramiko.ServerInterface):
 
     def check_channel_pty_request(self, channel, term, width, height, pixelwidth,
                                      pixelheight, modes):
+        channel.change_window_size_event = threading.Event()
+        channel.width = width
+        channel.height = height
         return True
 
     def check_channel_window_change_request(self, channel, width, height, pixelwidth, pixelheight):
+        channel.change_window_size_event.set()
+        channel.width = width
+        channel.height = height
         return True
 
 
@@ -180,6 +187,7 @@ class Navigation:
 
     def display_banner(self):
         client_channel = self.client_channel
+        client_channel.send(control_char.clear)
         client_channel.send('\r\n\r\n\t\tWelcome to use Jumpserver open source system !\r\n\r\n')
         client_channel.send('If you find some bug please contact us <ibuler@qq.com>\r\n')
         client_channel.send('See more at https://www.jumpserver.org\r\n')
@@ -196,6 +204,10 @@ class JumpServer:
     backend_server_pools = []
     backend_channel_pools = []
     client_channel_pools = []
+
+    CONTROL_CHAR = {
+        'clear': ''
+    }
 
     def __init__(self):
         self.listen_host = '0.0.0.0'
@@ -235,9 +247,9 @@ class JumpServer:
             raise SSHServerException('Client never asked for a shell.')
         return client_channel
 
-    def get_backend_channel(self, host, port, username):
+    def get_backend_channel(self, host, port, username, term='xterm', width=80, height=24):
         backend_server = BackendServer(host, port, username)
-        backend_channel = backend_server.connect()
+        backend_channel = backend_server.connect(term=term, width=width, height=height)
         self.__class__.backend_server_pools.append(backend_server)
         self.__class__.backend_channel_pools.append(backend_channel)
         if not backend_channel:
@@ -257,10 +269,15 @@ class JumpServer:
         try:
             client_channel = self.get_client_channel(client, addr)
             host, port, username = self.display_navigation('root', client_channel)
-            backend_channel = self.get_backend_channel(host, port, username)
+            backend_channel = self.get_backend_channel(host, port, username,
+                                                       width=client_channel.width,
+                                                       height=client_channel.height)
 
             while True:
                 r, w, x = select.select([client_channel, backend_channel], [], [])
+
+                if client_channel.change_window_size_event.is_set():
+                    backend_channel.resize_pty(width=client_channel.width, height=client_channel.height)
 
                 if client_channel in r:
                     client_data = client_channel.recv(1024)
@@ -270,6 +287,7 @@ class JumpServer:
                             'username': client_channel.username,
                         })
                         break
+                    print('CC: ' + repr(client_data))
                     backend_channel.send(client_data)
 
                 if backend_channel in r:
@@ -282,6 +300,7 @@ class JumpServer:
                             'username': backend_channel.username,
                         })
                         break
+                    print('SS: ' + repr(backend_data))
                     client_channel.send(backend_data)
 
                     # if len(recv_data) > 20:

@@ -15,5 +15,20 @@ def get_logger(name):
     return logging.getLogger('jumpserver.%s' % name)
 
 
+class ControlChar:
+    CHARS = {
+        'clear': '\x1b[H\x1b[2J',
+    }
+
+    def __init__(self):
+        pass
+
+    def __getattr__(self, item):
+        return self.__class__.CHARS.get(item, '')
+
+
 class SSHServerException(Exception):
     pass
+
+
+control_char = ControlChar()
