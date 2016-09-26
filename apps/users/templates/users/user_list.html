@@ -25,6 +25,7 @@
     <tbody>
     </tbody>
 </table>
+{% include "users/_user_bulk_update_modal.html" %}
 {% endblock %}
 {% block content_bottom_left %}
         <div class="input-group">
@@ -150,6 +151,7 @@ $(document).ready(function(){
         });
         APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(body)});
         $data_table.ajax.reload();
+        jumpserver.checked = false;
     }
     function doDelete() {
         swal({
@@ -172,9 +174,12 @@ $(document).ready(function(){
             };
             var url_delete = the_url + '?id__in=' + JSON.stringify(plain_id_list);
             APIUpdateAttr({url: url_delete, method: 'DELETE', success: success, error: fail});
+            jumpserver.checked = false;
         });
     }
-    function doUpdate() {}
+    function doUpdate() {
+        $('#user_bulk_update_modal').modal('show');
+    }
     switch(action) {
         case 'deactive':
             doDeactive();
@@ -232,6 +237,17 @@ $(document).ready(function(){
         jumpserver.checked = false;
         $('#user_list_table').DataTable().rows().deselect();
     }
+}).on('click', '#btn_user_bulk_update', function(){
+    var json_data = $('#fm_user_bulk_update').serializeObject();
+    var body = {};
+    body.enable_otp = (json_data.enable_otp === 'on')? true: false;
+    if (json_data.role != '') {
+        body.role = json_data.role;
+    }
+    if (json_data.groups != undefined) {
+        body.groups = json_data.groups;
+    }
+    console.log(body)
 })
 </script>
 {% endblock %}

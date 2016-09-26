@@ -178,8 +178,8 @@ function activeNav() {
     var url_array = document.location.pathname.split("/");
     var app = url_array[1];
     var resource = url_array[2];
-    if (app == ''){
-        $('#index').addClass('active')
+    if (app === ''){
+        $('#index').addClass('active');
     } else {
         $("#" + app).addClass('active');
         $('#' + app + ' #' + resource).addClass('active');
@@ -236,8 +236,24 @@ function objectDelete(obj, name, url){
                 swal('Deleted!' , "【"+name+"】"+"has been deleted.", "success");
                 $(obj).parent().parent().remove();
             }
-        })
+        });
     });
 }
 
 var jumpserver = {};
+$.fn.serializeObject = function()
+{
+    var o = {};
+    var a = this.serializeArray();
+    $.each(a, function() {
+        if (o[this.name] !== undefined) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
+};
