@@ -45,47 +45,21 @@
 <script>
 jumpserver.checked = false;
 $(document).ready(function(){
-    var table = $('#user_list_table').DataTable({
-        pageLength: 25,
-        dom: '<"uc pull-left"><"html5buttons"B>flti<"row m-t"<"#sth.col-md-6"><"col-md-6"p>>',
-        language: {
-            url: "{% static 'js/plugins/dataTables/i18n/language_code.json' %}".replace('language_code', '{{ LANGUAGE_CODE }}')
-        },
-        order: [[ 1, 'asc' ]],
-        buttons: [
-            {extend: 'excel',
-                exportOptions: {
-                    modifier: {
-                        selected: true
-                    }
-                }
-            },
-            {extend: 'pdf',
-                exportOptions: {
-                    modifier: {
-                        selected: true
-                    }
-                }
-            },
-            {extend: 'print',
-                customize: function (win){
-                    $(win.document.body).addClass('white-bg');
-                    $(win.document.body).css('font-size', '10px');
-                    $(win.document.body).find('table')
-                        .addClass('compact')
-                        .css('font-size', 'inherit');
-                }
-            }
-        ],
+    var options = {
+        ele: $('#user_list_table'),
         columnDefs: [
-            {targets: 0, orderable: false,
-             createdCell: function(td) {
-                $(td).html('<div class="checkbox checkbox-default"><input type="checkbox" class="ipt_check"><label></label></div>');
-             }
-            },
-            {className: 'text-center', targets: [0, 1, 2, 3, 4, 5, 6, 7]},
-            {targets: 7,
-             createdCell: function (td, cellData, rowData) {
+            {targets: 1, createdCell: function (td, cellData, rowData) {
+                var detail_btn = '<a href="{% url "users:user-detail" pk=99991937 %}">' + cellData + '</a>';
+                $(td).html(detail_btn.replace('99991937', rowData.id));
+             }},
+            {targets: 6, createdCell: function (td, cellData) {
+                if (!cellData) {
+                    $(td).html('<i class="fa fa-times text-danger"></i>')
+                } else {
+                    $(td).html('<i class="fa fa-check text-navy"></i>')
+                }
+             }},
+            {targets: 7, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "users:user-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
                 if (rowData.id === 1) {
@@ -93,49 +67,13 @@ $(document).ready(function(){
                 } else {
                     $(td).html(update_btn + del_btn)
                 }
-             }
-            },
-            {targets: 6,
-             createdCell: function (td, cellData) {
-                if (!cellData) {
-                    $(td).html('<i class="fa fa-times text-danger"></i>')
-                } else {
-                    $(td).html('<i class="fa fa-check text-navy"></i>')
-                }
-             }
-            },
-            {targets: 1,
-             createdCell: function (td, cellData, rowData) {
-                var detail_btn = '<a href="{% url "users:user-detail" pk=99991937 %}">' + cellData + '</a>';
-                $(td).html(detail_btn.replace('99991937', rowData.id));
-             }
-            }
-        ],
-        select: {style: 'multi'},
-        ajax: {
-            url: '{% url "users:user-bulk-update-api" %}',
-            dataSrc: ""
-        },
-        columns: [
-            {data: function(){return ""} },
-            {data: "username" },
-            {data: "name" },
-            {data: "get_role_display" },
-            {data: "group_display" },
-            {data: function(){return 999} },
-            {data: "active_display" },
-            {data: "id" }
-        ]
-    });
-    table.on('select', function(e, dt, type, indexes) {
-        var $node = table[ type ]( indexes ).nodes().to$();
-        $node.find('input.ipt_check').prop('checked', true);
-    }).on('deselect', function(e, dt, type, indexes) {
-        var $node = table[ type ]( indexes ).nodes().to$();
-        $node.find('input.ipt_check').prop('checked', false);
-    }).on('draw', function(){
-        $('#sth').html($('#actions').html());
-    });
+             }}],
+        ajax_url: '{% url "users:user-bulk-update-api" %}',
+        columns: [{data: function(){return ""}}, {data: "username" }, {data: "name" }, {data: "get_role_display" }, {data: "group_display" },
+                  {data: function(){return 999}}, {data: "active_display" }, {data: "id" }],
+        op_html: $('#actions').html()
+    };
+    jumpserver.initDataTable(options);
 }).on('click', '#btn_bulk_update', function(){
     var action = $('#slct_bulk_update').val();
     var $data_table = $('#user_list_table').DataTable()
