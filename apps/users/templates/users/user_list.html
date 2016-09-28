@@ -51,7 +51,6 @@ $(document).ready(function(){
             url: "{% static 'js/plugins/dataTables/i18n/language_code.json' %}".replace('language_code', '{{ LANGUAGE_CODE }}')
         },
         order: [[ 1, 'asc' ]],
-        aLengthMenu: [[3,10, 25, 50, -1], ["3","10", "25", "50", "all"]],
         buttons: [
             {extend: 'excel',
                 exportOptions: {
