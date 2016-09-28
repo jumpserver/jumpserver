@@ -11,6 +11,7 @@
                 <th class="text-center" style="background-color:white">
                     <input type="checkbox" id="check_all" onclick="checkAll('check_all', 'checked')">
                 </th>
+                <th id="th_no">id</th>
                 <th>资产名称</th>
                 <th>IP</th>
                 <th>硬件类型</th>
@@ -26,6 +27,7 @@
             {% else %}
                 <td class="text-center" ><input type="checkbox" name="checked" value="{{ asset.id }}"></td>
             {% endif %}
+                <td>{{ asset.id }}</td>
                 <td>{{ asset.hostname }}</td>
                 <td>{{ asset.ip }}</td>
                 <td>虚拟机</td>
@@ -44,74 +46,54 @@
 
 <script type="text/javascript">
 
-    $('#close-btn').on('click',function(){
-        //alert('点击关闭按钮时触发；')
-        $('#modal').modal('hide');
+//$(window).load(function (){
+$(document).ready(function(){
+
+    var table = $('#editable').DataTable({
+        aLengthMenu: [[2, 25, 50, -1], ["2", "25", "50", "all"]],
+        "aaSorting": [[2, "asc"]],
+        "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ] }],
+        "bAutoWidth": false,
+        columns: [
+            {data: "checkbox"},
+            {data: "id"},
+            {data: "name"},
+            {data: "ip"},
+            {data: "type"},
+            {data: "group"},
+            {data: "dp"}
+        ]
+    });
+    table.column('1').visible(false);
+    $('#editable tbody').on( 'click', 'tr', function () {
+        $(this).toggleClass('selected');
     });
 
     $('#save-btn').on('click',function(){
-       // alert('点击保存按钮时触发2；')
-        var box = $("input[name='checked']:checked");
-        var size=box.length;
+    //alert( table.rows('.selected').data().length +' row(s) selected' );
+        var d = table.rows('.selected').data();
+        var size = d.length;
         document.getElementById('add_asset').value = size;
-        var ids=[];
+        var column2 = table.rows('.selected').data();
         $("#asset_sed").find("input[name='assets']").remove();
-        for(var i=0;i<box.length;i++){
-            var value = $(box[i]).val();
+        for(var i=0;i<column2.length;i++){
+            var value = column2[i].id;
             $("#asset_sed").append("<input  type='hidden' name='assets' value='"+value+"'>");
         }
         $('#modal').modal('hide');
     });
 
-    $(document).ready(function(){
-        $('#editable').DataTable({
-            "aaSorting": [[1, "asc"]],  //给列表排序 ，第一个参数表示数组 (由0开始)。第二个参数为 desc或是asc
-            "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ] }], // 0列不参加排序
-            "aLengthMenu": [[10, 25, 50, -1], ["10", "25", "50", "all"]],  //设置每页显示记录的下拉菜单
-            "oLanguage": {
-                "sLengthMenu": "每页显示 _MENU_ 条记录",
-                "sZeroRecords": "对不起，查询不到任何相关数据",
-                "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录",
-                "sInfoEmtpy": "找不到相关数据",
-                "sInfoFiltered": "数据表中共为 _MAX_ 条记录)",
-                "sProcessing": "正在加载中...",
-                "sSearch": "搜索",
-                "sUrl": "", //多语言配置文件，可将oLanguage的设置放在一个txt文件中，例：Javascript/datatable/dtCH.txt
-                "oPaginate": {
-                    "sFirst":    "第一页",
-                    "sPrevious": " 上一页 ",
-                    "sNext":     " 下一页 ",
-                    "sLast":     " 最后一页 "
-                }
-            } //多语言配置
-        });
 
-        /* Init DataTables */
-        var oTable = $('#editable').DataTable();
-            /* Apply the jEditable handlers to the table */
-            oTable.$('td').editable( '../example_ajax.php', {
-                "callback": function( sValue, y ) {
-                    var aPos = oTable.fnGetPosition( this );
-                    oTable.fnUpdate( sValue, aPos[0], aPos[1] );
-                },
-                "submitdata": function ( value, settings ) {
-                    return {
-                        "row_id": this.parentNode.getAttribute('id'),
-                        "column": oTable.fnGetPosition( this )[2]
-                    };
-                },
 
-                "width": "90%",
-                "height": "100%",
-            });
+
+});
+    $('#close-btn').on('click',function(){
+        //alert('点击关闭按钮时触发；')
+        $('#modal').modal('hide');
     });
 
-    function fnClickAddRow() {
-            $('#editable').dataTable().fnAddData( [
-                "Custom row",
-                "New row",
-                "New row",
-                "New row",
-                "New row" ] );
-    }
+
+
+
+
 </script>

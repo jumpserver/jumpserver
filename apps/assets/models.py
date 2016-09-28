@@ -312,7 +312,7 @@ class Asset(models.Model):
     status = models.ForeignKey(AssetExtend, null=True, blank=True,
                                related_name="status_asset", verbose_name=_('Asset status'),)
                                # default=functools.partial(get_default_extend, 'status', 'In use'))
-    type = models.ForeignKey(AssetExtend, null=True, limit_choices_to={'key': 'type'},
+    type = models.ForeignKey(AssetExtend, blank=True,null=True, limit_choices_to={'key': 'type'},
                              related_name="type_asset", verbose_name=_('Asset type'),)
                              # default=functools.partial(get_default_extend, 'type','Server'))
     env = models.ForeignKey(AssetExtend, blank=True, null=True, limit_choices_to={'key': 'env'},
