@@ -222,7 +222,7 @@
 jumpserver.selected_groups = {};
 
 function updateUserGroups(user_groups) {
-    var the_url = "{% url 'users:user-group-edit-api' pk=user_object.id %}";
+    var the_url = "{% url 'users:group-user-edit-api' pk=user_object.id %}";
     var body = {
         id: {{ user_object.id }},
         groups: Object.assign([], user_groups)
@@ -237,7 +237,7 @@ function updateUserGroups(user_groups) {
             $('.group_edit tbody').append(
                 '<tr>' +
                 '<td><b class="bdg_user_group" data-gid="' + index + '">' + group_name + '</b></td>' +
-                '<td><button class="btn btn-danger btn-sm pull-right btn_delete_user_group" type="button"><i class="fa fa-minus"></i></button></td>' +
+                '<td><button class="btn btn-danger btn-xs pull-right btn_delete_user_group" type="button"><i class="fa fa-minus"></i></button></td>' +
                 '</tr>'
             )
         });

@@ -257,6 +257,7 @@ $.fn.serializeObject = function()
     return o;
 };
 var jumpserver = {};
+jumpserver.checked = false;
 jumpserver.initDataTable = function (options) {
   // options = {
   //    ele *: $('#dataTable_id'),
@@ -331,5 +332,16 @@ jumpserver.initDataTable = function (options) {
         $('#op').html(options.op_html || '');
         $('#uc').html(options.uc_html || '');
     });
+    $('.ipt_check_all').on('click', function() {
+      if (!jumpserver.checked) {
+          $(this).closest('table').find('.ipt_check').prop('checked', true);
+          jumpserver.checked = true;
+          table.rows().select();
+      } else {
+          $(this).closest('table').find('.ipt_check').prop('checked', false);
+          jumpserver.checked = false;
+          table.rows().deselect();
+      }
+    })
     return table;
 }

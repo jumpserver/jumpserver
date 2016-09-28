@@ -31,7 +31,7 @@ class GroupEditSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserGroup
-        fields = ['id', 'name', 'comment', 'date_created', 'created_by']
+        fields = ['id', 'name', 'comment', 'date_created', 'created_by', 'users']
 
 
 class UserAttributeSerializer(serializers.ModelSerializer):
@@ -41,7 +41,7 @@ class UserAttributeSerializer(serializers.ModelSerializer):
         fields = ['avatar', 'wechat', 'phone', 'enable_otp', 'comment', 'is_active', 'name']
 
 
-class UserGroupEditSerializer(serializers.ModelSerializer):
+class GroupUserEditSerializer(serializers.ModelSerializer):
     groups = serializers.PrimaryKeyRelatedField(many=True, queryset=UserGroup.objects.all())
 
     class Meta:
