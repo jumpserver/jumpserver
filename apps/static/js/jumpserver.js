@@ -240,7 +240,6 @@ function objectDelete(obj, name, url){
     });
 }
 
-var jumpserver = {};
 $.fn.serializeObject = function()
 {
     var o = {};
@@ -257,3 +256,80 @@ $.fn.serializeObject = function()
     });
     return o;
 };
+var jumpserver = {};
+jumpserver.initDataTable = function (options) {
+  // options = {
+  //    ele *: $('#dataTable_id'),
+  //    ajax_url *: '{% url 'users:user-list-api' %}',
+  //    columns *: [{data: ''}, ....],
+  //    dom: 'fltip',
+  //    i18n_url: '{% static "js/...../en-us.json" %}',
+  //    order: [[1, 'asc'], [2, 'asc'], ...],
+  //    buttons: ['excel', 'pdf', 'print'],
+  //    columnDefs: [{target: 0, createdCell: ()=>{}}, ...],
+  //    uc_html: '<a>header button</a>',
+  //    op_html: 'div.btn-group?'
+  // }
+  var ele = options.ele || $('.dataTable');
+  var columnDefs = [
+    {
+      targets: 0, orderable: false,
+      createdCell: function(td) {
+        $(td).html('<div class="checkbox checkbox-default"><input type="checkbox" class="ipt_check"><label></label></div>');
+      }
+    },
+    {className: 'text-center', targets: '_all'},
+  ];
+  columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
+  var table = ele.DataTable({
+        pageLength: options.pageLength || 25,
+        dom: options.dom || '<"#uc.pull-left"><"html5buttons"B>flti<"row m-t"<"#op.col-md-6"><"col-md-6"p>>',
+        language: {
+            url: options.i18n_url || "/static/js/plugins/dataTables/i18n/zh-hans.json"
+        },
+        order: options.order || [[ 1, 'asc' ]],
+        buttons: options.buttons || [
+            {extend: 'excel',
+                exportOptions: {
+                    modifier: {
+                        selected: true
+                    }
+                }
+            },
+            {extend: 'pdf',
+                exportOptions: {
+                    modifier: {
+                        selected: true
+                    }
+                }
+            },
+            {extend: 'print',
+                customize: function (win){
+                    $(win.document.body).addClass('white-bg');
+                    $(win.document.body).css('font-size', '10px');
+                    $(win.document.body).find('table')
+                        .addClass('compact')
+                        .css('font-size', 'inherit');
+                }
+            }
+        ],
+        columnDefs: columnDefs,
+        select: options.select || {style: 'multi'},
+        ajax: {
+            url: options.ajax_url ,
+            dataSrc: ""
+        },
+        columns: options.columns || []
+    });
+    table.on('select', function(e, dt, type, indexes) {
+        var $node = table[ type ]( indexes ).nodes().to$();
+        $node.find('input.ipt_check').prop('checked', true);
+    }).on('deselect', function(e, dt, type, indexes) {
+        var $node = table[ type ]( indexes ).nodes().to$();
+        $node.find('input.ipt_check').prop('checked', false);
+    }).on('draw', function(){
+        $('#op').html(options.op_html || '');
+        $('#uc').html(options.uc_html || '');
+    });
+    return table;
+}
