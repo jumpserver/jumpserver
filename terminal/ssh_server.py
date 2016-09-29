@@ -81,27 +81,6 @@ class SSHServer(paramiko.ServerInterface):
             return paramiko.OPEN_SUCCEEDED
         return paramiko.OPEN_FAILED_ADMINISTRATIVELY_PROHIBITED
 
-    def check_auth_gssapi_with_mic(self, username,
-                                   gss_authenticated=paramiko.AUTH_FAILED,
-                                   cc_file=None):
-
-        if gss_authenticated == paramiko.AUTH_SUCCESSFUL:
-            return paramiko.AUTH_SUCCESSFUL
-        return paramiko.AUTH_FAILED
-
-    def check_auth_gssapi_keyex(self, username,
-                                gss_authenticated=paramiko.AUTH_FAILED,
-                                cc_file=None):
-
-        if gss_authenticated == paramiko.AUTH_SUCCESSFUL:
-            return paramiko.AUTH_SUCCESSFUL
-        return paramiko.AUTH_FAILED
-
-    def enable_auth_gssapi(self):
-        UseGSSAPI = True
-        GSSAPICleanupCredentials = False
-        return UseGSSAPI
-
     def check_auth_password(self, username, password):
         self.user = user = check_user_is_valid(username=username, password=password)
         if self.user:
@@ -153,7 +132,6 @@ class SSHServer(paramiko.ServerInterface):
         self.__class__.channel_pools.append(channel)
         channel.username = self.username
         channel.addr = self.addr
-
         return True
 
     def check_channel_pty_request(self, channel, term, width, height, pixelwidth,
@@ -181,8 +159,14 @@ class BackendServer:
     def connect(self, term='xterm', width=80, height=24, timeout=10):
         self.ssh = ssh = paramiko.SSHClient()
         ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh.connect(hostname=self.host, port=self.port, username=self.username, password=self.host_password,
-                    pkey=self.host_private_key, look_for_keys=False, allow_agent=True, compress=True, timeout=timeout)
+
+        try:
+            ssh.connect(hostname=self.host, port=self.port, username=self.username, password=self.host_password,
+                        pkey=self.host_private_key, look_for_keys=False, allow_agent=True, compress=True, timeout=timeout)
+        except Exception:
+            logger.warning('Connect backend server %s failed' % self.host)
+            return None
+
         self.channel = channel = ssh.invoke_shell(term=term, width=width, height=height)
         logger.info('Connect backend server %(username)s@%(host)s:%(port)s successfully' % {
             'username': self.username,
@@ -260,12 +244,11 @@ class JumpServer:
             logger.warning('SSH negotiation failed.')
 
         client_channel = transport.accept(20)
-        self.__class__.client_channel_pools.append(client_channel)
         if client_channel is None:
             logger.warning('No ssh channel get.')
-            client.close()
-            sys.exit(404)
+            return None
 
+        self.__class__.client_channel_pools.append(client_channel)
         if not ssh_server.event.is_set():
             logger.warning('Client never asked for a shell.')
         return client_channel
@@ -273,14 +256,17 @@ class JumpServer:
     def get_backend_channel(self, host, port, username, term='xterm', width=80, height=24):
         backend_server = BackendServer(host, port, username)
         backend_channel = backend_server.connect(term=term, width=width, height=height)
-        self.__class__.backend_server_pools.append(backend_server)
-        self.__class__.backend_channel_pools.append(backend_channel)
-        if not backend_channel:
+
+        if backend_channel is None:
             logger.warning('Connect %(username)s@%(host)s:%(port)s failed' % {
                 'username': username,
                 'host': host,
                 'port': port,
             })
+            return None
+
+        self.__class__.backend_server_pools.append(backend_server)
+        self.__class__.backend_channel_pools.append(backend_channel)
 
         return backend_channel
 
@@ -289,12 +275,28 @@ class JumpServer:
             'host': addr[0],
             'port': addr[1],
         })
+        raise IndexError
+        dir(client)
+        client.close()
+        return False
+
         try:
             client_channel = self.get_client_channel(client, addr)
+            if client_channel is None:
+                client.close()
+                return
+
             host, port, username = self.display_navigation('root', client_channel)
             backend_channel = self.get_backend_channel(host, port, username,
                                                        width=client_channel.width,
                                                        height=client_channel.height)
+            if backend_channel is None:
+                client.shutdown()
+                client.close()
+                client.send('Close')
+                print(client)
+                print(dir(client))
+                return
 
             while True:
                 r, w, x = select.select([client_channel, backend_channel], [], [])
