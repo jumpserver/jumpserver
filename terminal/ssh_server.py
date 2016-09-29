@@ -92,7 +92,6 @@ class SSHServer(paramiko.ServerInterface):
             })
             return paramiko.AUTH_SUCCESSFUL
         else:
-            self.client.close()
             logger.info('Authentication password failed for %(username)s from %(host)s port %(port)s ' % {
                 'username': username,
                 'host': self.addr[0],
@@ -275,10 +274,6 @@ class JumpServer:
             'host': addr[0],
             'port': addr[1],
         })
-        raise IndexError
-        dir(client)
-        client.close()
-        return False
 
         try:
             client_channel = self.get_client_channel(client, addr)
@@ -360,9 +355,9 @@ class JumpServer:
         while True:
             try:
                 client, addr = sock.accept()
-                process = Process(target=self.handle_ssh_request, args=(client, addr))
-                process.daemon = True
-                process.start()
+                thread = threading.Thread(target=self.handle_ssh_request, args=(client, addr))
+                thread.daemon = True
+                thread.start()
             except Exception as e:
                 logger.error('Bind failed: ' + str(e))
                 traceback.print_exc()
