@@ -93,14 +93,16 @@ class GroupEditApi(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = GroupEditSerializer
 
     def perform_update(self, serializer):
-        partial = serializer.validated_data.get('partial', False)
         users = serializer.validated_data.get('users')
-        if partial and users:
+        if users:
             group = self.get_object()
-            group.users.add(users)
+            # Note: use `list` method to force hitting the db.
+            group_users = list(group.users.all())
+            serializer.save()
+            group.users.set(users + group_users)
             group.save()
             return
-        return super(GroupEditApi, self).perform_update(serializer)
+        serializer.save()
 
 
 class UserBulkUpdateApi(ListBulkCreateUpdateDestroyAPIView):

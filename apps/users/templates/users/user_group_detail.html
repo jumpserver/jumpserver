@@ -11,15 +11,48 @@
     <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
     <script src="{% static "js/plugins/dataTables/dataTables.min.js" %}"></script>
     <style>
-.label {
-    font-size: 14px;
-    line-height: 2.5;
+.user_div {
+    background-color: #d1dade;
+    color: #5e5e5e;
+    font-family: "Open Sans";
+    padding: 3px 8px;
+    text-shadow: none;
 }
-.label .remove {
+.user_div .remove {
     color: #fff;
 }
-.label span {
+.user_div span {
     color: #5e5e5e;
+}
+dl {
+  width: 100%;
+  overflow: hidden;
+  padding: 0;
+  margin: 10px;
+  border-bottom: 1px solid #e7eaec;
+}
+dt {
+  float: left;
+  width: 30%;
+  padding: 0;
+  margin: 0
+}
+dd {
+  float: left;
+  width: 70%;
+  padding: 0;
+  margin: 0
+}
+
+#group_user_row dt {
+  border-bottom: 1px solid #e7eaec;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+#group_user_row dd {
+  width: 100%;
+  overflow: auto;
 }
     </style>
 {% endblock %}
@@ -50,29 +83,26 @@
                                     </div>
                                 </div>
                                 <div class="ibox-content">
-                                    <table class="table">
-                                        <tbody>
-                                        <tr>
-                                            <td width="20%">{% trans 'Name' %}:</td>
-                                            <td><b>{{ object.name }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Comment' %}:</td>
-                                            <td><b>{{ object.comment }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Created at' %}:</td>
-                                            <td><b>{{ object.date_created }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Users' %}:</td>
-                                            <td style="line-height: 2">
+                                        <dl>
+                                            <dt width="20%">{% trans 'Name' %}:</dt>
+                                            <dd><b>{{ object.name }}</b></dd>
+                                        </dl>
+                                        <dl>
+                                            <dt>{% trans 'Comment' %}:</dt>
+                                            <dd><b>{{ object.comment }}</b></dd>
+                                        </dl>
+                                        <dl>
+                                            <dt>{% trans 'Created at' %}:</dt>
+                                            <dd><b>{{ object.date_created }}</b></dd>
+                                        </dl>
+                                        <dl id="group_user_row">
+                                            <dt>{% trans 'Users' %}:</dt>
+                                            <dd style="line-height: 2" id="group_user_container">
                                             {% for user in object.users.all %}
-                                            <span class="label m-l-xs"><a href="{{ user.get_absolute_url }}"><span>{{ user.name }}</span></a><a data-uid="{{ user.id }}" class="btn_remove"><i class="remove fa fa-times-circle"></i></a></span>
+                                            <div class="col-sm-4 user_div"><div class="col-xs-9"><a href="{{ user.get_absolute_url }}"><span>{{ user.name }}</span></a></div><div class="col-xs-3"><a data-uid="{{ user.id }}" class="btn_remove m-l-5"><i class="remove fa fa-times-circle"></i></a></div></div>
                                             {% endfor %}
-                                            </td>
-                                        </tr>
-                                    </table>
+                                            </dd>
+                                        </dl>
                                 </div>
                             </div>
                         </div>
@@ -119,7 +149,7 @@ $(document).on('click', '.btn_remove', function(){
     var uid = $this.data('uid');
     var the_url = '{% url "users:delete-user-from-group-api" pk=object.id uid=99991937 %}'.replace('99991937', uid);
     var success = function(){
-        $this.closest('.label').remove();
+        $this.closest('.user_div').remove();
     };
     var error = function(){};
     APIUpdateAttr({url: the_url, body: "{}", method: "DELETE", success: success, error: error});
@@ -167,25 +197,39 @@ $(document).on('click', '.btn_remove', function(){
     jumpserver.initDataTable(options);
 }).on('click', '#btn_select_user', function() {
     var $data_table = $('#select_user_table').DataTable();
-    var id_list = [];
     var plain_id_list = [];
+    var selected_users = [];
     $data_table.rows({selected: true}).every(function(){
-        id_list.push({id: this.data().id});
         plain_id_list.push(this.data().id);
+        selected_users.push({id: this.data().id, name: this.data().name});
     });
-    if (id_list === []) {
+    console.log(selected_users)
+    if (plain_id_list === []) {
         return false;
     };
-    console.log(id_list);
-    console.log(plain_id_list);
     var body = {
         id: {{ object.id }},
         users: plain_id_list.map(Number)
     };
-    console.log(body);
     $('#select_user_modal').modal('hide');
     var the_url = "{% url 'users:user-group-edit-api' pk=object.id %}";
-    APIUpdateAttr({url: the_url, body: JSON.stringify(body)});
+    var success = function() {
+        toastr.success('{% trans "The selected users has been added to current group." %}');
+        var html = "";
+        $.each(selected_users, function(index, user) {
+            html += [
+                '<div class="col-sm-4 user_div"><div class="col-xs-9"><a href="',
+                '{% url "users:user-detail" pk=99991937 %}'.replace(99991937, user.id),
+                '"><span>',
+                user.name,
+                '</span></a></div><div class="col-xs-3"><a data-uid="',
+                user.id,
+                '" class="btn_remove m-l-5"><i class="remove fa fa-times-circle"></i></a></div></div>\n',
+            ].join("");
+        });
+        $(html).appendTo($('#group_user_container'));
+    }
+    APIUpdateAttr({url: the_url, body: JSON.stringify(body), success: success});
 })
 </script>
 {% endblock %}
