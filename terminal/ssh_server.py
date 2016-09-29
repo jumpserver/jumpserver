@@ -41,6 +41,8 @@ from utils import get_logger, SSHServerException, control_char
 
 logger = get_logger(__name__)
 
+paramiko.util.log_to_file(os.path.join(BASE_DIR, 'logs', 'paramiko.log'))
+
 
 class SSHServer(paramiko.ServerInterface):
     host_key_path = os.path.join(BASE_DIR, 'host_rsa_key')
@@ -79,6 +81,27 @@ class SSHServer(paramiko.ServerInterface):
             return paramiko.OPEN_SUCCEEDED
         return paramiko.OPEN_FAILED_ADMINISTRATIVELY_PROHIBITED
 
+    def check_auth_gssapi_with_mic(self, username,
+                                   gss_authenticated=paramiko.AUTH_FAILED,
+                                   cc_file=None):
+
+        if gss_authenticated == paramiko.AUTH_SUCCESSFUL:
+            return paramiko.AUTH_SUCCESSFUL
+        return paramiko.AUTH_FAILED
+
+    def check_auth_gssapi_keyex(self, username,
+                                gss_authenticated=paramiko.AUTH_FAILED,
+                                cc_file=None):
+
+        if gss_authenticated == paramiko.AUTH_SUCCESSFUL:
+            return paramiko.AUTH_SUCCESSFUL
+        return paramiko.AUTH_FAILED
+
+    def enable_auth_gssapi(self):
+        UseGSSAPI = True
+        GSSAPICleanupCredentials = False
+        return UseGSSAPI
+
     def check_auth_password(self, username, password):
         self.user = user = check_user_is_valid(username=username, password=password)
         self.username = username = user.username
@@ -99,9 +122,9 @@ class SSHServer(paramiko.ServerInterface):
 
     def check_auth_publickey(self, username, public_key):
         self.user = user = check_user_is_valid(username=username, public_key=public_key)
-        self.username = username = user.username
 
         if self.user:
+            self.username = username = user.username
             logger.info('Accepted public key for %(username)s from %(host)s port %(port)s ' % {
                 'username': username,
                 'host': self.addr[0],

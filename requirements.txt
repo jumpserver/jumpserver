@@ -20,3 +20,4 @@ django-simple-captcha==0.5.2
 django-formtools==1.0
 sshpubkeys==2.2.0
 djangorestframework-bulk==0.2.1
+python-gssapi==0.6.4
