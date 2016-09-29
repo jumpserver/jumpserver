@@ -104,8 +104,8 @@ class SSHServer(paramiko.ServerInterface):
 
     def check_auth_password(self, username, password):
         self.user = user = check_user_is_valid(username=username, password=password)
-        self.username = username = user.username
         if self.user:
+            self.username = username = user.username
             logger.info('Accepted password for %(username)s from %(host)s port %(port)s ' % {
                 'username': username,
                 'host': self.addr[0],
@@ -113,6 +113,7 @@ class SSHServer(paramiko.ServerInterface):
             })
             return paramiko.AUTH_SUCCESSFUL
         else:
+            self.client.close()
             logger.info('Authentication password failed for %(username)s from %(host)s port %(port)s ' % {
                 'username': username,
                 'host': self.addr[0],
@@ -235,7 +236,6 @@ class JumpServer:
     def __init__(self):
         self.listen_host = '0.0.0.0'
         self.listen_port = 2222
-        self.sock = None
 
     def display_navigation(self, username, client_channel):
         nav = Navigation(username, client_channel)
@@ -262,12 +262,12 @@ class JumpServer:
         client_channel = transport.accept(20)
         self.__class__.client_channel_pools.append(client_channel)
         if client_channel is None:
-            logger.warning('No channel get.')
-            raise SSHServerException('No channel get.')
+            logger.warning('No ssh channel get.')
+            client.close()
+            sys.exit(404)
 
         if not ssh_server.event.is_set():
             logger.warning('Client never asked for a shell.')
-            raise SSHServerException('Client never asked for a shell.')
         return client_channel
 
     def get_backend_channel(self, host, port, username, term='xterm', width=80, height=24):
@@ -345,7 +345,7 @@ class JumpServer:
             sys.exit(100)
 
     def listen(self):
-        self.sock = sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.bind((self.listen_host, self.listen_port))
         sock.listen(5)
@@ -357,7 +357,7 @@ class JumpServer:
 
         while True:
             try:
-                client, addr = self.sock.accept()
+                client, addr = sock.accept()
                 process = Process(target=self.handle_ssh_request, args=(client, addr))
                 process.daemon = True
                 process.start()
