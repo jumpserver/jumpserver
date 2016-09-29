@@ -92,6 +92,16 @@ class GroupEditApi(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserGroup.objects.all()
     serializer_class = GroupEditSerializer
 
+    def perform_update(self, serializer):
+        partial = serializer.validated_data.get('partial', False)
+        users = serializer.validated_data.get('users')
+        if partial and users:
+            group = self.get_object()
+            group.users.add(users)
+            group.save()
+            return
+        return super(GroupEditApi, self).perform_update(serializer)
+
 
 class UserBulkUpdateApi(ListBulkCreateUpdateDestroyAPIView):
     queryset = User.objects.all()

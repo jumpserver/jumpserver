@@ -184,6 +184,8 @@ $(document).on('click', '.btn_remove', function(){
     };
     console.log(body);
     $('#select_user_modal').modal('hide');
+    var the_url = "{% url 'users:user-group-edit-api' pk=object.id %}";
+    APIUpdateAttr({url: the_url, body: JSON.stringify(body)});
 })
 </script>
 {% endblock %}
