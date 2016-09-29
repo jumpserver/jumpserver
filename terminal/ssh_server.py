@@ -293,6 +293,9 @@ class JumpServer:
                 print(dir(client))
                 return
 
+            input_data = []
+            output_data = []
+            id_ = 0
             while True:
                 r, w, x = select.select([client_channel, backend_channel], [], [])
 
@@ -307,8 +310,9 @@ class JumpServer:
                             'username': client_channel.username,
                         })
                         break
-                    print('CC: ' + repr(client_data))
                     backend_channel.send(client_data)
+                    input_data.append('%s: %s' % (id_, client_data[:5]))
+                    id_ += 1
 
                 if backend_channel in r:
                     backend_data = backend_channel.recv(1024)
@@ -320,8 +324,10 @@ class JumpServer:
                             'username': backend_channel.username,
                         })
                         break
-                    print('SS: ' + repr(backend_data))
                     client_channel.send(backend_data)
+                    output_data.append('%s: %s' % (id_-1, backend_data[:5]))
+                print('in: %s' % input_data)
+                print('out: %s' % output_data)
 
                     # if len(recv_data) > 20:
                     #     server_data.append('...')
