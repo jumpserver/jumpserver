@@ -12,17 +12,20 @@
     <script src="{% static "js/plugins/dataTables/dataTables.min.js" %}"></script>
     <style>
 .user_div {
-    background-color: #d1dade;
     color: #5e5e5e;
     font-family: "Open Sans";
     padding: 3px 8px;
     text-shadow: none;
 }
+.user_div .ui_container {
+    background-color: #d1dade;
+    width: 100%;
+}
+.user_div a {
+    color: #5e5e5e;
+}
 .user_div .remove {
     color: #fff;
-}
-.user_div span {
-    color: #5e5e5e;
 }
 dl {
   width: 100%;
@@ -99,7 +102,7 @@ dd {
                                             <dt>{% trans 'Users' %}:</dt>
                                             <dd style="line-height: 2" id="group_user_container">
                                             {% for user in object.users.all %}
-                                            <div class="col-sm-4 user_div"><div class="col-xs-9"><a href="{{ user.get_absolute_url }}"><span>{{ user.name }}</span></a></div><div class="col-xs-3"><a data-uid="{{ user.id }}" class="btn_remove m-l-5"><i class="remove fa fa-times-circle"></i></a></div></div>
+                                            <div class="col-sm-4 user_div"><div class="ui_container row"><div class="col-xs-9"><a href="{{ user.get_absolute_url }}" title="{{ user.name }}" data-toggle="tooltip">{{ user.name|truncatechars:15 }}</a></div><div class="col-xs-3"><a data-uid="{{ user.id }}" class="btn_remove m-l-5"><i class="remove fa fa-times-circle"></i></a></div></div></div>
                                             {% endfor %}
                                             </dd>
                                         </dl>
@@ -189,6 +192,10 @@ $(document).on('click', '.btn_remove', function(){
                     $(td).html('<i class="fa fa-check text-navy"></i>')
                 }
              }},
+            {targets: 4, createdCell: function (td, cellData) {
+                var innerHtml = cellData.length > 8 ? cellData.substring(0, 8) + '...': cellData;
+                $(td).html('<a href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</a>');
+             }}
         ],
         ajax_url: '{% url "users:user-bulk-update-api" %}',
         columns: [{data: function(){return ""}}, {data: "username" }, {data: "name" }, {data: "get_role_display" }, {data: "group_display" },
@@ -203,7 +210,6 @@ $(document).on('click', '.btn_remove', function(){
         plain_id_list.push(this.data().id);
         selected_users.push({id: this.data().id, name: this.data().name});
     });
-    console.log(selected_users)
     if (plain_id_list === []) {
         return false;
     };
@@ -218,13 +224,15 @@ $(document).on('click', '.btn_remove', function(){
         var html = "";
         $.each(selected_users, function(index, user) {
             html += [
-                '<div class="col-sm-4 user_div"><div class="col-xs-9"><a href="',
-                '{% url "users:user-detail" pk=99991937 %}'.replace(99991937, user.id),
-                '"><span>',
+                '<div class="col-sm-4 user_div"><div class="ui_container row"><div class="col-xs-9"><a title="',
                 user.name,
-                '</span></a></div><div class="col-xs-3"><a data-uid="',
+                '" data-toggle="tooltip" href="',
+                '{% url "users:user-detail" pk=99991937 %}'.replace(99991937, user.id),
+                '">',
+                user.name.length >=13 ? user.name.substring(0, 12) + '...' : user.name,
+                '</a></div><div class="col-xs-3"><a data-uid="',
                 user.id,
-                '" class="btn_remove m-l-5"><i class="remove fa fa-times-circle"></i></a></div></div>\n',
+                '" class="btn_remove m-l-5"><i class="remove fa fa-times-circle"></i></a></div></div></div>\n',
             ].join("");
         });
         $(html).appendTo($('#group_user_container'));

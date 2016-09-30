@@ -79,7 +79,7 @@ th a {
 }
 
 table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
-    background-color: #1ab394;
+    background-color: #1ab394 !important;
 }
 table.dataTable tbody tr.selected a,
 table.dataTable tbody th.selected a,
@@ -88,7 +88,7 @@ table.dataTable tbody tr.selected td i.text-navy,
 table.dataTable tbody th.selected td i.text-navy,
 table.dataTable tbody td.selected td i.text-navy
 {
-    color: white;
+    color: white !important;
 }
 
 .m-0 {

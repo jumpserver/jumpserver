@@ -8,12 +8,12 @@
 <script src="{% static "js/inspinia.js" %}"></script>
 <script src="{% static "js/jumpserver.js" %}"></script>
 <script>
-    activeNav();
-    $(document).ready(function(){
-        setAjaxCSRFToken();
-
-        // Set textarea rows five
-        $('textarea').attr('rows', 5);
-    });
-
+activeNav();
+$(document).ready(function(){
+    setAjaxCSRFToken();
+    $('textarea').attr('rows', 5);
+    if ($('.tooltip')[0]) {
+        $('.tooltip').tooltip();
+    }
+});
 </script>
