@@ -2,6 +2,19 @@
 {% load i18n static %}
 {% get_current_language as LANGUAGE_CODE %}
 {% load common_tags %}
+{% block custom_head_css_js %}
+{{ block.super }}
+<style>
+div.dataTables_wrapper div.dataTables_filter,
+.dataTables_length {
+    float: right !important;
+}
+
+div.dataTables_wrapper div.dataTables_filter {
+  margin-left: 15px;
+}
+</style>
+{% endblock %}
 {% block table_search %}{% endblock %}
 {% block table_container %}
 <div class="uc pull-left"><a href="{% url "users:user-create" %}" class="btn btn-sm btn-primary"> {% trans "Create user" %} </a></div>
@@ -43,7 +56,6 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-jumpserver.checked = false;
 $(document).ready(function(){
     var options = {
         ele: $('#user_list_table'),
@@ -169,16 +181,6 @@ $(document).ready(function(){
     }, function() {
         doDelete();
     });
-}).on('click', '.ipt_check_all', function(){
-    if (!jumpserver.checked) {
-        $(this).closest('table').find('.ipt_check').prop('checked', true);
-        jumpserver.checked = true;
-        $('#user_list_table').DataTable().rows().select();
-    } else {
-        $(this).closest('table').find('.ipt_check').prop('checked', false);
-        jumpserver.checked = false;
-        $('#user_list_table').DataTable().rows().deselect();
-    }
 }).on('click', '#btn_user_bulk_update', function(){
     var json_data = $('#fm_user_bulk_update').serializeObject();
     var body = {};

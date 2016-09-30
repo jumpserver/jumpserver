@@ -65,7 +65,7 @@ $(document).on('click', '.btn_delete_user_group', function(){
     var $this = $(this);
     function doDelete() {
         var group_id = $this.data('gid');
-        var the_url = "{% url 'users:user-group-delete-api' 99991937 %}".replace('99991937', group_id);
+        var the_url = "{% url 'users:user-group-edit-api' 99991937 %}".replace('99991937', group_id);
         var body = {};
         var success = function() {
             var msg = "{% trans 'Group Deleted.' %}";

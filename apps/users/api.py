@@ -9,7 +9,7 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 
-from .serializers import UserSerializer, UserGroupSerializer, UserAttributeSerializer, UserGroupEditSerializer, \
+from .serializers import UserSerializer, UserGroupSerializer, UserAttributeSerializer, GroupUserEditSerializer, \
     GroupEditSerializer, UserPKUpdateSerializer, UserBulkUpdateSerializer
 from .models import User, UserGroup
 
@@ -46,14 +46,14 @@ class UserAttributeApi(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserAttributeSerializer
 
 
-class UserGroupEditApi(generics.RetrieveUpdateAPIView):
+class GroupUserEditApi(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserGroupEditSerializer
+    serializer_class = GroupUserEditSerializer
 
 
 class UserResetPasswordApi(generics.UpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserGroupEditSerializer
+    serializer_class = GroupUserEditSerializer
 
     def perform_update(self, serializer):
         # Note: we are not updating the user object here.
@@ -68,7 +68,7 @@ class UserResetPasswordApi(generics.UpdateAPIView):
 
 class UserResetPKApi(generics.UpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserGroupEditSerializer
+    serializer_class = GroupUserEditSerializer
 
     def perform_update(self, serializer):
         user = self.get_object()
@@ -88,9 +88,21 @@ class UserUpdatePKApi(generics.UpdateAPIView):
         user.save()
 
 
-class GroupDeleteApi(generics.DestroyAPIView):
+class GroupEditApi(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserGroup.objects.all()
     serializer_class = GroupEditSerializer
+
+    def perform_update(self, serializer):
+        users = serializer.validated_data.get('users')
+        if users:
+            group = self.get_object()
+            # Note: use `list` method to force hitting the db.
+            group_users = list(group.users.all())
+            serializer.save()
+            group.users.set(users + group_users)
+            group.save()
+            return
+        serializer.save()
 
 
 class UserBulkUpdateApi(ListBulkCreateUpdateDestroyAPIView):
