@@ -17,7 +17,8 @@ div.dataTables_wrapper div.dataTables_filter {
 {% endblock %}
 {% block table_search %}{% endblock %}
 {% block table_container %}
-<div class="uc pull-left"><a href="{% url "users:user-create" %}" class="btn btn-sm btn-primary"> {% trans "Create user" %} </a></div>
+<div class="uc pull-left"><a href="javascript:void(0);" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#user_import_modal"> {% trans "Import user" %} </a></div>
+<div class="uc pull-left m-l-5 m-r-5"><a href="{% url "users:user-create" %}" class="btn btn-sm btn-primary"> {% trans "Create user" %} </a></div>
 <table class="table table-striped table-bordered table-hover " id="user_list_table" >
     <thead>
         <tr>
@@ -51,10 +52,12 @@ div.dataTables_wrapper div.dataTables_filter {
     </div>
 </div>
 {% include "users/_user_bulk_update_modal.html" %}
+{% include "users/_user_import_modal.html" %}
 {% endblock %}
 {% block content_bottom_left %}
 {% endblock %}
 {% block custom_foot_js %}
+<script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script>
 $(document).ready(function(){
     var options = {
@@ -219,6 +222,23 @@ $(document).ready(function(){
     }
     APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(post_list), success: success});
     $('#user_bulk_update_modal').modal('hide');
+}).on('click', '#btn_user_import', function() {
+    var $form = $('#fm_user_import');
+    $form.find('.help-block').remove();
+    function success (data) {
+        if (data.success === false) {
+            var $help = $form.find('.help-block');
+            $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_excel'));
+        } else {
+            $('#user_import_modal').modal('hide');
+            var $data_table = $('#user_list_table').DataTable();
+            toastr.success("{% trans 'Import User Success.' %}")
+            $data_table.ajax.reload();
+        }
+    }
+    $form.ajaxSubmit({success: success});
+}).on('change', '#id_excel', function() {
+    $(this).siblings('.help-block').remove();
 })
 </script>
 {% endblock %}

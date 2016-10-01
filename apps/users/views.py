@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 
+from django import forms
 from django.conf import settings
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -23,10 +24,11 @@ from django.views.generic.detail import DetailView
 
 from formtools.wizard.views import SessionWizardView
 
+from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none, get_logger
 from .models import User, UserGroup
 from .forms import UserCreateForm, UserUpdateForm, UserGroupForm, UserLoginForm, UserInfoForm, UserKeyForm, \
-    UserPrivateAssetPermissionForm
+    UserPrivateAssetPermissionForm, UserBulkImportForm
 from .utils import AdminUserRequiredMixin, user_add_success_next, send_reset_password_mail
 from .hands import AssetPermission, get_user_granted_asset_groups, get_user_granted_assets
 
@@ -443,3 +445,66 @@ class UserGrantedAssetView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
         }
         kwargs.update(context)
         return super(UserGrantedAssetView, self).get_context_data(**kwargs)
+
+
+class FileForm(forms.Form):
+    excel = forms.FileField()
+
+
+class BulkImportUserView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
+    form_class = FileForm
+
+    def form_invalid(self, form):
+        try:
+            error = form.errors.values()[-1][-1]
+        except Exception as e:
+            print e
+            error = _('Invalid file.')
+        data = {
+            'success': False,
+            'msg': error
+        }
+        return self.render_json_response(data)
+
+    def form_valid(self, form):
+        from openpyxl import load_workbook
+        try:
+            wb = load_workbook(form.cleaned_data['excel'])
+            ws = wb['users']
+        except Exception as e:
+            print e
+            error = _('Not a valid Excel file.')
+            data = {
+                'success': False,
+                'msg': error
+            }
+            return self.render_json_response(data)
+
+        errors = []
+        for index, row in enumerate(ws.rows):
+            user_data = [cell.value for cell in row]
+            if len(user_data) != 4:
+                errors.append("Row {}: invalid user data format.".format(index))
+                continue
+            username, email, enable_otp, role = user_data
+            data = {
+                'username': username,
+                'email': email,
+                'enable_otp': True if enable_otp in ['T', '1', 1, True] else False,
+                'role': role
+            }
+            form = UserBulkImportForm(data, auto_id=False)
+            if form.is_valid():
+                form.save()
+            else:
+                form_errors = form.errors.as_data()
+                for key, err_list in form_errors.iteritems():
+                    error_line = "{} :".format(key)
+                    for errs in err_list:
+                        error_line = "{}{}".format(error_line, ";".join([err for err in errs.messages]))
+                    errors.append("Row {}: {}".format(index, error_line))
+        data = {
+            'success': True if not errors else False,
+            'msg': 'ok' if not errors else '<br />'.join(errors)
+        }
+        return self.render_json_response(data)
