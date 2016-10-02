@@ -5,8 +5,23 @@
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
     <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/dataTables/dataTables.min.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" %}" rel="stylesheet">
     <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
     <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+    <script src="{% static "js/plugins/dataTables/dataTables.min.js" %}"></script>
+    <style>
+.label {
+    font-size: 14px;
+    line-height: 2.5;
+}
+.label .remove {
+    color: #fff;
+}
+.label span {
+    color: #5e5e5e;
+}
+    </style>
 {% endblock %}
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -46,8 +61,16 @@
                                             <td><b>{{ object.comment }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Created at:' %}:</td>
+                                            <td>{% trans 'Created at' %}:</td>
                                             <td><b>{{ object.date_created }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Users' %}:</td>
+                                            <td style="line-height: 2">
+                                            {% for user in object.users.all %}
+                                            <span class="label m-l-xs"><a href="{{ user.get_absolute_url }}"><span>{{ user.name }}</span></a><a data-uid="{{ user.id }}" class="btn_remove"><i class="remove fa fa-times-circle"></i></a></span>
+                                            {% endfor %}
+                                            </td>
                                         </tr>
                                     </table>
                                 </div>
@@ -61,43 +84,22 @@
                                 <div class="panel-body">
                                     <table class="table">
                                         <tbody>
-                                        <tr class="no-borders-tr">
-                                          <td width="50%">{% trans 'Active' %}:</td>
-                                            <td><span class="pull-right">
-                                                <div class="switch">
-                                                    <div class="onoffswitch">
-                                                        <input type="checkbox" {% if user_object.is_active %} checked {% endif %}  class="onoffswitch-checkbox" id="is_active">
-                                                        <label class="onoffswitch-label" for="is_active">
-                                                            <span class="onoffswitch-inner"></span>
-                                                            <span class="onoffswitch-switch"></span>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </span></td>
-                                        </tr>
-                                        <tr>
-                                          <td>{% trans 'Enable OTP' %}:</td>
-                                            <td><span class="pull-right">
-                                                <div class="switch">
-                                                    <div class="onoffswitch">
-                                                        <input type="checkbox" class="onoffswitch-checkbox" {% if user_object.enable_otp %} checked {% endif %}
-                                                               id="enable_otp">
-                                                        <label class="onoffswitch-label" for="enable_otp">
-                                                            <span class="onoffswitch-inner"></span>
-                                                            <span class="onoffswitch-switch"></span>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </span></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Reset password' %}:</td>
-                                            <td>
-                                                <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_password" style="width: 54px">{% trans 'Reset' %}</button>
-                                                </span>
-                                            </td>
-                                        </tr>
+                                            <tr>
+                                                <td>{% trans 'Add User' %}:</td>
+                                                <td>
+                                                    <span class="pull-right">
+                                                        <button type="button" class="btn btn-primary btn-xs" id="btn_group_add_user" style="width: 54px" data-toggle="modal" data-target="#select_user_modal">{% trans 'Add' %}</button>
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>{% trans 'Delete' %}:</td>
+                                                <td>
+                                                    <span class="pull-right">
+                                                        <button type="button" class="btn btn-danger btn-xs" id="btn_group_delete" style="width: 54px">{% trans 'Delete' %}</button>
+                                                    </span>
+                                                </td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -108,4 +110,80 @@
             </div>
         </div>
     </div>
+    {% include "users/_select_user_modal.html" %}
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+$(document).on('click', '.btn_remove', function(){
+    var $this = $(this);
+    var uid = $this.data('uid');
+    var the_url = '{% url "users:delete-user-from-group-api" pk=object.id uid=99991937 %}'.replace('99991937', uid);
+    var success = function(){
+        $this.closest('.label').remove();
+    };
+    var error = function(){};
+    APIUpdateAttr({url: the_url, body: "{}", method: "DELETE", success: success, error: error});
+    return false;
+}).on('click', '#btn_group_delete', function() {
+    function doDelete() {
+        var the_url = '{% url "users:user-group-detail-api" pk=object.id %}';
+        var success = function() {
+            window.location.href = '{% url "users:user-group-list" %}';
+        };
+        APIUpdateAttr({url: the_url, body: "{}", method: "DELETE", success: success});
+    }
+    swal({
+        title: "{% trans 'Are you sure?' %}",
+        text: "{% trans 'This will delete the current group, but will not delete any user of it.' %}",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: "{% trans 'Confirm' %}",
+        closeOnConfirm: false
+    }, function() {
+        doDelete();
+    });
+}).on('shown.bs.modal', '#select_user_modal', function() {
+    if ($.fn.dataTable.isDataTable('#select_user_table')) {
+        return true;
+    }
+    var options = {
+        ele: $('#select_user_table'),
+        pageLength: 10,
+        buttons: [],
+        columnDefs: [
+            {targets: 6, createdCell: function (td, cellData) {
+                if (!cellData) {
+                    $(td).html('<i class="fa fa-times text-danger"></i>')
+                } else {
+                    $(td).html('<i class="fa fa-check text-navy"></i>')
+                }
+             }},
+        ],
+        ajax_url: '{% url "users:user-bulk-update-api" %}',
+        columns: [{data: function(){return ""}}, {data: "username" }, {data: "name" }, {data: "get_role_display" }, {data: "group_display" },
+                  {data: function(){return 999}}, {data: "active_display" }],
+    };
+    jumpserver.initDataTable(options);
+}).on('click', '#btn_select_user', function() {
+    var $data_table = $('#select_user_table').DataTable();
+    var id_list = [];
+    var plain_id_list = [];
+    $data_table.rows({selected: true}).every(function(){
+        id_list.push({id: this.data().id});
+        plain_id_list.push(this.data().id);
+    });
+    if (id_list === []) {
+        return false;
+    };
+    console.log(id_list);
+    console.log(plain_id_list);
+    var body = {
+        id: {{ object.id }},
+        users: plain_id_list.map(Number)
+    };
+    console.log(body);
+    $('#select_user_modal').modal('hide');
+})
+</script>
 {% endblock %}

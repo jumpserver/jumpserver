@@ -1,6 +1,6 @@
 {% load i18n %}
-<div aria-hidden="true" role="dialog" tabindex="-1" id="{% block modal_id %}{% endblock %}" class="modal inmodal" style="display: none;">
-    <div class="modal-dialog">
+<div aria-hidden="true" role="dialog" id="{% block modal_id %}{% endblock %}" class="modal inmodal">
+    <div class="modal-dialog {% block modal_class %}{% endblock %}">
         <div class="modal-content animated fadeIn">
             <div class="modal-header">
                 <button data-dismiss="modal" class="close" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>

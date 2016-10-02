@@ -3,10 +3,13 @@
 
 import logging
 
-from rest_framework import generics
+from django.shortcuts import get_object_or_404
+
+from rest_framework import generics, status
+from rest_framework.response import Response
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 
-from .serializers import UserSerializer, UserGroupSerializer, UserAttributeSerializer, UserGroupEditSerializer, \
+from .serializers import UserSerializer, UserGroupSerializer, UserAttributeSerializer, GroupUserEditSerializer, \
     GroupEditSerializer, UserPKUpdateSerializer, UserBulkUpdateSerializer
 from .models import User, UserGroup
 
@@ -27,11 +30,6 @@ class UserDetailDeleteUpdateApi(generics.RetrieveUpdateDestroyAPIView):
         print(self.request.data)
         return super(UserDetailDeleteUpdateApi, self).delete(request, *args, **kwargs)
 
-    # def get(self, request, *args, **kwargs):
-    #     print("hello world")
-    #     print(request.user)
-    #     return super(UserDetailDeleteUpdateApi, self).get(request, *args, **kwargs)
-
 
 class UserGroupListAddApi(generics.ListCreateAPIView):
     queryset = UserGroup.objects.all()
@@ -48,14 +46,14 @@ class UserAttributeApi(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserAttributeSerializer
 
 
-class UserGroupEditApi(generics.RetrieveUpdateAPIView):
+class GroupUserEditApi(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserGroupEditSerializer
+    serializer_class = GroupUserEditSerializer
 
 
 class UserResetPasswordApi(generics.UpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserGroupEditSerializer
+    serializer_class = GroupUserEditSerializer
 
     def perform_update(self, serializer):
         # Note: we are not updating the user object here.
@@ -70,7 +68,7 @@ class UserResetPasswordApi(generics.UpdateAPIView):
 
 class UserResetPKApi(generics.UpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserGroupEditSerializer
+    serializer_class = GroupUserEditSerializer
 
     def perform_update(self, serializer):
         user = self.get_object()
@@ -90,7 +88,7 @@ class UserUpdatePKApi(generics.UpdateAPIView):
         user.save()
 
 
-class GroupDeleteApi(generics.DestroyAPIView):
+class GroupEditApi(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserGroup.objects.all()
     serializer_class = GroupEditSerializer
 
@@ -111,3 +109,18 @@ class UserBulkUpdateApi(ListBulkCreateUpdateDestroyAPIView):
             if isinstance(ids, list):
                 queryset = queryset.filter(id__in=ids)
         return queryset
+
+
+class DeleteUserFromGroupApi(generics.DestroyAPIView):
+    queryset = UserGroup.objects.all()
+    serializer_class = GroupEditSerializer
+
+    def destroy(self, request, *args, **kwargs):
+        group = self.get_object()
+        self.perform_destroy(group, **kwargs)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def perform_destroy(self, instance, **kwargs):
+        user_id = kwargs.get('uid')
+        user = get_object_or_404(User, id=user_id)
+        instance.users.remove(user)

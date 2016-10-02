@@ -7,7 +7,6 @@ from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.files.storage import default_storage
-from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
@@ -80,27 +79,12 @@ class UserLogoutView(TemplateView):
         return super(UserLogoutView, self).get_context_data(**kwargs)
 
 
-class UserListView(AdminUserRequiredMixin, ListView):
-    model = User
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    context_object_name = 'user_list'
-    template_name = 'users/asset_permission_list.html'
-    ordering = '-date_joined'
-
-    def get_queryset(self):
-        self.queryset = super(UserListView, self).get_queryset()
-        self.keyword = keyword = self.request.GET.get('keyword', '')
-        self.sort = sort = self.request.GET.get('sort')
-        if keyword:
-            self.queryset = self.queryset.filter(Q(username__icontains=keyword) |
-                                                 Q(name__icontains=keyword))
-        if sort:
-            self.queryset = self.queryset.order_by(sort)
-        return self.queryset
+class UserListView(AdminUserRequiredMixin, TemplateView):
+    template_name = 'users/user_list.html'
 
     def get_context_data(self, **kwargs):
         context = super(UserListView, self).get_context_data(**kwargs)
-        context.update({'app': _('Users'), 'action': _('User list'), 'keyword': self.keyword})
+        context.update({'app': _('Users'), 'action': _('User list'), 'groups': UserGroup.objects.all()})
         return context
 
 
@@ -151,26 +135,6 @@ class UserUpdateView(AdminUserRequiredMixin, UpdateView):
         context = super(UserUpdateView, self).get_context_data(**kwargs)
         context.update({'app': _('Users'), 'action': _('Update user')})
         return context
-
-
-class UserDeleteView(AdminUserRequiredMixin, DeleteView):
-    model = User
-    success_url = reverse_lazy('users:user-list')
-    template_name = 'users/user_delete_confirm.html'
-
-    def delete(self, request, *args, **kwargs):
-        """
-        Calls the delete() method on the fetched object and then
-        redirects to the success URL.
-        """
-        self.object = self.get_object()
-        success_url = self.get_success_url()
-        if self.object.name == "admin" or self.object.id == request.session.get('_auth_user_id'):
-            pass
-        else:
-            self.object.delete()
-
-        return HttpResponseRedirect(success_url)
 
 
 class UserDetailView(AdminUserRequiredMixin, DetailView):

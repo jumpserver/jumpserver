@@ -31,7 +31,7 @@ class GroupEditSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserGroup
-        fields = ['id', 'name', 'comment', 'date_created', 'created_by']
+        fields = ['id', 'name', 'comment', 'date_created', 'created_by', 'users']
 
 
 class UserAttributeSerializer(serializers.ModelSerializer):
@@ -41,7 +41,7 @@ class UserAttributeSerializer(serializers.ModelSerializer):
         fields = ['avatar', 'wechat', 'phone', 'enable_otp', 'comment', 'is_active', 'name']
 
 
-class UserGroupEditSerializer(serializers.ModelSerializer):
+class GroupUserEditSerializer(serializers.ModelSerializer):
     groups = serializers.PrimaryKeyRelatedField(many=True, queryset=UserGroup.objects.all())
 
     class Meta:
@@ -73,6 +73,7 @@ class UserPKUpdateSerializer(serializers.ModelSerializer):
 class UserBulkUpdateSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     group_display = serializers.SerializerMethodField()
     active_display = serializers.SerializerMethodField()
+    groups = serializers.PrimaryKeyRelatedField(many=True, queryset=UserGroup.objects.all())
 
     class Meta(object):
         model = User
