@@ -207,6 +207,83 @@ class Navigation:
         pass
 
 
+class ProxyChannel:
+    ENTER_CHAR = ['\r', '\n', '\r\n']
+    input_data = []
+    output_data = []
+
+    def __init__(self, client_channel, backend_channel, client_addr):
+        self.client_channel = client_channel
+        self.backend_channel = backend_channel
+        self.client_addr = client_addr
+        self.in_input_mode = True
+
+    def stream_flow(self, input_=None, output_=None):
+        if input_:
+            self.in_input_mode = True
+            if input_ in ['\r', '\n', '\r\n']:
+                self.in_input_mode = False
+
+        if output_:
+            print(''.join(self.__class__.output_data))
+            if not self.in_input_mode:
+                command = ''.join(self.__class__.output_data)
+                del self.__class__.output_data
+                self.__class__.output_data = []
+            self.__class__.output_data.append(output_)
+
+    def proxy(self):
+        client_channel = self.client_channel
+        backend_channel = self.backend_channel
+        client_addr = self.client_addr
+
+        while True:
+            r, w, x = select.select([client_channel, backend_channel], [], [])
+
+            if client_channel.change_window_size_event.is_set():
+                backend_channel.resize_pty(width=client_channel.width, height=client_channel.height)
+
+            if client_channel in r:
+                self.in_input_mode = True
+                client_data = client_channel.recv(1024)
+
+                if client_data in self.__class__.ENTER_CHAR:
+                    self.in_input_mode = False
+                    command = ''.join(self.__class__.output_data)
+                    print('########### command ##########')
+                    print(command)
+                    print('########### end command ##########')
+                    del self.__class__.output_data
+                    self.__class__.output_data = []
+                    backend_channel.send(client_data)
+                    output = ''.join(self.__class__.output_data)
+                    print('>>>>>>>>>>> output <<<<<<<<<<')
+                    print(output)
+                    print('>>>>>>>>>>> end output <<<<<<<<<<')
+                    continue
+
+                if len(client_data) == 0:
+                    logger.info('Logout from ssh server %(host)s: %(username)s' % {
+                        'host': client_addr[0],
+                        'username': client_channel.username,
+                    })
+                    break
+                backend_channel.send(client_data)
+
+            if backend_channel in r:
+                backend_data = backend_channel.recv(1024)
+                if len(backend_data) == 0:
+                    client_channel.send('Disconnect from %s \r\n' % backend_channel.host)
+                    client_channel.close()
+                    logger.info('Logout from backend server %(host)s: %(username)s' % {
+                        'host': backend_channel.host,
+                        'username': backend_channel.username,
+                    })
+                    break
+                self.__class__.output_data.append(backend_data)
+                client_channel.send(backend_data)
+
+
 class JumpServer:
     backend_server_pools = []
     backend_channel_pools = []
@@ -223,7 +300,7 @@ class JumpServer:
     def display_navigation(self, username, client_channel):
         nav = Navigation(username, client_channel)
         nav.display()
-        return '127.0.0.1', 22, 'root'
+        return 'j', 22, 'root'
 
     def get_client_channel(self, client, addr):
         transport = paramiko.Transport(client, gss_kex=False)
@@ -269,6 +346,9 @@ class JumpServer:
 
         return backend_channel
 
+    def command_flow(self, input_=None, output_=None):
+        pass
+
     def handle_ssh_request(self, client, addr):
         logger.info("Get ssh request from %(host)s:%(port)s" % {
             'host': addr[0],
@@ -289,58 +369,10 @@ class JumpServer:
                 client.shutdown()
                 client.close()
                 client.send('Close')
-                print(client)
-                print(dir(client))
                 return
 
-            input_data = []
-            output_data = []
-            id_ = 0
-            while True:
-                r, w, x = select.select([client_channel, backend_channel], [], [])
-
-                if client_channel.change_window_size_event.is_set():
-                    backend_channel.resize_pty(width=client_channel.width, height=client_channel.height)
-
-                if client_channel in r:
-                    client_data = client_channel.recv(1024)
-                    if len(client_data) == 0:
-                        logger.info('Logout from ssh server %(host)s: %(username)s' % {
-                            'host': addr[0],
-                            'username': client_channel.username,
-                        })
-                        break
-                    backend_channel.send(client_data)
-                    input_data.append('%s: %s' % (id_, client_data[:5]))
-                    id_ += 1
-
-                if backend_channel in r:
-                    backend_data = backend_channel.recv(1024)
-                    if len(backend_data) == 0:
-                        client_channel.send('Disconnect from %s \r\n' % backend_channel.host)
-                        client_channel.close()
-                        logger.info('Logout from backend server %(host)s: %(username)s' % {
-                            'host': backend_channel.host,
-                            'username': backend_channel.username,
-                        })
-                        break
-                    client_channel.send(backend_data)
-                    output_data.append('%s: %s' % (id_-1, backend_data[:5]))
-                print('in: %s' % input_data)
-                print('out: %s' % output_data)
-
-                    # if len(recv_data) > 20:
-                    #     server_data.append('...')
-                    # else:
-                    #     server_data.append(recv_data)
-                #     try:
-                #         if repr(server_data[-2]) == u'\r\n':
-                #             result = server_data.pop()
-                #             server_data.pop()
-                #             command = ''.join(server_data)
-                #             server_data = []
-                #     except IndexError:
-                #         pass
+            proxy_channel = ProxyChannel(client_channel, backend_channel, addr)
+            proxy_channel.proxy()
 
         # Todo: catch other exception
         except IndexError:
