@@ -151,27 +151,12 @@ class UserDetailView(AdminUserRequiredMixin, DetailView):
         return super(UserDetailView, self).get_context_data(**kwargs)
 
 
-class UserGroupListView(AdminUserRequiredMixin, ListView):
-    model = UserGroup
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    context_object_name = 'user_group_list'
+class UserGroupListView(AdminUserRequiredMixin, TemplateView):
     template_name = 'users/user_group_list.html'
-    ordering = '-date_created'
-
-    def get_queryset(self):
-        self.queryset = super(UserGroupListView, self).get_queryset()
-        self.keyword = keyword = self.request.GET.get('keyword', '')
-        self.sort = sort = self.request.GET.get('sort')
-        if keyword:
-            self.queryset = self.queryset.filter(name__icontains=keyword)
-
-        if sort:
-            self.queryset = self.queryset.order_by(sort)
-        return self.queryset
 
     def get_context_data(self, **kwargs):
         context = super(UserGroupListView, self).get_context_data(**kwargs)
-        context.update({'app': _('Users'), 'action': _('User group list'), 'keyword': self.keyword})
+        context.update({'app': _('Users'), 'action': _('User group list')})
         return context
 
 

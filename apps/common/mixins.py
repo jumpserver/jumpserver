@@ -45,3 +45,19 @@ class JSONResponseMixin(object):
 
     def render_json_response(self, context):
         return JsonResponse(context)
+
+
+class BulkDeleteApiMixin(object):
+
+    def filter_queryset(self, queryset):
+        id_list = self.request.query_params.get('id__in')
+        if id_list:
+            import json
+            try:
+                ids = json.loads(id_list)
+            except Exception as e:
+                print e
+                return queryset
+            if isinstance(ids, list):
+                queryset = queryset.filter(id__in=ids)
+        return queryset

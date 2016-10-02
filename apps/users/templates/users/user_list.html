@@ -1,7 +1,5 @@
 {% extends '_base_list.html' %}
 {% load i18n static %}
-{% get_current_language as LANGUAGE_CODE %}
-{% load common_tags %}
 {% block custom_head_css_js %}
 {{ block.super }}
 <style>
@@ -54,8 +52,7 @@ div.dataTables_wrapper div.dataTables_filter {
 {% include "users/_user_bulk_update_modal.html" %}
 {% include "users/_user_import_modal.html" %}
 {% endblock %}
-{% block content_bottom_left %}
-{% endblock %}
+{% block content_bottom_left %}{% endblock %}
 {% block custom_foot_js %}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script>
