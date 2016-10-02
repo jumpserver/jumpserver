@@ -70,6 +70,10 @@ class Config:
     # EMAIL_USE_TLS = False  # If port is 587, set True
     # EMAIL_SUBJECT_PREFIX = '[Jumpserver] '
 
+    # SSH use password or public key for auth
+    SSH_PASSWORD_AUTH = False
+    SSH_PUBLIC_KEY_AUTH = True
+
     def __init__(self):
         pass
 

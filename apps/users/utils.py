@@ -12,7 +12,8 @@ from django.utils.translation import ugettext as _
 from paramiko.rsakey import RSAKey
 
 from common.tasks import send_mail_async
-from common.utils import reverse
+from common.utils import reverse, get_object_or_none
+from .models import User
 
 
 try:
@@ -147,3 +148,75 @@ def send_reset_ssh_key_mail(user):
         logger.debug(message)
 
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
+
+
+def validate_ssh_pk(text):
+    """
+    Expects a SSH private key as string.
+    Returns a boolean and a error message.
+    If the text is parsed as private key successfully,
+    (True,'') is returned. Otherwise,
+    (False, <message describing the error>) is returned.
+
+    from https://github.com/githubnemo/SSH-private-key-validator/blob/master/validate.py
+
+    """
+
+    if not text:
+        return False, 'No text given'
+
+    startPattern = re.compile("^-----BEGIN [A-Z]+ PRIVATE KEY-----")
+    optionPattern = re.compile("^.+: .+")
+    contentPattern = re.compile("^([a-zA-Z0-9+/]{64}|[a-zA-Z0-9+/]{1,64}[=]{0,2})$")
+    endPattern = re.compile("^-----END [A-Z]+ PRIVATE KEY-----")
+
+    def contentState(text):
+        for i in range(0, len(text)):
+            line = text[i]
+
+            if endPattern.match(line):
+                if i == len(text) - 1 or len(text[i + 1]) == 0:
+                    return True, ''
+                else:
+                    return False, 'At end but content coming'
+
+            elif not contentPattern.match(line):
+                return False, 'Wrong string in content section'
+
+        return False, 'No content or missing end line'
+
+    def optionState(text):
+        for i in range(0, len(text)):
+            line = text[i]
+
+            if line[-1:] == '\\':
+                return optionState(text[i + 2:])
+
+            if not optionPattern.match(line):
+                return contentState(text[i + 1:])
+
+        return False, 'Expected option, found nothing'
+
+    def startState(text):
+        if len(text) == 0 or not startPattern.match(text[0]):
+            return False, 'Header is wrong'
+        return optionState(text[1:])
+
+    return startState([n.strip() for n in text.splitlines()])
+
+
+def check_user_is_valid(**kwargs):
+    password = kwargs.pop('password', None)
+    public_key = kwargs.pop('public_key', None)
+    user = get_object_or_none(User, **kwargs)
+
+    if password and not user.check_password(password):
+        user = None
+
+    if public_key and not user.public_key == public_key:
+        user = None
+
+    if user and user.is_valid:
+        return user
+
+    return None
