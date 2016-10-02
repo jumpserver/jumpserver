@@ -25,7 +25,6 @@ urlpatterns = [
     url(r'^(api/)?users/', include('users.urls')),
     url(r'^assets/', include('assets.urls')),
     url(r'^perms/', include('perms.urls')),
-    url(r'^terminal/', include('terminal.urls')),
 ]
 
 
