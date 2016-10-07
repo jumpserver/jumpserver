@@ -16,3 +16,4 @@ db.sqlite3
 config.py
 migrations/
 *.log
+host_rsa_key

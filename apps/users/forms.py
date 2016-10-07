@@ -34,6 +34,13 @@ class UserCreateForm(forms.ModelForm):
         }
 
 
+class UserBulkImportForm(forms.ModelForm):
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'enable_otp', 'role']
+
+
 class UserUpdateForm(forms.ModelForm):
 
     class Meta:

@@ -13,6 +13,7 @@ wcwidth==0.1.7
 websocket-client==0.37.0
 djangorestframework==3.4.5
 ForgeryPy==0.1
+openpyxl==2.4.0
 paramiko==2.0.2
 celery==3.1.23
 ansible==2.1.1.0
@@ -20,3 +21,6 @@ django-simple-captcha==0.5.2
 django-formtools==1.0
 sshpubkeys==2.2.0
 djangorestframework-bulk==0.2.1
+python-gssapi==0.6.4
+tornado==4.4.2
+

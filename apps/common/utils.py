@@ -30,11 +30,17 @@ def get_object_or_none(model, **kwargs):
 
 
 def encrypt(*args, **kwargs):
-    return signing.dumps(*args, **kwargs)
+    try:
+        return signing.dumps(*args, **kwargs)
+    except signing.BadSignature:
+        return ''
 
 
 def decrypt(*args, **kwargs):
-    return signing.loads(*args, **kwargs)
+    try:
+        return signing.loads(*args, **kwargs)
+    except signing.BadSignature:
+        return ''
 
 
 def date_expired_default():

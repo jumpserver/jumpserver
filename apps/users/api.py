@@ -9,51 +9,28 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 
-from .serializers import UserSerializer, UserGroupSerializer, UserAttributeSerializer, GroupUserEditSerializer, \
-    GroupEditSerializer, UserPKUpdateSerializer, UserBulkUpdateSerializer
 from .models import User, UserGroup
+from .serializers import UserDetailSerializer, UserAndGroupSerializer, \
+    GroupDetailSerializer, UserPKUpdateSerializer, UserBulkUpdateSerializer, GroupBulkUpdateSerializer
+from common.mixins import BulkDeleteApiMixin
 
 
 logger = logging.getLogger('jumpserver.users.api')
 
 
-class UserListAddApi(generics.ListCreateAPIView):
+class UserDetailApi(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserDetailSerializer
 
 
-class UserDetailDeleteUpdateApi(generics.RetrieveUpdateDestroyAPIView):
+class UserAndGroupEditApi(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
-
-    def delete(self, request, *args, **kwargs):
-        print(self.request.data)
-        return super(UserDetailDeleteUpdateApi, self).delete(request, *args, **kwargs)
-
-
-class UserGroupListAddApi(generics.ListCreateAPIView):
-    queryset = UserGroup.objects.all()
-    serializer_class = UserGroupSerializer
-
-
-class UserGroupDetailDeleteUpdateApi(generics.RetrieveUpdateDestroyAPIView):
-    queryset = UserGroup.objects.all()
-    serializer_class = UserGroupSerializer
-
-
-class UserAttributeApi(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserAttributeSerializer
-
-
-class GroupUserEditApi(generics.RetrieveUpdateAPIView):
-    queryset = User.objects.all()
-    serializer_class = GroupUserEditSerializer
+    serializer_class = UserAndGroupSerializer
 
 
 class UserResetPasswordApi(generics.UpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = GroupUserEditSerializer
+    serializer_class = UserDetailSerializer
 
     def perform_update(self, serializer):
         # Note: we are not updating the user object here.
@@ -68,7 +45,7 @@ class UserResetPasswordApi(generics.UpdateAPIView):
 
 class UserResetPKApi(generics.UpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = GroupUserEditSerializer
+    serializer_class = UserDetailSerializer
 
     def perform_update(self, serializer):
         user = self.get_object()
@@ -88,9 +65,9 @@ class UserUpdatePKApi(generics.UpdateAPIView):
         user.save()
 
 
-class GroupEditApi(generics.RetrieveUpdateDestroyAPIView):
+class GroupDetailApi(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserGroup.objects.all()
-    serializer_class = GroupEditSerializer
+    serializer_class = GroupDetailSerializer
 
     def perform_update(self, serializer):
         users = serializer.validated_data.get('users')
@@ -105,27 +82,19 @@ class GroupEditApi(generics.RetrieveUpdateDestroyAPIView):
         serializer.save()
 
 
-class UserBulkUpdateApi(ListBulkCreateUpdateDestroyAPIView):
+class UserListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserBulkUpdateSerializer
 
-    def filter_queryset(self, queryset):
-        id_list = self.request.query_params.get('id__in')
-        if id_list:
-            import json
-            try:
-                ids = json.loads(id_list)
-            except Exception as e:
-                logger.error(str(e))
-                return queryset
-            if isinstance(ids, list):
-                queryset = queryset.filter(id__in=ids)
-        return queryset
+
+class GroupListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):
+    queryset = UserGroup.objects.all()
+    serializer_class = GroupBulkUpdateSerializer
 
 
 class DeleteUserFromGroupApi(generics.DestroyAPIView):
     queryset = UserGroup.objects.all()
-    serializer_class = GroupEditSerializer
+    serializer_class = GroupDetailSerializer
 
     def destroy(self, request, *args, **kwargs):
         group = self.get_object()

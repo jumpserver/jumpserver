@@ -218,7 +218,7 @@ $(document).on('click', '.btn_remove', function(){
         users: plain_id_list.map(Number)
     };
     $('#select_user_modal').modal('hide');
-    var the_url = "{% url 'users:user-group-edit-api' pk=object.id %}";
+    var the_url = "{% url 'users:user-group-detail-api' pk=object.id %}";
     var success = function() {
         toastr.success('{% trans "The selected users has been added to current group." %}');
         var html = "";

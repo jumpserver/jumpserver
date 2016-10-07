@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from django.db import models
+from django.http import JsonResponse
 from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
 
@@ -36,3 +37,27 @@ class NoDeleteModelMixin(models.Model):
         self.is_discard = True
         self.discard_time = now()
         return self.save()
+
+
+class JSONResponseMixin(object):
+
+    """JSON mixin"""
+
+    def render_json_response(self, context):
+        return JsonResponse(context)
+
+
+class BulkDeleteApiMixin(object):
+
+    def filter_queryset(self, queryset):
+        id_list = self.request.query_params.get('id__in')
+        if id_list:
+            import json
+            try:
+                ids = json.loads(id_list)
+            except Exception as e:
+                print e
+                return queryset
+            if isinstance(ids, list):
+                queryset = queryset.filter(id__in=ids)
+        return queryset
