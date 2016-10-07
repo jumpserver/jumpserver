@@ -209,28 +209,53 @@ class Navigation:
 
 class ProxyChannel:
     ENTER_CHAR = ['\r', '\n', '\r\n']
-    input_data = []
     output_data = []
+    command = []
+    output = []
 
     def __init__(self, client_channel, backend_channel, client_addr):
         self.client_channel = client_channel
         self.backend_channel = backend_channel
         self.client_addr = client_addr
         self.in_input_mode = True
+        self.is_first_input = True
+        self.id = 0
 
-    def stream_flow(self, input_=None, output_=None):
-        if input_:
-            self.in_input_mode = True
-            if input_ in ['\r', '\n', '\r\n']:
-                self.in_input_mode = False
+    # def stream_flow(self, input_=None, output_=None):
+    #     if input_:
+    #         self.in_input_mode = True
+    #         if input_ in ['\r', '\n', '\r\n']:
+    #             self.in_input_mode = False
+    #
+    #     if output_:
+    #         print(''.join(self.__class__.output_data))
+    #         if not self.in_input_mode:
+    #             command = ''.join(self.__class__.output_data)
+    #             del self.__class__.output_data
+    #             self.__class__.output_data = []
+    #         self.__class__.output_data.append(output_)
 
-        if output_:
-            print(''.join(self.__class__.output_data))
-            if not self.in_input_mode:
-                command = ''.join(self.__class__.output_data)
-                del self.__class__.output_data
-                self.__class__.output_data = []
-            self.__class__.output_data.append(output_)
+    def get_output(self):
+        if self.in_input_mode is False:
+            self.__class__.output_data.pop()
+            result = ''.join(self.__class__.output_data)
+            self.__class__.output.append(result)
+            print('>>>>>>>>>>> output <<<<<<<<<<')
+            print(result)
+            print('>>>>>>>>>>> end output <<<<<<<<<<')
+            del self.__class__.output_data
+            self.__class__.output_data = []
+
+    def get_command(self, client_data):
+        if client_data in self.__class__.ENTER_CHAR:
+            self.in_input_mode = False
+            command = ''.join(self.__class__.output_data)
+            print('########### command ##########')
+            self.__class__.command.append(command)
+            print(command)
+            print('########### end command ##########')
+            del self.__class__.output_data
+            self.__class__.output_data = []
 
     def proxy(self):
         client_channel = self.client_channel
@@ -243,24 +268,17 @@ class ProxyChannel:
             if client_channel.change_window_size_event.is_set():
                 backend_channel.resize_pty(width=client_channel.width, height=client_channel.height)
 
+            # print(self.__class__.output)
             if client_channel in r:
-                self.in_input_mode = True
-                client_data = client_channel.recv(1024)
+                # Get output of the command
+                self.get_output()
 
-                if client_data in self.__class__.ENTER_CHAR:
-                    self.in_input_mode = False
-                    command = ''.join(self.__class__.output_data)
-                    print('########### command ##########')
-                    print(command)
-                    print('########### end command ##########')
-                    del self.__class__.output_data
-                    self.__class__.output_data = []
-                    backend_channel.send(client_data)
-                    output = ''.join(self.__class__.output_data)
-                    print('>>>>>>>>>>> output <<<<<<<<<<')
-                    print(output)
-                    print('>>>>>>>>>>> end output <<<<<<<<<<')
-                    continue
+                client_data = client_channel.recv(1024)
+                self.in_input_mode = True
+                self.is_first_input = False
+
+                # Get command input
+                self.get_command(client_data)
 
                 if len(client_data) == 0:
                     logger.info('Logout from ssh server %(host)s: %(username)s' % {
@@ -280,7 +298,8 @@ class ProxyChannel:
                         'username': backend_channel.username,
                     })
                     break
-                self.__class__.output_data.append(backend_data)
+                if not self.is_first_input:
+                    self.__class__.output_data.append(backend_data)
                 client_channel.send(backend_data)
 
 
@@ -345,9 +364,6 @@ class JumpServer:
         self.__class__.backend_channel_pools.append(backend_channel)
 
         return backend_channel
-
-    def command_flow(self, input_=None, output_=None):
-        pass
 
     def handle_ssh_request(self, client, addr):
         logger.info("Get ssh request from %(host)s:%(port)s" % {
