@@ -38,6 +38,8 @@ class AssetListView(AdminUserRequiredMixin, ListView):
         context = {
             'app': 'Assets',
             'action': 'Asset list',
+            'tag_list': [(i.id,i.name,i.asset_set.all().count())for i in Tag.objects.all().order_by('name')]
+
         }
         kwargs.update(context)
         return super(AssetListView, self).get_context_data(**kwargs)
@@ -45,6 +47,7 @@ class AssetListView(AdminUserRequiredMixin, ListView):
 
 class AssetCreateView(AdminUserRequiredMixin, CreateView):
     model = Asset
+    tag_type = 'asset'
     form_class = AssetCreateForm
     template_name = 'assets/asset_create.html'
     success_url = reverse_lazy('assets:asset-list')
@@ -53,12 +56,19 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
         print(form.errors)
         return super(AssetCreateView, self).form_invalid(form)
 
+    def form_valid(self, form):
+        tag_name_list = form.cleaned_data['tags']
+        print self.tag_type,tag_name_list
+        return super(AssetCreateView, self).form_valid(form)
+
+
     def get_context_data(self, **kwargs):
         context = {
             'app': 'Assets',
             'action': 'Create asset',
         }
         kwargs.update(context)
+
         return super(AssetCreateView, self).get_context_data(**kwargs)
 
 
@@ -122,6 +132,7 @@ class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
     form_class = AssetGroupForm
     template_name = 'assets/asset_group_create.html'
     success_url = reverse_lazy('assets:asset-group-list')
+    #ordering = '-id'
 
     # Todo: Asset group create template select assets so hard, need be resolve next
 
@@ -547,4 +558,14 @@ class SystemUserAssetView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
     #     return super(SystemUserAssetGroupView, self).get_context_data(**kwargs)
 
 
+class TagView(ListView):
+    context_object_name = 'asset_list'
+    template_name = 'assets/asset_list.html'
 
+    def get_queryset(self):
+        asset_list = Asset.objects.filter(tags=self.kwargs['tag_id'])
+        return asset_list
+
+    def get_context_data(self, **kwargs):
+        kwargs['tag_list'] =  [(i.id,i.name,i.asset_set.all().count() )for i in Tag.objects.all().order_by('name')]
+        return super(TagView, self).get_context_data(**kwargs)

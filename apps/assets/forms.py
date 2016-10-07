@@ -23,8 +23,6 @@ from django.utils.translation import gettext_lazy as _
 #
 
 class AssetCreateForm(forms.ModelForm):
-    tags = forms.CharField(label=_('Tags'), widget=forms.TextInput(attrs={'id': 'tags'}),
-                           required=False, help_text='Use `,` split')
 
     def __init__(self, *args, **kwargs):
         instance = kwargs.get('instance', None)
@@ -32,19 +30,15 @@ class AssetCreateForm(forms.ModelForm):
         if instance:
             initial = kwargs.get('initial', {})
             tags = instance.tags.all()
-            initial['tags'] = ",".join([tag.value for tag in tags])
+            initial['tags'] = [t.pk for t in kwargs['instance'].tags.all()]
             print(kwargs.get('initial'))
         super(AssetCreateForm, self).__init__(*args, **kwargs)
 
     def _save_m2m(self):
+        super(AssetCreateForm, self)._save_m2m()
         tags = self.cleaned_data['tags']
-
-        if tags:
-            value_list = tags.split(',')
-            self.instance.tags.all().delete()
-            Tag.objects.bulk_create(
-                [Tag(value=value, asset=self.instance) for value in value_list]
-            )
+        self.instance.tags.clear()
+        self.instance.tags.add(*tuple(tags))
 
     class Meta:
         model = Asset
@@ -52,10 +46,13 @@ class AssetCreateForm(forms.ModelForm):
         fields = [
             'hostname', 'ip', 'port', 'type', 'comment', 'admin_user', 'system_users', 'idc', 'groups',
             'other_ip', 'remote_card_ip', 'mac_address', 'brand', 'cpu', 'memory', 'disk', 'os', 'cabinet_no',
-            'cabinet_pos', 'number', 'status', 'env', 'sn',
+            'cabinet_pos', 'number', 'status', 'env', 'sn','tags',
         ]
+        tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all())
         widgets = {
             'groups': forms.SelectMultiple(attrs={'class': 'select2',
+                                                  'data-placeholder': _('Select asset groups')}),
+            'tags': forms.SelectMultiple(attrs={'class': 'select2',
                                                   'data-placeholder': _('Select asset groups')}),
             'system_users': forms.SelectMultiple(attrs={'class': 'select2',
                                                         'data-placeholder': _('Select asset system users')}),
@@ -64,6 +61,7 @@ class AssetCreateForm(forms.ModelForm):
         help_texts = {
             'hostname': '* required',
             'ip': '* required',
+            'tags': '最多5个标签，单个标签最长8个汉字，按回车确认'
         }
 
 

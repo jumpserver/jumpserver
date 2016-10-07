@@ -25,6 +25,8 @@
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Other' %}</h3>
     {{ form.tags|bootstrap_horizontal }}
+
+
     {{ form.comment|bootstrap_horizontal }}
 
     <div class="hr-line-dashed"></div>
@@ -42,7 +44,11 @@
     <script>
         $(document).ready(function () {
             $('.select2').select2();
-            $('#tags').inputTags();
+            $("#tags").select2({
+                tags: true,
+                maximumSelectionLength: 8  //最多能够选择的个数
+            });
         })
+
     </script>
 {% endblock %}

@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^asset-group/(?P<pk>[0-9]+)$', views.AssetGroupDetailView.as_view(), name='asset-group-detail'),
     url(r'^asset-group/(?P<pk>[0-9]+)/update$', views.AssetGroupUpdateView.as_view(), name='asset-group-update'),
     url(r'^asset-group/(?P<pk>[0-9]+)/delete$', views.AssetGroupDeleteView.as_view(), name='asset-group-delete'),
+    url(r'^asset-tag/(?P<tag_id>[0-9]+)$', views.TagView.as_view(), name='asset-tags'),
 
     # Resource idc url
     url(r'^idc$', views.IDCListView.as_view(), name='idc-list'),

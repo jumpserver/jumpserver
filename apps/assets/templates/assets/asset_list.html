@@ -47,6 +47,7 @@
              </td>
          </tr>
      {% endfor %}
+
 {% endblock %}
 
 {% block content_bottom_left %}
@@ -67,5 +68,12 @@
 
         </div>
    </form>
+    {% for tag in tag_list %}
+                 <a href="{% url 'assets:asset-tags' tag_id=tag.0%}">
+                     {{ tag.1}}({{ tag.2 }})
+                 </a>
+{% endfor %}
 {% endblock %}
+
+
 

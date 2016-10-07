@@ -323,6 +323,7 @@ class Asset(models.Model):
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     date_created = models.DateTimeField(auto_now=True, null=True, blank=True, verbose_name=_('Date added'))
     comment = models.TextField(max_length=128, null=True, blank=True, verbose_name=_('Comment'))
+    tags = models.ManyToManyField('Tag', verbose_name='标签集合', blank=True)
 
     def __unicode__(self):
         return '%(ip)s:%(port)s' % {'ip': self.ip, 'port': self.port}
@@ -364,15 +365,17 @@ class Asset(models.Model):
 
 
 class Tag(models.Model):
-    value = models.CharField(max_length=64, verbose_name=_('VALUE'))
-    asset = models.ForeignKey(Asset, related_name='tags', on_delete=models.CASCADE, verbose_name=_('Asset'))
+    name = models.CharField('标签名', max_length=64)
+    created_time = models.DateTimeField('创建时间', auto_now_add=True)
+    created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
 
+    def __str__(self):
+        return self.name
     def __unicode__(self):
-        return self.value
+        return self.name
 
     class Meta:
         db_table = 'tag'
-        unique_together = ('value', 'asset')
 
 
 def init_all_models():
