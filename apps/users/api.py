@@ -12,10 +12,10 @@ from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 from .models import User, UserGroup
 from .serializers import UserDetailSerializer, UserAndGroupSerializer, \
     GroupDetailSerializer, UserPKUpdateSerializer, UserBulkUpdateSerializer, GroupBulkUpdateSerializer
-from common.mixins import BulkDeleteApiMixin
+from common.mixins import BulkDeleteApiMixin, get_logger
 
 
-logger = logging.getLogger('jumpserver.users.api')
+logger = get_logger(__name__)
 
 
 class UserDetailApi(generics.RetrieveUpdateDestroyAPIView):

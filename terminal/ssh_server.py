@@ -6,21 +6,21 @@ __version__ = '0.3.3'
 
 import sys
 import os
-import base64
+# import base64
 import time
-from binascii import hexlify
+# from binascii import hexlify
 import sys
 import threading
-from multiprocessing.process import Process
+# from multiprocessing.process import Process
 import traceback
-import tty
-import termios
-import struct
-import fcntl
-import signal
+# import tty
+# import termios
+# import struct
+# import fcntl
+# import signal
 import socket
 import select
-import errno
+# import errno
 import paramiko
 import django
 
@@ -210,8 +210,7 @@ class Navigation:
 class ProxyChannel:
     ENTER_CHAR = ['\r', '\n', '\r\n']
     output_data = []
-    command = []
-    output = []
+    history = {}
 
     def __init__(self, client_channel, backend_channel, client_addr):
         self.client_channel = client_channel
@@ -219,39 +218,30 @@ class ProxyChannel:
         self.client_addr = client_addr
         self.in_input_mode = True
         self.is_first_input = True
-        self.id = 0
-
-    # def stream_flow(self, input_=None, output_=None):
-    #     if input_:
-    #         self.in_input_mode = True
-    #         if input_ in ['\r', '\n', '\r\n']:
-    #             self.in_input_mode = False
-    #
-    #     if output_:
-    #         print(''.join(self.__class__.output_data))
-    #         if not self.in_input_mode:
-    #             command = ''.join(self.__class__.output_data)
-    #             del self.__class__.output_data
-    #             self.__class__.output_data = []
-    #         self.__class__.output_data.append(output_)
+        self.no = 0
+        self.command = ''
+        self.output = ''
 
     def get_output(self):
         if self.in_input_mode is False:
-            self.__class__.output_data.pop()
-            result = ''.join(self.__class__.output_data)
-            self.__class__.output.append(result)
+            # self.__class__.output_data.pop()
+            self.output = output = ''.join(self.__class__.output_data)[:200]
+            self.__class__.history[self.no]['output'] = self.output
+            self.__class__.history[self.no]['date_finished'] = time.time()
             print('>>>>>>>>>>> output <<<<<<<<<<')
-            print(result)
+            print(output)
             print('>>>>>>>>>>> end output <<<<<<<<<<')
             del self.__class__.output_data
             self.__class__.output_data = []
+            self.no += 1
+            print(self.__class__.history)
 
     def get_command(self, client_data):
         if client_data in self.__class__.ENTER_CHAR:
             self.in_input_mode = False
-            command = ''.join(self.__class__.output_data)
+            self.command = command = ''.join(self.__class__.output_data)
+            self.__class__.history[self.no] = {'date_started': time.time(), 'command': self.command}
             print('########### command ##########')
-            self.__class__.command.append(command)
             print(command)
             print('########### end command ##########')
             del self.__class__.output_data
@@ -268,7 +258,6 @@ class ProxyChannel:
             if client_channel.change_window_size_event.is_set():
                 backend_channel.resize_pty(width=client_channel.width, height=client_channel.height)
 
-            # print(self.__class__.output)
             if client_channel in r:
                 # Get output of the command
                 self.get_output()
