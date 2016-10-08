@@ -40,6 +40,7 @@ class AssetCreateForm(forms.ModelForm):
         self.instance.tags.clear()
         self.instance.tags.add(*tuple(tags))
 
+
     class Meta:
         model = Asset
 
@@ -53,7 +54,8 @@ class AssetCreateForm(forms.ModelForm):
             'groups': forms.SelectMultiple(attrs={'class': 'select2',
                                                   'data-placeholder': _('Select asset groups')}),
             'tags': forms.SelectMultiple(attrs={'class': 'select2',
-                                                  'data-placeholder': _('Select asset groups')}),
+                                                'id':'tags',
+                                                'data-placeholder': _('Select asset tags')}),
             'system_users': forms.SelectMultiple(attrs={'class': 'select2',
                                                         'data-placeholder': _('Select asset system users')}),
             'admin_user': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select asset admin user')}),
@@ -263,4 +265,37 @@ class SystemUserForm(forms.ModelForm):
             'username': '* required',
             'auth_push': 'Auto push system user to asset',
             'auth_update': 'Auto update system user ssh key',
+        }
+
+class AssetTagForm(forms.ModelForm):
+    assets = forms.ModelMultipleChoiceField(queryset=Asset.objects.all(),
+                                            label=_('Asset'),
+                                            required=False,
+                                            widget=forms.SelectMultiple(
+                                                attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
+                                            )
+
+    def __init__(self, *args, **kwargs):
+        if kwargs.get('instance', None):
+            initial = kwargs.get('initial', {})
+            initial['assets'] = kwargs['instance'].asset_set.all()
+        super(AssetTagForm, self).__init__(*args, **kwargs)
+
+    def _save_m2m(self):
+        super(AssetTagForm, self)._save_m2m()
+        assets = self.cleaned_data['assets']
+        self.instance.asset_set.clear()
+        self.instance.asset_set.add(*tuple(assets))
+
+    class Meta:
+        model = Tag
+        fields = [
+            "name",
+        ]
+        widgets = {
+            'name' : forms.TextInput(attrs={}),
+
+        }
+        help_texts = {
+            'name': '* required',
         }

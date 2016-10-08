@@ -37,7 +37,7 @@ div.dataTables_wrapper div.dataTables_filter,
                         <div class="panel-body">
                             <div class="tab-content">
                                 <div id="tab-1" class="ibox float-e-margins tab-pane active"></div>
-                                    <form id="IDCForm" method="post" class="form-horizontal">
+                                    <form id="groupForm" method="post" class="form-horizontal">
                                         {% csrf_token %}
                                         <h3 class="widget-head-color-box">资产组信息</h3>
                                         {{ form.name|bootstrap_horizontal }}

@@ -13,7 +13,7 @@ from django.shortcuts import get_object_or_404, reverse, redirect
 
 from common.utils import int_seq
 from .models import Asset, AssetGroup, IDC, AssetExtend, AdminUser, SystemUser, Tag
-from .forms import AssetCreateForm, AssetGroupForm, IDCForm, AdminUserForm, SystemUserForm
+from .forms import *
 from .hands import AdminUserRequiredMixin
 
 
@@ -53,12 +53,14 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
     success_url = reverse_lazy('assets:asset-list')
 
     def form_invalid(self, form):
+
+        #tags = form.cleaned_data['tags']
         print(form.errors)
         return super(AssetCreateView, self).form_invalid(form)
 
     def form_valid(self, form):
         tag_name_list = form.cleaned_data['tags']
-        print self.tag_type,tag_name_list
+        # print self.tag_type,tag_name_list
         return super(AssetCreateView, self).form_valid(form)
 
 
@@ -85,6 +87,11 @@ class AssetUpdateView(AdminUserRequiredMixin, UpdateView):
         }
         kwargs.update(context)
         return super(AssetUpdateView, self).get_context_data(**kwargs)
+
+    def form_invalid(self, form):
+        print(form.errors)
+        print "jsf"
+        return super(AssetUpdateView, self).form_invalid(form)
 
 
 class AssetDeleteView(DeleteView):
@@ -119,10 +126,17 @@ class AssetModalListView(AdminUserRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         group_id = self.request.GET.get('group_id')
+        tag_id = self.request.GET.get('tag_id')
         if group_id:
             group = AssetGroup.objects.get(id=group_id)
             context = {
-                'group_assets':[x.id for x in group.assets.all()]
+                'all_assets':[x.id for x in group.assets.all()]
+            }
+            kwargs.update(context)
+        if tag_id:
+            tag = Tag.objects.get(id=tag_id)
+            context = {
+                'all_assets':[x.id for x in tag.asset_set.all()]
             }
             kwargs.update(context)
         return super(AssetModalListView, self).get_context_data(**kwargs)
@@ -150,7 +164,6 @@ class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
         asset_group = form.save()
         assets_id_list = self.request.POST.getlist('assets', [])
         assets = [get_object_or_404(Asset, id=int(asset_id)) for asset_id in assets_id_list]
-        print assets
         asset_group.created_by = self.request.user.username or 'Admin'
         asset_group.assets.add(*tuple(assets))
         asset_group.save()
@@ -161,6 +174,7 @@ class AssetGroupListView(AdminUserRequiredMixin, ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'asset_group_list'
     template_name = 'assets/asset_group_list.html'
+    ordering = '-id'
 
     def get_context_data(self, **kwargs):
         context = {
@@ -569,3 +583,94 @@ class TagView(ListView):
     def get_context_data(self, **kwargs):
         kwargs['tag_list'] =  [(i.id,i.name,i.asset_set.all().count() )for i in Tag.objects.all().order_by('name')]
         return super(TagView, self).get_context_data(**kwargs)
+
+
+class TagsListView(AdminUserRequiredMixin, ListView):
+    model = Tag
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    context_object_name = 'asset_tags_list'
+    template_name = 'assets/asset_tags_list.html'
+    ordering = '-id'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Tag'),
+            'action': _('Asset Tags list'),
+            'keyword': self.request.GET.get('keyword', '')
+        }
+        kwargs.update(context)
+        return super(TagsListView, self).get_context_data(**kwargs)
+
+class AssetTagCreateView(AdminUserRequiredMixin, CreateView):
+    model = Tag
+    form_class = AssetTagForm
+    template_name = 'assets/asset_tag_create.html'
+    success_url = reverse_lazy('assets:asset-tag-list')
+    #ordering = '-id'
+
+    # Todo: Asset group create template select assets so hard, need be resolve next
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Tag'),
+            'action': _('Asset Tags list'),
+            'assets_count': 0,
+        }
+        kwargs.update(context)
+        return super(AssetTagCreateView, self).get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        asset_tag = form.save()
+        assets_id_list = self.request.POST.getlist('assets', [])
+        assets = [get_object_or_404(Asset, id=int(asset_id)) for asset_id in assets_id_list]
+        asset_tag.created_by = self.request.user.username or 'Admin'
+        asset_tag.asset_set.add(*tuple(assets))
+        asset_tag.save()
+        return super(AssetTagCreateView, self).form_valid(form)
+
+class AssetTagDetailView(SingleObjectMixin, AdminUserRequiredMixin, ListView):
+    template_name = 'assets/asset_tag_detail.html'
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Tag.objects.all())
+        return super(AssetTagDetailView, self).get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return self.object.asset_set.all()
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Tag'),
+            'action': _('Asset Tags detail'),
+            'asset_tag': self.object,
+        }
+        kwargs.update(context)
+        return super(AssetTagDetailView, self).get_context_data(**kwargs)
+
+class AssetTagUpdateView(AdminUserRequiredMixin, UpdateView):
+    model = Tag
+    form_class = AssetTagForm
+    template_name = 'assets/asset_tag_create.html'
+    success_url = reverse_lazy('assets:asset-tag-list')
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=Tag.objects.all())
+        return super(AssetTagUpdateView, self).get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Tag'),
+            'action': _('Asset Tags detail'),
+            'assets_count': self.object.asset_set.all().count(),
+            'tag_id':self.object.id,
+        }
+        kwargs.update(context)
+        return super(AssetTagUpdateView, self).get_context_data(**kwargs)
+
+
+class AssetTagDeleteView(AdminUserRequiredMixin, DeleteView):
+    template_name = 'assets/delete_confirm.html'
+    model = Tag
+    success_url = reverse_lazy('assets:asset-tag-list')
+

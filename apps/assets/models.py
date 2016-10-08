@@ -365,7 +365,7 @@ class Asset(models.Model):
 
 
 class Tag(models.Model):
-    name = models.CharField('标签名', max_length=64)
+    name = models.CharField('标签名', max_length=64,unique=True)
     created_time = models.DateTimeField('创建时间', auto_now_add=True)
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
 

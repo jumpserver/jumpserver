@@ -70,12 +70,10 @@
     <script>
         $(document).ready(function () {
             $('.select2').select2();
-{#            $('#tags').inputTags({#}
-{#                tags: [{% for tag in form.tags.value %} {{ tag|safe }}, {% endfor %}]#}
-{#            });#}
-            $('#tags').inputTags(
-
-            );
+            $("#tags").select2({
+                tags: true,
+                maximumSelectionLength: 8  //最多能够选择的个数
+            });
         })
     </script>
 {% endblock %}

@@ -21,7 +21,7 @@
         </thead>
         <tbody>
         {% for asset in asset_modal_list %}
-            {% if asset.id in group_assets %}
+            {% if asset.id in all_assets %}
             <tr name="oAssets" class="odd selected">
                 <td class="text-center" ><input type="checkbox" name="checked" value="{{ asset.id }}" checked="checked" ></td>
             {% else %}
@@ -47,7 +47,6 @@
 
 <script type="text/javascript">
 
-//$(window).load(function (){
 $(document).ready(function(){
 
     var table = $('#editable').DataTable({
@@ -68,7 +67,7 @@ $(document).ready(function(){
             {data: "dp"}
         ]
     });
-    //讲ID列隐藏
+    //将ID列隐藏
     table.column('1').visible(false);
 
     $('#editable tbody').on( 'click', 'tr', function () {
@@ -82,6 +81,9 @@ $(document).ready(function(){
         };
     });
 
+    $('#close-btn').on('click',function(){
+        $('#modal').modal('hide');
+    });
     $('#save-btn').on('click',function(){
    // alert( table.rows('.selected').data().length +' row(s) selected' );
         var d = table.rows('.selected').data();

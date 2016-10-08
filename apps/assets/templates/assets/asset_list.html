@@ -42,8 +42,7 @@
              </td>
              <td class="text-center">
                  <a href="{% url 'assets:asset-update' pk=asset.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
-                 <a href="{% url 'assets:asset-delete' pk=asset.id %}" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>-
-{#                 <a href="{% url '' %}">{% trans 'Delete' %}</a>#}
+                 <a href="{% url 'assets:asset-delete' pk=asset.id %}" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
              </td>
          </tr>
      {% endfor %}
@@ -72,7 +71,7 @@
                  <a href="{% url 'assets:asset-tags' tag_id=tag.0%}">
                      {{ tag.1}}({{ tag.2 }})
                  </a>
-{% endfor %}
+    {% endfor %}
 {% endblock %}
 
 
