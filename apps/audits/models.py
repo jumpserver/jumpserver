@@ -23,7 +23,7 @@ class LoginLog(models.Model):
     date_logout = models.DateTimeField(null=True, verbose_name=_('Date logout'))
 
     class Meta:
-        db_table = 'loginlog'
+        db_table = 'login_log'
         ordering = ['-date_login', 'username']
 
 
@@ -44,10 +44,24 @@ class ProxyLog(models.Model):
     date_start = models.DateTimeField(auto_now=True, verbose_name=_('Date start'))
     date_finished = models.DateTimeField(null=True, verbose_name=_('Date finished'))
 
+    def __unicode__(self):
+        return '%s-%s-%s-%s' % (self.username, self.hostname, self.system_user, self.id)
+
+    class Meta:
+        db_table = 'proxy_log'
+        ordering = ['-date_start', 'username']
+
 
 class CommandLog(models.Model):
-    proxy_log = models.ForeignKey(ProxyLog, on_delete=models.CASCADE, related_name='proxy_log')
+    proxy_log = models.ForeignKey(ProxyLog, on_delete=models.CASCADE, related_name='command_log')
     command = models.CharField(max_length=1000, blank=True)
     output = models.TextField(blank=True)
     date_start = models.DateTimeField(null=True)
     date_finished = models.DateTimeField(null=True)
+
+    def __unicode__(self):
+        return '%s: %s' % (self.id, self.command)
+
+    class Meta:
+        db_table = 'command_log'
+        ordering = ['-date_start', 'command']

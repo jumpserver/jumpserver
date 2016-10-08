@@ -1,8 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 #
 
-import logging
-
 from django.shortcuts import get_object_or_404
 
 from rest_framework import generics, status
@@ -12,7 +10,8 @@ from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 from .models import User, UserGroup
 from .serializers import UserDetailSerializer, UserAndGroupSerializer, \
     GroupDetailSerializer, UserPKUpdateSerializer, UserBulkUpdateSerializer, GroupBulkUpdateSerializer
-from common.mixins import BulkDeleteApiMixin, get_logger
+from common.mixins import BulkDeleteApiMixin
+from common.utils import get_logger
 
 
 logger = get_logger(__name__)
