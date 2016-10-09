@@ -85,7 +85,7 @@ class PreSetup(object):
 
     @property
     def _is_redhat(self):
-        if self.dist.startswith("centos") or self.dist.startswith("red") or self.dist == "fedora" or self.dist == "amazon linux ami":
+        if self.dist.startswith("centos") or self.dist.startswith("red") or self.dist == "fedora" or self.dist == "oracle" or self.dist == "amazon linux ami":
             return True
 
     @property
@@ -105,7 +105,7 @@ class PreSetup(object):
 
     def check_platform(self):
         if not (self._is_redhat or self._is_ubuntu):
-            print(u"支持的平台: CentOS, RedHat, Fedora, Debian, Ubuntu, Amazon Linux, 暂不支持其他平台安装.")
+            print(u"支持的平台: CentOS, RedHat, Fedora, Oracle Linux, Debian, Ubuntu, Amazon Linux, 暂不支持其他平台安装.")
             exit()
 
     @staticmethod
