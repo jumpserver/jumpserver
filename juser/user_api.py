@@ -121,6 +121,21 @@ def db_del_user(username):
         user.delete()
 
 
+def add_ssh_key(username, key_content, home="/home"):
+    """
+    add a custem ssh key in home dir
+    用户上传自有的ssh公钥
+    """
+    logger.debug('上传ssh key, 并设置authorized_keys2')
+    if key_content:
+        auth_key_dir = os.path.join(home, username, '.ssh')
+        authorized_key_file = os.path.join(auth_key_dir, 'authorized_keys2')
+        with open(authorized_key_file, 'w') as auth_f:
+            auth_f.write(key_content)
+        os.chmod(authorized_key_file, 0600)
+        chown(authorized_key_file, username)
+
+
 def gen_ssh_key(username, password='',
                 key_dir=os.path.join(KEY_DIR, 'user'),
                 authorized_keys=True, home="/home", length=2048):

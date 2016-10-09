@@ -51,7 +51,7 @@
                                     <tr>
                                         <td class="text-navy">key</td>
                                         {% if user.username|key_exist %}
-                                        <td><a  href="{% url 'key_down' %}?id={{ user.id }}" >下载</a></td>
+                                        <td><a  href="{% url 'key_down' %}?id={{ user.id }}" >下载</a>&nbsp|&nbsp<a href="{% url 'user_pubkey' %}">添加公钥</a></td>
                                         {% else %}
                                         <td><span style="color: #586b7d">NoKey</span></td>
                                         {% endif %}
