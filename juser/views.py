@@ -445,8 +445,11 @@ def regen_ssh_key(request):
 @require_role(role='user')
 def change_ssh_pub_key(request):
 ########
-    header_title, path1, path2 = '修改公钥', '用户管理', '修改个人公钥'
-    user_id = request.user.id
+    header_title, path1, path2 = '修改公钥', '用户管理', '修改公钥'
+    if request.session.get('role_id') == 0:
+        user_id = request.user.id
+    else:
+        user_id = request.GET.get('id', '')
     user = User.objects.get(id=user_id)
     error = ''
     if not user:
@@ -454,7 +457,8 @@ def change_ssh_pub_key(request):
 
     if request.method == 'POST':
         key_content = request.POST.get('key', '')
-        add_ssh_key(user.name, key_content)
+        username = user.username
+        add_ssh_key(username, key_content)
         msg = '修改成功'
 
     return my_render('juser/change_ssh_pub_key.html', locals(), request)
