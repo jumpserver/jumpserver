@@ -80,17 +80,17 @@ class PreSetup(object):
         self.ip = ''
         self.key = ''.join(random.choice(string.ascii_lowercase + string.digits) \
                            for _ in range(16))
-        self.dist = platform.dist()[0].lower()
-        self.version = platform.dist()[1]
+        self.dist = platform.linux_distribution()[0].lower()
+        self.version = platform.linux_distribution()[1]
 
     @property
     def _is_redhat(self):
-        if self.dist == "centos" or self.dist == "redhat" or self.dist == "fedora":
+        if self.dist.startswith("centos") or self.dist.startswith("red") or self.dist == "fedora" or self.dist == "amazon linux ami":
             return True
 
     @property
     def _is_centos7(self):
-        if self.dist == "centos" and self.version.startswith("7"):
+        if self.dist.startswith("centos") and self.version.startswith("7"):
             return True
 
     @property
@@ -105,7 +105,7 @@ class PreSetup(object):
 
     def check_platform(self):
         if not (self._is_redhat or self._is_ubuntu):
-            print(u"支持的平台: CentOS, RedHat, Fedora, Debian, Ubuntu, 暂不支持其他平台安装.")
+            print(u"支持的平台: CentOS, RedHat, Fedora, Debian, Ubuntu, Amazon Linux, 暂不支持其他平台安装.")
             exit()
 
     @staticmethod
@@ -237,6 +237,8 @@ class PreSetup(object):
 
     def _require_pip(self):
         color_print('开始安装依赖pip包', 'green')
+        bash('pip uninstall -y pycrypto')
+        bash('rm -rf /usr/lib64/python2.6/site-packages/Crypto/')
         ret_code = bash('pip install -r requirements.txt')
         self.check_bash_return(ret_code, "安装JumpServer 依赖的python库失败！")
 

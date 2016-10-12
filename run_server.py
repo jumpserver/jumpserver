@@ -233,7 +233,9 @@ class ExecHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         logger.debug('Websocket: Open exec request')
         role_name = self.get_argument('role', 'sb')
-        self.remote_ip = self.request.remote_ip
+        self.remote_ip = self.request.headers.get("X-Real-IP")
+        if not self.remote_ip:
+            self.remote_ip = self.request.remote_ip
         logger.debug('Web执行命令: 请求系统用户 %s' % role_name)
         self.role = get_object(PermRole, name=role_name)
         self.perm = get_group_user_perm(self.user)
@@ -362,23 +364,22 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             return
 
         if 'resize' in jsondata.get('data'):
+            self.termlog.write(message)
             self.channel.resize_pty(
-                jsondata.get('data').get('resize').get('cols', 80),
-                jsondata.get('data').get('resize').get('rows', 24)
+                width=int(jsondata.get('data').get('resize').get('cols', 100)),
+                height=int(jsondata.get('data').get('resize').get('rows', 35))
             )
         elif jsondata.get('data'):
             self.termlog.recoder = True
             self.term.input_mode = True
             if str(jsondata['data']) in ['\r', '\n', '\r\n']:
-                if self.term.vim_flag:
-                    match = re.compile(r'\x1b\[\?1049', re.X).findall(self.term.vim_data)
-                    if match:
-                        if self.term.vim_end_flag or len(match) == 2:
-                            self.term.vim_flag = False
-                            self.term.vim_end_flag = False
-                        else:
-                            self.term.vim_end_flag = True
-                else:
+                match = re.compile(r'\x1b\[\?1049', re.X).findall(self.term.vim_data)
+                if match:
+                    if self.term.vim_flag or len(match) == 2:
+                        self.term.vim_flag = False
+                    else:
+                        self.term.vim_flag = True
+                elif not self.term.vim_flag:
                     result = self.term.deal_command(self.term.data)[0:200]
                     if len(result) > 0:
                         TtyLog(log=self.log, datetime=datetime.datetime.now(), cmd=result).save()
@@ -415,14 +416,13 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             data = ''
             pre_timestamp = time.time()
             while True:
-                r, w, e = select.select([self.channel, sys.stdin], [], [])
+                r, w, e = select.select([self.channel], [], [])
                 if self.channel in r:
                     recv = self.channel.recv(1024)
                     if not len(recv):
                         return
                     data += recv
-                    if self.term.vim_flag:
-                        self.term.vim_data += recv
+                    self.term.vim_data += recv
                     try:
                         self.write_message(data.decode('utf-8', 'replace'))
                         self.termlog.write(data)
@@ -433,7 +433,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
                         pre_timestamp = now_timestamp
                         self.log_file_f.flush()
                         self.log_time_f.flush()
-                        if self.term.input_mode and not self.term.is_output(data):
+                        if self.term.input_mode:
                             self.term.data += data
                         data = ''
                     except UnicodeDecodeError:
@@ -494,7 +494,7 @@ def main():
         [
             (r'/ws/monitor', MonitorHandler),
             (r'/ws/terminal', WebTerminalHandler),
-            (r'/kill', WebTerminalKillHandler),
+            (r'/ws/kill', WebTerminalKillHandler),
             (r'/ws/exec', ExecHandler),
             (r"/static/(.*)", tornado.web.StaticFileHandler,
              dict(path=os.path.join(os.path.dirname(__file__), "static"))),
@@ -502,7 +502,7 @@ def main():
         ], **setting)
 
     server = tornado.httpserver.HTTPServer(tornado_app)
-    server.listen(options.port)
+    server.listen(options.port, address=IP)
 
     tornado.ioloop.IOLoop.instance().start()
 

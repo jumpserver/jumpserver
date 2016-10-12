@@ -5,7 +5,7 @@ from django.shortcuts import render_to_response, render
 from jumpserver.api import *
 from jperm.perm_api import user_have_perm
 from django.http import HttpResponseNotFound
-from jlog.log_api import renderTemplate
+from jlog.log_api import renderJSON
 
 from jlog.models import Log, ExecLog, FileLog, TermLog
 from jumpserver.settings import LOG_DIR
@@ -138,7 +138,14 @@ def log_record(request):
         if log_id:
             TermL = TermLogRecorder(request.user)
             log = Log.objects.get(id=int(log_id))
-            return HttpResponse(TermL.load_full_log(filename=log.filename))
+            if len(log.filename) == 0:
+                log_file = log.log_path + '.log'
+                log_time = log.log_path + '.time'
+                if os.path.isfile(log_file) and os.path.isfile(log_time):
+                    content = renderJSON(log_file, log_time)
+                    return HttpResponse(content)
+            else:
+                return HttpResponse(TermL.load_full_log(filename=log.filename))
         else:
             return HttpResponse("ERROR")
     else:
@@ -217,7 +224,7 @@ class TermLogRecorder(object):
         Initializing the virtual screen and the character stream
         """
         self._stream = pyte.ByteStream()
-        self._screen = pyte.Screen(80, 24)
+        self._screen = pyte.Screen(100, 35)
         self._stream.attach(self._screen)
 
     def _command(self):
@@ -233,6 +240,7 @@ class TermLogRecorder(object):
         TermLogRecorder.loglist[str(id)] = [self]
 
     def write(self, msg):
+        """
         if self.recoder and (not self._in_vim):
             if self.commands.__len__() == 0:
                 self._stream.feed(msg)
@@ -249,6 +257,7 @@ class TermLogRecorder(object):
                 self._screen.reset()
             else:
                 self._command()
+        """
         try:
             self.write_message(msg)
         except:
@@ -265,7 +274,7 @@ class TermLogRecorder(object):
         self.filename = filename
         filepath = os.path.join(path, 'tty', date, filename + '.zip')
         if not os.path.isdir(os.path.join(path, 'tty', date)):
-            os.makedirs(os.path.join(path, 'tty', date), mode=0777)
+            mkdir(os.path.join(path, 'tty', date), mode=777)
         while os.path.isfile(filepath):
             filename = str(uuid.uuid4())
             filepath = os.path.join(path, 'tty', date, filename + '.zip')

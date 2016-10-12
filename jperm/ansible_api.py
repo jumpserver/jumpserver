@@ -316,6 +316,8 @@ class MyTask(MyRunner):
         """
         push the ssh authorized key to target.
         """
+        if user == 'root':
+            return {"status": "failed", "msg": "root cann't be delete"}
         module_args = 'user="%s" key="{{ lookup("file", "%s") }}" state="absent"' % (user, key_path)
         self.run("authorized_key", module_args, become=True)
 
@@ -361,6 +363,8 @@ class MyTask(MyRunner):
         """
         delete a host user.
         """
+        if username == 'root':
+            return {"status": "failed", "msg": "root cann't be delete"}
         module_args = 'name=%s state=absent remove=yes move_home=yes force=yes' % username
         self.run("user", module_args, become=True)
         return self.results
@@ -371,6 +375,8 @@ class MyTask(MyRunner):
         :param username:
         :return:
         """
+        if username == 'root':
+            return {"status": "failed", "msg": "root cann't be delete"}
         module_args = "sed -i 's/^%s.*//' /etc/sudoers" % username
         self.run("command", module_args, become=True)
         return self.results
@@ -493,8 +499,8 @@ if __name__ == "__main__":
                  # # "ansible_become_user": "root",
                  # "ansible_become_pass": "yusky0902",
                  }]
-    cmd = Command(resource)
-    print cmd.run('ls')
+    cmd.run('ls',pattern='*')
+    print cmd.results_raw
 
     # resource = [{"hostname": "192.168.10.148", "port": "22", "username": "root", "password": "xxx"}]
     # task = Tasks(resource)

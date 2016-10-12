@@ -29,7 +29,7 @@ from django.contrib.sessions.models import Session
 from jumpserver.api import ServerError, User, Asset, PermRole, AssetGroup, get_object, mkdir, get_asset_info
 from jumpserver.api import logger, Log, TtyLog, get_role_key, CRYPTOR, bash, get_tmp_dir
 from jperm.perm_api import gen_resource, get_group_asset_perm, get_group_user_perm, user_have_perm, PermRole
-from jumpserver.settings import LOG_DIR
+from jumpserver.settings import LOG_DIR, NAV_SORT_BY
 from jperm.ansible_api import MyRunner
 # from jlog.log_api import escapeString
 from jlog.models import ExecLog, FileLog
@@ -93,9 +93,7 @@ class Tty(object):
         self.remote_ip = ''
         self.login_type = login_type
         self.vim_flag = False
-        self.vim_end_flag = False
         self.vim_end_pattern = re.compile(r'\x1b\[\?1049', re.X)
-        self.vim_pattern = re.compile(r'\W?vi[m]?\s.* | \W?fg\s.*', re.X)
         self.vim_data = ''
         self.stream = None
         self.screen = None
@@ -117,7 +115,8 @@ class Tty(object):
                 return True
         return False
 
-    def command_parser(self, command):
+    @staticmethod
+    def command_parser(command):
         """
         处理命令中如果有ps1或者mysql的特殊情况,极端情况下会有ps1和mysql
         :param command:要处理的字符传
@@ -157,14 +156,10 @@ class Tty(object):
                     else:
                         command = line_data
                     break
-            if command != '':
-                # 判断用户输入的是否是vim 或者fg命令
-                if self.vim_pattern.search(command):
-                    self.vim_flag = True
-            # 虚拟屏幕清空
-            self.screen.reset()
         except Exception:
             pass
+        # 虚拟屏幕清空
+        self.screen.reset()
         return command
 
     def get_log(self):
@@ -180,8 +175,8 @@ class Tty(object):
         log_file_path = os.path.join(today_connect_log_dir, '%s_%s_%s' % (self.username, self.asset_name, time_start))
 
         try:
-            mkdir(os.path.dirname(today_connect_log_dir), mode=0777)
-            mkdir(today_connect_log_dir, mode=0777)
+            mkdir(os.path.dirname(today_connect_log_dir), mode=777)
+            mkdir(today_connect_log_dir, mode=777)
         except OSError:
             logger.debug('创建目录 %s 失败，请修改%s目录权限' % (today_connect_log_dir, tty_log_dir))
             raise ServerError('创建目录 %s 失败，请修改%s目录权限' % (today_connect_log_dir, tty_log_dir))
@@ -254,7 +249,7 @@ class Tty(object):
                         allow_agent=False,
                         look_for_keys=False)
 
-        except paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException:
+        except (paramiko.ssh_exception.AuthenticationException, paramiko.ssh_exception.SSHException):
             raise ServerError('认证失败 Authentication Error.')
         except socket.error:
             raise ServerError('端口可能不对 Connect SSH Socket Port Error, Please Correct it.')
@@ -305,7 +300,6 @@ class SshTty(Tty):
         old_tty = termios.tcgetattr(sys.stdin)
         pre_timestamp = time.time()
         data = ''
-        input_str = ''
         input_mode = False
         try:
             tty.setraw(sys.stdin.fileno())
@@ -325,8 +319,7 @@ class SshTty(Tty):
                         x = self.channel.recv(10240)
                         if len(x) == 0:
                             break
-                        if self.vim_flag:
-                            self.vim_data += x
+
                         index = 0
                         len_x = len(x)
                         while index < len_x:
@@ -347,10 +340,9 @@ class SshTty(Tty):
                         pre_timestamp = now_timestamp
                         log_file_f.flush()
 
-                        if input_mode and not self.is_output(x):
+                        self.vim_data += x
+                        if input_mode:
                             data += x
-
-                        input_str = ''
 
                     except socket.timeout:
                         pass
@@ -362,25 +354,22 @@ class SshTty(Tty):
                         pass
                     termlog.recoder = True
                     input_mode = True
-                    input_str += x
-                    if str(x) in ['\r', '\n', '\r\n']:
-                        # 这个是用来处理用户的复制操作
-                        if input_str != x:
-                            data += input_str
-                        if self.vim_flag:
-                            match = self.vim_end_pattern.findall(self.vim_data)
-                            if match:
-                                if self.vim_end_flag or len(match) == 2:
-                                    self.vim_flag = False
-                                    self.vim_end_flag = False
-                                else:
-                                    self.vim_end_flag = True
-                        else:
+                    if self.is_output(str(x)):
+                        # 如果len(str(x)) > 1 说明是复制输入的
+                        if len(str(x)) > 1:
+                            data = x
+                        match = self.vim_end_pattern.findall(self.vim_data)
+                        if match:
+                            if self.vim_flag or len(match) == 2:
+                                self.vim_flag = False
+                            else:
+                                self.vim_flag = True
+                        elif not self.vim_flag:
+                            self.vim_flag = False
                             data = self.deal_command(data)[0:200]
-                            if len(data) > 0:
+                            if data is not None:
                                 TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
                         data = ''
-                        input_str = ''
                         self.vim_data = ''
                         input_mode = False
 
@@ -406,7 +395,7 @@ class SshTty(Tty):
         """
         # 发起ssh连接请求 Make a ssh connection
         ssh = self.get_connection()
-        
+
         transport = ssh.get_transport()
         transport.set_keepalive(30)
         transport.use_compression(True)
@@ -422,7 +411,7 @@ class SshTty(Tty):
             signal.signal(signal.SIGWINCH, self.set_win_size)
         except:
             pass
-        
+
         self.posix_shell()
 
         # Shutdown channel socket
@@ -436,8 +425,21 @@ class Nav(object):
     """
     def __init__(self, user):
         self.user = user
-        self.search_result = {}
-        self.user_perm = {}
+        self.user_perm = get_group_user_perm(self.user)
+        if NAV_SORT_BY == 'ip':
+            self.perm_assets = sorted(self.user_perm.get('asset', []).keys(),
+                                      key=lambda x: [int(num) for num in x.ip.split('.') if num.isdigit()])
+        elif NAV_SORT_BY == 'hostname':
+            self.perm_assets = self.natural_sort_hostname(self.user_perm.get('asset', []).keys())
+        else:
+            self.perm_assets = tuple(self.user_perm.get('asset', []))
+        self.search_result = self.perm_assets
+        self.perm_asset_groups = self.user_perm.get('asset_group', [])
+
+    def natural_sort_hostname(self, list):
+        convert = lambda text: int(text) if text.isdigit() else text.lower()
+        alphanum_key = lambda x: [ convert(c) for c in re.split('([0-9]+)', x.hostname) ]
+        return sorted(list, key = alphanum_key)
 
     @staticmethod
     def print_nav():
@@ -447,11 +449,11 @@ class Nav(object):
         """
         msg = """\n\033[1;32m###    欢迎使用Jumpserver开源跳板机系统   ### \033[0m
 
-        1) 输入 \033[32mID\033[0m 直接登录.
-        2) 输入 \033[32m/\033[0m + \033[32mIP, 主机名 or 备注 \033[0m搜索.
+        1) 输入 \033[32mID\033[0m 直接登录 或 输入\033[32m部分 IP,主机名,备注\033[0m 进行搜索登录(如果唯一).
+        2) 输入 \033[32m/\033[0m + \033[32mIP, 主机名 or 备注 \033[0m搜索. 如: /ip
         3) 输入 \033[32mP/p\033[0m 显示您有权限的主机.
         4) 输入 \033[32mG/g\033[0m 显示您有权限的主机组.
-        5) 输入 \033[32mG/g\033[0m\033[0m + \033[32m组ID\033[0m 显示该组下主机.
+        5) 输入 \033[32mG/g\033[0m\033[0m + \033[32m组ID\033[0m 显示该组下主机. 如: g1
         6) 输入 \033[32mE/e\033[0m 批量执行命令.
         7) 输入 \033[32mU/u\033[0m 批量上传文件.
         8) 输入 \033[32mD/d\033[0m 批量下载文件.
@@ -460,45 +462,102 @@ class Nav(object):
         """
         print textwrap.dedent(msg)
 
-    def search(self, str_r=''):
+    def get_asset_group_member(self, str_r):
         gid_pattern = re.compile(r'^g\d+$')
-        # 获取用户授权的所有主机信息
-        if not self.user_perm:
-            self.user_perm = get_group_user_perm(self.user)
-        user_asset_all = self.user_perm.get('asset').keys()
-        # 搜索结果保存
-        user_asset_search = []
-        if str_r:
-            # 资产组组id匹配
-            if gid_pattern.match(str_r):
-                gid = int(str_r.lstrip('g'))
-                # 获取资产组包含的资产
-                asset_group = get_object(AssetGroup, id=gid)
-                if asset_group:
-                    user_asset_search = asset_group.asset_set.all()
-                else:
-                    color_print('没有该资产组或没有权限')
-                    return
 
+        if gid_pattern.match(str_r):
+            gid = int(str_r.lstrip('g'))
+            # 获取资产组包含的资产
+            asset_group = get_object(AssetGroup, id=gid)
+            if asset_group and asset_group in self.perm_asset_groups:
+                self.search_result = list(asset_group.asset_set.all())
             else:
+                color_print('没有该资产组或没有权限')
+                return
+
+    def search(self, str_r=''):
+        # 搜索结果保存
+        if str_r:
+            try:
+                id_ = int(str_r)
+                if id_ < len(self.search_result):
+                    self.search_result = [self.search_result[id_]]
+                    return
+                else:
+                    raise ValueError
+
+            except (ValueError, TypeError):
                 # 匹配 ip, hostname, 备注
-                for asset in user_asset_all:
-                    if str_r in asset.ip or str_r in str(asset.hostname) or str_r in str(asset.comment):
-                        user_asset_search.append(asset)
+                str_r = str_r.lower()
+                self.search_result = [asset for asset in self.perm_assets if str_r == str(asset.ip).lower()] or \
+                                     [asset for asset in self.perm_assets if str_r in str(asset.ip).lower() \
+                                      or str_r in str(asset.hostname).lower() \
+                                      or str_r in str(asset.comment).lower()]
         else:
             # 如果没有输入就展现所有
-            user_asset_search = user_asset_all
+            self.search_result = self.perm_assets
 
-        self.search_result = dict(zip(range(len(user_asset_search)), user_asset_search))
-        color_print('[%-3s] %-12s %-15s  %-5s  %-10s  %s' % ('ID', '主机名', 'IP', '端口', '系统用户', '备注'), 'title')
-        for index, asset in self.search_result.items():
-            # 获取该资产信息
-            asset_info = get_asset_info(asset)
-            # 获取该资产包含的角色
-            role = [str(role.name) for role in self.user_perm.get('asset').get(asset).get('role')]
-            print '[%-3s] %-15s %-15s  %-5s  %-10s  %s' % (index, asset.hostname, asset.ip, asset_info.get('port'),
-                                                            role, asset.comment)
+    @staticmethod
+    def truncate_str(str_, length=30):
+        str_ = str_.decode('utf-8')
+        if len(str_) > length:
+            return str_[:14] + '..' + str_[-14:]
+        else:
+            return str_
+
+    @staticmethod
+    def get_max_asset_property_length(assets, property_='hostname'):
+        try:
+            return max([len(getattr(asset, property_)) for asset in assets])
+        except ValueError:
+            return 30
+
+    def print_search_result(self):
+        hostname_max_length = self.get_max_asset_property_length(self.search_result)
+        line = '[%-3s] %-16s %-5s  %-' + str(hostname_max_length) + 's %-10s %s'
+        color_print(line % ('ID', 'IP', 'Port', 'Hostname', 'SysUser', 'Comment'), 'title')
+        if hasattr(self.search_result, '__iter__'):
+            for index, asset in enumerate(self.search_result):
+                # 获取该资产信息
+                asset_info = get_asset_info(asset)
+                # 获取该资产包含的角色
+                role = [str(role.name) for role in self.user_perm.get('asset').get(asset).get('role')]
+                print line % (index, asset.ip, asset_info.get('port'),
+                              self.truncate_str(asset.hostname), str(role).replace("'", ''), asset.comment)
         print
+
+    def try_connect(self):
+        try:
+            asset = self.search_result[0]
+            roles = list(self.user_perm.get('asset').get(asset).get('role'))
+            if len(roles) == 1:
+                role = roles[0]
+            elif len(roles) > 1:
+                print "\033[32m[ID] 系统用户\033[0m"
+                for index, role in enumerate(roles):
+                    print "[%-2s] %s" % (index, role.name)
+                print
+                print "授权系统用户超过1个，请输入ID, q退出"
+                try:
+                    role_index = raw_input("\033[1;32mID>:\033[0m ").strip()
+                    if role_index == 'q':
+                        return
+                    else:
+                        role = roles[int(role_index)]
+                except IndexError:
+                    color_print('请输入正确ID', 'red')
+                    return
+            else:
+                color_print('没有映射用户', 'red')
+                return
+
+            print('Connecting %s ...' % asset.hostname)
+            ssh_tty = SshTty(login_user, asset, role)
+            ssh_tty.connect()
+        except (KeyError, ValueError):
+            color_print('请输入正确ID', 'red')
+        except ServerError, e:
+            color_print(e, 'red')
 
     def print_asset_group(self):
         """
@@ -515,9 +574,6 @@ class Nav(object):
         批量执行命令
         """
         while True:
-            if not self.user_perm:
-                self.user_perm = get_group_user_perm(self.user)
-
             roles = self.user_perm.get('role').keys()
             if len(roles) > 1:  # 授权角色数大于1
                 color_print('[%-2s] %-15s' % ('ID', '系统用户'),  'info')
@@ -529,7 +585,7 @@ class Nav(object):
                 print "请输入运行命令所关联系统用户的ID, q退出"
 
                 try:
-                    role_id = raw_input("\033[1;32mRole>:\033[0m ").strip()
+                    role_id = int(raw_input("\033[1;32mRole>:\033[0m ").strip())
                     if role_id == 'q':
                         break
                 except (IndexError, ValueError):
@@ -587,8 +643,6 @@ class Nav(object):
 
     def upload(self):
         while True:
-            if not self.user_perm:
-                self.user_perm = get_group_user_perm(self.user)
             try:
                 print "进入批量上传模式"
                 print "请输入主机名或ansible支持的pattern, 多个主机:分隔 q退出"
@@ -640,8 +694,6 @@ class Nav(object):
 
     def download(self):
         while True:
-            if not self.user_perm:
-                self.user_perm = get_group_user_perm(self.user)
             try:
                 print "进入批量下载模式"
                 print "请输入主机名或ansible支持的pattern, 多个主机:分隔,q退出"
@@ -723,9 +775,14 @@ def main():
                 sys.exit(0)
             if option in ['P', 'p', '\n', '']:
                 nav.search()
+                nav.print_search_result()
                 continue
-            if option.startswith('/') or gid_pattern.match(option):
+            if option.startswith('/'):
                 nav.search(option.lstrip('/'))
+                nav.print_search_result()
+            elif gid_pattern.match(option):
+                nav.get_asset_group_member(str_r=option)
+                nav.print_search_result()
             elif option in ['G', 'g']:
                 nav.print_asset_group()
                 continue
@@ -741,36 +798,13 @@ def main():
             elif option in ['Q', 'q', 'exit']:
                 sys.exit()
             else:
-                try:
-                    asset = nav.search_result[int(option)]
-                    roles = nav.user_perm.get('asset').get(asset).get('role')
-                    if len(roles) > 1:
-                        role_check = dict(zip(range(len(roles)), roles))
-                        print "\033[32m[ID] 系统用户\033[0m"
-                        for index, role in role_check.items():
-                            print "[%-2s] %s" % (index, role.name)
-                        print
-                        print "授权系统用户超过1个，请输入ID, q退出"
-                        try:
-                            role_index = raw_input("\033[1;32mID>:\033[0m ").strip()
-                            if role_index == 'q':
-                                continue
-                            else:
-                                role = role_check[int(role_index)]
-                        except IndexError:
-                            color_print('请输入正确ID', 'red')
-                            continue
-                    elif len(roles) == 1:
-                        role = list(roles)[0]
-                    else:
-                        color_print('没有映射用户', 'red')
-                        continue
-                    ssh_tty = SshTty(login_user, asset, role)
-                    ssh_tty.connect()
-                except (KeyError, ValueError):
-                    color_print('请输入正确ID', 'red')
-                except ServerError, e:
-                    color_print(e, 'red')
+                nav.search(option)
+                if len(nav.search_result) == 1:
+                    print('Only match Host:  %s ' % nav.search_result[0].hostname)
+                    nav.try_connect()
+                else:
+                    nav.print_search_result()
+
     except IndexError, e:
         color_print(e)
         time.sleep(5)

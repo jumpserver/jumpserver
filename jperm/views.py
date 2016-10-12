@@ -16,6 +16,7 @@ from jperm.ansible_api import MyTask
 from jperm.perm_api import get_role_info, get_role_push_host
 from jumpserver.api import my_render, get_object, CRYPTOR
 
+
 # 设置PERM APP Log
 from jumpserver.api import logger
 #logger = set_log(LOG_LEVEL, filename='jumpserver_perm.log')
@@ -38,7 +39,7 @@ def perm_rule_list(request):
         rules_list = rules_list.filter(id=rule_id)
 
     if keyword:
-        rules_list = rules_list.filter(Q(name=keyword))
+        rules_list = rules_list.filter(Q(name__icontains=keyword))
 
     rules_list, p, rules, page_range, current_page, show_first, show_end = pages(rules_list, request)
 
@@ -290,6 +291,8 @@ def perm_role_add(request):
             if name == "root":
                 raise ServerError(u'禁止使用root用户作为系统用户，这样非常危险！')
             default = get_object(Setting, name='default')
+            if len(password) > 64:
+                raise ServerError(u'密码长度不能超过64位!')
 
             if password:
                 encrypt_pass = CRYPTOR.encrypt(password)
@@ -330,7 +333,6 @@ def perm_role_delete(request):
                 raise ServerError(u"role_id %s 无数据记录" % role_id)
             # 删除推送到主机上的role
             filter_type = request.GET.get("filter_type")
-            print filter_type
             if filter_type:
                 if filter_type == "recycle_assets":
                     recycle_assets = [push.asset for push in role.perm_push.all() if push.success]
@@ -414,6 +416,7 @@ def perm_role_detail(request):
             users = role_info.get("users")
             user_groups = role_info.get("user_groups")
             pushed_asset, need_push_asset = get_role_push_host(get_object(PermRole, id=role_id))
+
     except ServerError, e:
         logger.warning(e)
 
@@ -446,6 +449,8 @@ def perm_role_edit(request):
         role_sudo_names = request.POST.getlist("sudo_name")
         role_sudos = [PermSudo.objects.get(id=sudo_id) for sudo_id in role_sudo_names]
         key_content = request.POST.get("role_key", "")
+        if len(role_password) > 64:
+            raise ServerError(u'密码长度不能超过64位!')
 
         try:
             if not role:
