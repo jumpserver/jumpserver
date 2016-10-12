@@ -170,7 +170,7 @@ def user_add(request):
         else:
             try:
                 if re.match(r"^\w+$",username):
-                    username = username
+                    pass
                 else:
                     error = u'用户名不合法'
                     raise ServerError
