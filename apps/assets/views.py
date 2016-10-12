@@ -12,6 +12,7 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.shortcuts import get_object_or_404, reverse, redirect
 
 from common.utils import int_seq
+from .utils import CreateAssetTagsMiXin,UpdateAssetTagsMiXin
 from .models import Asset, AssetGroup, IDC, AssetExtend, AdminUser, SystemUser, Tag
 from .forms import *
 from .hands import AdminUserRequiredMixin
@@ -37,7 +38,7 @@ class AssetListView(AdminUserRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = {
             'app': 'Assets',
-            'action': 'Asset list',
+            'action': 'asset list',
             'tag_list': [(i.id,i.name,i.asset_set.all().count())for i in Tag.objects.all().order_by('name')]
 
         }
@@ -45,23 +46,22 @@ class AssetListView(AdminUserRequiredMixin, ListView):
         return super(AssetListView, self).get_context_data(**kwargs)
 
 
-class AssetCreateView(AdminUserRequiredMixin, CreateView):
+class AssetCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,CreateView):
     model = Asset
     tag_type = 'asset'
     form_class = AssetCreateForm
     template_name = 'assets/asset_create.html'
     success_url = reverse_lazy('assets:asset-list')
 
-    def form_invalid(self, form):
+    def form_valid(self, form):
+        asset = form.save()
+        asset.created_by = self.request.user.username or 'Admin'
+        asset.save()
+        return super(AssetCreateView, self).form_valid(form)
 
-        #tags = form.cleaned_data['tags']
+    def form_invalid(self, form):
         print(form.errors)
         return super(AssetCreateView, self).form_invalid(form)
-
-    def form_valid(self, form):
-        tag_name_list = form.cleaned_data['tags']
-        # print self.tag_type,tag_name_list
-        return super(AssetCreateView, self).form_valid(form)
 
 
     def get_context_data(self, **kwargs):
@@ -74,7 +74,9 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
         return super(AssetCreateView, self).get_context_data(**kwargs)
 
 
-class AssetUpdateView(AdminUserRequiredMixin, UpdateView):
+
+
+class AssetUpdateView(AdminUserRequiredMixin,UpdateAssetTagsMiXin,UpdateView):
     model = Asset
     form_class = AssetCreateForm
     template_name = 'assets/asset_update.html'
@@ -90,7 +92,6 @@ class AssetUpdateView(AdminUserRequiredMixin, UpdateView):
 
     def form_invalid(self, form):
         print(form.errors)
-        print "jsf"
         return super(AssetUpdateView, self).form_invalid(form)
 
 
@@ -581,7 +582,10 @@ class TagView(ListView):
         return asset_list
 
     def get_context_data(self, **kwargs):
+        kwargs['app'] = 'Assets'
+        kwargs['action']='asset list'
         kwargs['tag_list'] =  [(i.id,i.name,i.asset_set.all().count() )for i in Tag.objects.all().order_by('name')]
+        kwargs['tag_id'] = self.kwargs['tag_id']
         return super(TagView, self).get_context_data(**kwargs)
 
 

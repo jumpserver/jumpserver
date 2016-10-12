@@ -51,4 +51,3 @@ class IDCViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = IDC.objects.all()
     serializer_class = IDCSerializer
 
-

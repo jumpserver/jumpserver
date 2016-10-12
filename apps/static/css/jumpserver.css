@@ -196,3 +196,22 @@ table.dataTable tbody td.selected td i.text-navy
 .m-r-30 {
   margin-right: 30px !important;
 }
+
+.ydxbd {
+	font-size: 12px;
+	width: 100%;
+	overflow: hidden;
+	padding-top: 15px;
+	margin-bottom: 15px;
+	display: block;
+	background: #f4f4f4;
+	padding-left: 10px;
+}
+.mar {
+    margin-left: 2px;
+    line-height: 15px;
+}
+.mar-j {
+    margin-left: 3px;
+    margin-right: 3px;
+}

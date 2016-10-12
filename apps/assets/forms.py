@@ -26,12 +26,10 @@ class AssetCreateForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         instance = kwargs.get('instance', None)
-
         if instance:
             initial = kwargs.get('initial', {})
-            tags = instance.tags.all()
+            #tags = instance.tags.all()
             initial['tags'] = [t.pk for t in kwargs['instance'].tags.all()]
-            print(kwargs.get('initial'))
         super(AssetCreateForm, self).__init__(*args, **kwargs)
 
     def _save_m2m(self):

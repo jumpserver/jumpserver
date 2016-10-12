@@ -43,3 +43,7 @@ def join_attr(seq, attr=None, sep=None):
         seq = [getattr(obj, attr) for obj in seq]
     print(seq)
     return sep.join(seq)
+
+@register.filter
+def IntToStr(value):
+    return str(value)

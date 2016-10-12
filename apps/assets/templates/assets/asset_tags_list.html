@@ -1,0 +1,56 @@
+{% extends '_base_list.html' %}
+{% load i18n %}
+{% load common_tags %}
+{% block content_left_head %}
+    <a href="{% url 'assets:asset-tag-create' %}" class="btn btn-sm btn-primary "> {% trans "Create tag" %} </a>
+{% endblock %}
+
+{% block table_head %}
+    <th class="text-center">
+        <input type="checkbox" id="check_all" onclick="checkAll('check_all', 'checked')">
+    </th>
+    <th class="text-center"><a href="{% url 'assets:asset-tag-list' %}?sort=name">{% trans 'Tag Name' %}</a></th>
+    <th class="text-center">{% trans 'Asset num' %}</th>
+    <th class="text-center"></th>
+{% endblock %}
+
+{% block table_body %}
+
+     {% for asset_tag in asset_tags_list %}
+         <tr class="gradeX">
+             <td class="text-center">
+                 <input type="checkbox" name="checked" value="{{ asset_tag.id }}">
+             </td>
+             <td class="text-center">
+                 <a href="{% url 'assets:asset-tag-detail' pk=asset_tag.id %}">
+                     {{ asset_tag.name }}
+                 </a>
+             </td>
+             <td class="text-center">{{ asset_tag.asset_set.count }}</td>
+             <td class="text-center">
+                 <a href="{% url 'assets:asset-tag-update' pk=asset_tag.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
+                 <a onclick="objectDelete(this,'{{ asset_tag.name }}','{% url 'assets:asset-tag-delete' asset_tag.id %}')" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
+             </td>
+         </tr>
+     {% endfor %}
+{% endblock %}
+
+{% block content_bottom_left %}
+    <form id="" method="get" action="" class=" mail-search">
+        <div class="input-group">
+            <select class="form-control m-b" style="width: auto">
+                <option>{% trans 'Delete selected' %}</option>
+                <option>{% trans 'Update selected' %}</option>
+                <option>{% trans 'Deactive selected' %}</option>
+                <option>{% trans 'Export selected' %}</option>
+            </select>
+
+            <div class="input-group-btn pull-left" style="padding-left: 5px;">
+                <button id='search_btn' type="submit" style="height: 32px;"  class="btn btn-sm btn-primary">
+                 {% trans 'Submit' %}
+                </button>
+            </div>
+
+        </div>
+   </form>
+{% endblock %}
