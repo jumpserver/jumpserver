@@ -170,6 +170,7 @@ def user_add(request):
         else:
             try:
                 if not re.match(r"^\w+$",username):
+                    error = u'用户名不合法'
                     raise ServerError
                 user = db_add_user(username=username, name=name,
                                    password=password,
