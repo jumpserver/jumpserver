@@ -634,9 +634,12 @@
 <part>id</part>
 </key>
 </table>
-<table x="300" y="770" name="login_log">
+<table x="268" y="776" name="login_log">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="name" null="1" autoincrement="0">
+<datatype>CHAR</datatype>
 <default>NULL</default></row>
 <row name="username" null="1" autoincrement="0">
 <datatype>VARCHAR</datatype>
@@ -663,7 +666,7 @@
 <part>id</part>
 </key>
 </table>
-<table x="139" y="772" name="admin_log">
+<table x="108" y="775" name="admin_log">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
 <default>NULL</default></row>
@@ -689,14 +692,20 @@
 <part>id</part>
 </key>
 </table>
-<table x="435" y="806" name="proxy_log">
+<table x="418" y="775" name="proxy_log">
 <row name="id" null="1" autoincrement="1">
 <datatype>INTEGER</datatype>
+<default>NULL</default></row>
+<row name="name" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
 <default>NULL</default></row>
 <row name="username" null="1" autoincrement="0">
 <datatype>CHAR</datatype>
 <default>NULL</default></row>
 <row name="hostname" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
+<row name="ip" null="1" autoincrement="0">
 <datatype>CHAR</datatype>
 <default>NULL</default></row>
 <row name="sysuser" null="1" autoincrement="0">
@@ -705,17 +714,8 @@
 <row name="login_type" null="1" autoincrement="0">
 <datatype>CHAR</datatype>
 <default>NULL</default></row>
-<row name="refer_id" null="1" autoincrement="0">
-<datatype>INTEGER</datatype>
-<default>NULL</default></row>
 <row name="log_file" null="1" autoincrement="0">
 <datatype>CHAR</datatype>
-<default>NULL</default></row>
-<row name="login_ip" null="1" autoincrement="0">
-<datatype>VARCHAR</datatype>
-<default>NULL</default></row>
-<row name="login_city" null="1" autoincrement="0">
-<datatype>VARCHAR</datatype>
 <default>NULL</default></row>
 <row name="is_finished" null="1" autoincrement="0">
 <datatype>INTEGER</datatype>
@@ -738,11 +738,17 @@
 <datatype>INTEGER</datatype>
 <default>NULL</default><relation table="proxy_log" row="id" />
 </row>
+<row name="command" null="1" autoincrement="0">
+<datatype>CHAR</datatype>
+<default>NULL</default></row>
+<row name="output" null="1" autoincrement="0">
+<datatype>VARCHAR</datatype>
+<default>NULL</default></row>
 <row name="date_start" null="1" autoincrement="0">
 <datatype>DATE</datatype>
 <default>NULL</default></row>
-<row name="command" null="1" autoincrement="0">
-<datatype>CHAR</datatype>
+<row name="date_finished" null="1" autoincrement="0">
+<datatype>DATE</datatype>
 <default>NULL</default></row>
 <key type="PRIMARY" name="">
 <part>id</part>
