@@ -7,6 +7,7 @@ from itertools import chain
 import string
 import logging
 
+from itsdangerous import TimedJSONWebSignatureSerializer
 from django.shortcuts import reverse as dj_reverse
 from django.conf import settings
 from django.core import signing
