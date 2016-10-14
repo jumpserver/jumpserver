@@ -215,3 +215,20 @@ table.dataTable tbody td.selected td i.text-navy
     margin-left: 3px;
     margin-right: 3px;
 }
+
+.form-asset-on button{
+    background: #f1f1f1;
+    margin-right: 2px;
+}
+.form-asset-on{
+    border: 1px solid #e5e6e7;
+    padding-top:5px;
+    padding-bottom: 0px;
+    padding-left: 5px;
+    padding-right: 5px;
+    min-height:34px;
+    height: 100%;
+}
+.form-asset-on p{
+    margin-bottom:0px;
+}

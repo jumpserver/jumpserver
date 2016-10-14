@@ -30,7 +30,7 @@
                     </div>
                 </div>
                 <div class="ibox-content">
-                    <div class="">
+                    <div class="" id="content_start">
                         {% block content_left_head %} {% endblock %}
                         {% block table_search %}
                         <form id="search_form" method="get" action="" class="pull-right mail-search">
@@ -44,6 +44,7 @@
                             </div>
                         </form>
                         {% endblock %}
+                        {% block tags_list %}{% endblock %}
                     </div>
                     {% block table_container %}
                     <table class="table table-striped table-bordered table-hover " id="editable" >

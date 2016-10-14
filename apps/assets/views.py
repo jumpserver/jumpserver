@@ -229,11 +229,12 @@ class AssetGroupUpdateView(AdminUserRequiredMixin, UpdateView):
         return super(AssetGroupUpdateView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
+        assets_all = self.object.assets.all()
         context = {
             'app': _('Assets'),
             'action': _('Create asset group'),
-            # 'assets': Asset.objects.all(),
-            'assets_count': self.object.assets.all().count(),
+            'assets_on_list': assets_all,
+            'assets_count': len(assets_all),
             'group_id':self.object.id,
         }
         kwargs.update(context)
@@ -663,10 +664,12 @@ class AssetTagUpdateView(AdminUserRequiredMixin, UpdateView):
         return super(AssetTagUpdateView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
+        assets_all = self.object.asset_set.all()
         context = {
             'app': _('Tag'),
             'action': _('Asset Tags detail'),
-            'assets_count': self.object.asset_set.all().count(),
+            'assets_count': len(assets_all),
+            'assets_on_list': assets_all,
             'tag_id':self.object.id,
         }
         kwargs.update(context)
