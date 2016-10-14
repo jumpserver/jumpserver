@@ -7,15 +7,19 @@ from itertools import chain
 import string
 import logging
 
-from itsdangerous import TimedJSONWebSignatureSerializer
+from itsdangerous import Signer, TimedJSONWebSignatureSerializer, JSONWebSignatureSerializer, TimestampSigner, \
+    BadSignature, SignatureExpired
 from django.shortcuts import reverse as dj_reverse
 from django.conf import settings
 from django.core import signing
 from django.utils import timezone
 
+SECRET_KEY = settings.SECRET_KEY
+SIGNER = TimestampSigner(SECRET_KEY)
 
-def reverse(viewname, urlconf=None, args=None, kwargs=None, current_app=None, external=False):
-    url = dj_reverse(viewname, urlconf=urlconf, args=args, kwargs=kwargs, current_app=current_app)
+
+def reverse(view_name, urlconf=None, args=None, kwargs=None, current_app=None, external=False):
+    url = dj_reverse(view_name, urlconf=urlconf, args=args, kwargs=kwargs, current_app=current_app)
 
     if external:
         url = settings.SITE_URL.strip('/') + url
@@ -44,13 +48,27 @@ def decrypt(*args, **kwargs):
         return ''
 
 
+def sign(value):
+    return SIGNER.sign(value)
+
+
+def unsign(value, max_age=3600):
+    try:
+        return SIGNER.unsign(value, max_age=max_age)
+    except (BadSignature, SignatureExpired):
+        return None
+
+
 def date_expired_default():
     try:
         years = int(settings.CONFIG.DEFAULT_EXPIRED_YEARS)
     except TypeError:
         years = 70
+    return timezone.now() + timezone.timedelta(days=365*years)
 
-    return timezone.now() + timezone.timedelta(days=365 * years)
+
+def sign(value):
+    return SIGNER.sign(value)
 
 
 def combine_seq(s1, s2, callback=None):
