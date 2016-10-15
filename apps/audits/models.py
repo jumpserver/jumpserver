@@ -10,18 +10,18 @@ from django.utils.translation import ugettext_lazy as _
 class LoginLog(models.Model):
     LOGIN_TYPE_CHOICE = (
         ('W', 'Web'),
-        ('T', 'Terminal'),
+        ('S', 'SSH Terminal'),
         ('WT', 'Web Terminal')
     )
 
     username = models.CharField(max_length=20, verbose_name=_('Username'))
     name = models.CharField(max_length=20, blank=True, verbose_name=_('Name'))
-    login_type = models.CharField(choices=LOGIN_TYPE_CHOICE, max_length=1, verbose_name=_('Login type'))
+    login_type = models.CharField(choices=LOGIN_TYPE_CHOICE, max_length=2, verbose_name=_('Login type'))
     login_ip = models.GenericIPAddressField(verbose_name=_('Login ip'))
     login_city = models.CharField(max_length=100, blank=True, null=True, verbose_name=_('Login city'))
     user_agent = models.CharField(max_length=100, blank=True, null=True, verbose_name=_('User agent'))
     from_terminal = models.ForeignKey
-    date_login = models.DateTimeField(auto_now=True, verbose_name=_('Date login'))
+    date_login = models.DateTimeField(auto_now_add=True, verbose_name=_('Date login'))
     date_logout = models.DateTimeField(null=True, verbose_name=_('Date logout'))
 
     class Meta:
@@ -44,7 +44,7 @@ class ProxyLog(models.Model):
     log_file = models.CharField(max_length=1000, blank=True, null=True)
     was_failed = models.BooleanField(default=False, verbose_name=_('Did connect failed'))
     is_finished = models.BooleanField(default=False, verbose_name=_('Is finished'))
-    date_start = models.DateTimeField(auto_now=True, verbose_name=_('Date start'))
+    date_start = models.DateTimeField(auto_now_add=True, verbose_name=_('Date start'))
     date_finished = models.DateTimeField(null=True, verbose_name=_('Date finished'))
 
     def __unicode__(self):

@@ -27,7 +27,7 @@ class AssetPermission(models.Model):
     is_active = models.BooleanField(default=True, verbose_name=_('Active'))
     date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_('Date expired'))
     created_by = models.CharField(max_length=128, blank=True, verbose_name=_('Created by'))
-    date_created = models.DateTimeField(auto_now=True, verbose_name=_('Date created'))
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
 
     def __unicode__(self):

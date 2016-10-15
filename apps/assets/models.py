@@ -19,7 +19,7 @@ class IDC(models.Model):
     address = models.CharField(max_length=128, blank=True, verbose_name=_("Address"))
     intranet = models.TextField(blank=True, verbose_name=_('Intranet'))
     extranet = models.TextField(blank=True, verbose_name=_('Extranet'))
-    date_created = models.DateTimeField(auto_now=True, null=True, verbose_name=_('Date added'))
+    date_created = models.DateTimeField(auto_now_add=True, null=True, verbose_name=_('Date added'))
     operator = models.CharField(max_length=32, blank=True, verbose_name=_('Operator'))
     created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
@@ -62,7 +62,7 @@ class AssetExtend(models.Model):
     key = models.CharField(max_length=64, verbose_name=_('KEY'))
     value = models.CharField(max_length=64, verbose_name=_('VALUE'))
     created_by = models.CharField(max_length=32, blank=True, verbose_name=_("Created by"))
-    date_created = models.DateTimeField(auto_now=True, null=True)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
@@ -98,7 +98,7 @@ class AdminUser(models.Model):
     _public_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
     as_default = models.BooleanField(default=False, verbose_name=_('As default'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
-    date_created = models.DateTimeField(auto_now=True, null=True)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
     created_by = models.CharField(max_length=32, null=True, verbose_name=_('Created by'))
 
     def __unicode__(self):
@@ -169,7 +169,7 @@ class SystemUser(models.Model):
     shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
     home = models.CharField(max_length=64, blank=True, verbose_name=_('Home'))
     uid = models.IntegerField(null=True, blank=True, verbose_name=_('Uid'))
-    date_created = models.DateTimeField(auto_now=True)
+    date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
     comment = models.TextField(max_length=128, blank=True, verbose_name=_('Comment'))
 
@@ -243,7 +243,7 @@ class AssetGroup(models.Model):
     name = models.CharField(max_length=64, unique=True, verbose_name=_('Name'))
     system_users = models.ManyToManyField(SystemUser, related_name='asset_groups', blank=True)
     created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
-    date_created = models.DateTimeField(auto_now=True, null=True, verbose_name=_('Date added'))
+    date_created = models.DateTimeField(auto_now_add=True, null=True, verbose_name=_('Date added'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
@@ -321,7 +321,7 @@ class Asset(models.Model):
     sn = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Serial number'))
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
-    date_created = models.DateTimeField(auto_now=True, null=True, blank=True, verbose_name=_('Date added'))
+    date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date added'))
     comment = models.TextField(max_length=128, null=True, blank=True, verbose_name=_('Comment'))
     tags = models.ManyToManyField('Tag', verbose_name='标签集合', blank=True)
 
@@ -365,14 +365,14 @@ class Asset(models.Model):
 
 
 class Tag(models.Model):
-    name = models.CharField('标签名', max_length=64,unique=True)
-    created_time = models.DateTimeField('创建时间', auto_now_add=True)
+    name = models.CharField(max_length=64, unique=True, verbose_name=_('Name'))
+    created_time = models.DateTimeField(auto_now_add_add=True, verbose_name=_('Create time'))
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
 
-    def __str__(self):
-        return self.name
     def __unicode__(self):
         return self.name
+
+    __str__ = __unicode__
 
     class Meta:
         db_table = 'tag'
