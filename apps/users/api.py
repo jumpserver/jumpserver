@@ -7,11 +7,12 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 
+from common.mixins import BulkDeleteApiMixin
+from common.utils import get_logger
 from .models import User, UserGroup
 from .serializers import UserDetailSerializer, UserAndGroupSerializer, \
     GroupDetailSerializer, UserPKUpdateSerializer, UserBulkUpdateSerializer, GroupBulkUpdateSerializer
-from common.mixins import BulkDeleteApiMixin
-from common.utils import get_logger
+from .backends import IsSuperUser, IsAppUser, IsValidUser, IsSuperUserOrAppUser
 
 
 logger = get_logger(__name__)
@@ -84,6 +85,10 @@ class GroupDetailApi(generics.RetrieveUpdateDestroyAPIView):
 class UserListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserBulkUpdateSerializer
+    permission_classes = (IsSuperUserOrAppUser,)
+
+    def get(self, request, *args, **kwargs):
+        return super(UserListUpdateApi, self).get(request, *args, **kwargs)
 
 
 class GroupListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):

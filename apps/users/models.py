@@ -69,6 +69,7 @@ class User(AbstractUser):
     ROLE_CHOICES = (
         ('Admin', _('Administrator')),
         ('User', _('User')),
+        ('App', _('Application')),
     )
 
     username = models.CharField(max_length=20, unique=True, verbose_name=_('Username'))
@@ -148,9 +149,18 @@ class User(AbstractUser):
         else:
             self.role = 'User'
 
+    is_admin = is_superuser
+
+    @property
+    def is_app_user(self):
+        if self.role == 'App':
+            return True
+        else:
+            return False
+
     @property
     def is_staff(self):
-        if self.is_authenticated and self.is_active and not self.is_expired and self.is_superuser:
+        if self.is_authenticated and self.is_valid:
             return True
         else:
             return False
@@ -185,13 +195,13 @@ class User(AbstractUser):
         Token.objects.filter(user=self).delete()
         return Token.objects.create(user=self)
 
-    def generate_reset_token(self):
-        return signing.dumps({'reset': self.id, 'email': self.email})
-
     def is_member_of(self, user_group):
         if user_group in self.groups.all():
             return True
         return False
+
+    def generate_reset_token(self):
+        return signing.dumps({'reset': self.id, 'email': self.email})
 
     @classmethod
     def validate_reset_token(cls, token, max_age=3600):
