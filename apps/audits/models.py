@@ -9,8 +9,9 @@ from django.utils.translation import ugettext_lazy as _
 
 class LoginLog(models.Model):
     LOGIN_TYPE_CHOICE = (
-        ('S', 'ssh'),
-        ('W', 'web'),
+        ('W', 'Web'),
+        ('T', 'Terminal'),
+        ('WT', 'Web Terminal')
     )
 
     username = models.CharField(max_length=20, verbose_name=_('Username'))
@@ -19,6 +20,7 @@ class LoginLog(models.Model):
     login_ip = models.GenericIPAddressField(verbose_name=_('Login ip'))
     login_city = models.CharField(max_length=100, blank=True, null=True, verbose_name=_('Login city'))
     user_agent = models.CharField(max_length=100, blank=True, null=True, verbose_name=_('User agent'))
+    from_terminal = models.ForeignKey
     date_login = models.DateTimeField(auto_now=True, verbose_name=_('Date login'))
     date_logout = models.DateTimeField(null=True, verbose_name=_('Date logout'))
 
