@@ -21,11 +21,13 @@ logger = get_logger(__name__)
 class UserDetailApi(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserDetailSerializer
+    permission_classes = (IsSuperUser,)
 
 
 class UserAndGroupEditApi(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
     serializer_class = UserAndGroupSerializer
+    permission_classes = (IsSuperUser,)
 
 
 class UserResetPasswordApi(generics.UpdateAPIView):
@@ -109,3 +111,23 @@ class DeleteUserFromGroupApi(generics.DestroyAPIView):
         user_id = kwargs.get('uid')
         user = get_object_or_404(User, id=user_id)
         instance.users.remove(user)
+
+
+class AppUserRegisterApi(generics.CreateAPIView):
+    """App send a post request to register a app user
+
+    request params contains `username_signed`, You can unsign it,
+    username = unsign(username_signed), if you get the username,
+    It's present it's a valid request, or return (401, Invalid request),
+    then your should check if the user exist or not. If exist,
+    return (200, register success), If not, you should be save it, and
+    notice admin user, The user default is not active before admin user
+    unblock it.
+
+    Save fields:
+        username:
+        name: name + request.ip
+        email: username + '@app.org'
+        role: App
+    """
+    pass

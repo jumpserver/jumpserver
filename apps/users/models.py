@@ -69,7 +69,6 @@ class User(AbstractUser):
     ROLE_CHOICES = (
         ('Admin', _('Administrator')),
         ('User', _('User')),
-        ('App', _('Application')),
     )
 
     username = models.CharField(max_length=20, unique=True, verbose_name=_('Username'))
@@ -149,15 +148,6 @@ class User(AbstractUser):
         else:
             self.role = 'User'
 
-    is_admin = is_superuser
-
-    @property
-    def is_app_user(self):
-        if self.role == 'App':
-            return True
-        else:
-            return False
-
     @property
     def is_staff(self):
         if self.is_authenticated and self.is_valid:
@@ -188,7 +178,6 @@ class User(AbstractUser):
             token = Token.objects.get(user=self)
         except Token.DoesNotExist:
             token = Token.objects.create(user=self)
-
         return token.key
 
     def refresh_private_token(self):
