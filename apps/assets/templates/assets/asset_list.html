@@ -7,6 +7,9 @@ div.dataTables_wrapper div.dataTables_filter,
 .dataTables_length {
     float: right !important;
 }
+div.dataTables_wrapper div.dataTables_filter {
+  margin-left: 15px;
+}
 .custom{
     float:left;
     margin-right:5px;
@@ -21,21 +24,33 @@ div.dataTables_wrapper div.dataTables_filter,
                         {% endblock %}
 {% block tags_list %}
 
-                      <div class="ydxbd" id="ydxbd" style="display: block;">
+                      <div class="ydxbd" id="ydxbd" style="display: none;">
                            <div>
                                <p id="tags_p">
                                    {% for tag in tag_list %}
-                                    <a href="{% url 'assets:asset-tags' tag_id=tag.0 %}"
-                                        {% if tag.0|IntToStr == tag_id %}
-                                            class="fa fa-tag btn btn-sm  btn-primary mar-j" name="tag_on">
-                                        {% else %}
-                                            class="fa fa-tag btn btn-sm btn-outline btn-primary mar-j">
-                                        {% endif %}
-                                        <span class="mar">
-                                            <strong>{{ tag.1}}</strong>({{ tag.2 }})
-                                        </span></a>
+
+                                   <a href="{% url 'assets:asset-tags' tag_id=tag.0 %}">
+                                       <span
+                                           {% if tag.0|IntToStr == tag_id %}
+                                               class="label label-warning" name="tag_on"
+                                           {% else %}
+                                               class="label label-default"
+                                           {% endif %}
+                                       >{{ tag.1}}({{ tag.2 }})</span>
+                                       </a>
+{#                                    <a href="{% url 'assets:asset-tags' tag_id=tag.0 %}"#}
+{#                                        {% if tag.0|IntToStr == tag_id %}#}
+{#                                            class="fa fa-tag btn btn-sm btn-warning btn-rounded mar-j" name="tag_on">#}
+{#                                        {% else %}#}
+{#                                            class="fa fa-tag btn btn-sm btn-default btn-rounded mar-j">#}
+{#                                        {% endif %}#}
+{#                                        <span class="mar">#}
+{#                                            <strong>{{ tag.1}}</strong>({{ tag.2 }})#}
+{#                                        </span></a>#}
+
                                    {% endfor %}
-                                    <a href="{% url 'assets:asset-list' %}" class="btn btn-sm btn-outline btn-default ">移除选择</a>
+{#                                    <a href="{% url 'assets:asset-list' %}" class="btn btn-sm btn-rounded btn-default ">移除选择</a>#}
+                                   <a href="{% url 'assets:asset-list' %}" ><span class="label label-default">移除选择</span></a>
                                </p>
                            </div>
                        </div>
@@ -121,8 +136,8 @@ div.dataTables_wrapper div.dataTables_filter,
                 oDiv.style.display = "none";
             }
     };
-
     $(document).ready(function(){
+        var oTags = document.getElementById("ydxbd");
         var table = $('#editable').DataTable({
             "aLengthMenu": [[10, 25, 50, -1], ["10", "25", "50", "all"]],
             "iDisplayLength":25,
@@ -130,11 +145,11 @@ div.dataTables_wrapper div.dataTables_filter,
             "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ] }],
             "bAutoWidth": false,
             "language": {"url": "/static/js/plugins/dataTables/i18n/zh-hans.json"},
-            //"dom": '<lf<t>ip>',
             "dom": '<"custom">lftip',
             "initComplete": function() {
                 //alert( 'DataTables has finished its initialisation.' );
                 $('#editable_length').before("<a href=\"{% url 'assets:asset-create' %}\" class=\"btn btn-sm btn-primary custom \"> {% trans 'Create asset' %} </a>&nbsp; <button class='btn btn-sm btn-primary custom' id='zksx' onclick='tagShow()'>标签</button>");
+                $('#editable').before(oTags);
             },
         columns: [
             {data: "checkbox"},

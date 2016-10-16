@@ -204,12 +204,12 @@ table.dataTable tbody td.selected td i.text-navy
 	padding-top: 15px;
 	margin-bottom: 15px;
 	display: block;
-	background: #f4f4f4;
+	/*background: #ccc;*/
 	padding-left: 10px;
 }
 .mar {
     margin-left: 2px;
-    line-height: 15px;
+    line-height: 0px;
 }
 .mar-j {
     margin-left: 3px;
