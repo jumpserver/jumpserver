@@ -121,7 +121,7 @@ NgApp.controller('TerminalRecordCtrl', function ($scope, $http) {
         timelist = timelist.sort(function(a, b){return a-b});
         totalTime = totalTime * 1000;
         document.getElementById("afterScrubberText").innerHTML = buildTimeString(totalTime);
-        term.open(document.getElementById('terminal'));
+        term.open(document.getElementById('apps'));
         timer = setInterval(advance, TICK);
     })
 

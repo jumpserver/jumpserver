@@ -17,14 +17,13 @@ class Terminal(models.Model):
     is_bound_ip = models.BooleanField(default=False, verbose_name=_('Is bound ip'))
     heatbeat_interval = models.IntegerField(default=60, verbose_name=_('Heatbeat interval'))
     type = models.CharField(choices=TYPE_CHOICES, max_length=2, verbose_name=_('Terminal type'))
-    ssh_host = models.CharField(max_length=100, verbose_name=_('SSH host'))
-    ssh_port = models.IntegerField(verbose_name=_('SSH port'))
+    url = models.CharField(max_length=100, verbose_name=_('URL to login'))
     mail_to = models.ManyToManyField(User, verbose_name=_('Mail to'))
     date_created = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(verbose_name=_('Comment'))
 
     class Meta:
-        db_table = 'terminal'
+        db_table = 'apps'
         ordering = ['name']
 
 

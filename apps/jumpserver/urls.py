@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^assets/', include('assets.urls')),
     url(r'^perms/', include('perms.urls')),
     url(r'^(api/)?audits/', include('audits.urls')),
+    url(r'^(api/)?apps/', include('apps.urls')),
 ]
 
 

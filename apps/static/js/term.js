@@ -588,7 +588,7 @@ Terminal.bindKeys = function(document) {
   }, true);
 
   // If we click somewhere other than a
-  // terminal, unfocus the terminal.
+  // apps, unfocus the apps.
   on(document, 'mousedown', function(ev) {
     if (!Terminal.focus) return;
 
@@ -742,7 +742,7 @@ Terminal.insertStyle = function(document, bg, fg) {
 
   // textContent doesn't work well with IE for <style> elements.
   style.innerHTML = ''
-    + '.terminal {\n'
+    + '.apps {\n'
     + '  float: left;\n'
     + '  border: ' + bg + ' solid 5px;\n'
     + '  font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;\n'
@@ -751,7 +751,7 @@ Terminal.insertStyle = function(document, bg, fg) {
     + '  background: ' + bg + ';\n'
     + '}\n'
     + '\n'
-    + '.terminal-cursor {\n'
+    + '.apps-cursor {\n'
     + '  color: ' + bg + ';\n'
     + '  background: ' + fg + ';\n'
     + '}\n';
@@ -802,7 +802,7 @@ Terminal.prototype.open = function(parent) {
     this.isMSIE = !!~this.context.navigator.userAgent.indexOf('MSIE');
   }
 
-  // Create our main terminal element.
+  // Create our main apps element.
   this.element = this.document.createElement('div');
   this.element.className = 'terminal';
   this.element.style.outline = 'none';
@@ -811,7 +811,7 @@ Terminal.prototype.open = function(parent) {
   this.element.style.backgroundColor = this.colors[256];
   this.element.style.color = this.colors[257];
 
-  // Create the lines for our terminal.
+  // Create the lines for our apps.
   this.children = [];
   for (; i < this.rows; i++) {
     div = this.document.createElement('div');
@@ -1020,7 +1020,7 @@ Terminal.prototype.open = function(parent) {
 
   if (!('useMouse' in this.options) || this.options.useMouse) {
     // Listen for mouse events and translate
-    // them into terminal mouse protocols.
+    // them into apps mouse protocols.
     this.bindMouse();
   }
 
@@ -1549,7 +1549,7 @@ Terminal.prototype.refresh = function(start, end) {
         }
         if (data !== this.defAttr) {
           if (data === -1) {
-            out += '<span class="reverse-video terminal-cursor">';
+            out += '<span class="reverse-video apps-cursor">';
           } else {
             out += '<span style="';
 
@@ -1660,7 +1660,7 @@ Terminal.prototype.refresh = function(start, end) {
   }
 
   if (this._textarea) {
-    var cursorElement = this.element.querySelector('.terminal-cursor');
+    var cursorElement = this.element.querySelector('.apps-cursor');
     if(cursorElement){
       var cursor_x = cursorElement.offsetLeft;
       var cursor_y = cursorElement.offsetTop;
@@ -2474,7 +2474,7 @@ Terminal.prototype.write = function(data) {
           //   break;
 
           // CSI > Ps p  Set pointer mode.
-          // CSI ! p   Soft terminal reset (DECSTR).
+          // CSI ! p   Soft apps reset (DECSTR).
           // CSI Ps$ p
           //   Request ANSI mode (DECRQM).
           // CSI ? Ps$ p
@@ -3959,7 +3959,7 @@ Terminal.prototype.HPositionRelative = function(params) {
 };
 
 // CSI Ps c  Send Device Attributes (Primary DA).
-//     Ps = 0  or omitted -> request attributes from terminal.  The
+//     Ps = 0  or omitted -> request attributes from apps.  The
 //     response depends on the decTerminalID resource setting.
 //     -> CSI ? 1 ; 2 c  (``VT100 with Advanced Video Option'')
 //     -> CSI ? 1 ; 0 c  (``VT101 with No Options'')
@@ -3967,7 +3967,7 @@ Terminal.prototype.HPositionRelative = function(params) {
 //     -> CSI ? 6 0 ; 1 ; 2 ; 6 ; 8 ; 9 ; 1 5 ; c  (``VT220'')
 //   The VT100-style response parameters do not mean anything by
 //   themselves.  VT220 parameters do, telling the host what fea-
-//   tures the terminal supports:
+//   tures the apps supports:
 //     Ps = 1  -> 132-columns.
 //     Ps = 2  -> Printer.
 //     Ps = 6  -> Selective erase.
@@ -3978,12 +3978,12 @@ Terminal.prototype.HPositionRelative = function(params) {
 //     Ps = 2 9  -> ANSI text locator (i.e., DEC Locator mode).
 // CSI > Ps c
 //   Send Device Attributes (Secondary DA).
-//     Ps = 0  or omitted -> request the terminal's identification
+//     Ps = 0  or omitted -> request the apps's identification
 //     code.  The response depends on the decTerminalID resource set-
 //     ting.  It should apply only to VT220 and up, but xterm extends
 //     this to VT100.
 //     -> CSI  > Pp ; Pv ; Pc c
-//   where Pp denotes the terminal type
+//   where Pp denotes the apps type
 //     Pp = 0  -> ``VT100''.
 //     Pp = 1  -> ``VT220''.
 //   and Pv is the firmware version (for xterm, this was originally
@@ -3992,7 +3992,7 @@ Terminal.prototype.HPositionRelative = function(params) {
 //   always zero.
 // More information:
 //   xterm/charproc.c - line 2012, for more information.
-//   vim responds with ^[[?0c or ^[[?1c after the terminal's response (?)
+//   vim responds with ^[[?0c or ^[[?1c after the apps's response (?)
 Terminal.prototype.sendDeviceAttributes = function(params) {
   if (params[0] > 0) return;
 
@@ -4217,19 +4217,19 @@ Terminal.prototype.setMode = function(params) {
         // focusout: ^[[O
         this.sendFocus = true;
         break;
-      case 1005: // utf8 ext mode mouse
+      case 1005: // utf8 apps mode mouse
         this.utfMouse = true;
         // for wide terminals
         // simply encodes large values as utf8 characters
         break;
-      case 1006: // sgr ext mode mouse
+      case 1006: // sgr apps mode mouse
         this.sgrMouse = true;
         // for wide terminals
         // does not add 32 to fields
         // press: ^[[<b;x;yM
         // release: ^[[<b;x;ym
         break;
-      case 1015: // urxvt ext mode mouse
+      case 1015: // urxvt apps mode mouse
         this.urxvtMouse = true;
         // for wide terminals
         // numbers for fields
@@ -4406,13 +4406,13 @@ Terminal.prototype.resetMode = function(params) {
       case 1004: // send focusin/focusout events
         this.sendFocus = false;
         break;
-      case 1005: // utf8 ext mode mouse
+      case 1005: // utf8 apps mode mouse
         this.utfMouse = false;
         break;
-      case 1006: // sgr ext mode mouse
+      case 1006: // sgr apps mode mouse
         this.sgrMouse = false;
         break;
-      case 1015: // urxvt ext mode mouse
+      case 1015: // urxvt apps mode mouse
         this.urxvtMouse = false;
         break;
       case 25: // hide cursor
@@ -4622,7 +4622,7 @@ Terminal.prototype.setPointerMode = function(params) {
   ;
 };
 
-// CSI ! p   Soft terminal reset (DECSTR).
+// CSI ! p   Soft apps reset (DECSTR).
 // http://vt100.net/docs/vt220-rm/table4-10.html
 Terminal.prototype.softReset = function(params) {
   this.cursorHidden = false;
@@ -4870,7 +4870,7 @@ Terminal.prototype.enableFilterRectangle = function(params) {
 // CSI Ps x  Request Terminal Parameters (DECREQTPARM).
 //   if Ps is a "0" (default) or "1", and xterm is emulating VT100,
 //   the control sequence elicits a response of the same form whose
-//   parameters describe the terminal:
+//   parameters describe the apps:
 //     Ps -> the given Ps incremented by 2.
 //     Pn = 1  <- no parity.
 //     Pn = 1  <- eight bits.
@@ -6113,7 +6113,7 @@ function inherits(child, parent) {
 }
 
 // if bold is broken, we can't
-// use it in the terminal.
+// use it in the apps.
 function isBoldBroken(document) {
   var body = document.getElementsByTagName('body')[0];
   var terminal = document.createElement('div');

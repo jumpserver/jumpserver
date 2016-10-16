@@ -89,8 +89,8 @@ class UserListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):
     serializer_class = UserBulkUpdateSerializer
     permission_classes = (IsSuperUserOrAppUser,)
 
-    def get(self, request, *args, **kwargs):
-        return super(UserListUpdateApi, self).get(request, *args, **kwargs)
+    # def get(self, request, *args, **kwargs):
+    #     return super(UserListUpdateApi, self).get(request, *args, **kwargs)
 
 
 class GroupListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):

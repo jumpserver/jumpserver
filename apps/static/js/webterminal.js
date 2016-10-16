@@ -13,7 +13,7 @@ WSSHClient.prototype._generateEndpoint = function (options) {
         var protocol = 'ws://';
     }
 
-    var endpoint = protocol + document.URL.match(RegExp('//(.*?)/'))[1] + '/ws/terminal' + document.URL.match(/(\?.*)/);
+    var endpoint = protocol + document.URL.match(RegExp('//(.*?)/'))[1] + '/ws/apps' + document.URL.match(/(\?.*)/);
     return endpoint;
 };
 WSSHClient.prototype.connect = function (options) {
@@ -81,7 +81,7 @@ function openTerminal(options) {
     term.on('data', function (data) {
         client.send(data)
     });
-    $('.terminal').detach().appendTo('#term');
+    $('.apps').detach().appendTo('#term');
     //term.resize(colWidth, rowHeight);
     term.write('Connecting...');
     client.connect($.extend(options, {
@@ -100,13 +100,13 @@ function openTerminal(options) {
             term.write(data);
         }
     }));
-    //rowHeight = 0.0 + 1.00 * $('.terminal').height() / 24;
-    //colWidth = 0.0 + 1.00 * $('.terminal').width() / 80;
+    //rowHeight = 0.0 + 1.00 * $('.apps').height() / 24;
+    //colWidth = 0.0 + 1.00 * $('.apps').width() / 80;
     return {'term': term, 'client': client};
 }
 
 //function resize() {
-//    $('.terminal').css('width', window.innerWidth - 25);
+//    $('.apps').css('width', window.innerWidth - 25);
 //    console.log(window.innerWidth);
 //    console.log(window.innerWidth - 10);
 //    var rows = Math.floor(window.innerHeight / rowHeight) - 2;
@@ -145,10 +145,10 @@ $(document).ready(function () {
         term_client.client.send({'resize': {'rows': row, 'cols': col}});
         $('#ssh').show();
     });
-    $(".terminal").mouseleave(function () {
+    $(".apps").mouseleave(function () {
         $(".termChangBar").slideDown();
     });
-    $(".terminal").mouseenter(function () {
+    $(".apps").mouseenter(function () {
         $(".termChangBar").slideUp();
     })
 });

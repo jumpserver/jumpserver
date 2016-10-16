@@ -366,7 +366,7 @@ class Asset(models.Model):
 
 class Tag(models.Model):
     name = models.CharField(max_length=64, unique=True, verbose_name=_('Name'))
-    created_time = models.DateTimeField(auto_now_add_add=True, verbose_name=_('Create time'))
+    created_time = models.DateTimeField(auto_now_add=True, verbose_name=_('Create time'))
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
 
     def __unicode__(self):
