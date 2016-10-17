@@ -11,7 +11,7 @@ class Terminal(models.Model):
         ('S', 'SSH Terminal'),
         ('WT', 'Web Terminal')
     )
-    name = models.CharField(max_length=30, verbose_name=_('Name'))
+    name = models.CharField(max_length=30, unique=True, verbose_name=_('Name'))
     ip = models.GenericIPAddressField(verbose_name=_('From ip'))
     is_active = models.BooleanField(default=False, verbose_name=_('Is active'))
     is_bound_ip = models.BooleanField(default=False, verbose_name=_('Is bound ip'))
