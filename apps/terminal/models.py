@@ -19,11 +19,27 @@ class Terminal(models.Model):
     type = models.CharField(choices=TYPE_CHOICES, max_length=2, verbose_name=_('Terminal type'))
     url = models.CharField(max_length=100, verbose_name=_('URL to login'))
     mail_to = models.ManyToManyField(User, verbose_name=_('Mail to'))
+    is_accepted = models.BooleanField(default=False, verbose_name=_('Is accepted'))
     date_created = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(verbose_name=_('Comment'))
 
+    def is_valid(self):
+        return self.is_active and self.is_accepted
+
+    @property
+    def is_superuser(self):
+        return False
+
+    @property
+    def is_terminal(self):
+        return True
+
+    @property
+    def is_authenticated(self):
+        return False
+
     class Meta:
-        db_table = 'apps'
+        db_table = 'terminal'
         ordering = ['name']
 
 

@@ -68,7 +68,7 @@ $(document).ready(function(){
 {#                    $(td).html(update_btn + del_btn)#}
 {#             }}],#}
 {#                ],#}
-        ajax_url: '{% url "apps:apps-list-create-api" %}',
+        ajax_url: '{% url "terminal:terminal-list-create-api" %}',
         columns: [{data: function(){return ""}}, {data: "name" }, {data: "ip" }, {data: "get_type_display" }, {data: "url" },
                   {data: "is_active" }, {data: "ip"}],
         op_html: $('#actions').html()

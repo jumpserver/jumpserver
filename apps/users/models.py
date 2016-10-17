@@ -141,6 +141,10 @@ class User(AbstractUser):
         else:
             return False
 
+    @property
+    def is_terminal(self):
+        return False
+
     @is_superuser.setter
     def is_superuser(self, value):
         if value is True:

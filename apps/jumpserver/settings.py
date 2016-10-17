@@ -57,7 +57,7 @@ INSTALLED_APPS = [
     'ops.apps.OpsConfig',
     'audits.apps.AuditsConfig',
     'common.apps.CommonConfig',
-    'apps.apps.TerminalConfig',
+    'terminal.apps.TerminalConfig',
     'rest_framework',
     'rest_framework.authtoken',
     'bootstrapform',
@@ -270,7 +270,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
-        'users.backends.AppSignAuthentication',
+        'users.backends.TerminalAuthentication',
     ),
 }
 # This setting is required to override the Django's main loop, when running in

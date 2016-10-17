@@ -47,7 +47,7 @@ WSSHClient.prototype._generateEndpoint = function(options) {
         var protocol = 'ws://';
     }
 
-    var endpoint = protocol + window.location.host + ':8080' + '/apps';
+    var endpoint = protocol + window.location.host + ':8080' + '/terminal';
     return endpoint;
 };
 

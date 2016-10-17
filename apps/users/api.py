@@ -12,7 +12,7 @@ from common.utils import get_logger
 from .models import User, UserGroup
 from .serializers import UserDetailSerializer, UserAndGroupSerializer, \
     GroupDetailSerializer, UserPKUpdateSerializer, UserBulkUpdateSerializer, GroupBulkUpdateSerializer
-from .backends import IsSuperUser, IsAppUser, IsValidUser, IsSuperUserOrAppUser
+from .backends import IsSuperUser, IsTerminalUser, IsValidUser, IsSuperUserOrTerminalUser
 
 
 logger = get_logger(__name__)
@@ -87,7 +87,7 @@ class GroupDetailApi(generics.RetrieveUpdateDestroyAPIView):
 class UserListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserBulkUpdateSerializer
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsSuperUserOrTerminalUser,)
 
     # def get(self, request, *args, **kwargs):
     #     return super(UserListUpdateApi, self).get(request, *args, **kwargs)

@@ -9,7 +9,7 @@ from .models import Terminal
 
 class TerminalListView(ListView):
     model = Terminal
-    template_name = 'apps/terminal_list.html'
+    template_name = 'terminal/terminal_list.html'
 
     def get_context_data(self, **kwargs):
         context = super(TerminalListView, self).get_context_data(**kwargs)
