@@ -16,5 +16,4 @@ class CommandLogSerializer(serializers.ModelSerializer):
         model = models.CommandLog
 
 
-if __name__ == '__main__':
-    pass
+

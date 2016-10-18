@@ -6,7 +6,7 @@ from rest_framework import generics
 
 import serializers
 
-from .models import ProxyLog
+from .models import ProxyLog, CommandLog
 from .hands import IsSuperUserOrTerminalUser, Terminal
 
 
@@ -45,5 +45,7 @@ class ProxyLogDetailApi(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (IsSuperUserOrTerminalUser,)
 
 
-class CommandLogCreateApi(generics.CreateAPIView):
+class CommandLogCreateApi(generics.ListCreateAPIView):
+    queryset = CommandLog.objects.all()
     serializer_class = serializers.CommandLogSerializer
+    permission_classes = (IsSuperUserOrTerminalUser,)

@@ -60,14 +60,14 @@ class ProxyLog(models.Model):
 
 class CommandLog(models.Model):
     proxy_log = models.ForeignKey(ProxyLog, on_delete=models.CASCADE, related_name='command_log')
+    command_no = models.IntegerField()
     command = models.CharField(max_length=1000, blank=True)
     output = models.TextField(blank=True)
-    date_start = models.DateTimeField(null=True)
-    date_finished = models.DateTimeField(null=True)
+    datetime = models.DateTimeField(null=True)
 
     def __unicode__(self):
         return '%s: %s' % (self.id, self.command)
 
     class Meta:
         db_table = 'command_log'
-        ordering = ['-date_start', 'command']
+        ordering = ['command_no', 'command']
