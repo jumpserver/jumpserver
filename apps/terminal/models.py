@@ -41,7 +41,7 @@ class Terminal(models.Model):
 
 class TerminalHeatbeat(models.Model):
     terminal = models.ForeignKey(Terminal, on_delete=models.CASCADE)
-    date_timestamp = models.IntegerField()
+    date_created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'terminal_heatbeat'

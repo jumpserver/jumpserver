@@ -15,4 +15,5 @@ urlpatterns = [
 
 urlpatterns += [
     url(r'^v1/terminal/$', api.TerminalApi.as_view(), name='terminal-list-create-api'),
+    url(r'^v1/terminal-heatbeat/$', api.TerminalHeatbeatApi.as_view(), name='terminal-heatbeat-api'),
 ]
