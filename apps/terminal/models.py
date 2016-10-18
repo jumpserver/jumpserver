@@ -34,10 +34,6 @@ class Terminal(models.Model):
     def is_terminal(self):
         return True
 
-    @property
-    def is_authenticated(self):
-        return False
-
     class Meta:
         db_table = 'terminal'
         ordering = ['name']

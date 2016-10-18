@@ -15,7 +15,6 @@ from django.core import signing
 from django.utils import timezone
 
 SECRET_KEY = settings.SECRET_KEY
-SIGNER = TimestampSigner(SECRET_KEY)
 
 
 def reverse(view_name, urlconf=None, args=None, kwargs=None, current_app=None, external=False):
@@ -48,15 +47,17 @@ def decrypt(*args, **kwargs):
         return ''
 
 
-def sign(value):
-    return SIGNER.sign(value)
+def sign(value, secret_key=SECRET_KEY):
+    signer = TimestampSigner(secret_key)
+    return signer.sign(value)
 
 
-def unsign(value, max_age=3600):
+def unsign(value, max_age=3600, secret_key=SECRET_KEY):
+    signer = TimestampSigner(secret_key)
     try:
-        return SIGNER.unsign(value, max_age=max_age)
+        return signer.unsign(value, max_age=max_age)
     except (BadSignature, SignatureExpired):
-        return None
+        return ''
 
 
 def date_expired_default():

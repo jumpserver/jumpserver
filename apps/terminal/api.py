@@ -27,7 +27,7 @@ class TerminalApi(ListCreateAPIView):
                 else:
                     return Response(data={'data': {'name': name, 'ip': terminal.ip},
                                           'msg': 'Need admin accept or active it'},
-                                    status=204)
+                                    status=203)
 
             else:
                 ip = request.META.get('X-Real-IP') or request.META.get('REMOTE_ADDR')
