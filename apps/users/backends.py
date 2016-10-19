@@ -6,6 +6,7 @@ from rest_framework.compat import is_authenticated
 from django.utils.translation import ugettext as _
 
 from common.utils import unsign, get_object_or_none
+
 from .hands import Terminal
 
 
