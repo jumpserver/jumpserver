@@ -14,6 +14,3 @@ class ProxyLogSerializer(serializers.ModelSerializer):
 class CommandLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CommandLog
-
-
-

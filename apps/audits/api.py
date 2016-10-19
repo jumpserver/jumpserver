@@ -5,8 +5,7 @@
 from rest_framework import generics
 
 import serializers
-
-from .models import ProxyLog, CommandLog
+import models
 from .hands import IsSuperUserOrTerminalUser, Terminal
 
 
@@ -30,7 +29,7 @@ class ProxyLogListCreateApi(generics.ListCreateAPIView):
     }
     """
 
-    queryset = ProxyLog.objects.all()
+    queryset = models.ProxyLog.objects.all()
     serializer_class = serializers.ProxyLogSerializer
     permission_classes = (IsSuperUserOrTerminalUser,)
 
@@ -40,12 +39,12 @@ class ProxyLogListCreateApi(generics.ListCreateAPIView):
 
 
 class ProxyLogDetailApi(generics.RetrieveUpdateDestroyAPIView):
-    queryset = ProxyLog.objects.all()
+    queryset = models.ProxyLog.objects.all()
     serializer_class = serializers.ProxyLogSerializer
     permission_classes = (IsSuperUserOrTerminalUser,)
 
 
 class CommandLogCreateApi(generics.ListCreateAPIView):
-    queryset = CommandLog.objects.all()
+    queryset = models.CommandLog.objects.all()
     serializer_class = serializers.CommandLogSerializer
     permission_classes = (IsSuperUserOrTerminalUser,)
