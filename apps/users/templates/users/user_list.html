@@ -23,12 +23,12 @@ div.dataTables_wrapper div.dataTables_filter {
             <th class="text-center">
                 <div class="checkbox checkbox-default"><input id="" type="checkbox" class="ipt_check_all"><label></label></div>
             </th>
-            <th class="text-center">{% trans 'Name' %}</a></th>
-            <th class="text-center">{% trans 'Username' %}</a></th>
+            <th class="text-center">{% trans 'Name' %}</th>
+            <th class="text-center">{% trans 'Username' %}</th>
             <th class="text-center">{% trans 'Role' %}</th>
             <th class="text-center">{% trans 'User group' %}</th>
             <th class="text-center">{% trans 'Asset num' %}</th>
-            <th class="text-center">{% trans 'Active' %}</a></th>
+            <th class="text-center">{% trans 'Active' %}</th>
             <th class="text-center">{% trans 'Action' %}</th>
         </tr>
     </thead>
@@ -165,7 +165,7 @@ $(document).ready(function(){
         var fail = function() {
             var msg = "{% trans 'User Deleting failed.' %}";
             swal("{% trans 'User Delete' %}", msg, "error");
-        }
+        };
         APIUpdateAttr({
             url: the_url,
             body: JSON.stringify(body),
@@ -208,15 +208,15 @@ $(document).ready(function(){
         post_list.push(content);
     });
     if (post_list === []) {
-        return false;
-    };
+        return false
+    }
     var the_url = "{% url 'users:user-bulk-update-api' %}";
     var success = function() {
         var msg = "{% trans 'The selected users has been updated successfully.' %}";
         swal("{% trans 'User Updated' %}", msg, "success");
         $('#user_list_table').DataTable().ajax.reload();
         jumpserver.checked = false;
-    }
+    };
     APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(post_list), success: success});
     $('#user_bulk_update_modal').modal('hide');
 }).on('click', '#btn_user_import', function() {

@@ -33,7 +33,7 @@ except ImportError:
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = CONFIG.SECRET_KEY or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
+SECRET_KEY = CONFIG.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = CONFIG.DEBUG or False
@@ -54,10 +54,10 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'assets.apps.AssetsConfig',
     'perms.apps.PermsConfig',
-    # 'terminal.apps.TerminalConfig',
     'ops.apps.OpsConfig',
     'audits.apps.AuditsConfig',
     'common.apps.CommonConfig',
+    'terminal.apps.TerminalConfig',
     'rest_framework',
     'rest_framework.authtoken',
     'bootstrapform',
@@ -68,7 +68,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'ws4redis',
 
 ]
 
@@ -264,12 +263,14 @@ REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
     # or allow read-only access for unauthenticated users.
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAdminUser',
+        # 'rest_framework.permissions.IsAuthenticated',
+        'users.backends.IsValidUser',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
+        'users.backends.TerminalAuthentication',
     ),
 }
 # This setting is required to override the Django's main loop, when running in
