@@ -4,13 +4,20 @@
 from rest_framework import serializers
 
 from .models import Terminal, TerminalHeatbeat
+from .hands import ProxyLog
 
 
 class TerminalSerializer(serializers.ModelSerializer):
+    proxy_amount = serializers.SerializerMethodField()
+
     class Meta:
         model = Terminal
-        fields = ['name', 'ip', 'type', 'url', 'comment', 'is_active', 'is_accepted',
-                  'get_type_display']
+        fields = ['id', 'name', 'ip', 'type', 'url', 'comment', 'is_active',
+                  'get_type_display', 'proxy_amount']
+
+    @staticmethod
+    def get_proxy_amount(obj):
+        return ProxyLog.objects.filter(terminal=obj.name, is_finished=False).count()
 
 
 class TerminalHeatbeatSerializer(serializers.ModelSerializer):

@@ -11,7 +11,7 @@ from .serializers import TerminalSerializer, TerminalHeatbeatSerializer
 from .hands import IsSuperUserOrTerminalUser
 
 
-class TerminalApi(ListCreateAPIView):
+class TerminalCreateListApi(ListCreateAPIView):
     queryset = Terminal.objects.all()
     serializer_class = TerminalSerializer
     permission_classes = (AllowAny,)
@@ -21,20 +21,20 @@ class TerminalApi(ListCreateAPIView):
         if name:
             terminal = get_object_or_none(Terminal, name=name)
             if terminal:
-                if terminal.is_accepted and terminal.is_active:
+                if terminal.is_active:
                     return Response(data={'data': {'name': name, 'id': terminal.id},
                                           'msg': 'Success'},
                                     status=200)
                 else:
                     return Response(data={'data': {'name': name, 'ip': terminal.ip},
-                                          'msg': 'Need admin accept or active it'},
+                                          'msg': 'Need admin active it'},
                                     status=203)
 
             else:
                 ip = request.META.get('X-Real-IP') or request.META.get('REMOTE_ADDR')
                 terminal = Terminal.objects.create(name=name, ip=ip)
                 return Response(data={'data': {'name': name, 'ip': terminal.ip},
-                                      'msg': 'Need admin accept or active it'},
+                                      'msg': 'Need admin active it'},
                                 status=204)
         else:
             return Response(data={'msg': 'Secrete key invalid'}, status=401)
