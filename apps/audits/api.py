@@ -2,10 +2,10 @@
 # 
 
 
+from __future__ import absolute_import, unicode_literals
 from rest_framework import generics
 
-import serializers
-import models
+from . import models, serializers
 from .hands import IsSuperUserOrTerminalUser, Terminal
 
 

@@ -18,6 +18,7 @@ class TerminalCreateListApi(ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         name = unsign(request.data.get('name', ''))
+        print(name)
         if name:
             terminal = get_object_or_none(Terminal, name=name)
             if terminal:
