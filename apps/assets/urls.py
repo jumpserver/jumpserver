@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^asset/(?P<pk>[0-9]+)/update', views.AssetUpdateView.as_view(), name='asset-update'),
     url(r'^asset/(?P<pk>[0-9]+)/delete$', views.AssetDeleteView.as_view(), name='asset-delete'),
     url(r'^asset-modal$', views.AssetModalListView.as_view(), name='asset-modal-list'),
+    url(r'^asset-modal-update$', views.AssetModalCreateView.as_view(), name='asset-modal-update'),
 
     # Resource asset group url
     url(r'^asset-group$', views.AssetGroupListView.as_view(), name='asset-group-list'),
@@ -65,6 +66,7 @@ urlpatterns = [
 urlpatterns += [
     #json
     url(r'^v1/assets/$', api.AssetViewSet.as_view({'get':'list'}), name='assets-list-api'),
+    url(r'^v1/assets_bulk/$', api.AssetListUpdateApi.as_view(), name='asset-bulk-update-api'),
     url(r'^v1/idc/$', api.IDCViewSet.as_view({'get':'list'}), name='idc-list-json'),
 ]
 

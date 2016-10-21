@@ -3,8 +3,9 @@
 from rest_framework import serializers
 from rest_framework import viewsets, serializers,generics
 from .models import AssetGroup, Asset, IDC, AssetExtend
-
-
+from common.mixins import BulkDeleteApiMixin
+from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin,ListBulkCreateUpdateDestroyAPIView
+from .serializers import *
 class AssetGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssetGroup
@@ -51,3 +52,6 @@ class IDCViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = IDC.objects.all()
     serializer_class = IDCSerializer
 
+class AssetListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):
+    queryset = Asset.objects.all()
+    serializer_class = AssetBulkUpdateSerializer

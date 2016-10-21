@@ -204,7 +204,7 @@ table.dataTable tbody td.selected td i.text-navy
 	padding-top: 15px;
 	margin-bottom: 15px;
 	display: block;
-	/*background: #ccc;*/
+	background: #f4f4f4;
 	padding-left: 10px;
 }
 .mar {

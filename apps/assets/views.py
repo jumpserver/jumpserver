@@ -46,6 +46,8 @@ class AssetListView(AdminUserRequiredMixin, ListView):
         return super(AssetListView, self).get_context_data(**kwargs)
 
 
+
+
 class AssetCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,CreateView):
     model = Asset
     tag_type = 'asset'
@@ -73,8 +75,12 @@ class AssetCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,CreateView):
 
         return super(AssetCreateView, self).get_context_data(**kwargs)
 
-
-
+class AssetModalCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,CreateView):
+    model = Asset
+    # tag_type = 'asset'
+    form_class = AssetCreateForm
+    template_name = 'assets/asset_modal_update.html'
+    success_url = reverse_lazy('assets:asset-list')
 
 class AssetUpdateView(AdminUserRequiredMixin,UpdateAssetTagsMiXin,UpdateView):
     model = Asset

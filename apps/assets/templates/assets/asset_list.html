@@ -1,21 +1,26 @@
 {% extends '_base_list.html' %}
 {% load i18n %}
+{% load static %}
 {% load common_tags %}
 {% block custom_head_css_js %}
+<link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+<script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+
 <style>
+div.dataTables_wrapper div.dataTables_filter {
+  margin-left: 15px;
+    float: right !important;
+}
 div.dataTables_wrapper div.dataTables_filter,
 .dataTables_length {
     float: right !important;
 }
-div.dataTables_wrapper div.dataTables_filter {
-  margin-left: 15px;
-}
 .custom{
-    float:left;
+    /*float:left;*/
     margin-right:5px;
 
     }
-
+#modal .modal-body { max-height: 200px; }
 </style>
 {% endblock %}
 {% block content_left_head %}
@@ -59,6 +64,7 @@ div.dataTables_wrapper div.dataTables_filter {
 
 {% block table_head %}
     <th class="text-center"><input type="checkbox" id="check_all"  onclick="checkAll()"></th>
+    <th id="th_no">id</th>
     <th class="text-center"><a href="{% url 'assets:asset-list' %}?sort=hostname">{% trans 'Hostname' %}</a></th>
     <th class="text-center"><a href="{% url 'assets:asset-list' %}?sort=username">{% trans 'IP' %}</a></th>
     <th class="text-center">{% trans 'Port' %}</th>
@@ -74,6 +80,7 @@ div.dataTables_wrapper div.dataTables_filter {
              <td class="text-center">
                  <input type="checkbox" name="checked" value="{{ asset.id }}">
              </td>
+             <td>{{ asset.id }}</td>
              <td class="text-center">
                  <a href="{% url 'assets:asset-detail' pk=asset.id %}">
                      {{ asset.hostname }}
@@ -92,30 +99,36 @@ div.dataTables_wrapper div.dataTables_filter {
              </td>
              <td class="text-center">
                  <a href="{% url 'assets:asset-update' pk=asset.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
-                 <a href="{% url 'assets:asset-delete' pk=asset.id %}" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
+                 <a onclick="objectDelete(this,'{{ asset.hostname }}','{% url 'assets:asset-delete' pk=asset.id %}')" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
              </td>
          </tr>
      {% endfor %}
 {% endblock %}
 
 {% block content_bottom_left %}
-    <form id="" method="get" action="" class=" mail-search">
-        <div class="input-group">
-            <select class="form-control m-b" style="width: auto">
-                <option>{% trans 'Delete selected' %}</option>
-                <option>{% trans 'Update selected' %}</option>
-                <option>{% trans 'Deactive selected' %}</option>
-                <option>{% trans 'Export selected' %}</option>
+        <div class="input-group" id="actions">
+            <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+                <option value="delete">{% trans 'Delete selected' %}</option>
+                <option value="update">{% trans 'Update selected' %}</option>
+                <option value="deactive">{% trans 'Deactive selected' %}</option>
+                <option value="export">{% trans 'Export selected' %}</option>
             </select>
-
             <div class="input-group-btn pull-left" style="padding-left: 5px;">
-                <button id='search_btn' type="submit" style="height: 32px;"  class="btn btn-sm btn-primary">
-                 {% trans 'Submit' %}
+                <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary" >
+                {% trans 'Submit' %}
                 </button>
             </div>
-
         </div>
-   </form>
+{% include "assets/_asset_bulk_update_modal.html" %}
+
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="modal"  role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog modal-lg">
+      <div class="modal-content" id="box">
+        <!--此部分为主体内容，将远程加载进来-->
+      </div>
+   </div>
+</div>
 {% endblock %}
 
 {% block custom_foot_js %}
@@ -126,7 +139,9 @@ div.dataTables_wrapper div.dataTables_filter {
         if(tag_on.length > 0){
             oDiv.style.display = "block";
         }
+
     };
+
 
     function tagShow() {
         var oDiv = document.getElementById("ydxbd");
@@ -135,8 +150,37 @@ div.dataTables_wrapper div.dataTables_filter {
             }else{
                 oDiv.style.display = "none";
             }
-    };
+    };//onload;
+
+
     $(document).ready(function(){
+
+
+
+        $('#modal').modal({
+        show: false,
+        backdrop: 'static',
+        keyboard: 'false',
+        remote:"{% url 'assets:asset-modal-update' %}",
+    });
+
+    //$('#modal').on('shown.bs.modal',function(){
+    $('#asset_bulk_update_modal').on('shown.bs.modal',function(){
+        //alert('当弹窗完全加载完后，再触发；')
+                            $('.select2').select2();
+            $("#tags").select2({
+                tags: true,
+                maximumSelectionLength: 8,  //最多能够选择的个数
+                closeOnSelect: false
+            });
+    });
+
+
+        $('#asset_bulk_update_modal').modal({
+            show: false,
+            backdrop: 'static',
+            keyboard: 'false',
+        });
         var oTags = document.getElementById("ydxbd");
         var table = $('#editable').DataTable({
             "aLengthMenu": [[10, 25, 50, -1], ["10", "25", "50", "all"]],
@@ -145,7 +189,7 @@ div.dataTables_wrapper div.dataTables_filter {
             "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ] }],
             "bAutoWidth": false,
             "language": {"url": "/static/js/plugins/dataTables/i18n/zh-hans.json"},
-            "dom": '<"custom">lftip',
+            "dom": '<"custom"fl>tip',
             "initComplete": function() {
                 //alert( 'DataTables has finished its initialisation.' );
                 $('#editable_length').before("<a href=\"{% url 'assets:asset-create' %}\" class=\"btn btn-sm btn-primary custom \"> {% trans 'Create asset' %} </a>&nbsp; <button class='btn btn-sm btn-primary custom' id='zksx' onclick='tagShow()'>标签</button>");
@@ -156,6 +200,7 @@ div.dataTables_wrapper div.dataTables_filter {
             {data: "id"},
             {data: "name"},
             {data: "ip"},
+            {data: "port"},
             {data: "type"},
             {data: "group"},
             {data: "dp"},
@@ -163,7 +208,7 @@ div.dataTables_wrapper div.dataTables_filter {
         ]
         });
         //将ID列隐藏
-        //table.column('1').visible(false);
+        table.column('1').visible(false);
         $('#editable tbody').on( 'click', 'tr', function () {
         //alert($(this).hasClass('selected'));
             if($(this).hasClass('selected')){
@@ -174,24 +219,89 @@ div.dataTables_wrapper div.dataTables_filter {
                 this.children[0].children[0].checked=1;
             };
         });
-        $('#close-btn').on('click',function(){
-            $('#modal').modal('hide');
-        });
-        $('#save-btn').on('click',function(){
+
+
+        $('#btn_bulk_update').on('click',function(){
         // alert( table.rows('.selected').data().length +' row(s) selected' );
-            var d = table.rows('.selected').data();
-            var size = d.length;
-            document.getElementById('add_asset').value = size;
             var column2 = table.rows('.selected').data();
-            $("#asset_sed").find("input[name='assets']").remove();
+            var id_list = [];
+            var plain_id_list = [];
+            var the_url = "{% url 'assets:asset-bulk-update-api' %}";
             for(var i=0;i<column2.length;i++){
-                column2[i].checkbox='<input name="checked" value="1" checked="" type="checkbox">';
-                var value = column2[i].id;
-                $("#asset_sed").append("<input  type='hidden' name='assets' value='"+value+"'>");
+                id_list.push({id: column2[i].id,hostname:column2[i].ip});
+                plain_id_list.push(parseInt(column2[i].id));
+            };
+
+            var url_delete = the_url + '?id__in=' + JSON.stringify(plain_id_list);
+            //APIUpdateAttr({url: url_delete, method: 'DELETE', success: success, error: fail});
+            function doDelete(){
+                swal({
+                    title: "{% trans 'Are you sure?' %}",
+                    text: "{% trans 'This will delete the selected assets !!!' %}",
+                    type: "warning",
+                    showCancelButton: true,
+                    cancelButtonText: 'Cancel',
+                    confirmButtonColor: "#DD6B55",
+                    confirmButtonText: "{% trans 'Confirm' %}",
+                    closeOnConfirm: false
+                }, function () {
+                        $.ajax({
+                            type:'DELETE',
+                            url:url_delete,
+                            data:{
+                                data:'true',
+                            },
+                            success:function(){
+                                window.location.reload();
+                            }
+                        });
+                });
+            };
+
+            function doUpdate() {
+                $('#asset_bulk_update_modal').modal('show');
+              //  $('#modal').modal('show');
+            //    alert(JSON.stringify(id_list));
+            };
+
+            var action = $('#slct_bulk_update option:selected').val();
+            if (id_list.length === 0) {
+                action = 'default';
+            };
+            switch(action) {
+                case 'deactive':
+                    alert(action+"未完成");
+                    //doDeactive();
+                    break;
+                case 'delete':
+                    doDelete();
+                    break;
+                case 'update':
+                    doUpdate();
+                    break;
+                case 'export':
+                    alert(action+"未完成");
+                    break;
+                default:
+                    swal({
+                        title: "未选择任何元素",
+                        text: "Please..."
+                    });
+                    break;
             }
-            $('#modal').modal('hide');
-        });
+        });//button
+
+        $('#btn_asset_bulk_update').on('click',function(){
+
+        });//button
+
+
+
+
     }); //$(document).ready
+
+
+
 
     var bCheck = 1;
     function checkAll(){
@@ -213,5 +323,19 @@ div.dataTables_wrapper div.dataTables_filter {
             bCheck = 1;
         };
     };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
 {% endblock %}
