@@ -32,10 +32,12 @@
         <li id="asset-permission">
             <a href="{% url 'perms:asset-permission-list' %}">{% trans 'Asset permission' %}</a>
         </li>
-{#        <li id="user-group">#}
-{#            <a href="">{% trans 'User group perm' %}</a>#}
-{#        </li>#}
     </ul>
+</li>
+<li id="">
+    <a href="{% url 'terminal:terminal-list' %}">
+        <i class="fa fa-desktop"></i><span class="nav-label">{% trans 'Terminal' %}</span><span class="label label-info pull-right"></span>
+    </a>
 </li>
 <li id="">
     <a href="">

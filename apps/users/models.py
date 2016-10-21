@@ -141,6 +141,10 @@ class User(AbstractUser):
         else:
             return False
 
+    @property
+    def is_terminal(self):
+        return False
+
     @is_superuser.setter
     def is_superuser(self, value):
         if value is True:
@@ -150,7 +154,7 @@ class User(AbstractUser):
 
     @property
     def is_staff(self):
-        if self.is_authenticated and self.is_active and not self.is_expired and self.is_superuser:
+        if self.is_authenticated and self.is_valid:
             return True
         else:
             return False
@@ -178,20 +182,19 @@ class User(AbstractUser):
             token = Token.objects.get(user=self)
         except Token.DoesNotExist:
             token = Token.objects.create(user=self)
-
         return token.key
 
     def refresh_private_token(self):
         Token.objects.filter(user=self).delete()
         return Token.objects.create(user=self)
 
-    def generate_reset_token(self):
-        return signing.dumps({'reset': self.id, 'email': self.email})
-
     def is_member_of(self, user_group):
         if user_group in self.groups.all():
             return True
         return False
+
+    def generate_reset_token(self):
+        return signing.dumps({'reset': self.id, 'email': self.email})
 
     @classmethod
     def validate_reset_token(cls, token, max_age=3600):

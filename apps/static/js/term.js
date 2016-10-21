@@ -4217,19 +4217,19 @@ Terminal.prototype.setMode = function(params) {
         // focusout: ^[[O
         this.sendFocus = true;
         break;
-      case 1005: // utf8 ext mode mouse
+      case 1005: // utf8 terminal mode mouse
         this.utfMouse = true;
         // for wide terminals
         // simply encodes large values as utf8 characters
         break;
-      case 1006: // sgr ext mode mouse
+      case 1006: // sgr terminal mode mouse
         this.sgrMouse = true;
         // for wide terminals
         // does not add 32 to fields
         // press: ^[[<b;x;yM
         // release: ^[[<b;x;ym
         break;
-      case 1015: // urxvt ext mode mouse
+      case 1015: // urxvt terminal mode mouse
         this.urxvtMouse = true;
         // for wide terminals
         // numbers for fields
@@ -4406,13 +4406,13 @@ Terminal.prototype.resetMode = function(params) {
       case 1004: // send focusin/focusout events
         this.sendFocus = false;
         break;
-      case 1005: // utf8 ext mode mouse
+      case 1005: // utf8 terminal mode mouse
         this.utfMouse = false;
         break;
-      case 1006: // sgr ext mode mouse
+      case 1006: // sgr terminal mode mouse
         this.sgrMouse = false;
         break;
-      case 1015: // urxvt ext mode mouse
+      case 1015: // urxvt terminal mode mouse
         this.urxvtMouse = false;
         break;
       case 25: // hide cursor
@@ -6030,7 +6030,7 @@ Terminal.charsets = {};
 
 // DEC Special Character and Line Drawing Set.
 // http://vt100.net/docs/vt102-ug/table5-13.html
-// A lot of curses apps use this if they see TERM=xterm.
+// A lot of curses terminal use this if they see TERM=xterm.
 // testing: echo -e '\e(0a\e(B'
 // The xterm output sometimes seems to conflict with the
 // reference above. xterm seems in line with the reference

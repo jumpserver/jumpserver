@@ -5,23 +5,23 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin
 
+from common.utils import unsign
 from .models import User, UserGroup
 
 
 class UserDetailSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = ['avatar', 'wechat', 'phone', 'enable_otp', 'comment', 'is_active', 'name']
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = User
         fields = ['id', '_public_key']
 
-    def validate__public_key(self, value):
+    @staticmethod
+    def validate__public_key(value):
         from sshpubkeys import SSHKey
         from sshpubkeys.exceptions import InvalidKeyException
         ssh = SSHKey(value)
@@ -45,7 +45,6 @@ class UserAndGroupSerializer(serializers.ModelSerializer):
 
 
 class GroupDetailSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = UserGroup
         fields = ['id', 'name', 'comment', 'date_created', 'created_by', 'users']
@@ -63,16 +62,17 @@ class UserBulkUpdateSerializer(BulkSerializerMixin, serializers.ModelSerializer)
                   'enable_otp', 'comment', 'groups', 'get_role_display',
                   'group_display', 'active_display']
 
-    def get_group_display(self, obj):
+    @staticmethod
+    def get_group_display(obj):
         return " ".join([group.name for group in obj.groups.all()])
 
-    def get_active_display(self, obj):
-        # TODO: user ative state
+    @staticmethod
+    def get_active_display(obj):
+        # TODO: user active state
         return not (obj.is_expired and obj.is_active)
 
 
 class GroupBulkUpdateSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-
     user_amount = serializers.SerializerMethodField()
 
     class Meta:
@@ -80,5 +80,18 @@ class GroupBulkUpdateSerializer(BulkSerializerMixin, serializers.ModelSerializer
         list_serializer_class = BulkListSerializer
         fields = ['id', 'name', 'comment', 'user_amount']
 
-    def get_user_amount(self, obj):
+    @staticmethod
+    def get_user_amount(obj):
         return obj.users.count()
+
+
+class AppUserRegisterSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=20)
+
+    def create(self, validated_data):
+        sign = validated_data('username', '')
+        username = unsign(sign)
+        pass
+
+    def update(self, instance, validated_data):
+        pass
