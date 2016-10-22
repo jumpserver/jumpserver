@@ -1,0 +1,82 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% block modal_id %}asset_bulk_update_modal{% endblock %}
+{% block modal_class %}modal-lg{% endblock %}
+{% block modal_title%}{% trans "Update Asset" %}{% endblock %}
+{% block modal_body %}
+{% load bootstrap %}
+<p class="text-success text-center">{% trans "Hint: only change the field you want to update." %}</p>
+
+       <div class="ydxbd" id="ydxbd" style="display: block;">
+                           <div>
+                               <p id="tags_p">
+                                       <a href="/assets/asset-by-tag/5">
+                                       <span class="label label-default">三年质保(0)</span>
+                                       </a>
+                               </p>
+                           </div>
+                       </div>
+<form method="post" class="form-horizontal" action="" id="fm_asset_bulk_update">
+    <div class="form-group">
+        <label class="control-label col-sm-2 col-lg-2 " for="id_role">{% trans "Role" %}</label>
+        <div class=" col-sm-9 col-lg-9 ">
+            <select class=" select2 form-control" id="id_role" name="role">
+                <option value="">---------</option>
+                <option value="Admin">{% trans "Admin" %}</option>
+                <option value="User">{% trans "User" %}</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+
+        <label for="groups" class="col-sm-2 control-label">{% trans 'Groups' %}</label>
+        <div class="col-sm-9" id="select2-container">
+            <select name="groups" id="select2_groups" data-placeholder="{% trans 'Select Group' %}" class="select2 form-control m-b" multiple>
+                {% for group in groups %}
+                    <option value="{{ group.id }}">{{ group.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-9 col-lg-9 col-sm-offset-2">
+            <div class="checkbox checkbox-success">
+                <input type="checkbox" name="enable_otp" checked id="id_enable_otp"><label for="id_enable_otp">{% trans 'Enable-OTP' %}</label>
+            </div>
+        </div>
+    </div>
+
+
+<div class="form-group">
+
+
+            <label class="control-label col-sm-2 col-lg-2 " for="id_tags">标签集合</label>
+
+
+        <div class=" col-sm-9 col-lg-9 ">
+            <select multiple="multiple" class="select2 form-control" data-placeholder="Select asset tags" id="tags" name="tags">
+<option value="1">物理机</option>
+<option value="2">虚拟机</option>
+<option value="3">数据库备份</option>
+<option value="4">亦庄机房</option>
+<option value="5">三年质保</option>
+</select>
+
+
+
+
+                <p class="help-block">
+                    最多5个标签，单个标签最长8个汉字，按回车确认
+                </p>
+
+        </div>
+
+</div>
+
+
+
+
+
+</form>
+{% endblock %}
+{% block modal_confirm_id %}btn_asset_bulk_update{% endblock %}

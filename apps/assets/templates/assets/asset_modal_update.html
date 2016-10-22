@@ -1,0 +1,65 @@
+{% extends '_base_create_update.html' %}
+{% load static %}
+{% load bootstrap %}
+{% load i18n %}
+
+{% block form %}
+
+<div class="hr-line-dashed"></div>
+                      <div class="ydxbd" id="ydxbd" style="display: block;">
+                           <div>
+                               <p id="tags_p">
+                                   <a>
+                                    </a>
+                                   {% for f in form %}
+                                       <span class="label label-default">{{ f.hostname }}</span>
+
+                                   {% endfor %}
+                                   <a href="{% url 'assets:asset-list' %}" ><span class="label label-default">移除选择</span></a>
+                               </p>
+                           </div>
+                       </div>
+<div class="hr-line-dashed"></div>
+    <form action="" method="post" class="form-horizontal">
+    {% csrf_token %}
+
+
+        <div class="hr-line-dashed"></div>
+    {{ form.hostname|bootstrap_horizontal }}
+    {{ form.ip|bootstrap_horizontal }}
+    {{ form.port|bootstrap_horizontal }}
+    {{ form.type|bootstrap_horizontal }}
+
+    {{ form.idc|bootstrap_horizontal }}
+    {{ form.groups|bootstrap_horizontal }}
+
+    {{ form.admin_user|bootstrap_horizontal }}
+    {{ form.system_users|bootstrap_horizontal }}
+
+    {{ form.tags|bootstrap_horizontal }}
+    {{ form.comment|bootstrap_horizontal }}
+
+    <div class="hr-line-dashed"></div>
+    <div class="form-group">
+        <div class="col-sm-4 col-sm-offset-2">
+            <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+            <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+        </div>
+    </div>
+
+</form>
+{% endblock %}
+
+{% block custom_foot_js %}
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+            $("#tags").select2({
+                tags: true,
+                maximumSelectionLength: 8,  //最多能够选择的个数
+                closeOnSelect: false
+            });
+        })
+
+    </script>
+{% endblock %}
