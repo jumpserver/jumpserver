@@ -41,7 +41,7 @@ class TerminalAuthentication(authentication.BaseAuthentication):
         else:
             raise exceptions.AuthenticationFailed(_('Invalid sign.'))
 
-        if not terminal.is_active:
+        if not terminal or not terminal.is_active:
             raise exceptions.AuthenticationFailed(_('Terminal inactive or deleted.'))
         terminal.is_authenticated = True
         return terminal, None

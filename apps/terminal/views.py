@@ -1,7 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 #
 
-from django.views.generic import ListView, UpdateView
+from django.views.generic import ListView, UpdateView, DeleteView
 from django.utils.translation import ugettext as _
 from django.urls import reverse_lazy
 
@@ -29,3 +29,9 @@ class TerminalUpdateView(UpdateView):
         context = super(TerminalUpdateView, self).get_context_data(**kwargs)
         context.update({'app': _('Terminal'), 'action': _('Update terminal')})
         return context
+
+
+class TerminalDeleteView(DeleteView):
+    model = Terminal
+    template_name = 'assets/delete_confirm.html'
+    success_url = reverse_lazy('terminal:terminal-list')

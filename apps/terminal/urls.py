@@ -16,5 +16,7 @@ urlpatterns = [
 
 urlpatterns += [
     url(r'^v1/terminal/$', api.TerminalCreateListApi.as_view(), name='terminal-list-create-api'),
+    url(r'^v1/terminal/(?P<pk>\d+)/$', api.TerminalApiDetailUpdateDetailApi.as_view(),
+        name='terminal-detail-update-delete-api'),
     url(r'^v1/terminal-heatbeat/$', api.TerminalHeatbeatApi.as_view(), name='terminal-heatbeat-api'),
 ]

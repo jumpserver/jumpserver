@@ -74,8 +74,6 @@ class AssetCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,CreateView):
         return super(AssetCreateView, self).get_context_data(**kwargs)
 
 
-
-
 class AssetUpdateView(AdminUserRequiredMixin,UpdateAssetTagsMiXin,UpdateView):
     model = Asset
     form_class = AssetCreateForm
@@ -118,12 +116,12 @@ class AssetDetailView(DetailView):
         kwargs.update(context)
         return super(AssetDetailView, self).get_context_data(**kwargs)
 
+
 class AssetModalListView(AdminUserRequiredMixin, ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     model = Asset
     context_object_name = 'asset_modal_list'
     template_name = 'assets/asset_modal_list.html'
-
 
     def get_context_data(self, **kwargs):
         group_id = self.request.GET.get('group_id')
@@ -141,6 +139,7 @@ class AssetModalListView(AdminUserRequiredMixin, ListView):
             }
             kwargs.update(context)
         return super(AssetModalListView, self).get_context_data(**kwargs)
+
 
 class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
     model = AssetGroup
@@ -160,7 +159,6 @@ class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
         kwargs.update(context)
         return super(AssetGroupCreateView, self).get_context_data(**kwargs)
 
-
     def form_valid(self, form):
         asset_group = form.save()
         assets_id_list = self.request.POST.getlist('assets', [])
@@ -169,6 +167,7 @@ class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
         asset_group.assets.add(*tuple(assets))
         asset_group.save()
         return super(AssetGroupCreateView, self).form_valid(form)
+
 
 class AssetGroupListView(AdminUserRequiredMixin, ListView):
     model = AssetGroup
@@ -217,6 +216,7 @@ class AssetGroupDetailView(SingleObjectMixin, AdminUserRequiredMixin, ListView):
         }
         kwargs.update(context)
         return super(AssetGroupDetailView, self).get_context_data(**kwargs)
+
 
 class AssetGroupUpdateView(AdminUserRequiredMixin, UpdateView):
     model = AssetGroup
@@ -296,6 +296,7 @@ class IDCCreateView(AdminUserRequiredMixin, CreateView):
         # IDC_add_success_next(user)
         return super(IDCCreateView, self).form_valid(form)
 
+
 class IDCUpdateView(AdminUserRequiredMixin, UpdateView):
     model = IDC
     form_class = IDCForm
@@ -325,7 +326,6 @@ class IDCDeleteView(AdminUserRequiredMixin, DeleteView):
     model = IDC
     template_name = 'assets/delete_confirm.html'
     success_url = reverse_lazy('assets:idc-list')
-
 
 
 class AdminUserListView(AdminUserRequiredMixin, ListView):

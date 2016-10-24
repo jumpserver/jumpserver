@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # 
 
-from rest_framework.generics import ListCreateAPIView, CreateAPIView
+from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import AllowAny
 
@@ -18,7 +18,6 @@ class TerminalCreateListApi(ListCreateAPIView):
 
     def post(self, request, *args, **kwargs):
         name = unsign(request.data.get('name', ''))
-        print(name)
         if name:
             terminal = get_object_or_none(Terminal, name=name)
             if terminal:
@@ -36,12 +35,18 @@ class TerminalCreateListApi(ListCreateAPIView):
                 terminal = Terminal.objects.create(name=name, ip=ip)
                 return Response(data={'data': {'name': name, 'ip': terminal.ip},
                                       'msg': 'Need admin active it'},
-                                status=204)
+                                status=201)
         else:
             return Response(data={'msg': 'Secrete key invalid'}, status=401)
 
 
-class TerminalHeatbeatApi(CreateAPIView):
+class TerminalHeatbeatApi(ListCreateAPIView):
     model = TerminalHeatbeat
     serializer_class = TerminalHeatbeatSerializer
+    permission_classes = (IsSuperUserOrTerminalUser,)
+
+
+class TerminalApiDetailUpdateDetailApi(RetrieveUpdateDestroyAPIView):
+    queryset = Terminal.objects.all()
+    serializer_class = TerminalSerializer
     permission_classes = (IsSuperUserOrTerminalUser,)

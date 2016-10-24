@@ -197,7 +197,7 @@ function APIUpdateAttr(props) {
     type: props.method || "PATCH",
     data: props.body,
     contentType: props.content_type || "application/json; charset=utf-8",
-    dataType: props.data_type || "json",
+    dataType: props.data_type || "json"
   }).done(function(data, textStatue, jqXHR) {
     if (typeof props.success === 'function') {
       return props.success(data);
@@ -215,28 +215,37 @@ function APIUpdateAttr(props) {
 }
 
 // Sweet Alert for Delete
-function objectDelete(obj, name, url){
+function objectDelete(obj, name, url) {
+    var $this = $(this);
+    function doDelete() {
+        var uid = $this.data('uid');
+        var body = {};
+        var success = function() {
+            swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
+            $(obj).parent().parent().remove();
+        };
+        var fail = function() {
+            swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");
+        };
+        APIUpdateAttr({
+            url: url,
+            body: JSON.stringify(body),
+            method: 'DELETE',
+            success: success,
+            error: fail
+        });
+    }
     swal({
         title: 'Are you sure delete ?',
-        text: "【" + name + "】",
+        text: " [" + name + "] ",
         type: "warning",
         showCancelButton: true,
         cancelButtonText: 'Cancel',
         confirmButtonColor: "#DD6B55",
-        confirmButtonText: 'Yes, delete it!',
+        confirmButtonText: 'Confirm',
         closeOnConfirm: false
     }, function () {
-        $.ajax({
-            type : "post",
-            url : url,
-            data : {
-            },
-            dataType : "text",
-            success : function(data) {
-                swal('Deleted!' , "【"+name+"】"+"has been deleted.", "success");
-                $(obj).parent().parent().remove();
-            }
-        });
+        doDelete()       
     });
 }
 
@@ -279,7 +288,7 @@ jumpserver.initDataTable = function (options) {
         $(td).html('<div class="checkbox checkbox-default"><input type="checkbox" class="ipt_check"><label></label></div>');
       }
     },
-    {className: 'text-center', targets: '_all'},
+    {className: 'text-center', targets: '_all'}
   ];
   columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
   var table = ele.DataTable({
@@ -342,6 +351,6 @@ jumpserver.initDataTable = function (options) {
           jumpserver.checked = false;
           table.rows().deselect();
       }
-    })
+    });
     return table;
-}
+};
