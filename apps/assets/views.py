@@ -75,12 +75,32 @@ class AssetCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,CreateView):
 
         return super(AssetCreateView, self).get_context_data(**kwargs)
 
-class AssetModalCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,CreateView):
+class AssetModalCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,ListView):
     model = Asset
     # tag_type = 'asset'
     form_class = AssetCreateForm
     template_name = 'assets/asset_modal_update.html'
     success_url = reverse_lazy('assets:asset-list')
+    def get_queryset(self):
+        self.queryset = super(AssetModalCreateView,self).get_queryset()
+        self.s = self.request.GET.get('plain_id_lists')
+        if "," in str(self.s):
+            self.plain_id_lists  = [int(x) for x in self.s.split(',')]
+        else:
+            self.plain_id_lists = [self.s]
+
+        return self.queryset
+    def get_context_data(self, **kwargs):
+        asset_on_list = Asset.objects.filter(id__in = self.plain_id_lists)
+        context = {
+            'app': 'Assets',
+            'action': 'Bulk Update asset',
+            'assets_on_list': asset_on_list,
+            'assets_count': len(asset_on_list),
+            'plain_id_lists':self.s,
+        }
+        kwargs.update(context)
+        return super(AssetModalCreateView, self).get_context_data(**kwargs)
 
 class AssetUpdateView(AdminUserRequiredMixin,UpdateAssetTagsMiXin,UpdateView):
     model = Asset
@@ -134,6 +154,17 @@ class AssetModalListView(AdminUserRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         group_id = self.request.GET.get('group_id')
         tag_id = self.request.GET.get('tag_id')
+        plain_id_lists = self.request.GET.get('plain_id_lists')
+        self.s = self.request.GET.get('plain_id_lists')
+        if "," in str(self.s):
+            self.plain_id_lists  = [int(x) for x in self.s.split(',')]
+        else:
+            self.plain_id_lists = [self.s]
+        print plain_id_lists
+        if plain_id_lists:
+            context = {
+                'all_assets':plain_id_lists
+            }
         if group_id:
             group = AssetGroup.objects.get(id=group_id)
             context = {

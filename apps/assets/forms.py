@@ -52,7 +52,6 @@ class AssetCreateForm(forms.ModelForm):
             'groups': forms.SelectMultiple(attrs={'class': 'select2',
                                                   'data-placeholder': _('Select asset groups')}),
             'tags': forms.SelectMultiple(attrs={'class': 'select2',
-                                                'id':'tags',
                                                 'data-placeholder': _('Select asset tags')}),
             'system_users': forms.SelectMultiple(attrs={'class': 'select2',
                                                         'data-placeholder': _('Select asset system users')}),

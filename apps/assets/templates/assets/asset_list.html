@@ -8,7 +8,7 @@
 
 <style>
 div.dataTables_wrapper div.dataTables_filter {
-  margin-left: 15px;
+    margin-left: 15px;
     float: right !important;
 }
 div.dataTables_wrapper div.dataTables_filter,
@@ -18,48 +18,29 @@ div.dataTables_wrapper div.dataTables_filter,
 .custom{
     /*float:left;*/
     margin-right:5px;
-
     }
 #modal .modal-body { max-height: 200px; }
 </style>
 {% endblock %}
-{% block content_left_head %}
-{% endblock %}
-        {% block table_search %}
-                        {% endblock %}
+{% block content_left_head %}{% endblock %}
+{% block table_search %}{% endblock %}
 {% block tags_list %}
 
-                      <div class="ydxbd" id="ydxbd" style="display: none;">
-                           <div>
-                               <p id="tags_p">
-                                   {% for tag in tag_list %}
-
-                                   <a href="{% url 'assets:asset-tags' tag_id=tag.0 %}">
-                                       <span
-                                           {% if tag.0|IntToStr == tag_id %}
-                                               class="label label-warning" name="tag_on"
-                                           {% else %}
-                                               class="label label-default"
-                                           {% endif %}
-                                       >{{ tag.1}}({{ tag.2 }})</span>
-                                       </a>
-{#                                    <a href="{% url 'assets:asset-tags' tag_id=tag.0 %}"#}
-{#                                        {% if tag.0|IntToStr == tag_id %}#}
-{#                                            class="fa fa-tag btn btn-sm btn-warning btn-rounded mar-j" name="tag_on">#}
-{#                                        {% else %}#}
-{#                                            class="fa fa-tag btn btn-sm btn-default btn-rounded mar-j">#}
-{#                                        {% endif %}#}
-{#                                        <span class="mar">#}
-{#                                            <strong>{{ tag.1}}</strong>({{ tag.2 }})#}
-{#                                        </span></a>#}
-
-                                   {% endfor %}
-{#                                    <a href="{% url 'assets:asset-list' %}" class="btn btn-sm btn-rounded btn-default ">移除选择</a>#}
-                                   <a href="{% url 'assets:asset-list' %}" ><span class="label label-default">移除选择</span></a>
-                               </p>
-                           </div>
-                       </div>
-
+<div class="ydxbd" id="ydxbd" style="display: none;">
+    <div class="tagBtnList">
+    {% for tag in tag_list %}
+        <a href="{% url 'assets:asset-tags' tag_id=tag.0 %}"
+           {% if tag.0|IntToStr == tag_id %}
+           class="tagBtn2 label label-warning" name="tag_on">
+           {% else %}
+           class="tagBtn2 label label-default">
+           {% endif %}
+           {{ tag.1}}({{ tag.2 }})
+        </a>
+    {% endfor %}
+        <a href="{% url 'assets:asset-list' %}" class="tagBtn2 label label-default" >移除选择</a>
+    </div>
+</div>
 {% endblock %}
 
 {% block table_head %}
@@ -139,9 +120,7 @@ div.dataTables_wrapper div.dataTables_filter,
         if(tag_on.length > 0){
             oDiv.style.display = "block";
         }
-
     };
-
 
     function tagShow() {
         var oDiv = document.getElementById("ydxbd");
@@ -152,11 +131,7 @@ div.dataTables_wrapper div.dataTables_filter,
             }
     };//onload;
 
-
     $(document).ready(function(){
-
-
-
         $('#modal').modal({
         show: false,
         backdrop: 'static',
@@ -164,37 +139,35 @@ div.dataTables_wrapper div.dataTables_filter,
         remote:"{% url 'assets:asset-modal-update' %}",
     });
 
-    //$('#modal').on('shown.bs.modal',function(){
     $('#asset_bulk_update_modal').on('shown.bs.modal',function(){
         //alert('当弹窗完全加载完后，再触发；')
-                            $('.select2').select2();
-            $("#tags").select2({
+            $('.select2').select2();
+            $("#id_tags").select2({
                 tags: true,
                 maximumSelectionLength: 8,  //最多能够选择的个数
-                closeOnSelect: false
+                //closeOnSelect: false
             });
     });
 
-
-        $('#asset_bulk_update_modal').modal({
-            show: false,
-            backdrop: 'static',
-            keyboard: 'false',
-        });
-        var oTags = document.getElementById("ydxbd");
-        var table = $('#editable').DataTable({
-            "aLengthMenu": [[10, 25, 50, -1], ["10", "25", "50", "all"]],
-            "iDisplayLength":25,
-            "aaSorting": [[7, "asc"]],
-            "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ] }],
-            "bAutoWidth": false,
-            "language": {"url": "/static/js/plugins/dataTables/i18n/zh-hans.json"},
-            "dom": '<"custom"fl>tip',
-            "initComplete": function() {
-                //alert( 'DataTables has finished its initialisation.' );
-                $('#editable_length').before("<a href=\"{% url 'assets:asset-create' %}\" class=\"btn btn-sm btn-primary custom \"> {% trans 'Create asset' %} </a>&nbsp; <button class='btn btn-sm btn-primary custom' id='zksx' onclick='tagShow()'>标签</button>");
-                $('#editable').before(oTags);
-            },
+    $('#asset_bulk_update_modal').modal({
+        show: false,
+        backdrop: 'static',
+        keyboard: 'false',
+    });
+    var oTags = document.getElementById("ydxbd");
+    var table = $('#editable').DataTable({
+        "aLengthMenu": [[10, 25, 50, -1], ["10", "25", "50", "all"]],
+        "iDisplayLength":25,
+        "aaSorting": [[7, "asc"]],
+        "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ] }],
+        "bAutoWidth": false,
+        "language": {"url": "/static/js/plugins/dataTables/i18n/zh-hans.json"},
+        "dom": '<"custom"fl>tip',
+        "initComplete": function() {
+            //alert( 'DataTables has finished its initialisation.' );
+            $('#editable_length').before("<a href=\"{% url 'assets:asset-create' %}\" class=\"btn btn-sm btn-primary custom \"> {% trans 'Create asset' %} </a>&nbsp; <button class='btn btn-sm btn-primary custom' id='zksx' onclick='tagShow()'>标签</button>");
+            $('#editable').before(oTags);
+        },
         columns: [
             {data: "checkbox"},
             {data: "id"},
@@ -220,9 +193,7 @@ div.dataTables_wrapper div.dataTables_filter,
             };
         });
 
-
         $('#btn_bulk_update').on('click',function(){
-        // alert( table.rows('.selected').data().length +' row(s) selected' );
             var column2 = table.rows('.selected').data();
             var id_list = [];
             var plain_id_list = [];
@@ -259,9 +230,9 @@ div.dataTables_wrapper div.dataTables_filter,
             };
 
             function doUpdate() {
-                $('#asset_bulk_update_modal').modal('show');
-              //  $('#modal').modal('show');
-            //    alert(JSON.stringify(id_list));
+               // alert(plain_id_list);
+               // $('#asset_bulk_update_modal').modal('show');
+               window.location.href="{% url 'assets:asset-modal-update' %}?plain_id_lists="+plain_id_list
             };
 
             var action = $('#slct_bulk_update option:selected').val();
@@ -295,13 +266,7 @@ div.dataTables_wrapper div.dataTables_filter,
 
         });//button
 
-
-
-
     }); //$(document).ready
-
-
-
 
     var bCheck = 1;
     function checkAll(){
@@ -323,19 +288,6 @@ div.dataTables_wrapper div.dataTables_filter,
             bCheck = 1;
         };
     };
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 </script>
 {% endblock %}

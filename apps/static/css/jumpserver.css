@@ -206,6 +206,7 @@ table.dataTable tbody td.selected td i.text-navy
 	display: block;
 	background: #f4f4f4;
 	padding-left: 10px;
+	padding-bottom: 15px;
 }
 .mar {
     margin-left: 2px;
@@ -214,6 +215,10 @@ table.dataTable tbody td.selected td i.text-navy
 .mar-j {
     margin-left: 3px;
     margin-right: 3px;
+}
+
+.form-asset-on p{
+    margin-bottom:0px;
 }
 
 .form-asset-on button{
@@ -229,6 +234,24 @@ table.dataTable tbody td.selected td i.text-navy
     min-height:34px;
     height: 100%;
 }
-.form-asset-on p{
-    margin-bottom:0px;
+
+.mgl-5 {
+	margin-left: 5px;
+	font-size: 12px;
+}
+.c02 {
+	color: #999;
+}
+
+.tagBtnList {
+	font-size: 12px;
+	line-height: 32px;
+	margin: -5px 0 0 0;
+	padding-left: 0px;
+}
+
+.tagBtn2 {
+	margin: 0 5px 5px 0;
+	font-size: 12px;
+	vertical-align: middle;
 }
