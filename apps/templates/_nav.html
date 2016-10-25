@@ -39,10 +39,20 @@
         <i class="fa fa-desktop"></i><span class="nav-label">{% trans 'Terminal' %}</span><span class="label label-info pull-right"></span>
     </a>
 </li>
-<li id="">
-    <a href="">
-        <i class="fa fa-files-o"></i><span class="nav-label">{% trans 'Audits' %}</span><span class="label label-info pull-right"></span>
-    </a>
+<li id="audits">
+    <a href="#"><i class="fa fa-files-o"></i> <span class="nav-label">{% trans 'Audits' %}</span><span class="fa arrow"></span></a>
+    <ul class="nav nav-second-level">
+        <li id="proxy-log">
+            <a href="{% url 'audits:proxy-log-list' %}">{% trans 'Proxy log' %}</a>
+        </li>
+        <li id="login">
+            <a href="{% url 'perms:asset-permission-list' %}">{% trans 'Login log' %}</a>
+        </li>
+        <li id="admin">
+            <a href="{% url 'perms:asset-permission-list' %}">{% trans 'Admin log' %}</a>
+        </li>
+
+    </ul>
 </li>
 <li id="">
     <a href="#">

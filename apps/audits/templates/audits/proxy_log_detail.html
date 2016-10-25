@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% load common_tags %}
+{% load users_tags %}
+{% load bootstrap %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <script src="{% static "css/plugins/footable/footable.core.css" %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="#" class="text-center"> {% trans 'Proxy log detail' %} </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0;">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left">{% trans 'Command log list' %} <b>{{ user_object.name }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="footable table table-stripped toggle-arrow-tiny command" data-page-size="8">
+{#                                        <thead>#}
+{#                                        <tr>#}
+{#                                            <th data-toggle="true">No</th>#}
+{#                                            <th>Command</th>#}
+{#                                            <th>Datetime</th>#}
+{#                                        </tr>#}
+{#                                        </thead>#}
+{#                                        <tbody>#}
+{#                                        </tbody>#}
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left">{% trans 'Detail' %} <b>{{ user_object.name }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">{% trans 'Name' %}</th>
+                                                <th class="text-center">{% trans 'Asset count' %}</th>
+                                                <th class="text-center">{% trans 'System user' %}</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for asset_group, system_users in asset_groups %}
+                                            <tr class="gradeX">
+                                                <td class="text-center">
+                                                    <a href="{% url 'assets:asset-group-detail' pk=asset_group.id %}">
+                                                        {{ asset_group.name }}
+                                                    </a>
+                                                </td>
+                                                <td class="text-center">{{ asset_group.assets.count }}</td>
+                                                <td class="text-center">{{ system_users|join_attr:"name" }}</td>
+                                                <td>
+                                                    <button class="btn btn-danger btn-xs btn_delete_user_group {% if not asset_group.is_inherit_from_user_groups %} disabled {% endif %}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block custom_foot_js %}
+    <script>
+        $(document).ready(function () {
+            $('.command').footable({
+                "rows": $.get({% url 'audits:command-log-create-list-api' %})
+            })
+        });
+    </script>
+{% endblock %}
