@@ -80,56 +80,34 @@ class Config(object):
         default_config.HOST_KEY_CHECKING = False
 
 
-class MyInventory(object):
-    """Ansible Inventory对象的封装, Inventory是Ansbile中的核心概念(资产清单),
-    这个概念和CMDB很像,都是对资产的抽象. 为了简化Inventory的使用, 通过传入资产列表即可初始化Inventory.
+class InventoryMixin(object):
+    """提供生成Ansible inventory对象的方法
     """
 
-    def __init__(self, *assets, **group):
-        """初始化Inventory对象, args为一个资产列表, kwargs是资产组变量列表, 比如
-        args:
-            [{
-                "name": "asset_name",
-                "ip": "asset_ip",
-                "port": "asset_port",
-                "username": "asset_user",
-                "password": "asset_pass",
-                "key": "asset_private_key",
-                "group": "asset_group_name",
-                ...
-            }]
-        kwargs:
-            "groupName1": {"group_variable1": "value1",...}
-            "groupName2": {"group_variable1": "value1",...}
-        """
-        self.assets = assets
-        self.assets_group = group
-        self.loader = DataLoader()
-        self.variable_manager = VariableManager()
-        self.groups = []
-        self.inventory = self.gen_inventory()
+    def gen_inventory(self):
+        """用于生成动态构建Ansible Inventory.
 
-    def __gen_group(self):
-        """初始化Ansible Group, 将资产添加到Inventory里面
-        :return: None
+        :return: 返回一个Ansible的inventory对象
         """
+
+        # TODO: 验证输入
+
         # 创建Ansible Group.
-        for asset in self.assets:
+        for asset in self.hosts:
             g_name = asset.get('group', 'default')
             if g_name not in [g.name for g in self.groups]:
                 group = Group(name=asset.get('group', 'default'))
-
                 self.groups.append(group)
 
         # 初始化组变量
-        for group_name, variables in self.assets_group.iteritems():
+        for group_name, variables in self.group_vars.iteritems():
             for g in self.groups:
                 if g.name == group_name:
                     for v_name, v_value in variables:
                         g.set_variable(v_name, v_value)
 
         # 往组里面添加Host
-        for asset in self.assets:
+        for asset in self.hosts:
             host = Host(name=asset['name'], port=asset['port'])
             host.set_variable('ansible_ssh_host', asset['ip'])
             host.set_variable('ansible_ssh_port', asset['port'])
@@ -147,36 +125,103 @@ class MyInventory(object):
                 if g.name == asset.get('group', 'default'):
                     g.add_host(host)
 
-    def validate(self):
-        pass
-
-    def gen_inventory(self):
-        self.validate()
-        i = Inventory(loader=self.loader, variable_manager=self.variable_manager, host_list=[])
-        self.__gen_group()
+        # 生成Ansible inventory对象
+        inventory = Inventory(loader=self.loader, variable_manager=self.variable_manager, host_list=[])
         for g in self.groups:
-            i.add_group(g)
-        self.variable_manager.set_inventory(i)
-        return i
+            inventory.add_group(g)
+        self.variable_manager.set_inventory(inventory)
+        return inventory
 
 
-class PlayBookRunner(object):
-    """用于执行AnsiblePlaybook的接口.简化Playbook对象的使用
+class CallbackModule(CallbackBase):
+    """处理和分析Ansible运行结果,并保存数据.
+    """
+    CALLBACK_VERSION = 2.0
+    CALLBACK_TYPE = 'stdout'
+    CALLBACK_NAME = 'json'
+
+    def __init__(self, display=None):
+        super(CallbackModule, self).__init__(display)
+        self.results = []
+
+    def _new_play(self, play):
+        return {
+            'play': {
+                'name': play.name,
+                'id': str(play._uuid)
+            },
+            'tasks': []
+        }
+
+    def _new_task(self, task):
+        return {
+            'task': {
+                'name': task.name,
+                'id': str(task._uuid)
+            },
+            'hosts': {}
+        }
+
+    def v2_playbook_on_play_start(self, play):
+        self.results.append(self._new_play(play))
+
+    def v2_playbook_on_task_start(self, task, is_conditional):
+        self.results[-1]['tasks'].append(self._new_task(task))
+
+    def v2_runner_on_ok(self, result, **kwargs):
+        host = result._host
+        self.results[-1]['tasks'][-1]['hosts'][host.name] = result._result
+
+    def v2_playbook_on_stats(self, stats):
+        """Display info about playbook statistics"""
+
+        hosts = sorted(stats.processed.keys())
+
+        summary = {}
+        for h in hosts:
+            s = stats.summarize(h)
+            summary[h] = s
+
+        output = {
+            'plays': self.results,
+            'stats': summary
+        }
+
+        print(json.dumps(output, indent=4, sort_keys=True))
+
+    v2_runner_on_failed = v2_runner_on_ok
+    v2_runner_on_unreachable = v2_runner_on_ok
+    v2_runner_on_skipped = v2_runner_on_ok
+
+
+class PlayBookRunner(InventoryMixin):
+    """用于执行AnsiblePlaybook的接口.简化Playbook对象的使用.
     """
 
-    def __init__(self, inventory, config, palybook_path, playbook_var, become_pass, verbosity=0):
+    def __init__(self, config, palybook_path, playbook_var, become_pass, *hosts, **group_vars):
         """
-        :param inventory: myinventory实例
+
         :param config: Config实例
         :param palybook_path: playbook的路径
         :param playbook_var: 执行Playbook时的变量
         :param become_pass: sudo passsword
-        :param verbosity: --verbosity
+        :param hosts: 可变位置参数, 为一个资产列表, 每一个资产用dict表示, 以下是这个dict必须包含的key
+            [{
+                        "name": "asset_name",
+                        "ip": "asset_ip",
+                        "port": "asset_port",
+                        "username": "asset_user",
+                        "password": "asset_pass",
+                        "key": "asset_private_key",
+                        "group": "asset_group_name",
+                        ...
+            }]
+        :param group_vars: 可变关键字参数, 是资产组变量, 记录对应的资产组变量
+                "groupName1": {"group_variable1": "value1",...}
+                "groupName2": {"group_variable1": "value1",...}
         """
 
         self.options = config
-        self.options.verbosity = verbosity
-        self.options.connection = 'smart'
 
         # 设置verbosity级别, 及命令行的--verbose选项
         self.display = Display()
@@ -190,16 +235,24 @@ class PlayBookRunner(object):
         passwords = {'become_pass': become_pass}
 
         # 传入playbook的路径，以及执行需要的变量
-        inventory.variable_manager.extra_vars = playbook_var
         pb_dir = os.path.dirname(__file__)
         playbook = "%s/%s" % (pb_dir, palybook_path)
+
+        # 生成Ansible inventory, 这些变量Mixin都会用到
+        self.hosts = hosts
+        self.group_vars = group_vars
+        self.loader = DataLoader()
+        self.variable_manager = VariableManager()
+        self.groups = []
+        self.variable_manager.extra_vars = playbook_var
+        self.inventory = self.gen_inventory()
 
         # 初始化playbook的executor
         self.pbex = playbook_executor.PlaybookExecutor(
             playbooks=[playbook],
-            inventory=inventory,
-            variable_manager=inventory.variable_manager,
-            loader=inventory.loader,
+            inventory=self.inventory,
+            variable_manager=self.variable_manager,
+            loader=self.loader,
             options=self.options,
             passwords=passwords)
 
@@ -223,13 +276,15 @@ class PlayBookRunner(object):
         return stats
 
 
-class ADHocRunner(object):
+class ADHocRunner(InventoryMixin):
     """ADHoc接口
     """
-    def __init__(self, inventory, config, become_pass=None, verbosity=0):
+    def __init__(self, config, play_data, become_pass=None, *hosts, **group_vars):
         """
-        :param inventory: myinventory实例
+        :param hosts: 见PlaybookRunner参数
+        :param group_vars: 见PlaybookRunner参数
         :param config: Config实例
+
         :param play_data:
         play_data = dict(
             name="Ansible Ad-Hoc",
@@ -240,8 +295,6 @@ class ADHocRunner(object):
         """
 
         self.options = config
-        self.options.verbosity = verbosity
-        self.options.connection = 'smart'
 
         # 设置verbosity级别, 及命令行的--verbose选项
         self.display = Display()
@@ -254,22 +307,18 @@ class ADHocRunner(object):
         self.options.become_user = 'root'
         self.passwords = {'become_pass': become_pass}
 
+        # 生成Ansible inventory, 这些变量Mixin都会用到
+        self.hosts = hosts
+        self.group_vars = group_vars
+        self.loader = DataLoader()
+        self.variable_manager = VariableManager()
+        self.groups = []
+        self.inventory = self.gen_inventory()
+
         # 初始化callback插件
-        # self.results_callback = ResultCallback()
+        self.results_callback = CallbackModule()
 
-        # 初始化Play
-        play_source = {
-            "name": "Ansible Play",
-            "hosts": "*",
-            "gather_facts": "no",
-            "tasks": [
-                dict(action=dict(module='shell', args='id'), register='shell_out'),
-                dict(action=dict(module='debug', args=dict(msg='{{shell_out.stdout}}')))
-            ]
-        }
-
-        self.play = Play().load(play_source, variable_manager=inventory.variable_manager, loader=inventory.loader)
-        self.inventory = inventory
+        self.play = Play().load(play_data, variable_manager=self.variable_manager, loader=self.loader)
 
     def run(self):
         """执行ADHoc 记录日志，　处理结果
@@ -278,16 +327,16 @@ class ADHocRunner(object):
         # TODO:日志和结果分析
         try:
             tqm = TaskQueueManager(
-                inventory=self.inventory.inventory,
-                variable_manager=self.inventory.variable_manager,
-                loader=self.inventory.loader,
-                stdout_callback=default_config.DEFAULT_STDOUT_CALLBACK,
+                inventory=self.inventory,
+                variable_manager=self.variable_manager,
+                loader=self.loader,
+                stdout_callback=self.results_callback,
                 options=self.options,
                 passwords=self.passwords
             )
-
-            result = tqm.run(self.play)
-            return result
+            ext_code = tqm.run(self.play)
+            result = json.dumps(self.results_callback.results)
+            return ext_code, result
         finally:
             if tqm:
                 tqm.cleanup()
@@ -300,11 +349,19 @@ if __name__ == "__main__":
                 "ip": "localhost",
                 "port": "22",
                 "username": "yumaojun",
-                "password": "xxx",
+                "password": "yusky0902",
                 "key": "asset_private_key",
     }]
-    inv = MyInventory(*assets)
-    print inv.inventory.get_group('default').get_hosts()
-    hoc = ADHocRunner(inv, conf, 'xxx')
-    hoc.run()
-
+    # 初始化Play
+    play_source = {
+            "name": "Ansible Play",
+            "hosts": "*",
+            "gather_facts": "no",
+            "tasks": [
+                dict(action=dict(module='setup')),
+            ]
+        }
+    hoc = ADHocRunner(conf, play_source,'yusky0902', *assets)
+    ext_code, result = hoc.run()
+    print ext_code
+    print result
