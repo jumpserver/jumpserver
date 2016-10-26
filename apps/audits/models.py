@@ -2,6 +2,7 @@
 #
 
 from __future__ import unicode_literals
+import base64
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -67,6 +68,10 @@ class CommandLog(models.Model):
 
     def __unicode__(self):
         return '%s: %s' % (self.id, self.command)
+
+    @property
+    def output_decode(self):
+        return base64.b64decode(self.output).replace('\n', '<br />')
 
     class Meta:
         db_table = 'command_log'

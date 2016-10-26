@@ -27,12 +27,12 @@
             <th class="text-center">{% trans 'Username' %}</th>
             <th class="text-center">{% trans 'IP' %}</th>
             <th class="text-center">{% trans 'System user' %}</th>
-            <th class="text-center">{% trans 'Login type' %}</th>
-{#            <th class="text-center">{% trans 'Terminal' %}</th>#}
+{#            <th class="text-center">{% trans 'Login type' %}</th>#}
+            <th class="text-center">{% trans 'Command' %}</th>
             <th class="text-center">{% trans 'Success' %}</th>
             <th class="text-center">{% trans 'Finished' %}</th>
             <th class="text-center">{% trans 'Date start' %}</th>
-            <th class="text-center">{% trans 'Date finished' %}</th>
+            <th class="text-center">{% trans 'Time' %}</th>
             <th class="text-center">{% trans 'Action' %}</th>
         </tr>
     </thead>
@@ -76,8 +76,8 @@ $(document).ready(function(){
         ],
         ajax_url: '{% url "audits:proxy-log-list-create-api" %}',
         columns: [{data: function(){return ""}}, {data: "name" }, {data: "ip"},
-                  {data: "system_user"}, {data: "terminal"}, {data: 'was_failed'},
-                  {data: "is_finished"}, {data: "date_start"}, {data: 'date_finished'}, {data: 'id'}],
+                  {data: "system_user"}, {data: "command_length"}, {data: 'was_failed'},
+                  {data: "is_finished"}, {data: "date_start"}, {data: 'time'}, {data: 'id'}],
         op_html: $('#actions').html()
     };
     jumpserver.initDataTable(options);

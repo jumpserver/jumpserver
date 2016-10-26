@@ -22,7 +22,13 @@ class UserAssetsGrantedApi(APIView):
                     'hostname': asset.hostname,
                     'ip': asset.ip,
                     'port': asset.port,
-                    'system_users': [system_user.name for system_user in system_users],
+                    'system_users': [
+                        {
+                            'id': system_user.id,
+                            'name': system_user.name,
+                            'username': system_user.username,
+                        } for system_user in system_users
+                    ],
                     'comment': asset.comment
                 })
 

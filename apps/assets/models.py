@@ -3,6 +3,7 @@ from __future__ import unicode_literals, absolute_import
 
 import functools
 from django.db import models
+from django.core import serializers
 import logging
 from django.utils.translation import ugettext_lazy as _
 
@@ -335,6 +336,9 @@ class Asset(models.Model):
         else:
             return True, ''
         return False, warning
+
+    def json(self):
+        pass
 
     class Meta:
         db_table = 'asset'
