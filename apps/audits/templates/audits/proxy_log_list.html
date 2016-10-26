@@ -40,7 +40,7 @@
         <tbody>
         </tbody>
     </table>
-    {% include 'audits/_proxy_log_command_modal.html' %}
+    {% include 'audits/proxy_log_command_list_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
@@ -55,6 +55,13 @@ $(document).ready(function(){
                 var detail_btn = '<a href="{% url "users:user-detail" pk=99991937 %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('99991937', rowData.id));
              }},
+            {targets: 4, createdCell: function (td, cellData, rowData) {
+                if (cellData) {
+                    $(td).html('<a url="{% url "audits:proxy-log-detail-api" pk=99991938 %}" class="commands">99991937</a>'
+                            .replace('99991937', cellData)
+                            .replace('99991938',rowData.id))
+                }
+            }},
             {targets: 5, createdCell: function (td, cellData) {
                 if (cellData) {
                     $(td).html('<i class="fa fa-times text-danger"></i>')
@@ -85,12 +92,30 @@ $(document).ready(function(){
         op_html: $('#actions').html()
     };
     jumpserver.initDataTable(options);
-}).on('click', '.btn_delete', function(){
-    var $this = $(this);
-    var uid = $this.data('uid');
-    var name = $(this).data('name');
-    var the_url = '{% url "terminal:terminal-detail-update-delete-api" pk=99991937 %}'.replace('99991937', uid);
-    objectDelete($this, name, the_url)
+}).on('click', '.commands', function () {
+    var url = $(this).attr('url');
+    $.ajax({
+        url: url,
+        method: 'GET',
+        success: function (data) {
+            var table_body = '';
+            $.each(data.commands_dict, function (index, value) {
+                table_body += '<tr>' +
+                    '<td>' + value.command_no + '</td>' +
+                    '<td>' + value.command + '</td>' +
+                    '<td>' + value.output + '</td>' +
+                    '<td>' + value.datetime + '</td>' +
+                '</tr>'
+            });
+            console.log(table_body);
+            $('.table_body').html(table_body);
+            $('.footable').footable();
+            $('#command_table').modal('show');
+        }
+
+    })
 })
+
+
 </script>
 {% endblock %}

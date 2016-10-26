@@ -1,9 +1,7 @@
 {% extends '_modal.html' %}
 {% load i18n %}
-{% block modal_id %}Proxy command list{% endblock %}
-{% block modal_title%}{% trans "Proxy command list" %}{% endblock %}
+{% block modal_id %}command_table{% endblock %}
 {% block modal_body %}
-<div class="ibox-content">
     <table class="footable table table-stripped toggle-arrow-tiny" data-page-size="10">
         <thead>
         <tr>
@@ -13,7 +11,7 @@
             <th>Datetime</th>
         </tr>
         </thead>
-        <tbody>
+        <tbody class="table_body">
         {% for command in object_list %}
             <tr>
                 <td>{{ command.command_no }}</td>
