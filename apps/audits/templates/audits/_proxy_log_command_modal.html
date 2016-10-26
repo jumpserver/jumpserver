@@ -1,0 +1,27 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% block modal_id %}Proxy command list{% endblock %}
+{% block modal_title%}{% trans "Proxy command list" %}{% endblock %}
+{% block modal_body %}
+<div class="ibox-content">
+    <table class="footable table table-stripped toggle-arrow-tiny" data-page-size="10">
+        <thead>
+        <tr>
+            <th data-toggle="true">ID</th>
+            <th>Command</th>
+            <th data-hide="all">Output</th>
+            <th>Datetime</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for command in object_list %}
+            <tr>
+                <td>{{ command.command_no }}</td>
+                <td>{{ command.command }}</td>
+                <td>{{ command.output_decode |safe }}</td>
+                <td>{{ command.datetime }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

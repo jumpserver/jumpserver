@@ -1,49 +1,53 @@
 {% extends '_base_list.html' %}
 {% load i18n static %}
 {% block custom_head_css_js %}
-{{ block.super }}
-<style>
-    div.dataTables_wrapper div.dataTables_filter,
-    .dataTables_length {
-        float: right !important;
-    }
+    {{ block.super }}
+    <link href="{% static "css/plugins/footable/footable.core.css" %}" rel="stylesheet">
+    <style>
+        div.dataTables_wrapper div.dataTables_filter,
+        .dataTables_length {
+            float: right !important;
+        }
 
-    div.dataTables_wrapper div.dataTables_filter {
-        margin-left: 15px;
-    }
+        div.dataTables_wrapper div.dataTables_filter {
+            margin-left: 15px;
+        }
 </style>
 {% endblock %}
 {% block table_search %}{% endblock %}
 {% block table_container %}
 {#<div class="uc pull-left m-l-5 m-r-5"><a href="{% url "users:user-create" %}" class="btn btn-sm btn-primary"> {% trans "Create user" %} </a></div>#}
-<table class="table table-striped table-bordered table-hover " id="proxy_log_list_table" >
-    <thead>
-        <tr>
-            <th class="text-center">
-                <div class="checkbox checkbox-default">
-                    <input type="checkbox" class="ipt_check_all">
-                </div>
-            </th>
-            <th class="text-center">{% trans 'Username' %}</th>
-            <th class="text-center">{% trans 'IP' %}</th>
-            <th class="text-center">{% trans 'System user' %}</th>
-{#            <th class="text-center">{% trans 'Login type' %}</th>#}
-            <th class="text-center">{% trans 'Command' %}</th>
-            <th class="text-center">{% trans 'Success' %}</th>
-            <th class="text-center">{% trans 'Finished' %}</th>
-            <th class="text-center">{% trans 'Date start' %}</th>
-            <th class="text-center">{% trans 'Time' %}</th>
-            <th class="text-center">{% trans 'Action' %}</th>
-        </tr>
-    </thead>
-    <tbody>
-    </tbody>
-</table>
+    <table class="table table-striped table-bordered table-hover " id="proxy_log_list_table" >
+        <thead>
+            <tr>
+                <th class="text-center">
+                    <div class="checkbox checkbox-default">
+                        <input type="checkbox" class="ipt_check_all">
+                    </div>
+                </th>
+                <th class="text-center">{% trans 'Username' %}</th>
+                <th class="text-center">{% trans 'IP' %}</th>
+                <th class="text-center">{% trans 'System user' %}</th>
+    {#            <th class="text-center">{% trans 'Login type' %}</th>#}
+                <th class="text-center">{% trans 'Command' %}</th>
+                <th class="text-center">{% trans 'Success' %}</th>
+                <th class="text-center">{% trans 'Finished' %}</th>
+                <th class="text-center">{% trans 'Date start' %}</th>
+                <th class="text-center">{% trans 'Time' %}</th>
+                <th class="text-center">{% trans 'Action' %}</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    {% include 'audits/_proxy_log_command_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
+<script src="{% static "js/plugins/footable/footable.all.min.js" %}"></script>
 <script>
 $(document).ready(function(){
+    $('.footable').footable();
     var options = {
         ele: $('#proxy_log_list_table'),
         columnDefs: [
