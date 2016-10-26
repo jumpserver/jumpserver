@@ -39,3 +39,14 @@ class ProxyLogDetailView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
         }
         kwargs.update(context)
         return super(ProxyLogDetailView, self).get_context_data(**kwargs)
+
+
+class ProxyLogCommandsListView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
+    template_name = 'audits/proxy_log_commands_list_modal.html'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=ProxyLog.objects.all())
+        return super(ProxyLogCommandsListView, self).get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return list(self.object.command_log.all())

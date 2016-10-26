@@ -3,6 +3,7 @@
 {% block custom_head_css_js %}
     {{ block.super }}
     <link href="{% static "css/plugins/footable/footable.core.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/layer/layer.css" %}" rel="stylesheet">
     <style>
         div.dataTables_wrapper div.dataTables_filter,
         .dataTables_length {
@@ -40,14 +41,12 @@
         <tbody>
         </tbody>
     </table>
-    {% include 'audits/proxy_log_command_list_modal.html' %}
 {% endblock %}
 {% block custom_foot_js %}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
-<script src="{% static "js/plugins/footable/footable.all.min.js" %}"></script>
+<script src="{% static "js/plugins/layer/layer.js" %}"></script>
 <script>
 $(document).ready(function(){
-    $('.footable').footable();
     var options = {
         ele: $('#proxy_log_list_table'),
         columnDefs: [
@@ -57,7 +56,7 @@ $(document).ready(function(){
              }},
             {targets: 4, createdCell: function (td, cellData, rowData) {
                 if (cellData) {
-                    $(td).html('<a url="{% url "audits:proxy-log-detail-api" pk=99991938 %}" class="commands">99991937</a>'
+                    $(td).html('<a url="{% url "audits:proxy-log-commands-list" pk=99991938 %}" class="commands">99991937</a>'
                             .replace('99991937', cellData)
                             .replace('99991938',rowData.id))
                 }
@@ -94,28 +93,16 @@ $(document).ready(function(){
     jumpserver.initDataTable(options);
 }).on('click', '.commands', function () {
     var url = $(this).attr('url');
-    $.ajax({
-        url: url,
-        method: 'GET',
-        success: function (data) {
-            var table_body = '';
-            $.each(data.commands_dict, function (index, value) {
-                table_body += '<tr>' +
-                    '<td>' + value.command_no + '</td>' +
-                    '<td>' + value.command + '</td>' +
-                    '<td>' + value.output + '</td>' +
-                    '<td>' + value.datetime + '</td>' +
-                '</tr>'
-            });
-            console.log(table_body);
-            $('.table_body').html(table_body);
-            $('.footable').footable();
-            $('#command_table').modal('show');
-        }
-
+    layer.open({
+         type: 2,
+         title: '很多时候，我们想最大化看，比如像这个页面。',
+         shadeClose: true,
+         shade: false,
+         maxmin: true, //开启最大化最小化按钮
+         area: ['893px', '600px'],
+         content: url
+        });
     })
-})
-
 
 </script>
 {% endblock %}
