@@ -126,6 +126,7 @@ $('#userForm').validator({
     timely: 2,
     theme: "yellow_right_effect",
     rules: {
+        check_name: [/(?!^root$)^[\w.]{2,20}$/i, '大小写字母数字和下划线小数点,2-20位,并且非root'],
         check_username: [/^[\w.]{3,20}$/, '大小写字母数字和下划线小数点'],
         type_m: function(element){
                     return  $("#M").is(":checked");
@@ -133,7 +134,7 @@ $('#userForm').validator({
     },
     fields: {
         "username": {
-            rule: "required;check_username",
+            rule: "required;check_username;check_name",
             tip: "输入用户名",
             ok: "",
             msg: {required: "必须填写!"}
