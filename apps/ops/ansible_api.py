@@ -22,11 +22,11 @@ class Config(object):
     """Ansible运行时配置类, 用于初始化Ansible.
     """
     def __init__(self, verbosity=None, inventory=None, listhosts=None, subset=None, module_paths=None, extra_vars=None,
-                 forks=None, ask_vault_pass=None, vault_password_files=None, new_vault_password_file=None,
-                 output_file=None, tags=None, skip_tags=None, one_line=None, tree=None, ask_sudo_pass=None, ask_su_pass=None,
-                 sudo=None, sudo_user=None, become=None, become_method=None, become_user=None, become_ask_pass=None,
-                 ask_pass=None, private_key_file=None, remote_user=None, connection=None, timeout=None, ssh_common_args=None,
-                 sftp_extra_args=None, scp_extra_args=None, ssh_extra_args=None, poll_interval=None, seconds=None, check=None,
+                 forks=None, ask_vault_pass=False, vault_password_files=None, new_vault_password_file=None,
+                 output_file=None, tags=None, skip_tags=None, one_line=None, tree=None, ask_sudo_pass=False, ask_su_pass=False,
+                 sudo=None, sudo_user=None, become=None, become_method=None, become_user=None, become_ask_pass=False,
+                 ask_pass=False, private_key_file=None, remote_user=None, connection="smart", timeout=None, ssh_common_args=None,
+                 sftp_extra_args=None, scp_extra_args=None, ssh_extra_args=None, poll_interval=None, seconds=None, check=False,
                  syntax=None, diff=None, force_handlers=None, flush_cache=None, listtasks=None, listtags=None, module_path=None):
         self.verbosity = verbosity
         self.inventory = inventory
@@ -86,46 +86,75 @@ class InventoryMixin(object):
 
     def gen_inventory(self):
         """用于生成动态构建Ansible Inventory.
+        self.hosts: [
+                        {"host": <ip>,
+                          "port": <port>,
+                          "user": <user>,
+                          "pass": <pass>,
+                          "key": <sshKey>,
+                          "group": <default>
+                          "other_host_var": <other>},
+                        {...},
+                     ]
+        self.group_vars: {
+            "groupName1": {"var1": <value>, "var2": <value>, ...},
+            "groupName2": {"var1": <value>, "var2": <value>, ...},
+        }
 
         :return: 返回一个Ansible的inventory对象
         """
 
         # TODO: 验证输入
 
-        # 创建Ansible Group.
+        # 创建Ansible Group,如果没有则创建default组
         for asset in self.hosts:
             g_name = asset.get('group', 'default')
             if g_name not in [g.name for g in self.groups]:
-                group = Group(name=asset.get('group', 'default'))
+                group = Group(name=g_name)
                 self.groups.append(group)
 
-        # 初始化组变量
+        # 添加组变量到相应的组上
         for group_name, variables in self.group_vars.iteritems():
             for g in self.groups:
                 if g.name == group_name:
-                    for v_name, v_value in variables:
+                    for v_name, v_value in variables.iteritems():
                         g.set_variable(v_name, v_value)
 
         # 往组里面添加Host
         for asset in self.hosts:
+            # 添加Host链接的常用变量(host,port,user,pass,key)
             host = Host(name=asset['name'], port=asset['port'])
-            host.set_variable('ansible_ssh_host', asset['ip'])
-            host.set_variable('ansible_ssh_port', asset['port'])
-            host.set_variable('ansible_ssh_user', asset['username'])
+            host.set_variable('ansible_host', asset['ip'])
+            host.set_variable('ansible_port', asset['port'])
+            host.set_variable('ansible_user', asset['username'])
 
+            # 添加密码和秘钥
             if asset.get('password'):
                 host.set_variable('ansible_ssh_pass', asset['password'])
             if asset.get('key'):
                 host.set_variable('ansible_ssh_private_key_file', asset['key'])
 
+            # 添加become支持
+            become = asset.get("become", None)
+            if become is not None:
+                host.set_variable("ansible_become", True)
+                host.set_variable("ansible_become_method", become.get('method'))
+                host.set_variable("ansible_become_user", become.get('user'))
+                host.set_variable("ansible_become_pass", become.get('pass'))
+            else:
+                host.set_variable("ansible_become", False)
+
+            # 添加其他Host的额外变量
             for key, value in asset.iteritems():
                 if key not in ["name", "port", "ip", "username", "password", "key"]:
                     host.set_variable(key, value)
+
+            # 将host添加到组里面
             for g in self.groups:
                 if g.name == asset.get('group', 'default'):
                     g.add_host(host)
 
-        # 生成Ansible inventory对象
+        # 将组添加到Inventory里面，生成真正的inventory对象
         inventory = Inventory(loader=self.loader, variable_manager=self.variable_manager, host_list=[])
         for g in self.groups:
             inventory.add_group(g)
@@ -143,6 +172,7 @@ class CallbackModule(CallbackBase):
     def __init__(self, display=None):
         super(CallbackModule, self).__init__(display)
         self.results = []
+        self.output = {}
 
     def _new_play(self, play):
         return {
@@ -151,6 +181,7 @@ class CallbackModule(CallbackBase):
                 'id': str(play._uuid)
             },
             'tasks': []
+
         }
 
     def _new_task(self, task):
@@ -159,8 +190,32 @@ class CallbackModule(CallbackBase):
                 'name': task.name,
                 'id': str(task._uuid)
             },
-            'hosts': {}
+            'failed': {},
+            'unreachable': {},
+            'skipped': {},
+            'no_hosts': {},
+            'success': {}
         }
+
+    def v2_runner_on_failed(self, result, ignore_errors=False):
+        host = result._host
+        self.results[-1]['tasks'][-1]['failed'][host.name] = result._result
+
+    def v2_runner_on_unreachable(self, result):
+        host = result._host
+        self.results[-1]['tasks'][-1]['unreachable'][host.name] = result._result
+
+    def v2_runner_on_skipped(self, result):
+        host = result._host
+        self.results[-1]['tasks'][-1]['skipped'][host.name] = result._result
+
+    def v2_runner_on_no_hosts(self, task):
+        self.results[-1]['tasks'][-1]['no_hosts']['name'] = task.name
+        self.results[-1]['tasks'][-1]['no_hosts']['uuid'] = task.uuid
+
+    def v2_runner_on_ok(self, result):
+        host = result._host
+        self.results[-1]['tasks'][-1]['success'][host.name] = result._result
 
     def v2_playbook_on_play_start(self, play):
         self.results.append(self._new_play(play))
@@ -168,13 +223,8 @@ class CallbackModule(CallbackBase):
     def v2_playbook_on_task_start(self, task, is_conditional):
         self.results[-1]['tasks'].append(self._new_task(task))
 
-    def v2_runner_on_ok(self, result, **kwargs):
-        host = result._host
-        self.results[-1]['tasks'][-1]['hosts'][host.name] = result._result
-
     def v2_playbook_on_stats(self, stats):
         """Display info about playbook statistics"""
-
         hosts = sorted(stats.processed.keys())
 
         summary = {}
@@ -182,16 +232,8 @@ class CallbackModule(CallbackBase):
             s = stats.summarize(h)
             summary[h] = s
 
-        output = {
-            'plays': self.results,
-            'stats': summary
-        }
-
-        print(json.dumps(output, indent=4, sort_keys=True))
-
-    v2_runner_on_failed = v2_runner_on_ok
-    v2_runner_on_unreachable = v2_runner_on_ok
-    v2_runner_on_skipped = v2_runner_on_ok
+        self.output['plays'] = self.results
+        self.output['stats'] = summary
 
 
 class PlayBookRunner(InventoryMixin):
@@ -279,7 +321,7 @@ class PlayBookRunner(InventoryMixin):
 class ADHocRunner(InventoryMixin):
     """ADHoc接口
     """
-    def __init__(self, config, play_data, become_pass=None, *hosts, **group_vars):
+    def __init__(self, config, play_data, *hosts, **group_vars):
         """
         :param hosts: 见PlaybookRunner参数
         :param group_vars: 见PlaybookRunner参数
@@ -299,13 +341,9 @@ class ADHocRunner(InventoryMixin):
         # 设置verbosity级别, 及命令行的--verbose选项
         self.display = Display()
         self.display.verbosity = self.options.verbosity
-        playbook_executor.verbosity = self.options.verbosity
 
-        # sudo成其他用户的配置
-        self.options.become = True
-        self.options.become_method = 'sudo'
-        self.options.become_user = 'root'
-        self.passwords = {'become_pass': become_pass}
+        # sudo的配置移到了Host级别去了，因此这里不再需要处理
+        self.passwords = None
 
         # 生成Ansible inventory, 这些变量Mixin都会用到
         self.hosts = hosts
@@ -344,24 +382,36 @@ class ADHocRunner(InventoryMixin):
 
 if __name__ == "__main__":
     conf = Config()
-    assets = [{
-                "name": "localhost",
-                "ip": "localhost",
+    assets = [
+        {
+                "name": "192.168.1.119",
+                "ip": "192.168.1.119",
+                "port": "22",
+                "username": "root",
+                "password": "xxx",
+                "key": "asset_private_key",
+        },
+        {
+                "name": "192.168.232.135",
+                "ip": "192.168.232.135",
                 "port": "22",
                 "username": "yumaojun",
-                "password": "yusky0902",
+                "password": "xxx",
                 "key": "asset_private_key",
-    }]
+                "become": {"method": "sudo", "user": "root", "pass": "yusky0902"}
+    },
+    ]
     # 初始化Play
     play_source = {
             "name": "Ansible Play",
-            "hosts": "*",
+            "hosts": "default",
             "gather_facts": "no",
             "tasks": [
                 dict(action=dict(module='setup')),
+                dict(action=dict(module='command', args='lsdfd'))
             ]
         }
-    hoc = ADHocRunner(conf, play_source,'yusky0902', *assets)
+    hoc = ADHocRunner(conf, play_source, *assets)
     ext_code, result = hoc.run()
     print ext_code
     print result
