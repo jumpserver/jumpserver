@@ -215,7 +215,7 @@
 
    function cut(num, login_type){
        var protocol = window.location.protocol;
-       var endpoint = protocol + '//' +  document.URL.match(RegExp('//(.*?)/'))[1] + '/kill';
+       var endpoint = protocol + '//' +  document.URL.match(RegExp('//(.*?)/'))[1] + '/ws/kill';
        if (login_type=='web'){
            var g_url = endpoint + '?id=' + num;
            console.log(g_url);

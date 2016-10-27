@@ -153,9 +153,8 @@ def db_asset_alert(asset, username, alert_dic):
 
         elif field == 'group':
             old, new = [], []
-            for group_id in value[0]:
-                group_name = AssetGroup.objects.get(id=int(group_id)).name
-                old.append(group_name)
+            for asset_group in value[0]:
+                old.append(asset_group.name)
             for group_id in value[1]:
                 group_name = AssetGroup.objects.get(id=int(group_id)).name
                 new.append(group_name)

@@ -416,7 +416,7 @@ class WebTerminalHandler(tornado.websocket.WebSocketHandler):
             data = ''
             pre_timestamp = time.time()
             while True:
-                r, w, e = select.select([self.channel, sys.stdin], [], [])
+                r, w, e = select.select([self.channel], [], [])
                 if self.channel in r:
                     recv = self.channel.recv(1024)
                     if not len(recv):
@@ -494,7 +494,7 @@ def main():
         [
             (r'/ws/monitor', MonitorHandler),
             (r'/ws/terminal', WebTerminalHandler),
-            (r'/kill', WebTerminalKillHandler),
+            (r'/ws/kill', WebTerminalKillHandler),
             (r'/ws/exec', ExecHandler),
             (r"/static/(.*)", tornado.web.StaticFileHandler,
              dict(path=os.path.join(os.path.dirname(__file__), "static"))),
