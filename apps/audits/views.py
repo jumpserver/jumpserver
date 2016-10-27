@@ -1,7 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 #
 
-from django.views.generic import ListView, UpdateView, DeleteView, DetailView
+from django.views.generic import ListView, UpdateView, DeleteView, DetailView, TemplateView
 from django.views.generic.edit import SingleObjectMixin
 from django.utils.translation import ugettext as _
 from django.urls import reverse_lazy
@@ -11,8 +11,7 @@ from .models import ProxyLog, CommandLog
 from .utils import AdminUserRequiredMixin
 
 
-class ProxyLogListView(ListView):
-    model = ProxyLog
+class ProxyLogListView(TemplateView):
     template_name = 'audits/proxy_log_list.html'
 
     def get_context_data(self, **kwargs):
@@ -50,3 +49,15 @@ class ProxyLogCommandsListView(AdminUserRequiredMixin, SingleObjectMixin, ListVi
 
     def get_queryset(self):
         return list(self.object.command_log.all())
+
+
+class CommandLogListView(AdminUserRequiredMixin, TemplateView):
+    template_name = 'audits/command_log_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'Audits',
+            'action': 'Command log list'
+        }
+        kwargs.update(context)
+        return super(CommandLogListView, self).get_context_data(**kwargs)

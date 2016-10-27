@@ -18,7 +18,10 @@ class ProxyLogSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_time(obj):
-        return timesince(obj.date_start, since=obj.date_finished)
+        if not obj.is_finished:
+            return ''
+        else:
+            return timesince(obj.date_start, since=obj.date_finished)
 
     @staticmethod
     def get_command_length(obj):
