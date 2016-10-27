@@ -51,8 +51,24 @@ class ProxyLogCommandsListView(AdminUserRequiredMixin, SingleObjectMixin, ListVi
         return list(self.object.command_log.all())
 
 
-class CommandLogListView(AdminUserRequiredMixin, TemplateView):
+class CommandLogListView(AdminUserRequiredMixin, ListView):
+    model = CommandLog
     template_name = 'audits/command_log_list.html'
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    context_object_name = 'command_list'
+
+    def get_queryset(self):
+        # Todo: Default order by lose asset connection num
+        self.queryset = super(CommandLogListView, self).get_queryset()
+        self.keyword = keyword = self.request.GET.get('keyword', '')
+        self.sort = sort = self.request.GET.get('sort', '-datetime')
+
+        if keyword:
+            self.queryset = self.queryset.filter()
+
+        if sort:
+            self.queryset = self.queryset.order_by(sort)
+        return self.queryset
 
     def get_context_data(self, **kwargs):
         context = {
