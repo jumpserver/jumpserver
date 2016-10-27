@@ -159,9 +159,14 @@ def user_add(request):
             if '' in [username, password, ssh_key_pwd, name, role]:
                 error = u'带*内容不能为空'
                 raise ServerError
+                
             check_user_is_exist = User.objects.filter(username=username)
             if check_user_is_exist:
                 error = u'用户 %s 已存在' % username
+                raise ServerError
+            
+            if username in ['root']:
+                error = u'用户不能为root'
                 raise ServerError
 
         except ServerError:
