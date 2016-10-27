@@ -2,6 +2,7 @@
 #
 
 from __future__ import unicode_literals
+import base64
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -53,6 +54,17 @@ class ProxyLog(models.Model):
     def __unicode__(self):
         return '%s-%s-%s-%s' % (self.username, self.hostname, self.system_user, self.id)
 
+    @property
+    def commands_dict(self):
+        commands = self.command_log.all()
+        return [
+                    {
+                        "command_no": command.command_no,
+                        "command": command.command,
+                        "output": command.output_decode,
+                        "datetime": command.datetime,
+                    } for command in commands]
+
     class Meta:
         db_table = 'proxy_log'
         ordering = ['-date_start', 'username']
@@ -67,6 +79,10 @@ class CommandLog(models.Model):
 
     def __unicode__(self):
         return '%s: %s' % (self.id, self.command)
+
+    @property
+    def output_decode(self):
+        return base64.b64decode(self.output).replace('\n', '<br />')
 
     class Meta:
         db_table = 'command_log'

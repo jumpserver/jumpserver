@@ -2,11 +2,11 @@
 # 
 
 
+from __future__ import absolute_import, unicode_literals
 from rest_framework import generics
+from rest_framework.views import APIView, Response
 
-import serializers
-
-from .models import ProxyLog, CommandLog
+from . import models, serializers
 from .hands import IsSuperUserOrTerminalUser, Terminal
 
 
@@ -30,7 +30,7 @@ class ProxyLogListCreateApi(generics.ListCreateAPIView):
     }
     """
 
-    queryset = ProxyLog.objects.all()
+    queryset = models.ProxyLog.objects.all()
     serializer_class = serializers.ProxyLogSerializer
     permission_classes = (IsSuperUserOrTerminalUser,)
 
@@ -40,12 +40,23 @@ class ProxyLogListCreateApi(generics.ListCreateAPIView):
 
 
 class ProxyLogDetailApi(generics.RetrieveUpdateDestroyAPIView):
-    queryset = ProxyLog.objects.all()
+    queryset = models.ProxyLog.objects.all()
     serializer_class = serializers.ProxyLogSerializer
     permission_classes = (IsSuperUserOrTerminalUser,)
 
 
-class CommandLogCreateApi(generics.ListCreateAPIView):
-    queryset = CommandLog.objects.all()
+class CommandLogListCreateApi(generics.ListCreateAPIView):
+    queryset = models.CommandLog.objects.all()
     serializer_class = serializers.CommandLogSerializer
     permission_classes = (IsSuperUserOrTerminalUser,)
+
+
+# class CommandLogTitleApi(APIView):
+#     def get(self, request):
+#         response = [
+#             {"name": "command_no", "title": "ID", "type": "number"},
+#             {"name": "command", "title": "Title", "visible": True, "filterable": True},
+#             {"name": "datetime", "title": "Datetime", "type"},
+#             {"name": "output", "title": "Output", "filterable": True},
+#         ]
+#

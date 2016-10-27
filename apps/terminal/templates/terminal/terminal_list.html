@@ -27,7 +27,7 @@
             <th class="text-center">{% trans 'Name' %}</th>
             <th class="text-center">{% trans 'IP' %}</th>
             <th class="text-center">{% trans 'Type' %}</th>
-            <th class="text-center">{% trans 'url' %}</th>
+            <th class="text-center">{% trans 'proxy_amount' %}</th>
             <th class="text-center">{% trans 'Active' %}</th>
             <th class="text-center">{% trans 'Action' %}</th>
         </tr>
@@ -36,44 +36,46 @@
     </tbody>
 </table>
 {% endblock %}
-{% block content_bottom_left %}{% endblock %}
 {% block custom_foot_js %}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script>
 $(document).ready(function(){
     var options = {
         ele: $('#terminal_list_table'),
-{#        columnDefs: [#}
-{#            {targets: 1, createdCell: function (td, cellData, rowData) {#}
-{#                var detail_btn = '<a href="{% url "users:user-detail" pk=99991937 %}">' + cellData + '</a>';#}
-{#                $(td).html(detail_btn.replace('99991937', rowData.id));#}
-{#             }}#}
-{#            {targets: 4, createdCell: function (td, cellData) {#}
-{#                var innerHtml = cellData.length > 8 ? cellData.substring(0, 8) + '...': cellData;#}
-{#                $(td).html('<a href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</a>');#}
-{#             }},#}
-{#            {targets: 6, createdCell: function (td, cellData) {#}
-{#                if (!cellData) {#}
-{#                    $(td).html('<i class="fa fa-times text-danger"></i>')#}
-{#                } else {#}
-{#                    $(td).html('<i class="fa fa-check text-navy"></i>')#}
-{#                }#}
-{#             }},#}
-{#            {targets: 7, createdCell: function (td, cellData, rowData) {#}
-{#                var update_btn = '<a href="{% url "users:user-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);#}
-{#                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);#}
-{#                if (rowData.id === 1) {#}
-{#                    $(td).html(update_btn)#}
-{#                } else {#}
-{#                    $(td).html(update_btn + del_btn)#}
-{#             }}],#}
-{#                ],#}
+        columnDefs: [
+            {targets: 1, createdCell: function (td, cellData, rowData) {
+                var detail_btn = '<a href="{% url "users:user-detail" pk=99991937 %}">' + cellData + '</a>';
+                $(td).html(detail_btn.replace('99991937', rowData.id));
+             }},
+            {targets: 5, createdCell: function (td, cellData) {
+                if (!cellData) {
+                    $(td).html('<i class="fa fa-times text-danger"></i>')
+                } else {
+                    $(td).html('<i class="fa fa-check text-navy"></i>')
+                }
+             }},
+            {targets: 6, createdCell: function (td, cellData, rowData) {
+                console.log(rowData.name);
+                var update_btn = '<a href="{% url "terminal:terminal-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'
+                        .replace('99991937', cellData);
+                var delete_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_delete" data-uid="99991937" data-name="99991938">{% trans "Delete" %}</a>'
+                        .replace('99991937', cellData)
+                        .replace('99991938', rowData.name);
+                $(td).html(update_btn + delete_btn)
+             }}
+        ],
         ajax_url: '{% url "terminal:terminal-list-create-api" %}',
-        columns: [{data: function(){return ""}}, {data: "name" }, {data: "ip" }, {data: "get_type_display" }, {data: "url" },
-                  {data: "is_active" }, {data: "ip"}],
+        columns: [{data: function(){return ""}}, {data: "name" }, {data: "ip" }, {data: "get_type_display" },
+                  {data: "proxy_amount"}, {data: "is_active" }, {data: "id"}],
         op_html: $('#actions').html()
     };
     jumpserver.initDataTable(options);
+}).on('click', '.btn_delete', function(){
+    var $this = $(this);
+    var uid = $this.data('uid');
+    var name = $(this).data('name');
+    var the_url = '{% url "terminal:terminal-detail-update-delete-api" pk=99991937 %}'.replace('99991937', uid);
+    objectDelete($this, name, the_url)
 })
 </script>
 {% endblock %}

@@ -1,0 +1,46 @@
+{% extends '_base_list.html' %}
+{% load i18n %}
+{% load static %}
+{% load common_tags %}
+{% block content_left_head %}
+{#    <a href="{% url 'perms:asset-permission-create' %}" class="btn btn-sm btn-primary "> {% trans "Create permission" %} </a>#}
+    <link href="{% static "css/plugins/footable/footable.core.css" %}" rel="stylesheet">
+{% endblock %}
+
+{% block table_container %}
+    <table class="footable table table-stripped toggle-arrow-tiny" data-page="false">
+        <thead>
+        <tr>
+            <th data-toggle="true">ID</th>
+            <th>Command</th>
+            <th>Username</th>
+            <th>IP</th>
+            <th>Datetime</th>
+            <th data-hide="all">Output</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for command in command_list %}
+            <tr>
+                <td>{{ command.command_no }}</td>
+                <td>{{ command.command }}</td>
+                <td>{{ command.proxy_log.username }}</td>
+                <td>{{ command.proxy_log.ip }}</td>
+                <td>{{ command.datetime }}</td>
+                <td>{{ command.output_decode |safe }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+{% block custom_foot_js %}
+    <script src="{% static "js/plugins/footable/footable.all.min.js" %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('.footable').footable();
+        });
+    </script>
+{% endblock %}
+
+

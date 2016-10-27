@@ -2,6 +2,7 @@
 
 from django.conf.urls import url
 import views
+import api
 
 app_name = 'perms'
 
@@ -18,5 +19,10 @@ urlpatterns = [
         name='asset-permission-user-list'),
     url(r'^asset-permission/(?P<pk>[0-9]+)/asset$', views.AssetPermissionAssetView.as_view(),
         name='asset-permission-asset-list'),
+]
+
+urlpatterns += [
+    url(r'^v1/user/assets/granted/$', api.UserAssetsGrantedApi.as_view(),
+        name='user-assets-granted'),
 ]
 

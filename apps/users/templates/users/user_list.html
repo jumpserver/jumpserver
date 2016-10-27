@@ -92,7 +92,7 @@ $(document).ready(function(){
     jumpserver.initDataTable(options);
 }).on('click', '#btn_bulk_update', function(){
     var action = $('#slct_bulk_update').val();
-    var $data_table = $('#user_list_table').DataTable()
+    var $data_table = $('#user_list_table').DataTable();
     var id_list = [];
     var plain_id_list = [];
     $data_table.rows({selected: true}).every(function(){
@@ -101,7 +101,7 @@ $(document).ready(function(){
     });
     if (id_list === []) {
         return false;
-    };
+    }
     var the_url = "{% url 'users:user-bulk-update-api' %}";
     function doDeactive() {
         var body = $.each(id_list, function(index, user_object) {

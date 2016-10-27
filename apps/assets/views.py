@@ -65,7 +65,6 @@ class AssetCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,CreateView):
         print(form.errors)
         return super(AssetCreateView, self).form_invalid(form)
 
-
     def get_context_data(self, **kwargs):
         context = {
             'app': 'Assets',
@@ -75,21 +74,24 @@ class AssetCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,CreateView):
 
         return super(AssetCreateView, self).get_context_data(**kwargs)
 
-class AssetModalCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,ListView):
+
+class AssetModalCreateView(AdminUserRequiredMixin, CreateAssetTagsMiXin, ListView):
     model = Asset
     # tag_type = 'asset'
     form_class = AssetCreateForm
     template_name = 'assets/asset_modal_update.html'
     success_url = reverse_lazy('assets:asset-list')
+
     def get_queryset(self):
         self.queryset = super(AssetModalCreateView,self).get_queryset()
         self.s = self.request.GET.get('plain_id_lists')
         if "," in str(self.s):
-            self.plain_id_lists  = [int(x) for x in self.s.split(',')]
+            self.plain_id_lists = [int(x) for x in self.s.split(',')]
         else:
             self.plain_id_lists = [self.s]
 
         return self.queryset
+
     def get_context_data(self, **kwargs):
         asset_on_list = Asset.objects.filter(id__in = self.plain_id_lists)
         context = {
@@ -102,7 +104,8 @@ class AssetModalCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,ListView)
         kwargs.update(context)
         return super(AssetModalCreateView, self).get_context_data(**kwargs)
 
-class AssetUpdateView(AdminUserRequiredMixin,UpdateAssetTagsMiXin,UpdateView):
+
+class AssetUpdateView(AdminUserRequiredMixin, UpdateAssetTagsMiXin, UpdateView):
     model = Asset
     form_class = AssetCreateForm
     template_name = 'assets/asset_update.html'
@@ -144,12 +147,12 @@ class AssetDetailView(DetailView):
         kwargs.update(context)
         return super(AssetDetailView, self).get_context_data(**kwargs)
 
+
 class AssetModalListView(AdminUserRequiredMixin, ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     model = Asset
     context_object_name = 'asset_modal_list'
     template_name = 'assets/asset_modal_list.html'
-
 
     def get_context_data(self, **kwargs):
         group_id = self.request.GET.get('group_id')
@@ -160,7 +163,7 @@ class AssetModalListView(AdminUserRequiredMixin, ListView):
             self.plain_id_lists  = [int(x) for x in self.s.split(',')]
         else:
             self.plain_id_lists = [self.s]
-        print plain_id_lists
+
         if plain_id_lists:
             context = {
                 'all_assets':plain_id_lists
@@ -178,6 +181,7 @@ class AssetModalListView(AdminUserRequiredMixin, ListView):
             }
             kwargs.update(context)
         return super(AssetModalListView, self).get_context_data(**kwargs)
+
 
 class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
     model = AssetGroup
@@ -197,7 +201,6 @@ class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
         kwargs.update(context)
         return super(AssetGroupCreateView, self).get_context_data(**kwargs)
 
-
     def form_valid(self, form):
         asset_group = form.save()
         assets_id_list = self.request.POST.getlist('assets', [])
@@ -206,6 +209,7 @@ class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
         asset_group.assets.add(*tuple(assets))
         asset_group.save()
         return super(AssetGroupCreateView, self).form_valid(form)
+
 
 class AssetGroupListView(AdminUserRequiredMixin, ListView):
     model = AssetGroup
@@ -254,6 +258,7 @@ class AssetGroupDetailView(SingleObjectMixin, AdminUserRequiredMixin, ListView):
         }
         kwargs.update(context)
         return super(AssetGroupDetailView, self).get_context_data(**kwargs)
+
 
 class AssetGroupUpdateView(AdminUserRequiredMixin, UpdateView):
     model = AssetGroup
@@ -334,6 +339,7 @@ class IDCCreateView(AdminUserRequiredMixin, CreateView):
         # IDC_add_success_next(user)
         return super(IDCCreateView, self).form_valid(form)
 
+
 class IDCUpdateView(AdminUserRequiredMixin, UpdateView):
     model = IDC
     form_class = IDCForm
@@ -363,7 +369,6 @@ class IDCDeleteView(AdminUserRequiredMixin, DeleteView):
     model = IDC
     template_name = 'assets/delete_confirm.html'
     success_url = reverse_lazy('assets:idc-list')
-
 
 
 class AdminUserListView(AdminUserRequiredMixin, ListView):
