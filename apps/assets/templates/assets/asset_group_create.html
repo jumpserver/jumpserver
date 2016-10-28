@@ -10,6 +10,7 @@ div.dataTables_wrapper div.dataTables_filter,
 .dataTables_length {
     float: left;
 }
+
 </style>
 {% endblock %}
 {% block content %}
@@ -45,10 +46,16 @@ div.dataTables_wrapper div.dataTables_filter,
                                         <div class="hr-line-dashed"></div>
                                         <h3 class="widget-head-color-box">用户选择的资产</h3>
                                             <div class="form-group">
-                                                <label class="col-sm-2 control-label">已选</label>
-                                                    <div class="col-sm-9" id="asset_sed">
-                                                        <input type="text" class=" form-control" id="add_asset" value="{{ assets_count }}">
+                                                <label class="col-sm-2 control-label" id="asset_on_count">已选（{{ assets_count }}）</label>
+                                                <div class="col-sm-9" id="asset_sed">
+                                                    <div class="form-asset-on" id="add_asset">
+                                                        <p id="asset_on_p">
+                                                            {% for asset in assets_on_list %}
+                                                            <button name='asset_hostname' title='{{ asset.ip }}' type='button' class='btn btn-default btn-xs'>{{ asset.hostname }}</button>
+                                                           {% endfor %}
+                                                        </p>
                                                     </div>
+                                                </div>
                                             </div>
                                         <div class="hr-line-dashed"></div>
                                         <h3 class="widget-head-color-box">资产用户</h3>

@@ -50,7 +50,8 @@
 $(document).ready(function(){
 
     var table = $('#editable').DataTable({
-        aLengthMenu: [[2, 25, 50, -1], ["2", "25", "50", "all"]],
+        "aLengthMenu": [[10, 25, 50, -1], ["10", "25", "50", "all"]],
+        "iDisplayLength":25,
         "aaSorting": [[2, "asc"]],
         "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ] }],
         "bAutoWidth": false,
@@ -60,7 +61,7 @@ $(document).ready(function(){
         columns: [
             {data: "checkbox"},
             {data: "id"},
-            {data: "name"},
+            {data: "hostname"},
             {data: "ip"},
             {data: "type"},
             {data: "group"},
@@ -84,17 +85,26 @@ $(document).ready(function(){
     $('#close-btn').on('click',function(){
         $('#modal').modal('hide');
     });
+    var size_name = document.getElementById('asset_on_count').innerText
     $('#save-btn').on('click',function(){
-   // alert( table.rows('.selected').data().length +' row(s) selected' );
+        //alert( table.rows('.selected').data().length +' row(s) selected' );
         var d = table.rows('.selected').data();
         var size = d.length;
+        var re = /\d+/
         document.getElementById('add_asset').value = size;
+        var str= size_name;
+        var re=/\d+/g;
+        document.getElementById('asset_on_count').innerText = str.replace(re, size);
         var column2 = table.rows('.selected').data();
         $("#asset_sed").find("input[name='assets']").remove();
+        $("#asset_sed").find("button[name='asset_hostname']").remove();
         for(var i=0;i<column2.length;i++){
             column2[i].checkbox='<input name="checked" value="1" checked="" type="checkbox">';
             var value = column2[i].id;
+            var ip = column2[i].ip;
+            var hostname = column2[i].hostname;
             $("#asset_sed").append("<input  type='hidden' name='assets' value='"+value+"'>");
+            $("#asset_on_p").append("<button name='asset_hostname' title='"+ip+"' type='button' class='btn btn-default btn-xs ss'>"+hostname+"</button> ");
         }
         $('#modal').modal('hide');
     });
