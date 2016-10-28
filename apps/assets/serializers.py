@@ -13,7 +13,7 @@ class AssetBulkUpdateSerializer(BulkSerializerMixin, serializers.ModelSerializer
     class Meta(object):
         model = Asset
         list_serializer_class = BulkListSerializer
-        fields = ['id', 'is_active', 'hostname']
+        fields = ['id', 'port', 'idc']
 
     # def get_group_display(self, obj):
     #     return " ".join([group.name for group in obj.groups.all()])

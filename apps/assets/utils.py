@@ -18,8 +18,8 @@ class CreateAssetTagsMiXin(CreateView):
                 for t in tags_list:
                     try:
                         oTag = Tag.objects.get(pk=int(t))
-                    except (Tag.DoesNotExist,UnicodeEncodeError):
-                        oTag = Tag(name=t,created_by=self.request.user.username or 'Admin')
+                    except (Tag.DoesNotExist, UnicodeEncodeError):
+                        oTag = Tag(name=t, created_by=self.request.user.username or 'Admin')
                         oTag.save()
                         post_data.update({'tags':oTag.pk})
                     else:

@@ -1,6 +1,5 @@
 # coding:utf-8
 from __future__ import absolute_import, unicode_literals
-
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.db.models import Q
@@ -10,7 +9,6 @@ from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.shortcuts import get_object_or_404, reverse, redirect
-
 from common.utils import int_seq
 from .utils import CreateAssetTagsMiXin,UpdateAssetTagsMiXin
 from .models import Asset, AssetGroup, IDC, AssetExtend, AdminUser, SystemUser, Tag
@@ -65,15 +63,14 @@ class AssetCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,CreateView):
         print(form.errors)
         return super(AssetCreateView, self).form_invalid(form)
 
-
     def get_context_data(self, **kwargs):
         context = {
             'app': 'Assets',
             'action': 'Create asset',
         }
         kwargs.update(context)
-
         return super(AssetCreateView, self).get_context_data(**kwargs)
+
 
 class AssetModalCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,ListView):
     model = Asset
@@ -81,6 +78,7 @@ class AssetModalCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,ListView)
     form_class = AssetCreateForm
     template_name = 'assets/asset_modal_update.html'
     success_url = reverse_lazy('assets:asset-list')
+
     def get_queryset(self):
         self.queryset = super(AssetModalCreateView,self).get_queryset()
         self.s = self.request.GET.get('plain_id_lists')
@@ -88,10 +86,10 @@ class AssetModalCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,ListView)
             self.plain_id_lists  = [int(x) for x in self.s.split(',')]
         else:
             self.plain_id_lists = [self.s]
-
         return self.queryset
-    def get_context_data(self, **kwargs):
-        asset_on_list = Asset.objects.filter(id__in = self.plain_id_lists)
+
+    def get_context_data(self,**kwargs):
+        asset_on_list = Asset.objects.filter(id__in=self.plain_id_lists)
         context = {
             'app': 'Assets',
             'action': 'Bulk Update asset',
@@ -102,11 +100,38 @@ class AssetModalCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,ListView)
         kwargs.update(context)
         return super(AssetModalCreateView, self).get_context_data(**kwargs)
 
+
 class AssetUpdateView(AdminUserRequiredMixin,UpdateAssetTagsMiXin,UpdateView):
     model = Asset
     form_class = AssetCreateForm
     template_name = 'assets/asset_update.html'
     success_url = reverse_lazy('assets:asset-list')
+    new_form = ''
+    assets_ids = ''
+
+    def post(self, request, *args, **kwargs):
+        default_keys = [
+            'csrfmiddlewaretoken',
+            'assets_ids',
+            'ip',
+            'number',
+            'hostname',
+            'system_users',
+            'admin_user',
+        ]
+        self.assets_ids = self.request.POST.getlist('assets_ids')
+        print self.assets_ids
+        self.new_form = self.request.POST.copy()
+        print len(self.new_form)
+        print type(self.new_form)
+        for i in default_keys:
+            if self.new_form.has_key(i):
+                self.new_form.pop(i)
+        print self.new_form.items()
+        for i in self.new_form:
+            print i
+
+        return super(AssetUpdateView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = {
@@ -119,6 +144,29 @@ class AssetUpdateView(AdminUserRequiredMixin,UpdateAssetTagsMiXin,UpdateView):
     def form_invalid(self, form):
         print(form.errors)
         return super(AssetUpdateView, self).form_invalid(form)
+
+    def form_valid(self, form):
+        print self.new_form.keys()
+        print form.clean().keys()
+        asset = form.save(commit=False)
+        print "1111"
+
+        def prn_obj_key(obj_form):
+            return obj_form.clean().keys()
+
+        for i in prn_obj_key(form):
+            if i not in self.new_form.keys():
+                print i
+
+                #delattr(asset, '"%s" % i')
+                #del asset.i
+        asset.save()
+        asset.id = 27
+        # asset.created_by = self.request.user.username or 'Admin'
+        asset.save()
+        asset.id = 28
+        asset.save()
+        return super(AssetUpdateView, self).form_valid(form)
 
 
 class AssetDeleteView(DeleteView):
@@ -144,27 +192,27 @@ class AssetDetailView(DetailView):
         kwargs.update(context)
         return super(AssetDetailView, self).get_context_data(**kwargs)
 
+
 class AssetModalListView(AdminUserRequiredMixin, ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     model = Asset
     context_object_name = 'asset_modal_list'
     template_name = 'assets/asset_modal_list.html'
 
-
     def get_context_data(self, **kwargs):
         group_id = self.request.GET.get('group_id')
         tag_id = self.request.GET.get('tag_id')
         plain_id_lists = self.request.GET.get('plain_id_lists')
         self.s = self.request.GET.get('plain_id_lists')
-        if "," in str(self.s):
-            self.plain_id_lists  = [int(x) for x in self.s.split(',')]
-        else:
-            self.plain_id_lists = [self.s]
-        print plain_id_lists
         if plain_id_lists:
+            if "," in str(self.s):
+                plain_id_lists = [int(x) for x in self.s.split(',')]
+            else:
+                plain_id_lists = [int(self.s)]
             context = {
                 'all_assets':plain_id_lists
             }
+            kwargs.update(context)
         if group_id:
             group = AssetGroup.objects.get(id=group_id)
             context = {
@@ -178,6 +226,7 @@ class AssetModalListView(AdminUserRequiredMixin, ListView):
             }
             kwargs.update(context)
         return super(AssetModalListView, self).get_context_data(**kwargs)
+
 
 class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
     model = AssetGroup
@@ -197,7 +246,6 @@ class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
         kwargs.update(context)
         return super(AssetGroupCreateView, self).get_context_data(**kwargs)
 
-
     def form_valid(self, form):
         asset_group = form.save()
         assets_id_list = self.request.POST.getlist('assets', [])
@@ -207,7 +255,8 @@ class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
         asset_group.save()
         return super(AssetGroupCreateView, self).form_valid(form)
 
-class AssetGroupListView(AdminUserRequiredMixin, ListView):
+
+class AssetGroupListView(AdminUserRequiredMixin,ListView):
     model = AssetGroup
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'asset_group_list'
@@ -254,6 +303,7 @@ class AssetGroupDetailView(SingleObjectMixin, AdminUserRequiredMixin, ListView):
         }
         kwargs.update(context)
         return super(AssetGroupDetailView, self).get_context_data(**kwargs)
+
 
 class AssetGroupUpdateView(AdminUserRequiredMixin, UpdateView):
     model = AssetGroup
@@ -334,6 +384,7 @@ class IDCCreateView(AdminUserRequiredMixin, CreateView):
         # IDC_add_success_next(user)
         return super(IDCCreateView, self).form_valid(form)
 
+
 class IDCUpdateView(AdminUserRequiredMixin, UpdateView):
     model = IDC
     form_class = IDCForm
@@ -363,7 +414,6 @@ class IDCDeleteView(AdminUserRequiredMixin, DeleteView):
     model = IDC
     template_name = 'assets/delete_confirm.html'
     success_url = reverse_lazy('assets:idc-list')
-
 
 
 class AdminUserListView(AdminUserRequiredMixin, ListView):
@@ -588,29 +638,6 @@ class SystemUserAssetView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
         return super(SystemUserAssetView, self).get_context_data(**kwargs)
 
 
-# class SystemUserAssetGroupView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
-#     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-#     template_name = 'assets/system_user_asset_group.html'
-#     context_object_name = 'system_user'
-#
-#     def get(self, request, *args, **kwargs):
-#         self.object = self.get_object(queryset=SystemUser.objects.all())
-#         return super(SystemUserAssetGroupView, self).get(request, *args, **kwargs)
-#
-    # Todo: queryset default order by connectivity, need ops support
-    # def get_queryset(self):
-    #     return self.object.asset_groups.all()
-    #
-    # def get_context_data(self, **kwargs):
-    #     context = {
-    #         'app': 'assets',
-    #         'action': 'System user asset group',
-    #         'asset_groups': self.get_queryset(),
-    #     }
-    #     kwargs.update(context)
-    #     return super(SystemUserAssetGroupView, self).get_context_data(**kwargs)
-
-
 class TagView(ListView):
     context_object_name = 'asset_list'
     template_name = 'assets/asset_list.html'
@@ -643,6 +670,7 @@ class TagsListView(AdminUserRequiredMixin, ListView):
         kwargs.update(context)
         return super(TagsListView, self).get_context_data(**kwargs)
 
+
 class AssetTagCreateView(AdminUserRequiredMixin, CreateView):
     model = Tag
     form_class = AssetTagForm
@@ -670,6 +698,7 @@ class AssetTagCreateView(AdminUserRequiredMixin, CreateView):
         asset_tag.save()
         return super(AssetTagCreateView, self).form_valid(form)
 
+
 class AssetTagDetailView(SingleObjectMixin, AdminUserRequiredMixin, ListView):
     template_name = 'assets/asset_tag_detail.html'
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
@@ -689,6 +718,7 @@ class AssetTagDetailView(SingleObjectMixin, AdminUserRequiredMixin, ListView):
         }
         kwargs.update(context)
         return super(AssetTagDetailView, self).get_context_data(**kwargs)
+
 
 class AssetTagUpdateView(AdminUserRequiredMixin, UpdateView):
     model = Tag

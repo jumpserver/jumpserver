@@ -45,7 +45,7 @@ class AssetCreateForm(forms.ModelForm):
         fields = [
             'hostname', 'ip', 'port', 'type', 'comment', 'admin_user', 'system_users', 'idc', 'groups',
             'other_ip', 'remote_card_ip', 'mac_address', 'brand', 'cpu', 'memory', 'disk', 'os', 'cabinet_no',
-            'cabinet_pos', 'number', 'status', 'env', 'sn','tags',
+            'cabinet_pos', 'number', 'status', 'env', 'sn', 'tags',
         ]
         tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all())
         widgets = {

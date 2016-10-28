@@ -30,6 +30,9 @@
             <label class="control-label col-sm-2 col-lg-2 " id="asset_on_count">已选主机（{{ assets_count }}）</label>
             <div class="col-sm-9" id="asset_sed">
                 <div class="form-asset-on" id="add_asset">
+                    {% for asset in assets_on_list %}
+                    <input  type='hidden' name='assets' value='{{ asset.id }}'>
+                    {% endfor %}
                     <p id="asset_on_p">
                         {% for asset in assets_on_list %}
                         <button name='asset_hostname' title='{{ asset.ip }}' type='button' class='btn btn-default btn-xs'>{{ asset.hostname }}</button>
@@ -42,7 +45,7 @@
 <div class="hr-line-dashed"></div>
 
                       <div class="ydxbd" id="formlists" style="display: block;">
-                          <p id="tags_p" class="mgl-5 c02">选择属性</p>
+                          <p id="tags_p" class="mgl-5 c02">选择需要修改属性</p>
                            <div class="tagBtnList">
                                            <a onclick="AddAllForm(this)" class="tagBtn2 label label-primary" id="changeall">全选</a>
             <a onclick="AddForm(this,'id_port')" class="tagBtn2 label label-default" name="changebtn">端口</a>
@@ -65,14 +68,17 @@
                            </div>
                        </div>
 
-
+    <input name="assets_ids" type="hidden" value="111" >
+    <input name="assets_ids" type="hidden" value="112" >
 <div class="hr-line-dashed"></div>
-<form action="" method="post" class="form-horizontal" id="add_form">
+<form action="/assets/asset/27/update" method="post" class="form-horizontal" id="add_form">
     {% csrf_token %}
+
+    <input  name="ip" required="" type="hidden" value="1.0.0.0" >
     <div class="form-group" name="formbtn" id="formbtn">
         <div class="col-sm-4 col-sm-offset-2">
             <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
-            <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+            <button id="submit_button" class="btn btn-primary" type="button" onclick="fsubmit()">{% trans 'Submit' %}</button>
         </div>
     </div>
 </form>
@@ -173,5 +179,34 @@
             SetSelect2();
         };
     };
+
+
+    function fsubmit(){
+        var assets_id = document.getElementsByName("assets");
+        var oForm = document.getElementById('add_form');
+        var parentElem = document.getElementById("add_form");
+        var aDiv = parentElem.getElementsByClassName('form-group');
+        if (assets_id.length === 0) {
+            swal({
+                title: "未选择需要修改的主机",
+                text: "请点击选择"
+            });
+        }else if (aDiv.length === 1) {
+            swal({
+                title: "未选需要修改的属性",
+                text: "请点击选择"
+            });
+        }else{
+            var m = document.getElementsByName('assets_ids');
+            alert(m.length);
+            for(var i=0;i<m.length;i++){
+                alert(m[0].value);
+                oForm.appendChild(m[0]);
+            };
+            action="/assets/asset/"+assets_id[0].value+"/update";
+            oForm.action=action;
+            oForm.submit();
+        };
+    }
 </script>
 {% endblock %}

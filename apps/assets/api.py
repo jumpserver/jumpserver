@@ -29,29 +29,26 @@ class IDCSerializer(serializers.ModelSerializer):
 
 class AssetGroupViewSet(viewsets.ModelViewSet):
     """ API endpoint that allows AssetGroup to be viewed or edited.
-
-    some other comment
-
+        some other comment
     """
     queryset = AssetGroup.objects.all()
     serializer_class = AssetGroupSerializer
 
 
 class AssetViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows Asset to be viewed or edited.
-    """
+    """API endpoint that allows Asset to be viewed or edited."""
     queryset = Asset.objects.all()
     serializer_class = AssetSerializer
 
 
 class IDCViewSet(viewsets.ReadOnlyModelViewSet):
-    """
-    API endpoint that allows IDC to be viewed or edited.
-    """
+    """API endpoint that allows IDC to be viewed or edited."""
     queryset = IDC.objects.all()
     serializer_class = IDCSerializer
+
 
 class AssetListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):
     queryset = Asset.objects.all()
     serializer_class = AssetBulkUpdateSerializer
+
+
