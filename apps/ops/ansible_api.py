@@ -3,6 +3,10 @@ from __future__ import unicode_literals
 
 import os
 import json
+import logging
+import ansible.constants as default_config
+
+
 from ansible.executor.task_queue_manager import TaskQueueManager
 from ansible.inventory import Inventory, Host, Group
 from ansible.vars import VariableManager
@@ -10,8 +14,12 @@ from ansible.parsing.dataloader import DataLoader
 from ansible.executor import playbook_executor
 from ansible.utils.display import Display
 from ansible.playbook.play import Play
-import ansible.constants as default_config
 from ansible.plugins.callback import CallbackBase
+
+from models import AnsiblePlay, AnsibleTask, AnsibleHostResult
+
+
+logger = logging.getLogger(__name__)
 
 
 class AnsibleError(StandardError):
@@ -175,21 +183,28 @@ class CallbackModule(CallbackBase):
         self.output = {}
 
     def _new_play(self, play):
-        return {
-            'play': {
-                'name': play.name,
-                'id': str(play._uuid)
-            },
+        """将Play保持到数据里面
+        """
+        ret = {
+            'name': play.name,
+            'uuid': str(play._uuid),
             'tasks': []
-
         }
 
+        try:
+            play = AnsiblePlay(name=ret['name'], uuid=ret['uuid'], completed=False)
+            play.save()
+        except Exception as e:
+            logger.error("Save ansible play uuid to database error!, %s" % e.message)
+
+        return ret
+
     def _new_task(self, task):
-        return {
-            'task': {
-                'name': task.name,
-                'id': str(task._uuid)
-            },
+        """将Task保持到数据库里,需要和Play进行关联
+        """
+        ret = {
+            'name': task.name,
+            'uuid': str(task._uuid),
             'failed': {},
             'unreachable': {},
             'skipped': {},
@@ -197,23 +212,61 @@ class CallbackModule(CallbackBase):
             'success': {}
         }
 
+        try:
+            play = AnsiblePlay.objects.get(uuid=self.__play_uuid)
+            task = AnsibleTask(play=play, uuid=ret['uuid'], name=ret['name'])
+            task.save()
+        except Exception as e:
+            logger.error("Save ansible task uuid to database error!, %s" % e.message)
+
+        return ret
+
+    @property
+    def __task_uuid(self):
+        return self.results[-1]['tasks'][-1]['uuid']
+
+    @property
+    def __play_uuid(self):
+        return self.results[-1]['uuid']
+
+    def save_task_result(self, result):
+        try:
+            task = AnsibleTask.objects.get(uuid=self.__task_uuid)
+            host_result = AnsibleHostResult(task=task, name=result._host)
+            host_result.save()
+        except Exception as e:
+            logger.error("Save Ansible host result to database error!, %s" % e.message)
+
+    @staticmethod
+    def save_no_host_result(task):
+        try:
+            task = AnsibleTask.objects.get(uuid=task._uuid)
+            host_result = AnsibleHostResult(task=task, no_host="no host to run this task")
+            host_result.save()
+        except Exception as e:
+            logger.error("Save Ansible host result to database error!, %s" % e.message)
+
     def v2_runner_on_failed(self, result, ignore_errors=False):
+        self.save_task_result(result)
         host = result._host
         self.results[-1]['tasks'][-1]['failed'][host.name] = result._result
 
     def v2_runner_on_unreachable(self, result):
+        self.save_task_result(result)
         host = result._host
         self.results[-1]['tasks'][-1]['unreachable'][host.name] = result._result
 
     def v2_runner_on_skipped(self, result):
+        self.save_task_result(result)
         host = result._host
         self.results[-1]['tasks'][-1]['skipped'][host.name] = result._result
 
     def v2_runner_on_no_hosts(self, task):
-        self.results[-1]['tasks'][-1]['no_hosts']['name'] = task.name
-        self.results[-1]['tasks'][-1]['no_hosts']['uuid'] = task.uuid
+        self.save_no_host_result(task)
+        self.results[-1]['tasks'][-1]['no_hosts']['msg'] = "no host to run this task"
 
     def v2_runner_on_ok(self, result):
+        self.save_task_result(result)
         host = result._host
         self.results[-1]['tasks'][-1]['success'][host.name] = result._result
 
@@ -224,7 +277,8 @@ class CallbackModule(CallbackBase):
         self.results[-1]['tasks'].append(self._new_task(task))
 
     def v2_playbook_on_stats(self, stats):
-        """Display info about playbook statistics"""
+        """AdHoc模式下这个钩子不会执行
+        """
         hosts = sorted(stats.processed.keys())
 
         summary = {}
@@ -234,6 +288,7 @@ class CallbackModule(CallbackBase):
 
         self.output['plays'] = self.results
         self.output['stats'] = summary
+        print "summary: %s" % summary
 
 
 class PlayBookRunner(InventoryMixin):
@@ -358,8 +413,19 @@ class ADHocRunner(InventoryMixin):
 
         self.play = Play().load(play_data, variable_manager=self.variable_manager, loader=self.loader)
 
+    @staticmethod
+    def update_db_play(result, ext_code):
+        try:
+            play = AnsiblePlay.objects.get(uuid=result[0]['uuid'])
+            play.completed = True
+            play.status_code = ext_code
+            play.save()
+        except Exception as e:
+            print e.message
+            logger.error("Update Ansible Play Status into database error!, %s" % e.message)
+
     def run(self):
-        """执行ADHoc 记录日志，　处理结果
+        """执行ADHoc, 执行完后, 修改AnsiblePlay的状态
         """
         tqm = None
         # TODO:日志和结果分析
@@ -374,13 +440,17 @@ class ADHocRunner(InventoryMixin):
             )
             ext_code = tqm.run(self.play)
             result = json.dumps(self.results_callback.results)
+
+            self.update_db_play(result, ext_code)
+
             return ext_code, result
+
         finally:
             if tqm:
                 tqm.cleanup()
 
 
-if __name__ == "__main__":
+def test_run():
     conf = Config()
     assets = [
         {
@@ -388,7 +458,7 @@ if __name__ == "__main__":
                 "ip": "192.168.1.119",
                 "port": "22",
                 "username": "root",
-                "password": "xxx",
+                "password": "tongfang_test",
                 "key": "asset_private_key",
         },
         {
@@ -408,10 +478,14 @@ if __name__ == "__main__":
             "gather_facts": "no",
             "tasks": [
                 dict(action=dict(module='setup')),
-                dict(action=dict(module='command', args='lsdfd'))
+                dict(action=dict(module='command', args='ls'))
             ]
         }
     hoc = ADHocRunner(conf, play_source, *assets)
     ext_code, result = hoc.run()
     print ext_code
     print result
+
+
+if __name__ == "__main__":
+    test_run()
