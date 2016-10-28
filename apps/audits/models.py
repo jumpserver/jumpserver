@@ -82,7 +82,10 @@ class CommandLog(models.Model):
 
     @property
     def output_decode(self):
-        return base64.b64decode(self.output).replace('\n', '<br />')
+        try:
+            return base64.b64decode(self.output).replace('\n', '<br />')
+        except UnicodeDecodeError:
+            return 'UnicodeDecodeError'
 
     class Meta:
         db_table = 'command_log'

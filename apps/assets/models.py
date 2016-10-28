@@ -289,10 +289,10 @@ def get_default_idc():
 
 
 class Asset(models.Model):
-    ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'))
+    ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
     other_ip = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Other IP'))
     remote_card_ip = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Remote card IP'))
-    hostname = models.CharField(max_length=128, blank=True, verbose_name=_('Hostname'))
+    hostname = models.CharField(max_length=128, unique=True, verbose_name=_('Hostname'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
     groups = models.ManyToManyField(AssetGroup, blank=True, related_name='assets', verbose_name=_('Asset groups'))
     admin_user = models.ForeignKey(AdminUser, null=True, blank=True, related_name='assets',

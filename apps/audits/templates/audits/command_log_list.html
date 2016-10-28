@@ -15,6 +15,7 @@
             <th>Command</th>
             <th>Username</th>
             <th>IP</th>
+            <th>System user</th>
             <th>Datetime</th>
             <th data-hide="all">Output</th>
         </tr>
@@ -26,6 +27,7 @@
                 <td>{{ command.command }}</td>
                 <td>{{ command.proxy_log.username }}</td>
                 <td>{{ command.proxy_log.ip }}</td>
+                <td>{{ command.proxy_log.system_user }}</td>
                 <td>{{ command.datetime }}</td>
                 <td>{{ command.output_decode |safe }}</td>
             </tr>
