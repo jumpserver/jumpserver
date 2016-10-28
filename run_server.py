@@ -29,7 +29,7 @@ def start_django():
 def start_celery():
     os.chdir(apps_dir)
     print('start celery')
-    subprocess.call('celery -A common worker -l info', shell=True)
+    subprocess.call('celery -A common worker -P eventlet -l info', shell=True)
 
 
 def main():

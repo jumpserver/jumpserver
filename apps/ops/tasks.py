@@ -1,17 +1,35 @@
-from __future__ import absolute_import
-import time
+from __future__ import absolute_import, unicode_literals
 
 from celery import shared_task
 from common import celery_app
 
+from ops.ansible_api import Config, ADHocRunner
 
-@shared_task
-def longtime_add(x, y):
-    print 'long time task begins'
-    # sleep 5 seconds
-    time.sleep(5)
-    print 'long time task finished'
-    return x + y
+
+@shared_task(name="get_asset_hardware_info")
+def get_asset_hardware_info(*assets):
+    conf = Config()
+    play_source = {
+            "name": "Get host hardware information",
+            "hosts": "default",
+            "gather_facts": "no",
+            "tasks": [
+                dict(action=dict(module='setup'))
+            ]
+        }
+    hoc = ADHocRunner(conf, play_source, *assets)
+    ext_code, result = hoc.run()
+    return ext_code, result
+
+
+@shared_task(name="asset_test_ping_check")
+def asset_test_ping_check():
+    pass
+
+
+@shared_task(name="add_user_to_assert")
+def add_user_to_asset():
+    pass
 
 
 @celery_app.task(name='hello-world')
