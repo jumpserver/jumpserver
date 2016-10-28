@@ -15,13 +15,10 @@ class Terminal(models.Model):
     ip = models.GenericIPAddressField(verbose_name=_('From ip'))
     is_active = models.BooleanField(default=False, verbose_name=_('Is active'))
     is_bound_ip = models.BooleanField(default=False, verbose_name=_('Is bound ip'))
-    heatbeat_interval = models.IntegerField(default=60, verbose_name=_('Heatbeat interval'))
     type = models.CharField(choices=TYPE_CHOICES, max_length=2, verbose_name=_('Terminal type'))
     url = models.CharField(max_length=100, verbose_name=_('URL to login'))
-    mail_to = models.ManyToManyField(User, verbose_name=_('Mail to'))
-    is_accepted = models.BooleanField(default=False, verbose_name=_('Is accepted'))
     date_created = models.DateTimeField(auto_now_add=True)
-    comment = models.TextField(verbose_name=_('Comment'))
+    comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
     def is_valid(self):
         return self.is_active and self.is_accepted
@@ -36,7 +33,7 @@ class Terminal(models.Model):
 
     class Meta:
         db_table = 'terminal'
-        ordering = ['name']
+        ordering = ['is_active']
 
 
 class TerminalHeatbeat(models.Model):

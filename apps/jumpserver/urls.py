@@ -24,7 +24,7 @@ urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='base.html'), name='index'),
     url(r'^(api/)?users/', include('users.urls')),
     url(r'^assets/', include('assets.urls')),
-    url(r'^perms/', include('perms.urls')),
+    url(r'^(api/)?perms/', include('perms.urls')),
     url(r'^(api/)?audits/', include('audits.urls')),
     url(r'^(api/)?terminal/', include('terminal.urls')),
 ]

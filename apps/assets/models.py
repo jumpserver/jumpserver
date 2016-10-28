@@ -3,6 +3,7 @@ from __future__ import unicode_literals, absolute_import
 
 import functools
 from django.db import models
+from django.core import serializers
 import logging
 from django.utils.translation import ugettext_lazy as _
 
@@ -322,8 +323,8 @@ class Asset(models.Model):
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date added'))
-    comment = models.TextField(max_length=128, null=True, blank=True, verbose_name=_('Comment'))
-    tags = models.ManyToManyField('Tag', verbose_name='标签集合', blank=True)
+    comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
+    tags = models.ManyToManyField('Tag', blank=True, verbose_name=_('Tags'))
 
     def __unicode__(self):
         return '%(ip)s:%(port)s' % {'ip': self.ip, 'port': self.port}
@@ -335,6 +336,9 @@ class Asset(models.Model):
         else:
             return True, ''
         return False, warning
+
+    def json(self):
+        pass
 
     class Meta:
         db_table = 'asset'

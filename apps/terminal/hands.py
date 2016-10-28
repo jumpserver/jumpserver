@@ -2,4 +2,5 @@
 # 
 
 from users.backends import IsSuperUserOrTerminalUser
+from audits.models import ProxyLog
 

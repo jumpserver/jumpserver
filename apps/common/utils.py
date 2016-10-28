@@ -6,6 +6,7 @@ from six import string_types
 from itertools import chain
 import string
 import logging
+import datetime
 
 from itsdangerous import Signer, TimedJSONWebSignatureSerializer, JSONWebSignatureSerializer, TimestampSigner, \
     BadSignature, SignatureExpired
@@ -133,3 +134,34 @@ def int_seq(seq):
         return map(int, seq)
     except ValueError:
         return seq
+
+
+def timesince(dt, since='', default="just now"):
+    """
+    Returns string representing "time since" e.g.
+    3 days, 5 hours.
+    """
+
+    if since is '':
+        since = datetime.datetime.utcnow()
+
+    if since is None:
+        return default
+
+    diff = since - dt
+
+    periods = (
+        (diff.days / 365, "year", "years"),
+        (diff.days / 30, "month", "months"),
+        (diff.days / 7, "week", "weeks"),
+        (diff.days, "day", "days"),
+        (diff.seconds / 3600, "hour", "hours"),
+        (diff.seconds / 60, "minute", "minutes"),
+        (diff.seconds, "second", "seconds"),
+    )
+
+    for period, singular, plural in periods:
+        if period:
+            return "%d %s" % (period, singular if period == 1 else plural)
+    return default
+

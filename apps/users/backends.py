@@ -6,6 +6,7 @@ from rest_framework.compat import is_authenticated
 from django.utils.translation import ugettext as _
 
 from common.utils import unsign, get_object_or_none
+
 from .hands import Terminal
 
 
@@ -40,7 +41,7 @@ class TerminalAuthentication(authentication.BaseAuthentication):
         else:
             raise exceptions.AuthenticationFailed(_('Invalid sign.'))
 
-        if not terminal.is_active:
+        if not terminal or not terminal.is_active:
             raise exceptions.AuthenticationFailed(_('Terminal inactive or deleted.'))
         terminal.is_authenticated = True
         return terminal, None

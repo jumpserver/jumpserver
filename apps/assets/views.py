@@ -72,7 +72,7 @@ class AssetCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,CreateView):
         return super(AssetCreateView, self).get_context_data(**kwargs)
 
 
-class AssetModalCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,ListView):
+class AssetModalCreateView(AdminUserRequiredMixin, CreateAssetTagsMiXin, ListView):
     model = Asset
     # tag_type = 'asset'
     form_class = AssetCreateForm
@@ -83,13 +83,13 @@ class AssetModalCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,ListView)
         self.queryset = super(AssetModalCreateView,self).get_queryset()
         self.s = self.request.GET.get('plain_id_lists')
         if "," in str(self.s):
-            self.plain_id_lists  = [int(x) for x in self.s.split(',')]
+            self.plain_id_lists = [int(x) for x in self.s.split(',')]
         else:
             self.plain_id_lists = [self.s]
         return self.queryset
 
-    def get_context_data(self,**kwargs):
-        asset_on_list = Asset.objects.filter(id__in=self.plain_id_lists)
+    def get_context_data(self, **kwargs):
+        asset_on_list = Asset.objects.filter(id__in = self.plain_id_lists)
         context = {
             'app': 'Assets',
             'action': 'Bulk Update asset',
@@ -101,7 +101,7 @@ class AssetModalCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,ListView)
         return super(AssetModalCreateView, self).get_context_data(**kwargs)
 
 
-class AssetUpdateView(AdminUserRequiredMixin,UpdateAssetTagsMiXin,UpdateView):
+class AssetUpdateView(AdminUserRequiredMixin, UpdateAssetTagsMiXin, UpdateView):
     model = Asset
     form_class = AssetCreateForm
     template_name = 'assets/asset_update.html'
@@ -204,6 +204,11 @@ class AssetModalListView(AdminUserRequiredMixin, ListView):
         tag_id = self.request.GET.get('tag_id')
         plain_id_lists = self.request.GET.get('plain_id_lists')
         self.s = self.request.GET.get('plain_id_lists')
+        if "," in str(self.s):
+            self.plain_id_lists  = [int(x) for x in self.s.split(',')]
+        else:
+            self.plain_id_lists = [self.s]
+
         if plain_id_lists:
             if "," in str(self.s):
                 plain_id_lists = [int(x) for x in self.s.split(',')]
@@ -256,7 +261,7 @@ class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
         return super(AssetGroupCreateView, self).form_valid(form)
 
 
-class AssetGroupListView(AdminUserRequiredMixin,ListView):
+class AssetGroupListView(AdminUserRequiredMixin, ListView):
     model = AssetGroup
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'asset_group_list'
