@@ -229,10 +229,20 @@ class CallbackModule(CallbackBase):
     def __play_uuid(self):
         return self.results[-1]['uuid']
 
-    def save_task_result(self, result):
+    def save_task_result(self, result, status):
         try:
             task = AnsibleTask.objects.get(uuid=self.__task_uuid)
             host_result = AnsibleHostResult(task=task, name=result._host)
+            if status == "failed":
+                host_result.failed = json.dumps(result._result)
+            elif status == "unreachable":
+                host_result.unreachable = json.dumps(result._result)
+            elif status == "skipped":
+                host_result.skipped = json.dumps(result._result)
+            elif status == "success":
+                host_result.success = json.dumps(result._result)
+            else:
+                logger.error("No such status(failed|unreachable|skipped|success), please check!")
             host_result.save()
         except Exception as e:
             logger.error("Save Ansible host result to database error!, %s" % e.message)
@@ -247,17 +257,17 @@ class CallbackModule(CallbackBase):
             logger.error("Save Ansible host result to database error!, %s" % e.message)
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
-        self.save_task_result(result)
+        self.save_task_result(result, "failed")
         host = result._host
         self.results[-1]['tasks'][-1]['failed'][host.name] = result._result
 
     def v2_runner_on_unreachable(self, result):
-        self.save_task_result(result)
+        self.save_task_result(result, "unreachable")
         host = result._host
         self.results[-1]['tasks'][-1]['unreachable'][host.name] = result._result
 
     def v2_runner_on_skipped(self, result):
-        self.save_task_result(result)
+        self.save_task_result(result, "skipped")
         host = result._host
         self.results[-1]['tasks'][-1]['skipped'][host.name] = result._result
 
@@ -266,7 +276,7 @@ class CallbackModule(CallbackBase):
         self.results[-1]['tasks'][-1]['no_hosts']['msg'] = "no host to run this task"
 
     def v2_runner_on_ok(self, result):
-        self.save_task_result(result)
+        self.save_task_result(result, "success")
         host = result._host
         self.results[-1]['tasks'][-1]['success'][host.name] = result._result
 
@@ -421,11 +431,10 @@ class ADHocRunner(InventoryMixin):
             play.status_code = ext_code
             play.save()
         except Exception as e:
-            print e.message
             logger.error("Update Ansible Play Status into database error!, %s" % e.message)
 
     def run(self):
-        """执行ADHoc, 执行完后, 修改AnsiblePlay的状态
+        """执行ADHoc, 执行完后, 修改AnsiblePlay的状态为完成状态.
         """
         tqm = None
         # TODO:日志和结果分析
@@ -439,11 +448,12 @@ class ADHocRunner(InventoryMixin):
                 passwords=self.passwords
             )
             ext_code = tqm.run(self.play)
-            result = json.dumps(self.results_callback.results)
+            result = self.results_callback.results
 
             self.update_db_play(result, ext_code)
 
-            return ext_code, result
+            ret = json.dumps(result)
+            return ext_code, ret
 
         finally:
             if tqm:
@@ -478,7 +488,7 @@ def test_run():
             "gather_facts": "no",
             "tasks": [
                 dict(action=dict(module='setup')),
-                dict(action=dict(module='command', args='ls'))
+                dict(action=dict(module='command', args='lsss'))
             ]
         }
     hoc = ADHocRunner(conf, play_source, *assets)

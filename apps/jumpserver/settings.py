@@ -210,6 +210,10 @@ LOGGING = {
         'jumpserver.users.view': {
             'handlers': ['console', 'file'],
             'level': LOG_LEVEL,
+        },
+        'jumpserver.ops.ansible_api': {
+            'handlers': ['console', 'file'],
+            'level': LOG_LEVEL,
         }
     }
 }
