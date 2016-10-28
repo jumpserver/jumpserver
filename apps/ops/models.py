@@ -18,7 +18,7 @@ class AnsiblePlay(models.Model):
     status_code = models.IntegerField(default=0, verbose_name=_('StatusCode'))
 
     def __unicode__(self):
-        return "AnsiblePlay: %s<%s>" % (self.name, self.uuid)
+        return "%s<%s>" % (self.name, self.uuid)
 
 
 class AnsibleTask(models.Model):
@@ -27,7 +27,7 @@ class AnsibleTask(models.Model):
     name = models.CharField(max_length=128, blank=True, verbose_name=_('Name'))
 
     def __unicode__(self):
-        return "AnsibleTask: %s<%s>" % (self.name, self.uuid)
+        return "%s<%s>" % (self.name, self.uuid)
 
     def failed(self):
         pass
@@ -47,7 +47,7 @@ class AnsibleHostResult(models.Model):
     no_host = models.TextField(blank=True, verbose_name=_('NoHost'))
 
     def __unicode__(self):
-        return "AnsibleHostResult: %s<%s>" % (self.name, str(self.status))
+        return "%s<%s>" % (self.name, str(self.status))
 
     @property
     def is_failed(self):
