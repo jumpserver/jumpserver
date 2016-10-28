@@ -132,6 +132,7 @@ div.dataTables_wrapper div.dataTables_filter,
     };//onload;
 
     $(document).ready(function(){
+<<<<<<< HEAD
         $('#modal').modal({
         show: false,
         backdrop: 'static',
@@ -168,6 +169,22 @@ div.dataTables_wrapper div.dataTables_filter,
             $('#editable_length').before("<a href=\"{% url 'assets:asset-create' %}\" class=\"btn btn-sm btn-primary custom \"> {% trans 'Create asset' %} </a>&nbsp; <button class='btn btn-sm btn-primary custom' id='zksx' onclick='tagShow()'>标签</button>");
             $('#editable').before(oTags);
         },
+=======
+        var oTags = document.getElementById("ydxbd");
+        var table = $('#editable').DataTable({
+            "aLengthMenu": [[10, 25, 50, -1], ["10", "25", "50", "all"]],
+            "iDisplayLength":25,
+            "aaSorting": [[7, "asc"]],
+            "aoColumnDefs": [ { "bSortable": false, "aTargets": [ 0 ] }],
+            "bAutoWidth": false,
+            "language": {"url": "/static/js/plugins/dataTables/i18n/zh-hans.json"},
+            "dom": '<"custom">lftip',
+            "initComplete": function() {
+                //alert( 'DataTables has finished its initialisation.' );
+                $('#editable_length').before("<a href=\"{% url 'assets:asset-create' %}\" class=\"btn btn-sm btn-primary custom \"> {% trans 'Create asset' %} </a>&nbsp; <button class='btn btn-sm btn-primary custom' id='zksx' onclick='tagShow()'>标签</button>");
+                $('#editable').before(oTags);
+            },
+>>>>>>> 534321d1aa42f0853083876b807d0258dafc0b0c
         columns: [
             {data: "checkbox"},
             {data: "id"},
