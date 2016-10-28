@@ -468,7 +468,7 @@ def test_run():
                 "ip": "192.168.1.119",
                 "port": "22",
                 "username": "root",
-                "password": "tongfang_test",
+                "password": "xxx",
                 "key": "asset_private_key",
         },
         {
@@ -478,7 +478,7 @@ def test_run():
                 "username": "yumaojun",
                 "password": "xxx",
                 "key": "asset_private_key",
-                "become": {"method": "sudo", "user": "root", "pass": "yusky0902"}
+                "become": {"method": "sudo", "user": "root", "pass": "xxx"}
     },
     ]
     # 初始化Play

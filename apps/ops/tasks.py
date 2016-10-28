@@ -23,8 +23,19 @@ def get_asset_hardware_info(*assets):
 
 
 @shared_task(name="asset_test_ping_check")
-def asset_test_ping_check():
-    pass
+def asset_test_ping_check(*assets):
+    conf = Config()
+    play_source = {
+            "name": "Test host connection use ping",
+            "hosts": "default",
+            "gather_facts": "no",
+            "tasks": [
+                dict(action=dict(module='ping'))
+            ]
+        }
+    hoc = ADHocRunner(conf, play_source, *assets)
+    ext_code, result = hoc.run()
+    return ext_code, result
 
 
 @shared_task(name="add_user_to_assert")
