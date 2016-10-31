@@ -7,7 +7,7 @@ from ops.ansible_api import Config, ADHocRunner
 
 
 @shared_task(name="get_asset_hardware_info")
-def get_asset_hardware_info(*assets):
+def get_asset_hardware_info(task_name, task_uuid, *assets):
     conf = Config()
     play_source = {
             "name": "Get host hardware information",
@@ -18,12 +18,12 @@ def get_asset_hardware_info(*assets):
             ]
         }
     hoc = ADHocRunner(conf, play_source, *assets)
-    ext_code, result = hoc.run()
+    ext_code, result = hoc.run(task_name, task_uuid)
     return ext_code, result
 
 
 @shared_task(name="asset_test_ping_check")
-def asset_test_ping_check(*assets):
+def asset_test_ping_check(task_name, task_uuid, *assets):
     conf = Config()
     play_source = {
             "name": "Test host connection use ping",
@@ -34,7 +34,7 @@ def asset_test_ping_check(*assets):
             ]
         }
     hoc = ADHocRunner(conf, play_source, *assets)
-    ext_code, result = hoc.run()
+    ext_code, result = hoc.run(task_name, task_uuid)
     return ext_code, result
 
 

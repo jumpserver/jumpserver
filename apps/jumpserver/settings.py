@@ -182,6 +182,12 @@ LOGGING = {
             'formatter': 'main',
             'filename': os.path.join(PROJECT_DIR, 'logs', 'jumpserver.log')
         },
+        'ansible_logs': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'formatter': 'main',
+            'filename': os.path.join(PROJECT_DIR, 'logs', 'ansible.log')
+        },
     },
     'loggers': {
         'django': {
@@ -211,8 +217,8 @@ LOGGING = {
             'handlers': ['console', 'file'],
             'level': LOG_LEVEL,
         },
-        'jumpserver.ops.ansible_api': {
-            'handlers': ['console', 'file'],
+        'ops.ansible_api': {
+            'handlers': ['console', 'ansible_logs'],
             'level': LOG_LEVEL,
         }
     }

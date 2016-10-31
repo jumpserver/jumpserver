@@ -4,9 +4,11 @@ from __future__ import unicode_literals
 import os
 import json
 import logging
+import traceback
 import ansible.constants as default_config
 
-
+from uuid import uuid4
+from django.utils import timezone
 from ansible.executor.task_queue_manager import TaskQueueManager
 from ansible.inventory import Inventory, Host, Group
 from ansible.vars import VariableManager
@@ -16,7 +18,8 @@ from ansible.utils.display import Display
 from ansible.playbook.play import Play
 from ansible.plugins.callback import CallbackBase
 
-from models import AnsiblePlay, AnsibleTask, AnsibleHostResult
+from models import Tasker, AnsiblePlay, AnsibleTask, AnsibleHostResult
+
 
 
 logger = logging.getLogger(__name__)
@@ -177,24 +180,28 @@ class CallbackModule(CallbackBase):
     CALLBACK_TYPE = 'stdout'
     CALLBACK_NAME = 'json'
 
-    def __init__(self, display=None):
+    def __init__(self, tasker_id, display=None):
         super(CallbackModule, self).__init__(display)
         self.results = []
         self.output = {}
+        self.tasker_id = tasker_id
 
     def _new_play(self, play):
         """将Play保持到数据里面
         """
         ret = {
+            'tasker': self.tasker_id,
             'name': play.name,
             'uuid': str(play._uuid),
             'tasks': []
         }
 
         try:
-            play = AnsiblePlay(name=ret['name'], uuid=ret['uuid'], completed=False)
+            tasker = Tasker.objects.get(uuid=self.tasker_id)
+            play = AnsiblePlay(tasker, name=ret['name'], uuid=ret['uuid'])
             play.save()
         except Exception as e:
+            traceback.print_exc()
             logger.error("Save ansible play uuid to database error!, %s" % e.message)
 
         return ret
@@ -418,24 +425,37 @@ class ADHocRunner(InventoryMixin):
         self.groups = []
         self.inventory = self.gen_inventory()
 
-        # 初始化callback插件
-        self.results_callback = CallbackModule()
-
         self.play = Play().load(play_data, variable_manager=self.variable_manager, loader=self.loader)
 
     @staticmethod
-    def update_db_play(result, ext_code):
+    def update_db_tasker(tasker_id, ext_code):
         try:
-            play = AnsiblePlay.objects.get(uuid=result[0]['uuid'])
-            play.completed = True
-            play.status_code = ext_code
-            play.save()
+            tasker = Tasker.objects.get(uuid=tasker_id)
+            tasker.end = timezone.now()
+            tasker.completed = True
+            tasker.exit_code = ext_code
+            tasker.save()
         except Exception as e:
-            logger.error("Update Ansible Play Status into database error!, %s" % e.message)
+            logger.error("Update Tasker Status into database error!, %s" % e.message)
 
-    def run(self):
+    def create_db_tasker(self, name, uuid):
+        try:
+            hosts = [host.get('name') for host in self.hosts]
+            tasker = Tasker(name=name, uuid=uuid, hosts=','.join(hosts), start=timezone.now())
+            tasker.save()
+        except Exception as e:
+            logger.error("Save Tasker to database error!, %s" % e.message)
+
+    def run(self, tasker_name, tasker_uuid):
         """执行ADHoc, 执行完后, 修改AnsiblePlay的状态为完成状态.
+
+        :param tasker_uuid <str> 用于标示此次task
         """
+        # 初始化callback插件,以及Tasker
+
+        self.create_db_tasker(tasker_name, tasker_uuid)
+        self.results_callback = CallbackModule(tasker_uuid)
+
         tqm = None
         # TODO:日志和结果分析
         try:
@@ -450,7 +470,8 @@ class ADHocRunner(InventoryMixin):
             ext_code = tqm.run(self.play)
             result = self.results_callback.results
 
-            self.update_db_play(result, ext_code)
+            # 任务运行结束, 标示任务完成
+            self.update_db_tasker(tasker_uuid, ext_code)
 
             ret = json.dumps(result)
             return ext_code, ret
@@ -468,7 +489,7 @@ def test_run():
                 "ip": "192.168.1.119",
                 "port": "22",
                 "username": "root",
-                "password": "xxx",
+                "password": "tongfang_test",
                 "key": "asset_private_key",
         },
         {
@@ -487,12 +508,12 @@ def test_run():
             "hosts": "default",
             "gather_facts": "no",
             "tasks": [
-                dict(action=dict(module='setup')),
-                dict(action=dict(module='command', args='lsss'))
+                dict(action=dict(module='ping')),
             ]
         }
     hoc = ADHocRunner(conf, play_source, *assets)
-    ext_code, result = hoc.run()
+    uuid = "tasker-" + uuid4().hex
+    ext_code, result = hoc.run("test_task", uuid)
     print ext_code
     print result
 
