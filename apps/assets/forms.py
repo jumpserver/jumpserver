@@ -38,16 +38,14 @@ class AssetCreateForm(forms.ModelForm):
         self.instance.tags.clear()
         self.instance.tags.add(*tuple(tags))
 
-
     class Meta:
         model = Asset
-
+        tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all())
         fields = [
             'hostname', 'ip', 'port', 'type', 'comment', 'admin_user', 'system_users', 'idc', 'groups',
             'other_ip', 'remote_card_ip', 'mac_address', 'brand', 'cpu', 'memory', 'disk', 'os', 'cabinet_no',
-            'cabinet_pos', 'number', 'status', 'env', 'sn','tags',
+            'cabinet_pos', 'number', 'status', 'env', 'sn', 'tags',
         ]
-        tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all())
         widgets = {
             'groups': forms.SelectMultiple(attrs={'class': 'select2',
                                                   'data-placeholder': _('Select asset groups')}),
@@ -60,6 +58,7 @@ class AssetCreateForm(forms.ModelForm):
         help_texts = {
             'hostname': '* required',
             'ip': '* required',
+            'admin_user': _('Admin user should be exist on asset already, And have sudo ALL permission'),
             'tags': '最多5个标签，单个标签最长8个汉字，按回车确认'
         }
 
@@ -263,6 +262,7 @@ class SystemUserForm(forms.ModelForm):
             'auth_push': 'Auto push system user to asset',
             'auth_update': 'Auto update system user ssh key',
         }
+
 
 class AssetTagForm(forms.ModelForm):
     assets = forms.ModelMultipleChoiceField(queryset=Asset.objects.all(),

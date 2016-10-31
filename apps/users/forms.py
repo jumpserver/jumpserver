@@ -27,6 +27,7 @@ class UserCreateForm(forms.ModelForm):
         ]
         help_texts = {
             'username': '* required',
+            'name': '* required',
             'email': '* required',
         }
         widgets = {
