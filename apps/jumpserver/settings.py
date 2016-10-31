@@ -267,10 +267,11 @@ REST_FRAMEWORK = {
         'users.backends.IsValidUser',
     ),
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'users.backends.TerminalAuthentication',
+        'users.backends.AccessTokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
-        'users.backends.TerminalAuthentication',
     ),
 }
 # This setting is required to override the Django's main loop, when running in

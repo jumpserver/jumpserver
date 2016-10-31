@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
 #
 
+import base64
+
+from django.core.cache import cache
+from django.conf import settings
+from django.utils.translation import ugettext as _
 from rest_framework import authentication, exceptions, permissions
 from rest_framework.compat import is_authenticated
-from django.utils.translation import ugettext as _
 
 from common.utils import unsign, get_object_or_none
-
 from .hands import Terminal
+from .models import User
 
 
 class TerminalAuthentication(authentication.BaseAuthentication):
@@ -45,6 +49,47 @@ class TerminalAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed(_('Terminal inactive or deleted.'))
         terminal.is_authenticated = True
         return terminal, None
+
+
+class AccessTokenAuthentication(authentication.BaseAuthentication):
+    keyword = 'Token'
+    model = User
+    expiration = settings.CONFIG.TOKEN_EXPIRATION or 3600
+
+    def authenticate(self, request):
+        auth = authentication.get_authorization_header(request).split()
+
+        if not auth or auth[0].lower() != self.keyword.lower().encode():
+            return None
+
+        if len(auth) == 1:
+            msg = _('Invalid token header. No credentials provided.')
+            raise exceptions.AuthenticationFailed(msg)
+        elif len(auth) > 2:
+            msg = _('Invalid token header. Sign string should not contain spaces.')
+            raise exceptions.AuthenticationFailed(msg)
+
+        try:
+            token = auth[1].decode()
+        except UnicodeError:
+            msg = _('Invalid token header. Sign string should not contain invalid characters.')
+            raise exceptions.AuthenticationFailed(msg)
+        return self.authenticate_credentials(token, request)
+
+    def authenticate_credentials(self, token, request):
+        user_id = cache.get(token)
+        user = get_object_or_none(User, id=user_id)
+
+        if not user:
+            msg = _('Invalid token')
+            raise exceptions.AuthenticationFailed(msg)
+
+        remote_addr = request.META.get('REMOTE_ADDR', '')
+        remote_addr = base64.b16encode(remote_addr).replace('=', '')
+        cache.set(token, user_id, self.expiration)
+        cache.set('%s_%s' % (user.id, remote_addr), token, self.expiration)
+
+        return user, None
 
 
 class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):

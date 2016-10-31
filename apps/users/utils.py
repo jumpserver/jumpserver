@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import logging
 import os
 import re
+import uuid
 
 from django.conf import settings
 from django.contrib.auth.mixins import UserPassesTestMixin
@@ -206,18 +207,20 @@ def validate_ssh_pk(text):
     return startState([n.strip() for n in text.splitlines()])
 
 
-def check_user_is_valid(**kwargs):
+def check_user_valid(**kwargs):
     password = kwargs.pop('password', None)
     public_key = kwargs.pop('public_key', None)
     user = get_object_or_none(User, **kwargs)
 
-    if password and not user.check_password(password):
-        user = None
-
-    if public_key and not user.public_key == public_key:
-        user = None
-
-    if user and user.is_valid:
+    if user is None or not user.is_valid:
+        return None
+    if password and user.check_password(password):
         return user
-
+    if public_key and user.public_key == public_key:
+        return user
     return None
+
+
+def token_gen(*args, **kwargs):
+    return uuid.uuid4().get_hex()
+

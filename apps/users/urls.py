@@ -36,6 +36,7 @@ urlpatterns = [
 
 urlpatterns += [
     url(r'^v1/users/$', api.UserListUpdateApi.as_view(), name='user-bulk-update-api'),
+    url(r'^v1/users/token$', api.UserTokenApi.as_view(), name='user-token-api'),
     url(r'^v1/users/(?P<pk>\d+)/$', api.UserDetailApi.as_view(), name='user-patch-api'),
     url(r'^v1/users/(?P<pk>\d+)/reset-password/$', api.UserResetPasswordApi.as_view(), name='user-reset-password-api'),
     url(r'^v1/users/(?P<pk>\d+)/reset-pk/$', api.UserResetPKApi.as_view(), name='user-reset-pk-api'),

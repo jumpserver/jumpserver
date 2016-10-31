@@ -193,6 +193,11 @@ class User(AbstractUser):
             return True
         return False
 
+    def check_public_key(self, public_key):
+        if self.public_key == public_key:
+            return True
+        return False
+
     def generate_reset_token(self):
         return signing.dumps({'reset': self.id, 'email': self.email})
 
