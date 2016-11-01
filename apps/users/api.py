@@ -138,7 +138,6 @@ class UserTokenApi(APIView):
 
             cache.set(token, user.id, self.expiration)
             cache.set('%s_%s' % (user.id, remote_addr), token, self.expiration)
-            return Response({'token': token})
+            return Response({'token': token, 'id': user.id, 'username': user.username, 'name': user.name})
         else:
             return Response({'msg': 'Invalid password or public key or user is not active or expired'})
-

@@ -5,7 +5,7 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import AllowAny
 
-from common.utils import unsign, get_object_or_none
+from common.utils import signer, get_object_or_none
 from .models import Terminal, TerminalHeatbeat
 from .serializers import TerminalSerializer, TerminalHeatbeatSerializer
 from .hands import IsSuperUserOrTerminalUser
@@ -17,7 +17,7 @@ class TerminalCreateListApi(ListCreateAPIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
-        name = unsign(request.data.get('name', ''))
+        name = signer.unsign(request.data.get('name', ''))
         if name:
             terminal = get_object_or_none(Terminal, name=name)
             if terminal:

@@ -1,11 +1,16 @@
 # ~*~ coding: utf-8 ~*~
 
 from rest_framework import serializers
-from rest_framework import viewsets, serializers,generics
-from .models import AssetGroup, Asset, IDC, AssetExtend
+from rest_framework import viewsets, serializers, generics
+from rest_framework.views import APIView
+from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin, ListBulkCreateUpdateDestroyAPIView
+
 from common.mixins import BulkDeleteApiMixin
-from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin,ListBulkCreateUpdateDestroyAPIView
-from .serializers import *
+from common.utils import get_object_or_none
+from .models import AssetGroup, Asset, IDC, AssetExtend
+from .serializers import AssetBulkUpdateSerializer
+
+
 class AssetGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssetGroup
@@ -52,6 +57,21 @@ class IDCViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = IDC.objects.all()
     serializer_class = IDCSerializer
 
+
 class AssetListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):
     queryset = Asset.objects.all()
     serializer_class = AssetBulkUpdateSerializer
+
+
+class AssetSystemUserAuthApi(APIView):
+    def get(self, request, *args, **kwargs):
+        system_user_id = request.data.get('system_user_id', -1)
+        system_user_username = request.data.get('system_user_username', '')
+
+        system_user = get_object_or_none(Asset, id=system_user_id, username=system_user_username)
+
+        if system_user:
+            password = system_user.password
+            private_key = system_user.private_key
+
+

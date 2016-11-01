@@ -15,7 +15,7 @@ from django.shortcuts import reverse
 
 from rest_framework.authtoken.models import Token
 
-from common.utils import encrypt, decrypt, date_expired_default
+from common.utils import signer, date_expired_default
 from common.mixins import NoDeleteModelMixin
 
 
@@ -120,19 +120,19 @@ class User(AbstractUser):
 
     @property
     def private_key(self):
-        return decrypt(self._private_key)
+        return signer.unsign(self._private_key)
 
     @private_key.setter
     def private_key(self, private_key_raw):
-        self._private_key = encrypt(private_key_raw)
+        self._private_key = signer.sign(private_key_raw)
 
     @property
     def public_key(self):
-        return decrypt(self._public_key)
+        return signer.unsign(self._public_key)
 
     @public_key.setter
     def public_key(self, public_key_raw):
-        self._public_key = encrypt(public_key_raw)
+        self._public_key = signer.sign(public_key_raw)
 
     @property
     def is_superuser(self):
@@ -199,12 +199,12 @@ class User(AbstractUser):
         return False
 
     def generate_reset_token(self):
-        return signing.dumps({'reset': self.id, 'email': self.email})
+        return signer.sign_t({'reset': self.id, 'email': self.email}, expires_in=3600)
 
     @classmethod
-    def validate_reset_token(cls, token, max_age=3600):
+    def validate_reset_token(cls, token):
         try:
-            data = signing.loads(token, max_age=max_age)
+            data = signer.unsign_t(token)
             user_id = data.get('reset', None)
             user_email = data.get('email', '')
             user = cls.objects.get(id=user_id, email=user_email)

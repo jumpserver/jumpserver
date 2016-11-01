@@ -5,6 +5,7 @@ from .models import AssetGroup, Asset, IDC, AssetExtend
 from common.mixins import BulkDeleteApiMixin
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin
 
+
 class AssetBulkUpdateSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     # group_display = serializers.SerializerMethodField()
     # active_display = serializers.SerializerMethodField()

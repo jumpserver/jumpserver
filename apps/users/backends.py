@@ -9,7 +9,7 @@ from django.utils.translation import ugettext as _
 from rest_framework import authentication, exceptions, permissions
 from rest_framework.compat import is_authenticated
 
-from common.utils import unsign, get_object_or_none
+from common.utils import signer, get_object_or_none
 from .hands import Terminal
 from .models import User
 
@@ -39,7 +39,7 @@ class TerminalAuthentication(authentication.BaseAuthentication):
         return self.authenticate_credentials(sign)
 
     def authenticate_credentials(self, sign):
-        name = unsign(sign, max_age=300)
+        name = signer.unsign(sign)
         if name:
             terminal = get_object_or_none(self.model, name=name)
         else:

@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin
 
-from common.utils import unsign
+from common.utils import signer
 from .models import User, UserGroup
 
 
@@ -84,14 +84,3 @@ class GroupBulkUpdateSerializer(BulkSerializerMixin, serializers.ModelSerializer
     def get_user_amount(obj):
         return obj.users.count()
 
-
-class AppUserRegisterSerializer(serializers.Serializer):
-    username = serializers.CharField(max_length=20)
-
-    def create(self, validated_data):
-        sign = validated_data('username', '')
-        username = unsign(sign)
-        pass
-
-    def update(self, instance, validated_data):
-        pass
