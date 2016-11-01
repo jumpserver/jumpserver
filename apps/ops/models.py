@@ -142,8 +142,9 @@ class AnsibleHostResult(models.Model):
         """
         result = {}
         for key in interfaces:
-            if "ansible_" + key in facts.keys():
-                result[key] = facts.get(key)
+            gather_key = "ansible_" + key
+            if gather_key in facts.keys():
+                result[key] = facts.get(gather_key)
         return result
 
     def __deal_setup(self):
@@ -175,7 +176,7 @@ class AnsibleHostResult(models.Model):
                 data['interface'] = self.__gather_interface(facts, interfaces)
                 return {"msg": None, "data": data}
         else:
-            return {"msg": "there isn't module_name field! can't process this data format", "data": None}
+            return {"msg": "there result isn't ansible setup module result! can't process this data format", "data": None}
 
     @property
     def deal_setup(self):

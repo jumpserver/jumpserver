@@ -21,7 +21,6 @@ from ansible.plugins.callback import CallbackBase
 from models import Tasker, AnsiblePlay, AnsibleTask, AnsibleHostResult
 
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -30,13 +29,13 @@ class AnsibleError(StandardError):
 
 
 class Config(object):
-    """Ansible运行时配置类, 用于初始化Ansible.
+    """Ansible运行时配置类, 用于初始化Ansible的一些默认配置.
     """
     def __init__(self, verbosity=None, inventory=None, listhosts=None, subset=None, module_paths=None, extra_vars=None,
-                 forks=None, ask_vault_pass=False, vault_password_files=None, new_vault_password_file=None,
+                 forks=10, ask_vault_pass=False, vault_password_files=None, new_vault_password_file=None,
                  output_file=None, tags=None, skip_tags=None, one_line=None, tree=None, ask_sudo_pass=False, ask_su_pass=False,
                  sudo=None, sudo_user=None, become=None, become_method=None, become_user=None, become_ask_pass=False,
-                 ask_pass=False, private_key_file=None, remote_user=None, connection="smart", timeout=None, ssh_common_args=None,
+                 ask_pass=False, private_key_file=None, remote_user=None, connection="smart", timeout=10, ssh_common_args=None,
                  sftp_extra_args=None, scp_extra_args=None, ssh_extra_args=None, poll_interval=None, seconds=None, check=False,
                  syntax=None, diff=None, force_handlers=None, flush_cache=None, listtasks=None, listtags=None, module_path=None):
         self.verbosity = verbosity
