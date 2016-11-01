@@ -64,10 +64,10 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    #json
     url(r'^v1/assets/$', api.AssetViewSet.as_view({'get':'list'}), name='assets-list-api'),
     url(r'^v1/assets_bulk/$', api.AssetListUpdateApi.as_view(), name='asset-bulk-update-api'),
     url(r'^v1/idc/$', api.IDCViewSet.as_view({'get':'list'}), name='idc-list-json'),
+    url(r'^v1/system-user/auth/', api.SystemUserAuthApi.as_view(), name='system-user-auth'),
 ]
 
 

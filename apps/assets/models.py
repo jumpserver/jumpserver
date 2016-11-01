@@ -179,7 +179,7 @@ class SystemUser(models.Model):
 
     @property
     def password(self):
-        return signer.sign(self._password)
+        return signer.unsign(self._password)
 
     @password.setter
     def password(self, password_raw):
@@ -187,19 +187,19 @@ class SystemUser(models.Model):
 
     @property
     def private_key(self):
-        return signer(self._private_key)
+        return signer.unsign(self._private_key)
 
     @private_key.setter
     def private_key(self, private_key_raw):
-        self._private_key = signer(private_key_raw)
+        self._private_key = signer.sign(private_key_raw)
 
     @property
     def public_key(self):
-        return signer(self._public_key)
+        return signer.unsign(self._public_key)
 
     @public_key.setter
     def public_key(self, public_key_raw):
-        self._public_key = signer(public_key_raw)
+        self._public_key = signer.sign(public_key_raw)
 
     def get_assets_inherit_from_asset_groups(self):
         assets = set()
