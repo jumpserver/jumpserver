@@ -275,10 +275,10 @@ def generate_fake():
             model.generate_fake()
 
 
-@receiver(post_save, sender=settings.AUTH_USER_MODEL)
-def create_auth_token(sender, instance=None, created=False, **kwargs):
-    if created:
-        try:
-            Token.objects.create(user=instance)
-        except IntegrityError:
-            pass
+# @receiver(post_save, sender=settings.AUTH_USER_MODEL)
+# def create_auth_token(sender, instance=None, created=False, **kwargs):
+#     if created:
+#         try:
+#             Token.objects.create(user=instance)
+#         except IntegrityError:
+#             pass

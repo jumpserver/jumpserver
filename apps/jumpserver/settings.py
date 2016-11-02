@@ -62,7 +62,6 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'bootstrapform',
     'captcha',
-    # 'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -98,7 +97,6 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.static',
                 'django.template.context_processors.request',
-                'ws4redis.context_processors.default',
             ],
         },
     },
@@ -274,39 +272,6 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ),
 }
-# This setting is required to override the Django's main loop, when running in
-# development mode, such as ./manage runserver
-# WSGI_APPLICATION = 'ws4redis.django_runserver.application'
-
-# URL that distinguishes websocket connections from normal requests
-# WEBSOCKET_URL = '/ws/'
-
-# WebSocket Redis
-# WS4REDIS_CONNECTION = {
-#     'host': CONFIG.REDIS_HOST or '127.0.0.1',
-#     'port': CONFIG.REDIS_PORT or 6379,
-#     'db': 2,
-# }
-
-# Set the number of seconds each message shall persisted
-# WS4REDIS_EXPIRE = 3600
-
-# WS4REDIS_HEARTBEAT = 'love you'
-
-# WS4REDIS_PREFIX = 'demo'
-
-# SESSION_ENGINE = 'redis_sessions.session'
-
-# SESSION_REDIS_PREFIX = 'session'
-
-# SESSION_REDIS_HOST = CONFIG.REDIS_HOST
-
-# SESSION_REDIS_PORT = CONFIG.REDIS_PORT
-
-# SESSION_REDIS_PASSWORD = CONFIG.REDIS_PASSWORD
-
-# SESSION_REDIS_DB = CONFIG.REDIS_DB
-
 
 # Custom User Auth model
 AUTH_USER_MODEL = 'users.User'
@@ -322,6 +287,4 @@ CELERY_RESULT_BACKEND = BROKER_URL
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
 CAPTCHA_IMAGE_SIZE = (75, 33)
 CAPTCHA_FOREGROUND_COLOR = '#001100'
-
-#
 
