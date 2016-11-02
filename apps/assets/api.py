@@ -73,8 +73,15 @@ class SystemUserAuthApi(APIView):
         system_user = get_object_or_none(SystemUser, id=system_user_id, username=system_user_username)
 
         if system_user:
-            password = signer.sign(system_user.password)
-            private_key = signer.sign(system_user.private_key)
+            if system_user.password:
+                password = signer.sign(system_user.password)
+            else:
+                password = signer.sign('')
+
+            if system_user.private_key:
+                private_key = signer.sign(system_user.private_key)
+            else:
+                private_key = signer.sign(None)
 
             response = {
                 'id': system_user.id,

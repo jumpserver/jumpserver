@@ -242,7 +242,7 @@ class SystemUserForm(forms.ModelForm):
         # Todo: Validate private key file, and generate public key
         # Todo: Auto generate private key and public key
         if private_key_file:
-            system_user.private_key = private_key_file.read()
+            system_user.private_key = private_key_file.read().strip()
         system_user.save()
         return self.instance
 

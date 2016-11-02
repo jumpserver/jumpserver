@@ -46,8 +46,6 @@ class AssetListView(AdminUserRequiredMixin, ListView):
         return super(AssetListView, self).get_context_data(**kwargs)
 
 
-
-
 class AssetCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,CreateView):
     model = Asset
     tag_type = 'asset'
