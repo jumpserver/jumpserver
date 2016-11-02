@@ -58,6 +58,7 @@ class AssetCreateForm(forms.ModelForm):
         help_texts = {
             'hostname': '* required',
             'ip': '* required',
+            'system_users': _('System user will be granted for user to login assets (using ansible create automatic)'),
             'admin_user': _('Admin user should be exist on asset already, And have sudo ALL permission'),
             'tags': '最多5个标签，单个标签最长8个汉字，按回车确认'
         }
