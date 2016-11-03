@@ -15,7 +15,7 @@ services:
     #   - MYSQL_USER=jumpserver
     #   - MYSQL_PASS=love1314
     #   - MYSQL_NAME=jumpserver
-    #   - USE_ENABLED=true
+    #   - USE_MAIL=true
     #   - MAIL_ENABLED=1
     #   - MAIL_HOST=smtp.163.com
     #   - MAIL_PORT=25
