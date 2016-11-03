@@ -59,7 +59,12 @@ class Config:
     # Use Redis as broker for celery and web socket
     REDIS_HOST = '127.0.0.1'
     REDIS_PORT = 6379
-    # REDIS_PASSWORD = ''
+    REDIS_PASSWORD = ''
+    BROKER_URL = 'redis://%(password)s%(host)s:%(port)s/3' % {
+        'password': REDIS_PASSWORD,
+        'host': REDIS_HOST,
+        'port': REDIS_PORT,
+    }
 
     # Api token expiration when create
     TOKEN_EXPIRATION = 3600
