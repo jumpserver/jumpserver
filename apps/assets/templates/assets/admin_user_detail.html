@@ -18,6 +18,9 @@
                             <li class="active">
                                 <a href="" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
                             </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default" href="{% url 'assets:admin-user-update' pk=admin_user.id %}"><i class="fa fa-edit"></i>Update</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content">

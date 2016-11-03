@@ -22,6 +22,9 @@
                             <li>
                                 <a href="" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Asset login log' %}</a>
                             </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default" href="{% url 'assets:asset-update' pk=asset.id %}"><i class="fa fa-edit"></i>Update</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content">
