@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from juser.user_api import *
 from jperm.perm_api import get_group_user_perm
+import re
 
 MAIL_FROM = EMAIL_HOST_USER
 
@@ -142,7 +143,7 @@ def user_add(request):
     group_all = UserGroup.objects.all()
 
     if request.method == 'POST':
-        username = request.POST.get('username', '')
+        username = request.POST.get('username', '')      
         password = PyCrypt.gen_rand_pass(16)
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
@@ -173,6 +174,9 @@ def user_add(request):
             pass
         else:
             try:
+                if not re.match(r"^\w+$",username):
+                    error = u'用户名不合法'
+                    raise ServerError(error)
                 user = db_add_user(username=username, name=name,
                                    password=password,
                                    email=email, role=role, uuid=uuid_r,
