@@ -12,7 +12,6 @@ from __future__ import unicode_literals
 from jinja2 import Template
 
 
-
 __sudoers_tmp__ = """# management by JumpServer
 # This file MUST be edited with the 'visudo' command as root.
 #

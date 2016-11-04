@@ -211,3 +211,64 @@ class AnsibleHostResult(models.Model):
             return {"msg": "deal with ping data failed, %s" % e.message, "data": None}
 
 
+class HostAlia(models.Model):
+    name = models.CharField(max_length=128, blank=True, null=True, unique=True, verbose_name=_('Host_Alias'))
+    host_items = models.TextField(blank=True, null=True, verbose_name=_('Host_Items'))
+
+    def __unicode__(self):
+        return self.name
+
+
+class UserAlia(models.Model):
+    name = models.CharField(max_length=128, blank=True, null=True, unique=True, verbose_name=_('Host_Alias'))
+    host_items = models.TextField(blank=True, null=True, verbose_name=_('Host_Items'))
+
+    def __unicode__(self):
+        return self.name
+
+
+class CmdAlia(models.Model):
+    name = models.CharField(max_length=128, blank=True, null=True, unique=True, verbose_name=_('Host_Alias'))
+    host_items = models.TextField(blank=True, null=True, verbose_name=_('Host_Items'))
+
+    def __unicode__(self):
+        return self.name
+
+
+class RunasAlia(models.Model):
+    name = models.CharField(max_length=128, blank=True, null=True, unique=True, verbose_name=_('Host_Alias'))
+    host_items = models.TextField(blank=True, null=True, verbose_name=_('Host_Items'))
+
+    def __unicode__(self):
+        return self.name
+
+
+class Privilege(models.Model):
+    name = models.CharField(max_length=128, blank=True, null=True, unique=True, verbose_name=_('Host_Alias'))
+    host_items = models.TextField(blank=True, null=True, verbose_name=_('Host_Items'))
+
+    def __unicode__(self):
+        return self.name
+
+
+class Sudo(models.Model):
+    host_alias = models.ManyToManyField(HostAlia, related_name='sudos', blank=True, null=True)
+    user_alias = models.ManyToManyField(UserAlia, related_name='sudos', blank=True, null=True)
+    cmd_alias = models.ManyToManyField(CmdAlia, related_name='sudos', blank=True, null=True)
+    runas_alias = models.ManyToManyField(RunasAlia, related_name='sudos', blank=True, null=True)
+    privileges = models.ManyToManyField(Privilege, related_name='sudos', blank=True, null=True)
+
+    @property
+    def content(self):
+        pass
+
+
+
+
+
+
+
+
+
+
+
