@@ -11,8 +11,10 @@ from .models import ProxyLog, CommandLog
 from .utils import AdminUserRequiredMixin
 
 
-class ProxyLogListView(TemplateView):
+class ProxyLogListView(ListView):
+    model = ProxyLog
     template_name = 'audits/proxy_log_list.html'
+    context_object_name = 'proxy_log_list'
 
     def get_context_data(self, **kwargs):
         context = super(ProxyLogListView, self).get_context_data(**kwargs)
