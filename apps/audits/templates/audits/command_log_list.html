@@ -3,10 +3,44 @@
 {% load static %}
 {% load common_tags %}
 {% block content_left_head %}
-{#    <a href="{% url 'perms:asset-permission-create' %}" class="btn btn-sm btn-primary "> {% trans "Create permission" %} </a>#}
     <link href="{% static "css/plugins/footable/footable.core.css" %}" rel="stylesheet">
+    <style>
+        #search_btn {
+            margin-bottom: 0;
+        }
+    </style>
 {% endblock %}
 
+{% block table_search %}
+    <form id="search_form" method="get" action="" class="pull-right form-inline">
+        <div class="input-group">
+            <select class="select2 form-control" name="user">
+                <option>{% trans 'Select user' %}</option>
+                {% for user in user_list %}
+                    <option value="{{ user.username }}">{{ user.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <select class="select2 form-control" name="asset">
+                <option>{% trans 'Select asset' %}</option>
+                {% for asset in asset_list %}
+                    <option value="{{ asset.ip }}">{{ asset.ip }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="{{ keyword }}">
+        </div>
+        <div class="input-group">
+            <div class="input-group-btn">
+                <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                    搜索
+                </button>
+            </div>
+        </div>
+    </form>
+{% endblock %}
 {% block table_container %}
     <table class="footable table table-stripped toggle-arrow-tiny" data-page="false">
         <thead>
@@ -16,6 +50,7 @@
             <th>Username</th>
             <th>IP</th>
             <th>System user</th>
+            <th>Proxy log</th>
             <th>Datetime</th>
             <th data-hide="all">Output</th>
         </tr>
@@ -23,11 +58,12 @@
         <tbody>
         {% for command in command_list %}
             <tr>
-                <td>{{ command.command_no }}</td>
+                <td>{{ command.id }}</td>
                 <td>{{ command.command }}</td>
                 <td>{{ command.proxy_log.username }}</td>
                 <td>{{ command.proxy_log.ip }}</td>
                 <td>{{ command.proxy_log.system_user }}</td>
+                <td><a href="{% url 'audits:proxy-log-detail' pk=command.proxy_log.id  %}">{{ command.proxy_log.id}}</a></td>
                 <td>{{ command.datetime }}</td>
                 <td>{{ command.output_decode |safe }}</td>
             </tr>
@@ -41,6 +77,7 @@
     <script>
         $(document).ready(function () {
             $('.footable').footable();
+            $('.select2').select2();
         });
     </script>
 {% endblock %}

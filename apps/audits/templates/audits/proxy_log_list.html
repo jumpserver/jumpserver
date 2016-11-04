@@ -1,6 +1,55 @@
 {% extends '_base_list.html' %}
 {% load i18n %}
+{% load static %}
 {% load common_tags %}
+{% block content_left_head %}
+    <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
+    <style>
+        #search_btn {
+            margin-bottom: 0;
+        }
+    </style>
+{% endblock %}
+
+
+{% block table_search %}
+    <form id="search_form" method="get" action="" class="pull-right form-inline">
+        <div class="form-group" id="date">
+            <div class="input-daterange input-group" id="datepicker">
+                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_from" value="{{ date_from }}">
+                <span class="input-group-addon">to</span>
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_to" value="{{ date_to }}">
+            </div>
+        </div>
+        <div class="input-group">
+            <select class="select2 form-control" name="username">
+                <option value="">{% trans 'Select user' %}</option>
+                {% for user in user_list %}
+                    <option value="{{ user.username }}">{{ user.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <select class="select2 form-control" name="ip">
+                <option value="">{% trans 'Select asset' %}</option>
+                {% for asset in asset_list %}
+                    <option value="{{ asset.ip }}">{{ asset.ip }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="{{ keyword }}">
+        </div>
+        <div class="input-group">
+            <div class="input-group-btn">
+                <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                    搜索
+                </button>
+            </div>
+        </div>
+    </form>
+{% endblock %}
 
 {% block table_head %}
     <th class="text-center">{% trans 'ID' %}</th>
@@ -22,8 +71,8 @@
              </td>
              <td class="text-center">{{ proxy_log.username }}</td>
              <td class="text-center">{{ proxy_log.ip }}</td>
-             <td class="text-center">{{ proxy_log.system_user.name }}</td>
-             <td class="text-center">{{ proxy_log.command.count }}</td>
+             <td class="text-center">{{ proxy_log.system_user }}</td>
+             <td class="text-center">{{ proxy_log.commands.all|length}}</td>
              <td class="text-center">
              {% if proxy_log.was_failed %}
                  <i class="fa fa-times text-danger"></i>
@@ -33,25 +82,33 @@
              </td>
              <td class="text-center">
              {% if proxy_log.is_finished %}
-                 <i class="fa fa-times text-danger"></i>
-             {% else %}
                  <i class="fa fa-check text-navy"></i>
+             {% else %}
+                 <i class="fa fa-times text-danger"></i>
              {% endif %}
              </td>
              <td class="text-center">{{ proxy_log.date_start }}</td>
-             <td class="text-center">{{ proxy_log.date_finished }}</td>
+             <td class="text-center">{{ proxy_log.date_finished|timeuntil:proxy_log.date_start }}</td>
          </tr>
      {% endfor %}
 {% endblock %}
 
 {% block custom_foot_js %}
+    <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
     <script>
         $(document).ready(function() {
             $('table').DataTable({
                 "searching": false,
                 "paging": false,
                 "order": []
-            })
+            });
+            $('.select2').select2();
+            $('#date .input-daterange').datepicker({
+                dateFormat: 'mm/dd/yy',
+                keyboardNavigation: false,
+                forceParse: false,
+                autoclose: true
+            });
         })
     </script>
 {% endblock %}

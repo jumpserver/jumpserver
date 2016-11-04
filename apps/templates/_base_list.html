@@ -33,15 +33,19 @@
                     <div class="" id="content_start">
                         {% block content_left_head %} {% endblock %}
                         {% block table_search %}
-                        <form id="search_form" method="get" action="" class="pull-right mail-search">
+                        <form id="search_form" method="get" action="" class="pull-right mail-search form-inline">
+                            {% block search_form %}
                             <div class="input-group">
                                 <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="{{ keyword }}">
+                            </div>
+                            <div class="input-group">
                                 <div class="input-group-btn">
                                     <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
                                         搜索
                                     </button>
                                 </div>
                             </div>
+                            {% endblock %}
                         </form>
                         {% endblock %}
                         {% block tags_list %}{% endblock %}
