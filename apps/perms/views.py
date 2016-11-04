@@ -34,7 +34,6 @@ class AssetPermissionListView(AdminUserRequiredMixin, ListView):
         return super(AssetPermissionListView, self).get_context_data(**kwargs)
 
     def get_queryset(self):
-        # Todo: Default order by lose asset connection num
         self.queryset = super(AssetPermissionListView, self).get_queryset()
         self.keyword = keyword = self.request.GET.get('keyword', '')
         self.sort = sort = self.request.GET.get('sort', '-date_created')

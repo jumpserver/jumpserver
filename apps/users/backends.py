@@ -81,8 +81,7 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
         user = get_object_or_none(User, id=user_id)
 
         if not user:
-            msg = _('Invalid token')
-            raise exceptions.AuthenticationFailed(msg)
+            return None
 
         remote_addr = request.META.get('REMOTE_ADDR', '')
         remote_addr = base64.b16encode(remote_addr).replace('=', '')

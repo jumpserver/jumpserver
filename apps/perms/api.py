@@ -2,8 +2,17 @@
 # 
 
 from rest_framework.views import APIView, Response
-from users.backends import IsValidUser
+from rest_framework.generics import ListCreateAPIView
+from users.backends import IsValidUser, IsSuperUser
 from .utils import get_user_granted_assets, get_user_granted_asset_groups
+from .models import AssetPermission
+from . import serializers
+
+
+class AssetPermissionListCreateApi(ListCreateAPIView):
+    queryset = AssetPermission.objects.all()
+    serializer_class = serializers.AssetPermissionSerializer
+    permission_classes = (IsSuperUser,)
 
 
 class UserAssetsGrantedApi(APIView):
@@ -34,3 +43,26 @@ class UserAssetsGrantedApi(APIView):
 
         return Response(assets_json, status=200)
 
+
+class UserAssetsGroupsGrantedApi(APIView):
+    permission_classes = (IsValidUser,)
+
+    def get(self, request, *args, **kwargs):
+        asset_groups = {}
+        user = request.user
+
+        if user:
+            assets = get_user_granted_assets(user)
+            for asset in assets:
+                for asset_group in asset.groups.all():
+                    if asset_group.id in asset_groups:
+                        asset_groups[asset_group.id]['asset_num'] += 1
+                    else:
+                        asset_groups[asset_group.id] = {
+                            'id': asset_group.id,
+                            'name': asset_group.name,
+                            'asset_num': 1
+                        }
+
+        asset_groups_json = asset_groups.values()
+        return Response(asset_groups_json, status=200)

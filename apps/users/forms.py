@@ -108,7 +108,7 @@ class UserPrivateAssetPermissionForm(forms.ModelForm):
 
     def save(self, commit=True):
         self.instance = super(UserPrivateAssetPermissionForm, self).save(commit=commit)
-        self.instance.private_for = 'U'
+        # self.instance.private_for = 'U'
         self.instance.users = [self.user]
         self.instance.save()
         return self.instance
@@ -116,7 +116,7 @@ class UserPrivateAssetPermissionForm(forms.ModelForm):
     class Meta:
         model = AssetPermission
         fields = [
-            'assets', 'asset_groups', 'system_users', 'private_for', 'name',
+            'assets', 'asset_groups', 'system_users', 'name',
         ]
         widgets = {
             'assets': forms.SelectMultiple(attrs={'class': 'select2',

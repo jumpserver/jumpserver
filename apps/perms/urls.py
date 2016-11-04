@@ -22,7 +22,11 @@ urlpatterns = [
 ]
 
 urlpatterns += [
+    url(r'^v1/asset-permission/$', api.AssetPermissionListCreateApi.as_view(),
+        name='asset-permission-list-create-api'),
     url(r'^v1/user/assets/granted/$', api.UserAssetsGrantedApi.as_view(),
         name='user-assets-granted'),
+    url(r'^v1/user/asset-groups/granted/$', api.UserAssetsGroupsGrantedApi.as_view(),
+        name='user-asset-groups-granted'),
 ]
 
