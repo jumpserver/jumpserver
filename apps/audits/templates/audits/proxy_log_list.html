@@ -26,7 +26,7 @@
             <select class="select2 form-control" name="username">
                 <option value="">{% trans 'Select user' %}</option>
                 {% for user in user_list %}
-                    <option value="{{ user.username }}">{{ user.username }}</option>
+                    <option value="{{ user.username }}" {% if user.username == username %} selected {% endif %}>{{ user.username }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -34,7 +34,15 @@
             <select class="select2 form-control" name="ip">
                 <option value="">{% trans 'Select asset' %}</option>
                 {% for asset in asset_list %}
-                    <option value="{{ asset.ip }}">{{ asset.ip }}</option>
+                    <option value="{{ asset.ip }}" {% if asset.ip == ip %} selected {% endif %}>{{ asset.ip }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <select class="select2 form-control" name="system_user">
+                <option value="">{% trans 'System user' %}</option>
+                {% for su in system_user_list %}
+                    <option value="{{ su.username }}" {% if su.username == system_user %} selected {% endif %}>{{ su.username }}</option>
                 {% endfor %}
             </select>
         </div>
