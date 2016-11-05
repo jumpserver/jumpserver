@@ -24,9 +24,11 @@ urlpatterns = [
 urlpatterns += [
     url(r'^v1/asset-permission/$', api.AssetPermissionListCreateApi.as_view(),
         name='asset-permission-list-create-api'),
-    url(r'^v1/user/assets/granted/$', api.UserAssetsGrantedApi.as_view(),
-        name='user-assets-granted'),
-    url(r'^v1/user/asset-groups/granted/$', api.UserAssetsGroupsGrantedApi.as_view(),
-        name='user-asset-groups-granted'),
+    url(r'^v1/user/assets/$', api.UserAssetsApi.as_view(),
+        name='user-assets'),
+    url(r'^v1/user/asset-groups/$', api.UserAssetsGroupsApi.as_view(),
+        name='user-asset-groups'),
+    url(r'^v1/user/asset-groups/(?P<pk>[0-9]+)/assets/$', api.UserAssetsGroupAssetsApi.as_view(),
+        name='user-asset-groups-assets'),
 ]
 

@@ -15,7 +15,7 @@ class AssetPermissionListCreateApi(ListCreateAPIView):
     permission_classes = (IsSuperUser,)
 
 
-class UserAssetsGrantedApi(APIView):
+class UserAssetsApi(APIView):
     permission_classes = (IsValidUser,)
 
     def get(self, request, *args, **kwargs):
@@ -44,7 +44,7 @@ class UserAssetsGrantedApi(APIView):
         return Response(assets_json, status=200)
 
 
-class UserAssetsGroupsGrantedApi(APIView):
+class UserAssetsGroupsApi(APIView):
     permission_classes = (IsValidUser,)
 
     def get(self, request, *args, **kwargs):
@@ -61,8 +61,41 @@ class UserAssetsGroupsGrantedApi(APIView):
                         asset_groups[asset_group.id] = {
                             'id': asset_group.id,
                             'name': asset_group.name,
+                            'comment': asset_group.comment,
                             'asset_num': 1
                         }
 
         asset_groups_json = asset_groups.values()
         return Response(asset_groups_json, status=200)
+
+
+class UserAssetsGroupAssetsApi(APIView):
+    permission_classes = (IsValidUser,)
+
+    def get(self, request, *args, **kwargs):
+        # asset_group_id = request.query_params.get('asset_group_id', -1)
+        asset_group_id = kwargs.get('pk', -1)
+        # asset_group_name = request.query_params.get('asset_group_name', '')
+        user = request.user
+        assets_json = []
+
+        if user:
+            assets = get_user_granted_assets(user)
+            for asset, system_users in assets.items():
+                for asset_group in asset.groups.all():
+                    if str(asset_group.id) == asset_group_id: # and asset_group.name == asset_group_name:
+                        assets_json.append({
+                            'id': asset.id,
+                            'hostname': asset.hostname,
+                            'ip': asset.ip,
+                            'port': asset.port,
+                            'system_users': [
+                                {
+                                    'id': system_user.id,
+                                    'name': system_user.name,
+                                    'username': system_user.username,
+                                } for system_user in system_users
+                                ],
+                            'comment': asset.comment
+                        })
+        return Response(assets_json, status=200)
