@@ -255,3 +255,12 @@ table.dataTable tbody td.selected td i.text-navy
 	font-size: 12px;
 	vertical-align: middle;
 }
+
+div.dataTables_wrapper div.dataTables_filter,
+.dataTables_length {
+    float: right !important;
+}
+
+div.dataTables_wrapper div.dataTables_filter {
+    margin-left: 15px;
+}

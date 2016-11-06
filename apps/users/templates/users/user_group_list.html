@@ -1,18 +1,5 @@
 {% extends '_base_list.html' %}
 {% load i18n static %}
-{% block custom_head_css_js %}
-{{ block.super }}
-<style>
-div.dataTables_wrapper div.dataTables_filter,
-.dataTables_length {
-    float: right !important;
-}
-
-div.dataTables_wrapper div.dataTables_filter {
-  margin-left: 15px;
-}
-</style>
-{% endblock %}
 {% block table_search %}{% endblock %}
 {% block table_container %}
 <div class="pull-left m-r-5"><a href="{% url 'users:user-group-create' %}" class="btn btn-sm btn-primary ">{% trans "Add User Group" %}</a></div>
@@ -20,10 +7,10 @@ div.dataTables_wrapper div.dataTables_filter {
     <thead>
         <tr>
             <th class="text-center">
-                <div class="checkbox checkbox-default"><input id="" type="checkbox" class="ipt_check_all"><label></label></div>
+                <input id="" type="checkbox" class="ipt_check_all">
             </th>
-            <th class="text-center">{% trans 'Name' %}</a></th>
-            <th class="text-center">{% trans 'User Amount' %}</a></th>
+            <th class="text-center">{% trans 'Name' %}</th>
+            <th class="text-center">{% trans 'User Amount' %}</th>
             <th class="text-center">{% trans 'Asset Amount' %}</th>
             <th class="text-center">{% trans 'Comment' %}</th>
             <th class="text-center">{% trans 'Action' %}</th>

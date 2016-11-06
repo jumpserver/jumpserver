@@ -58,50 +58,17 @@ urlpatterns = [
 
 ]
 
-# router = routers.DefaultRouter()
-# router.register(r'v1/asset-groups/', api.AssetGroupViewSet)
-# router.register(r'v1/assets/', api.AssetViewSet)
-# router.register(r'v1/idc/', api.IDCViewSet)
-
-asset_list_view = api.AssetViewSet.as_view({
-    'get': 'list',
-    'post': 'create'
-})
-
-asset_detail_view = api.AssetViewSet.as_view({
-    'get': 'retrieve',
-    'put': 'update',
-    'patch': 'partial_update',
-    'delete': 'destroy',
-})
-
-idc_list_view = api.IDCViewSet.as_view({
-    'get': 'list',
-    'post': 'create',
-})
-
-idc_detail_view = api.IDCViewSet.as_view({
-    'get': 'retrieve',
-    'put': 'update',
-    'patch': 'partial_update',
-    'delete': 'destroy',
-})
-
-admin_user_list_view = api.AdminUserViewSet.as_view({
-    'get': 'list',
-    'post': 'create',
-})
+router = routers.DefaultRouter()
+router.register(r'v1/asset-groups', api.AssetGroupViewSet, 'api-asset-group')
+router.register(r'v1/assets', api.AssetViewSet, 'api-asset')
+router.register(r'v1/idc', api.IDCViewSet, 'api-idc')
+router.register(r'v1/admin-user', api.AdminUserViewSet, 'api-admin-user')
+router.register(r'v1/system-user', api.SystemUserViewSet, 'api-system-user')
 
 urlpatterns += [
-    url(r'^v1/assets/$', asset_list_view, name='asset-list-create-api'),
-    url(r'^v1/assets/(?P<pk>[0-9]+)/$', asset_detail_view, name='asset-detail-update-delete-api'),
-    url(r'^v1/assets_bulk/$', api.AssetListUpdateApi.as_view(), name='asset-bulk-update-api'),
-    url(r'^v1/idc/$', idc_list_view, name='idc-list-create-api'),
-    url(r'^v1/idc/(?P<pk>[0-9]+)/$', idc_detail_view, name='idc-detail-update-delete-api'),
-    url(r'^v1/idc/(?P<pk>[0-9]+)/assets/$', api.IDCAssetsApi.as_view(), name='idc-assets-api'),
-    url(r'^v1/admin-user/$', idc_list_view, name='idc-list-create-api'),
-    url(r'^v1/idc/(?P<pk>[0-9]+)/$', idc_detail_view, name='idc-detail-update-delete-api'),
-    url(r'^v1/system-user/auth/', api.SystemUserAuthApi.as_view(), name='system-user-auth'),
+    url(r'^v1/assets_bulk/$', api.AssetListUpdateApi.as_view(), name='api-asset-bulk-update'),
+    # url(r'^v1/idc/(?P<pk>[0-9]+)/assets/$', api.IDCAssetsApi.as_view(), name='api-idc-assets'),
+    url(r'^v1/system-user/auth/', api.SystemUserAuthApi.as_view(), name='api-system-user-auth'),
 ]
 
-
+urlpatterns += router.urls

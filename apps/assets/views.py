@@ -431,34 +431,34 @@ class IDCDeleteView(AdminUserRequiredMixin, DeleteView):
     success_url = reverse_lazy('assets:idc-list')
 
 
-class AdminUserListView(AdminUserRequiredMixin, ListView):
+class AdminUserListView(AdminUserRequiredMixin, TemplateView):
     model = AdminUser
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    context_object_name = 'admin_user_list'
+    # paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    # context_object_name = 'admin_user_list'
     template_name = 'assets/admin_user_list.html'
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Assets'),
             'action': _('Admin user list'),
-            'keyword': self.request.GET.get('keyword', '')
+            # 'keyword': self.request.GET.get('keyword', '')
         }
         kwargs.update(context)
         return super(AdminUserListView, self).get_context_data(**kwargs)
 
-    def get_queryset(self):
-        # Todo: Default order by lose asset connection num
-        self.queryset = super(AdminUserListView, self).get_queryset()
-        self.keyword = keyword = self.request.GET.get('keyword', '')
-        self.sort = sort = self.request.GET.get('sort', '-date_created')
-
-        if keyword:
-            self.queryset = self.queryset.filter(Q(name__icontains=keyword) |
-                                                 Q(comment__icontains=keyword))
-
-        if sort:
-            self.queryset = self.queryset.order_by(sort)
-        return self.queryset
+    # def get_queryset(self):
+    #     Todo: Default order by lose asset connection num
+        # self.queryset = super(AdminUserListView, self).get_queryset()
+        # self.keyword = keyword = self.request.GET.get('keyword', '')
+        # self.sort = sort = self.request.GET.get('sort', '-date_created')
+        #
+        # if keyword:
+        #     self.queryset = self.queryset.filter(Q(name__icontains=keyword) |
+        #                                          Q(comment__icontains=keyword))
+        #
+        # if sort:
+        #     self.queryset = self.queryset.order_by(sort)
+        # return self.queryset
 
 
 class AdminUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):

@@ -38,10 +38,20 @@ class AdminUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = AdminUser
 
+    def get_field_names(self, declared_fields, info):
+        fields = super(AdminUserSerializer, self).get_field_names(declared_fields, info)
+        fields.append('assets_amount')
+        return fields
+
 
 class SystemUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUser
+
+    def get_field_names(self, declared_fields, info):
+        fields = super(SystemUserSerializer, self).get_field_names(declared_fields, info)
+        fields.append('assets_amount')
+        return fields
 
 
 class IDCSerializer(serializers.ModelSerializer):

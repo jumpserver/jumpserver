@@ -26,6 +26,13 @@ class AssetViewSet(viewsets.ModelViewSet):
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
 
+    def get_queryset(self):
+        queryset = super(AssetViewSet, self).get_queryset()
+        idc = self.request.query_params.get('idc', '')
+        if idc:
+            queryset = queryset.filter(idc__id=idc)
+        return queryset
+
 
 class IDCViewSet(viewsets.ModelViewSet):
     """API endpoint that allows IDC to be viewed or edited."""
@@ -46,17 +53,17 @@ class SystemUserViewSet(viewsets.ModelViewSet):
     permission_classes = (IsSuperUser,)
 
 
-class IDCAssetsApi(generics.ListAPIView):
-    model = IDC
-    serializer_class = serializers.AssetSerializer
-
-    def get(self, request, *args, **kwargs):
-        filter_kwargs = {self.lookup_field: self.kwargs[self.lookup_field]}
-        self.object = get_object_or_404(self.model, **filter_kwargs)
-        return super(IDCAssetsApi, self).get(request, *args, **kwargs)
-
-    def get_queryset(self):
-        return self.object.assets.all()
+# class IDCAssetsApi(generics.ListAPIView):
+#     model = IDC
+#     serializer_class = serializers.AssetSerializer
+#
+#     def get(self, request, *args, **kwargs):
+#         filter_kwargs = {self.lookup_field: self.kwargs[self.lookup_field]}
+#         self.object = get_object_or_404(self.model, **filter_kwargs)
+#         return super(IDCAssetsApi, self).get(request, *args, **kwargs)
+#
+#     def get_queryset(self):
+#         return self.object.assets.all()
 
 
 class AssetListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):

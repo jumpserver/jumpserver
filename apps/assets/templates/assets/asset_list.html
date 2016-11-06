@@ -7,14 +7,6 @@
 <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
 
 <style>
-    div.dataTables_wrapper div.dataTables_filter {
-        margin-left: 15px;
-        float: right !important;
-    }
-    div.dataTables_wrapper div.dataTables_filter,
-    .dataTables_length {
-        float: right !important;
-    }
     .custom{
         /*float:left;*/
         margin-right:5px;
@@ -80,7 +72,7 @@
              </td>
              <td class="text-center">
                  <a href="{% url 'assets:asset-update' pk=asset.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
-                 <a onclick="objectDelete(this,'{{ asset.hostname }}','{% url 'assets:asset-detail-update-delete-api' pk=asset.id %}')" class="btn btn-xs btn-danger del">
+                 <a onclick="objectDelete(this,'{{ asset.hostname }}','{% url 'assets:api-asset-detail' pk=asset.id %}')" class="btn btn-xs btn-danger del">
                      {% trans 'Delete' %}</a>
              </td>
          </tr>
@@ -198,7 +190,7 @@
             var column2 = table.rows('.selected').data();
             var id_list = [];
             var plain_id_list = [];
-            var the_url = "{% url 'assets:asset-bulk-update-api' %}";
+            var the_url = "{% url 'assets:api-asset-bulk-update' %}";
             for(var i=0;i<column2.length;i++){
                 id_list.push({id: column2[i].id,hostname:column2[i].ip});
                 plain_id_list.push(parseInt(column2[i].id));

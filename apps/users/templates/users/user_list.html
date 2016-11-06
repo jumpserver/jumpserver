@@ -1,18 +1,5 @@
 {% extends '_base_list.html' %}
 {% load i18n static %}
-{% block custom_head_css_js %}
-{{ block.super }}
-<style>
-div.dataTables_wrapper div.dataTables_filter,
-.dataTables_length {
-    float: right !important;
-}
-
-div.dataTables_wrapper div.dataTables_filter {
-  margin-left: 15px;
-}
-</style>
-{% endblock %}
 {% block table_search %}{% endblock %}
 {% block table_container %}
 <div class="uc pull-left"><a href="javascript:void(0);" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#user_import_modal"> {% trans "Import user" %} </a></div>

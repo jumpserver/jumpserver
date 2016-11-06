@@ -107,7 +107,7 @@ class AdminUser(models.Model):
 
     @property
     def password(self):
-        return decrypt(self._password)
+        return signer.unsign(self._password)
 
     @password.setter
     def password(self, password_raw):
@@ -128,6 +128,10 @@ class AdminUser(models.Model):
     @public_key.setter
     def public_key(self, public_key_raw):
         self._public_key = signer.sign(public_key_raw)
+
+    @property
+    def assets_amount(self):
+        return self.assets.count()
 
     class Meta:
         db_table = 'admin_user'
@@ -215,6 +219,10 @@ class SystemUser(models.Model):
     def get_assets(self):
         assets = set(self.assets.all()) | self.get_assets_inherit_from_asset_groups()
         return list(assets)
+
+    @property
+    def assets_amount(self):
+        return self.assets.count()
 
     class Meta:
         db_table = 'system_user'

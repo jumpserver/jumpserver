@@ -293,7 +293,7 @@ jumpserver.initDataTable = function (options) {
   ];
   columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
   var table = ele.DataTable({
-        pageLength: options.pageLength || 25,
+        pageLength: options.pageLength || 15,
         dom: options.dom || '<"#uc.pull-left"><"html5buttons"B>flti<"row m-t"<"#op.col-md-6"><"col-md-6"p>>',
         language: {
             url: options.i18n_url || "/static/js/plugins/dataTables/i18n/zh-hans.json"
@@ -330,7 +330,8 @@ jumpserver.initDataTable = function (options) {
             url: options.ajax_url ,
             dataSrc: ""
         },
-        columns: options.columns || []
+        columns: options.columns || [],
+        lengthMenu: [[15, 25, 50, -1], [15, 25, 50, "All"]]
     });
     table.on('select', function(e, dt, type, indexes) {
         var $node = table[ type ]( indexes ).nodes().to$();

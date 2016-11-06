@@ -1585,9 +1585,9 @@ table.dataTable thead .sorting_desc_disabled {
 .dataTables_wrapper {
   padding-bottom: 30px;
 }
-.dataTables_length {
-  float: left;
-}
+/*.dataTables_length {*/
+  /*float: left;*/
+/*}*/
 .dataTables_filter label {
   margin-right: 5px;
 }
