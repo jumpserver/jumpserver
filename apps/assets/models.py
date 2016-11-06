@@ -6,8 +6,9 @@ from django.db import models
 from django.core import serializers
 import logging
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 
-from common.utils import signer
+from common.utils import signer, validate_ssh_private_key
 
 logger = logging.getLogger(__name__)
 
@@ -91,13 +92,21 @@ class AssetExtend(models.Model):
         unique_together = ('key', 'value')
 
 
+def private_key_validator(value):
+    if not validate_ssh_private_key(value):
+        raise ValidationError(
+            _('%(value)s is not an even number'),
+            params={'value': value},
+        )
+
+
 class AdminUser(models.Model):
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     username = models.CharField(max_length=16, verbose_name=_('Username'))
-    _password = models.CharField(max_length=256, blank=True, verbose_name=_('Password'))
-    _private_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH private key'))
+    _password = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
+    _private_key = models.CharField(max_length=4096, blank=True, null=True, verbose_name=_('SSH private key'),
+                                    validators=[private_key_validator,])
     _public_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
-    as_default = models.BooleanField(default=False, verbose_name=_('As default'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     created_by = models.CharField(max_length=32, null=True, verbose_name=_('Created by'))

@@ -483,6 +483,9 @@ class AdminUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
                             ))
         return success_message
 
+    def form_invalid(self, form):
+        return super(AdminUserCreateView, self).form_invalid(form)
+
 
 class AdminUserUpdateView(AdminUserRequiredMixin, UpdateView):
     model = AdminUser

@@ -1,8 +1,9 @@
 # coding:utf-8
 from django import forms
+from django.utils.translation import gettext_lazy as _
 
 from .models import IDC, Asset, AssetGroup, AdminUser, SystemUser, Tag
-from django.utils.translation import gettext_lazy as _
+from common.utils import validate_ssh_private_key, ssh_pubkey_gen
 
 
 # class AssetForm(forms.ModelForm):
@@ -141,7 +142,6 @@ class AdminUserForm(forms.ModelForm):
                                             widget=forms.SelectMultiple(
                                                 attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
                                             )
-    auto_generate_key = forms.BooleanField(required=True, initial=True)
     # Form field name can not start with `_`, so redefine it,
     password = forms.CharField(widget=forms.PasswordInput, max_length=100, min_length=8, strip=True,
                                help_text=_('If also set private key, use that first'), required=False)
@@ -166,21 +166,36 @@ class AdminUserForm(forms.ModelForm):
         # Because we define custom field, so we need rewrite :method: `save`
         admin_user = super(AdminUserForm, self).save(commit=commit)
         password = self.cleaned_data['password']
-        private_key_file = self.cleaned_data['private_key_file']
+        private_key = self.cleaned_data['private_key_file']
+        public_key = ssh_pubkey_gen(private_key)
 
         if password:
             admin_user.password = password
-            print(password)
-        # Todo: Validate private key file, and generate public key
-        # Todo: Auto generate private key and public key
-        if private_key_file:
-            admin_user.private_key = private_key_file.read()
+        if private_key:
+            admin_user.private_key = private_key
+            admin_user.public_key = public_key
         admin_user.save()
-        return self.instance
+        return admin_user
+
+    def clean_private_key_file(self):
+        private_key_file = self.cleaned_data['private_key_file']
+        if private_key_file:
+            private_key = private_key_file.read()
+            if not validate_ssh_private_key(private_key):
+                raise forms.ValidationError(_('Invalid private key'))
+            return private_key
+        return private_key_file
+
+    def clean(self):
+        password = self.cleaned_data['password']
+        private_key_file = self.cleaned_data.get('private_key_file', '')
+
+        if not (password or private_key_file):
+            raise forms.ValidationError(_('Password and private key file must be input one'))
 
     class Meta:
         model = AdminUser
-        fields = ['name', 'username', 'auto_generate_key', 'password', 'private_key_file', 'as_default', 'comment']
+        fields = ['name', 'username', 'password', 'private_key_file', 'comment']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
             'username': forms.TextInput(attrs={'placeholder': _('Username')}),
