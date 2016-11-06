@@ -79,7 +79,7 @@ $(document).ready(function(){
             {targets: 7, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "users:user-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
-                if (rowData.id === 1) {
+                if (rowData.id === 1 || rowData.username == "admin") {
                     $(td).html(update_btn)
                 } else {
                     $(td).html(update_btn + del_btn)

@@ -234,7 +234,7 @@ class User(AbstractUser):
         user.groups.add(UserGroup.initial())
 
     def delete(self):
-        if self.pk == 1:
+        if self.pk == 1 or self.username == 'admin':
             return
         return super(User, self).delete()
 

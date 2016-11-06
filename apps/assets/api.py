@@ -1,33 +1,16 @@
 # ~*~ coding: utf-8 ~*~
 
-from rest_framework import serializers
-from rest_framework import viewsets, serializers, generics
+from rest_framework import viewsets, generics, mixins
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin, ListBulkCreateUpdateDestroyAPIView
+from django.shortcuts import get_object_or_404
 
 from common.mixins import BulkDeleteApiMixin
 from common.utils import get_object_or_none, signer
 from .hands import IsSuperUserOrTerminalUser, IsSuperUser
-from .models import AssetGroup, Asset, IDC, SystemUser
-from .serializers import AssetBulkUpdateSerializer
-
-
-class AssetGroupSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AssetGroup
-
-
-class AssetSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Asset
-        # fields = ('id', 'title', 'code', 'linenos', 'language', 'style')
-
-
-class IDCSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = IDC
-        # fields = ('id', 'title', 'code', 'linenos', 'language', 'style')
+from .models import AssetGroup, Asset, IDC, SystemUser, AdminUser
+from . import serializers
 
 
 class AssetGroupViewSet(viewsets.ModelViewSet):
@@ -35,26 +18,50 @@ class AssetGroupViewSet(viewsets.ModelViewSet):
         some other comment
     """
     queryset = AssetGroup.objects.all()
-    serializer_class = AssetGroupSerializer
+    serializer_class = serializers.AssetGroupSerializer
 
 
 class AssetViewSet(viewsets.ModelViewSet):
     """API endpoint that allows Asset to be viewed or edited."""
     queryset = Asset.objects.all()
-    serializer_class = AssetSerializer
+    serializer_class = serializers.AssetSerializer
 
 
-class IDCViewSet(viewsets.ReadOnlyModelViewSet):
+class IDCViewSet(viewsets.ModelViewSet):
     """API endpoint that allows IDC to be viewed or edited."""
     queryset = IDC.objects.all()
-    serializer_class = IDCSerializer
+    serializer_class = serializers.IDCSerializer
     permission_classes = (IsSuperUser,)
 
+
+class AdminUserViewSet(viewsets.ModelViewSet):
+    queryset = AdminUser.objects.all()
+    serializer_class = serializers.AdminUserSerializer
+    permission_classes = (IsSuperUser,)
+
+
+class SystemUserViewSet(viewsets.ModelViewSet):
+    queryset = SystemUser.objects.all()
+    serializer_class = serializers.SystemUserSerializer
+    permission_classes = (IsSuperUser,)
+
+
+class IDCAssetsApi(generics.ListAPIView):
+    model = IDC
+    serializer_class = serializers.AssetSerializer
+
+    def get(self, request, *args, **kwargs):
+        filter_kwargs = {self.lookup_field: self.kwargs[self.lookup_field]}
+        self.object = get_object_or_404(self.model, **filter_kwargs)
+        return super(IDCAssetsApi, self).get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return self.object.assets.all()
 
 
 class AssetListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):
     queryset = Asset.objects.all()
-    serializer_class = AssetBulkUpdateSerializer
+    serializer_class = serializers.AssetBulkUpdateSerializer
     permission_classes = (IsSuperUser,)
 
 

@@ -30,14 +30,14 @@ class AssetListView(AdminUserRequiredMixin, ListView):
     @staticmethod
     def sorted_by_valid_and_ip(asset):
         ip_list = int_seq(asset.ip.split('.'))
-        ip_list.insert(0, asset.is_valid()[0])
+        ip_list.insert(0, asset.is_valid[0])
         return ip_list
 
     def get_context_data(self, **kwargs):
         context = {
             'app': 'Assets',
             'action': 'asset list',
-            'tag_list': [(i.id,i.name,i.asset_set.all().count())for i in Tag.objects.all().order_by('name')]
+            'tag_list': [(i.id, i.name, i.asset_set.all().count())for i in Tag.objects.all().order_by('name')]
 
         }
         kwargs.update(context)
@@ -341,33 +341,33 @@ class AssetGroupDeleteView(AdminUserRequiredMixin, DeleteView):
     success_url = reverse_lazy('assets:asset-group-list')
 
 
-class IDCListView(AdminUserRequiredMixin, ListView):
-    model = IDC
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    context_object_name = 'idc_list'
+class IDCListView(AdminUserRequiredMixin, TemplateView):
+    # model = IDC
+    # paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    # context_object_name = 'idc_list'
     template_name = 'assets/idc_list.html'
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Assets'),
             'action': _('IDC list'),
-            'keyword': self.request.GET.get('keyword', '')
+            # 'keyword': self.request.GET.get('keyword', '')
         }
         kwargs.update(context)
         return super(IDCListView, self).get_context_data(**kwargs)
 
-    def get_queryset(self):
-        self.queryset = super(IDCListView, self).get_queryset()
-        self.keyword = keyword = self.request.GET.get('keyword', '')
-        self.sort = sort = self.request.GET.get('sort', '-date_created')
-
-        if keyword:
-            self.queryset = self.queryset.filter(Q(name__icontains=keyword) |
-                                                 Q(comment__icontains=keyword))
-
-        if sort:
-            self.queryset = self.queryset.order_by(sort)
-        return self.queryset
+    # def get_queryset(self):
+    #     self.queryset = super(IDCListView, self).get_queryset()
+    #     self.keyword = keyword = self.request.GET.get('keyword', '')
+    #     self.sort = sort = self.request.GET.get('sort', '-date_created')
+    #
+    #     if keyword:
+    #         self.queryset = self.queryset.filter(Q(name__icontains=keyword) |
+    #                                              Q(comment__icontains=keyword))
+    #
+    #     if sort:
+    #         self.queryset = self.queryset.order_by(sort)
+    #     return self.queryset
 
 
 class IDCCreateView(AdminUserRequiredMixin, CreateView):
@@ -414,7 +414,15 @@ class IDCUpdateView(AdminUserRequiredMixin, UpdateView):
 
 
 class IDCDetailView(AdminUserRequiredMixin, DetailView):
-    pass
+    model = IDC
+    template_name = 'assets/idc_detail.html'
+    context_object_name = 'idc'
+
+
+class IDCAssetsView(AdminUserRequiredMixin, DetailView):
+    model = IDC
+    template_name = 'assets/idc_assets.html'
+    context_object_name = 'idc'
 
 
 class IDCDeleteView(AdminUserRequiredMixin, DeleteView):

@@ -329,6 +329,7 @@ class Asset(models.Model):
     def __unicode__(self):
         return '%(ip)s:%(port)s' % {'ip': self.ip, 'port': self.port}
 
+    @property
     def is_valid(self):
         warning = ''
         if not self.is_active:

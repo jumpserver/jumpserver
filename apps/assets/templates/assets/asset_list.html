@@ -7,19 +7,19 @@
 <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
 
 <style>
-div.dataTables_wrapper div.dataTables_filter {
-    margin-left: 15px;
-    float: right !important;
-}
-div.dataTables_wrapper div.dataTables_filter,
-.dataTables_length {
-    float: right !important;
-}
-.custom{
-    /*float:left;*/
-    margin-right:5px;
+    div.dataTables_wrapper div.dataTables_filter {
+        margin-left: 15px;
+        float: right !important;
     }
-#modal .modal-body { max-height: 200px; }
+    div.dataTables_wrapper div.dataTables_filter,
+    .dataTables_length {
+        float: right !important;
+    }
+    .custom{
+        /*float:left;*/
+        margin-right:5px;
+        }
+    #modal .modal-body { max-height: 200px; }
 </style>
 {% endblock %}
 {% block content_left_head %}{% endblock %}
@@ -80,7 +80,8 @@ div.dataTables_wrapper div.dataTables_filter,
              </td>
              <td class="text-center">
                  <a href="{% url 'assets:asset-update' pk=asset.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
-                 <a onclick="objectDelete(this,'{{ asset.hostname }}','{% url 'assets:asset-delete' pk=asset.id %}')" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
+                 <a onclick="objectDelete(this,'{{ asset.hostname }}','{% url 'assets:asset-detail-update-delete-api' pk=asset.id %}')" class="btn btn-xs btn-danger del">
+                     {% trans 'Delete' %}</a>
              </td>
          </tr>
      {% endfor %}
@@ -190,7 +191,7 @@ div.dataTables_wrapper div.dataTables_filter,
             }else{
                 $(this).addClass('selected');
                 this.children[0].children[0].checked=1;
-            };
+            }
         });
 
         $('#btn_bulk_update').on('click',function(){
@@ -201,7 +202,7 @@ div.dataTables_wrapper div.dataTables_filter,
             for(var i=0;i<column2.length;i++){
                 id_list.push({id: column2[i].id,hostname:column2[i].ip});
                 plain_id_list.push(parseInt(column2[i].id));
-            };
+            }
 
             var url_delete = the_url + '?id__in=' + JSON.stringify(plain_id_list);
             //APIUpdateAttr({url: url_delete, method: 'DELETE', success: success, error: fail});
@@ -227,18 +228,18 @@ div.dataTables_wrapper div.dataTables_filter,
                             }
                         });
                 });
-            };
+            }
 
             function doUpdate() {
                // alert(plain_id_list);
                // $('#asset_bulk_update_modal').modal('show');
                window.location.href="{% url 'assets:asset-modal-update' %}?plain_id_lists="+plain_id_list
-            };
+            }
 
             var action = $('#slct_bulk_update option:selected').val();
             if (id_list.length === 0) {
                 action = 'default';
-            };
+            }
             switch(action) {
                 case 'deactive':
                     alert(action+"未完成");

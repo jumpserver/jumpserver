@@ -2,14 +2,8 @@
 from django.conf.urls import url, include
 import views
 import api
-# from .api import (
-#     AssetGroupViewSet, AssetViewSet, IDCViewSet
-# )
-# from rest_framework import routers
-# router = routers.DefaultRouter()
-# router.register(r'assetgroup', AssetGroupViewSet)
-# router.register(r'asset', AssetViewSet)
-# router.register(r'idc', IDCViewSet)
+from rest_framework import routers
+
 app_name = 'assets'
 
 urlpatterns = [
@@ -43,6 +37,7 @@ urlpatterns = [
     url(r'^idc/(?P<pk>[0-9]+)$', views.IDCDetailView.as_view(), name='idc-detail'),
     url(r'^idc/(?P<pk>[0-9]+)/update', views.IDCUpdateView.as_view(), name='idc-update'),
     url(r'^idc/(?P<pk>[0-9]+)/delete$', views.IDCDeleteView.as_view(), name='idc-delete'),
+    url(r'^idc/(?P<pk>[0-9]+)/assets$', views.IDCAssetsView.as_view(), name='idc-assets'),
 
     # Resource admin user url
     url(r'^admin-user$', views.AdminUserListView.as_view(), name='admin-user-list'),
@@ -63,10 +58,49 @@ urlpatterns = [
 
 ]
 
+# router = routers.DefaultRouter()
+# router.register(r'v1/asset-groups/', api.AssetGroupViewSet)
+# router.register(r'v1/assets/', api.AssetViewSet)
+# router.register(r'v1/idc/', api.IDCViewSet)
+
+asset_list_view = api.AssetViewSet.as_view({
+    'get': 'list',
+    'post': 'create'
+})
+
+asset_detail_view = api.AssetViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy',
+})
+
+idc_list_view = api.IDCViewSet.as_view({
+    'get': 'list',
+    'post': 'create',
+})
+
+idc_detail_view = api.IDCViewSet.as_view({
+    'get': 'retrieve',
+    'put': 'update',
+    'patch': 'partial_update',
+    'delete': 'destroy',
+})
+
+admin_user_list_view = api.AdminUserViewSet.as_view({
+    'get': 'list',
+    'post': 'create',
+})
+
 urlpatterns += [
-    url(r'^v1/assets/$', api.AssetViewSet.as_view({'get':'list'}), name='assets-list-api'),
+    url(r'^v1/assets/$', asset_list_view, name='asset-list-create-api'),
+    url(r'^v1/assets/(?P<pk>[0-9]+)/$', asset_detail_view, name='asset-detail-update-delete-api'),
     url(r'^v1/assets_bulk/$', api.AssetListUpdateApi.as_view(), name='asset-bulk-update-api'),
-    url(r'^v1/idc/$', api.IDCViewSet.as_view({'get':'list'}), name='idc-list-json'),
+    url(r'^v1/idc/$', idc_list_view, name='idc-list-create-api'),
+    url(r'^v1/idc/(?P<pk>[0-9]+)/$', idc_detail_view, name='idc-detail-update-delete-api'),
+    url(r'^v1/idc/(?P<pk>[0-9]+)/assets/$', api.IDCAssetsApi.as_view(), name='idc-assets-api'),
+    url(r'^v1/admin-user/$', idc_list_view, name='idc-list-create-api'),
+    url(r'^v1/idc/(?P<pk>[0-9]+)/$', idc_detail_view, name='idc-detail-update-delete-api'),
     url(r'^v1/system-user/auth/', api.SystemUserAuthApi.as_view(), name='system-user-auth'),
 ]
 
