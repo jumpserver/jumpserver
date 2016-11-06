@@ -22,6 +22,9 @@
                             <li>
                                 <a href="" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Asset login log' %}</a>
                             </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default" href="{% url 'assets:asset-update' pk=asset.id %}"><i class="fa fa-edit"></i>Update</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -53,6 +56,14 @@
                                         <tr>
                                             <td>{% trans 'IP' %}:</td>
                                             <td><b>{{ asset.ip }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Admin user' %}:</td>
+                                            {% if asset.admin_user %}
+                                            <td><b>{{ asset.admin_user.name }}</b></td>
+                                            {% else %}
+                                            <td><b>None</b></td>
+                                            {% endif %}
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Other IP' %}:</td>
@@ -173,7 +184,15 @@
                                                 </span>
                                             </td>
                                         </tr>
-                                        </tbody>
+                                        <tr>
+                                            <td>{% trans 'Repush system users' %}:</td>
+                                            <td>
+                                                <span class="pull-right">
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_pk" style="width: 54px;">{% trans 'Push' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
+
                                         </tbody>
                                     </table>
                                 </div>
@@ -209,6 +228,41 @@
                                           <td>
                                               <button class="btn btn-danger pull-right btn-xs " type="button"><i class="fa fa-minus"></i></button>
                                           </td>
+                                        </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="panel panel-warning">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Asset groups' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table group_edit">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select system user' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for system_user in system_users_remain %}
+                                                            <option value="{{ system_user.id }}">{{ system_user.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button" class="btn btn-warning btn-sm">{% trans 'Associate' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+                                        {% for system_user in system_users %}
+                                        <tr>
+                                            <td ><b>{{ system_user.name }}</b></td>
+                                            <td>
+                                                <button class="btn btn-danger btn-xs" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                            </td>
                                         </tr>
                                         {% endfor %}
                                         </tbody>

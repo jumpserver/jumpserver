@@ -8,7 +8,7 @@ import string
 import logging
 import datetime
 
-from itsdangerous import Signer, TimedJSONWebSignatureSerializer, JSONWebSignatureSerializer, TimestampSigner, \
+from itsdangerous import TimedJSONWebSignatureSerializer, JSONWebSignatureSerializer, \
     BadSignature, SignatureExpired
 from django.shortcuts import reverse as dj_reverse
 from django.conf import settings
@@ -34,31 +34,31 @@ def get_object_or_none(model, **kwargs):
     return obj
 
 
-def encrypt(*args, **kwargs):
-    try:
-        return signing.dumps(*args, **kwargs)
-    except signing.BadSignature:
-        return ''
+class Signer(object):
+    def __init__(self, secret_key=SECRET_KEY):
+        self.secret_key = secret_key
 
+    def sign(self, value):
+        s = JSONWebSignatureSerializer(self.secret_key)
+        return s.dumps(value)
 
-def decrypt(*args, **kwargs):
-    try:
-        return signing.loads(*args, **kwargs)
-    except signing.BadSignature:
-        return ''
+    def unsign(self, value):
+        s = JSONWebSignatureSerializer(self.secret_key)
+        try:
+            return s.loads(value)
+        except BadSignature:
+            return None
 
+    def sign_t(self, value, expires_in=3600):
+        s = TimedJSONWebSignatureSerializer(self.secret_key, expires_in=expires_in)
+        return s.dumps(value)
 
-def sign(value, secret_key=SECRET_KEY):
-    signer = TimestampSigner(secret_key)
-    return signer.sign(value)
-
-
-def unsign(value, max_age=3600, secret_key=SECRET_KEY):
-    signer = TimestampSigner(secret_key)
-    try:
-        return signer.unsign(value, max_age=max_age)
-    except (BadSignature, SignatureExpired):
-        return ''
+    def unsign_t(self, value):
+        s = TimedJSONWebSignatureSerializer(self.secret_key)
+        try:
+            return s.loads(value)
+        except (BadSignature, SignatureExpired):
+            return None
 
 
 def date_expired_default():
@@ -67,10 +67,6 @@ def date_expired_default():
     except TypeError:
         years = 70
     return timezone.now() + timezone.timedelta(days=365*years)
-
-
-def sign(value):
-    return SIGNER.sign(value)
 
 
 def combine_seq(s1, s2, callback=None):
@@ -165,3 +161,5 @@ def timesince(dt, since='', default="just now"):
             return "%d %s" % (period, singular if period == 1 else plural)
     return default
 
+
+signer = Signer()

@@ -283,9 +283,10 @@ jumpserver.initDataTable = function (options) {
   var ele = options.ele || $('.dataTable');
   var columnDefs = [
     {
-      targets: 0, orderable: false,
+      targets: 0,
+      orderable: false,
       createdCell: function(td) {
-        $(td).html('<div class="checkbox checkbox-default"><input type="checkbox" class="ipt_check"><label></label></div>');
+        $(td).html('<input type="checkbox" class="ipt_check">');
       }
     },
     {className: 'text-center', targets: '_all'}

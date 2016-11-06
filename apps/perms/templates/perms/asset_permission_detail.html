@@ -28,6 +28,9 @@
                                 <a href="{% url 'perms:asset-permission-asset-list' pk=asset_permission.id  %}" class="text-center">
                                 <i class="fa fa-bar-chart-o"></i> {% trans 'Assets and asset groups' %}</a>
                             </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default" href="{% url 'perms:asset-permission-update' pk=asset_permission.id %}"><i class="fa fa-edit"></i>Update</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content">

@@ -32,8 +32,8 @@
                             {% csrf_token %}
                             <h3>{% trans 'Account' %}</h3>
                             {% block username %} {% endblock %}
-                            {{ form.email|bootstrap_horizontal }}
                             {{ form.name|bootstrap_horizontal }}
+                            {{ form.email|bootstrap_horizontal }}
                             {{ form.groups|bootstrap_horizontal }}
 
                             <div class="hr-line-dashed"></div>
@@ -79,7 +79,7 @@
     </div>
 {% endblock %}
 {% block custom_foot_js %}
-    <script src="{% static 'js/plugins/datapicker/bootstrap-datepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
     <script>
         $(document).ready(function () {
             $('.select2').select2();

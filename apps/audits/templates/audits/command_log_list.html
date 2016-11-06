@@ -3,10 +3,61 @@
 {% load static %}
 {% load common_tags %}
 {% block content_left_head %}
-{#    <a href="{% url 'perms:asset-permission-create' %}" class="btn btn-sm btn-primary "> {% trans "Create permission" %} </a>#}
     <link href="{% static "css/plugins/footable/footable.core.css" %}" rel="stylesheet">
+    <style>
+        #search_btn {
+            margin-bottom: 0;
+        }
+    </style>
 {% endblock %}
 
+{% block table_search %}
+    <form id="search_form" method="get" action="" class="pull-right form-inline">
+        <div class="form-group" id="date">
+            <div class="input-daterange input-group" id="datepicker">
+                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_from" value="{{ date_from }}">
+                <span class="input-group-addon">to</span>
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_to" value="{{ date_to }}">
+            </div>
+        </div>
+        <div class="input-group">
+            <select class="select2 form-control" name="username">
+                <option value="">{% trans 'User' %}</option>
+                {% for user in user_list %}
+                    <option value="{{ user.username }}" {% if user.username == username %} selected {% endif %}>{{ user.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <select class="select2 form-control" name="ip">
+                <option value="">{% trans 'Asset' %}</option>
+                {% for asset in asset_list %}
+                    <option value="{{ asset.ip }}" {% if asset.ip == ip %} selected {% endif %}>{{ asset.ip }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <select class="select2 form-control" name="system_user">
+{#                <option value="">{{ system_user }}</option>#}
+                <option value="">{% trans 'System user' %}</option>
+                {% for system_user in system_user_list %}
+                    <option value="{{ system_user.username }}" {% if system_user.username == system_user %} selected {% endif %}>{{ system_user.username }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="input-group">
+            <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="{{ keyword }}">
+        </div>
+        <div class="input-group">
+            <div class="input-group-btn">
+                <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                    搜索
+                </button>
+            </div>
+        </div>
+    </form>
+{% endblock %}
 {% block table_container %}
     <table class="footable table table-stripped toggle-arrow-tiny" data-page="false">
         <thead>
@@ -15,6 +66,8 @@
             <th>Command</th>
             <th>Username</th>
             <th>IP</th>
+            <th>System user</th>
+            <th>Proxy log</th>
             <th>Datetime</th>
             <th data-hide="all">Output</th>
         </tr>
@@ -22,10 +75,12 @@
         <tbody>
         {% for command in command_list %}
             <tr>
-                <td>{{ command.command_no }}</td>
+                <td>{{ command.id }}</td>
                 <td>{{ command.command }}</td>
                 <td>{{ command.proxy_log.username }}</td>
                 <td>{{ command.proxy_log.ip }}</td>
+                <td>{{ command.proxy_log.system_user }}</td>
+                <td><a href="{% url 'audits:proxy-log-detail' pk=command.proxy_log.id  %}">{{ command.proxy_log.id}}</a></td>
                 <td>{{ command.datetime }}</td>
                 <td>{{ command.output_decode |safe }}</td>
             </tr>
@@ -39,6 +94,13 @@
     <script>
         $(document).ready(function () {
             $('.footable').footable();
+            $('.select2').select2();
+            $('#date .input-daterange').datepicker({
+                dateFormat: 'mm/dd/yy',
+                keyboardNavigation: false,
+                forceParse: false,
+                autoclose: true
+            });
         });
     </script>
 {% endblock %}

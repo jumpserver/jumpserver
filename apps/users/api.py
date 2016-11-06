@@ -1,14 +1,20 @@
 # ~*~ coding: utf-8 ~*~
 #
 
-from django.shortcuts import get_object_or_404
+import base64
 
+from django.shortcuts import get_object_or_404
+from django.core.cache import cache
+from django.conf import settings
 from rest_framework import generics, status
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
+from rest_framework import authentication
 
 from common.mixins import BulkDeleteApiMixin
 from common.utils import get_logger
+from .utils import check_user_valid, token_gen
 from .models import User, UserGroup
 from .serializers import UserDetailSerializer, UserAndGroupSerializer, \
     GroupDetailSerializer, UserPKUpdateSerializer, UserBulkUpdateSerializer, GroupBulkUpdateSerializer
@@ -113,21 +119,25 @@ class DeleteUserFromGroupApi(generics.DestroyAPIView):
         instance.users.remove(user)
 
 
-class AppUserRegisterApi(generics.CreateAPIView):
-    """App send a post request to register a app user
+class UserTokenApi(APIView):
+    permission_classes = ()
+    expiration = settings.CONFIG.TOKEN_EXPIRATION or 3600
 
-    request params contains `username_signed`, You can unsign it,
-    username = unsign(username_signed), if you get the username,
-    It's present it's a valid request, or return (401, Invalid request),
-    then your should check if the user exist or not. If exist,
-    return (200, register success), If not, you should be save it, and
-    notice admin user, The user default is not active before admin user
-    unblock it.
+    def post(self, request, *args, **kwargs):
+        username = request.data.get('username', '')
+        password = request.data.get('password', '')
+        public_key = request.data.get('public_key', '')
+        remote_addr = request.META.get('REMOTE_ADDR', '')
 
-    Save fields:
-        username:
-        name: name + request.ip
-        email: username + '@app.org'
-        role: App
-    """
-    pass
+        remote_addr = base64.b64encode(remote_addr).replace('=', '')
+        user = check_user_valid(username=username, password=password, public_key=public_key)
+        if user:
+            token = cache.get('%s_%s' % (user.id, remote_addr))
+            if not token:
+                token = token_gen(user)
+
+            cache.set(token, user.id, self.expiration)
+            cache.set('%s_%s' % (user.id, remote_addr), token, self.expiration)
+            return Response({'token': token, 'id': user.id, 'username': user.username, 'name': user.name})
+        else:
+            return Response({'msg': 'Invalid password or public key or user is not active or expired'})

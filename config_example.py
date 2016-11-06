@@ -10,6 +10,7 @@
 import os
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
 
 
 class Config:
@@ -23,7 +24,6 @@ class Config:
     # It's used to identify your site, When we send a create mail to user, we only know login url is /login/
     # But we should know the absolute url like: http://jms.jumpserver.org/login/, so SITE_URL is
     # HTTP_PROTOCOL://HOST[:PORT]
-    # Todo: May be use :method: get_current_site more  grace, bug restful api unknown ok or not
     SITE_URL = 'http://localhost'
 
     # Django security setting, if your disable debug model, you should setting that
@@ -53,13 +53,21 @@ class Config:
     # When Django start it will bind this host and port
     # ./manage.py runserver 127.0.0.1:8080
     # Todo: Gunicorn or uwsgi run may be use it
-    HTTP_LISTEN_HOST = '0.0.0.0'
+    HTTP_BIND_HOST = '127.0.0.1'
     HTTP_LISTEN_PORT = 8080
 
     # Use Redis as broker for celery and web socket
     REDIS_HOST = '127.0.0.1'
     REDIS_PORT = 6379
-    # REDIS_PASSWORD = ''
+    REDIS_PASSWORD = ''
+    BROKER_URL = 'redis://%(password)s%(host)s:%(port)s/3' % {
+        'password': REDIS_PASSWORD,
+        'host': REDIS_HOST,
+        'port': REDIS_PORT,
+    }
+
+    # Api token expiration when create
+    TOKEN_EXPIRATION = 3600
 
     # Email SMTP setting, we only support smtp send mail
     # EMAIL_HOST = 'smtp.qq.com'
@@ -69,10 +77,6 @@ class Config:
     # EMAIL_USE_SSL = False  # If port is 465, set True
     # EMAIL_USE_TLS = False  # If port is 587, set True
     # EMAIL_SUBJECT_PREFIX = '[Jumpserver] '
-
-    # SSH use password or public key for auth
-    SSH_PASSWORD_AUTH = False
-    SSH_PUBLIC_KEY_AUTH = True
 
     def __init__(self):
         pass
@@ -86,6 +90,14 @@ class DevelopmentConfig(Config):
     DISPLAY_PER_PAGE = 20
     DB_ENGINE = 'sqlite'
     DB_NAME = os.path.join(BASE_DIR, 'db.sqlite3')
+    EMAIL_HOST = 'smtp.exmail.qq.com'
+    EMAIL_PORT = 465
+    EMAIL_HOST_USER = 'ask@jumpserver.org'
+    EMAIL_HOST_PASSWORD = 'xfDf4x1n'
+    EMAIL_USE_SSL = True  # If port is 465, set True
+    EMAIL_USE_TLS = False  # If port is 587, set True
+    EMAIL_SUBJECT_PREFIX = '[Jumpserver] '
+    SITE_URL = 'http://localhost:8080'
 
 
 class ProductionConfig(Config):
@@ -106,3 +118,4 @@ config = {
 }
 
 env = 'development'
+

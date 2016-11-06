@@ -7,7 +7,7 @@ from django.core import serializers
 import logging
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import encrypt, decrypt
+from common.utils import signer
 
 logger = logging.getLogger(__name__)
 
@@ -111,23 +111,23 @@ class AdminUser(models.Model):
 
     @password.setter
     def password(self, password_raw):
-        self._password = encrypt(password_raw)
+        self._password = signer.sign(password_raw)
 
     @property
     def private_key(self):
-        return decrypt(self._private_key)
+        return signer.unsign(self._private_key)
 
     @private_key.setter
     def private_key(self, private_key_raw):
-        self._private_key = encrypt(private_key_raw)
+        self._private_key = signer.sign(private_key_raw)
 
     @property
     def public_key(self):
-        return decrypt(self._public_key)
+        return signer.unsign(self._public_key)
 
     @public_key.setter
     def public_key(self, public_key_raw):
-        self._public_key = encrypt(public_key_raw)
+        self._public_key = signer.sign(public_key_raw)
 
     class Meta:
         db_table = 'admin_user'
@@ -179,27 +179,27 @@ class SystemUser(models.Model):
 
     @property
     def password(self):
-        return decrypt(self._password)
+        return signer.unsign(self._password)
 
     @password.setter
     def password(self, password_raw):
-        self._password = encrypt(password_raw)
+        self._password = signer.sign(password_raw)
 
     @property
     def private_key(self):
-        return decrypt(self._private_key)
+        return signer.unsign(self._private_key)
 
     @private_key.setter
     def private_key(self, private_key_raw):
-        self._private_key = encrypt(private_key_raw)
+        self._private_key = signer.sign(private_key_raw)
 
     @property
     def public_key(self):
-        return decrypt(self._public_key)
+        return signer.unsign(self._public_key)
 
     @public_key.setter
     def public_key(self, public_key_raw):
-        self._public_key = encrypt(public_key_raw)
+        self._public_key = signer.sign(public_key_raw)
 
     def get_assets_inherit_from_asset_groups(self):
         assets = set()
@@ -289,10 +289,10 @@ def get_default_idc():
 
 
 class Asset(models.Model):
-    ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'))
+    ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
     other_ip = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Other IP'))
     remote_card_ip = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Remote card IP'))
-    hostname = models.CharField(max_length=128, blank=True, verbose_name=_('Hostname'))
+    hostname = models.CharField(max_length=128, unique=True, verbose_name=_('Hostname'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
     groups = models.ManyToManyField(AssetGroup, blank=True, related_name='assets', verbose_name=_('Asset groups'))
     admin_user = models.ForeignKey(AdminUser, null=True, blank=True, related_name='assets',

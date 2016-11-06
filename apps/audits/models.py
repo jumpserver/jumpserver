@@ -71,7 +71,7 @@ class ProxyLog(models.Model):
 
 
 class CommandLog(models.Model):
-    proxy_log = models.ForeignKey(ProxyLog, on_delete=models.CASCADE, related_name='command_log')
+    proxy_log = models.ForeignKey(ProxyLog, on_delete=models.CASCADE, related_name='commands')
     command_no = models.IntegerField()
     command = models.CharField(max_length=1000, blank=True)
     output = models.TextField(blank=True)
@@ -82,7 +82,10 @@ class CommandLog(models.Model):
 
     @property
     def output_decode(self):
-        return base64.b64decode(self.output).replace('\n', '<br />')
+        try:
+            return base64.b64decode(self.output).replace('\n', '<br />')
+        except UnicodeDecodeError:
+            return 'UnicodeDecodeError'
 
     class Meta:
         db_table = 'command_log'

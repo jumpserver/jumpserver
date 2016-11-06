@@ -44,8 +44,6 @@ class AssetListView(AdminUserRequiredMixin, ListView):
         return super(AssetListView, self).get_context_data(**kwargs)
 
 
-
-
 class AssetCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,CreateView):
     model = Asset
     tag_type = 'asset'
@@ -182,12 +180,16 @@ class AssetDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         asset_groups = self.object.groups.all()
+        system_users = self.object.system_users.all()
         context = {
             'app': 'Assets',
             'action': 'Asset detail',
             'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all()
-                                   if asset_group not in asset_groups],
+                                    if asset_group not in asset_groups],
             'asset_groups': asset_groups,
+            'system_users_remain': [system_user for system_user in SystemUser.objects.all()
+                                    if system_user not in system_users],
+            'system_users': system_users,
         }
         kwargs.update(context)
         return super(AssetDetailView, self).get_context_data(**kwargs)

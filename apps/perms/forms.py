@@ -6,9 +6,18 @@ from django.utils.translation import ugettext_lazy as _
 
 # from .hands import User, UserGroup, Asset, AssetGroup, SystemUser
 from .models import AssetPermission
+from .hands import associate_system_users_with_assets
 
 
 class AssetPermissionForm(forms.ModelForm):
+    def save(self, commit=True):
+        instance = super(AssetPermissionForm, self).save(commit=commit)
+
+        assets = instance.assets.all()
+        asset_groups = instance.asset_groups.all()
+        system_users = instance.system_users.all()
+        associate_system_users_with_assets(system_users, assets, asset_groups)
+        return instance
 
     class Meta:
         model = AssetPermission
@@ -34,3 +43,4 @@ class AssetPermissionForm(forms.ModelForm):
             'asset_groups': '* Asset or Asset group at least one required',
             'system_users': '* required',
         }
+
