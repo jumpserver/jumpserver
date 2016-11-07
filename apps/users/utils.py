@@ -187,8 +187,14 @@ def check_user_valid(**kwargs):
         return None
     if password and user.check_password(password):
         return user
-    if public_key and user.public_key == public_key:
-        return user
+    if public_key:
+        public_key_saved = user.public_key.split()
+        if len(public_key_saved) == 1:
+            if public_key == public_key_saved[0]:
+                return user
+        elif len(public_key_saved) > 1:
+            if public_key == public_key_saved[1]:
+                return user
     return None
 
 
