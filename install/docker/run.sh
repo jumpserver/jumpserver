@@ -49,9 +49,10 @@ fi
 /usr/sbin/sshd -E /data/logs/jumpserver.log
 python /jumpserver/manage.py syncdb --noinput
 if [ ! -f "/home/init.locked" ]; then
-	python manage.py loaddata install/initial_data.yaml
+	python /jumpserver/manage.py loaddata install/initial_data.yaml
 	date > /home/init.locked
 fi
-python /jumpserver/run_server.py >> /data/logs/jumpserver.log &
+python /jumpserver/manage.py crontab add >> /data/logs/jumpserver.log &
+python /jumpserver/run_server.py >> /dev/null &
 chmod -R 777 /data/logs/jumpserver.log
 tail -f /data/logs/jumpserver.log
