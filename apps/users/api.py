@@ -29,10 +29,10 @@ class UserViewSet(BulkModelViewSet):
     permission_classes = (IsSuperUser,)
 
 
-# class UserAndGroupEditApi(generics.RetrieveUpdateAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = serializers.UserAndGroupSerializer
-#     permission_classes = (IsSuperUser,)
+class UserAndGroupEditApi(generics.RetrieveUpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = serializers.UserAndGroupSerializer
+    permission_classes = (IsSuperUser,)
 
 
 class UserResetPasswordApi(generics.UpdateAPIView):
@@ -50,7 +50,7 @@ class UserResetPasswordApi(generics.UpdateAPIView):
         send_reset_password_mail(user)
 
 
-class UserResetPubKeyApi(generics.UpdateAPIView):
+class UserResetPKApi(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
 
@@ -61,16 +61,16 @@ class UserResetPubKeyApi(generics.UpdateAPIView):
         user.save()
         send_reset_ssh_key_mail(user)
 
-#
-# class UserUpdatePKApi(generics.UpdateAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = serializers.UserPKUpdateSerializer
-#
-#     def perform_update(self, serializer):
-#         user = self.get_object()
-#         user.private_key = serializer.validated_data['_public_key']
-#         user.save()
-#
+
+class UserUpdatePKApi(generics.UpdateAPIView):
+    queryset = User.objects.all()
+    serializer_class = serializers.UserPKUpdateSerializer
+
+    def perform_update(self, serializer):
+        user = self.get_object()
+        user.public_key = serializer.validated_data['_public_key']
+        user.save()
+
 #
 # class GroupDetailApi(generics.RetrieveUpdateDestroyAPIView):
 #     queryset = UserGroup.objects.all()
@@ -87,8 +87,8 @@ class UserResetPubKeyApi(generics.UpdateAPIView):
             # group.save()
             # return
         # serializer.save()
-#
-#
+
+
 # class UserListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):
 #     queryset = User.objects.all()
 #     serializer_class = serializers.UserBulkUpdateSerializer
@@ -96,12 +96,12 @@ class UserResetPubKeyApi(generics.UpdateAPIView):
 #
 #     def get(self, request, *args, **kwargs):
 #         return super(UserListUpdateApi, self).get(request, *args, **kwargs)
-#
+
 #
 # class GroupListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):
 #     queryset = UserGroup.objects.all()
 #     serializer_class = serializers.GroupBulkUpdateSerializer
-
+#
 
 # class DeleteUserFromGroupApi(generics.DestroyAPIView):
 #     queryset = UserGroup.objects.all()

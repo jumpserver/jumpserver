@@ -191,7 +191,6 @@ function APIUpdateAttr(props) {
   props = props || {};
   var success_message = props.success_message || 'Update Successfully!';
   var fail_message = props.fail_message || 'Error occurred while updating.';
-  console.log(props.body);
   $.ajax({
     url: props.url,
     type: props.method || "PATCH",
@@ -208,7 +207,7 @@ function APIUpdateAttr(props) {
     if (typeof props.error === 'function') {
       return props.error(errorThrown);
     } else {
-      toastr.error(fail_message);
+      toastr.error(textStatue);
     }
   });
   return true;

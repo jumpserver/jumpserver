@@ -5,7 +5,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin
 
-from common.utils import signer
+from common.utils import signer, validate_ssh_public_key
 from .models import User, UserGroup
 
 
@@ -47,16 +47,9 @@ class UserPKUpdateSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def validate__public_key(value):
-        from sshpubkeys import SSHKey
-        from sshpubkeys.exceptions import InvalidKeyException
-        ssh = SSHKey(value)
-        try:
-            ssh.parse()
-        except InvalidKeyException as e:
-            print e
-            raise serializers.ValidationError(_('Not a valid ssh public key'))
-        except NotImplementedError as e:
-            print e
+        if not validate_ssh_public_key(value):
+            print('Not a valid key')
+            print(value)
             raise serializers.ValidationError(_('Not a valid ssh public key'))
         return value
 

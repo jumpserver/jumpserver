@@ -225,7 +225,7 @@
 jumpserver.selected_groups = {};
 
 function updateUserGroups(user_groups) {
-{#    var the_url = "{% url 'users:group-user-edit-api' pk=user.id %}";#}
+    var the_url = "{% url 'users:group-user-edit-api' pk=user.id %}";
     var body = {
         id: {{ user.id }},
         groups: Object.assign([], user_groups)
@@ -313,10 +313,11 @@ $(document).ready(function() {
     var user_groups = $('.bdg_user_group').map(function() {
         return $(this).data('gid');
     }).get();
+    console.log(user_groups);
     updateUserGroups(user_groups)
 }).on('click', '#btn_reset_password', function() {
     function doReset() {
-        var the_url = '{% url "users:user-reset-password-api" pk=user.id %}';
+        var the_url = '{% url "users:api-user-reset-password" pk=user.id %}';
         var body = {};
         var success = function() {
             var msg = "{% trans "An e-mail has been sent to the user\'s mailbox." %}";
@@ -341,7 +342,7 @@ $(document).ready(function() {
     });
 }).on('click', '#btn_reset_pk', function() {
     function doReset() {
-{#        var the_url = '{% url "users:user-reset-pk-api" pk=user.id %}';#}
+        var the_url = '{% url "users:api-user-reset-pk" pk=user.id %}';
         var body = {};
         var success = function() {
             var msg = "{% trans 'The reset-ssh-public-key E-mail has been sent successfully. Please inform the user to update his new ssh public key.' %}";
@@ -349,7 +350,7 @@ $(document).ready(function() {
         };
         APIUpdateAttr({
             url: the_url,
-            body: JSON.stringify(body),
+            body: body,
             success: success
         });
     }
@@ -367,7 +368,7 @@ $(document).ready(function() {
 }).on('click', '#btn_user_update_pk', function(){
     var $this = $(this);
     var pk = $('#txt_pk').val();
-{#    var the_url = '{% url "users:user-update-pk-api" pk=user.id %}';#}
+    var the_url = '{% url "users:api-user-update-pk" pk=user.id %}';
     var body = {'_public_key': pk};
     var success = function() {
         $('#txt_pk').val('');
@@ -375,8 +376,7 @@ $(document).ready(function() {
         var msg = "{% trans 'Successfully updated the SSH public key.' %}";
         swal("{% trans 'User SSH Public Key Update' %}", msg, "success");
     };
-    var fail = function() {
-        var msg = "{% trans 'Failed to update the user\'s SSH public key.' %}";
+    var fail = function(msg) {
         swal({
             title: "{% trans 'User SSH Public Key Update' %}",
             text: msg,
@@ -389,7 +389,7 @@ $(document).ready(function() {
               $('#txt_pk').focus();
             }
         );
-    }
+    };
     APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success, error: fail});
 });
 </script>

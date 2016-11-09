@@ -11,6 +11,7 @@ import datetime
 import paramiko
 
 import paramiko
+import sshpubkeys
 from itsdangerous import TimedJSONWebSignatureSerializer, JSONWebSignatureSerializer, \
     BadSignature, SignatureExpired
 from django.shortcuts import reverse as dj_reverse
@@ -234,6 +235,17 @@ def validate_ssh_private_key(text):
         return False
     else:
         return True
+
+
+def validate_ssh_public_key(text):
+    ssh = sshpubkeys.SSHKey(text)
+    try:
+        ssh.parse()
+    except sshpubkeys.InvalidKeyException:
+        return False
+    except NotImplementedError as e:
+        return False
+    return True
 
 
 signer = Signer()

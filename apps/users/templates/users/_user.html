@@ -6,7 +6,7 @@
      <form method="post" class="form-horizontal" action="" enctype="multipart/form-data">
          {% csrf_token %}
          <h3>{% trans 'Account' %}</h3>
-         {% block username %} {% endblock %}
+         {{ form.username|bootstrap_horizontal }}
          {{ form.name|bootstrap_horizontal }}
          {{ form.email|bootstrap_horizontal }}
          {{ form.groups|bootstrap_horizontal }}
@@ -27,7 +27,7 @@
                  <span class="help-block ">{{ form.date_expired.errors }}</span>
              </div>
           </div>
-           {{ form.date_expired|bootstrap_horizontal }}#}
+           {{ form.date_expired|bootstrap_horizontal }}
          <div class="form-group">
              <label for="{{ form.enable_otp.id_for_label }}" class="col-sm-2 control-label">{% trans 'Enable OTP' %}</label>
              <div class="col-sm-8">

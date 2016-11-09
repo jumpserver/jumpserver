@@ -5,6 +5,7 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import gettext_lazy as _
 from captcha.fields import CaptchaField
 
+from common.utils import validate_ssh_public_key
 from .models import User, UserGroup
 from .hands import AssetPermission
 
@@ -17,7 +18,7 @@ class UserLoginForm(AuthenticationForm):
     captcha = CaptchaField()
 
 
-class UserCreateForm(forms.ModelForm):
+class UserCreateUpdateForm(forms.ModelForm):
 
     class Meta:
         model = User
@@ -42,22 +43,22 @@ class UserBulkImportForm(forms.ModelForm):
         fields = ['username', 'email', 'enable_otp', 'role']
 
 
-class UserUpdateForm(forms.ModelForm):
-
-    class Meta:
-        model = User
-        fields = [
-            'name', 'email', 'groups', 'wechat',
-            'phone', 'enable_otp', 'role', 'date_expired', 'comment',
-        ]
-        help_texts = {
-            'username': '* required',
-            'email': '* required',
-            'groups': '* required'
-        }
-        widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Join user groups')}),
-        }
+# class UserUpdateForm(forms.ModelForm):
+#
+#     class Meta:
+#         model = User
+#         fields = [
+#             'name', 'email', 'groups', 'wechat',
+#             'phone', 'enable_otp', 'role', 'date_expired', 'comment',
+#         ]
+#         help_texts = {
+#             'username': '* required',
+#             'email': '* required',
+#             'groups': '* required'
+#         }
+#         widgets = {
+#             'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Join user groups')}),
+#         }
 
 
 class UserGroupForm(forms.ModelForm):
@@ -84,22 +85,14 @@ class UserKeyForm(forms.Form):
     public_key = forms.CharField(
         label=_('ssh public key'), max_length=5000,
         widget=forms.Textarea(attrs={'placeholder': _('ssh-rsa AAAA...')}),
-        help_text=_('Paste your id_ras.pub here.'))
+        help_text=_('Paste your id_rsa.pub here.'))
 
     def clean_public_key(self):
         public_key = self.cleaned_data['public_key']
-        if self.user._public_key and public_key == self.user.public_key:
+        if self.user.public_key and public_key == self.user.public_key:
             raise forms.ValidationError(_('Public key should not be the same as your old one.'))
-        from sshpubkeys import SSHKey
-        from sshpubkeys.exceptions import InvalidKeyException
-        ssh = SSHKey(public_key)
-        try:
-            ssh.parse()
-        except InvalidKeyException as e:
-            print e
-            raise forms.ValidationError(_('Not a valid ssh public key'))
-        except NotImplementedError as e:
-            print e
+
+        if not validate_ssh_public_key(public_key):
             raise forms.ValidationError(_('Not a valid ssh public key'))
         return public_key
 
@@ -126,3 +119,7 @@ class UserPrivateAssetPermissionForm(forms.ModelForm):
             'system_users': forms.SelectMultiple(attrs={'class': 'select2',
                                                         'data-placeholder': _('Select system users')}),
         }
+
+
+class FileForm(forms.Form):
+    excel = forms.FileField()

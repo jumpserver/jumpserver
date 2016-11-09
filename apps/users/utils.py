@@ -34,9 +34,6 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
         return self.request.user.is_staff
 
 
-
-
-
 def user_add_success_next(user):
     subject = _('Create account successfully')
     recipient_list = [user.email]

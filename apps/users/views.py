@@ -27,10 +27,9 @@ from formtools.wizard.views import SessionWizardView
 from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none, get_logger
 from .models import User, UserGroup
-from .forms import UserCreateForm, UserUpdateForm, UserGroupForm, UserLoginForm, UserInfoForm, UserKeyForm, \
-    UserPrivateAssetPermissionForm, UserBulkImportForm
 from .utils import AdminUserRequiredMixin, user_add_success_next, send_reset_password_mail
 from .hands import AssetPermission, get_user_granted_asset_groups, get_user_granted_assets
+from . import forms
 
 
 logger = get_logger(__name__)
@@ -41,7 +40,7 @@ logger = get_logger(__name__)
 @method_decorator(never_cache, name='dispatch')
 class UserLoginView(FormView):
     template_name = 'users/login.html'
-    form_class = UserLoginForm
+    form_class = forms.UserLoginForm
     redirect_field_name = 'next'
 
     def get(self, request, *args, **kwargs):
@@ -92,7 +91,7 @@ class UserListView(AdminUserRequiredMixin, TemplateView):
 
 class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = User
-    form_class = UserCreateForm
+    form_class = forms.UserCreateUpdateForm
     template_name = 'users/user_create.html'
     success_url = reverse_lazy('users:user-list')
     success_message = _('Create user <a href="%s">%s</a> successfully.')
@@ -118,7 +117,7 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
 
 class UserUpdateView(AdminUserRequiredMixin, UpdateView):
     model = User
-    form_class = UserUpdateForm
+    form_class = forms.UserCreateUpdateForm
     template_name = 'users/user_update.html'
     context_object_name = 'user_object'
     success_url = reverse_lazy('users:user-list')
@@ -162,7 +161,7 @@ class UserGroupListView(AdminUserRequiredMixin, TemplateView):
 
 class UserGroupCreateView(AdminUserRequiredMixin, CreateView):
     model = UserGroup
-    form_class = UserGroupForm
+    form_class = forms.UserGroupForm
     template_name = 'users/user_group_create.html'
     success_url = reverse_lazy('users:user-group-list')
 
@@ -184,7 +183,7 @@ class UserGroupCreateView(AdminUserRequiredMixin, CreateView):
 
 class UserGroupUpdateView(AdminUserRequiredMixin, UpdateView):
     model = UserGroup
-    form_class = UserGroupForm
+    form_class = forms.UserGroupForm
     template_name = 'users/user_group_create.html'
     success_url = reverse_lazy('users:user-group-list')
 
@@ -294,7 +293,7 @@ class UserResetPasswordView(TemplateView):
 
 class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
     template_name = 'users/first_login.html'
-    form_list = [UserInfoForm, UserKeyForm]
+    form_list = [forms.UserInfoForm, forms.UserKeyForm]
     file_storage = default_storage
 
     def dispatch(self, request, *args, **kwargs):
@@ -346,7 +345,7 @@ class UserAssetPermissionView(AdminUserRequiredMixin, FormMixin, SingleObjectMix
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     template_name = 'users/user_asset_permission.html'
     context_object_name = 'user_object'
-    form_class = UserPrivateAssetPermissionForm
+    form_class = forms.UserPrivateAssetPermissionForm
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=User.objects.all())
@@ -379,7 +378,7 @@ class UserAssetPermissionView(AdminUserRequiredMixin, FormMixin, SingleObjectMix
 
 
 class UserAssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
-    form_class = UserPrivateAssetPermissionForm
+    form_class = forms.UserPrivateAssetPermissionForm
     model = AssetPermission
 
     def get(self, request, *args, **kwargs):
@@ -432,12 +431,8 @@ class UserGrantedAssetView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
         return super(UserGrantedAssetView, self).get_context_data(**kwargs)
 
 
-class FileForm(forms.Form):
-    excel = forms.FileField()
-
-
 class BulkImportUserView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
-    form_class = FileForm
+    form_class = forms.FileForm
 
     def form_invalid(self, form):
         try:
@@ -478,7 +473,7 @@ class BulkImportUserView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                 'enable_otp': True if enable_otp in ['T', '1', 1, True] else False,
                 'role': role
             }
-            form = UserBulkImportForm(data, auto_id=False)
+            form = forms.UserBulkImportForm(data, auto_id=False)
             if form.is_valid():
                 form.save()
             else:
