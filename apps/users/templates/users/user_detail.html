@@ -18,20 +18,23 @@
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
                             <li class="active">
-                                <a href="{% url 'users:user-detail' pk=user_object.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User detail' %} </a>
+                                <a href="{% url 'users:user-detail' pk=user.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User detail' %} </a>
                             </li>
                             <li>
-                                <a href="{% url 'users:user-asset-permission' pk=user_object.id %}" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Asset permission' %}</a>
+                                <a href="{% url 'users:user-asset-permission' pk=user.id %}" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Asset permission' %}</a>
                             </li>
-                            <li><a href="{% url 'users:user-granted-asset' pk=user_object.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a></li>
-                            <li><a href="{% url 'users:user-login-history' pk=user_object.id %}" class="text-center"><i class="fa fa-calculator-o"></i> {% trans 'Login history' %}</a></li>
+                            <li><a href="{% url 'users:user-granted-asset' pk=user.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a></li>
+                            <li><a href="{% url 'users:user-login-history' pk=user.id %}" class="text-center"><i class="fa fa-calculator-o"></i> {% trans 'Login history' %}</a></li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default" href="{% url 'users:user-update' pk=user.id %}"><i class="fa fa-edit"></i>Update</a>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content">
                         <div class="col-sm-7" style="padding-left: 0">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span class="label"><b>{{ user_object.name }}</b></span>
+                                    <span class="label"><b>{{ user.name }}</b></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -51,56 +54,56 @@
                                         <tbody>
                                         <tr class="no-borders-tr">
                                             <td colspan="2">
-                                                <img src="{{ user_object | user_avatar_url }}" class="img-circle" width="64" height="64">
+                                                <img src="{{ user | user_avatar_url }}" class="img-circle" width="64" height="64">
                                             </td>
                                         </tr>
                                         <tr>
                                             <td width="20%">{% trans 'Name' %}:</td>
-                                            <td><b>{{ user_object.name }}</b></td>
+                                            <td><b>{{ user.name }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Username' %}:</td>
-                                            <td><b>{{ user_object.username }}</b></td>
+                                            <td><b>{{ user.username }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Email' %}:</td>
-                                            <td><b>{{ user_object.email }}</b></td>
+                                            <td><b>{{ user.email }}</b></td>
                                         </tr>
-                                        {% if user_object.phone %}
+                                        {% if user.phone %}
                                             <tr>
                                                 <td>{% trans 'Phone' %}:</td>
-                                                <td><b>{{ user_object.phone }}</b></td>
+                                                <td><b>{{ user.phone }}</b></td>
                                             </tr>
                                         {% endif %}
-                                        {% if user_object.wechat %}
+                                        {% if user.wechat %}
                                             <tr>
                                                 <td>{% trans 'Wechat' %}:</td>
-                                                <td><b>{{ user_object.wechat }}</b></td>
+                                                <td><b>{{ user.wechat }}</b></td>
                                             </tr>
                                         {% endif %}
                                         <tr>
                                             <td>{% trans 'Role' %}:</td>
-                                            <td><b>{{ user_object.get_role_display }}</b></td>
+                                            <td><b>{{ user.get_role_display }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Date expired' %}:</td>
-                                            <td><b>{{ user_object.date_expired|date:"Y-m-j H:i:s" }}</b></td>
+                                            <td><b>{{ user.date_expired|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Created by' %}:</td>
-                                            <td><b>{{ user_object.created_by }}</b></td>
+                                            <td><b>{{ user.created_by }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Date joined' %}:</td>
-                                            <td><b>{{ user_object.date_joined|date:"Y-m-j H:i:s" }}</b></td>
+                                            <td><b>{{ user.date_joined|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Last login' %}:</td>
-                                            <td><b>{{ user_object.last_login|date:"Y-m-j H:i:s" }}</b></td>
+                                            <td><b>{{ user.last_login|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Comment' %}:</td>
-                                            <td><b>{{ user_object.comment }}</b></td>
+                                            <td><b>{{ user.comment }}</b></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -120,7 +123,7 @@
                                             <td><span class="pull-right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
-                                                        <input type="checkbox" {% if user_object.is_active %} checked {% endif %}  class="onoffswitch-checkbox" id="is_active">
+                                                        <input type="checkbox" {% if user.is_active %} checked {% endif %}  class="onoffswitch-checkbox" id="is_active">
                                                         <label class="onoffswitch-label" for="is_active">
                                                             <span class="onoffswitch-inner"></span>
                                                             <span class="onoffswitch-switch"></span>
@@ -134,7 +137,7 @@
                                             <td><span class="pull-right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
-                                                        <input type="checkbox" class="onoffswitch-checkbox" {% if user_object.enable_otp %} checked {% endif %}
+                                                        <input type="checkbox" class="onoffswitch-checkbox" {% if user.enable_otp %} checked {% endif %}
                                                                id="enable_otp">
                                                         <label class="onoffswitch-label" for="enable_otp">
                                                             <span class="onoffswitch-inner"></span>
@@ -197,7 +200,7 @@
                                             </tr>
                                         </form>
 
-                                        {% for group in user_object.groups.all %}
+                                        {% for group in user.groups.all %}
                                         <tr>
                                           <td ><b class="bdg_user_group" data-gid={{ group.id }}>{{ group.name }}</b></td>
                                           <td>
@@ -222,9 +225,9 @@
 jumpserver.selected_groups = {};
 
 function updateUserGroups(user_groups) {
-    var the_url = "{% url 'users:group-user-edit-api' pk=user_object.id %}";
+{#    var the_url = "{% url 'users:group-user-edit-api' pk=user.id %}";#}
     var body = {
-        id: {{ user_object.id }},
+        id: {{ user.id }},
         groups: Object.assign([], user_groups)
     };
     var success = function(data) {
@@ -262,8 +265,8 @@ $(document).ready(function() {
             delete jumpserver.selected_groups[data.id]
         })
 }).on('click', '#is_active', function() {
-    var the_url = "{% url 'users:user-patch-api' pk=user_object.id %}";
-    var checked = !$(this).prop('checked');
+    var the_url = "{% url 'users:api-user-detail' pk=user.id %}";
+    var checked = $(this).prop('checked');
     var body = {
         'is_active': checked
     };
@@ -274,8 +277,8 @@ $(document).ready(function() {
         success_message: success
     });
 }).on('click', '#enable_otp', function() {
-    var the_url = "{% url 'users:user-patch-api' pk=user_object.id %}";
-    var checked = !$(this).prop('checked');
+    var the_url = "{% url 'users:api-user-detail' pk=user.id %}";
+    var checked = $(this).prop('checked');
     var body = {
         'enable_otp': checked
     };
@@ -313,10 +316,10 @@ $(document).ready(function() {
     updateUserGroups(user_groups)
 }).on('click', '#btn_reset_password', function() {
     function doReset() {
-        var the_url = '{% url "users:user-reset-password-api" pk=user_object.id %}';
+        var the_url = '{% url "users:user-reset-password-api" pk=user.id %}';
         var body = {};
         var success = function() {
-            var msg = "{% trans 'E-mail sent successfully. An e-mail has been sent to the user\'s mailbox.' %}";
+            var msg = "{% trans "An e-mail has been sent to the user\'s mailbox." %}";
             swal("{% trans 'Password-Reset' %}", msg, "success");
         };
         APIUpdateAttr({
@@ -338,7 +341,7 @@ $(document).ready(function() {
     });
 }).on('click', '#btn_reset_pk', function() {
     function doReset() {
-        var the_url = '{% url "users:user-reset-pk-api" pk=user_object.id %}';
+{#        var the_url = '{% url "users:user-reset-pk-api" pk=user.id %}';#}
         var body = {};
         var success = function() {
             var msg = "{% trans 'The reset-ssh-public-key E-mail has been sent successfully. Please inform the user to update his new ssh public key.' %}";
@@ -364,7 +367,7 @@ $(document).ready(function() {
 }).on('click', '#btn_user_update_pk', function(){
     var $this = $(this);
     var pk = $('#txt_pk').val();
-    var the_url = '{% url "users:user-update-pk-api" pk=user_object.id %}';
+{#    var the_url = '{% url "users:user-update-pk-api" pk=user.id %}';#}
     var body = {'_public_key': pk};
     var success = function() {
         $('#txt_pk').val('');

@@ -189,9 +189,9 @@ function activeNav() {
 function APIUpdateAttr(props) {
   // props = {url: .., body: , success: , error: , method: ,}
   props = props || {};
-  success_message = props.success_message || 'Update Successfully!';
-  fail_message = props.fail_message || 'Error occurred while updating.';
-
+  var success_message = props.success_message || 'Update Successfully!';
+  var fail_message = props.fail_message || 'Error occurred while updating.';
+  console.log(props.body);
   $.ajax({
     url: props.url,
     type: props.method || "PATCH",

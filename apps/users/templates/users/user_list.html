@@ -72,7 +72,7 @@ $(document).ready(function(){
                     $(td).html(update_btn + del_btn)
                 }
              }}],
-        ajax_url: '{% url "users:user-bulk-update-api" %}',
+        ajax_url: '{% url "users:api-user-list" %}',
         columns: [{data: function(){return ""}}, {data: "username" }, {data: "name" }, {data: "get_role_display" }, {data: "group_display" },
                   {data: function(){return 999}}, {data: "active_display" }, {data: "id" }],
         op_html: $('#actions').html()
@@ -90,7 +90,7 @@ $(document).ready(function(){
     if (id_list === []) {
         return false;
     }
-    var the_url = "{% url 'users:user-bulk-update-api' %}";
+    var the_url = "{% url 'users:api-user-list' %}";
     function doDeactive() {
         var body = $.each(id_list, function(index, user_object) {
             user_object['is_active'] = false;
@@ -143,7 +143,7 @@ $(document).ready(function(){
     var $this = $(this);
     function doDelete() {
         var uid = $this.data('uid');
-        var the_url = '{% url "users:user-patch-api" pk=99991937 %}'.replace('99991937', uid);
+        var the_url = '{% url "users:api-user-detail" pk=99991937 %}'.replace('99991937', uid);
         var body = {};
         var success = function() {
             var msg = "{% trans 'User Deleted.' %}";
@@ -198,7 +198,7 @@ $(document).ready(function(){
     if (post_list === []) {
         return false
     }
-    var the_url = "{% url 'users:user-bulk-update-api' %}";
+    var the_url = "{% url 'users:api-user-list' %}";
     var success = function() {
         var msg = "{% trans 'The selected users has been updated successfully.' %}";
         swal("{% trans 'User Updated' %}", msg, "success");

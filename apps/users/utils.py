@@ -78,7 +78,7 @@ def send_reset_password_mail(user):
     </br>
     <a href="%(rest_password_url)s?token=%(rest_password_token)s">Click here reset password</a>
     </br>
-    This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one<</a>
+    This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>
 
     </br>
     ---

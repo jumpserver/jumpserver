@@ -315,9 +315,8 @@ class Asset(models.Model):
     admin_user = models.ForeignKey(AdminUser, null=True, blank=True, related_name='assets',
                                    on_delete=models.SET_NULL, verbose_name=_("Admin user"))
     system_users = models.ManyToManyField(SystemUser, blank=True, related_name='assets', verbose_name=_("System User"))
-    idc = models.ForeignKey(IDC, null=True, related_name='assets',
+    idc = models.ForeignKey(IDC, blank=True, null=True, related_name='assets',
                             on_delete=models.SET_NULL, verbose_name=_('IDC'),)
-                            # default=get_default_idc)
     mac_address = models.CharField(max_length=20, null=True, blank=True, verbose_name=_("Mac address"))
     brand = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Brand'))
     cpu = models.CharField(max_length=64,  null=True, blank=True, verbose_name=_('CPU'))

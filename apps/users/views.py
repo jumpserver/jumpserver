@@ -64,7 +64,7 @@ class UserLoginView(FormView):
 
 @method_decorator(never_cache, name='dispatch')
 class UserLogoutView(TemplateView):
-    template_name = 'common/flash_message_standalone.html'
+    template_name = 'flash_message_standalone.html'
 
     def get(self, request, *args, **kwargs):
         auth_logout(request)
@@ -142,7 +142,7 @@ class UserUpdateView(AdminUserRequiredMixin, UpdateView):
 class UserDetailView(AdminUserRequiredMixin, DetailView):
     model = User
     template_name = 'users/user_detail.html'
-    context_object_name = "user_object"
+    context_object_name = "user"
 
     def get_context_data(self, **kwargs):
         groups = UserGroup.objects.exclude(id__in=self.object.groups.all())
@@ -239,7 +239,7 @@ class UserForgotPasswordView(TemplateView):
 
 
 class UserForgotPasswordSendmailSuccessView(TemplateView):
-    template_name = 'common/flash_message_standalone.html'
+    template_name = 'flash_message_standalone.html'
 
     def get_context_data(self, **kwargs):
         context = {
@@ -252,7 +252,7 @@ class UserForgotPasswordSendmailSuccessView(TemplateView):
 
 
 class UserResetPasswordSuccessView(TemplateView):
-    template_name = 'common/flash_message_standalone.html'
+    template_name = 'flash_message_standalone.html'
 
     def get_context_data(self, **kwargs):
         context = {

@@ -1,5 +1,5 @@
 from django.conf.urls import url
-
+from rest_framework_bulk.routes import BulkRouter
 import views
 import api
 
@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^password/reset$', views.UserResetPasswordView.as_view(), name='reset-password'),
     url(r'^password/reset/success$', views.UserResetPasswordSuccessView.as_view(),
         name='reset-password-success'),
+    # User view
     url(r'^user$', views.UserListView.as_view(), name='user-list'),
     url(r'^user/(?P<pk>[0-9]+)$', views.UserDetailView.as_view(), name='user-detail'),
     url(r'^user/(?P<pk>[0-9]+)/asset-permission$', views.UserAssetPermissionView.as_view(),
@@ -27,6 +28,8 @@ urlpatterns = [
     url(r'^user/(?P<pk>[0-9]+)/assets-perm$', views.UserDetailView.as_view(), name='user-detail'),
     url(r'^user/create$', views.UserCreateView.as_view(), name='user-create'),
     url(r'^user/(?P<pk>[0-9]+)/update$', views.UserUpdateView.as_view(), name='user-update'),
+
+    # User group view
     url(r'^user-group$', views.UserGroupListView.as_view(), name='user-group-list'),
     url(r'^user-group/(?P<pk>[0-9]+)$', views.UserGroupDetailView.as_view(), name='user-group-detail'),
     url(r'^user-group/create$', views.UserGroupCreateView.as_view(), name='user-group-create'),
@@ -34,17 +37,23 @@ urlpatterns = [
 ]
 
 
+router = BulkRouter()
+router.register(r'v1/users', api.UserViewSet, 'api-user')
+# router.register(r'v1/user-groups', api.AssetViewSet, 'api-groups')
+
+
 urlpatterns += [
-    url(r'^v1/users/$', api.UserListUpdateApi.as_view(), name='user-bulk-update-api'),
-    url(r'^v1/users/token/$', api.UserTokenApi.as_view(), name='user-token-api'),
-    url(r'^v1/users/(?P<pk>\d+)/$', api.UserDetailApi.as_view(), name='user-patch-api'),
+    # url(r'^v1/users/$', api.UserListUpdateApi.as_view(), name='user-bulk-update-api'),
+    url(r'^v1/users/token/$', api.UserAuthApi.as_view(), name='user-token-api'),
     url(r'^v1/users/(?P<pk>\d+)/reset-password/$', api.UserResetPasswordApi.as_view(), name='user-reset-password-api'),
-    url(r'^v1/users/(?P<pk>\d+)/reset-pk/$', api.UserResetPKApi.as_view(), name='user-reset-pk-api'),
-    url(r'^v1/users/(?P<pk>\d+)/update-pk/$', api.UserUpdatePKApi.as_view(), name='user-update-pk-api'),
-    url(r'^v1/user-groups/$', api.GroupListUpdateApi.as_view(), name='user-group-bulk-update-api'),
-    url(r'^v1/user-groups/(?P<pk>\d+)/$', api.GroupDetailApi.as_view(), name='user-group-detail-api'),
-    url(r'^v1/user-groups/(?P<pk>\d+)/user/(?P<uid>\d+)/$',
-        api.DeleteUserFromGroupApi.as_view(), name='delete-user-from-group-api'),
-    url(r'^v1/user-groups/(?P<pk>\d+)/users/$',
-        api.UserAndGroupEditApi.as_view(), name='group-user-edit-api'),
+    # url(r'^v1/users/(?P<pk>\d+)/reset-pk/$', api.UserResetPKApi.as_view(), name='user-reset-pk-api'),
+    # url(r'^v1/users/(?P<pk>\d+)/update-pk/$', api.UserUpdatePKApi.as_view(), name='user-update-pk-api'),
+    # url(r'^v1/user-groups/$', api.GroupListUpdateApi.as_view(), name='user-group-bulk-update-api'),
+    # url(r'^v1/user-groups/(?P<pk>\d+)/$', api.GroupDetailApi.as_view(), name='user-group-detail-api'),
+    # url(r'^v1/user-groups/(?P<pk>\d+)/user/(?P<uid>\d+)/$',
+    #     api.DeleteUserFromGroupApi.as_view(), name='delete-user-from-group-api'),
+    # url(r'^v1/user-groups/(?P<pk>\d+)/users/$',
+    #     api.UserAndGroupEditApi.as_view(), name='group-user-edit-api'),
 ]
+
+urlpatterns += router.urls

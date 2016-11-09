@@ -44,7 +44,7 @@ class AssetListView(AdminUserRequiredMixin, ListView):
         return super(AssetListView, self).get_context_data(**kwargs)
 
 
-class AssetCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,CreateView):
+class AssetCreateView(AdminUserRequiredMixin, CreateAssetTagsMiXin, CreateView):
     model = Asset
     tag_type = 'asset'
     form_class = AssetCreateForm
@@ -58,7 +58,8 @@ class AssetCreateView(AdminUserRequiredMixin,CreateAssetTagsMiXin,CreateView):
         return super(AssetCreateView, self).form_valid(form)
 
     def form_invalid(self, form):
-        print(form.errors)
+        if form.errors.get('__all__'):
+            form.errors['all'] = form.errors.get('__all__')
         return super(AssetCreateView, self).form_invalid(form)
 
     def get_context_data(self, **kwargs):
