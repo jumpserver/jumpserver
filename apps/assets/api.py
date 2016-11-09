@@ -13,14 +13,6 @@ from .models import AssetGroup, Asset, IDC, SystemUser, AdminUser
 from . import serializers
 
 
-class AssetGroupViewSet(viewsets.ModelViewSet):
-    """ API endpoint that allows AssetGroup to be viewed or edited.
-        some other comment
-    """
-    queryset = AssetGroup.objects.all()
-    serializer_class = serializers.AssetGroupSerializer
-
-
 class AssetViewSet(viewsets.ModelViewSet):
     """API endpoint that allows Asset to be viewed or edited."""
     queryset = Asset.objects.all()
@@ -32,6 +24,14 @@ class AssetViewSet(viewsets.ModelViewSet):
         if idc:
             queryset = queryset.filter(idc__id=idc)
         return queryset
+
+
+class AssetGroupViewSet(viewsets.ModelViewSet):
+    """ API endpoint that allows AssetGroup to be viewed or edited.
+        some other comment
+    """
+    queryset = AssetGroup.objects.all()
+    serializer_class = serializers.AssetGroupSerializer
 
 
 class IDCViewSet(viewsets.ModelViewSet):
@@ -68,7 +68,7 @@ class SystemUserViewSet(viewsets.ModelViewSet):
 
 class AssetListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):
     queryset = Asset.objects.all()
-    serializer_class = serializers.AssetBulkUpdateSerializer
+    serializer_class = serializers.AssetSerializer
     permission_classes = (IsSuperUser,)
 
 

@@ -3,16 +3,25 @@
 
 from rest_framework.views import APIView, Response
 from rest_framework.generics import ListCreateAPIView
+from rest_framework import viewsets
 from users.backends import IsValidUser, IsSuperUser
 from .utils import get_user_granted_assets, get_user_granted_asset_groups
 from .models import AssetPermission
 from . import serializers
 
 
-class AssetPermissionListCreateApi(ListCreateAPIView):
+class AssetPermissionViewSet(viewsets.ModelViewSet):
     queryset = AssetPermission.objects.all()
     serializer_class = serializers.AssetPermissionSerializer
     permission_classes = (IsSuperUser,)
+
+    def get_queryset(self):
+        queryset = super(AssetPermissionViewSet, self).get_queryset()
+        user_id = self.request.query_params.get('user', '')
+        if user_id:
+            queryset = queryset.filter(users__id=user_id)
+
+        return queryset
 
 
 class UserAssetsApi(APIView):

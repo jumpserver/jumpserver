@@ -1,6 +1,7 @@
 # coding:utf-8
 
 from django.conf.urls import url
+from rest_framework import routers
 import views
 import api
 
@@ -21,9 +22,10 @@ urlpatterns = [
         name='asset-permission-asset-list'),
 ]
 
+router = routers.DefaultRouter()
+router.register('v1/asset-permissions', api.AssetPermissionViewSet, 'api-asset-permission')
+
 urlpatterns += [
-    url(r'^v1/asset-permission/$', api.AssetPermissionListCreateApi.as_view(),
-        name='asset-permission-list-create-api'),
     url(r'^v1/user/assets/$', api.UserAssetsApi.as_view(),
         name='user-assets'),
     url(r'^v1/user/asset-groups/$', api.UserAssetsGroupsApi.as_view(),
@@ -32,3 +34,4 @@ urlpatterns += [
         name='user-asset-groups-assets'),
 ]
 
+urlpatterns += router.urls
