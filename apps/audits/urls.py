@@ -1,5 +1,6 @@
 from django.conf.urls import url
 
+from rest_framework import routers
 
 import api
 import views
@@ -13,9 +14,8 @@ urlpatterns = [
     url(r'^command-log$', views.CommandLogListView.as_view(), name='command-log-list'),
 ]
 
+router = routers.DefaultRouter()
+router.register(r'v1/proxy-log', api.ProxyLogViewSet, 'api-proxy-log')
+router.register(r'v1/command-log', api.CommandLogViewSet, 'api-command-log')
 
-urlpatterns += [
-    url(r'^v1/proxy-log/$', api.ProxyLogListCreateApi.as_view(), name='proxy-log-list-create-api'),
-    url(r'^v1/proxy-log/(?P<pk>\d+)/$', api.ProxyLogDetailApi.as_view(), name='proxy-log-detail-api'),
-    url(r'^v1/command-log/$', api.CommandLogListCreateApi.as_view(), name='command-log-create-list-api'),
-]
+urlpatterns += router.urls
