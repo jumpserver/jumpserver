@@ -3,6 +3,7 @@
 # 
 
 from django.conf.urls import url
+from rest_framework import routers
 
 import views
 import api
@@ -14,9 +15,11 @@ urlpatterns = [
     url(r'^terminal/(?P<pk>\d+)/update$', views.TerminalUpdateView.as_view(), name='terminal-update'),
 ]
 
+router = routers.DefaultRouter()
+router.register(r'v1/terminal', api.TerminalViewSet, 'api-terminal')
+
 urlpatterns += [
-    url(r'^v1/terminal/$', api.TerminalCreateListApi.as_view(), name='terminal-list-create-api'),
-    url(r'^v1/terminal/(?P<pk>\d+)/$', api.TerminalApiDetailUpdateDetailApi.as_view(),
-        name='terminal-detail-update-delete-api'),
-    url(r'^v1/terminal-heatbeat/$', api.TerminalHeatbeatApi.as_view(), name='terminal-heatbeat-api'),
+    url(r'^v1/terminal/heatbeat/$', api.TerminalHeatbeatApi.as_view(), name='terminal-heatbeat-api'),
 ]
+
+urlpatterns += router.urls

@@ -284,7 +284,6 @@ BROKER_URL = 'redis://%(password)s%(host)s:%(port)s/3' % {
 }
 CELERY_RESULT_BACKEND = BROKER_URL
 
-
 # Cache use redis
 CACHES = {
     'default': {

@@ -36,9 +36,10 @@ class Terminal(models.Model):
         ordering = ['is_active']
 
 
-class TerminalHeatbeat(models.Model):
+class HeatbeatFailedLog(models.Model):
+    """Terminal heatbeat failed log"""
     terminal = models.ForeignKey(Terminal, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'terminal_heatbeat'
+        db_table = 'heatbeat_failed_log'
