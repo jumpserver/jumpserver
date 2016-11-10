@@ -8,7 +8,7 @@ def get_user_group_granted_asset_groups(user_group):
     """Return asset groups granted of the user group
 
      :param user_group: Instance of :class: ``UserGroup``
-     :return: {asset_group1: {system_user1, }, asset_group2: {system_user1, system_user2]}
+     :return: {asset_group1: {system_user1, }, asset_group2: {system_user1, system_user2}}
     """
     asset_groups = {}
     asset_permissions = user_group.asset_permissions.all()
@@ -21,7 +21,6 @@ def get_user_group_granted_asset_groups(user_group):
                 asset_groups[asset_group] |= set(asset_permission.system_users.all())
             else:
                 asset_groups[asset_group] = set(asset_permission.system_users.all())
-
     return asset_groups
 
 
@@ -61,7 +60,7 @@ def get_user_granted_asset_groups_direct(user):
             if asset_group in asset_groups:
                 asset_groups[asset_group] |= set(asset_permission.system_users.all())
             else:
-                setattr(asset_group, 'is_inherit_from_user_group', False)
+                setattr(asset_group, 'inherited', False)
                 asset_groups[asset_group] = set(asset_permission.system_users.all())
 
     return asset_groups
@@ -89,7 +88,7 @@ def get_user_granted_asset_groups_inherit_from_user_groups(user):
             if asset_group in asset_groups:
                 asset_groups[asset_group] |= set(asset_permission.system_users.all())
             else:
-                setattr(asset_group, 'is_inherit_from_user_group', True)
+                setattr(asset_group, 'inherited', True)
                 asset_groups[asset_group] = set(asset_permission.system_users.all())
 
     return asset_groups
@@ -131,10 +130,8 @@ def get_user_granted_assets_direct(user):
             if asset in assets:
                 assets[asset] |= set(asset_permission.system_users.all())
             else:
-                setattr(asset, 'is_inherit_from_user_groups', False)
-                setattr(asset, 'is_inherit_from_user_groups', False)
+                setattr(asset, 'inherited', False)
                 assets[asset] = set(asset_permission.system_users.all())
-
     return assets
 
 
@@ -153,7 +150,7 @@ def get_user_granted_assets_inherit_from_user_groups(user):
             if asset in assets:
                 assets[asset] |= assets_inherited[asset]
             else:
-                setattr(asset, 'is_inherit_from_user_groups', True)
+                setattr(asset, 'inherited', True)
                 assets[asset] = assets_inherited[asset]
 
     return assets

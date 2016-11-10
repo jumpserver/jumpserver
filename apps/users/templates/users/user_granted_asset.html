@@ -17,34 +17,24 @@
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
                             <li>
-                                <a href="{% url 'users:user-detail' pk=user_object.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User detail' %} </a>
+                                <a href="{% url 'users:user-detail' pk=user.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User detail' %} </a>
                             </li>
                             <li>
-                                <a href="{% url 'users:user-asset-permission' pk=user_object.id %}" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Asset permission' %}</a>
+                                <a href="{% url 'users:user-asset-permission' pk=user.id %}" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Asset permission' %}</a>
                             </li>
                             <li class="active">
-                                <a href="{% url 'users:user-granted-asset' pk=user_object.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a>
+                                <a href="{% url 'users:user-granted-asset' pk=user.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a>
                             </li>
                             <li>
-                                <a href="{% url 'users:user-login-history' pk=user_object.id %}" class="text-center"><i class="fa fa-calculator-o"></i> {% trans 'Login history' %}</a>
+                                <a href="{% url 'users:user-login-history' pk=user.id %}" class="text-center"><i class="fa fa-calculator-o"></i> {% trans 'Login history' %}</a>
                             </li>
-                            <form id="search_form" method="get" action="" class="pull-right mail-search">
-                            <div class="input-group">
-                                <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="{{ keyword }}">
-                                <div class="input-group-btn">
-                                    <button id="search_btn" type="submit" class="btn btn-sm btn-primary">
-                                        搜索
-                                    </button>
-                                </div>
-                            </div>
-                            </form>
                         </ul>
                     </div>
                     <div class="tab-content">
                         <div class="col-sm-7" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span style="float: left">{% trans 'Granted assets of ' %} <b>{{ user_object.name }}</b></span>
+                                    <span style="float: left">{% trans 'Assets granted of ' %} <b>{{ user.name }}</b></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -60,54 +50,27 @@
                                     </div>
                                 </div>
                                 <div class="ibox-content">
-                                    <table class="table table-hover">
+                                    <table class="table table-hover " id="user_assets_table" >
                                         <thead>
                                             <tr>
-                                                <th class="text-center"><a href="{% url 'perms:asset-permission-list' %}?sort=name">{% trans 'Hostname' %}</a></th>
-                                                <th class="text-center">{% trans 'IP' %}</th>
-                                                <th class="text-center">{% trans 'Port' %}</th>
-                                                <th class="text-center">{% trans 'System user' %}</th>
-                                                <th class="text-center">
-                                                <a href="#">{% trans 'Is valid' %}</a>
-                                                </th>
-                                                <th></th>
+                                                <th class="text-center"></th>
+                                                <th>{% trans 'Hostname' %}</th>
+                                                <th>{% trans 'IP' %}</th>
+                                                <th>{% trans 'Port' %}</th>
+                                                <th>{% trans 'System user' %}</th>
+                                                <th>{% trans 'Valid' %}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for asset, system_users in object_list %}
-                                            <tr class="gradeX">
-                                                <td class="text-center">
-                                                    <a href="{% url 'assets:asset-detail' pk=asset.id %}">
-                                                        {{ asset.hostname }}
-                                                    </a>
-                                                </td>
-                                                <td class="text-center">{{ asset.ip }}</td>
-                                                <td class="text-center">{{ asset.port }}</td>
-                                                <td class="text-center">{{ system_users|join_attr:"name" }}</td>
-                                                <td class="text-center">
-                                                {% if asset.is_valid %}
-                                                    <i class="fa fa-check text-navy"></i>
-                                                {% else %}
-                                                    <i class="fa fa-times text-danger"></i>
-                                                {% endif %}
-                                                </td>
-                                                <td>
-                                                    <button class="btn btn-danger btn-xs btn_delete_user_group {% if asset.is_inherit_from_user_groups or asset.is_inherit_from_asset_groups %} disabled {% endif %}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
                                         </tbody>
                                     </table>
-                                    <div class="row">
-                                        {% include '_pagination.html' %}
-                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span style="float: left">{% trans 'Asset groups granted of ' %} <b>{{ user_object.name }}</b></span>
+                                    <span style="float: left">{% trans 'Asset groups granted of ' %} <b>{{ user.name }}</b></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -123,30 +86,15 @@
                                     </div>
                                 </div>
                                 <div class="ibox-content">
-                                    <table class="table table-hover">
+                                    <table class="table table-hover " id="user_asset_groups_table" >
                                         <thead>
                                             <tr>
-                                                <th class="text-center">{% trans 'Name' %}</th>
-                                                <th class="text-center">{% trans 'Asset count' %}</th>
-                                                <th class="text-center">{% trans 'System user' %}</th>
                                                 <th></th>
+                                                <th>{% trans 'Name' %}</th>
+                                                <th>{% trans 'Asset' %}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for asset_group, system_users in asset_groups %}
-                                            <tr class="gradeX">
-                                                <td class="text-center">
-                                                    <a href="{% url 'assets:asset-group-detail' pk=asset_group.id %}">
-                                                        {{ asset_group.name }}
-                                                    </a>
-                                                </td>
-                                                <td class="text-center">{{ asset_group.assets.count }}</td>
-                                                <td class="text-center">{{ system_users|join_attr:"name" }}</td>
-                                                <td>
-                                                    <button class="btn btn-danger btn-xs btn_delete_user_group {% if not asset_group.is_inherit_from_user_groups %} disabled {% endif %}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>
@@ -161,25 +109,53 @@
 {% endblock %}
 {% block custom_foot_js %}
     <script>
-{#        function switch_user_status(obj) {#}
-{#            var status = $(obj).prop('checked');#}
-{##}
-{#            $.ajax({#}
-{#                url: "{% url 'users:user-active-api' pk=user_object.id %}",#}
-{#                type: "PUT",#}
-{#                data: {#}
-{#                    'is_active': status#}
-{#                },#}
-{#                success: function (data, status) {#}
-{#                    console.log(data)#}
-{#                },#}
-{#                error: function () {#}
-{#                    console.log('error')#}
-{#                }#}
-{#            })#}
-{#        }#}
         $(document).ready(function () {
             $('.select2').select2();
+            var options = {
+                ele: $('#user_assets_table'),
+                buttons: [],
+                order: [],
+                select: [],
+                columnDefs: [
+                    {targets: 1, createdCell: function (td, cellData, rowData) {
+                        var detail_btn = '<a href="{% url "assets:asset-detail" pk=99991937 %}">' + cellData + '</a>';
+                        $(td).html(detail_btn.replace('99991937', rowData.id));
+                     }},
+                    {targets: 4, createdCell: function (td, cellData, rowData) {
+                        if (cellData.length > 10){
+                            $(td).html(cellData.substring(1, 10) + '..')
+                        } else {
+                            $(td).html(cellData)
+                        }
+                    }},
+                    {targets: 5, createdCell: function (td, cellData) {
+                        if (!cellData) {
+                            $(td).html('<i class="fa fa-times text-danger"></i>')
+                        } else {
+                            $(td).html('<i class="fa fa-check text-navy"></i>')
+                        }
+                    }}
+                ],
+                ajax_url: '{% url "perms:api-user-assets" %}',
+                columns: [{data: function(){return ""}}, {data: "hostname" }, {data: "ip" }, {data: "port"},
+                    {data: "system_users_join"}, {data: "is_active"}]
+            };
+            var options2 = {
+                ele: $('#user_asset_groups_table'),
+                buttons: [],
+                order: [],
+                select: [],
+                columnDefs: [
+                    {targets: 1, createdCell: function (td, cellData, rowData) {
+                        var detail_btn = '<a href="{% url "assets:asset-group-detail" pk=99991937 %}">' + cellData + '</a>';
+                        $(td).html(detail_btn.replace('99991937', rowData.id));
+                     }}
+                ],
+                ajax_url: '{% url "perms:api-user-asset-groups" %}',
+                columns: [{data: function(){return ""}}, {data: "name" }, {data: "asset_amount" }]
+            };
+            jumpserver.initDataTable(options);
+            jumpserver.initDataTable(options2);
         });
     </script>
 {% endblock %}

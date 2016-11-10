@@ -341,33 +341,15 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
         return form
 
 
-class UserAssetPermissionView(AdminUserRequiredMixin, DetailView):
+class UserAssetPermissionView(AdminUserRequiredMixin, FormMixin, SingleObjectMixin, ListView):
     model = User
     template_name = 'users/user_asset_permission.html'
     context_object_name = 'user'
+    form_class = forms.UserPrivateAssetPermissionForm
 
-    # form_class = forms.UserPrivateAssetPermissionForm
-
-    # def get(self, request, *args, **kwargs):
-    #     self.object = self.get_object(queryset=User.objects.all())
-    #     return super(UserAssetPermissionView, self).get(request, *args, **kwargs)
-
-    # def get_asset_permission_inherit_from_user_group(self):
-    #     asset_permissions = set()
-    #     user_groups = self.object.groups.all()
-    #
-    #     for user_group in user_groups:
-    #         for asset_permission in user_group.asset_permissions.all():
-    #             setattr(asset_permission, 'is_inherit_from_user_groups', True)
-    #             setattr(asset_permission, 'inherit_from_user_groups',
-    #                     getattr(asset_permission, b'inherit_from_user_groups', set()).add(user_group))
-    #             asset_permissions.add(asset_permission)
-    #     return asset_permissions
-    #
-    # def get_queryset(self):
-    #     asset_permissions = set(self.object.asset_permissions.all()) \
-    #         | self.get_asset_permission_inherit_from_user_group()
-    #     return list(asset_permissions)
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=User.objects.all())
+        return super(UserAssetPermissionView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = {
@@ -403,31 +385,19 @@ class UserAssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
         return reverse('users:user-asset-permission', kwargs={'pk': self.user_object.id})
 
 
-class UserGrantedAssetView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+class UserGrantedAssetView(AdminUserRequiredMixin, DetailView):
+    model = User
     template_name = 'users/user_granted_asset.html'
-    context_object_name = 'user_object'
+    context_object_name = 'user'
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=User.objects.all())
         return super(UserGrantedAssetView, self).get(request, *args, **kwargs)
 
-    def get_queryset(self):
-        # Convert format from {'asset': ['system_users'], ..} to
-        #     [('asset', ['system_users']), ('asset', ['system_users']))
-        # assets_granted = [(asset, system_users) for asset, system_users in
-        #                   get_user_granted_assets(self.object).items()]
-
-        # return assets_granted
-        return []
-
     def get_context_data(self, **kwargs):
-        # asset_groups = [(asset_group, system_users) for asset_group, system_users in
-        #                 get_user_granted_asset_groups(self.object).items()]
         context = {
             'app': 'User',
             'action': 'User granted asset',
-            # 'asset_groups': asset_groups,
         }
         kwargs.update(context)
         return super(UserGrantedAssetView, self).get_context_data(**kwargs)

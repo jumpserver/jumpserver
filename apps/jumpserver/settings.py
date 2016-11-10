@@ -284,6 +284,19 @@ BROKER_URL = 'redis://%(password)s%(host)s:%(port)s/3' % {
 }
 CELERY_RESULT_BACKEND = BROKER_URL
 
+
+# Cache use redis
+CACHES = {
+    'default': {
+        'BACKEND': 'redis_cache.RedisCache',
+        'LOCATION': 'redis://%(password)s%(host)s:%(port)s/4' % {
+            'password': CONFIG.REDIS_PASSWORD + '@' if CONFIG.REDIS_PASSWORD else '',
+            'host': CONFIG.REDIS_HOST or '127.0.0.1',
+            'port': CONFIG.REDIS_PORT or 6379,
+        }
+    }
+}
+
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
 CAPTCHA_IMAGE_SIZE = (75, 33)
 CAPTCHA_FOREGROUND_COLOR = '#001100'

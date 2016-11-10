@@ -28,16 +28,6 @@
                             <li>
                                 <a href="{% url 'users:user-login-history' pk=user.id %}" class="text-center"><i class="fa fa-calculator-o"></i> {% trans 'Login history' %}</a>
                             </li>
-                            <form id="search_form" method="get" action="" class="pull-right mail-search">
-                            <div class="input-group">
-                                <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="{{ keyword }}">
-                                <div class="input-group-btn">
-                                    <button id="search_btn" type="submit" class="btn btn-sm btn-primary">
-                                        搜索
-                                    </button>
-                                </div>
-                            </div>
-                            </form>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -86,38 +76,38 @@
                                     <i class="fa fa-info-circle"></i> {% trans 'Quick create permission for user' %}
                                 </div>
                                 <div class="panel-body">
-{#                                    <form method="post" action="{% url 'users:user-asset-permission-create' pk=user.id %}">#}
-{#                                        <table class="table">#}
-{#                                            <tbody>#}
-{#                                                {% csrf_token %}#}
-{#                                                <tr class="no-borders-tr">#}
-{#                                                    <td colspan="1" style="padding-top: 0">#}
-{#                                                        {{ form.name|bootstrap }}#}
-{#                                                    </td>#}
-{#                                                </tr>#}
-{#                                                <tr class="no-borders-tr">#}
-{#                                                    <td colspan="1" style="padding-top: 0">#}
-{#                                                        {{ form.assets|bootstrap }}#}
-{#                                                    </td>#}
-{#                                                </tr>#}
-{#                                                <tr class="no-borders-tr">#}
-{#                                                    <td colspan="1" style="padding-top: 0">#}
-{#                                                        {{ form.asset_groups|bootstrap }}#}
-{#                                                    </td>#}
-{#                                                </tr>#}
-{#                                                <tr class="no-borders-tr">#}
-{#                                                    <td colspan="1" style="padding-top: 0">#}
-{#                                                        {{ form.system_users|bootstrap }}#}
-{#                                                    </td>#}
-{#                                                </tr>#}
-{#                                                <tr class="no-borders-tr">#}
-{#                                                    <td>#}
-{#                                                        <button type="submit" class="btn btn-primary btn-sm">{% trans 'Submit' %}</button>#}
-{#                                                    </td>#}
-{#                                                </tr>#}
-{#                                            </tbody>#}
-{#                                        </table>#}
-{#                                    </form>#}
+                                    <form method="post" action="{% url 'users:user-asset-permission-create' pk=user.id %}">
+                                        <table class="table">
+                                            <tbody>
+                                                {% csrf_token %}
+                                                <tr class="no-borders-tr">
+                                                    <td colspan="1" style="padding-top: 0">
+                                                        {{ form.name|bootstrap }}
+                                                    </td>
+                                                </tr>
+                                                <tr class="no-borders-tr">
+                                                    <td colspan="1" style="padding-top: 0">
+                                                        {{ form.assets|bootstrap }}
+                                                    </td>
+                                                </tr>
+                                                <tr class="no-borders-tr">
+                                                    <td colspan="1" style="padding-top: 0">
+                                                        {{ form.asset_groups|bootstrap }}
+                                                    </td>
+                                                </tr>
+                                                <tr class="no-borders-tr">
+                                                    <td colspan="1" style="padding-top: 0">
+                                                        {{ form.system_users|bootstrap }}
+                                                    </td>
+                                                </tr>
+                                                <tr class="no-borders-tr">
+                                                    <td>
+                                                        <button type="submit" class="btn btn-primary btn-sm">{% trans 'Submit' %}</button>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </form>
                                 </div>
                             </div>
                         </div>
