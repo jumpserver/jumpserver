@@ -11,8 +11,7 @@ from django.conf import settings
 from django.db.models import Q
 
 from .models import ProxyLog, CommandLog
-from .utils import AdminUserRequiredMixin
-from .hands import User, Asset, SystemUser
+from .hands import User, Asset, SystemUser, AdminUserRequiredMixin
 
 
 seven_days_ago_s = (datetime.datetime.now()-datetime.timedelta(7)).strftime('%m/%d/%Y')

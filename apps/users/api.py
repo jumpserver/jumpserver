@@ -16,8 +16,9 @@ from common.mixins import BulkDeleteApiMixin
 from common.utils import get_logger
 from .utils import check_user_valid, token_gen
 from .models import User, UserGroup
-from . import serializers
+from .hands import write_login_log_async
 from .backends import IsSuperUser, IsTerminalUser, IsValidUser, IsSuperUserOrTerminalUser
+from . import serializers
 
 
 logger = get_logger(__name__)
@@ -126,8 +127,9 @@ class UserAuthApi(APIView):
         username = request.data.get('username', '')
         password = request.data.get('password', '')
         public_key = request.data.get('public_key', '')
-        remote_addr = request.META.get('REMOTE_ADDR', '')
-        remote_addr = base64.b64encode(remote_addr).replace('=', '')
+        remote_addr = request.data.get('remote_addr', '')
+        terminal = request.data.get('terminal', '')
+        login_type = request.data.get('login_type', 'T')
         user = check_user_valid(username=username, password=password, public_key=public_key)
 
         if user:
@@ -137,6 +139,8 @@ class UserAuthApi(APIView):
 
             cache.set(token, user.id, self.expiration)
             cache.set('%s_%s' % (user.id, remote_addr), token, self.expiration)
+            write_login_log_async.delay(user.username, name=user.name, terminal=terminal,
+                                        login_ip=remote_addr, login_type=login_type)
             return Response({'token': token, 'id': user.id, 'username': user.username, 'name': user.name})
         else:
             return Response({'msg': 'Invalid password or public key or user is not active or expired'}, status=401)

@@ -28,7 +28,7 @@ from common.utils import get_object_or_none, get_logger
 from perms.models import AssetPermission
 from .models import User, UserGroup
 from .utils import AdminUserRequiredMixin, user_add_success_next, send_reset_password_mail
-# from .hands import AssetPermission, get_user_granted_asset_groups, get_user_granted_assets
+from .hands import write_login_log_async
 from . import forms
 
 
@@ -50,6 +50,10 @@ class UserLoginView(FormView):
 
     def form_valid(self, form):
         auth_login(self.request, form.get_user())
+        login_ip = self.request.META.get('REMOTE_ADDR', '')
+        user_agent = self.request.META.get('HTTP_USER_AGENT', '')
+        write_login_log_async.delay(self.request.user.username, self.request.user.name,
+                                    login_type='W', login_ip=login_ip, user_agent=user_agent)
         return redirect(self.get_success_url())
 
     def get_success_url(self):

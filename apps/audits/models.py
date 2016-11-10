@@ -22,9 +22,7 @@ class LoginLog(models.Model):
     login_ip = models.GenericIPAddressField(verbose_name=_('Login ip'))
     login_city = models.CharField(max_length=100, blank=True, null=True, verbose_name=_('Login city'))
     user_agent = models.CharField(max_length=100, blank=True, null=True, verbose_name=_('User agent'))
-    from_terminal = models.ForeignKey
     date_login = models.DateTimeField(auto_now_add=True, verbose_name=_('Date login'))
-    date_logout = models.DateTimeField(null=True, verbose_name=_('Date logout'))
 
     class Meta:
         db_table = 'login_log'
