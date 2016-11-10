@@ -32,7 +32,7 @@ $(document).ready(function(){
         ele: $('#admin_user_list_table'),
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
-                var detail_btn = '<a href="{% url "assets:api-admin-user-detail" pk=99991937 %}">' + cellData + '</a>';
+                var detail_btn = '<a href="{% url "assets:admin-user-detail" pk=99991937 %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('99991937', rowData.id));
              }},
             {targets: 5, createdCell: function (td, cellData) {

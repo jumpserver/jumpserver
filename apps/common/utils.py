@@ -248,4 +248,11 @@ def validate_ssh_public_key(text):
     return True
 
 
+def setattr_bulk(seq, key, value):
+    def set_attr(obj):
+        setattr(obj, key, value)
+        return obj
+    return map(set_attr, seq)
+
+
 signer = Signer()

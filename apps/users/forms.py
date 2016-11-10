@@ -6,8 +6,8 @@ from django.utils.translation import gettext_lazy as _
 from captcha.fields import CaptchaField
 
 from common.utils import validate_ssh_public_key
+from perms.models import AssetPermission
 from .models import User, UserGroup
-from .hands import AssetPermission
 
 
 class UserLoginForm(AuthenticationForm):
@@ -101,7 +101,7 @@ class UserPrivateAssetPermissionForm(forms.ModelForm):
 
     def save(self, commit=True):
         self.instance = super(UserPrivateAssetPermissionForm, self).save(commit=commit)
-        # self.instance.private_for = 'U'
+        self.instance.private_for = 'U'
         self.instance.users = [self.user]
         self.instance.save()
         return self.instance

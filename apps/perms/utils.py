@@ -1,5 +1,6 @@
 from __future__ import absolute_import, unicode_literals
 
+from common.utils import setattr_bulk
 from .hands import User, UserGroup, Asset, AssetGroup, SystemUser
 
 
@@ -7,7 +8,7 @@ def get_user_group_granted_asset_groups(user_group):
     """Return asset groups granted of the user group
 
      :param user_group: Instance of :class: ``UserGroup``
-     :return: {asset1: {system_user1, }, asset1: {system_user1, system_user2]}
+     :return: {asset_group1: {system_user1, }, asset_group2: {system_user1, system_user2]}
     """
     asset_groups = {}
     asset_permissions = user_group.asset_permissions.all()
@@ -41,7 +42,6 @@ def get_user_group_granted_assets(user_group):
                 assets[asset] |= set(asset_permission.system_users.all())
             else:
                 assets[asset] = set(asset_permission.system_users.all())
-
     return assets
 
 
@@ -112,7 +112,6 @@ def get_user_granted_asset_groups(user):
             asset_groups[asset_group] |= asset_groups_direct[asset_group]
         else:
             asset_groups[asset_group] = asset_groups_direct[asset_group]
-
     return asset_groups
 
 
@@ -175,8 +174,23 @@ def get_user_granted_assets(user):
             assets[asset] |= assets_direct[asset]
         else:
             assets[asset] = assets_direct[asset]
-
     return assets
+
+
+def get_user_group_asset_permissions(user_group):
+    permissions = user_group.asset_permissions.all()
+    return permissions
+
+
+def get_user_asset_permissions(user):
+    user_group_permissions = set()
+    direct_permissions = set(setattr_bulk(user.asset_permissions.all(), 'inherited', 0))
+
+    for user_group in user.groups.all():
+        permissions = get_user_group_asset_permissions(user_group)
+        user_group_permissions |= set(permissions)
+    user_group_permissions = set(setattr_bulk(user_group_permissions, 'inherited', 1))
+    return direct_permissions | user_group_permissions
 
 
 def get_user_groups_granted_in_asset(asset):

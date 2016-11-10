@@ -313,7 +313,6 @@ $(document).ready(function() {
     var user_groups = $('.bdg_user_group').map(function() {
         return $(this).data('gid');
     }).get();
-    console.log(user_groups);
     updateUserGroups(user_groups)
 }).on('click', '#btn_reset_password', function() {
     function doReset() {

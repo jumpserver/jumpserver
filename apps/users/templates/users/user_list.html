@@ -53,7 +53,7 @@ $(document).ready(function(){
                 $(td).html(detail_btn.replace('99991937', rowData.id));
              }},
             {targets: 4, createdCell: function (td, cellData) {
-                var innerHtml = cellData.length > 8 ? cellData.substring(0, 8) + '...': cellData;
+                var innerHtml = cellData.length > 20 ? cellData.substring(0, 20) + '...': cellData;
                 $(td).html('<a href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</a>');
              }},
             {targets: 6, createdCell: function (td, cellData) {

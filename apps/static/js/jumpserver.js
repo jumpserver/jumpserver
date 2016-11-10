@@ -198,19 +198,18 @@ function APIUpdateAttr(props) {
     contentType: props.content_type || "application/json; charset=utf-8",
     dataType: props.data_type || "json"
   }).done(function(data, textStatue, jqXHR) {
+    toastr.success(success_message);
     if (typeof props.success === 'function') {
       return props.success(data);
-    } else {
-      toastr.success(success_message);
-    }
+    } 
+    
   }).fail(function(jqXHR, textStatue, errorThrown) {
+    toastr.error(fail_message);
     if (typeof props.error === 'function') {
       return props.error(errorThrown);
-    } else {
-      toastr.error(textStatue);
-    }
+    } 
   });
-  return true;
+  // return true;
 }
 
 // Sweet Alert for Delete

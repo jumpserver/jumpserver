@@ -26,10 +26,10 @@ router = routers.DefaultRouter()
 router.register('v1/asset-permissions', api.AssetPermissionViewSet, 'api-asset-permission')
 
 urlpatterns += [
-    url(r'^v1/user/assets/$', api.UserAssetsApi.as_view(),
-        name='user-assets'),
-    url(r'^v1/user/asset-groups/$', api.UserAssetsGroupsApi.as_view(),
-        name='user-asset-groups'),
+    url(r'^v1/user/assets/$', api.UserAssetsApi.as_view(), name='user-assets'),
+    url(r'^v1/asset-permissions/user/revoke/', api.RevokeUserAssetPermission.as_view(),
+        name='revoke-user-asset-permission'),
+    url(r'^v1/user/asset-groups/$', api.UserAssetsGroupsApi.as_view(), name='user-asset-groups'),
     url(r'^v1/user/asset-groups/(?P<pk>[0-9]+)/assets/$', api.UserAssetsGroupAssetsApi.as_view(),
         name='user-asset-groups-assets'),
 ]
