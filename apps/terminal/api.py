@@ -4,17 +4,17 @@
 from django.core.cache import cache
 from django.conf import settings
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework import viewsets
 from rest_framework.views import APIView, Response
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
 
 from common.utils import signer, get_object_or_none
-from .models import Terminal, HeatbeatFailedLog
+from .models import Terminal, TerminalHeatbeat
 from .serializers import TerminalSerializer, TerminalHeatbeatSerializer
 from .hands import IsSuperUserOrTerminalUser
 
 
-class TerminalViewSet(ModelViewSet):
+class TerminalViewSet(viewsets.ModelViewSet):
     queryset = Terminal.objects.all()
     serializer_class = TerminalSerializer
     permission_classes = (AllowAny,)
@@ -46,18 +46,19 @@ class TerminalViewSet(ModelViewSet):
             return Response(data={'msg': 'Secrete key invalid'}, status=401)
 
 
-class TerminalHeatbeatApi(APIView):
-    # model = HeatbeatFailedLog
-    # serializer_class = TerminalHeatbeatSerializer
+class TerminalHeatbeatApi(ListCreateAPIView):
+    queryset = TerminalHeatbeat.objects.all()
+    serializer_class = TerminalHeatbeatSerializer
     permission_classes = (IsSuperUserOrTerminalUser,)
 
-    def put(self, request, *args, **kwargs):
-        terminal_id = request.user.id
-        cache.set('terminal_heatbeat_%s' % terminal_id, settings.CONFIG.TERMINAL_HEATBEAT_INTERVAL * 3)
+
+class TerminalHeatbeatViewSet(viewsets.ModelViewSet):
+    queryset = TerminalHeatbeat.objects.all()
+    serializer_class = TerminalHeatbeatSerializer
+    permission_classes = (IsSuperUserOrTerminalUser,)
+
+    def create(self, request, *args, **kwargs):
+        terminal = request.user
+        TerminalHeatbeat.objects.create(terminal=terminal)
         return Response({'msg': 'Success'})
 
-
-# class TerminalApiDetailUpdateDetailApi(RetrieveUpdateDestroyAPIView):
-#     queryset = Terminal.objects.all()
-#     serializer_class = TerminalSerializer
-#     permission_classes = (IsSuperUserOrTerminalUser,)

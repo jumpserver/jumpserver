@@ -14,6 +14,7 @@ import os
 import sys
 
 from django.urls import reverse_lazy
+from datetime import timedelta
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -283,6 +284,19 @@ BROKER_URL = 'redis://%(password)s%(host)s:%(port)s/3' % {
     'port': CONFIG.REDIS_PORT or 6379,
 }
 CELERY_RESULT_BACKEND = BROKER_URL
+
+# TERMINAL_HEATBEAT_INTERVAL = CONFIG.TERMINAL_HEATBEAT_INTERVAL or 30
+
+# crontab job
+# CELERYBEAT_SCHEDULE = {
+#     Check terminal is alive every 10m
+    # 'check_terminal_alive': {
+    #     'task': 'terminal.tasks.check_terminal_alive',
+    #     'schedule': timedelta(seconds=TERMINAL_HEATBEAT_INTERVAL),
+    #     'args': (),
+    # },
+# }
+
 
 # Cache use redis
 CACHES = {

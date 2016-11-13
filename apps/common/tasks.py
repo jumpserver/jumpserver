@@ -1,26 +1,9 @@
 from __future__ import absolute_import
 
-import os
-from celery import shared_task
-from celery.schedules import crontab
+# from celery import shared_task
 from django.core.mail import send_mail
-# from django.conf import settings
-# from common import celery_app
-
-
-from celery import Celery
-
-# set the default Django settings module for the 'celery' program.
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'jumpserver.settings')
-
 from django.conf import settings
-
-app = Celery('jumpserver')
-
-# Using a string here means the worker will not have to
-# pickle the object when using Windows.
-app.config_from_object('django.conf:settings')
-app.autodiscover_tasks(lambda: [app_config.split('.')[0] for app_config in settings.INSTALLED_APPS])
+from common import celery_app as app
 
 
 @app.task
@@ -44,17 +27,3 @@ def send_mail_async(*args, **kwargs):
         args = tuple(args)
 
     send_mail(*args, **kwargs)
-
-
-# @celery_app.task
-# def test(arg):
-#     print(arg)
-
-
-# celery_app.conf.beat_schedule = {
-#     'add-every-30-seconds': {
-#         'task': 'common.test',
-#         'schedule': crontab(minute='*/1'),
-#         'args': ('nihao',)
-#     }
-# }
