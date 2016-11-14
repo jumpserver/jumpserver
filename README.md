@@ -1,4 +1,3 @@
-
                             // Jumpserver //
                             
                             
@@ -22,7 +21,13 @@
    
    cp config-example.py config.py
    
-   cd apps/ && python manage.py loaddata init  # 初始化数据
+   cd apps && python manage.py makemigrations 
+   
+   python manage.py migrate
+   
+   python manage.py loaddata init  # 初始化数据
+   
+   python manage.py loadata fake 
    
    python manage.py runserver 0.0.0.0:80
    
