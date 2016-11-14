@@ -29,6 +29,8 @@
    
    python manage.py loadata fake 
    
+   yum -y install redis && service redis start  # Or install redis docker
+   
    python manage.py runserver 0.0.0.0:80
    
    ```
