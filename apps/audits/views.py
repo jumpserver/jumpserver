@@ -10,7 +10,7 @@ from django.urls import reverse_lazy
 from django.conf import settings
 from django.db.models import Q
 
-from .models import ProxyLog, CommandLog
+from .models import ProxyLog, CommandLog, LoginLog
 from .hands import User, Asset, SystemUser, AdminUserRequiredMixin
 
 
@@ -151,3 +151,43 @@ class CommandLogListView(AdminUserRequiredMixin, ListView):
         }
         kwargs.update(context)
         return super(CommandLogListView, self).get_context_data(**kwargs)
+
+
+class LoginLogListView(AdminUserRequiredMixin, ListView):
+    model = LoginLog
+    template_name = 'audits/login_log_list.html'
+    context_object_name = 'login_log_list'
+
+    def get_queryset(self):
+        self.queryset = super(LoginLogListView, self).get_queryset()
+        self.keyword = keyword = self.request.GET.get('keyword', '')
+        self.username = username = self.request.GET.get('username', '')
+        self.date_from_s = date_from_s = self.request.GET.get('date_from', '%s' % seven_days_ago_s)
+        self.date_to_s = date_to_s = self.request.GET.get('date_to', '%s' % now_s)
+
+        if date_from_s:
+            date_from = timezone.datetime.strptime(date_from_s, '%m/%d/%Y')
+            self.queryset = self.queryset.filter(date_login__gt=date_from)
+        if date_to_s:
+            date_to = timezone.datetime.strptime(date_to_s + ' 23:59:59', '%m/%d/%Y %H:%M:%S')
+            self.queryset = self.queryset.filter(date_login__lt=date_to)
+        if username:
+            self.queryset = self.queryset.filter(username=username)
+        if keyword:
+            self.queryset = self.queryset.filter(Q(username__contains=keyword) |
+                                                 Q(name__icontains=keyword) |
+                                                 Q(login_ip=keyword)).distinct()
+        return self.queryset
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Audits'),
+            'action': _('Proxy log list'),
+            'user_list': User.objects.all().order_by('username'),
+            'keyword': self.keyword,
+            'date_from': self.date_from_s,
+            'date_to': self.date_to_s,
+            'username': self.username,
+        }
+        kwargs.update(context)
+        return super(LoginLogListView, self).get_context_data(**kwargs)

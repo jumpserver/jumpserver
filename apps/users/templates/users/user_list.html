@@ -54,7 +54,7 @@ $(document).ready(function(){
              }},
             {targets: 4, createdCell: function (td, cellData) {
                 var innerHtml = cellData.length > 20 ? cellData.substring(0, 20) + '...': cellData;
-                $(td).html('<a href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</a>');
+                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
              }},
             {targets: 6, createdCell: function (td, cellData) {
                 if (!cellData) {

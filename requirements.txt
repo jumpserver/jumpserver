@@ -14,3 +14,4 @@ djangorestframework-bulk==0.2.1
 paramiko==2.0.2
 django-redis-cache==1.7.1
 requests==2.11.1
+itsdangerous==0.24

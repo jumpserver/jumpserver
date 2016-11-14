@@ -323,7 +323,9 @@ jumpserver.initDataTable = function (options) {
             }
         ],
         columnDefs: columnDefs,
-        select: options.select || {style: 'multi'},
+        // select: 'single',
+      // select: options.select || {style: 'single'},
+        // select: false,
         ajax: {
             url: options.ajax_url ,
             dataSrc: ""
@@ -331,16 +333,16 @@ jumpserver.initDataTable = function (options) {
         columns: options.columns || [],
         lengthMenu: [[15, 25, 50, -1], [15, 25, 50, "All"]]
     });
-    table.on('select', function(e, dt, type, indexes) {
-        var $node = table[ type ]( indexes ).nodes().to$();
-        $node.find('input.ipt_check').prop('checked', true);
-    }).on('deselect', function(e, dt, type, indexes) {
-        var $node = table[ type ]( indexes ).nodes().to$();
-        $node.find('input.ipt_check').prop('checked', false);
-    }).on('draw', function(){
-        $('#op').html(options.op_html || '');
-        $('#uc').html(options.uc_html || '');
-    });
+    // table.on('select', function(e, dt, type, indexes) {
+    //     var $node = table[ type ]( indexes ).nodes().to$();
+    //     $node.find('input.ipt_check').prop('checked', true);
+    // }).on('deselect', function(e, dt, type, indexes) {
+    //     var $node = table[ type ]( indexes ).nodes().to$();
+    //     $node.find('input.ipt_check').prop('checked', false);
+    // }).on('draw', function(){
+    //     $('#op').html(options.op_html || '');
+    //     $('#uc').html(options.uc_html || '');
+    // });
     $('.ipt_check_all').on('click', function() {
       if (!jumpserver.checked) {
           $(this).closest('table').find('.ipt_check').prop('checked', true);
