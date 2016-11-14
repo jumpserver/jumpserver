@@ -224,9 +224,8 @@
 jumpserver.selected_groups = {};
 
 function updateUserGroups(user_groups) {
-    var the_url = "{% url 'users:group-user-edit-api' pk=user.id %}";
+    var the_url = "{% url 'users:api-user-update-group' pk=user.id %}";
     var body = {
-        id: {{ user.id }},
         groups: Object.assign([], user_groups)
     };
     var success = function(data) {
@@ -245,13 +244,11 @@ function updateUserGroups(user_groups) {
         });
         // clear jumpserver.selected_groups
         jumpserver.selected_groups = {};
-        toastr.success('{% trans "UserGroup Update Success!" %}')
     };
     APIUpdateAttr({
         url: the_url,
         body: JSON.stringify(body),
-        success: success,
-        method: 'PUT'
+        success: success
     });
 }
 $(document).ready(function() {

@@ -30,9 +30,9 @@ class UserViewSet(BulkModelViewSet):
     permission_classes = (IsSuperUser,)
 
 
-class UserAndGroupEditApi(generics.RetrieveUpdateAPIView):
+class UserUpdateGroupApi(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()
-    serializer_class = serializers.UserAndGroupSerializer
+    serializer_class = serializers.UserUpdateGroupSerializer
     permission_classes = (IsSuperUser,)
 
 
@@ -72,7 +72,17 @@ class UserUpdatePKApi(generics.UpdateAPIView):
         user.public_key = serializer.validated_data['_public_key']
         user.save()
 
-#
+
+class UserGroupViewSet(viewsets.ModelViewSet):
+    queryset = UserGroup.objects.all()
+    serializer_class = serializers.UserGroupSerializer
+
+
+class UserGroupUpdateUserApi(generics.RetrieveUpdateAPIView):
+    queryset = UserGroup.objects.all()
+    serializer_class = serializers.UserGroupUpdateMemeberSerializer
+    permission_classes = (IsSuperUser,)
+
 # class GroupDetailApi(generics.RetrieveUpdateDestroyAPIView):
 #     queryset = UserGroup.objects.all()
 #     serializer_class = serializers.GroupDetailSerializer

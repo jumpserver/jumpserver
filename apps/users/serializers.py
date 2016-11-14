@@ -16,8 +16,7 @@ from .models import User, UserGroup
 
 
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-    group_display = serializers.SerializerMethodField()
-    active_display = serializers.SerializerMethodField()
+    groups_display = serializers.SerializerMethodField()
     groups = serializers.PrimaryKeyRelatedField(many=True, queryset=UserGroup.objects.all())
 
     class Meta:
@@ -27,17 +26,16 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     def get_field_names(self, declared_fields, info):
         fields = super(UserSerializer, self).get_field_names(declared_fields, info)
-        fields.extend(['group_display', 'get_role_display'])
+        fields.extend(['groups_display', 'get_role_display', 'is_valid'])
         return fields
 
     @staticmethod
-    def get_group_display(obj):
+    def get_groups_display(obj):
         return " ".join([group.name for group in obj.groups.all()])
 
-    @staticmethod
-    def get_active_display(obj):
-        # TODO: user active state
-        return not (obj.is_expired and obj.is_active)
+    # @staticmethod
+    # def get_active_display(obj):
+    #     return not (obj.is_expired and obj.is_active)
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):
@@ -54,12 +52,32 @@ class UserPKUpdateSerializer(serializers.ModelSerializer):
         return value
 
 
-class UserAndGroupSerializer(serializers.ModelSerializer):
+class UserUpdateGroupSerializer(serializers.ModelSerializer):
     groups = serializers.PrimaryKeyRelatedField(many=True, queryset=UserGroup.objects.all())
 
     class Meta:
         model = User
         fields = ['id', 'groups']
+
+
+class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+    user_amount = serializers.SerializerMethodField()
+
+    class Meta:
+        model = UserGroup
+        list_serializer_class = BulkListSerializer
+
+    @staticmethod
+    def get_user_amount(obj):
+        return obj.users.count()
+
+
+class UserGroupUpdateMemeberSerializer(serializers.ModelSerializer):
+    users = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all())
+
+    class Meta:
+        model = UserGroup
+        fields = ['id', 'users']
 
 
 # class GroupDetailSerializer(serializers.ModelSerializer):

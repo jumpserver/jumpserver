@@ -15,7 +15,6 @@
             <th class="text-center">{% trans 'Username' %}</th>
             <th class="text-center">{% trans 'Role' %}</th>
             <th class="text-center">{% trans 'User group' %}</th>
-            <th class="text-center">{% trans 'Asset num' %}</th>
             <th class="text-center">{% trans 'Active' %}</th>
             <th class="text-center">{% trans 'Action' %}</th>
         </tr>
@@ -56,14 +55,14 @@ $(document).ready(function(){
                 var innerHtml = cellData.length > 20 ? cellData.substring(0, 20) + '...': cellData;
                 $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
              }},
-            {targets: 6, createdCell: function (td, cellData) {
+            {targets: 5, createdCell: function (td, cellData) {
                 if (!cellData) {
                     $(td).html('<i class="fa fa-times text-danger"></i>')
                 } else {
                     $(td).html('<i class="fa fa-check text-navy"></i>')
                 }
              }},
-            {targets: 7, createdCell: function (td, cellData, rowData) {
+            {targets: 6, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "users:user-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
                 if (rowData.id === 1 || rowData.username == "admin") {
@@ -73,8 +72,8 @@ $(document).ready(function(){
                 }
              }}],
         ajax_url: '{% url "users:api-user-list" %}',
-        columns: [{data: function(){return ""}}, {data: "username" }, {data: "name" }, {data: "get_role_display" }, {data: "group_display" },
-                  {data: function(){return 999}}, {data: "active_display" }, {data: "id" }],
+        columns: [{data: function(){return ""}}, {data: "username" }, {data: "name" }, {data: "get_role_display" },
+            {data: "groups_display" }, {data: "is_valid" }, {data: "id" }],
         op_html: $('#actions').html()
     };
     jumpserver.initDataTable(options);
@@ -224,6 +223,8 @@ $(document).ready(function(){
     $form.ajaxSubmit({success: success});
 }).on('change', '#id_excel', function() {
     $(this).siblings('.help-block').remove();
+}).on('click', '.ipt_check', function () {
+    console.log('Hello')
 })
 </script>
 {% endblock %}

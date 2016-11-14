@@ -216,10 +216,16 @@ class UserGroupUpdateView(AdminUserRequiredMixin, UpdateView):
 
 class UserGroupDetailView(AdminUserRequiredMixin, DetailView):
     model = UserGroup
+    context_object_name = 'user_group'
     template_name = 'users/user_group_detail.html'
 
     def get_context_data(self, **kwargs):
-        context = {'app': _('Users'), 'action': _('User Group Detail')}
+        users = User.objects.exclude(id__in=self.object.users.all())
+        context = {
+            'app': _('Users'),
+            'action': _('User Group Detail'),
+            'users': users,
+        }
         kwargs.update(context)
         return super(UserGroupDetailView, self).get_context_data(**kwargs)
 

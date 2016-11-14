@@ -39,6 +39,7 @@ urlpatterns = [
 
 router = BulkRouter()
 router.register(r'v1/users', api.UserViewSet, 'api-user')
+router.register(r'v1/user-groups', api.UserGroupViewSet, 'api-user-group')
 # router.register(r'v1/user-groups', api.AssetViewSet, 'api-groups')
 
 
@@ -53,7 +54,9 @@ urlpatterns += [
     # url(r'^v1/user-groups/(?P<pk>\d+)/user/(?P<uid>\d+)/$',
     #     api.DeleteUserFromGroupApi.as_view(), name='delete-user-from-group-api'),
     url(r'^v1/users/(?P<pk>\d+)/groups/$',
-        api.UserAndGroupEditApi.as_view(), name='group-user-edit-api'),
+        api.UserUpdateGroupApi.as_view(), name='api-user-update-group'),
+    url(r'^v1/user-groups/(?P<pk>\d+)/users/$',
+        api.UserGroupUpdateUserApi.as_view(), name='api-user-group-update-user'),
 ]
 
 urlpatterns += router.urls
