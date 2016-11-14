@@ -25,7 +25,7 @@
    
    python manage.py migrate
    
-   python manage.py loaddata init  # 初始化数据
+   python manage.py loaddata init
    
    python manage.py loadata fake 
    
