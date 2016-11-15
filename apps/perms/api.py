@@ -133,7 +133,7 @@ class MyGrantedAssetsGroupsApi(APIView):
                             'id': asset_group.id,
                             'name': asset_group.name,
                             'comment': asset_group.comment,
-                            'asset_amount': 1
+                            'assets_amount': 1
                         }
         asset_groups_json = asset_groups.values()
         return Response(asset_groups_json, status=200)

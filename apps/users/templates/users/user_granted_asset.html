@@ -133,7 +133,7 @@
                         }
                     }}
                 ],
-                ajax_url: '{% url "perms:api-user-assets" %}',
+                ajax_url: '{% url "perms:api-user-assets" pk=user.id %}',
                 columns: [{data: function(){return ""}}, {data: "hostname" }, {data: "ip" }, {data: "port"},
                     {data: "system_users_join"}, {data: "is_active"}]
             };
@@ -148,8 +148,8 @@
                         $(td).html(detail_btn.replace('99991937', rowData.id));
                      }}
                 ],
-                ajax_url: '{% url "perms:api-user-asset-groups" %}',
-                columns: [{data: function(){return ""}}, {data: "name" }, {data: "asset_amount" }]
+                ajax_url: '{% url "perms:api-user-asset-groups" pk=user.id %}',
+                columns: [{data: function(){return ""}}, {data: "name" }, {data: "assets_amount" }]
             };
             jumpserver.initDataTable(options);
             jumpserver.initDataTable(options2);
