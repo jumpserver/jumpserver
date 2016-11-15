@@ -2,13 +2,14 @@
 # 
 
 from rest_framework.views import APIView, Response
-from rest_framework.generics import ListAPIView
+from rest_framework.generics import ListAPIView, get_object_or_404
 from rest_framework import viewsets
 from users.backends import IsValidUser, IsSuperUser
 from common.utils import get_object_or_none
-from .utils import get_user_granted_assets, get_user_granted_asset_groups, get_user_asset_permissions
+from .utils import get_user_granted_assets, get_user_granted_asset_groups, get_user_asset_permissions, \
+    get_user_group_asset_permissions, get_user_group_granted_assets
 from .models import AssetPermission
-from .hands import AssetGrantedSerializer, User, AssetGroup, Asset, AssetGroup
+from .hands import AssetGrantedSerializer, User, UserGroup, AssetGroup, Asset, AssetGroup, AssetGroupSerializer
 from . import serializers
 
 
@@ -20,12 +21,15 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super(AssetPermissionViewSet, self).get_queryset()
         user_id = self.request.query_params.get('user', '')
+        user_group_id = self.request.query_params.get('user-group', '')
+
         if user_id and user_id.isdigit():
-            self.user_id = user_id
-            user = get_object_or_none(User, id=int(user_id))
-            if user:
-                queryset = get_user_asset_permissions(user)
-                print(queryset)
+            user = get_object_or_404(User, id=int(user_id))
+            queryset = get_user_asset_permissions(user)
+
+        if user_group_id:
+            user_group = get_object_or_404(UserGroup, id=user_group_id)
+            queryset = get_user_group_asset_permissions(user_group)
         return queryset
 
     def get_serializer_class(self):
@@ -42,8 +46,8 @@ class RevokeUserAssetPermission(APIView):
         user_id = str(request.data.get('user_id', ''))
 
         if permission_id and user_id and permission_id.isdigit() and user_id.isdigit():
-            asset_permission = get_object_or_none(AssetPermission, id=int(permission_id))
-            user = get_object_or_none(User, id=int(user_id))
+            asset_permission = get_object_or_404(AssetPermission, id=int(permission_id))
+            user = get_object_or_404(User, id=int(user_id))
 
             if asset_permission and user:
                 asset_permission.users.remove(user)
@@ -51,7 +55,54 @@ class RevokeUserAssetPermission(APIView):
         return Response({'msg': 'failed'}, status=404)
 
 
-class UserAssetsApi(ListAPIView):
+class RevokeUserGroupAssetPermission(APIView):
+    permission_classes = (IsSuperUser,)
+
+    def put(self, request, *args, **kwargs):
+        permission_id = str(request.data.get('id', ''))
+        user_group_id = str(request.data.get('user_group_id', ''))
+
+        if permission_id and user_group_id and permission_id.isdigit() and user_group_id.isdigit():
+            asset_permission = get_object_or_404(AssetPermission, id=int(permission_id))
+            user_group = get_object_or_404(UserGroup, id=int(user_group_id))
+
+            if asset_permission and user_group:
+                asset_permission.user_groups.remove(user_group)
+                return Response({'msg': 'success'})
+        return Response({'msg': 'failed'}, status=404)
+
+
+class UserGrantedAssetsApi(ListAPIView):
+    permission_classes = (IsSuperUser,)
+    serializer_class = AssetGrantedSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('pk', '')
+
+        if user_id:
+            user = get_object_or_404(User, id=user_id)
+            queryset = get_user_granted_assets(user)
+        else:
+            queryset = []
+        return queryset
+
+
+class UserGrantedAssetGroupsApi(ListAPIView):
+    permission_classes = (IsSuperUser,)
+    serializer_class = AssetGroupSerializer
+
+    def get_queryset(self):
+        user_id = self.kwargs.get('pk', '')
+
+        if user_id:
+            user = get_object_or_404(User, id=user_id)
+            queryset = get_user_granted_asset_groups(user)
+        else:
+            queryset = []
+        return queryset
+
+
+class MyGrantedAssetsApi(ListAPIView):
     permission_classes = (IsValidUser,)
     serializer_class = AssetGrantedSerializer
 
@@ -59,11 +110,12 @@ class UserAssetsApi(ListAPIView):
         user = self.request.user
         if user:
             queryset = get_user_granted_assets(user)
-            return queryset
-        return []
+        else:
+            queryset = []
+        return queryset
 
 
-class UserAssetsGroupsApi(APIView):
+class MyGrantedAssetsGroupsApi(APIView):
     permission_classes = (IsValidUser,)
 
     def get(self, request, *args, **kwargs):
@@ -87,7 +139,7 @@ class UserAssetsGroupsApi(APIView):
         return Response(asset_groups_json, status=200)
 
 
-class UserAssetsGroupAssetsApi(ListAPIView):
+class MyAssetGroupAssetsApi(ListAPIView):
     permission_classes = (IsValidUser,)
     serializer_class = AssetGrantedSerializer
 

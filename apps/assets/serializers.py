@@ -8,7 +8,7 @@ from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin
 
 class AssetGroupSerializer(serializers.ModelSerializer):
     assets_amount = serializers.SerializerMethodField()
-    assets = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    # assets = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = AssetGroup

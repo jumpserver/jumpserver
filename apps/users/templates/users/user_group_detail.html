@@ -10,54 +10,6 @@
     <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
     <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
     <script src="{% static "js/plugins/dataTables/dataTables.min.js" %}"></script>
-    <style>
-        .user_div {
-            color: #5e5e5e;
-            font-family: "Open Sans";
-            padding: 3px 8px;
-            text-shadow: none;
-        }
-        .user_div .ui_container {
-            background-color: #d1dade;
-            width: 100%;
-        }
-        .user_div a {
-            color: #5e5e5e;
-        }
-        .user_div .remove {
-            color: #fff;
-        }
-        dl {
-          width: 100%;
-          overflow: hidden;
-          padding: 0;
-          margin: 10px;
-          border-bottom: 1px solid #e7eaec;
-        }
-        dt {
-          float: left;
-          width: 30%;
-          padding: 0;
-          margin: 0
-        }
-        dd {
-          float: left;
-          width: 70%;
-          padding: 0;
-          margin: 0
-        }
-        
-        #group_user_row dt {
-          border-bottom: 1px solid #e7eaec;
-          width: 100%;
-          margin-bottom: 20px;
-        }
-        
-        #group_user_row dd {
-          width: 100%;
-          overflow: auto;
-        }
-    </style>
 {% endblock %}
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -68,6 +20,15 @@
                         <ul class="nav nav-tabs">
                             <li class="active">
                                 <a href="{% url 'users:user-group-detail' pk=user_group.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User Group Detail' %} </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'users:user-group-asset-permission' pk=user_group.id %}" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Asset permission' %}</a>
+                            </li>
+                            <li>
+                                <a href="{% url 'users:user-granted-asset' pk=user.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default" href="{% url 'users:user-group-update' pk=user_group.id %}"><i class="fa fa-edit"></i>Update</a>
                             </li>
                         </ul>
                     </div>
@@ -110,7 +71,7 @@
                             </div>
                         </div>
                         <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
-                            <div class="panel panel-info">
+                            <div class="panel panel-primary">
                                 <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'User' %}
                                 </div>
@@ -120,7 +81,7 @@
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Add user' %}" id="slct_groups" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Add user' %}" id="slct_users" class="select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for user in users %}
                                                         <option value="{{ user.id }}" id="opt_{{ user.id }}">{{ user.name }}</option>
                                                         {% endfor %}
@@ -129,7 +90,7 @@
                                             </tr>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-small" id="btn_add_user_group">{% trans 'Add' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-small" id="btn_add_user">{% trans 'Add' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
@@ -138,7 +99,7 @@
                                         <tr>
                                           <td ><b class="bdg_user" data-uid={{ user.id }}>{{ user.name }}</b></td>
                                           <td>
-                                              <button class="btn btn-danger pull-right btn-xs btn_delete_user" type="button"><i class="fa fa-minus"></i></button>
+                                              <button class="btn btn-danger pull-right btn-xs btn_remove_user" type="button"><i class="fa fa-minus"></i></button>
                                           </td>
                                         </tr>
                                         {% endfor %}
@@ -152,33 +113,32 @@
             </div>
         </div>
     </div>
-    {% include "users/_select_user_modal.html" %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-jumpserver.selected_groups = {};
+jumpserver.users_selected = {};
 
 function updateGroupMember(users) {
     var the_url = "{% url 'users:api-user-group-update-user' pk=user_group.id %}";
     var body = {
-        groups: Object.assign([], users)
+        users: Object.assign([], users)
     };
     var success = function(data) {
         // remove all the selected groups from select > option and rendered ul element;
         $('.select2-selection__rendered').empty();
         $('#slct_users').val('');
-        $.map(jumpserver.selected_groups, function(user_name, index) {
+        $.map(jumpserver.users_selected, function(user_name, index) {
             $('#opt_' + index).remove();
             // change tr html of users
             $('.user_edit tbody').append(
                 '<tr>' +
                 '<td><b class="bdg_user" data-uid="' + index + '">' + user_name + '</b></td>' +
-                '<td><button class="btn btn-danger btn-xs pull-right btn_delete_user" type="button"><i class="fa fa-minus"></i></button></td>' +
+                '<td><button class="btn btn-danger btn-xs pull-right btn_remove_user" type="button"><i class="fa fa-minus"></i></button></td>' +
                 '</tr>'
             )
         });
         // clear jumpserver.selected_groups
-        jumpserver.selected_users = {};
+        jumpserver.users_selected = {};
     };
     APIUpdateAttr({
         url: the_url,
@@ -188,93 +148,42 @@ function updateGroupMember(users) {
 }
 
 $(document).ready(function () {
-   $('.select2').select2();
-}).on('click', '.btn_remove', function(){
-    var $this = $(this);
-    var uid = $this.data('uid');
-    var the_url = '{% url "users:api-user-group-detail" pk=user_group.id %}'.replace('99991937', uid);
-    var success = function(){
-        $this.closest('.user_div').remove();
-    };
-    var error = function(){};
-    APIUpdateAttr({url: the_url, body: "{}", method: "DELETE", success: success, error: error});
-    return false;
-}).on('click', '.btn_delete_user', function() {
+   $('.select2').select2()
+          .on('select2:select', function(evt) {
+            var data = evt.params.data;
+            jumpserver.users_selected[data.id] = data.text;
+        }).on('select2:unselect', function(evt) {
+            var data = evt.params.data;
+            delete jumpserver.users_selected[data.id]
+        })
+}).on('click', '.btn_remove_user', function() {
     var $this = $(this);
     var $tr = $this.closest('tr');
-    var $badge = $tr.find('.bdg_user_group');
-    var gid = $badge.data('gid');
-    var group_name = $badge.html() || $badge.text();
-    $('#slct_groups').append(
-        '<option value="' + gid + '" id="opt_' + gid + '">' + group_name + '</option>'
+    var $badge = $tr.find('.bdg_user');
+    var uid = $badge.data('uid');
+    var user_name = $badge.html() || $badge.text();
+    $('#slct_users').append(
+        '<option value="' + uid + '" id="opt_' + uid + '">' + user_name + '</option>'
     );
     $tr.remove();
-    var user_groups = $('.bdg_user_group').map(function() {
-        return $(this).data('gid');
+    var users = $('.bdg_user').map(function() {
+        return $(this).data('uid');
     }).get();
-    updateUserGroups(user_groups)
-}).on('shown.bs.modal', '#select_user_modal', function() {
-    if ($.fn.dataTable.isDataTable('#select_user_table')) {
-        return true;
-    }
-    var options = {
-        ele: $('#select_user_table'),
-        pageLength: 10,
-        buttons: [],
-        columnDefs: [
-            {targets: 6, createdCell: function (td, cellData) {
-                if (!cellData) {
-                    $(td).html('<i class="fa fa-times text-danger"></i>')
-                } else {
-                    $(td).html('<i class="fa fa-check text-navy"></i>')
-                }
-             }},
-            {targets: 4, createdCell: function (td, cellData) {
-                var innerHtml = cellData.length > 8 ? cellData.substring(0, 8) + '...': cellData;
-                $(td).html('<a href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</a>');
-             }}
-        ],
-        ajax_url: '{% url "users:api-user-list" %}',
-        columns: [{data: function(){return ""}}, {data: "username" }, {data: "name" }, {data: "get_role_display" }, {data: "group_display" },
-                  {data: function(){return 999}}, {data: "active_display" }],
-    };
-    jumpserver.initDataTable(options);
-}).on('click', '#btn_select_user', function() {
-    var $data_table = $('#select_user_table').DataTable();
-    var plain_id_list = [];
-    var selected_users = [];
-    $data_table.rows({selected: true}).every(function(){
-        plain_id_list.push(this.data().id);
-        selected_users.push({id: this.data().id, name: this.data().name});
-    });
-    if (plain_id_list === []) {
+    console.log(users);
+    updateGroupMember(users)
+}).on('click', '#btn_add_user', function() {
+    if (Object.keys(jumpserver.users_selected).length === 0) {
         return false;
-    };
-    var body = {
-        id: {{ user_group.id }},
-        users: plain_id_list.map(Number)
-    };
-    $('#select_user_modal').modal('hide');
-    var the_url = "{% url 'users:api-user-group-detail' pk=user_group.id %}";
-    var success = function() {
-        toastr.success('{% trans "The selected users has been added to current group." %}');
-        var html = "";
-        $.each(selected_users, function(index, user) {
-            html += [
-                '<div class="col-sm-4 user_div"><div class="ui_container row"><div class="col-xs-9"><a title="',
-                user.name,
-                '" data-toggle="tooltip" href="',
-                '{% url "users:user-detail" pk=99991937 %}'.replace(99991937, user.id),
-                '">',
-                user.name.length >=13 ? user.name.substring(0, 12) + '...' : user.name,
-                '</a></div><div class="col-xs-3"><a data-uid="',
-                user.id,
-                '" class="btn_remove m-l-5"><i class="remove fa fa-times-circle"></i></a></div></div></div>\n',
-            ].join("");
-        });
-        $(html).appendTo($('#group_user_container'));
-    };
-    APIUpdateAttr({url: the_url, body: JSON.stringify(body), success: success});
+    }
+    var users = $('.bdg_user').map(function() {
+        return $(this).data('uid');
+    }).get();
+    $.map(jumpserver.users_selected, function(value, index) {
+        users.push(parseInt(index));
+        $('#opt_' + index).remove();
+    });
+    console.log(users);
+    updateGroupMember(users)
 })
 </script>
 {% endblock %}

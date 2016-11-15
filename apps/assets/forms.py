@@ -24,12 +24,10 @@ from common.utils import validate_ssh_private_key, ssh_pubkey_gen
 #
 
 class AssetCreateForm(forms.ModelForm):
-
     def __init__(self, *args, **kwargs):
         instance = kwargs.get('instance', None)
         if instance:
             initial = kwargs.get('initial', {})
-            #tags = instance.tags.all()
             initial['tags'] = [t.pk for t in kwargs['instance'].tags.all()]
         super(AssetCreateForm, self).__init__(*args, **kwargs)
 

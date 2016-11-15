@@ -19,7 +19,6 @@ class UserLoginForm(AuthenticationForm):
 
 
 class UserCreateUpdateForm(forms.ModelForm):
-
     class Meta:
         model = User
         fields = [
@@ -37,7 +36,6 @@ class UserCreateUpdateForm(forms.ModelForm):
 
 
 class UserBulkImportForm(forms.ModelForm):
-
     class Meta:
         model = User
         fields = ['username', 'email', 'enable_otp', 'role']
@@ -62,7 +60,6 @@ class UserBulkImportForm(forms.ModelForm):
 
 
 class UserGroupForm(forms.ModelForm):
-
     class Meta:
         model = UserGroup
         fields = [
@@ -101,8 +98,30 @@ class UserPrivateAssetPermissionForm(forms.ModelForm):
 
     def save(self, commit=True):
         self.instance = super(UserPrivateAssetPermissionForm, self).save(commit=commit)
-        self.instance.private_for = 'U'
         self.instance.users = [self.user]
+        self.instance.save()
+        return self.instance
+
+    class Meta:
+        model = AssetPermission
+        fields = [
+            'assets', 'asset_groups', 'system_users', 'name',
+        ]
+        widgets = {
+            'assets': forms.SelectMultiple(attrs={'class': 'select2',
+                                                  'data-placeholder': _('Select assets')}),
+            'asset_groups': forms.SelectMultiple(attrs={'class': 'select2',
+                                                        'data-placeholder': _('Select asset groups')}),
+            'system_users': forms.SelectMultiple(attrs={'class': 'select2',
+                                                        'data-placeholder': _('Select system users')}),
+        }
+
+
+class UserGroupPrivateAssetPermissionForm(forms.ModelForm):
+
+    def save(self, commit=True):
+        self.instance = super(UserGroupPrivateAssetPermissionForm, self).save(commit=commit)
+        self.instance.user_groups = [self.user_group]
         self.instance.save()
         return self.instance
 
