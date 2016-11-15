@@ -533,6 +533,8 @@ def perm_role_push(request):
             sudo_list = set([sudo for sudo in role.sudo.all()])  # set(sudo1, sudo2, sudo3)
             if sudo_list:
                 ret['sudo'] = task.push_sudo_file([role], sudo_list)
+            else:
+                ret['sudo'] = task.recyle_cmd_alias(role.name)
 
         logger.debug('推送role结果: %s' % ret)
         success_asset = {}

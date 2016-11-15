@@ -409,6 +409,17 @@ class MyTask(MyRunner):
         self.run("script", module_args1, become=True)
         return self.results
 
+    def recyle_cmd_alias(self, role_name):
+        """
+        recyle sudo cmd alias
+        :return:
+        """
+        if role_name == 'root':
+            return {"status": "failed", "msg": "can't recyle root privileges"}
+        module_args = "sed -i 's/^%s.*//' /etc/sudoers" % role_name
+        self.run("command", module_args, become=True)
+        return self.results
+
 
 class CustomAggregateStats(callbacks.AggregateStats):
     """                                                                             
