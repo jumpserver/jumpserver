@@ -36,7 +36,7 @@ urlpatterns = [
     url(r'^user-group/(?P<pk>[0-9]+)/update$', views.UserGroupUpdateView.as_view(), name='user-group-update'),
     url(r'^user-group/(?P<pk>[0-9]+)/asset-permission$', views.UserGroupAssetPermissionView.as_view(),
         name='user-group-asset-permission'),
-    url(r'^user-group/(?P<pk>[0-9]+)/asset-permission/create$', views.UserAssetPermissionCreateView.as_view(),
+    url(r'^user-group/(?P<pk>[0-9]+)/asset-permission/create$', views.UserGroupAssetPermissionCreateView.as_view(),
         name='user-group-asset-permission-create'),
     url(r'^user-group/(?P<pk>[0-9]+)/assets', views.UserGroupGrantedAssetView.as_view(),
         name='user-group-granted-asset'),

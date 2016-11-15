@@ -31,10 +31,16 @@ urlpatterns += [
     url(r'^v1/user/my/asset-group/(?P<pk>[0-9]+)/assets/$', api.MyAssetGroupAssetsApi.as_view(),
         name='user-my-asset-group-assets'),
 
-    # Select user or user group permission of asset or asset group
+    # Select user permission of asset and asset group
     url(r'^v1/user/(?P<pk>[0-9]+)/assets/$', api.UserGrantedAssetsApi.as_view(), name='api-user-assets'),
     url(r'^v1/user/(?P<pk>[0-9]+)/asset-groups/$', api.UserGrantedAssetGroupsApi.as_view(),
         name='api-user-asset-groups'),
+
+    # Select user group permission of asset and asset group
+    url(r'^v1/user-group/(?P<pk>[0-9]+)/assets/$', api.UserGroupGrantedAssetsApi.as_view(), name='api-user-group-assets'),
+    url(r'^v1/user-group/(?P<pk>[0-9]+)/asset-groups/$', api.UserGroupGrantedAssetGroupsApi.as_view(),
+        name='api-user-group-asset-groups'),
+
 
     # Revoke permission api
     url(r'^v1/asset-permissions/user/revoke/', api.RevokeUserAssetPermission.as_view(),

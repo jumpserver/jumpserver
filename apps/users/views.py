@@ -414,7 +414,7 @@ class UserAssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
 
 
 class UserGroupAssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
-    form_class = forms.UserPrivateAssetPermissionForm
+    form_class = forms.UserGroupPrivateAssetPermissionForm
     model = AssetPermission
 
     def get(self, request, *args, **kwargs):
