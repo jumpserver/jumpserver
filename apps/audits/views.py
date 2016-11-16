@@ -14,8 +14,9 @@ from .models import ProxyLog, CommandLog, LoginLog
 from .hands import User, Asset, SystemUser, AdminUserRequiredMixin
 
 
-seven_days_ago_s = (datetime.datetime.now()-datetime.timedelta(7)).strftime('%m/%d/%Y')
-now_s = datetime.datetime.now().strftime('%m/%d/%Y')
+date_now = timezone.localtime(timezone.now())
+now_s = date_now.strftime('%m/%d/%Y')
+seven_days_ago_s = (date_now-timezone.timedelta(7)).strftime('%m/%d/%Y')
 
 
 class ProxyLogListView(AdminUserRequiredMixin, ListView):
@@ -53,6 +54,7 @@ class ProxyLogListView(AdminUserRequiredMixin, ListView):
         return self.queryset
 
     def get_context_data(self, **kwargs):
+        print(self.date_to_s)
         context = {
             'app': _('Audits'),
             'action': _('Proxy log list'),
