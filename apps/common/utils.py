@@ -3,17 +3,26 @@
 
 from __future__ import unicode_literals
 from six import string_types
+import os
 from itertools import chain
 import string
 import logging
 import datetime
+import paramiko
 
+import paramiko
+import sshpubkeys
 from itsdangerous import TimedJSONWebSignatureSerializer, JSONWebSignatureSerializer, \
     BadSignature, SignatureExpired
 from django.shortcuts import reverse as dj_reverse
 from django.conf import settings
 from django.core import signing
 from django.utils import timezone
+
+try:
+    import cStringIO as StringIO
+except ImportError:
+    import StringIO
 
 SECRET_KEY = settings.SECRET_KEY
 
@@ -160,6 +169,90 @@ def timesince(dt, since='', default="just now"):
         if period:
             return "%d %s" % (period, singular if period == 1 else plural)
     return default
+
+
+def ssh_key_string_to_obj(text):
+    key_f = StringIO.StringIO(text)
+    key = None
+    try:
+        key = paramiko.RSAKey.from_private_key(key_f)
+    except paramiko.SSHException:
+        pass
+
+    try:
+        key = paramiko.DSSKey.from_private_key(key_f)
+    except paramiko.SSHException:
+        pass
+    return key
+
+
+def ssh_pubkey_gen(private_key=None, username='jumpserver', hostname='localhost'):
+    if isinstance(private_key, string_types):
+        private_key = ssh_key_string_to_obj(private_key)
+
+    if not isinstance(private_key, (paramiko.RSAKey, paramiko.DSSKey)):
+        raise IOError('Invalid private key')
+
+    public_key = "%(key_type)s %(key_content)s %(username)s@%(hostname)s" % {
+        'key_type': private_key.get_name(),
+        'key_content': private_key.get_base64(),
+        'username': username,
+        'hostname': hostname,
+    }
+    return public_key
+
+
+def ssh_key_gen(length=2048, type='rsa', password=None, username='jumpserver', hostname=None):
+    """Generate user ssh private and public key
+
+    Use paramiko RSAKey generate it.
+    :return private key str and public key str
+    """
+
+    if hostname is None:
+        hostname = os.uname()[1]
+
+    f = StringIO.StringIO()
+
+    try:
+        if type == 'rsa':
+            private_key_obj = paramiko.RSAKey.generate(length)
+        elif type == 'dsa':
+            private_key_obj = paramiko.DSSKey.generate(length)
+        else:
+            raise IOError('SSH private key must be `rsa` or `dsa`')
+        private_key_obj.write_private_key(f, password=password)
+        private_key = f.getvalue()
+        public_key = ssh_pubkey_gen(private_key_obj, username=username, hostname=hostname)
+        return private_key, public_key
+    except IOError:
+        raise IOError('These is error when generate ssh key.')
+
+
+def validate_ssh_private_key(text):
+    key = ssh_key_string_to_obj(text)
+    if key is None:
+        return False
+    else:
+        return True
+
+
+def validate_ssh_public_key(text):
+    ssh = sshpubkeys.SSHKey(text)
+    try:
+        ssh.parse()
+    except sshpubkeys.InvalidKeyException:
+        return False
+    except NotImplementedError as e:
+        return False
+    return True
+
+
+def setattr_bulk(seq, key, value):
+    def set_attr(obj):
+        setattr(obj, key, value)
+        return obj
+    return map(set_attr, seq)
 
 
 signer = Signer()

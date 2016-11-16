@@ -78,6 +78,7 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
 
     def authenticate_credentials(self, token, request):
         user_id = cache.get(token)
+        print('Auth id: %s' % user_id)
         user = get_object_or_none(User, id=user_id)
 
         if not user:
@@ -87,7 +88,6 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
         remote_addr = base64.b16encode(remote_addr).replace('=', '')
         cache.set(token, user_id, self.expiration)
         cache.set('%s_%s' % (user.id, remote_addr), token, self.expiration)
-
         return user, None
 
 

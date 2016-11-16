@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
+from django.contrib.auth import logout
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
 from django.core import signing
@@ -234,7 +235,7 @@ class User(AbstractUser):
         user.groups.add(UserGroup.initial())
 
     def delete(self):
-        if self.pk == 1:
+        if self.pk == 1 or self.username == 'admin':
             return
         return super(User, self).delete()
 

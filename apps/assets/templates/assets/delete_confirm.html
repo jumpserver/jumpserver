@@ -8,7 +8,7 @@
 <body>
 <form action="" method="post">
     {% csrf_token %}
-    <p>Are you sure you want to delete "{{ object.name }}"?</p>
+    <p>{% trans 'Are you sure delete' %} <b>{{ object.name }} </b> ?</p>
     <input type="submit" value="Confirm" />
 </form>
 </body>

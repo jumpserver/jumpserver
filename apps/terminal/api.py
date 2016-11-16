@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 # 
 
+from django.core.cache import cache
+from django.conf import settings
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework import viewsets
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import AllowAny
 
@@ -11,42 +14,51 @@ from .serializers import TerminalSerializer, TerminalHeatbeatSerializer
 from .hands import IsSuperUserOrTerminalUser
 
 
-class TerminalCreateListApi(ListCreateAPIView):
+class TerminalViewSet(viewsets.ModelViewSet):
     queryset = Terminal.objects.all()
     serializer_class = TerminalSerializer
     permission_classes = (AllowAny,)
 
-    def post(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs):
         name = signer.unsign(request.data.get('name', ''))
         if name:
             terminal = get_object_or_none(Terminal, name=name)
             if terminal:
+                data = {
+                    'data': {'name': name, 'id': terminal.id},
+                }
                 if terminal.is_active:
-                    return Response(data={'data': {'name': name, 'id': terminal.id},
-                                          'msg': 'Success'},
-                                    status=200)
+                    data['msg'] = 'Success'
+                    return Response(data=data, status=200)
                 else:
-                    return Response(data={'data': {'name': name, 'ip': terminal.ip},
-                                          'msg': 'Need admin active it'},
-                                    status=203)
+                    data['msg'] = 'Need admin active this terminal'
+                    return Response(data=data, status=203)
 
             else:
                 ip = request.META.get('X-Real-IP') or request.META.get('REMOTE_ADDR')
                 terminal = Terminal.objects.create(name=name, ip=ip)
-                return Response(data={'data': {'name': name, 'ip': terminal.ip},
-                                      'msg': 'Need admin active it'},
-                                status=201)
+                data = {
+                    'data': {'name': name, 'id': terminal.id},
+                    'msg': 'Need admin active this terminal',
+                }
+                return Response(data=data, status=201)
         else:
             return Response(data={'msg': 'Secrete key invalid'}, status=401)
 
 
 class TerminalHeatbeatApi(ListCreateAPIView):
-    model = TerminalHeatbeat
+    queryset = TerminalHeatbeat.objects.all()
     serializer_class = TerminalHeatbeatSerializer
     permission_classes = (IsSuperUserOrTerminalUser,)
 
 
-class TerminalApiDetailUpdateDetailApi(RetrieveUpdateDestroyAPIView):
-    queryset = Terminal.objects.all()
-    serializer_class = TerminalSerializer
+class TerminalHeatbeatViewSet(viewsets.ModelViewSet):
+    queryset = TerminalHeatbeat.objects.all()
+    serializer_class = TerminalHeatbeatSerializer
     permission_classes = (IsSuperUserOrTerminalUser,)
+
+    def create(self, request, *args, **kwargs):
+        terminal = request.user
+        TerminalHeatbeat.objects.create(terminal=terminal)
+        return Response({'msg': 'Success'})
+

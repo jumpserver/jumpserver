@@ -19,20 +19,21 @@
                         <form method="post" class="form-horizontal" action="" >
                             {% csrf_token %}
                             {{ form.name|bootstrap_horizontal }}
-
                             <div class="form-group">
                               <label for="users" class="col-sm-2 control-label">{% trans 'Users' %}</label>
                                 <div class="col-sm-9">
-                                    <select name="users" id="users" data-placeholder="{% trans 'Select User' %}" class="select2 form-control m-b" multiple  tabindex="2">
+                                    <select name="users" id="id_users" data-placeholder="{% trans 'Select User' %}" class="select2 form-control m-b" multiple  tabindex="2">
                                         {% for user in users %}
-                                            <option value="{{ user.id }}">{{ user.name }}</option>
+                                            {% if user.id in group_users %}
+                                            <option value="{{ user.id }}" selected>{{ user.name }}</option>
+                                            {% else %}
+                                                <option value="{{ user.id }}">{{ user.name }}</option>
+                                            {% endif %}
                                         {% endfor %}
                                     </select>
                                 </div>
                             </div>
-
                             {{ form.comment|bootstrap_horizontal }}
-
                             <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-2">
                                     <button class="btn btn-white" type="reset">{% trans 'Cancel' %}</button>
@@ -45,11 +46,12 @@
             </div>
         </div>
     </div>
+    {% include "users/_select_user_modal.html" %}
 {% endblock %}
 {% block custom_foot_js %}
 <script>
 $(document).ready(function () {
-    $('.select2').select2().val([{{ group_users }}]).trigger("change");
+    $('.select2').select2();
 })
 </script>
 {% endblock %}

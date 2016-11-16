@@ -1,8 +1,7 @@
 # coding:utf-8
 
 from django.conf.urls import url
-import views
-import api
+from .. import views
 
 app_name = 'perms'
 
@@ -21,14 +20,4 @@ urlpatterns = [
         name='asset-permission-asset-list'),
 ]
 
-urlpatterns += [
-    url(r'^v1/asset-permission/$', api.AssetPermissionListCreateApi.as_view(),
-        name='asset-permission-list-create-api'),
-    url(r'^v1/user/assets/$', api.UserAssetsApi.as_view(),
-        name='user-assets'),
-    url(r'^v1/user/asset-groups/$', api.UserAssetsGroupsApi.as_view(),
-        name='user-asset-groups'),
-    url(r'^v1/user/asset-groups/(?P<pk>[0-9]+)/assets/$', api.UserAssetsGroupAssetsApi.as_view(),
-        name='user-asset-groups-assets'),
-]
 

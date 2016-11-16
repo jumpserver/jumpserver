@@ -30,12 +30,11 @@
     <div class="hr-line-dashed"></div>
     <div class="form-group">
         <div class="col-sm-4 col-sm-offset-2">
-            <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+            <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
             <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
         </div>
     </div>
-
-</form>
+    </form>
 {% endblock %}
 
 {% block custom_foot_js %}
@@ -44,10 +43,9 @@
             $('.select2').select2();
             $("#id_tags").select2({
                 tags: true,
-                maximumSelectionLength: 8,  //最多能够选择的个数
+                maximumSelectionLength: 8  //最多能够选择的个数
                 //closeOnSelect: false
             });
         })
-
     </script>
 {% endblock %}

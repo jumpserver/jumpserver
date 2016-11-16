@@ -4,6 +4,7 @@
 from users.utils import AdminUserRequiredMixin
 from users.models import User, UserGroup
 from assets.models import Asset, AssetGroup, SystemUser
+from assets.serializers import AssetGrantedSerializer, AssetGroupSerializer
 
 
 def associate_system_users_with_assets(system_users, assets, asset_groups):

@@ -2,13 +2,14 @@
 
 from __future__ import unicode_literals
 
+import csv
 from django import forms
 from django.conf import settings
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.files.storage import default_storage
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -21,16 +22,15 @@ from django.views.generic.list import ListView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView, SingleObjectMixin, \
     FormMixin
 from django.views.generic.detail import DetailView
-
 from formtools.wizard.views import SessionWizardView
 
 from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none, get_logger
+from perms.models import AssetPermission
 from .models import User, UserGroup
-from .forms import UserCreateForm, UserUpdateForm, UserGroupForm, UserLoginForm, UserInfoForm, UserKeyForm, \
-    UserPrivateAssetPermissionForm, UserBulkImportForm
 from .utils import AdminUserRequiredMixin, user_add_success_next, send_reset_password_mail
-from .hands import AssetPermission, get_user_granted_asset_groups, get_user_granted_assets
+from .hands import write_login_log_async
+from . import forms
 
 
 logger = get_logger(__name__)
@@ -41,7 +41,7 @@ logger = get_logger(__name__)
 @method_decorator(never_cache, name='dispatch')
 class UserLoginView(FormView):
     template_name = 'users/login.html'
-    form_class = UserLoginForm
+    form_class = forms.UserLoginForm
     redirect_field_name = 'next'
 
     def get(self, request, *args, **kwargs):
@@ -51,6 +51,10 @@ class UserLoginView(FormView):
 
     def form_valid(self, form):
         auth_login(self.request, form.get_user())
+        login_ip = self.request.META.get('REMOTE_ADDR', '')
+        user_agent = self.request.META.get('HTTP_USER_AGENT', '')
+        write_login_log_async.delay(self.request.user.username, self.request.user.name,
+                                    login_type='W', login_ip=login_ip, user_agent=user_agent)
         return redirect(self.get_success_url())
 
     def get_success_url(self):
@@ -64,7 +68,7 @@ class UserLoginView(FormView):
 
 @method_decorator(never_cache, name='dispatch')
 class UserLogoutView(TemplateView):
-    template_name = 'common/flash_message_standalone.html'
+    template_name = 'flash_message_standalone.html'
 
     def get(self, request, *args, **kwargs):
         auth_logout(request)
@@ -92,7 +96,7 @@ class UserListView(AdminUserRequiredMixin, TemplateView):
 
 class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = User
-    form_class = UserCreateForm
+    form_class = forms.UserCreateUpdateForm
     template_name = 'users/user_create.html'
     success_url = reverse_lazy('users:user-list')
     success_message = _('Create user <a href="%s">%s</a> successfully.')
@@ -118,7 +122,7 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
 
 class UserUpdateView(AdminUserRequiredMixin, UpdateView):
     model = User
-    form_class = UserUpdateForm
+    form_class = forms.UserCreateUpdateForm
     template_name = 'users/user_update.html'
     context_object_name = 'user_object'
     success_url = reverse_lazy('users:user-list')
@@ -142,7 +146,7 @@ class UserUpdateView(AdminUserRequiredMixin, UpdateView):
 class UserDetailView(AdminUserRequiredMixin, DetailView):
     model = User
     template_name = 'users/user_detail.html'
-    context_object_name = "user_object"
+    context_object_name = "user"
 
     def get_context_data(self, **kwargs):
         groups = UserGroup.objects.exclude(id__in=self.object.groups.all())
@@ -162,8 +166,8 @@ class UserGroupListView(AdminUserRequiredMixin, TemplateView):
 
 class UserGroupCreateView(AdminUserRequiredMixin, CreateView):
     model = UserGroup
-    form_class = UserGroupForm
-    template_name = 'users/user_group_create.html'
+    form_class = forms.UserGroupForm
+    template_name = 'users/user_group_create_update.html'
     success_url = reverse_lazy('users:user-group-list')
 
     def get_context_data(self, **kwargs):
@@ -184,15 +188,15 @@ class UserGroupCreateView(AdminUserRequiredMixin, CreateView):
 
 class UserGroupUpdateView(AdminUserRequiredMixin, UpdateView):
     model = UserGroup
-    form_class = UserGroupForm
-    template_name = 'users/user_group_create.html'
+    form_class = forms.UserGroupForm
+    template_name = 'users/user_group_create_update.html'
     success_url = reverse_lazy('users:user-group-list')
 
     def get_context_data(self, **kwargs):
-        self.object = self.get_object()
+        # self.object = self.get_object()
         context = super(UserGroupUpdateView, self).get_context_data(**kwargs)
         users = User.objects.all()
-        group_users = ",".join([str(u.id) for u in self.object.users.all()])
+        group_users = [user.id for user in self.object.users.all()]
         context.update({
             'app': _('Users'),
             'action': _('Update User Group'),
@@ -213,10 +217,16 @@ class UserGroupUpdateView(AdminUserRequiredMixin, UpdateView):
 
 class UserGroupDetailView(AdminUserRequiredMixin, DetailView):
     model = UserGroup
+    context_object_name = 'user_group'
     template_name = 'users/user_group_detail.html'
 
     def get_context_data(self, **kwargs):
-        context = {'app': _('Users'), 'action': _('User Group Detail')}
+        users = User.objects.exclude(id__in=self.object.users.all())
+        context = {
+            'app': _('Users'),
+            'action': _('User Group Detail'),
+            'users': users,
+        }
         kwargs.update(context)
         return super(UserGroupDetailView, self).get_context_data(**kwargs)
 
@@ -239,7 +249,7 @@ class UserForgotPasswordView(TemplateView):
 
 
 class UserForgotPasswordSendmailSuccessView(TemplateView):
-    template_name = 'common/flash_message_standalone.html'
+    template_name = 'flash_message_standalone.html'
 
     def get_context_data(self, **kwargs):
         context = {
@@ -252,7 +262,7 @@ class UserForgotPasswordSendmailSuccessView(TemplateView):
 
 
 class UserResetPasswordSuccessView(TemplateView):
-    template_name = 'common/flash_message_standalone.html'
+    template_name = 'flash_message_standalone.html'
 
     def get_context_data(self, **kwargs):
         context = {
@@ -294,7 +304,7 @@ class UserResetPasswordView(TemplateView):
 
 class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
     template_name = 'users/first_login.html'
-    form_list = [UserInfoForm, UserKeyForm]
+    form_list = [forms.UserInfoForm, forms.UserKeyForm]
     file_storage = default_storage
 
     def dispatch(self, request, *args, **kwargs):
@@ -343,31 +353,14 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
 
 
 class UserAssetPermissionView(AdminUserRequiredMixin, FormMixin, SingleObjectMixin, ListView):
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    model = User
     template_name = 'users/user_asset_permission.html'
-    context_object_name = 'user_object'
-    form_class = UserPrivateAssetPermissionForm
+    context_object_name = 'user'
+    form_class = forms.UserPrivateAssetPermissionForm
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=User.objects.all())
         return super(UserAssetPermissionView, self).get(request, *args, **kwargs)
-
-    def get_asset_permission_inherit_from_user_group(self):
-        asset_permissions = set()
-        user_groups = self.object.groups.all()
-
-        for user_group in user_groups:
-            for asset_permission in user_group.asset_permissions.all():
-                setattr(asset_permission, 'is_inherit_from_user_groups', True)
-                setattr(asset_permission, 'inherit_from_user_groups',
-                        getattr(asset_permission, b'inherit_from_user_groups', set()).add(user_group))
-                asset_permissions.add(asset_permission)
-        return asset_permissions
-
-    def get_queryset(self):
-        asset_permissions = set(self.object.asset_permissions.all()) \
-            | self.get_asset_permission_inherit_from_user_group()
-        return list(asset_permissions)
 
     def get_context_data(self, **kwargs):
         context = {
@@ -378,66 +371,111 @@ class UserAssetPermissionView(AdminUserRequiredMixin, FormMixin, SingleObjectMix
         return super(UserAssetPermissionView, self).get_context_data(**kwargs)
 
 
+class UserGroupAssetPermissionView(AdminUserRequiredMixin, FormMixin, SingleObjectMixin, ListView):
+    model = UserGroup
+    template_name = 'users/user_group_asset_permission.html'
+    context_object_name = 'user_group'
+    form_class = forms.UserPrivateAssetPermissionForm
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=UserGroup.objects.all())
+        return super(UserGroupAssetPermissionView, self).get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'Users',
+            'action': 'User group asset permissions',
+        }
+        kwargs.update(context)
+        return super(UserGroupAssetPermissionView, self).get_context_data(**kwargs)
+
+
 class UserAssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
-    form_class = UserPrivateAssetPermissionForm
+    form_class = forms.UserPrivateAssetPermissionForm
     model = AssetPermission
 
     def get(self, request, *args, **kwargs):
-        user_object = self.get_object(queryset=User.objects.all())
-        return redirect(reverse('users:user-asset-permission', kwargs={'pk': user_object.id}))
+        user = self.get_object(queryset=User.objects.all())
+        return redirect(reverse('users:user-asset-permission', kwargs={'pk': user.id}))
 
     def post(self, request, *args, **kwargs):
-        self.user_object = self.get_object(queryset=User.objects.all())
+        self.user = self.get_object(queryset=User.objects.all())
         return super(UserAssetPermissionCreateView, self).post(request, *args, **kwargs)
 
     def get_form(self, form_class=None):
         form = super(UserAssetPermissionCreateView, self).get_form(form_class=form_class)
-        form.user = self.user_object
+        form.user = self.user
         return form
 
     def form_invalid(self, form):
-        print(form.errors)
-        return redirect(reverse('users:user-asset-permission', kwargs={'pk': self.user_object.id}))
+        return redirect(reverse('users:user-asset-permission', kwargs={'pk': self.user.id}))
 
     def get_success_url(self):
-        return reverse('users:user-asset-permission', kwargs={'pk': self.user_object.id})
+        return reverse('users:user-asset-permission', kwargs={'pk': self.user.id})
 
 
-class UserGrantedAssetView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+class UserGroupAssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
+    form_class = forms.UserGroupPrivateAssetPermissionForm
+    model = AssetPermission
+
+    def get(self, request, *args, **kwargs):
+        user_group = self.get_object(queryset=UserGroup.objects.all())
+        return redirect(reverse('users:user-group-asset-permission', kwargs={'pk': user_group.id}))
+
+    def post(self, request, *args, **kwargs):
+        self.user_group = self.get_object(queryset=UserGroup.objects.all())
+        return super(UserGroupAssetPermissionCreateView, self).post(request, *args, **kwargs)
+
+    def get_form(self, form_class=None):
+        form = super(UserGroupAssetPermissionCreateView, self).get_form(form_class=form_class)
+        form.user_group = self.user_group
+        return form
+
+    def form_invalid(self, form):
+        return redirect(reverse('users:user-group-asset-permission', kwargs={'pk': self.user_group.id}))
+
+    def get_success_url(self):
+        return reverse('users:user-group-asset-permission', kwargs={'pk': self.user_group.id})
+
+
+class UserGrantedAssetView(AdminUserRequiredMixin, DetailView):
+    model = User
     template_name = 'users/user_granted_asset.html'
-    context_object_name = 'user_object'
+    context_object_name = 'user'
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=User.objects.all())
         return super(UserGrantedAssetView, self).get(request, *args, **kwargs)
 
-    def get_queryset(self):
-        # Convert format from {'asset': ['system_users'], ..} to
-        #     [('asset', ['system_users']), ('asset', ['system_users']))
-        assets_granted = [(asset, system_users) for asset, system_users in
-                          get_user_granted_assets(self.object).items()]
-
-        return assets_granted
-
     def get_context_data(self, **kwargs):
-        asset_groups = [(asset_group, system_users) for asset_group, system_users in
-                        get_user_granted_asset_groups(self.object).items()]
         context = {
             'app': 'User',
             'action': 'User granted asset',
-            'asset_groups': asset_groups,
         }
         kwargs.update(context)
         return super(UserGrantedAssetView, self).get_context_data(**kwargs)
 
 
-class FileForm(forms.Form):
-    excel = forms.FileField()
+class UserGroupGrantedAssetView(AdminUserRequiredMixin, DetailView):
+    model = User
+    template_name = 'users/user_group_granted_asset.html'
+    context_object_name = 'user_group'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=UserGroup.objects.all())
+        return super(UserGroupGrantedAssetView, self).get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'User',
+            'action': 'User group granted asset',
+        }
+        kwargs.update(context)
+        return super(UserGroupGrantedAssetView, self).get_context_data(**kwargs)
 
 
 class BulkImportUserView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
-    form_class = FileForm
+    form_class = forms.FileForm
 
     def form_invalid(self, form):
         try:
@@ -478,7 +516,7 @@ class BulkImportUserView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                 'enable_otp': True if enable_otp in ['T', '1', 1, True] else False,
                 'role': role
             }
-            form = UserBulkImportForm(data, auto_id=False)
+            form = forms.UserBulkImportForm(data, auto_id=False)
             if form.is_valid():
                 form.save()
             else:
@@ -493,3 +531,14 @@ class BulkImportUserView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
             'msg': 'ok' if not errors else '<br />'.join(errors)
         }
         return self.render_json_response(data)
+
+
+def down_csv(request, xx):
+    print(xx)
+    response = HttpResponse(content_type='application/csv')
+    response['Content-Disposition'] = 'attachment; filename="somefile.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['First row', 'Foo', 'Bar', 'Baz'])
+    writer.writerow(['Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"])
+    return response
+

@@ -31,20 +31,8 @@
                             {% csrf_token %}
                             {{ form.name|bootstrap_horizontal }}
                             {{ form.username|bootstrap_horizontal }}
-                            <div class="form-group">
-                                <label for="{{ form.auto_generate_key.id_for_label }}" class="col-sm-2 control-label">{% trans 'Auto generate key' %}</label>
-                                <div class="col-sm-8">
-                                    {{ form.auto_generate_key}}
-                                </div>
-                            </div>
                             {{ form.password|bootstrap_horizontal }}
                             {{ form.private_key_file|bootstrap_horizontal }}
-                            <div class="form-group">
-                                <label for="{{ form.as_default.id_for_label }}" class="col-sm-2 control-label">{% trans 'As default' %}</label>
-                                <div class="col-sm-8">
-                                    {{ form.as_default}}
-                                </div>
-                            </div>
                             {{ form.assets|bootstrap_horizontal }}
                             {{ form.comment|bootstrap_horizontal }}
 

@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+{% load common_tags %}
+{% load users_tags %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li>
+                                <a href="{% url 'assets:idc-detail' pk=idc.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
+                            </li>
+                            <li class="active"><a href="{% url 'assets:idc-assets' pk=idc.id %}" class="text-center">
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'IDC assets' %}</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0;">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left">{% trans 'IDC assets' %} <b>{{ idc.name }} </b><span class="badge"></span></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table table-striped table-bordered table-hover " id="idc_assets_table" >
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">
+                                                    <input type="checkbox" id="check_all" class="ipt_check_all" >
+                                                </th>
+                                                <th>{% trans 'Hostname' %}</th>
+                                                <th>{% trans 'IP' %}</th>
+                                                <th>{% trans 'Port' %}</th>
+                                                <th>{% trans 'Type' %}</th>
+                                                <th>{% trans 'Valid' %}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Attach to assets ' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select asset' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for asset in assets_remain %}
+                                                            <option value="{{ asset.id }}">{{ asset.ip}}:{{ asset.port }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button" class="btn btn-primary btn-sm">{% trans 'Attach' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block custom_foot_js %}
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+            var options = {
+                ele: $('#idc_assets_table'),
+                buttons: [],
+                order: [],
+                columnDefs: [
+                    {targets: 1, createdCell: function (td, cellData, rowData) {
+                        var detail_btn = '<a href="{% url "assets:asset-detail" pk=99991937 %}">' + cellData + '</a>';
+                        $(td).html(detail_btn.replace('99991937', rowData.id));
+                     }},
+                    {targets: 5, createdCell: function (td, cellData) {
+                        if (!cellData) {
+                            $(td).html('<i class="fa fa-times text-danger"></i>')
+                        } else {
+                            $(td).html('<i class="fa fa-check text-navy"></i>')
+                        }
+                     }}],
+                ajax_url: '{% url "api-assets:asset-list" %}?idc={{ idc.id }}',
+                columns: [{data: function(){return ""}}, {data: "hostname" }, {data: "ip" }, {data: "port" },
+                    {data: "type" }, {data: "is_active" }]
+            };
+            jumpserver.initDataTable(options);
+        });
+    </script>
+{% endblock %}

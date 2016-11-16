@@ -6,8 +6,9 @@ from django.db import models
 from django.core import serializers
 import logging
 from django.utils.translation import ugettext_lazy as _
+from django.core.exceptions import ValidationError
 
-from common.utils import signer
+from common.utils import signer, validate_ssh_private_key
 
 logger = logging.getLogger(__name__)
 
@@ -91,13 +92,21 @@ class AssetExtend(models.Model):
         unique_together = ('key', 'value')
 
 
+def private_key_validator(value):
+    if not validate_ssh_private_key(value):
+        raise ValidationError(
+            _('%(value)s is not an even number'),
+            params={'value': value},
+        )
+
+
 class AdminUser(models.Model):
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     username = models.CharField(max_length=16, verbose_name=_('Username'))
-    _password = models.CharField(max_length=256, blank=True, verbose_name=_('Password'))
-    _private_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH private key'))
+    _password = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
+    _private_key = models.CharField(max_length=4096, blank=True, null=True, verbose_name=_('SSH private key'),
+                                    validators=[private_key_validator,])
     _public_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
-    as_default = models.BooleanField(default=False, verbose_name=_('As default'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     created_by = models.CharField(max_length=32, null=True, verbose_name=_('Created by'))
@@ -107,7 +116,7 @@ class AdminUser(models.Model):
 
     @property
     def password(self):
-        return decrypt(self._password)
+        return signer.unsign(self._password)
 
     @password.setter
     def password(self, password_raw):
@@ -128,6 +137,10 @@ class AdminUser(models.Model):
     @public_key.setter
     def public_key(self, public_key_raw):
         self._public_key = signer.sign(public_key_raw)
+
+    @property
+    def assets_amount(self):
+        return self.assets.count()
 
     class Meta:
         db_table = 'admin_user'
@@ -216,6 +229,10 @@ class SystemUser(models.Model):
         assets = set(self.assets.all()) | self.get_assets_inherit_from_asset_groups()
         return list(assets)
 
+    @property
+    def assets_amount(self):
+        return self.assets.count()
+
     class Meta:
         db_table = 'system_user'
 
@@ -298,9 +315,8 @@ class Asset(models.Model):
     admin_user = models.ForeignKey(AdminUser, null=True, blank=True, related_name='assets',
                                    on_delete=models.SET_NULL, verbose_name=_("Admin user"))
     system_users = models.ManyToManyField(SystemUser, blank=True, related_name='assets', verbose_name=_("System User"))
-    idc = models.ForeignKey(IDC, null=True, related_name='assets',
+    idc = models.ForeignKey(IDC, blank=True, null=True, related_name='assets',
                             on_delete=models.SET_NULL, verbose_name=_('IDC'),)
-                            # default=get_default_idc)
     mac_address = models.CharField(max_length=20, null=True, blank=True, verbose_name=_("Mac address"))
     brand = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Brand'))
     cpu = models.CharField(max_length=64,  null=True, blank=True, verbose_name=_('CPU'))
@@ -329,6 +345,7 @@ class Asset(models.Model):
     def __unicode__(self):
         return '%(ip)s:%(port)s' % {'ip': self.ip, 'port': self.port}
 
+    @property
     def is_valid(self):
         warning = ''
         if not self.is_active:

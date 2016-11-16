@@ -1,34 +1,26 @@
 # -*- coding: utf-8 -*-
 #
 
-from rest_framework  import serializers
+from django.utils.translation import ugettext_lazy as _
+from rest_framework import serializers
+from common.utils import get_object_or_none
 from .models import AssetPermission
+from .hands import User
 
 
 class AssetPermissionSerializer(serializers.ModelSerializer):
-    # users_amount = serializers.SerializerMethodField()
-    # user_groups_amount = serializers.SerializerMethodField()
-    # assets_amount = serializers.SerializerMethodField()
-    # asset_groups_amount = serializers.SerializerMethodField()
-
     class Meta:
         model = AssetPermission
-        fields = ['id', 'name', 'users', 'user_groups', 'assets', 'asset_groups',
-                  'system_users', 'is_active', 'comment', 'date_expired']
 
-    # @staticmethod
-    # def get_users_amount(obj):
-    #     return obj.users.count()
-    #
-    # @staticmethod
-    # def get_user_groups_amount(obj):
-    #     return obj.user_groups.count()
-    #
-    # @staticmethod
-    # def get_assets_amount(obj):
-    #     return obj.assets.count()
-    #
-    # @staticmethod
-    # def get_asset_groups_amount(obj):
-    #     return obj.asset_groups.count()
+
+class UserAssetPermissionSerializer(AssetPermissionSerializer):
+    is_inherited = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_is_inherited(obj):
+        if getattr(obj, 'inherited', ''):
+            return True
+        else:
+            return False
+
 

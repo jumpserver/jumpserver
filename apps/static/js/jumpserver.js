@@ -189,9 +189,8 @@ function activeNav() {
 function APIUpdateAttr(props) {
   // props = {url: .., body: , success: , error: , method: ,}
   props = props || {};
-  success_message = props.success_message || 'Update Successfully!';
-  fail_message = props.fail_message || 'Error occurred while updating.';
-
+  var success_message = props.success_message || 'Update Successfully!';
+  var fail_message = props.fail_message || 'Error occurred while updating.';
   $.ajax({
     url: props.url,
     type: props.method || "PATCH",
@@ -199,19 +198,18 @@ function APIUpdateAttr(props) {
     contentType: props.content_type || "application/json; charset=utf-8",
     dataType: props.data_type || "json"
   }).done(function(data, textStatue, jqXHR) {
+    toastr.success(success_message);
     if (typeof props.success === 'function') {
       return props.success(data);
-    } else {
-      toastr.success(success_message);
-    }
+    } 
+    
   }).fail(function(jqXHR, textStatue, errorThrown) {
+    toastr.error(fail_message);
     if (typeof props.error === 'function') {
       return props.error(errorThrown);
-    } else {
-      toastr.error(fail_message);
-    }
+    } 
   });
-  return true;
+  // return true;
 }
 
 // Sweet Alert for Delete
@@ -267,6 +265,7 @@ $.fn.serializeObject = function()
 };
 var jumpserver = {};
 jumpserver.checked = false;
+jumpserver.selected = {};
 jumpserver.initDataTable = function (options) {
   // options = {
   //    ele *: $('#dataTable_id'),
@@ -285,59 +284,37 @@ jumpserver.initDataTable = function (options) {
     {
       targets: 0,
       orderable: false,
-      createdCell: function(td) {
-        $(td).html('<input type="checkbox" class="ipt_check">');
-      }
-    },
+      createdCell: function(td, cellData) {
+          $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
+      }},
     {className: 'text-center', targets: '_all'}
   ];
   columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
   var table = ele.DataTable({
-        pageLength: options.pageLength || 25,
+        pageLength: options.pageLength || 15,
         dom: options.dom || '<"#uc.pull-left"><"html5buttons"B>flti<"row m-t"<"#op.col-md-6"><"col-md-6"p>>',
         language: {
             url: options.i18n_url || "/static/js/plugins/dataTables/i18n/zh-hans.json"
         },
         order: options.order || [[ 1, 'asc' ]],
-        buttons: options.buttons || [
-            {extend: 'excel',
-                exportOptions: {
-                    modifier: {
-                        selected: true
-                    }
-                }
-            },
-            {extend: 'pdf',
-                exportOptions: {
-                    modifier: {
-                        selected: true
-                    }
-                }
-            },
-            {extend: 'print',
-                customize: function (win){
-                    $(win.document.body).addClass('white-bg');
-                    $(win.document.body).css('font-size', '10px');
-                    $(win.document.body).find('table')
-                        .addClass('compact')
-                        .css('font-size', 'inherit');
-                }
-            }
-        ],
+        select: options.select || 'multi',
+        buttons: [],
         columnDefs: columnDefs,
-        select: options.select || {style: 'multi'},
         ajax: {
             url: options.ajax_url ,
             dataSrc: ""
         },
-        columns: options.columns || []
+        columns: options.columns || [],
+        lengthMenu: [[15, 25, 50, -1], [15, 25, 50, "All"]]
     });
     table.on('select', function(e, dt, type, indexes) {
         var $node = table[ type ]( indexes ).nodes().to$();
         $node.find('input.ipt_check').prop('checked', true);
+        jumpserver.selected[$node.find('input.ipt_check').prop('id')] = true
     }).on('deselect', function(e, dt, type, indexes) {
         var $node = table[ type ]( indexes ).nodes().to$();
         $node.find('input.ipt_check').prop('checked', false);
+        jumpserver.selected[$node.find('input.ipt_check').prop('id')] = false
     }).on('draw', function(){
         $('#op').html(options.op_html || '');
         $('#uc').html(options.uc_html || '');
@@ -353,5 +330,6 @@ jumpserver.initDataTable = function (options) {
           table.rows().deselect();
       }
     });
+
     return table;
 };

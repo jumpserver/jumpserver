@@ -3,14 +3,14 @@
 
 
 from __future__ import absolute_import, unicode_literals
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.views import APIView, Response
 
 from . import models, serializers
 from .hands import IsSuperUserOrTerminalUser, Terminal
 
 
-class ProxyLogListCreateApi(generics.ListCreateAPIView):
+class ProxyLogViewSet(viewsets.ModelViewSet):
     """User proxy to backend server need call this api.
 
     params: {
@@ -34,18 +34,8 @@ class ProxyLogListCreateApi(generics.ListCreateAPIView):
     serializer_class = serializers.ProxyLogSerializer
     permission_classes = (IsSuperUserOrTerminalUser,)
 
-    def perform_create(self, serializer):
-        # Todo: May be save log_file
-        super(ProxyLogListCreateApi, self).perform_create(serializer)
 
-
-class ProxyLogDetailApi(generics.RetrieveUpdateDestroyAPIView):
-    queryset = models.ProxyLog.objects.all()
-    serializer_class = serializers.ProxyLogSerializer
-    permission_classes = (IsSuperUserOrTerminalUser,)
-
-
-class CommandLogListCreateApi(generics.ListCreateAPIView):
+class CommandLogViewSet(viewsets.ModelViewSet):
     queryset = models.CommandLog.objects.all()
     serializer_class = serializers.CommandLogSerializer
     permission_classes = (IsSuperUserOrTerminalUser,)
