@@ -7,7 +7,7 @@ from rest_framework import viewsets
 from users.backends import IsValidUser, IsSuperUser
 from common.utils import get_object_or_none
 from .utils import get_user_granted_assets, get_user_granted_asset_groups, get_user_asset_permissions, \
-    get_user_group_asset_permissions, get_user_group_granted_assets
+    get_user_group_asset_permissions, get_user_group_granted_assets, get_user_group_granted_asset_groups
 from .models import AssetPermission
 from .hands import AssetGrantedSerializer, User, UserGroup, AssetGroup, Asset, AssetGroup, AssetGroupSerializer
 from . import serializers
@@ -154,4 +154,34 @@ class MyAssetGroupAssetsApi(ListAPIView):
             for asset in assets:
                 if asset_group in asset.groups.all():
                     queryset.append(asset)
+        return queryset
+
+
+class UserGroupGrantedAssetsApi(ListAPIView):
+    permission_classes = (IsSuperUser,)
+    serializer_class = AssetGrantedSerializer
+
+    def get_queryset(self):
+        user_group_id = self.kwargs.get('pk', '')
+
+        if user_group_id:
+            user_group = get_object_or_404(User, id=user_group_id)
+            queryset = get_user_group_granted_assets(user_group)
+        else:
+            queryset = []
+        return queryset
+
+
+class UserGroupGrantedAssetGroupsApi(ListAPIView):
+    permission_classes = (IsSuperUser,)
+    serializer_class = AssetGroupSerializer
+
+    def get_queryset(self):
+        user_group_id = self.kwargs.get('pk', '')
+
+        if user_group_id:
+            user_group = get_object_or_404(User, id=user_group_id)
+            queryset = get_user_group_granted_asset_groups(user_group)
+        else:
+            queryset = []
         return queryset

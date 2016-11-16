@@ -25,7 +25,7 @@
                                 <a href="{% url 'users:user-group-asset-permission' pk=user_group.id %}" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Asset permission' %}</a>
                             </li>
                             <li>
-                                <a href="{% url 'users:user-granted-asset' pk=user.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a>
+                                <a href="{% url 'users:user-group-granted-asset' pk=user.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a>
                             </li>
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-default" href="{% url 'users:user-group-update' pk=user_group.id %}"><i class="fa fa-edit"></i>Update</a>
