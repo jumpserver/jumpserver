@@ -158,7 +158,7 @@
                         }
                      }}
                 ],
-                ajax_url: '{% url "perms:api-asset-permission-list" %}?user={{ user.id }}',
+                ajax_url: '{% url "api-perms:asset-permission-list" %}?user={{ user.id }}',
                 columns: [{data: function(){return ""}}, {data: "name" }, {data: "assets" }, {data: "asset_groups"},
                     {data: "system_users"}, {data: "is_active"}, {data: "id"}]
             };

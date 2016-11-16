@@ -228,7 +228,7 @@
 jumpserver.groups_selected = {};
 
 function updateUserGroups(groups) {
-    var the_url = "{% url 'users:api-user-update-group' pk=user.id %}";
+    var the_url = "{% url 'api-users:user-update-group' pk=user.id %}";
     var body = {
         groups: Object.assign([], groups)
     };
@@ -265,7 +265,7 @@ $(document).ready(function() {
             delete jumpserver.groups_selected[data.id]
         })
 }).on('click', '#is_active', function() {
-    var the_url = "{% url 'users:api-user-detail' pk=user.id %}";
+    var the_url = "{% url 'api-users:user-detail' pk=user.id %}";
     var checked = $(this).prop('checked');
     var body = {
         'is_active': checked
@@ -277,7 +277,7 @@ $(document).ready(function() {
         success_message: success
     });
 }).on('click', '#enable_otp', function() {
-    var the_url = "{% url 'users:api-user-detail' pk=user.id %}";
+    var the_url = "{% url 'api-users:user-detail' pk=user.id %}";
     var checked = $(this).prop('checked');
     var body = {
         'enable_otp': checked
@@ -316,7 +316,7 @@ $(document).ready(function() {
     updateUserGroups(groups)
 }).on('click', '#btn_reset_password', function() {
     function doReset() {
-        var the_url = '{% url "users:api-user-reset-password" pk=user.id %}';
+        var the_url = '{% url "api-users:user-reset-password" pk=user.id %}';
         var body = {};
         var success = function() {
             var msg = "{% trans "An e-mail has been sent to the user\'s mailbox." %}";
@@ -341,7 +341,7 @@ $(document).ready(function() {
     });
 }).on('click', '#btn_reset_pk', function() {
     function doReset() {
-        var the_url = '{% url "users:api-user-reset-pk" pk=user.id %}';
+        var the_url = '{% url "api-users:user-reset-pk" pk=user.id %}';
         var body = {};
         var success = function() {
             var msg = "{% trans 'The reset-ssh-public-key E-mail has been sent successfully. Please inform the user to update his new ssh public key.' %}";
@@ -367,7 +367,7 @@ $(document).ready(function() {
 }).on('click', '#btn_user_update_pk', function(){
     var $this = $(this);
     var pk = $('#txt_pk').val();
-    var the_url = '{% url "users:api-user-update-pk" pk=user.id %}';
+    var the_url = '{% url "api-users:user-update-pk" pk=user.id %}';
     var body = {'_public_key': pk};
     var success = function() {
         $('#txt_pk').val('');

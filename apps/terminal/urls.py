@@ -16,8 +16,8 @@ urlpatterns = [
 ]
 
 router = routers.DefaultRouter()
-router.register(r'v1/terminal/heatbeat', api.TerminalHeatbeatViewSet, 'api-terminal-heatbeat')
-router.register(r'v1/terminal', api.TerminalViewSet, 'api-terminal')
+router.register(r'v1/terminal/heatbeat', api.TerminalHeatbeatViewSet, 'terminal-heatbeat')
+router.register(r'v1/terminal', api.TerminalViewSet, 'terminal')
 # urlpatterns += [
 #     url(r'v1/terminal/heatbeat/', api.TerminalHeatbeatApi.as_view(), name='api-terminal-heatbeat')
 # ]

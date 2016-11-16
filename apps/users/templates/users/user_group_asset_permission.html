@@ -154,7 +154,7 @@
                         $(td).html(btn)
                      }}
                 ],
-                ajax_url: '{% url "perms:api-asset-permission-list" %}?user_group={{ user_group.id }}',
+                ajax_url: '{% url "api-perms:asset-permission-list" %}?user_group={{ user_group.id }}',
                 columns: [{data: function(){return ""}}, {data: "name" }, {data: "assets" }, {data: "asset_groups"},
                     {data: "system_users"}, {data: "is_active"}, {data: "id"}]
             };

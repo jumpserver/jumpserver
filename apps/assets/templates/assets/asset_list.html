@@ -72,7 +72,7 @@
              </td>
              <td class="text-center">
                  <a href="{% url 'assets:asset-update' pk=asset.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
-                 <a onclick="objectDelete(this,'{{ asset.hostname }}','{% url 'assets:api-asset-detail' pk=asset.id %}')" class="btn btn-xs btn-danger del">
+                 <a onclick="objectDelete(this,'{{ asset.hostname }}','{% url 'api-assets:asset-detail' pk=asset.id %}')" class="btn btn-xs btn-danger del">
                      {% trans 'Delete' %}</a>
              </td>
          </tr>
@@ -190,7 +190,7 @@
             var column2 = table.rows('.selected').data();
             var id_list = [];
             var plain_id_list = [];
-            var the_url = "{% url 'assets:api-asset-bulk-update' %}";
+            var the_url = "{% url 'api-assets:asset-bulk-update' %}";
             for(var i=0;i<column2.length;i++){
                 id_list.push({id: column2[i].id,hostname:column2[i].ip});
                 plain_id_list.push(parseInt(column2[i].id));

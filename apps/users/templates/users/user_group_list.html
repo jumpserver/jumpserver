@@ -55,7 +55,7 @@ $(document).ready(function() {
                     $(td).html(update_btn + del_btn)
                 }
              }}],
-        ajax_url: '{% url "users:api-user-group-list" %}',
+        ajax_url: '{% url "api-users:user-group-list" %}',
         columns: [{data: function(){return ""}}, {data: "name" }, {data: "user_amount"},
                   {data: "comment"}, {data: "id" }],
         op_html: $('#actions').html()
@@ -65,7 +65,7 @@ $(document).ready(function() {
     var $this = $(this);
     function doDelete() {
         var group_id = $this.data('gid');
-        var the_url = "{% url 'users:api-user-group-detail' pk=99991937 %}".replace('99991937', group_id);
+        var the_url = "{% url 'api-users:user-group-detail' pk=99991937 %}".replace('99991937', group_id);
         var body = {};
         var success = function() {
             var msg = "{% trans 'Group Deleted.' %}";
@@ -105,7 +105,7 @@ $(document).ready(function() {
     if (plain_id_list === []) {
         return false;
     }
-    var the_url = "{% url 'users:api-user-group-list' %}";
+    var the_url = "{% url 'api-users:user-group-list' %}";
     function doDelete() {
         swal({
             title: "{% trans 'Are you sure?' %}",

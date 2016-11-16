@@ -50,7 +50,7 @@ $(document).ready(function(){
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
                 $(td).html(update_btn + del_btn)
              }}],
-        ajax_url: '{% url "assets:api-idc-list" %}',
+        ajax_url: '{% url "api-assets:idc-list" %}',
         columns: [{data: function(){return ""}}, {data: "name" }, {data: "assets_amount" }, {data: "contact" }, {data: "phone" },
                   {data: "operator" }, {data: "id" }],
         op_html: $('#actions').html()

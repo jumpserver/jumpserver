@@ -73,7 +73,7 @@ $(document).ready(function(){
                 $(td).html(update_btn + delete_btn)
              }}
         ],
-        ajax_url: '{% url "terminal:api-terminal-list" %}',
+        ajax_url: '{% url "api-terminal:terminal-list" %}',
         columns: [{data: function(){return ""}}, {data: "name" }, {data: "ip" }, {data: "get_type_display" },
                   {data: "proxy_online"}, {data: "is_active" }, {data: 'is_active'}, {data: "id"}],
         op_html: $('#actions').html()
@@ -83,7 +83,7 @@ $(document).ready(function(){
     var $this = $(this);
     var uid = $this.data('uid');
     var name = $(this).data('name');
-    var the_url = '{% url "terminal:api-terminal-detail" pk=99991937 %}'.replace('99991937', uid);
+    var the_url = '{% url "api-terminal:terminal-detail" pk=99991937 %}'.replace('99991937', uid);
     objectDelete($this, name, the_url)
 })
 </script>

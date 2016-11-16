@@ -119,7 +119,7 @@
 jumpserver.users_selected = {};
 
 function updateGroupMember(users) {
-    var the_url = "{% url 'users:api-user-group-update-user' pk=user_group.id %}";
+    var the_url = "{% url 'api-users:user-group-update-user' pk=user_group.id %}";
     var body = {
         users: Object.assign([], users)
     };

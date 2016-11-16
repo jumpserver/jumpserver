@@ -52,7 +52,7 @@ $(document).ready(function(){
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_admin_user_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
                 $(td).html(script_btn + update_btn + del_btn)
              }}],
-        ajax_url: '{% url "assets:api-admin-user-list" %}',
+        ajax_url: '{% url "api-assets:admin-user-list" %}',
         columns: [{data: function(){return ""}}, {data: "name" }, {data: "username" }, {data: "assets_amount" }, {data: function () {return 'lost'} },
                   {data: "comment" }, {data: "id" }],
         op_html: $('#actions').html()
