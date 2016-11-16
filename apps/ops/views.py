@@ -7,7 +7,6 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from .hands import AdminUserRequiredMixin
-from .utils import *
 
 
 class SudoListView(AdminUserRequiredMixin, ListView):
@@ -38,13 +37,7 @@ class SudoListView(AdminUserRequiredMixin, ListView):
         return super(AssetListView, self).get_context_data(**kwargs)
 
 
-class SudoCreateView(AdminUserRequiredMixin,
-                     CreateHostAliasMinxin,
-                     CreateUserAliasMinxin,
-                     CreateCmdAliasMinxin,
-                     CreateRunasAliasMinxin,
-                     CreateExtralineAliasMinxin,
-                     CreateView):
+class SudoCreateView(AdminUserRequiredMixin, CreateView):
     model = Asset
     tag_type = 'asset'
     form_class = AssetCreateForm
@@ -72,13 +65,7 @@ class SudoCreateView(AdminUserRequiredMixin,
         return super(AssetCreateView, self).get_context_data(**kwargs)
 
 
-class SudoUpdateView(AdminUserRequiredMixin,
-                     UpdateHostAliasMinxin,
-                     UpdateUserAliasMinxin,
-                     UpdateCmdAliasMinxin,
-                     UpdateRunasAliasMinxin,
-                     UpdateExtralineAliasMinxin,
-                     UpdateView):
+class SudoUpdateView(AdminUserRequiredMixin, UpdateView):
     model = Asset
     form_class = AssetCreateForm
     template_name = 'assets/asset_update.html'
