@@ -22,16 +22,16 @@ from django.views.generic.base import TemplateView
 urlpatterns = [
     url(r'^captcha/', include('captcha.urls')),
     url(r'^$', TemplateView.as_view(template_name='base.html'), name='index'),
-    url(r'^users/', include('users.urls', namespace='users')),
-    url(r'^assets/', include('assets.urls', namespace='assets')),
-    url(r'^perms/', include('perms.urls', namespace='perms')),
-    url(r'^audits/', include('audits.urls', namespace='audits')),
-    url(r'^terminal/', include('terminal.urls', namespace='terminal')),
-    url(r'^api/users/', include('users.urls', namespace='api-users')),
-    url(r'^api/assets/', include('assets.urls', namespace='api-assets')),
-    url(r'^api/perms/', include('perms.urls', namespace='api-perms')),
-    url(r'^api/audits/', include('audits.urls', namespace='api-audits')),
-    url(r'^api/terminal/', include('terminal.urls', namespace='api-terminal')),
+    url(r'^users/', include('users.urls.views_urls', namespace='users')),
+    url(r'^assets/', include('assets.urls.views_urls', namespace='assets')),
+    url(r'^perms/', include('perms.urls.views_urls', namespace='perms')),
+    url(r'^audits/', include('audits.urls.views_urls', namespace='audits')),
+    url(r'^terminal/', include('terminal.urls.views_urls', namespace='terminal')),
+    url(r'^api/users/', include('users.urls.api_urls', namespace='api-users')),
+    url(r'^api/assets/', include('assets.urls.api_urls', namespace='api-assets')),
+    url(r'^api/perms/', include('perms.urls.api_urls', namespace='api-perms')),
+    url(r'^api/audits/', include('audits.urls.api_urls', namespace='api-audits')),
+    url(r'^api/terminal/', include('terminal.urls.api_urls', namespace='api-terminal')),
 ]
 
 

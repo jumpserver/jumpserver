@@ -1,9 +1,5 @@
 from django.conf.urls import url
-
-from rest_framework import routers
-
-import api
-import views
+from .. import views
 
 app_name = 'audits'
 
@@ -15,8 +11,4 @@ urlpatterns = [
     url(r'^login-log$', views.LoginLogListView.as_view(), name='login-log-list'),
 ]
 
-router = routers.DefaultRouter()
-router.register(r'v1/proxy-log', api.ProxyLogViewSet, 'proxy-log')
-router.register(r'v1/command-log', api.CommandLogViewSet, 'command-log')
 
-urlpatterns += router.urls
