@@ -2,13 +2,14 @@
 
 from __future__ import unicode_literals
 
+import csv
 from django import forms
 from django.conf import settings
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.files.storage import default_storage
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -530,3 +531,14 @@ class BulkImportUserView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
             'msg': 'ok' if not errors else '<br />'.join(errors)
         }
         return self.render_json_response(data)
+
+
+def down_csv(request, xx):
+    print(xx)
+    response = HttpResponse(content_type='application/csv')
+    response['Content-Disposition'] = 'attachment; filename="somefile.csv"'
+    writer = csv.writer(response)
+    writer.writerow(['First row', 'Foo', 'Bar', 'Baz'])
+    writer.writerow(['Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"])
+    return response
+

@@ -23,21 +23,21 @@ urlpatterns = [
 ]
 
 router = routers.DefaultRouter()
-router.register('v1/asset-permissions', api.AssetPermissionViewSet, 'api-asset-permission')
+router.register('v1/asset-permissions', api.AssetPermissionViewSet, 'asset-permission')
 
 urlpatterns += [
-    url(r'^v1/user/my/assets/$', api.MyGrantedAssetsApi.as_view(), name='api-my-assets'),
-    url(r'^v1/user/my/asset-groups/$', api.MyGrantedAssetsGroupsApi.as_view(), name='api-my-asset-groups'),
+    url(r'^v1/user/my/assets/$', api.MyGrantedAssetsApi.as_view(), name='my-assets'),
+    url(r'^v1/user/my/asset-groups/$', api.MyGrantedAssetsGroupsApi.as_view(), name='my-asset-groups'),
     url(r'^v1/user/my/asset-group/(?P<pk>[0-9]+)/assets/$', api.MyAssetGroupAssetsApi.as_view(),
         name='user-my-asset-group-assets'),
 
     # Select user permission of asset and asset group
-    url(r'^v1/user/(?P<pk>[0-9]+)/assets/$', api.UserGrantedAssetsApi.as_view(), name='api-user-assets'),
+    url(r'^v1/user/(?P<pk>[0-9]+)/assets/$', api.UserGrantedAssetsApi.as_view(), name='user-assets'),
     url(r'^v1/user/(?P<pk>[0-9]+)/asset-groups/$', api.UserGrantedAssetGroupsApi.as_view(),
         name='api-user-asset-groups'),
 
     # Select user group permission of asset and asset group
-    url(r'^v1/user-group/(?P<pk>[0-9]+)/assets/$', api.UserGroupGrantedAssetsApi.as_view(), name='api-user-group-assets'),
+    url(r'^v1/user-group/(?P<pk>[0-9]+)/assets/$', api.UserGroupGrantedAssetsApi.as_view(), name='user-group-assets'),
     url(r'^v1/user-group/(?P<pk>[0-9]+)/asset-groups/$', api.UserGroupGrantedAssetGroupsApi.as_view(),
         name='api-user-group-asset-groups'),
 

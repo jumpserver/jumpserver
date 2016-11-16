@@ -154,7 +154,7 @@
                         $(td).html(btn)
                      }}
                 ],
-                ajax_url: '{% url "perms:api-asset-permission-list" %}?user-group={{ user_group.id }}',
+                ajax_url: '{% url "perms:api-asset-permission-list" %}?user_group={{ user_group.id }}',
                 columns: [{data: function(){return ""}}, {data: "name" }, {data: "assets" }, {data: "asset_groups"},
                     {data: "system_users"}, {data: "is_active"}, {data: "id"}]
             };
@@ -165,7 +165,6 @@
                 id: $this.attr('id'),
                 user_group_id: {{ user_group.id }}
             };
-            console.log(body);
             var the_url = "{% url 'perms:revoke-user-group-asset-permission' %}";
             var success = function () {
                 $this.closest('tr').remove();
@@ -177,6 +176,8 @@
                 success_message: '{% trans "Revoke Successfully!" %}',
                 success: success
             });
+        }).on('click', 'buttons-excel', function () {
+            console.log('click excel')
         })
     </script>
 {% endblock %}

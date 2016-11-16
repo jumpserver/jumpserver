@@ -265,6 +265,7 @@ $.fn.serializeObject = function()
 };
 var jumpserver = {};
 jumpserver.checked = false;
+jumpserver.selected = {};
 jumpserver.initDataTable = function (options) {
   // options = {
   //    ele *: $('#dataTable_id'),
@@ -283,10 +284,9 @@ jumpserver.initDataTable = function (options) {
     {
       targets: 0,
       orderable: false,
-      createdCell: function(td) {
-        $(td).html('<input type="checkbox" class="ipt_check">');
-      }
-    },
+      createdCell: function(td, cellData) {
+          $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
+      }},
     {className: 'text-center', targets: '_all'}
   ];
   columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
@@ -298,31 +298,7 @@ jumpserver.initDataTable = function (options) {
         },
         order: options.order || [[ 1, 'asc' ]],
         select: options.select || 'multi',
-        buttons: options.buttons || [
-            {extend: 'excel',
-                exportOptions: {
-                    modifier: {
-                        selected: true
-                    }
-                }
-            },
-            {extend: 'pdf',
-                exportOptions: {
-                    modifier: {
-                        selected: true
-                    }
-                }
-            },
-            {extend: 'print',
-                customize: function (win){
-                    $(win.document.body).addClass('white-bg');
-                    $(win.document.body).css('font-size', '10px');
-                    $(win.document.body).find('table')
-                        .addClass('compact')
-                        .css('font-size', 'inherit');
-                }
-            }
-        ],
+        buttons: [],
         columnDefs: columnDefs,
         ajax: {
             url: options.ajax_url ,
@@ -334,9 +310,11 @@ jumpserver.initDataTable = function (options) {
     table.on('select', function(e, dt, type, indexes) {
         var $node = table[ type ]( indexes ).nodes().to$();
         $node.find('input.ipt_check').prop('checked', true);
+        jumpserver.selected[$node.find('input.ipt_check').prop('id')] = true
     }).on('deselect', function(e, dt, type, indexes) {
         var $node = table[ type ]( indexes ).nodes().to$();
         $node.find('input.ipt_check').prop('checked', false);
+        jumpserver.selected[$node.find('input.ipt_check').prop('id')] = false
     }).on('draw', function(){
         $('#op').html(options.op_html || '');
         $('#uc').html(options.uc_html || '');

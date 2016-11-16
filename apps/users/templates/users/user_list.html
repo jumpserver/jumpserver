@@ -1,6 +1,16 @@
 {% extends '_base_list.html' %}
 {% load i18n static %}
-{% block table_search %}{% endblock %}
+{% block table_search %}
+    <div class="html5buttons">
+        <div class="dt-buttons btn-group">
+            <a class="btn btn-default buttons-pdf" tabindex="0" href="#">
+                <span>PDF</span></a>
+            <a class="btn btn-default buttons-excel" tabindex="0" href="#">
+                <span>Excel</span>
+            </a>
+        </div>
+    </div>
+{% endblock %}
 {% block table_container %}
 <div class="uc pull-left m-l-5 m-r-5"><a href="{% url "users:user-create" %}" class="btn btn-sm btn-primary"> {% trans "Create user" %} </a></div>
 <div class="uc pull-left"><a href="javascript:void(0);" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#user_import_modal"> {% trans "Import user" %} </a></div>
@@ -72,11 +82,19 @@ $(document).ready(function(){
                 }
              }}],
         ajax_url: '{% url "users:api-user-list" %}',
-        columns: [{data: function(){return ""}}, {data: "username" }, {data: "name" }, {data: "get_role_display" },
-            {data: "groups_display" }, {data: "is_valid" }, {data: "id" }],
-        op_html: $('#actions').html()
+        columns: [{data: "id"}, {data: "username" }, {data: "name" }, {data: "get_role_display" },
+            {data: "groups_display" }, {data: "is_valid" }, {data: "id" }]
     };
-    jumpserver.initDataTable(options);
+    var table = jumpserver.initDataTable(options);
+
+    $('.buttons-pdf').click(function () {
+        var users = [];
+        var rows = table.rows('.selected').data();
+        $.each(rows, function (index, obj) {
+            users.push(obj.id)
+        })
+    });
+
 }).on('click', '#btn_bulk_update', function(){
     var action = $('#slct_bulk_update').val();
     var $data_table = $('#user_list_table').DataTable();
@@ -216,15 +234,11 @@ $(document).ready(function(){
         } else {
             $('#user_import_modal').modal('hide');
             var $data_table = $('#user_list_table').DataTable();
-            toastr.success("{% trans 'Import User Success.' %}")
+            toastr.success("{% trans 'Import User Success.' %}");
             $data_table.ajax.reload();
         }
     }
     $form.ajaxSubmit({success: success});
-}).on('change', '#id_excel', function() {
-    $(this).siblings('.help-block').remove();
-}).on('click', '.ipt_check', function () {
-    console.log('Hello')
 })
 </script>
 {% endblock %}

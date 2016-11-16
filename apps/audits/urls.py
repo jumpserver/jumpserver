@@ -16,7 +16,7 @@ urlpatterns = [
 ]
 
 router = routers.DefaultRouter()
-router.register(r'v1/proxy-log', api.ProxyLogViewSet, 'api-proxy-log')
-router.register(r'v1/command-log', api.CommandLogViewSet, 'api-command-log')
+router.register(r'v1/proxy-log', api.ProxyLogViewSet, 'proxy-log')
+router.register(r'v1/command-log', api.CommandLogViewSet, 'command-log')
 
 urlpatterns += router.urls

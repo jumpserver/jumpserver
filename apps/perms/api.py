@@ -21,7 +21,7 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         queryset = super(AssetPermissionViewSet, self).get_queryset()
         user_id = self.request.query_params.get('user', '')
-        user_group_id = self.request.query_params.get('user-group', '')
+        user_group_id = self.request.query_params.get('user_group', '')
 
         if user_id and user_id.isdigit():
             user = get_object_or_404(User, id=int(user_id))
@@ -165,7 +165,7 @@ class UserGroupGrantedAssetsApi(ListAPIView):
         user_group_id = self.kwargs.get('pk', '')
 
         if user_group_id:
-            user_group = get_object_or_404(User, id=user_group_id)
+            user_group = get_object_or_404(UserGroup, id=user_group_id)
             queryset = get_user_group_granted_assets(user_group)
         else:
             queryset = []
@@ -180,7 +180,7 @@ class UserGroupGrantedAssetGroupsApi(ListAPIView):
         user_group_id = self.kwargs.get('pk', '')
 
         if user_group_id:
-            user_group = get_object_or_404(User, id=user_group_id)
+            user_group = get_object_or_404(UserGroup, id=user_group_id)
             queryset = get_user_group_granted_asset_groups(user_group)
         else:
             queryset = []
