@@ -334,7 +334,7 @@ class Sudo(models.Model):
                    "Host_Alias": self.hosts,
                    "Runas_Alias": self.runas,
                    "Extra_Lines": self.extras,
-                   "privileges": self.privileges}
+                   "Privileges": self.privileges}
         return template.render(context)
 
     @property
@@ -392,7 +392,7 @@ root    ALL=(ALL:ALL) ALL
 # JumpServer Generate User privilege is here.
 # Note privileges is a tuple list like [(user, host, runas, command, nopassword),]
 {% if privileges -%}
-{% for User_Flag, Host_Flag, Runas_Flag, Command_Flag, NopassWord in privileges -%}
+{% for User_Flag, Host_Flag, Runas_Flag, Command_Flag, NopassWord in Privileges -%}
 {% if NopassWord -%}
 {{ User_Flag }} {{ Host_Flag }}=({{ Runas_Flag }}) NOPASSWD: {{ Command_Flag }}
 {%- else -%}
