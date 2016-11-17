@@ -118,7 +118,7 @@
                             $(td).html('<i class="fa fa-check text-navy"></i>')
                         }
                      }}],
-                ajax_url: '{% url "api-assets:asset-list" %}?idc={{ idc.id }}',
+                ajax_url: '{% url "api-assets:asset-list" %}?idc_id={{ idc.id }}',
                 columns: [{data: function(){return ""}}, {data: "hostname" }, {data: "ip" }, {data: "port" },
                     {data: "type" }, {data: "is_active" }]
             };

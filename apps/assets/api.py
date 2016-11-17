@@ -20,9 +20,14 @@ class AssetViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super(AssetViewSet, self).get_queryset()
-        idc = self.request.query_params.get('idc', '')
-        if idc:
-            queryset = queryset.filter(idc__id=idc)
+        idc_id = self.request.query_params.get('idc_id', '')
+        asset_group_id = self.request.query_params.get('asset_group_id', '')
+        if idc_id:
+            queryset = queryset.filter(idc__id=idc_id)
+
+        if asset_group_id:
+            queryset = queryset.filter(groups__id=asset_group_id)
+
         return queryset
 
 

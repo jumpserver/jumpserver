@@ -40,12 +40,25 @@ class SystemUserSerializer(serializers.ModelSerializer):
 
 
 class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-    system_users = SystemUserSerializer(many=True, read_only=True)
-    admin_user = AdminUserSerializer(many=False, read_only=True)
+    # system_users = SystemUserSerializer(many=True, read_only=True)
+    # admin_user = AdminUserSerializer(many=False, read_only=True)
+    hardware = serializers.SerializerMethodField()
+    type_display = serializers.SerializerMethodField()
 
     class Meta(object):
         model = Asset
         list_serializer_class = BulkListSerializer
+
+    @staticmethod
+    def get_hardware(obj):
+        return '%s %s %s' % (obj.cpu, obj.memory, obj.disk)
+
+    @staticmethod
+    def get_type_display(obj):
+        if obj.type:
+            return obj.type.value
+        else:
+            return ''
 
 
 class AssetGrantedSerializer(serializers.ModelSerializer):

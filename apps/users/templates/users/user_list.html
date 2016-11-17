@@ -83,7 +83,8 @@ $(document).ready(function(){
              }}],
         ajax_url: '{% url "api-users:user-list" %}',
         columns: [{data: "id"}, {data: "username" }, {data: "name" }, {data: "get_role_display" },
-            {data: "groups_display" }, {data: "is_valid" }, {data: "id" }]
+            {data: "groups_display" }, {data: "is_valid" }, {data: "id" }],
+        op_html: $('#actions').html()
     };
     var table = jumpserver.initDataTable(options);
 
