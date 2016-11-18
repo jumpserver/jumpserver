@@ -292,7 +292,7 @@ jumpserver.initDataTable = function (options) {
   columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
   var table = ele.DataTable({
         pageLength: options.pageLength || 15,
-        dom: options.dom || '<"#uc.pull-left"><"html5buttons"B>flti<"row m-t"<"#op.col-md-6"><"col-md-6"p>>',
+        dom: options.dom || '<"#uc.pull-left">flt<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
         language: {
             url: options.i18n_url || "/static/js/plugins/dataTables/i18n/zh-hans.json"
         },

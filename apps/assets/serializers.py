@@ -35,7 +35,7 @@ class SystemUserSerializer(serializers.ModelSerializer):
 
     def get_field_names(self, declared_fields, info):
         fields = super(SystemUserSerializer, self).get_field_names(declared_fields, info)
-        fields.append('assets_amount')
+        fields.extend(['assets_amount'])
         return fields
 
 

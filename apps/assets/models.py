@@ -233,6 +233,10 @@ class SystemUser(models.Model):
     def assets_amount(self):
         return self.assets.count()
 
+    @property
+    def asset_group_amount(self):
+        return self.asset_groups.count()
+
     class Meta:
         db_table = 'system_user'
 

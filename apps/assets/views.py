@@ -478,34 +478,16 @@ class AdminUserDeleteView(AdminUserRequiredMixin, DeleteView):
     success_url = reverse_lazy('assets:admin-user-list')
 
 
-class SystemUserListView(AdminUserRequiredMixin, ListView):
-    model = SystemUser
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    context_object_name = 'system_user_list'
+class SystemUserListView(AdminUserRequiredMixin, TemplateView):
     template_name = 'assets/system_user_list.html'
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Assets'),
             'action': _('System user list'),
-            'keyword': self.request.GET.get('keyword', '')
         }
         kwargs.update(context)
         return super(SystemUserListView, self).get_context_data(**kwargs)
-
-    def get_queryset(self):
-        # Todo: Default order by lose asset connection num
-        self.queryset = super(SystemUserListView, self).get_queryset()
-        self.keyword = keyword = self.request.GET.get('keyword', '')
-        self.sort = sort = self.request.GET.get('sort', '-date_created')
-
-        if keyword:
-            self.queryset = self.queryset.filter(Q(name__icontains=keyword) |
-                                                 Q(comment__icontains=keyword))
-
-        if sort:
-            self.queryset = self.queryset.order_by(sort)
-        return self.queryset
 
 
 class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
