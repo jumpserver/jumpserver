@@ -274,49 +274,29 @@ class Sudo(models.Model):
     """
     Sudo配置文件对象, 用于配置sudo的配置文件
 
-    :param user_alias: <dict> {<alia>: <users_list>}
-    :param cmnd_alias: <dict> {<alia>: <commands_list>}
-    :param host_alias: <dict> {<alia>: <hosts_list>}
-    :param runas_alias: <dict> {<alia>: <runas_list>}
     :param extra_lines: <list> [<line1>, <line2>,...]
     :param privileges: <list> [(user, host, runas, command, nopassword),]
     """
 
     asset = models.ForeignKey(Asset, null=True, blank=True, related_name='sudos')
-    host_alias = models.ManyToManyField(HostAlia, related_name='sudos', blank=True)
-    user_alias = models.ManyToManyField(UserAlia, related_name='sudos', blank=True)
-    cmnd_alias = models.ManyToManyField(CmdAlia, related_name='sudos', blank=True)
-    runas_alias = models.ManyToManyField(RunasAlia, related_name='sudos', blank=True)
     extra_lines = models.ManyToManyField(Extra_conf, related_name='sudos', blank=True)
     privilege_items = models.ManyToManyField(Privilege, related_name='sudos', blank=True)
 
     @property
     def users(self):
-        ret = {}
-        for user in self.user_alias.all():
-            ret[user.name] = user.user_items.split(',')
-        return ret
+        return {privilege.user.name: privilege.user.user_items.split(',') for privilege in self.privilege_items.all()}
 
     @property
     def commands(self):
-        ret = {}
-        for cmd in self.cmnd_alias.all():
-            ret[cmd.name] = cmd.cmd_items.split(',')
-        return ret
+        return {privilege.command.name: privilege.command.cmd_items.split(',') for privilege in self.privilege_items.all()}
 
     @property
     def hosts(self):
-        ret = {}
-        for host in self.host_alias.all():
-            ret[host.name] = host.host_items.split(',')
-        return ret
+        return {privilege.host.name: privilege.host.host_items.split(',') for privilege in self.privilege_items.all()}
 
     @property
     def runas(self):
-        ret = {}
-        for runas in self.runas_alias.all():
-            ret[runas.name] = runas.runas_items.split(',')
-        return ret
+        return {privilege.runas.name: privilege.runas.runas_items.split(',') for privilege in self.privilege_items.all()}
 
     @property
     def extras(self):
@@ -391,7 +371,7 @@ root    ALL=(ALL:ALL) ALL
 
 # JumpServer Generate User privilege is here.
 # Note privileges is a tuple list like [(user, host, runas, command, nopassword),]
-{% if privileges -%}
+{% if Privileges -%}
 {% for User_Flag, Host_Flag, Runas_Flag, Command_Flag, NopassWord in Privileges -%}
 {% if NopassWord -%}
 {{ User_Flag }} {{ Host_Flag }}=({{ Runas_Flag }}) NOPASSWD: {{ Command_Flag }}

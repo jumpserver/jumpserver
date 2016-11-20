@@ -1,41 +1,16 @@
 # ~*~ coding: utf-8 ~*~
 
 
-class CreateHostAliasMinxin(object):
-    pass
+class CreateSudoPrivilegesMixin(object):
+
+    def create_privilege(self):
+        pass
 
 
-class CreateUserAliasMinxin(object):
-    pass
+class ListSudoPrivilegesMixin(object):
+
+    def get_all_privilege(self):
+        pass
 
 
-class CreateCmdAliasMinxin(object):
-    pass
 
-
-class CreateRunasAliasMinxin(object):
-    pass
-
-
-class CreateExtralineAliasMinxin(object):
-    pass
-
-
-class UpdateHostAliasMinxin(object):
-    pass
-
-
-class UpdateUserAliasMinxin(object):
-    pass
-
-
-class UpdateCmdAliasMinxin(object):
-    pass
-
-
-class UpdateRunasAliasMinxin(object):
-    pass
-
-
-class UpdateExtralineAliasMinxin(object):
-    pass

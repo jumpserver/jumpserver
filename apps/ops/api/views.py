@@ -193,3 +193,55 @@ class ExtraconfViewSet(viewsets.GenericViewSet):
         pass
 
 
+class PrivilegeViewSet(viewsets.GenericViewSet):
+    queryset = Privilege.objects.all()
+    serializer_class = PrivilegeSerializer
+    permission_classes = None
+
+    def list(self):
+        pass
+
+    def create(self):
+        pass
+
+    def retrieve(self, *args, **kwargs):
+        pass
+
+    def update(self, *args, **kwargs):
+        pass
+
+    def destroy(self, *args, **kwargs):
+        privilege = self.get_object()
+        privilege.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def perform_create(self):
+        pass
+
+
+class SudoViewSet(viewsets.GenericViewSet):
+    queryset = Sudo.objects.all()
+    serializer_class = SudoSerializer
+    permission_classes = None
+
+    def list(self):
+        pass
+
+    def create(self):
+        pass
+
+    def retrieve(self, *args, **kwargs):
+        pass
+
+    def update(self, *args, **kwargs):
+        pass
+
+    def destroy(self, *args, **kwargs):
+        sudo = self.get_object()
+        sudo.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def perform_create(self):
+        pass
+
+

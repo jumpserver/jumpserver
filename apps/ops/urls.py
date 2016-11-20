@@ -20,11 +20,11 @@ router.register(r'Extraconf',  api_view.ExtraconfViewSet)
 
 urlpatterns = [
     # Resource Sudo url
-    url(r'^sudo/list$',  mvc_view.SudoListView.as_view(), name='sudo-list'),
-    url(r'^sudo/create', mvc_view.SudoCreateView.as_view(), name='sudo-create'),
-    url(r'^sudo/detail', mvc_view.SudoDetailView.as_view(), name='sudo-detail'),
-    url(r'^sudo/update', mvc_view.SudoUpdateView.as_view(), name='sudo-update'),
-    url(r'^sudo/delete', mvc_view.SudoDeleteView.as_view(), name='sudo-delete'),
+    url(r'^sudo/list$',   mvc_view.SudoListView.as_view(),   name='sudo-list'),
+    url(r'^sudo/create$', mvc_view.SudoCreateView.as_view(), name='sudo-create'),
+    url(r'^sudo/detail$', mvc_view.SudoDetailView.as_view(), name='sudo-detail'),
+    url(r'^sudo/update$', mvc_view.SudoUpdateView.as_view(), name='sudo-update'),
+    url(r'^sudo/delete$', mvc_view.SudoDeleteView.as_view(), name='sudo-delete'),
 ]
 
 urlpatterns += [
