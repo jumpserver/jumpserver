@@ -1,6 +1,6 @@
 # ~*~ coding: utf-8 ~*~
+from __future__ import unicode_literals
 
-from __future__ import unicode_literals, print_function
 from ..models import HostAlia, UserAlia, CmdAlia, RunasAlia, Extra_conf, Privilege, Sudo
 from rest_framework import serializers
 
