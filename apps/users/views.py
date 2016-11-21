@@ -1,10 +1,11 @@
 # ~*~ coding: utf-8 ~*~
 
 from __future__ import unicode_literals
+from io import BytesIO
 
-import csv
+import unicodecsv as csv
 from django import forms
-from django.conf import settings
+from django.utils import timezone
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -19,8 +20,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView, SingleObjectMixin, \
-    FormMixin
+from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView, SingleObjectMixin, FormMixin
 from django.views.generic.detail import DetailView
 from formtools.wizard.views import SessionWizardView
 
@@ -533,12 +533,16 @@ class BulkImportUserView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         return self.render_json_response(data)
 
 
-def down_csv(request, xx):
-    print(xx)
+def down_csv(request):
     response = HttpResponse(content_type='application/csv')
-    response['Content-Disposition'] = 'attachment; filename="somefile.csv"'
+    response['Content-Disposition'] = 'attachment; filename="users-%s.csv"' % \
+                                      timezone.localtime(timezone.now()).strftime('%Y-%m-%d')
     writer = csv.writer(response)
-    writer.writerow(['First row', 'Foo', 'Bar', 'Baz'])
-    writer.writerow(['Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"])
+    header = [u"你好", 'username', 'email',
+              _('user group'), _('role'), _('phone'), _('wechat'), _('comment')]
+    writer.writerow(header)
+    for user in User.objects.all():
+        writer.writerow([user.name, user.username, user.email, ','.join([group.name for group in user.groups.all()]),
+                         user.role, user.phone, user.wechat, user.comment])
     return response
 

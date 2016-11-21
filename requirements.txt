@@ -15,3 +15,4 @@ paramiko==2.0.2
 django-redis-cache==1.7.1
 requests==2.11.1
 itsdangerous==0.24
+unicodecsv==0.14.1
