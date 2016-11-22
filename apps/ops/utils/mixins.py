@@ -11,6 +11,3 @@ class ListSudoPrivilegesMixin(object):
 
     def get_all_privilege(self):
         pass
-
-
-

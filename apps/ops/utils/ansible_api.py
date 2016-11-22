@@ -18,7 +18,7 @@ from ansible.utils.display import Display
 from ansible.playbook.play import Play
 from ansible.plugins.callback import CallbackBase
 
-from models import Tasker, AnsiblePlay, AnsibleTask, AnsibleHostResult
+from ops.models import Tasker, AnsiblePlay, AnsibleTask, AnsibleHostResult
 
 
 logger = logging.getLogger(__name__)

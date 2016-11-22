@@ -1,9 +1,9 @@
 from __future__ import absolute_import, unicode_literals
 
 from celery import shared_task
-from common import celery_app
 
-from ops.ansible_api import Config, ADHocRunner
+from common import celery_app
+from ops.utils.ansible_api import Config, ADHocRunner
 
 
 @shared_task(name="get_asset_hardware_info")

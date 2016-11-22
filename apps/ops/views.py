@@ -7,7 +7,7 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from .hands import AdminUserRequiredMixin
-from .utils import CreateSudoPrivilegesMixin, ListSudoPrivilegesMixin
+from .utils.mixins import CreateSudoPrivilegesMixin, ListSudoPrivilegesMixin
 from models import *
 
 
