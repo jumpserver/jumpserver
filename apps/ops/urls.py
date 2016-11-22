@@ -19,6 +19,7 @@ router.register(r'runas_alia', api_view.RunasAliaViewSet)
 router.register(r'extra_conf', api_view.ExtraconfViewSet)
 router.register(r'privilege',  api_view.PrivilegeViewSet)
 router.register(r'sudo',       api_view.SudoViewSet)
+router.register(r'cron',       api_view.CronTableViewSet)
 
 urlpatterns = [
     # Resource Sudo url

@@ -1,7 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
 
-from ..models import HostAlia, UserAlia, CmdAlia, RunasAlia, Extra_conf, Privilege, Sudo
+from ..models import HostAlia, UserAlia, CmdAlia, RunasAlia, Extra_conf, Privilege, Sudo, CronTable
 from rest_framework import serializers
 
 
@@ -47,3 +47,7 @@ class SudoSerializer(serializers.ModelSerializer):
         model = Sudo
 
 
+class CronTableSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CronTable

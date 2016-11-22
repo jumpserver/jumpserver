@@ -83,4 +83,15 @@ class SudoViewSet(mixins.CreateModelMixin,
     permission_classes = (AdminUserRequired,)
 
 
+class CronTableViewSet(mixins.CreateModelMixin,
+                       mixins.ListModelMixin,
+                       mixins.RetrieveModelMixin,
+                       mixins.UpdateModelMixin,
+                       mixins.DestroyModelMixin,
+                       viewsets.GenericViewSet):
+    queryset = CronTable.objects.all()
+    serializer_class = CronTableSerializer
+    permission_classes = (AdminUserRequired,)
+
+
 
