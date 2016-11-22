@@ -1713,6 +1713,18 @@ msgstr "Token错误或失效"
 msgid "Password not same"
 msgstr "密码不一致"
 
+#: templates/_nav.html:43
+msgid "Job Center"
+msgstr "作业中心"
+
+#: templates/_nav.html:46
+msgid "Sudo"
+msgstr "Sudo管理"
+
+#: templates/_nav.html:47
+msgid "Cron"
+msgstr "Cron管理"
+
 #~ msgid "Admin password"
 #~ msgstr "管理员密码"
 

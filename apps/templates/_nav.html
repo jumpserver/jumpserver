@@ -37,6 +37,17 @@
 {#        </li>#}
     </ul>
 </li>
+
+<li id="ops">
+    <a>
+        <i class="fa fa-inbox"></i> <span class="nav-label">{% trans 'Job Center' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level">
+        <li id="sudo"><a href="{% url 'ops:page-sudo-list' %}">{% trans 'Sudo' %}</a></li>
+        <li id="cron"><a href="{% url 'ops:page-cron-list' %}">{% trans 'Cron' %}</a></li>
+    </ul>
+</li>
+
 <li id="">
     <a href="">
         <i class="fa fa-files-o"></i><span class="nav-label">{% trans 'Audits' %}</span><span class="label label-info pull-right"></span>

@@ -394,7 +394,7 @@ root    ALL=(ALL:ALL) ALL
 
 
 class CronTable(models.Model):
-    name = models.CharField(max_length=128, blank=True, null=True, unique=True, verbose_name=_('Runas_Alias'),
+    name = models.CharField(max_length=128, blank=True, null=True, unique=True, verbose_name=_('Name'),
                             help_text=_("Description of a crontab entry"))
     month = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Month'),
                              help_text=_("Month of the year the job should run ( 1-12, *, */2, etc )"))
