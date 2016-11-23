@@ -93,7 +93,8 @@ $(document).ready(function(){
         var rows = table.rows('.selected').data();
         $.each(rows, function (index, obj) {
             users.push(obj.id)
-        })
+        });
+        console.log(users)
     });
 
 }).on('click', '#btn_bulk_update', function(){

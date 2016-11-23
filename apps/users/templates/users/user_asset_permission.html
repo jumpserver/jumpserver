@@ -169,7 +169,7 @@
                 id: $this.attr('id'),
                 user_id: {{ user.id }}
             };
-            var the_url = "{% url 'perms:revoke-user-asset-permission' %}";
+            var the_url = "{% url 'api-perms:revoke-user-asset-permission' %}";
             var success = function () {
                 $this.closest('tr').remove();
             };

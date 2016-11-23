@@ -165,7 +165,7 @@
                 id: $this.attr('id'),
                 user_group_id: {{ user_group.id }}
             };
-            var the_url = "{% url 'perms:revoke-user-group-asset-permission' %}";
+            var the_url = "{% url 'api-perms:revoke-user-group-asset-permission' %}";
             var success = function () {
                 $this.closest('tr').remove();
             };
