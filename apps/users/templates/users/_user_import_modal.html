@@ -3,13 +3,11 @@
 {% block modal_id %}user_import_modal{% endblock %}
 {% block modal_title%}{% trans "Import User" %}{% endblock %}
 {% block modal_body %}
-<p class="text-success text-center">{% trans "Hint: your excel should organized in the following format." %}</p>
-<p class="text-success text-center">{% trans "* You should have a very worksheet named `users`." %}</p>
-<p class="text-success text-center">{% trans "* Rows in this worksheet: username, email, enable_opt(0, 1), role(one of ['Admin', 'User'])" %}</p>
+<p class="text-success">{% trans "   * CSV format should be same as export" %}</p>
 <form method="post" class="form-horizontal" action="{% url 'users:user-import' %}" id="fm_user_import" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="form-group">
-        <label class="control-label col-sm-2 col-lg-2 " for="id_excel">{% trans "Excel" %}</label>
+        <label class="control-label col-sm-2 col-lg-2 " for="id_excel">{% trans "CSV" %}</label>
         <div class=" col-sm-9 col-lg-9 ">
             <input id="id_excel" type="file" name="excel" />
         </div>

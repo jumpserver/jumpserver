@@ -3,7 +3,9 @@
 from __future__ import unicode_literals
 import json
 import uuid
+from io import BytesIO
 
+from reportlab.pdfgen import canvas
 import unicodecsv as csv
 from django import forms
 from django.utils import timezone
@@ -570,3 +572,4 @@ class ExportUserCsvView(View):
         cache.set(spm, users_id, 300)
         url = reverse('users:export-user-csv') + '?spm=%s' % spm
         return JsonResponse({'redirect': url})
+
