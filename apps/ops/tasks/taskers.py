@@ -1,9 +1,9 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
 
-from .tasks import *
+from ops.tasks import _celery_tasks
 
-from .models import Tasker
+from ops.models import Tasker
 from uuid import uuid1
 from celery.result import AsyncResult
 
@@ -52,7 +52,7 @@ def __get_result_by_tasker_id(tasker_uuid, deal_method):
 def start_get_hardware_info(*assets):
     name = "Get host hardware information"
     uuid = "tasker-" + uuid1().hex
-    get_asset_hardware_info.delay(name, uuid, *assets)
+    _celery_tasks.get_asset_hardware_info.delay(name, uuid, *assets)
     return uuid
 
 
@@ -90,7 +90,7 @@ def get_hardware_info(tasker_uuid):
 def start_ping_test(*assets):
     name = "Test host connection"
     uuid = "tasker-" + uuid1().hex
-    asset_test_ping_check.delay(name, uuid, *assets)
+    _celery_tasks.asset_test_ping_check.delay(name, uuid, *assets)
     return uuid
 
 
