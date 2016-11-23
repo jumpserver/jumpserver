@@ -141,4 +141,4 @@ class UserGroupPrivateAssetPermissionForm(forms.ModelForm):
 
 
 class FileForm(forms.Form):
-    excel = forms.FileField()
+    users = forms.FileField()

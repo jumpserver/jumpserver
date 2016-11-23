@@ -3,17 +3,18 @@
 {% block table_search %}
     <div class="html5buttons">
         <div class="dt-buttons btn-group">
-{#            <a class="btn btn-default buttons-pdf" tabindex="0" href="#">#}
-{#                <span>PDF</span></a>#}
-            <a class="btn btn-default buttons-csv" tabindex="0" href="#">
-                <span>CSV</span>
+            <a class="btn btn-default btn_import" data-toggle="modal" data-target="#user_import_modal" tabindex="0">
+                <span>{% trans "Import" %}</span>
+            </a>
+            <a class="btn btn-default btn_export" tabindex="0">
+                <span>{% trans "Export" %}</span>
             </a>
         </div>
     </div>
 {% endblock %}
 {% block table_container %}
 <div class="uc pull-left m-l-5 m-r-5"><a href="{% url "users:user-create" %}" class="btn btn-sm btn-primary"> {% trans "Create user" %} </a></div>
-<div class="uc pull-left"><a href="javascript:void(0);" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#user_import_modal"> {% trans "Import user" %} </a></div>
+{#<div class="uc pull-left"><a href="javascript:void(0);" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#user_import_modal"> {% trans "Import user" %} </a></div>#}
 <table class="table table-striped table-bordered table-hover " id="user_list_table" >
     <thead>
         <tr>
@@ -88,7 +89,7 @@ $(document).ready(function(){
     };
     var table = jumpserver.initDataTable(options);
 
-    $('.buttons-csv').click(function () {
+    $('.btn_export').click(function () {
         var users = [];
         var rows = table.rows('.selected').data();
         $.each(rows, function (index, obj) {
@@ -107,6 +108,26 @@ $(document).ready(function(){
             }
         })
     });
+
+    $('#btn_user_import').click(function() {
+        var $form = $('#fm_user_import');
+        $form.find('.help-block').remove();
+        function success (data) {
+            if (data.valid === false) {
+                var $help = $form.find('.help-block');
+                $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_users'));
+            } else {
+{#                $('#user_import_modal').modal('hide');#}
+{#                var $data_table = $('#user_list_table').DataTable();#}
+{#                toastr.success("{% trans 'Import User Success.' %}");#}
+                $('<span />', {class: 'help-block text-danger'}).html(data.errors.join(',')).insertAfter($('#id_users'));
+                $('<span />', {class: 'help-block text-warning'}).html(data.updated.join(',')).insertAfter($('#id_users'));
+                $('<span />', {class: 'help-block text-primary'}).html(data.created.join(',')).insertAfter($('#id_users'));
+{#                $data_table.ajax.reload();#}
+            }
+        }
+        $form.ajaxSubmit({success: success});
+    })
 
 }).on('click', '#btn_bulk_update', function(){
     var action = $('#slct_bulk_update').val();
@@ -219,7 +240,7 @@ $(document).ready(function(){
         new_groups = body.groups.map(Number);
         body.groups = new_groups;
     }
-    var $data_table = $('#user_list_table').DataTable()
+    var $data_table = $('#user_list_table').DataTable();
     var post_list = [];
     $data_table.rows({selected: true}).every(function(){
         var content = Object.assign({id: this.data().id}, body);
@@ -237,22 +258,7 @@ $(document).ready(function(){
     };
     APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(post_list), success: success});
     $('#user_bulk_update_modal').modal('hide');
-}).on('click', '#btn_user_import', function() {
-    var $form = $('#fm_user_import');
-    $form.find('.help-block').remove();
-    function success (data) {
-        if (data.success === false) {
-            var $help = $form.find('.help-block');
-            $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_excel'));
-        } else {
-            $('#user_import_modal').modal('hide');
-            var $data_table = $('#user_list_table').DataTable();
-            toastr.success("{% trans 'Import User Success.' %}");
-            $data_table.ajax.reload();
-        }
-    }
-    $form.ajaxSubmit({success: success});
-})
+});
 </script>
 {% endblock %}
 

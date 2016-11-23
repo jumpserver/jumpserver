@@ -5,11 +5,11 @@ import json
 import uuid
 from io import BytesIO
 
-from reportlab.pdfgen import canvas
 import unicodecsv as csv
 from django import forms
 from django.utils import timezone
 from django.core.cache import cache
+from django.db import IntegrityError
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -496,45 +496,41 @@ class BulkImportUserView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         return self.render_json_response(data)
 
     def form_valid(self, form):
-        from openpyxl import load_workbook
-        try:
-            wb = load_workbook(form.cleaned_data['excel'])
-            ws = wb['users']
-        except Exception as e:
-            print e
-            error = _('Not a valid Excel file.')
-            data = {
-                'success': False,
-                'msg': error
-            }
+        users_csv = form.cleaned_data['users']
+        users_csv_f = csv.reader(users_csv, encoding='utf-8')
+        header_need = ["name", 'username', 'email', 'groups', "role", "phone", "wechat", "comment"]
+        header = next(users_csv_f)
+        print(header)
+        if header != header_need:
+            data = {'valid': False, 'msg': 'Must be same format as export csv: name, ...'}
             return self.render_json_response(data)
 
+        created = []
+        updated = []
         errors = []
-        for index, row in enumerate(ws.rows):
-            user_data = [cell.value for cell in row]
-            if len(user_data) != 4:
-                errors.append("Row {}: invalid user data format.".format(index))
-                continue
-            username, email, enable_otp, role = user_data
-            data = {
-                'username': username,
-                'email': email,
-                'enable_otp': True if enable_otp in ['T', '1', 1, True] else False,
-                'role': role
-            }
-            form = forms.UserBulkImportForm(data, auto_id=False)
-            if form.is_valid():
-                form.save()
-            else:
-                form_errors = form.errors.as_data()
-                for key, err_list in form_errors.iteritems():
-                    error_line = "{} :".format(key)
-                    for errs in err_list:
-                        error_line = "{}{}".format(error_line, ";".join([err for err in errs.messages]))
-                    errors.append("Row {}: {}".format(index, error_line))
+        for row in users_csv_f:
+            user_dict = dict(zip(header, row))
+            groups_name = user_dict.pop('groups').split(',')
+            groups = UserGroup.objects.filter(name__in=groups_name)
+            try:
+                user = User.objects.create(**user_dict)
+                user.groups.add(*tuple(groups))
+                user.save()
+                created.append(user_dict['username'])
+            except IntegrityError:
+                user = User.objects.filter(username=user_dict['username'])
+                user.update(**user_dict)
+                user[0].groups.add(*tuple(groups))
+                updated.append(user_dict['username'])
+            except TypeError:
+                errors.append(user_dict['username'])
+
         data = {
-            'success': True if not errors else False,
-            'msg': 'ok' if not errors else '<br />'.join(errors)
+            'created': created,
+            'updated': updated,
+            'errors': errors,
+            'valid': True,
+            'msg': 'Created: {}. Updated: {}, Error: {}'.format(len(created), len(updated), len(errors))
         }
         return self.render_json_response(data)
 
@@ -543,22 +539,21 @@ class BulkImportUserView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
 class ExportUserCsvView(View):
     def get(self, request, *args, **kwargs):
         spm = request.GET.get('spm', '')
-        print(spm)
         users_id = cache.get(spm)
         if not users_id and not isinstance(users_id, list):
             return HttpResponse('May be expired', status=404)
 
         users = User.objects.filter(id__in=users_id)
-        filename = 'users-%s.csv' % timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H:%M:%D')
+        filename = 'users-%s.csv' % timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S')
         response = HttpResponse(content_type='application/csv')
         response['Content-Disposition'] = 'attachment; filename="%s"' % filename
         writer = csv.writer(response, delimiter=str(","), lineterminator='\n',
                             quoting=csv.QUOTE_ALL, dialect='excel')
-        header = [_("name"), _('username'), _('email'), _('user group'),
-                  _('role'), _('phone'), _('wechat'), _('comment')]
+        header = ["name", 'username', 'email', 'groups', "role", "phone", "wechat", "comment"]
         writer.writerow(header)
         for user in users:
-            writer.writerow([user.name, user.username, user.email, ','.join([group.name for group in user.groups.all()]),
+            writer.writerow([user.name, user.username, user.email,
+                             ','.join([group.name for group in user.groups.all()]),
                              user.role, user.phone, user.wechat, user.comment])
         return response
 
