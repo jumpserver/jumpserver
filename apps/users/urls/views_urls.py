@@ -40,5 +40,5 @@ urlpatterns = [
         name='user-group-asset-permission-create'),
     url(r'^user-group/(?P<pk>[0-9]+)/assets', views.UserGroupGrantedAssetView.as_view(),
         name='user-group-granted-asset'),
-    url(r'down-csv/', views.down_csv),
+    url(r'^export/user/csv/', views.ExportUserCsvView.as_view(), name='export-user-csv'),
 ]

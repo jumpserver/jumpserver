@@ -5,8 +5,8 @@
         <div class="dt-buttons btn-group">
             <a class="btn btn-default buttons-pdf" tabindex="0" href="#">
                 <span>PDF</span></a>
-            <a class="btn btn-default buttons-excel" tabindex="0" href="#">
-                <span>Excel</span>
+            <a class="btn btn-default buttons-csv" tabindex="0" href="#">
+                <span>CSV</span>
             </a>
         </div>
     </div>
@@ -88,13 +88,24 @@ $(document).ready(function(){
     };
     var table = jumpserver.initDataTable(options);
 
-    $('.buttons-pdf').click(function () {
+    $('.buttons-csv').click(function () {
         var users = [];
         var rows = table.rows('.selected').data();
         $.each(rows, function (index, obj) {
             users.push(obj.id)
         });
-        console.log(users)
+        $.ajax({
+            url: "{% url "users:export-user-csv" %}",
+            method: 'POST',
+            data: JSON.stringify({users_id: users}),
+            dataType: "json",
+            success: function (data, textStatus) {
+                window.open(data.redirect)
+            },
+            error: function () {
+                toastr.error('Export failed');
+            }
+        })
     });
 
 }).on('click', '#btn_bulk_update', function(){

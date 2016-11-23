@@ -1,22 +1,25 @@
 # ~*~ coding: utf-8 ~*~
 
 from __future__ import unicode_literals
-from io import BytesIO
+import json
+import uuid
 
 import unicodecsv as csv
 from django import forms
 from django.utils import timezone
+from django.core.cache import cache
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.files.storage import default_storage
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
@@ -31,6 +34,7 @@ from .models import User, UserGroup
 from .utils import AdminUserRequiredMixin, user_add_success_next, send_reset_password_mail
 from .hands import write_login_log_async
 from . import forms
+
 
 
 logger = get_logger(__name__)
@@ -533,16 +537,36 @@ class BulkImportUserView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         return self.render_json_response(data)
 
 
-def down_csv(request):
-    response = HttpResponse(content_type='application/csv')
-    response['Content-Disposition'] = 'attachment; filename="users-%s.csv"' % \
-                                      timezone.localtime(timezone.now()).strftime('%Y-%m-%d')
-    writer = csv.writer(response)
-    header = [u"你好", 'username', 'email',
-              _('user group'), _('role'), _('phone'), _('wechat'), _('comment')]
-    writer.writerow(header)
-    for user in User.objects.all():
-        writer.writerow([user.name, user.username, user.email, ','.join([group.name for group in user.groups.all()]),
-                         user.role, user.phone, user.wechat, user.comment])
-    return response
+@method_decorator(csrf_exempt, name='dispatch')
+class ExportUserCsvView(View):
+    def get(self, request, *args, **kwargs):
+        spm = request.GET.get('spm', '')
+        print(spm)
+        users_id = cache.get(spm)
+        if not users_id and not isinstance(users_id, list):
+            return HttpResponse('May be expired', status=404)
 
+        users = User.objects.filter(id__in=users_id)
+        filename = 'users-%s.csv' % timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H:%M:%D')
+        response = HttpResponse(content_type='application/csv')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+        writer = csv.writer(response, delimiter=str(","), lineterminator='\n',
+                            quoting=csv.QUOTE_ALL, dialect='excel')
+        header = [_("name"), _('username'), _('email'), _('user group'),
+                  _('role'), _('phone'), _('wechat'), _('comment')]
+        writer.writerow(header)
+        for user in users:
+            writer.writerow([user.name, user.username, user.email, ','.join([group.name for group in user.groups.all()]),
+                             user.role, user.phone, user.wechat, user.comment])
+        return response
+
+    def post(self, request, *args, **kwargs):
+        try:
+            print(request.body)
+            users_id = json.loads(request.body).get('users_id', [])
+        except ValueError:
+            return HttpResponse('Json object not valid', status=400)
+        spm = uuid.uuid4().get_hex()
+        cache.set(spm, users_id, 300)
+        url = reverse('users:export-user-csv') + '?spm=%s' % spm
+        return JsonResponse({'redirect': url})
