@@ -1,25 +1,13 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
 
-from rest_framework.routers import DefaultRouter
-from django.conf.urls import url, include
 
-
-from api import views as api_view
+from django.conf.urls import url
 import views as page_view
 
 
 app_name = 'ops'
 
-router = DefaultRouter()
-router.register(r'host_alia',  api_view.HostAliaViewSet)
-router.register(r'user_alia',  api_view.UserAliaViewSet)
-router.register(r'cmd_alia',   api_view.CmdAliaViewSet)
-router.register(r'runas_alia', api_view.RunasAliaViewSet)
-router.register(r'extra_conf', api_view.ExtraconfViewSet)
-router.register(r'privilege',  api_view.PrivilegeViewSet)
-router.register(r'sudo',       api_view.SudoViewSet)
-router.register(r'cron',       api_view.CronTableViewSet)
 
 urlpatterns = [
     # Resource Sudo url
@@ -35,8 +23,5 @@ urlpatterns = [
     url(r'^cron/update$', page_view.CronUpdateView.as_view(), name='page-cron-update'),
 ]
 
-urlpatterns += [
-    url(r'^v1/sudo', include(router.urls)),
-]
 
 
