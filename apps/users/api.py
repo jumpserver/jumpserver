@@ -3,6 +3,7 @@
 
 import base64
 
+from rest_framework import filters
 from django.shortcuts import get_object_or_404
 from django.core.cache import cache
 from django.conf import settings
@@ -11,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView, BulkModelViewSet
 from rest_framework import authentication
+from django_filters.rest_framework import DjangoFilterBackend
 
 from common.mixins import BulkDeleteApiMixin
 from common.utils import get_logger
@@ -28,9 +30,9 @@ class UserViewSet(BulkModelViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
     permission_classes = (IsSuperUser,)
-
-    def allow_bulk_destroy(self, qs, filtered):
-        return qs is not filtered
+    filter_backends = (DjangoFilterBackend,)
+    # filter_fields = ('username', 'email', 'name', 'id')
+    ordering_fields = ('username', 'email')
 
 
 class UserUpdateGroupApi(generics.RetrieveUpdateAPIView):
