@@ -6,7 +6,7 @@ djangorestframework==3.4.5
 ForgeryPy==0.1
 openpyxl==2.4.0
 celery==3.1.23
-ansible==2.1.1.0
+ansible==2.1.2.0
 django-simple-captcha==0.5.2
 django-formtools==1.0
 sshpubkeys==2.2.0
@@ -15,3 +15,6 @@ paramiko==2.0.2
 django-redis-cache==1.7.1
 requests==2.11.1
 itsdangerous==0.24
+python-gssapi==0.6.4
+tornado==4.4.2
+eventlet==0.19.0
