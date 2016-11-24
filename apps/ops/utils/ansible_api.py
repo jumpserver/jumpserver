@@ -1,5 +1,5 @@
 # ~*~ coding: utf-8 ~*~
-from __future__ import unicode_literals
+from __future__ import unicode_literals, print_function
 
 import os
 import json
@@ -304,7 +304,7 @@ class CallbackModule(CallbackBase):
 
         self.output['plays'] = self.results
         self.output['stats'] = summary
-        print "summary: %s" % summary
+        print("summary: %s", summary)
 
 
 class PlayBookRunner(InventoryMixin):
@@ -513,8 +513,8 @@ def test_run():
     hoc = ADHocRunner(conf, play_source, *assets)
     uuid = "tasker-" + uuid4().hex
     ext_code, result = hoc.run("test_task", uuid)
-    print ext_code
-    print result
+    print(ext_code)
+    print(result)
 
 
 if __name__ == "__main__":
