@@ -566,7 +566,7 @@ class Nav(object):
         user_asset_group_all = get_group_user_perm(self.user).get('asset_group', [])
         color_print('[%-3s] %-20s %s' % ('ID', '组名', '备注'), 'title')
         for asset_group in user_asset_group_all:
-            print '[%-3s] %-15s %s' % (asset_group.id, asset_group.name, asset_group.comment)
+            print '[%-3s] %-15s %s' % (asset_group.id, asset_group.name.encode("UTF-8"), asset_group.comment.encode("UTF-8"))
         print
 
     def exec_cmd(self):
