@@ -1,34 +1,31 @@
 {% extends '_base_list.html' %}
 {% load i18n static %}
-{% block custom_head_css_js %}
-{{ block.super }}
-<style>
-div.dataTables_wrapper div.dataTables_filter,
-.dataTables_length {
-    float: right !important;
-}
-
-div.dataTables_wrapper div.dataTables_filter {
-  margin-left: 15px;
-}
-</style>
+{% block table_search %}
+    <div class="html5buttons">
+        <div class="dt-buttons btn-group">
+            <a class="btn btn-default buttons-pdf" tabindex="0" href="#">
+                <span>PDF</span></a>
+            <a class="btn btn-default buttons-excel" tabindex="0" href="#">
+                <span>Excel</span>
+            </a>
+        </div>
+    </div>
 {% endblock %}
-{% block table_search %}{% endblock %}
 {% block table_container %}
-<div class="uc pull-left"><a href="javascript:void(0);" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#user_import_modal"> {% trans "Import user" %} </a></div>
 <div class="uc pull-left m-l-5 m-r-5"><a href="{% url "users:user-create" %}" class="btn btn-sm btn-primary"> {% trans "Create user" %} </a></div>
+<div class="uc pull-left"><a href="javascript:void(0);" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#user_import_modal"> {% trans "Import user" %} </a></div>
 <table class="table table-striped table-bordered table-hover " id="user_list_table" >
     <thead>
         <tr>
             <th class="text-center">
-                <div class="checkbox checkbox-default"><input id="" type="checkbox" class="ipt_check_all"><label></label></div>
+{#                <div><input id="" type="checkbox" class="ipt_check_all"><label></label></div>#}
+                <input id="" type="checkbox" class="ipt_check_all">
             </th>
-            <th class="text-center">{% trans 'Name' %}</a></th>
-            <th class="text-center">{% trans 'Username' %}</a></th>
+            <th class="text-center">{% trans 'Name' %}</th>
+            <th class="text-center">{% trans 'Username' %}</th>
             <th class="text-center">{% trans 'Role' %}</th>
             <th class="text-center">{% trans 'User group' %}</th>
-            <th class="text-center">{% trans 'Asset num' %}</th>
-            <th class="text-center">{% trans 'Active' %}</a></th>
+            <th class="text-center">{% trans 'Active' %}</th>
             <th class="text-center">{% trans 'Action' %}</th>
         </tr>
     </thead>
@@ -65,34 +62,43 @@ $(document).ready(function(){
                 $(td).html(detail_btn.replace('99991937', rowData.id));
              }},
             {targets: 4, createdCell: function (td, cellData) {
-                var innerHtml = cellData.length > 8 ? cellData.substring(0, 8) + '...': cellData;
-                $(td).html('<a href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</a>');
+                var innerHtml = cellData.length > 20 ? cellData.substring(0, 20) + '...': cellData;
+                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
              }},
-            {targets: 6, createdCell: function (td, cellData) {
+            {targets: 5, createdCell: function (td, cellData) {
                 if (!cellData) {
                     $(td).html('<i class="fa fa-times text-danger"></i>')
                 } else {
                     $(td).html('<i class="fa fa-check text-navy"></i>')
                 }
              }},
-            {targets: 7, createdCell: function (td, cellData, rowData) {
+            {targets: 6, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "users:user-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
-                if (rowData.id === 1) {
+                if (rowData.id === 1 || rowData.username == "admin") {
                     $(td).html(update_btn)
                 } else {
                     $(td).html(update_btn + del_btn)
                 }
              }}],
-        ajax_url: '{% url "users:user-bulk-update-api" %}',
-        columns: [{data: function(){return ""}}, {data: "username" }, {data: "name" }, {data: "get_role_display" }, {data: "group_display" },
-                  {data: function(){return 999}}, {data: "active_display" }, {data: "id" }],
+        ajax_url: '{% url "api-users:user-list" %}',
+        columns: [{data: "id"}, {data: "username" }, {data: "name" }, {data: "get_role_display" },
+            {data: "groups_display" }, {data: "is_valid" }, {data: "id" }],
         op_html: $('#actions').html()
     };
-    jumpserver.initDataTable(options);
+    var table = jumpserver.initDataTable(options);
+
+    $('.buttons-pdf').click(function () {
+        var users = [];
+        var rows = table.rows('.selected').data();
+        $.each(rows, function (index, obj) {
+            users.push(obj.id)
+        })
+    });
+
 }).on('click', '#btn_bulk_update', function(){
     var action = $('#slct_bulk_update').val();
-    var $data_table = $('#user_list_table').DataTable()
+    var $data_table = $('#user_list_table').DataTable();
     var id_list = [];
     var plain_id_list = [];
     $data_table.rows({selected: true}).every(function(){
@@ -101,8 +107,8 @@ $(document).ready(function(){
     });
     if (id_list === []) {
         return false;
-    };
-    var the_url = "{% url 'users:user-bulk-update-api' %}";
+    }
+    var the_url = "{% url 'api-users:user-list' %}";
     function doDeactive() {
         var body = $.each(id_list, function(index, user_object) {
             user_object['is_active'] = false;
@@ -155,7 +161,7 @@ $(document).ready(function(){
     var $this = $(this);
     function doDelete() {
         var uid = $this.data('uid');
-        var the_url = '{% url "users:user-patch-api" pk=99991937 %}'.replace('99991937', uid);
+        var the_url = '{% url "api-users:user-detail" pk=99991937 %}'.replace('99991937', uid);
         var body = {};
         var success = function() {
             var msg = "{% trans 'User Deleted.' %}";
@@ -165,7 +171,7 @@ $(document).ready(function(){
         var fail = function() {
             var msg = "{% trans 'User Deleting failed.' %}";
             swal("{% trans 'User Delete' %}", msg, "error");
-        }
+        };
         APIUpdateAttr({
             url: the_url,
             body: JSON.stringify(body),
@@ -208,15 +214,15 @@ $(document).ready(function(){
         post_list.push(content);
     });
     if (post_list === []) {
-        return false;
-    };
-    var the_url = "{% url 'users:user-bulk-update-api' %}";
+        return false
+    }
+    var the_url = "{% url 'api-users:user-list' %}";
     var success = function() {
         var msg = "{% trans 'The selected users has been updated successfully.' %}";
         swal("{% trans 'User Updated' %}", msg, "success");
         $('#user_list_table').DataTable().ajax.reload();
         jumpserver.checked = false;
-    }
+    };
     APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(post_list), success: success});
     $('#user_bulk_update_modal').modal('hide');
 }).on('click', '#btn_user_import', function() {
@@ -229,13 +235,11 @@ $(document).ready(function(){
         } else {
             $('#user_import_modal').modal('hide');
             var $data_table = $('#user_list_table').DataTable();
-            toastr.success("{% trans 'Import User Success.' %}")
+            toastr.success("{% trans 'Import User Success.' %}");
             $data_table.ajax.reload();
         }
     }
     $form.ajaxSubmit({success: success});
-}).on('change', '#id_excel', function() {
-    $(this).siblings('.help-block').remove();
 })
 </script>
 {% endblock %}
