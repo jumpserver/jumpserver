@@ -40,10 +40,9 @@ class NoDeleteModelMixin(models.Model):
 
 
 class JSONResponseMixin(object):
-
     """JSON mixin"""
-
-    def render_json_response(self, context):
+    @staticmethod
+    def render_json_response(context):
         return JsonResponse(context)
 
 

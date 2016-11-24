@@ -530,8 +530,9 @@ class BulkImportUserView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                 groups = None
             try:
                 user = User.objects.create(**user_dict)
+                user_add_success_next(user)
                 created.append(user_dict['username'])
-            except IntegrityError:
+            except IntegrityError as e:
                 user = User.objects.filter(username=user_dict['username'])
                 if not user:
                     failed.append(user_dict['username'])
@@ -539,7 +540,8 @@ class BulkImportUserView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                 user.update(**user_dict)
                 user = user[0]
                 updated.append(user_dict['username'])
-            except TypeError:
+            except TypeError as e:
+                print(e)
                 failed.append(user_dict['username'])
                 user = None
 

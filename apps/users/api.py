@@ -29,6 +29,9 @@ class UserViewSet(BulkModelViewSet):
     serializer_class = serializers.UserSerializer
     permission_classes = (IsSuperUser,)
 
+    def allow_bulk_destroy(self, qs, filtered):
+        return qs is not filtered
+
 
 class UserUpdateGroupApi(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()

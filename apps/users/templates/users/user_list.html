@@ -117,11 +117,11 @@ $(document).ready(function(){
                 $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_users'));
             } else {
                 $('#id_created').html(data.created_info);
-                $('#id_created_detail').html(data.created.join(','));
+                $('#id_created_detail').html(data.created.join(', '));
                 $('#id_updated').html(data.updated_info);
-                $('#id_updated_detail').html(data.updated.join(','));
+                $('#id_updated_detail').html(data.updated.join(', '));
                 $('#id_failed').html(data.failed_info);
-                $('#id_failed_detail').html(data.failed.join(','));
+                $('#id_failed_detail').html(data.failed.join(', '));
                 var $data_table = $('#user_list_table').DataTable();
                 $data_table.ajax.reload();
             }
