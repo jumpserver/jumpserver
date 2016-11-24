@@ -114,16 +114,16 @@ $(document).ready(function(){
         $form.find('.help-block').remove();
         function success (data) {
             if (data.valid === false) {
-                var $help = $form.find('.help-block');
                 $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_users'));
             } else {
-{#                $('#user_import_modal').modal('hide');#}
-{#                var $data_table = $('#user_list_table').DataTable();#}
-{#                toastr.success("{% trans 'Import User Success.' %}");#}
-                $('<span />', {class: 'help-block text-danger'}).html(data.errors.join(',')).insertAfter($('#id_users'));
-                $('<span />', {class: 'help-block text-warning'}).html(data.updated.join(',')).insertAfter($('#id_users'));
-                $('<span />', {class: 'help-block text-primary'}).html(data.created.join(',')).insertAfter($('#id_users'));
-{#                $data_table.ajax.reload();#}
+                $('#id_created').html(data.created_info);
+                $('#id_created_detail').html(data.created.join(','));
+                $('#id_updated').html(data.updated_info);
+                $('#id_updated_detail').html(data.updated.join(','));
+                $('#id_failed').html(data.failed_info);
+                $('#id_failed_detail').html(data.failed.join(','));
+                var $data_table = $('#user_list_table').DataTable();
+                $data_table.ajax.reload();
             }
         }
         $form.ajaxSubmit({success: success});

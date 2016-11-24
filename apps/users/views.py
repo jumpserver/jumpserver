@@ -3,8 +3,11 @@
 from __future__ import unicode_literals
 import json
 import uuid
-from io import BytesIO
+import codecs
 
+from openpyxl import Workbook
+from openpyxl.writer.excel import save_virtual_workbook
+from openpyxl import load_workbook
 import unicodecsv as csv
 from django import forms
 from django.utils import timezone
@@ -36,8 +39,6 @@ from .models import User, UserGroup
 from .utils import AdminUserRequiredMixin, user_add_success_next, send_reset_password_mail
 from .hands import write_login_log_async
 from . import forms
-
-
 
 logger = get_logger(__name__)
 
@@ -96,7 +97,11 @@ class UserListView(AdminUserRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(UserListView, self).get_context_data(**kwargs)
-        context.update({'app': _('Users'), 'action': _('User list'), 'groups': UserGroup.objects.all()})
+        context.update({
+            'app': _('Users'),
+            'action': _('User list'),
+            'groups': UserGroup.objects.all()
+        })
         return context
 
 
@@ -496,41 +501,61 @@ class BulkImportUserView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         return self.render_json_response(data)
 
     def form_valid(self, form):
-        users_csv = form.cleaned_data['users']
-        users_csv_f = csv.reader(users_csv, encoding='utf-8')
+        try:
+            wb = load_workbook(form.cleaned_data['file'])
+            ws = wb.get_active_sheet()
+        except Exception as e:
+            print(e)
+            data = {'valid': False, 'msg': 'Not a valid Excel file'}
+            return self.render_json_response(data)
+
+        rows = ws.rows
         header_need = ["name", 'username', 'email', 'groups', "role", "phone", "wechat", "comment"]
-        header = next(users_csv_f)
+        header = [col.value for col in next(rows)]
         print(header)
         if header != header_need:
-            data = {'valid': False, 'msg': 'Must be same format as export csv: name, ...'}
+            data = {'valid': False, 'msg': 'Must be same format as template or export file'}
             return self.render_json_response(data)
 
         created = []
         updated = []
-        errors = []
-        for row in users_csv_f:
-            user_dict = dict(zip(header, row))
-            groups_name = user_dict.pop('groups').split(',')
-            groups = UserGroup.objects.filter(name__in=groups_name)
+        failed = []
+        for row in rows:
+            user_dict = dict(zip(header, [col.value for col in row]))
+            groups_name = user_dict.pop('groups')
+            if groups_name:
+                groups_name = groups_name.split(',')
+                groups = UserGroup.objects.filter(name__in=groups_name)
+            else:
+                groups = None
             try:
                 user = User.objects.create(**user_dict)
-                user.groups.add(*tuple(groups))
-                user.save()
                 created.append(user_dict['username'])
             except IntegrityError:
                 user = User.objects.filter(username=user_dict['username'])
+                if not user:
+                    failed.append(user_dict['username'])
+                    continue
                 user.update(**user_dict)
-                user[0].groups.add(*tuple(groups))
+                user = user[0]
                 updated.append(user_dict['username'])
             except TypeError:
-                errors.append(user_dict['username'])
+                failed.append(user_dict['username'])
+                user = None
+
+            if user and groups:
+                user.groups.add(*tuple(groups))
+                user.save()
 
         data = {
             'created': created,
+            'created_info': 'Created {}'.format(len(created)),
             'updated': updated,
-            'errors': errors,
+            'updated_info': 'Updated {}'.format(len(updated)),
+            'failed': failed,
+            'failed_info': 'Failed {}'.format(len(failed)),
             'valid': True,
-            'msg': 'Created: {}. Updated: {}, Error: {}'.format(len(created), len(updated), len(errors))
+            'msg': 'Created: {}. Updated: {}, Error: {}'.format(len(created), len(updated), len(failed))
         }
         return self.render_json_response(data)
 
@@ -544,22 +569,24 @@ class ExportUserCsvView(View):
             return HttpResponse('May be expired', status=404)
 
         users = User.objects.filter(id__in=users_id)
-        filename = 'users-%s.csv' % timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S')
-        response = HttpResponse(content_type='application/csv')
-        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
-        writer = csv.writer(response, delimiter=str(","), lineterminator='\n',
-                            quoting=csv.QUOTE_ALL, dialect='excel')
+        wb = Workbook()
+        ws = wb.active
+        ws.title = 'User'
         header = ["name", 'username', 'email', 'groups', "role", "phone", "wechat", "comment"]
-        writer.writerow(header)
+        ws.append(header)
+
         for user in users:
-            writer.writerow([user.name, user.username, user.email,
-                             ','.join([group.name for group in user.groups.all()]),
-                             user.role, user.phone, user.wechat, user.comment])
+            ws.append([user.name, user.username, user.email,
+                       ','.join([group.name for group in user.groups.all()]),
+                        user.role, user.phone, user.wechat, user.comment])
+
+        filename = 'users-{}.xlsx'.format(timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S'))
+        response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
         return response
 
     def post(self, request, *args, **kwargs):
         try:
-            print(request.body)
             users_id = json.loads(request.body).get('users_id', [])
         except ValueError:
             return HttpResponse('Json object not valid', status=400)
