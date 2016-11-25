@@ -46,7 +46,7 @@ class JSONResponseMixin(object):
         return JsonResponse(context)
 
 
-class BulkDeleteApiMixin(object):
+class IDInFilterMixin(object):
 
     def filter_queryset(self, queryset):
         id_list = self.request.query_params.get('id__in')

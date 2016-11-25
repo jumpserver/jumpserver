@@ -2,7 +2,7 @@
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import viewsets, serializers,generics
 from .models import AssetGroup, Asset, IDC, AssetExtend, AdminUser, SystemUser
-from common.mixins import BulkDeleteApiMixin
+from common.mixins import IDInFilterMixin
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin
 
 

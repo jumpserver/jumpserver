@@ -3,12 +3,10 @@
 from __future__ import unicode_literals
 import json
 import uuid
-import codecs
 
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl import load_workbook
-import unicodecsv as csv
 from django import forms
 from django.utils import timezone
 from django.core.cache import cache

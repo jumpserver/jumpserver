@@ -15,7 +15,7 @@ from rest_framework import authentication
 import django_filters
 from django_filters.rest_framework import DjangoFilterBackend
 
-from common.mixins import BulkDeleteApiMixin
+from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 from .utils import check_user_valid, token_gen
 from .models import User, UserGroup
@@ -27,29 +27,12 @@ from . import serializers
 logger = get_logger(__name__)
 
 
-class IDInFilter(django_filters.rest_framework.FilterSet):
-    id__in = django_filters.CharFilter(method='in_filter')
-
-    class Meta:
-        model = User
-        fields = ['id__in']
-
-    def in_filter(self, queryset, name, value):
-        try:
-            value = json.loads(value)
-        except ValueError:
-            value = []
-        return queryset.filter(**{name+'__in': value})
-
-
-class UserViewSet(BulkModelViewSet):
+class UserViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
     permission_classes = (IsSuperUser,)
     filter_backends = (DjangoFilterBackend,)
     filter_fields = ('username', 'email', 'name', 'id')
-    filter_class = IDInFilter
-    ordering_fields = ('username', 'email')
 
 
 class UserUpdateGroupApi(generics.RetrieveUpdateAPIView):
