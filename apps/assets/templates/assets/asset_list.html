@@ -18,10 +18,11 @@
 {% block table_search %}
     <div class="html5buttons">
         <div class="dt-buttons btn-group">
-            <a class="btn btn-default buttons-pdf" tabindex="0" href="#">
-                <span>PDF</span></a>
-            <a class="btn btn-default buttons-excel" tabindex="0" href="#">
-                <span>Excel</span>
+            <a class="btn btn-default btn_import" data-toggle="modal" data-target="#asset_import_modal" tabindex="0">
+                <span>{% trans "Import" %}</span>
+            </a>
+            <a class="btn btn-default btn_export" tabindex="0">
+                <span>{% trans "Export" %}</span>
             </a>
         </div>
     </div>
@@ -32,7 +33,7 @@
     <div class="tagBtnList">
     {% for tag in tag_list %}
         <a href="{% url 'assets:asset-tags' tag_id=tag.0 %}"
-           {% if tag.0|IntToStr == tag_id %}
+           {% if tag.0|int_to_str == tag_id %}
            class="tagBtn2 label label-warning" name="tag_on">
            {% else %}
            class="tagBtn2 label label-default">
@@ -84,7 +85,7 @@
 
 {% block custom_foot_js %}
 <script type="text/javascript">
-    window.onload=function (){
+    window.onload = function (){
         var tag_on = document.getElementsByName("tag_on");
         var oDiv = document.getElementById("ydxbd");
         if(tag_on.length > 0){
@@ -136,6 +137,27 @@
             op_html: $('#actions').html()
         };
         var table = jumpserver.initDataTable(options);
+
+        $('.btn_export').click(function () {
+        var assets = [];
+        var rows = table.rows('.selected').data();
+        $.each(rows, function (index, obj) {
+            assets.push(obj.id)
+        });
+        $.ajax({
+            url: "{% url "assets:export-assets-xlsx" %}",
+            method: 'POST',
+            data: JSON.stringify({users_id: users}),
+            dataType: "json",
+            success: function (data, textStatus) {
+                window.open(data.redirect)
+            },
+            error: function () {
+                toastr.error('Export failed');
+            }
+        })
+    });
+
     });
 </script>
 {% endblock %}

@@ -1,17 +1,29 @@
 # coding:utf-8
 from __future__ import absolute_import, unicode_literals
+import json
+import uuid
+
+from openpyxl import Workbook
+from openpyxl.writer.excel import save_virtual_workbook
+from openpyxl import load_workbook
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.db.models import Q
-from django.views.generic import TemplateView, ListView
+from django.views.generic import TemplateView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.shortcuts import get_object_or_404, reverse, redirect
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.utils.decorators import method_decorator
+from django.core.cache import cache
+from django.utils import timezone
+
 from common.utils import int_seq
 from .utils import CreateAssetTagsMiXin,UpdateAssetTagsMiXin
-from .models import Asset, AssetGroup, IDC, AssetExtend, AdminUser, SystemUser, Tag
+from .models import Asset, AssetGroup, IDC, AdminUser, SystemUser, Tag
 from .forms import *
 from .hands import AdminUserRequiredMixin
 
@@ -693,3 +705,46 @@ class AssetTagDeleteView(AdminUserRequiredMixin, DeleteView):
     model = Tag
     success_url = reverse_lazy('assets:asset-tag-list')
 
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ExportAssetView(View):
+    @staticmethod
+    def asset_get_attr(asset, attr):
+        if attr in ['admin_user', 'idc']:
+            return getattr(asset, attr).name
+        if attr in ['status', 'tyoe', 'env']:
+            return getattr(asset, 'get_{}_display')
+
+    def get(self, request, *args, **kwargs):
+        spm = request.GET.get('spm', '')
+        assets_id = cache.get(spm)
+        if not assets_id and not isinstance(assets_id, list):
+            return HttpResponse('May be expired', status=404)
+
+        assets = Asset.objects.filter(id__in=assets_id)
+        wb = Workbook()
+        ws = wb.active
+        ws.title = 'Asset'
+        header = ['hostname', 'ip', 'port', 'admin_user', 'system_users', 'idc',
+                  'cpu', 'memory', 'disk', 'mac_address', 'other_ip', 'remote_card_ip',
+                  'os', 'cabinet_no', 'cabinet_pos', 'number', 'status', 'type', 'env',
+                  'sn', 'comment']
+        ws.append(header)
+
+        for asset in assets:
+            ws.append([getattr(asset, attr) for attr in header])
+
+        filename = 'users-{}.xlsx'.format(timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S'))
+        response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+        return response
+
+    def post(self, request, *args, **kwargs):
+        try:
+            assets_id = json.loads(request.body).get('assets_id', [])
+        except ValueError:
+            return HttpResponse('Json object not valid', status=400)
+        spm = uuid.uuid4().get_hex()
+        cache.set(spm, assets_id, 300)
+        url = reverse('users:export-user-csv') + '?spm=%s' % spm
+        return JsonResponse({'redirect': url})

@@ -240,10 +240,6 @@ class UserGroupDetailView(AdminUserRequiredMixin, DetailView):
         return super(UserGroupDetailView, self).get_context_data(**kwargs)
 
 
-class UserGroupDeleteView(DeleteView):
-    pass
-
-
 class UserForgotPasswordView(TemplateView):
     template_name = 'users/forgot_password.html'
 
@@ -561,7 +557,7 @@ class BulkImportUserView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class ExportUserCsvView(View):
+class ExportUserView(View):
     def get(self, request, *args, **kwargs):
         spm = request.GET.get('spm', '')
         users_id = cache.get(spm)

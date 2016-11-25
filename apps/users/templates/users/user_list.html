@@ -99,7 +99,7 @@ $(document).ready(function(){
             users.push(obj.id)
         });
         $.ajax({
-            url: "{% url "users:export-user-csv" %}",
+            url: "{% url "users:export-user" %}",
             method: 'POST',
             data: JSON.stringify({users_id: users}),
             dataType: "json",
