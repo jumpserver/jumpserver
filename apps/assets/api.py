@@ -17,6 +17,7 @@ class AssetViewSet(viewsets.ModelViewSet):
     """API endpoint that allows Asset to be viewed or edited."""
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
+    filter_fields = ('id', 'ip', 'hostname')
 
     def get_queryset(self):
         queryset = super(AssetViewSet, self).get_queryset()
@@ -27,7 +28,6 @@ class AssetViewSet(viewsets.ModelViewSet):
 
         if asset_group_id:
             queryset = queryset.filter(groups__id=asset_group_id)
-
         return queryset
 
 

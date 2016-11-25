@@ -39,6 +39,7 @@
             <option value="delete">{% trans 'Delete selected' %}</option>
             <option value="update">{% trans 'Update selected' %}</option>
             <option value="deactive">{% trans 'Deactive selected' %}</option>
+            <option value="active">{% trans 'Active selected' %}</option>
         </select>
         <div class="input-group-btn pull-left" style="padding-left: 5px;">
             <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
@@ -75,7 +76,9 @@ $(document).ready(function(){
              }},
             {targets: 6, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "users:user-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
-                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
+                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="99991937" data-name="99991938">{% trans "Delete" %}</a>'
+                        .replace('99991937', cellData)
+                        .replace('99991938', rowData.name);
                 if (rowData.id === 1 || rowData.username == "admin") {
                     $(td).html(update_btn)
                 } else {
@@ -150,6 +153,14 @@ $(document).ready(function(){
         $data_table.ajax.reload();
         jumpserver.checked = false;
     }
+    function  doActive() {
+        var body = $.each(id_list, function(index, user_object) {
+            user_object['is_active'] = true;
+        });
+        APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(body)});
+        $data_table.ajax.reload();
+        jumpserver.checked = false;
+    }
     function doDelete() {
         swal({
             title: "{% trans 'Are you sure?' %}",
@@ -187,43 +198,18 @@ $(document).ready(function(){
         case 'update':
             doUpdate();
             break;
+        case 'active':
+            doActive();
+            break;
         default:
             break;
     }
 }).on('click', '.btn_user_delete', function(){
     var $this = $(this);
-    function doDelete() {
-        var uid = $this.data('uid');
-        var the_url = '{% url "api-users:user-detail" pk=99991937 %}'.replace('99991937', uid);
-        var body = {};
-        var success = function() {
-            var msg = "{% trans 'User Deleted.' %}";
-            swal("{% trans 'User Delete' %}", msg, "success");
-            $('#user_list_table').DataTable().ajax.reload();
-        };
-        var fail = function() {
-            var msg = "{% trans 'User Deleting failed.' %}";
-            swal("{% trans 'User Delete' %}", msg, "error");
-        };
-        APIUpdateAttr({
-            url: the_url,
-            body: JSON.stringify(body),
-            method: 'DELETE',
-            success: success,
-            error: fail
-        });
-    }
-    swal({
-        title: "{% trans 'Are you sure?' %}",
-        text: "{% trans 'This will delete the selected user.' %}",
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: "{% trans 'Confirm' %}",
-        closeOnConfirm: false
-    }, function() {
-        doDelete();
-    });
+    var name = $this.data('name');
+    var uid = $this.data('uid');
+    var the_url = '{% url "api-users:user-detail" pk=99991937 %}'.replace('99991937', uid);
+    objectDelete($this, name, the_url);
 }).on('click', '#btn_user_bulk_update', function(){
     var json_data = $('#fm_user_bulk_update').serializeObject();
     var body = {};
@@ -237,7 +223,7 @@ $(document).ready(function(){
     if (typeof body.groups === 'string') {
         body.groups = [parseInt(body.groups)]
     } else if(typeof body.groups === 'array') {
-        new_groups = body.groups.map(Number);
+        var new_groups = body.groups.map(Number);
         body.groups = new_groups;
     }
     var $data_table = $('#user_list_table').DataTable();

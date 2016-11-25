@@ -2,8 +2,8 @@
 #
 
 import base64
+import json
 
-from rest_framework import filters
 from django.shortcuts import get_object_or_404
 from django.core.cache import cache
 from django.conf import settings
@@ -12,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView, BulkModelViewSet
 from rest_framework import authentication
+import django_filters
 from django_filters.rest_framework import DjangoFilterBackend
 
 from common.mixins import BulkDeleteApiMixin
@@ -26,12 +27,28 @@ from . import serializers
 logger = get_logger(__name__)
 
 
+class IDInFilter(django_filters.rest_framework.FilterSet):
+    id__in = django_filters.CharFilter(method='in_filter')
+
+    class Meta:
+        model = User
+        fields = ['id__in']
+
+    def in_filter(self, queryset, name, value):
+        try:
+            value = json.loads(value)
+        except ValueError:
+            value = []
+        return queryset.filter(**{name+'__in': value})
+
+
 class UserViewSet(BulkModelViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
     permission_classes = (IsSuperUser,)
     filter_backends = (DjangoFilterBackend,)
-    # filter_fields = ('username', 'email', 'name', 'id')
+    filter_fields = ('username', 'email', 'name', 'id')
+    filter_class = IDInFilter
     ordering_fields = ('username', 'email')
 
 

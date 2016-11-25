@@ -214,9 +214,7 @@ function APIUpdateAttr(props) {
 
 // Sweet Alert for Delete
 function objectDelete(obj, name, url) {
-    var $this = $(this);
     function doDelete() {
-        var uid = $this.data('uid');
         var body = {};
         var success = function() {
             swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
