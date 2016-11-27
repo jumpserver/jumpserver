@@ -309,12 +309,12 @@ class Asset(models.Model):
     cabinet_no = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Cabinet number'))
     cabinet_pos = models.IntegerField(null=True, blank=True, verbose_name=_('Cabinet position'))
     number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
-    status = models.CharField(choices=STATUS_CHOICES, max_length=1, null=True, blank=True,
-                              default='I', verbose_name=_('Asset status'))
+    status = models.CharField(choices=STATUS_CHOICES, max_length=8, null=True, blank=True,
+                              default='In use', verbose_name=_('Asset status'))
     type = models.CharField(choices=TYPE_CHOICES, max_length=16, blank=True, null=True,
                             default='Server', verbose_name=_('Asset type'),)
     env = models.CharField(choices=ENV_CHOICES, max_length=8, blank=True, null=True,
-                           default='P', verbose_name=_('Asset environment'),)
+                           default='Prod', verbose_name=_('Asset environment'),)
     sn = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Serial number'))
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))

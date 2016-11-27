@@ -96,7 +96,7 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Asset status' %}:</td>
-                                            <td><b>{{ asset.status }}</b></td>
+                                            <td><b>{{ asset.get_status_display() }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Is active' %}:</td>

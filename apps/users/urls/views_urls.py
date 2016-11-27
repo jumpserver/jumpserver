@@ -23,6 +23,7 @@ urlpatterns = [
         name='user-asset-permission-create'),
     url(r'^user/(?P<pk>[0-9]+)/assets', views.UserGrantedAssetView.as_view(), name='user-granted-asset'),
     url(r'^user/(?P<pk>[0-9]+)/login-history', views.UserDetailView.as_view(), name='user-login-history'),
+    url(r'^user/export/', views.UserExportView.as_view(), name='user-export'),
     url(r'^first-login/$', views.UserFirstLoginView.as_view(), name='user-first-login'),
     url(r'^user/import/$', views.BulkImportUserView.as_view(), name='user-import'),
     # url(r'^user/(?P<pk>[0-9]+)/assets-perm$', views.UserDetailView.as_view(), name='user-detail'),
@@ -40,5 +41,4 @@ urlpatterns = [
         name='user-group-asset-permission-create'),
     url(r'^user-group/(?P<pk>[0-9]+)/assets', views.UserGroupGrantedAssetView.as_view(),
         name='user-group-granted-asset'),
-    url(r'^export/user/', views.ExportUserView.as_view(), name='export-user'),
 ]

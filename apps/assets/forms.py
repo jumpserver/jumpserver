@@ -310,3 +310,7 @@ class AssetTagForm(forms.ModelForm):
         help_texts = {
             'name': '* required',
         }
+
+
+class FileForm(forms.Form):
+    file = forms.FileField()

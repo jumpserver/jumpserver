@@ -557,7 +557,7 @@ class BulkImportUserView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class ExportUserView(View):
+class UserExportView(View):
     def get(self, request, *args, **kwargs):
         spm = request.GET.get('spm', '')
         users_id = cache.get(spm)
@@ -588,6 +588,6 @@ class ExportUserView(View):
             return HttpResponse('Json object not valid', status=400)
         spm = uuid.uuid4().get_hex()
         cache.set(spm, users_id, 300)
-        url = reverse('users:export-user-csv') + '?spm=%s' % spm
+        url = reverse('users:user-export') + '?spm=%s' % spm
         return JsonResponse({'redirect': url})
 
