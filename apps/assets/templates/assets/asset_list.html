@@ -84,6 +84,7 @@
 {% endblock %}
 
 {% block custom_foot_js %}
+<script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script type="text/javascript">
     window.onload = function (){
         var tag_on = document.getElementsByName("tag_on");
@@ -159,24 +160,24 @@
         });
 
         $('#btn_asset_import').click(function() {
-        var $form = $('#fm_asset_import');
-        $form.find('.help-block').remove();
-        function success (data) {
-            if (data.valid === false) {
-                $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_users'));
-            } else {
-                $('#id_created').html(data.created_info);
-                $('#id_created_detail').html(data.created.join(', '));
-                $('#id_updated').html(data.updated_info);
-                $('#id_updated_detail').html(data.updated.join(', '));
-                $('#id_failed').html(data.failed_info);
-                $('#id_failed_detail').html(data.failed.join(', '));
-                var $data_table = $('#asset_list_table').DataTable();
-                $data_table.ajax.reload();
+            var $form = $('#fm_asset_import');
+            $form.find('.help-block').remove();
+            function success (data) {
+                if (data.valid === false) {
+                    $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_assets'));
+                } else {
+                    $('#id_created').html(data.created_info);
+                    $('#id_created_detail').html(data.created.join(', '));
+                    $('#id_updated').html(data.updated_info);
+                    $('#id_updated_detail').html(data.updated.join(', '));
+                    $('#id_failed').html(data.failed_info);
+                    $('#id_failed_detail').html(data.failed.join(', '));
+                    var $data_table = $('#asset_list_table').DataTable();
+                    $data_table.ajax.reload();
+                }
             }
-        }
-        $form.ajaxSubmit({success: success});
-    })
+            $form.ajaxSubmit({success: success});
+        })
 
     });
 </script>

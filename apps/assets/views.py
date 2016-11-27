@@ -772,7 +772,7 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                       'cabinet_pos', 'number', 'status', 'type', 'env', 'sn', 'comment']
         header_min = ['hostname', 'ip', 'port', 'admin_user', 'comment']
         header = [col.value for col in next(rows)]
-        if header not in header_all and header_min not in header:
+        if not set(header).issubset(set(header_all)) and not set(header).issuperset(set(header_min)):
             data = {'valid': False, 'msg': 'Must be same format as template or export file'}
             return self.render_json_response(data)
 
@@ -790,12 +790,12 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                 asset_dict['idc'] = idc
 
             if asset_dict.get('type'):
-                asset_display_type_map = dict(zip(dict(Asset.TYPE_CHOICES).values, dict(Asset.TYPE_CHOICES).keys()))
+                asset_display_type_map = dict(zip(dict(Asset.TYPE_CHOICES).values(), dict(Asset.TYPE_CHOICES).keys()))
                 asset_type = asset_display_type_map.get(asset_dict['type'], 'Server')
                 asset_dict['type'] = asset_type
 
             if asset_dict.get('status'):
-                asset_display_status_map = dict(zip(dict(Asset.STATUS_CHOICES).values,
+                asset_display_status_map = dict(zip(dict(Asset.STATUS_CHOICES).values(),
                                                     dict(Asset.STATUS_CHOICES).keys()))
                 asset_status = asset_display_status_map.get(asset_dict['status'], 'In use')
                 asset_dict['status'] = asset_status
