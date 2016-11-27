@@ -3,7 +3,7 @@ from __future__ import unicode_literals, absolute_import
 
 from jinja2 import Template
 from django.db import models
-from assets.models import Asset
+from assets.models import Asset, AssetGroup
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -40,11 +40,13 @@ class RunasAlia(models.Model):
 
 
 class Privilege(models.Model):
+    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     user = models.ForeignKey(UserAlia, blank=True, null=True, related_name='privileges')
     host = models.ForeignKey(HostAlia, blank=True, null=True, related_name='privileges')
     runas = models.ForeignKey(RunasAlia, blank=True, null=True, related_name='privileges')
     command = models.ForeignKey(CmdAlia, blank=True, null=True, related_name='privileges')
     nopassword = models.BooleanField(default=True, verbose_name=_('Is_NoPassword'))
+    comment = models.TextField(blank=True, null=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
         return "[%s %s %s %s %s]" % (self.user.name,
@@ -58,7 +60,8 @@ class Privilege(models.Model):
 
 
 class Extra_conf(models.Model):
-    line = models.TextField(blank=True, null=True, verbose_name=_('Extra_Item'))
+    line = models.TextField(blank=True, null=True, verbose_name=_('Extra_Item'),
+                            help_text=_('The extra sudo config line.'))
 
     def __unicode__(self):
         return self.line
@@ -72,9 +75,19 @@ class Sudo(models.Model):
     :param privileges: <list> [(user, host, runas, command, nopassword),]
     """
 
-    asset = models.ForeignKey(Asset, null=True, blank=True, related_name='sudos')
+    assets = models.ManyToManyField(Asset, blank=True, related_name='sudos')
+    asset_groups = models.ManyToManyField(AssetGroup, blank=True, related_name='sudos')
     extra_lines = models.ManyToManyField(Extra_conf, related_name='sudos', blank=True)
     privilege_items = models.ManyToManyField(Privilege, related_name='sudos', blank=True)
+
+    @property
+    def all_assets(self):
+        assets = list(self.assets.all())
+        for group in self.asset_groups.all():
+            for asset in group.assets.all():
+                if asset not in assets:
+                    assets.append(asset)
+        return assets
 
     @property
     def users(self):

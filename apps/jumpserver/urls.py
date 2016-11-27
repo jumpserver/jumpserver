@@ -20,7 +20,7 @@ from django.conf.urls import url, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.views.generic.base import TemplateView
-from jumpserver.api_router import router
+from jumpserver.api_router import api_router
 
 
 urlpatterns = [
@@ -41,7 +41,7 @@ urlpatterns = [
 
 
 urlpatterns += [
-    url(r'^api/v1/ops', include(router.urls)),
+    url(r'^api/v1/ops', include(api_router.urls)),
     url(r'^ops/', include('ops.urls', namespace='ops')),
 ]
 

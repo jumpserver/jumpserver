@@ -53,6 +53,6 @@ class CronUpdateView(AdminUserRequiredMixin, UpdateView):
 
 class CronDetailView(DetailView):
     model = CronTable
-    context_object_name = 'sudo'
+    context_object_name = 'cron'
     template_name = 'cron/detail.html'
 
