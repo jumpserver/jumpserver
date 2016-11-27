@@ -41,7 +41,7 @@ urlpatterns = [
 
 
 urlpatterns += [
-    url(r'^api/v1/ops', include(api_router.urls)),
+    url(r'^api/v1/ops/', include(api_router.urls)),
     url(r'^ops/', include('ops.urls', namespace='ops')),
 ]
 
