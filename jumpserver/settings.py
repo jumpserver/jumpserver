@@ -34,6 +34,12 @@ except ConfigParser.NoOptionError:
 EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend' if EMAIL_USE_SSL else 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_TIMEOUT = 5
 
+# ======== zabbix ========
+IS_ZABBIX = config.get("zbx", "is_zbx")
+ZBX_URL = config.get("zbx", "zbx_url")
+ZBX_USER = config.get("zbx", "zbx_user")
+ZBX_PWD = config.get("zbx", "zbx_pwd")
+
 # ======== Log ==========
 LOG_DIR = os.path.join(BASE_DIR, 'logs')
 SSH_KEY_DIR = os.path.join(BASE_DIR, 'keys/role_keys')
