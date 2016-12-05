@@ -79,6 +79,7 @@ class Sudo(models.Model):
     asset_groups = models.ManyToManyField(AssetGroup, blank=True, related_name='sudos')
     extra_lines = models.ManyToManyField(Extra_conf, related_name='sudos', blank=True)
     privilege_items = models.ManyToManyField(Privilege, related_name='sudos', blank=True)
+    created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
 
     @property
     def all_assets(self):

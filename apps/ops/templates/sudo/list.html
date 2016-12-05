@@ -1,15 +1,6 @@
 {% extends '_base_list.html' %}
 {% load i18n static %}
 {% block table_search %}
-    <div class="html5buttons">
-        <div class="dt-buttons btn-group">
-            <a class="btn btn-default buttons-pdf" tabindex="0" href="#">
-                <span>PDF</span></a>
-            <a class="btn btn-default buttons-excel" tabindex="0" href="#">
-                <span>Excel</span>
-            </a>
-        </div>
-    </div>
 {% endblock %}
 {% block table_container %}
 <div class="uc pull-left m-l-5 m-r-5"><a href="{% url "users:user-create" %}" class="btn btn-sm btn-primary"> {% trans "Create user" %} </a></div>
