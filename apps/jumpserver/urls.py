@@ -30,7 +30,7 @@ urlpatterns = [
     url(r'^perms/', include('perms.urls.views_urls', namespace='perms')),
     url(r'^audits/', include('audits.urls.views_urls', namespace='audits')),
     url(r'^terminal/', include('terminal.urls.views_urls', namespace='terminal')),
-    url('^ops/', include('ops.urls.view_urls'), name='ops'),
+    url('^ops/', include('ops.urls.view_urls', namespace='ops')),
 
     url(r'^api/users/', include('users.urls.api_urls', namespace='api-users')),
     url(r'^api/assets/', include('assets.urls.api_urls', namespace='api-assets')),
