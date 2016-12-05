@@ -266,6 +266,7 @@ def setting(request):
 
 @login_required(login_url='/login')
 def upload(request):
+    return "sorry"
     user = request.user
     assets = get_group_user_perm(user).get('asset').keys()
     asset_select = []
@@ -310,6 +311,7 @@ def upload(request):
 
 @login_required(login_url='/login')
 def download(request):
+    return "sorry"
     user = request.user
     assets = get_group_user_perm(user).get('asset').keys()
     asset_select = []
@@ -352,6 +354,7 @@ def download(request):
 
 @login_required(login_url='/login')
 def exec_cmd(request):
+    return "sorry"
     role = request.GET.get('role')
     check_assets = request.GET.get('check_assets', '')
     web_terminal_uri = '/ws/exec?role=%s' % (role)
@@ -360,6 +363,7 @@ def exec_cmd(request):
 
 @require_role('user')
 def web_terminal(request):
+    return "sorry"
     asset_id = request.GET.get('id')
     role_name = request.GET.get('role')
     asset = get_object(Asset, id=asset_id)
