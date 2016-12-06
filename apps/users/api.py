@@ -1,18 +1,16 @@
 # ~*~ coding: utf-8 ~*~
 #
 
-import base64
 
-from django.shortcuts import get_object_or_404
 from django.core.cache import cache
 from django.conf import settings
-from rest_framework import generics, status, viewsets
+from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView, BulkModelViewSet
-from rest_framework import authentication
+from rest_framework_bulk import BulkModelViewSet
+from django_filters.rest_framework import DjangoFilterBackend
 
-from common.mixins import BulkDeleteApiMixin
+from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 from .utils import check_user_valid, token_gen
 from .models import User, UserGroup
@@ -24,10 +22,12 @@ from . import serializers
 logger = get_logger(__name__)
 
 
-class UserViewSet(BulkModelViewSet):
+class UserViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
     permission_classes = (IsSuperUser,)
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('username', 'email', 'name', 'id')
 
 
 class UserUpdateGroupApi(generics.RetrieveUpdateAPIView):
@@ -73,7 +73,7 @@ class UserUpdatePKApi(generics.UpdateAPIView):
         user.save()
 
 
-class UserGroupViewSet(viewsets.ModelViewSet):
+class UserGroupViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = UserGroup.objects.all()
     serializer_class = serializers.UserGroupSerializer
 
@@ -83,52 +83,7 @@ class UserGroupUpdateUserApi(generics.RetrieveUpdateAPIView):
     serializer_class = serializers.UserGroupUpdateMemeberSerializer
     permission_classes = (IsSuperUser,)
 
-# class GroupDetailApi(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = UserGroup.objects.all()
-#     serializer_class = serializers.GroupDetailSerializer
-#
-#     def perform_update(self, serializer):
-#         users = serializer.validated_data.get('users')
-#         if users:
-#             group = self.get_object()
-#             Note: use `list` method to force hitting the db.
-            # group_users = list(group.users.all())
-            # serializer.save()
-            # group.users.set(users + group_users)
-            # group.save()
-            # return
-        # serializer.save()
 
-
-# class UserListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = serializers.UserBulkUpdateSerializer
-#     permission_classes = (IsSuperUserOrTerminalUser,)
-#
-#     def get(self, request, *args, **kwargs):
-#         return super(UserListUpdateApi, self).get(request, *args, **kwargs)
-
-#
-# class GroupListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):
-#     queryset = UserGroup.objects.all()
-#     serializer_class = serializers.GroupBulkUpdateSerializer
-#
-
-# class DeleteUserFromGroupApi(generics.DestroyAPIView):
-#     queryset = UserGroup.objects.all()
-#     serializer_class = serializers.GroupDetailSerializer
-#
-#     def destroy(self, request, *args, **kwargs):
-#         group = self.get_object()
-#         self.perform_destroy(group, **kwargs)
-#         return Response(status=status.HTTP_204_NO_CONTENT)
-#
-#     def perform_destroy(self, instance, **kwargs):
-#         user_id = kwargs.get('uid')
-#         user = get_object_or_404(User, id=user_id)
-#         instance.users.remove(user)
-#
-#
 class UserAuthApi(APIView):
     permission_classes = ()
     expiration = settings.CONFIG.TOKEN_EXPIRATION or 3600

@@ -6,17 +6,18 @@ from rest_framework.views import APIView
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin, ListBulkCreateUpdateDestroyAPIView
 from django.shortcuts import get_object_or_404
 
-from common.mixins import BulkDeleteApiMixin
+from common.mixins import IDInFilterMixin
 from common.utils import get_object_or_none, signer
 from .hands import IsSuperUserOrTerminalUser, IsSuperUser
 from .models import AssetGroup, Asset, IDC, SystemUser, AdminUser
 from . import serializers
 
 
-class AssetViewSet(viewsets.ModelViewSet):
+class AssetViewSet(IDInFilterMixin, viewsets.ModelViewSet):
     """API endpoint that allows Asset to be viewed or edited."""
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
+    filter_fields = ('id', 'ip', 'hostname')
 
     def get_queryset(self):
         queryset = super(AssetViewSet, self).get_queryset()
@@ -27,7 +28,6 @@ class AssetViewSet(viewsets.ModelViewSet):
 
         if asset_group_id:
             queryset = queryset.filter(groups__id=asset_group_id)
-
         return queryset
 
 
@@ -71,7 +71,7 @@ class SystemUserViewSet(viewsets.ModelViewSet):
 #         return self.object.assets.all()
 
 
-class AssetListUpdateApi(BulkDeleteApiMixin, ListBulkCreateUpdateDestroyAPIView):
+class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
     permission_classes = (IsSuperUser,)

@@ -1,19 +1,27 @@
 {% extends '_modal.html' %}
 {% load i18n %}
 {% block modal_id %}user_import_modal{% endblock %}
-{% block modal_title%}{% trans "Import User" %}{% endblock %}
+{% block modal_title%}{% trans "Import user" %}{% endblock %}
 {% block modal_body %}
-<p class="text-success text-center">{% trans "Hint: your excel should organized in the following format." %}</p>
-<p class="text-success text-center">{% trans "* You should have a very worksheet named `users`." %}</p>
-<p class="text-success text-center">{% trans "* Rows in this worksheet: username, email, enable_opt(0, 1), role(one of ['Admin', 'User'])" %}</p>
-<form method="post" class="form-horizontal" action="{% url 'users:user-import' %}" id="fm_user_import" enctype="multipart/form-data">
+<p class="text-success">{% trans "Download template or use export excel format" %}</p>
+<form method="post" action="{% url 'users:user-import' %}" id="fm_user_import" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="form-group">
-        <label class="control-label col-sm-2 col-lg-2 " for="id_excel">{% trans "Excel" %}</label>
-        <div class=" col-sm-9 col-lg-9 ">
-            <input id="id_excel" type="file" name="excel" />
-        </div>
+        <label class="control-label" for="id_users">{% trans "Template" %}</label>
+        <a href="{{ MEDIA_URL }}files/user_import_template.xlsx" style="display: block">{% trans 'Download' %}</a>
+    </div>
+    <div class="form-group">
+        <label class="control-label" for="id_users">{% trans "Users excel file" %}</label>
+        <input id="id_users" type="file" name="file" />
     </div>
 </form>
+<p>
+    <p class="text-success" id="id_created"></p>
+    <p id="id_created_detail"></p>
+    <p class="text-warning" id="id_updated"></p>
+    <p id="id_updated_detail"></p>
+    <p class="text-danger" id="id_failed"></p>
+    <p id="id_failed_detail"></p>
+</p>
 {% endblock %}
 {% block modal_confirm_id %}btn_user_import{% endblock %}

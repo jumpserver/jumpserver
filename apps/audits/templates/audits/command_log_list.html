@@ -4,6 +4,7 @@
 {% load common_tags %}
 {% block content_left_head %}
     <link href="{% static "css/plugins/footable/footable.core.css" %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
     <style>
         #search_btn {
             margin-bottom: 0;
@@ -91,6 +92,7 @@
 
 {% block custom_foot_js %}
     <script src="{% static "js/plugins/footable/footable.all.min.js" %}"></script>
+    <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
     <script>
         $(document).ready(function () {
             $('.footable').footable();

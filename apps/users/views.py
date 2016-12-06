@@ -1,26 +1,32 @@
 # ~*~ coding: utf-8 ~*~
 
 from __future__ import unicode_literals
+import json
+import uuid
 
-import csv
+from openpyxl import Workbook
+from openpyxl.writer.excel import save_virtual_workbook
+from openpyxl import load_workbook
 from django import forms
-from django.conf import settings
+from django.utils import timezone
+from django.core.cache import cache
+from django.db import IntegrityError
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.files.storage import default_storage
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponseRedirect, HttpResponse, JsonResponse
 from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.decorators.cache import never_cache
-from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.list import ListView
-from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView, SingleObjectMixin, \
-    FormMixin
+from django.views.generic.edit import CreateView, DeleteView, UpdateView, FormView, SingleObjectMixin, FormMixin
 from django.views.generic.detail import DetailView
 from formtools.wizard.views import SessionWizardView
 
@@ -31,7 +37,6 @@ from .models import User, UserGroup
 from .utils import AdminUserRequiredMixin, user_add_success_next, send_reset_password_mail
 from .hands import write_login_log_async
 from . import forms
-
 
 logger = get_logger(__name__)
 
@@ -90,7 +95,11 @@ class UserListView(AdminUserRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super(UserListView, self).get_context_data(**kwargs)
-        context.update({'app': _('Users'), 'action': _('User list'), 'groups': UserGroup.objects.all()})
+        context.update({
+            'app': _('Users'),
+            'action': _('User list'),
+            'groups': UserGroup.objects.all()
+        })
         return context
 
 
@@ -229,10 +238,6 @@ class UserGroupDetailView(AdminUserRequiredMixin, DetailView):
         }
         kwargs.update(context)
         return super(UserGroupDetailView, self).get_context_data(**kwargs)
-
-
-class UserGroupDeleteView(DeleteView):
-    pass
 
 
 class UserForgotPasswordView(TemplateView):
@@ -490,55 +495,99 @@ class BulkImportUserView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         return self.render_json_response(data)
 
     def form_valid(self, form):
-        from openpyxl import load_workbook
         try:
-            wb = load_workbook(form.cleaned_data['excel'])
-            ws = wb['users']
+            wb = load_workbook(form.cleaned_data['file'])
+            ws = wb.get_active_sheet()
         except Exception as e:
-            print e
-            error = _('Not a valid Excel file.')
-            data = {
-                'success': False,
-                'msg': error
-            }
+            print(e)
+            data = {'valid': False, 'msg': 'Not a valid Excel file'}
             return self.render_json_response(data)
 
-        errors = []
-        for index, row in enumerate(ws.rows):
-            user_data = [cell.value for cell in row]
-            if len(user_data) != 4:
-                errors.append("Row {}: invalid user data format.".format(index))
-                continue
-            username, email, enable_otp, role = user_data
-            data = {
-                'username': username,
-                'email': email,
-                'enable_otp': True if enable_otp in ['T', '1', 1, True] else False,
-                'role': role
-            }
-            form = forms.UserBulkImportForm(data, auto_id=False)
-            if form.is_valid():
-                form.save()
+        rows = ws.rows
+        header_need = ["name", 'username', 'email', 'groups', "role", "phone", "wechat", "comment"]
+        header = [col.value for col in next(rows)]
+        print(header)
+        if header != header_need:
+            data = {'valid': False, 'msg': 'Must be same format as template or export file'}
+            return self.render_json_response(data)
+
+        created = []
+        updated = []
+        failed = []
+        for row in rows:
+            user_dict = dict(zip(header, [col.value for col in row]))
+            groups_name = user_dict.pop('groups')
+            if groups_name:
+                groups_name = groups_name.split(',')
+                groups = UserGroup.objects.filter(name__in=groups_name)
             else:
-                form_errors = form.errors.as_data()
-                for key, err_list in form_errors.iteritems():
-                    error_line = "{} :".format(key)
-                    for errs in err_list:
-                        error_line = "{}{}".format(error_line, ";".join([err for err in errs.messages]))
-                    errors.append("Row {}: {}".format(index, error_line))
+                groups = None
+            try:
+                user = User.objects.create(**user_dict)
+                user_add_success_next(user)
+                created.append(user_dict['username'])
+            except IntegrityError as e:
+                user = User.objects.filter(username=user_dict['username'])
+                if not user:
+                    failed.append(user_dict['username'])
+                    continue
+                user.update(**user_dict)
+                user = user[0]
+                updated.append(user_dict['username'])
+            except TypeError as e:
+                print(e)
+                failed.append(user_dict['username'])
+                user = None
+
+            if user and groups:
+                user.groups.add(*tuple(groups))
+                user.save()
+
         data = {
-            'success': True if not errors else False,
-            'msg': 'ok' if not errors else '<br />'.join(errors)
+            'created': created,
+            'created_info': 'Created {}'.format(len(created)),
+            'updated': updated,
+            'updated_info': 'Updated {}'.format(len(updated)),
+            'failed': failed,
+            'failed_info': 'Failed {}'.format(len(failed)),
+            'valid': True,
+            'msg': 'Created: {}. Updated: {}, Error: {}'.format(len(created), len(updated), len(failed))
         }
         return self.render_json_response(data)
 
 
-def down_csv(request, xx):
-    print(xx)
-    response = HttpResponse(content_type='application/csv')
-    response['Content-Disposition'] = 'attachment; filename="somefile.csv"'
-    writer = csv.writer(response)
-    writer.writerow(['First row', 'Foo', 'Bar', 'Baz'])
-    writer.writerow(['Second row', 'A', 'B', 'C', '"Testing"', "Here's a quote"])
-    return response
+@method_decorator(csrf_exempt, name='dispatch')
+class UserExportView(View):
+    def get(self, request, *args, **kwargs):
+        spm = request.GET.get('spm', '')
+        users_id = cache.get(spm)
+        if not users_id and not isinstance(users_id, list):
+            return HttpResponse('May be expired', status=404)
+
+        users = User.objects.filter(id__in=users_id)
+        wb = Workbook()
+        ws = wb.active
+        ws.title = 'User'
+        header = ["name", 'username', 'email', 'groups', "role", "phone", "wechat", "comment"]
+        ws.append(header)
+
+        for user in users:
+            ws.append([user.name, user.username, user.email,
+                       ','.join([group.name for group in user.groups.all()]),
+                        user.role, user.phone, user.wechat, user.comment])
+
+        filename = 'users-{}.xlsx'.format(timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S'))
+        response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+        return response
+
+    def post(self, request, *args, **kwargs):
+        try:
+            users_id = json.loads(request.body).get('users_id', [])
+        except ValueError:
+            return HttpResponse('Json object not valid', status=400)
+        spm = uuid.uuid4().get_hex()
+        cache.set(spm, users_id, 300)
+        url = reverse('users:user-export') + '?spm=%s' % spm
+        return JsonResponse({'redirect': url})
 

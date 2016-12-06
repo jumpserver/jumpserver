@@ -1,18 +1,32 @@
 # coding:utf-8
 from __future__ import absolute_import, unicode_literals
+import json
+import uuid
+
+from openpyxl import Workbook
+from openpyxl.writer.excel import save_virtual_workbook
+from openpyxl import load_workbook
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.db.models import Q
-from django.views.generic import TemplateView, ListView
+from django.db import IntegrityError
+from django.views.generic import TemplateView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.shortcuts import get_object_or_404, reverse, redirect
-from common.utils import int_seq
-from .utils import CreateAssetTagsMiXin,UpdateAssetTagsMiXin
-from .models import Asset, AssetGroup, IDC, AssetExtend, AdminUser, SystemUser, Tag
-from .forms import *
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.utils.decorators import method_decorator
+from django.core.cache import cache
+from django.utils import timezone
+
+from common.mixins import JSONResponseMixin
+from common.utils import get_object_or_none
+from .utils import CreateAssetTagsMiXin, UpdateAssetTagsMiXin
+from . import forms
+from .models import Asset, AssetGroup, AdminUser, IDC, SystemUser, Tag
 from .hands import AdminUserRequiredMixin
 
 
@@ -33,7 +47,7 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
 class AssetCreateView(AdminUserRequiredMixin, CreateAssetTagsMiXin, CreateView):
     model = Asset
     tag_type = 'asset'
-    form_class = AssetCreateForm
+    form_class = forms.AssetCreateForm
     template_name = 'assets/asset_create.html'
     success_url = reverse_lazy('assets:asset-list')
 
@@ -59,7 +73,7 @@ class AssetCreateView(AdminUserRequiredMixin, CreateAssetTagsMiXin, CreateView):
 
 class AssetModalCreateView(AdminUserRequiredMixin, CreateAssetTagsMiXin, ListView):
     model = Asset
-    form_class = AssetCreateForm
+    form_class = forms.AssetCreateForm
     template_name = 'assets/asset_modal_update.html'
     success_url = reverse_lazy('assets:asset-list')
 
@@ -87,7 +101,7 @@ class AssetModalCreateView(AdminUserRequiredMixin, CreateAssetTagsMiXin, ListVie
 
 class AssetUpdateView(AdminUserRequiredMixin, UpdateAssetTagsMiXin, UpdateView):
     model = Asset
-    form_class = AssetCreateForm
+    form_class = forms.AssetCreateForm
     template_name = 'assets/asset_update.html'
     success_url = reverse_lazy('assets:asset-list')
     new_form = ''
@@ -214,7 +228,7 @@ class AssetModalListView(AdminUserRequiredMixin, ListView):
 
 class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
     model = AssetGroup
-    form_class = AssetGroupForm
+    form_class = forms.AssetGroupForm
     template_name = 'assets/asset_group_create.html'
     success_url = reverse_lazy('assets:asset-group-list')
     #ordering = '-id'
@@ -275,7 +289,7 @@ class AssetGroupDetailView(AdminUserRequiredMixin, DetailView):
 
 class AssetGroupUpdateView(AdminUserRequiredMixin, UpdateView):
     model = AssetGroup
-    form_class = AssetGroupForm
+    form_class = forms.AssetGroupForm
     template_name = 'assets/asset_group_create.html'
     success_url = reverse_lazy('assets:asset-group-list')
 
@@ -317,7 +331,7 @@ class IDCListView(AdminUserRequiredMixin, TemplateView):
 
 class IDCCreateView(AdminUserRequiredMixin, CreateView):
     model = IDC
-    form_class = IDCForm
+    form_class = forms.IDCForm
     template_name = 'assets/idc_create_update.html'
     success_url = reverse_lazy('assets:idc-list')
 
@@ -339,7 +353,7 @@ class IDCCreateView(AdminUserRequiredMixin, CreateView):
 
 class IDCUpdateView(AdminUserRequiredMixin, UpdateView):
     model = IDC
-    form_class = IDCForm
+    form_class = forms.IDCForm
     template_name = 'assets/idc_create_update.html'
     context_object_name = 'idc'
     success_url = reverse_lazy('assets:idc-list')
@@ -408,7 +422,7 @@ class AdminUserListView(AdminUserRequiredMixin, TemplateView):
 
 class AdminUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = AdminUser
-    form_class = AdminUserForm
+    form_class = forms.AdminUserForm
     template_name = 'assets/admin_user_create_update.html'
     success_url = reverse_lazy('assets:admin-user-list')
 
@@ -434,7 +448,7 @@ class AdminUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
 
 class AdminUserUpdateView(AdminUserRequiredMixin, UpdateView):
     model = AdminUser
-    form_class = AdminUserForm
+    form_class = forms.AdminUserForm
     template_name = 'assets/admin_user_create_update.html'
 
     def get_context_data(self, **kwargs):
@@ -478,39 +492,21 @@ class AdminUserDeleteView(AdminUserRequiredMixin, DeleteView):
     success_url = reverse_lazy('assets:admin-user-list')
 
 
-class SystemUserListView(AdminUserRequiredMixin, ListView):
-    model = SystemUser
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    context_object_name = 'system_user_list'
+class SystemUserListView(AdminUserRequiredMixin, TemplateView):
     template_name = 'assets/system_user_list.html'
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Assets'),
             'action': _('System user list'),
-            'keyword': self.request.GET.get('keyword', '')
         }
         kwargs.update(context)
         return super(SystemUserListView, self).get_context_data(**kwargs)
 
-    def get_queryset(self):
-        # Todo: Default order by lose asset connection num
-        self.queryset = super(SystemUserListView, self).get_queryset()
-        self.keyword = keyword = self.request.GET.get('keyword', '')
-        self.sort = sort = self.request.GET.get('sort', '-date_created')
-
-        if keyword:
-            self.queryset = self.queryset.filter(Q(name__icontains=keyword) |
-                                                 Q(comment__icontains=keyword))
-
-        if sort:
-            self.queryset = self.queryset.order_by(sort)
-        return self.queryset
-
 
 class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = SystemUser
-    form_class = SystemUserForm
+    form_class = forms.SystemUserForm
     template_name = 'assets/system_user_create_update.html'
     success_url = reverse_lazy('assets:system-user-list')
 
@@ -534,7 +530,7 @@ class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVi
 
 class SystemUserUpdateView(AdminUserRequiredMixin, UpdateView):
     model = SystemUser
-    form_class = SystemUserForm
+    form_class = forms.SystemUserForm
     template_name = 'assets/system_user_create_update.html'
 
     def get_context_data(self, **kwargs):
@@ -636,7 +632,7 @@ class TagsListView(AdminUserRequiredMixin, ListView):
 
 class AssetTagCreateView(AdminUserRequiredMixin, CreateView):
     model = Tag
-    form_class = AssetTagForm
+    form_class = forms.AssetTagForm
     template_name = 'assets/asset_tag_create.html'
     success_url = reverse_lazy('assets:asset-tag-list')
     #ordering = '-id'
@@ -685,7 +681,7 @@ class AssetTagDetailView(SingleObjectMixin, AdminUserRequiredMixin, ListView):
 
 class AssetTagUpdateView(AdminUserRequiredMixin, UpdateView):
     model = Tag
-    form_class = AssetTagForm
+    form_class = forms.AssetTagForm
     template_name = 'assets/asset_tag_create.html'
     success_url = reverse_lazy('assets:asset-tag-list')
 
@@ -711,3 +707,127 @@ class AssetTagDeleteView(AdminUserRequiredMixin, DeleteView):
     model = Tag
     success_url = reverse_lazy('assets:asset-tag-list')
 
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AssetExportView(View):
+    @staticmethod
+    def get_asset_attr(asset, attr):
+        if attr in ['admin_user', 'idc']:
+            return getattr(asset, attr).name
+        elif attr in ['status', 'type', 'env']:
+            return getattr(asset, 'get_{}_display'.format(attr))()
+        else:
+            return getattr(asset, attr)
+
+    def get(self, request, *args, **kwargs):
+        spm = request.GET.get('spm', '')
+        assets_id = cache.get(spm)
+        if not assets_id and not isinstance(assets_id, list):
+            return HttpResponse('May be expired', status=404)
+
+        assets = Asset.objects.filter(id__in=assets_id)
+        wb = Workbook()
+        ws = wb.active
+        ws.title = 'Asset'
+        header = ['hostname', 'ip', 'port', 'admin_user', 'idc', 'cpu', 'memory', 'disk',
+                  'mac_address', 'other_ip', 'remote_card_ip', 'os', 'cabinet_no',
+                  'cabinet_pos', 'number', 'status', 'type', 'env', 'sn', 'comment']
+        ws.append(header)
+
+        for asset in assets:
+            ws.append([self.get_asset_attr(asset, attr) for attr in header])
+
+        filename = 'assets-{}.xlsx'.format(timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S'))
+        response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+        return response
+
+    def post(self, request, *args, **kwargs):
+        try:
+            assets_id = json.loads(request.body).get('assets_id', [])
+            print(assets_id)
+        except ValueError:
+            return HttpResponse('Json object not valid', status=400)
+        spm = uuid.uuid4().get_hex()
+        cache.set(spm, assets_id, 300)
+        url = reverse('assets:asset-export') + '?spm=%s' % spm
+        return JsonResponse({'redirect': url})
+
+
+class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
+    form_class = forms.FileForm
+
+    def form_valid(self, form):
+        try:
+            wb = load_workbook(form.cleaned_data['file'])
+            ws = wb.get_active_sheet()
+        except Exception as e:
+            print(e)
+            data = {'valid': False, 'msg': 'Not a valid Excel file'}
+            return self.render_json_response(data)
+
+        rows = ws.rows
+        header_all = ['hostname', 'ip', 'port', 'admin_user', 'idc', 'cpu', 'memory', 'disk',
+                      'mac_address', 'other_ip', 'remote_card_ip', 'os', 'cabinet_no',
+                      'cabinet_pos', 'number', 'status', 'type', 'env', 'sn', 'comment']
+        header_min = ['hostname', 'ip', 'port', 'admin_user', 'comment']
+        header = [col.value for col in next(rows)]
+        if not set(header).issubset(set(header_all)) and not set(header).issuperset(set(header_min)):
+            data = {'valid': False, 'msg': 'Must be same format as template or export file'}
+            return self.render_json_response(data)
+
+        created = []
+        updated = []
+        failed = []
+        for row in rows:
+            asset_dict = dict(zip(header, [col.value for col in row]))
+            if asset_dict.get('admin_user', None):
+                admin_user = get_object_or_none(AdminUser, name=asset_dict['admin_user'])
+                asset_dict['admin_user'] = admin_user
+
+            if asset_dict.get('idc'):
+                idc = get_object_or_none(IDC, name=asset_dict['idc'])
+                asset_dict['idc'] = idc
+
+            if asset_dict.get('type'):
+                asset_display_type_map = dict(zip(dict(Asset.TYPE_CHOICES).values(), dict(Asset.TYPE_CHOICES).keys()))
+                asset_type = asset_display_type_map.get(asset_dict['type'], 'Server')
+                asset_dict['type'] = asset_type
+
+            if asset_dict.get('status'):
+                asset_display_status_map = dict(zip(dict(Asset.STATUS_CHOICES).values(),
+                                                    dict(Asset.STATUS_CHOICES).keys()))
+                asset_status = asset_display_status_map.get(asset_dict['status'], 'In use')
+                asset_dict['status'] = asset_status
+
+            if asset_dict.get('env'):
+                asset_display_env_map = dict(zip(dict(Asset.ENV_CHOICES).values(),
+                                                 dict(Asset.ENV_CHOICES).keys()))
+                asset_env = asset_display_env_map.get(asset_dict['env'], 'Prod')
+                asset_dict['env'] = asset_env
+
+            try:
+                Asset.objects.create(**asset_dict)
+                created.append(asset_dict['ip'])
+            except IntegrityError as e:
+                asset = Asset.objects.filter(ip=asset_dict['ip'], port=asset_dict['port'])
+                if not asset:
+                    failed.append(asset_dict['ip'])
+                    continue
+                asset.update(**asset_dict)
+                updated.append(asset_dict['ip'])
+            except TypeError as e:
+                print(e)
+                failed.append(asset_dict['ip'])
+
+        data = {
+            'created': created,
+            'created_info': 'Created {}'.format(len(created)),
+            'updated': updated,
+            'updated_info': 'Updated {}'.format(len(updated)),
+            'failed': failed,
+            'failed_info': 'Failed {}'.format(len(failed)),
+            'valid': True,
+            'msg': 'Created: {}. Updated: {}, Error: {}'.format(len(created), len(updated), len(failed))
+        }
+        return self.render_json_response(data)

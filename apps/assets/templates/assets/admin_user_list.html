@@ -39,13 +39,6 @@ $(document).ready(function(){
                 var innerHtml = cellData.length > 8 ? cellData.substring(0, 24) + '...': cellData;
                 $(td).html('<a href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</a>');
              }},
-{#            {targets: 6, createdCell: function (td, cellData) {#}
-{#                if (!cellData) {#}
-{#                    $(td).html('<i class="fa fa-times text-danger"></i>')#}
-{#                } else {#}
-{#                    $(td).html('<i class="fa fa-check text-navy"></i>')#}
-{#                }#}
-{#             }},#}
             {targets: 6, createdCell: function (td, cellData, rowData) {
                 var script_btn = '<a href="{% url "assets:admin-user-update" pk=99991937 %}" class="btn btn-xs btn-primary">{% trans "Script" %}</a>'.replace('99991937', cellData);
                 var update_btn = '<a href="{% url "assets:admin-user-update" pk=99991937 %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
@@ -55,7 +48,6 @@ $(document).ready(function(){
         ajax_url: '{% url "api-assets:admin-user-list" %}',
         columns: [{data: function(){return ""}}, {data: "name" }, {data: "username" }, {data: "assets_amount" }, {data: function () {return 'lost'} },
                   {data: "comment" }, {data: "id" }],
-        op_html: $('#actions').html()
     };
     jumpserver.initDataTable(options);
 });

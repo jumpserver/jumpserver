@@ -9,12 +9,6 @@ from common.utils import signer, validate_ssh_public_key
 from .models import User, UserGroup
 
 
-# class UserDetailSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ['avatar', 'wechat', 'phone', 'enable_otp', 'comment', 'is_active', 'name']
-
-
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     groups_display = serializers.SerializerMethodField()
     groups = serializers.PrimaryKeyRelatedField(many=True, queryset=UserGroup.objects.all())
@@ -32,10 +26,6 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     @staticmethod
     def get_groups_display(obj):
         return " ".join([group.name for group in obj.groups.all()])
-
-    # @staticmethod
-    # def get_active_display(obj):
-    #     return not (obj.is_expired and obj.is_active)
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):

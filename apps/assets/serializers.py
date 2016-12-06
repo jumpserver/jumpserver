@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import viewsets, serializers,generics
-from .models import AssetGroup, Asset, IDC, AssetExtend, AdminUser, SystemUser
-from common.mixins import BulkDeleteApiMixin
+from .models import AssetGroup, Asset, IDC, AdminUser, SystemUser
+from common.mixins import IDInFilterMixin
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin
 
 
@@ -35,7 +35,7 @@ class SystemUserSerializer(serializers.ModelSerializer):
 
     def get_field_names(self, declared_fields, info):
         fields = super(SystemUserSerializer, self).get_field_names(declared_fields, info)
-        fields.append('assets_amount')
+        fields.extend(['assets_amount'])
         return fields
 
 
@@ -43,7 +43,6 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     # system_users = SystemUserSerializer(many=True, read_only=True)
     # admin_user = AdminUserSerializer(many=False, read_only=True)
     hardware = serializers.SerializerMethodField()
-    type_display = serializers.SerializerMethodField()
 
     class Meta(object):
         model = Asset
@@ -51,14 +50,15 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     @staticmethod
     def get_hardware(obj):
-        return '%s %s %s' % (obj.cpu, obj.memory, obj.disk)
-
-    @staticmethod
-    def get_type_display(obj):
-        if obj.type:
-            return obj.type.value
+        if obj.cpu:
+            return '%s %s %s' % (obj.cpu, obj.memory, obj.disk)
         else:
             return ''
+
+    def get_field_names(self, declared_fields, info):
+        fields = super(AssetSerializer, self).get_field_names(declared_fields, info)
+        fields.extend(['get_type_display', 'get_env_display'])
+        return fields
 
 
 class AssetGrantedSerializer(serializers.ModelSerializer):

@@ -60,38 +60,6 @@ class IDC(models.Model):
                 continue
 
 
-class AssetExtend(models.Model):
-    key = models.CharField(max_length=64, verbose_name=_('KEY'))
-    value = models.CharField(max_length=64, verbose_name=_('VALUE'))
-    created_by = models.CharField(max_length=32, blank=True, verbose_name=_("Created by"))
-    date_created = models.DateTimeField(auto_now_add=True, null=True)
-    comment = models.TextField(blank=True, verbose_name=_('Comment'))
-
-    def __unicode__(self):
-        return '%(key)s: %(value)s' % {'key': self.key, 'value': self.value}
-
-    @classmethod
-    def initial(cls):
-        for k, v in (
-                (_('status'), _('In use')),
-                (_('status'), _('Out of use')),
-                (_('type'), _('Server')),
-                (_('type'), _('VM')),
-                (_('type'), _('Switch')),
-                (_('type'), _('Router')),
-                (_('type'), _('Firewall')),
-                (_('type'), _('Storage')),
-                (_('env'), _('Production')),
-                (_('env'), _('Development')),
-                (_('env'), _('Testing')),
-                ):
-            cls.objects.create(key=k, value=v, created_by='System')
-
-    class Meta:
-        db_table = 'asset_extend'
-        unique_together = ('key', 'value')
-
-
 def private_key_validator(value):
     if not validate_ssh_private_key(value):
         raise ValidationError(
@@ -233,6 +201,10 @@ class SystemUser(models.Model):
     def assets_amount(self):
         return self.assets.count()
 
+    @property
+    def asset_group_amount(self):
+        return self.asset_groups.count()
+
     class Meta:
         db_table = 'system_user'
 
@@ -294,18 +266,29 @@ class AssetGroup(models.Model):
                 continue
 
 
-def get_default_extend(key, value):
-    try:
-        return AssetExtend.objects.get_or_create(key=key, value=value)[0]
-    except:
-        return None
-
-
 def get_default_idc():
     return IDC.initial()
 
 
 class Asset(models.Model):
+    STATUS_CHOICES = (
+        ('In use', _('In use')),
+        ('Out of use', _('Out of use')),
+    )
+    TYPE_CHOICES = (
+        ('Server', _('Server')),
+        ('VM', _('VM')),
+        ('Switch', _('Switch')),
+        ('Router', _('Router')),
+        ('Firewall', _('Firewall')),
+        ('Storage', _("Storage")),
+    )
+    ENV_CHOICES = (
+        ('Prod', 'Production'),
+        ('Dev', 'Development'),
+        ('Test', 'Testing'),
+    )
+
     ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
     other_ip = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Other IP'))
     remote_card_ip = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Remote card IP'))
@@ -326,15 +309,12 @@ class Asset(models.Model):
     cabinet_no = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Cabinet number'))
     cabinet_pos = models.IntegerField(null=True, blank=True, verbose_name=_('Cabinet position'))
     number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
-    status = models.ForeignKey(AssetExtend, null=True, blank=True,
-                               related_name="status_asset", verbose_name=_('Asset status'),)
-                               # default=functools.partial(get_default_extend, 'status', 'In use'))
-    type = models.ForeignKey(AssetExtend, blank=True,null=True, limit_choices_to={'key': 'type'},
-                             related_name="type_asset", verbose_name=_('Asset type'),)
-                             # default=functools.partial(get_default_extend, 'type','Server'))
-    env = models.ForeignKey(AssetExtend, blank=True, null=True, limit_choices_to={'key': 'env'},
-                            related_name="env_asset", verbose_name=_('Asset environment'),)
-                            # default=functools.partial(get_default_extend, 'env', 'Production'))
+    status = models.CharField(choices=STATUS_CHOICES, max_length=8, null=True, blank=True,
+                              default='In use', verbose_name=_('Asset status'))
+    type = models.CharField(choices=TYPE_CHOICES, max_length=16, blank=True, null=True,
+                            default='Server', verbose_name=_('Asset type'),)
+    env = models.CharField(choices=ENV_CHOICES, max_length=8, blank=True, null=True,
+                           default='Prod', verbose_name=_('Asset environment'),)
     sn = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Serial number'))
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
@@ -400,7 +380,7 @@ class Tag(models.Model):
 
 
 def init_all_models():
-    for cls in (AssetExtend, AssetGroup):
+    for cls in (AssetGroup,):
         cls.initial()
 
 
@@ -410,5 +390,5 @@ def generate_fake():
 
 
 def flush_all():
-    for cls in (AssetGroup, AssetExtend, IDC, AdminUser, SystemUser, Asset):
+    for cls in (AssetGroup, IDC, AdminUser, SystemUser, Asset):
         cls.objects.all().delete()
