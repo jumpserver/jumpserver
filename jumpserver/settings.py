@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/1.7/ref/settings/
 import os
 import ConfigParser
 import getpass
+import ldap
+from django_auth_ldap.config import LDAPSearch
 
 config = ConfigParser.ConfigParser()
 
@@ -174,3 +176,22 @@ CRONJOBS = [
     ('0 1 * * *', 'jasset.asset_api.asset_ansible_update_all'),
     ('*/10 * * * *', 'jlog.log_api.kill_invalid_connection'),
 ]
+
+
+AUTHENTICATION_BACKENDS = (
+    'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+AUTH_LDAP_SERVER_URI = 'ldap://XXX.XXX.XXX.XXX'
+AUTH_LDAP_USER_SEARCH = LDAPSearch("ou=People,dc=example,dc=com,dc=cn",
+    ldap.SCOPE_SUBTREE, "(uid=%(user)s)")
+
+AUTH_LDAP_USER_ATTR_MAP = {
+    "first_name": "givenName",
+    "last_name": "sn",
+    "name": "cn",
+    "uuid":"uidnumber",
+    "email": "mail"
+}
+
