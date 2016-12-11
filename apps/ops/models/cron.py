@@ -5,6 +5,8 @@ from django.db import models
 from assets.models import Asset
 from django.utils.translation import ugettext_lazy as _
 
+__all__ = ["CronTable"]
+
 
 class CronTable(models.Model):
     name = models.CharField(max_length=128, blank=True, null=True, unique=True, verbose_name=_('Name'),

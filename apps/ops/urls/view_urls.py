@@ -5,9 +5,7 @@ from __future__ import unicode_literals
 from django.conf.urls import url
 from ops import views as page_view
 
-
-app_name = 'ops'
-
+__all__ = ["urlpatterns"]
 
 urlpatterns = [
     # Resource Sudo url

@@ -5,6 +5,16 @@ from rest_framework import viewsets
 from serializers import *
 from permissions import *
 
+__all__ = ["HostAliaViewSet",
+           "CmdAliaViewSet",
+           "UserAliaViewSet",
+           "RunasAliaViewSet",
+           "ExtraconfViewSet",
+           "PrivilegeViewSet",
+           "SudoViewSet",
+           "CronTableViewSet",
+           ]
+
 
 class HostAliaViewSet(viewsets.ModelViewSet):
     queryset = HostAlia.objects.all()

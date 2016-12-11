@@ -7,8 +7,8 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from users.utils import AdminUserRequiredMixin
-from .utils.mixins import CreateSudoPrivilegesMixin, ListSudoPrivilegesMixin
-from models import *
+from ops.utils.mixins import CreateSudoPrivilegesMixin, ListSudoPrivilegesMixin
+from ops.models import  *
 
 
 class SudoListView(AdminUserRequiredMixin, ListSudoPrivilegesMixin, ListView):

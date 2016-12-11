@@ -7,6 +7,12 @@ from ops.models import Tasker
 from uuid import uuid1
 from celery.result import AsyncResult
 
+__all__ = ["get_result",
+           "start_get_hardware_info",
+           "start_ping_test",
+           "get_hardware_info",
+           "get_ping_test"]
+
 
 def get_result(task_id):
     result = AsyncResult(task_id)

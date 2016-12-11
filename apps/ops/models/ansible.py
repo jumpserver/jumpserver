@@ -7,6 +7,8 @@ import json
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
+__all__ = ["Tasker", "AnsiblePlay", "AnsibleTask", "AnsibleHostResult"]
+
 
 logger = logging.getLogger(__name__)
 

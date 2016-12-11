@@ -6,6 +6,9 @@ from django.db import models
 from assets.models import Asset, AssetGroup
 from django.utils.translation import ugettext_lazy as _
 
+__all__ = ["HostAlia", "UserAlia", "CmdAlia", "RunasAlia", "Privilege",
+           "Extra_conf", "Sudo"]
+
 
 class HostAlia(models.Model):
     name = models.CharField(max_length=128, blank=True, null=True, unique=True, verbose_name=_('Host_Alias'))
