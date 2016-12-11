@@ -29,6 +29,24 @@ class Tasker(models.Model):
     def total_hosts(self):
         return self.hosts.split(',')
 
+    @classmethod
+    def generate_fake(cls, count=100):
+        from random import seed
+        import forgery_py
+        from django.db import IntegrityError
+
+        seed()
+        for i in range(count):
+            group = cls(name=forgery_py.name.full_name(),
+                        comment=forgery_py.lorem_ipsum.sentence(),
+                        created_by='Fake')
+            try:
+                group.save()
+                logger.debug('Generate fake asset group: %s' % group.name)
+            except IntegrityError:
+                print('Error continue')
+                continue
+
 
 class AnsiblePlay(models.Model):
     tasker = models.ForeignKey(Tasker, related_name='plays', blank=True, null=True)

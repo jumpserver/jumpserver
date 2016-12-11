@@ -78,11 +78,14 @@ class Sudo(models.Model):
     :param privileges: <list> [(user, host, runas, command, nopassword),]
     """
 
+    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'),
+                            help_text=_('Name for this sudo'))
+    created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'),
+                                  help_text=_('The create time of this sudo'))
     assets = models.ManyToManyField(Asset, blank=True, related_name='sudos')
     asset_groups = models.ManyToManyField(AssetGroup, blank=True, related_name='sudos')
     extra_lines = models.ManyToManyField(Extra_conf, related_name='sudos', blank=True)
     privilege_items = models.ManyToManyField(Privilege, related_name='sudos', blank=True)
-    created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
 
     @property
     def all_assets(self):
