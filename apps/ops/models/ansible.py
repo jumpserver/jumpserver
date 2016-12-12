@@ -30,21 +30,21 @@ class Tasker(models.Model):
         return self.hosts.split(',')
 
     @classmethod
-    def generate_fake(cls, count=100):
+    def generate_fake(cls, count=20):
         from random import seed
+        from uuid import uuid4
         import forgery_py
-        from django.db import IntegrityError
 
         seed()
         for i in range(count):
-            group = cls(name=forgery_py.name.full_name(),
-                        comment=forgery_py.lorem_ipsum.sentence(),
-                        created_by='Fake')
+            tasker = cls(uuid=str(uuid4()),
+                         name=forgery_py.name.full_name(),
+                        )
             try:
-                group.save()
-                logger.debug('Generate fake asset group: %s' % group.name)
-            except IntegrityError:
-                print('Error continue')
+                tasker.save()
+                logger.debug('Generate fake tasker: %s' % tasker.name)
+            except Exception as e:
+                print('Error: %s, continue...' % e.message)
                 continue
 
 
@@ -58,6 +58,25 @@ class AnsiblePlay(models.Model):
 
     def to_dict(self):
         return {"uuid": self.uuid, "name": self.name}
+
+    @classmethod
+    def generate_fake(cls, count=20):
+        from random import seed, choice
+        from uuid import uuid4
+        import forgery_py
+
+        seed()
+        for i in range(count):
+            play = cls(uuid=str(uuid4()),
+                       name=forgery_py.name.full_name(),
+                      )
+            try:
+                play.tasker = choice(Tasker.objects.all())
+                play.save()
+                logger.debug('Generate fake play: %s' % play.name)
+            except Exception as e:
+                print('Error: %s, continue...' % e.message)
+                continue
 
 
 class AnsibleTask(models.Model):
@@ -76,6 +95,25 @@ class AnsibleTask(models.Model):
 
     def success(self):
         pass
+
+    @classmethod
+    def generate_fake(cls, count=20):
+        from random import seed, choice
+        from uuid import uuid4
+        import forgery_py
+
+        seed()
+        for i in range(count):
+            task = cls(uuid=str(uuid4()),
+                       name=forgery_py.name.full_name(),
+                      )
+            try:
+                task.play = choice(AnsiblePlay.objects.all())
+                task.save()
+                logger.debug('Generate fake play: %s' % task.name)
+            except Exception as e:
+                print('Error: %s, continue...' % e.message)
+                continue
 
 
 class AnsibleHostResult(models.Model):
@@ -230,6 +268,27 @@ class AnsibleHostResult(models.Model):
         except Exception as e:
             return {"msg": "deal with ping data failed, %s" % e.message, "data": None}
 
+    @classmethod
+    def generate_fake(cls, count=20):
+        from random import seed, choice
+        import forgery_py
+
+        seed()
+        for i in range(count):
+            result = cls(name=forgery_py.name.full_name(),
+                         success=forgery_py.lorem_ipsum.sentence(),
+                         failed=forgery_py.lorem_ipsum.sentence(),
+                         skipped=forgery_py.lorem_ipsum.sentence(),
+                         unreachable=forgery_py.lorem_ipsum.sentence(),
+                         no_host=forgery_py.lorem_ipsum.sentence(),
+                        )
+            try:
+                result.task = choice(AnsibleTask.objects.all())
+                result.save()
+                logger.debug('Generate fake HostResult: %s' % result.name)
+            except Exception as e:
+                print('Error: %s, continue...' % e.message)
+                continue
 
 
 

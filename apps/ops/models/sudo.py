@@ -1,10 +1,15 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals, absolute_import
 
+import logging
+
 from jinja2 import Template
 from django.db import models
+from django.utils import timezone
 from assets.models import Asset, AssetGroup
 from django.utils.translation import ugettext_lazy as _
+
+logger = logging.getLogger(__name__)
 
 __all__ = ["HostAlia", "UserAlia", "CmdAlia", "RunasAlia", "Privilege",
            "Extra_conf", "Sudo"]
@@ -17,6 +22,23 @@ class HostAlia(models.Model):
     def __unicode__(self):
         return self.name
 
+    @classmethod
+    def generate_fake(cls, count=20):
+        from random import seed
+        import forgery_py
+
+        seed()
+        for i in range(count):
+            hostA = cls(name=forgery_py.name.full_name(),
+                       host_items=forgery_py.lorem_ipsum.sentence(),
+                        )
+            try:
+                hostA.save()
+                logger.debug('Generate fake host alia: %s' % hostA.name)
+            except Exception as e:
+                print('Error: %s, continue...' % e.message)
+                continue
+
 
 class UserAlia(models.Model):
     name = models.CharField(max_length=128, blank=True, null=True, unique=True, verbose_name=_('User_Alias'))
@@ -24,6 +46,23 @@ class UserAlia(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @classmethod
+    def generate_fake(cls, count=20):
+        from random import seed
+        import forgery_py
+
+        seed()
+        for i in range(count):
+            userA = cls(name=forgery_py.name.full_name(),
+                        user_items=forgery_py.lorem_ipsum.sentence(),
+                       )
+            try:
+                userA.save()
+                logger.debug('Generate fake host alia: %s' % userA.name)
+            except Exception as e:
+                print('Error: %s, continue...' % e.message)
+                continue
 
 
 class CmdAlia(models.Model):
@@ -33,6 +72,23 @@ class CmdAlia(models.Model):
     def __unicode__(self):
         return self.name
 
+    @classmethod
+    def generate_fake(cls, count=20):
+        from random import seed
+        import forgery_py
+
+        seed()
+        for i in range(count):
+            cmdA = cls(name=forgery_py.name.full_name(),
+                       cmd_items=forgery_py.lorem_ipsum.sentence(),
+                       )
+            try:
+                cmdA.save()
+                logger.debug('Generate fake command alia: %s' % cmdA.name)
+            except Exception as e:
+                print('Error: %s, continue...' % e.message)
+                continue
+
 
 class RunasAlia(models.Model):
     name = models.CharField(max_length=128, blank=True, null=True, unique=True, verbose_name=_('Runas_Alias'))
@@ -40,6 +96,23 @@ class RunasAlia(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    @classmethod
+    def generate_fake(cls, count=20):
+        from random import seed
+        import forgery_py
+
+        seed()
+        for i in range(count):
+            runas = cls(name=forgery_py.name.full_name(),
+                       runas_items=forgery_py.lorem_ipsum.sentence(),
+                       )
+            try:
+                runas.save()
+                logger.debug('Generate fake RunAs alia: %s' % runas.name)
+            except Exception as e:
+                print('Error: %s, continue...' % e.message)
+                continue
 
 
 class Privilege(models.Model):
@@ -61,6 +134,27 @@ class Privilege(models.Model):
     def to_tuple(self):
         return self.user.name, self.host.name, self.runas.name, self.command.name, self.nopassword
 
+    @classmethod
+    def generate_fake(cls, count=20):
+        from random import seed, choice
+        import forgery_py
+
+        seed()
+        for i in range(count):
+            pri = cls(name=forgery_py.name.full_name(),
+                       comment=forgery_py.lorem_ipsum.sentence(),
+                      )
+            try:
+                pri.user = choice(UserAlia.objects.all())
+                pri.host = choice(HostAlia.objects.all())
+                pri.runas = choice(RunasAlia.objects.all())
+                pri.command = choice(CmdAlia.objects.all())
+                pri.save()
+                logger.debug('Generate fake privileges: %s' % pri.name)
+            except Exception as e:
+                print('Error: %s, continue...' % e.message)
+                continue
+
 
 class Extra_conf(models.Model):
     line = models.TextField(blank=True, null=True, verbose_name=_('Extra_Item'),
@@ -80,8 +174,10 @@ class Sudo(models.Model):
 
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'),
                             help_text=_('Name for this sudo'))
-    created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'),
-                                  help_text=_('The create time of this sudo'))
+    created_time = models.DateTimeField(verbose_name=_('Created Time'), default=timezone.now(),
+                                        help_text=_('The create time of this sudo'))
+    modify_time = models.DateTimeField(auto_now=True, verbose_name=_('Modify Time'),
+                                       help_text=_('The recent modify time of this sudo'))
     assets = models.ManyToManyField(Asset, blank=True, related_name='sudos')
     asset_groups = models.ManyToManyField(AssetGroup, blank=True, related_name='sudos')
     extra_lines = models.ManyToManyField(Extra_conf, related_name='sudos', blank=True)
@@ -205,3 +301,22 @@ root    ALL=(ALL:ALL) ALL
 
 #includedir /etc/sudoers.d
 """
+
+    @classmethod
+    def generate_fake(cls, count=20):
+        from random import seed, choice
+        import forgery_py
+
+        seed()
+        for i in range(count):
+            sudo = cls(name=forgery_py.name.full_name(),
+                       created_time=timezone.now()
+                      )
+            try:
+                sudo.save()
+                sudo.privilege_items = [choice(Privilege.objects.all())]
+                sudo.save()
+                logger.debug('Generate fake cron: %s' % sudo.name)
+            except Exception as e:
+                print('Error: %s, continue...' % e.message)
+                continue

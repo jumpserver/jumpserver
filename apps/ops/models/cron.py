@@ -1,9 +1,13 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals, absolute_import
 
+import logging
+
 from django.db import models
 from assets.models import Asset
 from django.utils.translation import ugettext_lazy as _
+
+logger = logging.getLogger(__name__)
 
 __all__ = ["CronTable"]
 
@@ -32,3 +36,26 @@ class CronTable(models.Model):
     @property
     def describe(self):
         return "http://docs.ansible.com/ansible/cron_module.html"
+
+    @classmethod
+    def generate_fake(cls, count=20):
+        from random import seed, choice
+        import forgery_py
+
+        seed()
+        for i in range(count):
+            cron = cls(name=forgery_py.name.full_name(),
+                       month=str(choice(range(1,13))),
+                       weekday=str(choice(range(0,7))),
+                       day=str(choice(range(1,32))),
+                       hour=str(choice(range(0,24))),
+                       minute=str(choice(range(0,60))),
+                       job=forgery_py.lorem_ipsum.sentence(),
+                       user=forgery_py.name.first_name(),
+                        )
+            try:
+                cron.save()
+                logger.debug('Generate fake cron: %s' % cron.name)
+            except Exception as e:
+                print('Error: %s, continue...' % e.message)
+                continue
