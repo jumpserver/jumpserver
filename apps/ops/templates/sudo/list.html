@@ -3,19 +3,20 @@
 {% block table_search %}
 {% endblock %}
 {% block table_container %}
-<div class="uc pull-left m-l-5 m-r-5"><a href="{% url "users:user-create" %}" class="btn btn-sm btn-primary"> {% trans "Create user" %} </a></div>
-<div class="uc pull-left"><a href="javascript:void(0);" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#user_import_modal"> {% trans "Import user" %} </a></div>
+<div class="uc pull-left m-l-5 m-r-5"><a href="{% url "users:user-create" %}" class="btn btn-sm btn-primary"> {% trans "Create sudo" %} </a></div>
+{#<div class="uc pull-left"><a href="javascript:void(0);" class="btn btnbtn-sm btn-primary" data-toggle="modal" data-target="#user_import_modal"> {% trans "Import user" %} </a></div>#}
 <table class="table table-striped table-bordered table-hover " id="sudo_list_table">
     <thead>
         <tr>
             <th class="text-center">
-{#                <div><input id="" type="checkbox" class="ipt_check_all"><label></label></div>#}
                 <input id="" type="checkbox" class="ipt_check_all">
             </th>
             <th class="text-center">{% trans 'Name' %}</th>
             <th class="text-center">{% trans 'Privileges' %}</th>
             <th class="text-center">{% trans 'Extra Lines' %}</th>
             <th class="text-center">{% trans 'Created' %}</th>
+            <th class="text-center">{% trans 'Action' %}</th>
+
         </tr>
     </thead>
     <tbody>
@@ -35,8 +36,8 @@
         </div>
     </div>
 </div>
-{% include "users/_user_bulk_update_modal.html" %}
-{% include "users/_user_import_modal.html" %}
+{#{% include "users/_user_bulk_update_modal.html" %}#}
+{#{% include "users/_user_import_modal.html" %}#}
 {% endblock %}
 {% block content_bottom_left %}{% endblock %}
 {% block custom_foot_js %}
@@ -47,21 +48,10 @@ $(document).ready(function(){
         ele: $('#sudo_list_table'),
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
-                var detail_btn = '<a href="{% url "users:user-detail" pk=99991937 %}">' + cellData + '</a>';
+                var detail_btn = '<a href="{% url "ops:page-sudo-detail" pk=99991937 %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('99991937', rowData.id));
              }},
-            {targets: 4, createdCell: function (td, cellData) {
-                var innerHtml = cellData.length > 20 ? cellData.substring(0, 20) + '...': cellData;
-                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
-             }},
-            {targets: 5, createdCell: function (td, cellData) {
-                if (!cellData) {
-                    $(td).html('<i class="fa fa-times text-danger"></i>')
-                } else {
-                    $(td).html('<i class="fa fa-check text-navy"></i>')
-                }
-             }},
-            {targets: 6, createdCell: function (td, cellData, rowData) {
+            {targets: 5, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "users:user-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
                 if (rowData.id === 1 || rowData.username == "admin") {
@@ -70,9 +60,9 @@ $(document).ready(function(){
                     $(td).html(update_btn + del_btn)
                 }
              }}],
-        ajax_url: '{% url "api-users:user-list" %}',
-        columns: [{data: "id"}, {data: "username" }, {data: "name" }, {data: "get_role_display" },
-            {data: "groups_display" }, {data: "is_valid" }, {data: "id" }],
+        ajax_url: '{% url "api-ops:sudo-list" %}',
+        columns: [{data: "id"}, {data: "name" }, {data: "privilege_items" }, {data: "extra_lines" },
+            {data: "created_time" }, {data: "id" }],
         op_html: $('#actions').html()
     };
     var table = jumpserver.initDataTable(options);

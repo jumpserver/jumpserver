@@ -7,13 +7,13 @@ from ops import api as v1_api
 __all__ = ["urlpatterns"]
 
 api_router = DefaultRouter()
-api_router.register(r'host_alia', v1_api.HostAliaViewSet)
-api_router.register(r'user_alia', v1_api.UserAliaViewSet)
-api_router.register(r'cmd_alia', v1_api.CmdAliaViewSet)
-api_router.register(r'runas_alia', v1_api.RunasAliaViewSet)
-api_router.register(r'extra_conf', v1_api.ExtraconfViewSet)
-api_router.register(r'privilege', v1_api.PrivilegeViewSet)
-api_router.register(r'sudo', v1_api.SudoViewSet)
-api_router.register(r'cron', v1_api.CronTableViewSet)
+api_router.register(r'v1/host_alia', v1_api.HostAliaViewSet)
+api_router.register(r'v1/user_alia', v1_api.UserAliaViewSet)
+api_router.register(r'v1/cmd_alia', v1_api.CmdAliaViewSet)
+api_router.register(r'v1/runas_alia', v1_api.RunasAliaViewSet)
+api_router.register(r'v1/extra_conf', v1_api.ExtraconfViewSet)
+api_router.register(r'v1/privilege', v1_api.PrivilegeViewSet)
+api_router.register(r'v1/sudo', v1_api.SudoViewSet)
+api_router.register(r'v1/cron', v1_api.CronTableViewSet)
 
 urlpatterns = api_router.urls
