@@ -34,14 +34,14 @@ class SudoDetailView(DetailView):
     template_name = 'sudo/detail.html'
 
 
-class CronListView(AdminUserRequiredMixin, ListSudoPrivilegesMixin, ListView):
+class CronListView(AdminUserRequiredMixin, ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     model = CronTable
     context_object_name = 'crons'
-    template_name = 'sudo/list.html'
+    template_name = 'cron/list.html'
 
 
-class CronCreateView(AdminUserRequiredMixin, CreateSudoPrivilegesMixin, CreateView):
+class CronCreateView(AdminUserRequiredMixin, CreateView):
     model = CronTable
     template_name = 'cron/create.html'
 
