@@ -96,7 +96,7 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Asset status' %}:</td>
-                                            <td><b>{{ asset.get_status_display() }}</b></td>
+                                            <td><b>{{ asset.status }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Is active' %}:</td>
@@ -205,9 +205,9 @@
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Join asset groups' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Join asset groups' %}" id="groups_selected" class="select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for asset_group in asset_groups_remain %}
-                                                        <option value="{{ asset_group.id }}" >{{ asset_group.name }}</option>
+                                                        <option value="{{ asset_group.id }}" id="opt_{{ asset_group.id }}" >{{ asset_group.name }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
@@ -221,9 +221,9 @@
 
                                         {% for asset_group in asset_groups %}
                                         <tr>
-                                          <td ><b data-gid={{ asset_group.id }}>{{ asset_group.name }}</b></td>
+                                          <td ><b class="bdg_group" data-gid={{ asset_group.id }}>{{ asset_group.name }}</b></td>
                                           <td>
-                                              <button class="btn btn-danger pull-right btn-xs " type="button"><i class="fa fa-minus"></i></button>
+                                              <button class="btn btn-danger pull-right btn-xs btn_leave_group" type="button"><i class="fa fa-minus"></i></button>
                                           </td>
                                         </tr>
                                         {% endfor %}
@@ -243,22 +243,22 @@
                                                 <td colspan="2">
                                                     <select data-placeholder="{% trans 'Select system user' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for system_user in system_users_remain %}
-                                                            <option value="{{ system_user.id }}">{{ system_user.name }}</option>
+                                                            <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user.name }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
                                             </tr>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <button type="button" class="btn btn-warning btn-sm">{% trans 'Associate' %}</button>
+                                                    <button type="button" class="btn btn-warning btn-sm btn-system-user">{% trans 'Associate' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
                                         {% for system_user in system_users %}
                                         <tr>
-                                            <td ><b>{{ system_user.name }}</b></td>
+                                            <td ><b class="bdg_group" data-sid={{ system_user.id }}>{{ system_user.name }}</b></td>
                                             <td>
-                                                <button class="btn btn-danger btn-xs" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                                <button class="btn btn-danger btn-xs pull-right btn_leave_system" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                             </td>
                                         </tr>
                                         {% endfor %}
@@ -275,8 +275,154 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
+jumpserver.groups_selected = {};
+function updateAssetGroups(groups) {
+    var the_url = "{% url 'api-assets:asset-update-group' pk=asset.id %}";
+    var body = {
+        groups: Object.assign([], groups)
+    };
+    var success = function(data) {
+        // remove all the selected groups from select > option and rendered ul element;
+        $('.select2-selection__rendered').empty();
+        $('#groups_selected').val('');
+        $.map(jumpserver.groups_selected, function(group_name, index) {
+            $('#opt_' + index).remove();
+            // change tr html of user groups.
+            $('.group_edit tbody').append(
+                '<tr>' +
+                '<td><b class="bdg_group" data-gid="' + index + '">' + group_name + '</b></td>' +
+                '<td><button class="btn btn-danger btn-xs pull-right btn_leave_group" type="button"><i class="fa fa-minus"></i></button></td>' +
+                '</tr>'
+            )
+        });
+        // clear jumpserver.groups_selected
+        jumpserver.groups_selected = {};
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success: success
+    });
+}
+
+function updateAssetSystem(system_users) {
+    var the_url = "{% url 'api-assets:asset-update-systemusers' pk=asset.id %}";
+    var body = {
+        system_users: Object.assign([], system_users)
+    };
+    var success = function(data) {
+        $('.select2-selection__rendered').empty();
+        $('#groups_selected').val('');
+        $.map(jumpserver.groups_selected, function(name, index) {
+            $('#opt_' + index).remove();
+
+            $('.group_edit tbody').append(
+                '<tr>' +
+                '<td><b class="bdg_group" data-sid="' + index + '">' + name + '</b></td>' +
+                '<td><button class="btn btn-danger btn-xs pull-right btn_leave_system" type="button"><i class="fa fa-minus"></i></button></td>' +
+                '</tr>'
+            )
+        });
+        // clear jumpserver.groups_selected
+        jumpserver.groups_selected = {};
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success: success
+    });
+}
+
+
 $(document).ready(function () {
-    $('.select2').select2();
+    $('.select2').select2()
+    .on('select2:select', function(evt) {
+            var data = evt.params.data;
+            jumpserver.groups_selected[data.id] = data.text;
+        }).on('select2:unselect', function(evt) {
+            var data = evt.params.data;
+            delete jumpserver.groups_selected[data.id]
+        })
 })
+	.on('click', '#is_active', function () {
+	var the_url = '{% url "api-assets:asset-detail" pk=asset.id %}';
+	var checked = $(this).prop('checked');
+    var body = {
+        'is_active': checked
+    };
+    var success = '{% trans "Update Successfully!" %}';
+    var status = $(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").text();
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success_message: success
+    });
+    if (status == "False") {
+    	$(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").html('True');
+    }else{
+    	$(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").html('False');
+    }
+})
+	.on('click', '#btn_add_user_group', function () {
+		if (Object.keys(jumpserver.groups_selected).length === 0) {
+            return false;
+        }
+	    var groups = $('.bdg_group').map(function() {
+	        return $(this).data('gid');
+	    }).get();
+	    $.map(jumpserver.groups_selected, function(value, index) {
+	        groups.push(parseInt(index));
+	        $('#opt_' + index).remove();
+	    });
+	    updateAssetGroups(groups)
+})
+    .on('click', '.btn_leave_group', function() {
+    var $this = $(this);
+    var $tr = $this.closest('tr');
+    var $badge = $tr.find('.bdg_group');
+    var gid = $badge.data('gid');
+    var group_name = $badge.html() || $badge.text();
+    $('#groups_selected').append(
+        '<option value="' + gid + '" id="opt_' + gid + '">' + group_name + '</option>'
+    );
+    $tr.remove();
+    var groups = $('.bdg_group').map(function () {
+        return $(this).data('gid');
+    }).get();
+    updateAssetGroups(groups)
+})
+    .on('click', '.btn-system-user', function () {
+    	if (Object.keys(jumpserver.groups_selected).length === 0) {
+            return false;
+        }
+	    var system_users = $('.bdg_group').map(function() {
+	        return $(this).data('sid');
+	    }).get();
+	    $.map(jumpserver.groups_selected, function(value, index) {
+	        system_users.push(parseInt(index));
+	        $('#opt_' + index).remove();
+	    });
+	    updateAssetSystem(system_users)
+
+})
+	.on('click', '.btn_leave_system', function () {
+		var $this = $(this);
+	    var $tr = $this.closest('tr');
+	    var $badge = $tr.find('.bdg_group');
+	    var sid = $badge.data('sid');
+	    var name = $badge.html() || $badge.text();
+	    $('#groups_selected').append(
+	        '<option value="' + sid + '" id="opt_' + sid + '">' + name + '</option>'
+	    );
+	    $tr.remove();
+	    var system_users = $('.bdg_group').map(function () {
+	        return $(this).data('sid');
+	    }).get();
+	    console.log(system_users);
+	    updateAssetSystem(system_users)
+
+})
+
+
 </script>
 {% endblock %}

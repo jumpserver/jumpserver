@@ -17,6 +17,19 @@ class AssetGroupSerializer(serializers.ModelSerializer):
     def get_assets_amount(obj):
         return obj.assets.count()
 
+class AssetUpdateGroupSerializer(serializers.ModelSerializer):
+    groups = serializers.PrimaryKeyRelatedField(many=True, queryset=AssetGroup.objects.all())
+
+    class Meta:
+        model = Asset
+        fields = ['id', 'groups']
+
+class AssetUpdateSystemUserSerializer(serializers.ModelSerializer):
+    system_users = serializers.PrimaryKeyRelatedField(many=True, queryset=SystemUser.objects.all())
+
+    class Meta:
+        model = Asset
+        fields = ['id', 'system_users']
 
 class AdminUserSerializer(serializers.ModelSerializer):
     class Meta:
