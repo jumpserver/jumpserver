@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 #
 
+import base64
 
 from django.core.cache import cache
 from django.conf import settings
@@ -84,6 +85,31 @@ class UserGroupUpdateUserApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsSuperUser,)
 
 
+class UserToken(APIView):
+    permission_classes = (IsValidUser,)
+    expiration = settings.CONFIG.TOKEN_EXPIRATION or 3600
+
+    def get(self, request):
+        if not request.user:
+            return Response({'error': 'unauthorized'})
+
+        remote_addr = request.META.get('REMOTE_ADDR', '')
+        remote_addr = base64.b16encode(remote_addr).replace('=', '')
+        token = cache.get('%s_%s' % (request.user.id, remote_addr))
+        if not token:
+            token = token_gen(request.user)
+            cache.set(token, request.user.id, self.expiration)
+            cache.set('%s_%s' % (request.user.id, remote_addr), token, self.expiration)
+        return Response({'token': token})
+
+
+class UserProfile(APIView):
+    permission_classes = (IsValidUser,)
+
+    def get(self, request):
+        return Response(request.user.to_json())
+
+
 class UserAuthApi(APIView):
     permission_classes = ()
     expiration = settings.CONFIG.TOKEN_EXPIRATION or 3600
@@ -106,6 +132,7 @@ class UserAuthApi(APIView):
             cache.set('%s_%s' % (user.id, remote_addr), token, self.expiration)
             write_login_log_async.delay(user.username, name=user.name, terminal=terminal,
                                         login_ip=remote_addr, login_type=login_type)
-            return Response({'token': token, 'id': user.id, 'username': user.username, 'name': user.name})
+            return Response({'token': token, 'id': user.id, 'username': user.username,
+                             'name': user.name, 'is_active': user.is_active})
         else:
             return Response({'msg': 'Invalid password or public key or user is not active or expired'}, status=401)

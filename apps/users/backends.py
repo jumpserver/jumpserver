@@ -52,7 +52,7 @@ class TerminalAuthentication(authentication.BaseAuthentication):
 
 
 class AccessTokenAuthentication(authentication.BaseAuthentication):
-    keyword = 'Token'
+    keyword = 'Bearer'
     model = User
     expiration = settings.CONFIG.TOKEN_EXPIRATION or 3600
 

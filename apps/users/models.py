@@ -1,15 +1,12 @@
 # ~*~ coding: utf-8 ~*~
 
 from __future__ import unicode_literals
+from collections import OrderedDict
 
-from django.conf import settings
-from django.contrib.auth import logout
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
 from django.core import signing
 from django.db import models, IntegrityError
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
@@ -201,6 +198,22 @@ class User(AbstractUser):
 
     def generate_reset_token(self):
         return signer.sign_t({'reset': self.id, 'email': self.email}, expires_in=3600)
+
+    def to_json(self):
+        return OrderedDict({
+            'id': self.id,
+            'username': self.username,
+            'name': self.name,
+            'email': self.email,
+            'is_active': self.is_active,
+            'is_superuser': self.is_superuser,
+            'role': self.get_role_display(),
+            'groups': [group.name for group in self.groups.all()],
+            'wechat': self.wechat,
+            'phone': self.phone,
+            'comment': self.comment,
+            'date_expired': self.date_expired.strftime('%Y-%m-%d %H:%M:%S')
+        })
 
     @classmethod
     def validate_reset_token(cls, token):
