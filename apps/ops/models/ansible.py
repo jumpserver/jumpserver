@@ -4,10 +4,12 @@ from __future__ import unicode_literals, absolute_import
 import logging
 import json
 
+from assets.models import Asset
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-__all__ = ["Tasker", "AnsiblePlay", "AnsibleTask", "AnsibleHostResult"]
+__all__ = ["Task", "Tasker", "AnsiblePlay", "AnsibleTask", "AnsibleHostResult"]
 
 
 logger = logging.getLogger(__name__)
@@ -290,11 +292,9 @@ class AnsibleHostResult(models.Model):
                 print('Error: %s, continue...' % e.message)
                 continue
 
+class Task(models.Model):
+    name = models.CharField(max_length=128, blank=True, verbose_name=_('Name'))
+    asset = models.ForeignKey(Asset, null=True, blank=True, related_name='crontables')
 
-
-
-
-
-
-
-
+    def __unicode__(self):
+        pass
