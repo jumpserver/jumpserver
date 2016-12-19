@@ -11,7 +11,8 @@ from rest_framework.permissions import AllowAny
 from common.utils import signer, get_object_or_none
 from .models import Terminal, TerminalHeatbeat
 from .serializers import TerminalSerializer, TerminalHeatbeatSerializer
-from .hands import IsSuperUserOrTerminalUser
+from .hands import IsSuperUserOrTerminalUser, User
+
 
 
 class TerminalViewSet(viewsets.ModelViewSet):

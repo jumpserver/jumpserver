@@ -13,10 +13,10 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
-from .utils import check_user_valid, token_gen
+from .utils import check_user_valid, get_or_refresh_token
 from .models import User, UserGroup
 from .hands import write_login_log_async
-from .backends import IsSuperUser, IsTerminalUser, IsValidUser, IsSuperUserOrTerminalUser
+from .permissions import IsSuperUser, IsTerminalUser, IsValidUser, IsSuperUserOrTerminalUser
 from . import serializers
 
 
@@ -87,19 +87,11 @@ class UserGroupUpdateUserApi(generics.RetrieveUpdateAPIView):
 
 class UserToken(APIView):
     permission_classes = (IsValidUser,)
-    expiration = settings.CONFIG.TOKEN_EXPIRATION or 3600
 
     def get(self, request):
         if not request.user:
             return Response({'error': 'unauthorized'})
-
-        remote_addr = request.META.get('REMOTE_ADDR', '')
-        remote_addr = base64.b16encode(remote_addr).replace('=', '')
-        token = cache.get('%s_%s' % (request.user.id, remote_addr))
-        if not token:
-            token = token_gen(request.user)
-            cache.set(token, request.user.id, self.expiration)
-            cache.set('%s_%s' % (request.user.id, remote_addr), token, self.expiration)
+        token = get_token(request)
         return Response({'token': token})
 
 

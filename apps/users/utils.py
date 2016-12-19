@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 #
 from __future__ import unicode_literals
+import base64
 import logging
 import os
 import re
@@ -10,6 +11,7 @@ from django.conf import settings
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
+from django.core.cache import cache
 
 from paramiko.rsakey import RSAKey
 
@@ -195,6 +197,13 @@ def check_user_valid(**kwargs):
     return None
 
 
-def token_gen(*args, **kwargs):
+def get_or_refresh_token(request, user):
+    expiration = settings.CONFIG.TOKEN_EXPIRATION or 3600
+    remote_addr = request.META.get('REMOTE_ADDR', '')
+    remote_addr = base64.b16encode(remote_addr).replace('=', '')
+    token = cache.get('%s_%s' % (user.id, remote_addr))
+    if not token:
+        token = uuid.uuid4().get_hex()
+        cache.set(token, request.user.id, expiration)
+        cache.set('%s_%s' % (request.user.id, remote_addr), token, expiration)
     return uuid.uuid4().get_hex()
-

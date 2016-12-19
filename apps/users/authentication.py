@@ -11,6 +11,7 @@ from rest_framework.compat import is_authenticated
 
 from common.utils import signer, get_object_or_none
 from .hands import Terminal
+from .utils import get_or_refresh_token
 from .models import User
 
 
@@ -83,45 +84,5 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
 
         if not user:
             return None
-
-        remote_addr = request.META.get('REMOTE_ADDR', '')
-        remote_addr = base64.b16encode(remote_addr).replace('=', '')
-        cache.set(token, user_id, self.expiration)
-        cache.set('%s_%s' % (user.id, remote_addr), token, self.expiration)
+        get_or_refresh_token(request, user)
         return user, None
-
-
-class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
-    """Allows access to valid user, is active and not expired"""
-
-    def has_permission(self, request, view):
-        return super(IsValidUser, self).has_permission(request, view) \
-               and request.user.is_valid
-
-
-class IsTerminalUser(IsValidUser, permissions.BasePermission):
-    """Allows access only to app user """
-
-    def has_permission(self, request, view):
-        return super(IsTerminalUser, self).has_permission(request, view) \
-               and isinstance(request.user, Terminal)
-
-
-class IsSuperUser(IsValidUser, permissions.BasePermission):
-    """Allows access only to superuser"""
-
-    def has_permission(self, request, view):
-        return super(IsSuperUser, self).has_permission(request, view) \
-               and request.user.is_superuser
-
-
-class IsSuperUserOrTerminalUser(IsValidUser, permissions.BasePermission):
-    """Allows access between superuser and app user"""
-
-    def has_permission(self, request, view):
-        return super(IsSuperUserOrTerminalUser, self).has_permission(request, view) \
-               and (request.user.is_superuser or request.user.is_terminal)
-
-
-if __name__ == '__main__':
-    pass
