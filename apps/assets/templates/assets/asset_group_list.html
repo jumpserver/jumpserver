@@ -6,7 +6,7 @@
 <div class="uc pull-left m-l-5 m-r-5">
     <a href="{% url "assets:asset-group-create" %}" class="btn btn-sm btn-primary"> {% trans "Create asset group" %} </a>
 </div>
-<table class="table table-striped table-bordered table-hover " id="admin_user_list_table" >
+<table class="table table-striped table-bordered table-hover " id="asset_groups_list_table" >
     <thead>
     <tr>
         <th class="text-center">
@@ -27,7 +27,7 @@
 <script>
 $(document).ready(function(){
     var options = {
-        ele: $('#admin_user_list_table'),
+        ele: $('#asset_groups_list_table'),
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
                 var detail_btn = '<a href="{% url "assets:asset-group-detail" pk=99991937 %}">' + cellData + '</a>';
@@ -46,7 +46,14 @@ $(document).ready(function(){
         columns: [{data: "id"}, {data: "name" }, {data: "assets_amount" }, {data: "comment" }, {data: "id"}]
     };
     jumpserver.initDataTable(options);
-});
+})
+	.on('click', '.btn_asset_group_delete', function () {
+		var $this = $(this);
+		var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
+		var uid = $this.data('uid');
+		var the_url = '{% url "api-assets:asset-group-detail" pk=99991937 %}'.replace('99991937', uid);
+		objectDelete($this, name, the_url);
+	});
 </script>
 {% endblock %}
 

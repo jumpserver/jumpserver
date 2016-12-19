@@ -40,14 +40,13 @@ class NoDeleteModelMixin(models.Model):
 
 
 class JSONResponseMixin(object):
-
     """JSON mixin"""
-
-    def render_json_response(self, context):
+    @staticmethod
+    def render_json_response(context):
         return JsonResponse(context)
 
 
-class BulkDeleteApiMixin(object):
+class IDInFilterMixin(object):
 
     def filter_queryset(self, queryset):
         id_list = self.request.query_params.get('id__in')

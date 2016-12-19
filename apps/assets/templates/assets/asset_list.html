@@ -18,10 +18,11 @@
 {% block table_search %}
     <div class="html5buttons">
         <div class="dt-buttons btn-group">
-            <a class="btn btn-default buttons-pdf" tabindex="0" href="#">
-                <span>PDF</span></a>
-            <a class="btn btn-default buttons-excel" tabindex="0" href="#">
-                <span>Excel</span>
+            <a class="btn btn-default btn_import" data-toggle="modal" data-target="#asset_import_modal" tabindex="0">
+                <span>{% trans "Import" %}</span>
+            </a>
+            <a class="btn btn-default btn_export" tabindex="0">
+                <span>{% trans "Export" %}</span>
             </a>
         </div>
     </div>
@@ -32,7 +33,7 @@
     <div class="tagBtnList">
     {% for tag in tag_list %}
         <a href="{% url 'assets:asset-tags' tag_id=tag.0 %}"
-           {% if tag.0|IntToStr == tag_id %}
+           {% if tag.0|int_to_str == tag_id %}
            class="tagBtn2 label label-warning" name="tag_on">
            {% else %}
            class="tagBtn2 label label-default">
@@ -47,7 +48,6 @@
 
 {% block table_container %}
 <div class="uc pull-left m-l-5 m-r-5"><a href="{% url "assets:asset-create" %}" class="btn btn-sm btn-primary"> {% trans "Create asset" %} </a></div>
-<div class="uc pull-left"><a href="javascript:void(0);" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#asset_import_modal"> {% trans "Import asset" %} </a></div>
 <table class="table table-striped table-bordered table-hover " id="asset_list_table" >
     <thead>
         <tr>
@@ -80,11 +80,13 @@
         </div>
     </div>
 </div>
+{% include 'assets/_asset_import_modal.html' %}
 {% endblock %}
 
 {% block custom_foot_js %}
+<script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script type="text/javascript">
-    window.onload=function (){
+    window.onload = function (){
         var tag_on = document.getElementsByName("tag_on");
         var oDiv = document.getElementById("ydxbd");
         if(tag_on.length > 0){
@@ -99,7 +101,7 @@
             }else{
                 oDiv.style.display = "none";
             }
-    };  //onload;
+    }  //onload;
 
     $(document).ready(function(){
         var options = {
@@ -125,17 +127,67 @@
                 }},
                 {targets: 9, createdCell: function (td, cellData, rowData) {
                     var update_btn = '<a href="{% url "assets:asset-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
-                    var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
+                    var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
                     $(td).html(update_btn + del_btn)
+
                  }}
             ],
             ajax_url: '{% url "api-assets:asset-list" %}',
             columns: [{data: "id"}, {data: "hostname" }, {data: "ip" }, {data: "port" },
-                {data: "type_display" }, {data: "env"}, {data: "hardware"}, {data: "is_active" },
-                {data: "is_active"}, {data: "id" }],
+                {data: "get_type_display" }, {data: "get_env_display"}, {data: "hardware"},
+                {data: "is_active" }, {data: "is_active"}, {data: "id" }],
             op_html: $('#actions').html()
         };
         var table = jumpserver.initDataTable(options);
+
+        $('.btn_export').click(function () {
+            var assets = [];
+            var rows = table.rows('.selected').data();
+            $.each(rows, function (index, obj) {
+                assets.push(obj.id)
+            });
+            $.ajax({
+                url: "{% url "assets:asset-export" %}",
+                method: 'POST',
+                data: JSON.stringify({assets_id: assets}),
+                dataType: "json",
+                success: function (data, textStatus) {
+                    window.open(data.redirect)
+                },
+                error: function () {
+                    toastr.error('Export failed');
+                }
+            })
+        });
+
+        $('#btn_asset_import').click(function() {
+            var $form = $('#fm_asset_import');
+            $form.find('.help-block').remove();
+            function success (data) {
+                if (data.valid === false) {
+                    $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_assets'));
+                } else {
+                    $('#id_created').html(data.created_info);
+                    $('#id_created_detail').html(data.created.join(', '));
+                    $('#id_updated').html(data.updated_info);
+                    $('#id_updated_detail').html(data.updated.join(', '));
+                    $('#id_failed').html(data.failed_info);
+                    $('#id_failed_detail').html(data.failed.join(', '));
+                    var $data_table = $('#asset_list_table').DataTable();
+                    $data_table.ajax.reload();
+                }
+            }
+            $form.ajaxSubmit({success: success});
+        })
+
+    })
+	    .on('click', '.btn_asset_delete', function () {
+	        var $this = $(this);
+		    var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
+		    var uid = $this.data('uid');
+		    var the_url = '{% url "api-assets:asset-detail" pk=99991937 %}'.replace('99991937', uid);
+
+		    objectDelete($this, name, the_url);
     });
 </script>
 {% endblock %}

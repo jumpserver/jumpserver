@@ -44,6 +44,7 @@ def join_attr(seq, attr=None, sep=None):
     print(seq)
     return sep.join(seq)
 
+
 @register.filter
-def IntToStr(value):
+def int_to_str(value):
     return str(value)
