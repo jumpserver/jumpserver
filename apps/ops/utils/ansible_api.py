@@ -20,6 +20,8 @@ from ansible.plugins.callback import CallbackBase
 
 from ops.models import TaskRecord, AnsiblePlay, AnsibleTask, AnsibleHostResult
 
+__all__ = ["ADHocRunner", "Config"]
+
 
 logger = logging.getLogger(__name__)
 
@@ -392,7 +394,7 @@ class PlayBookRunner(InventoryMixin):
 class ADHocRunner(InventoryMixin):
     """ADHoc接口
     """
-    def __init__(self, config, play_data, *hosts, **group_vars):
+    def __init__(self, play_data, config=None, *hosts, **group_vars):
         """
         :param hosts: 见PlaybookRunner参数
         :param group_vars: 见PlaybookRunner参数
@@ -406,8 +408,7 @@ class ADHocRunner(InventoryMixin):
             tasks=[dict(action=dict(module='service', args={'name': 'vsftpd', 'state': 'restarted'}), async=async, poll=poll)]
         )
         """
-
-        self.options = config
+        self.options = config if config != None else Config()
 
         # 设置verbosity级别, 及命令行的--verbose选项
         self.display = Display()

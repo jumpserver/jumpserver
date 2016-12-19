@@ -11,8 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 
 logger = logging.getLogger(__name__)
 
-__all__ = ["HostAlia", "UserAlia", "CmdAlia", "RunasAlia", "Privilege",
-           "Extra_conf", "Sudo"]
+__all__ = ["HostAlia", "UserAlia", "CmdAlia", "RunasAlia", "Privilege", "Extra_conf", "Sudo"]
 
 
 class HostAlia(models.Model):

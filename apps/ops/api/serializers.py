@@ -53,7 +53,13 @@ class CronTableSerializer(serializers.ModelSerializer):
         model = CronTable
 
 class TaskSerializer(serializers.ModelSerializer):
+    sub_tasks = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Task
         read_only_fields = ('record',)
+
+class SubTaskSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SubTask
