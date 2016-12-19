@@ -18,7 +18,7 @@ from ansible.utils.display import Display
 from ansible.playbook.play import Play
 from ansible.plugins.callback import CallbackBase
 
-from ops.models import Tasker, AnsiblePlay, AnsibleTask, AnsibleHostResult
+from ops.models import TaskRecord, AnsiblePlay, AnsibleTask, AnsibleHostResult
 
 
 logger = logging.getLogger(__name__)
@@ -196,7 +196,7 @@ class CallbackModule(CallbackBase):
         }
 
         try:
-            tasker = Tasker.objects.get(uuid=self.tasker_id)
+            tasker = TaskRecord.objects.get(uuid=self.tasker_id)
             play = AnsiblePlay(tasker, name=ret['name'], uuid=ret['uuid'])
             play.save()
         except Exception as e:
@@ -429,7 +429,7 @@ class ADHocRunner(InventoryMixin):
     @staticmethod
     def update_db_tasker(tasker_id, ext_code):
         try:
-            tasker = Tasker.objects.get(uuid=tasker_id)
+            tasker = TaskRecord.objects.get(uuid=tasker_id)
             tasker.end = timezone.now()
             tasker.completed = True
             tasker.exit_code = ext_code
@@ -440,7 +440,7 @@ class ADHocRunner(InventoryMixin):
     def create_db_tasker(self, name, uuid):
         try:
             hosts = [host.get('name') for host in self.hosts]
-            tasker = Tasker(name=name, uuid=uuid, hosts=','.join(hosts), start=timezone.now())
+            tasker = TaskRecord(name=name, uuid=uuid, hosts=','.join(hosts), start=timezone.now())
             tasker.save()
         except Exception as e:
             logger.error("Save Tasker to database error!, %s" % e.message)

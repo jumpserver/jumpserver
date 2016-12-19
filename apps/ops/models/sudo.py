@@ -5,7 +5,7 @@ import logging
 
 from jinja2 import Template
 from django.db import models
-from django.utils import timezone
+from django.utils.timezone import now
 from assets.models import Asset, AssetGroup
 from django.utils.translation import ugettext_lazy as _
 
@@ -174,7 +174,7 @@ class Sudo(models.Model):
 
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'),
                             help_text=_('Name for this sudo'))
-    created_time = models.DateTimeField(verbose_name=_('Created Time'), default=timezone.now(),
+    created_time = models.DateTimeField(verbose_name=_('Created Time'), auto_created=True,
                                         help_text=_('The create time of this sudo'))
     modify_time = models.DateTimeField(auto_now=True, verbose_name=_('Modify Time'),
                                        help_text=_('The recent modify time of this sudo'))
@@ -310,7 +310,7 @@ root    ALL=(ALL:ALL) ALL
         seed()
         for i in range(count):
             sudo = cls(name=forgery_py.name.full_name(),
-                       created_time=timezone.now()
+                       created_time=now()
                       )
             try:
                 sudo.save()

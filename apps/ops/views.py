@@ -56,3 +56,32 @@ class CronDetailView(DetailView):
     context_object_name = 'cron'
     template_name = 'cron/detail.html'
 
+class TaskListView(AdminUserRequiredMixin, ListView):
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    model = Task
+    context_object_name = 'tasks'
+    template_name = 'task/list.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'task': 'Assets',
+            'action': 'Create asset',
+        }
+        kwargs.update(context)
+        return super(TaskListView, self).get_context_data(**kwargs)
+
+
+class TaskCreateView(AdminUserRequiredMixin, CreateView):
+    model = Task
+    template_name = 'task/create.html'
+
+
+class TaskUpdateView(AdminUserRequiredMixin, UpdateView):
+    model = Task
+    template_name = 'task/update.html'
+
+
+class TaskDetailView(DetailView):
+    model = Task
+    context_object_name = 'task'
+    template_name = 'task/detail.html'

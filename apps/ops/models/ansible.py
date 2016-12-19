@@ -9,13 +9,13 @@ from assets.models import Asset
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-__all__ = ["Task", "Tasker", "AnsiblePlay", "AnsibleTask", "AnsibleHostResult"]
+__all__ = ["Task", "TaskRecord", "AnsiblePlay", "AnsibleTask", "AnsibleHostResult"]
 
 
 logger = logging.getLogger(__name__)
 
 
-class Tasker(models.Model):
+class TaskRecord(models.Model):
     uuid = models.CharField(max_length=128, verbose_name=_('UUID'), primary_key=True)
     name = models.CharField(max_length=128, blank=True, verbose_name=_('Name'))
     start = models.DateTimeField(auto_now_add=True, verbose_name=_('Start Time'))
@@ -51,7 +51,7 @@ class Tasker(models.Model):
 
 
 class AnsiblePlay(models.Model):
-    tasker = models.ForeignKey(Tasker, related_name='plays', blank=True, null=True)
+    tasker = models.ForeignKey(TaskRecord, related_name='plays', blank=True, null=True)
     uuid = models.CharField(max_length=128, verbose_name=_('UUID'), primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_('Name'))
 
@@ -73,7 +73,7 @@ class AnsiblePlay(models.Model):
                        name=forgery_py.name.full_name(),
                       )
             try:
-                play.tasker = choice(Tasker.objects.all())
+                play.tasker = choice(TaskRecord.objects.all())
                 play.save()
                 logger.debug('Generate fake play: %s' % play.name)
             except Exception as e:
@@ -293,8 +293,16 @@ class AnsibleHostResult(models.Model):
                 continue
 
 class Task(models.Model):
+    record = models.OneToOneField(TaskRecord)
     name = models.CharField(max_length=128, blank=True, verbose_name=_('Name'))
-    asset = models.ForeignKey(Asset, null=True, blank=True, related_name='crontables')
+    module_name = models.CharField(max_length=128, verbose_name=_('Ansible Module Name'))
+    module_args = models.CharField(max_length=512, blank=True, verbose_name=_("Ansible Module Args"))
+    register = models.CharField(max_length=128, blank=True, verbose_name=_('Ansible Task Register'))
+    is_gather_facts = models.BooleanField(default=False,verbose_name=_('Is Gather Ansible Facts'))
+    asset = models.ManyToManyField(Asset, related_name='tasks')
 
     def __unicode__(self):
+        return "%s %s" % (self.module_name, self.module_args)
+
+    def run(self):
         pass

@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from ops.tasks import _celery_tasks
 
-from ops.models import Tasker
+from ops.models import TaskRecord
 from uuid import uuid1
 from celery.result import AsyncResult
 
@@ -23,7 +23,7 @@ def get_result(task_id):
 
 
 def __get_result_by_tasker_id(tasker_uuid, deal_method):
-    tasker = Tasker.objects.get(uuid=tasker_uuid)
+    tasker = TaskRecord.objects.get(uuid=tasker_uuid)
     total = tasker.total_hosts
     total_len = len(total)
     host_results = []

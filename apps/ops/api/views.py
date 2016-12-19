@@ -13,6 +13,7 @@ __all__ = ["HostAliaViewSet",
            "PrivilegeViewSet",
            "SudoViewSet",
            "CronTableViewSet",
+           "TaskViewSet",
            ]
 
 
@@ -61,6 +62,11 @@ class SudoViewSet(viewsets.ModelViewSet):
 class CronTableViewSet(viewsets.ModelViewSet):
     queryset = CronTable.objects.all()
     serializer_class = CronTableSerializer
+    permission_classes = (AdminUserRequired,)
+
+class TaskViewSet(viewsets.ModelViewSet):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
     permission_classes = (AdminUserRequired,)
 
 

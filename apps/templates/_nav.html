@@ -46,6 +46,7 @@
         <i class="fa fa-coffee"></i> <span class="nav-label">{% trans 'Job Center' %}</span><span class="fa arrow"></span>
     </a>
     <ul class="nav nav-second-level">
+        <li id="task"><a href="{% url 'ops:page-task-list' %}">{% trans 'Task' %}</a></li>
         <li id="sudo"><a href="{% url 'ops:page-sudo-list' %}">{% trans 'Sudo' %}</a></li>
         <li id="cron"><a href="{% url 'ops:page-cron-list' %}">{% trans 'Cron' %}</a></li>
     </ul>

@@ -9,6 +9,6 @@ __all__ = ["generate_fake"]
 
 
 def generate_fake():
-    for cls in (Tasker, AnsiblePlay, AnsibleTask, AnsibleHostResult, CronTable,
+    for cls in (TaskRecord, AnsiblePlay, AnsibleTask, AnsibleHostResult, CronTable,
                 HostAlia, UserAlia, CmdAlia, RunasAlia, Privilege, Sudo):
         cls.generate_fake()

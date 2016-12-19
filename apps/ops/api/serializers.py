@@ -1,7 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
 
-from ..models import HostAlia, UserAlia, CmdAlia, RunasAlia, Extra_conf, Privilege, Sudo, CronTable
+from ops.models import *
 from rest_framework import serializers
 
 
@@ -51,3 +51,9 @@ class CronTableSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CronTable
+
+class TaskSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Task
+        read_only_fields = ('record',)

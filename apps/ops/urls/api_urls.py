@@ -15,5 +15,6 @@ api_router.register(r'v1/extra_conf', v1_api.ExtraconfViewSet)
 api_router.register(r'v1/privilege', v1_api.PrivilegeViewSet)
 api_router.register(r'v1/sudo', v1_api.SudoViewSet)
 api_router.register(r'v1/cron', v1_api.CronTableViewSet)
+api_router.register(r'v1/task', v1_api.TaskViewSet)
 
 urlpatterns = api_router.urls
