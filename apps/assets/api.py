@@ -38,10 +38,12 @@ class AssetGroupViewSet(viewsets.ModelViewSet):
     queryset = AssetGroup.objects.all()
     serializer_class = serializers.AssetGroupSerializer
 
+
 class AssetUpdateGroupApi(generics.RetrieveUpdateAPIView):
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetUpdateGroupSerializer
     permission_classes = (IsSuperUser,)
+
 
 class IDCViewSet(viewsets.ModelViewSet):
     """API endpoint that allows IDC to be viewed or edited."""
@@ -49,15 +51,18 @@ class IDCViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.IDCSerializer
     permission_classes = (IsSuperUser,)
 
+
 class AdminUserViewSet(viewsets.ModelViewSet):
     queryset = AdminUser.objects.all()
     serializer_class = serializers.AdminUserSerializer
     permission_classes = (IsSuperUser,)
 
+
 class SystemUserViewSet(viewsets.ModelViewSet):
     queryset = SystemUser.objects.all()
     serializer_class = serializers.SystemUserSerializer
     permission_classes = (IsSuperUser,)
+
 
 class SystemUserUpdateApi(generics.RetrieveUpdateAPIView):
     queryset = Asset.objects.all()
