@@ -11,11 +11,13 @@ from django.db import models, IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
-
 from rest_framework.authtoken.models import Token
 
 from common.utils import signer, date_expired_default
-from common.mixins import NoDeleteModelMixin
+from . import UserGroup
+
+
+__all__ = ['User']
 
 
 class User(AbstractUser):
@@ -45,7 +47,7 @@ class User(AbstractUser):
 
     @property
     def password_raw(self):
-        raise AttributeError('Password raw is not readable attribute')
+        raise AttributeError('Password raw is not a readable attribute')
 
     #: Use this attr to set user object password, example
     #: user = User(username='example', password_raw='password', ...)
@@ -61,10 +63,10 @@ class User(AbstractUser):
 
     @property
     def is_expired(self):
-        if self.date_expired > timezone.now():
-            return False
-        else:
+        if self.date_expired < timezone.now():
             return True
+        else:
+            return False
 
     @property
     def is_valid(self):
@@ -148,7 +150,7 @@ class User(AbstractUser):
         return False
 
     def check_public_key(self, public_key):
-        if self.public_key == public_key:
+        if self.ssH_public_key == public_key:
             return True
         return False
 
@@ -187,6 +189,11 @@ class User(AbstractUser):
         self.set_password(new_password)
         self.save()
 
+    def delete(self):
+        if self.pk == 1 or self.username == 'admin':
+            return
+        return super(User, self).delete()
+
     class Meta:
         db_table = 'user'
 
@@ -202,11 +209,6 @@ class User(AbstractUser):
                    created_by=_('System'))
         user.save()
         user.groups.add(UserGroup.initial())
-
-    def delete(self):
-        if self.pk == 1 or self.username == 'admin':
-            return
-        return super(User, self).delete()
 
     @classmethod
     def generate_fake(cls, count=100):
