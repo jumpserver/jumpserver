@@ -7,6 +7,7 @@ from collections import OrderedDict
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
 from django.core import signing
+from django.conf import settings
 from django.db import models, IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
@@ -14,7 +15,7 @@ from django.shortcuts import reverse
 from rest_framework.authtoken.models import Token
 
 from common.utils import signer, date_expired_default
-from . import UserGroup
+from . import UserGroup, AccessKey
 
 
 __all__ = ['User']
@@ -24,7 +25,7 @@ class User(AbstractUser):
     ROLE_CHOICES = (
         ('Admin', _('Administrator')),
         ('User', _('User')),
-        ('APP', _('Application'))
+        ('App', _('Application'))
     )
 
     username = models.CharField(max_length=20, unique=True, verbose_name=_('Username'))
@@ -44,6 +45,8 @@ class User(AbstractUser):
     date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True,
                                         verbose_name=_('Date expired'))
     created_by = models.CharField(max_length=30, default='', verbose_name=_('Created by'))
+
+
 
     @property
     def password_raw(self):
@@ -172,6 +175,15 @@ class User(AbstractUser):
             'comment': self.comment,
             'date_expired': self.date_expired.strftime('%Y-%m-%d %H:%M:%S')
         })
+
+    @classmethod
+    def create_app_user(cls, name, comment):
+        domain_name = settings.DOMAIN_NAME or 'jumpserver.org'
+        app = cls.objects.create(username=name, name=name, email='%s@%s' % (name, domain_name),
+                                 role='App', enable_otp=False, comment=comment, is_first_login=False,
+                                 created_by='System')
+        AccessKey.object.create(user=app)
+        return app
 
     @classmethod
     def validate_reset_token(cls, token):

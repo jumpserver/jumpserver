@@ -26,6 +26,9 @@ class Config:
     # HTTP_PROTOCOL://HOST[:PORT]
     SITE_URL = 'http://localhost'
 
+    # Domain name, If set app email will set as it
+    DOMAIN_NAME = 'jumpserver.org'
+
     # Django security setting, if your disable debug model, you should setting that
     ALLOWED_HOSTS = ['*']
 
