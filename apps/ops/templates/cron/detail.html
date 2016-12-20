@@ -1,0 +1,282 @@
+{% extends 'base.html' %}
+{% load common_tags %}
+{% load users_tags %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="{% url 'ops:page-cron-detail' pk=cron.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Cron detail' %} </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'ops:page-cron-detail' pk=cron.id %}" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Asset permission' %}</a>
+                            </li>
+                            <li><a href="{% url 'ops:page-cron-detail' pk=cron.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a></li>
+                            <li><a href="{% url 'ops:page-cron-detail' pk=cron.id %}" class="text-center"><i class="fa fa-calculator-o"></i> {% trans 'Login history' %}</a></li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span class="label"><b>{{ cron.name }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr>
+                                            <td width="20%">{% trans 'Name' %}:</td>
+                                            <td><b>{{ cron.name }}</b></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Quick modify' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr class="no-borders-tr">
+                                          <td width="50%">{% trans 'Active' %}:</td>
+                                            <td><span class="pull-right">
+                                                <div class="switch">
+                                                    <div class="onoffswitch">
+                                                        <input type="checkbox" {% if cron.is_active %} checked {% endif %}  class="onoffswitch-checkbox" id="is_active">
+                                                        <label class="onoffswitch-label" for="is_active">
+                                                            <span class="onoffswitch-inner"></span>
+                                                            <span class="onoffswitch-switch"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </span></td>
+                                        </tr>
+                                        <tr>
+                                          <td>{% trans 'Enable OTP' %}:</td>
+                                            <td><span class="pull-right">
+                                                <div class="switch">
+                                                    <div class="onoffswitch">
+                                                        <input type="checkbox" class="onoffswitch-checkbox" {% if cron.enable_otp %} checked {% endif %}
+                                                               id="enable_otp">
+                                                        <label class="onoffswitch-label" for="enable_otp">
+                                                            <span class="onoffswitch-inner"></span>
+                                                            <span class="onoffswitch-switch"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Reset password' %}:</td>
+                                            <td>
+                                                <span class="pull-right">
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_password" style="width: 54px">{% trans 'Reset' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Reset ssh key' %}:</td>
+                                            <td>
+                                                <span class="pull-right">
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_pk" style="width: 54px;">{% trans 'Reset' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Update ssh key' %}:</td>
+                                            <td>
+                                                <span class="pull-right">
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_update_pk" style="width: 54px;"  data-toggle="modal" data-target="#user_update_pk_modal">{% trans 'Update' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'User group' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table group_edit">
+                                        <tbody>
+                                        <form>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <select data-placeholder="{% trans 'Join user groups' %}" id="slct_groups" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for group in groups %}
+                                                        <option value="{{ group.id }}" id="opt_{{ group.id }}">{{ group.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <button type="button" class="btn btn-info btn-small" id="btn_add_user_group">{% trans 'Join' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+
+                                        {% for group in user_object.groups.all %}
+                                        <tr>
+                                          <td ><b class="bdg_user_group" data-gid={{ group.id }}>{{ group.name }}</b></td>
+                                          <td>
+                                              <button class="btn btn-danger pull-right btn-xs btn_delete_user_group" type="button"><i class="fa fa-minus"></i></button>
+                                          </td>
+                                        </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% include 'users/_user_update_pk_modal.html' %}
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+jumpserver.selected_groups = {};
+
+function updateCrons(crons) {
+    var the_url = "{% url 'api-ops:crontable-detail' pk=cron.id %}";
+    var body = {
+        id: {{ user_object.id }},
+        groups: Object.assign([], crons)
+    };
+    var success = function(data) {
+        // remove all the selected groups from select > option and rendered ul element;
+        $('.select2-selection__rendered').empty();
+        $('#slct_groups').val('');
+        $.map(jumpserver.selected_groups, function(group_name, index) {
+            $('#opt_' + index).remove();
+            // change tr html of user groups.
+            $('.group_edit tbody').append(
+                '<tr>' +
+                '<td><b class="bdg_user_group" data-gid="' + index + '">' + group_name + '</b></td>' +
+                '<td><button class="btn btn-danger btn-xs pull-right btn_delete_user_group" type="button"><i class="fa fa-minus"></i></button></td>' +
+                '</tr>'
+            )
+        });
+        // clear jumpserver.selected_groups
+        jumpserver.selected_groups = {};
+        toastr.success('{% trans "UserGroup Update Success!" %}')
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success: success,
+        method: 'PUT'
+    });
+}
+$(document).ready(function() {
+    $('.select2').select2()
+        .on('select2:select', function(evt) {
+            var data = evt.params.data;
+            jumpserver.selected_groups[data.id] = data.text;
+        }).on('select2:unselect', function(evt) {
+            var data = evt.params.data;
+            delete jumpserver.selected_groups[data.id]
+        })
+}).on('click', '#is_active', function() {
+    var the_url = "{% url 'api-ops:crontable-detail' pk=cron.id %}";
+    var checked = !$(this).prop('checked');
+    var body = {
+        'is_active': checked
+    };
+    var success = '{% trans "Update Successfully!" %}';
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success_message: success
+    });
+}).on('click', '#btn_add_user_group', function() {
+    if (Object.keys(jumpserver.selected_groups).length === 0) {
+        return false;
+    }
+    var user_groups = $('.bdg_user_group').map(function() {
+        return $(this).data('gid');
+    }).get();
+    $.map(jumpserver.selected_groups, function(value, index) {
+        user_groups.push(parseInt(index));
+        $('#opt_' + index).remove();
+    });
+    updateCrons(user_groups)
+}).on('click', '.btn_delete_user_group', function() {
+    var $this = $(this);
+    var $tr = $this.closest('tr');
+    var $badge = $tr.find('.bdg_user_group');
+    var gid = $badge.data('gid');
+    var group_name = $badge.html() || $badge.text();
+    $('#slct_groups').append(
+        '<option value="' + gid + '" id="opt_' + gid + '">' + group_name + '</option>'
+    );
+    $tr.remove();
+    var user_groups = $('.bdg_user_group').map(function() {
+        return $(this).data('gid');
+    }).get();
+    updateCrons(user_groups)
+}).on('click', '#btn_user_update_pk', function(){
+    var $this = $(this);
+    var pk = $('#txt_pk').val();
+    var the_url = '{% url "api-ops:crontable-detail" pk=cron.id %}';
+    var body = {'_public_key': pk};
+    var success = function() {
+        $('#txt_pk').val('');
+        $this.closest('.modal').modal('hide');
+        var msg = "{% trans 'Successfully updated the SSH public key.' %}";
+        swal("{% trans 'User SSH Public Key Update' %}", msg, "success");
+    };
+    var fail = function() {
+        var msg = "{% trans 'Failed to update the user\'s SSH public key.' %}";
+        swal({
+            title: "{% trans 'User SSH Public Key Update' %}",
+            text: msg,
+            type: "error",
+            showCancelButton: false,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "{% trans 'Confirm' %}",
+            closeOnConfirm: true
+            }, function () {
+              $('#txt_pk').focus();
+            }
+        );
+    }
+    APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success, error: fail});
+});
+</script>
+{% endblock %}
