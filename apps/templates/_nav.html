@@ -34,11 +34,24 @@
         </li>
     </ul>
 </li>
+
 <li id="terminal">
     <a href="{% url 'terminal:terminal-list' %}">
         <i class="fa fa-desktop"></i><span class="nav-label">{% trans 'Terminal' %}</span><span class="label label-info pull-right"></span>
-    </a>
+　　</a>
 </li>
+
+<li id="ops">
+    <a>
+        <i class="fa fa-coffee"></i> <span class="nav-label">{% trans 'Job Center' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level">
+        <li id="task"><a href="{% url 'ops:page-task-list' %}">{% trans 'Task' %}</a></li>
+        <li id="sudo"><a href="{% url 'ops:page-sudo-list' %}">{% trans 'Sudo' %}</a></li>
+        <li id="cron"><a href="{% url 'ops:page-cron-list' %}">{% trans 'Cron' %}</a></li>
+    </ul>
+</li>
+
 <li id="audits">
     <a href="#"><i class="fa fa-files-o"></i> <span class="nav-label">{% trans 'Audits' %}</span><span class="fa arrow"></span></a>
     <ul class="nav nav-second-level">

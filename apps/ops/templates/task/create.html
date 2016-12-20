@@ -1,0 +1,16 @@
+{% extends 'sudo/_sudo.html' %}
+{% load i18n %}
+{% load bootstrap %}
+{% block user_template_title %}{% trans "Create user" %}{% endblock %}
+{% block username %}
+    {{ form.username|bootstrap_horizontal }}
+{% endblock %}
+{% block password %}
+    <h3>{% trans 'Password' %}</h3>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">{% trans 'Password' %}</label>
+        <div class="col-sm-8 controls" >
+            {% trans 'Reset link will be generated and sent to the user. ' %}
+        </div>
+    </div>
+{% endblock %}
