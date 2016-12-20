@@ -73,6 +73,8 @@ class Asset(models.Model):
     def __unicode__(self):
         return '%(ip)s:%(port)s' % {'ip': self.ip, 'port': self.port}
 
+    __str__ = __unicode__()
+
     @property
     def is_valid(self):
         warning = ''
@@ -82,7 +84,7 @@ class Asset(models.Model):
             return True, ''
         return False, warning
 
-    def json(self):
+    def to_json(self):
         pass
 
     class Meta:
