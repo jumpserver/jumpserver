@@ -255,16 +255,19 @@ function updateUserGroups(groups) {
         success: success
     });
 }
+
 $(document).ready(function() {
     $('.select2').select2()
         .on('select2:select', function(evt) {
             var data = evt.params.data;
             jumpserver.groups_selected[data.id] = data.text;
-        }).on('select2:unselect', function(evt) {
+        })
+        .on('select2:unselect', function(evt) {
             var data = evt.params.data;
             delete jumpserver.groups_selected[data.id]
         })
-}).on('click', '#is_active', function() {
+})
+    .on('click', '#is_active', function() {
     var the_url = "{% url 'api-users:user-detail' pk=user.id %}";
     var checked = $(this).prop('checked');
     var body = {
@@ -276,19 +279,21 @@ $(document).ready(function() {
         body: JSON.stringify(body),
         success_message: success
     });
-}).on('click', '#enable_otp', function() {
-    var the_url = "{% url 'api-users:user-detail' pk=user.id %}";
-    var checked = $(this).prop('checked');
-    var body = {
-        'enable_otp': checked
-    };
-    var success = '{% trans "Update Successfully!" %}';
-    APIUpdateAttr({
-        url: the_url,
-        body: JSON.stringify(body),
-        success_message: success
-    });
-}).on('click', '#btn_join_group', function() {
+})
+    .on('click', '#enable_otp', function() {
+        var the_url = "{% url 'api-users:user-detail' pk=user.id %}";
+        var checked = $(this).prop('checked');
+        var body = {
+            'enable_otp': checked
+        };
+        var success = '{% trans "Update Successfully!" %}';
+        APIUpdateAttr({
+            url: the_url,
+            body: JSON.stringify(body),
+            success_message: success
+        });
+})
+    .on('click', '#btn_join_group', function() {
     if (Object.keys(jumpserver.groups_selected).length === 0) {
         return false;
     }

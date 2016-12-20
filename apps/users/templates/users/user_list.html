@@ -132,7 +132,8 @@ $(document).ready(function(){
         $form.ajaxSubmit({success: success});
     })
 
-}).on('click', '#btn_bulk_update', function(){
+})
+	.on('click', '#btn_bulk_update', function(){
     var action = $('#slct_bulk_update').val();
     var $data_table = $('#user_list_table').DataTable();
     var id_list = [];
@@ -204,13 +205,15 @@ $(document).ready(function(){
         default:
             break;
     }
-}).on('click', '.btn_user_delete', function(){
+})
+	.on('click', '.btn_user_delete', function(){
     var $this = $(this);
     var name = $this.data('name');
     var uid = $this.data('uid');
     var the_url = '{% url "api-users:user-detail" pk=99991937 %}'.replace('99991937', uid);
     objectDelete($this, name, the_url);
-}).on('click', '#btn_user_bulk_update', function(){
+})
+	.on('click', '#btn_user_bulk_update', function(){
     var json_data = $('#fm_user_bulk_update').serializeObject();
     var body = {};
     body.enable_otp = (json_data.enable_otp === 'on')? true: false;

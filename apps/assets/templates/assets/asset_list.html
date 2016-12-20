@@ -127,8 +127,9 @@
                 }},
                 {targets: 9, createdCell: function (td, cellData, rowData) {
                     var update_btn = '<a href="{% url "assets:asset-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
-                    var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
+                    var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
                     $(td).html(update_btn + del_btn)
+
                  }}
             ],
             ajax_url: '{% url "api-assets:asset-list" %}',
@@ -179,6 +180,14 @@
             $form.ajaxSubmit({success: success});
         })
 
+    })
+	    .on('click', '.btn_asset_delete', function () {
+	        var $this = $(this);
+		    var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
+		    var uid = $this.data('uid');
+		    var the_url = '{% url "api-assets:asset-detail" pk=99991937 %}'.replace('99991937', uid);
+
+		    objectDelete($this, name, the_url);
     });
 </script>
 {% endblock %}
