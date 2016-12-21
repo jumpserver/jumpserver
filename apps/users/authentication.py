@@ -8,16 +8,27 @@ from django.conf import settings
 from django.utils.translation import ugettext as _
 from rest_framework import authentication, exceptions, permissions
 from rest_framework.compat import is_authenticated
+from django.utils.six import text_type
+from django.utils.translation import ugettext_lazy as _
+from rest_framework import HTTP_HEADER_ENCODING
 
-from common.utils import signer, get_object_or_none
-from .hands import Terminal
+from common.utils import get_object_or_none
 from .utils import get_or_refresh_token
-from .models import User
+from .models import User, AccessKey
 
 
-class TerminalAuthentication(authentication.BaseAuthentication):
+def get_request_date_header(request):
+    date = request.META.get('HTTP_DATE', b'')
+    if isinstance(date, text_type):
+        # Work around django test client oddness
+        date = date.encode(HTTP_HEADER_ENCODING)
+
+    return date
+
+
+class AccessKeyAuthentication(authentication.BaseAuthentication):
     keyword = 'Sign'
-    model = Terminal
+    model = AccessKey
 
     def authenticate(self, request):
         auth = authentication.get_authorization_header(request).split()
@@ -26,30 +37,40 @@ class TerminalAuthentication(authentication.BaseAuthentication):
             return None
 
         if len(auth) == 1:
-            msg = _('Invalid sign header. No credentials provided.')
+            msg = _('Invalid signature header. No credentials provided.')
             raise exceptions.AuthenticationFailed(msg)
         elif len(auth) > 2:
-            msg = _('Invalid sign header. Sign string should not contain spaces.')
+            msg = _('Invalid signature header. Signature string should not contain spaces.')
             raise exceptions.AuthenticationFailed(msg)
+
 
         try:
-            sign = auth[1].decode()
+            sign = auth[1].decode().split(':')
+            if len(sign) != 2:
+                msg = _('Invalid signature header. Format like AccessKeyId:Signature')
+                raise exceptions.AuthenticationFailed(msg)
         except UnicodeError:
-            msg = _('Invalid token header. Sign string should not contain invalid characters.')
+            msg = _('Invalid signature header. Signature string should not contain invalid characters.')
             raise exceptions.AuthenticationFailed(msg)
+
+        access_key_id = sign[0]
+        secret = sign[1]
+        date =
+
         return self.authenticate_credentials(sign)
 
-    def authenticate_credentials(self, sign):
-        name = signer.unsign(sign)
-        if name:
-            terminal = get_object_or_none(self.model, name=name)
-        else:
-            raise exceptions.AuthenticationFailed(_('Invalid sign.'))
+    def authenticate_credentials(self, access_key_id, secret, datetime):
+        access_key_id = sign[0]
+        secret = sign[1]
 
-        if not terminal or not terminal.is_active:
-            raise exceptions.AuthenticationFailed(_('Terminal inactive or deleted.'))
-        terminal.is_authenticated = True
-        return terminal, None
+        access_key = get_object_or_none(AccessKey, id=access_key_id)
+        if access_key is None or not access_key.user:
+            raise exceptions.AuthenticationFailed(_('Invalid signature.'))
+
+        if not access_key.user.is_active:
+            raise exceptions.AuthenticationFailed(_('User disabled.'))
+
+        return access_key.user, None
 
 
 class AccessTokenAuthentication(authentication.BaseAuthentication):
