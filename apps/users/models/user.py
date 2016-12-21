@@ -15,7 +15,7 @@ from django.shortcuts import reverse
 from rest_framework.authtoken.models import Token
 
 from common.utils import signer, date_expired_default
-from . import UserGroup, AccessKey
+from . import UserGroup
 
 
 __all__ = ['User']
@@ -178,11 +178,12 @@ class User(AbstractUser):
 
     @classmethod
     def create_app_user(cls, name, comment):
-        domain_name = settings.DOMAIN_NAME or 'jumpserver.org'
+        from . import AccessKey
+        domain_name = settings.CONFIG.DOMAIN_NAME or 'jumpserver.org'
         app = cls.objects.create(username=name, name=name, email='%s@%s' % (name, domain_name),
                                  role='App', enable_otp=False, comment=comment, is_first_login=False,
                                  created_by='System')
-        AccessKey.object.create(user=app)
+        AccessKey.objects.create(user=app)
         return app
 
     @classmethod
@@ -207,7 +208,7 @@ class User(AbstractUser):
         return super(User, self).delete()
 
     class Meta:
-        db_table = 'user'
+        ordering = ['username']
 
     #: Use this method initial user
     @classmethod

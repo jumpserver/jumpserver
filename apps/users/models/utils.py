@@ -7,10 +7,11 @@ from . import User, UserGroup
 
 def initial_model():
     for cls in [User, UserGroup]:
-        cls.initial()
+        if getattr(cls, 'initial'):
+            cls.initial()
 
 
 def generate_fake():
     for cls in [User, UserGroup]:
-        cls.generate_fake()
-
+        if getattr(cls, 'generate_fake'):
+            cls.generate_fake()

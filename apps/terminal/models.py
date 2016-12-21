@@ -8,20 +8,42 @@ from users.models import User
 
 class Terminal(models.Model):
     TYPE_CHOICES = (
-        ('S', 'SSH Terminal'),
-        ('WT', 'Web Terminal')
+        ('SSH', 'SSH Terminal'),
+        ('Web', 'Web Terminal')
     )
     name = models.CharField(max_length=30, unique=True, verbose_name=_('Name'))
-    ip = models.GenericIPAddressField(verbose_name=_('From ip'))
-    is_active = models.BooleanField(default=False, verbose_name=_('Is active'))
-    is_bound_ip = models.BooleanField(default=False, verbose_name=_('Is bound ip'))
+    remote_addr = models.GenericIPAddressField(verbose_name=_('Remote address'), blank=True, null=True)
     type = models.CharField(choices=TYPE_CHOICES, max_length=2, verbose_name=_('Terminal type'))
+    user = models.OneToOneField(User, verbose_name='Application user', null=True)
     url = models.CharField(max_length=100, verbose_name=_('URL to login'))
     date_created = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
-    def is_valid(self):
-        return self.is_active and self.is_accepted
+    @property
+    def is_active(self):
+        if self.user and self.user.is_active:
+            return True
+        return False
+
+    @is_active.setter
+    def is_active(self, active):
+        if self.user:
+            self.user.is_active = active
+            self.user.save()
+
+    @property
+    def is_accepted(self):
+        if self.user:
+            return True
+        else:
+            return False
+
+    @is_accepted.setter
+    def is_accepted(self, accepted):
+        if accepted:
+            user = User.create_app_user(name=self.name, comment=self.comment)
+            self.user = user
+            self.save()
 
     @property
     def is_superuser(self):
@@ -31,9 +53,14 @@ class Terminal(models.Model):
     def is_terminal(self):
         return True
 
+    def __unicode__(self):
+        active = 'Active' if self.user and self.user.is_active else 'Disabled'
+        return '%s: %s' % (self.name, active)
+
+    __str__ = __unicode__
+
     class Meta:
         db_table = 'terminal'
-        ordering = ['is_active']
 
 
 class TerminalHeatbeat(models.Model):

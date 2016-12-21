@@ -73,7 +73,7 @@ class Asset(models.Model):
     def __unicode__(self):
         return '%(ip)s:%(port)s' % {'ip': self.ip, 'port': self.port}
 
-    __str__ = __unicode__()
+    __str__ = __unicode__
 
     @property
     def is_valid(self):
@@ -88,7 +88,6 @@ class Asset(models.Model):
         pass
 
     class Meta:
-        db_table = 'asset'
         unique_together = ('ip', 'port')
 
     @classmethod
@@ -126,4 +125,4 @@ class Tag(models.Model):
     __str__ = __unicode__
 
     class Meta:
-        db_table = 'tag'
+        ordering = ['name']

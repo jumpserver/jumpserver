@@ -10,7 +10,7 @@ from .models import Terminal
 class TerminalForm(forms.ModelForm):
     class Meta:
         model = Terminal
-        fields = ['name', 'ip', 'is_active', 'type', 'url', 'comment']
+        fields = ['name', 'remote_addr', 'type', 'url', 'comment']
         help_texts = {
             'url': 'Example: ssh://192.168.1.1:22 or http://jms.jumpserver.org, that user login'
         }

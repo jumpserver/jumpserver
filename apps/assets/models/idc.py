@@ -34,7 +34,7 @@ class IDC(models.Model):
         return cls.objects.get_or_create(name=_('Default'), created_by=_('System'), comment=_('Default IDC'))[0]
 
     class Meta:
-        db_table = 'idc'
+        ordering = ['name']
 
     @classmethod
     def generate_fake(cls, count=100):

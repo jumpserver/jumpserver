@@ -37,6 +37,8 @@ class AdminUser(models.Model):
     def __unicode__(self):
         return self.name
 
+    __str__ = __unicode__
+
     @property
     def password(self):
         return signer.unsign(self._password)
@@ -66,7 +68,7 @@ class AdminUser(models.Model):
         return self.assets.count()
 
     class Meta:
-        db_table = 'admin_user'
+        ordering = ['name']
 
     @classmethod
     def generate_fake(cls, count=100):
@@ -161,7 +163,7 @@ class SystemUser(models.Model):
         return self.asset_groups.count()
 
     class Meta:
-        db_table = 'system_user'
+        ordering = ['name']
 
     @classmethod
     def generate_fake(cls, count=100):

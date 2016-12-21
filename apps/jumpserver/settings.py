@@ -60,7 +60,6 @@ INSTALLED_APPS = [
     'common.apps.CommonConfig',
     'terminal.apps.TerminalConfig',
     'rest_framework',
-    'rest_framework.authtoken',
     'bootstrapform',
     'captcha',
     'django.contrib.auth',

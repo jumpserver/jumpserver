@@ -14,6 +14,18 @@ from .serializers import TerminalSerializer, TerminalHeatbeatSerializer
 from .hands import IsSuperUserOrTerminalUser, User
 
 
+class TerminalRegister(ListCreateAPIView):
+    queryset = Terminal.objects.all()
+    serializer_class = TerminalSerializer
+    permission_classes = (AllowAny,)
+
+    def create(self, request, *args, **kwargs):
+        name = signer.unsign(request.data.get('name', ''))
+        remote_addr = request.Meta.get('REMOTE_ADDR')
+        serializer = self.serializer_class({'name': name, 'remote_addr': remote_addr})
+
+
+
 
 class TerminalViewSet(viewsets.ModelViewSet):
     queryset = Terminal.objects.all()

@@ -5,6 +5,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, IntegrityError
+from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy as _
 
 from common.utils import signer, date_expired_default
@@ -13,8 +14,7 @@ from common.mixins import NoDeleteModelMixin
 __all__ = ['UserGroup']
 
 
-class UserGroup(NoDeleteModelMixin):
-    name = models.CharField(max_length=100, unique=True, verbose_name=_('Name'))
+class UserGroup(NoDeleteModelMixin, Group):
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True)
     created_by = models.CharField(max_length=100)
@@ -34,7 +34,7 @@ class UserGroup(NoDeleteModelMixin):
         return True
 
     class Meta:
-        db_table = 'user_group'
+        ordering = ['name']
 
     @classmethod
     def initial(cls):

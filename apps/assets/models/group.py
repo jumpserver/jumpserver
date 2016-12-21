@@ -25,7 +25,7 @@ class AssetGroup(models.Model):
         return self.name
 
     class Meta:
-        db_table = 'asset_group'
+        ordering = ['name']
 
     @classmethod
     def initial(cls):
