@@ -14,7 +14,7 @@ class TerminalSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Terminal
-        fields = ['id', 'name', 'ip', 'type', 'url', 'comment',
+        fields = ['id', 'name', 'remote_addr', 'type', 'url', 'comment',
                   'is_active', 'get_type_display', 'proxy_online', 'is_alive']
 
     @staticmethod

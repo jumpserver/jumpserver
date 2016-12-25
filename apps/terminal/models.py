@@ -13,9 +13,9 @@ class Terminal(models.Model):
     )
     name = models.CharField(max_length=30, unique=True, verbose_name=_('Name'))
     remote_addr = models.GenericIPAddressField(verbose_name=_('Remote address'), blank=True, null=True)
-    type = models.CharField(choices=TYPE_CHOICES, max_length=2, verbose_name=_('Terminal type'))
+    type = models.CharField(choices=TYPE_CHOICES, max_length=2, blank=True, verbose_name=_('Terminal type'))
     user = models.OneToOneField(User, verbose_name='Application user', null=True)
-    url = models.CharField(max_length=100, verbose_name=_('URL to login'))
+    url = models.CharField(max_length=100, blank=True, verbose_name=_('URL to login'))
     date_created = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
@@ -39,11 +39,16 @@ class Terminal(models.Model):
             return False
 
     @is_accepted.setter
-    def is_accepted(self, accepted):
-        if accepted:
-            user = User.create_app_user(name=self.name, comment=self.comment)
-            self.user = user
-            self.save()
+    def is_accepted(self, active):
+        if active is True and self.user:
+            self.user.is_active = True
+            self.user.save()
+
+    def create_related_app_user(self):
+        user, access_key = User.create_app_user(name=self.name, comment=self.comment)
+        self.user = user
+        self.save()
+        return user, access_key
 
     @property
     def is_superuser(self):

@@ -180,11 +180,11 @@ class User(AbstractUser):
     def create_app_user(cls, name, comment):
         from . import AccessKey
         domain_name = settings.CONFIG.DOMAIN_NAME or 'jumpserver.org'
-        app = cls.objects.create(username=name, name=name, email='%s@%s' % (name, domain_name),
+        app = cls.objects.create(username=name, name=name, email='%s@%s' % (name, domain_name), is_active=False,
                                  role='App', enable_otp=False, comment=comment, is_first_login=False,
                                  created_by='System')
-        AccessKey.objects.create(user=app)
-        return app
+        access_key = AccessKey.objects.create(user=app)
+        return app, access_key
 
     @classmethod
     def validate_reset_token(cls, token):
