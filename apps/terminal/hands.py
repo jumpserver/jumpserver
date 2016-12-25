@@ -2,5 +2,5 @@
 # 
 
 from users.models import User
-from users.permissions import IsSuperUserOrTerminalUser
+from users.permissions import IsSuperUserOrAppUser
 from audits.models import ProxyLog

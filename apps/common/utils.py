@@ -3,12 +3,17 @@
 
 from __future__ import unicode_literals
 from six import string_types
+import base64
 import os
 from itertools import chain
 import string
 import logging
 import datetime
-import paramiko
+import time
+import hashlib
+from email.utils import formatdate
+import calendar
+import threading
 
 import paramiko
 import sshpubkeys
@@ -16,13 +21,14 @@ from itsdangerous import TimedJSONWebSignatureSerializer, JSONWebSignatureSerial
     BadSignature, SignatureExpired
 from django.shortcuts import reverse as dj_reverse
 from django.conf import settings
-from django.core import signing
 from django.utils import timezone
 
 try:
     import cStringIO as StringIO
 except ImportError:
     import StringIO
+
+from .compat import to_bytes, to_string
 
 SECRET_KEY = settings.SECRET_KEY
 
@@ -253,6 +259,65 @@ def setattr_bulk(seq, key, value):
         setattr(obj, key, value)
         return obj
     return map(set_attr, seq)
+
+
+def content_md5(data):
+    """计算data的MD5值，经过Base64编码并返回str类型。
+
+    返回值可以直接作为HTTP Content-Type头部的值
+    """
+    m = hashlib.md5(to_bytes(data))
+    return to_string(base64.b64encode(m.digest()))
+
+_STRPTIME_LOCK = threading.Lock()
+
+_GMT_FORMAT = "%a, %d %b %Y %H:%M:%S GMT"
+_ISO8601_FORMAT = "%Y-%m-%dT%H:%M:%S.000Z"
+
+
+def to_unixtime(time_string, format_string):
+    with _STRPTIME_LOCK:
+        return int(calendar.timegm(time.strptime(time_string, format_string)))
+
+
+def http_date(timeval=None):
+    """返回符合HTTP标准的GMT时间字符串，用strftime的格式表示就是"%a, %d %b %Y %H:%M:%S GMT"。
+    但不能使用strftime，因为strftime的结果是和locale相关的。
+    """
+    return formatdate(timeval, usegmt=True)
+
+
+def http_to_unixtime(time_string):
+    """把HTTP Date格式的字符串转换为UNIX时间（自1970年1月1日UTC零点的秒数）。
+
+    HTTP Date形如 `Sat, 05 Dec 2015 11:10:29 GMT` 。
+    """
+    return to_unixtime(time_string, _GMT_FORMAT)
+
+
+def iso8601_to_unixtime(time_string):
+    """把ISO8601时间字符串（形如，2012-02-24T06:07:48.000Z）转换为UNIX时间，精确到秒。"""
+    return to_unixtime(time_string, _ISO8601_FORMAT)
+
+
+def http_to_unixtime(time_string):
+    """把HTTP Date格式的字符串转换为UNIX时间（自1970年1月1日UTC零点的秒数）。
+
+    HTTP Date形如 `Sat, 05 Dec 2015 11:10:29 GMT` 。
+    """
+    return to_unixtime(time_string, "%a, %d %b %Y %H:%M:%S GMT")
+
+
+def make_signature(access_key_secret, date=None):
+    if isinstance(date, int):
+        date_gmt = http_date(date)
+    elif date is None:
+        date_gmt = http_date(int(time.time()))
+    else:
+        date_gmt = date
+
+    data = str(access_key_secret) + "\n" + date_gmt
+    return content_md5(data)
 
 
 signer = Signer()

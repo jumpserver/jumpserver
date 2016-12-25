@@ -7,7 +7,7 @@ from rest_framework import generics, viewsets
 from rest_framework.views import APIView, Response
 
 from . import models, serializers
-from .hands import IsSuperUserOrTerminalUser, Terminal
+from .hands import IsSuperUserOrAppUser, Terminal
 
 
 class ProxyLogViewSet(viewsets.ModelViewSet):
@@ -32,13 +32,13 @@ class ProxyLogViewSet(viewsets.ModelViewSet):
 
     queryset = models.ProxyLog.objects.all()
     serializer_class = serializers.ProxyLogSerializer
-    permission_classes = (IsSuperUserOrTerminalUser,)
+    permission_classes = (IsSuperUserOrAppUser,)
 
 
 class CommandLogViewSet(viewsets.ModelViewSet):
     queryset = models.CommandLog.objects.all()
     serializer_class = serializers.CommandLogSerializer
-    permission_classes = (IsSuperUserOrTerminalUser,)
+    permission_classes = (IsSuperUserOrAppUser,)
 
 
 # class CommandLogTitleApi(APIView):

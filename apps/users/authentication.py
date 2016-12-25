@@ -2,6 +2,8 @@
 #
 
 import base64
+import hashlib
+import time
 
 from django.core.cache import cache
 from django.conf import settings
@@ -12,7 +14,7 @@ from django.utils.six import text_type
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import HTTP_HEADER_ENCODING
 
-from common.utils import get_object_or_none
+from common.utils import get_object_or_none, make_signature, http_to_unixtime
 from .utils import get_or_refresh_token
 from .models import User, AccessKey
 
@@ -22,7 +24,6 @@ def get_request_date_header(request):
     if isinstance(date, text_type):
         # Work around django test client oddness
         date = date.encode(HTTP_HEADER_ENCODING)
-
     return date
 
 
@@ -54,18 +55,30 @@ class AccessKeyAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed(msg)
 
         access_key_id = sign[0]
-        secret = sign[1]
-        date =
+        request_signature = sign[1]
 
-        return self.authenticate_credentials(sign)
+        return self.authenticate_credentials(request, access_key_id, request_signature)
 
-    def authenticate_credentials(self, access_key_id, secret, datetime):
-        access_key_id = sign[0]
-        secret = sign[1]
-
+    def authenticate_credentials(self, request, access_key_id, request_signature):
         access_key = get_object_or_none(AccessKey, id=access_key_id)
+        request_date = get_request_date_header(request)
         if access_key is None or not access_key.user:
             raise exceptions.AuthenticationFailed(_('Invalid signature.'))
+        access_key_secret = access_key.secret
+
+        print(request_date)
+
+        try:
+            request_unix_time = http_to_unixtime(request_date)
+        except ValueError:
+            raise exceptions.AuthenticationFailed(_('HTTP header: Date not provide or not %a, %d %b %Y %H:%M:%S GMT'))
+
+        if int(time.time()) - request_unix_time > 15*60:
+            raise exceptions.AuthenticationFailed(_('Expired, more than 15 minutes'))
+
+        signature = make_signature(access_key_secret, request_date)
+        if not signature == request_signature:
+            raise exceptions.AuthenticationFailed(_('Invalid signature. %s: %s' % (signature, request_signature)))
 
         if not access_key.user.is_active:
             raise exceptions.AuthenticationFailed(_('User disabled.'))

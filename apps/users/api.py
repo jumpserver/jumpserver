@@ -16,7 +16,7 @@ from common.utils import get_logger
 from .utils import check_user_valid, get_or_refresh_token
 from .models import User, UserGroup
 from .hands import write_login_log_async
-from .permissions import IsSuperUser, IsTerminalUser, IsValidUser, IsSuperUserOrTerminalUser
+from .permissions import IsSuperUser, IsAppUser, IsValidUser, IsSuperUserOrAppUser
 from . import serializers
 
 

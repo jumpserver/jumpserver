@@ -23,12 +23,12 @@ class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
                and request.user.is_valid
 
 
-class IsTerminalUser(IsValidUser, permissions.BasePermission):
+class IsAppUser(IsValidUser, permissions.BasePermission):
     """Allows access only to app user """
 
     def has_permission(self, request, view):
-        return super(IsTerminalUser, self).has_permission(request, view) \
-               and isinstance(request.user, Terminal)
+        return super(IsAppUser, self).has_permission(request, view) \
+               and request.user.is_app()
 
 
 class IsSuperUser(IsValidUser, permissions.BasePermission):
@@ -39,12 +39,12 @@ class IsSuperUser(IsValidUser, permissions.BasePermission):
                and request.user.is_superuser
 
 
-class IsSuperUserOrTerminalUser(IsValidUser, permissions.BasePermission):
+class IsSuperUserOrAppUser(IsValidUser, permissions.BasePermission):
     """Allows access between superuser and app user"""
 
     def has_permission(self, request, view):
-        return super(IsSuperUserOrTerminalUser, self).has_permission(request, view) \
-               and (request.user.is_superuser or request.user.is_terminal)
+        return super(IsSuperUserOrAppUser, self).has_permission(request, view) \
+               and (request.user.is_superuser or request.user.is_app)
 
 
 if __name__ == '__main__':

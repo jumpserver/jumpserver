@@ -12,5 +12,5 @@
 
 
 from users.utils import AdminUserRequiredMixin
-from users.permissions import IsSuperUserOrTerminalUser, IsSuperUser
+from users.permissions import IsSuperUserOrAppUser, IsSuperUser
 from users.models import User, UserGroup

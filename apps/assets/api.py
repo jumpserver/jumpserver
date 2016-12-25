@@ -8,7 +8,7 @@ from django.shortcuts import get_object_or_404
 
 from common.mixins import IDInFilterMixin
 from common.utils import get_object_or_none, signer
-from .hands import IsSuperUserOrTerminalUser, IsSuperUser
+from .hands import IsSuperUserOrAppUser, IsSuperUser
 from .models import AssetGroup, Asset, IDC, SystemUser, AdminUser
 from . import serializers
 
@@ -18,6 +18,7 @@ class AssetViewSet(IDInFilterMixin, viewsets.ModelViewSet):
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
     filter_fields = ('id', 'ip', 'hostname')
+    permission_classes = (IsSuperUserOrAppUser,)
 
     def get_queryset(self):
         queryset = super(AssetViewSet, self).get_queryset()
@@ -90,7 +91,7 @@ class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
 
 
 class SystemUserAuthApi(APIView):
-    permission_classes = (IsSuperUserOrTerminalUser,)
+    permission_classes = (IsSuperUserOrAppUser,)
 
     def get(self, request, *args, **kwargs):
         system_user_id = request.query_params.get('system_user_id', -1)

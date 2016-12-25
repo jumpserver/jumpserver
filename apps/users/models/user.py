@@ -101,8 +101,8 @@ class User(AbstractUser):
             return False
 
     @property
-    def is_terminal(self):
-        return False
+    def is_app(self):
+        return self.role == 'App'
 
     @is_superuser.setter
     def is_superuser(self, value):

@@ -11,7 +11,7 @@ from rest_framework.permissions import AllowAny
 from common.utils import signer, get_object_or_none
 from .models import Terminal, TerminalHeatbeat
 from .serializers import TerminalSerializer, TerminalHeatbeatSerializer
-from .hands import IsSuperUserOrTerminalUser, User
+from .hands import IsSuperUserOrAppUser, User
 
 
 class TerminalRegister(ListCreateAPIView):
@@ -62,13 +62,13 @@ class TerminalViewSet(viewsets.ModelViewSet):
 class TerminalHeatbeatApi(ListCreateAPIView):
     queryset = TerminalHeatbeat.objects.all()
     serializer_class = TerminalHeatbeatSerializer
-    permission_classes = (IsSuperUserOrTerminalUser,)
+    permission_classes = (IsSuperUserOrAppUser,)
 
 
 class TerminalHeatbeatViewSet(viewsets.ModelViewSet):
     queryset = TerminalHeatbeat.objects.all()
     serializer_class = TerminalHeatbeatSerializer
-    permission_classes = (IsSuperUserOrTerminalUser,)
+    permission_classes = (IsSuperUserOrAppUser,)
 
     def create(self, request, *args, **kwargs):
         terminal = request.user
