@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     'ops.apps.OpsConfig',
     'audits.apps.AuditsConfig',
     'common.apps.CommonConfig',
-    'terminal.apps.TerminalConfig',
+    'applications.apps.ApplicationsConfig',
     'rest_framework',
     'bootstrapform',
     'captcha',
@@ -103,7 +103,7 @@ TEMPLATES = [
     },
 ]
 
-# WSGI_APPLICATION = 'jumpserver.wsgi.application'
+# WSGI_APPLICATION = 'jumpserver.wsgi.applications'
 
 LOGIN_REDIRECT_URL = reverse_lazy('index')
 LOGIN_URL = reverse_lazy('users:login')
@@ -277,7 +277,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'users.authentication.AccessKeyAuthentication',
         'users.authentication.AccessTokenAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
+        'users.authentication.PrivateTokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
@@ -298,9 +298,9 @@ CELERY_RESULT_BACKEND = BROKER_URL
 
 # crontab job
 # CELERYBEAT_SCHEDULE = {
-#     Check terminal is alive every 10m
+#     Check applications is alive every 10m
     # 'check_terminal_alive': {
-    #     'task': 'terminal.tasks.check_terminal_alive',
+    #     'task': 'applications.tasks.check_terminal_alive',
     #     'schedule': timedelta(seconds=TERMINAL_HEATBEAT_INTERVAL),
     #     'args': (),
     # },

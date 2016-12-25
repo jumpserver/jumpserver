@@ -10,7 +10,7 @@
     :license: GPL v2, see LICENSE for more details.
 """
 
-from terminal.models import Terminal
+from applications.models import Terminal
 from audits.tasks import write_login_log_async
 from users.models import User
 # from perms.models import AssetPermission

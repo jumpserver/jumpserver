@@ -65,16 +65,23 @@ $(document).ready(function(){
             }},
             {targets: 7, createdCell: function (td, cellData, rowData) {
                 console.log(rowData.name);
-                var update_btn = '<a href="{% url "terminal:terminal-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'
+                var update_btn = '<a href="{% url "applications:terminal-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'
                         .replace('99991937', cellData);
                 var delete_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_delete" data-uid="99991937" data-name="99991938">{% trans "Delete" %}</a>'
                         .replace('99991937', cellData)
                         .replace('99991938', rowData.name);
-                $(td).html(update_btn + delete_btn)
+                var accept_btn = '<a href="" class="btn btn-xs btn-primary">{% trans "Accept" %}</a> '
+                        .replace('99991937', cellData);
+                var reject_btn = '<a href="" class="btn btn-xs btn-danger">{% trans "Reject" %}</a>'
+                if (rowData.is_accepted) {
+                    $(td).html(update_btn + delete_btn)
+                } else {
+                    $(td).html(accept_btn + reject_btn)
+                }
              }}
         ],
-        ajax_url: '{% url "api-terminal:terminal-list" %}',
-        columns: [{data: function(){return ""}}, {data: "name" }, {data: "ip" }, {data: "get_type_display" },
+        ajax_url: '{% url "api-applications:terminal-list" %}',
+        columns: [{data: function(){return ""}}, {data: "name" }, {data: "remote_addr" }, {data: "get_type_display" },
                   {data: "proxy_online"}, {data: "is_active" }, {data: 'is_active'}, {data: "id"}],
         op_html: $('#actions').html()
     };
@@ -83,7 +90,7 @@ $(document).ready(function(){
     var $this = $(this);
     var uid = $this.data('uid');
     var name = $(this).data('name');
-    var the_url = '{% url "api-terminal:terminal-detail" pk=99991937 %}'.replace('99991937', uid);
+    var the_url = '{% url "api-applications:terminal-detail" pk=99991937 %}'.replace('99991937', uid);
     objectDelete($this, name, the_url)
 })
 </script>

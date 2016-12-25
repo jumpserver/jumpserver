@@ -9,14 +9,13 @@ from django.core.cache import cache
 from django.conf import settings
 from django.utils.translation import ugettext as _
 from rest_framework import authentication, exceptions, permissions
-from rest_framework.compat import is_authenticated
 from django.utils.six import text_type
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import HTTP_HEADER_ENCODING
 
 from common.utils import get_object_or_none, make_signature, http_to_unixtime
-from .utils import get_or_refresh_token
-from .models import User, AccessKey
+from .utils import refresh_token
+from .models import User, AccessKey, PrivateToken
 
 
 def get_request_date_header(request):
@@ -93,7 +92,6 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
 
     def authenticate(self, request):
         auth = authentication.get_authorization_header(request).split()
-
         if not auth or auth[0].lower() != self.keyword.lower().encode():
             return None
 
@@ -109,14 +107,18 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
         except UnicodeError:
             msg = _('Invalid token header. Sign string should not contain invalid characters.')
             raise exceptions.AuthenticationFailed(msg)
-        return self.authenticate_credentials(token, request)
+        return self.authenticate_credentials(token)
 
-    def authenticate_credentials(self, token, request):
+    def authenticate_credentials(self, token):
         user_id = cache.get(token)
-        print('Auth id: %s' % user_id)
         user = get_object_or_none(User, id=user_id)
 
         if not user:
-            return None
-        get_or_refresh_token(request, user)
+            msg = _('Invalid token or cache refreshed.')
+            raise exceptions.AuthenticationFailed(msg)
+        refresh_token(token, user)
         return user, None
+
+
+class PrivateTokenAuthentication(authentication.TokenAuthentication):
+    model = PrivateToken

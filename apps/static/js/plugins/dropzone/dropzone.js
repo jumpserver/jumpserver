@@ -1370,7 +1370,7 @@
                                 return;
                             }
                             response = xhr.responseText;
-                            if (xhr.getResponseHeader("content-type") && ~xhr.getResponseHeader("content-type").indexOf("application/json")) {
+                            if (xhr.getResponseHeader("content-type") && ~xhr.getResponseHeader("content-type").indexOf("applications/json")) {
                                 try {
                                     response = JSON.parse(response);
                                 } catch (_error) {
@@ -1397,7 +1397,7 @@
                     progressObj = (_ref = xhr.upload) != null ? _ref : xhr;
                     progressObj.onprogress = updateProgress;
                     headers = {
-                        "Accept": "application/json",
+                        "Accept": "applications/json",
                         "Cache-Control": "no-cache",
                         "X-Requested-With": "XMLHttpRequest"
                     };

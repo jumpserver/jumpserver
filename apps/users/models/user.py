@@ -12,7 +12,6 @@ from django.db import models, IntegrityError
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
-from rest_framework.authtoken.models import Token
 
 from common.utils import signer, date_expired_default
 from . import UserGroup
@@ -100,16 +99,16 @@ class User(AbstractUser):
         else:
             return False
 
-    @property
-    def is_app(self):
-        return self.role == 'App'
-
     @is_superuser.setter
     def is_superuser(self, value):
         if value is True:
             self.role = 'Admin'
         else:
             self.role = 'User'
+
+    @property
+    def is_app(self):
+        return self.role == 'App'
 
     @property
     def is_staff(self):
@@ -134,18 +133,20 @@ class User(AbstractUser):
 
     @property
     def private_token(self):
-        return self.get_private_token()
+        return self.create_private_token()
 
-    def get_private_token(self):
+    def create_private_token(self):
+        from .authentication import PrivateToken
         try:
-            token = Token.objects.get(user=self)
-        except Token.DoesNotExist:
-            token = Token.objects.create(user=self)
+            token = PrivateToken.objects.get(user=self)
+        except PrivateToken.DoesNotExist:
+            token = PrivateToken.objects.create(user=self)
         return token.key
 
     def refresh_private_token(self):
-        Token.objects.filter(user=self).delete()
-        return Token.objects.create(user=self)
+        from .authentication import PrivateToken
+        PrivateToken.objects.filter(user=self).delete()
+        return PrivateToken.objects.create(user=self)
 
     def is_member_of(self, user_group):
         if user_group in self.groups.all():

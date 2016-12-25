@@ -738,7 +738,7 @@ class AssetExportView(View):
             ws.append([self.get_asset_attr(asset, attr) for attr in header])
 
         filename = 'assets-{}.xlsx'.format(timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S'))
-        response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
+        response = HttpResponse(save_virtual_workbook(wb), content_type='applications/vnd.ms-excel')
         response['Content-Disposition'] = 'attachment; filename="%s"' % filename
         return response
 

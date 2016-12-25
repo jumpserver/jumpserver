@@ -13,7 +13,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
-from .utils import check_user_valid, get_or_refresh_token
+from .utils import check_user_valid, generate_token
 from .models import User, UserGroup
 from .hands import write_login_log_async
 from .permissions import IsSuperUser, IsAppUser, IsValidUser, IsSuperUserOrAppUser
@@ -91,7 +91,7 @@ class UserToken(APIView):
     def get(self, request):
         if not request.user:
             return Response({'error': 'unauthorized'})
-        token = get_token(request)
+        token = generate_token(request)
         return Response({'token': token})
 
 
@@ -111,14 +111,14 @@ class UserAuthApi(APIView):
         password = request.data.get('password', '')
         public_key = request.data.get('public_key', '')
         remote_addr = request.data.get('remote_addr', '')
-        terminal = request.data.get('terminal', '')
+        terminal = request.data.get('applications', '')
         login_type = request.data.get('login_type', 'T')
         user = check_user_valid(username=username, password=password, public_key=public_key)
 
         if user:
             token = cache.get('%s_%s' % (user.id, remote_addr))
             if not token:
-                token = token_gen(user)
+                token = generate_token(request)
 
             cache.set(token, user.id, self.expiration)
             cache.set('%s_%s' % (user.id, remote_addr), token, self.expiration)

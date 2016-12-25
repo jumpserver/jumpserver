@@ -6,7 +6,7 @@ from django.conf.urls import url
 
 from .. import views
 
-app_name = 'terminal'
+app_name = 'applications'
 
 urlpatterns = [
     url(r'^terminal$', views.TerminalListView.as_view(), name='terminal-list'),

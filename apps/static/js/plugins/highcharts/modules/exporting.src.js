@@ -128,7 +128,7 @@ defaultOptions.exporting = {
 				textKey: 'downloadPDF',
 				onclick: function () {
 					this.exportChart({
-						type: 'application/pdf'
+						type: 'applications/pdf'
 					});
 				}
 			}, {

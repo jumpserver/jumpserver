@@ -29,14 +29,15 @@ urlpatterns = [
     url(r'^assets/', include('assets.urls.views_urls', namespace='assets')),
     url(r'^perms/', include('perms.urls.views_urls', namespace='perms')),
     url(r'^audits/', include('audits.urls.views_urls', namespace='audits')),
-    url(r'^terminal/', include('terminal.urls.views_urls', namespace='terminal')),
-    url('^ops/', include('ops.urls.view_urls', namespace='ops')),
+    url(r'^applications/', include('applications.urls.views_urls', namespace='applications')),
+    url(r'^ops/', include('ops.urls.view_urls', namespace='ops')),
 
+    # Api url view map
     url(r'^api/users/', include('users.urls.api_urls', namespace='api-users')),
     url(r'^api/assets/', include('assets.urls.api_urls', namespace='api-assets')),
     url(r'^api/perms/', include('perms.urls.api_urls', namespace='api-perms')),
     url(r'^api/audits/', include('audits.urls.api_urls', namespace='api-audits')),
-    url(r'^api/terminal/', include('terminal.urls.api_urls', namespace='api-terminal')),
+    url(r'^api/applications/', include('applications.urls.api_urls', namespace='api-applications')),
     url(r'^api/ops/', include('ops.urls.api_urls', namespace='api-ops')),
 
 ]

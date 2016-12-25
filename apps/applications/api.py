@@ -33,7 +33,7 @@ class TerminalRegisterView(ListCreateAPIView):
             terminal = serializer.save()
             app_user, access_key = terminal.create_related_app_user()
             data = {}
-            data['terminal'] = copy.deepcopy(serializer.data)
+            data['applications'] = copy.deepcopy(serializer.data)
             data['user'] = app_user.to_json()
             data['access_key_id'] = access_key.id
             data['access_key_secret'] = access_key.secret

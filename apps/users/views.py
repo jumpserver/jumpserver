@@ -577,7 +577,7 @@ class UserExportView(View):
                         user.role, user.phone, user.wechat, user.comment])
 
         filename = 'users-{}.xlsx'.format(timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S'))
-        response = HttpResponse(save_virtual_workbook(wb), content_type='application/vnd.ms-excel')
+        response = HttpResponse(save_virtual_workbook(wb), content_type='applications/vnd.ms-excel')
         response['Content-Disposition'] = 'attachment; filename="%s"' % filename
         return response
 

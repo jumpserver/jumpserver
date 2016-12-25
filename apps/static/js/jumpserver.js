@@ -195,7 +195,7 @@ function APIUpdateAttr(props) {
     url: props.url,
     type: props.method || "PATCH",
     data: props.body,
-    contentType: props.content_type || "application/json; charset=utf-8",
+    contentType: props.content_type || "applications/json; charset=utf-8",
     dataType: props.data_type || "json"
   }).done(function(data, textStatue, jqXHR) {
     toastr.success(success_message);

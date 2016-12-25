@@ -18,7 +18,7 @@ class ProxyLogViewSet(viewsets.ModelViewSet):
         "name": "",
         "hostname": "",
         "ip": "",
-        "terminal", "",
+        "applications", "",
         "login_type": "",
         "system_user": "",
         "was_failed": "",

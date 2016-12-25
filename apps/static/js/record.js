@@ -16,7 +16,7 @@ NgApp.config(['$httpProvider', function ($httpProvider) {
     $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
     $httpProvider.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     $httpProvider.defaults.headers.post = {
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type': 'applications/x-www-form-urlencoded'
     }
 }]);
 NgApp.controller('TerminalRecordCtrl', function ($scope, $http) {
@@ -121,7 +121,7 @@ NgApp.controller('TerminalRecordCtrl', function ($scope, $http) {
         timelist = timelist.sort(function(a, b){return a-b});
         totalTime = totalTime * 1000;
         document.getElementById("afterScrubberText").innerHTML = buildTimeString(totalTime);
-        term.open(document.getElementById('terminal'));
+        term.open(document.getElementById('apps'));
         timer = setInterval(advance, TICK);
     })
 

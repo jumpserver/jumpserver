@@ -5,4 +5,4 @@ from users.utils import AdminUserRequiredMixin
 from users.models import User
 from assets.models import Asset, SystemUser
 from users.permissions import IsSuperUserOrAppUser
-from terminal.models import Terminal
+from applications.models import Terminal

@@ -8,10 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
 from . import User
 
-__all__ = ['AccessKey']
-
-def get_uuid_string():
-    return uuid.uuid4().__str__()
+__all__ = ['AccessKey', 'PrivateToken']
 
 
 class AccessKey(models.Model):

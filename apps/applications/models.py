@@ -16,6 +16,7 @@ class Terminal(models.Model):
     type = models.CharField(choices=TYPE_CHOICES, max_length=2, blank=True, verbose_name=_('Terminal type'))
     user = models.OneToOneField(User, verbose_name='Application user', null=True)
     url = models.CharField(max_length=100, blank=True, verbose_name=_('URL to login'))
+    is_accepted = models.BooleanField(default=False, verbose_name='Is Accepted')
     date_created = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
@@ -29,19 +30,6 @@ class Terminal(models.Model):
     def is_active(self, active):
         if self.user:
             self.user.is_active = active
-            self.user.save()
-
-    @property
-    def is_accepted(self):
-        if self.user:
-            return True
-        else:
-            return False
-
-    @is_accepted.setter
-    def is_accepted(self, active):
-        if active is True and self.user:
-            self.user.is_active = True
             self.user.save()
 
     def create_related_app_user(self):
@@ -65,7 +53,7 @@ class Terminal(models.Model):
     __str__ = __unicode__
 
     class Meta:
-        db_table = 'terminal'
+        db_table = 'applications'
 
 
 class TerminalHeatbeat(models.Model):

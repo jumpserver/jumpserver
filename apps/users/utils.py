@@ -197,13 +197,21 @@ def check_user_valid(**kwargs):
     return None
 
 
-def get_or_refresh_token(request, user):
+def refresh_token(token, user):
+    expiration = settings.CONFIG.TOKEN_EXPIRATION or 3600
+    cache.set(token, user.id, expiration)
+
+
+def generate_token(request):
     expiration = settings.CONFIG.TOKEN_EXPIRATION or 3600
     remote_addr = request.META.get('REMOTE_ADDR', '')
     remote_addr = base64.b16encode(remote_addr).replace('=', '')
-    token = cache.get('%s_%s' % (user.id, remote_addr))
+    token = cache.get('%s_%s' % (request.user.id, remote_addr))
     if not token:
         token = uuid.uuid4().get_hex()
+        print('Set cache: %s' % token)
         cache.set(token, request.user.id, expiration)
         cache.set('%s_%s' % (request.user.id, remote_addr), token, expiration)
-    return uuid.uuid4().get_hex()
+    return token
+
+
