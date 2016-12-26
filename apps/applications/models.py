@@ -13,7 +13,7 @@ class Terminal(models.Model):
     )
     name = models.CharField(max_length=30, unique=True, verbose_name=_('Name'))
     remote_addr = models.GenericIPAddressField(verbose_name=_('Remote address'), blank=True, null=True)
-    type = models.CharField(choices=TYPE_CHOICES, max_length=2, blank=True, verbose_name=_('Terminal type'))
+    type = models.CharField(choices=TYPE_CHOICES, max_length=3, blank=True, verbose_name=_('Terminal type'))
     user = models.OneToOneField(User, verbose_name='Application user', null=True)
     url = models.CharField(max_length=100, blank=True, verbose_name=_('URL to login'))
     is_accepted = models.BooleanField(default=False, verbose_name='Is Accepted')
@@ -53,7 +53,7 @@ class Terminal(models.Model):
     __str__ = __unicode__
 
     class Meta:
-        db_table = 'applications'
+        ordering = ('is_accepted',)
 
 
 class TerminalHeatbeat(models.Model):

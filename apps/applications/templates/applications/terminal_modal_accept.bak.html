@@ -1,0 +1,26 @@
+{% extends '_modal.html' %}
+{% load static %}
+{% load bootstrap %}
+{% load i18n %}
+
+{% block modal_body %}
+ <form action="" method="post" class="form-horizontal">
+    {% csrf_token %}
+    {{ form.name|bootstrap_horizontal }}
+    {{ form.remote_addr|bootstrap_horizontal }}
+    {{ form.type|bootstrap_horizontal }}
+    {{ form.url|bootstrap_horizontal }}
+    {{ form.comment|bootstrap_horizontal }}
+
+    <div class="hr-line-dashed"></div>
+    <div class="form-group">
+        <div class="col-sm-4 col-sm-offset-2">
+            <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
+            <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+        </div>
+    </div>
+    </form>
+{% endblock %}
+
+{% block custom_foot_js %}
+{% endblock %}

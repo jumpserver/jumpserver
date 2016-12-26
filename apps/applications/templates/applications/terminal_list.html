@@ -2,15 +2,17 @@
 {% load i18n static %}
 {% block custom_head_css_js %}
 {{ block.super }}
+
 <style>
     div.dataTables_wrapper div.dataTables_filter,
     .dataTables_length {
         float: right !important;
     }
-
     div.dataTables_wrapper div.dataTables_filter {
         margin-left: 15px;
     }
+
+    #modal .modal-body { max-height: 200px; }
 </style>
 {% endblock %}
 {% block table_search %}{% endblock %}
@@ -36,6 +38,8 @@
     <tbody>
     </tbody>
 </table>
+{% include 'applications/terminal_modal_accept.html' %}
+
 {% endblock %}
 {% block custom_foot_js %}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
@@ -70,7 +74,7 @@ $(document).ready(function(){
                 var delete_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_delete" data-uid="99991937" data-name="99991938">{% trans "Delete" %}</a>'
                         .replace('99991937', cellData)
                         .replace('99991938', rowData.name);
-                var accept_btn = '<a href="" class="btn btn-xs btn-primary">{% trans "Accept" %}</a> '
+                var accept_btn = '<a class="btn btn-xs btn-primary btn-accept" data-id="99991937">{% trans "Accept" %}</a> '
                         .replace('99991937', cellData);
                 var reject_btn = '<a href="" class="btn btn-xs btn-danger">{% trans "Reject" %}</a>'
                 if (rowData.is_accepted) {
@@ -86,12 +90,47 @@ $(document).ready(function(){
         op_html: $('#actions').html()
     };
     jumpserver.initDataTable(options);
+
 }).on('click', '.btn_delete', function(){
     var $this = $(this);
     var uid = $this.data('uid');
     var name = $(this).data('name');
     var the_url = '{% url "api-applications:terminal-detail" pk=99991937 %}'.replace('99991937', uid);
     objectDelete($this, name, the_url)
+
+}).on('click', '.btn-accept', function () {
+    var $this = $(this);
+    var terminal_id = $this.data('id');
+    var the_url = "{% url 'api-applications:terminal-detail' pk=99991937 %}".replace('99991937', terminal_id);
+    var post_url = $('#form_terminal_accept').attr('action').replace('99991937', terminal_id);
+    console.log(post_url);
+    $.ajax({
+        url: the_url,
+        method: 'GET',
+        success: function (data) {
+            $('#id_name').val(data.name);
+            $('#id_remote_addr').val(data.remote_addr);
+            $('#id_type').val(data.type);
+            $('#id_url').val(data.url);
+            $('#id_comment').val(data.comment);
+            $('#form_terminal_accept').attr('action', post_url)
+        }
+    });
+    $('#modal_terminal_accept').modal({
+        show: true
+    });
+}).on('click', '#btn_terminal_accept', function () {
+    var $form = $('#form_terminal_accept');
+    function success (data, textStatus, jqXHR) {
+        if (data.success === false) {
+            console.log(data.msg);
+            window.location.reload()
+
+        } else {
+            console.log(data.msg);
+        }
+    }
+    $form.ajaxSubmit({success: success});
 })
 </script>
 {% endblock %}
