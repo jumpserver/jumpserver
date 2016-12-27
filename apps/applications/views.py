@@ -51,6 +51,7 @@ class TerminalModelAccept(AdminUserRequiredMixin, JSONResponseMixin, UpdateView)
     def form_valid(self, form):
         terminal = form.save()
         terminal.is_accepted = True
+        terminal.is_active = True
         terminal.save()
         data = {
             'success': True,

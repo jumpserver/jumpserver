@@ -12,7 +12,7 @@ from rest_framework.decorators import api_view
 
 from .models import Terminal, TerminalHeatbeat
 from .serializers import TerminalSerializer, TerminalHeatbeatSerializer
-from .hands import IsSuperUserOrAppUser, User
+from .hands import IsSuperUserOrAppUser, IsAppUser, User
 from common.utils import get_object_or_none
 
 
@@ -39,7 +39,8 @@ class TerminalRegisterView(ListCreateAPIView):
             data['access_key_secret'] = access_key.secret
             return Response(data, status=201)
         else:
-            return Response(serializer.errors, status=400)
+            data = {'msg': 'Not valid', 'detail': ';'.join(serializer.errors)}
+            return Response(data, status=400)
 
     def list(self, request, *args, **kwargs):
         return Response('', status=404)
@@ -57,10 +58,16 @@ class TerminalViewSet(viewsets.ModelViewSet):
 class TerminalHeatbeatViewSet(viewsets.ModelViewSet):
     queryset = TerminalHeatbeat.objects.all()
     serializer_class = TerminalHeatbeatSerializer
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsAppUser,)
 
     def create(self, request, *args, **kwargs):
-        terminal = request.user
+        terminal = request.user.terminal
         TerminalHeatbeat.objects.create(terminal=terminal)
-        return Response({'msg': 'Success'})
+        return Response({'msg': 'Success'}, status=201)
 
+
+class TestHeatbeat(APIView):
+    permission_classes = (IsAppUser,)
+
+    def post(self, request):
+        return Response({'hello': 'world'})

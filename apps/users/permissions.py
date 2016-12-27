@@ -28,7 +28,7 @@ class IsAppUser(IsValidUser, permissions.BasePermission):
 
     def has_permission(self, request, view):
         return super(IsAppUser, self).has_permission(request, view) \
-               and request.user.is_app()
+               and request.user.is_app
 
 
 class IsSuperUser(IsValidUser, permissions.BasePermission):
