@@ -122,3 +122,8 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
 
 class PrivateTokenAuthentication(authentication.TokenAuthentication):
     model = PrivateToken
+
+
+class SessionAuthentication(authentication.SessionAuthentication):
+    def enforce_csrf(self, request):
+        return None

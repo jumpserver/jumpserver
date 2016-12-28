@@ -45,8 +45,6 @@ class User(AbstractUser):
                                         verbose_name=_('Date expired'))
     created_by = models.CharField(max_length=30, default='', verbose_name=_('Created by'))
 
-
-
     @property
     def password_raw(self):
         raise AttributeError('Password raw is not a readable attribute')

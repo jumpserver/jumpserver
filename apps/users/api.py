@@ -8,6 +8,9 @@ from django.conf import settings
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
+from rest_framework.permissions import AllowAny
+from rest_framework.authentication import SessionAuthentication
 from rest_framework_bulk import BulkModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 
@@ -86,13 +89,21 @@ class UserGroupUpdateUserApi(generics.RetrieveUpdateAPIView):
 
 
 class UserToken(APIView):
-    permission_classes = (IsValidUser,)
+    permission_classes = (AllowAny,)
 
-    def get(self, request):
-        if not request.user:
-            return Response({'error': 'unauthorized'})
-        token = generate_token(request)
-        return Response({'token': token})
+    def post(self, request):
+        username = request.data.get('username', '')
+        email = request.data.get('email', '')
+        password = request.data.get('password', '')
+        public_key = request.data.get('public_key', '')
+
+        user, msg = check_user_valid(username=username, email=email,
+                                     password=password, public_key=public_key)
+        if user:
+            token = generate_token(request)
+            return Response({'Token': token, 'key': 'Bearer'}, status=200)
+        else:
+            return Response({'error': msg}, status=406)
 
 
 class UserProfile(APIView):

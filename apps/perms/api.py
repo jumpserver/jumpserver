@@ -2,6 +2,7 @@
 # 
 
 from rest_framework.views import APIView, Response
+from rest_framework.decorators import api_view
 from rest_framework.generics import ListAPIView, get_object_or_404
 from rest_framework import viewsets
 from users.permissions import IsValidUser, IsSuperUser
@@ -127,7 +128,7 @@ class MyGrantedAssetsGroupsApi(APIView):
             for asset in assets:
                 for asset_group in asset.groups.all():
                     if asset_group.id in asset_groups:
-                        asset_groups[asset_group.id]['asset_amount'] += 1
+                        asset_groups[asset_group.id]['assets_amount'] += 1
                     else:
                         asset_groups[asset_group.id] = {
                             'id': asset_group.id,

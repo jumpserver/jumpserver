@@ -180,21 +180,33 @@ def send_reset_ssh_key_mail(user):
 def check_user_valid(**kwargs):
     password = kwargs.pop('password', None)
     public_key = kwargs.pop('public_key', None)
-    user = get_object_or_none(User, **kwargs)
+    email = kwargs.pop('email')
+    username = kwargs.pop('username')
 
-    if user is None or not user.is_valid:
-        return None
+    if username:
+        user = get_object_or_none(User, username=username)
+    elif email:
+        user = get_object_or_none(User, email=email)
+    else:
+        user = None
+
+    if user is None:
+        return None, _('User not exist')
+    elif not user.is_valid:
+        return None, _('Disabled or expired')
+
     if password and user.check_password(password):
-        return user
+        return user, ''
+
     if public_key:
         public_key_saved = user.public_key.split()
         if len(public_key_saved) == 1:
             if public_key == public_key_saved[0]:
-                return user
+                return user, ''
         elif len(public_key_saved) > 1:
             if public_key == public_key_saved[1]:
-                return user
-    return None
+                return user, ''
+    return None, _('Passowrd or SSH public key invalid')
 
 
 def refresh_token(token, user):
