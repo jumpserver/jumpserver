@@ -180,8 +180,8 @@ def send_reset_ssh_key_mail(user):
 def check_user_valid(**kwargs):
     password = kwargs.pop('password', None)
     public_key = kwargs.pop('public_key', None)
-    email = kwargs.pop('email')
-    username = kwargs.pop('username')
+    email = kwargs.pop('email', None)
+    username = kwargs.pop('username', None)
 
     if username:
         user = get_object_or_none(User, username=username)
@@ -206,24 +206,23 @@ def check_user_valid(**kwargs):
         elif len(public_key_saved) > 1:
             if public_key == public_key_saved[1]:
                 return user, ''
-    return None, _('Passowrd or SSH public key invalid')
+    return None, _('Password or SSH public key invalid')
 
 
-def refresh_token(token, user):
-    expiration = settings.CONFIG.TOKEN_EXPIRATION or 3600
+def refresh_token(token, user, expiration=3600):
     cache.set(token, user.id, expiration)
 
 
-def generate_token(request):
+def generate_token(request, user):
     expiration = settings.CONFIG.TOKEN_EXPIRATION or 3600
     remote_addr = request.META.get('REMOTE_ADDR', '')
     remote_addr = base64.b16encode(remote_addr).replace('=', '')
-    token = cache.get('%s_%s' % (request.user.id, remote_addr))
+    token = cache.get('%s_%s' % (user.id, remote_addr))
     if not token:
         token = uuid.uuid4().get_hex()
         print('Set cache: %s' % token)
-        cache.set(token, request.user.id, expiration)
-        cache.set('%s_%s' % (request.user.id, remote_addr), token, expiration)
+        cache.set(token, user.id, expiration)
+        cache.set('%s_%s' % (user.id, remote_addr), token, expiration)
     return token
 
 

@@ -43,7 +43,6 @@ class AccessKeyAuthentication(authentication.BaseAuthentication):
             msg = _('Invalid signature header. Signature string should not contain spaces.')
             raise exceptions.AuthenticationFailed(msg)
 
-
         try:
             sign = auth[1].decode().split(':')
             if len(sign) != 2:
@@ -58,7 +57,8 @@ class AccessKeyAuthentication(authentication.BaseAuthentication):
 
         return self.authenticate_credentials(request, access_key_id, request_signature)
 
-    def authenticate_credentials(self, request, access_key_id, request_signature):
+    @staticmethod
+    def authenticate_credentials(request, access_key_id, request_signature):
         access_key = get_object_or_none(AccessKey, id=access_key_id)
         request_date = get_request_date_header(request)
         if access_key is None or not access_key.user:
@@ -109,7 +109,8 @@ class AccessTokenAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed(msg)
         return self.authenticate_credentials(token)
 
-    def authenticate_credentials(self, token):
+    @staticmethod
+    def authenticate_credentials(token):
         user_id = cache.get(token)
         user = get_object_or_none(User, id=user_id)
 

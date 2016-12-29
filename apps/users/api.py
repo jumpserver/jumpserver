@@ -100,7 +100,7 @@ class UserToken(APIView):
         user, msg = check_user_valid(username=username, email=email,
                                      password=password, public_key=public_key)
         if user:
-            token = generate_token(request)
+            token = generate_token(request, user)
             return Response({'Token': token, 'key': 'Bearer'}, status=200)
         else:
             return Response({'error': msg}, status=406)
@@ -114,28 +114,22 @@ class UserProfile(APIView):
 
 
 class UserAuthApi(APIView):
-    permission_classes = ()
-    expiration = settings.CONFIG.TOKEN_EXPIRATION or 3600
+    permission_classes = (AllowAny,)
 
     def post(self, request, *args, **kwargs):
         username = request.data.get('username', '')
         password = request.data.get('password', '')
         public_key = request.data.get('public_key', '')
-        remote_addr = request.data.get('remote_addr', '')
-        terminal = request.data.get('applications', '')
-        login_type = request.data.get('login_type', 'T')
-        user = check_user_valid(username=username, password=password, public_key=public_key)
+        login_type = request.data.get('login_type', '')
+        login_ip = request.META.get('REMOTE_ADDR', '')
+        user_agent = request.data.get('HTTP_USER_AGENT', '')
+
+        user, msg = check_user_valid(username=username, password=password, public_key=public_key)
 
         if user:
-            token = cache.get('%s_%s' % (user.id, remote_addr))
-            if not token:
-                token = generate_token(request)
-
-            cache.set(token, user.id, self.expiration)
-            cache.set('%s_%s' % (user.id, remote_addr), token, self.expiration)
-            write_login_log_async.delay(user.username, name=user.name, terminal=terminal,
-                                        login_ip=remote_addr, login_type=login_type)
-            return Response({'token': token, 'id': user.id, 'username': user.username,
-                             'name': user.name, 'is_active': user.is_active})
+            token = generate_token(request, user)
+            write_login_log_async.delay(user.username, name=user.name, user_agent=user_agent,
+                                        login_ip=login_ip, login_type=login_type)
+            return Response({'token': token, 'user': user.to_json()})
         else:
-            return Response({'msg': 'Invalid password or public key or user is not active or expired'}, status=401)
+            return Response({'msg': msg}, status=401)

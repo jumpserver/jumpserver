@@ -18,7 +18,6 @@ class LoginLog(models.Model):
     username = models.CharField(max_length=20, verbose_name=_('Username'))
     name = models.CharField(max_length=20, blank=True, verbose_name=_('Name'))
     login_type = models.CharField(choices=LOGIN_TYPE_CHOICE, max_length=2, verbose_name=_('Login type'))
-    terminal = models.CharField(max_length=32, verbose_name=_('Terminal'))
     login_ip = models.GenericIPAddressField(verbose_name=_('Login ip'))
     login_city = models.CharField(max_length=100, blank=True, null=True, verbose_name=_('Login city'))
     user_agent = models.CharField(max_length=100, blank=True, null=True, verbose_name=_('User agent'))

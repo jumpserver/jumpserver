@@ -95,13 +95,18 @@ class SystemUser(models.Model):
     PROTOCOL_CHOICES = (
         ('ssh', 'ssh'),
     )
+    AUTH_METHOD_CHOICES = (
+        ('P', 'Password'),
+        ('K', 'Public key'),
+    )
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     username = models.CharField(max_length=16, verbose_name=_('Username'))
     _password = models.CharField(max_length=256, blank=True, verbose_name=_('Password'))
     protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
     _private_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH private key'))
     _public_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
-    as_default = models.BooleanField(default=False, verbose_name=_('As default'))
+    auth_method = models.CharField(choices=AUTH_METHOD_CHOICES, default='K',
+                                   max_length=1, verbose_name=_('Auth method'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
     auto_update = models.BooleanField(default=True, verbose_name=_('Auto update pass/key'))
     sudo = models.TextField(max_length=4096, default='/user/bin/whoami', verbose_name=_('Sudo'))

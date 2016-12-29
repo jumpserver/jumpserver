@@ -263,7 +263,7 @@ class SystemUserForm(forms.ModelForm):
     class Meta:
         model = SystemUser
         fields = [
-            'name', 'username', 'protocol', 'auto_generate_key', 'password', 'private_key_file', 'as_default',
+            'name', 'username', 'protocol', 'auto_generate_key', 'password', 'private_key_file', 'auth_method',
             'auto_push', 'auto_update', 'sudo', 'comment', 'shell', 'home', 'uid',
         ]
         widgets = {
@@ -273,8 +273,8 @@ class SystemUserForm(forms.ModelForm):
         help_texts = {
             'name': '* required',
             'username': '* required',
-            'auth_push': 'Auto push system user to asset',
-            'auth_update': 'Auto update system user ssh key',
+            'auto_push': 'Auto push system user to asset',
+            'auto_update': 'Auto update system user ssh key',
         }
 
 

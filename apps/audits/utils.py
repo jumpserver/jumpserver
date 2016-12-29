@@ -17,25 +17,28 @@ def validate_ip(ip):
     return False
 
 
-def write_login_log(username, name='', login_type='W',
-                    terminal='', login_ip='', user_agent=''):
+def write_login_log(username, name='', login_type='',
+                    login_ip='', user_agent=''):
     if not (login_ip and validate_ip(login_ip)):
         login_ip = '0.0.0.0'
     if not name:
         name = username
     login_city = get_ip_city(login_ip)
-    LoginLog.objects.create(username=username, name=name, login_type=login_type, login_ip=login_ip,
-                            terminal=terminal, login_city=login_city, user_agent=user_agent)
+    LoginLog.objects.create(username=username, name=name, login_type=login_type,
+                            login_ip=login_ip, login_city=login_city, user_agent=user_agent)
 
 
 def get_ip_city(ip, timeout=10):
     # Taobao ip api: http://ip.taobao.com//service/getIpInfo.php?ip=8.8.8.8
-    # Sina ip api: http://int.dpool.sina.com.cn/iplookup/iplookup.php?ip=8.8.8.8&format=js
+    # Sina ip api: http://int.dpool.sina.com.cn/iplookup/iplookup.php?ip=8.8.8.8&format=json
 
-    url = 'http://ip.taobao.com/service/getIpInfo.php?ip=' + ip
-    r = requests.get(url, timeout=timeout)
+    url = 'http://int.dpool.sina.com.cn/iplookup/iplookup.php?ip=%s&format=json' % ip
+    try:
+        r = requests.get(url, timeout=timeout)
+    except requests.Timeout:
+        r = None
     city = 'Unknown'
-    if r.status_code == 200:
+    if r and r.status_code == 200:
         try:
             data = r.json()
             if data['code'] == 0:

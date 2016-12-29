@@ -17,6 +17,7 @@ class AssetGroupSerializer(serializers.ModelSerializer):
     def get_assets_amount(obj):
         return obj.assets.count()
 
+
 class AssetUpdateGroupSerializer(serializers.ModelSerializer):
     groups = serializers.PrimaryKeyRelatedField(many=True, queryset=AssetGroup.objects.all())
 
@@ -24,12 +25,14 @@ class AssetUpdateGroupSerializer(serializers.ModelSerializer):
         model = Asset
         fields = ['id', 'groups']
 
+
 class AssetUpdateSystemUserSerializer(serializers.ModelSerializer):
     system_users = serializers.PrimaryKeyRelatedField(many=True, queryset=SystemUser.objects.all())
 
     class Meta:
         model = Asset
         fields = ['id', 'system_users']
+
 
 class AdminUserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -50,6 +53,12 @@ class SystemUserSerializer(serializers.ModelSerializer):
         fields = super(SystemUserSerializer, self).get_field_names(declared_fields, info)
         fields.extend(['assets_amount'])
         return fields
+
+
+class SystemUserSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SystemUser
+        fields = ('id', 'name', 'username')
 
 
 class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
@@ -75,7 +84,7 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
 
 class AssetGrantedSerializer(serializers.ModelSerializer):
-    system_users = SystemUserSerializer(many=True, read_only=True)
+    system_users = SystemUserSimpleSerializer(many=True, read_only=True)
     is_inherited = serializers.SerializerMethodField()
     system_users_join = serializers.SerializerMethodField()
 

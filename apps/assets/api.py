@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 
 from rest_framework import viewsets, generics, mixins
+
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin, ListBulkCreateUpdateDestroyAPIView
@@ -90,34 +91,19 @@ class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
     permission_classes = (IsSuperUser,)
 
 
-class SystemUserAuthApi(APIView):
+class SystemUserAuthInfoApi(generics.RetrieveAPIView):
+    queryset = SystemUser.objects.all()
     permission_classes = (IsSuperUserOrAppUser,)
 
-    def get(self, request, *args, **kwargs):
-        system_user_id = request.query_params.get('system_user_id', -1)
-        system_user_username = request.query_params.get('system_user_username', '')
-
-        system_user = get_object_or_none(SystemUser, id=system_user_id, username=system_user_username)
-
-        if system_user:
-            if system_user.password:
-                password = signer.sign(system_user.password)
-            else:
-                password = signer.sign('')
-
-            if system_user.private_key:
-                private_key = signer.sign(system_user.private_key)
-            else:
-                private_key = signer.sign(None)
-
-            response = {
-                'id': system_user.id,
-                'password': password,
-                'private_key': private_key,
-            }
-
-            return Response(response)
-        else:
-            return Response({'msg': 'error system user id or username'}, status=401)
-
+    def retrieve(self, request, *args, **kwargs):
+        system_user = self.get_object()
+        data = {
+            'id': system_user.id,
+            'name': system_user.name,
+            'username': system_user.username,
+            'password': system_user.password,
+            'private_key': system_user.private_key,
+            'auth_method': system_user.auth_method,
+        }
+        return Response(data)
 
