@@ -122,12 +122,10 @@ $(document).ready(function(){
 }).on('click', '#btn_terminal_accept', function () {
     var $form = $('#form_terminal_accept');
     function success (data, textStatus, jqXHR) {
-        if (data.success === false) {
-            console.log(data.msg);
+        if (data.success === true) {
             window.location.reload()
-
         } else {
-            console.log(data.msg);
+            $('#modal-error').html(data.msg).css('display', 'block');
         }
     }
     $form.ajaxSubmit({success: success});

@@ -64,10 +64,3 @@ class TerminalHeatbeatViewSet(viewsets.ModelViewSet):
         terminal = request.user.terminal
         TerminalHeatbeat.objects.create(terminal=terminal)
         return Response({'msg': 'Success'}, status=201)
-
-
-class TestHeatbeat(APIView):
-    permission_classes = (IsAppUser,)
-
-    def post(self, request):
-        return Response({'hello': 'world'})

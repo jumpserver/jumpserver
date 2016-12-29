@@ -7,6 +7,7 @@
 {% load bootstrap %}
 <form action="{% url 'applications:terminal-modal-accept' pk="99991937" %}" method="post" class="form-horizontal" id="form_terminal_accept">
     {% csrf_token %}
+    <p class="alert alert-danger" id="modal-error" style="display: none"></p>
     {{ form.name|bootstrap_horizontal }}
     {{ form.remote_addr|bootstrap_horizontal }}
     {{ form.type|bootstrap_horizontal }}

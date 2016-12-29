@@ -65,8 +65,6 @@ class AccessKeyAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed(_('Invalid signature.'))
         access_key_secret = access_key.secret
 
-        print(request_date)
-
         try:
             request_unix_time = http_to_unixtime(request_date)
         except ValueError:

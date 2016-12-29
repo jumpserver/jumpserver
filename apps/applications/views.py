@@ -2,6 +2,7 @@
 #
 
 from django.views.generic import ListView, UpdateView, DeleteView, FormView
+from django.views.generic.edit import BaseUpdateView
 from django.utils.translation import ugettext as _
 from django.urls import reverse_lazy
 
@@ -44,9 +45,13 @@ class TerminalDeleteView(DeleteView):
     success_url = reverse_lazy('applications:applications-list')
 
 
-class TerminalModelAccept(AdminUserRequiredMixin, JSONResponseMixin, UpdateView):
+class TerminalModelAccept(AdminUserRequiredMixin, JSONResponseMixin, BaseUpdateView):
     model = Terminal
     form_class = TerminalForm
+
+    def post(self, request, *args, **kwargs):
+        print(request.POST)
+        return super(TerminalModelAccept, self).post(request, *args, **kwargs)
 
     def form_valid(self, form):
         terminal = form.save()
@@ -57,14 +62,13 @@ class TerminalModelAccept(AdminUserRequiredMixin, JSONResponseMixin, UpdateView)
             'success': True,
             'msg': 'success'
         }
-        print('Valid')
         return self.render_json_response(data)
 
     def form_invalid(self, form):
-        print(form.errors)
+        print('form.data')
         data = {
             'success': False,
-            'msg': ','.join(form.errors)
+            'msg': str(form.errors),
         }
         return self.render_json_response(data)
 
