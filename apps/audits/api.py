@@ -3,11 +3,22 @@
 
 
 from __future__ import absolute_import, unicode_literals
+
 from rest_framework import generics, viewsets
 from rest_framework.views import APIView, Response
 
 from . import models, serializers
-from .hands import IsSuperUserOrAppUser, Terminal
+from .hands import IsSuperUserOrAppUser, Terminal, IsAppUser
+
+
+class ProxyLogReceiveView(generics.CreateAPIView):
+    queryset = models.ProxyLog.objects.all()
+    serializer_class = serializers.ProxyLogSerializer
+    permission_classes = (IsAppUser,)
+
+    def get_serializer(self, *args, **kwargs):
+        kwargs['data']['terminal'] = self.request.user.terminal.name
+        return super(ProxyLogReceiveView, self).get_serializer(*args, **kwargs)
 
 
 class ProxyLogViewSet(viewsets.ModelViewSet):
@@ -18,7 +29,7 @@ class ProxyLogViewSet(viewsets.ModelViewSet):
         "name": "",
         "hostname": "",
         "ip": "",
-        "applications", "",
+        "terminal": "",
         "login_type": "",
         "system_user": "",
         "was_failed": "",

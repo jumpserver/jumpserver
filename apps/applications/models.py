@@ -38,14 +38,6 @@ class Terminal(models.Model):
         self.save()
         return user, access_key
 
-    @property
-    def is_superuser(self):
-        return False
-
-    @property
-    def is_terminal(self):
-        return True
-
     def __unicode__(self):
         active = 'Active' if self.user and self.user.is_active else 'Disabled'
         return '%s: %s' % (self.name, active)

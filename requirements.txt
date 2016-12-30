@@ -2,7 +2,7 @@ Django==1.10
 django-bootstrap-form==3.2.1
 logging==0.4.9.6
 Pillow==3.3.1
-djangorestframework==3.4.5
+djangorestframework==3.5.3
 ForgeryPy==0.1
 openpyxl==2.4.0
 celery==3.1.23

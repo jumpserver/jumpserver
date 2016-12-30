@@ -45,9 +45,10 @@ class TerminalDeleteView(DeleteView):
     success_url = reverse_lazy('applications:applications-list')
 
 
-class TerminalModelAccept(AdminUserRequiredMixin, JSONResponseMixin, BaseUpdateView):
+class TerminalModelAccept(AdminUserRequiredMixin, JSONResponseMixin, UpdateView):
     model = Terminal
     form_class = TerminalForm
+    template_name = 'applications/terminal_modal_test.html'
 
     def post(self, request, *args, **kwargs):
         print(request.POST)

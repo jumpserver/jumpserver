@@ -91,6 +91,18 @@ $(document).ready(function(){
     };
     jumpserver.initDataTable(options);
 
+    $('#btn_terminal_accept').click(function () {
+        var $form = $('#form_terminal_accept');
+        function success(data, textStatus, jqXHR) {
+            if (data.success === true) {
+                window.location.reload()
+            } else {
+                $('#modal-error').html(data.msg).css('display', 'block');
+            }
+        }
+        $form.ajaxSubmit({success: success});
+    })
+
 }).on('click', '.btn_delete', function(){
     var $this = $(this);
     var uid = $this.data('uid');
@@ -119,16 +131,6 @@ $(document).ready(function(){
     $('#modal_terminal_accept').modal({
         show: true
     });
-}).on('click', '#btn_terminal_accept', function () {
-    var $form = $('#form_terminal_accept');
-    function success (data, textStatus, jqXHR) {
-        if (data.success === true) {
-            window.location.reload()
-        } else {
-            $('#modal-error').html(data.msg).css('display', 'block');
-        }
-    }
-    $form.ajaxSubmit({success: success});
 })
 </script>
 {% endblock %}

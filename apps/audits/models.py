@@ -45,7 +45,7 @@ class ProxyLog(models.Model):
     log_file = models.CharField(max_length=1000, blank=True, null=True)
     was_failed = models.BooleanField(default=False, verbose_name=_('Did connect failed'))
     is_finished = models.BooleanField(default=False, verbose_name=_('Is finished'))
-    date_start = models.DateTimeField(verbose_name=_('Date start'))
+    date_start = models.DateTimeField(auto_created=True, verbose_name=_('Date start'))
     date_finished = models.DateTimeField(null=True, verbose_name=_('Date finished'))
 
     def __unicode__(self):
@@ -54,16 +54,14 @@ class ProxyLog(models.Model):
     @property
     def commands_dict(self):
         commands = self.command_log.all()
-        return [
-                    {
-                        "command_no": command.command_no,
-                        "command": command.command,
-                        "output": command.output_decode,
-                        "datetime": command.datetime,
+        return [{
+                    "command_no": command.command_no,
+                    "command": command.command,
+                    "output": command.output_decode,
+                    "datetime": command.datetime,
                     } for command in commands]
 
     class Meta:
-        db_table = 'proxy_log'
         ordering = ['-date_start', 'username']
 
 
