@@ -35,14 +35,15 @@ def get_ip_city(ip, timeout=10):
     url = 'http://int.dpool.sina.com.cn/iplookup/iplookup.php?ip=%s&format=json' % ip
     try:
         r = requests.get(url, timeout=timeout)
+        print(r)
     except requests.Timeout:
         r = None
     city = 'Unknown'
     if r and r.status_code == 200:
         try:
             data = r.json()
-            if data['code'] == 0:
-                city = data['data']['country'] + data['data']['city']
+            if not isinstance(data, int) and data['ret'] == 1:
+                city = data['country'] + ' ' + data['city']
         except ValueError:
             pass
     return city

@@ -195,10 +195,10 @@ def check_user_valid(**kwargs):
     elif not user.is_valid:
         return None, _('Disabled or expired')
 
-    if password and user.check_password(password):
+    if password and user.password and user.check_password(password):
         return user, ''
 
-    if public_key:
+    if public_key and user.public_key:
         public_key_saved = user.public_key.split()
         if len(public_key_saved) == 1:
             if public_key == public_key_saved[0]:

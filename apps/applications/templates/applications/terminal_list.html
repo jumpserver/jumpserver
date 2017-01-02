@@ -76,7 +76,9 @@ $(document).ready(function(){
                         .replace('99991938', rowData.name);
                 var accept_btn = '<a class="btn btn-xs btn-primary btn-accept" data-id="99991937">{% trans "Accept" %}</a> '
                         .replace('99991937', cellData);
-                var reject_btn = '<a href="" class="btn btn-xs btn-danger">{% trans "Reject" %}</a>'
+                var reject_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_delete" data-uid="99991937" data-name="99991938">{% trans "Reject" %}</a>'
+                        .replace('99991937', cellData)
+                        .replace('99991938', rowData.name);
                 if (rowData.is_accepted) {
                     $(td).html(update_btn + delete_btn)
                 } else {

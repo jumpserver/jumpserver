@@ -121,7 +121,7 @@ class UserAuthApi(APIView):
         password = request.data.get('password', '')
         public_key = request.data.get('public_key', '')
         login_type = request.data.get('login_type', '')
-        login_ip = request.META.get('REMOTE_ADDR', '')
+        login_ip = request.data.get('remote_addr', None) or request.META.get('REMOTE_ADDR', '')
         user_agent = request.data.get('HTTP_USER_AGENT', '')
 
         user, msg = check_user_valid(username=username, password=password, public_key=public_key)

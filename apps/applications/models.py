@@ -14,7 +14,8 @@ class Terminal(models.Model):
     name = models.CharField(max_length=30, unique=True, verbose_name=_('Name'))
     remote_addr = models.GenericIPAddressField(verbose_name=_('Remote address'), blank=True, null=True)
     type = models.CharField(choices=TYPE_CHOICES, max_length=3, blank=True, verbose_name=_('Terminal type'))
-    user = models.OneToOneField(User, related_name='terminal', verbose_name='Application user', null=True)
+    user = models.OneToOneField(User, related_name='terminal', verbose_name='Application user',
+                                null=True, on_delete=models.CASCADE)
     url = models.CharField(max_length=100, blank=True, verbose_name=_('URL to login'))
     is_accepted = models.BooleanField(default=False, verbose_name='Is Accepted')
     date_created = models.DateTimeField(auto_now_add=True)
@@ -37,6 +38,11 @@ class Terminal(models.Model):
         self.user = user
         self.save()
         return user, access_key
+
+    def delete(self, using=None, keep_parents=False):
+        if self.user:
+            self.user.delete()
+        return super(Terminal, self).delete(using=using, keep_parents=keep_parents)
 
     def __unicode__(self):
         active = 'Active' if self.user and self.user.is_active else 'Disabled'
