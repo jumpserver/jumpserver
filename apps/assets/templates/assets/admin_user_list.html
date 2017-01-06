@@ -23,6 +23,18 @@
     <tbody>
     </tbody>
 </table>
+<div id="actions" class="hide">
+    <div class="input-group">
+        <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+            <option value="delete">{% trans 'Delete selected' %}</option>
+        </select>
+        <div class="input-group-btn pull-left" style="padding-left: 5px;">
+            <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
+             {% trans 'Submit' %}
+            </button>
+        </div>
+    </div>
+</div>
 {% endblock %}
 {% block content_bottom_left %}{% endblock %}
 {% block custom_foot_js %}
@@ -48,8 +60,72 @@ $(document).ready(function(){
         ajax_url: '{% url "api-assets:admin-user-list" %}',
         columns: [{data: function(){return ""}}, {data: "name" }, {data: "username" }, {data: "assets_amount" }, {data: function () {return 'lost'} },
                   {data: "comment" }, {data: "id" }],
+	    op_html: $('#actions').html()
     };
     jumpserver.initDataTable(options);
+})
+
+.on('click', '.btn_admin_user_delete', function () {
+	var $this = $(this);
+	var $data_table = $("#admin_user_list_table").DataTable();
+	var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
+	var uid = $this.data('uid');
+	var the_url = '{% url "api-assets:admin-user-detail" pk=99991937 %}'.replace('99991937', uid);
+	objectDelete($this, name, the_url);
+	$data_table.ajax.reload();
+})
+
+.on('click', '#btn_bulk_update', function () {
+	var action = $('#slct_bulk_update').val();
+	var $data_table = $('#admin_user_list_table').DataTable();
+	var id_list = [];
+    var plain_id_list = [];
+    $data_table.rows({selected: true}).every(function(){
+        id_list.push({id: this.data().id});
+        plain_id_list.push(this.data().id);
+    });
+    if (plain_id_list.length == 0) {
+        return false;
+    }
+    var the_url = "{% url 'api-assets:admin-user-list' %}";
+    function doDelete() {
+        swal({
+            title: "{% trans 'Are you sure?' %}",
+            text: "{% trans 'This will delete the selected Admin Users !!!' %}",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "{% trans 'Confirm' %}",
+            closeOnConfirm: false
+        }, function() {
+            var success = function() {
+                var msg = "{% trans 'Admin Users Deleted.' %}";
+                swal("{% trans 'Admin Users Delete' %}", msg, "success");
+                $('#admin_user_list_table').DataTable().ajax.reload();
+            };
+            var fail = function() {
+                var msg = "{% trans 'Admin Users Deleting failed.' %}";
+                swal("{% trans 'Admin Users Delete' %}", msg, "error");
+            };
+            var url_delete = the_url + '?id__in=' + JSON.stringify(plain_id_list);
+            APIUpdateAttr({url: url_delete, method: 'DELETE', success: success, error: fail});
+            $data_table.ajax.reload();
+            jumpserver.checked = false;
+        });
+    }
+    function doUpdate() {
+
+    }
+    switch (action) {
+	    case 'delete':
+	    	doDelete();
+	    	break;
+	    case 'update':
+	    	doUpdate();
+	    	break;
+	    default:
+	    	break;
+    }
 });
 </script>
 {% endblock %}

@@ -6,30 +6,33 @@
 {% block modal_body %}
 {% load bootstrap %}
 <p class="text-success text-center">{% trans "Hint: only change the field you want to update." %}</p>
-
-       <div class="ydxbd" id="ydxbd" style="display: block;">
-                           <div>
-                               <p id="tags_p">
-                                       <a href="/assets/asset-by-tag/5">
-                                       <span class="label label-default">三年质保(0)</span>
-                                       </a>
-                               </p>
-                           </div>
-                       </div>
+<div class="ydxbd" id="ydxbd" style="display: block;">
+	<div>
+		<p id="tags_p">
+			<a href="/assets/asset-by-tag/5">
+				<span class="label label-default">三年质保(0)</span>
+			</a>
+		</p>
+	</div>
+</div>
 <form method="post" class="form-horizontal" action="" id="fm_asset_bulk_update">
     <div class="form-group">
-        <label class="control-label col-sm-2 col-lg-2 " for="id_role">{% trans "Role" %}</label>
+        <label class="control-label col-sm-2 col-lg-2 " for="id_type">{% trans "System Type" %}</label>
         <div class=" col-sm-9 col-lg-9 ">
-            <select class=" select2 form-control" id="id_role" name="role">
+            <select class=" select2 form-control" id="id_type" name="type">
                 <option value="">---------</option>
-                <option value="Admin">{% trans "Admin" %}</option>
-                <option value="User">{% trans "User" %}</option>
+                <option value="Server">{% trans "Server" %}</option>
+                <option value="VM">{% trans "VM" %}</option>
+	            <option value="Switch">{% trans "Switch" %}</option>
+	            <option value="Storage">{% trans "Storage" %}</option>
+	            <option value="Router">{% trans "Router" %}</option>
+	            <option value="Firewall">{% trans "Firewall" %}</option>
             </select>
         </div>
     </div>
-    <div class="form-group">
 
-        <label for="groups" class="col-sm-2 control-label">{% trans 'Groups' %}</label>
+    <div class="form-group">
+        <label for="groups" class="col-sm-2 control-label">{% trans 'Asset Groups' %}</label>
         <div class="col-sm-9" id="select2-container">
             <select name="groups" id="select2_groups" data-placeholder="{% trans 'Select Group' %}" class="select2 form-control m-b" multiple>
                 {% for group in groups %}
@@ -38,6 +41,18 @@
             </select>
         </div>
     </div>
+
+	<div class="form-group">
+		<label for="users" class="col-sm-2 control-label">{% trans 'System Users' %}</label>
+        <div class="col-sm-9" id="select2-container">
+            <select name="system_users" id="select2_users" data-placeholder="{% trans 'Select System Users' %}" class="select2 form-control m-b" multiple>
+                {% for system_user in system_users %}
+                    <option value="{{ system_user.id }}">{{ system_user.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+	</div>
+
     <div class="form-group">
         <div class="col-sm-9 col-lg-9 col-sm-offset-2">
             <div class="checkbox checkbox-success">
@@ -48,28 +63,17 @@
 
 
 <div class="form-group">
-
-
-            <label class="control-label col-sm-2 col-lg-2 " for="id_tags">标签集合</label>
-
-
-        <div class=" col-sm-9 col-lg-9 ">
-            <select multiple="multiple" class="select2 form-control" data-placeholder="Select asset tags" id="tags" name="tags">
-<option value="1">物理机</option>
-<option value="2">虚拟机</option>
-<option value="3">数据库备份</option>
-<option value="4">亦庄机房</option>
-<option value="5">三年质保</option>
-</select>
-
-
-
-
-                <p class="help-block">
-                    最多5个标签，单个标签最长8个汉字，按回车确认
-                </p>
-
-        </div>
+	<label class="control-label col-sm-2 col-lg-2 " for="id_tags">标签集合</label>
+	<div class=" col-sm-9 col-lg-9 ">
+		<select multiple="multiple" class="select2 form-control" data-placeholder="Select asset tags" id="tags" name="tags">
+			{% for tag in tags %}
+				<option value="{{ tag.id }}">{{ tag.name }}</option>
+			{% endfor %}
+		</select>
+		<p class="help-block">
+			最多5个标签，单个标签最长8个汉字，按回车确认
+		</p>
+	</div>
 
 </div>
 

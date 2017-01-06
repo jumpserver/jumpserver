@@ -27,7 +27,7 @@
                                 <a class="btn btn-outline btn-default" href="{% url 'assets:idc-update' pk=idc.id %}"><i class="fa fa-edit"></i>Update</a>
                             </li>
                             <li class="pull-right">
-                                <a class="btn btn-outline btn-danger" href="{% url 'assets:idc-delete' pk=idc.id %}">
+                                <a class="btn btn-outline btn-danger btn-delete-idc">
                                     <i class="fa fa-edit"></i>Delete
                                 </a>
                             </li>
@@ -53,9 +53,9 @@
                                     </div>
                                 </div>
                                 <div class="ibox-content">
-                                    <table class="table">
+                                    <table class="table idc-details">
                                         <tbody>
-                                        <tr class="no-borders-tr">
+                                        <tr class="no-borders-tr" data-name="{{ idc.name }}">
                                             <td>{% trans 'Name' %}:</td>
                                             <td><b>{{ idc.name }}</b></td>
                                         </tr>
@@ -113,26 +113,47 @@
 
 {% endblock %}
 {% block custom_foot_js %}
-    <script>
-{#        function switch_user_status(obj) {#}
-{#            var status = $(obj).prop('checked');#}
-{##}
-{#            $.ajax({#}
-{#                url: "{% url 'users:user-active-api' pk=user.id %}",#}
-{#                type: "PUT",#}
-{#                data: {#}
-{#                    'is_active': status#}
-{#                },#}
-{#                success: function (data, status) {#}
-{#                    console.log(data)#}
-{#                },#}
-{#                error: function () {#}
-{#                    console.log('error')#}
-{#                }#}
-{#            })#}
-{#        }#}
-        $(document).ready(function () {
-            $('.select2').select2();
+<script>
+function idcDelete(name, url) {
+    function doDelete() {
+        var body = {};
+        var success = function() {
+            swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
+	        window.location.href="{% url 'assets:idc-list' %}";
+        };
+        var fail = function() {
+            swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");
+        };
+        APIUpdateAttr({
+            url: url,
+            body: JSON.stringify(body),
+            method: 'DELETE',
+            success: success,
+            error: fail
         });
-    </script>
+    }
+    swal({
+        title: 'Are you sure delete ?',
+        text: " [" + name + "] ",
+        type: "warning",
+        showCancelButton: true,
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: 'Confirm',
+        closeOnConfirm: false
+    }, function () {
+        doDelete()
+    });
+}
+
+$(document).ready(function () {
+	$('.select2').select2();
+})
+.on('click', '.btn-delete-idc', function () {
+	var name = $('.idc-details > tbody > tr').attr("data-name");
+	var id = {{ idc.id }};
+	var the_url = '{% url "api-assets:idc-detail" pk=99991937 %}'.replace(99991937, id);
+	idcDelete(name, the_url);
+});
+</script>
 {% endblock %}

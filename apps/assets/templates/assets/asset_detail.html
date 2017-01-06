@@ -200,7 +200,7 @@
                                     <i class="fa fa-info-circle"></i> {% trans 'Asset groups' %}
                                 </div>
                                 <div class="panel-body">
-                                    <table class="table group_edit">
+                                    <table class="table group_edit" id="add-asset2group">
                                         <tbody>
                                         <form>
                                             <tr>
@@ -236,7 +236,7 @@
                                     <i class="fa fa-info-circle"></i> {% trans 'System users' %}
                                 </div>
                                 <div class="panel-body">
-                                    <table class="table group_edit">
+                                    <table class="table group_edit" id="add-asset2systemuser">
                                         <tbody>
                                         <form>
                                             <tr class="no-borders-tr">
@@ -288,7 +288,7 @@ function updateAssetGroups(groups) {
         $.map(jumpserver.groups_selected, function(group_name, index) {
             $('#opt_' + index).remove();
             // change tr html of user groups.
-            $('.group_edit tbody').append(
+            $('#add-asset2group tbody').append(
                 '<tr>' +
                 '<td><b class="bdg_group" data-gid="' + index + '">' + group_name + '</b></td>' +
                 '<td><button class="btn btn-danger btn-xs pull-right btn_leave_group" type="button"><i class="fa fa-minus"></i></button></td>' +
@@ -316,7 +316,7 @@ function updateAssetSystem(system_users) {
         $.map(jumpserver.groups_selected, function(name, index) {
             $('#opt_' + index).remove();
 
-            $('.group_edit tbody').append(
+            $('#add-asset2systemuser tbody').append(
                 '<tr>' +
                 '<td><b class="bdg_group" data-sid="' + index + '">' + name + '</b></td>' +
                 '<td><button class="btn btn-danger btn-xs pull-right btn_leave_system" type="button"><i class="fa fa-minus"></i></button></td>' +
@@ -418,7 +418,6 @@ $(document).ready(function () {
 	    var system_users = $('.bdg_group').map(function () {
 	        return $(this).data('sid');
 	    }).get();
-	    console.log(system_users);
 	    updateAssetSystem(system_users)
 
 })

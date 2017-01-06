@@ -43,35 +43,35 @@
                                     </div>
                                 </div>
                                 <div class="ibox-content">
-                                    <table class="table table-hover">
+                                    <table class="table table-hover" id="system_user_list">
                                         <thead>
                                             <tr>
                                                 <th>{% trans 'Hostname' %}</th>
                                                 <th>{% trans 'IP' %}</th>
                                                 <th>{% trans 'Port' %}</th>
                                                 <th>{% trans 'Reachable' %}</th>
-                                                <th></th>
+                                                <th>{% trans 'Action' %}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for asset in page_obj %}
-                                            <tr>
-                                                <td>{{ asset.hostname }}</td>
-                                                <td>{{ asset.ip }}</td>
-                                                <td>{{ asset.port }}</td>
-                                                <td>
-                                                    <i class="fa fa-check text-navy"></i>
-                                                </td>
-                                                <td>
-                                                    <button class="btn btn-danger pull-right btn-xs {% if asset.is_inherit_from_asset_groups %} disabled {% endif %}" type="button"><i class="fa fa-minus"></i></button>
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
+{#                                            {% for asset in page_obj %}#}
+{#                                            <tr>#}
+{#                                                <td>{{ asset.hostname }}</td>#}
+{#                                                <td>{{ asset.ip }}</td>#}
+{#                                                <td>{{ asset.port }}</td>#}
+{#                                                <td>#}
+{#                                                    <i class="fa fa-check text-navy"></i>#}
+{#                                                </td>#}
+{#                                                <td>#}
+{#                                                    <button class="btn btn-danger pull-right btn-xs {% if asset.is_inherit_from_asset_groups %} disabled {% endif %}" type="button"><i class="fa fa-minus"></i></button>#}
+{#                                                </td>#}
+{#                                            </tr>#}
+{#                                            {% endfor %}#}
                                         </tbody>
                                     </table>
-                                    <div class="row">
-                                        {% include '_pagination.html' %}
-                                    </div>
+{#                                    <div class="row">#}
+{#                                        {% include '_pagination.html' %}#}
+{#                                    </div>#}
                                 </div>
                             </div>
                         </div>
@@ -95,7 +95,7 @@
                                             </tr>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <button type="button" class="btn btn-primary btn-sm">{% trans 'Attach' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-sm btn-add-asset2system-user">{% trans 'Attach Asset' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
@@ -123,16 +123,16 @@
                                             </tr>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-sm" id="btn_add_user_group">{% trans 'Attach' %}</button>
+                                                    <button type="button" class="btn btn-info btn-sm" id="btn_add_user_group">{% trans 'Attach AssetGroup' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
 
                                         {% for asset_group in asset_groups %}
                                         <tr>
-                                          <td ><b data-gid={{ asset_group.id }}>{{ asset_group.name }}</b></td>
+                                          <td ><b class="bdg_asset_groups" data-gid={{ asset_group.id }}>{{ asset_group.name }}</b></td>
                                           <td>
-                                              <button class="btn btn-danger pull-right btn-xs" type="button"><i class="fa fa-minus"></i></button>
+                                              <button class="btn btn-danger pull-right btn-xs btn-leave-system_user" type="button"><i class="fa fa-minus"></i></button>
                                           </td>
                                         </tr>
                                         {% endfor %}
@@ -150,26 +150,224 @@
 
 {% endblock %}
 {% block custom_foot_js %}
-    <script>
-{#        function switch_user_status(obj) {#}
-{#            var status = $(obj).prop('checked');#}
-{##}
-{#            $.ajax({#}
-{#                url: "{% url 'users:user-active-api' pk=user.id %}",#}
-{#                type: "PUT",#}
-{#                data: {#}
-{#                    'is_active': status#}
-{#                },#}
-{#                success: function (data, status) {#}
-{#                    console.log(data)#}
-{#                },#}
-{#                error: function () {#}
-{#                    console.log('error')#}
-{#                }#}
-{#            })#}
-{#        }#}
-        $(document).ready(function () {
-            $('.select2').select2();
+<script>
+jumpserver.assets_selected = {};
+jumpserver.asset_groups_selected = {};
+Array.prototype.remove = function(val) {
+	var index = this.indexOf(val);
+		if (index > -1) {
+		this.splice(index, 1);
+	}
+};
+Array.prototype.unique = function(){
+	var res = [];
+	var json = {};
+ 	for(var i = 0; i < this.length; i++){
+  		if(!json[this[i]]){
+   			res.push(this[i]);
+   			json[this[i]] = 1;
+  		}
+ 	}
+ 	return res;
+};
+function objectDelete(obj, name, url, data) {
+    function doDelete() {
+        var body = data;
+        var success = function() {
+            swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
+            $(obj).parent().parent().remove();
+        };
+        var fail = function() {
+            swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");
+        };
+        APIUpdateAttr({
+            url: url,
+            body: JSON.stringify(body),
+            method: 'PATCH',
+            success: success,
+            error: fail
         });
-    </script>
+    }
+    swal({
+        title: 'Are you sure delete ?',
+        text: " [" + name + "] ",
+        type: "warning",
+        showCancelButton: true,
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: 'Confirm',
+        closeOnConfirm: false
+    }, function () {
+        doDelete()
+    });
+}
+function updateSystemUserAssetGroup(asset_groups) {
+	var the_url = "{% url 'api-assets:systemuser-update-assetgroups' pk=system_user.id %}";
+    var body = {
+        asset_groups: Object.assign([], asset_groups)
+    };
+    var success = function(data) {
+        $('.select2-selection__rendered').empty();
+        $('#groups_selected').val('');
+        $.map(jumpserver.asset_groups_selected, function(asset_groups, index) {
+            $('#opt_' + index).remove();
+            $('.system-user-table tbody').append(
+                '<tr>' +
+                '<td><b class="bdg_asset_groups" data-sid="' + index + '">' + asset_groups + '</b></td>' +
+                '<td><button class="btn btn-danger btn-xs pull-right btn-leave-system_user" type="button"><i class="fa fa-minus"></i></button></td>' +
+                '</tr>'
+            )
+        });
+        jumpserver.assets_selected = {};
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success: success
+    });
+}
+$(document).ready(function () {
+	$('.select2').select2()
+	.on("select2:select", function (evt) {
+		var data = evt.params.data;
+		jumpserver.assets_selected[data.id] = data.text;
+		jumpserver.asset_groups_selected[data.id] = data.text;
+	})
+	.on('select2:unselect', function(evt) {
+		var data = evt.params.data;
+		delete jumpserver.assets_selected[data.id];
+		delete jumpserver.asset_groups_selected[data.id];
+	});
+	var options = {
+		ele: $('#system_user_list'),
+		buttons: [],
+		order: [],
+		columnDefs: [
+			{targets: 0, createdCell: function (td, cellData, rowData) {
+				var detail_btn = '<a href="{% url "assets:asset-detail" pk=99991937 %}" data-aid="'+rowData.id+'">' + cellData + '</a>';
+				$(td).html(detail_btn.replace('99991937', rowData.id));
+			}},
+			{targets: 3, createdCell: function (td, cellData) {
+				if (!cellData) {
+					$(td).html('<i class="fa fa-times text-danger"></i>')
+				} else {
+					$(td).html('<i class="fa fa-check text-navy"></i>')
+				}
+			}},
+			{targets: 4, createdCell: function (td, cellData, rowData) {
+				var update_btn = '<a href="{% url "assets:asset-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', rowData.id);
+				var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-aid="99991937">{% trans "Delete" %}</a>'.replace('99991937', rowData.id);
+				$(td).html(update_btn + del_btn)
+			}}
+			],
+		ajax_url: '{% url "api-assets:asset-list" %}?system_user_id={{ system_user.id }}',
+		columns: [{data: "hostname" }, {data: "ip" }, {data: "port" }, {data: function () { return ""; } }, {data: "id"}],
+		op_html: $('#actions').html()
+	};
+	jumpserver.initDataTable(options);
+})
+
+.on('click', '.btn-add-asset2system-user', function () {
+	if (Object.keys(jumpserver.assets_selected).length === 0) {
+		return false;
+	}
+	var $data_table = $("#system_user_list").DataTable();
+	var assets = [];
+	$.ajax({
+		url: '{% url "api-assets:asset-list" %}?system_user_id={{ system_user.id }}',
+		method: 'GET',
+		dataType: 'json',
+		success: function (result) {
+			for(var i in result){
+				if (!isNaN(parseInt(result[i]['id']))) {
+					assets.push(parseInt(result[i]['id']))
+				}
+			}
+			$.map(jumpserver.assets_selected, function(value, index) {
+				assets.push(parseInt(index));
+			});
+			assets.unique();
+			var the_url = "{% url 'api-assets:systemuser-update-assets' pk=system_user.id %}";
+			var body = {"assets": assets};
+			APIUpdateAttr({
+				url: the_url,
+	            body: JSON.stringify(body),
+	            method: 'PATCH'
+			});
+			$data_table.ajax.reload();
+		}
+	});
+})
+
+.on('click', '.btn_asset_delete', function () {
+	var $this = $(this);
+	var the_url = "{% url 'api-assets:systemuser-update-assets' pk=system_user.id %}";
+	var name = $(this).closest("tr").find(":nth-child(1) > a").html();
+	var $data_table = $("#system_user_list").DataTable();
+	var assets = [];
+	$('#system_user_list > tbody > tr').map(function () {
+		assets.push(parseInt($(this).closest("tr").find(":nth-child(1) > a").attr("data-aid")))
+	});
+	var delete_asset_id = $(this).data('aid');
+	assets.remove(delete_asset_id);
+	assets.unique();
+	var data = {"assets": assets};
+	objectDelete($this, name, the_url, data);
+	$data_table.ajax.reload();
+})
+	
+.on('click', '#btn_add_user_group', function () {
+	jumpserver.assets_selected = {};
+	if (Object.keys(jumpserver.asset_groups_selected).length === 0) {
+		return false;
+	}
+	asset_groups = [];
+	$.ajax({
+		url: '{% url "api-assets:systemuser-update-assetgroups" pk=system_user.id %}',
+		method: 'GET',
+		dataType: 'json',
+		success: function (result) {
+			for (var i in result['asset_groups']) {
+				if (!isNaN(result['asset_groups'][i])) {
+					asset_groups.push(parseInt(result['asset_groups'][i]));
+				}
+			}
+			$.map(jumpserver.asset_groups_selected, function(value, index) {
+				asset_groups.push(parseInt(index));
+			});
+			asset_groups.unique();
+			console.log(asset_groups);
+			var the_url = '{% url "api-assets:systemuser-update-assetgroups" pk=system_user.id %}';
+			var body = {"asset_groups": asset_groups};
+			APIUpdateAttr({
+				url: the_url,
+	            body: JSON.stringify(body),
+	            method: 'PATCH'
+			});
+{#			TODO: reload the table #}
+{#			window.location.href="{% url 'assets:system-user-asset' pk=system_user.id %}"#}
+		}
+	});
+})
+	
+.on('click', '.btn-leave-system_user', function () {
+	var $this = $(this);
+	var $tr = $this.closest('tr');
+	var $badge = $tr.find('.bdg_asset_groups');
+	var sid = $badge.data('gid');
+	var name = $badge.html() || $badge.text();
+	$('system-user-table').append(
+		'<option value="' + sid + '" id="opt_' + sid + '">' + name + '</option>'
+	);
+	$tr.remove();
+	var asset_groups = $('.bdg_asset_groups').map(function () {
+		return $(this).data('gid');
+	}).get();
+	updateSystemUserAssetGroup(asset_groups);
+});
+
+
+
+
+</script>
 {% endblock %}

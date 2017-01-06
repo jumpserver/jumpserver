@@ -269,6 +269,19 @@ class AssetGroup(models.Model):
 def get_default_idc():
     return IDC.initial()
 
+class Tag(models.Model):
+    name = models.CharField(max_length=64, unique=True, verbose_name=_('Name'))
+    created_time = models.DateTimeField(auto_now_add=True, verbose_name=_('Create time'))
+    created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
+
+    def __unicode__(self):
+        return self.name
+
+    __str__ = __unicode__
+
+    class Meta:
+        db_table = 'tag'
+
 
 class Asset(models.Model):
     STATUS_CHOICES = (
@@ -320,7 +333,7 @@ class Asset(models.Model):
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date added'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
-    tags = models.ManyToManyField('Tag', blank=True, verbose_name=_('Tags'))
+    tags = models.ManyToManyField(Tag, related_name='assets', blank=True, verbose_name=_('Tags'))
 
     def __unicode__(self):
         return '%(ip)s:%(port)s' % {'ip': self.ip, 'port': self.port}
@@ -339,7 +352,7 @@ class Asset(models.Model):
 
     class Meta:
         db_table = 'asset'
-        unique_together = ('ip', 'port')
+        # unique_together = ('ip', 'port')
 
     @classmethod
     def generate_fake(cls, count=100):
@@ -365,18 +378,7 @@ class Asset(models.Model):
                 continue
 
 
-class Tag(models.Model):
-    name = models.CharField(max_length=64, unique=True, verbose_name=_('Name'))
-    created_time = models.DateTimeField(auto_now_add=True, verbose_name=_('Create time'))
-    created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
 
-    def __unicode__(self):
-        return self.name
-
-    __str__ = __unicode__
-
-    class Meta:
-        db_table = 'tag'
 
 
 def init_all_models():
