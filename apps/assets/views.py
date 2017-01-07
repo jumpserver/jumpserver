@@ -16,7 +16,7 @@ from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.shortcuts import get_object_or_404, reverse, redirect
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.cache import cache
@@ -37,8 +37,10 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
         context = {
             'app': 'Assets',
             'action': 'asset list',
-            'tag_list': [(i.id, i.name, i.asset_set.all().count())for i in Tag.objects.all().order_by('name')]
-
+            'groups': AssetGroup.objects.all(),
+            'system_users': SystemUser.objects.all(),
+            'tag_list': [(i.id, i.name, i.assets.all().count())for i in Tag.objects.all().order_by('name')],
+            'tags': Tag.objects.all().order_by('name')
         }
         kwargs.update(context)
         return super(AssetListView, self).get_context_data(**kwargs)
@@ -261,6 +263,8 @@ class AssetGroupListView(AdminUserRequiredMixin, TemplateView):
         context = {
             'app': _('Assets'),
             'action': _('Asset group list'),
+            'assets': Asset.objects.all(),
+            'system_users': SystemUser.objects.all(),
             'keyword': self.request.GET.get('keyword', '')
         }
         kwargs.update(context)
@@ -280,6 +284,7 @@ class AssetGroupDetailView(AdminUserRequiredMixin, DetailView):
             'app': _('Assets'),
             'action': _('Asset group detail'),
             'assets_remain': assets_remain,
+            'assets': [asset for asset in Asset.objects.all() if asset not in assets_remain],
             'system_users': system_users,
             'system_users_remain': system_users_remain,
         }
@@ -383,6 +388,21 @@ class IDCAssetsView(AdminUserRequiredMixin, DetailView):
     template_name = 'assets/idc_assets.html'
     context_object_name = 'idc'
 
+    def get_context_data(self, **kwargs):
+        assets_remain = Asset.objects.exclude(id__in=self.object.assets.all())
+
+        context = {
+            'app': _('Assets'),
+            'action': _('Asset detail'),
+            'groups': AssetGroup.objects.all(),
+            'system_users': SystemUser.objects.all(),
+            'tags': Tag.objects.all(),
+            'assets_remain': assets_remain,
+            'assets': [asset for asset in Asset.objects.all() if asset not in assets_remain],
+        }
+        kwargs.update(context)
+        return super(IDCAssetsView, self).get_context_data(**kwargs)
+
 
 class IDCDeleteView(AdminUserRequiredMixin, DeleteView):
     model = IDC
@@ -477,10 +497,19 @@ class AdminUserDetailView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
     def get_queryset(self):
         return self.object.assets.all()
 
+    # def get_asset_groups(self):
+    #     return self.object.asset_groups.all()
+
     def get_context_data(self, **kwargs):
+        asset_groups = AssetGroup.objects.all()
+        assets = self.get_queryset()
         context = {
             'app': 'assets',
-            'action': 'Admin user detail'
+            'action': 'Admin user detail',
+            'assets_remain': [asset for asset in Asset.objects.all() if asset not in assets],
+            'asset_groups': asset_groups,
+            # 'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all()
+            #                         if asset_group not in asset_groups]
         }
         kwargs.update(context)
         return super(AdminUserDetailView, self).get_context_data(**kwargs)
@@ -630,7 +659,7 @@ class TagsListView(AdminUserRequiredMixin, ListView):
         return super(TagsListView, self).get_context_data(**kwargs)
 
 
-class AssetTagCreateView(AdminUserRequiredMixin, CreateView):
+class AssetTagCreateView(AdminUserRequiredMixin, CreateAssetTagsMiXin, CreateView):
     model = Tag
     form_class = forms.AssetTagForm
     template_name = 'assets/asset_tag_create.html'
@@ -653,7 +682,7 @@ class AssetTagCreateView(AdminUserRequiredMixin, CreateView):
         assets_id_list = self.request.POST.getlist('assets', [])
         assets = [get_object_or_404(Asset, id=int(asset_id)) for asset_id in assets_id_list]
         asset_tag.created_by = self.request.user.username or 'Admin'
-        asset_tag.asset_set.add(*tuple(assets))
+        asset_tag.assets.add(*tuple(assets))
         asset_tag.save()
         return super(AssetTagCreateView, self).form_valid(form)
 
@@ -667,13 +696,16 @@ class AssetTagDetailView(SingleObjectMixin, AdminUserRequiredMixin, ListView):
         return super(AssetTagDetailView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
-        return self.object.asset_set.all()
+        return self.object.assets.all()
 
     def get_context_data(self, **kwargs):
+        assets_remain = Asset.objects.exclude(id__in=self.object.assets.all())
         context = {
             'app': _('Tag'),
             'action': _('Asset Tags detail'),
             'asset_tag': self.object,
+            'assets_remain': assets_remain,
+            'assets': [asset for asset in Asset.objects.all() if asset not in assets_remain]
         }
         kwargs.update(context)
         return super(AssetTagDetailView, self).get_context_data(**kwargs)
@@ -690,7 +722,7 @@ class AssetTagUpdateView(AdminUserRequiredMixin, UpdateView):
         return super(AssetTagUpdateView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        assets_all = self.object.asset_set.all()
+        assets_all = self.object.assets.all()
         context = {
             'app': _('Tag'),
             'action': _('Asset Tags detail'),
@@ -710,6 +742,7 @@ class AssetTagDeleteView(AdminUserRequiredMixin, DeleteView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class AssetExportView(View):
+
     @staticmethod
     def get_asset_attr(asset, attr):
         if attr in ['admin_user', 'idc']:

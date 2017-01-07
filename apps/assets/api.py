@@ -4,41 +4,48 @@ from rest_framework import viewsets, generics, mixins
 
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_bulk import BulkModelViewSet, BulkDestroyAPIView
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin, ListBulkCreateUpdateDestroyAPIView
 from django.shortcuts import get_object_or_404
 
 from common.mixins import IDInFilterMixin
 from common.utils import get_object_or_none, signer
-from .hands import IsSuperUserOrAppUser, IsSuperUser
-from .models import AssetGroup, Asset, IDC, SystemUser, AdminUser
+from .hands import IsSuperUser, IsAppUser
+from .models import AssetGroup, Asset, IDC, SystemUser, AdminUser, Tag
 from . import serializers
 
 
-class AssetViewSet(IDInFilterMixin, viewsets.ModelViewSet):
+class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
     """API endpoint that allows Asset to be viewed or edited."""
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
-    filter_fields = ('id', 'ip', 'hostname')
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsSuperUser,)
 
     def get_queryset(self):
         queryset = super(AssetViewSet, self).get_queryset()
         idc_id = self.request.query_params.get('idc_id', '')
+        tags_id = self.request.query_params.get('tag_id', '')
+        system_users_id = self.request.query_params.get('system_user_id', '')
         asset_group_id = self.request.query_params.get('asset_group_id', '')
+        admin_user_id = self.request.query_params.get('admin_user_id', '')
         if idc_id:
             queryset = queryset.filter(idc__id=idc_id)
-
+        if tags_id:
+            queryset = queryset.filter(tags__id=tags_id)
+        if system_users_id:
+            queryset = queryset.filter(system_users__id=system_users_id)
+        if admin_user_id:
+            queryset = queryset.filter(admin_user__id=admin_user_id)
         if asset_group_id:
             queryset = queryset.filter(groups__id=asset_group_id)
         return queryset
 
 
-class AssetGroupViewSet(viewsets.ModelViewSet):
-    """ API endpoint that allows AssetGroup to be viewed or edited.
-        some other comment
-    """
+class AssetGroupViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = AssetGroup.objects.all()
     serializer_class = serializers.AssetGroupSerializer
+    permission_classes = (IsSuperUser,)
 
 
 class AssetUpdateGroupApi(generics.RetrieveUpdateAPIView):
@@ -47,20 +54,41 @@ class AssetUpdateGroupApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsSuperUser,)
 
 
-class IDCViewSet(viewsets.ModelViewSet):
+## update the asset group, and add or delete the asset to the group
+class AssetGroupUpdateApi(generics.RetrieveUpdateAPIView):
+    queryset = AssetGroup.objects.all()
+    serializer_class = serializers.AssetGroupUpdateSerializer
+    permission_classes = (IsSuperUser,)
+
+
+## update the asset group, and add or delete the system_user to the group
+class AssetGroupUpdateSystemUserApi(generics.RetrieveUpdateAPIView):
+    queryset = AssetGroup.objects.all()
+    serializer_class = serializers.AssetGroupUpdateSystemUserSerializer
+    permission_classes = (IsSuperUser,)
+
+
+## update the IDC, and add or delete the assets to the IDC
+class IDCupdateAssetsApi(generics.RetrieveUpdateAPIView):
+    queryset = IDC.objects.all()
+    serializer_class = serializers.IDCUpdateAssetsSerializer
+    permission_classes = (IsSuperUser,)
+
+
+class IDCViewSet(IDInFilterMixin, BulkModelViewSet):
     """API endpoint that allows IDC to be viewed or edited."""
     queryset = IDC.objects.all()
     serializer_class = serializers.IDCSerializer
     permission_classes = (IsSuperUser,)
 
 
-class AdminUserViewSet(viewsets.ModelViewSet):
+class AdminUserViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = AdminUser.objects.all()
     serializer_class = serializers.AdminUserSerializer
     permission_classes = (IsSuperUser,)
 
 
-class SystemUserViewSet(viewsets.ModelViewSet):
+class SystemUserViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = SystemUser.objects.all()
     serializer_class = serializers.SystemUserSerializer
     permission_classes = (IsSuperUser,)
@@ -69,6 +97,18 @@ class SystemUserViewSet(viewsets.ModelViewSet):
 class SystemUserUpdateApi(generics.RetrieveUpdateAPIView):
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetUpdateSystemUserSerializer
+    permission_classes = (IsSuperUser,)
+
+
+class SystemUserUpdateAssetsApi(generics.RetrieveUpdateAPIView):
+    queryset = SystemUser.objects.all()
+    serializer_class = serializers.SystemUserUpdateAssetsSerializer
+    permission_classes = (IsSuperUser,)
+
+
+class SystemUserUpdateAssetGroupApi(generics.RetrieveUpdateAPIView):
+    queryset = SystemUser.objects.all()
+    serializer_class = serializers.SystemUserUpdateAssetGroupSerializer
     permission_classes = (IsSuperUser,)
 
 
@@ -93,7 +133,7 @@ class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
 
 class SystemUserAuthInfoApi(generics.RetrieveAPIView):
     queryset = SystemUser.objects.all()
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsAppUser,)
 
     def retrieve(self, request, *args, **kwargs):
         system_user = self.get_object()
@@ -106,4 +146,17 @@ class SystemUserAuthInfoApi(generics.RetrieveAPIView):
             'auth_method': system_user.auth_method,
         }
         return Response(data)
+
+
+class TagViewSet(IDInFilterMixin, BulkModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = serializers.TagSerializer
+    permission_classes = (IsSuperUser,)
+
+
+## update the IDC, and add or delete the assets to the IDC
+class TagUpdateAssetsApi(generics.RetrieveUpdateAPIView):
+    queryset = Tag.objects.all()
+    serializer_class = serializers.TagUpdateAssetsSerializer
+    permission_classes = (IsSuperUser,)
 

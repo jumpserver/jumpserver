@@ -68,7 +68,7 @@ class Asset(models.Model):
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date added'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
-    tags = models.ManyToManyField('Tag', blank=True, verbose_name=_('Tags'))
+    tags = models.ManyToManyField('Tag', related_name='assets', blank=True, verbose_name=_('Tags'))
 
     def __unicode__(self):
         return '%(ip)s:%(port)s' % {'ip': self.ip, 'port': self.port}
@@ -125,4 +125,4 @@ class Tag(models.Model):
     __str__ = __unicode__
 
     class Meta:
-        ordering = ['name']
+        db_table = 'tag'

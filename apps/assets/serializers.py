@@ -1,17 +1,19 @@
 # -*- coding: utf-8 -*-
 from django.utils.translation import ugettext_lazy as _
 from rest_framework import viewsets, serializers,generics
-from .models import AssetGroup, Asset, IDC, AdminUser, SystemUser
+from .models import AssetGroup, Asset, IDC, AdminUser, SystemUser, Tag
 from common.mixins import IDInFilterMixin
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin
 
 
-class AssetGroupSerializer(serializers.ModelSerializer):
+class AssetGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     assets_amount = serializers.SerializerMethodField()
-    # assets = serializers.PrimaryKeyRelatedField(many=True, read_only=True)
+    assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
 
     class Meta:
         model = AssetGroup
+        list_serializer_class = BulkListSerializer
+        fields = ['id', 'name', 'comment', 'assets_amount']
 
     @staticmethod
     def get_assets_amount(obj):
@@ -34,7 +36,47 @@ class AssetUpdateSystemUserSerializer(serializers.ModelSerializer):
         fields = ['id', 'system_users']
 
 
+class AssetGroupUpdateSerializer(serializers.ModelSerializer):
+    """update the asset group, and add or delete the asset to the group"""
+    assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
+
+    class Meta:
+        model = AssetGroup
+        fields = ['id', 'assets']
+
+
+class AssetGroupUpdateSystemUserSerializer(serializers.ModelSerializer):
+    system_users = serializers.PrimaryKeyRelatedField(many=True, queryset=SystemUser.objects.all())
+
+    class Meta:
+        model = AssetGroup
+        fields = ['id', 'system_users']
+
+
+class IDCUpdateAssetsSerializer(serializers.ModelSerializer):
+    assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
+
+    class Meta:
+        model = IDC
+        fields = ['id', 'assets']
+
+
+class TagSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+    assets_amount = serializers.SerializerMethodField()
+    assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
+
+    class Meta:
+        model = Tag
+        list_serializer_class = BulkListSerializer
+
+    @staticmethod
+    def get_assets_amount(obj):
+        return obj.assets.count()
+
+
 class AdminUserSerializer(serializers.ModelSerializer):
+    assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
+
     class Meta:
         model = AdminUser
 
@@ -55,6 +97,22 @@ class SystemUserSerializer(serializers.ModelSerializer):
         return fields
 
 
+class SystemUserUpdateAssetsSerializer(serializers.ModelSerializer):
+    assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
+
+    class Meta:
+        model = SystemUser
+        fields = ['id', 'assets']
+
+
+class SystemUserUpdateAssetGroupSerializer(serializers.ModelSerializer):
+    asset_groups = serializers.PrimaryKeyRelatedField(many=True, queryset=AssetGroup.objects.all())
+
+    class Meta:
+        model = SystemUser
+        fields = ['id', 'asset_groups']
+
+
 class SystemUserSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUser
@@ -69,6 +127,7 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     class Meta(object):
         model = Asset
         list_serializer_class = BulkListSerializer
+        fields = ['__all__']
 
     @staticmethod
     def get_hardware(obj):
@@ -84,7 +143,7 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
 
 class AssetGrantedSerializer(serializers.ModelSerializer):
-    system_users = SystemUserSimpleSerializer(many=True, read_only=True)
+    system_users = SystemUserSerializer(many=True, read_only=True)
     is_inherited = serializers.SerializerMethodField()
     system_users_join = serializers.SerializerMethodField()
 
@@ -105,8 +164,9 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
         return ', '.join([system_user.username for system_user in obj.system_users.all()])
 
 
-class IDCSerializer(serializers.ModelSerializer):
+class IDCSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     assets_amount = serializers.SerializerMethodField()
+    assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
 
     class Meta:
         model = IDC
@@ -119,3 +179,11 @@ class IDCSerializer(serializers.ModelSerializer):
         fields = super(IDCSerializer, self).get_field_names(declared_fields, info)
         fields.append('assets_amount')
         return fields
+
+
+class TagUpdateAssetsSerializer(serializers.ModelSerializer):
+    assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
+
+    class Meta:
+        model = Tag
+        fields = ['id', 'assets']

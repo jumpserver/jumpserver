@@ -37,6 +37,14 @@ class AssetCreateForm(forms.ModelForm):
         self.instance.tags.clear()
         self.instance.tags.add(*tuple(tags))
 
+    def clean(self):
+        clean_data = super(AssetCreateForm, self).clean()
+        ip = clean_data.get('ip')
+        port = clean_data.get('port')
+        query = Asset.objects.filter(ip=ip, port=port)
+        if query:
+            raise forms.ValidationError('this asset has exists.')
+
     class Meta:
         model = Asset
         tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all())
@@ -293,10 +301,10 @@ class AssetTagForm(forms.ModelForm):
         super(AssetTagForm, self).__init__(*args, **kwargs)
 
     def _save_m2m(self):
-        super(AssetTagForm, self)._save_m2m()
         assets = self.cleaned_data['assets']
-        self.instance.asset_set.clear()
-        self.instance.asset_set.add(*tuple(assets))
+        self.instance.assets.clear()
+        self.instance.assets.add(*tuple(assets))
+        super(AssetTagForm, self)._save_m2m()
 
     class Meta:
         model = Tag

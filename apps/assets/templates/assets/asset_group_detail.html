@@ -48,10 +48,28 @@
                                                 <th>{% trans 'Hostname' %}</th>
                                                 <th>{% trans 'IP' %}</th>
                                                 <th>{% trans 'Port' %}</th>
+	                                            <th>{% trans 'Type' %}</th>
                                                 <th>{% trans 'Alive' %}</th>
+	                                            <th>{% trans 'Action' %}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
+{#                                        {% for asset in assets %}#}
+{#                                            <tr id="bdg_asset" data-aid="{{ asset.id }}">#}
+{#                                                <td>{{ asset.hostname }}</td>#}
+{#                                                <td>{{ asset.ip }}</td>#}
+{#                                                <td>{{ asset.port }}</td>#}
+{#                                                {% if asset.is_active %}#}
+{#	                                                <td><i class="fa fa-circle text-navy"></i></td>#}
+{#	                                            {% else %}#}
+{#	                                                <td><i class="fa fa-circle text-danger"></i></td>#}
+{#	                                            {% endif %}#}
+{#                                                <td>#}
+{#	                                                <a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-aid="{{ asset.id }}">{% trans "Delete" %}</a>#}
+{#	                                                <a class="btn btn-xs btn-info m-l-xs btn_asset_update" data-aid="{{ asset.id }}" href="{% url 'assets:asset-update' pk=asset.id %}">{% trans "Update" %}</a>#}
+{#                                                </td>#}
+{#                                            </tr>#}
+{#                                        {% endfor %}#}
                                         </tbody>
                                     </table>
                                 </div>
@@ -70,14 +88,14 @@
                                                 <td colspan="2">
                                                     <select data-placeholder="{% trans 'Select assets' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for asset in assets_remain %}
-                                                            <option value="{{ asset.id }}">{{ asset.ip }}:{{ asset.port }}</option>
+                                                            <option value="{{ asset.id }}" id="opt_{{ asset.id }}">{{ asset.ip }}:{{ asset.port }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
                                             </tr>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <button type="button" class="btn btn-primary btn-sm">{% trans 'Add' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-sm btn-asset-add-groups">{% trans 'Add' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
@@ -91,29 +109,29 @@
                                     <i class="fa fa-info-circle"></i> {% trans 'Associate system user' %}
                                 </div>
                                 <div class="panel-body">
-                                    <table class="table">
+                                    <table class="table system-user-table">
                                         <tbody>
                                         <form>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
                                                     <select data-placeholder="{% trans 'Select system user' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for system_user in system_users_remain %}
-                                                            <option value="{{ system_user.id }}">{{ system_user.name }}</option>
+                                                            <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user.name }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
                                             </tr>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <button type="button" class="btn btn-info btn-sm">{% trans 'Associate' %}</button>
+                                                    <button type="button" class="btn btn-info btn-sm btn-asset-add-groups-system-users">{% trans 'Associate' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
                                         {% for system_user in system_users %}
                                         <tr>
-                                            <td ><b>{{ group.name }}</b></td>
+                                            <td ><b class="bdg_system_user" data-sid={{ system_user.id }}>{{ system_user.name }}</b></td>
                                             <td>
-                                                <button class="btn btn-danger btn-xs" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                                <button class="btn btn-danger btn-xs pull-right btn_leave_asset_group" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                             </td>
                                         </tr>
                                         {% endfor %}
@@ -132,53 +150,249 @@
 
 {% endblock %}
 {% block custom_foot_js %}
-    <script>
-        $(document).ready(function () {
-            $('.select2').select2();
-            var options = {
-                ele: $('#asset_list_table'),
-                buttons: [],
-                order: [],
-                select: [],
-                columnDefs: [
-                    {targets: 1, createdCell: function (td, cellData, rowData) {
-                        var detail_btn = '<a href="{% url "perms:asset-permission-detail" pk=99991937 %}">' + cellData + '</a>';
-                        $(td).html(detail_btn.replace('99991937', rowData.id));
-                     }},
-                    {targets: 2, createdCell: function (td, cellData, rowData) {
-                        var dataLength = cellData.length;
-                        $(td).html(dataLength);
-                    }},
-                    {targets: 3, createdCell: function (td, cellData, rowData) {
-                        var dataLength = cellData.length;
-                        $(td).html(dataLength);
-                    }},
-                    {targets: 4, createdCell: function (td, cellData, rowData) {
-                        var dataLength = cellData.length;
-                        $(td).html(dataLength);
-                    }},
-                    {targets: 5, createdCell: function (td, cellData) {
-                        if (!cellData) {
-                            $(td).html('<i class="fa fa-times text-danger"></i>')
-                        } else {
-                            $(td).html('<i class="fa fa-check text-navy"></i>')
-                        }
-                    }},
-                    {targets: 6, createdCell: function (td, cellData, rowData) {
-                        var btn = '<button class="btn btn-danger btn-xs btn_del_permission disabled" id=99991937 type="button" style="float: right;"><i class="fa fa-minus"></i></button>';
-                        if (rowData.is_inherited) {
-                            $(td).html(btn)
-                        } else {
-                            btn = btn.replace('99991937', cellData);
-                            $(td).html(btn.replace('disabled', ''));
-                        }
-                     }}
-                ],
-                ajax_url: '{% url "api-perms:asset-permission-list" %}?user={{ user.id }}',
-                columns: [{data: function(){return ""}}, {data: "name" }, {data: "assets" }, {data: "asset_groups"},
-                    {data: "system_users"}, {data: "is_active"}, {data: "id"}]
-            };
-            jumpserver.initDataTable(options);
-        })
-    </script>
+<script>
+jumpserver.assets_selected = {};
+jumpserver.system_users_selected = {};
+function updateAssetsGroup(assets) {
+    var the_url = "{% url 'api-assets:asset-groups-update' pk=asset_group.id %}";
+    var body = {
+        assets: Object.assign([], assets)
+    };
+    var success = function(data) {
+        $('select2-selection__rendered').empty();
+        $('#groups_selected').val('');
+        $('#asset_list_table > tbody').empty();
+        $.map(jumpserver.assets_selected, function(asset_ip, index) {
+        	var url = '{% url "api-assets:asset-detail" pk=99991937 %}'.replace(99991937, index);
+        	asset = $.ajax({
+        		url: url,
+		        method: "GET",
+		        dataType: "json",
+		        success: function (data, textStatus) {
+			        var add_tr = '<tr id="bdg_asset" data-aid="'+data.id+'">'+
+				        '<td>'+data.hostname+'</td>'+
+				        '<td>'+data.ip+'</td>'+
+				        '<td>'+data.port+'</td>'+
+				        '<td>status</td>'+
+				        '<td>'+
+				        '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-aid="'+data.id+'">{% trans "Delete" %}</a>'+
+					    '<a class="btn btn-xs btn-info m-l-xs btn_asset_update" data-aid="'+data.id+'" href="'+'{% url "assets:asset-update" pk=99991937 %}'.replace(99991937, data.id)+'">{% trans "Update" %}</a>'+
+				        '</td>'+
+			            '</tr>';
+			        (data.is_active == true) ? tr = add_tr.replace('<td>status</td>', '<td><i class="fa fa-circle text-navy"></i></td>'): tr = add_tr.replace('<td>status</td>', '<td><i class="fa fa-circle text-danger"></i></td>');
+			        $('#asset_list_table > tbody').append(tr);
+
+		        }
+	        });
+        });
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success: success
+    });
+}
+
+function objectDelete(obj, name, url, data) {
+    function doDelete() {
+        var body = data;
+        var success = function() {
+            swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
+            $(obj).parent().parent().remove();
+        };
+        var fail = function() {
+            swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");
+        };
+        APIUpdateAttr({
+            url: url,
+            body: JSON.stringify(body),
+            method: 'PATCH',
+            success: success,
+            error: fail
+        });
+    }
+    swal({
+        title: 'Are you sure delete ?',
+        text: " [" + name + "] ",
+        type: "warning",
+        showCancelButton: true,
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: 'Confirm',
+        closeOnConfirm: false
+    }, function () {
+        doDelete()
+    });
+}
+
+function updateAssetGroupSystemUsers(system_users) {
+	var the_url = "{% url 'api-assets:asset-groups-update-systemusers' pk=asset_group.id %}";
+    var body = {
+        system_users: Object.assign([], system_users)
+    };
+    var success = function(data) {
+        $('.select2-selection__rendered').empty();
+        $('#groups_selected').val('');
+        $.map(jumpserver.system_users_selected, function(system_user, index) {
+            $('#opt_' + index).remove();
+            $('.system-user-table tbody').append(
+                '<tr>' +
+                '<td><b class="bdg_group" data-sid="' + index + '">' + system_user + '</b></td>' +
+                '<td><button class="btn btn-danger btn-xs pull-right btn_leave_group" type="button"><i class="fa fa-minus"></i></button></td>' +
+                '</tr>'
+            )
+        });
+        jumpserver.system_users_selected = {};
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success: success
+    });
+}
+
+Array.prototype.remove = function(val) {
+	var index = this.indexOf(val);
+		if (index > -1) {
+		this.splice(index, 1);
+	}
+};
+
+Array.prototype.unique = function(){
+	var res = [];
+	var json = {};
+ 	for(var i = 0; i < this.length; i++){
+  		if(!json[this[i]]){
+   			res.push(this[i]);
+   			json[this[i]] = 1;
+  		}
+ 	}
+ 	return res;
+};
+
+$(document).ready(function () {
+	$('.select2').select2()
+	.on("select2:select", function (evt) {
+		var data = evt.params.data;
+		jumpserver.assets_selected[data.id] = data.text;
+		jumpserver.system_users_selected[data.id] = data.text;
+	})
+	.on('select2:unselect', function(evt) {
+		var data = evt.params.data;
+		delete jumpserver.assets_selected[data.id];
+		delete jumpserver.system_users_selected[data.id]
+	});
+
+	var options = {
+		ele: $('#asset_list_table'),
+		buttons: [],
+		order: [],
+		columnDefs: [
+			{targets: 0, createdCell: function (td, cellData, rowData) {
+				var detail_btn = '<a href="{% url "assets:asset-detail" pk=99991937 %}" data-aid="'+rowData.id+'">' + cellData + '</a>';
+				$(td).html(detail_btn.replace('99991937', rowData.id));
+			}},
+			{targets: 4, createdCell: function (td, cellData) {
+				if (!cellData) {
+					$(td).html('<i class="fa fa-times text-danger"></i>')
+				} else {
+					$(td).html('<i class="fa fa-check text-navy"></i>')
+				}
+			}},
+			{targets: 5, createdCell: function (td, cellData, rowData) {
+				var update_btn = '<a href="{% url "assets:asset-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', rowData.id);
+				var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-aid="99991937">{% trans "Remove" %}</a>'.replace('99991937', rowData.id);
+				$(td).html(update_btn + del_btn)
+			}}
+		],
+		ajax_url: '{% url "api-assets:asset-list" %}?asset_group_id={{ asset_group.id }}',
+		columns: [{data: "hostname" }, {data: "ip" }, {data: "port" },
+			{data: "type" }, {data: "is_active" }, {data: "id"}],
+		op_html: $('#actions').html()
+	};
+	jumpserver.initDataTable(options);
+})
+
+.on('click', '.btn-asset-add-groups', function () {
+	if (Object.keys(jumpserver.assets_selected).length === 0) {
+		return false;
+	}
+	jumpserver.system_users_selected = {};
+	var $data_table = $("#asset_list_table").DataTable();
+	var assets = [];
+	$.ajax({
+		url: '{% url "api-assets:asset-list" %}?asset_group_id={{ asset_group.id }}',
+		method: 'GET',
+		dataType: 'json',
+		success: function (result) {
+			for(var i in result){
+				if (!isNaN(parseInt(result[i]['id']))) {
+					assets.push(parseInt(result[i]['id']))
+				}
+			}
+			$.map(jumpserver.assets_selected, function(value, index) {
+				assets.push(parseInt(index));
+			});
+			assets.unique();
+			var the_url = "{% url 'api-assets:asset-groups-update' pk=asset_group.id %}";
+			var body = {"assets": assets};
+			APIUpdateAttr({
+				url: the_url,
+	            body: JSON.stringify(body),
+	            method: 'PATCH'
+			});
+{#			TODO: reflash the table and reset the jumpserver variables #}
+{#			window.location.href='{% url "assets:asset-group-detail" pk=asset_group.id %}';#}
+
+		}
+	});
+})
+
+.on('click', '.btn_asset_delete', function () {
+	var $this = $(this);
+	var the_url = "{% url 'api-assets:asset-groups-update' pk=asset_group.id %}";
+	var name = $(this).closest("tr").find(":nth-child(1) > a").html();
+	var assets = [];
+	$('#asset_list_table > tbody > tr').map(function () {
+		assets.push(parseInt($(this).closest("tr").find(":nth-child(1) > a").attr("data-aid")))
+	});
+	var delete_asset_id = $(this).data('aid');
+	assets.remove(delete_asset_id);
+	var data = {"assets": assets};
+	objectDelete($this, name, the_url, data);
+})
+
+.on('click', '.btn-asset-add-groups-system-users', function () {
+	if (Object.keys(jumpserver.system_users_selected).length === 0) {
+        return false;
+	}
+	jumpserver.assets_selected = {};
+	var system_users = $('.bdg_system_user').map(function() {
+		return $(this).data('sid');
+	}).get();
+	$.map(jumpserver.system_users_selected, function(value, index) {
+		system_users.push(parseInt(index));
+		$('#opt_' + index).remove();
+	});
+	system_users.unique();
+	updateAssetGroupSystemUsers(system_users);
+})
+
+.on('click', '.btn_leave_asset_group', function () {
+	var $this = $(this);
+	var $tr = $this.closest('tr');
+	var $badge = $tr.find('.bdg_system_user');
+	var sid = $badge.data('sid');
+	var name = $badge.html() || $badge.text();
+	$('system-user-table').append(
+		'<option value="' + sid + '" id="opt_' + sid + '">' + name + '</option>'
+	);
+	$tr.remove();
+	var system_users = $('.bdg_system_user').map(function () {
+		return $(this).data('sid');
+	}).get();
+	updateAssetGroupSystemUsers(system_users)
+})
+
+</script>
 {% endblock %}

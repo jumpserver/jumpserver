@@ -17,21 +17,23 @@
    ~ 快速开始
    
    ```
-   pip install -r requirements.txt
+   pip install -r requirements.txt  #  Install pip module
    
-   cp config-example.py config.py
+   yum -y install `cat rpm_requirements.txt` #  Install rpm package
    
-   cd apps && python manage.py makemigrations 
+   cp config-example.py config.py  #  Prepaire config from example config
    
-   python manage.py migrate
+   cd apps && python manage.py makemigrations  #  Make migrations for django
    
-   python manage.py loaddata init
+   python manage.py migrate  # Migrate ORM to database
    
-   python manage.py loadata fake 
+   python manage.py loaddata init  # Init some data
+   
+   python manage.py loaddata fake   # Generake some fake data
    
    yum -y install redis && service redis start  # Or install redis docker
    
-   python manage.py runserver 0.0.0.0:80
+   python manage.py runserver 0.0.0.0:80  # Run it
    
    ```
    

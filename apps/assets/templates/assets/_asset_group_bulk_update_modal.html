@@ -1,0 +1,42 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% block modal_id %}asset_group_bulk_update_modal{% endblock %}
+{% block modal_class %}modal-lg{% endblock %}
+{% block modal_title%}{% trans "Update Asset Group" %}{% endblock %}
+{% block modal_body %}
+{% load bootstrap %}
+<p class="text-success text-center">{% trans "Hint: only change the field you want to update." %}</p>
+<form method="post" class="form-horizontal" action="" id="fm_asset_group_bulk_update">
+
+    <div class="form-group">
+        <label for="assets" class="col-sm-2 control-label">{% trans 'Assets' %}</label>
+        <div class="col-sm-9" id="select2-container">
+            <select name="assets" id="select2_groups" data-placeholder="{% trans 'Select Asset' %}" class="select2 form-control m-b" multiple>
+                {% for asset in assets %}
+                    <option value="{{ asset.id }}">{{ asset.ip }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+	<div class="form-group">
+        <label for="system_users" class="col-sm-2 control-label">{% trans 'System Users' %}</label>
+        <div class="col-sm-9" id="select2-container">
+            <select name="system_users" id="select2_groups" data-placeholder="{% trans 'Select System Users' %}" class="select2 form-control m-b" multiple>
+                {% for system_user in system_users %}
+                    <option value="{{ system_user.id }}">{{ system_user.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="col-sm-9 col-lg-9 col-sm-offset-2">
+            <div class="checkbox checkbox-success">
+                <input type="checkbox" name="enable_otp" checked id="id_enable_otp"><label for="id_enable_otp">{% trans 'Enable-OTP' %}</label>
+            </div>
+        </div>
+    </div>
+
+</form>
+{% endblock %}
+{% block modal_confirm_id %}btn_asset_group_bulk_update{% endblock %}

@@ -2,9 +2,9 @@
 #
 
 python ../apps/manage.py shell << EOF
-from users.models import *
+from users.models.utils import *
 generate_fake()
-from assets.models import *
+from assets.models.utils import *
 generate_fake()
 EOF
 

@@ -15,8 +15,8 @@ def initial():
 
 def generate_fake():
     for cls in [IDC, SystemUser, AdminUser, AssetGroup, Asset, Tag]:
-        if hasattr(cls, 'generake_fake'):
-            cls.generake_fake()
+        if hasattr(cls, 'generate_fake'):
+            cls.generate_fake()
 
 
 if __name__ == '__main__':
