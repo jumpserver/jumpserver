@@ -280,7 +280,7 @@ REST_FRAMEWORK = {
         'users.authentication.PrivateTokenAuthentication',
         'users.authentication.SessionAuthentication',
     ),
-    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    # 'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 }
 
 # Custom User Auth model

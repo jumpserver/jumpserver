@@ -2,6 +2,7 @@
 *.pyc
 *.pyo
 *.swp
+.env
 env
 env*
 dist
@@ -9,6 +10,7 @@ build
 *.egg
 *.egg-info
 _mailinglist
+dump.rdb
 .tox
 .cache/
 .idea/

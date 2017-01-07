@@ -56,7 +56,7 @@ class Config:
     # When Django start it will bind this host and port
     # ./manage.py runserver 127.0.0.1:8080
     # Todo: Gunicorn or uwsgi run may be use it
-    HTTP_BIND_HOST = '127.0.0.1'
+    HTTP_BIND_HOST = '0.0.0.0'
     HTTP_LISTEN_PORT = 8080
 
     # Use Redis as broker for celery and web socket

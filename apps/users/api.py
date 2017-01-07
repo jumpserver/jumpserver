@@ -12,7 +12,7 @@ from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny
 from rest_framework.authentication import SessionAuthentication
 from rest_framework_bulk import BulkModelViewSet
-from django_filters.rest_framework import DjangoFilterBackend
+# from django_filters.rest_framework import DjangoFilterBackend
 
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
@@ -30,7 +30,7 @@ class UserViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = User.objects.all()
     serializer_class = serializers.UserSerializer
     permission_classes = (IsSuperUser,)
-    filter_backends = (DjangoFilterBackend,)
+    # filter_backends = (DjangoFilterBackend,)
     filter_fields = ('username', 'email', 'name', 'id')
 
 
