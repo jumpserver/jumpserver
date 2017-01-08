@@ -18,5 +18,4 @@ itsdangerous==0.24
 #python-gssapi==0.6.4
 tornado==4.4.2
 eventlet==0.19.0
-#unicodecsv==0.14.1
-#django-filter==1.0.0
+django-filter==1.0.0

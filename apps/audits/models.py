@@ -11,7 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 class LoginLog(models.Model):
     LOGIN_TYPE_CHOICE = (
         ('W', 'Web'),
-        ('S', 'SSH Terminal'),
+        ('ST', 'SSH Terminal'),
         ('WT', 'Web Terminal')
     )
 
@@ -30,7 +30,7 @@ class LoginLog(models.Model):
 
 class ProxyLog(models.Model):
     LOGIN_TYPE_CHOICE = (
-        ('S', 'SSH Terminal'),
+        ('ST', 'SSH Terminal'),
         ('WT', 'Web Terminal'),
     )
 
