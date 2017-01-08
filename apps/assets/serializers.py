@@ -13,7 +13,7 @@ class AssetGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = AssetGroup
         list_serializer_class = BulkListSerializer
-        fields = ['id', 'name', 'comment', 'assets_amount']
+        fields = ['id', 'name', 'comment', 'assets_amount', 'assets']
 
     @staticmethod
     def get_assets_amount(obj):
@@ -68,6 +68,7 @@ class TagSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = Tag
         list_serializer_class = BulkListSerializer
+        fields = '__all__'
 
     @staticmethod
     def get_assets_amount(obj):
@@ -79,6 +80,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AdminUser
+        fields = '__all__'
 
     def get_field_names(self, declared_fields, info):
         fields = super(AdminUserSerializer, self).get_field_names(declared_fields, info)
@@ -127,7 +129,7 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     class Meta(object):
         model = Asset
         list_serializer_class = BulkListSerializer
-        fields = ['__all__']
+        fields = '__all__'
 
     @staticmethod
     def get_hardware(obj):
@@ -170,6 +172,7 @@ class IDCSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     class Meta:
         model = IDC
+        fields = '__all__'
 
     @staticmethod
     def get_assets_amount(obj):

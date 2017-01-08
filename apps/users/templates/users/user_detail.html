@@ -346,7 +346,7 @@ $(document).ready(function() {
     });
 }).on('click', '#btn_reset_pk', function() {
     function doReset() {
-        var the_url = '{% url "api-users:user-reset-pk" pk=user.id %}';
+        var the_url = '{% url "api-users:user-public-key-reset" pk=user.id %}';
         var body = {};
         var success = function() {
             var msg = "{% trans 'The reset-ssh-public-key E-mail has been sent successfully. Please inform the user to update his new ssh public key.' %}";
@@ -372,7 +372,7 @@ $(document).ready(function() {
 }).on('click', '#btn_user_update_pk', function(){
     var $this = $(this);
     var pk = $('#txt_pk').val();
-    var the_url = '{% url "api-users:user-update-pk" pk=user.id %}';
+    var the_url = '{% url "api-users:user-public-key-reset" pk=user.id %}';
     var body = {'_public_key': pk};
     var success = function() {
         $('#txt_pk').val('');

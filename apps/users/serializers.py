@@ -56,6 +56,7 @@ class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = UserGroup
         list_serializer_class = BulkListSerializer
+        fields = '__all__'
 
     @staticmethod
     def get_user_amount(obj):

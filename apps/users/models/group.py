@@ -16,18 +16,13 @@ __all__ = ['UserGroup']
 
 class UserGroup(NoDeleteModelMixin, Group):
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
-    date_created = models.DateTimeField(auto_now_add=True)
+    date_created = models.DateTimeField(auto_now_add=True, null=True)
     created_by = models.CharField(max_length=100)
 
     def __unicode__(self):
         return self.name
 
-    def has_member(self, user):
-        if user in self.users.all():
-            return True
-        return False
-
-    def delete(self):
+    def delete(self, using=None, keep_parents=False):
         if self.name != 'Default':
             self.users.clear()
             return super(UserGroup, self).delete()

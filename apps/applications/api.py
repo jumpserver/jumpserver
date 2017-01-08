@@ -27,7 +27,7 @@ class TerminalRegisterView(ListCreateAPIView):
         serializer = self.serializer_class(data={'name': name, 'remote_addr': remote_addr})
 
         if get_object_or_none(Terminal, name=name):
-            return Response({'msg': 'Registed, Need admin active it'}, status=200)
+            return Response({'msg': 'Already register, Need administrator active it'}, status=200)
 
         if serializer.is_valid():
             terminal = serializer.save()
@@ -53,6 +53,12 @@ class TerminalViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         return Response({'msg': 'Use register view except that'}, status=404)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        if instance.user is not None:
+            instance.user.delete()
+        return super(TerminalViewSet, self).destroy(request, *args, **kwargs)
 
 
 class TerminalHeatbeatViewSet(viewsets.ModelViewSet):
