@@ -92,16 +92,20 @@ class UserToken(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        username = request.data.get('username', '')
-        email = request.data.get('email', '')
-        password = request.data.get('password', '')
-        public_key = request.data.get('public_key', '')
+        if not request.user:
+            username = request.data.get('username', '')
+            email = request.data.get('email', '')
+            password = request.data.get('password', '')
+            public_key = request.data.get('public_key', '')
 
-        user, msg = check_user_valid(username=username, email=email,
-                                     password=password, public_key=public_key)
+            user, msg = check_user_valid(username=username, email=email,
+                                         password=password, public_key=public_key)
+        else:
+            user = request.user
+            msg = None
         if user:
             token = generate_token(request, user)
-            return Response({'Token': token, 'key': 'Bearer'}, status=200)
+            return Response({'Token': token, 'Keyword': 'Bearer'}, status=200)
         else:
             return Response({'error': msg}, status=406)
 

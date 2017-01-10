@@ -306,7 +306,7 @@ function updateAssetGroups(groups) {
 }
 
 function updateAssetSystem(system_users) {
-    var the_url = "{% url 'api-assets:asset-update-systemusers' pk=asset.id %}";
+    var the_url = "{% url 'api-assets:asset-update-system-users' pk=asset.id %}";
     var body = {
         system_users: Object.assign([], system_users)
     };
