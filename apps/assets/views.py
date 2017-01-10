@@ -547,6 +547,10 @@ class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVi
         kwargs.update(context)
         return super(SystemUserCreateView, self).get_context_data(**kwargs)
 
+    def form_invalid(self, form):
+        print(form.errors)
+        return super(SystemUserCreateView, self).form_invalid(form)
+
     def get_success_message(self, cleaned_data):
         success_message = _('Create system user <a href="%s">%s</a> successfully.' %
                             (

@@ -214,23 +214,9 @@ class AdminUserForm(forms.ModelForm):
 
 class SystemUserForm(forms.ModelForm):
     # Admin user assets define, let user select, save it in form not in view
-    assets = forms.ModelMultipleChoiceField(queryset=Asset.objects.all(),
-                                            label=_('Asset'),
-                                            required=False,
-                                            widget=forms.SelectMultiple(
-                                                attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
-                                            )
-    asset_groups = forms.ModelMultipleChoiceField(queryset=AssetGroup.objects.all(),
-                                                  label=_('Asset group'),
-                                                  required=False,
-                                                  widget=forms.SelectMultiple(
-                                                      attrs={'class': 'select2',
-                                                             'data-placeholder': _('Select asset groups')})
-                                                  )
-    auto_generate_key = forms.BooleanField(initial=True)
+    auto_generate_key = forms.BooleanField(initial=True, required=False)
     # Form field name can not start with `_`, so redefine it,
-    password = forms.CharField(widget=forms.PasswordInput, max_length=100, min_length=8, strip=True,
-                               help_text=_('If also set private key, use that first'), required=False)
+    password = forms.CharField(widget=forms.PasswordInput, max_length=100, min_length=8, strip=True)
     # Need use upload private key file except paste private key content
     private_key_file = forms.FileField(required=False)
 
@@ -242,24 +228,15 @@ class SystemUserForm(forms.ModelForm):
             initial['asset_groups'] = kwargs['instance'].asset_groups.all()
         super(SystemUserForm, self).__init__(*args, **kwargs)
 
-    def _save_m2m(self):
-        # Save assets relation with admin user
-        super(SystemUserForm, self)._save_m2m()
-        assets = self.cleaned_data['assets']
-        asset_groups = self.cleaned_data['asset_groups']
-        self.instance.assets.clear()
-        self.instance.assets.add(*tuple(assets))
-        self.instance.asset_groups.clear()
-        self.instance.asset_groups.add(*tuple(asset_groups))
-
     def save(self, commit=True):
         # Because we define custom field, so we need rewrite :method: `save`
         system_user = super(SystemUserForm, self).save(commit=commit)
         password = self.cleaned_data['password']
         private_key_file = self.cleaned_data['private_key_file']
 
-        if password:
-            system_user.password = password
+        if system_user.auth_method == 'P':
+            if password:
+                system_user.password = password
             print(password)
         # Todo: Validate private key file, and generate public key
         # Todo: Auto generate private key and public key
@@ -268,11 +245,30 @@ class SystemUserForm(forms.ModelForm):
         system_user.save()
         return self.instance
 
+    # Todo: check valid
+    # def clean_private_key_file(self):
+    #     if not self.cleaned_data['auto_generate_key']:
+    #         if not self.cleaned_data['private_key_file']:
+    #             raise forms.ValidationError(_('Private key required'))
+
+    # def clean_password(self):
+    #     if self.cleaned_data['auth_method'] == 'P':
+    #         if not self.cleaned_data['password']:
+    #             raise forms.ValidationError(_('Password required'))
+    #     return self.cleaned_data['password']
+
+    # def clean(self):
+    #     password = self.cleaned_data['password']
+    #     private_key_file = self.cleaned_data.get('private_key_file', '')
+    #
+    #     if not (password or private_key_file):
+    #         raise forms.ValidationError(_('Password and private key file must be input one'))
+
     class Meta:
         model = SystemUser
         fields = [
             'name', 'username', 'protocol', 'auto_generate_key', 'password', 'private_key_file', 'auth_method',
-            'auto_push', 'auto_update', 'sudo', 'comment', 'shell', 'home', 'uid',
+            'auto_push', 'sudo', 'comment', 'shell', 'home', 'uid',
         ]
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
@@ -282,7 +278,6 @@ class SystemUserForm(forms.ModelForm):
             'name': '* required',
             'username': '* required',
             'auto_push': 'Auto push system user to asset',
-            'auto_update': 'Auto update system user ssh key',
         }
 
 
