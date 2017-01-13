@@ -21,7 +21,7 @@
    
    yum -y install `cat rpm_requirements.txt` #  Install rpm package
    
-   cp config-example.py config.py  #  Prepaire config from example config
+   cp config_example.py config.py  #  Prepaire config from example config
    
    cd apps && python manage.py makemigrations  #  Make migrations for django
    
