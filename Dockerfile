@@ -6,6 +6,7 @@ MAINTAINER Jumpserver Team <ibuler@qq.com>
 COPY . /opt/jumpserver
 WORKDIR /opt/jumpserver
 
+RUN cp config_example.py config.py
 #RUN pip install -r requirements.txt -i https://pypi.doubanio.com/simple
 RUN rm -f db.sqlite3 && cd utils && sh make_migrations.sh && sh init_db.sh
 EXPOSE 8080
