@@ -18,7 +18,7 @@ from .utils import check_user_valid, generate_token
 from .models import User, UserGroup
 from .hands import write_login_log_async
 from .permissions import (
-    IsSuperUser, IsAppUser, IsValidUser, IsSuperUserOrAppUser)
+    IsSuperUser, IsAppUser, IsValidUser)
 from . import serializers
 
 

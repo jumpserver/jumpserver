@@ -201,21 +201,21 @@ class UserGroupGrantedAssetGroupsApi(ListAPIView):
         return queryset
 
 
-class CheckUserAssetSystemPermission(APIView):
+class ValidateUserAssetPermissionView(APIView):
     permission_classes = (IsAppUser,)
 
-    def get(self, request):
+    @staticmethod
+    def get(request):
         user_id = request.params.get('user_id', '')
         asset_id = request.params.get('asset_id', '')
         system_id = request.params.get('system_id', '')
 
-        user = get_object_or_none(User, id=user_id)
-        asset = get_object_or_none(Asset, id=asset_id)
-        system_user = get_object_or_none(SystemUser, id=system_id)
-
-        if not (user and asset and system_user):
-            return Response(status=403)
+        user = get_object_or_404(User, id=user_id)
+        asset = get_object_or_404(Asset, id=asset_id)
+        system_user = get_object_or_404(SystemUser, id=system_id)
 
         assets_granted = get_user_granted_assets(user)
-
-
+        if system_user in assets_granted.get(asset, []):
+            return Response({'msg': True}, status=200)
+        else:
+            return Response({'msg': False}, status=403)
