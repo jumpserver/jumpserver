@@ -37,6 +37,8 @@ def get_user_group_granted_assets(user_group):
         if not asset_permission.is_valid:
             continue
         for asset in asset_permission.get_granted_assets():
+            if not asset.is_active:
+                continue
             if asset in assets:
                 assets[asset] |= set(asset_permission.system_users.all())
             else:
@@ -127,6 +129,8 @@ def get_user_granted_assets_direct(user):
         if not asset_permission.is_valid:
             continue
         for asset in asset_permission.get_granted_assets():
+            if not asset.is_active:
+                continue
             if asset in assets:
                 assets[asset] |= set(asset_permission.system_users.all())
             else:
@@ -147,12 +151,13 @@ def get_user_granted_assets_inherit_from_user_groups(user):
     for user_group in user_groups:
         assets_inherited = get_user_group_granted_assets(user_group)
         for asset in assets_inherited:
+            if not asset.is_active:
+                continue
             if asset in assets:
                 assets[asset] |= assets_inherited[asset]
             else:
                 setattr(asset, 'inherited', True)
                 assets[asset] = assets_inherited[asset]
-
     return assets
 
 
@@ -167,6 +172,8 @@ def get_user_granted_assets(user):
     assets = assets_inherited
 
     for asset in assets_direct:
+        if not asset.is_active:
+            continue
         if asset in assets:
             assets[asset] |= assets_direct[asset]
         else:

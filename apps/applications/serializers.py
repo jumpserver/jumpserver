@@ -14,8 +14,9 @@ class TerminalSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Terminal
-        fields = ['id', 'name', 'remote_addr', 'type', 'url', 'comment', 'is_accepted',
-                  'is_active', 'get_type_display', 'proxy_online', 'is_alive']
+        fields = ['id', 'name', 'remote_addr', 'type', 'url', 'comment',
+                  'is_accepted', 'is_active', 'get_type_display',
+                  'proxy_online', 'is_alive']
 
     @staticmethod
     def get_proxy_online(obj):
@@ -31,6 +32,7 @@ class TerminalSerializer(serializers.ModelSerializer):
 
 
 class TerminalHeatbeatSerializer(serializers.ModelSerializer):
+    date_start = serializers.DateTimeField
     class Meta:
         model = TerminalHeatbeat
 

@@ -14,17 +14,16 @@ from .models import ProxyLog, CommandLog, LoginLog
 from .hands import User, Asset, SystemUser, AdminUserRequiredMixin
 
 
-date_now = timezone.localtime(timezone.now())
-now_s = date_now.strftime('%m/%d/%Y')
-seven_days_ago_s = (date_now-timezone.timedelta(7)).strftime('%m/%d/%Y')
-
-
 class ProxyLogListView(AdminUserRequiredMixin, ListView):
     model = ProxyLog
     template_name = 'audits/proxy_log_list.html'
     context_object_name = 'proxy_log_list'
 
     def get_queryset(self):
+        date_now = timezone.localtime(timezone.now())
+        now_s = date_now.strftime('%m/%d/%Y')
+        seven_days_ago_s = (date_now-timezone.timedelta(7)).strftime('%m/%d/%Y')
+
         self.queryset = super(ProxyLogListView, self).get_queryset()
         self.keyword = keyword = self.request.GET.get('keyword', '')
         self.username = username = self.request.GET.get('username', '')
@@ -37,7 +36,8 @@ class ProxyLogListView(AdminUserRequiredMixin, ListView):
             date_from = timezone.datetime.strptime(date_from_s, '%m/%d/%Y')
             self.queryset = self.queryset.filter(date_start__gt=date_from)
         if date_to_s:
-            date_to = timezone.datetime.strptime(date_to_s + ' 23:59:59', '%m/%d/%Y %H:%M:%S')
+            date_to = timezone.datetime.strptime(date_to_s + ' 23:59:59',
+                                                 '%m/%d/%Y %H:%M:%S')
             self.queryset = self.queryset.filter(date_start__lt=date_to)
         if username:
             self.queryset = self.queryset.filter(username=username)
@@ -54,7 +54,6 @@ class ProxyLogListView(AdminUserRequiredMixin, ListView):
         return self.queryset
 
     def get_context_data(self, **kwargs):
-        print(self.date_to_s)
         context = {
             'app': _('Audits'),
             'action': _('Proxy log list'),
@@ -110,6 +109,9 @@ class CommandLogListView(AdminUserRequiredMixin, ListView):
     context_object_name = 'command_list'
 
     def get_queryset(self):
+        date_now = timezone.localtime(timezone.now())
+        now_s = date_now.strftime('%m/%d/%Y')
+        seven_days_ago_s = (date_now-timezone.timedelta(7)).strftime('%m/%d/%Y')
         self.queryset = super(CommandLogListView, self).get_queryset()
         self.keyword = keyword = self.request.GET.get('keyword', '')
         self.sort = sort = self.request.GET.get('sort', '-datetime')
@@ -161,6 +163,9 @@ class LoginLogListView(AdminUserRequiredMixin, ListView):
     context_object_name = 'login_log_list'
 
     def get_queryset(self):
+        date_now = timezone.localtime(timezone.now())
+        now_s = date_now.strftime('%m/%d/%Y')
+        seven_days_ago_s = (date_now - timezone.timedelta(7)).strftime('%m/%d/%Y')
         self.queryset = super(LoginLogListView, self).get_queryset()
         self.keyword = keyword = self.request.GET.get('keyword', '')
         self.username = username = self.request.GET.get('username', '')
