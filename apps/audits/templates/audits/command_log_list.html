@@ -83,7 +83,7 @@
                 <td>{{ command.proxy_log.system_user }}</td>
                 <td><a href="{% url 'audits:proxy-log-detail' pk=command.proxy_log.id  %}">{{ command.proxy_log.id}}</a></td>
                 <td>{{ command.datetime }}</td>
-                <td>{{ command.output_decode |safe }}</td>
+                <td>{{ command.output_decode|safe }}</td>
             </tr>
         {% endfor %}
         </tbody>

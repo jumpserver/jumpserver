@@ -23,17 +23,20 @@ class TerminalRegisterView(ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         name = request.data.get('name', '')
-        remote_addr = request.META.get('X-Real-IP') or request.META.get('REMOTE_ADDR')
-        serializer = self.serializer_class(data={'name': name, 'remote_addr': remote_addr})
+        remote_addr = request.META.get('X-Real-IP') or \
+                      request.META.get('REMOTE_ADDR')
+        serializer = self.serializer_class(
+            data={'name': name, 'remote_addr': remote_addr})
 
         if get_object_or_none(Terminal, name=name):
-            return Response({'msg': 'Already register, Need administrator active it'}, status=200)
+            return Response({'msg': 'Already register, Need '
+                                    'administrator active it'}, status=200)
 
         if serializer.is_valid():
             terminal = serializer.save()
             app_user, access_key = terminal.create_related_app_user()
             data = {}
-            data['applications'] = copy.deepcopy(serializer.data)
+            data['terminal'] = copy.deepcopy(serializer.data)
             data['user'] = app_user.to_json()
             data['access_key_id'] = access_key.id
             data['access_key_secret'] = access_key.secret
@@ -54,11 +57,11 @@ class TerminalViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         return Response({'msg': 'Use register view except that'}, status=404)
 
-    def destroy(self, request, *args, **kwargs):
-        instance = self.get_object()
-        if instance.user is not None:
-            instance.user.delete()
-        return super(TerminalViewSet, self).destroy(request, *args, **kwargs)
+    # def destroy(self, request, *args, **kwargs):
+        # instance = self.get_object()
+        # if instance.user is not None:
+        #     instance.user.delete()
+        # return super(TerminalViewSet, self).destroy(request, *args, **kwargs)
 
 
 class TerminalHeatbeatViewSet(viewsets.ModelViewSet):

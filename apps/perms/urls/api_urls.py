@@ -7,30 +7,50 @@ from .. import api
 app_name = 'perms'
 
 router = routers.DefaultRouter()
-router.register('v1/asset-permissions', api.AssetPermissionViewSet, 'asset-permission')
+router.register('v1/asset-permissions',
+                api.AssetPermissionViewSet,
+                'asset-permission')
 
 urlpatterns = [
-    url(r'^v1/user/my/assets/$', api.MyGrantedAssetsApi.as_view(), name='my-assets'),
-    url(r'^v1/user/my/asset-groups/$', api.MyGrantedAssetsGroupsApi.as_view(), name='my-asset-groups'),
-    url(r'^v1/user/my/asset-group/(?P<pk>[0-9]+)/assets/$', api.MyAssetGroupAssetsApi.as_view(),
+    # 用户可以使用自己的Token或其它认证查看自己授权的资产,资产组等
+    url(r'^v1/user/my/assets/$',
+        api.MyGrantedAssetsApi.as_view(),
+        name='my-assets'),
+    url(r'^v1/user/my/asset-groups/$',
+        api.MyGrantedAssetsGroupsApi.as_view(),
+        name='my-asset-groups'),
+    url(r'^v1/user/my/asset-group/(?P<pk>[0-9]+)/assets/$',
+        api.MyAssetGroupAssetsApi.as_view(),
         name='user-my-asset-group-assets'),
 
-    # Select user permission of asset and asset group
-    url(r'^v1/user/(?P<pk>[0-9]+)/assets/$', api.UserGrantedAssetsApi.as_view(), name='user-assets'),
-    url(r'^v1/user/(?P<pk>[0-9]+)/asset-groups/$', api.UserGrantedAssetGroupsApi.as_view(),
+    # 查询某个用户授权的资产和资产组
+    url(r'^v1/user/(?P<pk>[0-9]+)/assets/$',
+        api.UserGrantedAssetsApi.as_view(),
+        name='user-assets'),
+    url(r'^v1/user/(?P<pk>[0-9]+)/asset-groups/$',
+        api.UserGrantedAssetGroupsApi.as_view(),
         name='user-asset-groups'),
 
-    # Select user group permission of asset and asset group
-    url(r'^v1/user-group/(?P<pk>[0-9]+)/assets/$', api.UserGroupGrantedAssetsApi.as_view(), name='user-group-assets'),
-    url(r'^v1/user-group/(?P<pk>[0-9]+)/asset-groups/$', api.UserGroupGrantedAssetGroupsApi.as_view(),
+    # 查询某个用户组授权的资产和资产组
+    url(r'^v1/user-group/(?P<pk>[0-9]+)/assets/$',
+        api.UserGroupGrantedAssetsApi.as_view(),
+        name='user-group-assets'),
+    url(r'^v1/user-group/(?P<pk>[0-9]+)/asset-groups/$',
+        api.UserGroupGrantedAssetGroupsApi.as_view(),
         name='user-group-asset-groups'),
 
-
-    # Revoke permission api
-    url(r'^v1/asset-permissions/user/revoke/', api.RevokeUserAssetPermission.as_view(),
+    # 回收用户或用户组授权
+    url(r'^v1/asset-permissions/user/revoke/$',
+        api.RevokeUserAssetPermission.as_view(),
         name='revoke-user-asset-permission'),
-    url(r'^v1/asset-permissions/user-group/revoke/', api.RevokeUserGroupAssetPermission.as_view(),
+    url(r'^v1/asset-permissions/user-group/revoke/$',
+        api.RevokeUserGroupAssetPermission.as_view(),
         name='revoke-user-group-asset-permission'),
+
+    # 验证用户是否有某个资产和系统用户的权限
+    url(r'v1/asset-permission/user/validate/$',
+        api.ValidateUserAssetPermissionView.as_view(),
+        name='validate-user-asset-permission')
 ]
 
 urlpatterns += router.urls

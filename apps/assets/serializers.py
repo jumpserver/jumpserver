@@ -99,6 +99,12 @@ class SystemUserSerializer(serializers.ModelSerializer):
         return fields
 
 
+class AssetSystemUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SystemUser
+        fields = ('id', 'name', 'username', 'protocol', 'auth_method', 'comment')
+
+
 class SystemUserUpdateAssetsSerializer(serializers.ModelSerializer):
     assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
 
@@ -145,13 +151,13 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
 
 class AssetGrantedSerializer(serializers.ModelSerializer):
-    system_users = SystemUserSerializer(many=True, read_only=True)
+    system_users_granted = AssetSystemUserSerializer(many=True, read_only=True)
     is_inherited = serializers.SerializerMethodField()
     system_users_join = serializers.SerializerMethodField()
 
     class Meta(object):
         model = Asset
-        fields = ("id", "hostname", "ip", "port", "system_users", "is_inherited",
+        fields = ("id", "hostname", "ip", "port", "system_users_granted", "is_inherited",
                   "is_active", "system_users_join", "comment")
 
     @staticmethod
@@ -163,7 +169,7 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_system_users_join(obj):
-        return ', '.join([system_user.username for system_user in obj.system_users.all()])
+        return ', '.join([system_user.username for system_user in obj.system_users_granted])
 
 
 class IDCSerializer(BulkSerializerMixin, serializers.ModelSerializer):

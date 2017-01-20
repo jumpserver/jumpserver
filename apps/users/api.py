@@ -1,16 +1,10 @@
 # ~*~ coding: utf-8 ~*~
 #
 
-import base64
-
-from django.core.cache import cache
-from django.conf import settings
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny
-from rest_framework.authentication import SessionAuthentication
 from rest_framework_bulk import BulkModelViewSet
 # from django_filters.rest_framework import DjangoFilterBackend
 
@@ -19,7 +13,8 @@ from common.utils import get_logger
 from .utils import check_user_valid, generate_token
 from .models import User, UserGroup
 from .hands import write_login_log_async
-from .permissions import IsSuperUser, IsAppUser, IsValidUser, IsSuperUserOrAppUser
+from .permissions import (
+    IsSuperUser, IsAppUser, IsValidUser)
 from . import serializers
 
 
@@ -98,8 +93,9 @@ class UserToken(APIView):
             password = request.data.get('password', '')
             public_key = request.data.get('public_key', '')
 
-            user, msg = check_user_valid(username=username, email=email,
-                                         password=password, public_key=public_key)
+            user, msg = check_user_valid(
+                username=username, email=email,
+                password=password, public_key=public_key)
         else:
             user = request.user
             msg = None
@@ -116,24 +112,31 @@ class UserProfile(APIView):
     def get(self, request):
         return Response(request.user.to_json())
 
+    def post(self, request):
+        return Response(request.user.to_json())
+
 
 class UserAuthApi(APIView):
     permission_classes = (AllowAny,)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         username = request.data.get('username', '')
         password = request.data.get('password', '')
         public_key = request.data.get('public_key', '')
         login_type = request.data.get('login_type', '')
-        login_ip = request.data.get('remote_addr', None) or request.META.get('REMOTE_ADDR', '')
+        login_ip = request.data.get('remote_addr', None)
         user_agent = request.data.get('HTTP_USER_AGENT', '')
 
-        user, msg = check_user_valid(username=username, password=password, public_key=public_key)
+        user, msg = check_user_valid(
+            username=username, password=password,
+            public_key=public_key)
 
         if user:
             token = generate_token(request, user)
-            write_login_log_async.delay(user.username, name=user.name, user_agent=user_agent,
-                                        login_ip=login_ip, login_type=login_type)
+            write_login_log_async.delay(
+                user.username, name=user.name,
+                user_agent=user_agent, login_ip=login_ip,
+                login_type=login_type)
             return Response({'token': token, 'user': user.to_json()})
         else:
             return Response({'msg': msg}, status=401)

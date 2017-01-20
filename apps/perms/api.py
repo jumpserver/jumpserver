@@ -1,16 +1,18 @@
 # ~*~ coding: utf-8 ~*~
 # 
 
+from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView, Response
-from rest_framework.decorators import api_view
 from rest_framework.generics import ListAPIView, get_object_or_404
 from rest_framework import viewsets
-from users.permissions import IsValidUser, IsSuperUser
+from users.permissions import IsValidUser, IsSuperUser, IsAppUser
 from common.utils import get_object_or_none
-from .utils import get_user_granted_assets, get_user_granted_asset_groups, get_user_asset_permissions, \
-    get_user_group_asset_permissions, get_user_group_granted_assets, get_user_group_granted_asset_groups
+from .utils import get_user_granted_assets, get_user_granted_asset_groups, \
+    get_user_asset_permissions, get_user_group_asset_permissions, \
+    get_user_group_granted_assets, get_user_group_granted_asset_groups
 from .models import AssetPermission
-from .hands import AssetGrantedSerializer, User, UserGroup, AssetGroup, Asset, AssetGroup, AssetGroupSerializer
+from .hands import AssetGrantedSerializer, User, UserGroup, AssetGroup, Asset, \
+    AssetGroup, AssetGroupSerializer, SystemUser
 from . import serializers
 
 
@@ -80,11 +82,12 @@ class UserGrantedAssetsApi(ListAPIView):
     def get_queryset(self):
         user_id = self.kwargs.get('pk', '')
 
+        queryset = []
         if user_id:
             user = get_object_or_404(User, id=user_id)
-            queryset = get_user_granted_assets(user)
-        else:
-            queryset = []
+            for k, v in get_user_granted_assets(user).items():
+                k.system_users_granted = v
+                queryset.append(k)
         return queryset
 
 
@@ -104,19 +107,26 @@ class UserGrantedAssetGroupsApi(ListAPIView):
 
 
 class MyGrantedAssetsApi(ListAPIView):
+    """授权给用户的资产列表
+    [{'hostname': 'x','ip': 'x', ..,
+      'system_users_granted': [{'name': 'x', .}, ...]
+    """
     permission_classes = (IsValidUser,)
     serializer_class = AssetGrantedSerializer
 
     def get_queryset(self):
+        queryset = []
         user = self.request.user
         if user:
-            queryset = get_user_granted_assets(user)
-        else:
-            queryset = []
+            for asset, system_users in get_user_granted_assets(user).items():
+                asset.system_users_granted = system_users
+                queryset.append(asset)
         return queryset
 
 
 class MyGrantedAssetsGroupsApi(APIView):
+    """授权给用户的资产组列表, 非直接通过授权规则授权的资产组列表, 而是授权资产的所有
+    资产组之和"""
     permission_classes = (IsValidUser,)
 
     def get(self, request, *args, **kwargs):
@@ -141,6 +151,7 @@ class MyGrantedAssetsGroupsApi(APIView):
 
 
 class MyAssetGroupAssetsApi(ListAPIView):
+    """授权用户资产组下的资产列表, 非该资产组的所有资产,而是被授权的"""
     permission_classes = (IsValidUser,)
     serializer_class = AssetGrantedSerializer
 
@@ -152,8 +163,9 @@ class MyAssetGroupAssetsApi(ListAPIView):
 
         if user and asset_group:
             assets = get_user_granted_assets(user)
-            for asset in assets:
-                if asset_group in asset.groups.all():
+            for asset in asset_group.assets.all():
+                if asset in assets:
+                    asset.system_users_granted = assets[asset]
                     queryset.append(asset)
         return queryset
 
@@ -186,3 +198,23 @@ class UserGroupGrantedAssetGroupsApi(ListAPIView):
         else:
             queryset = []
         return queryset
+
+
+class ValidateUserAssetPermissionView(APIView):
+    permission_classes = (IsAppUser,)
+
+    @staticmethod
+    def get(request):
+        user_id = request.query_params.get('user_id', '')
+        asset_id = request.query_params.get('asset_id', '')
+        system_id = request.query_params.get('system_user_id', '')
+
+        user = get_object_or_404(User, id=user_id)
+        asset = get_object_or_404(Asset, id=asset_id)
+        system_user = get_object_or_404(SystemUser, id=system_id)
+
+        assets_granted = get_user_granted_assets(user)
+        if system_user in assets_granted.get(asset, []):
+            return Response({'msg': True}, status=200)
+        else:
+            return Response({'msg': False}, status=403)
