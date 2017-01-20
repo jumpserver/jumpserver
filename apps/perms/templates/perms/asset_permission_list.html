@@ -2,7 +2,9 @@
 {% load i18n %}
 {% load common_tags %}
 {% block content_left_head %}
-    <a href="{% url 'perms:asset-permission-create' %}" class="btn btn-sm btn-primary "> {% trans "Create permission" %} </a>
+    <a href="{% url 'perms:asset-permission-create' %}" class="btn btn-sm btn-primary">
+        {% trans "Create permission" %}
+    </a>
 {% endblock %}
 
 {% block table_head %}
@@ -39,8 +41,12 @@
              {% endif %}
              </td>
              <td class="text-center">
-                 <a href="{% url 'perms:asset-permission-update' pk=asset_permission.id %}" class="btn btn-xs btn-info">{% trans 'Update' %}</a>
-                 <a href="{% url 'perms:asset-permission-delete' pk=asset_permission.id %}" class="btn btn-xs btn-danger del">{% trans 'Delete' %}</a>
+                 <a href="{% url 'perms:asset-permission-update' pk=asset_permission.id %}"
+                    class="btn btn-xs btn-info">{% trans 'Update' %}
+                 </a>
+                 <a class="btn btn-xs btn-danger btn-del" data-name="{{ asset_permission.name }}"
+                    data-uid="{{ asset_permission.id }}">{% trans 'Delete' %}
+                 </a>
              </td>
          </tr>
      {% endfor %}
@@ -54,6 +60,13 @@
                 "paging": false,
                 "order": []
             })
+        }).on('click', '.btn-del', function () {
+            var $this = $(this);
+            var name = $this.data('name');
+            var uid = $this.data('uid');
+            var the_url = '{% url "api-perms:asset-permission-detail" pk=99991937 %}'
+                    .replace('99991937', uid);
+            objectDelete($this, name, the_url);
         })
     </script>
 {% endblock %}

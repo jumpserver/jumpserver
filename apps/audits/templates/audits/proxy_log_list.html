@@ -24,17 +24,17 @@
         </div>
         <div class="input-group">
             <select class="select2 form-control" name="username">
-                <option value="">{% trans 'Select user' %}</option>
+                <option value="">{% trans 'User' %}</option>
                 {% for user in user_list %}
-                    <option value="{{ user.username }}" {% if user.username == username %} selected {% endif %}>{{ user.username }}</option>
+                    <option value="{{ user }}" {% if user == username %} selected {% endif %}>{{ user }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="input-group">
             <select class="select2 form-control" name="ip">
-                <option value="">{% trans 'Select asset' %}</option>
+                <option value="">{% trans 'Asset' %}</option>
                 {% for asset in asset_list %}
-                    <option value="{{ asset.ip }}" {% if asset.ip == ip %} selected {% endif %}>{{ asset.ip }}</option>
+                    <option value="{{ asset }}" {% if asset == ip %} selected {% endif %}>{{ asset }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -42,12 +42,12 @@
             <select class="select2 form-control" name="system_user">
                 <option value="">{% trans 'System user' %}</option>
                 {% for su in system_user_list %}
-                    <option value="{{ su.username }}" {% if su.username == system_user %} selected {% endif %}>{{ su.username }}</option>
+                    <option value="{{ su }}" {% if su == system_user %} selected {% endif %}>{{ su }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="input-group">
-            <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="{{ keyword }}">
+            <input type="text" class="form-control input-sm" name="keyword" placeholder="Command" value="{{ keyword }}">
         </div>
         <div class="input-group">
             <div class="input-group-btn">
@@ -108,6 +108,7 @@
             $('table').DataTable({
                 "searching": false,
                 "paging": false,
+                "bInfo" : false,
                 "order": []
             });
             $('.select2').select2();

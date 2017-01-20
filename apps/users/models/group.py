@@ -33,8 +33,9 @@ class UserGroup(NoDeleteModelMixin, Group):
 
     @classmethod
     def initial(cls):
-        group, created = cls.objects.get_or_create(name='Default', comment='Default user group for all user',
-                                                   created_by='System')
+        group, created = cls.objects.get_or_create(
+            name='Default', created_by='System',
+            comment='Default user group for all user')
         return group
 
     @classmethod

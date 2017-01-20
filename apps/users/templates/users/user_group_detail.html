@@ -30,6 +30,11 @@
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-default" href="{% url 'users:user-group-update' pk=user_group.id %}"><i class="fa fa-edit"></i>Update</a>
                             </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-danger btn-delete-user-group">
+                                    <i class="fa fa-edit"></i>Delete
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -184,6 +189,13 @@ $(document).ready(function () {
     });
     console.log(users);
     updateGroupMember(users)
+}).on('click', '.btn-delete-user-group', function () {
+    var $this = $(this);
+    var name = "{{ user_group.name }}";
+    var uid = "{{ user_group.id }}";
+    var the_url = '{% url "api-users:user-group-detail" pk=99991937 %}'.replace('99991937', uid);
+    var redirect_url = "{% url 'users:user-group-list' %}";
+    objectDelete($this, name, the_url, redirect_url);
 })
 </script>
 {% endblock %}

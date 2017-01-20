@@ -27,6 +27,11 @@
                         </div>
                     </div>
                     <div class="ibox-content">
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
                         <form enctype="multipart/form-data" method="post" class="form-horizontal" action="" >
                             {% csrf_token %}
                             {{ form.name|bootstrap_horizontal }}

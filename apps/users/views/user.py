@@ -118,13 +118,14 @@ class UserDetailView(AdminUserRequiredMixin, DetailView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class UserExportView(View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         spm = request.GET.get('spm', '')
         users_id = cache.get(spm)
         if not users_id and not isinstance(users_id, list):
             return HttpResponse('May be expired', status=404)
 
         users = User.objects.filter(id__in=users_id)
+        print(users)
         wb = Workbook()
         ws = wb.active
         ws.title = 'User'
@@ -133,9 +134,12 @@ class UserExportView(View):
         ws.append(header)
 
         for user in users:
-            ws.append([user.name, user.username, user.email,
-                       ','.join([group.name for group in user.groups.all()]),
-                        user.role, user.phone, user.wechat, user.comment])
+            print(user.name)
+            ws.append([
+                user.name, user.username, user.email,
+                ','.join([group.name for group in user.groups.all()]),
+                user.role, user.phone, user.wechat, user.comment,
+            ])
 
         filename = 'users-{}.xlsx'.format(
             timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S'))
@@ -144,7 +148,7 @@ class UserExportView(View):
         response['Content-Disposition'] = 'attachment; filename="%s"' % filename
         return response
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         try:
             users_id = json.loads(request.body).get('users_id', [])
         except ValueError:
@@ -180,11 +184,13 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
             return self.render_json_response(data)
 
         rows = ws.rows
-        header_need = ["name", 'username', 'email', 'groups', "role", "phone", "wechat", "comment"]
+        header_need = ["name", 'username', 'email', 'groups',
+                       "role", "phone", "wechat", "comment"]
         header = [col.value for col in next(rows)]
         print(header)
         if header != header_need:
-            data = {'valid': False, 'msg': 'Must be same format as template or export file'}
+            data = {'valid': False, 'msg': 'Must be same format as '
+                                           'template or export file'}
             return self.render_json_response(data)
 
         created = []

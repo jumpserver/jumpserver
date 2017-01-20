@@ -31,6 +31,11 @@
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-default" href="{% url 'perms:asset-permission-update' pk=asset_permission.id %}"><i class="fa fa-edit"></i>Update</a>
                             </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-danger btn-delete-perm">
+                                    <i class="fa fa-edit"></i>Delete
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -191,25 +196,15 @@
 {% endblock %}
 {% block custom_foot_js %}
     <script>
-{#        function switch_user_status(obj) {#}
-{#            var status = $(obj).prop('checked');#}
-{##}
-{#            $.ajax({#}
-{#                url: "{% url 'users:user-active-api' pk=user.id %}",#}
-{#                type: "PUT",#}
-{#                data: {#}
-{#                    'is_active': status#}
-{#                },#}
-{#                success: function (data, status) {#}
-{#                    console.log(data)#}
-{#                },#}
-{#                error: function () {#}
-{#                    console.log('error')#}
-{#                }#}
-{#            })#}
-{#        }#}
         $(document).ready(function () {
             $('.select2').select2();
-        });
+        }).on('click', '.btn-delete-perm', function () {
+            var $this = $(this);
+            var name = "{{ asset_permission.name }}";
+            var uid = "{{ asset_permission.id }}";
+            var the_url = '{% url "api-perms:asset-permission-detail" pk=99991937 %}'.replace('99991937', uid);
+            var redirect_url = "{% url 'perms:asset-permission-list' %}";
+            objectDelete($this, name, the_url, redirect_url);
+        })
     </script>
 {% endblock %}

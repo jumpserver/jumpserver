@@ -18,8 +18,8 @@ class Config:
     # SECURITY WARNING: keep the secret key used in production secret!
     SECRET_KEY = os.environ.get('SECRET_KEY') or '2vym+ky!997d5kkcc64mnz06y1mmui3lut#(^wd=%s_qj$1%x'
 
-    # How many line display every page, default 20
-    DISPLAY_PER_PAGE = 20
+    # How many line display every page, default 25
+    DISPLAY_PER_PAGE = 25
 
     # It's used to identify your site, When we send a create mail to user, we only know login url is /login/
     # But we should know the absolute url like: http://jms.jumpserver.org/login/, so SITE_URL is

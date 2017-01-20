@@ -213,12 +213,16 @@ function APIUpdateAttr(props) {
 }
 
 // Sweet Alert for Delete
-function objectDelete(obj, name, url) {
+function objectDelete(obj, name, url, redirectTo) {
     function doDelete() {
         var body = {};
         var success = function() {
             swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
-            $(obj).parent().parent().remove();
+            if (!redirectTo) {
+                $(obj).parent().parent().remove();
+            } else {
+                window.location.href=redirectTo;
+            }
         };
         var fail = function() {
             swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");

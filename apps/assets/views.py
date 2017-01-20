@@ -412,35 +412,20 @@ class IDCDeleteView(AdminUserRequiredMixin, DeleteView):
 
 class AdminUserListView(AdminUserRequiredMixin, TemplateView):
     model = AdminUser
-    # paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    # context_object_name = 'admin_user_list'
     template_name = 'assets/admin_user_list.html'
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Assets'),
             'action': _('Admin user list'),
-            # 'keyword': self.request.GET.get('keyword', '')
         }
         kwargs.update(context)
         return super(AdminUserListView, self).get_context_data(**kwargs)
 
-    # def get_queryset(self):
-    #     Todo: Default order by lose asset connection num
-        # self.queryset = super(AdminUserListView, self).get_queryset()
-        # self.keyword = keyword = self.request.GET.get('keyword', '')
-        # self.sort = sort = self.request.GET.get('sort', '-date_created')
-        #
-        # if keyword:
-        #     self.queryset = self.queryset.filter(Q(name__icontains=keyword) |
-        #                                          Q(comment__icontains=keyword))
-        #
-        # if sort:
-        #     self.queryset = self.queryset.order_by(sort)
-        # return self.queryset
 
-
-class AdminUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
+class AdminUserCreateView(AdminUserRequiredMixin,
+                          SuccessMessageMixin,
+                          CreateView):
     model = AdminUser
     form_class = forms.AdminUserForm
     template_name = 'assets/admin_user_create_update.html'
@@ -455,11 +440,12 @@ class AdminUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
         return super(AdminUserCreateView, self).get_context_data(**kwargs)
 
     def get_success_message(self, cleaned_data):
-        success_message = _('Create admin user <a href="%s">%s</a> successfully.' %
-                            (
-                                reverse_lazy('assets:admin-user-detail', kwargs={'pk': self.object.pk}),
-                                self.object.name,
-                            ))
+        success_message = _(
+            'Create admin user <a href="%s">%s</a> successfully.' % (
+                reverse_lazy('assets:admin-user-detail',
+                             kwargs={'pk': self.object.pk}),
+                self.object.name,
+            ))
         return success_message
 
     def form_invalid(self, form):
@@ -480,7 +466,8 @@ class AdminUserUpdateView(AdminUserRequiredMixin, UpdateView):
         return super(AdminUserUpdateView, self).get_context_data(**kwargs)
 
     def get_success_url(self):
-        success_url = reverse_lazy('assets:admin-user-detail', pk=self.object.pk)
+        success_url = reverse_lazy('assets:admin-user-detail',
+                                   kwargs={'pk': self.object.pk})
         return success_url
 
 
@@ -787,7 +774,7 @@ class AssetExportView(View):
             return HttpResponse('Json object not valid', status=400)
         spm = uuid.uuid4().get_hex()
         cache.set(spm, assets_id, 300)
-        url = reverse('assets:asset-export') + '?spm=%s' % spm
+        url = reverse_lazy('assets:asset-export') + '?spm=%s' % spm
         return JsonResponse({'redirect': url})
 
 

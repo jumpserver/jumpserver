@@ -21,6 +21,11 @@
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-default" href="{% url 'assets:admin-user-update' pk=admin_user.id %}"><i class="fa fa-edit"></i>Update</a>
                             </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-danger btn-delete-admin-user">
+                                    <i class="fa fa-edit"></i>Delete
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -311,6 +316,38 @@ $(document).ready(function () {
 		op_html: $('#actions').html()
 	};
 	jumpserver.initDataTable(options);
+
+    function adminUserDelete(name, url) {
+        function doDelete() {
+            var body = {};
+            var success = function() {
+                swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
+	            window.location.href="{% url 'assets:idc-list' %}";
+            };
+            var fail = function() {
+                swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");
+            };
+            APIUpdateAttr({
+                url: url,
+                body: JSON.stringify(body),
+                method: 'DELETE',
+                success: success,
+                error: fail
+            });
+        }
+        swal({
+            title: 'Are you sure delete ?',
+            text: " [" + name + "] ",
+            type: "warning",
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: 'Confirm',
+            closeOnConfirm: false
+        }, function () {
+            doDelete()
+        });
+    }
 })
 
 .on('click', '.btn-replace-asset-admin_user', function () {
@@ -392,8 +429,14 @@ $(document).ready(function () {
 			var data = {"assets": assets};
 			objectRemove($this, name, the_url, data);
 		}
-	});
-
-});
+	})
+}).on('click', '.btn-delete-admin-user', function () {
+    var $this = $(this);
+    var name = "{{ admin_user.name }}";
+    var uid = "{{ admin_user.id }}";
+    var the_url = '{% url "api-assets:admin-user-detail" pk=99991937 %}'.replace('99991937', uid);
+    var redirect_url = "{% url 'assets:admin-user-list' %}";
+    objectDelete($this, name, the_url, redirect_url);
+})
 </script>
 {% endblock %}

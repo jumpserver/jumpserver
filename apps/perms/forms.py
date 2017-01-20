@@ -26,16 +26,21 @@ class AssetPermissionForm(forms.ModelForm):
             'system_users', 'is_active', 'date_expired', 'comment',
         ]
         widgets = {
-            'users': forms.SelectMultiple(attrs={'class': 'select2',
-                                                 'data-placeholder': _('Select users')}),
-            'user_groups': forms.SelectMultiple(attrs={'class': 'select2',
-                                                       'data-placeholder': _('Select user groups')}),
-            'assets': forms.SelectMultiple(attrs={'class': 'select2',
-                                                  'data-placeholder': _('Select assets')}),
-            'asset_groups': forms.SelectMultiple(attrs={'class': 'select2',
-                                                        'data-placeholder': _('Select asset groups')}),
-            'system_users': forms.SelectMultiple(attrs={'class': 'select2',
-                                                        'data-placeholder': _('Select system users')}),
+            'users': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select users')}),
+            'user_groups': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select user groups')}),
+            'assets': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select assets')}),
+            'asset_groups': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select asset groups')}),
+            'system_users': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select system users')}),
         }
         help_texts = {
             'name': '* required',

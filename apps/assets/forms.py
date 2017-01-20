@@ -6,23 +6,6 @@ from .models import IDC, Asset, AssetGroup, AdminUser, SystemUser, Tag
 from common.utils import validate_ssh_private_key, ssh_pubkey_gen
 
 
-# class AssetForm(forms.ModelForm):
-#     class Meta:
-#         model = Asset
-#
-#         fields = [
-#             'ip', 'other_ip', 'remote_card_ip', 'hostname', 'port', 'groups', 'username', 'password',
-#             'idc', 'mac_address', 'brand', 'cpu', 'memory', 'disk', 'os', 'cabinet_no', 'cabinet_pos',
-#             'number', 'status', 'type', 'env', 'sn', 'is_active', 'comment', 'admin_user', 'system_users'
-#         ]
-#
-#         widgets = {
-#             'groups': forms.SelectMultiple(attrs={'class': 'select2-groups', 'data-placeholder': _('Select asset groups')}),
-#             'system_user': forms.SelectMultiple(attrs={'class': 'select2-system-user', 'data-placeholder': _('Select asset system user')}),
-#             'admin_user': forms.SelectMultiple(attrs={'class': 'select2-admin-user', 'data-placeholder': _('Select asset admin user')}),
-        # }
-#
-
 class AssetCreateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         instance = kwargs.get('instance', None)
@@ -142,15 +125,19 @@ class IDCForm(forms.ModelForm):
 
 class AdminUserForm(forms.ModelForm):
     # Admin user assets define, let user select, save it in form not in view
-    assets = forms.ModelMultipleChoiceField(queryset=Asset.objects.all(),
-                                            label=_('Asset'),
-                                            required=False,
-                                            widget=forms.SelectMultiple(
-                                                attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
-                                            )
+    assets = forms.ModelMultipleChoiceField(
+        queryset=Asset.objects.all(),
+        label=_('Asset'),
+        required=False,
+        widget=forms.SelectMultiple(
+            attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
+    )
     # Form field name can not start with `_`, so redefine it,
-    password = forms.CharField(widget=forms.PasswordInput, max_length=100, min_length=8, strip=True,
-                               help_text=_('If also set private key, use that first'), required=False)
+    password = forms.CharField(
+        widget=forms.PasswordInput, max_length=100,
+        min_length=8, strip=True, required=False,
+        help_text=_('If also set private key, use that first'),
+    )
     # Need use upload private key file except paste private key content
     private_key_file = forms.FileField(required=False)
 
@@ -173,11 +160,11 @@ class AdminUserForm(forms.ModelForm):
         admin_user = super(AdminUserForm, self).save(commit=commit)
         password = self.cleaned_data['password']
         private_key = self.cleaned_data['private_key_file']
-        public_key = ssh_pubkey_gen(private_key)
 
         if password:
             admin_user.password = password
         if private_key:
+            public_key = ssh_pubkey_gen(private_key)
             admin_user.private_key = private_key
             admin_user.public_key = public_key
         admin_user.save()
@@ -196,8 +183,9 @@ class AdminUserForm(forms.ModelForm):
         password = self.cleaned_data['password']
         private_key_file = self.cleaned_data.get('private_key_file', '')
 
-        if not (password or private_key_file):
-            raise forms.ValidationError(_('Password and private key file must be input one'))
+        if not self.instance and not (password or private_key_file):
+            raise forms.ValidationError(
+                _('Password and private key file must be input one'))
 
     class Meta:
         model = AdminUser
