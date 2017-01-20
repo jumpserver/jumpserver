@@ -3,7 +3,6 @@
 
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView, Response
-from rest_framework.decorators import api_view
 from rest_framework.generics import ListAPIView, get_object_or_404
 from rest_framework import viewsets
 from users.permissions import IsValidUser, IsSuperUser, IsAppUser
@@ -206,9 +205,9 @@ class ValidateUserAssetPermissionView(APIView):
 
     @staticmethod
     def get(request):
-        user_id = request.params.get('user_id', '')
-        asset_id = request.params.get('asset_id', '')
-        system_id = request.params.get('system_id', '')
+        user_id = request.query_params.get('user_id', '')
+        asset_id = request.query_params.get('asset_id', '')
+        system_id = request.query_params.get('system_user_id', '')
 
         user = get_object_or_404(User, id=user_id)
         asset = get_object_or_404(Asset, id=asset_id)

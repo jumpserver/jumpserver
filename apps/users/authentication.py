@@ -2,6 +2,7 @@
 #
 
 import base64
+import uuid
 import hashlib
 import time
 
@@ -72,6 +73,10 @@ class AccessKeyAuthentication(authentication.BaseAuthentication):
             raise exceptions.AuthenticationFailed(msg)
 
         access_key_id = sign[0]
+        try:
+            uuid.UUID(access_key_id)
+        except ValueError:
+            raise exceptions.AuthenticationFailed('Access key id invalid')
         request_signature = sign[1]
 
         return self.authenticate_credentials(

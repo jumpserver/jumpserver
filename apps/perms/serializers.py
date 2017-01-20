@@ -11,6 +11,7 @@ from .hands import User
 class AssetPermissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssetPermission
+        fields = '__all__'
 
 
 class UserAssetPermissionSerializer(AssetPermissionSerializer):
@@ -22,5 +23,4 @@ class UserAssetPermissionSerializer(AssetPermissionSerializer):
             return True
         else:
             return False
-
 

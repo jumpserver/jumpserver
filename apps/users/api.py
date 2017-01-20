@@ -1,16 +1,12 @@
 # ~*~ coding: utf-8 ~*~
 #
 
-import base64
-
 from rest_framework import generics, viewsets
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework_bulk import BulkModelViewSet
-from rest_framework.authentication import CSRFCheck
 # from django_filters.rest_framework import DjangoFilterBackend
-from django.conf import settings
 
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
@@ -131,14 +127,16 @@ class UserAuthApi(APIView):
         login_ip = request.data.get('remote_addr', None)
         user_agent = request.data.get('HTTP_USER_AGENT', '')
 
-        user, msg = check_user_valid(username=username, password=password,
-                                     public_key=public_key)
+        user, msg = check_user_valid(
+            username=username, password=password,
+            public_key=public_key)
 
         if user:
             token = generate_token(request, user)
-            write_login_log_async.delay(user.username, name=user.name,
-                                        user_agent=user_agent, login_ip=login_ip,
-                                        login_type=login_type)
+            write_login_log_async.delay(
+                user.username, name=user.name,
+                user_agent=user_agent, login_ip=login_ip,
+                login_type=login_type)
             return Response({'token': token, 'user': user.to_json()})
         else:
             return Response({'msg': msg}, status=401)
