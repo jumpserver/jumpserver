@@ -81,6 +81,8 @@ class Config:
     # EMAIL_USE_TLS = False  # If port is 587, set True
     # EMAIL_SUBJECT_PREFIX = '[Jumpserver] '
 
+    CAPTCHA_TEST_MODE = False
+
     def __init__(self):
         pass
 
@@ -121,4 +123,3 @@ config = {
 }
 
 env = 'development'
-

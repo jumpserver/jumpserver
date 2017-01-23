@@ -14,7 +14,6 @@ import os
 import sys
 
 from django.urls import reverse_lazy
-from datetime import timedelta
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -299,11 +298,11 @@ CELERY_RESULT_BACKEND = BROKER_URL
 # crontab job
 # CELERYBEAT_SCHEDULE = {
 #     Check applications is alive every 10m
-    # 'check_terminal_alive': {
-    #     'task': 'applications.tasks.check_terminal_alive',
-    #     'schedule': timedelta(seconds=TERMINAL_HEATBEAT_INTERVAL),
-    #     'args': (),
-    # },
+# 'check_terminal_alive': {
+#     'task': 'applications.tasks.check_terminal_alive',
+#     'schedule': timedelta(seconds=TERMINAL_HEATBEAT_INTERVAL),
+#     'args': (),
+# },
 # }
 
 
@@ -322,4 +321,4 @@ CACHES = {
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
 CAPTCHA_IMAGE_SIZE = (75, 33)
 CAPTCHA_FOREGROUND_COLOR = '#001100'
-
+CAPTCHA_TEST_MODE = CONFIG.CAPTCHA_TEST_MODE
