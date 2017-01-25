@@ -225,6 +225,7 @@ table.dataTable tbody td.selected td i.text-navy
     background: #f1f1f1;
     margin-right: 2px;
 }
+
 .form-asset-on{
     border: 1px solid #e5e6e7;
     padding-top:5px;
@@ -263,4 +264,16 @@ div.dataTables_wrapper div.dataTables_filter,
 
 div.dataTables_wrapper div.dataTables_filter {
     margin-left: 15px;
+}
+
+.simple-tag {
+  background-color: #f3f3f4;
+  border: 1px solid #e7eaec;
+  border-radius: 2px;
+  color: inherit;
+  display: inline-block;
+  font-size: 10px;
+  margin-right: 5px;
+  margin-top: 5px;
+  padding: 5px 12px;
 }

@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 from django.conf.urls import url
+
 from .. import views
 
 app_name = 'users'
@@ -19,6 +20,11 @@ urlpatterns = [
     url(r'^password/reset/success$',
         views.UserResetPasswordSuccessView.as_view(),
         name='reset-password-success'),
+
+    # Profile
+    url(r'^profile/$',
+        views.UserProfileView.as_view(),
+        name='user-profile'),
 
     # User view
     url(r'^user$', views.UserListView.as_view(), name='user-list'),
