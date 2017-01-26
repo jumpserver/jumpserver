@@ -1,6 +1,4 @@
 {% extends 'base.html' %}
-{% load common_tags %}
-{% load users_tags %}
 {% load static %}
 {% load i18n %}
 
@@ -55,7 +53,7 @@
                                         <tbody>
                                         <tr class="no-borders-tr">
                                             <td colspan="2">
-                                                <img src="{{ user|user_avatar_url }}" class="img-circle" width="64" height="64">
+                                                <img src="{{ user.avatar_url }}" class="img-circle" width="64" height="64">
                                             </td>
                                         </tr>
                                         <tr>

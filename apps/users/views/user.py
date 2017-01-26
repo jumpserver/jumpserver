@@ -324,8 +324,5 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
             'asset_groups': asset_groups,
             'permissions': permissions
         }
-        print assets
-        print asset_groups
-        print permissions
         kwargs.update(context)
         return super(UserProfileView, self).get_context_data(**kwargs)

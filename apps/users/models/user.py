@@ -1,20 +1,21 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
+import os
 
 from collections import OrderedDict
 
+from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
 from django.core import signing
-from django.conf import settings
-from django.db import models, IntegrityError
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
-from common.utils import signer, date_expired_default
 from . import UserGroup
+from common.utils import signer, date_expired_default
 
 
 __all__ = ['User']
@@ -155,6 +156,17 @@ class User(AbstractUser):
         if self.ssH_public_key == public_key:
             return True
         return False
+
+    def avatar_url(self):
+        if self.avatar:
+            return self.avatar.url
+        else:
+            default_dir = os.path.join(settings.MEDIA_ROOT, 'avatar', 'default')
+            if os.path.isdir(default_dir):
+                default_avatar_list = os.listdir(default_dir)
+                default_avatar = default_avatar_list[len(self.username) % len(default_avatar_list)]
+                return os.path.join(settings.MEDIA_URL, 'avatar', 'default',  default_avatar)
+        return 'https://www.gravatar.com/avatar/c6812ab450230979465d7bf288eadce2a?s=120&d=identicon'
 
     def generate_reset_token(self):
         return signer.sign_t({'reset': self.id, 'email': self.email}, expires_in=3600)

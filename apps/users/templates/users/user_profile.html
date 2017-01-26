@@ -1,6 +1,4 @@
 {% extends 'base.html' %}
-{% load common_tags %}
-{% load users_tags %}
 {% load static %}
 {% load i18n %}
 
@@ -11,7 +9,7 @@
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
-            <div class="col-sm-4">
+            <div class="col-sm-6">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
                         <span class="label label-primary"><b>{{ user.name }}</b></span>
@@ -84,7 +82,7 @@
                                         <td>
                                             {% for group in asset_groups %}
                                             <span class="simple-tag with-link">
-                                                <a href="#">{{ group.name }}</a>
+                                                <a href="{% url 'assets:asset-group-detail' group.id %}">{{ group.name }}</a>
                                             </span>
                                             {% endfor %}
                                         </td>
@@ -94,7 +92,7 @@
                                         <td>
                                             {% for perm in permissions %}
                                             <span class="simple-tag with-link">
-                                                <a href="#">{{ perm.name }}</a>
+                                                <a href="{% url 'perms:asset-permission-detail' perm.id %}">{{ perm.name }}</a>
                                             </span>
                                             {% endfor %}
                                         </td>
@@ -105,8 +103,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-sm-4"></div>
-            <div class="col-sm-4"></div>
+            <div class="col-sm-6"></div>
         </div>
     </div>
 {% endblock %}
