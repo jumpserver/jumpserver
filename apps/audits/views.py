@@ -1,17 +1,23 @@
 # ~*~ coding: utf-8 ~*~
 #
-import datetime
+import time
+from datetime import datetime
 
+import pytz
 from django.views.generic import ListView, UpdateView, DeleteView, DetailView, TemplateView
 from django.views.generic.edit import SingleObjectMixin
 from django.utils.translation import ugettext as _
 from django.utils import timezone
+from django.utils.module_loading import import_string
 from django.urls import reverse_lazy
+from django.http import HttpResponse
 from django.conf import settings
 from django.db.models import Q
 
 from .models import ProxyLog, CommandLog, LoginLog
 from .hands import User, Asset, SystemUser, AdminUserRequiredMixin
+from audits.backends import command_store
+from audits.backends import CommandLogSerializer
 
 
 class ProxyLogListView(AdminUserRequiredMixin, ListView):
@@ -19,42 +25,45 @@ class ProxyLogListView(AdminUserRequiredMixin, ListView):
     template_name = 'audits/proxy_log_list.html'
     context_object_name = 'proxy_log_list'
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-
-    keyword = username = ip = system_user = date_from_s = date_to_s = ''
+    keyword = user = asset = system_user = date_from_s = date_to_s = ''
+    ordering = ['is_finished', '-id']
+    date_format = '%m/%d/%Y'
 
     def get_queryset(self):
         date_now = timezone.localtime(timezone.now())
-        now_s = date_now.strftime('%m/%d/%Y')
-        seven_days_ago_s = (date_now-timezone.timedelta(7)).strftime('%m/%d/%Y')
+        date_to_default = date_now.strftime(self.date_format)
+        date_from_default = (date_now-timezone.timedelta(7))\
+            .strftime(self.date_format)
 
         self.queryset = super(ProxyLogListView, self).get_queryset()
-        self.keyword = keyword = self.request.GET.get('keyword', '')
-        self.username = username = self.request.GET.get('username', '')
-        self.ip = ip = self.request.GET.get('ip', '')
-        self.system_user = system_user = self.request.GET.get('system_user', '')
-        self.date_from_s = date_from_s = self.request.GET.get('date_from', '%s' % seven_days_ago_s)
-        self.date_to_s = date_to_s = self.request.GET.get('date_to', '%s' % now_s)
+        self.keyword = self.request.GET.get('keyword', '')
+        self.user = self.request.GET.get('user')
+        self.asset = self.request.GET.get('asset')
+        self.system_user = self.request.GET.get('system_user')
+        self.date_from_s = self.request.GET.get('date_from', date_from_default)
+        self.date_to_s = self.request.GET.get('date_to', date_to_default)
 
-        if date_from_s:
-            date_from = timezone.datetime.strptime(date_from_s, '%m/%d/%Y')
-            self.queryset = self.queryset.filter(date_start__gt=date_from)
-        if date_to_s:
-            date_to = timezone.datetime.strptime(date_to_s + ' 23:59:59',
-                                                 '%m/%d/%Y %H:%M:%S')
-            self.queryset = self.queryset.filter(date_start__lt=date_to)
-        if username:
-            self.queryset = self.queryset.filter(username=username)
-        if ip:
-            self.queryset = self.queryset.filter(ip=ip)
-        if system_user:
-            self.queryset = self.queryset.filter(system_user=system_user)
-        if keyword:
+        filter_kwargs = {}
+        if self.date_from_s:
+            date_from = datetime.strptime(self.date_from_s, self.date_format)
+            date_from.replace(tzinfo=timezone.get_current_timezone())
+            filter_kwargs['date_start__gt'] = date_from
+        if self.date_to_s:
+            date_to = timezone.datetime.strptime(
+                self.date_to_s + ' 23:59:59', '%m/%d/%Y %H:%M:%S')
+            date_to.replace(tzinfo=timezone.get_current_timezone())
+            filter_kwargs['date_start__lt'] = date_to
+        if self.user:
+            filter_kwargs['user'] = self.user
+        if self.asset:
+            filter_kwargs['asset'] = self.asset
+        if self.system_user:
+            filter_kwargs['system_user'] = self.system_user
+        if self.keyword:
             self.queryset = self.queryset.filter(
-                Q(username__contains=keyword) |
-                Q(name__icontains=keyword) |
-                Q(hostname__icontains=keyword) |
-                Q(ip__icontains=keyword) |
-                Q(system_user__icontains=keyword)).distinct()
+                Q(user__icontains=self.keyword) |
+                Q(asset__icontains=self.keyword) |
+                Q(system_user__icontains=self.keyword)).distinct()
         return self.queryset
 
     def get_context_data(self, **kwargs):
@@ -62,16 +71,16 @@ class ProxyLogListView(AdminUserRequiredMixin, ListView):
             'app': _('Audits'),
             'action': _('Proxy log list'),
             'user_list': set(
-                list(ProxyLog.objects.values_list('username', flat=True))),
+                list(ProxyLog.objects.values_list('user', flat=True))),
             'asset_list': set(
-                list(ProxyLog.objects.values_list('ip', flat=True))),
+                list(ProxyLog.objects.values_list('asset', flat=True))),
             'system_user_list': set(
                 list(ProxyLog.objects.values_list('system_user', flat=True))),
             'keyword': self.keyword,
             'date_from': self.date_from_s,
             'date_to': self.date_to_s,
-            'username': self.username,
-            'ip': self.ip,
+            'user': self.user,
+            'asset': self.asset,
             'system_user': self.system_user,
         }
         kwargs.update(context)
@@ -90,7 +99,7 @@ class ProxyLogDetailView(AdminUserRequiredMixin,
         return super(ProxyLogDetailView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
-        return list(self.object.commands.all())
+        return list(command_store.filter(proxy_log_id=self.object.id))
 
     def get_context_data(self, **kwargs):
         context = {
@@ -117,42 +126,49 @@ class ProxyLogCommandsListView(AdminUserRequiredMixin,
 
 
 class CommandLogListView(AdminUserRequiredMixin, ListView):
-    model = CommandLog
     template_name = 'audits/command_log_list.html'
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'command_list'
-    keyword = username = ip = system_user = date_from_s = date_to_s = ''
+    user = asset = system_user = command = date_from_s = date_to_s = ''
+    date_format = '%m/%d/%Y'
+    ordering = ['-id']
 
     def get_queryset(self):
         date_now = timezone.localtime(timezone.now())
-        now_s = date_now.strftime('%m/%d/%Y')
-        seven_days_ago_s = (date_now-timezone.timedelta(7)).strftime('%m/%d/%Y')
-        self.queryset = super(CommandLogListView, self).get_queryset()
-        self.keyword = keyword = self.request.GET.get('keyword', '')
-        self.username = username = self.request.GET.get('username', '')
-        self.ip = ip = self.request.GET.get('ip', '')
-        self.system_user = system_user = self.request.GET.get('system_user', '')
-        self.date_from_s = date_from_s = \
-            self.request.GET.get('date_from', '%s' % seven_days_ago_s)
-        self.date_to_s = date_to_s = \
-            self.request.GET.get('date_to', '%s' % now_s)
+        date_to_default = date_now.strftime(self.date_format)
+        date_from_default = (date_now - timezone.timedelta(7)) \
+            .strftime(self.date_format)
+        self.command = self.request.GET.get('command', '')
+        self.user = self.request.GET.get('user')
+        self.asset = self.request.GET.get('asset')
+        self.system_user = self.request.GET.get('system_user')
+        self.date_from_s = \
+            self.request.GET.get('date_from', date_from_default)
+        self.date_to_s = \
+            self.request.GET.get('date_to', date_to_default)
 
-        if date_from_s:
-            date_from = timezone.datetime.strptime(date_from_s, '%m/%d/%Y')
-            self.queryset = self.queryset.filter(datetime__gt=date_from)
-        if date_to_s:
-            date_to = timezone.datetime.strptime(
-                date_to_s + ' 23:59:59', '%m/%d/%Y %H:%M:%S')
-            self.queryset = self.queryset.filter(datetime__lt=date_to)
-        if username:
-            self.queryset = self.queryset.filter(proxy_log__username=username)
-        if ip:
-            self.queryset = self.queryset.filter(proxy_log__ip=ip)
-        if system_user:
-            self.queryset = self.queryset.filter(
-                proxy_log__system_user=system_user)
-        if keyword:
-            self.queryset = self.queryset.filter(command=keyword)
+        filter_kwargs = {}
+        if self.date_from_s:
+            date_from = datetime.strptime(self.date_from_s, self.date_format)\
+                .replace(tzinfo=timezone.get_current_timezone())
+            # date_from_utc = date_from.astimezone(pytz.utc)
+            date_from_ts = time.mktime(date_from.timetuple())
+            filter_kwargs['date_from_ts'] = date_from_ts
+        if self.date_to_s:
+            date_to = datetime.strptime(
+                self.date_to_s + ' 23:59:59', '%m/%d/%Y %H:%M:%S')\
+                .replace(tzinfo=timezone.get_current_timezone())
+            date_to_ts = time.mktime(date_to.timetuple())
+            filter_kwargs['date_to_ts'] = date_to_ts
+        if self.user:
+            filter_kwargs['user'] = self.user
+        if self.asset:
+            filter_kwargs['asset'] = self.asset
+        if self.system_user:
+            filter_kwargs['system_user'] = self.system_user
+        if self.command:
+            filter_kwargs['command'] = self.command
+        self.queryset = command_store.filter(**filter_kwargs).order_by(*self.ordering)
         return self.queryset
 
     def get_context_data(self, **kwargs):
@@ -161,12 +177,12 @@ class CommandLogListView(AdminUserRequiredMixin, ListView):
             'action': _('Command log list'),
             'user_list': User.objects.all().order_by('username'),
             'asset_list': Asset.objects.all().order_by('ip'),
-            'system_user_list': SystemUser.objects.all().order_by('name'),
-            'keyword': self.keyword,
+            'system_user_list': SystemUser.objects.all().order_by('username'),
+            'command': self.command,
             'date_from': self.date_from_s,
             'date_to': self.date_to_s,
-            'username': self.username,
-            'ip': self.ip,
+            'user': self.user,
+            'asset': self.asset,
             'system_user': self.system_user,
         }
         kwargs.update(context)
@@ -178,7 +194,6 @@ class LoginLogListView(AdminUserRequiredMixin, ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     template_name = 'audits/login_log_list.html'
     context_object_name = 'login_log_list'
-
     keyword = username = date_from_s = date_to_s = ''
 
     def get_queryset(self):

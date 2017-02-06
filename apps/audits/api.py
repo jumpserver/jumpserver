@@ -5,11 +5,12 @@
 from __future__ import absolute_import, unicode_literals
 
 from rest_framework import generics, viewsets
-from rest_framework.views import APIView, Response
 from rest_framework_bulk import BulkModelViewSet
 
+from audits.backends import command_store
+from audits.backends.command.serializers import CommandLogSerializer
 from . import models, serializers
-from .hands import IsSuperUserOrAppUser, Terminal, IsAppUser
+from .hands import IsSuperUserOrAppUser, IsAppUser
 
 
 class ProxyLogReceiveView(generics.CreateAPIView):
@@ -47,8 +48,21 @@ class ProxyLogViewSet(viewsets.ModelViewSet):
     permission_classes = (IsSuperUserOrAppUser,)
 
 
-class CommandLogViewSet(viewsets.ModelViewSet):
-    queryset = models.CommandLog.objects.all()
-    serializer_class = serializers.CommandLogSerializer
+class CommandLogViewSet(BulkModelViewSet):
+    """接受app发送来的command log, 格式如下
+    {
+        "proxy_log_id": 23,
+        "user": "admin",
+        "asset": "localhost",
+        "system_user": "web",
+        "command_no": 1,
+        "command": "whoami",
+        "output": "d2hvbWFp",  # base64.b64encode(s)
+        "timestamp": 1485238673.0
+    }
+
+    """
+    queryset = command_store.all()
+    serializer_class = CommandLogSerializer
     permission_classes = (IsSuperUserOrAppUser,)
 

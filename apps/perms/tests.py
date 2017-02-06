@@ -1,3 +1,4 @@
 from django.test import TestCase
 
-# Create your tests here.
+from django.contrib.sessions.backends import file, db, cache
+from django.contrib.auth.views import login

@@ -79,6 +79,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'jumpserver.middleware.TimezoneMiddleware',
 ]
 
 ROOT_URLCONF = 'jumpserver.urls'
@@ -322,4 +323,6 @@ CACHES = {
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
 CAPTCHA_IMAGE_SIZE = (75, 33)
 CAPTCHA_FOREGROUND_COLOR = '#001100'
+
+COMMAND_STORE_BACKEND = 'audits.backends.command.db'
 

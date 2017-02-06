@@ -31,7 +31,9 @@ class UserCreateUpdateForm(forms.ModelForm):
             'email': '* required',
         }
         widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Join user groups')}),
+            'groups': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Join user groups')}),
         }
 
 
@@ -41,29 +43,11 @@ class UserBulkImportForm(forms.ModelForm):
         fields = ['username', 'email', 'enable_otp', 'role']
 
 
-# class UserUpdateForm(forms.ModelForm):
-#
-#     class Meta:
-#         model = User
-#         fields = [
-#             'name', 'email', 'groups', 'wechat',
-#             'phone', 'enable_otp', 'role', 'date_expired', 'comment',
-#         ]
-#         help_texts = {
-#             'username': '* required',
-#             'email': '* required',
-#             'groups': '* required'
-#         }
-#         widgets = {
-#             'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Join user groups')}),
-#         }
-
-
 class UserGroupForm(forms.ModelForm):
     class Meta:
         model = UserGroup
         fields = [
-            'name', 'comment',
+            'name', 'comment'
         ]
         help_texts = {
             'name': '* required'
@@ -87,7 +71,8 @@ class UserKeyForm(forms.Form):
     def clean_public_key(self):
         public_key = self.cleaned_data['public_key']
         if self.user.public_key and public_key == self.user.public_key:
-            raise forms.ValidationError(_('Public key should not be the same as your old one.'))
+            raise forms.ValidationError(_('Public key should not be the '
+                                          'same as your old one.'))
 
         if not validate_ssh_public_key(public_key):
             raise forms.ValidationError(_('Not a valid ssh public key'))
@@ -97,7 +82,8 @@ class UserKeyForm(forms.Form):
 class UserPrivateAssetPermissionForm(forms.ModelForm):
 
     def save(self, commit=True):
-        self.instance = super(UserPrivateAssetPermissionForm, self).save(commit=commit)
+        self.instance = super(UserPrivateAssetPermissionForm, self)\
+            .save(commit=commit)
         self.instance.users = [self.user]
         self.instance.save()
         return self.instance
@@ -108,19 +94,23 @@ class UserPrivateAssetPermissionForm(forms.ModelForm):
             'assets', 'asset_groups', 'system_users', 'name',
         ]
         widgets = {
-            'assets': forms.SelectMultiple(attrs={'class': 'select2',
-                                                  'data-placeholder': _('Select assets')}),
-            'asset_groups': forms.SelectMultiple(attrs={'class': 'select2',
-                                                        'data-placeholder': _('Select asset groups')}),
-            'system_users': forms.SelectMultiple(attrs={'class': 'select2',
-                                                        'data-placeholder': _('Select system users')}),
+            'assets': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select assets')}),
+            'asset_groups': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select asset groups')}),
+            'system_users': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select system users')}),
         }
 
 
 class UserGroupPrivateAssetPermissionForm(forms.ModelForm):
 
     def save(self, commit=True):
-        self.instance = super(UserGroupPrivateAssetPermissionForm, self).save(commit=commit)
+        self.instance = super(UserGroupPrivateAssetPermissionForm, self)\
+            .save(commit=commit)
         self.instance.user_groups = [self.user_group]
         self.instance.save()
         return self.instance
@@ -131,12 +121,15 @@ class UserGroupPrivateAssetPermissionForm(forms.ModelForm):
             'assets', 'asset_groups', 'system_users', 'name',
         ]
         widgets = {
-            'assets': forms.SelectMultiple(attrs={'class': 'select2',
-                                                  'data-placeholder': _('Select assets')}),
-            'asset_groups': forms.SelectMultiple(attrs={'class': 'select2',
-                                                        'data-placeholder': _('Select asset groups')}),
-            'system_users': forms.SelectMultiple(attrs={'class': 'select2',
-                                                        'data-placeholder': _('Select system users')}),
+            'assets': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select assets')}),
+            'asset_groups': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select asset groups')}),
+            'system_users': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select system users')}),
         }
 
 

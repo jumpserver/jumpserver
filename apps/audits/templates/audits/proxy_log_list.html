@@ -47,7 +47,7 @@
             </select>
         </div>
         <div class="input-group">
-            <input type="text" class="form-control input-sm" name="keyword" placeholder="Command" value="{{ keyword }}">
+            <input type="text" class="form-control input-sm" name="keyword" placeholder="Keyword" value="{{ keyword }}">
         </div>
         <div class="input-group">
             <div class="input-group-btn">
@@ -61,44 +61,53 @@
 
 {% block table_head %}
     <th class="text-center">{% trans 'ID' %}</th>
-    <th class="text-center">{% trans 'Username' %}</th>
-    <th class="text-center">{% trans 'IP' %}</th>
+    <th class="text-center">{% trans 'User' %}</th>
+    <th class="text-center">{% trans 'Asset' %}</th>
     <th class="text-center">{% trans 'System user' %}</th>
     <th class="text-center">{% trans 'Command' %}</th>
     <th class="text-center">{% trans 'Success' %}</th>
     <th class="text-center">{% trans 'Finished' %}</th>
+    <th class="text-center">{% trans 'R/M' %}</th>
     <th class="text-center">{% trans 'Date start' %}</th>
     <th class="text-center">{% trans 'Time' %}</th>
 {% endblock %}
 
 {% block table_body %}
-     {% for proxy_log in proxy_log_list %}
-         <tr class="gradeX">
-             <td class="text-center">
-                 <a href="{% url 'audits:proxy-log-detail' pk=proxy_log.id %}">{{ proxy_log.id }}</a>
-             </td>
-             <td class="text-center">{{ proxy_log.username }}</td>
-             <td class="text-center">{{ proxy_log.ip }}</td>
-             <td class="text-center">{{ proxy_log.system_user }}</td>
-             <td class="text-center">{{ proxy_log.commands.all|length}}</td>
-             <td class="text-center">
-             {% if proxy_log.was_failed %}
-                 <i class="fa fa-times text-danger"></i>
-             {% else %}
-                 <i class="fa fa-check text-navy"></i>
-             {% endif %}
-             </td>
-             <td class="text-center">
-             {% if proxy_log.is_finished %}
-                 <i class="fa fa-check text-navy"></i>
-             {% else %}
-                 <i class="fa fa-times text-danger"></i>
-             {% endif %}
-             </td>
-             <td class="text-center">{{ proxy_log.date_start }}</td>
-             <td class="text-center">{{ proxy_log.date_finished|timeuntil:proxy_log.date_start }}</td>
-         </tr>
-     {% endfor %}
+    {% for proxy_log in proxy_log_list %}
+        <tr class="gradeX">
+            <td class="text-center">
+                <a href="{% url 'audits:proxy-log-detail' pk=proxy_log.id %}">{{ proxy_log.id }}</a>
+            </td>
+            <td class="text-center">{{ proxy_log.user }}</td>
+            <td class="text-center">{{ proxy_log.asset }}</td>
+            <td class="text-center">{{ proxy_log.system_user }}</td>
+            <td class="text-center">{{ proxy_log.commands.all|length}}</td>
+            <td class="text-center">
+            {% if proxy_log.is_failed %}
+                <i class="fa fa-times text-danger"></i>
+            {% else %}
+                <i class="fa fa-check text-navy"></i>
+            {% endif %}
+            </td>
+            {% if proxy_log.is_finished %}
+                <td class="text-center">
+                    <i class="fa fa-check text-navy"></i>
+                </td>
+                <td class="text-center">
+                    <a><span class="text-navy"><i class="fa fa-play-circle"></i></span></a>
+                </td>
+            {% else %}
+                <td class="text-center">
+                    <i class="fa fa-times text-danger"></i>
+                </td>
+                <td class="text-center">
+                    <a><span class="text-danger"><i class="fa fa-eye"></i></span></a>
+                </td>
+            {% endif %}
+            <td class="text-center">{{ proxy_log.date_start }}</td>
+            <td class="text-center">{{ proxy_log.date_finished|timeuntil:proxy_log.date_start }}</td>
+        </tr>
+    {% endfor %}
 {% endblock %}
 
 {% block custom_foot_js %}

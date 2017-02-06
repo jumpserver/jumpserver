@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # 
 
+from collections import OrderedDict
 from django.core.cache import cache
 from django.conf import settings
 import copy
@@ -35,7 +36,7 @@ class TerminalRegisterView(ListCreateAPIView):
         if serializer.is_valid():
             terminal = serializer.save()
             app_user, access_key = terminal.create_related_app_user()
-            data = {}
+            data = OrderedDict()
             data['terminal'] = copy.deepcopy(serializer.data)
             data['user'] = app_user.to_json()
             data['access_key_id'] = access_key.id

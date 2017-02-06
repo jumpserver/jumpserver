@@ -19,7 +19,7 @@
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-sm-7" style="padding-left: 0;">
+                        <div class="col-sm-11" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
                                     <span style="float: left">{% trans 'Command log list' %} <b>{{ user_object.name }}</b></span>
@@ -52,8 +52,8 @@
                                             <tr>
                                                 <td>{{ command.command_no }}</td>
                                                 <td>{{ command.command }}</td>
-                                                <td>{{ command.output_decode|safe }}</td>
-                                                <td>{{ command.datetime }}</td>
+                                                <td><pre style="border: none;background: none">{{ command.output|to_html|safe}}</pre></td>
+                                                <td>{{ command.timestamp|ts_to_date}}</td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>

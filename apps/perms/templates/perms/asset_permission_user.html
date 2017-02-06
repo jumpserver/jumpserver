@@ -108,7 +108,7 @@
                                         <form>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select user' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Select user' %}" class="select2 user" style="width: 100%" multiple="" tabindex="4">
                                                         {% for user in users_remain %}
                                                             <option value="{{ user.id }}">{{ user.name }}: {{ user.username }}</option>
                                                         {% endfor %}
@@ -117,7 +117,7 @@
                                             </tr>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <button type="button" class="btn btn-primary btn-sm">{% trans 'Add' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-sm btn-add-user">{% trans 'Add' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
@@ -136,7 +136,7 @@
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Select user groups' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Select user groups' %}" class="select2 user-group" style="width: 100%" multiple="" tabindex="4">
                                                         {% for user_group in user_groups_remain %}
                                                         <option value="{{ user_group.id }}" id="opt_{{ user_group.id }}">{{ user_group.name }}</option>
                                                         {% endfor %}
@@ -145,7 +145,7 @@
                                             </tr>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-small" id="btn_add_user_group">{% trans 'Join' %}</button>
+                                                    <button type="button" class="btn btn-info btn-small" id="btn_add_user_group">{% trans 'Add' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
@@ -172,25 +172,29 @@
 {% endblock %}
 {% block custom_foot_js %}
     <script>
-{#        function switch_user_status(obj) {#}
-{#            var status = $(obj).prop('checked');#}
-{##}
-{#            $.ajax({#}
-{#                url: "{% url 'users:user-active-api' pk=user.id %}",#}
-{#                type: "PUT",#}
-{#                data: {#}
-{#                    'is_active': status#}
-{#                },#}
-{#                success: function (data, status) {#}
-{#                    console.log(data)#}
-{#                },#}
-{#                error: function () {#}
-{#                    console.log('error')#}
-{#                }#}
-{#            })#}
-{#        }#}
+        jumpserver.users_selected = {};
+        jumpserver.user_groups_selected = {};
         $(document).ready(function () {
-            $('.select2').select2();
-        });
+            $('.select2.user').select2()
+                .on('select2:select', function(evt) {
+                     var data = evt.params.data;
+                     jumpserver.users_selected[data.id] = data.text;
+                })
+                .on('select2:unselect', function(evt) {
+                    var data = evt.params.data;
+                    delete jumpserver.users_selected[data.id]
+                });
+            $('.select2.user-group').select2()
+                .on('select2:select', function(evt) {
+                     var data = evt.params.data;
+                     jumpserver.user_groups_selected[data.id] = data.text;
+                })
+                .on('select2:unselect', function(evt) {
+                    var data = evt.params.data;
+                    delete jumpserver.user_groups_selected[data.id]
+                })
+        }).on('click', '.btn-add-user', function () {
+            console.log(jumpserver.users_selected)
+        })
     </script>
 {% endblock %}

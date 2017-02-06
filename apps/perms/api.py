@@ -14,6 +14,7 @@ from .models import AssetPermission
 from .hands import AssetGrantedSerializer, User, UserGroup, AssetGroup, Asset, \
     AssetGroup, AssetGroupSerializer, SystemUser
 from . import serializers
+from .utils import associate_system_users_and_assets
 
 
 class AssetPermissionViewSet(viewsets.ModelViewSet):
@@ -35,10 +36,31 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
             queryset = get_user_group_asset_permissions(user_group)
         return queryset
 
+    # Todo: 忘记为何要重写get_serializer_class了
     def get_serializer_class(self):
         if getattr(self, 'user_id', ''):
             return serializers.UserAssetPermissionSerializer
         return serializers.AssetPermissionSerializer
+
+    def associate_system_users_and_assets(self, serializer):
+        assets = serializer.validated_data.get('assets', [])
+        asset_groups = serializer.validated_data.get('asset_groups', [])
+        system_users = serializer.validated_data.get('system_users', [])
+        if serializer.partial:
+            instance = self.get_object()
+            assets.extend(list(instance.assets.all()))
+            asset_groups.extend(list(instance.asset_groups.all()))
+            system_users.extend(list(instance.system_users.all()))
+        print('Run')
+        associate_system_users_and_assets(system_users, assets, asset_groups)
+
+    def perform_create(self, serializer):
+        self.associate_system_users_and_assets(serializer)
+        return super(AssetPermissionViewSet, self).perform_create(serializer)
+
+    def perform_update(self, serializer):
+        self.associate_system_users_and_assets(serializer)
+        return super(AssetPermissionViewSet, self).perform_update(serializer)
 
 
 class RevokeUserAssetPermission(APIView):
@@ -56,6 +78,27 @@ class RevokeUserAssetPermission(APIView):
                 asset_permission.users.remove(user)
                 return Response({'msg': 'success'})
         return Response({'msg': 'failed'}, status=404)
+
+
+class RemoveSystemUserAssetPermission(APIView):
+    """将系统用户从授权中移除, Detail页面会调用"""
+    permission_classes = (IsSuperUser,)
+
+    def put(self, request, *args, **kwargs):
+        response = []
+        asset_permission_id = kwargs.pop('pk')
+        system_users_id = request.data.get('system_users')
+        print(system_users_id)
+        asset_permission = get_object_or_404(
+            AssetPermission, id=asset_permission_id)
+        if not isinstance(system_users_id, list):
+            system_users_id = [system_users_id]
+        for system_user_id in system_users_id:
+            system_user = get_object_or_none(SystemUser, id=system_user_id)
+            if system_user:
+                asset_permission.system_users.remove(system_user)
+                response.append(system_user.to_json())
+        return Response(response, status=200)
 
 
 class RevokeUserGroupAssetPermission(APIView):

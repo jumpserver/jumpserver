@@ -169,16 +169,16 @@
                                             </tr>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-small" id="btn_add_user_group">{% trans 'Join' %}</button>
+                                                    <button type="button" class="btn btn-info btn-small" id="btn_add_system_user">{% trans 'Join' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
 
                                         {% for system_user in system_users %}
                                         <tr>
-                                          <td ><b class="bdg_user_group" data-gid={{ system_user.id }}>{{ system_user.name }}</b></td>
+                                          <td ><b class="bdg-system-user" data-uid={{ system_user.id }}>{{ system_user.name }}</b></td>
                                           <td>
-                                              <button class="btn btn-danger btn-xs btn_delete_user_group" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                              <button class="btn btn-danger btn-xs btn-del" data-uid="{{ system_user.id }}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                           </td>
                                         </tr>
                                         {% endfor %}
@@ -196,8 +196,47 @@
 {% endblock %}
 {% block custom_foot_js %}
     <script>
+        jumpserver.system_users_selected = {};
+        function addSystemUser(system_users) {
+            var the_url = "{% url 'api-perms:asset-permission-detail' pk=asset_permission.id %}";
+            var body = {
+                system_users: Object.assign([], system_users)
+            };
+            var success = function(data) {
+                window.location.reload();
+            };
+            APIUpdateAttr({
+                url: the_url,
+                body: JSON.stringify(body),
+                success: success
+            });
+        }
+        function removeSystemUser(system_users, tr) {
+            var the_url = "{% url 'api-perms:remove-system-user-asset-permission' pk=asset_permission.id %}";
+            var body = {
+                system_users: system_users
+            };
+            var success = function (data) {
+                tr.remove()
+            };
+            APIUpdateAttr({
+                url: the_url,
+                body: JSON.stringify(body),
+                method: 'PUT',
+                success: success
+            })
+        }
         $(document).ready(function () {
-            $('.select2').select2();
+            $('.select2').select2()
+                .on('select2:select', function(evt) {
+                     var data = evt.params.data;
+                     jumpserver.system_users_selected[data.id] = data.text;
+                })
+                .on('select2:unselect', function(evt) {
+                    var data = evt.params.data;
+                    delete jumpserver.system_users_selected[data.id]
+                })
+
         }).on('click', '.btn-delete-perm', function () {
             var $this = $(this);
             var name = "{{ asset_permission.name }}";
@@ -205,6 +244,28 @@
             var the_url = '{% url "api-perms:asset-permission-detail" pk=99991937 %}'.replace('99991937', uid);
             var redirect_url = "{% url 'perms:asset-permission-list' %}";
             objectDelete($this, name, the_url, redirect_url);
+        }).on('click', '#btn_add_system_user', function () {
+            if (Object.keys(jumpserver.system_users_selected).length === 0) {
+                return false;
+            }
+            var system_users = $('.bdg-system-user').map(function() {
+                return $(this).data('uid');
+            }).get();
+            $.map(jumpserver.system_users_selected, function(value, index) {
+                system_users.push(parseInt(index));
+                $('#opt_' + index).remove();
+            });
+            addSystemUser(system_users)
+        }).on('click', '.btn-del', function () {
+            var $this = $(this);
+            var $uid = $this.data('uid');
+            var $tr = $this.closest('tr');
+            var $badge = $tr.find('.bdg-system-user');
+            var $system_user = $badge.html() || $badge.text();
+            $('#groups_selected').append(
+                '<option value="' + $uid + '" id="opt_' + $uid + '">' + $system_user + '</option>'
+            );
+            removeSystemUser($uid, $tr)
         })
     </script>
 {% endblock %}

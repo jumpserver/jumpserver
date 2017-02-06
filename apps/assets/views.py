@@ -233,9 +233,6 @@ class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
     form_class = forms.AssetGroupForm
     template_name = 'assets/asset_group_create.html'
     success_url = reverse_lazy('assets:asset-group-list')
-    #ordering = '-id'
-
-    # Todo: Asset group create template select assets so hard, need be resolve next
 
     def get_context_data(self, **kwargs):
         context = {
@@ -249,7 +246,8 @@ class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
     def form_valid(self, form):
         asset_group = form.save()
         assets_id_list = self.request.POST.getlist('assets', [])
-        assets = [get_object_or_404(Asset, id=int(asset_id)) for asset_id in assets_id_list]
+        assets = [get_object_or_404(Asset, id=int(asset_id))
+                  for asset_id in assets_id_list]
         asset_group.created_by = self.request.user.username or 'Admin'
         asset_group.assets.add(*tuple(assets))
         asset_group.save()
@@ -284,7 +282,8 @@ class AssetGroupDetailView(AdminUserRequiredMixin, DetailView):
             'app': _('Assets'),
             'action': _('Asset group detail'),
             'assets_remain': assets_remain,
-            'assets': [asset for asset in Asset.objects.all() if asset not in assets_remain],
+            'assets': [asset for asset in Asset.objects.all()
+                       if asset not in assets_remain],
             'system_users': system_users,
             'system_users_remain': system_users_remain,
         }
@@ -349,10 +348,9 @@ class IDCCreateView(AdminUserRequiredMixin, CreateView):
         return super(IDCCreateView, self).get_context_data(**kwargs)
 
     def form_valid(self, form):
-        IDC = form.save(commit=False)
-        IDC.created_by = self.request.user.username or 'System'
-        IDC.save()
-        # IDC_add_success_next(user)
+        idc = form.save(commit=False)
+        idc.created_by = self.request.user.username or 'System'
+        idc.save()
         return super(IDCCreateView, self).form_valid(form)
 
 

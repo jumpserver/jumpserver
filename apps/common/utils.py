@@ -33,8 +33,10 @@ from .compat import to_bytes, to_string
 SECRET_KEY = settings.SECRET_KEY
 
 
-def reverse(view_name, urlconf=None, args=None, kwargs=None, current_app=None, external=False):
-    url = dj_reverse(view_name, urlconf=urlconf, args=args, kwargs=kwargs, current_app=current_app)
+def reverse(view_name, urlconf=None, args=None, kwargs=None,
+            current_app=None, external=False):
+    url = dj_reverse(view_name, urlconf=urlconf, args=args,
+                     kwargs=kwargs, current_app=current_app)
 
     if external:
         url = settings.SITE_URL.strip('/') + url
@@ -44,8 +46,8 @@ def reverse(view_name, urlconf=None, args=None, kwargs=None, current_app=None, e
 def get_object_or_none(model, **kwargs):
     try:
         obj = model.objects.get(**kwargs)
-    except model.DoesNotExist:
-        obj = None
+    except (model.FieldError, model.DoesNotExist):
+        return None
     return obj
 
 

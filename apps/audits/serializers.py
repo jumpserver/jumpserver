@@ -13,10 +13,7 @@ class ProxyLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = models.ProxyLog
-        fields = ['id', 'name', 'username', 'hostname', 'ip', 'system_user',
-                  'login_type', 'terminal', 'log_file', 'was_failed',
-                  'is_finished', 'date_start', 'date_finished', 'time',
-                  'command_length', "commands_dict"]
+        fields = '__all__'
 
     @staticmethod
     def get_time(obj):
@@ -27,10 +24,5 @@ class ProxyLogSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_command_length(obj):
-        return len(obj.commands.all())
+        return 2
 
-
-class CommandLogSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.CommandLog
-        fields = '__all__'

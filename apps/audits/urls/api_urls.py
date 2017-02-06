@@ -10,7 +10,8 @@ router.register(r'v1/proxy-log', api.ProxyLogViewSet, 'proxy-log')
 router.register(r'v1/command-log', api.CommandLogViewSet, 'command-log')
 
 urlpatterns = [
-    url(r'^v1/proxy-log/receive/$', api.ProxyLogReceiveView.as_view(), name='proxy-log-receive'),
+    url(r'^v1/proxy-log/receive/$', api.ProxyLogReceiveView.as_view(),
+        name='proxy-log-receive'),
 ]
 
 urlpatterns += router.urls

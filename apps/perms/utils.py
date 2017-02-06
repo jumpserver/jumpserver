@@ -1,14 +1,18 @@
+# coding: utf-8
+
 from __future__ import absolute_import, unicode_literals
 
 from common.utils import setattr_bulk
-from .hands import User, UserGroup, Asset, AssetGroup, SystemUser
+from .hands import User, UserGroup, Asset, AssetGroup, SystemUser, \
+    push_system_user
 
 
 def get_user_group_granted_asset_groups(user_group):
     """Return asset groups granted of the user group
 
      :param user_group: Instance of :class: ``UserGroup``
-     :return: {asset_group1: {system_user1, }, asset_group2: {system_user1, system_user2}}
+     :return: {asset_group1: {system_user1, },
+               asset_group2: {system_user1, system_user2}}
     """
     asset_groups = {}
     asset_permissions = user_group.asset_permissions.all()
@@ -50,7 +54,8 @@ def get_user_granted_asset_groups_direct(user):
     """Return asset groups granted of the user direct nor inherit from user group
 
         :param user: Instance of :class: ``User``
-        :return: {asset_group: {system_user1, }, asset_group2: {system_user1, system_user2]}
+        :return: {asset_group: {system_user1, },
+                  asset_group2: {system_user1, system_user2]}
         """
     asset_groups = {}
     asset_permissions_direct = user.asset_permissions.all()
@@ -72,7 +77,8 @@ def get_user_granted_asset_groups_inherit_from_user_groups(user):
     """Return asset groups granted of the user and inherit from user group
 
     :param user: Instance of :class: ``User``
-    :return: {asset_group: {system_user1, }, asset_group2: {system_user1, system_user2]}
+    :return: {asset_group: {system_user1, },
+              asset_group2: {system_user1, system_user2]}
     """
     asset_groups = {}
     user_groups = user.groups.all()
@@ -103,7 +109,8 @@ def get_user_granted_asset_groups(user):
     :return: {asset1: {system_user1, system_user2}, asset2: {...}}
     """
 
-    asset_groups_inherit_from_user_groups = get_user_granted_asset_groups_inherit_from_user_groups(user)
+    asset_groups_inherit_from_user_groups = \
+        get_user_granted_asset_groups_inherit_from_user_groups(user)
     asset_groups_direct = get_user_granted_asset_groups_direct(user)
     asset_groups = asset_groups_inherit_from_user_groups
 
@@ -211,3 +218,27 @@ def get_user_groups_granted_in_asset_group(asset):
 
 def get_users_granted_in_asset_group(asset):
     pass
+
+
+def associate_system_users_and_assets(system_users, assets, asset_groups):
+    """关联系统用户和资产, 目的是保存它们的关系, 然后新加入的资产或系统
+    用户时,推送系统用户到资产
+
+    Todo: 这里需要最终Api定下来更改一下, 现在策略是以系统用户为核心推送, 一个系统用户
+    推送一次
+    """
+    assets_all = set(assets)
+
+    for asset_group in asset_groups:
+        assets_all |= set(asset_group.assets.all())
+
+    for system_user in system_users:
+        assets_need_push = []
+        if system_user.auto_push:
+            assets_need_push.extend(
+                [asset for asset in assets_all
+                 if asset not in system_user.assets.all()
+                 ]
+            )
+        system_user.assets.add(*(tuple(assets_all)))
+        push_system_user(assets_need_push, system_user)

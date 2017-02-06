@@ -107,7 +107,6 @@ class AccessKeyAuthentication(authentication.BaseAuthentication):
 
         if not access_key.user.is_active:
             raise exceptions.AuthenticationFailed(_('User disabled.'))
-
         return access_key.user, None
 
 

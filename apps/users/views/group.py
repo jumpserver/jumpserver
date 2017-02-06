@@ -44,6 +44,7 @@ class UserGroupCreateView(AdminUserRequiredMixin, CreateView):
                         'users': users})
         return context
 
+    # 需要添加组下用户, 而user并不是group的多对多,所以需要手动建立关系
     def form_valid(self, form):
         user_group = form.save()
         users_id_list = self.request.POST.getlist('users', [])

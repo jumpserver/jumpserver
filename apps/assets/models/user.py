@@ -167,6 +167,16 @@ class SystemUser(models.Model):
     def asset_group_amount(self):
         return self.asset_groups.count()
 
+    def to_json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'username': self.username,
+            'protocol': self.protocol,
+            'auth_method': self.auth_method,
+            'auto_push': self.auto_push,
+        }
+
     class Meta:
         ordering = ['name']
 

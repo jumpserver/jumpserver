@@ -4,6 +4,7 @@ import functools
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from django.db.models.signals import m2m_changed
 
 from users.models import User, UserGroup
 from assets.models import Asset, AssetGroup, SystemUser
@@ -16,18 +17,26 @@ class AssetPermission(models.Model):
     #     ('U', 'user'),
     #     ('G', 'user group'),
     # )
-    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
-    users = models.ManyToManyField(User, related_name='asset_permissions', blank=True)
-    user_groups = models.ManyToManyField(UserGroup, related_name='asset_permissions', blank=True)
-    assets = models.ManyToManyField(Asset, related_name='granted_by_permissions', blank=True)
-    asset_groups = models.ManyToManyField(AssetGroup, related_name='granted_by_permissions', blank=True)
-    system_users = models.ManyToManyField(SystemUser, related_name='granted_by_permissions')
-    # private_for = models.CharField(choices=PRIVATE_FOR_CHOICE, max_length=1, default='N', blank=True,
-    #                                verbose_name=_('Private for'))
-    is_active = models.BooleanField(default=True, verbose_name=_('Active'))
-    date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_('Date expired'))
-    created_by = models.CharField(max_length=128, blank=True, verbose_name=_('Created by'))
-    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
+    name = models.CharField(
+        max_length=128, unique=True, verbose_name=_('Name'))
+    users = models.ManyToManyField(
+        User, related_name='asset_permissions', blank=True)
+    user_groups = models.ManyToManyField(
+        UserGroup, related_name='asset_permissions', blank=True)
+    assets = models.ManyToManyField(
+        Asset, related_name='granted_by_permissions', blank=True)
+    asset_groups = models.ManyToManyField(
+        AssetGroup, related_name='granted_by_permissions', blank=True)
+    system_users = models.ManyToManyField(
+        SystemUser, related_name='granted_by_permissions')
+    is_active = models.BooleanField(
+        default=True, verbose_name=_('Active'))
+    date_expired = models.DateTimeField(
+        default=date_expired_default, verbose_name=_('Date expired'))
+    created_by = models.CharField(
+        max_length=128, blank=True, verbose_name=_('Created by'))
+    date_created = models.DateTimeField(
+        auto_now_add=True, verbose_name=_('Date created'))
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
 
     def __unicode__(self):
@@ -67,4 +76,16 @@ class AssetPermission(models.Model):
 
     class Meta:
         db_table = 'asset_permission'
+
+
+# def change_permission(sender, **kwargs):
+#     print('Sender: %s' % sender)
+#     for k, v in kwargs.items():
+#         print('%s: %s' % (k, v))
+#     print()
+
+#
+# m2m_changed.connect(change_permission, sender=AssetPermission.assets.through)
+
+
 

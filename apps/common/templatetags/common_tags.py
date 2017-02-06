@@ -3,7 +3,8 @@
 from django import template
 from django.utils import timezone
 from django.conf import settings
-
+from django.utils.html import escape
+from audits.backends import command_store
 
 register = template.Library()
 
@@ -41,10 +42,30 @@ def join_attr(seq, attr=None, sep=None):
         sep = ', '
     if attr is not None:
         seq = [getattr(obj, attr) for obj in seq]
-    print(seq)
     return sep.join(seq)
 
 
 @register.filter
 def int_to_str(value):
     return str(value)
+
+
+@register.filter
+def ts_to_date(ts):
+    try:
+        ts = float(ts)
+    except TypeError:
+        ts = 0
+    dt = timezone.datetime.fromtimestamp(ts).\
+        replace(tzinfo=timezone.get_current_timezone())
+    return dt.strftime('%Y-%m-%d %H:%M:%S')
+
+
+@register.filter
+def to_html(s):
+    return escape(s).replace('\n', '<br />')
+
+
+@register.filter
+def proxy_log_commands(log_id):
+    return command_store.filter(proxy_log_id=log_id)

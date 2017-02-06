@@ -23,32 +23,31 @@
             </div>
         </div>
         <div class="input-group">
-            <select class="select2 form-control" name="username">
+            <select class="select2 form-control" name="user">
                 <option value="">{% trans 'User' %}</option>
-                {% for user in user_list %}
-                    <option value="{{ user.username }}" {% if user.username == username %} selected {% endif %}>{{ user.username }}</option>
+                {% for u in user_list %}
+                    <option value="{{ u.username }}" {% if user == u.username %} selected {% endif %}>{{ u.username }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="input-group">
-            <select class="select2 form-control" name="ip">
+            <select class="select2 form-control" name="asset">
                 <option value="">{% trans 'Asset' %}</option>
-                {% for asset in asset_list %}
-                    <option value="{{ asset.ip }}" {% if asset.ip == ip %} selected {% endif %}>{{ asset.ip }}</option>
+                {% for a in asset_list %}
+                    <option value="{{ a.ip }}" {% if asset == a.ip %} selected {% endif %}>{{ a.ip }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="input-group">
             <select class="select2 form-control" name="system_user">
-{#                <option value="">{{ system_user }}</option>#}
                 <option value="">{% trans 'System user' %}</option>
-                {% for system_user in system_user_list %}
-                    <option value="{{ system_user.username }}" {% if system_user.username == system_user %} selected {% endif %}>{{ system_user.username }}</option>
+                {% for s in system_user_list %}
+                    <option value="{{ s.username }}" {% if s.username == system_user %} selected {% endif %}>{{ s.username }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="input-group">
-            <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="{{ keyword }}">
+            <input type="text" class="form-control input-sm" name="command" placeholder="Command" value="{{ command }}">
         </div>
         <div class="input-group">
             <div class="input-group-btn">
@@ -78,12 +77,12 @@
             <tr>
                 <td>{{ command.id }}</td>
                 <td>{{ command.command }}</td>
-                <td>{{ command.proxy_log.username }}</td>
-                <td>{{ command.proxy_log.ip }}</td>
-                <td>{{ command.proxy_log.system_user }}</td>
-                <td><a href="{% url 'audits:proxy-log-detail' pk=command.proxy_log.id  %}">{{ command.proxy_log.id}}</a></td>
-                <td>{{ command.datetime }}</td>
-                <td>{{ command.output_decode|safe }}</td>
+                <td>{{ command.user }}</td>
+                <td>{{ command.asset }}</td>
+                <td>{{ command.system_user }}</td>
+                <td><a href="{% url 'audits:proxy-log-detail' pk=command.proxy_log_id  %}">{{ command.proxy_log_id}}</a></td>
+                <td>{{ command.timestamp|ts_to_date }}</td>
+                <td><pre style="border: none; background: none">{{ command.output|to_html|safe }}</pre></td>
             </tr>
         {% endfor %}
         </tbody>

@@ -6,16 +6,18 @@ import functools
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.db.models import Q
-from django.views.generic import TemplateView, ListView
-from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
+from django.views.generic import ListView, CreateView, UpdateView
+from django.views.generic.edit import DeleteView, FormView
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from common.utils import search_object_attr
-from .hands import AdminUserRequiredMixin, User, UserGroup, SystemUser, Asset, AssetGroup
+from .hands import AdminUserRequiredMixin, User, UserGroup, SystemUser, \
+    Asset, AssetGroup
 from .models import AssetPermission
 from .forms import AssetPermissionForm
+from .utils import associate_system_users_and_assets
 
 
 class AssetPermissionListView(AdminUserRequiredMixin, ListView):
@@ -79,6 +81,16 @@ class AssetPermissionCreateView(AdminUserRequiredMixin,
                                self.object.name,))
         return success_message
 
+    def form_valid(self, form):
+        assets = form.cleaned_data['assets']
+        asset_groups = form.cleaned_data['asset_groups']
+        system_users = form.cleaned_data['system_users']
+        associate_system_users_and_assets(system_users, assets, asset_groups)
+        response = super(AssetPermissionCreateView, self).form_valid(form)
+        self.object.created_by = self.request.user.name
+        self.object.save()
+        return response
+
 
 class AssetPermissionUpdateView(AdminUserRequiredMixin, UpdateView):
     model = AssetPermission
@@ -99,6 +111,13 @@ class AssetPermissionUpdateView(AdminUserRequiredMixin, UpdateView):
         success_url = reverse_lazy('perms:asset-permission-detail',
                                    kwargs={'pk': self.object.pk})
         return success_url
+
+    def form_valid(self, form):
+        assets = form.cleaned_data['assets']
+        asset_groups = form.cleaned_data['asset_groups']
+        system_users = form.cleaned_data['system_users']
+        associate_system_users_and_assets(system_users, assets, asset_groups)
+        return super(AssetPermissionUpdateView, self).form_valid(form)
 
 
 class AssetPermissionDetailView(AdminUserRequiredMixin, DetailView):

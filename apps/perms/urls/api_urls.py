@@ -50,7 +50,12 @@ urlpatterns = [
     # 验证用户是否有某个资产和系统用户的权限
     url(r'v1/asset-permission/user/validate/$',
         api.ValidateUserAssetPermissionView.as_view(),
-        name='validate-user-asset-permission')
+        name='validate-user-asset-permission'),
+
+    # 删除asset permission中的某个系统用户
+    url(r'^v1/asset-permissions/(?P<pk>[0-9]+)/system-user/remove/$',
+        api.RemoveSystemUserAssetPermission.as_view(),
+        name='remove-system-user-asset-permission'),
 ]
 
 urlpatterns += router.urls

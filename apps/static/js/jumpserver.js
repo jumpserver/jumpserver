@@ -187,28 +187,28 @@ function activeNav() {
 }
 
 function APIUpdateAttr(props) {
-  // props = {url: .., body: , success: , error: , method: ,}
-  props = props || {};
-  var success_message = props.success_message || 'Update Successfully!';
-  var fail_message = props.fail_message || 'Error occurred while updating.';
-  $.ajax({
-    url: props.url,
-    type: props.method || "PATCH",
-    data: props.body,
-    contentType: props.content_type || "application/json; charset=utf-8",
-    dataType: props.data_type || "json"
-  }).done(function(data, textStatue, jqXHR) {
-    toastr.success(success_message);
-    if (typeof props.success === 'function') {
-      return props.success(data);
-    } 
-    
-  }).fail(function(jqXHR, textStatue, errorThrown) {
-    toastr.error(fail_message);
-    if (typeof props.error === 'function') {
-      return props.error(errorThrown);
-    } 
-  });
+    // props = {url: .., body: , success: , error: , method: ,}
+    props = props || {};
+    var success_message = props.success_message || 'Update Successfully!';
+    var fail_message = props.fail_message || 'Error occurred while updating.';
+    $.ajax({
+        url: props.url,
+        type: props.method || "PATCH",
+        data: props.body,
+        contentType: props.content_type || "application/json; charset=utf-8",
+        dataType: props.data_type || "json"
+    }).done(function(data, textStatue, jqXHR) {
+        toastr.success(success_message);
+        if (typeof props.success === 'function') {
+            return props.success(data);
+        } 
+      
+    }).fail(function(jqXHR, textStatue, errorThrown) {
+        toastr.error(fail_message);
+        if (typeof props.error === 'function') {
+            return props.error(errorThrown);
+        } 
+    });
   // return true;
 }
 
