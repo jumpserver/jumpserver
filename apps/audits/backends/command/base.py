@@ -11,8 +11,8 @@ class CommandBase(object):
         pass
 
     @abc.abstractmethod
-    def filter(self, date_from=None, date_to=None, user='',
-               asset='', system_user='', command=''):
+    def filter(self, date_from_ts=None, date_to_ts=None, user='',
+               asset='', system_user='', command='', proxy_log_id=0):
         pass
 
 

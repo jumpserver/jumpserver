@@ -46,7 +46,6 @@ class ProxyLog(models.Model):
         null=True, verbose_name=_('Login type'))
     terminal = models.CharField(
         max_length=32, blank=True, null=True, verbose_name=_('Terminal'))
-    log_file = models.CharField(max_length=1000, blank=True, null=True)
     is_failed = models.BooleanField(
         default=False, verbose_name=_('Did connect failed'))
     is_finished = models.BooleanField(
@@ -64,14 +63,14 @@ class ProxyLog(models.Model):
 
 
 class CommandLog(models.Model):
-    proxy_log_id = models.IntegerField()
+    proxy_log_id = models.IntegerField(db_index=True)
     user = models.CharField(max_length=48, db_index=True)
     asset = models.CharField(max_length=128, db_index=True)
     system_user = models.CharField(max_length=48, db_index=True)
     command_no = models.IntegerField()
     command = models.CharField(max_length=1000, blank=True, db_index=True)
     output = models.TextField(blank=True)
-    timestamp = models.FloatField(null=True, db_index=True)
+    timestamp = models.FloatField(db_index=True)
 
     def __unicode__(self):
         return '%s: %s' % (self.id, self.command)
@@ -81,9 +80,12 @@ class CommandLog(models.Model):
 
 
 class RecordLog(models.Model):
-    proxy_log_id = models.IntegerField()
+    proxy_log_id = models.IntegerField(db_index=True)
     output = models.TextField(verbose_name=_('Output'))
-    timestamp = models.FloatField(null=True)
+    timestamp = models.FloatField(db_index=True)
 
     def __unicode__(self):
         return 'Record: %s' % self.proxy_log_id
+
+    class Meta:
+        ordering = ['timestamp']

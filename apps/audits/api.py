@@ -7,12 +7,14 @@ from __future__ import absolute_import, unicode_literals
 from rest_framework import generics, viewsets
 from rest_framework_bulk import BulkModelViewSet
 
-from audits.backends import command_store
+from audits.backends import command_store, record_store
 from audits.backends.command.serializers import CommandLogSerializer
+from audits.backends.record.serializers import RecordSerializer
 from . import models, serializers
 from .hands import IsSuperUserOrAppUser, IsAppUser
 
 
+# Todo: 忘记当时为何不和ProxyLogViewSet复用了
 class ProxyLogReceiveView(generics.CreateAPIView):
     queryset = models.ProxyLog.objects.all()
     serializer_class = serializers.ProxyLogSerializer
@@ -38,9 +40,6 @@ class ProxyLogViewSet(viewsets.ModelViewSet):
         "date_start": ""
     }
 
-    some params we need generate:  {
-        "log_file", "", # No use now, may be think more about monitor and record
-    }
     """
 
     queryset = models.ProxyLog.objects.all()
@@ -65,4 +64,35 @@ class CommandLogViewSet(BulkModelViewSet):
     queryset = command_store.all()
     serializer_class = CommandLogSerializer
     permission_classes = (IsSuperUserOrAppUser,)
+
+
+class RecordLogViewSet(BulkModelViewSet):
+    """接受app发送来的record log, 格式如下
+        {
+            "proxy_log_id": 23,
+            "output": "d2hvbWFp",  # base64.b64encode(s)
+            "timestamp": 1485238673.0
+        }
+    """
+
+    serializer_class = RecordSerializer
+    permission_classes = (IsSuperUserOrAppUser,)
+
+    def get_queryset(self):
+        filter_kwargs = {}
+        proxy_log_id = self.request.query_params.get('proxy_log_id')
+        data_from_ts = self.request.query_params.get('date_from_ts')
+        if proxy_log_id:
+            filter_kwargs['proxy_log_id'] = proxy_log_id
+        if data_from_ts:
+            filter_kwargs['date_from_ts'] = data_from_ts
+        if filter_kwargs:
+            return record_store.filter(**filter_kwargs)
+        else:
+            return record_store.all()
+
+
+
+
+
 

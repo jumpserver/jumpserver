@@ -17,7 +17,7 @@ class CommandStore(CommandBase):
         )
 
     def filter(self, date_from_ts=None, date_to_ts=None, user='',
-               asset='', system_user='', command='', proxy_log_id=''):
+               asset='', system_user='', command='', proxy_log_id=0):
         filter_kwargs = {}
 
         if date_from_ts:

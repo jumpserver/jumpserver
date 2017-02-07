@@ -325,4 +325,4 @@ CAPTCHA_IMAGE_SIZE = (75, 33)
 CAPTCHA_FOREGROUND_COLOR = '#001100'
 
 COMMAND_STORE_BACKEND = 'audits.backends.command.db'
-
+RECORD_STORE_BACKEND = 'audits.backends.record.db'
