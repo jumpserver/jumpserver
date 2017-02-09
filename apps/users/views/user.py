@@ -106,7 +106,7 @@ class UserUpdateView(AdminUserRequiredMixin, UpdateView):
 class UserDetailView(AdminUserRequiredMixin, DetailView):
     model = User
     template_name = 'users/user_detail.html'
-    context_object_name = "user"
+    context_object_name = "user_object"
 
     def get_context_data(self, **kwargs):
         groups = UserGroup.objects.exclude(id__in=self.object.groups.all())

@@ -62,6 +62,15 @@ class User(AbstractUser):
     def get_absolute_url(self):
         return reverse('users:user-detail', args=(self.id,))
 
+    def is_public_key_valid(self):
+        """
+            Check if the user's ssh public key is valid.
+            This function is used in base.html.
+        """
+        if self._public_key:
+            return True
+        return False
+
     @property
     def is_expired(self):
         if self.date_expired < timezone.now():
