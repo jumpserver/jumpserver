@@ -9,11 +9,12 @@ from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIV
 from rest_framework import viewsets
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import AllowAny
+from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 
 from .models import Terminal, TerminalHeatbeat
 from .serializers import TerminalSerializer, TerminalHeatbeatSerializer
-from .hands import IsSuperUserOrAppUser, IsAppUser, User
+from .hands import IsSuperUserOrAppUser, IsAppUser, User, ProxyLog
 from common.utils import get_object_or_none
 
 
@@ -64,6 +65,9 @@ class TerminalViewSet(viewsets.ModelViewSet):
         #     instance.user.delete()
         # return super(TerminalViewSet, self).destroy(request, *args, **kwargs)
 
+tasks = OrderedDict()
+# tasks = {1: [{'name': 'kill_proxy', 'proxy_log_id': 23}]}
+
 
 class TerminalHeatbeatViewSet(viewsets.ModelViewSet):
     queryset = TerminalHeatbeat.objects.all()
@@ -73,4 +77,24 @@ class TerminalHeatbeatViewSet(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         terminal = request.user.terminal
         TerminalHeatbeat.objects.create(terminal=terminal)
-        return Response({'msg': 'Success'}, status=201)
+        task = tasks.get(terminal.name)
+        tasks[terminal.name] = []
+        return Response({'msg': 'Success',
+                         'tasks': task,},
+                        status=201)
+
+
+class TerminateConnectionView(APIView):
+    def post(self, request, *args, **kwargs):
+        proxy_log_id = request.data.get('proxy_log_id')
+        proxy_log = get_object_or_404(ProxyLog, id=proxy_log_id)
+        terminal_id = proxy_log.terminal
+        if terminal_id in tasks:
+            tasks[terminal_id].append({'name': 'kill_proxy',
+                                       'proxy_log_id': proxy_log_id})
+        else:
+            tasks[terminal_id] = [{'name': 'kill_proxy',
+                                   'proxy_log_id': proxy_log_id}]
+
+        print(tasks)
+        return Response({'msg': 'get it'})

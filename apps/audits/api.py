@@ -14,7 +14,6 @@ from . import models, serializers
 from .hands import IsSuperUserOrAppUser, IsAppUser
 
 
-# Todo: 忘记当时为何不和ProxyLogViewSet复用了
 class ProxyLogReceiveView(generics.CreateAPIView):
     queryset = models.ProxyLog.objects.all()
     serializer_class = serializers.ProxyLogSerializer
