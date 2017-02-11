@@ -12,6 +12,3 @@ class RecordBase(object):
     @abc.abstractmethod
     def filter(self, date_from_ts=None, proxy_log_id=None):
         pass
-
-
-

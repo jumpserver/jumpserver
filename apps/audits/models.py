@@ -58,6 +58,10 @@ class ProxyLog(models.Model):
     def __unicode__(self):
         return '%s-%s-%s' % (self.user, self.asset, self.system_user)
 
+    def commands(self):
+        from audits.backends import command_store
+        return command_store.filter(proxy_log_id=self.id)
+
     class Meta:
         ordering = ['-date_start', 'user']
 
