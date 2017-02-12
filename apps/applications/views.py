@@ -1,7 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 #
 
-from django.views.generic import ListView, UpdateView, DeleteView, FormView
+from django.views.generic import ListView, UpdateView, DeleteView, DetailView
 from django.views.generic.edit import BaseUpdateView
 from django.utils.translation import ugettext as _
 from django.urls import reverse_lazy
@@ -35,7 +35,21 @@ class TerminalUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super(TerminalUpdateView, self).get_context_data(**kwargs)
-        context.update({'app': _('Terminal'), 'action': _('Update applications')})
+        context.update({'app': _('Applications'), 'action': _('Update terminal')})
+        return context
+
+
+class TerminalDetailView(DetailView):
+    model = Terminal
+    template_name = 'applications/terminal_detail.html'
+    context_object_name = 'terminal'
+
+    def get_context_data(self, **kwargs):
+        context = super(TerminalDetailView, self).get_context_data(**kwargs)
+        context.update({
+            'app': _('Applications'),
+            'action': _('Terminal detail')
+        })
         return context
 
 

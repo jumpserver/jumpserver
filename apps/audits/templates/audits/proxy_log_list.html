@@ -60,6 +60,7 @@
 {% endblock %}
 
 {% block table_head %}
+    <th class="text-center"></th>
     <th class="text-center">{% trans 'ID' %}</th>
     <th class="text-center">{% trans 'User' %}</th>
     <th class="text-center">{% trans 'Asset' %}</th>
@@ -76,6 +77,7 @@
 {% block table_body %}
     {% for proxy_log in proxy_log_list %}
         <tr class="gradeX">
+            <td class="text-center"><input type="checkbox" class="cbx-term" value="{{ proxy_log.id }}"></td>
             <td class="text-center">
                 <a href="{% url 'audits:proxy-log-detail' pk=proxy_log.id %}">{{ proxy_log.id }}</a>
             </td>
@@ -100,7 +102,7 @@
                 </td>
             {% else %}
                 <td class="text-center">
-                    <a><i class="fa fa-times text-danger"></i></a>
+                    <a class="btn-term" value="{{ proxy_log.id }}"><i class="fa fa-times text-danger"></i></a>
                 </td>
                 <td class="text-center">
                     <a><span class="text-danger"><i class="fa fa-eye"></i></span></a>
@@ -112,9 +114,33 @@
     {% endfor %}
 {% endblock %}
 
+{% block content_bottom_left %}
+    <div id="actions">
+    <div class="input-group">
+        <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+            <option value="terminate">{% trans 'Terminate selected' %}</option>
+        </select>
+        <div class="input-group-btn pull-left" style="padding-left: 5px;">
+            <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
+             {% trans 'Submit' %}
+            </button>
+        </div>
+    </div>
+    </div>
+{% endblock %}
+
 {% block custom_foot_js %}
     <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
     <script>
+        function terminateConnection(data) {
+            function success() {
+                window.setTimeout(function () {
+                    window.location.reload()
+                }, 300)
+            }
+            var the_url = "{% url 'api-applications:terminate-connection' %}";
+            APIUpdateAttr({url: the_url, method: 'POST', body: JSON.stringify(data), success: success, success_message: 'Terminate success'});
+        }
         $(document).ready(function() {
             $('table').DataTable({
                 "searching": false,
@@ -129,6 +155,19 @@
                 forceParse: false,
                 autoclose: true
             });
+        }).on('click', '.btn-term', function () {
+            var $this = $(this);
+            var proxy_log_id = $this.attr('value');
+            var data = {
+                proxy_log_id: proxy_log_id
+            };
+            terminateConnection(data)
+        }).on('click', '#btn_bulk_update', function () {
+            var data = [];
+            $('.cbx-term:checked').each(function () {
+                data.push({proxy_log_id: $(this).attr('value')})
+            });
+            terminateConnection(data)
         })
     </script>
 {% endblock %}

@@ -50,7 +50,7 @@ $(document).ready(function(){
         buttons: [],
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
-                var detail_btn = '<a href="{% url "users:user-detail" pk=99991937 %}">' + cellData + '</a>';
+                var detail_btn = '<a href="{% url "applications:terminal-detail" pk=99991937 %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('99991937', rowData.id));
              }},
             {targets: 5, createdCell: function (td, cellData) {

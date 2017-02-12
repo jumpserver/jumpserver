@@ -4,6 +4,7 @@
 from collections import OrderedDict
 from django.core.cache import cache
 from django.conf import settings
+from django.utils import timezone
 import copy
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework import viewsets
@@ -80,21 +81,29 @@ class TerminalHeatbeatViewSet(viewsets.ModelViewSet):
         task = tasks.get(terminal.name)
         tasks[terminal.name] = []
         return Response({'msg': 'Success',
-                         'tasks': task,},
+                         'tasks': task},
                         status=201)
 
 
 class TerminateConnectionView(APIView):
     def post(self, request, *args, **kwargs):
-        proxy_log_id = request.data.get('proxy_log_id')
-        proxy_log = get_object_or_404(ProxyLog, id=proxy_log_id)
-        terminal_id = proxy_log.terminal
-        if terminal_id in tasks:
-            tasks[terminal_id].append({'name': 'kill_proxy',
-                                       'proxy_log_id': proxy_log_id})
+        if isinstance(request.data, dict):
+            data = [request.data]
         else:
-            tasks[terminal_id] = [{'name': 'kill_proxy',
-                                   'proxy_log_id': proxy_log_id}]
+            data = request.data
+        for d in data:
+            proxy_log_id = d.get('proxy_log_id')
+            proxy_log = get_object_or_404(ProxyLog, id=proxy_log_id)
+            terminal_id = proxy_log.terminal
+            proxy_log.is_finished = True
+            proxy_log.date_finished = timezone.now()
+            proxy_log.save()
+            if terminal_id in tasks:
+                tasks[terminal_id].append({'name': 'kill_proxy',
+                                           'proxy_log_id': proxy_log_id})
+            else:
+                tasks[terminal_id] = [{'name': 'kill_proxy',
+                                       'proxy_log_id': proxy_log_id}]
 
         print(tasks)
         return Response({'msg': 'get it'})
