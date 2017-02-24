@@ -32,7 +32,7 @@
     <div class="tagBtnList">
     {% for tag in tag_list %}
         <a href="{% url 'assets:asset-tags' tag_id=tag.0 %}"
-           {% if tag.0|int_to_str == tag_id %}
+           {% if tag.0 == tag_id %}
            class="tagBtn2 label label-warning" name="tag_on">
            {% else %}
            class="tagBtn2 label label-default">
@@ -103,6 +103,38 @@ function tagShow() {
 		oDiv.style.display = "none";
 	}
 }  //onload;
+
+function objDelete(obj, name, url) {
+    function doDelete() {
+        var body = {};
+        var success = function() {
+            swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
+            $(obj).parent().parent().remove();
+        };
+        var fail = function() {
+            swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");
+        };
+        APIUpdateAttr({
+            url: url,
+            body: JSON.stringify(body),
+            method: 'DELETE',
+            success: success,
+            error: fail
+        });
+    }
+    swal({
+        title: 'Are you sure delete ?',
+        text: " [" + name + "] ",
+        type: "warning",
+        showCancelButton: true,
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: 'Confirm',
+        closeOnConfirm: false
+    }, function () {
+        doDelete()
+    });
+}
 
 $(document).ready(function(){
 	var options = {
@@ -186,7 +218,7 @@ $(document).ready(function(){
 	var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
 	var uid = $this.data('uid');
 	var the_url = '{% url "api-assets:asset-detail" pk=99991937 %}'.replace('99991937', uid);
-	objectDelete($this, name, the_url);
+	objDelete($this, name, the_url);
 	$data_table.ajax.reload();
 })
 
