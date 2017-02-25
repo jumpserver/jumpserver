@@ -52,10 +52,11 @@ $(document).ready(function(){
                 $(td).html('<a href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</a>');
              }},
             {targets: 6, createdCell: function (td, cellData, rowData) {
-                var script_btn = '<a href="{% url "assets:admin-user-update" pk=99991937 %}" class="btn btn-xs btn-primary">{% trans "Script" %}</a>'.replace('99991937', cellData);
+{#                var script_btn = '<a href="{% url "assets:admin-user-update" pk=99991937 %}" class="btn btn-xs btn-primary">{% trans "Script" %}</a>'.replace('99991937', cellData);#}
                 var update_btn = '<a href="{% url "assets:admin-user-update" pk=99991937 %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_admin_user_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
-                $(td).html(script_btn + update_btn + del_btn)
+{#                $(td).html(script_btn + update_btn + del_btn)#}
+                $(td).html(update_btn + del_btn)
              }}],
         ajax_url: '{% url "api-assets:admin-user-list" %}',
         columns: [{data: function(){return ""}}, {data: "name" }, {data: "username" }, {data: "assets_amount" }, {data: function () {return 'lost'} },
@@ -72,7 +73,9 @@ $(document).ready(function(){
 	var uid = $this.data('uid');
 	var the_url = '{% url "api-assets:admin-user-detail" pk=99991937 %}'.replace('99991937', uid);
 	objectDelete($this, name, the_url);
-	$data_table.ajax.reload();
+	setTimeout( function () {
+        $data_table.ajax.reload();
+    }, 3000);
 })
 
 .on('click', '#btn_bulk_update', function () {
