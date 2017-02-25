@@ -218,8 +218,11 @@ $(document).ready(function(){
 	var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
 	var uid = $this.data('uid');
 	var the_url = '{% url "api-assets:asset-detail" pk=99991937 %}'.replace('99991937', uid);
+	console.log(the_url);
 	objDelete($this, name, the_url);
-	$data_table.ajax.reload();
+	setTimeout( function () {
+        $data_table.ajax.reload();
+    }, 3000);
 })
 
 .on('click', '#btn_bulk_update', function () {
@@ -355,5 +358,6 @@ $(document).ready(function(){
 {#    APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(post_list), success: success});#}
     $('#asset_bulk_update_modal').modal('hide');
 });
+
 </script>
 {% endblock %}
