@@ -37,13 +37,13 @@ class AssetCreateForm(forms.ModelForm):
         self.instance.tags.clear()
         self.instance.tags.add(*tuple(tags))
 
-    def clean(self):
-        clean_data = super(AssetCreateForm, self).clean()
-        ip = clean_data.get('ip')
-        port = clean_data.get('port')
-        query = Asset.objects.filter(ip=ip, port=port)
-        if query:
-            raise forms.ValidationError('this asset has exists.')
+    # def clean(self):
+    #     clean_data = super(AssetCreateForm, self).clean()
+    #     ip = clean_data.get('ip')
+    #     port = clean_data.get('port')
+    #     query = Asset.objects.filter(ip=ip, port=port)
+    #     if query:
+    #         raise forms.ValidationError('this asset has exists.')
 
     class Meta:
         model = Asset
