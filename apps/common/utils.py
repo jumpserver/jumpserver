@@ -46,7 +46,7 @@ def reverse(view_name, urlconf=None, args=None, kwargs=None,
 def get_object_or_none(model, **kwargs):
     try:
         obj = model.objects.get(**kwargs)
-    except (model.FieldError, model.DoesNotExist):
+    except model.DoesNotExist:
         return None
     return obj
 
