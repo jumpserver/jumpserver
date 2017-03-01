@@ -1,6 +1,5 @@
 {% extends '_base_list.html' %}
 {% load i18n %}
-{% load common_tags %}
 
 {% block table_search %}
 {% endblock %}
@@ -75,7 +74,9 @@ $(document).ready(function(){
 	var uid = $this.data('uid');
 	var the_url = '{% url "api-assets:system-user-detail" pk=99991937 %}'.replace('99991937', uid);
 	objectDelete($this, name, the_url);
-	$data_table.ajax.reload();
+	setTimeout( function () {
+        $data_table.ajax.reload();
+    }, 3000);
 })
 
 .on('click', '#btn_bulk_update', function () {

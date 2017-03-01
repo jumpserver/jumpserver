@@ -1,21 +1,18 @@
 # ~*~ coding: utf-8 ~*~
-#
 
-from rest_framework import generics, viewsets
+from rest_framework import generics
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
 from rest_framework_bulk import BulkModelViewSet
-# from django_filters.rest_framework import DjangoFilterBackend
 
+from . import serializers
+from .hands import write_login_log_async
+from .models import User, UserGroup
+from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly
+from .utils import check_user_valid, generate_token
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
-from .utils import check_user_valid, generate_token
-from .models import User, UserGroup
-from .hands import write_login_log_async
-from .permissions import (
-    IsSuperUser, IsAppUser, IsValidUser)
-from . import serializers
 
 
 logger = get_logger(__name__)
@@ -41,7 +38,7 @@ class UserResetPasswordApi(generics.UpdateAPIView):
 
     def perform_update(self, serializer):
         # Note: we are not updating the user object here.
-        # We just do the reset-password staff.
+        # We just do the reset-password stuff.
         import uuid
         from .utils import send_reset_password_mail
         user = self.get_object()
@@ -65,6 +62,7 @@ class UserResetPKApi(generics.UpdateAPIView):
 class UserUpdatePKApi(generics.UpdateAPIView):
     queryset = User.objects.all()
     serializer_class = serializers.UserPKUpdateSerializer
+    permission_classes = (IsCurrentUserOrReadOnly,)
 
     def perform_update(self, serializer):
         user = self.get_object()

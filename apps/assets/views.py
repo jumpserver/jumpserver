@@ -139,15 +139,15 @@ class AssetUpdateView(AdminUserRequiredMixin, UpdateAssetTagsMiXin, UpdateView):
         print(form.errors)
         return super(AssetUpdateView, self).form_invalid(form)
 
-    def form_valid(self, form):
-        asset = form.save(commit=False)
-
-        def prn_obj_key(obj_form):
-            return obj_form.clean().keys()
-
-        for i in prn_obj_key(form):
-            if i not in self.new_form.keys():
-                print i
+    # def form_valid(self, form):
+    #     asset = form.save(commit=False)
+    #
+    #     def prn_obj_key(obj_form):
+    #         return obj_form.clean().keys()
+    #
+    #     for i in prn_obj_key(form):
+    #         if i not in self.new_form.keys():
+    #             print i
 
                 #delattr(asset, '"%s" % i')
                 #del asset.i

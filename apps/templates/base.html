@@ -24,9 +24,9 @@
         {% block first_login_message %}
             {% if user.is_authenticated and user.is_first_login %}
             <div class="alert alert-danger" style="margin: 20px auto 0px">
-                {% url 'users:user-first-login' as the_url %}
+                {% url 'users:user-first-login' as first_login_url %}
                 {% blocktrans %}
-                Your information was incomplete. Please click <a href="{{ the_url }}"> this link </a>to complete your information.
+                Your information was incomplete. Please click <a href="{{ first_login_url }}"> this link </a>to complete your information.
                 {% endblocktrans %}
             </div>
             {% endif %}
@@ -34,8 +34,9 @@
         {% block update_public_key_message %}
             {% if user.is_authenticated and not user.is_public_key_valid %}
             <div class="alert alert-danger" style="margin: 20px auto 0px">
+                {% url 'users:user-profile' as profile_url %}
                 {% blocktrans %}
-                Your ssh-public-key has been expired. Please click <a href="#"> this link </a>to  update your ssh-public-key.
+                Your ssh-public-key has been expired. Please click <a href="{{ profile_url }}"> this link </a>to update your ssh-public-key.
                 {% endblocktrans %}
             </div>
             {% endif %}

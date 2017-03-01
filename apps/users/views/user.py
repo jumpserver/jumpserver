@@ -1,17 +1,19 @@
 # ~*~ coding: utf-8 ~*~
 
 from __future__ import unicode_literals
-import uuid
-import json
 
-from django.shortcuts import redirect
+import json
+import uuid
+
+from openpyxl import load_workbook
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
-from openpyxl import load_workbook
-from django import forms
+
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.cache import cache
 from django.http import HttpResponse, JsonResponse
-from django.contrib.messages.views import SuccessMessageMixin
+from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.utils import timezone
 from django.utils.translation import ugettext as _
@@ -19,22 +21,23 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import ListView
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import CreateView, UpdateView, FormMixin, \
-    FormView
+from django.views.generic.edit import (CreateView, UpdateView, FormMixin,
+                                       FormView)
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.decorators.csrf import csrf_exempt
 
+from .. import forms
+from ..models import User, UserGroup
+from ..utils import AdminUserRequiredMixin, user_add_success_next
 from common.mixins import JSONResponseMixin
 from common.utils import get_logger
 from perms.models import AssetPermission
-from ..models import User, UserGroup
-from ..utils import AdminUserRequiredMixin, user_add_success_next
-from .. import forms
 
 __all__ = ['UserListView', 'UserCreateView', 'UserDetailView',
            'UserUpdateView', 'UserAssetPermissionCreateView',
            'UserAssetPermissionView', 'UserGrantedAssetView',
-           'UserExportView',  'UserBulkImportView']
+           'UserExportView',  'UserBulkImportView', 'UserProfileView']
+
 logger = get_logger(__name__)
 
 
@@ -103,7 +106,7 @@ class UserUpdateView(AdminUserRequiredMixin, UpdateView):
 class UserDetailView(AdminUserRequiredMixin, DetailView):
     model = User
     template_name = 'users/user_detail.html'
-    context_object_name = "user"
+    context_object_name = "user_object"
 
     def get_context_data(self, **kwargs):
         groups = UserGroup.objects.exclude(id__in=self.object.groups.all())
@@ -134,18 +137,16 @@ class UserExportView(View):
         ws.append(header)
 
         for user in users:
-            print(user.name)
-            ws.append([
-                user.name, user.username, user.email,
-                ','.join([group.name for group in user.groups.all()]),
-                user.role, user.phone, user.wechat, user.comment,
-            ])
+            ws.append([user.name, user.username, user.email,
+                       ','.join([group.name for group in user.groups.all()]),
+                       user.role, user.phone, user.wechat, user.comment])
 
         filename = 'users-{}.xlsx'.format(
             timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S'))
         response = HttpResponse(save_virtual_workbook(wb),
                                 content_type='applications/vnd.ms-excel')
-        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+        response[
+            'Content-Disposition'] = 'attachment; filename="%s"' % filename
         return response
 
     def post(self, request):
@@ -304,3 +305,24 @@ class UserGrantedAssetView(AdminUserRequiredMixin, DetailView):
         }
         kwargs.update(context)
         return super(UserGrantedAssetView, self).get_context_data(**kwargs)
+
+
+class UserProfileView(LoginRequiredMixin, TemplateView):
+    template_name = 'users/user_profile.html'
+
+    def get_context_data(self, **kwargs):
+        from perms.utils import (get_user_granted_assets,
+                                 get_user_granted_asset_groups,
+                                 get_user_asset_permissions)
+        assets = get_user_granted_assets(self.request.user)
+        asset_groups = get_user_granted_asset_groups(self.request.user)
+        permissions = get_user_asset_permissions(self.request.user)
+        context = {
+            'app': 'User',
+            'action': 'User Profile',
+            'assets': assets,
+            'asset_groups': asset_groups,
+            'permissions': permissions
+        }
+        kwargs.update(context)
+        return super(UserProfileView, self).get_context_data(**kwargs)

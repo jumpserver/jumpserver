@@ -6,7 +6,6 @@ import logging
 from uuid import uuid4
 from assets.models import Asset
 from ops.models import TaskRecord
-from ops.utils.ansible_api import ADHocRunner, Config
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -20,7 +19,7 @@ logger = logging.getLogger(__name__)
 class Task(models.Model):
     record = models.OneToOneField(TaskRecord)
     name = models.CharField(max_length=128, blank=True, verbose_name=_('Name'))
-    is_gather_facts = models.BooleanField(default=False,verbose_name=_('Is Gather Ansible Facts'))
+    is_gather_facts = models.BooleanField(default=False, verbose_name=_('Is Gather Ansible Facts'))
     assets = models.ManyToManyField(Asset, related_name='tasks')
 
     def __unicode__(self):
@@ -31,6 +30,7 @@ class Task(models.Model):
         return []
 
     def run(self):
+        from ops.utils.ansible_api import ADHocRunner, Config
         conf = Config()
         gather_facts = "yes" if self.is_gather_facts else "no"
         play_source = {

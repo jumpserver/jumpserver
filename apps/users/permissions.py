@@ -1,18 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
 
-import base64
-
-from django.core.cache import cache
-from django.conf import settings
-from django.utils.translation import ugettext as _
-from rest_framework import authentication, exceptions, permissions
-from rest_framework.compat import is_authenticated
-
-from common.utils import signer, get_object_or_none
-from .hands import Terminal
-from .models import User
+from rest_framework import permissions
 
 
 class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
@@ -20,7 +9,7 @@ class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
 
     def has_permission(self, request, view):
         return super(IsValidUser, self).has_permission(request, view) \
-               and request.user.is_valid
+            and request.user.is_valid
 
 
 class IsAppUser(IsValidUser, permissions.BasePermission):
@@ -28,7 +17,7 @@ class IsAppUser(IsValidUser, permissions.BasePermission):
 
     def has_permission(self, request, view):
         return super(IsAppUser, self).has_permission(request, view) \
-               and request.user.is_app
+            and request.user.is_app
 
 
 class IsSuperUser(IsValidUser, permissions.BasePermission):
@@ -36,7 +25,7 @@ class IsSuperUser(IsValidUser, permissions.BasePermission):
 
     def has_permission(self, request, view):
         return super(IsSuperUser, self).has_permission(request, view) \
-               and request.user.is_superuser
+            and request.user.is_superuser
 
 
 class IsSuperUserOrAppUser(IsValidUser, permissions.BasePermission):
@@ -44,8 +33,12 @@ class IsSuperUserOrAppUser(IsValidUser, permissions.BasePermission):
 
     def has_permission(self, request, view):
         return super(IsSuperUserOrAppUser, self).has_permission(request, view) \
-               and (request.user.is_superuser or request.user.is_app)
+            and (request.user.is_superuser or request.user.is_app)
 
 
-if __name__ == '__main__':
-    pass
+class IsCurrentUserOrReadOnly(permissions.BasePermission):
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return obj == request.user
