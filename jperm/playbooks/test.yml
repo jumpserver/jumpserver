@@ -1,9 +1,0 @@
----
-
-- hosts: test
-  gather_facts: no
-  tasks:
-    - name: just for test
-      command: uname -a
-
-
