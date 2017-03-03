@@ -1,0 +1,77 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{{ title }}</title>
+
+    {% include '_head_css_js.html' %}
+    <link href="{% static "css/jumpserver.css" %}" rel="stylesheet">
+    <script src="{% static "js/jumpserver.js" %}"></script>
+
+</head>
+
+<body class="gray-bg">
+    <div class="passwordBox2 animated fadeInDown">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="ibox-content">
+                    <div>
+                        <img src="{% static 'img/logo.png' %}" style="margin: auto" width="82" height="82">
+                        <h2 style="display: inline">Jumpserver</h2>
+                    </div>
+                    {% if errors %}
+                    <p>
+                        <div class="alert alert-danger">
+                            {{ errors }}
+                        </div>
+                    </p>
+                    {% endif %}
+
+                    {% if messages %}
+                        <p>
+                        <div class="alert alert-success" id="messages">
+                            {{ messages }}
+                        </div>
+                    </p>
+                    {% endif %}
+                    <div class="row">
+                        <div class="col-lg-3">
+                                <a href="{{ redirect_url }}" class="btn btn-primary block full-width m-b">返回</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr/>
+        <div class="row">
+            <div class="col-md-6">
+                Copyright Jumpserver.org
+            </div>
+            <div class="col-md-6 text-right">
+               <small>2014-2016</small>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    var time=5;
+    function redirect_page() {
+        if (time >= 0) {
+            var messages = '{{ messages }}， <b>' + time +'</b> ...';
+            $('#messages').html(messages);
+            time--;
+            setTimeout(redirect_page, 1000);
+        }
+        else {
+            window.location.href = "{{ redirect_url }}";
+        }
+    }
+    {% if auto_redirect %}
+    window.onload = redirect_page;
+    {% endif %}
+</script>
+</html>

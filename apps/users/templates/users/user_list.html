@@ -1,0 +1,250 @@
+{% extends '_base_list.html' %}
+{% load i18n static %}
+{% block table_search %}
+    <div class="html5buttons">
+        <div class="dt-buttons btn-group">
+            <a class="btn btn-default btn_import" data-toggle="modal" data-target="#user_import_modal" tabindex="0">
+                <span>{% trans "Import" %}</span>
+            </a>
+            <a class="btn btn-default btn_export" tabindex="0">
+                <span>{% trans "Export" %}</span>
+            </a>
+        </div>
+    </div>
+{% endblock %}
+{% block table_container %}
+<div class="uc pull-left m-l-5 m-r-5"><a href="{% url "users:user-create" %}" class="btn btn-sm btn-primary"> {% trans "Create user" %} </a></div>
+{#<div class="uc pull-left"><a href="javascript:void(0);" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#user_import_modal"> {% trans "Import user" %} </a></div>#}
+<table class="table table-striped table-bordered table-hover " id="user_list_table" >
+    <thead>
+        <tr>
+            <th class="text-center">
+{#                <div><input id="" type="checkbox" class="ipt_check_all"><label></label></div>#}
+                <input id="" type="checkbox" class="ipt_check_all">
+            </th>
+            <th class="text-center">{% trans 'Name' %}</th>
+            <th class="text-center">{% trans 'Username' %}</th>
+            <th class="text-center">{% trans 'Role' %}</th>
+            <th class="text-center">{% trans 'User group' %}</th>
+            <th class="text-center">{% trans 'Active' %}</th>
+            <th class="text-center">{% trans 'Action' %}</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<div id="actions" class="hide">
+    <div class="input-group">
+        <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+            <option value="delete">{% trans 'Delete selected' %}</option>
+            <option value="update">{% trans 'Update selected' %}</option>
+            <option value="deactive">{% trans 'Deactive selected' %}</option>
+            <option value="active">{% trans 'Active selected' %}</option>
+        </select>
+        <div class="input-group-btn pull-left" style="padding-left: 5px;">
+            <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
+             {% trans 'Submit' %}
+            </button>
+        </div>
+    </div>
+</div>
+{% include "users/_user_bulk_update_modal.html" %}
+{% include "users/_user_import_modal.html" %}
+{% endblock %}
+{% block content_bottom_left %}{% endblock %}
+{% block custom_foot_js %}
+<script src="{% static 'js/jquery.form.min.js' %}"></script>
+<script>
+$(document).ready(function(){
+    var options = {
+        ele: $('#user_list_table'),
+        columnDefs: [
+            {targets: 1, createdCell: function (td, cellData, rowData) {
+                var detail_btn = '<a href="{% url "users:user-detail" pk=99991937 %}">' + cellData + '</a>';
+                $(td).html(detail_btn.replace('99991937', rowData.id));
+             }},
+            {targets: 4, createdCell: function (td, cellData) {
+                var innerHtml = cellData.length > 20 ? cellData.substring(0, 20) + '...': cellData;
+                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
+             }},
+            {targets: 5, createdCell: function (td, cellData) {
+                if (!cellData) {
+                    $(td).html('<i class="fa fa-times text-danger"></i>')
+                } else {
+                    $(td).html('<i class="fa fa-check text-navy"></i>')
+                }
+             }},
+            {targets: 6, createdCell: function (td, cellData, rowData) {
+                var update_btn = '<a href="{% url "users:user-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
+                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="99991937" data-name="99991938">{% trans "Delete" %}</a>'
+                        .replace('99991937', cellData)
+                        .replace('99991938', rowData.name);
+                if (rowData.id === 1 || rowData.username == "admin") {
+                    $(td).html(update_btn)
+                } else {
+                    $(td).html(update_btn + del_btn)
+                }
+             }}],
+        ajax_url: '{% url "api-users:user-list" %}',
+        columns: [{data: "id"}, {data: "name" }, {data: "username" }, {data: "get_role_display" },
+            {data: "groups_display" }, {data: "is_valid" }, {data: "id" }],
+        op_html: $('#actions').html()
+    };
+    var table = jumpserver.initDataTable(options);
+
+    $('.btn_export').click(function () {
+        var users = [];
+        var rows = table.rows('.selected').data();
+        $.each(rows, function (index, obj) {
+            users.push(obj.id)
+        });
+        $.ajax({
+            url: "{% url 'users:user-export' %}",
+            method: 'POST',
+            data: JSON.stringify({users_id: users}),
+            dataType: "json",
+            success: function (data, textStatus) {
+                window.open(data.redirect)
+            },
+            error: function () {
+                toastr.error('Export failed');
+            }
+        })
+    });
+
+    $('#btn_user_import').click(function() {
+        var $form = $('#fm_user_import');
+        $form.find('.help-block').remove();
+        function success (data) {
+            if (data.valid === false) {
+                $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_users'));
+            } else {
+                $('#id_created').html(data.created_info);
+                $('#id_created_detail').html(data.created.join(', '));
+                $('#id_updated').html(data.updated_info);
+                $('#id_updated_detail').html(data.updated.join(', '));
+                $('#id_failed').html(data.failed_info);
+                $('#id_failed_detail').html(data.failed.join(', '));
+                var $data_table = $('#user_list_table').DataTable();
+                $data_table.ajax.reload();
+            }
+        }
+        $form.ajaxSubmit({success: success});
+    })
+
+}).on('click', '#btn_bulk_update', function(){
+    var action = $('#slct_bulk_update').val();
+    var $data_table = $('#user_list_table').DataTable();
+    var id_list = [];
+    var plain_id_list = [];
+    $data_table.rows({selected: true}).every(function(){
+        id_list.push({id: this.data().id});
+        plain_id_list.push(this.data().id);
+    });
+    if (id_list === []) {
+        return false;
+    }
+    var the_url = "{% url 'api-users:user-list' %}";
+    function doDeactive() {
+        var body = $.each(id_list, function(index, user_object) {
+            user_object['is_active'] = false;
+        });
+        APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(body)});
+        $data_table.ajax.reload();
+        jumpserver.checked = false;
+    }
+    function  doActive() {
+        var body = $.each(id_list, function(index, user_object) {
+            user_object['is_active'] = true;
+        });
+        APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(body)});
+        $data_table.ajax.reload();
+        jumpserver.checked = false;
+    }
+    function doDelete() {
+        swal({
+            title: "{% trans 'Are you sure?' %}",
+            text: "{% trans 'This will delete the selected users !!!' %}",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "{% trans 'Confirm' %}",
+            closeOnConfirm: false
+        }, function() {
+            var success = function() {
+                var msg = "{% trans 'User Deleted.' %}";
+                swal("{% trans 'User Delete' %}", msg, "success");
+                $('#user_list_table').DataTable().ajax.reload();
+            };
+            var fail = function() {
+                var msg = "{% trans 'User Deleting failed.' %}";
+                swal("{% trans 'User Delete' %}", msg, "error");
+            };
+            var url_delete = the_url + '?id__in=' + JSON.stringify(plain_id_list);
+            APIUpdateAttr({url: url_delete, method: 'DELETE', success: success, error: fail});
+            jumpserver.checked = false;
+        });
+    }
+    function doUpdate() {
+        $('#user_bulk_update_modal').modal('show');
+    }
+    switch(action) {
+        case 'deactive':
+            doDeactive();
+            break;
+        case 'delete':
+            doDelete();
+            break;
+        case 'update':
+            doUpdate();
+            break;
+        case 'active':
+            doActive();
+            break;
+        default:
+            break;
+    }
+}).on('click', '.btn_user_delete', function(){
+    var $this = $(this);
+    var name = $this.data('name');
+    var uid = $this.data('uid');
+    var the_url = '{% url "api-users:user-detail" pk=99991937 %}'.replace('99991937', uid);
+    objectDelete($this, name, the_url);
+}).on('click', '#btn_user_bulk_update', function(){
+    var json_data = $('#fm_user_bulk_update').serializeObject();
+    var body = {};
+    body.enable_otp = (json_data.enable_otp === 'on')? true: false;
+    if (json_data.role != '') {
+        body.role = json_data.role;
+    }
+    if (json_data.groups != undefined) {
+        body.groups = json_data.groups;
+    }
+    if (typeof body.groups === 'string') {
+        body.groups = [parseInt(body.groups)]
+    } else if(typeof body.groups === 'array') {
+        var new_groups = body.groups.map(Number);
+        body.groups = new_groups;
+    }
+    var $data_table = $('#user_list_table').DataTable();
+    var post_list = [];
+    $data_table.rows({selected: true}).every(function(){
+        var content = Object.assign({id: this.data().id}, body);
+        post_list.push(content);
+    });
+    if (post_list === []) {
+        return false
+    }
+    var the_url = "{% url 'api-users:user-list' %}";
+    var success = function() {
+        var msg = "{% trans 'The selected users has been updated successfully.' %}";
+        swal("{% trans 'User Updated' %}", msg, "success");
+        $('#user_list_table').DataTable().ajax.reload();
+        jumpserver.checked = false;
+    };
+    APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(post_list), success: success});
+    $('#user_bulk_update_modal').modal('hide');
+});
+</script>
+{% endblock %}
+

@@ -1,0 +1,426 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset detail' %} </a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default" href="{% url 'assets:asset-update' pk=asset.id %}"><i class="fa fa-edit"></i>Update</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span class="label"><b>{{ asset.hostname }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr class="no-borders-tr">
+                                            <td width="20%">{% trans 'Hostname' %}:</td>
+                                            <td><b>{{ asset.hostname }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'IP' %}:</td>
+                                            <td><b>{{ asset.ip }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Admin user' %}:</td>
+                                            {% if asset.admin_user %}
+                                            <td><b>{{ asset.admin_user.name }}</b></td>
+                                            {% else %}
+                                            <td><b>None</b></td>
+                                            {% endif %}
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Other IP' %}:</td>
+                                            <td><b>{{ asset.other_ip }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Remote card IP' %}:</td>
+                                            <td><b>{{ asset.remote_card_ip }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Port' %}:</td>
+                                            <td><b>{{ asset.port }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Mac address' %}:</td>
+                                            <td><b>{{ asset.mac_addr }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'CPU' %}:</td>
+                                            <td><b>{{ asset.cpu }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Memory' %}:</td>
+                                            <td><b>{{ asset.memory }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Disk' %}:</td>
+                                            <td><b>{{ asset.disk }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'OS' %}:</td>
+                                            <td><b>{{ asset.os }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Asset status' %}:</td>
+                                            <td><b>{{ asset.status }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Is active' %}:</td>
+                                            <td><b>{{ asset.is_active }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Asset type' %}:</td>
+                                            <td><b>{{ asset.type }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Asset environment' %}:</td>
+                                            <td><b>{{ asset.env }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Serial number' %}:</td>
+                                            <td><b>{{ asset.sn }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Asset number' %}:</td>
+                                            <td><b>{{ asset.number }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Created by' %}:</td>
+                                            <td><b>{{ asset.created_by }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Date joined' %}:</td>
+                                            <td><b>{{ asset.date_joined|date:"Y-m-j H:i:s" }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Comment' %}:</td>
+                                            <td><b>{{ asset.comment }}</b></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Quick modify' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr class="no-borders-tr">
+                                          <td width="50%">{% trans 'Active' %}:</td>
+                                            <td><span class="pull-right">
+                                                <div class="switch">
+                                                    <div class="onoffswitch">
+                                                        <input type="checkbox" {% if asset.is_active %} checked {% endif %}  class="onoffswitch-checkbox" id="is_active">
+                                                        <label class="onoffswitch-label" for="is_active">
+                                                            <span class="onoffswitch-inner"></span>
+                                                            <span class="onoffswitch-switch"></span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </span></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Rrefresh hardware' %}:</td>
+                                            <td>
+                                                <span class="pull-right">
+                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Refresh' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Test admin user' %}:</td>
+                                            <td>
+                                                <span class="pull-right">
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_pk" style="width: 54px;">{% trans 'Test' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Test system users' %}:</td>
+                                            <td>
+                                                <span class="pull-right">
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_pk" style="width: 54px;">{% trans 'Test' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Repush system users' %}:</td>
+                                            <td>
+                                                <span class="pull-right">
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_pk" style="width: 54px;">{% trans 'Push' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Asset groups' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table group_edit" id="add-asset2group">
+                                        <tbody>
+                                        <form>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <select data-placeholder="{% trans 'Join asset groups' %}" id="groups_selected" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for asset_group in asset_groups_remain %}
+                                                        <option value="{{ asset_group.id }}" id="opt_{{ asset_group.id }}" >{{ asset_group.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <button type="button" class="btn btn-info btn-sm" id="btn_add_user_group">{% trans 'Join' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+
+                                        {% for asset_group in asset_groups %}
+                                        <tr>
+                                          <td ><b class="bdg_group" data-gid={{ asset_group.id }}>{{ asset_group.name }}</b></td>
+                                          <td>
+                                              <button class="btn btn-danger pull-right btn-xs btn_leave_group" type="button"><i class="fa fa-minus"></i></button>
+                                          </td>
+                                        </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="panel panel-warning">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'System users' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table group_edit" id="add-asset2systemuser">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select system user' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for system_user in system_users_remain %}
+                                                            <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button" class="btn btn-warning btn-sm btn-system-user">{% trans 'Associate' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+                                        {% for system_user in system_users %}
+                                        <tr>
+                                            <td ><b class="bdg_group" data-sid={{ system_user.id }}>{{ system_user.name }}</b></td>
+                                            <td>
+                                                <button class="btn btn-danger btn-xs pull-right btn_leave_system" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+jumpserver.groups_selected = {};
+function updateAssetGroups(groups) {
+    var the_url = "{% url 'api-assets:asset-update-group' pk=asset.id %}";
+    var body = {
+        groups: Object.assign([], groups)
+    };
+    var success = function(data) {
+        // remove all the selected groups from select > option and rendered ul element;
+        $('.select2-selection__rendered').empty();
+        $('#groups_selected').val('');
+        $.map(jumpserver.groups_selected, function(group_name, index) {
+            $('#opt_' + index).remove();
+            // change tr html of user groups.
+            $('#add-asset2group tbody').append(
+                '<tr>' +
+                '<td><b class="bdg_group" data-gid="' + index + '">' + group_name + '</b></td>' +
+                '<td><button class="btn btn-danger btn-xs pull-right btn_leave_group" type="button"><i class="fa fa-minus"></i></button></td>' +
+                '</tr>'
+            )
+        });
+        // clear jumpserver.groups_selected
+        jumpserver.groups_selected = {};
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success: success
+    });
+}
+
+function updateAssetSystem(system_users) {
+    var the_url = "{% url 'api-assets:asset-update-system-users' pk=asset.id %}";
+    var body = {
+        system_users: Object.assign([], system_users)
+    };
+    var success = function(data) {
+        $('.select2-selection__rendered').empty();
+        $('#groups_selected').val('');
+        $.map(jumpserver.groups_selected, function(name, index) {
+            $('#opt_' + index).remove();
+
+            $('#add-asset2systemuser tbody').append(
+                '<tr>' +
+                '<td><b class="bdg_group" data-sid="' + index + '">' + name + '</b></td>' +
+                '<td><button class="btn btn-danger btn-xs pull-right btn_leave_system" type="button"><i class="fa fa-minus"></i></button></td>' +
+                '</tr>'
+            )
+        });
+        // clear jumpserver.groups_selected
+        jumpserver.groups_selected = {};
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success: success
+    });
+}
+
+
+$(document).ready(function () {
+    $('.select2').select2()
+    .on('select2:select', function(evt) {
+            var data = evt.params.data;
+            jumpserver.groups_selected[data.id] = data.text;
+        }).on('select2:unselect', function(evt) {
+            var data = evt.params.data;
+            delete jumpserver.groups_selected[data.id]
+        })
+})
+	.on('click', '#is_active', function () {
+	var the_url = '{% url "api-assets:asset-detail" pk=asset.id %}';
+	var checked = $(this).prop('checked');
+    var body = {
+        'is_active': checked
+    };
+    var success = '{% trans "Update Successfully!" %}';
+    var status = $(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").text();
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success_message: success
+    });
+    if (status == "False") {
+    	$(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").html('True');
+    }else{
+    	$(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").html('False');
+    }
+})
+	.on('click', '#btn_add_user_group', function () {
+		if (Object.keys(jumpserver.groups_selected).length === 0) {
+            return false;
+        }
+	    var groups = $('.bdg_group').map(function() {
+	        return $(this).data('gid');
+	    }).get();
+	    $.map(jumpserver.groups_selected, function(value, index) {
+	        groups.push(parseInt(index));
+	        $('#opt_' + index).remove();
+	    });
+	    updateAssetGroups(groups)
+})
+    .on('click', '.btn_leave_group', function() {
+    var $this = $(this);
+    var $tr = $this.closest('tr');
+    var $badge = $tr.find('.bdg_group');
+    var gid = $badge.data('gid');
+    var group_name = $badge.html() || $badge.text();
+    $('#groups_selected').append(
+        '<option value="' + gid + '" id="opt_' + gid + '">' + group_name + '</option>'
+    );
+    $tr.remove();
+    var groups = $('.bdg_group').map(function () {
+        return $(this).data('gid');
+    }).get();
+    updateAssetGroups(groups)
+})
+    .on('click', '.btn-system-user', function () {
+    	if (Object.keys(jumpserver.groups_selected).length === 0) {
+            return false;
+        }
+	    var system_users = $('.bdg_group').map(function() {
+	        return $(this).data('sid');
+	    }).get();
+	    $.map(jumpserver.groups_selected, function(value, index) {
+	        system_users.push(parseInt(index));
+	        $('#opt_' + index).remove();
+	    });
+	    updateAssetSystem(system_users)
+
+})
+	.on('click', '.btn_leave_system', function () {
+		var $this = $(this);
+	    var $tr = $this.closest('tr');
+	    var $badge = $tr.find('.bdg_group');
+	    var sid = $badge.data('sid');
+	    var name = $badge.html() || $badge.text();
+	    $('#groups_selected').append(
+	        '<option value="' + sid + '" id="opt_' + sid + '">' + name + '</option>'
+	    );
+	    $tr.remove();
+	    var system_users = $('.bdg_group').map(function () {
+	        return $(this).data('sid');
+	    }).get();
+	    updateAssetSystem(system_users)
+
+})
+
+
+</script>
+{% endblock %}

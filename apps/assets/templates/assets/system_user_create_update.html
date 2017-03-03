@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load bootstrap %}
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>{% trans 'Create system user' %}</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        {% if form.no_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+                        <form enctype="multipart/form-data" method="post" class="form-horizontal" action="" >
+                            {% csrf_token %}
+                            <h3>{% trans 'Basic' %}</h3>
+                            {{ form.name|bootstrap_horizontal }}
+                            {{ form.username|bootstrap_horizontal }}
+                            {{ form.protocol|bootstrap_horizontal }}
+                            <h3>{% trans 'Auth' %}</h3>
+                            {{ form.auth_method|bootstrap_horizontal }}
+                            <div class="password-auth hidden">
+                                {{ form.password|bootstrap_horizontal }}
+                            </div>
+                            <div class="public-key-auth">
+                                <div class="form-group">
+                                    <label for="{{ form.auto_generate_key.id_for_label }}" class="col-sm-2 control-label">{% trans 'Auto generate key' %}</label>
+                                    <div class="col-sm-8">
+                                        {{ form.auto_generate_key}}
+                                    </div>
+                                </div>
+                                <div>
+                                    {{ form.private_key_file|bootstrap_horizontal }}
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="{{ form.as_push.id_for_label }}" class="col-sm-2 control-label">{% trans 'Auto push' %}</label>
+                                <div class="col-sm-8">
+                                    {{ form.auto_push}}
+                                </div>
+                            </div>
+                            <h3>{% trans 'Other' %}</h3>
+                            {{ form.sudo|bootstrap_horizontal }}
+                            {{ form.home|bootstrap_horizontal }}
+                            {{ form.shell|bootstrap_horizontal }}
+                            {{ form.uid|bootstrap_horizontal }}
+                            {{ form.comment|bootstrap_horizontal }}
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block custom_foot_js %}
+    <script>
+        var auth_method = '#'+'{{ form.auth_method.id_for_label }}';
+        var auto_generate_key = '#'+'{{ form.auto_generate_key.id_for_label }}';
+        function authMethodDisplay() {
+            if ($(auth_method).val() == 'P') {
+                $('.password-auth').removeClass('hidden');
+                $('.public-key-auth').addClass('hidden');
+                $('#'+'{{ form.password.id_for_label }}').attr('required', 'required');
+
+            } else if ($(auth_method).val() == 'K') {
+                $('.password-auth').addClass('hidden');
+                $('.public-key-auth').removeClass('hidden');
+
+                if ($(auto_generate_key).prop('checked')){
+                    $('#'+'{{ form.private_key_file.id_for_label }}').closest('.form-group').addClass('hidden');
+                } else {
+                    $('#'+'{{ form.private_key_file.id_for_label }}').closest('.form-group').removeClass('hidden');
+{#                    $('#'+'{{ form.private_key_file.id_for_label }}').attr('required', 'required');#}
+                }
+            }
+        }
+        $(document).ready(function () {
+            $('.select2').select2();
+            authMethodDisplay();
+            $(auth_method).change(function () {
+                authMethodDisplay();
+            });
+            $(auto_generate_key).change(function () {
+                authMethodDisplay();
+            });
+
+
+            if ($('#'+'{{ form.protocol.id_for_label }}').val() == 'telnet') {
+                $('#'+'{{ form.auto_generate_key.id_for_label }}').closest('.form-group').remove();
+                $('#'+'{{ form.private_key_file.id_for_label }}').closest('.form-group').remove();
+                $('#'+'{{ form.auto_push.id_for_label }}').closest('.form-group').remove();
+                $('#'+'{{ form.auto_update.id_for_label }}').closest('.form-group').remove();
+            }
+        })
+    </script>
+{% endblock %}

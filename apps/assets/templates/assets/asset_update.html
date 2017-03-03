@@ -1,0 +1,79 @@
+{% extends '_base_create_update.html' %}
+{% load static %}
+{% load bootstrap %}
+{% load i18n %}
+
+{% block custom_head_css_js_create %}
+    <link href="{% static "css/plugins/inputTags.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/inputTags.jquery.min.js" %}"></script>
+{% endblock %}
+
+{% block form %}
+    <form action="" method="post" class="form-horizontal">
+    {% csrf_token %}
+    <h3>{% trans 'Basic' %}</h3>
+    {{ form.hostname|bootstrap_horizontal }}
+    {{ form.ip|bootstrap_horizontal }}
+    {{ form.port|bootstrap_horizontal }}
+    {{ form.type|bootstrap_horizontal }}
+
+    <div class="hr-line-dashed"></div>
+    <h3>{% trans 'Group' %}</h3>
+    {{ form.idc|bootstrap_horizontal }}
+    {{ form.groups|bootstrap_horizontal }}
+
+    <div class="hr-line-dashed"></div>
+    <h3>{% trans 'Asset user' %}</h3>
+    {{ form.admin_user|bootstrap_horizontal }}
+    {{ form.system_users|bootstrap_horizontal }}
+
+    <div class="hr-line-dashed"></div>
+    <h3>{% trans 'Hardware' %}</h3>
+    {{ form.sn|bootstrap_horizontal }}
+    {{ form.brand|bootstrap_horizontal }}
+    {{ form.cpu|bootstrap_horizontal }}
+    {{ form.memory|bootstrap_horizontal }}
+    {{ form.disk|bootstrap_horizontal }}
+    {{ form.mac_address|bootstrap_horizontal }}
+
+    <div class="hr-line-dashed"></div>
+    <h3>{% trans 'Configuration' %}</h3>
+    {{ form.number|bootstrap_horizontal }}
+    {{ form.other_ip|bootstrap_horizontal }}
+    {{ form.remote_card_ip|bootstrap_horizontal }}
+    {{ form.os|bootstrap_horizontal }}
+
+    <div class="hr-line-dashed"></div>
+    <h3>{% trans 'Location' %}</h3>
+    {{ form.cabinet_no|bootstrap_horizontal }}
+    {{ form.cabinet_pos|bootstrap_horizontal }}
+
+    <div class="hr-line-dashed"></div>
+    <h3>{% trans 'Other' %}</h3>
+    {{ form.status|bootstrap_horizontal }}
+    {{ form.env|bootstrap_horizontal }}
+    {{ form.tags|bootstrap_horizontal }}
+    {{ form.comment|bootstrap_horizontal }}
+
+    <div class="hr-line-dashed"></div>
+    <div class="form-group">
+        <div class="col-sm-4 col-sm-offset-2">
+            <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+            <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+        </div>
+    </div>
+
+</form>
+{% endblock %}
+
+{% block custom_foot_js %}
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+            $("#tags").select2({
+                tags: true,
+                maximumSelectionLength: 8  //最多能够选择的个数
+            });
+        })
+    </script>
+{% endblock %}

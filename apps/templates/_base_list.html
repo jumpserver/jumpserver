@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/dataTables/dataTables.min.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+    <script src="{% static "js/plugins/dataTables/dataTables.min.js" %}"></script>
+{% endblock %}
+{% block content %}
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>
+                        {{ action }}
+                    </h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="" id="content_start">
+                        {% block content_left_head %} {% endblock %}
+                        {% block table_search %}
+                        <form id="search_form" method="get" action="" class="pull-right mail-search form-inline">
+                            {% block search_form %}
+                            <div class="input-group">
+                                <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="{{ keyword }}">
+                            </div>
+                            <div class="input-group">
+                                <div class="input-group-btn">
+                                    <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                                        搜索
+                                    </button>
+                                </div>
+                            </div>
+                            {% endblock %}
+                        </form>
+                        {% endblock %}
+                        {% block tags_list %}{% endblock %}
+                    </div>
+                    {% block table_container %}
+                    <table class="table table-striped table-bordered table-hover " id="editable" >
+                        <thead>
+                            <tr>
+                                {% block table_head %} {% endblock %}
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% block table_body %} {% endblock %}
+                        </tbody>
+                    </table>
+                    {% endblock %}
+                    <div class="row">
+                        <div class="col-sm-4">
+                            {# Update batch #}
+                            {% block content_bottom_left %} {% endblock %}
+                        </div>
+                        {% block table_pagination %}
+                        {% include '_pagination.html' %}
+                        {% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% load static %}
+{% load i18n %}
+<li class="nav-header">
+    <div class="dropdown profile-element">
+        <span>
+            <img alt="image" class="img-circle" width="48" height="48" src="{% static "img/root.png" %}"/>
+        </span>
+        <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+            <span class="clear">
+                <span class="block m-t-xs">
+                    <strong class="font-bold"> {{ user.name }}<span style="color: #8095a8"></span></strong>
+                </span>
+                <span class="text-muted text-xs block">
+                     {{ user.get_role_display | default:_('User') }}<b class="caret"></b>
+                </span>
+            </span>
+        </a>
+        <ul class="dropdown-menu animated fadeInRight m-t-xs">
+            <li><a value="">{% trans 'Profile' %}</a></li>
+            <li class="divider"></li>
+            <li><a href="">{% trans 'Logout' %}</a></li>
+        </ul>
+    </div>
+    <div class="logo-element">
+        JMS
+    </div>
+</li>

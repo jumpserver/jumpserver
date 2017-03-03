@@ -1,0 +1,23 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% block modal_class %}modal-lg{% endblock %}
+{% block modal_id %}select_user_modal{% endblock %}
+{% block modal_title%}{% trans "Please Select User" %}{% endblock %}
+{% block modal_body %}
+<table class="table table-striped table-bordered table-hover " id="select_user_table" >
+    <thead>
+        <tr>
+            <th class="text-center">
+                <div class="checkbox checkbox-default"><input id="" type="checkbox" class="ipt_check_all"><label></label></div>
+            </th>
+            <th class="text-center">{% trans 'Name' %}</th>
+            <th class="text-center">{% trans 'Username' %}</th>
+            <th class="text-center">{% trans 'Role' %}</th>
+            <th class="text-center">{% trans 'User group' %}</th>
+            <th class="text-center">{% trans 'Asset num' %}</th>
+            <th class="text-center">{% trans 'Active' %}</th>
+        </tr>
+    </thead>
+</table>
+{% endblock %}
+{% block modal_confirm_id %}btn_select_user{% endblock %}

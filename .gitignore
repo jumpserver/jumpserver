@@ -1,46 +1,23 @@
-*.py[cod]
-.idea
-test.py
 .DS_Store
-db.sqlite3
-# C extensions
-*.so
-
-# Packages
-*.egg
-*.egg-info
+*.pyc
+*.pyo
+*.swp
+.env
+env
+env*
 dist
 build
-eggs
-parts
-bin
-var
-sdist
-develop-eggs
-.installed.cfg
-lib
-lib64
-__pycache__
-
-# Installer logs
-pip-log.txt
-
-# Unit test / coverage reports
-.coverage
+*.egg
+*.egg-info
+_mailinglist
+dump.rdb
 .tox
-nosetests.xml
-
-# Translations
-*.mo
-
-# Mr Developer
-.mr.developer.cfg
-.project
-.pydevproject
-.settings
+.cache/
+.idea/
+db.sqlite3
+config.py
+migrations/
 *.log
-logs/*
-keys/*
-jumpserver.conf
-nohup.out
-tmp/*
+host_rsa_key
+*.bat
+tags

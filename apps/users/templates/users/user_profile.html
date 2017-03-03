@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-primary"><b>{{ user.name }}</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <div class="text-left">
+                            <table class="table">
+                                <tr>
+                                    <td class="text-navy">用户名</td>
+                                    <td>{{ user.username }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">姓名</td>
+                                    <td>{{ user.name }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">权限</td>
+                                    <td>{{ user.get_role_display }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">Email</td>
+                                    <td>{{ user.email }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">激活</td>
+                                    <td>{{ user.is_active }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">添加日期</td>
+                                    <td>{{ user.date_joined|date:"Y-m-d H:i:s" }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">最后登录</td>
+                                    <td>{{ user.last_login|date:"Y-m-d H:i:s" }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">所在用户组</td>
+                                    <td>
+                                        {% for group in user.groups.all %}
+                                        <span class="simple-tag with-link">
+                                            <a href="{% url 'users:user-group-detail' group.id %}">{{ group.name }}</a>
+                                        </span>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">授权主机数量</td>
+                                    <td>{{ assets | length }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">授权主机组</td>
+                                    <td>
+                                        {% for group in asset_groups %}
+                                        <span class="simple-tag with-link">
+                                            <a href="{% url 'assets:asset-group-detail' group.id %}">{{ group.name }}</a>
+                                        </span>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="text-navy">授权规则</td>
+                                    <td>
+                                        {% for perm in permissions %}
+                                        <span class="simple-tag with-link">
+                                            <a href="{% url 'perms:asset-permission-detail' perm.id %}">{{ perm.name }}</a>
+                                        </span>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <span class="label label-primary"><b>{% trans "Update Public Key" %}</b></span>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <p>{% trans "Paste your SSH Public Key here" %}</p>
+                        <textarea id="txt_pk" class="form-control" cols="30" rows="10" placeholder="ssh-rsa AAAAB3NzaC1yc2EAA....."></textarea>
+                        <button id="btn_update_pk" class="btn btn-primary m-t-15">{% trans 'Update' %}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+$(document).on('click', '#btn_update_pk', function() {
+    var $this = $(this);
+    var pk = $('#txt_pk').val();
+    var the_url = '{% url "api-users:user-public-key-update" pk=user.id %}';
+    var body = {'_public_key': pk};
+    var success = function() {
+        $('#txt_pk').val('');
+        var msg = "{% trans 'Successfully updated the SSH public key.' %}";
+        swal("{% trans 'User SSH Public Key Update' %}", msg, "success");
+    };
+    var fail = function() {
+        var msg = "{% trans 'Failed to update SSH public key.' %}";
+        swal({
+            title: "{% trans 'User SSH Public Key Update' %}",
+            text: msg,
+            type: "error",
+            showCancelButton: false,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "{% trans 'Confirm' %}",
+            closeOnConfirm: true
+            }, function () {
+              $('#txt_pk').focus();
+            }
+        );
+    }
+    APIUpdateAttr({ url: the_url, body: JSON.stringify(body), success: success, error: fail});
+})
+</script>
+{% endblock %}

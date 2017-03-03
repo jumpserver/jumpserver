@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li>
+                                <a href="{% url 'perms:asset-permission-detail' pk=asset_permission.id %}" class="text-center">
+                                    <i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
+                            </li>
+                            <li class="active">
+                                <a href="{% url 'perms:asset-permission-user-list' pk=asset_permission.id %}" class="text-center">
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'Users and user groups' %}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'perms:asset-permission-asset-list' pk=asset_permission.id  %}" class="text-center">
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'Assets and asset groups' %}</a>
+                            </li>
+                            <form id="search_form" method="get" action="" class="pull-right mail-search">
+                            <div class="input-group">
+                                <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="{{ keyword }}">
+                                <div class="input-group-btn">
+                                    <button id="search_btn" type="submit" class="btn btn-sm btn-primary">
+                                        搜索
+                                    </button>
+                                </div>
+                            </div>
+                            </form>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0;">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left">{% trans 'User list of ' %} <b>{{ asset_permission.name }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>{% trans 'Name' %}</th>
+                                                <th>{% trans 'Username' %}</th>
+                                                <th>{% trans 'Email' %}</th>
+                                                <th>{% trans 'Is valid' %}</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for user in page_obj %}
+                                            <tr>
+                                                <td>{{ user.name }}</td>
+                                                <td>{{ user.username }}</td>
+                                                <td>{{ user.email }}</td>
+                                                <td>
+                                                    {% if user.is_expired and user.is_active %}
+                                                    <i class="fa fa-times text-danger"></i>
+                                                    {% else %}
+                                                    <i class="fa fa-check text-navy"></i>
+                                                    {% endif %}
+                                                </td>
+
+                                                <td>
+                                                    <button class="btn btn-danger btn-xs btn_delete_user_group {% if user.is_inherit_from_user_groups %} disabled {% endif %}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                    <div class="row">
+                                        {% include '_pagination.html' %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Add user to asset permission' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select user' %}" class="select2 user" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for user in users_remain %}
+                                                            <option value="{{ user.id }}">{{ user.name }}: {{ user.username }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button" class="btn btn-primary btn-sm btn-add-user">{% trans 'Add' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Add user group to asset permission' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table group_edit">
+                                        <tbody>
+                                        <form>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <select data-placeholder="{% trans 'Select user groups' %}" class="select2 user-group" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for user_group in user_groups_remain %}
+                                                        <option value="{{ user_group.id }}" id="opt_{{ user_group.id }}">{{ user_group.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <button type="button" class="btn btn-info btn-small" id="btn_add_user_group">{% trans 'Add' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+
+                                        {% for user_group in user_groups %}
+                                        <tr>
+                                          <td ><b class="bdg_user_group" data-gid={{ user_group.id }}>{{ user_group.name }}</b></td>
+                                          <td>
+                                              <button class="btn btn-danger btn-xs btn_delete_user_group" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                          </td>
+                                        </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block custom_foot_js %}
+    <script>
+        jumpserver.users_selected = {};
+        jumpserver.user_groups_selected = {};
+        $(document).ready(function () {
+            $('.select2.user').select2()
+                .on('select2:select', function(evt) {
+                     var data = evt.params.data;
+                     jumpserver.users_selected[data.id] = data.text;
+                })
+                .on('select2:unselect', function(evt) {
+                    var data = evt.params.data;
+                    delete jumpserver.users_selected[data.id]
+                });
+            $('.select2.user-group').select2()
+                .on('select2:select', function(evt) {
+                     var data = evt.params.data;
+                     jumpserver.user_groups_selected[data.id] = data.text;
+                })
+                .on('select2:unselect', function(evt) {
+                    var data = evt.params.data;
+                    delete jumpserver.user_groups_selected[data.id]
+                })
+        }).on('click', '.btn-add-user', function () {
+            console.log(jumpserver.users_selected)
+        })
+    </script>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends '_base_list.html' %}
+{% load i18n %}
+{% block content_left_head %}
+    <a href="{% url 'perms:asset-permission-create' %}" class="btn btn-sm btn-primary">
+        {% trans "Create permission" %}
+    </a>
+{% endblock %}
+
+{% block table_head %}
+    <th class="text-center">{% trans 'ID' %}</th>
+    <th class="text-center">{% trans 'Name' %}</th>
+    <th class="text-center">{% trans 'User' %}</th>
+    <th class="text-center">{% trans 'User group' %}</th>
+    <th class="text-center">{% trans 'Asset' %}</th>
+    <th class="text-center">{% trans 'Asset group' %}</th>
+    <th class="text-center">{% trans 'System user' %}</th>
+    <th class="text-center">{% trans 'Is valid' %}</th>
+    <th class="text-center">{% trans 'Action' %}</th>
+{% endblock %}
+
+{% block table_body %}
+     {% for asset_permission in asset_permission_list %}
+         <tr class="gradeX">
+             <td class="text-center">{{ asset_permission.id }}</td>
+             <td class="text-center">
+                 <a href="{% url 'perms:asset-permission-detail' pk=asset_permission.id %}">
+                     {{ asset_permission.name }}
+                 </a>
+             </td>
+             <td class="text-center">{{ asset_permission.users.count }}</td>
+             <td class="text-center">{{ asset_permission.user_groups.count }}</td>
+             <td class="text-center">{{ asset_permission.assets.count }}</td>
+             <td class="text-center">{{ asset_permission.asset_groups.count }}</td>
+             <td class="text-center">{{ asset_permission.system_users.count }}</td>
+             <td class="text-center">
+             {% if asset_permission.is_valid %}
+                 <i class="fa fa-check text-navy"></i>
+             {% else %}
+                 <i class="fa fa-times text-danger"></i>
+             {% endif %}
+             </td>
+             <td class="text-center">
+                 <a href="{% url 'perms:asset-permission-update' pk=asset_permission.id %}"
+                    class="btn btn-xs btn-info">{% trans 'Update' %}
+                 </a>
+                 <a class="btn btn-xs btn-danger btn-del" data-name="{{ asset_permission.name }}"
+                    data-uid="{{ asset_permission.id }}">{% trans 'Delete' %}
+                 </a>
+             </td>
+         </tr>
+     {% endfor %}
+{% endblock %}
+
+{% block custom_foot_js %}
+    <script>
+        $(document).ready(function() {
+            $('table').DataTable({
+                "searching": false,
+                "paging": false,
+                "order": []
+            })
+        }).on('click', '.btn-del', function () {
+            var $this = $(this);
+            var name = $this.data('name');
+            var uid = $this.data('uid');
+            var the_url = '{% url "api-perms:asset-permission-detail" pk=99991937 %}'
+                    .replace('99991937', uid);
+            objectDelete($this, name, the_url);
+        })
+    </script>
+{% endblock %}

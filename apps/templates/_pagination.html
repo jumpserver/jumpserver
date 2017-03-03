@@ -1,0 +1,58 @@
+{% load common_tags %}
+   {% if is_paginated %}
+   <div class="col-sm-4">
+       <div class="dataTables_info text-center" id="editable_info" role="status" aria-live="polite">
+           显示第 {{ page_obj.start_index }} 至 {{ page_obj.end_index }} 项结果，共 {{ paginator.count }} 项
+       </div>
+   </div>
+   <div class="col-sm-4">
+       <div class="dataTables_paginate paging_simple_numbers" id="editable_paginate">
+           <ul class="pagination" style="margin-top: 0; float: right">
+               {% if page_obj.has_previous %}
+                   <li class="paginate_button previous" aria-controls="editable" tabindex="0" id="previous">
+                       <a data-page="next" href="?page={{ page_obj.previous_page_number}}">‹</a>
+                   </li>
+               {% endif %}
+
+               {% for page in paginator.num_pages|pagination_range:page_obj.number %}
+                   {% if page == page_obj.number %}
+                       <li class="paginate_button active" aria-controls="editable" tabindex="0">
+                   {% else %}
+                       <li class="paginate_button" aria-controls="editable" tabindex="0">
+                   {% endif %}
+                           <a class="page" href="?page={{ page }}" title="第{{ page }}页">{{ page }}</a>
+                       </li>
+               {% endfor %}
+
+               {% if page_obj.has_next %}
+                   <li class="paginate_button next" aria-controls="editable" tabindex="0" id="next">
+                       <a data-page="next" href="?page={{ page_obj.next_page_number }}">›</a>
+                   </li>
+               {% endif %}
+           </ul>
+       </div>
+   </div>
+   {% endif %}
+<script>
+    $(document).ready(function () {
+        $('.page').click(function () {
+            var searchStr = location.search;
+            var old_href = $(this).attr('href').replace('?', '');
+            var searchArray = searchStr.split('&');
+
+            if (searchStr == '') {
+                searchStr = '?page=1'
+            }
+
+            if (searchStr.indexOf('page') >= 0) {
+                searchArray.pop();
+            }
+
+            searchArray.push(old_href);
+            if (searchArray.length > 1) {
+                $(this).attr('href', searchArray.join('&'));
+            }
+        })
+    });
+
+</script>

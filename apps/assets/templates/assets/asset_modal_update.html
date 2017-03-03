@@ -1,0 +1,212 @@
+{% extends '_base_create_update.html' %}
+{% load static %}
+{% load bootstrap %}
+{% load i18n %}
+
+{% block form %}
+
+<div style="display:none" id="ridd">
+    {{ form.port|bootstrap_horizontal }}
+    {{ form.type|bootstrap_horizontal }}
+    {{ form.idc|bootstrap_horizontal }}
+    {{ form.groups|bootstrap_horizontal }}
+    {{ form.admin_user|bootstrap_horizontal }}
+    {{ form.system_users|bootstrap_horizontal }}
+    {{ form.brand|bootstrap_horizontal }}
+    {{ form.cpu|bootstrap_horizontal }}
+    {{ form.memory|bootstrap_horizontal }}
+    {{ form.disk|bootstrap_horizontal }}
+    {{ form.os|bootstrap_horizontal }}
+    {{ form.cabinet_no|bootstrap_horizontal }}
+    {{ form.cabinet_pos|bootstrap_horizontal }}
+    {{ form.status|bootstrap_horizontal }}
+    {{ form.env|bootstrap_horizontal }}
+    {{ form.tags|bootstrap_horizontal }}
+    {{ form.comment|bootstrap_horizontal }}
+</div>
+<div class="hr-line-dashed"></div>
+    <form action="" class="form-horizontal">
+        <div class="form-group">
+            <label class="control-label col-sm-2 col-lg-2 " id="asset_on_count">已选主机（{{ assets_count }}）</label>
+            <div class="col-sm-9" id="asset_sed">
+                <div class="form-asset-on" id="add_asset">
+                    {% for asset in assets_on_list %}
+                    <input  type='hidden' name='assets' value='{{ asset.id }}'>
+                    {% endfor %}
+                    <p id="asset_on_p">
+                        {% for asset in assets_on_list %}
+                        <button name='asset_hostname' title='{{ asset.ip }}' type='button' class='btn btn-default btn-xs'>{{ asset.hostname }}</button>
+                       {% endfor %}
+                    </p>
+                </div>
+             </div>
+        </div>
+    </form>
+<div class="hr-line-dashed"></div>
+
+                      <div class="ydxbd" id="formlists" style="display: block;">
+                          <p id="tags_p" class="mgl-5 c02">选择需要修改属性</p>
+                           <div class="tagBtnList">
+                                           <a onclick="AddAllForm(this)" class="tagBtn2 label label-primary" id="changeall">全选</a>
+            <a onclick="AddForm(this,'id_port')" class="tagBtn2 label label-default" name="changebtn">端口</a>
+            <a onclick="AddForm(this,'id_type')" class="tagBtn2 label label-default" name="changebtn">系统类型</a>
+            <a onclick="AddForm(this,'id_idc')" class="tagBtn2 label label-default" name="changebtn">机房</a>
+            <a onclick="AddForm(this,'id_groups')" class="tagBtn2 label label-default" name="changebtn">用户组</a>
+            <a onclick="AddForm(this,'id_admin_user')" class="tagBtn2 label label-default" name="changebtn">管理用户</a>
+            <a onclick="AddForm(this,'id_system_users')" class="tagBtn2 label label-default" name="changebtn">系统用户</a>
+            <a onclick="AddForm(this,'id_brand')" class="tagBtn2 label label-default" name="changebtn">品牌</a>
+            <a onclick="AddForm(this,'id_cpu')" class="tagBtn2 label label-default" name="changebtn">CPU</a>
+            <a onclick="AddForm(this,'id_memory')" class="tagBtn2 label label-default" name="changebtn">内存</a>
+            <a onclick="AddForm(this,'id_disk')" class="tagBtn2 label label-default" name="changebtn">硬盘</a>
+            <a onclick="AddForm(this,'id_os')" class="tagBtn2 label label-default" name="changebtn">操作系统</a>
+            <a onclick="AddForm(this,'id_cabinet_no')" class="tagBtn2 label label-default" name="changebtn">机柜编号</a>
+            <a onclick="AddForm(this,'id_cabinet_pos')" class="tagBtn2 label label-default" name="changebtn">机柜层号</a>
+            <a onclick="AddForm(this,'id_status')" class="tagBtn2 label label-default" name="changebtn">资产状态</a>
+            <a onclick="AddForm(this,'id_env')" class="tagBtn2 label label-default" name="changebtn">资产环境</a>
+            <a onclick="AddForm(this,'id_tags')" class="tagBtn2 label label-default" name="changebtn">标签</a>
+            <a onclick="AddForm(this,'id_comment')" class="tagBtn2 label label-default" name="changebtn">备注</a>
+                           </div>
+                       </div>
+
+    <input name="assets_ids" type="hidden" value="111" >
+    <input name="assets_ids" type="hidden" value="112" >
+<div class="hr-line-dashed"></div>
+<form action="/assets/asset/27/update" method="post" class="form-horizontal" id="add_form">
+    {% csrf_token %}
+
+    <input  name="ip" required="" type="hidden" value="1.0.0.0" >
+    <div class="form-group" name="formbtn" id="formbtn">
+        <div class="col-sm-4 col-sm-offset-2">
+            <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+            <button id="submit_button" class="btn btn-primary" type="button" onclick="fsubmit()">{% trans 'Submit' %}</button>
+        </div>
+    </div>
+</form>
+<!-- 模态框（Modal） -->
+<div class="modal fade" id="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+   <div class="modal-dialog modal-lg">
+      <div class="modal-content" id="box">
+        <!--此部分为主体内容，将远程加载进来-->
+      </div>
+   </div>
+</div>
+{% endblock %}
+
+{% block custom_foot_js %}
+<script>
+
+    $('#add_asset').on('click',function(){
+        $('#modal').modal('show');
+    });
+
+    $('#modal').modal({
+        show: false,
+        backdrop: 'static',
+        keyboard: 'false',
+        remote:"{% url 'assets:asset-modal-list' %}?plain_id_lists={{ plain_id_lists }}",
+    });
+
+    $('#modal').on('show.bs.modal',function(){
+        //alert('当调用show方法时，立即触发；')
+    });
+
+    $('#modal').on('shown.bs.modal',function(){
+        //alert('当弹窗完全加载完后，再触发；')
+    });
+
+    $('#modal').on('hide.bs.modal',function(){
+        //alert('当关闭时，立即触发；')
+    });
+
+    $('#modal').on('hidden.bs.modal',function(){
+        //alert('当关完全关闭后，再触发；')
+    });
+
+    $('#modal').on('loaded.bs.modal',function(){
+        //alert('当远程数据加载完毕后，再触发；')
+    });
+
+    function SetSelect2(){
+        $('.select2').select2();
+        $("#id_tags").select2({
+        tags: true,
+        maximumSelectionLength: 8,  //最多能够选择的个数
+        //closeOnSelect: false
+        });
+    };
+    function AddForm(obj,id_form) {
+        var oHiddenForms = document.getElementById("ridd");
+        var parentElem = document.getElementById("add_form");
+        var oH = document.getElementById(id_form);
+        var oNew = oH.parentNode.parentNode
+        var aDiv = parentElem.getElementsByClassName('form-group');
+            if(oNew.parentNode.id=='ridd') {
+                obj.className="tagBtn2 label label-warning";
+                parentElem.insertBefore(oNew,aDiv[0]);
+                SetSelect2();
+            }else{
+                oHiddenForms.appendChild(oNew);
+                obj.className="tagBtn2 label label-default";
+                SetSelect2();
+            };
+    };
+
+    function ChangeBtnCss(class_var){
+        var changebtns = $("#formlists").find("a[name='changebtn']")
+        for (var i=0; i<changebtns.length;i++){
+            changebtns[i].className=class_var;
+        };
+    };
+    function AddAllForm(obj) {
+        var oHiddenForms = document.getElementById("ridd");
+        var parentElem = document.getElementById("add_form");
+        var aDiv = parentElem.getElementsByClassName('form-group');
+        var bFormBtn = document.getElementById("formbtn");
+        var oHidden_len = oHiddenForms.children.length;
+        var aDiv_len = aDiv.length;
+        if(oHidden_len == 0 || obj.innerText == "取消全选"){
+            for(var i=0;i<aDiv_len-1;i++){
+                oHiddenForms.appendChild(aDiv[0]);
+            };
+            ChangeBtnCss("tagBtn2 label label-default");
+            $('#changeall').text("全选");
+        }else{
+            for(var i=0;i<oHidden_len;i++){
+                parentElem.insertBefore(oHiddenForms.children[0],bFormBtn);
+            };
+            ChangeBtnCss("tagBtn2 label label-warning");
+            $('#changeall').text("取消全选");
+            SetSelect2();
+        };
+    };
+
+
+    function fsubmit(){
+        var assets_id = document.getElementsByName("assets");
+        var oForm = document.getElementById('add_form');
+        var parentElem = document.getElementById("add_form");
+        var aDiv = parentElem.getElementsByClassName('form-group');
+        if (assets_id.length === 0) {
+            swal({
+                title: "未选择需要修改的主机",
+                text: "请点击选择"
+            });
+        }else if (aDiv.length === 1) {
+            swal({
+                title: "未选需要修改的属性",
+                text: "请点击选择"
+            });
+        }else{
+            var m = document.getElementsByName('assets_ids');
+            alert(m.length);
+            for(var i=0;i<m.length;i++){
+                alert(m[0].value);
+                oForm.appendChild(m[0]);
+            };
+            action="/assets/asset/"+assets_id[0].value+"/update";
+            oForm.action=action;
+            oForm.submit();
+        };
+    }
+</script>
+{% endblock %}

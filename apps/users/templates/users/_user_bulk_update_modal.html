@@ -1,0 +1,37 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% block modal_id %}user_bulk_update_modal{% endblock %}
+{% block modal_title%}{% trans "Update User" %}{% endblock %}
+{% block modal_body %}
+<p class="text-success text-center">{% trans "Hint: only change the field you want to update." %}</p>
+<form method="post" class="form-horizontal" action="" id="fm_user_bulk_update">
+    <div class="form-group">
+        <label class="control-label col-sm-2 col-lg-2 " for="id_role">{% trans "Role" %}</label>
+        <div class=" col-sm-9 col-lg-9 ">
+            <select class=" form-control" id="id_role" name="role">
+                <option value="">---------</option>
+                <option value="Admin">{% trans "Admin" %}</option>
+                <option value="User">{% trans "User" %}</option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="groups" class="col-sm-2 control-label">{% trans 'Groups' %}</label>
+        <div class="col-sm-9" id="select2-container">
+            <select name="groups" id="select2_groups" data-placeholder="{% trans 'Select Group' %}" class="select2 form-control m-b" multiple>
+                {% for group in groups %}
+                    <option value="{{ group.id }}">{{ group.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-sm-9 col-lg-9 col-sm-offset-2">
+            <div class="checkbox">
+                <input type="checkbox" name="enable_otp" checked id="id_enable_otp"><label for="id_enable_otp">{% trans 'Enable-OTP' %}</label>
+            </div>
+        </div>
+    </div>
+</form>
+{% endblock %}
+{% block modal_confirm_id %}btn_user_bulk_update{% endblock %}

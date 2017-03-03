@@ -1,0 +1,52 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+
+    <title>Jumpserver</title>
+
+    <link rel="shortcut icon" href="{% static 'img/facio.ico' %}" type="image/x-icon">
+    {% include '_head_css_js.html' %}
+    <link href="{% static 'css/jumpserver.css' %}" rel="stylesheet">
+    {% block custom_head_css_js %} {% endblock %}
+</head>
+
+<body>
+<div id="wrapper">
+
+    {% include '_left_side_bar.html' %}
+    <div id="page-wrapper" class="gray-bg">
+        {% include '_header_bar.html' %}
+        {% include '_message.html' %}
+        {% block first_login_message %}
+            {% if user.is_authenticated and user.is_first_login %}
+            <div class="alert alert-danger" style="margin: 20px auto 0px">
+                {% url 'users:user-first-login' as first_login_url %}
+                {% blocktrans %}
+                Your information was incomplete. Please click <a href="{{ first_login_url }}"> this link </a>to complete your information.
+                {% endblocktrans %}
+            </div>
+            {% endif %}
+        {% endblock %}
+        {% block update_public_key_message %}
+            {% if user.is_authenticated and not user.is_public_key_valid %}
+            <div class="alert alert-danger" style="margin: 20px auto 0px">
+                {% url 'users:user-profile' as profile_url %}
+                {% blocktrans %}
+                Your ssh-public-key has been expired. Please click <a href="{{ profile_url }}"> this link </a>to update your ssh-public-key.
+                {% endblocktrans %}
+            </div>
+            {% endif %}
+        {% endblock %}
+        {% block content %}{% endblock %}
+        {% include '_footer.html' %}
+    </div>
+</div>
+
+</body>
+{% include '_foot_js.html' %}
+{% block custom_foot_js %} {% endblock %}
+</html>

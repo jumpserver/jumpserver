@@ -1,0 +1,20 @@
+{% load i18n %}
+<div aria-hidden="true" role="dialog" id="{% block modal_id %}{% endblock %}" class="modal inmodal">
+    <div class="modal-dialog {% block modal_class %}{% endblock %}">
+        <div class="modal-content animated fadeIn">
+            <div class="modal-header">
+                <button data-dismiss="modal" class="close" type="button"><span aria-hidden="true">×</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">{% block modal_title %}{% endblock %}</h4>
+                <small>{% block modal_comment %}{% endblock %}</small>
+            </div>
+            <div class="modal-body">
+              {% block modal_body %}
+              {% endblock %}
+            </div>
+            <div class="modal-footer">
+              <button data-dismiss="modal" class="btn btn-white" type="button">{% trans "Close" %}</button>
+              <button class="btn btn-primary" type="button" id="{% block modal_confirm_id %}{% endblock %}">{% trans 'Confirm' %}</button>
+            </div>
+        </div>
+    </div>
+</div>

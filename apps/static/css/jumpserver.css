@@ -1,0 +1,279 @@
+.red-fonts {
+    color: #ed5565;
+}
+
+.form-group.required .control-label:after {
+  content: " *";
+  color: red;
+}
+
+.n-invalid {border: 1px solid #f00;}
+
+
+.primary-panel .ibox-title {
+  color: #ffffff;
+  background-color: #1AB394;
+}
+
+.primary-panel .ibox-content {
+  border: 1px solid #1AB394;
+}
+
+.info-panel .ibox-title {
+  color: #ffffff;
+  background-color: #23c6c8;
+}
+
+.info-panel .ibox-content {
+  border: 1px solid #23c6c8;;
+}
+
+
+th a {
+  color: #676a6c;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+   background-color: #1ab394 !important;
+   color: white;
+ }
+
+.select2-selection--single,
+.select2-selection--multiple {
+   border: 1px solid #e5e6e7 !important;
+   cursor: text !important;
+ }
+
+.select2-container--forcus {
+   border: 1px solid #1AB394 !important;
+ }
+
+.select2-selection__choice,
+.chosen-container-multi .chosen-choices li.search-choice {
+  background: #f1f1f1 !important;
+  border: 1px solid #e5e6e7 !important;
+  /*border: 1px solid #ededed;*/
+  border-radius: 2px !important;
+  box-shadow: none !important;
+  color: #333333 !important;
+  cursor: default !important;
+  line-height: 13px !important;
+  /*margin: 3px 0 3px 5px !important;*/
+  padding: 3px 20px 3px 5px !important;
+  position: relative !important;
+ }
+
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+   border: 1px solid #1ab394 !important;
+   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3) !important;
+}
+
+.passwordBox2 {
+  max-width: 660px;
+  margin: 0 auto;
+  padding: 100px 20px 20px 20px;
+}
+
+.no-borders-tr td {
+  border-top: none !important;
+}
+
+table.dataTable tbody > tr.selected, table.dataTable tbody > tr > .selected {
+    background-color: #1ab394 !important;
+}
+table.dataTable tbody tr.selected a,
+table.dataTable tbody th.selected a,
+table.dataTable tbody td.selected a,
+table.dataTable tbody tr.selected td i.text-navy,
+table.dataTable tbody th.selected td i.text-navy,
+table.dataTable tbody td.selected td i.text-navy
+{
+    color: white !important;
+}
+
+.m-0 {
+  margin: 0px !important;
+}
+.m-t-0 {
+  margin-top: 0px !important;
+}
+.m-b-0 {
+  margin-bottom: 0px !important;
+}
+.m-l-0 {
+  margin-left: 0px !important;
+}
+.m-r-0 {
+  margin-right: 0px !important;
+}
+.m-5 {
+  margin: 5px !important;
+}
+.m-t-5 {
+  margin-top: 5px !important;
+}
+.m-b-5 {
+  margin-bottom: 5px !important;
+}
+.m-l-5 {
+  margin-left: 5px !important;
+}
+.m-r-5 {
+  margin-right: 5px !important;
+}
+.m-10 {
+  margin: 10px !important;
+}
+.m-t-10 {
+  margin-top: 10px !important;
+}
+.m-b-10 {
+  margin-bottom: 10px !important;
+}
+.m-l-10 {
+  margin-left: 10px !important;
+}
+.m-r-10 {
+  margin-right: 10px !important;
+}
+.m-15 {
+  margin: 15px !important;
+}
+.m-t-15 {
+  margin-top: 15px !important;
+}
+.m-b-15 {
+  margin-bottom: 15px !important;
+}
+.m-l-15 {
+  margin-left: 15px !important;
+}
+.m-r-15 {
+  margin-right: 15px !important;
+}
+.m-20 {
+  margin: 20px !important;
+}
+.m-t-20 {
+  margin-top: 20px !important;
+}
+.m-b-20 {
+  margin-bottom: 20px !important;
+}
+.m-l-20 {
+  margin-left: 20px !important;
+}
+.m-r-20 {
+  margin-right: 20px !important;
+}
+.m-25 {
+  margin: 25px !important;
+}
+.m-t-25 {
+  margin-top: 25px !important;
+}
+.m-b-25 {
+  margin-bottom: 25px !important;
+}
+.m-l-25 {
+  margin-left: 25px !important;
+}
+.m-r-25 {
+  margin-right: 25px !important;
+}
+.m-30 {
+  margin: 30px !important;
+}
+.m-t-30 {
+  margin-top: 30px !important;
+}
+.m-b-30 {
+  margin-bottom: 30px !important;
+}
+.m-l-30 {
+  margin-left: 30px !important;
+}
+.m-r-30 {
+  margin-right: 30px !important;
+}
+
+.ydxbd {
+	font-size: 12px;
+	width: 100%;
+	overflow: hidden;
+	padding-top: 15px;
+	margin-bottom: 15px;
+	display: block;
+	background: #f4f4f4;
+	padding-left: 10px;
+	padding-bottom: 15px;
+}
+.mar {
+    margin-left: 2px;
+    line-height: 0px;
+}
+.mar-j {
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.form-asset-on p{
+    margin-bottom:0px;
+}
+
+.form-asset-on button{
+    background: #f1f1f1;
+    margin-right: 2px;
+}
+
+.form-asset-on{
+    border: 1px solid #e5e6e7;
+    padding-top:5px;
+    padding-bottom: 0px;
+    padding-left: 5px;
+    padding-right: 5px;
+    min-height:34px;
+    height: 100%;
+}
+
+.mgl-5 {
+	margin-left: 5px;
+	font-size: 12px;
+}
+.c02 {
+	color: #999;
+}
+
+.tagBtnList {
+	font-size: 12px;
+	line-height: 32px;
+	margin: -5px 0 0 0;
+	padding-left: 0px;
+}
+
+.tagBtn2 {
+	margin: 0 5px 5px 0;
+	font-size: 12px;
+	vertical-align: middle;
+}
+
+div.dataTables_wrapper div.dataTables_filter,
+.dataTables_length {
+    float: right !important;
+}
+
+div.dataTables_wrapper div.dataTables_filter {
+    margin-left: 15px;
+}
+
+.simple-tag {
+  background-color: #f3f3f4;
+  border: 1px solid #e7eaec;
+  border-radius: 2px;
+  color: inherit;
+  display: inline-block;
+  font-size: 10px;
+  margin-right: 5px;
+  margin-top: 5px;
+  padding: 5px 12px;
+}

@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load bootstrap %}
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>{% trans 'Create admin user' %}</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {{ form.non_field_errors }}
+                        </div>
+                        {% endif %}
+                        <form enctype="multipart/form-data" method="post" class="form-horizontal" action="" >
+                            {% csrf_token %}
+                            {{ form.name|bootstrap_horizontal }}
+                            {{ form.username|bootstrap_horizontal }}
+                            {{ form.password|bootstrap_horizontal }}
+                            {{ form.private_key_file|bootstrap_horizontal }}
+                            {{ form.assets|bootstrap_horizontal }}
+                            {{ form.comment|bootstrap_horizontal }}
+
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block custom_foot_js %}
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+        })
+    </script>
+{% endblock %}

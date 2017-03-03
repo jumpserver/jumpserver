@@ -1,0 +1,440 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default" href="{% url 'assets:admin-user-update' pk=admin_user.id %}"><i class="fa fa-edit"></i>Update</a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-danger btn-delete-admin-user">
+                                    <i class="fa fa-edit"></i>Delete
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0;">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span class="label"><b>{{ admin_user.name }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr class="no-borders-tr">
+                                            <td>{% trans 'Name' %}:</td>
+                                            <td><b>{{ admin_user.name }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Username' %}:</td>
+                                            <td><b>{{ admin_user.username }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Date created' %}:</td>
+                                            <td><b>{{ admin_user.date_created }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Created by' %}:</td>
+                                            <td><b>{{ asset_group.created_by  }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Comment' %}:</td>
+                                            <td><b>{{ admin_user.comment }}</b></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left">{% trans 'Asset list of ' %} <b>{{ admin_user.name }}</b> <span class="badge"> {{ paginator.count }}</span></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table table-hover" id="system_user_assets_table">
+                                        <thead>
+                                            <tr>
+                                                <th>{% trans 'Hostname' %}</th>
+                                                <th>{% trans 'IP' %}</th>
+                                                <th>{% trans 'Port' %}</th>
+                                                <th>{% trans 'Alive' %}</th>
+	                                            <th>{% trans 'Action' %}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+{#                                            {% for asset in page_obj %}#}
+{#                                            <tr>#}
+{#                                                <td>{{ asset.hostname }}</td>#}
+{#                                                <td>{{ asset.ip }}</td>#}
+{#                                                <td>{{ asset.port }}</td>#}
+{#                                                <td>Alive</td>#}
+{#                                            </tr>#}
+{#                                            {% endfor %}#}
+                                        </tbody>
+                                    </table>
+{#                                    <div class="row">#}
+{#                                        {% include '_pagination.html' %}#}
+{#                                    </div>#}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Quick update' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr class="no-borders-tr">
+                                            <td width="50%">{% trans 'Get install script' %}:</td>
+                                            <td>
+                                                <span style="float: right">
+                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Get' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td width="50%">{% trans 'Retest asset connectivity' %}:</td>
+                                            <td>
+                                                <span style="float: right">
+                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Start' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td width="50%">{% trans 'Reset private key' %}:</td>
+                                            <td>
+                                                <span style="float: right">
+                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Reset' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Replace asset admin user with this' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select asset' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for asset in assets_remain %}
+                                                            <option value="{{ asset.id }}">{{ asset.ip }}:{{ asset.port }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button" class="btn btn-info btn-sm btn-replace-asset-admin_user">{% trans 'Replace' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-warning">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Replace asset admin user with this admin user' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select asset groups' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for asset_group in asset_groups %}
+                                                            <option value="{{ asset_group.id }}">{{ asset_group.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button" class="btn btn-warning btn-sm btn-replace-asset_groups-admin_user">{% trans 'Replace' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+Array.prototype.remove = function(val) {
+	var index = this.indexOf(val);
+		if (index > -1) {
+		this.splice(index, 1);
+	}
+};
+Array.prototype.unique = function(){
+	var res = [];
+	var json = {};
+ 	for(var i = 0; i < this.length; i++){
+  		if(!json[this[i]]){
+   			res.push(this[i]);
+   			json[this[i]] = 1;
+  		}
+ 	}
+ 	return res;
+};
+function objectRemove(obj, name, url, data) {
+    function doRemove() {
+        var body = data;
+        var success = function() {
+            swal('Remove!', "[ "+name+"]"+" has been deleted ", "success");
+            $(obj).parent().parent().remove();
+        };
+        var fail = function() {
+            swal("Failed", "Remove"+"[ "+name+" ]"+"failed", "error");
+        };
+        APIUpdateAttr({
+            url: url,
+            body: JSON.stringify(body),
+            method: 'PATCH',
+            success: success,
+            error: fail
+        });
+    }
+    swal({
+        title: 'Are you sure remove ?',
+        text: " [" + name + "] ",
+        type: "warning",
+        showCancelButton: true,
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: "#DD6B55",
+        confirmButtonText: 'Confirm',
+        closeOnConfirm: false
+    }, function () {
+        doRemove()
+    });
+}
+jumpserver.assets_selected = {};
+jumpserver.asset_groups_selected = {};
+$(document).ready(function () {
+	$('.select2').select2()
+	.on("select2:select", function (evt) {
+		var data = evt.params.data;
+		jumpserver.assets_selected[data.id] = data.text;
+		jumpserver.asset_groups_selected[data.id] = data.text;
+	})
+	.on('select2:unselect', function(evt) {
+		var data = evt.params.data;
+		delete jumpserver.assets_selected[data.id];
+		delete jumpserver.asset_groups_selected[data.id]
+	});
+	var options = {
+		ele: $('#system_user_assets_table'),
+		buttons: [],
+		order: [],
+		columnDefs: [
+			{targets: 0, createdCell: function (td, cellData, rowData) {
+				var detail_btn = '<a href="{% url "assets:asset-detail" pk=99991937 %}" data-aid="'+rowData.id+'">' + cellData + '</a>';
+				$(td).html(detail_btn.replace('99991937', rowData.id));
+			}},
+			{targets: 3, createdCell: function (td, cellData) {
+				if (!cellData) {
+					$(td).html('<i class="fa fa-times text-danger"></i>')
+				} else {
+					$(td).html('<i class="fa fa-check text-navy"></i>')
+				}
+			}},
+			{targets: 4, createdCell: function (td, cellData, rowData) {
+				var update_btn = '<a href="{% url "assets:asset-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', rowData.id);
+				var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_remove" data-aid="99991937">{% trans "Remove" %}</a>'.replace('99991937', rowData.id);
+				$(td).html(update_btn + del_btn)
+			}}
+
+			],
+		ajax_url: '{% url "api-assets:asset-list" %}?admin_user_id={{ admin_user.id }}',
+		columns: [{data: "hostname" }, {data: "ip" }, {data: "port" },
+			{data: "is_active" }, {data: "id"}],
+		op_html: $('#actions').html()
+	};
+	jumpserver.initDataTable(options);
+
+    function adminUserDelete(name, url) {
+        function doDelete() {
+            var body = {};
+            var success = function() {
+                swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
+	            window.location.href="{% url 'assets:idc-list' %}";
+            };
+            var fail = function() {
+                swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");
+            };
+            APIUpdateAttr({
+                url: url,
+                body: JSON.stringify(body),
+                method: 'DELETE',
+                success: success,
+                error: fail
+            });
+        }
+        swal({
+            title: 'Are you sure delete ?',
+            text: " [" + name + "] ",
+            type: "warning",
+            showCancelButton: true,
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: 'Confirm',
+            closeOnConfirm: false
+        }, function () {
+            doDelete()
+        });
+    }
+})
+
+.on('click', '.btn-replace-asset-admin_user', function () {
+	if (Object.keys(jumpserver.assets_selected).length === 0) {
+		return false;
+	}
+	jumpserver.asset_groups_selected = {};
+	var $data_table = $("#system_user_assets_table").DataTable();
+	var assets = [];
+	$.map(jumpserver.assets_selected, function(value, index) {
+		assets.push(parseInt(index));
+	});
+	assets.unique();
+	var data = [];
+	var admin_user_id = {{ admin_user.id }};
+	var the_url = '{% url "api-assets:asset-list" %}';
+	for (var i=0; i<assets.length; i++) {
+		data.push({"id": assets[i], "admin_user": admin_user_id});
+	}
+	APIUpdateAttr({
+		url: the_url,
+		body: JSON.stringify(data),
+		method: 'PATCH'
+	});
+	$data_table.ajax.reload();
+})
+
+.on('click', '.btn-replace-asset_groups-admin_user', function () {
+	if (Object.keys(jumpserver.asset_groups_selected).length === 0) {
+		return false;
+	}
+	jumpserver.assets_selected = {};
+	var $data_table = $("#system_user_assets_table").DataTable();
+	var asset_groups = [];
+	var assets = [];
+	var data = [];
+	var the_url = '{% url "api-assets:asset-list" %}';
+	$.map(jumpserver.asset_groups_selected, function(value, index) {
+		asset_groups.push(parseInt(index));
+	});
+	$.ajax({
+		url: '{% url "api-assets:asset-group-list" %}?id__in=['+asset_groups.join(',')+']',
+		method: 'GET',
+		dataType: 'json',
+		success: function (result) {
+			for (var i=0; i<result.length; i++) {
+				for (var j=0; j<result[i]['assets'].length; j++) {
+					assets.push(result[i]['assets'][j])
+				}
+			}
+			for (var z=0; z<assets.length; z++) {
+				data.push({"id":assets[z], "admin_user":{{admin_user.id}} });
+			}
+			APIUpdateAttr({
+				url: the_url,
+				body: JSON.stringify(data),
+				method: 'PATCH'
+			});
+			$data_table.ajax.reload();
+		}
+	});
+})
+	
+.on('click', '.btn_asset_remove', function () {
+	var $this = $(this);
+	var the_url = "{% url 'api-assets:admin-user-detail' pk=admin_user.id %}";
+	var name = $(this).closest("tr").find(":nth-child(1) > a").html();
+	var assets = [];
+	var delete_asset_id = $(this).data('aid');
+	$.ajax({
+		url: the_url,
+		method: 'GET',
+		dataType: 'json',
+		success: function (result) {
+			for (var i=0; i<result['assets'].length; i++) {
+				assets.push(result['assets'][i])
+			}
+			assets.remove(delete_asset_id);
+			var data = {"assets": assets};
+			objectRemove($this, name, the_url, data);
+		}
+	})
+}).on('click', '.btn-delete-admin-user', function () {
+    var $this = $(this);
+    var name = "{{ admin_user.name }}";
+    var uid = "{{ admin_user.id }}";
+    var the_url = '{% url "api-assets:admin-user-detail" pk=99991937 %}'.replace('99991937', uid);
+    var redirect_url = "{% url 'assets:admin-user-list' %}";
+    objectDelete($this, name, the_url, redirect_url);
+})
+</script>
+{% endblock %}

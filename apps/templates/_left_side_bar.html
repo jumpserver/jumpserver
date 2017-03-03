@@ -1,0 +1,12 @@
+<nav class="navbar-default navbar-static-side" role="navigation">
+    <div class="sidebar-collapse">
+        <ul class="nav" id="side-menu">
+            {% include '_user_profile.html' %}
+            {% if request.user.is_superuser %}
+                {% include '_nav.html' %}
+            {% else %}
+                {% include '_nav_user.html' %}
+            {% endif %}
+        </ul>
+    </div>
+</nav>

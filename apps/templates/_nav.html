@@ -1,0 +1,94 @@
+{% load i18n %}
+<li id="index">
+    <a href="">
+        <i class="fa fa-dashboard"></i> <span class="nav-label">{% trans 'Home' %}</span><span class="label label-info pull-right"></span>
+    </a>
+</li>
+<li id="users">
+    <a href="#">
+        <i class="fa fa-group"></i> <span class="nav-label">{% trans 'Users' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level active">
+        <li id="user"><a href="{% url 'users:user-list' %}">{% trans 'User' %}</a></li>
+        <li id="user-group"><a href="{% url 'users:user-group-list' %}">{% trans 'User group' %}</a></li>
+    </ul>
+</li>
+<li id="assets">
+    <a>
+        <i class="fa fa-inbox"></i> <span class="nav-label">{% trans 'Assets' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level">
+        <li id="asset"><a href="{% url 'assets:asset-list' %}">{% trans 'Asset' %}</a></li>
+        <li id="asset-group"><a href="{% url 'assets:asset-group-list' %}">{% trans 'Asset group' %}</a></li>
+        <li id="idc"><a href="{% url 'assets:idc-list' %}">{% trans 'IDC' %}</a></li>
+        <li id="admin-user"><a href="{% url 'assets:admin-user-list' %}">{% trans 'Admin user' %}</a></li>
+        <li id="system-user"><a href="{% url 'assets:system-user-list' %}">{% trans 'System user' %}</a></li>
+        <li id="asset-tag"><a href="{% url 'assets:asset-tag-list' %}">{% trans 'Label' %}</a></li>
+    </ul>
+</li>
+<li id="perms">
+    <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">{% trans 'Perms' %}</span><span class="fa arrow"></span></a>
+    <ul class="nav nav-second-level">
+        <li id="asset-permission">
+            <a href="{% url 'perms:asset-permission-list' %}">{% trans 'Asset permission' %}</a>
+        </li>
+    </ul>
+</li>
+
+<li id="applications">
+    <a>
+        <i class="fa fa-coffee"></i> <span class="nav-label">{% trans 'Applications' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level">
+        <li id="terminal"><a href="{% url 'applications:terminal-list' %}">{% trans 'Terminal' %}</a></li>
+    </ul>
+</li>
+
+<li id="ops">
+    <a>
+        <i class="fa fa-coffee"></i> <span class="nav-label">{% trans 'Job Center' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level">
+        <li id="task"><a href="{% url 'ops:page-task-list' %}">{% trans 'Task' %}</a></li>
+        <li id="sudo"><a href="{% url 'ops:page-sudo-list' %}">{% trans 'Sudo' %}</a></li>
+        <li id="cron"><a href="{% url 'ops:page-cron-list' %}">{% trans 'Cron' %}</a></li>
+    </ul>
+</li>
+
+<li id="audits">
+    <a href="#"><i class="fa fa-files-o"></i> <span class="nav-label">{% trans 'Audits' %}</span><span class="fa arrow"></span></a>
+    <ul class="nav nav-second-level">
+        <li id="proxy-log">
+            <a href="{% url 'audits:proxy-log-list' %}">{% trans 'Proxy log' %}</a>
+        </li>
+        <li id="command-log">
+            <a href="{% url 'audits:command-log-list' %}">{% trans 'Command log' %}</a>
+        </li>
+        <li id="login-log">
+            <a href="{% url 'audits:login-log-list' %}">{% trans 'Login log' %}</a>
+        </li>
+        <li id="admin-log">
+            <a href="{% url 'perms:asset-permission-list' %}">{% trans 'Admin log' %}</a>
+        </li>
+
+    </ul>
+</li>
+<li id="">
+    <a href="#">
+        <i class="fa fa-download"></i> <span class="nav-label">{% trans 'File' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level">
+        <li id="upload"><a href="">{% trans 'File upload' %}</a></li>
+        <li id="download"><a href="">{% trans 'File download' %}</a></li>
+    </ul>
+</li>
+<li id="">
+    <a href="">
+        <i class="fa fa-gears"></i> <span class="nav-label">{% trans 'Settings' %}</span><span class="label label-info pull-right"></span>
+    </a>
+</li>
+<li class="special_link">
+    <a href="http://www.jumpserver.org" target="_blank"><i class="fa fa-database"></i>
+        <span class="nav-label">{% trans 'Visit us' %}</span>
+    </a>
+</li>

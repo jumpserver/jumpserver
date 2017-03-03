@@ -1,0 +1,19 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% block modal_id %}modal_terminal_accept{% endblock %}
+{% block modal_class %}modal-lg{% endblock %}
+{% block modal_title%}{% trans "Accept terminal registration" %}{% endblock %}
+{% block modal_body %}
+{% load bootstrap %}
+<form action="{% url 'applications:terminal-modal-accept' pk="99991937" %}" method="post" class="form-horizontal" id="form_terminal_accept" enctype="multipart/form-data">
+    {% csrf_token %}
+    <p class="alert alert-danger" id="modal-error" style="display: none"></p>
+    {{ form.name|bootstrap_horizontal }}
+    {{ form.remote_addr|bootstrap_horizontal }}
+    {{ form.type|bootstrap_horizontal }}
+    {{ form.url|bootstrap_horizontal }}
+    {{ form.comment|bootstrap_horizontal }}
+</form>
+
+{% endblock %}
+{% block modal_confirm_id %}btn_terminal_accept{% endblock %}

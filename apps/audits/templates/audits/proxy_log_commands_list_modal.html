@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    {% include '_head_css_js.html' %}
+    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+    <link href="{% static "css/plugins/footable/footable.core.css" %}" rel="stylesheet">
+    <script src="{% static 'js/jquery-2.1.1.js' %}"></script>
+    <script src="{% static 'js/plugins/sweetalert/sweetalert.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+</head>
+<body>
+<div class="wrapper wrapper-content animated fadeInRight">
+<div class="tab-content">
+<div class="ibox-content">
+    <input type="text" class="form-control input-sm m-b-xs" id="filter"
+                                   placeholder="Search in table">
+    <table class="footable table table-stripped toggle-arrow-tiny" data-page-size="10" data-filter=#filter>
+        <thead>
+        <tr>
+            <th data-toggle="true">ID</th>
+            <th>Command</th>
+            <th data-hide="all">Output</th>
+            <th>Datetime</th>
+        </tr>
+        </thead>
+        <tbody class="table_body">
+        {% for command in object_list %}
+            <tr>
+                <td>{{ command.command_no }}</td>
+                <td>{{ command.command }}</td>
+                <td>{{ command.output_decode |safe }}</td>
+                <td>{{ command.datetime }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="5">
+                    <ul class="pagination pull-right"></ul>
+                </td>
+            </tr>
+        </tfoot>
+    </table>
+</div>
+</div>
+</div>
+</body>
+<script src="{% static "js/plugins/footable/footable.all.min.js" %}"></script>
+<script>
+    $(document).ready(function () {
+        $('.footable').footable();
+    });
+</script>
+</html>

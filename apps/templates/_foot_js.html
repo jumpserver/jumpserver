@@ -1,0 +1,19 @@
+{% load i18n %}
+{% load static %}
+<!-- Mainly scripts -->
+<script src="{% static "js/plugins/metisMenu/jquery.metisMenu.js" %}"></script>
+
+<!-- Custom and plugin javascript -->
+<script src="{% static "js/plugins/toastr/toastr.min.js" %}"></script>
+<script src="{% static "js/inspinia.js" %}"></script>
+<script src="{% static "js/jumpserver.js" %}"></script>
+<script>
+activeNav();
+$(document).ready(function(){
+    setAjaxCSRFToken();
+    $('textarea').attr('rows', 5);
+    if ($('.tooltip')[0]) {
+        $('.tooltip').tooltip();
+    }
+});
+</script>

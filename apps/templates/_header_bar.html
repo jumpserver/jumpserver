@@ -1,0 +1,57 @@
+{% load i18n %}
+<div class="row border-bottom">
+    <nav class="navbar navbar-static-top white-bg" role="navigation" style="margin-bottom: 0">
+        <div class="navbar-header">
+            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
+            <form role="search" class="navbar-form-custom" method="get" action="">
+                <div class="form-group">
+                    <input type="text" placeholder="{% trans 'Search' %}..." class="form-control" name="search" id="top-search">
+                </div>
+            </form>
+        </div>
+        <ul class="nav navbar-top-links navbar-right">
+            <li>
+                <span class="m-r-sm text-muted welcome-message">{% trans 'Welcome to use Jumpserver system' %}</span>
+            </li>
+            <li class="dropdown">
+                <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                     <span class="m-r-sm text-muted welcome-message">{% trans 'Help' %}</span>
+                </a>
+            </li>
+            <li>
+                {% if user.is_authenticated %}
+                <a href="{% url 'users:logout' %}">
+                    <i class="fa fa-sign-out"></i>{% trans 'Logout' %}
+                </a>
+                {% else %}
+                <a href="{% url 'users:login' %}">
+                    <i class="fa fa-sign-in"></i>{% trans 'Login' %}
+                </a>
+                {% endif %}
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-sm-10">
+        <h2></h2>
+        <ol class="breadcrumb">
+            <li>
+                <a href="">{% trans 'Home' %}</a>
+            </li>
+            <li>
+            {% if app %}
+                <a>{{ app }}</a>
+            {% endif %}
+            </li>
+            {% if action %}
+            <li class="active">
+                <strong>{{ action }}</strong>
+            </li>
+            {% endif %}
+        </ol>
+    </div>
+    <div class="col-sm-2">
+    </div>
+</div>

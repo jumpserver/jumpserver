@@ -1,0 +1,12 @@
+{% extends 'users/_user.html' %}
+{% load i18n %}
+{% block user_template_title %}{% trans "Update user" %}{% endblock %}
+{% block password %}
+    <h3>{% trans 'Password' %}</h3>
+    <div class="form-group">
+        <label for="password" class="col-sm-2 control-label">{% trans 'Password' %}</label>
+        <div class="col-sm-9 controls" >
+            <input id="password" name="password" type="password" class="form-control">
+        </div>
+    </div>
+{% endblock %}

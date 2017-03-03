@@ -1,0 +1,27 @@
+{% extends '_modal.html' %}
+{% load i18n %}
+{% block modal_id %}user_import_modal{% endblock %}
+{% block modal_title%}{% trans "Import user" %}{% endblock %}
+{% block modal_body %}
+<p class="text-success">{% trans "Download template or use export excel format" %}</p>
+<form method="post" action="{% url 'users:user-import' %}" id="fm_user_import" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+        <label class="control-label" for="id_users">{% trans "Template" %}</label>
+        <a href="{{ MEDIA_URL }}files/user_import_template.xlsx" style="display: block">{% trans 'Download' %}</a>
+    </div>
+    <div class="form-group">
+        <label class="control-label" for="id_users">{% trans "Users excel file" %}</label>
+        <input id="id_users" type="file" name="file" />
+    </div>
+</form>
+<p>
+    <p class="text-success" id="id_created"></p>
+    <p id="id_created_detail"></p>
+    <p class="text-warning" id="id_updated"></p>
+    <p id="id_updated_detail"></p>
+    <p class="text-danger" id="id_failed"></p>
+    <p id="id_failed_detail"></p>
+</p>
+{% endblock %}
+{% block modal_confirm_id %}btn_user_import{% endblock %}
