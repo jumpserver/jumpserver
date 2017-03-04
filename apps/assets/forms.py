@@ -121,6 +121,9 @@ class IDCForm(forms.ModelForm):
             'extranet': forms.Textarea(
                 attrs={'placeholder': 'IP段之间用逗号隔开，如：201.1.32.1/24,202.2.32.1/24'})
         }
+        help_texts = {
+            'name': '* required'
+        }
 
 
 class AdminUserForm(forms.ModelForm):

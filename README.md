@@ -1,46 +1,59 @@
-                            // Jumpserver //
-                            
-                            
-   ~ Jumpserver是什么?
-         
-   Jumpserver是一款开源的跳板机(堡垒机)产品, 主要使用Python,Django开发
-   他实现了跳板机(堡垒机)的主要功能，删减、优化了传统堡垒机，致力于为互联网
-   运维提供服务
-   
-   ~ 版本依赖
-   
-   * Python 2.7
-   
+## Jumpserver
+Jumpserver是一款开源的跳板机产品，主要使用Python，Django开发
+
+### 开发环境
+   * Python 2.7  # 开发时需考虑兼容Python3
    * Django 1.10
-   
-   
-   ~ 快速开始
-   
-   ```
-   pip install -r requirements.txt  #  Install pip module
-   
-   yum -y install `cat rpm_requirements.txt` #  Install rpm package
-   
-   cp config_example.py config.py  #  Prepaire config from example config
-   
-   cd apps && python manage.py makemigrations  #  Make migrations for django
-   
-   python manage.py migrate  # Migrate ORM to database
-   
-   python manage.py loaddata init  # Init some data
-   
-   python manage.py loaddata fake   # Generake some fake data
-   
-   yum -y install redis && service redis start  # Or install redis docker
-   
-   python manage.py runserver 0.0.0.0:80  # Run it
-   
-   ```
-   
-   ~ 文档
 
-   * [项目结构描述](https://code.jumpserver.org/jumpserver/jumpserver/blob/master/docs/project_structure.md)
-   * [Python代码规范](https://code.jumpserver.org/jumpserver/jumpserver/blob/master/docs/python_style_guide.md)
-   * [API设计规范](https://code.jumpserver.org/jumpserver/jumpserver/blob/master/docs/api_style_guide.md)
-   * [表结构](https://code.jumpserver.org/Jumpserver/jumpserver/wikis/table-structure)
+### 安装
+1. 安装依赖库
+```
+   $ cd requirements
+   $ sudo yum -y install `cat rpm_requirements.txt`  # CentOS/RedHat
+   $ sudo apt-get  install `cat deb_requirements.txt`  # Ubuntu/Debian
+```
 
+2. 安装Python依赖包
+
+```
+# 请自行安装 Python2.7 和 pip, 以下运行是以python2.7和pip2.7开始
+$ pip2.7 install -r requirements.txt -i https://pypi.doubanio.com/simple
+
+# MacOS
+$ pip2.7 install -r requirements.txt -i https://pypi.doubanio.com/simple --user
+```
+	   
+3. 配置文件
+
+```	
+$ cd ..
+$ cp config_example.py config.py
+```
+
+配置项 参考 config.py
+
+4. 初始化数据库
+```
+# cd utils
+# sh make_migrations.sh
+# sh init_db.sh
+```
+ 
+5. 依赖redis
+```
+$ yum -y install redis
+$ service redis start  # Run docker or redis-server &
+```
+
+6. 启动
+
+```
+$ python2.7 run_server.py
+```
+ 
+### 开发者文档
+
+
+   * [项目结构描述](https://github.com/jumpserver/jumpserver/blob/dev/docs/project_structure.md)
+   * [Python代码规范](https://github.com/jumpserver/jumpserver/blob/dev/docs/python_style_guide.md)
+   * [API设计规范](https://github.com/jumpserver/jumpserver/blob/dev/docs/api_style_guide.md)

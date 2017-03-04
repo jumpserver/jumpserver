@@ -23,7 +23,7 @@ def start_django():
     http_port = CONFIG.HTTP_LISTEN_PORT or '8080'
     os.chdir(apps_dir)
     print('start django')
-    subprocess.call('python ./manage.py runserver %s:%s' % (http_host, http_port), shell=True)
+    subprocess.call('python2.7 ./manage.py runserver %s:%s' % (http_host, http_port), shell=True)
 
 
 def start_celery():

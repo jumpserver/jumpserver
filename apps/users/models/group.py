@@ -14,7 +14,8 @@ from common.mixins import NoDeleteModelMixin
 __all__ = ['UserGroup']
 
 
-class UserGroup(NoDeleteModelMixin, Group):
+class UserGroup(NoDeleteModelMixin):
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     created_by = models.CharField(max_length=100)
@@ -34,9 +35,12 @@ class UserGroup(NoDeleteModelMixin, Group):
 
     @classmethod
     def initial(cls):
-        group, created = cls.objects.get_or_create(
-            name='Default', created_by='System',
-            comment='Default user group for all user')
+        default_group = cls.objects.filter(name='Default')
+        if not default_group:
+            group = cls(name='Default', created_by='System', comment='Default user group')
+            group.save()
+        else:
+            group = default_group[0]
         return group
 
     @classmethod

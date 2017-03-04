@@ -1,6 +1,6 @@
 #!/bin/bash
 #
 
-python ../apps/manage.py makemigrations
+python2.7 ../apps/manage.py makemigrations
 
-python ../apps/manage.py migrate
+python2.7 ../apps/manage.py migrate

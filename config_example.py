@@ -99,8 +99,8 @@ class DevelopmentConfig(Config):
     EMAIL_PORT = 465
     EMAIL_HOST_USER = 'ask@jumpserver.org'
     EMAIL_HOST_PASSWORD = 'xfDf4x1n'
-    EMAIL_USE_SSL = True  # If port is 465, set True
-    EMAIL_USE_TLS = False  # If port is 587, set True
+    EMAIL_USE_SSL = True
+    EMAIL_USE_TLS = False
     EMAIL_SUBJECT_PREFIX = '[Jumpserver] '
     SITE_URL = 'http://localhost:8080'
 

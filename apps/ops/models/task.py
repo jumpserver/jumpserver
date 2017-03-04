@@ -30,8 +30,8 @@ class Task(models.Model):
         return []
 
     def run(self):
-        from ops.utils.ansible_api import ADHocRunner, Config
-        conf = Config()
+        from ops.utils.ansible_api import ADHocRunner, Options
+        conf = Options()
         gather_facts = "yes" if self.is_gather_facts else "no"
         play_source = {
             "name": "Ansible Play",

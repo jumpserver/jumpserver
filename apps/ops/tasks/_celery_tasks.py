@@ -3,12 +3,12 @@ from __future__ import absolute_import, unicode_literals
 from celery import shared_task
 
 from common import celery_app
-from ops.utils.ansible_api import Config, ADHocRunner
+from ops.utils.ansible_api import Options, ADHocRunner
 
 
 @shared_task(name="get_asset_hardware_info")
 def get_asset_hardware_info(task_name, task_uuid, *assets):
-    conf = Config()
+    conf = Options()
     play_source = {
             "name": "Get host hardware information",
             "hosts": "default",
@@ -24,7 +24,7 @@ def get_asset_hardware_info(task_name, task_uuid, *assets):
 
 @shared_task(name="asset_test_ping_check")
 def asset_test_ping_check(task_name, task_uuid, *assets):
-    conf = Config()
+    conf = Options()
     play_source = {
             "name": "Test host connection use ping",
             "hosts": "default",

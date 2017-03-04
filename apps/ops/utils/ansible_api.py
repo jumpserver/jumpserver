@@ -20,7 +20,7 @@ from ansible.plugins.callback import CallbackBase
 
 from ops.models import TaskRecord, AnsiblePlay, AnsibleTask, AnsibleHostResult
 
-__all__ = ["ADHocRunner", "Config"]
+__all__ = ["ADHocRunner", "Options"]
 
 
 logger = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ class AnsibleError(StandardError):
     pass
 
 
-class Config(object):
+class Options(object):
     """Ansible运行时配置类, 用于初始化Ansible的一些默认配置.
     """
     def __init__(self, verbosity=None, inventory=None, listhosts=None, subset=None, module_paths=None, extra_vars=None,
@@ -93,7 +93,8 @@ class Config(object):
 
 
 class InventoryMixin(object):
-    """提供生成Ansible inventory对象的方法
+    """
+    提供生成Ansible inventory对象的方法
     """
 
     def gen_inventory(self):
@@ -313,7 +314,8 @@ class PlayBookRunner(InventoryMixin):
     """用于执行AnsiblePlaybook的接口.简化Playbook对象的使用.
     """
 
-    def __init__(self, config, palybook_path, playbook_var, become_pass, *hosts, **group_vars):
+    def __init__(self, config, palybook_path, playbook_var,
+                 become_pass, *hosts, **group_vars):
         """
 
         :param config: Config实例
@@ -392,7 +394,8 @@ class PlayBookRunner(InventoryMixin):
 
 
 class ADHocRunner(InventoryMixin):
-    """ADHoc接口
+    """
+    ADHoc接口
     """
     def __init__(self, play_data, config=None, *hosts, **group_vars):
         """
@@ -408,7 +411,7 @@ class ADHocRunner(InventoryMixin):
             tasks=[dict(action=dict(module='service', args={'name': 'vsftpd', 'state': 'restarted'}), async=async, poll=poll)]
         )
         """
-        self.options = config if config != None else Config()
+        self.options = config if config != None else Options()
 
         # 设置verbosity级别, 及命令行的--verbose选项
         self.display = Display()
@@ -482,7 +485,7 @@ class ADHocRunner(InventoryMixin):
 
 
 def test_run():
-    conf = Config()
+    conf = Options()
     assets = [
         {
                 "name": "192.168.1.119",
