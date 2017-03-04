@@ -1,19 +1,19 @@
 ## Jumpserver
-Jumpserver是一款开源的跳板机产品，主要使用Python，Django开发
+Jumpserver是一款使用Python, Django开发的开源跳板机系统, 助力互联网企业高效 用户、资产、权限、审计 管理
 
 ### 开发环境
    * Python 2.7  # 开发时需考虑兼容Python3
    * Django 1.10
 
 ### 安装
-1. 安装依赖库
+- 安装依赖库
 ```
    $ cd requirements
    $ sudo yum -y install `cat rpm_requirements.txt`  # CentOS/RedHat
    $ sudo apt-get  install `cat deb_requirements.txt`  # Ubuntu/Debian
 ```
 
-2. 安装Python依赖包
+- 安装Python依赖包
 
 ```
 # 请自行安装 Python2.7 和 pip, 以下运行是以python2.7和pip2.7开始
@@ -23,7 +23,7 @@ $ pip2.7 install -r requirements.txt -i https://pypi.doubanio.com/simple
 $ pip2.7 install -r requirements.txt -i https://pypi.doubanio.com/simple --user
 ```
 	   
-3. 配置文件
+- 配置文件
 
 ```	
 $ cd ..
@@ -32,20 +32,20 @@ $ cp config_example.py config.py
 
 配置项 参考 config.py
 
-4. 初始化数据库
+- 初始化数据库
 ```
 # cd utils
 # sh make_migrations.sh
 # sh init_db.sh
 ```
  
-5. 依赖redis
+- 依赖redis
 ```
 $ yum -y install redis
 $ service redis start  # Run docker or redis-server &
 ```
 
-6. 启动
+- 启动
 
 ```
 $ python2.7 run_server.py
