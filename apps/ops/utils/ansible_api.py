@@ -1,11 +1,12 @@
 # ~*~ coding: utf-8 ~*~
-from __future__ import unicode_literals, print_function
+# from __future__ import unicode_literals, print_function
 
 import os
 import json
 import logging
 import traceback
 import ansible.constants as default_config
+from collections import namedtuple
 
 from uuid import uuid4
 from django.utils import timezone
@@ -17,11 +18,15 @@ from ansible.executor import playbook_executor
 from ansible.utils.display import Display
 from ansible.playbook.play import Play
 from ansible.plugins.callback import CallbackBase
+import ansible.constants as C
+from ansible.utils.vars import load_extra_vars
+from ansible.utils.vars import load_options_vars
 
-from ops.models import TaskRecord, AnsiblePlay, AnsibleTask, AnsibleHostResult
+from ..models import TaskRecord, AnsiblePlay, AnsibleTask, AnsibleHostResult
 
 __all__ = ["ADHocRunner", "Options"]
 
+C.HOST_KEY_CHECKING = False
 
 logger = logging.getLogger(__name__)
 
@@ -30,149 +35,187 @@ class AnsibleError(StandardError):
     pass
 
 
-class Options(object):
-    """Ansible运行时配置类, 用于初始化Ansible的一些默认配置.
-    """
-    def __init__(self, verbosity=None, inventory=None, listhosts=None, subset=None, module_paths=None, extra_vars=None,
-                 forks=10, ask_vault_pass=False, vault_password_files=None, new_vault_password_file=None,
-                 output_file=None, tags=None, skip_tags=None, one_line=None, tree=None, ask_sudo_pass=False, ask_su_pass=False,
-                 sudo=None, sudo_user=None, become=None, become_method=None, become_user=None, become_ask_pass=False,
-                 ask_pass=False, private_key_file=None, remote_user=None, connection="smart", timeout=10, ssh_common_args=None,
-                 sftp_extra_args=None, scp_extra_args=None, ssh_extra_args=None, poll_interval=None, seconds=None, check=False,
-                 syntax=None, diff=None, force_handlers=None, flush_cache=None, listtasks=None, listtags=None, module_path=None):
-        self.verbosity = verbosity
-        self.inventory = inventory
-        self.listhosts = listhosts
-        self.subset = subset
-        self.module_paths = module_paths
-        self.extra_vars = extra_vars
-        self.forks = forks
-        self.ask_vault_pass = ask_vault_pass
-        self.vault_password_files = vault_password_files
-        self.new_vault_password_file = new_vault_password_file
-        self.output_file = output_file
-        self.tags = tags
-        self.skip_tags = skip_tags
-        self.one_line = one_line
-        self.tree = tree
-        self.ask_sudo_pass = ask_sudo_pass
-        self.ask_su_pass = ask_su_pass
-        self.sudo = sudo
-        self.sudo_user = sudo_user
-        self.become = become
-        self.become_method = become_method
-        self.become_user = become_user
-        self.become_ask_pass = become_ask_pass
-        self.ask_pass = ask_pass
-        self.private_key_file = private_key_file
-        self.remote_user = remote_user
-        self.connection = connection
-        self.timeout = timeout
-        self.ssh_common_args = ssh_common_args
-        self.sftp_extra_args = sftp_extra_args
-        self.scp_extra_args = scp_extra_args
-        self.ssh_extra_args = ssh_extra_args
-        self.poll_interval = poll_interval
-        self.seconds = seconds
-        self.check = check
-        self.syntax = syntax
-        self.diff = diff
-        self.force_handlers = force_handlers
-        self.flush_cache = flush_cache
-        self.listtasks = listtasks
-        self.listtags = listtags
-        self.module_path = module_path
-        self.__overwrite_default()
+# class Options(object):
+#     """Ansible运行时配置类, 用于初始化Ansible的一些默认配置.
+#     """
+#     def __init__(self, verbosity=None, inventory=None, listhosts=None, subset=None, module_paths=None, extra_vars=None,
+#                  forks=10, ask_vault_pass=False, vault_password_files=None, new_vault_password_file=None,
+#                  output_file=None, tags=None, skip_tags=None, one_line=None, tree=None, ask_sudo_pass=False, ask_su_pass=False,
+#                  sudo=None, sudo_user=None, become=None, become_method=None, become_user=None, become_ask_pass=False,
+#                  ask_pass=False, private_key_file=None, remote_user=None, connection="smart", timeout=10, ssh_common_args=None,
+#                  sftp_extra_args=None, scp_extra_args=None, ssh_extra_args=None, poll_interval=None, seconds=None, check=False,
+#                  syntax=None, diff=None, force_handlers=None, flush_cache=None, listtasks=None, listtags=None, module_path=None):
+#         self.verbosity = verbosity
+#         self.inventory = inventory
+#         self.listhosts = listhosts
+#         self.subset = subset
+#         self.module_paths = module_paths
+#         self.extra_vars = extra_vars
+#         self.forks = forks
+#         self.ask_vault_pass = ask_vault_pass
+#         self.vault_password_files = vault_password_files
+#         self.new_vault_password_file = new_vault_password_file
+#         self.output_file = output_file
+#         self.tags = tags
+#         self.skip_tags = skip_tags
+#         self.one_line = one_line
+#         self.tree = tree
+#         self.ask_sudo_pass = ask_sudo_pass
+#         self.ask_su_pass = ask_su_pass
+#         self.sudo = sudo
+#         self.sudo_user = sudo_user
+#         self.become = become
+#         self.become_method = become_method
+#         self.become_user = become_user
+#         self.become_ask_pass = become_ask_pass
+#         self.ask_pass = ask_pass
+#         self.private_key_file = private_key_file
+#         self.remote_user = remote_user
+#         self.connection = connection
+#         self.timeout = timeout
+#         self.ssh_common_args = ssh_common_args
+#         self.sftp_extra_args = sftp_extra_args
+#         self.scp_extra_args = scp_extra_args
+#         self.ssh_extra_args = ssh_extra_args
+#         self.poll_interval = poll_interval
+#         self.seconds = seconds
+#         self.check = check
+#         self.syntax = syntax
+#         self.diff = diff
+#         self.force_handlers = force_handlers
+#         self.flush_cache = flush_cache
+#         self.listtasks = listtasks
+#         self.listtags = listtags
+#         self.module_path = module_path
+#         self.__overwrite_default()
+#
+#     def __overwrite_default(self):
+#         """上面并不能包含Ansible所有的配置, 如果有其他的配置,
+#         可以通过替换default_config模块里面的变量进行重载，　
+#         比如 default_config.DEFAULT_ASK_PASS = False.
+#         """
+#         default_config.HOST_KEY_CHECKING = False
+Options = namedtuple("Options", [
+    'connection', 'module_path', 'private_key_file', "remote_user", "timeout",
+    'forks', 'become', 'become_method', 'become_user', 'check', "extra_vars",
+    ]
+)
 
-    def __overwrite_default(self):
-        """上面并不能包含Ansible所有的配置, 如果有其他的配置,
-        可以通过替换default_config模块里面的变量进行重载，　
-        比如 default_config.DEFAULT_ASK_PASS = False.
-        """
-        default_config.HOST_KEY_CHECKING = False
+
+class JMSHost(Host):
+    def __init__(self, asset):
+        self.asset = asset
+        self.name = name = asset.get('hostname') or asset.get('ip')
+        self.port = port = asset.get('port') or 22
+        super(JMSHost, self).__init__(name, port)
+        self.set_all_variable()
+
+    def set_all_variable(self):
+        asset = self.asset
+        self.set_variable('ansible_host', asset['ip'])
+        self.set_variable('ansible_port', asset['port'])
+        self.set_variable('ansible_user', asset['username'])
+
+        # 添加密码和秘钥
+        if asset.get('password'):
+            self.set_variable('ansible_ssh_pass', asset['password'])
+        if asset.get('key'):
+            self.set_variable('ansible_ssh_private_key_file', asset['private_key'])
+
+        # 添加become支持
+        become = asset.get("become", None)
+        if become is not None:
+            self.set_variable("ansible_become", True)
+            self.set_variable("ansible_become_method", become.get('method'))
+            self.set_variable("ansible_become_user", become.get('user'))
+            self.set_variable("ansible_become_pass", become.get('pass'))
+        else:
+            self.set_variable("ansible_become", False)
 
 
-class InventoryMixin(object):
+class JMSInventory(Inventory):
     """
     提供生成Ansible inventory对象的方法
     """
 
-    def gen_inventory(self):
+    def __init__(self, host_list=None):
+        if host_list is None:
+            host_list = []
+        assert isinstance(host_list, list)
+        self.host_list = host_list
+        self.loader = DataLoader()
+        self.variable_manager = VariableManager()
+        super(JMSInventory, self).__init__(self.loader, self.variable_manager,
+                                           host_list=host_list)
+
+    def parse_inventory(self, host_list):
         """用于生成动态构建Ansible Inventory.
-        self.hosts: [
-                        {"host": <ip>,
-                          "port": <port>,
-                          "user": <user>,
-                          "pass": <pass>,
-                          "key": <sshKey>,
-                          "group": <default>
-                          "other_host_var": <other>},
-                        {...},
-                     ]
-        self.group_vars: {
-            "groupName1": {"var1": <value>, "var2": <value>, ...},
-            "groupName2": {"var1": <value>, "var2": <value>, ...},
-        }
+        self.host_list: [
+            {"name": "asset_name",
+             "ip": <ip>,
+             "port": <port>,
+             "user": <user>,
+             "pass": <pass>,
+             "key": <sshKey>,
+             "groups": ['group1', 'group2'],
+             "other_host_var": <other>},
+             {...},
+        ]
 
         :return: 返回一个Ansible的inventory对象
         """
 
         # TODO: 验证输入
-
         # 创建Ansible Group,如果没有则创建default组
-        for asset in self.hosts:
-            g_name = asset.get('group', 'default')
-            if g_name not in [g.name for g in self.groups]:
-                group = Group(name=g_name)
-                self.groups.append(group)
+        ungrouped = Group('ungrouped')
+        all = Group('all')
+        all.add_child_group(ungrouped)
+        self.groups = dict(all=all, ungrouped=ungrouped)
 
-        # 添加组变量到相应的组上
-        for group_name, variables in self.group_vars.iteritems():
-            for g in self.groups:
-                if g.name == group_name:
-                    for v_name, v_value in variables.iteritems():
-                        g.set_variable(v_name, v_value)
-
-        # 往组里面添加Host
-        for asset in self.hosts:
-            # 添加Host链接的常用变量(host,port,user,pass,key)
-            host = Host(name=asset['name'], port=asset['port'])
-            host.set_variable('ansible_host', asset['ip'])
-            host.set_variable('ansible_port', asset['port'])
-            host.set_variable('ansible_user', asset['username'])
-
-            # 添加密码和秘钥
-            if asset.get('password'):
-                host.set_variable('ansible_ssh_pass', asset['password'])
-            if asset.get('key'):
-                host.set_variable('ansible_ssh_private_key_file', asset['key'])
-
-            # 添加become支持
-            become = asset.get("become", None)
-            if become is not None:
-                host.set_variable("ansible_become", True)
-                host.set_variable("ansible_become_method", become.get('method'))
-                host.set_variable("ansible_become_user", become.get('user'))
-                host.set_variable("ansible_become_pass", become.get('pass'))
+        for asset in host_list:
+            host = JMSHost(asset=asset)
+            asset_groups = asset.get('groups')
+            if asset_groups:
+                for group_name in asset_groups:
+                    if group_name not in self.groups:
+                        group = Group(group_name)
+                        self.groups[group_name] = group
+                    else:
+                        group = self.groups[group_name]
+                    group.add_host(host)
             else:
-                host.set_variable("ansible_become", False)
+                ungrouped.add_host(host)
+            all.add_host(host)
 
-            # 添加其他Host的额外变量
-            for key, value in asset.iteritems():
-                if key not in ["name", "port", "ip", "username", "password", "key"]:
-                    host.set_variable(key, value)
 
-            # 将host添加到组里面
-            for g in self.groups:
-                if g.name == asset.get('group', 'default'):
-                    g.add_host(host)
+class BasicResultCallback(CallbackBase):
+    """
+    Custom Callback
+    """
+    def __init__(self, display=None):
+        self.result_q = dict(contacted={}, dark={})
+        super(BasicResultCallback, self).__init__(display)
 
-        # 将组添加到Inventory里面，生成真正的inventory对象
-        inventory = Inventory(loader=self.loader, variable_manager=self.variable_manager, host_list=[])
-        for g in self.groups:
-            inventory.add_group(g)
-        self.variable_manager.set_inventory(inventory)
-        return inventory
+    def gather_result(self, n, res):
+        self.result_q[n].update({res._host.name: res._result})
+
+    def v2_runner_on_ok(self, result):
+        self.gather_result("contacted", result)
+
+    def v2_runner_on_failed(self, result, ignore_errors=False):
+        self.gather_result("dark", result)
+
+    def v2_runner_on_unreachable(self, result):
+        self.gather_result("dark", result)
+
+    def v2_runner_on_skipped(self, result):
+        self.gather_result("dark", result)
+
+    def v2_playbook_on_task_start(self, task, is_conditional):
+        pass
+
+    def v2_playbook_on_play_start(self, play):
+        pass
 
 
 class CallbackModule(CallbackBase):
@@ -310,7 +353,7 @@ class CallbackModule(CallbackBase):
         print("summary: %s", summary)
 
 
-class PlayBookRunner(InventoryMixin):
+class PlayBookRunner(object):
     """用于执行AnsiblePlaybook的接口.简化Playbook对象的使用.
     """
 
@@ -393,133 +436,121 @@ class PlayBookRunner(InventoryMixin):
         return stats
 
 
-class ADHocRunner(InventoryMixin):
+class ADHocRunner(object):
     """
     ADHoc接口
     """
-    def __init__(self, play_data, config=None, *hosts, **group_vars):
-        """
-        :param hosts: 见PlaybookRunner参数
-        :param group_vars: 见PlaybookRunner参数
-        :param config: Config实例
+    def __init__(self,
+                 hosts=C.DEFAULT_HOST_LIST,
+                 module_name=C.DEFAULT_MODULE_NAME,  # * command
+                 module_args=C.DEFAULT_MODULE_ARGS,  # * 'cmd args'
+                 forks=C.DEFAULT_FORKS,  # 5
+                 timeout=C.DEFAULT_TIMEOUT,  # SSH timeout = 10s
+                 pattern="all",  # all
+                 remote_user=C.DEFAULT_REMOTE_USER,  # root
+                 module_path=None,  # dirs of custome modules
+                 connection_type="smart",
+                 become=None,
+                 become_method=None,
+                 become_user=None,
+                 check=False,
+                 passwords=None,
+                 extra_vars=None,
+                 private_key_file=None,
+                 gather_facts='no'):
 
-        :param play_data:
-        play_data = dict(
-            name="Ansible Ad-Hoc",
-            hosts=pattern,
-            gather_facts=True,
-            tasks=[dict(action=dict(module='service', args={'name': 'vsftpd', 'state': 'restarted'}), async=async, poll=poll)]
-        )
-        """
-        self.options = config if config != None else Options()
-
-        # 设置verbosity级别, 及命令行的--verbose选项
-        self.display = Display()
-        self.display.verbosity = self.options.verbosity
-
-        # sudo的配置移到了Host级别去了，因此这里不再需要处理
-        self.passwords = None
-
-        # 生成Ansible inventory, 这些变量Mixin都会用到
-        self.hosts = hosts
-        self.group_vars = group_vars
-        self.loader = DataLoader()
+        self.pattern = pattern
         self.variable_manager = VariableManager()
-        self.groups = []
-        self.inventory = self.gen_inventory()
+        self.loader = DataLoader()
+        self.module_name = module_name
+        self.module_args = module_args
+        self.check_module_args()
+        self.gather_facts = gather_facts
+        self.results_callback = BasicResultCallback()
+        self.options = Options(
+            connection=connection_type,
+            timeout=timeout,
+            module_path=module_path,
+            forks=forks,
+            become=become,
+            become_method=become_method,
+            become_user=become_user,
+            check=check,
+            remote_user=remote_user,
+            extra_vars=extra_vars or [],
+            private_key_file=private_key_file,
+        )
 
-        self.play = Play().load(play_data, variable_manager=self.variable_manager, loader=self.loader)
+        self.variable_manager.extra_vars = load_extra_vars(self.loader, options=self.options)
+        self.variable_manager.options_vars = load_options_vars(self.options)
+        self.passwords = passwords or {}
+        self.inventory = JMSInventory(hosts)
+        self.variable_manager.set_inventory(self.inventory)
 
-    @staticmethod
-    def update_db_tasker(tasker_id, ext_code):
+        self.play_source = dict(
+            name='Ansible Ad-hoc',
+            hosts=self.pattern,
+            gather_facts=self.gather_facts,
+            tasks=[dict(action=dict(
+                module=self.module_name,
+                args=self.module_args
+            ))]
+        )
+
+        self.play = Play().load(
+            self.play_source,
+            variable_manager=self.variable_manager,
+            loader=self.loader,
+        )
+
+        self.runner = TaskQueueManager(
+            inventory=self.inventory,
+            variable_manager=self.variable_manager,
+            loader=self.loader,
+            options=self.options,
+            passwords=self.passwords,
+            stdout_callback=self.results_callback,
+        )
+
+    def check_module_args(self):
+        if self.module_name in C.MODULE_REQUIRE_ARGS and not self.module_args:
+            err = "No argument passed to '%s' module." % self.module_name
+            raise AnsibleError(err)
+
+    def run(self):
+        if not self.inventory.list_hosts("all"):
+            raise AnsibleError("Inventory is empty.")
+
+        if not self.inventory.list_hosts(self.pattern):
+            raise AnsibleError(
+                "pattern: %s  dose not match any hosts." % self.pattern)
+
         try:
-            tasker = TaskRecord.objects.get(uuid=tasker_id)
-            tasker.end = timezone.now()
-            tasker.completed = True
-            tasker.exit_code = ext_code
-            tasker.save()
+            self.runner.run(self.play)
         except Exception as e:
-            logger.error("Update Tasker Status into database error!, %s" % e.message)
-
-    def create_db_tasker(self, name, uuid):
-        try:
-            hosts = [host.get('name') for host in self.hosts]
-            tasker = TaskRecord(name=name, uuid=uuid, hosts=','.join(hosts), start=timezone.now())
-            tasker.save()
-        except Exception as e:
-            logger.error("Save Tasker to database error!, %s" % e.message)
-
-    def run(self, tasker_name, tasker_uuid):
-        """执行ADHoc, 执行完后, 修改AnsiblePlay的状态为完成状态.
-
-        :param tasker_uuid <str> 用于标示此次task
-        """
-        # 初始化callback插件,以及Tasker
-
-        self.create_db_tasker(tasker_name, tasker_uuid)
-        self.results_callback = CallbackModule(tasker_uuid)
-
-        tqm = None
-        # TODO:日志和结果分析
-        try:
-            tqm = TaskQueueManager(
-                inventory=self.inventory,
-                variable_manager=self.variable_manager,
-                loader=self.loader,
-                stdout_callback=self.results_callback,
-                options=self.options,
-                passwords=self.passwords
-            )
-            ext_code = tqm.run(self.play)
-            result = self.results_callback.results
-
-            # 任务运行结束, 标示任务完成
-            self.update_db_tasker(tasker_uuid, ext_code)
-
-            ret = json.dumps(result)
-            return ext_code, ret
-
+            pass
+        else:
+            return self.results_callback.result_q
         finally:
-            if tqm:
-                tqm.cleanup()
+            if self.runner:
+                self.runner.cleanup()
+            if self.loader:
+                self.loader.cleanup_all_tmp_files()
 
 
 def test_run():
-    conf = Options()
     assets = [
         {
-                "name": "192.168.1.119",
-                "ip": "192.168.1.119",
-                "port": "22",
+                "hostname": "192.168.152.129",
+                "ip": "192.168.152.129",
+                "port": 22,
                 "username": "root",
-                "password": "tongfang_test",
-                "key": "asset_private_key",
+                "password": "redhat",
         },
-        {
-                "name": "192.168.232.135",
-                "ip": "192.168.232.135",
-                "port": "22",
-                "username": "yumaojun",
-                "password": "xxx",
-                "key": "asset_private_key",
-                "become": {"method": "sudo", "user": "root", "pass": "xxx"}
-    },
     ]
-    # 初始化Play
-    play_source = {
-            "name": "Ansible Play",
-            "hosts": "default",
-            "gather_facts": "no",
-            "tasks": [
-                dict(action=dict(module='ping')),
-            ]
-        }
-    hoc = ADHocRunner(conf, play_source, *assets)
-    uuid = "tasker-" + uuid4().hex
-    ext_code, result = hoc.run("test_task", uuid)
-    print(ext_code)
-    print(result)
-
+    hoc = ADHocRunner(module_name='shell', module_args='ls', hosts=assets)
+    ret = hoc.run()
+    print(ret)
 
 if __name__ == "__main__":
     test_run()

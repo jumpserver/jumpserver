@@ -2,13 +2,10 @@
 from __future__ import unicode_literals
 
 from ansible import *
-from cron import *
-from sudo import *
 
 __all__ = ["generate_fake"]
 
 
 def generate_fake():
-    for cls in (TaskRecord, AnsiblePlay, AnsibleTask, AnsibleHostResult, CronTable,
-                HostAlia, UserAlia, CmdAlia, RunasAlia, Privilege, Sudo):
+    for cls in (TaskRecord, AnsiblePlay, AnsibleTask, AnsibleHostResult):
         cls.generate_fake()

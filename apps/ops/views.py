@@ -8,53 +8,8 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from users.utils import AdminUserRequiredMixin
 from ops.utils.mixins import CreateSudoPrivilegesMixin, ListSudoPrivilegesMixin
-from ops.models import  *
+from .models import Task
 
-
-class SudoListView(AdminUserRequiredMixin, ListSudoPrivilegesMixin, ListView):
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    model = Sudo
-    context_object_name = 'sudos'
-    template_name = 'sudo/list.html'
-
-
-class SudoCreateView(AdminUserRequiredMixin, CreateSudoPrivilegesMixin, CreateView):
-    model = Sudo
-    template_name = 'sudo/create.html'
-
-
-class SudoUpdateView(AdminUserRequiredMixin, UpdateView):
-    model = Sudo
-    template_name = 'sudo/update.html'
-
-
-class SudoDetailView(DetailView):
-    model = Sudo
-    context_object_name = 'sudo'
-    template_name = 'sudo/detail.html'
-
-
-class CronListView(AdminUserRequiredMixin, ListView):
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    model = CronTable
-    context_object_name = 'crons'
-    template_name = 'cron/list.html'
-
-
-class CronCreateView(AdminUserRequiredMixin, CreateView):
-    model = CronTable
-    template_name = 'cron/create.html'
-
-
-class CronUpdateView(AdminUserRequiredMixin, UpdateView):
-    model = CronTable
-    template_name = 'cron/update.html'
-
-
-class CronDetailView(DetailView):
-    model = CronTable
-    context_object_name = 'cron'
-    template_name = 'cron/detail.html'
 
 class TaskListView(AdminUserRequiredMixin, ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE

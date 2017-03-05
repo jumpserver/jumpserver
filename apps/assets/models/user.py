@@ -9,7 +9,7 @@ import logging
 from django.utils.translation import ugettext_lazy as _
 from django.core.exceptions import ValidationError
 
-from common.utils import signer, validate_ssh_private_key
+from common.utils import signer, validate_ssh_private_key, ssh_key_string_to_obj
 
 __all__ = ['AdminUser', 'SystemUser', 'private_key_validator']
 logger = logging.getLogger(__name__)
@@ -24,12 +24,20 @@ def private_key_validator(value):
 
 
 class AdminUser(models.Model):
+    BECOME_METHOD_CHOICES = (
+        ('sudo', 'sudo'),
+        ('su', 'su'),
+    )
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     username = models.CharField(max_length=16, verbose_name=_('Username'))
     _password = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
     _private_key = models.CharField(max_length=4096, blank=True, null=True, verbose_name=_('SSH private key'),
                                     validators=[private_key_validator,])
     _public_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
+    become = models.BooleanField(default=True)
+    become_method = models.CharField(choices=BECOME_METHOD_CHOICES, default='sudo', max_length=4)
+    become_user = models.CharField(default='root', max_length=64)
+    become_password = models.CharField(default='', max_length=128)
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True, null=True)
     created_by = models.CharField(max_length=32, null=True, verbose_name=_('Created by'))
@@ -41,7 +49,10 @@ class AdminUser(models.Model):
 
     @property
     def password(self):
-        return signer.unsign(self._password)
+        if self._password:
+            return signer.unsign(self._password)
+        else:
+            return ''
 
     @password.setter
     def password(self, password_raw):
@@ -49,7 +60,11 @@ class AdminUser(models.Model):
 
     @property
     def private_key(self):
-        return signer.unsign(self._private_key)
+        if self._private_key:
+            key_str = signer.unsign(self._private_key)
+            return ssh_key_string_to_obj(key_str)
+        else:
+            return None
 
     @private_key.setter
     def private_key(self, private_key_raw):

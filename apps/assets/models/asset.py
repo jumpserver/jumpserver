@@ -87,6 +87,18 @@ class Asset(models.Model):
     def to_json(self):
         pass
 
+    def _to_secret_json(self):
+        """Ansible use it create inventory"""
+        return {
+            'hostname': self.hostname,
+            'ip': self.ip,
+            'port': self.port,
+            'groups': [group.name for group in self.groups.all()],
+            'username': self.admin_user.username,
+            'password': self.admin_user.password,
+            'private_key': self.admin_user.private_key,
+        }
+
     class Meta:
         unique_together = ('ip', 'port')
 
