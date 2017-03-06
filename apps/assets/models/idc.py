@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 
 from __future__ import unicode_literals
 
-from django.db import models
 import logging
+
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -15,15 +16,22 @@ logger = logging.getLogger(__name__)
 
 class IDC(models.Model):
     name = models.CharField(max_length=32, verbose_name=_('Name'))
-    bandwidth = models.CharField(max_length=32, blank=True, verbose_name=_('Bandwidth'))
-    contact = models.CharField(max_length=16, blank=True, verbose_name=_('Contact'))
-    phone = models.CharField(max_length=32, blank=True, verbose_name=_('Phone'))
-    address = models.CharField(max_length=128, blank=True, verbose_name=_("Address"))
+    bandwidth = models.CharField(
+        max_length=32, blank=True, verbose_name=_('Bandwidth'))
+    contact = models.CharField(
+        max_length=128, blank=True, verbose_name=_('Contact'))
+    phone = models.CharField(max_length=32, blank=True,
+                             verbose_name=_('Phone'))
+    address = models.CharField(
+        max_length=128, blank=True, verbose_name=_("Address"))
     intranet = models.TextField(blank=True, verbose_name=_('Intranet'))
     extranet = models.TextField(blank=True, verbose_name=_('Extranet'))
-    date_created = models.DateTimeField(auto_now_add=True, null=True, verbose_name=_('Date added'))
-    operator = models.CharField(max_length=32, blank=True, verbose_name=_('Operator'))
-    created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
+    date_created = models.DateTimeField(
+        auto_now_add=True, null=True, verbose_name=_('Date added'))
+    operator = models.CharField(
+        max_length=32, blank=True, verbose_name=_('Operator'))
+    created_by = models.CharField(
+        max_length=32, blank=True, verbose_name=_('Created by'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
@@ -58,4 +66,3 @@ class IDC(models.Model):
             except IntegrityError:
                 print('Error continue')
                 continue
-

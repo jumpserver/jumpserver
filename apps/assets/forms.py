@@ -7,6 +7,7 @@ from common.utils import validate_ssh_private_key, ssh_pubkey_gen
 
 
 class AssetCreateForm(forms.ModelForm):
+
     def __init__(self, *args, **kwargs):
         instance = kwargs.get('instance', None)
         if instance:
@@ -78,10 +79,10 @@ class AssetGroupForm(forms.ModelForm):
     class Meta:
         model = AssetGroup
         fields = [
-            "name", "comment","system_users",
+            "name", "comment", "system_users",
         ]
         widgets = {
-            'name' : forms.TextInput(attrs={}),
+            'name': forms.TextInput(attrs={}),
             'system_users': forms.SelectMultiple(attrs={'class': 'select2-system-user', 'data-placeholder': _('Select asset system user')}),
 
         }
@@ -113,7 +114,8 @@ class IDCForm(forms.ModelForm):
 
     class Meta:
         model = IDC
-        fields = ['name', "bandwidth", "operator", 'contact', 'phone', 'address', 'intranet', 'extranet','comment']
+        fields = ['name', "bandwidth", "operator", 'contact',
+                  'phone', 'address', 'intranet', 'extranet', 'comment']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
             'intranet': forms.Textarea(
@@ -189,7 +191,8 @@ class AdminUserForm(forms.ModelForm):
 
     class Meta:
         model = AdminUser
-        fields = ['name', 'username', 'password', 'private_key_file', 'comment']
+        fields = ['name', 'username', 'password',
+                  'private_key_file', 'comment']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
             'username': forms.TextInput(attrs={'placeholder': _('Username')}),
@@ -204,7 +207,8 @@ class SystemUserForm(forms.ModelForm):
     # Admin user assets define, let user select, save it in form not in view
     auto_generate_key = forms.BooleanField(initial=True, required=False)
     # Form field name can not start with `_`, so redefine it,
-    password = forms.CharField(widget=forms.PasswordInput, max_length=100, min_length=8, strip=True)
+    password = forms.CharField(widget=forms.PasswordInput, max_length=100,
+                               required=False, min_length=8, strip=True)
     # Need use upload private key file except paste private key content
     private_key_file = forms.FileField(required=False)
 
@@ -295,7 +299,7 @@ class AssetTagForm(forms.ModelForm):
             "name",
         ]
         widgets = {
-            'name' : forms.TextInput(attrs={}),
+            'name': forms.TextInput(attrs={}),
 
         }
         help_texts = {
