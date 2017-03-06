@@ -1,17 +1,14 @@
 # ~*~ coding: utf-8 ~*~
 
-# ~*~ coding: utf-8 ~*~
-# from __future__ import unicode_literals, print_function
-
 import os
-from collections import namedtuple
+import sys
+from collections import namedtuple, defaultdict
 
 from ansible.executor.task_queue_manager import TaskQueueManager
 from ansible.vars import VariableManager
 from ansible.parsing.dataloader import DataLoader
 from ansible.executor.playbook_executor import PlaybookExecutor
 from ansible.playbook.play import Play
-from ansible.plugins.callback import CallbackBase
 import ansible.constants as C
 from ansible.utils.vars import load_extra_vars
 from ansible.utils.vars import load_options_vars
@@ -128,7 +125,7 @@ class PlayBookRunner(object):
         return self.callbackmodule.output
 
 
-class ADHocRunner(object):
+class AdHocRunner(object):
     """
     ADHoc接口
     """
@@ -141,12 +138,8 @@ class ADHocRunner(object):
 
     def __init__(self,
                  hosts=C.DEFAULT_HOST_LIST,
-                 task_name='Ansible Ad-hoc',
-                 module_name=C.DEFAULT_MODULE_NAME,  # * command
-                 module_args=C.DEFAULT_MODULE_ARGS,  # * 'cmd args'
                  forks=C.DEFAULT_FORKS,  # 5
                  timeout=C.DEFAULT_TIMEOUT,  # SSH timeout = 10s
-                 pattern="all",  # all
                  remote_user=C.DEFAULT_REMOTE_USER,  # root
                  module_path=None,  # dirs of custome modules
                  connection_type="smart",
@@ -159,12 +152,9 @@ class ADHocRunner(object):
                  private_key_file=None,
                  gather_facts='no'):
 
-        self.pattern = pattern
+        self.pattern = ''
         self.variable_manager = VariableManager()
         self.loader = DataLoader()
-        self.module_name = module_name
-        self.module_args = module_args
-        self.check_module_args()
         self.gather_facts = gather_facts
         self.results_callback = AdHocResultCallback()
         self.options = self.Options(
@@ -186,18 +176,41 @@ class ADHocRunner(object):
         self.passwords = passwords or {}
         self.inventory = JMSInventory(hosts)
         self.variable_manager.set_inventory(self.inventory)
+        self.tasks = []
+        self.play_source = None
+        self.play = None
+        self.runner = None
+
+    @staticmethod
+    def check_module_args(module_name, module_args=''):
+        if module_name in C.MODULE_REQUIRE_ARGS and not module_args:
+            err = "No argument passed to '%s' module." % module_name
+            print(err)
+            return False
+        return True
+
+    def run(self, task_tuple, pattern='all', task_name='Ansible Ad-hoc'):
+        """
+        :param task_tuple:  (('shell', 'ls'), ('ping', ''))
+        :param pattern:
+        :param task_name:
+        :return:
+        """
+        for module, args in task_tuple:
+            if not self.check_module_args(module, args):
+                return
+            self.tasks.append(
+                dict(action=dict(
+                    module=module,
+                    args=args,
+                ))
+            )
 
         self.play_source = dict(
             name=task_name,
-            hosts=self.pattern,
+            hosts=pattern,
             gather_facts=self.gather_facts,
-            tasks=[
-                dict(action=dict(
-                        module=self.module_name,
-                        args=self.module_args,
-                    )
-                )
-            ]
+            tasks=self.tasks
         )
 
         self.play = Play().load(
@@ -215,12 +228,6 @@ class ADHocRunner(object):
             stdout_callback=self.results_callback,
         )
 
-    def check_module_args(self):
-        if self.module_name in C.MODULE_REQUIRE_ARGS and not self.module_args:
-            err = "No argument passed to '%s' module." % self.module_name
-            raise AnsibleError(err)
-
-    def run(self):
         if not self.inventory.list_hosts("all"):
             raise AnsibleError("Inventory is empty.")
 
@@ -242,9 +249,13 @@ class ADHocRunner(object):
                 self.loader.cleanup_all_tmp_files()
 
     def clean_result(self):
-        failed = self.results_callback.result_q['dark'].keys()
-        success = self.results_callback.result_q['contacted'].keys()
-        return {'failed': failed, 'success': success}
+        result = defaultdict(dict)
+        for host, msgs in self.results_callback.result_q['contacted'].items():
+            result[host]['success'] = len(msgs)
+
+        for host, msgs in self.results_callback.result_q['dark'].items():
+            result[host]['failed'] = len(msgs)
+        return result
 
 
 def test_run():
@@ -257,8 +268,9 @@ def test_run():
                 "password": "redhat",
         },
     ]
-    hoc = ADHocRunner(module_name='shell', module_args='ls', hosts=assets)
-    ret = hoc.run()
+    task_tuple = (('shell', 'ls'), ('ping', ''))
+    hoc = AdHocRunner(hosts=assets)
+    ret = hoc.run(task_tuple)
     print(ret)
 
     play = PlayBookRunner(assets, playbook_path='/tmp/some.yml')

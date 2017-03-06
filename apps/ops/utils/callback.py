@@ -12,7 +12,10 @@ class AdHocResultCallback(CallbackBase):
         super(AdHocResultCallback, self).__init__(display)
 
     def gather_result(self, n, res):
-        self.result_q[n].update({res._host.name: res._result})
+        if res._host.name in self.result_q[n]:
+            self.result_q[n][res._host.name].append(res._result)
+        else:
+            self.result_q[n][res._host.name] = [res._result]
 
     def v2_runner_on_ok(self, result):
         self.gather_result("contacted", result)
