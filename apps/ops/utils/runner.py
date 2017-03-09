@@ -1,7 +1,7 @@
 # ~*~ coding: utf-8 ~*~
+from __future__ import unicode_literals
 
 import os
-import sys
 from collections import namedtuple, defaultdict
 
 from ansible.executor.task_queue_manager import TaskQueueManager
@@ -249,12 +249,20 @@ class AdHocRunner(object):
                 self.loader.cleanup_all_tmp_files()
 
     def clean_result(self):
-        result = defaultdict(dict)
-        for host, msgs in self.results_callback.result_q['contacted'].items():
-            result[host]['success'] = len(msgs)
+        """
+        :return: {
+            "success": ['hostname',],
+            "failed": [{'hostname': 'msg'}, {}],
+        }
+        """
+        result = {'success': [], 'failed': []}
+        for host in self.results_callback.result_q['contacted']:
+            result['success'].append(host)
 
         for host, msgs in self.results_callback.result_q['dark'].items():
-            result[host]['failed'] = len(msgs)
+            msg = '\n'.join(['{}: {}'.format(msg.get('invocation', {}).get('module_name'),
+                                             msg.get('msg', '')) for msg in msgs])
+            result['failed'].append({host: msg})
         return result
 
 

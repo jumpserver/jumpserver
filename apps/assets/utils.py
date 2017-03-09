@@ -4,6 +4,7 @@ from rest_framework import serializers
 from models import Tag
 from django.views.generic.edit import CreateView
 
+
 class CreateAssetTagsMiXin(CreateView):
     def get_form_kwargs(self):
         tags_list = self.request.POST.getlist('tags')
@@ -29,6 +30,7 @@ class CreateAssetTagsMiXin(CreateView):
                 'files': self.request.FILES,
             })
         return kwargs
+
 
 class UpdateAssetTagsMiXin(CreateAssetTagsMiXin):
     def get_form_kwargs(self):

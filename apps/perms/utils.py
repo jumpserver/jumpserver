@@ -2,9 +2,11 @@
 
 from __future__ import absolute_import, unicode_literals
 
-from common.utils import setattr_bulk
-from .hands import User, UserGroup, Asset, AssetGroup, SystemUser, \
-    push_system_user
+from common.utils import setattr_bulk, get_logger
+from ops.tasks import push_users
+from .hands import User, UserGroup, Asset, AssetGroup, SystemUser
+
+logger = get_logger(__file__)
 
 
 def get_user_group_granted_asset_groups(user_group):
@@ -220,6 +222,19 @@ def get_users_granted_in_asset_group(asset):
     pass
 
 
+def push_system_user(assets, system_user):
+    logger.info('Push system user %s' % system_user.name)
+    for asset in assets:
+        logger.info('\tAsset: %s' % asset.ip)
+    if not assets:
+        return None
+
+    assets = [asset._to_secret_json() for asset in assets]
+    system_user = system_user._to_secret_json()
+    task = push_users.delay(assets, system_user)
+    return task.id
+
+
 def associate_system_users_and_assets(system_users, assets, asset_groups):
     """关联系统用户和资产, 目的是保存它们的关系, 然后新加入的资产或系统
     用户时,推送系统用户到资产
@@ -242,3 +257,5 @@ def associate_system_users_and_assets(system_users, assets, asset_groups):
             )
         system_user.assets.add(*(tuple(assets_all)))
         push_system_user(assets_need_push, system_user)
+
+

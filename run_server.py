@@ -29,8 +29,9 @@ def start_django():
 def start_celery():
     os.chdir(apps_dir)
     os.environ.setdefault('C_FORCE_ROOT', '1')
+    os.environ.setdefault('PYTHONOPTIMIZE', 1)
     print('start celery')
-    subprocess.call('celery -A common worker -P eventlet -s /tmp/celerybeat-schedule -l info ', shell=True)
+    subprocess.call('celery -A common worker -s /tmp/celerybeat-schedule -l debug', shell=True)
 
 
 def main():

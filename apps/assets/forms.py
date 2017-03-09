@@ -3,7 +3,10 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from .models import IDC, Asset, AssetGroup, AdminUser, SystemUser, Tag
-from common.utils import validate_ssh_private_key, ssh_pubkey_gen
+from common.utils import validate_ssh_private_key, ssh_pubkey_gen, ssh_key_gen, get_logger
+
+
+logger = get_logger(__file__)
 
 
 class AssetCreateForm(forms.ModelForm):
@@ -207,59 +210,59 @@ class SystemUserForm(forms.ModelForm):
     # Admin user assets define, let user select, save it in form not in view
     auto_generate_key = forms.BooleanField(initial=True, required=False)
     # Form field name can not start with `_`, so redefine it,
-    password = forms.CharField(widget=forms.PasswordInput, max_length=100, min_length=8, strip=True)
+    password = forms.CharField(widget=forms.PasswordInput, required=False,
+                               max_length=100, min_length=8, strip=True)
     # Need use upload private key file except paste private key content
     private_key_file = forms.FileField(required=False)
 
     def __init__(self, *args, **kwargs):
-        # When update a admin user instance, initial it
-        if kwargs.get('instance'):
-            initial = kwargs.get('initial', {})
-            initial['assets'] = kwargs['instance'].assets.all()
-            initial['asset_groups'] = kwargs['instance'].asset_groups.all()
         super(SystemUserForm, self).__init__(*args, **kwargs)
 
     def save(self, commit=True):
         # Because we define custom field, so we need rewrite :method: `save`
         system_user = super(SystemUserForm, self).save(commit=commit)
         password = self.cleaned_data['password']
-        private_key_file = self.cleaned_data['private_key_file']
+        private_key_file = self.cleaned_data.get('private_key_file')
 
         if system_user.auth_method == 'P':
             if password:
                 system_user.password = password
-            print(password)
-        # Todo: Validate private key file, and generate public key
-        # Todo: Auto generate private key and public key
-        if private_key_file:
-            system_user.private_key = private_key_file.read().strip()
+        elif system_user.auth_method == 'K':
+            if self.cleaned_data['auto_generate_key']:
+                private_key, public_key = ssh_key_gen(username=system_user.name)
+                logger.info('Generate private key and public key')
+            else:
+                private_key = private_key_file.read().strip()
+                public_key = ssh_pubkey_gen(private_key=private_key)
+            system_user.private_key = private_key
+            system_user.public_key = public_key
         system_user.save()
         return self.instance
 
-    # Todo: check valid
-    # def clean_private_key_file(self):
-    #     if not self.cleaned_data['auto_generate_key']:
-    #         if not self.cleaned_data['private_key_file']:
-    #             raise forms.ValidationError(_('Private key required'))
+    def clean_private_key_file(self):
+        if self.data['auth_method'] == 'K' and \
+                not self.cleaned_data['auto_generate_key']:
+            if not self.cleaned_data['private_key_file']:
+                raise forms.ValidationError(_('Private key required'))
+            else:
+                key_string = self.cleaned_data['private_key_file'].read()
+                self.cleaned_data['private_key_file'].seek(0)
+                if not validate_ssh_private_key(key_string):
+                    raise forms.ValidationError(_('Private key invalid'))
+        return self.cleaned_data['private_key_file']
 
-    # def clean_password(self):
-    #     if self.cleaned_data['auth_method'] == 'P':
-    #         if not self.cleaned_data['password']:
-    #             raise forms.ValidationError(_('Password required'))
-    #     return self.cleaned_data['password']
-
-    # def clean(self):
-    #     password = self.cleaned_data['password']
-    #     private_key_file = self.cleaned_data.get('private_key_file', '')
-    #
-    #     if not (password or private_key_file):
-    #         raise forms.ValidationError(_('Password and private key file must be input one'))
+    def clean_password(self):
+        if self.data['auth_method'] == 'P':
+            if not self.cleaned_data.get('password'):
+                raise forms.ValidationError(_('Password required'))
+        return self.cleaned_data['password']
 
     class Meta:
         model = SystemUser
         fields = [
-            'name', 'username', 'protocol', 'auto_generate_key', 'password', 'private_key_file', 'auth_method',
-            'auto_push', 'sudo', 'comment', 'shell', 'home', 'uid',
+            'name', 'username', 'protocol', 'auto_generate_key', 'password',
+            'private_key_file', 'auth_method', 'auto_push', 'sudo',
+            'comment', 'shell', 'home', 'uid',
         ]
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),

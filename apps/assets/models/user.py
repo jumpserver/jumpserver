@@ -116,14 +116,13 @@ class SystemUser(models.Model):
     )
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     username = models.CharField(max_length=16, verbose_name=_('Username'))
-    _password = models.CharField(max_length=256, blank=True, verbose_name=_('Password'))
+    _password = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
     protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
     _private_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH private key'))
     _public_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
     auth_method = models.CharField(choices=AUTH_METHOD_CHOICES, default='K',
                                    max_length=1, verbose_name=_('Auth method'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
-    auto_update = models.BooleanField(default=True, verbose_name=_('Auto update pass/key'))
     sudo = models.TextField(max_length=4096, default='/user/bin/whoami', verbose_name=_('Sudo'))
     shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
     home = models.CharField(max_length=64, blank=True, verbose_name=_('Home'))
@@ -137,7 +136,9 @@ class SystemUser(models.Model):
 
     @property
     def password(self):
-        return signer.unsign(self._password)
+        if self._password:
+            return signer.unsign(self._password)
+        return None
 
     @password.setter
     def password(self, password_raw):
@@ -145,7 +146,9 @@ class SystemUser(models.Model):
 
     @property
     def private_key(self):
-        return signer.unsign(self._private_key)
+        if self._private_key:
+            return signer.unsign(self._private_key)
+        return None
 
     @private_key.setter
     def private_key(self, private_key_raw):
@@ -173,6 +176,17 @@ class SystemUser(models.Model):
     def get_assets(self):
         assets = set(self.assets.all()) | self.get_assets_inherit_from_asset_groups()
         return list(assets)
+
+    def _to_secret_json(self):
+        """Push system user use it"""
+        return {
+            'name': self.name,
+            'username': self.username,
+            'shell': self.shell,
+            'sudo': self.sudo,
+            'password': self.password,
+            'public_key': self.public_key
+        }
 
     @property
     def assets_amount(self):

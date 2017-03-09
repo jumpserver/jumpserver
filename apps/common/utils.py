@@ -16,6 +16,7 @@ import calendar
 import threading
 
 import paramiko
+from passlib.hash import sha512_crypt
 import sshpubkeys
 from itsdangerous import TimedJSONWebSignatureSerializer, JSONWebSignatureSerializer, \
     BadSignature, SignatureExpired
@@ -320,6 +321,13 @@ def make_signature(access_key_secret, date=None):
 
     data = str(access_key_secret) + "\n" + date_gmt
     return content_md5(data)
+
+
+def encrypt_password(password):
+    from passlib.hash import sha512_crypt
+    if password:
+        return sha512_crypt.using(rounds=5000).hash(password)
+    return None
 
 
 signer = Signer()

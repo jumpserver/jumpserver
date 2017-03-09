@@ -34,14 +34,20 @@
                         {% endif %}
                         <form enctype="multipart/form-data" method="post" class="form-horizontal" action="" >
                             {% csrf_token %}
+                            {% if form.non_field_errors %}
+                                <div class="alert alert-danger">
+                                    {{ form.non_field_errors }}
+                                </div>
+                            {% endif %}
                             <h3>{% trans 'Basic' %}</h3>
                             {{ form.name|bootstrap_horizontal }}
                             {{ form.username|bootstrap_horizontal }}
                             {{ form.protocol|bootstrap_horizontal }}
                             <h3>{% trans 'Auth' %}</h3>
                             {{ form.auth_method|bootstrap_horizontal }}
+                            {% block auth %}
                             <div class="password-auth hidden">
-                                {{ form.password|bootstrap_horizontal }}
+                            {{ form.password|bootstrap_horizontal }}
                             </div>
                             <div class="public-key-auth">
                                 <div class="form-group">
@@ -54,6 +60,7 @@
                                     {{ form.private_key_file|bootstrap_horizontal }}
                                 </div>
                             </div>
+                            {% endblock %}
                             <div class="form-group">
                                 <label for="{{ form.as_push.id_for_label }}" class="col-sm-2 control-label">{% trans 'Auto push' %}</label>
                                 <div class="col-sm-8">
@@ -88,16 +95,19 @@
                 $('.password-auth').removeClass('hidden');
                 $('.public-key-auth').addClass('hidden');
                 $('#'+'{{ form.password.id_for_label }}').attr('required', 'required');
+                $('#'+'{{ form.password.id_for_label }}').removeAttr('disabled');
 
             } else if ($(auth_method).val() == 'K') {
                 $('.password-auth').addClass('hidden');
                 $('.public-key-auth').removeClass('hidden');
+                $('#'+'{{ form.password.id_for_label }}').removeAttr('required');
+                $('#'+'{{ form.password.id_for_label }}').attr('disabled', 'disabled');
 
                 if ($(auto_generate_key).prop('checked')){
                     $('#'+'{{ form.private_key_file.id_for_label }}').closest('.form-group').addClass('hidden');
                 } else {
                     $('#'+'{{ form.private_key_file.id_for_label }}').closest('.form-group').removeClass('hidden');
-{#                    $('#'+'{{ form.private_key_file.id_for_label }}').attr('required', 'required');#}
+                    $('#'+'{{ form.private_key_file.id_for_label }}').closest('.form-group input').attr('required', 'required');
                 }
             }
         }
@@ -110,14 +120,8 @@
             $(auto_generate_key).change(function () {
                 authMethodDisplay();
             });
-
-
-            if ($('#'+'{{ form.protocol.id_for_label }}').val() == 'telnet') {
-                $('#'+'{{ form.auto_generate_key.id_for_label }}').closest('.form-group').remove();
-                $('#'+'{{ form.private_key_file.id_for_label }}').closest('.form-group').remove();
-                $('#'+'{{ form.auto_push.id_for_label }}').closest('.form-group').remove();
-                $('#'+'{{ form.auto_update.id_for_label }}').closest('.form-group').remove();
-            }
         })
+
+
     </script>
 {% endblock %}

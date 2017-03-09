@@ -9,6 +9,7 @@ from openpyxl import load_workbook
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.db.models import Q
+from django.db import transaction
 from django.db import IntegrityError
 from django.views.generic import TemplateView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
@@ -521,8 +522,12 @@ class SystemUserListView(AdminUserRequiredMixin, TemplateView):
 class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = SystemUser
     form_class = forms.SystemUserForm
-    template_name = 'assets/system_user_create_update.html'
+    template_name = 'assets/system_user_create.html'
     success_url = reverse_lazy('assets:system-user-list')
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        return super(SystemUserCreateView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = {
@@ -549,7 +554,7 @@ class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVi
 class SystemUserUpdateView(AdminUserRequiredMixin, UpdateView):
     model = SystemUser
     form_class = forms.SystemUserForm
-    template_name = 'assets/system_user_create_update.html'
+    template_name = 'assets/system_user_update.html'
 
     def get_context_data(self, **kwargs):
         context = {

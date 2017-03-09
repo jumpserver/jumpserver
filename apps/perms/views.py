@@ -1,9 +1,11 @@
 # ~*~ coding: utf-8 ~*~
 
 from __future__ import unicode_literals, absolute_import
+
 import functools
 
 from django.utils.translation import ugettext as _
+from django.db import transaction
 from django.conf import settings
 from django.db.models import Q
 from django.views.generic import ListView, CreateView, UpdateView
@@ -64,6 +66,10 @@ class AssetPermissionCreateView(AdminUserRequiredMixin,
     form_class = AssetPermissionForm
     template_name = 'perms/asset_permission_create_update.html'
     success_url = reverse_lazy('perms:asset-permission-list')
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        return super(AssetPermissionCreateView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = {

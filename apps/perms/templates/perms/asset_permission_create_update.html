@@ -38,7 +38,7 @@
                             {{ form.user_groups|bootstrap_horizontal }}
                             <div class="hr-line-dashed"></div>
                             <h3>{% trans 'Asset' %}</h3>
-                            {{ form.assets|bootstrap_horizontal }}
+                            {{ form.assets|bootstrap_horizontal|safe }}
                             {{ form.asset_groups|bootstrap_horizontal }}
                             {{ form.system_users |bootstrap_horizontal }}
                             <div class="hr-line-dashed"></div>

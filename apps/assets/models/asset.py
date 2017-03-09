@@ -71,7 +71,7 @@ class Asset(models.Model):
     tags = models.ManyToManyField('Tag', related_name='assets', blank=True, verbose_name=_('Tags'))
 
     def __unicode__(self):
-        return '%(ip)s:%(port)s' % {'ip': self.ip, 'port': self.port}
+        return '%s <%s: %s>' % (self.hostname, self.ip, self.port)
 
     __str__ = __unicode__
 
