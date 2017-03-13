@@ -522,8 +522,12 @@ class Nav(object):
                 asset_info = get_asset_info(asset)
                 # 获取该资产包含的角色
                 role = [str(role.name) for role in self.user_perm.get('asset').get(asset).get('role')]
-                print line % (index, asset.ip, asset_info.get('port'),
-                              self.truncate_str(asset.hostname), str(role).replace("'", ''), asset.comment)
+                try:
+                    print line % (index, asset.ip, asset_info.get('port'),
+                                  self.truncate_str(asset.hostname), str(role).replace("'", ''), asset.comment)
+                except:
+                    print line % (index, asset.ip, asset_info.get('port'),
+                                  self.truncate_str(asset.hostname), str(role).replace("'", ''), '')
         print
 
     def try_connect(self):
