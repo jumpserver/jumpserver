@@ -1,11 +1,37 @@
 # ~*~ coding: utf-8 ~*~
 
+from collections import defaultdict
 from ansible.plugins.callback import CallbackBase
+
+
+class CommandResultCallback(CallbackBase):
+    def __init__(self, display=None):
+        self.result_q = dict(contacted={}, dark={})
+        super(CommandResultCallback, self).__init__(display)
+
+    def gather_result(self, n, res):
+        self.result_q[n][res._host.name] = {}
+        self.result_q[n][res._host.name]['cmd'] = res._result.get('cmd')
+        self.result_q[n][res._host.name]['stderr'] = res._result.get('stderr')
+        self.result_q[n][res._host.name]['stdout'] = res._result.get('stdout')
+        self.result_q[n][res._host.name]['rc'] = res._result.get('rc')
+
+    def v2_runner_on_ok(self, result):
+        self.gather_result("contacted", result)
+
+    def v2_runner_on_failed(self, result, ignore_errors=False):
+        self.gather_result("dark", result)
+
+    def v2_runner_on_unreachable(self, result):
+        self.gather_result("dark", result)
+
+    def v2_runner_on_skipped(self, result):
+        self.gather_result("dark", result)
 
 
 class AdHocResultCallback(CallbackBase):
     """
-    Custom Callback
+    AdHoc result Callback
     """
     def __init__(self, display=None):
         self.result_q = dict(contacted={}, dark={})

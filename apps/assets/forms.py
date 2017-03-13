@@ -23,19 +23,16 @@ class AssetCreateForm(forms.ModelForm):
         self.instance.tags.clear()
         self.instance.tags.add(*tuple(tags))
 
-    # def clean(self):
-    #     clean_data = super(AssetCreateForm, self).clean()
-    #     ip = clean_data.get('ip')
-    #     port = clean_data.get('port')
-    #     query = Asset.objects.filter(ip=ip, port=port)
-    #     if query:
-    #         raise forms.ValidationError('this asset has exists.')
+    def clean_admin_user(self):
+        if not self.cleaned_data['admin_user']:
+            raise forms.ValidationError(_('Select admin user'))
+        return self.cleaned_data['admin_user']
 
     class Meta:
         model = Asset
         tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all())
         fields = [
-            'hostname', 'ip', 'port', 'type', 'comment', 'admin_user', 'system_users', 'idc', 'groups',
+            'hostname', 'ip', 'port', 'type', 'comment', 'admin_user', 'idc', 'groups',
             'other_ip', 'remote_card_ip', 'mac_address', 'brand', 'cpu', 'memory', 'disk', 'os', 'cabinet_no',
             'cabinet_pos', 'number', 'status', 'env', 'sn', 'tags',
         ]
@@ -44,8 +41,6 @@ class AssetCreateForm(forms.ModelForm):
                                                   'data-placeholder': _('Select asset groups')}),
             'tags': forms.SelectMultiple(attrs={'class': 'select2',
                                                 'data-placeholder': _('Select asset tags')}),
-            'system_users': forms.SelectMultiple(attrs={'class': 'select2',
-                                                        'data-placeholder': _('Select asset system users')}),
             'admin_user': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select asset admin user')}),
         }
         help_texts = {

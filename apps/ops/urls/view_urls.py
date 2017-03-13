@@ -3,11 +3,12 @@ from __future__ import unicode_literals
 
 
 from django.conf.urls import url
-from ops import views as page_view
+from .. import views
 
 __all__ = ["urlpatterns"]
 
 urlpatterns = [
     # TResource Task url
-    url(r'^task/list$',   page_view.TaskListView.as_view(), name='page-task-list'),
+    url(r'^task-record/$',  views.TaskRecordListView.as_view(), name='task-record-list'),
+    url(r'^task-record/(?P<pk>[0-9a-zA-Z-]+)/$',   views.TaskRecordDetailView.as_view(), name='task-record-detail'),
 ]

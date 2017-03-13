@@ -94,9 +94,9 @@ class Asset(models.Model):
             'ip': self.ip,
             'port': self.port,
             'groups': [group.name for group in self.groups.all()],
-            'username': self.admin_user.username,
-            'password': self.admin_user.password,
-            'private_key': self.admin_user.private_key,
+            'username': self.admin_user.username if self.admin_user else '',
+            'password': self.admin_user.password if self.admin_user else '',
+            'private_key': self.admin_user.private_key if self.admin_user else None,
         }
 
     class Meta:

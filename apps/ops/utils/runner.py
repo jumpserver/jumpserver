@@ -14,7 +14,8 @@ from ansible.utils.vars import load_extra_vars
 from ansible.utils.vars import load_options_vars
 
 from .inventory import JMSInventory
-from .callback import AdHocResultCallback, PlaybookResultCallBack
+from .callback import AdHocResultCallback, PlaybookResultCallBack, \
+    CommandResultCallback
 from common.utils import get_logger
 
 
@@ -29,6 +30,7 @@ class AnsibleError(StandardError):
     pass
 
 
+# Jumpserver not use playbook
 class PlayBookRunner(object):
     """
     用于执行AnsiblePlaybook的接口.简化Playbook对象的使用.
@@ -136,6 +138,8 @@ class AdHocRunner(object):
         ]
     )
 
+    results_callback_class = AdHocResultCallback
+
     def __init__(self,
                  hosts=C.DEFAULT_HOST_LIST,
                  forks=C.DEFAULT_FORKS,  # 5
@@ -156,7 +160,7 @@ class AdHocRunner(object):
         self.variable_manager = VariableManager()
         self.loader = DataLoader()
         self.gather_facts = gather_facts
-        self.results_callback = AdHocResultCallback()
+        self.results_callback = AdHocRunner.results_callback_class()
         self.options = self.Options(
             connection=connection_type,
             timeout=timeout,
@@ -171,7 +175,8 @@ class AdHocRunner(object):
             private_key_file=private_key_file,
         )
 
-        self.variable_manager.extra_vars = load_extra_vars(self.loader, options=self.options)
+        self.variable_manager.extra_vars = load_extra_vars(self.loader,
+                                                           options=self.options)
         self.variable_manager.options_vars = load_options_vars(self.options)
         self.passwords = passwords or {}
         self.inventory = JMSInventory(hosts)
@@ -252,7 +257,7 @@ class AdHocRunner(object):
         """
         :return: {
             "success": ['hostname',],
-            "failed": [{'hostname': 'msg'}, {}],
+            "failed": [('hostname', 'msg'), {}],
         }
         """
         result = {'success': [], 'failed': []}
@@ -262,26 +267,30 @@ class AdHocRunner(object):
         for host, msgs in self.results_callback.result_q['dark'].items():
             msg = '\n'.join(['{}: {}'.format(msg.get('invocation', {}).get('module_name'),
                                              msg.get('msg', '')) for msg in msgs])
-            result['failed'].append({host: msg})
+            result['failed'].append((host, msg))
         return result
+
+
+
 
 
 def test_run():
     assets = [
         {
-                "hostname": "192.168.152.129",
-                "ip": "192.168.152.129",
+                "hostname": "192.168.244.129",
+                "ip": "192.168.244.129",
                 "port": 22,
                 "username": "root",
                 "password": "redhat",
         },
     ]
-    task_tuple = (('shell', 'ls'), ('ping', ''))
+    task_tuple = (('shell', 'ls'),)
     hoc = AdHocRunner(hosts=assets)
+    hoc.results_callback = CommandResultCallback()
     ret = hoc.run(task_tuple)
     print(ret)
 
-    play = PlayBookRunner(assets, playbook_path='/tmp/some.yml')
+    #play = PlayBookRunner(assets, playbook_path='/tmp/some.yml')
     """
     # /tmp/some.yml
     ---
@@ -293,7 +302,7 @@ def test_run():
        - name: exec uptime
          shell: uptime
     """
-    play.run()
+    #play.run()
 
 
 if __name__ == "__main__":
