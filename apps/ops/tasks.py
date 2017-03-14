@@ -70,8 +70,20 @@ def run_AdHoc(self, task_tuple, assets,
     return summary
 
 
-@shared_task(bind=True)
-def push_users(self, assets, users):
+def rerun_AdHoc(uuid):
+    from .models import TaskRecord
+    record = TaskRecord.objects.get(uuid=uuid)
+    assets = record.assets_json
+    task_tuple = record.module_args
+    pattern = record.pattern
+    task_name = record.name
+    task = run_AdHoc.apply_async((task_tuple, assets),
+                                 {'pattern': pattern, 'task_name': task_name},
+                                 task_id=uuid)
+    return task
+
+
+def push_users(assets, users):
     """
     user: {
         name: 'web',
@@ -104,25 +116,7 @@ def push_users(self, assets, users):
              ))
         ])
     task_name = 'Push user {}'.format(','.join([user['name'] for user in users]))
-    record = TaskRecord(name=task_name,
-                        uuid=self.request.id,
-                        date_start=timezone.now(),
-                        assets=','.join(asset['hostname'] for asset in assets))
-    record.save()
-    logger.info('Runner {0} start {1}'.format(task_name, timezone.now()))
-    hoc = AdHocRunner(assets)
-    ts_start = time.time()
-    _ = hoc.run(task_tuple)
-    logger.info('Runner {0} complete {1}'.format(task_name, timezone.now()))
-    result_clean = hoc.clean_result()
-    record.time = int(time.time() - ts_start)
-    record.date_finished = timezone.now()
-    record.is_finished = True
+    task = run_AdHoc.delay(task_tuple, assets, pattern='all', task_name=task_name)
+    return task
 
-    if len(result_clean['failed']) == 0:
-        record.is_success = True
-    else:
-        record.is_success = False
-    record.result = json.dumps(result_clean)
-    record.save()
-    return result_clean
+

@@ -231,7 +231,7 @@ def push_system_user(assets, system_user):
 
     assets = [asset._to_secret_json() for asset in assets]
     system_user = system_user._to_secret_json()
-    task = push_users.delay(assets, system_user)
+    task = push_users(assets, system_user)
     return task.id
 
 

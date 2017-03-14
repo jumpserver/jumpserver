@@ -40,7 +40,7 @@ class TaskRecord(models.Model):
         from assets.models import Asset
         return [Asset.objects.get(hostname=hostname)._to_secret_json()
                 for hostname in self.total_assets
-                if Asset.objects.exists(hostname=hostname)]
+                if Asset.objects.filter(hostname=hostname)]
 
     @property
     def module_args(self):
