@@ -303,12 +303,12 @@ def iso8601_to_unixtime(time_string):
     return to_unixtime(time_string, _ISO8601_FORMAT)
 
 
-def http_to_unixtime(time_string):
-    """把HTTP Date格式的字符串转换为UNIX时间（自1970年1月1日UTC零点的秒数）。
-
-    HTTP Date形如 `Sat, 05 Dec 2015 11:10:29 GMT` 。
-    """
-    return to_unixtime(time_string, "%a, %d %b %Y %H:%M:%S GMT")
+# def http_to_unixtime(time_string):
+#     """把HTTP Date格式的字符串转换为UNIX时间（自1970年1月1日UTC零点的秒数）。
+#
+#     HTTP Date形如 `Sat, 05 Dec 2015 11:10:29 GMT` 。
+#     """
+#     return to_unixtime(time_string, "%a, %d %b %Y %H:%M:%S GMT")
 
 
 def make_signature(access_key_secret, date=None):

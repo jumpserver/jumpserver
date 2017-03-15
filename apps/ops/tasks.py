@@ -10,12 +10,9 @@ from django.utils import timezone
 
 from assets.models import Asset
 from common.utils import get_logger, encrypt_password
-from ops.ansible.runner import AdHocRunner
+from .ansible.runner import AdHocRunner
 
 logger = get_logger(__file__)
-
-
-
 
 
 @shared_task(bind=True)
