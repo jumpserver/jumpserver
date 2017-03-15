@@ -5,10 +5,16 @@
 
 {% block form %}
     <form action="" method="post" class="form-horizontal">
+    {% if form.no_field_errors %}
+         <div class="alert alert-danger">
+             {{ form.non_field_errors }}
+         </div>
+    {% endif %}
     {% csrf_token %}
     <h3>{% trans 'Basic' %}</h3>
     {{ form.hostname|bootstrap_horizontal }}
     {{ form.ip|bootstrap_horizontal }}
+    {{ form.public_ip|bootstrap_horizontal }}
     {{ form.port|bootstrap_horizontal }}
     {{ form.type|bootstrap_horizontal }}
 
@@ -25,6 +31,8 @@
     <h3>{% trans 'Other' %}</h3>
     {{ form.tags|bootstrap_horizontal }}
     {{ form.comment|bootstrap_horizontal }}
+    {{ form.is_active|bootstrap_horizontal }}
+
 
     <div class="hr-line-dashed"></div>
     <div class="form-group">

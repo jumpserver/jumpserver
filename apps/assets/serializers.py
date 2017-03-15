@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.utils.translation import ugettext_lazy as _
-from rest_framework import viewsets, serializers,generics
+from rest_framework import viewsets, serializers, generics
 from .models import AssetGroup, Asset, IDC, AdminUser, SystemUser, Tag
 from common.mixins import IDInFilterMixin
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin
@@ -139,8 +139,8 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     @staticmethod
     def get_hardware(obj):
-        if obj.cpu:
-            return '%s %s %s' % (obj.cpu, obj.memory, obj.disk)
+        if obj.cpu_count:
+            return '{} Core {} {}'.format(obj.cpu_count*obj.cpu_cores, obj.memory, obj.disk_total)
         else:
             return ''
 

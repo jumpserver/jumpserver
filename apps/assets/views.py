@@ -60,11 +60,6 @@ class AssetCreateView(AdminUserRequiredMixin, CreateAssetTagsMiXin, CreateView):
         asset.save()
         return super(AssetCreateView, self).form_valid(form)
 
-    def form_invalid(self, form):
-        if form.errors.get('__all__'):
-            form.errors['all'] = form.errors.get('__all__')
-        return super(AssetCreateView, self).form_invalid(form)
-
     def get_context_data(self, **kwargs):
         context = {
             'app': 'Assets',
@@ -104,29 +99,29 @@ class AssetModalCreateView(AdminUserRequiredMixin, CreateAssetTagsMiXin, ListVie
 
 class AssetUpdateView(AdminUserRequiredMixin, UpdateAssetTagsMiXin, UpdateView):
     model = Asset
-    form_class = forms.AssetCreateForm
+    form_class = forms.AssetUpdateForm
     template_name = 'assets/asset_update.html'
     success_url = reverse_lazy('assets:asset-list')
-    new_form = ''
-    assets_ids = ''
+    # new_form = ''
+    # assets_ids = ''
 
-    def post(self, request, *args, **kwargs):
-        default_keys = [
-            'csrfmiddlewaretoken',
-            'assets_ids',
-            'ip',
-            'number',
-            'hostname',
-            'system_users',
-            'admin_user',
-        ]
-        self.assets_ids = self.request.POST.getlist('assets_ids')
-        self.new_form = self.request.POST.copy()
-        for i in default_keys:
-            if self.new_form.has_key(i):
-                self.new_form.pop(i)
+    # def post(self, request, *args, **kwargs):
+        # default_keys = [
+        #     'csrfmiddlewaretoken',
+        #     'assets_ids',
+        #     'ip',
+        #     'number',
+        #     'hostname',
+        #     'system_users',
+        #     'admin_user',
+        # ]
+        # self.assets_ids = self.request.POST.getlist('assets_ids')
+        # self.new_form = self.request.POST.copy()
+        # for i in default_keys:
+        #     if self.new_form.has_key(i):
+        #         self.new_form.pop(i)
 
-        return super(AssetUpdateView, self).post(request, *args, **kwargs)
+        # return super(AssetUpdateView, self).post(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = {
@@ -152,13 +147,13 @@ class AssetUpdateView(AdminUserRequiredMixin, UpdateAssetTagsMiXin, UpdateView):
 
                 #delattr(asset, '"%s" % i')
                 #del asset.i
-        asset.save()
-        asset.id = 27
-        # asset.created_by = self.request.user.username or 'Admin'
-        asset.save()
-        asset.id = 28
-        asset.save()
-        return super(AssetUpdateView, self).form_valid(form)
+        # asset.save()
+        # asset.id = 27
+        # # asset.created_by = self.request.user.username or 'Admin'
+        # asset.save()
+        # asset.id = 28
+        # asset.save()
+        # return super(AssetUpdateView, self).form_valid(form)
 
 
 class AssetDeleteView(DeleteView):

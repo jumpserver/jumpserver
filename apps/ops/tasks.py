@@ -1,42 +1,32 @@
 # coding: utf-8
 
 from __future__ import absolute_import, unicode_literals
+
 import json
 import time
 
-
-from django.utils import timezone
 from celery import shared_task
+from django.utils import timezone
 
+from assets.models import Asset
 from common.utils import get_logger, encrypt_password
-from .utils.runner import AdHocRunner
-from .models import TaskRecord
+from ops.ansible.runner import AdHocRunner
 
 logger = get_logger(__file__)
 
 
-@shared_task(name="get_assets_hardware_info")
-def get_assets_hardware_info(self, assets):
-    task_tuple = (
-        ('setup', ''),
-    )
-    hoc = AdHocRunner(assets)
-    return hoc.run(task_tuple)
 
-
-@shared_task(name="asset_test_ping_check")
-def asset_test_ping_check(assets):
-    task_tuple = (
-        ('ping', ''),
-    )
-    hoc = AdHocRunner(assets)
-    result = hoc.run(task_tuple)
-    return result['contacted'].keys(), result['dark'].keys()
 
 
 @shared_task(bind=True)
 def run_AdHoc(self, task_tuple, assets,
-              task_name='Ansible AdHoc runner', pattern='all', record=True):
+              task_name='Ansible AdHoc runner',
+              pattern='all', record=True):
+
+    if not assets:
+        logger.warning('Empty assets, runner cancel')
+    if isinstance(assets[0], Asset):
+        assets = [asset._to_secret_json() for asset in assets]
 
     runner = AdHocRunner(assets)
     if record:
@@ -44,7 +34,7 @@ def run_AdHoc(self, task_tuple, assets,
         if not TaskRecord.objects.filter(uuid=self.request.id):
             record = TaskRecord(uuid=self.request.id,
                                 name=task_name,
-                                assets=','.join(asset['hostname'] for asset in assets),
+                                assets=','.join(str(asset['id']) for asset in assets),
                                 module_args=task_tuple,
                                 pattern=pattern)
             record.save()
@@ -67,7 +57,7 @@ def run_AdHoc(self, task_tuple, assets,
         else:
             record.is_success = False
         record.save()
-    return summary
+    return summary, result
 
 
 def rerun_AdHoc(uuid):

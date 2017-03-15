@@ -32,9 +32,33 @@ class AssetCreateForm(forms.ModelForm):
         model = Asset
         tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all())
         fields = [
-            'hostname', 'ip', 'port', 'type', 'comment', 'admin_user', 'idc', 'groups',
-            'other_ip', 'remote_card_ip', 'mac_address', 'brand', 'cpu', 'memory', 'disk', 'os', 'cabinet_no',
-            'cabinet_pos', 'number', 'status', 'env', 'sn', 'tags',
+            'hostname', 'ip', 'public_ip', 'port', 'type', 'comment', 'admin_user',
+            'idc', 'groups', 'status', 'env', 'tags', 'is_active'
+        ]
+        widgets = {
+            'groups': forms.SelectMultiple(attrs={'class': 'select2',
+                                                  'data-placeholder': _('Select asset groups')}),
+            'tags': forms.SelectMultiple(attrs={'class': 'select2',
+                                                'data-placeholder': _('Select asset tags')}),
+            'admin_user': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select asset admin user')}),
+        }
+        help_texts = {
+            'hostname': '* required',
+            'ip': '* required',
+            'system_users': _('System user will be granted for user to login assets (using ansible create automatic)'),
+            'admin_user': _('Admin user should be exist on asset already, And have sudo ALL permission'),
+            'tags': '最多5个标签，单个标签最长8个汉字，按回车确认'
+        }
+
+
+class AssetUpdateForm(AssetCreateForm):
+    class Meta:
+        model = Asset
+        tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all())
+        fields = [
+            'hostname', 'ip', 'port', 'groups', 'admin_user', 'idc', 'is_active',
+            'type', 'env', 'status', 'public_ip', 'remote_card_ip', 'cabinet_no',
+            'cabinet_pos', 'number', 'comment', 'tags'
         ]
         widgets = {
             'groups': forms.SelectMultiple(attrs={'class': 'select2',

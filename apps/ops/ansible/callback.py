@@ -62,6 +62,36 @@ class AdHocResultCallback(CallbackBase):
         pass
 
 
+class SingleAdHocResultCallback(CallbackBase):
+    """
+    AdHoc result Callback
+    """
+    def __init__(self, display=None):
+        self.result_q = dict(contacted={}, dark={})
+        super(SingleAdHocResultCallback, self).__init__(display)
+
+    def gather_result(self, n, res):
+        self.result_q[n][res._host.name].append(res._result)
+
+    def v2_runner_on_ok(self, result):
+        self.gather_result("contacted", result)
+
+    def v2_runner_on_failed(self, result, ignore_errors=False):
+        self.gather_result("dark", result)
+
+    def v2_runner_on_unreachable(self, result):
+        self.gather_result("dark", result)
+
+    def v2_runner_on_skipped(self, result):
+        self.gather_result("dark", result)
+
+    def v2_playbook_on_task_start(self, task, is_conditional):
+        pass
+
+    def v2_playbook_on_play_start(self, play):
+        pass
+
+
 class PlaybookResultCallBack(CallbackBase):
     """
     Custom callback model for handlering the output data of

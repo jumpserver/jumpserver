@@ -10,10 +10,16 @@
 
 {% block form %}
     <form action="" method="post" class="form-horizontal">
+    {% if form.no_field_errors %}
+         <div class="alert alert-danger">
+             {{ form.non_field_errors }}
+         </div>
+    {% endif %}
     {% csrf_token %}
     <h3>{% trans 'Basic' %}</h3>
     {{ form.hostname|bootstrap_horizontal }}
     {{ form.ip|bootstrap_horizontal }}
+    {{ form.public_ip|bootstrap_horizontal }}
     {{ form.port|bootstrap_horizontal }}
     {{ form.type|bootstrap_horizontal }}
 
@@ -27,20 +33,9 @@
     {{ form.admin_user|bootstrap_horizontal }}
 
     <div class="hr-line-dashed"></div>
-    <h3>{% trans 'Hardware' %}</h3>
-    {{ form.sn|bootstrap_horizontal }}
-    {{ form.brand|bootstrap_horizontal }}
-    {{ form.cpu|bootstrap_horizontal }}
-    {{ form.memory|bootstrap_horizontal }}
-    {{ form.disk|bootstrap_horizontal }}
-    {{ form.mac_address|bootstrap_horizontal }}
-
-    <div class="hr-line-dashed"></div>
     <h3>{% trans 'Configuration' %}</h3>
     {{ form.number|bootstrap_horizontal }}
-    {{ form.other_ip|bootstrap_horizontal }}
     {{ form.remote_card_ip|bootstrap_horizontal }}
-    {{ form.os|bootstrap_horizontal }}
 
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Location' %}</h3>
@@ -53,6 +48,7 @@
     {{ form.env|bootstrap_horizontal }}
     {{ form.tags|bootstrap_horizontal }}
     {{ form.comment|bootstrap_horizontal }}
+    {{ form.is_active|bootstrap_horizontal }}
 
     <div class="hr-line-dashed"></div>
     <div class="form-group">

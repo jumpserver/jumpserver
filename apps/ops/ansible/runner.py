@@ -271,9 +271,6 @@ class AdHocRunner(object):
         return result
 
 
-
-
-
 def test_run():
     assets = [
         {

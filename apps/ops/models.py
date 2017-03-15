@@ -22,7 +22,7 @@ class TaskRecord(models.Model):
     timedelta = models.FloatField(default=0.0, verbose_name=_('Time'), null=True)
     is_finished = models.BooleanField(default=False, verbose_name=_('Is finished'))
     is_success = models.BooleanField(default=False, verbose_name=_('Is success'))
-    assets = models.TextField(blank=True, null=True, verbose_name=_('Assets for hostname'))  # Asset inventory may be change
+    assets = models.TextField(blank=True, null=True, verbose_name=_('Assets for id'))  # Asset inventory may be change
     _modules_args = models.TextField(blank=True, null=True, verbose_name=_('Task module and args json format'))
     pattern = models.CharField(max_length=64, default='all', verbose_name=_('Task run pattern'))
     result = models.TextField(blank=True, null=True, verbose_name=_('Task raw result'))
@@ -38,9 +38,9 @@ class TaskRecord(models.Model):
     @property
     def assets_json(self):
         from assets.models import Asset
-        return [Asset.objects.get(hostname=hostname)._to_secret_json()
-                for hostname in self.total_assets
-                if Asset.objects.filter(hostname=hostname)]
+        return [Asset.objects.get(id=int(id_))._to_secret_json()
+                for id_ in self.total_assets
+                if Asset.objects.filter(id=int(id_))]
 
     @property
     def module_args(self):
