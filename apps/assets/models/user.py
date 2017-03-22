@@ -4,10 +4,11 @@
 
 from __future__ import unicode_literals
 
-from django.db import models
 import logging
-from django.utils.translation import ugettext_lazy as _
+
 from django.core.exceptions import ValidationError
+from django.db import models
+from django.utils.translation import ugettext_lazy as _
 
 from common.utils import signer, validate_ssh_private_key, ssh_key_string_to_obj
 
@@ -30,17 +31,20 @@ class AdminUser(models.Model):
     )
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     username = models.CharField(max_length=16, verbose_name=_('Username'))
-    _password = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
+    _password = models.CharField(
+        max_length=256, blank=True, null=True, verbose_name=_('Password'))
     _private_key = models.CharField(max_length=4096, blank=True, null=True, verbose_name=_('SSH private key'),
                                     validators=[private_key_validator,])
-    _public_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
     become = models.BooleanField(default=True)
     become_method = models.CharField(choices=BECOME_METHOD_CHOICES, default='sudo', max_length=4)
     become_user = models.CharField(default='root', max_length=64)
     become_password = models.CharField(default='', max_length=128)
+    _public_key = models.CharField(
+        max_length=4096, blank=True, verbose_name=_('SSH public key'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True, null=True)
-    created_by = models.CharField(max_length=32, null=True, verbose_name=_('Created by'))
+    created_by = models.CharField(
+        max_length=32, null=True, verbose_name=_('Created by'))
 
     def __unicode__(self):
         return self.name
@@ -114,22 +118,29 @@ class SystemUser(models.Model):
         ('P', 'Password'),
         ('K', 'Public key'),
     )
-    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
+    name = models.CharField(max_length=128, unique=True,
+                            verbose_name=_('Name'))
     username = models.CharField(max_length=16, verbose_name=_('Username'))
-    _password = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
-    protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
-    _private_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH private key'))
-    _public_key = models.CharField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
+    _password = models.CharField(
+        max_length=256, blank=True, verbose_name=_('Password'))
+    protocol = models.CharField(
+        max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
+    _private_key = models.CharField(
+        max_length=8192, blank=True, verbose_name=_('SSH private key'))
+    _public_key = models.CharField(
+        max_length=8192, blank=True, verbose_name=_('SSH public key'))
     auth_method = models.CharField(choices=AUTH_METHOD_CHOICES, default='K',
                                    max_length=1, verbose_name=_('Auth method'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
-    sudo = models.TextField(max_length=4096, default='/user/bin/whoami', verbose_name=_('Sudo'))
-    shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
-    home = models.CharField(max_length=64, blank=True, verbose_name=_('Home'))
-    uid = models.IntegerField(null=True, blank=True, verbose_name=_('Uid'))
+    sudo = models.TextField(
+        max_length=4096, default='/sbin/ifconfig', verbose_name=_('Sudo'))
+    shell = models.CharField(
+        max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
     date_created = models.DateTimeField(auto_now_add=True)
-    created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
-    comment = models.TextField(max_length=128, blank=True, verbose_name=_('Comment'))
+    created_by = models.CharField(
+        max_length=32, blank=True, verbose_name=_('Created by'))
+    comment = models.TextField(
+        max_length=128, blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
         return self.name
@@ -174,7 +185,8 @@ class SystemUser(models.Model):
         return assets
 
     def get_assets(self):
-        assets = set(self.assets.all()) | self.get_assets_inherit_from_asset_groups()
+        assets = set(self.assets.all()
+                     ) | self.get_assets_inherit_from_asset_groups()
         return list(assets)
 
     def _to_secret_json(self):
@@ -228,4 +240,3 @@ class SystemUser(models.Model):
             except IntegrityError:
                 print('Error continue')
                 continue
-
