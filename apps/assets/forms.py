@@ -284,7 +284,7 @@ class SystemUserForm(forms.ModelForm):
         fields = [
             'name', 'username', 'protocol', 'auto_generate_key', 'password',
             'private_key_file', 'auth_method', 'auto_push', 'sudo',
-            'comment', 'shell', 'home', 'uid',
+            'comment', 'shell'
         ]
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
