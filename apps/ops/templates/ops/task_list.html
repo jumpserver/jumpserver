@@ -46,10 +46,10 @@
 {% endblock %}
 
 {% block table_body %}
-    {% for object in task_record_list %}
+    {% for object in task_list %}
         <tr class="gradeX">
             <td class="text-center"><input type="checkbox" class="cbx-term"> </td>
-            <td class="text-center"><a href="{% url 'ops:task-record-detail' pk=object.uuid %}">{{ object.name }}</a></td>
+            <td class="text-center"><a href="{% url 'ops:task-detail' pk=object.uuid %}">{{ object.name }}</a></td>
             <td class="text-center">{{ object.total_assets|length }}</td>
             <td class="text-center">
             {% if object.is_success %}
@@ -68,7 +68,7 @@
             <td class="text-center">{{ object.date_start }}</td>
             <td class="text-center">{{ object.timedelta }} s</td>
             <td class="text-center">
-                <a href="" class="btn btn-xs btn-info">{% trans "Repush" %}</a>
+                <a href="{% url 'ops:task-run' pk=object.uuid %}" class="btn btn-xs btn-info">{% trans "Run again" %}</a>
             </td>
         </tr>
     {% endfor %}

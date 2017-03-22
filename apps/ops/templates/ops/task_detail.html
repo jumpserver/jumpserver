@@ -52,7 +52,7 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Date start' %}:</td>
-                                            <td><b>{{ object.date_start}}</b></td>
+                                            <td><b>{{ object.date_start }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Date finished' %}:</td>
@@ -64,11 +64,11 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Is finished' %}:</td>
-                                            <td><b>{{ object.is_finished }}</b></td>
+                                            <td><b>{{ object.is_finished|yesno:"Yes,No,Unkown" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Is success ' %}:</td>
-                                            <td><b>{{ object.is_success }}</b></td>
+                                            <td><b>{{ object.is_success|yesno:"Yes,No,Unkown" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Assets ' %}:</td>

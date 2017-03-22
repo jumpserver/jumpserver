@@ -9,6 +9,7 @@ __all__ = ["urlpatterns"]
 
 urlpatterns = [
     # TResource Task url
-    url(r'^task-record/$',  views.TaskRecordListView.as_view(), name='task-record-list'),
-    url(r'^task-record/(?P<pk>[0-9a-zA-Z-]+)/$',   views.TaskRecordDetailView.as_view(), name='task-record-detail'),
+    url(r'^task/$', views.TaskListView.as_view(), name='task-list'),
+    url(r'^task/(?P<pk>[0-9a-zA-Z-]+)/$', views.TaskDetailView.as_view(), name='task-detail'),
+    url(r'^task/(?P<pk>[0-9a-zA-Z-]+)/run/$', views.TaskRunView.as_view(), name='task-run'),
 ]

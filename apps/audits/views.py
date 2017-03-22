@@ -46,12 +46,12 @@ class ProxyLogListView(AdminUserRequiredMixin, ListView):
         filter_kwargs = {}
         if self.date_from_s:
             date_from = datetime.strptime(self.date_from_s, self.date_format)
-            date_from.replace(tzinfo=timezone.get_current_timezone())
+            date_from = date_from.replace(tzinfo=timezone.get_current_timezone())
             filter_kwargs['date_start__gt'] = date_from
         if self.date_to_s:
             date_to = timezone.datetime.strptime(
                 self.date_to_s + ' 23:59:59', '%m/%d/%Y %H:%M:%S')
-            date_to.replace(tzinfo=timezone.get_current_timezone())
+            date_to = date_to.replace(tzinfo=timezone.get_current_timezone())
             filter_kwargs['date_start__lt'] = date_to
         if self.user:
             filter_kwargs['user'] = self.user
@@ -64,6 +64,8 @@ class ProxyLogListView(AdminUserRequiredMixin, ListView):
                 Q(user__icontains=self.keyword) |
                 Q(asset__icontains=self.keyword) |
                 Q(system_user__icontains=self.keyword)).distinct()
+        if filter_kwargs:
+            self.queryset = self.queryset.filter(**filter_kwargs)
         return self.queryset
 
     def get_context_data(self, **kwargs):

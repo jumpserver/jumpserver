@@ -8,13 +8,13 @@ import json
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-__all__ = ["TaskRecord"]
+__all__ = ["Task"]
 
 
 logger = logging.getLogger(__name__)
 
 
-class TaskRecord(models.Model):
+class Task(models.Model):
     uuid = models.CharField(max_length=128, verbose_name=_('UUID'), primary_key=True)
     name = models.CharField(max_length=128, blank=True, verbose_name=_('Name'))
     date_start = models.DateTimeField(auto_now_add=True, verbose_name=_('Start time'))

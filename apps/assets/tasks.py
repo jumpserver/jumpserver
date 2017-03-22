@@ -12,8 +12,8 @@ def update_assets_hardware_info(assets):
     task_tuple = (
         ('setup', ''),
     )
-    task = run_AdHoc.delay(task_tuple, assets, record=False)
-    summary, result = task.get(timeout=60*10)
+    task_name = ','.join([asset.hostname for asset in assets])
+    summary, result = run_AdHoc(task_tuple, assets, record=True, task_name=task_name)
     for hostname, info in result['contacted'].items():
         if info:
             info = info[0]['ansible_facts']

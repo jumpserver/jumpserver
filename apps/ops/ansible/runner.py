@@ -19,7 +19,7 @@ from .callback import AdHocResultCallback, PlaybookResultCallBack, \
 from common.utils import get_logger
 
 
-__all__ = ["ADHocRunner", "Options"]
+__all__ = ["AdHocRunner", "PlayBookRunner"]
 
 C.HOST_KEY_CHECKING = False
 
