@@ -45,7 +45,7 @@ class IDC(models.Model):
         ordering = ['name']
 
     @classmethod
-    def generate_fake(cls, count=100):
+    def generate_fake(cls, count=5):
         from random import seed, choice
         import forgery_py
         from django.db import IntegrityError

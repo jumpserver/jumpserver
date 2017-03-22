@@ -19,6 +19,16 @@ def run_AdHoc(task_tuple, assets,
               task_name='Ansible AdHoc runner',
               task_id=None, pattern='all',
               record=True, verbose=False):
+    """
+    :param task_tuple:  (('module_name', 'module_args'), ('module_name', 'module_args'))
+    :param assets: [asset1, asset2]
+    :param task_name:
+    :param task_id:
+    :param pattern:
+    :param record:
+    :param verbose:
+    :return:
+    """
 
     if not assets:
         logger.warning('Empty assets, runner cancel')

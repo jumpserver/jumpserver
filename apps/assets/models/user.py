@@ -90,7 +90,7 @@ class AdminUser(models.Model):
         ordering = ['name']
 
     @classmethod
-    def generate_fake(cls, count=100):
+    def generate_fake(cls, count=10):
         from random import seed
         import forgery_py
         from django.db import IntegrityError
@@ -222,7 +222,7 @@ class SystemUser(models.Model):
         ordering = ['name']
 
     @classmethod
-    def generate_fake(cls, count=100):
+    def generate_fake(cls, count=10):
         from random import seed
         import forgery_py
         from django.db import IntegrityError
