@@ -265,8 +265,10 @@ class AdHocRunner(object):
             result['success'].append(host)
 
         for host, msgs in self.results_callback.result_q['dark'].items():
-            msg = '\n'.join(['{}: {}'.format(msg.get('invocation', {}).get('module_name'),
-                                             msg.get('msg', '')) for msg in msgs])
+            msg = '\n'.join(['{} {}: {}'.format(
+                msg.get('module_stdout', ''),
+                msg.get('invocation', {}).get('module_name'),
+                msg.get('msg', '')) for msg in msgs])
             result['failed'].append((host, msg))
         return result
 

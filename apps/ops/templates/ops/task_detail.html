@@ -68,7 +68,17 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Is success ' %}:</td>
+                                            {% if object.is_finished %}
                                             <td><b>{{ object.is_success|yesno:"Yes,No,Unkown" }}</b></td>
+                                            {% else %}
+                                            <td>
+                                                <div class="progress progress-striped active">
+                                                    <div style="width: 50%" aria-valuemax="100" aria-valuemin="0" aria-valuenow="75" role="progressbar" class="progress-bar progress-bar-danger">
+                                                        <span class="sr-only">40% Complete (success)</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            {% endif %}
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Assets ' %}:</td>
@@ -82,6 +92,31 @@
                                         </tr>
                                         </tbody>
                                     </table>
+                                </div>
+                            </div>
+
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span><b>Result</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <pre>
+{{ object.result }}
+                                    </pre>
+                                </div>
                                 </div>
                             </div>
                         </div>

@@ -35,10 +35,10 @@ def push_users(self, assets, users):
             ('authorized_key', "user={} state=present key='{}'".format(
                 user['username'], user['public_key'])),
             ('lineinfile',
-             "name=/etc/sudoers state=present regexp='^{0} ALL=(ALL)' "
+             "dest=/etc/sudoers state=present regexp='^{0} ALL=' "
              "line='{0} ALL=(ALL) NOPASSWD: {1}' "
              "validate='visudo -cf %s'".format(
-                 user['username'], user.get('sudo', '/bin/whoami')
+                 user['username'], user.get('sudo', '/sbin/ifconfig')
              ))
         ])
     task_name = 'Push user {}'.format(','.join([user['name'] for user in users]))

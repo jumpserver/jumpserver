@@ -56,8 +56,11 @@
 <li id="audits">
     <a href="#"><i class="fa fa-files-o"></i> <span class="nav-label">{% trans 'Audits' %}</span><span class="fa arrow"></span></a>
     <ul class="nav nav-second-level">
-        <li id="proxy-log">
-            <a href="{% url 'audits:proxy-log-list' %}">{% trans 'Proxy log' %}</a>
+        <li id="proxy-log-offline">
+            <a href="{% url 'audits:proxy-log-offline-list' %}">{% trans 'Session online' %}</a>
+        </li>
+        <li id="proxy-log-online">
+            <a href="{% url 'audits:proxy-log-online-list' %}">{% trans 'Session history' %}</a>
         </li>
         <li id="command-log">
             <a href="{% url 'audits:command-log-list' %}">{% trans 'Command log' %}</a>

@@ -1,5 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
+import time
 import json
 from datetime import datetime
 
@@ -81,4 +82,5 @@ class TaskRunView(View):
     def get(self, request, *args, **kwargs):
         pk = kwargs.get(self.pk_url_kwarg)
         rerun_task.delay(pk)
+        time.sleep(0.5)
         return redirect(reverse('ops:task-detail', kwargs={'pk': pk}))

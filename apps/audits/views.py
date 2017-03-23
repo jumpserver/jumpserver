@@ -22,7 +22,7 @@ from audits.backends import CommandLogSerializer
 
 class ProxyLogListView(AdminUserRequiredMixin, ListView):
     model = ProxyLog
-    template_name = 'audits/proxy_log_list.html'
+    template_name = 'audits/proxy_log_online_list.html'
     context_object_name = 'proxy_log_list'
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     keyword = user = asset = system_user = date_from_s = date_to_s = ''
@@ -87,6 +87,38 @@ class ProxyLogListView(AdminUserRequiredMixin, ListView):
         }
         kwargs.update(context)
         return super(ProxyLogListView, self).get_context_data(**kwargs)
+
+
+class ProxyLogOfflineListView(ProxyLogListView):
+    template_name = 'audits/proxy_log_online_list.html'
+
+    def get_queryset(self):
+        queryset = super(ProxyLogOfflineListView, self).get_queryset()
+        queryset = queryset.filter(is_finished=True)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'action': _('Proxy log offline list'),
+        }
+        kwargs.update(context)
+        return super(ProxyLogOfflineListView, self).get_context_data(**kwargs)
+
+
+class ProxyLogOnlineListView(ProxyLogListView):
+    template_name = 'audits/proxy_log_online_list.html'
+
+    def get_queryset(self):
+        queryset = super(ProxyLogOnlineListView, self).get_queryset()
+        queryset = queryset.filter(is_finished=False)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'action': _('Proxy log online list'),
+        }
+        kwargs.update(context)
+        return super(ProxyLogOnlineListView, self).get_context_data(**kwargs)
 
 
 class ProxyLogDetailView(AdminUserRequiredMixin,
