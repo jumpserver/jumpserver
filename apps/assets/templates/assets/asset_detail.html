@@ -173,18 +173,10 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Test system users' %}:</td>
+                                            <td>{% trans 'Test system pingpong' %}:</td>
                                             <td>
                                                 <span class="pull-right">
                                                     <button type="button" class="btn btn-primary btn-xs" id="btn_reset_pk" style="width: 54px;">{% trans 'Test' %}</button>
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Repush system users' %}:</td>
-                                            <td>
-                                                <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_pk" style="width: 54px;">{% trans 'Push' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
@@ -224,41 +216,6 @@
                                           <td>
                                               <button class="btn btn-danger pull-right btn-xs btn_leave_group" type="button"><i class="fa fa-minus"></i></button>
                                           </td>
-                                        </tr>
-                                        {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="panel panel-warning">
-                                <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'System users' %}
-                                </div>
-                                <div class="panel-body">
-                                    <table class="table group_edit" id="add-asset2systemuser">
-                                        <tbody>
-                                        <form>
-                                            <tr class="no-borders-tr">
-                                                <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select system user' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for system_user in system_users_remain %}
-                                                            <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user.name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                            <tr class="no-borders-tr">
-                                                <td colspan="2">
-                                                    <button type="button" class="btn btn-warning btn-sm btn-system-user">{% trans 'Associate' %}</button>
-                                                </td>
-                                            </tr>
-                                        </form>
-                                        {% for system_user in system_users %}
-                                        <tr>
-                                            <td ><b class="bdg_group" data-sid={{ system_user.id }}>{{ system_user.name }}</b></td>
-                                            <td>
-                                                <button class="btn btn-danger btn-xs pull-right btn_leave_system" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
-                                            </td>
                                         </tr>
                                         {% endfor %}
                                         </tbody>
@@ -343,9 +300,9 @@ $(document).ready(function () {
             delete jumpserver.groups_selected[data.id]
         })
 })
-	.on('click', '#is_active', function () {
-	var the_url = '{% url "api-assets:asset-detail" pk=asset.id %}';
-	var checked = $(this).prop('checked');
+        .on('click', '#is_active', function () {
+        var the_url = '{% url "api-assets:asset-detail" pk=asset.id %}';
+        var checked = $(this).prop('checked');
     var body = {
         'is_active': checked
     };
@@ -357,23 +314,23 @@ $(document).ready(function () {
         success_message: success
     });
     if (status == "False") {
-    	$(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").html('True');
+            $(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").html('True');
     }else{
-    	$(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").html('False');
+            $(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").html('False');
     }
 })
-	.on('click', '#btn_add_user_group', function () {
-		if (Object.keys(jumpserver.groups_selected).length === 0) {
+        .on('click', '#btn_add_user_group', function () {
+                if (Object.keys(jumpserver.groups_selected).length === 0) {
             return false;
         }
-	    var groups = $('.bdg_group').map(function() {
-	        return $(this).data('gid');
-	    }).get();
-	    $.map(jumpserver.groups_selected, function(value, index) {
-	        groups.push(parseInt(index));
-	        $('#opt_' + index).remove();
-	    });
-	    updateAssetGroups(groups)
+            var groups = $('.bdg_group').map(function() {
+                return $(this).data('gid');
+            }).get();
+            $.map(jumpserver.groups_selected, function(value, index) {
+                groups.push(parseInt(index));
+                $('#opt_' + index).remove();
+            });
+            updateAssetGroups(groups)
 })
     .on('click', '.btn_leave_group', function() {
     var $this = $(this);
@@ -391,33 +348,33 @@ $(document).ready(function () {
     updateAssetGroups(groups)
 })
     .on('click', '.btn-system-user', function () {
-    	if (Object.keys(jumpserver.groups_selected).length === 0) {
+            if (Object.keys(jumpserver.groups_selected).length === 0) {
             return false;
         }
-	    var system_users = $('.bdg_group').map(function() {
-	        return $(this).data('sid');
-	    }).get();
-	    $.map(jumpserver.groups_selected, function(value, index) {
-	        system_users.push(parseInt(index));
-	        $('#opt_' + index).remove();
-	    });
-	    updateAssetSystem(system_users)
+            var system_users = $('.bdg_group').map(function() {
+                return $(this).data('sid');
+            }).get();
+            $.map(jumpserver.groups_selected, function(value, index) {
+                system_users.push(parseInt(index));
+                $('#opt_' + index).remove();
+            });
+            updateAssetSystem(system_users)
 
 })
-	.on('click', '.btn_leave_system', function () {
-		var $this = $(this);
-	    var $tr = $this.closest('tr');
-	    var $badge = $tr.find('.bdg_group');
-	    var sid = $badge.data('sid');
-	    var name = $badge.html() || $badge.text();
-	    $('#groups_selected').append(
-	        '<option value="' + sid + '" id="opt_' + sid + '">' + name + '</option>'
-	    );
-	    $tr.remove();
-	    var system_users = $('.bdg_group').map(function () {
-	        return $(this).data('sid');
-	    }).get();
-	    updateAssetSystem(system_users)
+        .on('click', '.btn_leave_system', function () {
+                var $this = $(this);
+            var $tr = $this.closest('tr');
+            var $badge = $tr.find('.bdg_group');
+            var sid = $badge.data('sid');
+            var name = $badge.html() || $badge.text();
+            $('#groups_selected').append(
+                '<option value="' + sid + '" id="opt_' + sid + '">' + name + '</option>'
+            );
+            $tr.remove();
+            var system_users = $('.bdg_group').map(function () {
+                return $(this).data('sid');
+            }).get();
+            updateAssetSystem(system_users)
 
 })
 
