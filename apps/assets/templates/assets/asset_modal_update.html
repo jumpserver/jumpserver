@@ -43,11 +43,10 @@
         </div>
     </form>
 <div class="hr-line-dashed"></div>
-
-                      <div class="ydxbd" id="formlists" style="display: block;">
-                          <p id="tags_p" class="mgl-5 c02">选择需要修改属性</p>
-                           <div class="tagBtnList">
-                                           <a onclick="AddAllForm(this)" class="tagBtn2 label label-primary" id="changeall">全选</a>
+    <div class="ydxbd" id="formlists" style="display: block;">
+        <p id="tags_p" class="mgl-5 c02">选择需要修改属性</p>
+        <div class="tagBtnList">
+            <a onclick="AddAllForm(this)" class="tagBtn2 label label-primary" id="changeall">全选</a>
             <a onclick="AddForm(this,'id_port')" class="tagBtn2 label label-default" name="changebtn">端口</a>
             <a onclick="AddForm(this,'id_type')" class="tagBtn2 label label-default" name="changebtn">系统类型</a>
             <a onclick="AddForm(this,'id_idc')" class="tagBtn2 label label-default" name="changebtn">机房</a>
@@ -65,9 +64,8 @@
             <a onclick="AddForm(this,'id_env')" class="tagBtn2 label label-default" name="changebtn">资产环境</a>
             <a onclick="AddForm(this,'id_tags')" class="tagBtn2 label label-default" name="changebtn">标签</a>
             <a onclick="AddForm(this,'id_comment')" class="tagBtn2 label label-default" name="changebtn">备注</a>
-                           </div>
-                       </div>
-
+        </div>
+    </div>
     <input name="assets_ids" type="hidden" value="111" >
     <input name="assets_ids" type="hidden" value="112" >
 <div class="hr-line-dashed"></div>
@@ -130,15 +128,15 @@
         $('.select2').select2();
         $("#id_tags").select2({
         tags: true,
-        maximumSelectionLength: 8,  //最多能够选择的个数
+        maximumSelectionLength: 8  //最多能够选择的个数
         //closeOnSelect: false
         });
-    };
+    }
     function AddForm(obj,id_form) {
         var oHiddenForms = document.getElementById("ridd");
         var parentElem = document.getElementById("add_form");
         var oH = document.getElementById(id_form);
-        var oNew = oH.parentNode.parentNode
+        var oNew = oH.parentNode.parentNode;
         var aDiv = parentElem.getElementsByClassName('form-group');
             if(oNew.parentNode.id=='ridd') {
                 obj.className="tagBtn2 label label-warning";
@@ -148,15 +146,15 @@
                 oHiddenForms.appendChild(oNew);
                 obj.className="tagBtn2 label label-default";
                 SetSelect2();
-            };
-    };
+            }
+    }
 
     function ChangeBtnCss(class_var){
-        var changebtns = $("#formlists").find("a[name='changebtn']")
+        var changebtns = $("#formlists").find("a[name='changebtn']");
         for (var i=0; i<changebtns.length;i++){
             changebtns[i].className=class_var;
-        };
-    };
+        }
+    }
     function AddAllForm(obj) {
         var oHiddenForms = document.getElementById("ridd");
         var parentElem = document.getElementById("add_form");
@@ -167,18 +165,18 @@
         if(oHidden_len == 0 || obj.innerText == "取消全选"){
             for(var i=0;i<aDiv_len-1;i++){
                 oHiddenForms.appendChild(aDiv[0]);
-            };
+            }
             ChangeBtnCss("tagBtn2 label label-default");
             $('#changeall').text("全选");
         }else{
             for(var i=0;i<oHidden_len;i++){
                 parentElem.insertBefore(oHiddenForms.children[0],bFormBtn);
-            };
+            }
             ChangeBtnCss("tagBtn2 label label-warning");
             $('#changeall').text("取消全选");
             SetSelect2();
-        };
-    };
+        }
+    }
 
 
     function fsubmit(){
@@ -202,11 +200,11 @@
             for(var i=0;i<m.length;i++){
                 alert(m[0].value);
                 oForm.appendChild(m[0]);
-            };
+            }
             action="/assets/asset/"+assets_id[0].value+"/update";
             oForm.action=action;
             oForm.submit();
-        };
+        }
     }
 </script>
 {% endblock %}

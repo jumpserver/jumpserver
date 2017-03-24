@@ -14,26 +14,22 @@
                 <th id="th_no">id</th>
                 <th>资产名称</th>
                 <th>IP</th>
-                <th>硬件类型</th>
-                <th>资产组</th>
-                <th>部门</th>
+                <th>类型</th>
             </tr>
         </thead>
         <tbody>
         {% for asset in asset_modal_list %}
             {% if asset.id in all_assets %}
-            <tr name="oAssets" class="odd selected">
-                <td class="text-center" ><input type="checkbox" name="checked" value="{{ asset.id }}" checked="checked" ></td>
+            <tr name="oAssets" class="odd selected text-center">
+                <td class="text-center" ><input type="checkbox" name="checked" value="{{ asset.id }}" checked="checked"></td>
             {% else %}
             <tr name="oAssets">
-                <td class="text-center" ><input type="checkbox" name="checked" value="{{ asset.id }}" ></td>
+                <td class="text-center"><input type="checkbox" name="checked" value="{{ asset.id }}" ></td>
             {% endif %}
                 <td>{{ asset.id }}</td>
                 <td>{{ asset.hostname }}</td>
                 <td>{{ asset.ip }}</td>
-                <td>虚拟机</td>
-                <td>网络设备</td>
-                <td>微信事业部</td>
+                <td>{{ asset.env }}-{{ asset.type }}</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -61,9 +57,7 @@ $(document).ready(function(){
             {data: "id"},
             {data: "hostname"},
             {data: "ip"},
-            {data: "type"},
-            {data: "group"},
-            {data: "dp"}
+            {data: "type"}
         ]
     });
     //将ID列隐藏
@@ -77,18 +71,18 @@ $(document).ready(function(){
         }else{
             $(this).addClass('selected');
             this.children[0].children[0].checked=1;
-        };
+        }
     });
 
     $('#close-btn').on('click',function(){
         $('#modal').modal('hide');
     });
-    var size_name = document.getElementById('asset_on_count').innerText
+    var size_name = document.getElementById('asset_on_count').innerText;
     $('#save-btn').on('click',function(){
         //alert( table.rows('.selected').data().length +' row(s) selected' );
         var d = table.rows('.selected').data();
         var size = d.length;
-        var re = /\d+/
+        var re = /\d+/;
         document.getElementById('add_asset').value = size;
         var str= size_name;
         var re=/\d+/g;
@@ -109,25 +103,25 @@ $(document).ready(function(){
 
 }); //$(document).ready
 
-    var bCheck = 1;
-    function checkAll(){
-        if(bCheck){
-            $("tr[name='oAssets']").each(function(){
-                oCheckbox = this.children[0].children[0];
-                $(this).toggleClass('selected',true);
-                oCheckbox.checked=1;
-            });
-            document.getElementById('check_all').checked=1;
-            bCheck = 0;
-        }else{
-            $("tr[name='oAssets']").each(function(){
-                oCheckbox = this.children[0].children[0];
-                $(this).toggleClass('selected',false);
-                oCheckbox.checked=0;
-            });
-            document.getElementById('check_all').checked=0;
-            bCheck = 1;
-        };
-    };
+var bCheck = 1;
+function checkAll(){
+    if(bCheck){
+        $("tr[name='oAssets']").each(function(){
+            oCheckbox = this.children[0].children[0];
+            $(this).toggleClass('selected',true);
+            oCheckbox.checked=1;
+        });
+        document.getElementById('check_all').checked=1;
+        bCheck = 0;
+    }else{
+        $("tr[name='oAssets']").each(function(){
+            oCheckbox = this.children[0].children[0];
+            $(this).toggleClass('selected',false);
+            oCheckbox.checked=0;
+        });
+        document.getElementById('check_all').checked=0;
+        bCheck = 1;
+    }
+}
 
 </script>

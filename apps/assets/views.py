@@ -206,7 +206,7 @@ class AssetModalListView(AdminUserRequiredMixin, ListView):
             else:
                 plain_id_lists = [int(self.s)]
             context = {
-                'all_assets' :plain_id_lists
+                'all_assets': plain_id_lists
             }
             kwargs.update(context)
         if group_id:
@@ -304,7 +304,8 @@ class AssetGroupUpdateView(AdminUserRequiredMixin, UpdateView):
             'action': _('Create asset group'),
             'assets_on_list': assets_all,
             'assets_count': len(assets_all),
-            'group_id':self.object.id,
+            'group_id': self.object.id,
+            'tags': Tag.objects.all()
         }
         kwargs.update(context)
         return super(AssetGroupUpdateView, self).get_context_data(**kwargs)
