@@ -95,9 +95,6 @@ class TerminateConnectionView(APIView):
             proxy_log_id = d.get('proxy_log_id')
             proxy_log = get_object_or_404(ProxyLog, id=proxy_log_id)
             terminal_id = proxy_log.terminal
-            proxy_log.is_finished = True
-            proxy_log.date_finished = timezone.now()
-            proxy_log.save()
             if terminal_id in tasks:
                 tasks[terminal_id].append({'name': 'kill_proxy',
                                            'proxy_log_id': proxy_log_id})

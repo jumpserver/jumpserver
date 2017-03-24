@@ -24,16 +24,16 @@
         <div class="input-group">
             <select class="select2 form-control" name="username">
                 <option value="">{% trans 'User' %}</option>
-                {% for user in user_list %}
-                    <option value="{{ user }}" {% if user == username %} selected {% endif %}>{{ user }}</option>
+                {% for u in user_list %}
+                    <option value="{{ u }}" {% if u == username %} selected {% endif %}>{{ u }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="input-group">
             <select class="select2 form-control" name="ip">
                 <option value="">{% trans 'Asset' %}</option>
-                {% for asset in asset_list %}
-                    <option value="{{ asset }}" {% if asset == ip %} selected {% endif %}>{{ asset }}</option>
+                {% for a in asset_list %}
+                    <option value="{{ a }}" {% if a == ip %} selected {% endif %}>{{ a }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -68,7 +68,7 @@
     <th class="text-center">{% trans 'Command' %}</th>
     <th class="text-center">{% trans 'Success' %}</th>
     <th class="text-center">{% trans 'Finished' %}</th>
-    <th class="text-center">{% trans 'R/M' %}</th>
+    <th class="text-center">{% trans 'Play' %}</th>
     <th class="text-center">{% trans 'Date start' %}</th>
     <th class="text-center">{% trans 'Time' %}</th>
 {% endblock %}
@@ -113,20 +113,6 @@
     {% endfor %}
 {% endblock %}
 
-{% block content_bottom_left %}
-    <div id="actions">
-    <div class="input-group">
-        <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
-            <option value="terminate">{% trans 'Terminate selected' %}</option>
-        </select>
-        <div class="input-group-btn pull-left" style="padding-left: 5px;">
-            <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
-             {% trans 'Submit' %}
-            </button>
-        </div>
-    </div>
-    </div>
-{% endblock %}
 
 {% block custom_foot_js %}
     <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>

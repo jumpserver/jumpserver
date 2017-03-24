@@ -24,16 +24,16 @@
         <div class="input-group">
             <select class="select2 form-control" name="username">
                 <option value="">{% trans 'User' %}</option>
-                {% for user in user_list %}
-                    <option value="{{ user }}" {% if user == username %} selected {% endif %}>{{ user }}</option>
+                {% for u in user_list %}
+                    <option value="{{ u }}" {% if u == username %} selected {% endif %}>{{ u }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="input-group">
             <select class="select2 form-control" name="ip">
                 <option value="">{% trans 'Asset' %}</option>
-                {% for asset in asset_list %}
-                    <option value="{{ asset }}" {% if asset == ip %} selected {% endif %}>{{ asset }}</option>
+                {% for a in asset_list %}
+                    <option value="{{ a }}" {% if a == ip %} selected {% endif %}>{{ a }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -68,7 +68,7 @@
     <th class="text-center">{% trans 'Command' %}</th>
     <th class="text-center">{% trans 'Success' %}</th>
     <th class="text-center">{% trans 'Finished' %}</th>
-    <th class="text-center">{% trans 'R/M' %}</th>
+    <th class="text-center">{% trans 'Monitor' %}</th>
     <th class="text-center">{% trans 'Date start' %}</th>
     <th class="text-center">{% trans 'Time' %}</th>
 {% endblock %}
