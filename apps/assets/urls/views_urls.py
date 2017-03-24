@@ -24,13 +24,6 @@ urlpatterns = [
     url(r'^asset-group/(?P<pk>[0-9]+)/update/$', views.AssetGroupUpdateView.as_view(), name='asset-group-update'),
     url(r'^asset-group/(?P<pk>[0-9]+)/delete/$', views.AssetGroupDeleteView.as_view(), name='asset-group-delete'),
 
-    url(r'^tags/$', views.TagsListView.as_view(), name='asset-tag-list'),
-    url(r'^asset-by-tag/(?P<tag_id>[0-9]+)/$', views.TagView.as_view(), name='asset-tags'),
-    url(r'^tags/create/$', views.AssetTagCreateView.as_view(), name='asset-tag-create'),
-    url(r'^asset-tag/(?P<pk>[0-9]+)/$', views.AssetTagDetailView.as_view(), name='asset-tag-detail'),
-    url(r'^asset-tag/(?P<pk>[0-9]+)/update/$', views.AssetTagUpdateView.as_view(), name='asset-tag-update'),
-    url(r'^asset-tag/(?P<pk>[0-9]+)/delete/$', views.AssetTagDeleteView.as_view(), name='asset-tag-delete'),
-
     # Resource idc url
     url(r'^idc/$', views.IDCListView.as_view(), name='idc-list'),
     url(r'^idc/create/$', views.IDCCreateView.as_view(), name='idc-create'),

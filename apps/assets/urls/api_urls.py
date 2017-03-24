@@ -13,7 +13,6 @@ router.register(r'v1/assets', api.AssetViewSet, 'asset')
 router.register(r'v1/idc', api.IDCViewSet, 'idc')
 router.register(r'v1/admin-user', api.AdminUserViewSet, 'admin-user')
 router.register(r'v1/system-user', api.SystemUserViewSet, 'system-user')
-router.register(r'v1/tags', api.TagViewSet, 'asset-tag')
 
 urlpatterns = [
     url(r'^v1/assets_bulk/$', api.AssetListUpdateApi.as_view(), name='asset-bulk-update'),
@@ -45,8 +44,6 @@ urlpatterns = [
     url(r'^v1/idc/(?P<pk>\d+)/assets/$',
         api.IDCupdateAssetsApi.as_view(), name='idc-update-assets'),
 
-    url(r'v1/tag/(?P<pk>\d+)/assets/$',
-        api.TagUpdateAssetsApi.as_view(), name='tag-update-assets'),
 ]
 
 urlpatterns += router.urls

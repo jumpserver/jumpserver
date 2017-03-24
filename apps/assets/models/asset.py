@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from . import IDC, AssetGroup, AdminUser, SystemUser
 
-__all__ = ['Asset', 'Tag']
+__all__ = ['Asset']
 logger = logging.getLogger(__name__)
 
 
@@ -83,7 +83,6 @@ class Asset(models.Model):
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date added'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
-    tags = models.ManyToManyField('Tag', related_name='assets', blank=True, verbose_name=_('Tags'))
 
     def __unicode__(self):
         return '%s <%s: %s>' % (self.hostname, self.ip, self.port)
@@ -146,16 +145,3 @@ class Asset(models.Model):
                 print('Error continue')
                 continue
 
-
-class Tag(models.Model):
-    name = models.CharField(max_length=64, unique=True, verbose_name=_('Name'))
-    created_time = models.DateTimeField(auto_now_add=True, verbose_name=_('Create time'))
-    created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
-
-    def __unicode__(self):
-        return self.name
-
-    __str__ = __unicode__
-
-    class Meta:
-        db_table = 'tag'
