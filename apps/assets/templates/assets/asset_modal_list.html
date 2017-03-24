@@ -18,7 +18,7 @@
             </tr>
         </thead>
         <tbody>
-        {% for asset in asset_modal_list %}
+        {% for asset in assets %}
             {% if asset.id in all_assets %}
             <tr name="oAssets" class="odd selected text-center">
                 <td class="text-center" ><input type="checkbox" name="checked" value="{{ asset.id }}" checked="checked"></td>
@@ -26,10 +26,10 @@
             <tr name="oAssets">
                 <td class="text-center"><input type="checkbox" name="checked" value="{{ asset.id }}" ></td>
             {% endif %}
-                <td>{{ asset.id }}</td>
-                <td>{{ asset.hostname }}</td>
-                <td>{{ asset.ip }}</td>
-                <td>{{ asset.env }}-{{ asset.type }}</td>
+                <td class="text-center">{{ asset.id }}</td>
+                <td class="text-center">{{ asset.hostname }}</td>
+                <td class="text-center">{{ asset.ip }}</td>
+                <td class="text-center">{{ asset.env }}-{{ asset.type }}</td>
             </tr>
         {% endfor %}
         </tbody>

@@ -195,6 +195,7 @@ class AssetModalListView(AdminUserRequiredMixin, ListView):
         tag_id = self.request.GET.get('tag_id')
         plain_id_lists = self.request.GET.get('plain_id_lists')
         self.s = self.request.GET.get('plain_id_lists')
+        assets = Asset.objects.all()
         if "," in str(self.s):
             self.plain_id_lists = [int(x) for x in self.s.split(',')]
         else:
@@ -206,19 +207,28 @@ class AssetModalListView(AdminUserRequiredMixin, ListView):
             else:
                 plain_id_lists = [int(self.s)]
             context = {
-                'all_assets': plain_id_lists
+                'all_assets': plain_id_lists,
+                'assets': assets
             }
             kwargs.update(context)
         if group_id:
             group = AssetGroup.objects.get(id=group_id)
+            print group
             context = {
-                'all_assets': [x.id for x in group.assets.all()]
+                'all_assets': [x.id for x in group.assets.all()],
+                'assets': assets
             }
             kwargs.update(context)
         if tag_id:
             tag = Tag.objects.get(id=tag_id)
             context = {
-                'all_assets': [x.id for x in tag.asset_set.all()]
+                'all_assets': [x.id for x in tag.asset_set.all()],
+                'assets': assets
+            }
+            kwargs.update(context)
+        else:
+            context = {
+                'assets': assets
             }
             kwargs.update(context)
         return super(AssetModalListView, self).get_context_data(**kwargs)
