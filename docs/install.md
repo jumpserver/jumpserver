@@ -15,9 +15,7 @@
 
 **1.2 安装Python**
 
-	这里可以参考 [https://segmentfault.com/a/1190000000654227][1]
-
-	也可以下载我编译的rpm版本:
+	这里可以参考 [https://segmentfault.com/a/1190000000654227][1]也可以下载我编译的rpm版本:
 
 	$ wget http://repo.jumpserver.org/python27-2.7.13-1.el6.x86_64.rpm 
 	
