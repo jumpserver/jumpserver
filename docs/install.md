@@ -8,40 +8,41 @@
 #### 一. 环境准备
 **1.1 安装基本工具和库**
 ```
-`$ yum -y install sqlite-devel git epel-release
+$ yum -y install sqlite-devel git epel-release
 ```
-`
+
 **1.2 安装Python**
 这里可以参考 [https://segmentfault.com/a/1190000000654227][1]
 也可以下载我编译的rpm版本:
 ```
-`$ wget http://repo.jumpserver.org/python27-2.7.13-1.el6.x86_64.rpm_
+$ wget http://repo.jumpserver.org/python27-2.7.13-1.el6.x86_64.rpm_
 $ yum localinstall -y python27-2.7.13-1.el6.x86_64.rpm
 $ bash 
 $ python2.7 -V
 Python 2.7.13
 ```
-`
+
 #### 二. Jumpserver安装
 **2.1 下载仓库代码 **
 
 ```
-`$ cd /opt
+$ cd /opt
 $ git clone [https://github.com/jumpserver/jumpserver.git][2]
 $ cd jumpserver
 $ git checkout dev
 ```
-`**2.1 安装依赖**
+**2.1 安装依赖**
 
 ```
-`$ cd requirements 
+$ cd requirements 
 $ sudo yum -y install `cat rpm_requirements.txt`
 $ pip2.7 install -r requirements.txt -i https://pypi.doubanio.com/simple
 ```
-`**2.3 准备配置文件 **
+
+**2.3 准备配置文件 **
 
 ```
-`$ cd ..
+$ cd ..
 $ cp config_example.py config.py
 $ vim config.py
 
@@ -55,26 +56,26 @@ EMAIL_USE_SSL = True   // 端口是 465 设置 True 否则 False
 EMAIL_USE_TLS = False  // 端口是 587 设置为 True 否则 False
 SITE_URL = 'http://localhost:8080'  // 发送邮件会使用这个地址 
 ```
-`
+
 **2.4 初始化数据库**
 ```
-`$ cd utils
+$ cd utils
 $ sh make_migrations.sh
 $ sh init_db.sh
 ```
-`
+
 **2.5 安装redis server**
 ```
 `$ yum -y install redis
 $ service redis start  
 ```
-`
+
 **2.6 启动**
 ```
-`$ cd ..
+$ cd ..
 $ python2.7 run_server.py
 ```
-`访问  http://ip:8080
+访问  http://ip:8080
 账号密码： admin admin
 
 **2.7  测试使用**
@@ -97,28 +98,28 @@ $ python2.7 run_server.py
 #### 三. 安装 SSH SERVER - COCO
 **3.1 下载代码库**
 ```
-`$ cd /opt
+$ cd /opt
 $[git clone https://github.com/jumpserver/coco.git][3]
 ```
-`
+
 **3.2 安装依赖**
 ```
-`$ pip2.7 install -r requirements.txt -i https://pypi.doubanio.com/simple
+$ pip2.7 install -r requirements.txt -i https://pypi.doubanio.com/simple
 ```
-`
+
 **3.3 启动**
 
 ```
-`$ python2.7 run_server.py
+$ python2.7 run_server.py
 ```
-`
+
 说明： Coco启动后会向jumpserver注册，请去 jumpserver页面 - 应用程序 - terminal - coco - Accept 允许， 这时 coco就 运行在 2222端口，可以ssh来连接
 
 命令行：
 ``` 
-`ssh admin@192.168.244.128 -p2222
+ssh admin@192.168.244.128 -p2222
 ```
-`
+
 **3.5 测试**
 - 测试登录 ssh server
 - 测试跳转
