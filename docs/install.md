@@ -17,27 +17,25 @@
 
 这里可以参考 [https://segmentfault.com/a/1190000000654227][1] 也可以下载我编译的rpm版本:
 
-	$ wget http://repo.jumpserver.org/python27-2.7.13-1.el6.x86_64.rpm 
-	
-	$ yum localinstall -y python27-2.7.13-1.el6.x86_64.rpm
-	
-	$ bash
-	
-	$ python2.7 -V
-	
+	$ wget http://repo.jumpserver.org/python27-2.7.13-1.el6.x86_64.rpm 	
+	$ yum localinstall -y python27-2.7.13-1.el6.x86_64.rpm	
+	$ bash	
+	$ python2.7 -V	
 	Python 2.7.13
 
 #### 二. Jumpserver安装
 
-**2.1 下载仓库代码**
+##### 2.1 下载仓库代码
 
-```
-$ cd /opt
-$ git clone [https://github.com/jumpserver/jumpserver.git][2]
-$ cd jumpserver
-$ git checkout dev
-```
-**2.2 安装依赖**
+	$ cd /opt
+	
+	$ git clone https://github.com/jumpserver/jumpserver.git
+	
+	$ cd jumpserver
+	
+	$ git checkout dev
+
+##### 2.2 安装依赖
 
 ```
 $ cd requirements 
