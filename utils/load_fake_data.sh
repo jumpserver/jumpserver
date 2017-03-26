@@ -1,4 +1,4 @@
 #!/bin/bash
 #
 
-python ../apps/manage.py loaddata fake
+python2.7 ../apps/manage.py loaddata fake

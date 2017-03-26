@@ -1,4 +1,4 @@
 #!/bin/bash
 #
 
-python ../apps/manage.py loaddata init
+python2.7 ../apps/manage.py loaddata init
