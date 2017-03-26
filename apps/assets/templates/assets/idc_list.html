@@ -27,16 +27,16 @@
     </tbody>
 </table>
 <div id="actions" class="hide">
-	<div class="input-group">
-		<select class="form-control m-b" style="width: auto" id="slct_bulk_update">
-			<option value="delete">{% trans 'Delete selected' %}</option>
-		</select>
-		<div class="input-group-btn pull-left" style="padding-left: 5px;">
-			<button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
-				{% trans 'Submit' %}
-			</button>
-		</div>
-	</div>
+    <div class="input-group">
+        <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+            <option value="delete">{% trans 'Delete selected' %}</option>
+        </select>
+        <div class="input-group-btn pull-left" style="padding-left: 5px;">
+            <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
+                {% trans 'Submit' %}
+            </button>
+        </div>
+    </div>
 </div>
 {% endblock %}
 {% block content_bottom_left %}{% endblock %}
@@ -65,19 +65,20 @@ $(document).ready(function(){
 })
 
 .on('click', '.btn_idc_delete', function () {
-	var $this = $(this);
-	var $data_table = $('#idc_list_table').DataTable();
-	var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
-	var uid = $this.data('uid');
-	var the_url = '{% url "api-assets:idc-detail" pk=99991937 %}'.replace('99991937', uid);
-	objectDelete($this, name, the_url);
-	$data_table.ajax.reload();
-{#	TODO: reload the tale #}
+    var $this = $(this);
+    var $data_table = $('#idc_list_table').DataTable();
+    var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
+    var uid = $this.data('uid');
+    var the_url = '{% url "api-assets:idc-detail" pk=99991937 %}'.replace('99991937', uid);
+    objectDelete($this, name, the_url);
+    setTimeout( function () {
+        $data_table.ajax.reload();
+    }, 3000);
 })
 
 .on('click', '#btn_bulk_update', function () {
-	var action = $('#slct_bulk_update').val();
-	var $data_table = $('#idc_list_table').DataTable();
+    var action = $('#slct_bulk_update').val();
+    var $data_table = $('#idc_list_table').DataTable();
     var id_list = [];
     var plain_id_list = [];
     $data_table.rows({selected: true}).every(function(){
@@ -113,13 +114,13 @@ $(document).ready(function(){
             jumpserver.checked = false;
         });
     }
-	switch (action) {
-		case 'delete':
-			doDelete();
-			break;
-		default:
-			break;
-	}
+    switch (action) {
+        case 'delete':
+            doDelete();
+            break;
+        default:
+            break;
+    }
 });
 </script>
 {% endblock %}
