@@ -28,51 +28,43 @@
 ##### 2.1 下载仓库代码
 
 	$ cd /opt
-	
 	$ git clone https://github.com/jumpserver/jumpserver.git
-	
 	$ cd jumpserver
-	
 	$ git checkout dev
 
 ##### 2.2 安装依赖
 
-```
-$ cd requirements 
-$ sudo yum -y install `cat rpm_requirements.txt`
-$ pip2.7 install -r requirements.txt -i https://pypi.doubanio.com/simple
-```
+	$ cd requirements 
+	$ sudo yum -y install `cat rpm_requirements.txt`
+	$ pip2.7 install -r requirements.txt -i https://pypi.doubanio.com/simple
 
-**2.3 准备配置文件**
 
-```
-$ cd ..
-$ cp config_example.py config.py
-$ vim config.py
+##### 2.3 准备配置文件
 
-// 默认使用的是 DevelpmentConfig 所以应该去修改这部分
-class DevelopmentConfig(Config):
-EMAIL_HOST = 'smtp.exmail.qq.com'
-EMAIL_PORT = 465
-EMAIL_HOST_USER = 'ask@jumpserver.org'
-EMAIL_HOST_PASSWORD = 'xxx'
-EMAIL_USE_SSL = True   // 端口是 465 设置 True 否则 False
-EMAIL_USE_TLS = False  // 端口是 587 设置为 True 否则 False
-SITE_URL = 'http://localhost:8080'  // 发送邮件会使用这个地址 
-```
+	$ cd ..
+	$ cp config_example.py config.py
+	$ vim config.py
 
-**2.4 初始化数据库**
-```
-$ cd utils
-$ sh make_migrations.sh
-$ sh init_db.sh
-```
+	// 默认使用的是 DevelpmentConfig 所以应该去修改这部分
+	class DevelopmentConfig(Config):
+	EMAIL_HOST = 'smtp.exmail.qq.com'
+	EMAIL_PORT = 465
+	EMAIL_HOST_USER = 'ask@jumpserver.org'
+	EMAIL_HOST_PASSWORD = 'xxx'
+	EMAIL_USE_SSL = True   // 端口是 465 设置 True 否则 False
+	EMAIL_USE_TLS = False  // 端口是 587 设置为 True 否则 False
+	SITE_URL = 'http://localhost:8080'  // 发送邮件会使用这个地址 
 
-**2.5 安装redis server**
-```
-`$ yum -y install redis
-$ service redis start  
-```
+##### 2.4 初始化数据库
+
+	$ cd utils
+	$ sh make_migrations.sh
+	$ sh init_db.sh
+
+##### 2.5 安装redis server
+
+	$ yum -y install redis
+	$ service redis start  
 
 **2.6 启动**
 ```
