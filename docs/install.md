@@ -23,7 +23,8 @@ Python 2.7.13
 ```
 
 #### 二. Jumpserver安装
-**2.1 下载仓库代码 **
+
+**2.1 下载仓库代码**
 
 ```
 $ cd /opt
@@ -31,7 +32,7 @@ $ git clone [https://github.com/jumpserver/jumpserver.git][2]
 $ cd jumpserver
 $ git checkout dev
 ```
-**2.1 安装依赖**
+**2.2 安装依赖**
 
 ```
 $ cd requirements 
@@ -39,7 +40,7 @@ $ sudo yum -y install `cat rpm_requirements.txt`
 $ pip2.7 install -r requirements.txt -i https://pypi.doubanio.com/simple
 ```
 
-**2.3 准备配置文件 **
+**2.3 准备配置文件**
 
 ```
 $ cd ..
@@ -78,7 +79,7 @@ $ python2.7 run_server.py
 访问  http://ip:8080
 账号密码： admin admin
 
-**2.7  测试使用**
+**2.7 测试使用**
 - 创建用户  
 	会发送邮件，测试是否正常修改密码，登录
 
