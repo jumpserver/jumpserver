@@ -150,6 +150,7 @@ class AssetModalListView(AdminUserRequiredMixin, ListView):
         group_id = self.request.GET.get('group_id')
         plain_id_lists = self.request.GET.get('plain_id_lists')
         self.s = self.request.GET.get('plain_id_lists')
+        assets = Asset.objects.all()
         if "," in str(self.s):
             self.plain_id_lists = [int(x) for x in self.s.split(',')]
         else:
@@ -161,13 +162,19 @@ class AssetModalListView(AdminUserRequiredMixin, ListView):
             else:
                 plain_id_lists = [int(self.s)]
             context = {
-                'all_assets': plain_id_lists
+                'all_assets': plain_id_lists,
             }
             kwargs.update(context)
         if group_id:
             group = AssetGroup.objects.get(id=group_id)
             context = {
-                'all_assets': [x.id for x in group.assets.all()]
+                'all_assets': [x.id for x in group.assets.all()],
+                'assets': assets
+            }
+            kwargs.update(context)
+        else:
+            context = {
+                'assets': assets
             }
             kwargs.update(context)
         return super(AssetModalListView, self).get_context_data(**kwargs)
@@ -253,7 +260,7 @@ class AssetGroupUpdateView(AdminUserRequiredMixin, UpdateView):
             'action': _('Create asset group'),
             'assets_on_list': assets_all,
             'assets_count': len(assets_all),
-            'group_id':self.object.id,
+            'group_id': self.object.id,
         }
         kwargs.update(context)
         return super(AssetGroupUpdateView, self).get_context_data(**kwargs)
