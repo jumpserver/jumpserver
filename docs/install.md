@@ -95,7 +95,7 @@ $ python2.7 run_server.py
 **3.1 下载代码库**
 ```
 $ cd /opt
-$[git clone https://github.com/jumpserver/coco.git][3]
+$ git clone https://github.com/jumpserver/coco.git
 ```
 
 **3.2 安装依赖**
