@@ -2,7 +2,8 @@
 
 ### 环境
 
-- 系统: CentOS 6.5 x86\_64 mini_ - Python: 版本 2.7.13 (未来支持 3.5)
+- 系统: CentOS 6.5 x86\_64 mini
+- Python: 版本 2.7.13 (未来支持 3.5)
 - 安装目录 
 	- /opt/jumpserver
 	- /opt/coco
