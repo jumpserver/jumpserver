@@ -104,37 +104,6 @@ function tagShow() {
     }
 }  //onload;
 
-function objDelete(obj, name, url) {
-    function doDelete() {
-        var body = {};
-        var success = function() {
-            swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
-            $(obj).parent().parent().remove();
-        };
-        var fail = function() {
-            swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");
-        };
-        APIUpdateAttr({
-            url: url,
-            body: JSON.stringify(body),
-            method: 'DELETE',
-            success: success,
-            error: fail
-        });
-    }
-    swal({
-        title: 'Are you sure delete ?',
-        text: " [" + name + "] ",
-        type: "warning",
-        showCancelButton: true,
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: 'Confirm',
-        closeOnConfirm: false
-    }, function () {
-        doDelete()
-    });
-}
 
 $(document).ready(function(){
     var options = {

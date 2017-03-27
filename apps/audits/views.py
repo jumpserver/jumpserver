@@ -3,7 +3,6 @@
 import time
 from datetime import datetime
 
-import pytz
 from django.views.generic import ListView, UpdateView, DeleteView, DetailView, TemplateView
 from django.views.generic.edit import SingleObjectMixin
 from django.utils.translation import ugettext as _
@@ -22,10 +21,10 @@ from audits.backends import CommandLogSerializer
 
 class ProxyLogListView(AdminUserRequiredMixin, ListView):
     model = ProxyLog
-    template_name = 'audits/proxy_log_list.html'
+    template_name = 'audits/proxy_log_online_list.html'
     context_object_name = 'proxy_log_list'
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    keyword = user = asset = system_user = date_from_s = date_to_s = ''
+    keyword = username = hostname = system_user = date_from_s = date_to_s = ''
     ordering = ['is_finished', '-id']
     date_format = '%m/%d/%Y'
 
@@ -37,8 +36,8 @@ class ProxyLogListView(AdminUserRequiredMixin, ListView):
 
         self.queryset = super(ProxyLogListView, self).get_queryset()
         self.keyword = self.request.GET.get('keyword', '')
-        self.user = self.request.GET.get('user')
-        self.asset = self.request.GET.get('asset')
+        self.username = self.request.GET.get('username')
+        self.ip = self.request.GET.get('ip')
         self.system_user = self.request.GET.get('system_user')
         self.date_from_s = self.request.GET.get('date_from', date_from_default)
         self.date_to_s = self.request.GET.get('date_to', date_to_default)
@@ -53,10 +52,10 @@ class ProxyLogListView(AdminUserRequiredMixin, ListView):
                 self.date_to_s + ' 23:59:59', '%m/%d/%Y %H:%M:%S')
             date_to = date_to.replace(tzinfo=timezone.get_current_timezone())
             filter_kwargs['date_start__lt'] = date_to
-        if self.user:
-            filter_kwargs['user'] = self.user
-        if self.asset:
-            filter_kwargs['asset'] = self.asset
+        if self.username:
+            filter_kwargs['user'] = self.username
+        if self.ip:
+            filter_kwargs['ip'] = self.ip
         if self.system_user:
             filter_kwargs['system_user'] = self.system_user
         if self.keyword:
@@ -81,12 +80,44 @@ class ProxyLogListView(AdminUserRequiredMixin, ListView):
             'keyword': self.keyword,
             'date_from': self.date_from_s,
             'date_to': self.date_to_s,
-            'user': self.user,
-            'asset': self.asset,
+            'username': self.username,
+            'ip': self.ip,
             'system_user': self.system_user,
         }
         kwargs.update(context)
         return super(ProxyLogListView, self).get_context_data(**kwargs)
+
+
+class ProxyLogOfflineListView(ProxyLogListView):
+    template_name = 'audits/proxy_log_offline_list.html'
+
+    def get_queryset(self):
+        queryset = super(ProxyLogOfflineListView, self).get_queryset()
+        queryset = queryset.filter(is_finished=True)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'action': _('Proxy log offline list'),
+        }
+        kwargs.update(context)
+        return super(ProxyLogOfflineListView, self).get_context_data(**kwargs)
+
+
+class ProxyLogOnlineListView(ProxyLogListView):
+    template_name = 'audits/proxy_log_online_list.html'
+
+    def get_queryset(self):
+        queryset = super(ProxyLogOnlineListView, self).get_queryset()
+        queryset = queryset.filter(is_finished=False)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'action': _('Proxy log online list'),
+        }
+        kwargs.update(context)
+        return super(ProxyLogOnlineListView, self).get_context_data(**kwargs)
 
 
 class ProxyLogDetailView(AdminUserRequiredMixin,
@@ -131,7 +162,7 @@ class CommandLogListView(AdminUserRequiredMixin, ListView):
     template_name = 'audits/command_log_list.html'
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'command_list'
-    user = asset = system_user = command = date_from_s = date_to_s = ''
+    username = ip = system_user = command = date_from_s = date_to_s = ''
     date_format = '%m/%d/%Y'
     ordering = ['-id']
 
@@ -141,8 +172,8 @@ class CommandLogListView(AdminUserRequiredMixin, ListView):
         date_from_default = (date_now - timezone.timedelta(7)) \
             .strftime(self.date_format)
         self.command = self.request.GET.get('command', '')
-        self.user = self.request.GET.get('user')
-        self.asset = self.request.GET.get('asset')
+        self.username = self.request.GET.get('username')
+        self.ip = self.request.GET.get('ip')
         self.system_user = self.request.GET.get('system_user')
         self.date_from_s = \
             self.request.GET.get('date_from', date_from_default)
@@ -162,10 +193,10 @@ class CommandLogListView(AdminUserRequiredMixin, ListView):
                 .replace(tzinfo=timezone.get_current_timezone())
             date_to_ts = time.mktime(date_to.timetuple())
             filter_kwargs['date_to_ts'] = date_to_ts
-        if self.user:
-            filter_kwargs['user'] = self.user
-        if self.asset:
-            filter_kwargs['asset'] = self.asset
+        if self.username:
+            filter_kwargs['user'] = self.username
+        if self.ip:
+            filter_kwargs['asset'] = self.ip
         if self.system_user:
             filter_kwargs['system_user'] = self.system_user
         if self.command:
@@ -183,8 +214,8 @@ class CommandLogListView(AdminUserRequiredMixin, ListView):
             'command': self.command,
             'date_from': self.date_from_s,
             'date_to': self.date_to_s,
-            'user': self.user,
-            'asset': self.asset,
+            'username': self.username,
+            'ip': self.ip,
             'system_user': self.system_user,
         }
         kwargs.update(context)

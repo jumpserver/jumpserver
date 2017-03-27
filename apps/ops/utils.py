@@ -18,7 +18,7 @@ logger = get_logger(__file__)
 def run_AdHoc(task_tuple, assets,
               task_name='Ansible AdHoc runner',
               task_id=None, pattern='all',
-              record=True, verbose=False):
+              record=True, verbose=True):
     """
     :param task_tuple:  (('module_name', 'module_args'), ('module_name', 'module_args'))
     :param assets: [asset1, asset2]
@@ -51,6 +51,11 @@ def run_AdHoc(task_tuple, assets,
         else:
             record = Task.objects.get(uuid=task_id)
             record.date_start = timezone.now()
+            record.date_finished = None
+            record.timedelta = None
+            record.is_finished = False
+            record.is_success = False
+            record.save()
     ts_start = time.time()
     if verbose:
         logger.debug('Start runner {}'.format(task_name))
@@ -61,7 +66,7 @@ def run_AdHoc(task_tuple, assets,
         record.date_finished = timezone.now()
         record.is_finished = True
         if verbose:
-            record.result = json.dumps(result)
+            record.result = json.dumps(result, indent=4, sort_keys=True)
         record.summary = json.dumps(summary)
         record.timedelta = timedelta
         if len(summary['failed']) == 0:

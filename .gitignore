@@ -21,3 +21,4 @@ migrations/
 host_rsa_key
 *.bat
 tags
+tmp/*

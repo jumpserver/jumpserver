@@ -320,8 +320,9 @@ CACHES = {
 }
 
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
-CAPTCHA_IMAGE_SIZE = (75, 33)
+CAPTCHA_IMAGE_SIZE = (80, 33)
 CAPTCHA_FOREGROUND_COLOR = '#001100'
+CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 
 COMMAND_STORE_BACKEND = 'audits.backends.command.db'
 RECORD_STORE_BACKEND = 'audits.backends.record.db'

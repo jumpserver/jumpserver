@@ -23,18 +23,18 @@
             </div>
         </div>
         <div class="input-group">
-            <select class="select2 form-control" name="user">
+            <select class="select2 form-control" name="username">
                 <option value="">{% trans 'User' %}</option>
                 {% for u in user_list %}
-                    <option value="{{ u.username }}" {% if user == u.username %} selected {% endif %}>{{ u.username }}</option>
+                    <option value="{{ u.username }}" {% if username == u.username %} selected {% endif %}>{{ u.username }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="input-group">
-            <select class="select2 form-control" name="asset">
+            <select class="select2 form-control" name="ip">
                 <option value="">{% trans 'Asset' %}</option>
                 {% for a in asset_list %}
-                    <option value="{{ a.ip }}" {% if asset == a.ip %} selected {% endif %}>{{ a.ip }}</option>
+                    <option value="{{ a.ip }}" {% if ip == a.ip %} selected {% endif %}>{{ a.ip }}</option>
                 {% endfor %}
             </select>
         </div>

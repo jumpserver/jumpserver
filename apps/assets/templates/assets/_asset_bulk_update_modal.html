@@ -61,22 +61,6 @@
         </div>
     </div>
 
-
-<div class="form-group">
-	<label class="control-label col-sm-2 col-lg-2 " for="id_tags">标签集合</label>
-	<div class=" col-sm-9 col-lg-9 ">
-		<select multiple="multiple" class="select2 form-control" data-placeholder="Select asset tags" id="tags" name="tags">
-			{% for tag in tags %}
-				<option value="{{ tag.id }}">{{ tag.name }}</option>
-			{% endfor %}
-		</select>
-		<p class="help-block">
-			最多5个标签，单个标签最长8个汉字，按回车确认
-		</p>
-	</div>
-
-</div>
-
 </form>
 {% endblock %}
 {% block modal_confirm_id %}btn_asset_bulk_update{% endblock %}

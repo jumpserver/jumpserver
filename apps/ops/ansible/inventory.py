@@ -21,16 +21,16 @@ class JMSHost(Host):
         # 添加密码和秘钥
         if asset.get('password'):
             self.set_variable('ansible_ssh_pass', asset['password'])
-        if asset.get('key'):
+        if asset.get('private_key'):
             self.set_variable('ansible_ssh_private_key_file', asset['private_key'])
 
         # 添加become支持
-        become = asset.get("become", None)
-        if become is not None:
+        become = asset.get("become", False)
+        if become:
             self.set_variable("ansible_become", True)
-            self.set_variable("ansible_become_method", become.get('method'))
-            self.set_variable("ansible_become_user", become.get('user'))
-            self.set_variable("ansible_become_pass", become.get('pass'))
+            self.set_variable("ansible_become_method", become.get('method', 'sudo'))
+            self.set_variable("ansible_become_user", become.get('user', 'root'))
+            self.set_variable("ansible_become_pass", become.get('pass', ''))
         else:
             self.set_variable("ansible_become", False)
 

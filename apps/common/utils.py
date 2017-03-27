@@ -2,6 +2,7 @@
 #
 
 from __future__ import unicode_literals
+from collections import OrderedDict
 from six import string_types
 import base64
 import os
@@ -53,6 +54,7 @@ def get_object_or_none(model, **kwargs):
 
 
 class Signer(object):
+    """用来加密,解密,和基于时间戳的方式验证token"""
     def __init__(self, secret_key=SECRET_KEY):
         self.secret_key = secret_key
 
@@ -330,13 +332,13 @@ def encrypt_password(password):
     return None
 
 
-from collections import OrderedDict
 
 
 def capacity_convert(size, expect='auto', rate=1000):
     """
-    :param cap: '100MB', '1G'
+    :param size: '100MB', '1G'
     :param expect: 'K, M, G, T
+    :param rate: Default 1000, may be 1024
     :return:
     """
     rate_mapping = (

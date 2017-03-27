@@ -3,12 +3,14 @@
 #
 
 from __future__ import unicode_literals
-
+import os
 import logging
+from hashlib import md5
 
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from common.utils import signer, validate_ssh_private_key, ssh_key_string_to_obj
 
@@ -38,7 +40,7 @@ class AdminUser(models.Model):
     become = models.BooleanField(default=True)
     become_method = models.CharField(choices=BECOME_METHOD_CHOICES, default='sudo', max_length=4)
     become_user = models.CharField(default='root', max_length=64)
-    become_password = models.CharField(default='', max_length=128)
+    become_pass = models.CharField(default='', max_length=128)
     _public_key = models.CharField(
         max_length=4096, blank=True, verbose_name=_('SSH public key'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
@@ -73,6 +75,18 @@ class AdminUser(models.Model):
     @private_key.setter
     def private_key(self, private_key_raw):
         self._private_key = signer.sign(private_key_raw)
+
+    @property
+    def private_key_file(self):
+        if not self.private_key:
+            return None
+        project_dir = settings.PROJECT_DIR
+        tmp_dir = os.path.join(project_dir, 'tmp')
+        key_name = md5(self._private_key).hexdigest()
+        key_path = os.path.join(tmp_dir, key_name)
+        if not os.path.exists(key_path):
+            self.private_key.write_private_key_file(key_path)
+        return key_path
 
     @property
     def public_key(self):

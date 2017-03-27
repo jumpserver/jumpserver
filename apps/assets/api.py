@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404
 from common.mixins import IDInFilterMixin
 from common.utils import get_object_or_none, signer
 from .hands import IsSuperUser, IsAppUser
-from .models import AssetGroup, Asset, IDC, SystemUser, AdminUser, Tag
+from .models import AssetGroup, Asset, IDC, SystemUser, AdminUser
 from . import serializers
 
 
@@ -25,14 +25,11 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
     def get_queryset(self):
         queryset = super(AssetViewSet, self).get_queryset()
         idc_id = self.request.query_params.get('idc_id', '')
-        tags_id = self.request.query_params.get('tag_id', '')
         system_users_id = self.request.query_params.get('system_user_id', '')
         asset_group_id = self.request.query_params.get('asset_group_id', '')
         admin_user_id = self.request.query_params.get('admin_user_id', '')
         if idc_id:
             queryset = queryset.filter(idc__id=idc_id)
-        if tags_id:
-            queryset = queryset.filter(tags__id=tags_id)
         if system_users_id:
             queryset = queryset.filter(system_users__id=system_users_id)
         if admin_user_id:
@@ -146,17 +143,4 @@ class SystemUserAuthInfoApi(generics.RetrieveAPIView):
             'auth_method': system_user.auth_method,
         }
         return Response(data)
-
-
-class TagViewSet(IDInFilterMixin, BulkModelViewSet):
-    queryset = Tag.objects.all()
-    serializer_class = serializers.TagSerializer
-    permission_classes = (IsSuperUser,)
-
-
-## update the IDC, and add or delete the assets to the IDC
-class TagUpdateAssetsApi(generics.RetrieveUpdateAPIView):
-    queryset = Tag.objects.all()
-    serializer_class = serializers.TagUpdateAssetsSerializer
-    permission_classes = (IsSuperUser,)
 
