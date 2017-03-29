@@ -37,6 +37,20 @@ class UserCreateUpdateForm(forms.ModelForm):
         }
 
 
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = [
+            'username', 'name', 'email', 'groups', 'wechat',
+            'phone',
+        ]
+        help_texts = {
+            'username': '* required',
+            'name': '* required',
+            'email': '* required',
+        }
+
+
 class UserBulkImportForm(forms.ModelForm):
     class Meta:
         model = User

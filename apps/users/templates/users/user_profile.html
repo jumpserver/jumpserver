@@ -17,7 +17,7 @@
                                 <a href="" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Profile' %} </a>
                             </li>
                             <li class="pull-right">
-                                <a class="btn btn-outline btn-default" href=""><i class="fa fa-edit"></i>{% trans 'Settings' %}</a>
+                                <a class="btn btn-outline btn-default" href="{% url 'users:user-profile-update' %}"><i class="fa fa-edit"></i>{% trans 'Settings' %}</a>
                             </li>
                         </ul>
                     </div>
@@ -38,67 +38,72 @@
                                 <div class="ibox-content">
                                     <div class="text-left">
                                         <table class="table">
-                                            <tr>
-                                                <td class="text-navy">用户名</td>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <img src="{{ user.avatar_url }}" class="img-circle" width="64" height="64">
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td class="text-navy">{% trans 'Username' %}</td>
                                                 <td>{{ user.username }}</td>
                                             </tr>
                                             <tr>
-                                                <td class="text-navy">姓名</td>
+                                                <td class="text-navy">{% trans 'Name' %}</td>
                                                 <td>{{ user.name }}</td>
                                             </tr>
                                             <tr>
-                                                <td class="text-navy">权限</td>
+                                                <td class="text-navy">{% trans 'Role' %}</td>
                                                 <td>{{ user.get_role_display }}</td>
                                             </tr>
                                             <tr>
-                                                <td class="text-navy">Email</td>
+                                                <td class="text-navy">{% trans 'Email' %}</td>
                                                 <td>{{ user.email }}</td>
                                             </tr>
                                             <tr>
-                                                <td class="text-navy">激活</td>
+                                                <td class="text-navy">{% trans 'Active' %}</td>
                                                 <td>{{ user.is_active|yesno:"Yes,No,Unkown" }}</td>
                                             </tr>
                                             <tr>
-                                                <td class="text-navy">添加日期</td>
+                                                <td class="text-navy">{% trans 'OTP' %}</td>
+                                                <td>{{ user.enable_otp|yesno:"Yes,No,Unkown" }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-navy">{% trans 'Public key fingerprint' %}</td>
+                                                <td>{{ user.public_key_hash }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-navy">{% trans 'Date joined' %}</td>
                                                 <td>{{ user.date_joined|date:"Y-m-d H:i:s" }}</td>
                                             </tr>
                                             <tr>
-                                                <td class="text-navy">最后登录</td>
+                                                <td class="text-navy">{% trans 'Last login' %}</td>
                                                 <td>{{ user.last_login|date:"Y-m-d H:i:s" }}</td>
                                             </tr>
                                             <tr>
-                                                <td class="text-navy">所在用户组</td>
+                                                <td class="text-navy">{% trans 'Date expired' %}</td>
+                                                <td>{{ user.date_expired|date:"Y-m-d H:i:s" }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="text-navy">{% trans 'User groups' %}</td>
                                                 <td>
-                                                    {% for group in user.groups.all %}
-                                                    <span class="simple-tag with-link">
-                                                        <a href="{% url 'users:user-group-detail' group.id %}">{{ group.name }}</a>
-                                                    </span>
-                                                    {% endfor %}
+                                                    <table>
+                                                        {% for group in user.groups.all %}
+                                                        <tr>
+                                                        <td>
+                                                            {{ group.name }}
+                                                        </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </table>
                                                 </td>
                                             </tr>
                                             <tr>
-                                                <td class="text-navy">授权主机数量</td>
+                                                <td class="text-navy">{% trans 'Perm assets' %}</td>
                                                 <td>{{ assets | length }}</td>
                                             </tr>
                                             <tr>
-                                                <td class="text-navy">授权主机组</td>
-                                                <td>
-                                                    {% for group in asset_groups %}
-                                                    <span class="simple-tag with-link">
-                                                        <a href="{% url 'assets:asset-group-detail' group.id %}">{{ group.name }}</a>
-                                                    </span>
-                                                    {% endfor %}
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td class="text-navy">授权规则</td>
-                                                <td>
-                                                    {% for perm in permissions %}
-                                                    <span class="simple-tag with-link">
-                                                        <a href="{% url 'perms:asset-permission-detail' perm.id %}">{{ perm.name }}</a>
-                                                    </span>
-                                                    {% endfor %}
-                                                </td>
+                                                <td class="text-navy">{% trans 'Comment' %}:</td>
+                                                <td><b>{{ user.comment }}</b></td>
                                             </tr>
                                         </table>
                                     </div>
@@ -106,23 +111,49 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-sm-5">
-                        <div class="ibox float-e-margins">
-                            <div class="ibox-title">
-                                <span class="label label-primary"><b>{% trans "Update Public Key" %}</b></span>
-                                <div class="ibox-tools">
-                                    <a class="collapse-link">
-                                        <i class="fa fa-chevron-up"></i>
-                                    </a>
-                                    <a class="close-link">
-                                        <i class="fa fa-times"></i>
-                                    </a>
-                                </div>
+                    <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <i class="fa fa-info-circle"></i> {% trans 'Quick modify' %}
                             </div>
-                            <div class="ibox-content">
-                                <p>{% trans "Paste your SSH Public Key here" %}</p>
-                                <textarea id="txt_pk" class="form-control" cols="30" rows="10" placeholder="ssh-rsa AAAAB3NzaC1yc2EAA....."></textarea>
-                                <button id="btn_update_pk" class="btn btn-primary m-t-15">{% trans 'Update' %}</button>
+                            <div class="panel-body">
+                                <table class="table">
+                                    <tbody>
+                                    <tr class="no-borders-tr">
+                                        <td>{% trans 'Reset password' %}:</td>
+                                        <td>
+                                            <span class="pull-right">
+                                                <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Reset' %}</button>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>{% trans 'Reset public key' %}:</td>
+                                        <td>
+                                            <span class="pull-right">
+                                                <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Reset' %}</button>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>{% trans 'Test admin user' %}:</td>
+                                        <td>
+                                            <span class="pull-right">
+                                                <button type="button" class="btn btn-primary btn-xs" id="btn_reset_pk" style="width: 54px;">{% trans 'Test' %}</button>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>{% trans 'Test system pingpong' %}:</td>
+                                        <td>
+                                            <span class="pull-right">
+                                                <button type="button" class="btn btn-primary btn-xs" id="btn_reset_pk" style="width: 54px;">{% trans 'Test' %}</button>
+                                            </span>
+                                        </td>
+                                    </tr>
+
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>

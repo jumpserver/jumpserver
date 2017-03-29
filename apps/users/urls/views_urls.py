@@ -25,6 +25,9 @@ urlpatterns = [
     url(r'^profile/$',
         views.UserProfileView.as_view(),
         name='user-profile'),
+    url(r'^profile/update/$',
+        views.UserProfileUpdateView.as_view(),
+        name='user-profile-update'),
 
     # User view
     url(r'^user$', views.UserListView.as_view(), name='user-list'),

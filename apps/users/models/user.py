@@ -101,6 +101,16 @@ class User(AbstractUser):
         self._public_key = signer.sign(public_key_raw)
 
     @property
+    def public_key_hash(self):
+        if self.public_key:
+            import sshpubkeys
+            try:
+                return sshpubkeys.SSHKey(self.public_key).hash_md5()
+            except TabError:
+                pass
+        return 'None'
+
+    @property
     def is_superuser(self):
         if self.role == 'Admin':
             return True

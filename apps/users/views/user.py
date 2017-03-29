@@ -36,7 +36,9 @@ from perms.models import AssetPermission
 __all__ = ['UserListView', 'UserCreateView', 'UserDetailView',
            'UserUpdateView', 'UserAssetPermissionCreateView',
            'UserAssetPermissionView', 'UserGrantedAssetView',
-           'UserExportView',  'UserBulkImportView', 'UserProfileView']
+           'UserExportView',  'UserBulkImportView', 'UserProfileView',
+           'UserProfileUpdateView',
+           ]
 
 logger = get_logger(__name__)
 
@@ -311,18 +313,40 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
     template_name = 'users/user_profile.html'
 
     def get_context_data(self, **kwargs):
-        from perms.utils import (get_user_granted_assets,
-                                 get_user_granted_asset_groups,
-                                 get_user_asset_permissions)
+        from perms.utils import get_user_granted_assets
         assets = get_user_granted_assets(self.request.user)
-        asset_groups = get_user_granted_asset_groups(self.request.user)
-        permissions = get_user_asset_permissions(self.request.user)
         context = {
             'app': 'User',
             'action': 'User Profile',
             'assets': assets,
-            'asset_groups': asset_groups,
-            'permissions': permissions
         }
         kwargs.update(context)
         return super(UserProfileView, self).get_context_data(**kwargs)
+
+
+class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
+    template_name = 'users/user_profile_update.html'
+    model = User
+    form_class = forms.UserProfileForm
+    success_url = reverse_lazy('users:user-profile')
+    success_message = _('Create user <a href="%s">%s</a> successfully.')
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def get_success_message(self, cleaned_data):
+        return self.success_message % (
+            reverse_lazy('users:user-detail', kwargs={'pk': self.object.pk}),
+            self.object.name,
+        )
+
+    def get_context_data(self, **kwargs):
+        from perms.utils import get_user_granted_assets
+        assets = get_user_granted_assets(self.request.user)
+        context = {
+            'app': 'User',
+            'action': 'User Profile',
+            'assets': assets,
+        }
+        kwargs.update(context)
+        return super(UserProfileUpdateView, self).get_context_data(**kwargs)
