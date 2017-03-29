@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404
 
 from common.mixins import IDInFilterMixin
 from common.utils import get_object_or_none, signer
-from .hands import IsSuperUser, IsAppUser
+from .hands import IsSuperUser, IsAppUser, IsValidUser, get_user_granted_assets
 from .models import AssetGroup, Asset, IDC, SystemUser, AdminUser
 from . import serializers
 
@@ -20,10 +20,13 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
     """API endpoint that allows Asset to be viewed or edited."""
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsValidUser,)
 
     def get_queryset(self):
-        queryset = super(AssetViewSet, self).get_queryset()
+        if self.request.user.is_superuser:
+            queryset = super(AssetViewSet, self).get_queryset()
+        else:
+            queryset = get_user_granted_assets(self.request.user)
         idc_id = self.request.query_params.get('idc_id', '')
         system_users_id = self.request.query_params.get('system_user_id', '')
         asset_group_id = self.request.query_params.get('asset_group_id', '')

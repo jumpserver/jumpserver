@@ -17,6 +17,9 @@ urlpatterns = [
     url(r'^asset-modal$', views.AssetModalListView.as_view(), name='asset-modal-list'),
     url(r'^asset-modal-update$', views.AssetModalCreateView.as_view(), name='asset-modal-update'),
 
+    # User asset view
+    url(r'^user-asset/$', views.UserAssetListView.as_view(), name='user-asset-list'),
+
     # Resource asset group url
     url(r'^asset-group/$', views.AssetGroupListView.as_view(), name='asset-group-list'),
     url(r'^asset-group/create/$', views.AssetGroupCreateView.as_view(), name='asset-group-create'),

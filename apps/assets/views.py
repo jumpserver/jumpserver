@@ -44,6 +44,19 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
         return super(AssetListView, self).get_context_data(**kwargs)
 
 
+class UserAssetListView(TemplateView):
+    template_name = 'assets/user_asset_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'Assets',
+            'action': 'asset list',
+            'system_users': SystemUser.objects.all(),
+        }
+        kwargs.update(context)
+        return super(UserAssetListView, self).get_context_data(**kwargs)
+
+
 class AssetCreateView(AdminUserRequiredMixin, CreateView):
     model = Asset
     form_class = forms.AssetCreateForm

@@ -16,7 +16,7 @@
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
                             <li class="active">
-                                <a href="" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset detail' %} </a>
+                                <a href="{% url 'assets:asset-detail' %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset detail' %} </a>
                             </li>
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-default" href="{% url 'assets:asset-update' pk=asset.id %}"><i class="fa fa-edit"></i>Update</a>

@@ -99,7 +99,12 @@ class Asset(models.Model):
         return False, warning
 
     def to_json(self):
-        pass
+        return {
+            'id': self.id,
+            'hostname': self.hostname,
+            'ip': self.ip,
+            'port': self.port,
+        }
 
     def _to_secret_json(self):
         """Ansible use it create inventory"""

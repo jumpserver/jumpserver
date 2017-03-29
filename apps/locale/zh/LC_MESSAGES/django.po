@@ -2391,45 +2391,33 @@ msgid "Create by"
 msgstr "创建者"
 
 #: users/templates/users/user_group_detail.html:89
-#, fuzzy
-#| msgid "User"
 msgid "Add user"
-msgstr "用户"
+msgstr "创建用户"
 
 #: users/templates/users/user_group_list.html:5
-#, fuzzy
-#| msgid "Asset group"
 msgid "Add User Group"
-msgstr "资产组"
+msgstr "创建用户组"
 
 #: users/templates/users/user_group_list.html:13
-#, fuzzy
-#| msgid "User group"
 msgid "User Amount"
-msgstr "用户组"
+msgstr "用户数量"
 
 #: users/templates/users/user_group_list.html:95
-#, fuzzy
-#| msgid "User group list"
 msgid "UserGroups Deleted."
-msgstr "用户组列表"
+msgstr "用户组删除"
 
 #: users/templates/users/user_group_list.html:96
 #: users/templates/users/user_group_list.html:101
-#, fuzzy
-#| msgid "User group list"
 msgid "UserGroups Delete"
-msgstr "用户组列表"
+msgstr "用户组删除"
 
 #: users/templates/users/user_group_list.html:100
 msgid "UserGroup Deleting failed."
-msgstr ""
+msgstr "用户组删除失败"
 
 #: users/templates/users/user_list.html:42
-#, fuzzy
-#| msgid "Deactive selected"
 msgid "Active selected"
-msgstr "禁用所选"
+msgstr "激活所选"
 
 #: users/templates/users/user_list.html:167
 msgid "This will delete the selected users !!!"
@@ -2438,51 +2426,37 @@ msgstr ""
 # msgid "Deleted!"
 # msgstr "删除"
 #: users/templates/users/user_list.html:175
-#, fuzzy
-#| msgid "has been deleted."
 msgid "User Deleted."
 msgstr "已被删除"
 
 #: users/templates/users/user_list.html:176
 #: users/templates/users/user_list.html:181
-#, fuzzy
-#| msgid "Delete"
 msgid "User Delete"
 msgstr "删除"
 
 #: users/templates/users/user_list.html:180
-#, fuzzy
-#| msgid "User detail"
 msgid "User Deleting failed."
-msgstr "用户详情"
+msgstr "用户删除失败"
 
 #: users/templates/users/user_list.html:240
 msgid "The selected users has been updated successfully."
 msgstr ""
 
 #: users/templates/users/user_list.html:241
-#, fuzzy
-#| msgid "Update"
 msgid "User Updated"
 msgstr "更新"
 
 #: users/templates/users/user_profile.html:98
-#, fuzzy
-#| msgid "SSH private key"
 msgid "Update Public Key"
-msgstr "ssh密钥"
+msgstr "更新公钥"
 
 #: users/templates/users/user_profile.html:109
-#, fuzzy
-#| msgid "SSH private key"
 msgid "Paste your SSH Public Key here"
-msgstr "ssh密钥"
+msgstr "复制公钥到这里"
 
 #: users/templates/users/user_profile.html:131
-#, fuzzy
-#| msgid "SSH private key"
 msgid "Failed to update SSH public key."
-msgstr "ssh密钥"
+msgstr "更新公钥失败"
 
 #: users/templates/users/user_update.html:3 users/views/user.py:102
 msgid "Update user"

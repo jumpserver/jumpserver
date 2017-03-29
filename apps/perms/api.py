@@ -194,6 +194,32 @@ class MyGrantedAssetsGroupsApi(APIView):
 
 
 class MyAssetGroupAssetsApi(ListAPIView):
+    permission_classes = (IsValidUser,)
+
+    def get(self, request, *args, **kwargs):
+        asset_groups = {}
+        # asset_group = {1: {'id': 1, 'name': 'hello', 'assets': set(),
+        #                 'assets_id': set()}, 2: {}}
+        user = request.user
+
+        if user:
+            assets = get_user_granted_assets(user)
+            for asset in assets:
+                for asset_group in asset.groups.all():
+                    if asset_group.id in asset_groups:
+                        asset_groups[asset_group.id]['assets'].add(asset.to_json())
+                    else:
+                        asset_groups[asset_group.id] = {
+                            'id': asset_group.id,
+                            'name': asset_group.name,
+                            'comment': asset_group.comment,
+                            'assets': {asset.to_json()},
+                        }
+        asset_groups_json = asset_groups.values()
+        return Response(asset_groups_json, status=200)
+
+
+class MyAssetGroupOfAssetsApi(ListAPIView):
     """授权用户资产组下的资产列表, 非该资产组的所有资产,而是被授权的"""
     permission_classes = (IsValidUser,)
     serializer_class = AssetGrantedSerializer
