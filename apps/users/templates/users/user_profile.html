@@ -68,8 +68,21 @@
                                                 <td>{{ user.enable_otp|yesno:"Yes,No,Unkown" }}</td>
                                             </tr>
                                             <tr>
-                                                <td class="text-navy">{% trans 'Public key fingerprint' %}</td>
-                                                <td>{{ user.public_key_hash }}</td>
+                                                <td class="text-navy">{% trans 'Public key' %}</td>
+                                                <td>
+                                                    <table>
+                                                        <tr>
+                                                            <td>
+                                                                {{ user.public_key_obj.comment }}
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                {{ user.public_key_obj.hash_md5 }}
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
                                             </tr>
                                             <tr>
                                                 <td class="text-navy">{% trans 'Date joined' %}</td>
@@ -123,7 +136,7 @@
                                         <td>{% trans 'Reset password' %}:</td>
                                         <td>
                                             <span class="pull-right">
-                                                <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Reset' %}</button>
+                                                <a type="button" class="btn btn-primary btn-xs" style="width: 54px" href="{% url 'users:user-password-update' %}">{% trans 'Reset' %}</a>
                                             </span>
                                         </td>
                                     </tr>
@@ -131,27 +144,10 @@
                                         <td>{% trans 'Reset public key' %}:</td>
                                         <td>
                                             <span class="pull-right">
-                                                <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Reset' %}</button>
+                                                <a type="button" class="btn btn-primary btn-xs" style="width: 54px" href="{% url 'users:user-pubkey-update' %}">{% trans 'Reset' %}</a>
                                             </span>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td>{% trans 'Test admin user' %}:</td>
-                                        <td>
-                                            <span class="pull-right">
-                                                <button type="button" class="btn btn-primary btn-xs" id="btn_reset_pk" style="width: 54px;">{% trans 'Test' %}</button>
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>{% trans 'Test system pingpong' %}:</td>
-                                        <td>
-                                            <span class="pull-right">
-                                                <button type="button" class="btn btn-primary btn-xs" id="btn_reset_pk" style="width: 54px;">{% trans 'Test' %}</button>
-                                            </span>
-                                        </td>
-                                    </tr>
-
                                     </tbody>
                                 </table>
                             </div>

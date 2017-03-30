@@ -154,7 +154,7 @@ class UserResetPasswordView(TemplateView):
 
 class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
     template_name = 'users/first_login.html'
-    form_list = [forms.UserInfoForm, forms.UserKeyForm]
+    form_list = [forms.UserInfoForm, forms.UserPublicKeyForm]
     file_storage = default_storage
 
     def dispatch(self, request, *args, **kwargs):

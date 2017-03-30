@@ -25,6 +25,7 @@ from django.views.generic.edit import (CreateView, UpdateView, FormMixin,
                                        FormView)
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth import logout as auth_logout
 
 from .. import forms
 from ..models import User, UserGroup
@@ -37,7 +38,8 @@ __all__ = ['UserListView', 'UserCreateView', 'UserDetailView',
            'UserUpdateView', 'UserAssetPermissionCreateView',
            'UserAssetPermissionView', 'UserGrantedAssetView',
            'UserExportView',  'UserBulkImportView', 'UserProfileView',
-           'UserProfileUpdateView',
+           'UserProfileUpdateView', 'UserPasswordUpdateView',
+           'UserPublicKeyUpdateView',
            ]
 
 logger = get_logger(__name__)
@@ -341,12 +343,49 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
         )
 
     def get_context_data(self, **kwargs):
-        from perms.utils import get_user_granted_assets
-        assets = get_user_granted_assets(self.request.user)
         context = {
             'app': 'User',
-            'action': 'User Profile',
-            'assets': assets,
+            'action': 'Profile update',
         }
         kwargs.update(context)
         return super(UserProfileUpdateView, self).get_context_data(**kwargs)
+
+
+class UserPasswordUpdateView(LoginRequiredMixin, UpdateView):
+    template_name = 'users/user_password_update.html'
+    model = User
+    form_class = forms.UserPasswordForm
+    success_url = reverse_lazy('users:user-profile')
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'User',
+            'action': 'Password update',
+        }
+        kwargs.update(context)
+        return super(UserPasswordUpdateView, self).get_context_data(**kwargs)
+
+    def get_success_url(self):
+        auth_logout(self.request)
+        return super(UserPasswordUpdateView, self).get_success_url()
+
+
+class UserPublicKeyUpdateView(LoginRequiredMixin, UpdateView):
+    template_name = 'users/user_pubkey_update.html'
+    model = User
+    form_class = forms.UserPublicKeyForm
+    success_url = reverse_lazy('users:user-profile')
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'User',
+            'action': 'Public key update',
+        }
+        kwargs.update(context)
+        return super(UserPublicKeyUpdateView, self).get_context_data(**kwargs)
