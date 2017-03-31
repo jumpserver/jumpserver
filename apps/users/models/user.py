@@ -183,11 +183,9 @@ class User(AbstractUser):
         if self.avatar:
             return self.avatar.url
         else:
-            default_dir = os.path.join(settings.MEDIA_ROOT, 'avatar', 'default')
-            if os.path.isdir(default_dir):
-                default_avatar_list = os.listdir(default_dir)
-                default_avatar = default_avatar_list[len(self.username) % len(default_avatar_list)]
-                return os.path.join(settings.MEDIA_URL, 'avatar', 'default',  default_avatar)
+            avatar_dir = os.path.join(settings.MEDIA_ROOT, 'avatar')
+            if os.path.isdir(avatar_dir):
+                return os.path.join(settings.MEDIA_URL, 'avatar', 'default.png')
         return 'https://www.gravatar.com/avatar/c6812ab450230979465d7bf288eadce2a?s=120&d=identicon'
 
     def generate_reset_token(self):

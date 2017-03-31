@@ -81,9 +81,15 @@ $(document).ready(function(){
                 var connect_btn = '<a href="{% url "applications:terminal-connect" pk=99991937 %}"" class="btn btn-xs btn-warning btn-connect" >{% trans "Connect" %}</a> '
                         .replace('99991937', cellData);
                 if (rowData.is_accepted) {
-                    $(td).html(connect_btn + update_btn + delete_btn)
+                    {% if user.is_superuser %}
+                    $(td).html(connect_btn + update_btn + delete_btn);
+                    {% else %}
+                    $(td).html(connect_btn);
+                    {% endif %}
                 } else {
-                    $(td).html(accept_btn + reject_btn)
+                    {% if user.is_superuser %}
+                    $(td).html(accept_btn + reject_btn);
+                    {% endif %}
                 }
              }}
         ],
