@@ -34,7 +34,7 @@
                      aria-disabled="false" aria-selected="true">
                      <a href="javascript:void(0)"><span class="number">{% trans 'Step' %} {{ step }}</span></a>
                     </li>
-                    {% endfor %}
+                    {% endfor >%}
                   </ul>
                 </div>
                 <div class="content clearfix">
@@ -54,10 +54,10 @@
                 <div class="actions clearfix">
                   <ul>
                     {% if wizard.steps.prev %}
-                    <li><a class="fl_goto" data-goto="{{ wizard.steps.first }}">{% trans "first step" %}</a></li>
-                    <li><a class="fl_goto" name="wizard_goto_step" data-goto="{{ wizard.steps.prev }}">{% trans "prev step" %}</a></li>
+                    <li><a class="fl_goto" data-goto="{{ wizard.steps.first }}">{% trans "First step" %}</a></li>
+                    <li><a class="fl_goto" name="wizard_goto_step" data-goto="{{ wizard.steps.prev }}">{% trans "Prev step" %}</a></li>
                     {% endif %}
-                    <li><a id="fl_submit">{% trans "submit" %}</a></li>
+                    <li><a id="fl_submit">{% trans "Submit" %}</a></li>
                   </ul>
                 </div>
               </div>

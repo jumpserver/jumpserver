@@ -252,7 +252,7 @@ def validate_ssh_public_key(text):
     ssh = sshpubkeys.SSHKey(text)
     try:
         ssh.parse()
-    except sshpubkeys.InvalidKeyException:
+    except (sshpubkeys.InvalidKeyException, UnicodeDecodeError):
         return False
     except NotImplementedError as e:
         return False

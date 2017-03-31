@@ -83,6 +83,9 @@ class Config:
 
     CAPTCHA_TEST_MODE = False
 
+    # You can set jumpserver usage url here, that when user submit wizard redirect to
+    USER_GUIDE_URL = ''
+
     def __init__(self):
         pass
 

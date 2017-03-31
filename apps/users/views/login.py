@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 from django import forms
+from django.shortcuts import render
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.storage import default_storage
@@ -15,6 +16,7 @@ from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from formtools.wizard.views import SessionWizardView
+from django.conf import settings
 
 from common.utils import get_object_or_none
 from ..models import User
@@ -154,7 +156,7 @@ class UserResetPasswordView(TemplateView):
 
 class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
     template_name = 'users/first_login.html'
-    form_list = [forms.UserInfoForm, forms.UserPublicKeyForm]
+    form_list = [forms.UserProfileForm, forms.UserPublicKeyForm]
     file_storage = default_storage
 
     def dispatch(self, request, *args, **kwargs):
@@ -162,7 +164,7 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
             return redirect(reverse('index'))
         return super(UserFirstLoginView, self).dispatch(request, *args, **kwargs)
 
-    def done(self, form_list, form_dict, **kwargs):
+    def done(self, form_list, **kwargs):
         user = self.request.user
         for form in form_list:
             for field in form:
@@ -173,19 +175,23 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
         user.is_first_login = False
         user.is_public_key_valid = True
         user.save()
-        return redirect(reverse('index'))
+        context = {
+            'user_guide_url': settings.CONFIG.USER_GUIDE_URL
+        }
+        return render(self.request, 'users/first_login_done.html', context)
 
     def get_context_data(self, **kwargs):
         context = super(UserFirstLoginView, self).get_context_data(**kwargs)
-        context.update({'app': _('Users'), 'action': _('First Login')})
+        context.update({'app': _('Users'), 'action': _('First login')})
         return context
 
     def get_form_initial(self, step):
         user = self.request.user
         if step == '0':
             return {
+                'username': user.username or '',
                 'name': user.name or user.username,
-                'enable_otp': user.enable_otp or True,
+                'email': user.email or '',
                 'wechat': user.wechat or '',
                 'phone': user.phone or ''
             }
@@ -194,9 +200,10 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
     def get_form(self, step=None, data=None, files=None):
         form = super(UserFirstLoginView, self).get_form(step, data, files)
 
+        form.instance = self.request.user
         if step is None:
             step = self.steps.current
 
-        if step == '1':
-            form.user = self.request.user
+        # if step == '1':
+        #     form.instance = self.request.user
         return form

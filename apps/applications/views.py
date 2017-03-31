@@ -108,6 +108,7 @@ class TerminalConnectView(LoginRequiredMixin, DetailView):
                 'messages': _('You should use your ssh client tools '
                               'connect terminal: {} <br /> <br />'
                               '{}'.format(self.object.name, self.object.url)),
+                'redirect_url': reverse('applications:terminal-list')
             }
 
         kwargs.update(context)

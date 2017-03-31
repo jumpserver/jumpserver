@@ -91,7 +91,10 @@ class UserPublicKeyForm(forms.Form):
         help_text=_('Paste your id_rsa.pub here.'))
 
     def __init__(self, *args, **kwargs):
-        self.instance = kwargs.pop('instance')
+        if 'instance' in kwargs:
+            self.instance = kwargs.pop('instance')
+        else:
+            self.instance = None
         super(UserPublicKeyForm, self).__init__(*args, **kwargs)
 
     def clean_public_key(self):
@@ -128,15 +131,12 @@ class UserGroupForm(forms.ModelForm):
         }
 
 
-class UserInfoForm(forms.Form):
-    name = forms.CharField(max_length=20, label=_('name'))
-    avatar = forms.ImageField(label=_('avatar'), required=False)
-    wechat = forms.CharField(max_length=30, label=_('wechat'), required=False)
-    phone = forms.CharField(max_length=20, label=_('phone'), required=False)
-    enable_otp = forms.BooleanField(required=False, label=_('enable otp'))
-
-
-
+# class UserInfoForm(forms.Form):
+#     name = forms.CharField(max_length=20, label=_('name'))
+#     avatar = forms.ImageField(label=_('avatar'), required=False)
+#     wechat = forms.CharField(max_length=30, label=_('wechat'), required=False)
+#     phone = forms.CharField(max_length=20, label=_('phone'), required=False)
+#     enable_otp = forms.BooleanField(required=False, label=_('enable otp'))
 
 
 class UserPrivateAssetPermissionForm(forms.ModelForm):
