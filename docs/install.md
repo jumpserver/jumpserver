@@ -2,79 +2,70 @@
 
 ### 环境
 
-- 系统: CentOS 6.5 x86\_64 mini_ - Python: 版本 2.7.13 (未来支持 3.5)
+- 系统: CentOS 6.5 x86\_64 mini
+- Python: 版本 2.7.13 (未来支持 3.5)
 - 安装目录 
 	- /opt/jumpserver
 	- /opt/coco
 
 #### 一. 环境准备
 
-**1.1 安装基本工具和库**
+##### 1.1 安装基本工具和库
 
 	$ yum -y install sqlite-devel git epel-release
 
-**1.2 安装Python**
+##### 1.2 安装Python
 
-	这里可以参考 [https://segmentfault.com/a/1190000000654227][1]也可以下载我编译的rpm版本:
+这里可以参考 [https://segmentfault.com/a/1190000000654227][1] 也可以下载我编译的rpm版本:
 
-	$ wget http://repo.jumpserver.org/python27-2.7.13-1.el6.x86_64.rpm 
-	
-	$ yum localinstall -y python27-2.7.13-1.el6.x86_64.rpm
-	
-	$ bash
-	
-	$ python2.7 -V
-	
+	$ wget http://repo.jumpserver.org/python27-2.7.13-1.el6.x86_64.rpm 	
+	$ yum localinstall -y python27-2.7.13-1.el6.x86_64.rpm	
+	$ bash	
+	$ python2.7 -V	
 	Python 2.7.13
 
 #### 二. Jumpserver安装
 
-**2.1 下载仓库代码**
+##### 2.1 下载仓库代码
 
-```
-$ cd /opt
-$ git clone [https://github.com/jumpserver/jumpserver.git][2]
-$ cd jumpserver
-$ git checkout dev
-```
-**2.2 安装依赖**
+	$ cd /opt
+	$ git clone https://github.com/jumpserver/jumpserver.git
+	$ cd jumpserver
+	$ git checkout dev
 
-```
-$ cd requirements 
-$ sudo yum -y install `cat rpm_requirements.txt`
-$ pip2.7 install -r requirements.txt -i https://pypi.doubanio.com/simple
-```
+##### 2.2 安装依赖
 
-**2.3 准备配置文件**
+	$ cd requirements 
+	$ sudo yum -y install `cat rpm_requirements.txt`
+	$ pip2.7 install -r requirements.txt -i https://pypi.doubanio.com/simple
 
-```
-$ cd ..
-$ cp config_example.py config.py
-$ vim config.py
 
-// 默认使用的是 DevelpmentConfig 所以应该去修改这部分
-class DevelopmentConfig(Config):
-EMAIL_HOST = 'smtp.exmail.qq.com'
-EMAIL_PORT = 465
-EMAIL_HOST_USER = 'ask@jumpserver.org'
-EMAIL_HOST_PASSWORD = 'xxx'
-EMAIL_USE_SSL = True   // 端口是 465 设置 True 否则 False
-EMAIL_USE_TLS = False  // 端口是 587 设置为 True 否则 False
-SITE_URL = 'http://localhost:8080'  // 发送邮件会使用这个地址 
-```
+##### 2.3 准备配置文件
 
-**2.4 初始化数据库**
-```
-$ cd utils
-$ sh make_migrations.sh
-$ sh init_db.sh
-```
+	$ cd ..
+	$ cp config_example.py config.py
+	$ vim config.py
 
-**2.5 安装redis server**
-```
-`$ yum -y install redis
-$ service redis start  
-```
+	// 默认使用的是 DevelpmentConfig 所以应该去修改这部分
+	class DevelopmentConfig(Config):
+	EMAIL_HOST = 'smtp.exmail.qq.com'
+	EMAIL_PORT = 465
+	EMAIL_HOST_USER = 'ask@jumpserver.org'
+	EMAIL_HOST_PASSWORD = 'xxx'
+	EMAIL_USE_SSL = True   // 端口是 465 设置 True 否则 False
+	EMAIL_USE_TLS = False  // 端口是 587 设置为 True 否则 False
+	SITE_URL = 'http://localhost:8080'  // 发送邮件会使用这个地址 
+
+##### 2.4 初始化数据库
+
+	$ cd utils
+	$ sh make_migrations.sh
+	$ sh init_db.sh
+
+##### 2.5 安装redis server
+
+	$ yum -y install redis
+	$ service redis start  
 
 **2.6 启动**
 ```
@@ -105,7 +96,7 @@ $ python2.7 run_server.py
 **3.1 下载代码库**
 ```
 $ cd /opt
-$[git clone https://github.com/jumpserver/coco.git][3]
+$ git clone https://github.com/jumpserver/coco.git
 ```
 
 **3.2 安装依赖**
