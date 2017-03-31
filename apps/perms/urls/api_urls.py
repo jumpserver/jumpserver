@@ -19,12 +19,12 @@ urlpatterns = [
     url(r'^v1/user/my/asset-groups/$',
         api.MyGrantedAssetsGroupsApi.as_view(),
         name='my-asset-groups'),
+    url(r'^v1/user/my/asset-groups-assets/$',
+        api.MyAssetGroupAssetsApi.as_view(),
+        name='my-asset-group-assets'),
     url(r'^v1/user/my/asset-group/(?P<pk>[0-9]+)/assets/$',
         api.MyAssetGroupOfAssetsApi.as_view(),
         name='my-asset-group-of-assets'),
-    url(r'^v1/user/my/asset-group-assets/$',
-        api.MyAssetGroupAssetsApi.as_view(),
-        name='my-asset-group-assets'),
 
     # 查询某个用户授权的资产和资产组
     url(r'^v1/user/(?P<pk>[0-9]+)/assets/$',
