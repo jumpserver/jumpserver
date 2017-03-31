@@ -68,19 +68,20 @@ $(document).ready(function(){
                 }
             }},
             {targets: 7, createdCell: function (td, cellData, rowData) {
-                console.log(rowData.name);
                 var update_btn = '<a href="{% url "applications:terminal-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'
                         .replace('99991937', cellData);
-                var delete_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_delete" data-uid="99991937" data-name="99991938">{% trans "Delete" %}</a>'
+                var delete_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-id="99991937" data-name="99991938">{% trans "Delete" %}</a>'
                         .replace('99991937', cellData)
                         .replace('99991938', rowData.name);
                 var accept_btn = '<a class="btn btn-xs btn-primary btn-accept" data-id="99991937">{% trans "Accept" %}</a> '
                         .replace('99991937', cellData);
-                var reject_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_delete" data-uid="99991937" data-name="99991938">{% trans "Reject" %}</a>'
+                var reject_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-id="99991937" data-name="99991938">{% trans "Reject" %}</a>'
                         .replace('99991937', cellData)
                         .replace('99991938', rowData.name);
+                var connect_btn = '<a href="{% url "applications:terminal-connect" pk=99991937 %}"" class="btn btn-xs btn-warning btn-connect" >{% trans "Connect" %}</a> '
+                        .replace('99991937', cellData);
                 if (rowData.is_accepted) {
-                    $(td).html(update_btn + delete_btn)
+                    $(td).html(connect_btn + update_btn + delete_btn)
                 } else {
                     $(td).html(accept_btn + reject_btn)
                 }
@@ -105,11 +106,11 @@ $(document).ready(function(){
         $form.ajaxSubmit({success: success});
     })
 
-}).on('click', '.btn_delete', function(){
+}).on('click', '.btn-del', function(){
     var $this = $(this);
-    var uid = $this.data('uid');
+    var id = $this.data('id');
     var name = $(this).data('name');
-    var the_url = '{% url "api-applications:terminal-detail" pk=99991937 %}'.replace('99991937', uid);
+    var the_url = '{% url "api-applications:terminal-detail" pk=99991937 %}'.replace('99991937', id);
     objectDelete($this, name, the_url)
 
 }).on('click', '.btn-accept', function () {
@@ -133,6 +134,10 @@ $(document).ready(function(){
     $('#modal_terminal_accept').modal({
         show: true
     });
+}).on('click', '.btn-connect', function () {
+    var $this = $(this);
+    var id = $this.data('id');
+    console.log(id)
 })
 </script>
 {% endblock %}

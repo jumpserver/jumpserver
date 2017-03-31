@@ -34,7 +34,7 @@
                     {% if messages %}
                         <p>
                         <div class="alert alert-success" id="messages">
-                            {{ messages }}
+                            {{ messages|safe }}
                         </div>
                     </p>
                     {% endif %}
@@ -52,16 +52,21 @@
                 Copyright Jumpserver.org
             </div>
             <div class="col-md-6 text-right">
-               <small>2014-2016</small>
+               <small>2014-2017</small>
             </div>
         </div>
     </div>
 </body>
 <script>
-    var time=5;
+    var time = '{{ interval }}';
+    if (!time){
+        time = 5;
+    } else {
+        time = parseInt(time);
+    }
     function redirect_page() {
         if (time >= 0) {
-            var messages = '{{ messages }}， <b>' + time +'</b> ...';
+            var messages = '{{ messages|safe }}， <b>' + time +'</b> ...';
             $('#messages').html(messages);
             time--;
             setTimeout(redirect_page, 1000);

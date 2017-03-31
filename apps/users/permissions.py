@@ -12,7 +12,7 @@ class IsValidUser(permissions.IsAuthenticated, permissions.BasePermission):
             and request.user.is_valid
 
 
-class IsAppUser(IsValidUser, permissions.BasePermission):
+class IsAppUser(IsValidUser):
     """Allows access only to app user """
 
     def has_permission(self, request, view):
@@ -20,7 +20,7 @@ class IsAppUser(IsValidUser, permissions.BasePermission):
             and request.user.is_app
 
 
-class IsSuperUser(IsValidUser, permissions.BasePermission):
+class IsSuperUser(IsValidUser):
     """Allows access only to superuser"""
 
     def has_permission(self, request, view):
@@ -28,7 +28,7 @@ class IsSuperUser(IsValidUser, permissions.BasePermission):
             and request.user.is_superuser
 
 
-class IsSuperUserOrAppUser(IsValidUser, permissions.BasePermission):
+class IsSuperUserOrAppUser(IsValidUser):
     """Allows access between superuser and app user"""
 
     def has_permission(self, request, view):
@@ -36,8 +36,16 @@ class IsSuperUserOrAppUser(IsValidUser, permissions.BasePermission):
             and (request.user.is_superuser or request.user.is_app)
 
 
-class IsCurrentUserOrReadOnly(permissions.BasePermission):
+class IsSuperUserOrAppUserOrUserReadonly(IsSuperUserOrAppUser):
+    def has_permission(self, request, view):
+        if IsValidUser.has_permission(self, request, view) \
+                and request.method in permissions.SAFE_METHODS:
+            return True
+        else:
+            return IsSuperUserOrAppUser.has_permission(self, request, view)
 
+
+class IsCurrentUserOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
             return True

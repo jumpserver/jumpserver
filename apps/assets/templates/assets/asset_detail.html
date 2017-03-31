@@ -16,11 +16,13 @@
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
                             <li class="active">
-                                <a href="{% url 'assets:asset-detail' %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset detail' %} </a>
+                                <a href="{% url 'assets:asset-detail' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset detail' %} </a>
                             </li>
+                            {% if user.is_superuser %}
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-default" href="{% url 'assets:asset-update' pk=asset.id %}"><i class="fa fa-edit"></i>Update</a>
                             </li>
+                            {% endif %}
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -134,6 +136,7 @@
                                 </div>
                             </div>
                         </div>
+                        {% if user.is_superuser %}
                         <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
@@ -222,6 +225,7 @@
                                     </table>
                                 </div>
                             </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

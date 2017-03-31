@@ -6,7 +6,7 @@ from django.core.cache import cache
 from django.conf import settings
 from django.utils import timezone
 import copy
-from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView
+from rest_framework.generics import ListCreateAPIView
 from rest_framework import viewsets
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import AllowAny
@@ -15,7 +15,8 @@ from rest_framework.decorators import api_view
 
 from .models import Terminal, TerminalHeatbeat
 from .serializers import TerminalSerializer, TerminalHeatbeatSerializer
-from .hands import IsSuperUserOrAppUser, IsAppUser, User, ProxyLog
+from .hands import IsSuperUserOrAppUser, IsAppUser, ProxyLog, \
+    IsSuperUserOrAppUserOrUserReadonly
 from common.utils import get_object_or_none
 
 
@@ -55,7 +56,7 @@ class TerminalRegisterView(ListCreateAPIView):
 class TerminalViewSet(viewsets.ModelViewSet):
     queryset = Terminal.objects.all()
     serializer_class = TerminalSerializer
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsSuperUserOrAppUserOrUserReadonly,)
 
     def create(self, request, *args, **kwargs):
         return Response({'msg': 'Use register view except that'}, status=404)
@@ -102,5 +103,4 @@ class TerminateConnectionView(APIView):
                 tasks[terminal_id] = [{'name': 'kill_proxy',
                                        'proxy_log_id': proxy_log_id}]
 
-        print(tasks)
         return Response({'msg': 'get it'})

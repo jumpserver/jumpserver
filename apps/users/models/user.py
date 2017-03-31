@@ -33,7 +33,7 @@ class User(AbstractUser):
     email = models.EmailField(max_length=30, unique=True, verbose_name=_('Email'))
     groups = models.ManyToManyField(UserGroup, related_name='users', blank=True, verbose_name=_('User group'))
     role = models.CharField(choices=ROLE_CHOICES, default='User', max_length=10, blank=True, verbose_name=_('Role'))
-    avatar = models.ImageField(upload_to="avatar", verbose_name=_('Avatar'))
+    avatar = models.ImageField(upload_to="avatar", null=True, verbose_name=_('Avatar'))
     wechat = models.CharField(max_length=30, blank=True, verbose_name=_('Wechat'))
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name=_('Phone'))
     enable_otp = models.BooleanField(default=False, verbose_name=_('Enable OTP'))

@@ -3,17 +3,14 @@
 from __future__ import unicode_literals
 import base64
 import logging
-import os
-import re
 import uuid
 
+from paramiko.rsakey import RSAKey
 from django.conf import settings
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.urls import reverse_lazy
 from django.utils.translation import ugettext as _
 from django.core.cache import cache
-
-from paramiko.rsakey import RSAKey
 
 from common.tasks import send_mail_async
 from common.utils import reverse, get_object_or_none
@@ -30,10 +27,13 @@ logger = logging.getLogger('jumpserver')
 
 
 class AdminUserRequiredMixin(UserPassesTestMixin):
-    login_url = reverse_lazy('users:login')
-
     def test_func(self):
-        return self.request.user.is_superuser
+        if not self.request.user.is_authenticated:
+            return False
+        elif not self.request.user.is_superuser:
+            self.raise_exception = True
+            return False
+        return True
 
 
 def user_add_success_next(user):

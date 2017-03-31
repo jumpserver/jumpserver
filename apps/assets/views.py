@@ -125,7 +125,7 @@ class AssetUpdateView(AdminUserRequiredMixin, UpdateView):
         return super(AssetUpdateView, self).form_invalid(form)
 
 
-class AssetDeleteView(DeleteView):
+class AssetDeleteView(AdminUserRequiredMixin, DeleteView):
     model = Asset
     template_name = 'assets/delete_confirm.html'
     success_url = reverse_lazy('assets:asset-list')

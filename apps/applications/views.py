@@ -1,18 +1,19 @@
 # ~*~ coding: utf-8 ~*~
 #
 
-from django.views.generic import ListView, UpdateView, DeleteView, DetailView
-from django.views.generic.edit import BaseUpdateView
+from django.views.generic import ListView, UpdateView, DeleteView, \
+    DetailView, TemplateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import ugettext as _
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 
-from .models import Terminal
-from users.utils import AdminUserRequiredMixin
 from common.mixins import JSONResponseMixin
+from .models import Terminal
 from .forms import TerminalForm
+from .hands import AdminUserRequiredMixin
 
 
-class TerminalListView(ListView):
+class TerminalListView(LoginRequiredMixin, ListView):
     model = Terminal
     template_name = 'applications/terminal_list.html'
     form_class = TerminalForm
@@ -27,11 +28,11 @@ class TerminalListView(ListView):
         return context
 
 
-class TerminalUpdateView(UpdateView):
+class TerminalUpdateView(AdminUserRequiredMixin, UpdateView):
     model = Terminal
     form_class = TerminalForm
     template_name = 'applications/terminal_update.html'
-    success_url = reverse_lazy('applications:applications-list')
+    success_url = reverse_lazy('applications:terminal-list')
 
     def get_context_data(self, **kwargs):
         context = super(TerminalUpdateView, self).get_context_data(**kwargs)
@@ -39,7 +40,7 @@ class TerminalUpdateView(UpdateView):
         return context
 
 
-class TerminalDetailView(DetailView):
+class TerminalDetailView(LoginRequiredMixin, DetailView):
     model = Terminal
     template_name = 'applications/terminal_detail.html'
     context_object_name = 'terminal'
@@ -53,7 +54,7 @@ class TerminalDetailView(DetailView):
         return context
 
 
-class TerminalDeleteView(DeleteView):
+class TerminalDeleteView(AdminUserRequiredMixin, DeleteView):
     model = Terminal
     template_name = 'assets/delete_confirm.html'
     success_url = reverse_lazy('applications:applications-list')
@@ -88,3 +89,26 @@ class TerminalModelAccept(AdminUserRequiredMixin, JSONResponseMixin, UpdateView)
         return self.render_json_response(data)
 
 
+class TerminalConnectView(LoginRequiredMixin, DetailView):
+    template_name = 'flash_message_standalone.html'
+    model = Terminal
+
+    def get_context_data(self, **kwargs):
+        if self.object.type == 'Web':
+            context = {
+                'title': _('Redirect to web terminal'),
+                'messages': _('Redirect to web terminal: {}'.format(self.object.url)),
+                'auto_redirect': True,
+                'interval': 3,
+                'redirect_url': self.object.url
+            }
+        else:
+            context = {
+                'title': _('Connect ssh terminal'),
+                'messages': _('You should use your ssh client tools '
+                              'connect terminal: {} <br /> <br />'
+                              '{}'.format(self.object.name, self.object.url)),
+            }
+
+        kwargs.update(context)
+        return super(TerminalConnectView, self).get_context_data(**kwargs)
