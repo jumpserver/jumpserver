@@ -20,4 +20,3 @@ tornado==4.4.2
 eventlet==0.20.1
 django-filter==1.0.0
 passlib==1.7.1
-sshpass
