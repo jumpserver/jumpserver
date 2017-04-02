@@ -22,12 +22,14 @@ from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.cache import cache
 from django.utils import timezone
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none
 from . import forms
 from .models import Asset, AssetGroup, AdminUser, IDC, SystemUser
 from .hands import AdminUserRequiredMixin
+from .tasks import update_assets_hardware_info
 
 
 class AssetListView(AdminUserRequiredMixin, TemplateView):
@@ -44,7 +46,7 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
         return super(AssetListView, self).get_context_data(**kwargs)
 
 
-class UserAssetListView(TemplateView):
+class UserAssetListView(LoginRequiredMixin, TemplateView):
     template_name = 'assets/user_asset_list.html'
 
     def get_context_data(self, **kwargs):
@@ -64,7 +66,7 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
     success_url = reverse_lazy('assets:asset-list')
 
     def form_valid(self, form):
-        asset = form.save()
+        self.asset = asset = form.save()
         asset.created_by = self.request.user.username or 'Admin'
         asset.save()
         return super(AssetCreateView, self).form_valid(form)
@@ -76,6 +78,10 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
         }
         kwargs.update(context)
         return super(AssetCreateView, self).get_context_data(**kwargs)
+
+    def get_success_url(self):
+        update_assets_hardware_info.delay([self.asset])
+        return super(AssetCreateView, self).get_success_url()
 
 
 class AssetModalCreateView(AdminUserRequiredMixin, ListView):
@@ -439,15 +445,11 @@ class AdminUserDetailView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
     context_object_name = 'admin_user'
 
     def get(self, request, *args, **kwargs):
-        self.object  = self.get_object(queryset=AdminUser.objects.all())
+        self.object = self.get_object(queryset=AdminUser.objects.all())
         return super(AdminUserDetailView, self).get(request, *args, **kwargs)
 
-    # Todo: queryset default order by connectivity, need ops support
     def get_queryset(self):
         return self.object.assets.all()
-
-    # def get_asset_groups(self):
-    #     return self.object.asset_groups.all()
 
     def get_context_data(self, **kwargs):
         asset_groups = AssetGroup.objects.all()
@@ -457,8 +459,6 @@ class AdminUserDetailView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
             'action': 'Admin user detail',
             'assets_remain': [asset for asset in Asset.objects.all() if asset not in assets],
             'asset_groups': asset_groups,
-            # 'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all()
-            #                         if asset_group not in asset_groups]
         }
         kwargs.update(context)
         return super(AdminUserDetailView, self).get_context_data(**kwargs)

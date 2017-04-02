@@ -1,6 +1,9 @@
 from django.views.generic import TemplateView
 from django.utils import timezone
 from django.db.models import Count
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import redirect
+
 
 from users.utils import AdminUserRequiredMixin
 from users.models import User
@@ -8,8 +11,13 @@ from assets.models import Asset
 from audits.models import ProxyLog
 
 
-class IndexView(AdminUserRequiredMixin, TemplateView):
+class IndexView(LoginRequiredMixin, TemplateView):
     template_name = 'index.html'
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_superuser:
+            return redirect('assets:user-asset-list')
+        return super(IndexView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         seven_days_ago = timezone.now() - timezone.timedelta(days=7)

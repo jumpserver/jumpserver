@@ -188,7 +188,7 @@ $(document).ready(function(){
     var uid = $this.data('uid');
     var the_url = '{% url "api-assets:asset-detail" pk=99991937 %}'.replace('99991937', uid);
     console.log(the_url);
-    objDelete($this, name, the_url);
+    objectDelete($this, name, the_url);
     setTimeout( function () {
         $data_table.ajax.reload();
     }, 3000);

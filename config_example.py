@@ -100,8 +100,8 @@ class DevelopmentConfig(Config):
     DB_NAME = os.path.join(BASE_DIR, 'db.sqlite3')
     EMAIL_HOST = 'smtp.exmail.qq.com'
     EMAIL_PORT = 465
-    EMAIL_HOST_USER = 'ask@jumpserver.org'
-    EMAIL_HOST_PASSWORD = 'xfDf4x1n'
+    EMAIL_HOST_USER = 'a@jumpserver.org'
+    EMAIL_HOST_PASSWORD = 'somepasswrd'
     EMAIL_USE_SSL = True
     EMAIL_USE_TLS = False
     EMAIL_SUBJECT_PREFIX = '[Jumpserver] '
