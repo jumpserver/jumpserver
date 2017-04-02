@@ -254,3 +254,6 @@ class SystemUser(models.Model):
             except IntegrityError:
                 print('Error continue')
                 continue
+
+
+

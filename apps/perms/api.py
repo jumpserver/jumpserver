@@ -197,7 +197,7 @@ class MyAssetGroupAssetsApi(ListAPIView):
     permission_classes = (IsValidUser,)
 
     def get(self, request, *args, **kwargs):
-        asset_groups = {}
+        asset_groups = dict()
         asset_groups[0] = {
             'id': 0, 'name': 'ungrouped', 'assets': []
         }
@@ -216,7 +216,7 @@ class MyAssetGroupAssetsApi(ListAPIView):
                 asset_json = asset.to_json()
                 asset_json['system_users'] = [su.to_json() for su in system_users]
                 if not asset.groups.all():
-                    asset_groups[0][assets].append(asset_json)
+                    asset_groups[0]['assets'].append(asset_json)
                     continue
                 for asset_group in asset.groups.all():
                     if asset_group.id in asset_groups:
