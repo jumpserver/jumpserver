@@ -53,14 +53,17 @@ def update_assets_hardware_info(assets):
         asset.save()
 
 
-@shared_task(name="asset_test_ping_check")
-def asset_test_ping_check(assets):
+@shared_task
+def test_admin_user_connective(assets=None):
+    if None:
+        assets = Asset.objects.filter(type__in=['Server', 'VM'])
+    if not assets:
+        return 'No asset get'
     task_tuple = (
         ('ping', ''),
     )
-    hoc = AdHocRunner(assets)
-    result = hoc.run(task_tuple)
-    return result['contacted'].keys(), result['dark'].keys()
+    summary, result = run_AdHoc(task_tuple, assets, record=False)
+    return summary, result
 
 
 def get_assets_hardware_info(assets):
