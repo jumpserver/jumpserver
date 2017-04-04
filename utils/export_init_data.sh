@@ -3,10 +3,13 @@
 
 python2.7 ../apps/manage.py shell << EOF
 from users.models import *
-init_all_models()
+init_model()
 
 from assets.models import *
-init_all_models()
+init_model()
+
+from audits.models import LoginLog
+LoginLog.objects.all().delete()
 EOF
 
 
