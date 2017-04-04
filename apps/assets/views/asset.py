@@ -32,7 +32,7 @@ from ..tasks import update_assets_hardware_info
 __all__ = ['AssetListView', 'AssetCreateView', 'AssetUpdateView',
            'UserAssetListView', 'AssetModalCreateView', 'AssetDetailView',
            'AssetModalListView', 'AssetDeleteView', 'AssetExportView',
-           'BulkImportAssetView', 'AssetRefreshHardwareView',
+           'BulkImportAssetView',
            ]
 
 
@@ -328,12 +328,4 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         }
         return self.render_json_response(data)
 
-
-class AssetRefreshHardwareView(AdminUserRequiredMixin, View):
-    def get(self, request, *args, **kwargs):
-        asset_id = kwargs.get('pk')
-        asset = get_object_or_404(Asset, pk=asset_id)
-        update_assets_hardware_info([asset])
-
-        return redirect(reverse('assets:asset-detail', kwargs={'pk': asset_id}))
 

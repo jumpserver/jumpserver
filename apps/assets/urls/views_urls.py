@@ -14,7 +14,6 @@ urlpatterns = [
     url(r'^asset/(?P<pk>[0-9]+)/$', views.AssetDetailView.as_view(), name='asset-detail'),
     url(r'^asset/(?P<pk>[0-9]+)/update/$', views.AssetUpdateView.as_view(), name='asset-update'),
     url(r'^asset/(?P<pk>[0-9]+)/delete/$', views.AssetDeleteView.as_view(), name='asset-delete'),
-    url(r'^asset/(?P<pk>[0-9]+)/refresh/$', views.AssetRefreshHardwareView.as_view(), name='asset-refresh'),
     url(r'^asset-modal$', views.AssetModalListView.as_view(), name='asset-modal-list'),
     url(r'^asset-modal-update$', views.AssetModalCreateView.as_view(), name='asset-modal-update'),
 
