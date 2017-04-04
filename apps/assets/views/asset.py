@@ -8,6 +8,7 @@ from openpyxl.writer.excel import save_virtual_workbook
 from openpyxl import load_workbook
 from django.conf import settings
 from django.db import IntegrityError
+from django.urls import reverse
 from django.views.generic import TemplateView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from django.urls import reverse_lazy
@@ -18,6 +19,7 @@ from django.utils.decorators import method_decorator
 from django.core.cache import cache
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.shortcuts import get_object_or_404, redirect
 
 from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none
@@ -30,7 +32,7 @@ from ..tasks import update_assets_hardware_info
 __all__ = ['AssetListView', 'AssetCreateView', 'AssetUpdateView',
            'UserAssetListView', 'AssetModalCreateView', 'AssetDetailView',
            'AssetModalListView', 'AssetDeleteView', 'AssetExportView',
-           'BulkImportAssetView',
+           'BulkImportAssetView', 'AssetRefreshHardwareView',
            ]
 
 
@@ -325,3 +327,13 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
             'msg': 'Created: {}. Updated: {}, Error: {}'.format(len(created), len(updated), len(failed))
         }
         return self.render_json_response(data)
+
+
+class AssetRefreshHardwareView(AdminUserRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        asset_id = kwargs.get('pk')
+        asset = get_object_or_404(Asset, pk=asset_id)
+        update_assets_hardware_info([asset])
+
+        return redirect(reverse('assets:asset-detail', kwargs={'pk': asset_id}))
+

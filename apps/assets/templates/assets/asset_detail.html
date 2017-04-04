@@ -188,7 +188,7 @@
                                             <td>{% trans 'Rrefresh hardware' %}:</td>
                                             <td>
                                                 <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Refresh' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs btn-refresh-asset" style="width: 54px">{% trans 'Refresh' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
@@ -353,20 +353,30 @@ function updateAssetSystem(system_users) {
     });
 }
 
+function refreshAssetHardware() {
+    var the_url = "{% url 'api-assets:asset-refresh' pk=asset.id %}";
+    var success = function (data) {
+        location.reload();
+    };
+    APIUpdateAttr({
+        url: the_url,
+        success: success,
+        method: 'GET'
+    })
+}
+
 
 $(document).ready(function () {
-    $('.select2').select2()
-    .on('select2:select', function(evt) {
-            var data = evt.params.data;
-            jumpserver.groups_selected[data.id] = data.text;
-        }).on('select2:unselect', function(evt) {
-            var data = evt.params.data;
-            delete jumpserver.groups_selected[data.id]
-        })
-})
-        .on('click', '#is_active', function () {
-        var the_url = '{% url "api-assets:asset-detail" pk=asset.id %}';
-        var checked = $(this).prop('checked');
+    $('.select2').select2().on('select2:select', function(evt) {
+        var data = evt.params.data;
+        jumpserver.groups_selected[data.id] = data.text;
+    }).on('select2:unselect', function(evt) {
+        var data = evt.params.data;
+        delete jumpserver.groups_selected[data.id]
+    })
+}).on('click', '#is_active', function () {
+    var the_url = '{% url "api-assets:asset-detail" pk=asset.id %}';
+    var checked = $(this).prop('checked');
     var body = {
         'is_active': checked
     };
@@ -382,21 +392,19 @@ $(document).ready(function () {
     }else{
             $(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").html('False');
     }
-})
-        .on('click', '#btn_add_user_group', function () {
-                if (Object.keys(jumpserver.groups_selected).length === 0) {
-            return false;
-        }
-            var groups = $('.bdg_group').map(function() {
-                return $(this).data('gid');
-            }).get();
-            $.map(jumpserver.groups_selected, function(value, index) {
-                groups.push(parseInt(index));
-                $('#opt_' + index).remove();
-            });
-            updateAssetGroups(groups)
-})
-    .on('click', '.btn_leave_group', function() {
+}).on('click', '#btn_add_user_group', function () {
+    if (Object.keys(jumpserver.groups_selected).length === 0) {
+       return false;
+    }
+    var groups = $('.bdg_group').map(function() {
+        return $(this).data('gid');
+    }).get();
+    $.map(jumpserver.groups_selected, function(value, index) {
+        groups.push(parseInt(index));
+        $('#opt_' + index).remove();
+    });
+    updateAssetGroups(groups)
+}).on('click', '.btn_leave_group', function() {
     var $this = $(this);
     var $tr = $this.closest('tr');
     var $badge = $tr.find('.bdg_group');
@@ -410,35 +418,33 @@ $(document).ready(function () {
         return $(this).data('gid');
     }).get();
     updateAssetGroups(groups)
-})
-    .on('click', '.btn-system-user', function () {
-            if (Object.keys(jumpserver.groups_selected).length === 0) {
-            return false;
-        }
-            var system_users = $('.bdg_group').map(function() {
-                return $(this).data('sid');
-            }).get();
-            $.map(jumpserver.groups_selected, function(value, index) {
-                system_users.push(parseInt(index));
-                $('#opt_' + index).remove();
-            });
-            updateAssetSystem(system_users)
+}).on('click', '.btn-system-user', function () {
+    if (Object.keys(jumpserver.groups_selected).length === 0) {
+        return false;
+    }
+    var system_users = $('.bdg_group').map(function() {
+            return $(this).data('sid');
+    }).get();
+    $.map(jumpserver.groups_selected, function(value, index) {
+        system_users.push(parseInt(index));
+        $('#opt_' + index).remove();
+    });
+    updateAssetSystem(system_users)
 
-})
-        .on('click', '.btn_leave_system', function () {
-                var $this = $(this);
-            var $tr = $this.closest('tr');
-            var $badge = $tr.find('.bdg_group');
-            var sid = $badge.data('sid');
-            var name = $badge.html() || $badge.text();
-            $('#groups_selected').append(
-                '<option value="' + sid + '" id="opt_' + sid + '">' + name + '</option>'
-            );
-            $tr.remove();
-            var system_users = $('.bdg_group').map(function () {
-                return $(this).data('sid');
-            }).get();
-            updateAssetSystem(system_users)
+}).on('click', '.btn_leave_system', function () {
+    var $this = $(this);
+    var $tr = $this.closest('tr');
+    var $badge = $tr.find('.bdg_group');
+    var sid = $badge.data('sid');
+    var name = $badge.html() || $badge.text();
+    $('#groups_selected').append(
+        '<option value="' + sid + '" id="opt_' + sid + '">' + name + '</option>'
+    );
+    $tr.remove();
+    var system_users = $('.bdg_group').map(function () {
+            return $(this).data('sid');
+        }).get();
+        updateAssetSystem(system_users)
 
 }).on('click', '.btn-delete-asset', function () {
     var $this = $(this);
@@ -447,6 +453,8 @@ $(document).ready(function () {
     var the_url = '{% url "api-assets:asset-detail" pk=99991937 %}'.replace('99991937', uid);
     var redirect_url = "{% url 'assets:asset-list' %}";
     objectDelete($this, name, the_url, redirect_url);
+}).on('click', '.btn-refresh-asset', function () {
+    refreshAssetHardware()
 })
 
 

@@ -2,6 +2,7 @@
 
 from rest_framework import viewsets, generics, mixins
 
+
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_bulk import BulkModelViewSet, BulkDestroyAPIView
@@ -14,6 +15,7 @@ from common.utils import get_object_or_none, signer
 from .hands import IsSuperUser, IsAppUser, IsValidUser, get_user_granted_assets
 from .models import AssetGroup, Asset, IDC, SystemUser, AdminUser
 from . import serializers
+from .tasks import update_assets_hardware_info
 
 
 class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
@@ -54,29 +56,25 @@ class AssetUpdateGroupApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsSuperUser,)
 
 
-## update the asset group, and add or delete the asset to the group
 class AssetGroupUpdateApi(generics.RetrieveUpdateAPIView):
     queryset = AssetGroup.objects.all()
     serializer_class = serializers.AssetGroupUpdateSerializer
     permission_classes = (IsSuperUser,)
 
 
-## update the asset group, and add or delete the system_user to the group
 class AssetGroupUpdateSystemUserApi(generics.RetrieveUpdateAPIView):
     queryset = AssetGroup.objects.all()
     serializer_class = serializers.AssetGroupUpdateSystemUserSerializer
     permission_classes = (IsSuperUser,)
 
 
-## update the IDC, and add or delete the assets to the IDC
-class IDCupdateAssetsApi(generics.RetrieveUpdateAPIView):
+class IDCUpdateAssetsApi(generics.RetrieveUpdateAPIView):
     queryset = IDC.objects.all()
     serializer_class = serializers.IDCUpdateAssetsSerializer
     permission_classes = (IsSuperUser,)
 
 
 class IDCViewSet(IDInFilterMixin, BulkModelViewSet):
-    """API endpoint that allows IDC to be viewed or edited."""
     queryset = IDC.objects.all()
     serializer_class = serializers.IDCSerializer
     permission_classes = (IsSuperUser,)
@@ -147,3 +145,14 @@ class SystemUserAuthInfoApi(generics.RetrieveAPIView):
         }
         return Response(data)
 
+
+class AssetRefreshHardwareView(generics.RetrieveAPIView):
+    queryset = Asset.objects.all()
+    serializer_class = serializers.AssetSerializer
+    permission_classes = (IsSuperUser,)
+
+    def retrieve(self, request, *args, **kwargs):
+        asset_id = kwargs.get('pk')
+        asset = get_object_or_404(Asset, pk=asset_id)
+        update_assets_hardware_info([asset])
+        return super(AssetRefreshHardwareView, self).retrieve(request, *args, **kwargs)

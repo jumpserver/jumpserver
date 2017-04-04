@@ -22,6 +22,9 @@ urlpatterns = [
     url(r'^v1/assets/(?P<pk>\d+)/groups/$',
         api.AssetUpdateGroupApi.as_view(), name='asset-update-group'),
 
+    url(r'^v1/assets/(?P<pk>\d+)/refresh/$',
+        api.AssetRefreshHardwareView.as_view(), name='asset-refresh'),
+
     url(r'^v1/assets/(?P<pk>\d+)/system-users/$',
         api.SystemUserUpdateApi.as_view(), name='asset-update-system-users'),
 
@@ -42,7 +45,7 @@ urlpatterns = [
 
     # update the IDC, and add or delete the assets to the IDC
     url(r'^v1/idc/(?P<pk>\d+)/assets/$',
-        api.IDCupdateAssetsApi.as_view(), name='idc-update-assets'),
+        api.IDCUpdateAssetsApi.as_view(), name='idc-update-assets'),
 
 ]
 
