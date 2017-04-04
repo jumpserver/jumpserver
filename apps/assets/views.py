@@ -68,6 +68,7 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
     def form_valid(self, form):
         self.asset = asset = form.save()
         asset.created_by = self.request.user.username or 'Admin'
+        asset.date_created = timezone.now()
         asset.save()
         return super(AssetCreateView, self).form_valid(form)
 
