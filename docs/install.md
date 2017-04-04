@@ -120,6 +120,7 @@ $ git clone https://github.com/jumpserver/coco.git
 
 **3.2 安装依赖**
 ```
+$ cd coco
 $ pip2.7 install -r requirements.txt -i https://pypi.doubanio.com/simple
 ```
 
