@@ -13,7 +13,10 @@
 ##### 1.1 安装基本工具和库
 
 	$ yum -y install sqlite-devel git epel-release
-
+	$ yum -y install python-devel libffi-devel openssl-devel
+	$ yum -y install gcc gcc-c++
+	
+	
 ##### 1.2 安装Python
 
 这里可以参考 [https://segmentfault.com/a/1190000000654227][1] 也可以下载我编译的rpm版本:
@@ -23,6 +26,20 @@
 	$ bash	
 	$ python2.7 -V	
 	Python 2.7.13
+	
+设置默认python版本为2.7.13:
+```
+$ mv /usr/bin/python /usr/bin/python.bak	
+$ which python2.7
+/data/server/python27/bin/python2.7
+$ ln -s /data/server/python27/bin/python2.7 /usr/bin/python
+```	
+设置yum默认python用2.6:
+```
+$ vim /usr/bin/yum
+#!/usr/bin/python2.6
+
+```
 
 #### 二. Jumpserver安装
 
