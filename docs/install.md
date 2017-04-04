@@ -33,6 +33,8 @@ $ mv /usr/bin/python /usr/bin/python.bak
 $ which python2.7
 /data/server/python27/bin/python2.7
 $ ln -s /data/server/python27/bin/python2.7 /usr/bin/python
+$python
+Python 2.7.13
 ```	
 设置yum默认python用2.6:
 ```
