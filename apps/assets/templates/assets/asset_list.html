@@ -121,7 +121,9 @@ $(document).ready(function(){
                 }
             }},
             {targets: 8, createdCell: function (td, cellData) {
-                if (!cellData) {
+                if (cellData == 'Unknown'){
+                    $(td).html('<i class="fa fa-circle text-warning"></i>')
+                } else if (!cellData) {
                     $(td).html('<i class="fa fa-circle text-danger"></i>')
                 } else {
                     $(td).html('<i class="fa fa-circle text-navy"></i>')
@@ -136,7 +138,7 @@ $(document).ready(function(){
         ajax_url: '{% url "api-assets:asset-list" %}',
         columns: [{data: "id"}, {data: "hostname" }, {data: "ip" }, {data: "port" },
             {data: "get_type_display" }, {data: "get_env_display"}, {data: "hardware"},
-            {data: "is_active" }, {data: "is_active"}, {data: "id" }],
+            {data: "is_active" }, {data: "is_online"}, {data: "id" }],
         op_html: $('#actions').html()
     };
     var table = jumpserver.initDataTable(options);

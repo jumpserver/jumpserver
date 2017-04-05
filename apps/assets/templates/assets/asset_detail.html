@@ -188,7 +188,7 @@
                                             <td>{% trans 'Rrefresh hardware' %}:</td>
                                             <td>
                                                 <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs btn-refresh-asset" style="width: 54px">{% trans 'Refresh' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_refresh_asset" style="width: 54px">{% trans 'Refresh' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
@@ -196,19 +196,10 @@
                                             <td>{% trans 'Test admin user' %}:</td>
                                             <td>
                                                 <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_pk" style="width: 54px;">{% trans 'Test' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_test_admin_user" style="width: 54px;">{% trans 'Test' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>{% trans 'Test system pingpong' %}:</td>
-                                            <td>
-                                                <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_pk" style="width: 54px;">{% trans 'Test' %}</button>
-                                                </span>
-                                            </td>
-                                        </tr>
-
                                         </tbody>
                                     </table>
                                 </div>
@@ -453,8 +444,17 @@ $(document).ready(function () {
     var the_url = '{% url "api-assets:asset-detail" pk=99991937 %}'.replace('99991937', uid);
     var redirect_url = "{% url 'assets:asset-list' %}";
     objectDelete($this, name, the_url, redirect_url);
-}).on('click', '.btn-refresh-asset', function () {
+}).on('click', '#btn_refresh_asset', function () {
+    alert('请等待几秒, 等待完成');
     refreshAssetHardware()
+}).on('click', '#btn_test_admin_user', function () {
+    $.ajax({
+        url: '{% url "api-assets:asset-admin-user-test" pk=asset.id %}'
+    }).done(function (data, textStatue, jqXHR) {
+        toastr.success('Success')
+    }).fail(function (data, textStaue, errorThrown) {
+        toastr.error('Error')
+    })
 })
 
 

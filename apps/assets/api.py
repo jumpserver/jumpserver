@@ -12,10 +12,12 @@ from django.shortcuts import get_object_or_404
 
 from common.mixins import IDInFilterMixin
 from common.utils import get_object_or_none, signer
-from .hands import IsSuperUser, IsAppUser, IsValidUser, get_user_granted_assets
+from .hands import IsSuperUser, IsAppUser, IsValidUser, \
+    get_user_granted_assets, push_users
 from .models import AssetGroup, Asset, IDC, SystemUser, AdminUser
 from . import serializers
 from .tasks import update_assets_hardware_info
+from .utils import test_admin_user_connective_manual
 
 
 class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
@@ -97,6 +99,16 @@ class SystemUserUpdateApi(generics.RetrieveUpdateAPIView):
     serializer_class = serializers.AssetUpdateSystemUserSerializer
     permission_classes = (IsSuperUser,)
 
+    def patch(self, request, *args, **kwargs):
+        asset = self.get_object()
+        old_system_users = set(asset.system_users.all())
+        response = super(SystemUserUpdateApi, self).patch(request, *args, **kwargs)
+        system_users_new = set(asset.system_users.all())
+        system_users = system_users_new - old_system_users
+        system_users = [system_user._to_secret_json() for system_user in system_users]
+        push_users.delay([asset], system_users)
+        return response
+
 
 class SystemUserUpdateAssetsApi(generics.RetrieveUpdateAPIView):
     queryset = SystemUser.objects.all()
@@ -108,19 +120,6 @@ class SystemUserUpdateAssetGroupApi(generics.RetrieveUpdateAPIView):
     queryset = SystemUser.objects.all()
     serializer_class = serializers.SystemUserUpdateAssetGroupSerializer
     permission_classes = (IsSuperUser,)
-
-
-# class IDCAssetsApi(generics.ListAPIView):
-#     model = IDC
-#     serializer_class = serializers.AssetSerializer
-#
-#     def get(self, request, *args, **kwargs):
-#         filter_kwargs = {self.lookup_field: self.kwargs[self.lookup_field]}
-#         self.object = get_object_or_404(self.model, **filter_kwargs)
-#         return super(IDCAssetsApi, self).get(request, *args, **kwargs)
-#
-#     def get_queryset(self):
-#         return self.object.assets.all()
 
 
 class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
@@ -154,5 +153,22 @@ class AssetRefreshHardwareView(generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         asset_id = kwargs.get('pk')
         asset = get_object_or_404(Asset, pk=asset_id)
-        update_assets_hardware_info([asset])
-        return super(AssetRefreshHardwareView, self).retrieve(request, *args, **kwargs)
+        summary = update_assets_hardware_info([asset])
+        if len(summary['failed']) == 0:
+            return super(AssetRefreshHardwareView, self).retrieve(request, *args, **kwargs)
+        else:
+            return Response('', status=502)
+
+
+class AssetAdminUserTestView(AssetRefreshHardwareView):
+    queryset = Asset.objects.all()
+    permission_classes = (IsSuperUser,)
+
+    def retrieve(self, request, *args, **kwargs):
+        asset_id = kwargs.get('pk')
+        asset = get_object_or_404(Asset, pk=asset_id)
+        result = test_admin_user_connective_manual([asset])
+        if result:
+            return Response('1')
+        else:
+            return Response('0', status=502)

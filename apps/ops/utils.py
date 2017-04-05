@@ -27,7 +27,8 @@ def run_AdHoc(task_tuple, assets,
     :param pattern:
     :param record:
     :param verbose:
-    :return:
+    :return: summary: {'success': [], 'failed': [{'192.168.1.1': 'msg'}]}
+             result: {'contacted': {'hostname': [{''}, {''}], 'dark': []}
     """
 
     if not assets:

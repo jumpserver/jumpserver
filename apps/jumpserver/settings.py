@@ -108,6 +108,10 @@ TEMPLATES = [
 LOGIN_REDIRECT_URL = reverse_lazy('index')
 LOGIN_URL = reverse_lazy('users:login')
 
+SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN or None
+CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN or None
+SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600*24
+
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 

@@ -76,7 +76,7 @@ class Asset(models.Model):
 
     platform = models.CharField(max_length=128, null=True, blank=True, verbose_name='Platform')
     os = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('OS'))
-    os_version = models.FloatField(null=True, blank=True, verbose_name=_('OS Version'))
+    os_version = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('OS Version'))
     os_arch = models.CharField(max_length=16, blank=True, null=True, verbose_name=_('OS Arch'))
     hostname_raw = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Hostname raw'))
 

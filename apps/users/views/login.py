@@ -69,7 +69,7 @@ class UserLogoutView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         auth_logout(request)
-        return super(UserLogoutView, self).get(request)
+        return super(UserLogoutView, self).get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = {
@@ -201,9 +201,4 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
         form = super(UserFirstLoginView, self).get_form(step, data, files)
 
         form.instance = self.request.user
-        if step is None:
-            step = self.steps.current
-
-        # if step == '1':
-        #     form.instance = self.request.user
         return form

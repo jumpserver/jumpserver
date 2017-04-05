@@ -31,7 +31,7 @@ def start_celery():
     os.environ.setdefault('C_FORCE_ROOT', '1')
     os.environ.setdefault('PYTHONOPTIMIZE', '1')
     print('start celery')
-    subprocess.call('celery -A common worker -s /tmp/celerybeat-schedule -l debug', shell=True)
+    subprocess.call('celery -A common worker -B -s /tmp/celerybeat-schedule -l debug', shell=True)
 
 
 def main():

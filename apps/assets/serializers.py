@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.utils.translation import ugettext_lazy as _
+from django.core.cache import cache
 from rest_framework import viewsets, serializers, generics
 from .models import AssetGroup, Asset, IDC, AdminUser, SystemUser
 from common.mixins import IDInFilterMixin
@@ -117,6 +118,7 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     # system_users = SystemUserSerializer(many=True, read_only=True)
     # admin_user = AdminUserSerializer(many=False, read_only=True)
     hardware = serializers.SerializerMethodField()
+    is_online = serializers.SerializerMethodField()
 
     class Meta(object):
         model = Asset
@@ -129,6 +131,16 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             return '{} Core {} {}'.format(obj.cpu_count*obj.cpu_cores, obj.memory, obj.disk_total)
         else:
             return ''
+
+    @staticmethod
+    def get_is_online(obj):
+        hostname = obj.hostname
+        if cache.get(hostname) == '1':
+            return True
+        elif cache.get(hostname) == '0':
+            return False
+        else:
+            return 'Unknown'
 
     def get_field_names(self, declared_fields, info):
         fields = super(AssetSerializer, self).get_field_names(declared_fields, info)

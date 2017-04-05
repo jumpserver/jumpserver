@@ -72,6 +72,11 @@ class Config:
     # Api token expiration when create
     TOKEN_EXPIRATION = 3600
 
+    # Session and csrf domain settings
+    SESSION_COOKIE_DOMAIN = '.jms.com'
+    CSRF_COOKIE_DOMAIN = '.jms.com'
+    SESSION_COOKIE_AGE = 3600*24
+
     # Email SMTP setting, we only support smtp send mail
     # EMAIL_HOST = 'smtp.qq.com'
     # EMAIL_PORT = 25
