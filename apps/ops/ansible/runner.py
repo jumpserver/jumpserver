@@ -26,10 +26,6 @@ C.HOST_KEY_CHECKING = False
 logger = get_logger(__name__)
 
 
-class AnsibleError(StandardError):
-    pass
-
-
 # Jumpserver not use playbook
 class PlayBookRunner(object):
     """

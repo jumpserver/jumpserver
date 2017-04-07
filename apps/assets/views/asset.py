@@ -209,7 +209,7 @@ class AssetExportView(View):
     @staticmethod
     def get_asset_attr(asset, attr):
         if attr in ['admin_user', 'idc']:
-            return getattr(asset, attr).name
+            return getattr(asset, attr)
         elif attr in ['status', 'type', 'env']:
             return getattr(asset, 'get_{}_display'.format(attr))()
         else:
@@ -225,7 +225,7 @@ class AssetExportView(View):
         wb = Workbook()
         ws = wb.active
         ws.title = 'Asset'
-        header = ['hostname', 'ip', 'port', 'admin_user', 'idc', 'cpu', 'memory', 'disk',
+        header = ['hostname', 'ip', 'port', 'admin_user', 'idc', 'memory', 'disk',
                   'mac_address', 'other_ip', 'remote_card_ip', 'os', 'cabinet_no',
                   'cabinet_pos', 'number', 'status', 'type', 'env', 'sn', 'comment']
         ws.append(header)

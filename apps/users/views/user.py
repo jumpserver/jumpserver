@@ -171,7 +171,6 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         try:
             error = form.errors.values()[-1][-1]
         except Exception as e:
-            print e
             error = _('Invalid file.')
         data = {
             'success': False,

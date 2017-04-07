@@ -3,7 +3,6 @@
 {% block modal_id %}asset_import_modal{% endblock %}
 {% block modal_title%}{% trans "Import asset" %}{% endblock %}
 {% block modal_body %}
-<p class="text-success">{% trans "Download template or use export excel format" %}</p>
 <form method="post" action="{% url 'assets:asset-import' %}" id="fm_asset_import" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="form-group">

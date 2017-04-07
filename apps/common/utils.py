@@ -26,9 +26,9 @@ from django.conf import settings
 from django.utils import timezone
 
 try:
-    import cStringIO as StringIO
+    from io import StringIO
 except ImportError:
-    import StringIO
+    from StringIO import StringIO
 
 from .compat import to_bytes, to_string
 
@@ -183,7 +183,7 @@ def timesince(dt, since='', default="just now"):
 
 
 def ssh_key_string_to_obj(text):
-    key_f = StringIO.StringIO(text)
+    key_f = StringIO(text)
     key = None
     try:
         key = paramiko.RSAKey.from_private_key(key_f)
@@ -223,7 +223,7 @@ def ssh_key_gen(length=2048, type='rsa', password=None, username='jumpserver', h
     if hostname is None:
         hostname = os.uname()[1]
 
-    f = StringIO.StringIO()
+    f = StringIO()
 
     try:
         if type == 'rsa':

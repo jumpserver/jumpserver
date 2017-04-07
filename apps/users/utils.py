@@ -17,10 +17,10 @@ from common.utils import reverse, get_object_or_none
 from .models import User
 
 
-try:
-    import cStringIO as StringIO
-except ImportError:
-    import StringIO
+# try:
+#     from io import StringIO
+# except ImportError:
+#     from StringIO import StringIO
 
 
 logger = logging.getLogger('jumpserver')

@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'applications.apps.ApplicationsConfig',
     'rest_framework',
     'bootstrapform',
+    'bootstrap3',
     'captcha',
     'django.contrib.auth',
     'django.contrib.contenttypes',
