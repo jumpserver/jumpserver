@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load static %}
-{% load bootstrap %}
+{% load bootstrap3 %}
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
     <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
@@ -40,14 +40,14 @@
                                 </div>
                             {% endif %}
                             <h3>{% trans 'Basic' %}</h3>
-                            {{ form.name|bootstrap_horizontal }}
-                            {{ form.username|bootstrap_horizontal }}
-                            {{ form.protocol|bootstrap_horizontal }}
+                            {% bootstrap_field form.name layout="horizontal" %}
+                            {% bootstrap_field form.username layout="horizontal" %}
+                            {% bootstrap_field form.protocol layout="horizontal" %}
                             <h3>{% trans 'Auth' %}</h3>
-                            {{ form.auth_method|bootstrap_horizontal }}
+                            {% bootstrap_field form.auth_method layout="horizontal" %}
                             {% block auth %}
                             <div class="password-auth hidden">
-                            {{ form.password|bootstrap_horizontal }}
+                            {% bootstrap_field form.password layout="horizontal" %}
                             </div>
                             <div class="public-key-auth">
                                 <div class="form-group">
@@ -57,7 +57,7 @@
                                     </div>
                                 </div>
                                 <div>
-                                    {{ form.private_key_file|bootstrap_horizontal }}
+                                    {% bootstrap_field form.private_key_file layout="horizontal" %}
                                 </div>
                             </div>
                             {% endblock %}
@@ -68,9 +68,9 @@
                                 </div>
                             </div>
                             <h3>{% trans 'Other' %}</h3>
-                            {{ form.sudo|bootstrap_horizontal }}
-                            {{ form.shell|bootstrap_horizontal }}
-                            {{ form.comment|bootstrap_horizontal }}
+                            {% bootstrap_field form.sudo layout="horizontal" %}
+                            {% bootstrap_field form.shell layout="horizontal" %}
+                            {% bootstrap_field form.comment layout="horizontal" %}
                             <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-2">
                                     <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>

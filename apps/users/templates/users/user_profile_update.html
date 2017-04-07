@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
-{% load bootstrap %}
+{% load bootstrap3 %}
 
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/cropper/cropper.min.css" %}" rel="stylesheet">
@@ -49,14 +49,14 @@
                                 <form method="post" class="form-horizontal" action="" enctype="multipart/form-data">
                                     {% csrf_token %}
                                     <h3>{% trans 'Account' %}</h3>
-                                    {{ form.username|bootstrap_horizontal }}
-                                    {{ form.name|bootstrap_horizontal }}
-                                    {{ form.email|bootstrap_horizontal }}
+                                    {% bootstrap_field form.username layout="horizontal" %}
+                                    {% bootstrap_field form.name layout="horizontal" %}
+                                    {% bootstrap_field form.email layout="horizontal" %}
 
                                     <div class="hr-line-dashed"></div>
                                     <h3>{% trans 'Profile' %}</h3>
-                                    {{ form.phone|bootstrap_horizontal }}
-                                    {{ form.wechat|bootstrap_horizontal }}
+                                    {% bootstrap_field form.phone layout="horizontal" %}
+                                    {% bootstrap_field form.wechat layout="horizontal" %}
                                     <div class="hr-line-dashed"></div>
                                     <div class="form-group">
                                         <div class="col-sm-4 col-sm-offset-2">

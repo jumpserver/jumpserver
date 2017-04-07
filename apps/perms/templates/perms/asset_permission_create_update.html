@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load static %}
-{% load bootstrap %}
+{% load bootstrap3 %}
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
     <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
@@ -31,15 +31,15 @@
                         <form method="post" class="form-horizontal" action="" >
                             {% csrf_token %}
                             <h3>{% trans 'Name' %}</h3>
-                            {{ form.name|bootstrap_horizontal }}
+                            {% bootstrap_field form.name layout="horizontal" %}
                             <div class="hr-line-dashed"></div>
                             <h3>{% trans 'User' %}</h3>
-                            {{ form.users|bootstrap_horizontal }}
-                            {{ form.user_groups|bootstrap_horizontal }}
+                            {% bootstrap_field form.users layout="horizontal" %}
+                            {% bootstrap_field form.user_groups layout="horizontal" %}
                             <div class="hr-line-dashed"></div>
                             <h3>{% trans 'Asset' %}</h3>
                             {{ form.assets|bootstrap_horizontal|safe }}
-                            {{ form.asset_groups|bootstrap_horizontal }}
+                            {% bootstrap_field form.asset_groups layout="horizontal" %}
                             {{ form.system_users |bootstrap_horizontal }}
                             <div class="hr-line-dashed"></div>
                             <h3>{% trans 'Other' %}</h3>
@@ -60,7 +60,7 @@
                                     <span class="help-block ">{{ form.date_expired.errors }}</span>
                                 </div>
                              </div>
-                            {{ form.comment|bootstrap_horizontal }}
+                            {% bootstrap_field form.comment layout="horizontal" %}
 
                             <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-2">

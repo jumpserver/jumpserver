@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
-{% load bootstrap %}
+{% load bootstrap3 %}
 
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/cropper/cropper.min.css" %}" rel="stylesheet">
@@ -62,7 +62,7 @@
                                         </div>
                                     </div>
                                     <h3>{% trans 'Update public key' %}</h3>
-                                    {{ form.public_key|bootstrap_horizontal}}
+                                    {% bootstrap_field form.public_key layout="horizontal" %}
                                     <div class="hr-line-dashed"></div>
                                     <div class="form-group">
                                         <div class="col-sm-4 col-sm-offset-2">

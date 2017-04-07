@@ -59,7 +59,6 @@ INSTALLED_APPS = [
     'common.apps.CommonConfig',
     'applications.apps.ApplicationsConfig',
     'rest_framework',
-    'bootstrapform',
     'bootstrap3',
     'captcha',
     'django.contrib.auth',
@@ -334,3 +333,13 @@ CAPTCHA_TEST_MODE = CONFIG.CAPTCHA_TEST_MODE
 
 COMMAND_STORE_BACKEND = 'audits.backends.command.db'
 RECORD_STORE_BACKEND = 'audits.backends.record.db'
+
+
+# Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
+BOOTSTRAP3 = {
+    'horizontal_label_class': 'col-md-2',
+    # Field class to use in horizontal forms
+    'horizontal_field_class': 'col-md-9',
+    # Set placeholder attributes to label if no placeholder is provided
+    'set_placeholder': True,
+}

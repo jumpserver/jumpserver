@@ -1,28 +1,28 @@
 {% extends '_base_create_update.html' %}
 {% load static %}
-{% load bootstrap %}
+{% load bootstrap3 %}
 {% load i18n %}
 
 {% block form %}
 
 <div style="display:none" id="ridd">
-    {{ form.port|bootstrap_horizontal }}
-    {{ form.type|bootstrap_horizontal }}
-    {{ form.idc|bootstrap_horizontal }}
-    {{ form.groups|bootstrap_horizontal }}
-    {{ form.admin_user|bootstrap_horizontal }}
-    {{ form.system_users|bootstrap_horizontal }}
-    {{ form.brand|bootstrap_horizontal }}
-    {{ form.cpu|bootstrap_horizontal }}
-    {{ form.memory|bootstrap_horizontal }}
-    {{ form.disk|bootstrap_horizontal }}
-    {{ form.os|bootstrap_horizontal }}
-    {{ form.cabinet_no|bootstrap_horizontal }}
-    {{ form.cabinet_pos|bootstrap_horizontal }}
-    {{ form.status|bootstrap_horizontal }}
-    {{ form.env|bootstrap_horizontal }}
-    {{ form.tags|bootstrap_horizontal }}
-    {{ form.comment|bootstrap_horizontal }}
+    {% bootstrap_field form.port layout="horizontal" %}
+    {% bootstrap_field form.type layout="horizontal" %}
+    {% bootstrap_field form.idc layout="horizontal" %}
+    {% bootstrap_field form.groups layout="horizontal" %}
+    {% bootstrap_field form.admin_user layout="horizontal" %}
+    {% bootstrap_field form.system_users layout="horizontal" %}
+    {% bootstrap_field form.brand layout="horizontal" %}
+    {% bootstrap_field form.cpu layout="horizontal" %}
+    {% bootstrap_field form.memory layout="horizontal" %}
+    {% bootstrap_field form.disk layout="horizontal" %}
+    {% bootstrap_field form.os layout="horizontal" %}
+    {% bootstrap_field form.cabinet_no layout="horizontal" %}
+    {% bootstrap_field form.cabinet_pos layout="horizontal" %}
+    {% bootstrap_field form.status layout="horizontal" %}
+    {% bootstrap_field form.env layout="horizontal" %}
+    {% bootstrap_field form.tags layout="horizontal" %}
+    {% bootstrap_field form.comment layout="horizontal" %}
 </div>
 <div class="hr-line-dashed"></div>
     <form action="" class="form-horizontal">

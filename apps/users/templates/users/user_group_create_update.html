@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
-{% load bootstrap %}
+{% load bootstrap3 %}
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
     <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
@@ -23,7 +23,7 @@
                        {% endif %}
                         <form method="post" class="form-horizontal" action="" >
                             {% csrf_token %}
-                            {{ form.name|bootstrap_horizontal }}
+                            {% bootstrap_field form.name layout="horizontal" %}
                             <div class="form-group">
                               <label for="users" class="col-sm-2 control-label">{% trans 'Users' %}</label>
                                 <div class="col-sm-9">
@@ -38,7 +38,7 @@
                                     </select>
                                 </div>
                             </div>
-                            {{ form.comment|bootstrap_horizontal }}
+                            {% bootstrap_field form.comment layout="horizontal" %}
                             <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-2">
                                     <button class="btn btn-white" type="reset">{% trans 'Cancel' %}</button>

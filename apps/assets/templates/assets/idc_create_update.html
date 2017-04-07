@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load static %}
-{% load bootstrap %}
+{% load bootstrap3 %}
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
     <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
@@ -34,16 +34,16 @@
                                     <form id="IDCForm" method="post" class="form-horizontal">
                                         {% csrf_token %}
                                         <h3 class="widget-head-color-box">基本信息</h3>
-                                        {{ form.name|bootstrap_horizontal }}
-                                        {{ form.address|bootstrap_horizontal }}
-                                        {{ form.contact|bootstrap_horizontal }}
-                                        {{ form.phone|bootstrap_horizontal }}
+                                        {% bootstrap_field form.name layout="horizontal" %}
+                                        {% bootstrap_field form.address layout="horizontal" %}
+                                        {% bootstrap_field form.contact layout="horizontal" %}
+                                        {% bootstrap_field form.phone layout="horizontal" %}
 
                                         <div class="hr-line-dashed"></div>
                                         <h3 class="widget-head-color-box">IP段</h3>
-                                        {{ form.operator|bootstrap_horizontal }}
-                                        {{ form.intranet|bootstrap_horizontal }}
-                                        {{ form.extranet|bootstrap_horizontal }}
+                                        {% bootstrap_field form.operator layout="horizontal" %}
+                                        {% bootstrap_field form.intranet layout="horizontal" %}
+                                        {% bootstrap_field form.extranet layout="horizontal" %}
 
                                         <div class="hr-line-dashed"></div>
                                         <div class="form-group">
