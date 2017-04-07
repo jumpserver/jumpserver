@@ -97,7 +97,7 @@ class TerminalConnectView(LoginRequiredMixin, DetailView):
         if self.object.type == 'Web':
             context = {
                 'title': _('Redirect to web terminal'),
-                'messages': _('Redirect to web terminal: {}'.format(self.object.url)),
+                'messages': _('Redirect to web terminal') + self.object.url,
                 'auto_redirect': True,
                 'interval': 3,
                 'redirect_url': self.object.url

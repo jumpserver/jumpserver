@@ -18,7 +18,7 @@
                             </li>
                             <li>
                                 <a href="{% url 'assets:system-user-asset' pk=system_user.id %}" class="text-center">
-                                <i class="fa fa-bar-chart-o"></i> {% trans 'Associate assets and asset groups' %}
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'Attached assets' %}
                                 </a>
                             </li>
                             <li class="pull-right">
@@ -62,15 +62,7 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Auto push' %}:</td>
-                                            <td><b>{{ system_user.protocol }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Auto update' %}:</td>
-                                            <td><b>{{ system_user.auto_update }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'As default' %}:</td>
-                                            <td><b>{{ system_user.protocol }}</b></td>
+                                            <td><b>{{ system_user.auto_push|yesno:"Yes,No,Unknown" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Sudo' %}:</td>
@@ -121,7 +113,7 @@
                                     <table class="table">
                                         <tbody>
                                         <tr class="no-borders-tr">
-                                            <td width="50%">{% trans 'Get mannual install script' %}:</td>
+                                            <td width="50%">{% trans 'Get manual install script' %}:</td>
                                             <td>
                                                 <span style="float: right">
                                                     <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Get' %}</button>

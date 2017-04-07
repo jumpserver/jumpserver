@@ -50,16 +50,13 @@ class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVi
         kwargs.update(context)
         return super(SystemUserCreateView, self).get_context_data(**kwargs)
 
-    def form_invalid(self, form):
-        print(form.errors)
-        return super(SystemUserCreateView, self).form_invalid(form)
-
     def get_success_message(self, cleaned_data):
-        success_message = _('Create system user <a href="%s">%s</a> successfully.' %
-                            (
-                                reverse_lazy('assets:system-user-detail', kwargs={'pk': self.object.pk}),
-                                self.object.name,
-                            ))
+        url = reverse_lazy('assets:system-user-detail',
+                           kwargs={'pk': self.object.pk}),
+        success_message = _(
+            'Create system user <a href="{url}">{name}</a> '
+            'successfully.'.format(url=url, name=self.object.name)
+        )
 
         return success_message
 
@@ -78,7 +75,8 @@ class SystemUserUpdateView(AdminUserRequiredMixin, UpdateView):
         return super(SystemUserUpdateView, self).get_context_data(**kwargs)
 
     def get_success_url(self):
-        success_url = reverse_lazy('assets:system-user-detail', kwargs={'pk': self.object.pk})
+        success_url = reverse_lazy('assets:system-user-detail',
+                                   kwargs={'pk': self.object.pk})
         return success_url
 
 

@@ -9,6 +9,7 @@ from django.views.generic import ListView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import CreateView, UpdateView, FormMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
+from django.contrib.messages.views import SuccessMessageMixin
 
 from common.utils import get_logger
 from perms.models import AssetPermission
@@ -31,11 +32,12 @@ class UserGroupListView(AdminUserRequiredMixin, TemplateView):
         return context
 
 
-class UserGroupCreateView(AdminUserRequiredMixin, CreateView):
+class UserGroupCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = UserGroup
     form_class = forms.UserGroupForm
     template_name = 'users/user_group_create_update.html'
     success_url = reverse_lazy('users:user-group-list')
+    success_message = '<a href={url}> {name} </a> was created successfully'
 
     def get_context_data(self, **kwargs):
         context = super(UserGroupCreateView, self).get_context_data(**kwargs)
@@ -54,6 +56,14 @@ class UserGroupCreateView(AdminUserRequiredMixin, CreateView):
         user_group.save()
         return super(UserGroupCreateView, self).form_valid(form)
 
+    def get_success_message(self, cleaned_data):
+        url = reverse_lazy('users:user-group-detail',
+                           kwargs={'pk': self.object.id}
+                           )
+        return self.success_message.format(
+            url=url, name=self.object.name
+        )
+
 
 class UserGroupUpdateView(AdminUserRequiredMixin, UpdateView):
     model = UserGroup
@@ -68,7 +78,7 @@ class UserGroupUpdateView(AdminUserRequiredMixin, UpdateView):
         group_users = [user.id for user in self.object.users.all()]
         context.update({
             'app': _('Users'),
-            'action': _('Update User Group'),
+            'action': _('Update user group'),
             'users': users,
             'group_users': group_users
         })

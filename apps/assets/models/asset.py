@@ -76,12 +76,12 @@ class Asset(models.Model):
 
     platform = models.CharField(max_length=128, null=True, blank=True, verbose_name='Platform')
     os = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('OS'))
-    os_version = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('OS Version'))
-    os_arch = models.CharField(max_length=16, blank=True, null=True, verbose_name=_('OS Arch'))
+    os_version = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('OS version'))
+    os_arch = models.CharField(max_length=16, blank=True, null=True, verbose_name=_('OS arch'))
     hostname_raw = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Hostname raw'))
 
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
-    date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date added'))
+    date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):

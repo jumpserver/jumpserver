@@ -131,14 +131,6 @@ class UserGroupForm(forms.ModelForm):
         }
 
 
-# class UserInfoForm(forms.Form):
-#     name = forms.CharField(max_length=20, label=_('name'))
-#     avatar = forms.ImageField(label=_('avatar'), required=False)
-#     wechat = forms.CharField(max_length=30, label=_('wechat'), required=False)
-#     phone = forms.CharField(max_length=20, label=_('phone'), required=False)
-#     enable_otp = forms.BooleanField(required=False, label=_('enable otp'))
-
-
 class UserPrivateAssetPermissionForm(forms.ModelForm):
     def save(self, commit=True):
         self.instance = super(UserPrivateAssetPermissionForm, self)\

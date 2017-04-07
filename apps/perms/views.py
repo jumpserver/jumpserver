@@ -80,11 +80,11 @@ class AssetPermissionCreateView(AdminUserRequiredMixin,
         return super(AssetPermissionCreateView, self).get_context_data(**kwargs)
 
     def get_success_message(self, cleaned_data):
+        url = reverse_lazy('perms:asset-permission-detail',
+                           kwargs={'pk': self.object.pk})
         success_message = _(
-            'Create asset permission <a href="%s"> %s </a> '
-            'successfully.' % (reverse_lazy('perms:asset-permission-detail',
-                                            kwargs={'pk': self.object.pk}),
-                               self.object.name,))
+            'Create asset permission <a href="{url}"> {name} </a> '
+            'successfully.'.format(url=url, name=self.object.name))
         return success_message
 
     def form_valid(self, form):
@@ -102,8 +102,9 @@ class AssetPermissionUpdateView(AdminUserRequiredMixin, UpdateView):
     model = AssetPermission
     form_class = AssetPermissionForm
     template_name = 'perms/asset_permission_create_update.html'
-    success_message = _('Update asset permission '
-                        '<a href="%s"> %s </a> successfully.')
+    success_message = _(
+        'Update asset permission <a href="{url}"> {name} </a> successfully.'
+    )
 
     def get_context_data(self, **kwargs):
         context = {
@@ -113,10 +114,12 @@ class AssetPermissionUpdateView(AdminUserRequiredMixin, UpdateView):
         kwargs.update(context)
         return super(AssetPermissionUpdateView, self).get_context_data(**kwargs)
 
-    def get_success_url(self):
-        success_url = reverse_lazy('perms:asset-permission-detail',
-                                   kwargs={'pk': self.object.pk})
-        return success_url
+    def get_success_message(self):
+        url = reverse_lazy('perms:asset-permission-detail',
+                           kwargs={'pk': self.object.pk})
+        return self.success_message.format(
+            url=url, name=self.object.name
+        )
 
     def form_valid(self, form):
         assets = form.cleaned_data['assets']

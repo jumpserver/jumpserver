@@ -106,7 +106,7 @@
                                         <form>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select asset ' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Select assets' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for asset in asset_remain %}
                                                             <option value="{{ asset.id }}">{{ asset.hostname }}: {{ asset.ip }}</option>
                                                         {% endfor %}

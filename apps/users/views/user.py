@@ -63,7 +63,7 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     form_class = forms.UserCreateUpdateForm
     template_name = 'users/user_create.html'
     success_url = reverse_lazy('users:user-list')
-    success_message = _('Create user <a href="%s">%s</a> successfully.')
+    success_message = _('Create user <a href="{url}">{name}</a> successfully.')
 
     def get_context_data(self, **kwargs):
         context = super(UserCreateView, self).get_context_data(**kwargs)
@@ -78,9 +78,9 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         return super(UserCreateView, self).form_valid(form)
 
     def get_success_message(self, cleaned_data):
-        return self.success_message % (
-            reverse_lazy('users:user-detail', kwargs={'pk': self.object.pk}),
-            self.object.name,
+        url = reverse_lazy('users:user-detail', kwargs={'pk': self.object.pk})
+        return self.success_message.format(
+            url=url, name=self.object.name
         )
 
 
@@ -331,15 +331,15 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = forms.UserProfileForm
     success_url = reverse_lazy('users:user-profile')
-    success_message = _('Create user <a href="%s">%s</a> successfully.')
+    success_message = _('Create user <a href="{url}">{name}</a> successfully.')
 
     def get_object(self, queryset=None):
         return self.request.user
 
     def get_success_message(self, cleaned_data):
-        return self.success_message % (
-            reverse_lazy('users:user-detail', kwargs={'pk': self.object.pk}),
-            self.object.name,
+        url = reverse_lazy('users:user-detail', kwargs={'pk': self.object.pk})
+        return self.success_message.format(
+            url=url, name=self.object.name
         )
 
     def get_context_data(self, **kwargs):

@@ -268,7 +268,7 @@ $(document).ready(function() {
     var body = {
         'is_active': checked
     };
-    var success = '{% trans "Update Successfully!" %}';
+    var success = '{% trans "Update successfully!" %}';
     APIUpdateAttr({
         url: the_url,
         body: JSON.stringify(body),
@@ -281,7 +281,7 @@ $(document).ready(function() {
         var body = {
             'enable_otp': checked
         };
-        var success = '{% trans "Update Successfully!" %}';
+        var success = '{% trans "Update successfully!" %}';
         APIUpdateAttr({
             url: the_url,
             body: JSON.stringify(body),
@@ -320,7 +320,7 @@ $(document).ready(function() {
         var body = {};
         var success = function() {
             var msg = "{% trans "An e-mail has been sent to the user\'s mailbox." %}";
-            swal("{% trans 'Password-Reset' %}", msg, "success");
+            swal("{% trans 'Reset password' %}", msg, "success");
         };
         APIUpdateAttr({
             url: the_url,
@@ -330,7 +330,7 @@ $(document).ready(function() {
     }
     swal({
         title: "{% trans 'Are you sure?' %}",
-        text: "{% trans 'This will reset the user\'s password. A password-reset email will be sent to the user\'s mailbox.' %}",
+        text: "{% trans "This will reset the user's password. A password-reset email will be sent to the user\'s mailbox." %}",
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#DD6B55",
@@ -345,7 +345,7 @@ $(document).ready(function() {
         var body = {};
         var success = function() {
             var msg = "{% trans 'The reset-ssh-public-key E-mail has been sent successfully. Please inform the user to update his new ssh public key.' %}";
-            swal("{% trans 'SSH-Public-Key Reset' %}", msg, "success");
+            swal("{% trans 'Reset SSH public key' %}", msg, "success");
         };
         APIUpdateAttr({
             url: the_url,

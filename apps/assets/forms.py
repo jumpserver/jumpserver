@@ -80,13 +80,8 @@ class AssetGroupForm(forms.ModelForm):
     class Meta:
         model = AssetGroup
         fields = [
-            "name", "comment", "system_users",
+            "name", "comment",
         ]
-        widgets = {
-            'name': forms.TextInput(attrs={}),
-            'system_users': forms.SelectMultiple(attrs={'class': 'select2-system-user', 'data-placeholder': _('Select asset system user')}),
-
-        }
         help_texts = {
             'name': '* required',
         }
@@ -94,12 +89,13 @@ class AssetGroupForm(forms.ModelForm):
 
 class IDCForm(forms.ModelForm):
     # See AdminUserForm comment same it
-    assets = forms.ModelMultipleChoiceField(queryset=Asset.objects.all(),
-                                            label=_('Asset'),
-                                            required=False,
-                                            widget=forms.SelectMultiple(
-                                                attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
-                                            )
+    assets = forms.ModelMultipleChoiceField(
+        queryset=Asset.objects.all(),
+        label=_('Asset'),
+        required=False,
+        widget=forms.SelectMultiple(
+            attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
+        )
 
     def __init__(self, *args, **kwargs):
         if kwargs.get('instance'):
@@ -249,7 +245,7 @@ class SystemUserForm(forms.ModelForm):
                 key_string = self.cleaned_data['private_key_file'].read()
                 self.cleaned_data['private_key_file'].seek(0)
                 if not validate_ssh_private_key(key_string):
-                    raise forms.ValidationError(_('Private key invalid'))
+                    raise forms.ValidationError(_('Invalid private key'))
         return self.cleaned_data['private_key_file']
 
     def clean_password(self):

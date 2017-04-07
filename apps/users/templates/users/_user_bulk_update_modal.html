@@ -18,7 +18,7 @@
     <div class="form-group">
         <label for="groups" class="col-sm-2 control-label">{% trans 'Groups' %}</label>
         <div class="col-sm-9" id="select2-container">
-            <select name="groups" id="select2_groups" data-placeholder="{% trans 'Select Group' %}" class="select2 form-control m-b" multiple>
+            <select name="groups" id="select2_groups" data-placeholder="{% trans 'Select groups' %}" class="select2 form-control m-b" multiple>
                 {% for group in groups %}
                     <option value="{{ group.id }}">{{ group.name }}</option>
                 {% endfor %}

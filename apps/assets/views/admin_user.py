@@ -49,10 +49,10 @@ class AdminUserCreateView(AdminUserRequiredMixin,
 
     def get_success_message(self, cleaned_data):
         success_message = _(
-            'Create admin user <a href="%s">%s</a> successfully.' % (
-                reverse_lazy('assets:admin-user-detail',
-                             kwargs={'pk': self.object.pk}),
-                self.object.name,
+            'Create admin user <a href="{url}">{name}</a> successfully.'.format(
+                url=reverse_lazy('assets:admin-user-detail',
+                                 kwargs={'pk': self.object.pk}),
+                name=self.object.name,
             ))
         return success_message
 

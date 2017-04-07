@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load i18n %}
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/dataTables/datatables.min.css" %}" rel="stylesheet">
     <link href="{% static "css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" %}" rel="stylesheet">
@@ -40,17 +41,17 @@
                             <div class="input-group">
                                 <div class="input-group-btn">
                                     <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
-                                        搜索
+                                        {% trans 'Search' %}
                                     </button>
                                 </div>
                             </div>
                             {% endblock %}
                         </form>
                         {% endblock %}
-                        {% block tags_list %}{% endblock %}
+{#                        {% block tags_list %}{% endblock %}#}
                     </div>
                     {% block table_container %}
-                    <table class="table table-striped table-bordered table-hover " id="editable" >
+                    <table class="table table-striped table-bordered table-hover" id="editable" >
                         <thead>
                             <tr>
                                 {% block table_head %} {% endblock %}

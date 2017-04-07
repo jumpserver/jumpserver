@@ -22,7 +22,7 @@ class Task(models.Model):
     timedelta = models.FloatField(default=0.0, verbose_name=_('Time'), null=True)
     is_finished = models.BooleanField(default=False, verbose_name=_('Is finished'))
     is_success = models.BooleanField(default=False, verbose_name=_('Is success'))
-    assets = models.TextField(blank=True, null=True, verbose_name=_('Assets for id'))  # Asset inventory may be change
+    assets = models.TextField(blank=True, null=True, verbose_name=_('Assets id'))  # Asset inventory may be change
     _modules_args = models.TextField(blank=True, null=True, verbose_name=_('Task module and args json format'))
     pattern = models.CharField(max_length=64, default='all', verbose_name=_('Task run pattern'))
     result = models.TextField(blank=True, null=True, verbose_name=_('Task raw result'))

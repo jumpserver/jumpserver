@@ -17,7 +17,7 @@
 </div>
 <form method="post" class="form-horizontal" action="" id="fm_asset_bulk_update">
     <div class="form-group">
-        <label class="control-label col-sm-2 col-lg-2 " for="id_type">{% trans "System Type" %}</label>
+        <label class="control-label col-sm-2 col-lg-2 " for="id_type">{% trans "Asset type" %}</label>
         <div class=" col-sm-9 col-lg-9 ">
             <select class=" select2 form-control" id="id_type" name="type">
                 <option value="">---------</option>
@@ -34,7 +34,7 @@
     <div class="form-group">
         <label for="groups" class="col-sm-2 control-label">{% trans 'Asset Groups' %}</label>
         <div class="col-sm-9" id="select2-container">
-            <select name="groups" id="select2_groups" data-placeholder="{% trans 'Select Group' %}" class="select2 form-control m-b" multiple>
+            <select name="groups" id="select2_groups" data-placeholder="{% trans 'Select groups' %}" class="select2 form-control m-b" multiple>
                 {% for group in groups %}
                     <option value="{{ group.id }}">{{ group.name }}</option>
                 {% endfor %}
@@ -43,9 +43,9 @@
     </div>
 
 	<div class="form-group">
-		<label for="users" class="col-sm-2 control-label">{% trans 'System Users' %}</label>
+		<label for="users" class="col-sm-2 control-label">{% trans 'System users' %}</label>
         <div class="col-sm-9" id="select2-container">
-            <select name="system_users" id="select2_users" data-placeholder="{% trans 'Select System Users' %}" class="select2 form-control m-b" multiple>
+            <select name="system_users" id="select2_users" data-placeholder="{% trans 'Select system users' %}" class="select2 form-control m-b" multiple>
                 {% for system_user in system_users %}
                     <option value="{{ system_user.id }}">{{ system_user.name }}</option>
                 {% endfor %}

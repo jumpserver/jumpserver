@@ -17,7 +17,8 @@ __all__ = ['UserGroup']
 class UserGroup(NoDeleteModelMixin):
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
-    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    date_created = models.DateTimeField(auto_now_add=True, null=True,
+                                        verbose_name=_('Date created'))
     created_by = models.CharField(max_length=100)
 
     def __unicode__(self):
