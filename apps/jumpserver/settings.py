@@ -260,7 +260,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace('\\', '/') + '/'
 
 # Use django-bootstrap-form to format template, input max width arg
-BOOTSTRAP_COLUMN_COUNT = 11
+# BOOTSTRAP_COLUMN_COUNT = 11
 
 # Init data or generate fake data source for development
 FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures'), ]

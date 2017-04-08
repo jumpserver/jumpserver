@@ -103,7 +103,7 @@ class UserGroupDetailView(AdminUserRequiredMixin, DetailView):
         users = User.objects.exclude(id__in=self.object.users.all())
         context = {
             'app': _('Users'),
-            'action': _('User Group Detail'),
+            'action': _('User group detail'),
             'users': users,
         }
         kwargs.update(context)

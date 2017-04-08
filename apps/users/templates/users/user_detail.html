@@ -90,6 +90,10 @@
                                             <td><b>{{ user_object.get_role_display }}</b></td>
                                         </tr>
                                         <tr>
+                                            <td>{% trans 'Enable OTP' %}:</td>
+                                            <td><b>{{ user_object.enable_otp|yesno:"Yes,No,Unknown"}}</b></td>
+                                        </tr>
+                                        <tr>
                                             <td>{% trans 'Date expired' %}:</td>
                                             <td><b>{{ user_object.date_expired|date:"Y-m-j H:i:s" }}</b></td>
                                         </tr>

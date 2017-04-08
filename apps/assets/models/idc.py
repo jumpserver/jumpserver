@@ -36,6 +36,7 @@ class IDC(models.Model):
 
     def __unicode__(self):
         return self.name
+    __str__ = __unicode__
 
     @classmethod
     def initial(cls):

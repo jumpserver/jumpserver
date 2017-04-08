@@ -7,11 +7,14 @@
     {% csrf_token %}
     <div class="form-group">
         <label class="control-label" for="id_assets">{% trans "Template" %}</label>
-        <a href="{{ MEDIA_URL }}files/asset_import_template.xlsx" style="display: block">{% trans 'Download' %}</a>
+        <a href="{% url 'assets:asset-export' %}" style="display: block">{% trans 'Download' %}</a>
     </div>
     <div class="form-group">
         <label class="control-label" for="id_users">{% trans "Asset excel file" %}</label>
         <input id="id_assets" type="file" name="file" />
+        <span class="help-block">
+            {% trans 'If set id, will use this id update asset existed' %}
+        </span>
     </div>
 </form>
 <p>

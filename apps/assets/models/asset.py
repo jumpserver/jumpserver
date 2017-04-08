@@ -86,7 +86,6 @@ class Asset(models.Model):
 
     def __unicode__(self):
         return '%s <%s: %s>' % (self.hostname, self.ip, self.port)
-
     __str__ = __unicode__
 
     @property

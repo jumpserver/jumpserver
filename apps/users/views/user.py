@@ -4,10 +4,9 @@ from __future__ import unicode_literals
 
 import json
 import uuid
-
-from openpyxl import load_workbook
-from openpyxl import Workbook
-from openpyxl.writer.excel import save_virtual_workbook
+import csv
+import codecs
+from io import StringIO
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
@@ -31,7 +30,7 @@ from .. import forms
 from ..models import User, UserGroup
 from ..utils import AdminUserRequiredMixin, user_add_success_next
 from common.mixins import JSONResponseMixin
-from common.utils import get_logger
+from common.utils import get_logger, get_object_or_none
 from perms.models import AssetPermission
 
 __all__ = ['UserListView', 'UserCreateView', 'UserDetailView',
@@ -123,34 +122,44 @@ class UserDetailView(AdminUserRequiredMixin, DetailView):
         return super(UserDetailView, self).get_context_data(**kwargs)
 
 
+USER_ATTR_MAPPING = (
+    ('name', 'Name'),
+    ('username', 'Username'),
+    ('email', 'Email'),
+    ('groups', 'User groups'),
+    ('role', 'Role'),
+    ('phone', 'Phone'),
+    ('wechat', 'Wechat'),
+    ('comment', 'Comment'),
+)
+
+
 @method_decorator(csrf_exempt, name='dispatch')
 class UserExportView(View):
     def get(self, request):
+        mapping = [
+            (k, _(v)) for k, v in USER_ATTR_MAPPING
+        ]
         spm = request.GET.get('spm', '')
-        users_id = cache.get(spm)
-        if not users_id and not isinstance(users_id, list):
-            return HttpResponse('May be expired', status=404)
-
+        users_id = cache.get(spm, ['1'])
+        filename = 'users-{}.csv'.format(
+            timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S'))
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+        response.write(codecs.BOM_UTF8)
         users = User.objects.filter(id__in=users_id)
-        print(users)
-        wb = Workbook()
-        ws = wb.active
-        ws.title = 'User'
-        header = ["name", 'username', 'email', 'groups',
-                  "role", "phone", "wechat", "comment"]
-        ws.append(header)
+        writer = csv.writer(response, dialect='excel', quoting=csv.QUOTE_MINIMAL)
+
+        header = [v for k, v in mapping]
+        writer.writerow(header)
 
         for user in users:
-            ws.append([user.name, user.username, user.email,
-                       ','.join([group.name for group in user.groups.all()]),
-                       user.role, user.phone, user.wechat, user.comment])
+            groups = ','.join([group.name for group in user.groups.all()])
+            writer.writerow([
+                user.name, user.username, user.email, groups,
+                user.role, user.phone, user.wechat, user.comment
+            ])
 
-        filename = 'users-{}.xlsx'.format(
-            timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S'))
-        response = HttpResponse(save_virtual_workbook(wb),
-                                content_type='applications/vnd.ms-excel')
-        response[
-            'Content-Disposition'] = 'attachment; filename="%s"' % filename
         return response
 
     def post(self, request):
@@ -158,7 +167,7 @@ class UserExportView(View):
             users_id = json.loads(request.body).get('users_id', [])
         except ValueError:
             return HttpResponse('Json object not valid', status=400)
-        spm = uuid.uuid4().get_hex()
+        spm = uuid.uuid4().hex
         cache.set(spm, users_id, 300)
         url = reverse('users:user-export') + '?spm=%s' % spm
         return JsonResponse({'redirect': url})
@@ -179,54 +188,51 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         return self.render_json_response(data)
 
     def form_valid(self, form):
-        try:
-            wb = load_workbook(form.cleaned_data['file'])
-            ws = wb.get_active_sheet()
-        except Exception as e:
-            print(e)
-            data = {'valid': False, 'msg': 'Not a valid Excel file'}
+        file = form.cleaned_data['file']
+        data = file.read().decode('utf-8').strip(codecs.BOM_UTF8.decode('utf-8'))
+        csv_file = StringIO(data)
+        reader = csv.reader(csv_file)
+        csv_data = [row for row in reader]
+        header_ = csv_data[0]
+        mapping_reverse = {_(v): k for k, v in USER_ATTR_MAPPING}
+        user_attr = [mapping_reverse.get(n, None) for n in header_]
+        if None in user_attr:
+            data = {'valid': False,
+                    'msg': 'Must be same format as '
+                           'template or export file'}
             return self.render_json_response(data)
 
-        rows = ws.rows
-        header_need = ["name", 'username', 'email', 'groups',
-                       "role", "phone", "wechat", "comment"]
-        header = [col.value for col in next(rows)]
-        print(header)
-        if header != header_need:
-            data = {'valid': False, 'msg': 'Must be same format as '
-                                           'template or export file'}
-            return self.render_json_response(data)
-
-        created = []
-        updated = []
-        failed = []
-        for row in rows:
-            user_dict = dict(zip(header, [col.value for col in row]))
+        created, updated, failed = [], [], []
+        for row in csv_data[1:]:
+            if set(row) == {''}:
+                continue
+            user_dict = dict(zip(user_attr, row))
             groups_name = user_dict.pop('groups')
             if groups_name:
                 groups_name = groups_name.split(',')
                 groups = UserGroup.objects.filter(name__in=groups_name)
             else:
                 groups = None
-            try:
-                user = User.objects.create(**user_dict)
-                user_add_success_next(user)
-                created.append(user_dict['username'])
-            except User.IntegrityError as e:
-                user = User.objects.filter(username=user_dict['username'])
-                if not user:
-                    failed.append(user_dict['username'])
-                    continue
-                user.update(**user_dict)
-                user = user[0]
-                updated.append(user_dict['username'])
-            except TypeError as e:
-                print(e)
-                failed.append(user_dict['username'])
-                user = None
-
+            username = user_dict['username']
+            user = get_object_or_none(User, username=username)
+            if not user:
+                try:
+                    user = User.objects.create(**user_dict)
+                    created.append(user_dict['username'])
+                    user_add_success_next(user)
+                except Exception as e:
+                    failed.append('%s: %s' % (user_dict['username'], str(e)))
+            else:
+                for k, v in user_dict.items():
+                    if v:
+                        setattr(user, k, v)
+                try:
+                    user.save()
+                    updated.append(user_dict['username'])
+                except Exception as e:
+                    failed.append('%s: %s' % (user_dict['username'], str(e)))
             if user and groups:
-                user.groups.add(*tuple(groups))
+                user.groups = groups
                 user.save()
 
         data = {
