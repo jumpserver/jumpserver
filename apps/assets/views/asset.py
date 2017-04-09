@@ -85,7 +85,7 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
         return super(AssetCreateView, self).get_context_data(**kwargs)
 
     def get_success_url(self):
-        update_assets_hardware_info.delay([self.asset])
+        update_assets_hardware_info.delay([self.asset._to_secret_json()])
         return super(AssetCreateView, self).get_success_url()
 
 
@@ -209,7 +209,6 @@ class AssetExportView(View):
     def get(self, request, *args, **kwargs):
         spm = request.GET.get('spm', '')
         assets_id = cache.get(spm, [Asset.objects.first().id])
-        print(assets_id)
         fields = [
             field for field in Asset._meta.fields
             if field.name not in [
@@ -274,6 +273,7 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
             return self.render_json_response(data)
 
         created, updated, failed = [], [], []
+        assets = []
         for row in csv_data[1:]:
             if set(row) == {''}:
                 continue
@@ -305,6 +305,7 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                     asset = Asset.objects.create(**asset_dict)
                     asset.groups.set(groups)
                     created.append(asset_dict['hostname'])
+                    assets.append(asset)
                 except IndexError as e:
                     failed.append('%s: %s' % (asset_dict['hostname'], str(e)))
             else:
@@ -319,6 +320,9 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                     updated.append(asset_dict['hostname'])
                 except Exception as e:
                     failed.append('%s: %s' % (asset_dict['hostname'], str(e)))
+
+        if assets:
+            update_assets_hardware_info.delay(assets)
 
         data = {
             'created': created,

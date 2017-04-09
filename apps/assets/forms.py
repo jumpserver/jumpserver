@@ -10,11 +10,6 @@ logger = get_logger(__file__)
 
 
 class AssetCreateForm(forms.ModelForm):
-    def clean_admin_user(self):
-        if not self.cleaned_data['admin_user']:
-            raise forms.ValidationError(_('Select admin user'))
-        return self.cleaned_data['admin_user']
-
     class Meta:
         model = Asset
         fields = [
@@ -32,6 +27,11 @@ class AssetCreateForm(forms.ModelForm):
             'system_users': _('System user will be granted for user to login assets (using ansible create automatic)'),
             'admin_user': _('Admin user should be exist on asset already, And have sudo ALL permission'),
         }
+
+    def clean_admin_user(self):
+        if not self.cleaned_data['admin_user']:
+            raise forms.ValidationError(_('Select admin user'))
+        return self.cleaned_data['admin_user']
 
 
 class AssetUpdateForm(AssetCreateForm):

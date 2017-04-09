@@ -137,8 +137,12 @@ USER_ATTR_MAPPING = (
 @method_decorator(csrf_exempt, name='dispatch')
 class UserExportView(View):
     def get(self, request):
-        mapping = [
-            (k, _(v)) for k, v in USER_ATTR_MAPPING
+        fields = [
+            User._meta.get_field(name)
+            for name in [
+                'id', 'name', 'username', 'email', 'role', 'wechat', 'phone',
+                'enable_otp', 'is_active', 'comment',
+            ]
         ]
         spm = request.GET.get('spm', '')
         users_id = cache.get(spm, ['1'])
@@ -150,15 +154,15 @@ class UserExportView(View):
         users = User.objects.filter(id__in=users_id)
         writer = csv.writer(response, dialect='excel', quoting=csv.QUOTE_MINIMAL)
 
-        header = [v for k, v in mapping]
+        header = [field.verbose_name for field in fields]
+        header.append(_('User groups'))
         writer.writerow(header)
 
         for user in users:
             groups = ','.join([group.name for group in user.groups.all()])
-            writer.writerow([
-                user.name, user.username, user.email, groups,
-                user.role, user.phone, user.wechat, user.comment
-            ])
+            data = [getattr(user, field.name) for field in fields]
+            data.append(groups)
+            writer.writerow(data)
 
         return response
 
@@ -194,9 +198,18 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         reader = csv.reader(csv_file)
         csv_data = [row for row in reader]
         header_ = csv_data[0]
-        mapping_reverse = {_(v): k for k, v in USER_ATTR_MAPPING}
-        user_attr = [mapping_reverse.get(n, None) for n in header_]
-        if None in user_attr:
+        fields = [
+            User._meta.get_field(name)
+            for name in [
+                'id', 'name', 'username', 'email', 'role', 'wechat', 'phone',
+                'enable_otp', 'is_active', 'comment',
+            ]
+        ]
+        mapping_reverse = {field.verbose_name: field.name for field in fields}
+        mapping_reverse[_('User groups')] = 'groups'
+        attr = [mapping_reverse.get(n, None) for n in header_]
+        print(attr)
+        if None in attr:
             data = {'valid': False,
                     'msg': 'Must be same format as '
                            'template or export file'}
@@ -206,24 +219,36 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         for row in csv_data[1:]:
             if set(row) == {''}:
                 continue
-            user_dict = dict(zip(user_attr, row))
-            groups_name = user_dict.pop('groups')
-            if groups_name:
-                groups_name = groups_name.split(',')
-                groups = UserGroup.objects.filter(name__in=groups_name)
-            else:
-                groups = None
-            username = user_dict['username']
-            user = get_object_or_none(User, username=username)
+            user_dict = dict(zip(attr, row))
+            id_ = user_dict.pop('id', 0)
+            user = get_object_or_none(User, id=id_)
+            for k, v in user_dict.items():
+                if k in ['enable_otp', 'is_active']:
+                    if v.lower() == 'false':
+                        v = False
+                    else:
+                        v = bool(v)
+                elif k == 'groups':
+                    groups_name = v.split(',')
+                    v = UserGroup.objects.filter(name__in=groups_name)
+                else:
+                    continue
+                user_dict[k] = v
+
             if not user:
                 try:
+                    groups = user_dict.pop('groups')
                     user = User.objects.create(**user_dict)
+                    user.groups.set(groups)
                     created.append(user_dict['username'])
                     user_add_success_next(user)
                 except Exception as e:
                     failed.append('%s: %s' % (user_dict['username'], str(e)))
             else:
                 for k, v in user_dict.items():
+                    if k == 'groups':
+                        user.groups.set(v)
+                        continue
                     if v:
                         setattr(user, k, v)
                 try:
@@ -231,9 +256,6 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                     updated.append(user_dict['username'])
                 except Exception as e:
                     failed.append('%s: %s' % (user_dict['username'], str(e)))
-            if user and groups:
-                user.groups = groups
-                user.save()
 
         data = {
             'created': created,
