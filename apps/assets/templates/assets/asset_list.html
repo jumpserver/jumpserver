@@ -27,23 +27,6 @@
     </div>
 {% endblock %}
 
-{% block tags_list %}
-<div class="ydxbd" id="ydxbd" style="display: none;">
-    <div class="tagBtnList">
-    {% for tag in tag_list %}
-        <a href="{% url 'assets:asset-tags' tag_id=tag.0 %}"
-           {% if tag.0 == tag_id %}
-           class="tagBtn2 label label-warning" name="tag_on">
-           {% else %}
-           class="tagBtn2 label label-default">
-           {% endif %}
-           {{ tag.1}}({{ tag.2 }})
-        </a>
-    {% endfor %}
-        <a href="{% url 'assets:asset-list' %}" class="tagBtn2 label label-default" >移除选择</a>
-    </div>
-</div>
-{% endblock %}
 
 {% block table_container %}
 <div class="uc pull-left m-l-5 m-r-5"><a href="{% url "assets:asset-create" %}" class="btn btn-sm btn-primary"> {% trans "Create asset" %} </a></div>

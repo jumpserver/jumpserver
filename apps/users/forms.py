@@ -114,10 +114,15 @@ class UserPublicKeyForm(forms.Form):
         return self.instance
 
 
-class UserBulkImportForm(forms.ModelForm):
+# class UserBulkImportForm(forms.ModelForm):
+#     class Meta:
+#         model = User
+#         fields = ['username', 'email', 'enable_otp', 'role']
+
+class UserBulkUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['username', 'email', 'enable_otp', 'role']
+        fields = ['role', 'groups', 'date_expired', 'is_active', 'enable_otp']
 
 
 class UserGroupForm(forms.ModelForm):

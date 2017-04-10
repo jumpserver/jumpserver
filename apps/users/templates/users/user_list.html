@@ -55,8 +55,9 @@
 {% block custom_foot_js %}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script>
-$(document).ready(function(){
-    var options = {
+
+function renderTable() {
+     var options = {
         ele: $('#user_list_table'),
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
@@ -91,7 +92,13 @@ $(document).ready(function(){
         op_html: $('#actions').html()
     };
     var table = jumpserver.initDataTable(options);
-
+}
+$(document).ready(function(){
+    renderTable();
+    var fields = $('#fm_user_bulk_update .form-group');
+    $.each(fields, function (index, value) {
+        console.log(value)
+    });
     $('.btn_export').click(function () {
         var users = [];
         var rows = table.rows('.selected').data();
@@ -242,7 +249,8 @@ $(document).ready(function(){
         $('#user_list_table').DataTable().ajax.reload();
         jumpserver.checked = false;
     };
-    APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(post_list), success: success});
+    console.log(body);
+{#    APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(post_list), success: success});#}
     $('#user_bulk_update_modal').modal('hide');
 });
 </script>

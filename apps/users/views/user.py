@@ -52,7 +52,8 @@ class UserListView(AdminUserRequiredMixin, TemplateView):
         context.update({
             'app': _('Users'),
             'action': _('User list'),
-            'groups': UserGroup.objects.all()
+            'groups': UserGroup.objects.all(),
+            'form': forms.UserBulkUpdateForm(),
         })
         return context
 
@@ -122,16 +123,16 @@ class UserDetailView(AdminUserRequiredMixin, DetailView):
         return super(UserDetailView, self).get_context_data(**kwargs)
 
 
-USER_ATTR_MAPPING = (
-    ('name', 'Name'),
-    ('username', 'Username'),
-    ('email', 'Email'),
-    ('groups', 'User groups'),
-    ('role', 'Role'),
-    ('phone', 'Phone'),
-    ('wechat', 'Wechat'),
-    ('comment', 'Comment'),
-)
+# USER_ATTR_MAPPING = (
+#     ('name', 'Name'),
+#     ('username', 'Username'),
+#     ('email', 'Email'),
+#     ('groups', 'User groups'),
+#     ('role', 'Role'),
+#     ('phone', 'Phone'),
+#     ('wechat', 'Wechat'),
+#     ('comment', 'Comment'),
+# )
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -208,7 +209,6 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         mapping_reverse = {field.verbose_name: field.name for field in fields}
         mapping_reverse[_('User groups')] = 'groups'
         attr = [mapping_reverse.get(n, None) for n in header_]
-        print(attr)
         if None in attr:
             data = {'valid': False,
                     'msg': 'Must be same format as '

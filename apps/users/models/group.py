@@ -23,6 +23,7 @@ class UserGroup(NoDeleteModelMixin):
 
     def __unicode__(self):
         return self.name
+    __str__ = __unicode__
 
     def delete(self, using=None, keep_parents=False):
         self.group_ptr.delete()
