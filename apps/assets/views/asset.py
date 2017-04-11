@@ -6,6 +6,7 @@ import json
 import uuid
 import codecs
 from io import StringIO
+from collections import defaultdict
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
@@ -30,7 +31,7 @@ from ..tasks import update_assets_hardware_info
 
 
 __all__ = ['AssetListView', 'AssetCreateView', 'AssetUpdateView',
-           'UserAssetListView', 'AssetModalCreateView', 'AssetDetailView',
+           'UserAssetListView', 'AssetBulkUpdateView', 'AssetDetailView',
            'AssetModalListView', 'AssetDeleteView', 'AssetExportView',
            'BulkImportAssetView',
            ]
@@ -45,6 +46,7 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
             'action': 'asset list',
             'groups': AssetGroup.objects.all(),
             'system_users': SystemUser.objects.all(),
+            # 'form': forms.AssetBulkUpdateForm(),
         }
         kwargs.update(context)
         return super(AssetListView, self).get_context_data(**kwargs)
@@ -89,32 +91,102 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
         return super(AssetCreateView, self).get_success_url()
 
 
-class AssetModalCreateView(AdminUserRequiredMixin, ListView):
+class AssetModalListView(AdminUserRequiredMixin, ListView):
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     model = Asset
-    form_class = forms.AssetCreateForm
-    template_name = 'assets/asset_modal_update.html'
-    success_url = reverse_lazy('assets:asset-list')
-
-    def get_queryset(self):
-        self.queryset = super(AssetModalCreateView,self).get_queryset()
-        self.s = self.request.GET.get('plain_id_lists')
-        if "," in str(self.s):
-            self.plain_id_lists = [int(x) for x in self.s.split(',')]
-        else:
-            self.plain_id_lists = [self.s]
-        return self.queryset
+    context_object_name = 'asset_modal_list'
+    template_name = 'assets/asset_modal_list.html'
 
     def get_context_data(self, **kwargs):
-        asset_on_list = Asset.objects.filter(id__in = self.plain_id_lists)
+        assets = Asset.objects.all()
+        assets_id = self.request.GET.get('assets_id', '')
+        assets_id_list = [i for i in assets_id.split(',') if i.isdigit()]
         context = {
-            'app': 'Assets',
-            'action': 'Bulk Update asset',
-            'assets_on_list': asset_on_list,
-            'assets_count': len(asset_on_list),
-            'plain_id_lists':self.s,
+            'all_assets': assets_id_list,
+            'assets': assets
         }
         kwargs.update(context)
-        return super(AssetModalCreateView, self).get_context_data(**kwargs)
+        return super(AssetModalListView, self).get_context_data(**kwargs)
+
+
+class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
+    model = Asset
+    form_class = forms.AssetBulkUpdateForm
+    template_name = 'assets/asset_bulk_update.html'
+    success_url = reverse_lazy('assets:asset-list')
+
+    def get(self, request, *args, **kwargs):
+        assets_id = self.request.GET.get('assets_id', '')
+        self.assets_id_list = [int(i) for i in assets_id.split(',') if i.isdigit()]
+        self.form = self.form_class()
+        self.errors = kwargs.get('errors')
+        return super(AssetBulkUpdateView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        raw_data = request.POST
+        data = {}
+        errors = defaultdict(list)
+        for k in raw_data:
+            if not hasattr(Asset, k) or raw_data.get(k) == '':
+                if k not in ['assets']:
+                    continue
+            if k == 'assets':
+                v = Asset.objects.filter(id__in=raw_data.getlist(k))
+                if not v:
+                    errors['assets'].append(_('Required'))
+            elif k == 'port':
+                try:
+                    v = int(raw_data.get(k))
+                except ValueError:
+                    v = None
+                    errors['port'].append(_('Integer required'))
+            elif k == 'admin_user':
+                admin_user_id = raw_data.get(k)
+                try:
+                    v = int(admin_user_id)
+                except ValueError:
+                    v = None
+                    errors['admin_user'].append(_('Invalid admin user'))
+                v = get_object_or_none(AdminUser, id=v)
+            elif k == 'groups':
+                groups_id = raw_data.getlist(k)
+                v = [AssetGroup.objects.filter(id__in=groups_id)]
+            elif k == 'idc':
+                idc_id = raw_data.get(k)
+                try:
+                    v = int(idc_id)
+                except ValueError:
+                    v = None
+                    errors['idc'].append(_('Integer required'))
+                v = get_object_or_none(IDC, id=v)
+            else:
+                v = raw_data.get(k)
+            data[k] = v
+
+        if not errors:
+            for asset in data['assets']:
+                for k, v in data.items():
+                    if k == 'groups':
+                        asset.groups.set(data['groups'])
+                    else:
+                        setattr(asset, k, v)
+                asset.save()
+                return redirect(reverse_lazy('assets:asset-list'))
+        else:
+            return self.get(request, errors=errors, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        # assets_list = Asset.objects.filter(id__in=self.assets_id_list)
+        context = {
+            'app': 'Assets',
+            'action': 'Bulk update asset',
+            'form': self.form,
+            'errors': self.errors,
+            'assets_selected': self.assets_id_list,
+            'assets': Asset.objects.all(),
+        }
+        kwargs.update(context)
+        return super(AssetBulkUpdateView, self).get_context_data(**kwargs)
 
 
 class AssetUpdateView(AdminUserRequiredMixin, UpdateView):
@@ -164,44 +236,7 @@ class AssetDetailView(DetailView):
         return super(AssetDetailView, self).get_context_data(**kwargs)
 
 
-class AssetModalListView(AdminUserRequiredMixin, ListView):
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    model = Asset
-    context_object_name = 'asset_modal_list'
-    template_name = 'assets/asset_modal_list.html'
 
-    def get_context_data(self, **kwargs):
-        group_id = self.request.GET.get('group_id')
-        plain_id_lists = self.request.GET.get('plain_id_lists')
-        self.s = self.request.GET.get('plain_id_lists')
-        assets = Asset.objects.all()
-        if "," in str(self.s):
-            self.plain_id_lists = [int(x) for x in self.s.split(',')]
-        else:
-            self.plain_id_lists = [self.s]
-
-        if plain_id_lists:
-            if "," in str(self.s):
-                plain_id_lists = [int(x) for x in self.s.split(',')]
-            else:
-                plain_id_lists = [int(self.s)]
-            context = {
-                'all_assets': plain_id_lists,
-            }
-            kwargs.update(context)
-        if group_id:
-            group = AssetGroup.objects.get(id=group_id)
-            context = {
-                'all_assets': [x.id for x in group.assets.all()],
-                'assets': assets
-            }
-            kwargs.update(context)
-        else:
-            context = {
-                'assets': assets
-            }
-            kwargs.update(context)
-        return super(AssetModalListView, self).get_context_data(**kwargs)
 
 
 @method_decorator(csrf_exempt, name='dispatch')

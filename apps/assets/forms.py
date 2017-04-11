@@ -34,7 +34,7 @@ class AssetCreateForm(forms.ModelForm):
         return self.cleaned_data['admin_user']
 
 
-class AssetUpdateForm(AssetCreateForm):
+class AssetUpdateForm(forms.ModelForm):
     class Meta:
         model = Asset
         fields = [
@@ -52,6 +52,23 @@ class AssetUpdateForm(AssetCreateForm):
             'ip': '* required',
             'system_users': _('System user will be granted for user to login assets (using ansible create automatic)'),
             'admin_user': _('Admin user should be exist on asset already, And have sudo ALL permission'),
+        }
+
+
+class AssetBulkUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Asset
+        fields = [
+            'port', 'groups', 'admin_user', 'idc',
+            'type', 'env', 'status',
+        ]
+        widgets = {
+            'groups': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select asset groups')}),
+            'admin_user': forms.Select(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select asset admin user')}),
         }
 
 

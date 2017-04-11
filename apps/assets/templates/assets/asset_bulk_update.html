@@ -1,0 +1,115 @@
+{% extends '_base_create_update.html' %}
+{% load static %}
+{% load bootstrap3 %}
+{% load i18n %}
+
+{% block form %}
+<div class="ydxbd" id="formlists" style="display: block;">
+    <p id="tags_p" class="mgl-5 c02">选择需要修改属性</p>
+    <div class="tagBtnList">
+        <a class="label label-primary" id="change_all" value="1">全选</a>
+        {% for field in form %}
+             <a data-id="{{ field.id_for_label }}" class="label label-default label-primary field-tag" value="1">{{ field.label }}</a>
+        {% endfor %}
+    </div>
+</div>
+{% if errors %}
+    <div class="alert alert-danger">
+        {{ errors }}
+    </div>
+{% endif %}
+<form method="post" class="form-horizontal" id="add_form">
+    {% csrf_token %}
+    <div class="form-group abc">
+        <label class="control-label col-sm-2 col-lg-2 " id="asset_on_count">{% trans 'Asset' %}</label>
+        <div class="col-sm-9">
+            <select class="form-control select2" multiple="multiple" name="assets">
+                {% for asset in assets %}
+                    {% if asset.id in assets_selected %}
+                        <option selected="selected" value="{{ asset.id }}">{{ asset.hostname }}</option>
+                    {% else %}
+                        <option value="{{ asset.id }}">{{ asset.hostname }}</option>
+                    {% endif %}
+                {% endfor %}
+            </select>
+            <span class="help-block">* required</span>
+        </div>
+    </div>
+    {% bootstrap_form form layout="horizontal" %}
+    <div class="form-group abc">
+        <div class="col-sm-4 col-sm-offset-2">
+            <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+            <button class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block custom_foot_js %}
+<script>
+    $(document).ready(function () {
+        $('.select2').select2();
+    }).on('click', '.field-tag', function() {
+        changeField(this);
+    }).on('click', '#change_all', function () {
+        var tag_fields = $('.field-tag');
+        var $this = $(this);
+        var active = '1';
+        if ($this.attr('value') == '0'){
+            active = '0';
+            $this.attr('value', '1').addClass('label-primary')
+        } else {
+            active = '1';
+            $this.attr('value', '0').removeClass('label-primary')
+        }
+        $.each(tag_fields, function (k, v) {
+            changeField(v, active)
+        })
+    });
+
+    function changeField(obj, active) {
+        var $this = $(obj);
+        var field_id = $this.data('id');
+        if (!active) {
+            active = $this.attr('value');
+        }
+        if (active == '0') {
+            $this.attr('value', '1').addClass('label-primary');
+            var form_groups = $('#add_form .form-group:not(.abc)');
+            form_groups.filter(':has(#'  + field_id + ')').show().find('select,input').prop('disabled', false)
+        } else {
+            $this.attr('value', '0').removeClass('label-primary');
+            var form_groups = $('#add_form .form-group:not(.abc)');
+            form_groups.filter(':has(#'  + field_id + ')').hide().find('select,input').prop('disabled', true)
+        }
+    }
+
+    function fsubmit(){
+        var assets_id = document.getElementsByName("assets");
+        var oForm = document.getElementById('add_form');
+        var parentElem = document.getElementById("add_form");
+        var aDiv = parentElem.getElementsByClassName('form-group');
+        if (assets_id.length === 0) {
+            swal({
+                title: "未选择需要修改的主机",
+                text: "请点击选择"
+            });
+        }else if (aDiv.length === 1) {
+            swal({
+                title: "未选需要修改的属性",
+                text: "请点击选择"
+            });
+        }else{
+            var m = document.getElementsByName('assets_ids');
+            alert(m.length);
+            for(var i=0;i<m.length;i++){
+                alert(m[0].value);
+                oForm.appendChild(m[0]);
+            }
+            action="/assets/asset/"+assets_id[0].value+"/update";
+            oForm.action=action;
+            oForm.submit();
+        }
+    }
+</script>
+{% endblock %}
