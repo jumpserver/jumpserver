@@ -48,7 +48,6 @@
         </div>
     </div>
 </div>
-{% include "users/_user_bulk_update_modal.html" %}
 {% include "users/_user_import_modal.html" %}
 {% endblock %}
 {% block content_bottom_left %}{% endblock %}
@@ -235,40 +234,6 @@ $(document).ready(function(){
     var uid = $this.data('uid');
     var the_url = '{% url "api-users:user-detail" pk=99991937 %}'.replace('99991937', uid);
     objectDelete($this, name, the_url);
-}).on('click', '#btn_user_bulk_update', function(){
-    var json_data = $('#fm_user_bulk_update').serializeObject();
-    var body = {};
-    body.enable_otp = (json_data.enable_otp === 'on')? true: false;
-    if (json_data.role != '') {
-        body.role = json_data.role;
-    }
-    if (json_data.groups != undefined) {
-        body.groups = json_data.groups;
-    }
-    if (typeof body.groups === 'string') {
-        body.groups = [parseInt(body.groups)]
-    } else if(typeof body.groups === 'array') {
-        var new_groups = body.groups.map(Number);
-        body.groups = new_groups;
-    }
-    var $data_table = $('#user_list_table').DataTable();
-    var post_list = [];
-    $data_table.rows({selected: true}).every(function(){
-        var content = Object.assign({id: this.data().id}, body);
-        post_list.push(content);
-    });
-    if (post_list === []) {
-        return false
-    }
-    var the_url = "{% url 'api-users:user-list' %}";
-    var success = function() {
-        var msg = "{% trans 'The selected users has been updated successfully.' %}";
-        swal("{% trans 'User Updated' %}", msg, "success");
-        $('#user_list_table').DataTable().ajax.reload();
-        jumpserver.checked = false;
-    };
-{#    APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(post_list), success: success});#}
-    $('#user_bulk_update_modal').modal('hide');
 })
 </script>
 {% endblock %}

@@ -29,6 +29,9 @@ urlpatterns = [
     url(r'^v1/assets/(?P<pk>\d+)/system-users/$',
         api.SystemUserUpdateApi.as_view(), name='asset-update-system-users'),
 
+    url(r'^v1/asset-groups/(?P<pk>\d+)/push-system-user/$',
+        api.AssetGroupPushSystemUserView.as_view(), name='asset-group-push-system-user'),
+
     # update the system users, which add and delete the asset to the system user
     url(r'^v1/system_user/(?P<pk>\d+)/assets/$',
         api.SystemUserUpdateAssetsApi.as_view(), name='systemuser-update-assets'),

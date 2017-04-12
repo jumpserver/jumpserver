@@ -7,6 +7,7 @@ import json
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from assets.models import Asset
 
 __all__ = ["Task"]
 
@@ -33,7 +34,9 @@ class Task(models.Model):
 
     @property
     def total_assets(self):
-        return self.assets.split(',')
+        assets_id = [i for i in self.assets.split(',') if i.isdigit()]
+        assets = Asset.objects.filter(id__in=assets_id)
+        return assets
 
     @property
     def assets_json(self):

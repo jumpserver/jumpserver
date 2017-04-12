@@ -172,3 +172,19 @@ class AssetAdminUserTestView(AssetRefreshHardwareView):
             return Response('1')
         else:
             return Response('0', status=502)
+
+
+class AssetGroupPushSystemUserView(generics.UpdateAPIView):
+    queryset = AssetGroup.objects.all()
+    permission_classes = (IsSuperUser,)
+
+    def patch(self, request, *args, **kwargs):
+        asset_group = self.get_object()
+        assets = asset_group.assets.all()
+        system_user_id = self.request.data['system_user']
+        system_user = get_object_or_none(SystemUser, id=system_user_id)
+        if not assets or not system_user:
+            return Response('Invalid system user id or asset group id', status=404)
+        task = push_users.delay([asset._to_secret_json() for asset in assets],
+                                system_user._to_secret_json())
+        return Response(task.id)

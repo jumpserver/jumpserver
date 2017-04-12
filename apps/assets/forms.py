@@ -70,7 +70,7 @@ class AssetBulkUpdateForm(forms.ModelForm):
         required=True,
         help_text='* required',
         label=_('Select assets'),
-        choices=[(asset.id, asset.hostname) for asset in Asset.objects.all()],
+        # choices=[(asset.id, asset.hostname) for asset in Asset.objects.all()],
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',

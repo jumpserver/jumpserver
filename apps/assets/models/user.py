@@ -157,6 +157,7 @@ class SystemUser(models.Model):
 
     def __unicode__(self):
         return self.name
+    __str__ = __unicode__
 
     @property
     def password(self):

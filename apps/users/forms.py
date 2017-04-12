@@ -123,7 +123,7 @@ class UserBulkUpdateForm(forms.ModelForm):
         required=True,
         help_text='* required',
         label=_('Select users'),
-        choices=[(user.id, user.name ) for user in User.objects.all()],
+        # choices=[(user.id, user.name) for user in User.objects.all()],
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',

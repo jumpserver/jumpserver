@@ -17,3 +17,4 @@ itsdangerous
 eventlet
 django-filter
 passlib
+ForgeryPy
