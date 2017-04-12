@@ -55,6 +55,22 @@
 {% block custom_foot_js %}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script>
+function changeField(obj, active) {
+    var $this = $(obj);
+    var field_id = $this.data('id');
+    if (!active) {
+        active = $this.attr('value');
+    }
+    if (active == '0') {
+        $this.attr('value', '1').addClass('label-primary');
+        var form_groups = $('#add_form .form-group:not(.abc)');
+        form_groups.filter(':has(#'  + field_id + ')').show().find('select,input').prop('disabled', false)
+    } else {
+        $this.attr('value', '0').removeClass('label-primary');
+        var form_groups = $('#add_form .form-group:not(.abc)');
+        form_groups.filter(':has(#'  + field_id + ')').hide().find('select,input').prop('disabled', true)
+    }
+}
 
 function renderTable() {
      var options = {
@@ -193,7 +209,9 @@ $(document).ready(function(){
         });
     }
     function doUpdate() {
-        $('#user_bulk_update_modal').modal('show');
+        var users_id = plain_id_list.join(',');
+        var url = "{% url 'users:user-bulk-update' %}?users_id=" + users_id;
+        location.href = url
     }
     switch(action) {
         case 'deactive':
@@ -249,10 +267,9 @@ $(document).ready(function(){
         $('#user_list_table').DataTable().ajax.reload();
         jumpserver.checked = false;
     };
-    console.log(body);
 {#    APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(post_list), success: success});#}
     $('#user_bulk_update_modal').modal('hide');
-});
+})
 </script>
 {% endblock %}
 

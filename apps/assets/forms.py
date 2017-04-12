@@ -13,19 +13,24 @@ class AssetCreateForm(forms.ModelForm):
     class Meta:
         model = Asset
         fields = [
-            'hostname', 'ip', 'public_ip', 'port', 'type', 'comment', 'admin_user',
-            'idc', 'groups', 'status', 'env', 'is_active'
+            'hostname', 'ip', 'public_ip', 'port', 'type', 'comment',
+            'admin_user', 'idc', 'groups', 'status', 'env', 'is_active'
         ]
         widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'select2',
-                                                  'data-placeholder': _('Select asset groups')}),
-            'admin_user': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select asset admin user')}),
+            'groups': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select asset groups')}),
+            'admin_user': forms.Select(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select asset admin user')}),
         }
         help_texts = {
             'hostname': '* required',
             'ip': '* required',
-            'system_users': _('System user will be granted for user to login assets (using ansible create automatic)'),
-            'admin_user': _('Admin user should be exist on asset already, And have sudo ALL permission'),
+            'system_users': _('System user will be granted for user to login '
+                              'assets (using ansible create automatic)'),
+            'admin_user': _('Admin user should be exist on asset already, '
+                            'And have sudo ALL permission'),
         }
 
     def clean_admin_user(self):
@@ -43,23 +48,43 @@ class AssetUpdateForm(forms.ModelForm):
             'cabinet_pos', 'number', 'comment'
         ]
         widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'select2',
-                                                  'data-placeholder': _('Select asset groups')}),
-            'admin_user': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select asset admin user')}),
+            'groups': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select asset groups')}),
+            'admin_user': forms.Select(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select asset admin user')}),
         }
         help_texts = {
             'hostname': '* required',
             'ip': '* required',
-            'system_users': _('System user will be granted for user to login assets (using ansible create automatic)'),
-            'admin_user': _('Admin user should be exist on asset already, And have sudo ALL permission'),
+            'system_users': _('System user will be granted for user '
+                              'to login assets (using ansible create automatic)'),
+            'admin_user': _('Admin user should be exist on asset '
+                            'already, And have sudo ALL permission'),
         }
 
 
 class AssetBulkUpdateForm(forms.ModelForm):
+    assets = forms.MultipleChoiceField(
+        required=True,
+        help_text='* required',
+        label=_('Select assets'),
+        choices=[(asset.id, asset.hostname) for asset in Asset.objects.all()],
+        widget=forms.SelectMultiple(
+            attrs={
+                'class': 'select2',
+                'data-placeholder': _('Select assets')
+            }
+        )
+    )
+    port = forms.IntegerField(min_value=1, max_value=65535,
+                              required=False, label=_('Port'))
+
     class Meta:
         model = Asset
         fields = [
-            'port', 'groups', 'admin_user', 'idc',
+            'assets', 'port', 'groups', 'admin_user', 'idc',
             'type', 'env', 'status',
         ]
         widgets = {
@@ -70,6 +95,17 @@ class AssetBulkUpdateForm(forms.ModelForm):
                 attrs={'class': 'select2',
                        'data-placeholder': _('Select asset admin user')}),
         }
+
+    def save(self, commit=True):
+        cleaned_data = {k: v for k, v in self.cleaned_data.items() if v is not None}
+        assets_id = cleaned_data.pop('assets')
+        groups = cleaned_data.pop('groups')
+        assets = Asset.objects.filter(id__in=assets_id)
+        assets.update(**cleaned_data)
+        if groups:
+            for asset in assets:
+                asset.groups.set(groups)
+        return assets
 
 
 class AssetGroupForm(forms.ModelForm):

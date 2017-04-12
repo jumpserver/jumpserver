@@ -9,7 +9,7 @@
     <div class="tagBtnList">
         <a class="label label-primary" id="change_all" value="1">全选</a>
         {% for field in form %}
-            {% if field.name != 'assets' %}
+            {% if field.name != 'users' %}
              <a data-id="{{ field.id_for_label }}" class="label label-default label-primary field-tag" value="1">{{ field.label }}</a>
             {% endif %}
         {% endfor %}
@@ -57,11 +57,11 @@
         }
         if (active == '0') {
             $this.attr('value', '1').addClass('label-primary');
-            var form_groups = $('#add_form .form-group:not(.abc)');
+            var form_groups = $('#add_form .form-group');
             form_groups.filter(':has(#'  + field_id + ')').show().find('select,input').prop('disabled', false)
         } else {
             $this.attr('value', '0').removeClass('label-primary');
-            var form_groups = $('#add_form .form-group:not(.abc)');
+            var form_groups = $('#add_form .form-group');
             form_groups.filter(':has(#'  + field_id + ')').hide().find('select,input').prop('disabled', true)
         }
     }

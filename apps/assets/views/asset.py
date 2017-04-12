@@ -20,7 +20,7 @@ from django.utils.decorators import method_decorator
 from django.core.cache import cache
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, reverse
 
 from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none
@@ -43,7 +43,7 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = {
             'app': 'Assets',
-            'action': 'asset list',
+            'action': 'Asset list',
             'groups': AssetGroup.objects.all(),
             'system_users': SystemUser.objects.all(),
             # 'form': forms.AssetBulkUpdateForm(),
@@ -58,7 +58,7 @@ class UserAssetListView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = {
             'app': 'Assets',
-            'action': 'asset list',
+            'action': 'Asset list',
             'system_users': SystemUser.objects.all(),
         }
         kwargs.update(context)
@@ -118,62 +118,24 @@ class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
     def get(self, request, *args, **kwargs):
         assets_id = self.request.GET.get('assets_id', '')
         self.assets_id_list = [int(i) for i in assets_id.split(',') if i.isdigit()]
-        self.form = self.form_class()
-        self.errors = kwargs.get('errors')
+
+        if kwargs.get('form'):
+            self.form = kwargs['form']
+        elif assets_id:
+            self.form = self.form_class(
+                initial={'assets': self.assets_id_list}
+            )
+        else:
+            self.form = self.form_class()
         return super(AssetBulkUpdateView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        raw_data = request.POST
-        data = {}
-        errors = defaultdict(list)
-        for k in raw_data:
-            if not hasattr(Asset, k) or raw_data.get(k) == '':
-                if k not in ['assets']:
-                    continue
-            if k == 'assets':
-                v = Asset.objects.filter(id__in=raw_data.getlist(k))
-                if not v:
-                    errors['assets'].append(_('Required'))
-            elif k == 'port':
-                try:
-                    v = int(raw_data.get(k))
-                except ValueError:
-                    v = None
-                    errors['port'].append(_('Integer required'))
-            elif k == 'admin_user':
-                admin_user_id = raw_data.get(k)
-                try:
-                    v = int(admin_user_id)
-                except ValueError:
-                    v = None
-                    errors['admin_user'].append(_('Invalid admin user'))
-                v = get_object_or_none(AdminUser, id=v)
-            elif k == 'groups':
-                groups_id = raw_data.getlist(k)
-                v = [AssetGroup.objects.filter(id__in=groups_id)]
-            elif k == 'idc':
-                idc_id = raw_data.get(k)
-                try:
-                    v = int(idc_id)
-                except ValueError:
-                    v = None
-                    errors['idc'].append(_('Integer required'))
-                v = get_object_or_none(IDC, id=v)
-            else:
-                v = raw_data.get(k)
-            data[k] = v
-
-        if not errors:
-            for asset in data['assets']:
-                for k, v in data.items():
-                    if k == 'groups':
-                        asset.groups.set(data['groups'])
-                    else:
-                        setattr(asset, k, v)
-                asset.save()
-                return redirect(reverse_lazy('assets:asset-list'))
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(self.success_url)
         else:
-            return self.get(request, errors=errors, *args, **kwargs)
+            return self.get(request, form=form, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         # assets_list = Asset.objects.filter(id__in=self.assets_id_list)
@@ -181,7 +143,6 @@ class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
             'app': 'Assets',
             'action': 'Bulk update asset',
             'form': self.form,
-            'errors': self.errors,
             'assets_selected': self.assets_id_list,
             'assets': Asset.objects.all(),
         }
@@ -234,9 +195,6 @@ class AssetDetailView(DetailView):
         }
         kwargs.update(context)
         return super(AssetDetailView, self).get_context_data(**kwargs)
-
-
-
 
 
 @method_decorator(csrf_exempt, name='dispatch')

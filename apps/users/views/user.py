@@ -38,7 +38,7 @@ __all__ = ['UserListView', 'UserCreateView', 'UserDetailView',
            'UserAssetPermissionView', 'UserGrantedAssetView',
            'UserExportView',  'UserBulkImportView', 'UserProfileView',
            'UserProfileUpdateView', 'UserPasswordUpdateView',
-           'UserPublicKeyUpdateView',
+           'UserPublicKeyUpdateView', 'UserBulkUpdateView',
            ]
 
 logger = get_logger(__name__)
@@ -105,6 +105,46 @@ class UserUpdateView(AdminUserRequiredMixin, UpdateView):
         context = super(UserUpdateView, self).get_context_data(**kwargs)
         context.update({'app': _('Users'), 'action': _('Update user')})
         return context
+
+
+class UserBulkUpdateView(AdminUserRequiredMixin, ListView):
+    model = User
+    form_class = forms.UserBulkUpdateForm
+    template_name = 'users/user_bulk_update.html'
+    success_url = reverse_lazy('users:user-list')
+
+    def get(self, request, *args, **kwargs):
+        users_id = self.request.GET.get('users_id', '')
+        self.id_list = [int(i) for i in users_id.split(',') if i.isdigit()]
+
+        if kwargs.get('form'):
+            self.form = kwargs['form']
+        elif users_id:
+            self.form = self.form_class(
+                initial={'users': self.id_list}
+            )
+        else:
+            self.form = self.form_class()
+        return super(UserBulkUpdateView, self).get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect(self.success_url)
+        else:
+            return self.get(request, form=form, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'Assets',
+            'action': 'Bulk update asset',
+            'form': self.form,
+            'users_selected': self.id_list,
+            'users': User.objects.all(),
+        }
+        kwargs.update(context)
+        return super(UserBulkUpdateView, self).get_context_data(**kwargs)
 
 
 class UserDetailView(AdminUserRequiredMixin, DetailView):

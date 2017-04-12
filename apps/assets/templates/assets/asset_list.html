@@ -88,6 +88,7 @@ function tagShow() {
 }  //onload;
 
 
+
 $(document).ready(function(){
     var options = {
         ele: $('#asset_list_table'),
@@ -125,6 +126,7 @@ $(document).ready(function(){
         op_html: $('#actions').html()
     };
     var table = jumpserver.initDataTable(options);
+
     $('.btn_export').click(function () {
         var assets = [];
         var rows = table.rows('.selected').data();
@@ -178,20 +180,18 @@ $(document).ready(function(){
         $data_table.ajax.reload();
     }, 3000);
 })
-
 .on('click', '#btn_bulk_update', function () {
     var action = $('#slct_bulk_update').val();
     var $data_table = $('#asset_list_table').DataTable();
     var id_list = [];
-    var plain_id_list = [];
     $data_table.rows({selected: true}).every(function(){
-        id_list.push({id: this.data().id});
-        plain_id_list.push(this.data().id);
+        id_list.push(this.data().id);
     });
-    if (plain_id_list.length == 0) {
+    if (id_list.length == 0) {
         return false;
     }
     var the_url = "{% url 'api-assets:asset-list' %}";
+
     function doDeactive() {
         var body = $.each(id_list, function(index, asset_object) {
             asset_object['is_active'] = false;
@@ -234,7 +234,9 @@ $(document).ready(function(){
         });
     }
     function doUpdate() {
-        $('#asset_bulk_update_modal').modal('show');
+        var id_list_string = id_list.join(',');
+        var url = "{% url 'assets:asset-bulk-update' %}?assets_id=" + id_list_string;
+        location.href = url
     }
     switch(action) {
         case 'deactive':
@@ -252,66 +254,66 @@ $(document).ready(function(){
         default:
             break;
     }
-})
-
-.on('click', '#btn_asset_bulk_update', function () {
-    var json_data = $("#fm_asset_bulk_update").serializeObject();
-    var body = {};
-    body.enable_otp = (json_data.enable_otp === 'on')? true: false;
-    if (json_data.type != '') {
-        body.type = json_data.type;
-    }
-    if (json_data.groups != undefined) {
-        body.groups = json_data.groups;
-    }
-    if (typeof body.groups === 'string') {
-        body.groups = [parseInt(body.groups)]
-    } else if(typeof body.groups === 'array') {
-        var new_groups = body.groups.map(Number);
-        body.groups = new_groups;
-    }
-
-    if (json_data.system_users != undefined) {
-        body.system_users = json_data.system_users;
-    }
-    if (typeof body.system_users === 'string') {
-        body.system_users = [parseInt(body.system_users)]
-    } else if(typeof body.system_users === 'array') {
-        var new_users = body.system_users.map(Number);
-        body.system_users = new_users;
-    }
-
-    if (json_data.tags != undefined) {
-        body.tags = json_data.tags;
-    }
-    if (typeof body.tags == 'string') {
-        body.tags = [parseInt(body.tags)];
-    } else if (typeof body.tags === 'array') {
-        var new_tags = body.tags.map(Number);
-        body.tags = new_tags;
-    }
-
-    var $data_table = $('#asset_list_table').DataTable();
-    var post_list = [];
-    $data_table.rows({selected: true}).every(function(){
-        var content = Object.assign({id: this.data().id}, body);
-        post_list.push(content);
-    });
-    if (post_list === []) {
-        return false
-    }
-    var the_url = "{% url 'api-assets:asset-list' %}";
-    var success = function() {
-        var msg = "{% trans 'The selected assets has been updated successfully.' %}";
-        swal("{% trans 'Asset Updated' %}", msg, "success");
-        $('#asset_list_table').DataTable().ajax.reload();
-        jumpserver.checked = false;
-    };
-    console.log(JSON.stringify(post_list));
-    console.log(the_url);
-{#    APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(post_list), success: success});#}
-    $('#asset_bulk_update_modal').modal('hide');
 });
+{##}
+{#.on('click', '#btn_asset_bulk_update', function () {#}
+{#    var json_data = $("#fm_asset_bulk_update").serializeObject();#}
+{#    var body = {};#}
+{#    body.enable_otp = (json_data.enable_otp === 'on')? true: false;#}
+{#    if (json_data.type != '') {#}
+{#        body.type = json_data.type;#}
+{#    }#}
+{#    if (json_data.groups != undefined) {#}
+{#        body.groups = json_data.groups;#}
+{#    }#}
+{#    if (typeof body.groups === 'string') {#}
+{#        body.groups = [parseInt(body.groups)]#}
+{#    } else if(typeof body.groups === 'array') {#}
+{#        var new_groups = body.groups.map(Number);#}
+{#        body.groups = new_groups;#}
+{#    }#}
+{##}
+{#    if (json_data.system_users != undefined) {#}
+{#        body.system_users = json_data.system_users;#}
+{#    }#}
+{#    if (typeof body.system_users === 'string') {#}
+{#        body.system_users = [parseInt(body.system_users)]#}
+{#    } else if(typeof body.system_users === 'array') {#}
+{#        var new_users = body.system_users.map(Number);#}
+{#        body.system_users = new_users;#}
+{#    }#}
+{##}
+{#    if (json_data.tags != undefined) {#}
+{#        body.tags = json_data.tags;#}
+{#    }#}
+{#    if (typeof body.tags == 'string') {#}
+{#        body.tags = [parseInt(body.tags)];#}
+{#    } else if (typeof body.tags === 'array') {#}
+{#        var new_tags = body.tags.map(Number);#}
+{#        body.tags = new_tags;#}
+{#    }#}
+{##}
+{#    var $data_table = $('#asset_list_table').DataTable();#}
+{#    var post_list = [];#}
+{#    $data_table.rows({selected: true}).every(function(){#}
+{#        var content = Object.assign({id: this.data().id}, body);#}
+{#        post_list.push(content);#}
+{#    });#}
+{#    if (post_list === []) {#}
+{#        return false#}
+{#    }#}
+{#    var the_url = "{% url 'api-assets:asset-list' %}";#}
+{#    var success = function() {#}
+{#        var msg = "{% trans 'The selected assets has been updated successfully.' %}";#}
+{#        swal("{% trans 'Asset Updated' %}", msg, "success");#}
+{#        $('#asset_list_table').DataTable().ajax.reload();#}
+{#        jumpserver.checked = false;#}
+{#    };#}
+{#    console.log(JSON.stringify(post_list));#}
+{#    console.log(the_url);#}
+{#    APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(post_list), success: success});#}
+{#    $('#asset_bulk_update_modal').modal('hide');#}
+{#})#}
 
 </script>
 {% endblock %}
