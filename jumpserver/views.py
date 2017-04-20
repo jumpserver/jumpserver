@@ -19,8 +19,9 @@ from jlog.models import Log, FileLog
 from jperm.perm_api import get_group_user_perm, gen_resource
 from jasset.models import Asset, IDC
 from jperm.ansible_api import MyRunner
+from juser.user_api import *
 import zipfile
-
+import getent
 
 def getDaysByNum(num):
     """
@@ -181,6 +182,10 @@ def Login(request):
             if user is not None:
                 if user.is_active:
                     login(request, user)
+                    """如果从LDAP登录，没有创建过本地账号，添加之"""
+                    local_user=getent.passwd(username)
+                    if local_user is None:
+                        server_add_user(username=username)
                     # c = {}
                     # c.update(csrf(request))
                     # request.session['csrf_token'] = str(c.get('csrf_token'))
