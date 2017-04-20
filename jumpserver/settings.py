@@ -74,6 +74,7 @@ INSTALLED_APPS = (
     'django.contrib.humanize',
     'django_crontab',
     'bootstrapform',
+    'captcha',
     'jumpserver',
     'juser',
     'jasset',
@@ -95,6 +96,9 @@ ROOT_URLCONF = 'jumpserver.urls'
 
 WSGI_APPLICATION = 'jumpserver.wsgi.application'
 
+# captcha
+CAPTCHA_CHALLENGE_FUNCT = 'captcha.helpers.random_char_challenge'
+CAPTCHA_LENGTH = 4
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases

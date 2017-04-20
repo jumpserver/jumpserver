@@ -24,10 +24,13 @@
             <h2>Welcome to JumpServer</h2>
             <form class="m-t" role="form" method="post" action="">
                 <div class="form-group">
-                    <input type="text" name="username" class="form-control" placeholder="Username" required="length[6~50]">
+                    {{ form.username }}
                 </div>
                 <div class="form-group">
-                    <input type="password" name="password" class="form-control" placeholder="Password" required="">
+                    {{ form.password }}
+                </div>
+                <div class="form-group">
+                    {{ form.captcha }}
                 </div>
                 <button type="submit" class="btn btn-primary block full-width m-b">Login</button>
 
@@ -40,6 +43,19 @@
     <!-- Mainly scripts -->
     <script src="/static/js/jquery-2.1.1.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
+    <script type="text/javascript">
+        $('img.captcha').click( function() {
+            $form = $(this).parents('form');
+            var url =  location.protocol + "//" + window.location.hostname + ":" + location.port + "/captcha/refresh/";
+            $.getJSON(url, {}, function(json) {
+                $form.find('input[name="captcha_0"]').val(json.key);
+                $form.find('img.captcha').attr('src',json.image_url);
+            });
+            return false;
+        });
+    </script>
+
+
 
 </body>
 
