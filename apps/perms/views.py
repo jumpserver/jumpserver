@@ -102,6 +102,7 @@ class AssetPermissionUpdateView(AdminUserRequiredMixin, UpdateView):
     model = AssetPermission
     form_class = AssetPermissionForm
     template_name = 'perms/asset_permission_create_update.html'
+    success_url = reverse_lazy('perms:asset-permission-list')
     success_message = _(
         'Update asset permission <a href="{url}"> {name} </a> successfully.'
     )
