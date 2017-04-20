@@ -234,7 +234,6 @@ class Tty(object):
                     ssh.connect(connect_info.get('ip'),
                                 port=connect_info.get('port'),
                                 username=connect_info.get('role_name'),
-                                password=connect_info.get('role_pass'),
                                 key_filename=role_key,
                                 look_for_keys=False)
                     return ssh
@@ -301,81 +300,82 @@ class SshTty(Tty):
         pre_timestamp = time.time()
         data = ''
         input_mode = False
+        
+        fd_channel = self.channel.fileno()
+        fd_stdin = sys.sdtin.fileno()
+        epoll = select.epoll()
+        epoll.register(fd_channel, select.EPOLLIN)
+        epoll.register(fd_stdin, select.EPOLLIN)
         try:
-            tty.setraw(sys.stdin.fileno())
-            tty.setcbreak(sys.stdin.fileno())
+            tty.setraw(fd_stdin)
+            tty.setcbreak(fd_stdin)
             self.channel.settimeout(0.0)
-
+            
+            flag = fcntl.fcntl(sys.stdin, fcntl.F_GETFL, 0)
+            fcntl.fcntl(fd_stdin, fcntl.F_SETFL, flag|os.O_NONBLOCK)
             while True:
+                events = epoll.poll()
                 try:
-                    r, w, e = select.select([self.channel, sys.stdin], [], [])
-                    flag = fcntl.fcntl(sys.stdin, fcntl.F_GETFL, 0)
-                    fcntl.fcntl(sys.stdin.fileno(), fcntl.F_SETFL, flag|os.O_NONBLOCK)
-                except Exception:
+                    for fd, event in events:
+                        # channel can read
+                        if fd == fd_channel:
+                            x = self.channel.recv(10240)
+                            if len(x) == 0:
+                                break
+                            index = 0
+                            len_x = len(x)
+                            while index < len_x:
+                                try:
+                                    n = os.write(sys.stdout.fileno(), x[index:])
+                                    sys.stdout.flush()
+                                    index += n
+                                except OSError as msg:
+                                    if msg.errno == errno.EAGAIN:
+                                        continue
+                            now_timestamp = time.time()
+                            termlog.write(x)
+                            termlog.recoder = False
+                            log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(x)))
+                            log_time_f.flush()
+                            log_file_f.write(x)
+                            log_file_f.flush()
+                            pre_timestamp = now_timestamp
+                            log_file_f.flush()
+    
+                            self.vim_data += x
+                            if input_mode:
+                                data += x
+
+                        # stdin can read
+                        if fd == fd_stdin:
+                            x = sys.stdin.read(4096)
+                            termlog.recoder = True
+                            input_mode = True
+                            if self.is_output(str(x)):
+                                # 如果len(str(x)) > 1 说明是复制输入的
+                                if len(str(x)) > 1:
+                                    data = x
+                                match = self.vim_end_pattern.findall(self.vim_data)
+                                if match:
+                                    if self.vim_flag or len(match) == 2:
+                                        self.vim_flag = False
+                                    else:
+                                        self.vim_flag = True
+                                elif not self.vim_flag:
+                                    self.vim_flag = False
+                                    data = self.deal_command(data)[0:200]
+                                    if data is not None:
+                                        TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
+                                data = ''
+                                self.vim_data = ''
+                                input_mode = False
+    
+                            if len(x) == 0:
+                                break
+                            self.channel.send(x)
+                        
+                except socket.timeout:
                     pass
-
-                if self.channel in r:
-                    try:
-                        x = self.channel.recv(10240)
-                        if len(x) == 0:
-                            break
-
-                        index = 0
-                        len_x = len(x)
-                        while index < len_x:
-                            try:
-                                n = os.write(sys.stdout.fileno(), x[index:])
-                                sys.stdout.flush()
-                                index += n
-                            except OSError as msg:
-                                if msg.errno == errno.EAGAIN:
-                                    continue
-                        now_timestamp = time.time()
-                        termlog.write(x)
-                        termlog.recoder = False
-                        log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(x)))
-                        log_time_f.flush()
-                        log_file_f.write(x)
-                        log_file_f.flush()
-                        pre_timestamp = now_timestamp
-                        log_file_f.flush()
-
-                        self.vim_data += x
-                        if input_mode:
-                            data += x
-
-                    except socket.timeout:
-                        pass
-
-                if sys.stdin in r:
-                    try:
-                        x = os.read(sys.stdin.fileno(), 4096)
-                    except OSError:
-                        pass
-                    termlog.recoder = True
-                    input_mode = True
-                    if self.is_output(str(x)):
-                        # 如果len(str(x)) > 1 说明是复制输入的
-                        if len(str(x)) > 1:
-                            data = x
-                        match = self.vim_end_pattern.findall(self.vim_data)
-                        if match:
-                            if self.vim_flag or len(match) == 2:
-                                self.vim_flag = False
-                            else:
-                                self.vim_flag = True
-                        elif not self.vim_flag:
-                            self.vim_flag = False
-                            data = self.deal_command(data)[0:200]
-                            if data is not None:
-                                TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
-                        data = ''
-                        self.vim_data = ''
-                        input_mode = False
-
-                    if len(x) == 0:
-                        break
-                    self.channel.send(x)
 
         finally:
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, old_tty)
