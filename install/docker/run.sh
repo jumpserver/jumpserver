@@ -46,6 +46,9 @@ if [ ! -f "/etc/ssh/ssh_host_ed25519_key" ]; then
   ssh-keygen -t ed25519 -b 1024 -f /etc/ssh/ssh_host_ed25519_key -N ''
 fi
 
+# handle empty data directory
+mkdir -p /data/logs
+
 /usr/sbin/sshd -E /data/logs/jumpserver.log
 python /jumpserver/manage.py syncdb --noinput
 if [ ! -f "/home/init.locked" ]; then
