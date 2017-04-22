@@ -449,6 +449,10 @@ def regen_ssh_key(request):
     username = user.username
     ssh_key_pass = PyCrypt.gen_rand_pass(16)
     gen_ssh_key(username, ssh_key_pass)
+    user.ssh_key_pwd = ssh_key_pass
+    user.save()
+    if MAIL_ENABLE:
+        regen_ssh_key_mail(user, kwargs=locals())
     return HttpResponse('ssh密钥已生成，密码为 %s, 请到下载页面下载' % ssh_key_pass)
 
 

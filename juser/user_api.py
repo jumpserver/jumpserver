@@ -155,6 +155,22 @@ def server_add_user(username, ssh_key_pwd=''):
     gen_ssh_key(username, ssh_key_pwd)
 
 
+def regen_ssh_key_mail(user, kwargs):
+    """
+    change ssh key send mail
+    发送用户添加邮件
+    """
+    mail_title = u'恭喜你的跳板机用户 %s 公钥修改成功 Jumpserver' % user.name
+    mail_msg = u"""
+    Hi, %s
+        您的用户名： %s
+        您的ssh密钥文件密码： %s
+        密钥下载地址： %s/juser/key/down/?uuid=%s
+        说明： 请登陆跳板机后台下载密钥, 然后使用新的密钥登陆跳板机！
+    """ % (user.name, user.username, kwargs.get('ssh_key_pass'), URL, user.uuid)
+    send_mail(mail_title, mail_msg, MAIL_FROM, [user.email], fail_silently=False)
+
+
 def user_add_mail(user, kwargs):
     """
     add user send mail
