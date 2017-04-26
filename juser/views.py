@@ -151,13 +151,14 @@ def user_add(request):
         admin_groups = request.POST.getlist('admin_groups', [])
         role = request.POST.get('role', 'CU')
         uuid_r = uuid.uuid4().get_hex()
-        ssh_key_pwd = PyCrypt.gen_rand_pass(16)
+	key_with_pwd = request.POST.get('keypwd', 'y')
+	ssh_key_pwd = PyCrypt.gen_rand_pass(16) if key_with_pwd.lower() == 'y' else ''
         extra = request.POST.getlist('extra', [])
         is_active = False if '0' in extra else True
         send_mail_need = True if '1' in extra else False
 
         try:
-            if '' in [username, password, ssh_key_pwd, name, role]:
+            if '' in [username, password, name, role]:
                 error = u'带*内容不能为空'
                 raise ServerError
                 
@@ -442,14 +443,19 @@ def change_info(request):
 @require_role(role='user')
 def regen_ssh_key(request):
     uuid_r = request.GET.get('uuid', '')
+    key_with_pwd = request.GET.get('keypwd', 'y')
     user = get_object(User, uuid=uuid_r)
     if not user:
         return HttpResponse('没有该用户')
 
     username = user.username
-    ssh_key_pass = PyCrypt.gen_rand_pass(16)
-    gen_ssh_key(username, ssh_key_pass)
-    return HttpResponse('ssh密钥已生成，密码为 %s, 请到下载页面下载' % ssh_key_pass)
+    ssh_key_pwd = PyCrypt.gen_rand_pass(16) if key_with_pwd.lower() == 'y' else ''
+    gen_ssh_key(username, ssh_key_pwd)
+
+    if ssh_key_pwd:
+        return HttpResponse('ssh密钥已生成，密码为 %s, 请到下载页面下载' % ssh_key_pwd)
+    else:
+        return HttpResponse('ssh密钥已生成(无密码保护), 请到下载页面下载')
 
 
 @require_role(role='user')

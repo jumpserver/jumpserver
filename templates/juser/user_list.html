@@ -70,7 +70,7 @@
                                     {% if user.username|key_exist %}
                                         <a  href="{% url 'key_down' %}?uuid={{ user.uuid }}" >下载</a>
                                     {% else %}
-                                        <a href="#" onclick="genSSH('{{ user.username }}','{% url 'key_gen' %}?uuid={{ user.uuid }}')">NoKey GenOne?</a>
+                                        <a href="#" onclick="genSSH('{{ user.username }}','{% url 'key_gen' %}?uuid={{ user.uuid }}&keypwd=n')">NoKey GenOne?</a>
                                     {% endif %}
                                 </td>
                                 <td class="text-center">
