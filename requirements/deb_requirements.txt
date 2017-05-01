@@ -1,1 +1,5 @@
-libtiff4-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.5-dev tk8.5-dev python-tk
+libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev
+libwebp-dev tcl8.5-dev tk8.5-dev python-tk
+build-essential libssl-dev libffi-dev python-dev
+libcurl4-openssl-dev libtiff5-dev libmysqlclient-dev
+
