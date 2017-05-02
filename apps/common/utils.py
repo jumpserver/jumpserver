@@ -183,7 +183,7 @@ def timesince(dt, since='', default="just now"):
 
 
 def ssh_key_string_to_obj(text):
-    key_f = StringIO(text)
+    key_f = StringIO(unicode(text))
     key = None
     try:
         key = paramiko.RSAKey.from_private_key(key_f)

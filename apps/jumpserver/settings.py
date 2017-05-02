@@ -133,6 +133,7 @@ else:
             'PORT': CONFIG.DB_PORT,
             'USER': CONFIG.DB_USER,
             'PASSWORD': CONFIG.DB_PASSWORD,
+            'init_command': "SET sql_mode='STRICT_ALL_TABLES'",
         }
     }
 
