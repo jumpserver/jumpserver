@@ -13,7 +13,7 @@
 ##### 1.1 安装基本工具和库
 
 	$ yum -y install sqlite-devel git epel-release
-	$ yum -y install python-devel libffi-devel openssl-devel
+	$ yum -y install sshpass python-devel libffi-devel openssl-devel
 	$ yum -y install gcc gcc-c++
 	
 	
