@@ -34,7 +34,7 @@
 
 	$ cd requirements 
 	$ sudo yum -y install `cat rpm_requirements.txt`
-	$ pip2.7 install -r requirements.txt -i https://pypi.doubanio.com/simple
+	$ pip install -r requirements.txt -i https://pypi.doubanio.com/simple
 
 
 ##### 2.3 准备配置文件
