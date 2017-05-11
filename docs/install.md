@@ -3,7 +3,7 @@
 ### 环境
 
 - 系统: CentOS 6.5 x86\_64 mini
-- Python: 版本 2.7.13 (未来支持 3.5)
+- Python: 版本 3.6 大部分功能兼容 2.7
 - 安装目录 
 	- /opt/jumpserver
 	- /opt/coco
@@ -17,31 +17,9 @@
 	$ yum -y install gcc gcc-c++
 	
 	
-##### 1.2 安装Python
+##### 1.2 安装Python 3.6 和 虚拟环境
+略
 
-这里可以参考 [https://segmentfault.com/a/1190000000654227][1] 也可以下载我编译的rpm版本:
-
-	$ wget http://repo.jumpserver.org/python27-2.7.13-1.el6.x86_64.rpm 	
-	$ yum localinstall -y python27-2.7.13-1.el6.x86_64.rpm	
-	$ bash	
-	$ python2.7 -V	
-	Python 2.7.13
-	
-设置默认python版本为2.7.13:
-```
-$ mv /usr/bin/python /usr/bin/python.bak	
-$ which python2.7
-/data/server/python27/bin/python2.7
-$ ln -s /data/server/python27/bin/python2.7 /usr/bin/python
-$python
-Python 2.7.13
-```	
-设置yum默认python用2.6:
-```
-$ vim /usr/bin/yum
-#!/usr/bin/python2.6
-
-```
 
 #### 二. Jumpserver安装
 
@@ -89,7 +67,7 @@ $ vim /usr/bin/yum
 **2.6 启动**
 ```
 $ cd ..
-$ python2.7 run_server.py
+$ python run_server.py
 ```
 访问  http://ip:8080
 账号密码： admin admin
@@ -121,20 +99,20 @@ $ git clone https://github.com/jumpserver/coco.git
 **3.2 安装依赖**
 ```
 $ cd coco
-$ pip2.7 install -r requirements.txt -i https://pypi.doubanio.com/simple
+$ pip install -r requirements.txt  # -i https://pypi.doubanio.com/simple
 ```
 
 **3.3 启动**
 
 ```
-$ python2.7 run_server.py
+$ python run_server.py
 ```
 
 说明： Coco启动后会向jumpserver注册，请去 jumpserver页面 - 应用程序 - terminal - coco - Accept 允许， 这时 coco就 运行在 2222端口，可以ssh来连接
 
 命令行：
 ``` 
-ssh admin@192.168.244.128 -p2222
+ssh admin@YourServerIP -p2222
 ```
 
 **3.5 测试**
