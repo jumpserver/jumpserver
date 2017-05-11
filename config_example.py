@@ -72,9 +72,11 @@ class Config:
     # Api token expiration when create
     TOKEN_EXPIRATION = 3600
 
-    # Session and csrf domain settings
-    SESSION_COOKIE_DOMAIN = '.jms.com'
-    CSRF_COOKIE_DOMAIN = '.jms.com'
+    # Session and csrf domain settings, If you deploy jumpserver,coco,luna standby,
+    # So than share cookie, and you need use a same top-level domain name
+
+    # SESSION_COOKIE_DOMAIN = '.jms.com'
+    # CSRF_COOKIE_DOMAIN = '.jms.com'
     SESSION_COOKIE_AGE = 3600*24
 
     # Email SMTP setting, we only support smtp send mail
