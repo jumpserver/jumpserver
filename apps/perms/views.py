@@ -105,6 +105,7 @@ class AssetPermissionUpdateView(AdminUserRequiredMixin, UpdateView):
     success_message = _(
         'Update asset permission <a href="{url}"> {name} </a> successfully.'
     )
+    success_url = reverse_lazy("perms:asset-permission-list")
 
     def get_context_data(self, **kwargs):
         context = {

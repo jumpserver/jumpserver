@@ -40,10 +40,7 @@ class Task(models.Model):
 
     @property
     def assets_json(self):
-        from assets.models import Asset
-        return [Asset.objects.get(id=int(id_))._to_secret_json()
-                for id_ in self.total_assets
-                if Asset.objects.filter(id=int(id_))]
+        return [asset._to_secret_json() for asset in self.total_assets]
 
     @property
     def module_args(self):

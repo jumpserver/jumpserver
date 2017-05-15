@@ -55,7 +55,7 @@ class ProxyLogListView(AdminUserRequiredMixin, ListView):
         if self.username:
             filter_kwargs['user'] = self.username
         if self.ip:
-            filter_kwargs['ip'] = self.ip
+            filter_kwargs['asset'] = self.ip
         if self.system_user:
             filter_kwargs['system_user'] = self.system_user
         if self.keyword:

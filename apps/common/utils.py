@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
-
 from __future__ import unicode_literals
+
 from collections import OrderedDict
 from six import string_types
 import base64
@@ -15,9 +15,9 @@ import hashlib
 from email.utils import formatdate
 import calendar
 import threading
+from io import StringIO
 
 import paramiko
-from passlib.hash import sha512_crypt
 import sshpubkeys
 from itsdangerous import TimedJSONWebSignatureSerializer, JSONWebSignatureSerializer, \
     BadSignature, SignatureExpired
@@ -25,10 +25,6 @@ from django.shortcuts import reverse as dj_reverse
 from django.conf import settings
 from django.utils import timezone
 
-try:
-    from io import StringIO
-except ImportError:
-    from StringIO import StringIO
 
 from .compat import to_bytes, to_string
 
@@ -281,6 +277,7 @@ _ISO8601_FORMAT = "%Y-%m-%dT%H:%M:%S.000Z"
 
 
 def to_unixtime(time_string, format_string):
+    time_string = time_string.decode("ascii")
     with _STRPTIME_LOCK:
         return int(calendar.timegm(time.strptime(time_string, format_string)))
 
@@ -305,15 +302,9 @@ def iso8601_to_unixtime(time_string):
     return to_unixtime(time_string, _ISO8601_FORMAT)
 
 
-# def http_to_unixtime(time_string):
-#     """把HTTP Date格式的字符串转换为UNIX时间（自1970年1月1日UTC零点的秒数）。
-#
-#     HTTP Date形如 `Sat, 05 Dec 2015 11:10:29 GMT` 。
-#     """
-#     return to_unixtime(time_string, "%a, %d %b %Y %H:%M:%S GMT")
-
-
 def make_signature(access_key_secret, date=None):
+    if isinstance(date, bytes):
+        date = bytes.decode(date)
     if isinstance(date, int):
         date_gmt = http_date(date)
     elif date is None:

@@ -22,3 +22,4 @@ host_rsa_key
 *.bat
 tags
 tmp/*
+jumpserver.iml
