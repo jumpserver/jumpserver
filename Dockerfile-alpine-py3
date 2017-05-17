@@ -1,0 +1,5 @@
+FROM alpine:3.4
+LABEL MAINTAINER Jumpserver Team <ibuler@qq.com>
+
+RUN apk add --update python3 gcc python3-dev musl-dev linux-headers \
+        libffi-dev openssl-dev jpeg-dev freetype-dev && rm -rf /var/cache/apk/*

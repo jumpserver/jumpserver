@@ -3,7 +3,7 @@ django-bootstrap3>=8.2.2
 Pillow>=4.1.0
 djangorestframework>=3.6.2
 ForgeryPy
-openpyxl>=2.4.0
+#openpyxl>=2.4.0
 celery>=4.0.2
 paramiko>=2.1.2
 ansible>=2.2.2.0

@@ -42,7 +42,7 @@ class Config:
     # See https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
     # Sqlite setting:
-    DATABASE_ENGINE = 'sqlite3'
+    DB_ENGINE = 'sqlite3'
     DB_NAME = os.path.join(BASE_DIR, 'data', 'db.sqlite3')
 
     # Mysql or postgres setting like:
@@ -125,11 +125,25 @@ class ProductionConfig(Config):
     DB_NAME = 'jumpserver'
 
 
+class DockerConfig(Config):
+    DB_ENGINE = 'sqlite'
+    DB_NAME = os.path.join(BASE_DIR, 'data', 'db.sqlite3')
+    REDIS_HOST = os.environ.get('REDIS_HOST') or 'redis'
+    EMAIL_HOST = os.environ.get('EMAIL_HOST') or 'smtp.qq.com'
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 465))
+    EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER') or 'admin'
+    EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD') or 'somepasswrd'
+    EMAIL_USE_SSL = True if EMAIL_PORT == 465 else False
+    EMAIL_USE_TLS = True if EMAIL_PORT == 587 else False
+    EMAIL_SUBJECT_PREFIX = os.environ.get('EMAIL_SUBJECT_PREFIX') or '[Jumpserver] '
+    SITE_URL = os.environ.get('SITE_URL') or 'http://localhost:8080'
+
+
 config = {
     'development': DevelopmentConfig,
     'production': ProductionConfig,
-
     'default': DevelopmentConfig,
+    'docker': DockerConfig,
 }
 
-env = 'development'
+env = 'docker'

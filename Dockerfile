@@ -1,13 +1,20 @@
-FROM jumpserver/base-env-alpine:latest
-MAINTAINER Jumpserver Team <ibuler@qq.com>
+FROM jumpserver/alpine-py3:v3.4
+LABEL MAINTAINER Jumpserver Team <ibuler@qq.com>
 
-#RUN apk add --update python gcc python-dev py-pip musl-dev linux-headers \
-#        libffi-dev openssl-dev jpeg-dev redis  && rm -rf /var/cache/apk/*
 COPY . /opt/jumpserver
+COPY config_docker.py /opt/jumpserver/config.py
 WORKDIR /opt/jumpserver
+RUN rm -r .git
+RUN rm -f config.py
 
-RUN cp config_example.py config.py
-#RUN pip install -r requirements.txt -i https://pypi.doubanio.com/simple
-RUN rm -f db.sqlite3 && cd utils && sh make_migrations.sh && sh init_db.sh
+VOLUME /opt/jumpserver/data
+VOLUME /opt/jumpserver/logs
+
+RUN ln -s /usr/bin/pip3 /usr/bin/pip
+RUN ln -s /usr/bin/python3 /usr/bin/python
+RUN cp config_docker.py config.py
+
+RUN pip install -r requirements/requirements.txt
+RUN cd utils && sh make_migrations.sh && sh init_db.sh
 EXPOSE 8080
-CMD redis-server utils/redis.conf && python run_server.py
+CMD python run_server.py
