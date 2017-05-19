@@ -1,20 +1,23 @@
-FROM jumpserver/alpine-py3:v3.4
+FROM jumpserver/python:v3.6.1
 LABEL MAINTAINER Jumpserver Team <ibuler@qq.com>
 
+
 COPY . /opt/jumpserver
-COPY config_docker.py /opt/jumpserver/config.py
 WORKDIR /opt/jumpserver
+
+RUN yum -y install epel-release
+RUN cd requirements && yum -y install $(cat rpm_requirements.txt)
+RUN cd requirements && pip install -r requirements.txt
+RUN yum clean all
+
+RUN rm -f data/db.sqlite3
 RUN rm -r .git
 RUN rm -f config.py
 
 VOLUME /opt/jumpserver/data
 VOLUME /opt/jumpserver/logs
 
-RUN ln -s /usr/bin/pip3 /usr/bin/pip
-RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN cp config_docker.py config.py
 
-RUN pip install -r requirements/requirements.txt
-RUN cd utils && sh make_migrations.sh && sh init_db.sh
 EXPOSE 8080
-CMD python run_server.py
+CMD cd utils && sh make_migrations.sh && sh init_db.sh && cd .. && python run_server.py

@@ -77,22 +77,22 @@
                                                 {% csrf_token %}
                                                 <tr class="no-borders-tr">
                                                     <td colspan="1" style="padding-top: 0">
-                                                        {{ form.name|bootstrap }}
+                                                        {% bootstrap_field form.name layout="horizontal" %}
                                                     </td>
                                                 </tr>
                                                 <tr class="no-borders-tr">
                                                     <td colspan="1" style="padding-top: 0">
-                                                        {{ form.assets|bootstrap }}
+                                                        {% bootstrap_field form.asset layout="horizontal" %}
                                                     </td>
                                                 </tr>
                                                 <tr class="no-borders-tr">
                                                     <td colspan="1" style="padding-top: 0">
-                                                        {{ form.asset_groups|bootstrap }}
+                                                        {% bootstrap_field form.asset_groups layout="horizontal" %}
                                                     </td>
                                                 </tr>
                                                 <tr class="no-borders-tr">
                                                     <td colspan="1" style="padding-top: 0">
-                                                        {{ form.system_users|bootstrap }}
+                                                        {% bootstrap_field form.system_users layout="horizontal" %}
                                                     </td>
                                                 </tr>
                                                 <tr class="no-borders-tr">
