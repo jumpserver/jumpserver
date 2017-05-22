@@ -63,7 +63,7 @@ class Signer(object):
         try:
             return s.loads(value)
         except BadSignature:
-            return None
+            return {}
 
     def sign_t(self, value, expires_in=3600):
         s = TimedJSONWebSignatureSerializer(self.secret_key, expires_in=expires_in)
@@ -74,7 +74,7 @@ class Signer(object):
         try:
             return s.loads(value)
         except (BadSignature, SignatureExpired):
-            return None
+            return {}
 
 
 def date_expired_default():
