@@ -9,7 +9,11 @@ Jumpserver是一款使用Python, Django开发的开源跳板机系统, 助力互
 使用docker compose 安装，一键完成，docker compose 安装见 docker官方
 
    $ docker-compose up
-   
+
+### 截图
+
+参见 https://github.com/jumpserver/jumpserver/issues/438
+
 ### 开发者文档
 
 
