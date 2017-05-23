@@ -194,7 +194,7 @@ class SystemUser(models.Model):
             for asset in asset_group.assets.all():
                 setattr(asset, 'is_inherit_from_asset_groups', True)
                 setattr(asset, 'inherit_from_asset_groups',
-                        getattr(asset, b'inherit_from_asset_groups', set()).add(asset_group))
+                        getattr(asset, 'inherit_from_asset_groups', set()).add(asset_group))
                 assets.add(asset)
         return assets
 
