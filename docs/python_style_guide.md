@@ -1,10 +1,10 @@
 # Jumpserver 项目规范（Draft）
 
 ## 语言框架
-1. Python 2.7 由于ansible目前不支持python3
-2. Django 1.10 (最新版本)
-3. Terminal Websocket使用go实现 (未来)
-
+1. Python 3.6.1 (当前最新)
+2. Django 1.11 (当前最新)
+3. Flask 0.12 Luna (当前最新)
+4. Paramiko 2.12 Coco (当前最新)
 
 ## Django规范
 1. 尽量使用Class Base View编程，更少代码

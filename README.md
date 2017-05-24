@@ -6,51 +6,30 @@ Jumpserver是一款使用Python, Django开发的开源跳板机系统, 助力互
    * Django 1.11
 
 ### 安装
-- 安装依赖库
-```
-   $ cd requirements
-   $ sudo yum -y install `cat rpm_requirements.txt`  # CentOS/RedHat
-   $ sudo apt-get  install `cat deb_requirements.txt`  # Ubuntu/Debian
-```
+使用docker compose 安装，一键完成，docker compose 安装见 docker官方
 
-- 安装Python依赖包
+   $ docker-compose up
 
-```
-# 请自行安装 Python 和 pip, 和虚拟环境, 如果速度慢可以尝试后面的 douban pypi
-$ pip3 install -r requirements.txt  # -i https://pypi.doubanio.com/simple
-
-# MacOS
-$ pip3 install -r requirements.txt  # -i https://pypi.doubanio.com/simple --user
-```
-	   
-- 配置文件
-
-```	
-$ cd ..
-$ cp config_example.py config.py
-```
-
-配置项 参考 config.py
-
-- 初始化数据库
-```
-$ cd utils
-$ sh make_migrations.sh
-$ sh init_db.sh
-```
+### 使用
+   1. 访问 http://你的主机IP:8080 来访问 Jumpserver
+   
+   2. 左侧 应用程序接受 Coco和Luna的注册
+   
+   3. 添加 管理用户
+   
+   4. 添加 资产 
+   
+   5. 添加授权规则，授权给admin
+   
+   6. ssh -p2222 admin@你的主机IP 测试连接服务器
  
-- 依赖redis
-```
-$ yum -y install redis
-$ service redis start  # Run docker or redis-server &
-```
+   7. 访问 http://你的主机IP:5000 访问Luna，点击左侧服务器连接测试
+   
+   
+### 截图
 
-- 启动
+参见 https://github.com/jumpserver/jumpserver/issues/438
 
-```
-$ python3 run_server.py
-```
- 
 ### 开发者文档
 
 

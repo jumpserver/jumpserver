@@ -57,7 +57,7 @@ class AssetPermission(models.Model):
             for user in user_group.users.all():
                 setattr(user, 'is_inherit_from_user_groups', True)
                 setattr(user, 'inherit_from_user_groups',
-                        getattr(user, b'inherit_from_user_groups', set()).add(user_group))
+                        getattr(user, 'inherit_from_user_groups', set()).add(user_group))
                 users.add(user)
         return users
 
@@ -70,7 +70,7 @@ class AssetPermission(models.Model):
             for asset in asset_group.assets.all():
                 setattr(asset, 'is_inherit_from_asset_groups', True)
                 setattr(asset, 'inherit_from_asset_groups',
-                        getattr(asset, b'inherit_from_user_groups', set()).add(asset_group))
+                        getattr(asset, 'inherit_from_user_groups', set()).add(asset_group))
                 assets.add(asset)
         return assets
 
