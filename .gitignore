@@ -21,5 +21,6 @@ migrations/
 host_rsa_key
 *.bat
 tags
-tmp/*
 jumpserver.iml
+.python-version
+tmp/*
