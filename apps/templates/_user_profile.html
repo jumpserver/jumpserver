@@ -19,7 +19,7 @@
             <li><a href="{% url 'users:user-profile' %}">{% trans 'Profile' %}</a></li>
             <li><a href="{% url 'users:user-profile-update' %}">{% trans 'Profile settings' %}</a></li>
             <li class="divider"></li>
-            <li><a href="">{% trans 'Logout' %}</a></li>
+            <li><a href="{% url 'users:logout' %}">{% trans 'Logout' %}</a></li>
         </ul>
     </div>
     <div class="logo-element">
