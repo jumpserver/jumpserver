@@ -14,7 +14,7 @@ import hashlib
 from email.utils import formatdate
 import calendar
 import threading
-from io import StringIO
+from six import StringIO
 
 import paramiko
 import sshpubkeys
