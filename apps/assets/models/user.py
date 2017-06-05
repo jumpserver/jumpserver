@@ -81,7 +81,7 @@ class AdminUser(models.Model):
             return None
         project_dir = settings.PROJECT_DIR
         tmp_dir = os.path.join(project_dir, 'tmp')
-        key_name = md5(self._private_key).hexdigest()
+        key_name = md5(self._private_key.encode()).hexdigest()
         key_path = os.path.join(tmp_dir, key_name)
         if not os.path.exists(key_path):
             self.private_key.write_private_key_file(key_path)
