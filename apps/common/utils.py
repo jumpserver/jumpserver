@@ -68,7 +68,7 @@ class Signer(object):
 
     def sign_t(self, value, expires_in=3600):
         s = TimedJSONWebSignatureSerializer(self.secret_key, expires_in=expires_in)
-        return s.dumps(value)
+        return str(s.dumps(value), encoding="utf8")
 
     def unsign_t(self, value):
         s = TimedJSONWebSignatureSerializer(self.secret_key)
