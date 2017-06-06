@@ -180,15 +180,14 @@ def timesince(dt, since='', default="just now"):
 
 
 def ssh_key_string_to_obj(text):
-    key_f = StringIO(text)
     key = None
     try:
-        key = paramiko.RSAKey.from_private_key(key_f)
+        key = paramiko.RSAKey.from_private_key( StringIO(text) )
     except paramiko.SSHException:
         pass
 
     try:
-        key = paramiko.DSSKey.from_private_key(key_f)
+        key = paramiko.DSSKey.from_private_key( StringIO(text) )
     except paramiko.SSHException:
         pass
     return key
