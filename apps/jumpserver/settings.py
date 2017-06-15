@@ -79,6 +79,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'jumpserver.middleware.TimezoneMiddleware',
+    'jumpserver.middleware.DemoMiddleware',
 ]
 
 ROOT_URLCONF = 'jumpserver.urls'
