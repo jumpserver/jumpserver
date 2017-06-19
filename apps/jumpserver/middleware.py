@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 
 import os
+import re
 import pytz
 from django.utils import timezone
 from django.utils.deprecation import MiddlewareMixin
@@ -8,7 +9,7 @@ from django.shortcuts import HttpResponse
 
 
 DEMO_MODE = os.environ.get("DEMO_MODE", "")
-SAFE_URL = ["/users/login",]
+SAFE_URL = r'^/users/login|^/api/applications/v1/.*'
 
 
 class TimezoneMiddleware(MiddlewareMixin):
@@ -22,5 +23,5 @@ class TimezoneMiddleware(MiddlewareMixin):
 
 class DemoMiddleware(MiddlewareMixin):
     def process_request(self, request):
-        if DEMO_MODE and request.method not in ["GET", "HEAD"] and request.path not in SAFE_URL:
+        if DEMO_MODE and request.method not in ["GET", "HEAD"] and not re.match(SAFE_URL, request.path):
                 return HttpResponse("Demo mode, only get request accept", 403)
