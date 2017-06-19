@@ -55,4 +55,10 @@ demo使用了开发者模式，并发只能为1
 - 小彧 <李磊> Django资深开发者，为users模块贡献了很多代码
 - sofia <周小侠> 资深前端工程师, luna前端代码贡献者和现在维护者
 - liuz <刘正> 全栈工程师, 编写了luna大部分代码
+- jiaxiangkong <陈尚委> Jumpserver测试运营
+
+#### 0.3.2 
+- halcyon <王墉> DevOps 资深开发者, jassets开发者
+- yumaojun03 <喻茂峻> DevOps 资深开发者，jperm开发者，擅长Python, Go以及PAAS平台开发
+- kelianchun <柯连春> DevOps 资产开发者，fix了很多connect.py bug
 
