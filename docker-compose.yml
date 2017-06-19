@@ -5,7 +5,7 @@ services:
     container_name: redis
     restart: always
   jumpserver:
-    image: jumpserver/jumpserver:beta
+    image: jumpserver/jumpserver:v0.4.0-beta1
     container_name: jumpserver
     restart: always
     ports:
@@ -13,7 +13,7 @@ services:
     depends_on:
       - redis
   coco:
-    image: jumpserver/coco:beta
+    image: jumpserver/coco:v0.4.0-beta1
     container_name: coco
     restart: always
     ports:
@@ -21,7 +21,7 @@ services:
     depends_on:
       - jumpserver
   luna:
-    image: jumpserver/luna:beta
+    image: jumpserver/luna:v0.4.0-beta1
     container_name: luna
     restart: always
     ports:

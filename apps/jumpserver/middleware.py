@@ -9,7 +9,7 @@ from django.shortcuts import HttpResponse
 
 
 DEMO_MODE = os.environ.get("DEMO_MODE", "")
-SAFE_URL = r'^/users/login|^/api/applications/v1/.*'
+SAFE_URL = r'^/users/login|^/api/applications/v1/.*|/api/audits/.*|/api/users/v1/auth/|/api/users/v1/profile/'
 
 
 class TimezoneMiddleware(MiddlewareMixin):
@@ -24,4 +24,4 @@ class TimezoneMiddleware(MiddlewareMixin):
 class DemoMiddleware(MiddlewareMixin):
     def process_request(self, request):
         if DEMO_MODE and request.method not in ["GET", "HEAD"] and not re.match(SAFE_URL, request.path):
-                return HttpResponse("Demo mode, only get request accept", 403)
+                return HttpResponse("Demo mode, only get request accept", status=403)
