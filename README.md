@@ -30,6 +30,18 @@ Jumpserver是一款使用Python, Django开发的开源跳板机系统, 助力互
 
 参见 https://github.com/jumpserver/jumpserver/issues/438
 
+
+### Demo
+
+demo使用了开发者模式，并发只能为1 
+
+- Jumpserver: [访问](http://demo.jumpserver.org:8080)  账号: admin 密码: admin
+
+- Luna: [访问](http://demo.jumpserver.org:5000) 同Jumpserver认证
+
+- Coco: ssh -p 2222 admin@demo.jumpserver.org 密码: admin
+
+
 ### 开发者文档
 
 
