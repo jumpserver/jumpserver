@@ -2,7 +2,6 @@
 #
 
 from django import forms
-from django.utils.translation import ungettext_lazy as _
 
 from .models import Terminal
 

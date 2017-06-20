@@ -79,7 +79,7 @@ class Asset(models.Model):
     disk_total = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_('Disk total'))
     disk_info = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_('Disk info'))
 
-    platform = models.CharField(max_length=128, null=True, blank=True, verbose_name='Platform')
+    platform = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Platform'))
     os = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('OS'))
     os_version = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('OS version'))
     os_arch = models.CharField(max_length=16, blank=True, null=True, verbose_name=_('OS arch'))

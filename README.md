@@ -30,9 +30,35 @@ Jumpserver是一款使用Python, Django开发的开源跳板机系统, 助力互
 
 参见 https://github.com/jumpserver/jumpserver/issues/438
 
+
+### Demo
+
+demo使用了开发者模式，并发只能为1 
+
+- Jumpserver: [访问](http://demo.jumpserver.org:8080)  账号: admin 密码: admin
+
+- Luna: [访问](http://demo.jumpserver.org:5000) 同Jumpserver认证
+
+- Coco: ssh -p 2222 admin@demo.jumpserver.org 密码: admin
+
+
 ### 开发者文档
 
 
    * [项目结构描述](https://github.com/jumpserver/jumpserver/blob/dev/docs/project_structure.md)
    * [Python代码规范](https://github.com/jumpserver/jumpserver/blob/dev/docs/python_style_guide.md)
    * [API设计规范](https://github.com/jumpserver/jumpserver/blob/dev/docs/api_style_guide.md)
+
+### 贡献者
+#### 0.4.0
+- ibuler <广宏伟>
+- 小彧 <李磊> Django资深开发者，为users模块贡献了很多代码
+- sofia <周小侠> 资深前端工程师, luna前端代码贡献者和现在维护者
+- liuz <刘正> 全栈工程师, 编写了luna大部分代码
+- jiaxiangkong <陈尚委> Jumpserver测试运营
+
+#### 0.3.2 
+- halcyon <王墉> DevOps 资深开发者, jassets开发者
+- yumaojun03 <喻茂峻> DevOps 资深开发者，jperm开发者，擅长Python, Go以及PAAS平台开发
+- kelianchun <柯连春> DevOps 资产开发者，fix了很多connect.py bug
+
