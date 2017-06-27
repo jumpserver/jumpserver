@@ -30,8 +30,13 @@ def pagination_range(total_page, current_num=1, display=5):
     except ValueError:
         current_num = 1
 
-    start = current_num - display/2 if current_num > display/2 else 1
-    end = start + display if start + display <= total_page else total_page + 1
+    half_display = int(display/2)
+    start = current_num - half_display if current_num > half_display else 1
+    if start + display <= total_page:
+        end = start + display
+    else:
+        end = total_page + 1
+        start = end - display if end > display else 1
 
     return range(start, end)
 
