@@ -19,12 +19,13 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.generic.base import TemplateView
+
+from .views import IndexView
 
 
 urlpatterns = [
     url(r'^captcha/', include('captcha.urls')),
-    url(r'^$', TemplateView.as_view(template_name='base.html'), name='index'),
+    url(r'^$', IndexView.as_view(), name='index'),
     url(r'^users/', include('users.urls.views_urls', namespace='users')),
     url(r'^assets/', include('assets.urls.views_urls', namespace='assets')),
     url(r'^perms/', include('perms.urls.views_urls', namespace='perms')),

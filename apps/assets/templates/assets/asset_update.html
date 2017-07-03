@@ -1,6 +1,6 @@
 {% extends '_base_create_update.html' %}
 {% load static %}
-{% load bootstrap %}
+{% load bootstrap3 %}
 {% load i18n %}
 
 {% block custom_head_css_js_create %}
@@ -10,50 +10,44 @@
 
 {% block form %}
     <form action="" method="post" class="form-horizontal">
+    {% if form.no_field_errors %}
+         <div class="alert alert-danger">
+             {{ form.non_field_errors }}
+         </div>
+    {% endif %}
     {% csrf_token %}
     <h3>{% trans 'Basic' %}</h3>
-    {{ form.hostname|bootstrap_horizontal }}
-    {{ form.ip|bootstrap_horizontal }}
-    {{ form.port|bootstrap_horizontal }}
-    {{ form.type|bootstrap_horizontal }}
+    {% bootstrap_field form.hostname layout="horizontal" %}
+    {% bootstrap_field form.ip layout="horizontal" %}
+    {% bootstrap_field form.public_ip layout="horizontal" %}
+    {% bootstrap_field form.port layout="horizontal" %}
+    {% bootstrap_field form.type layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Group' %}</h3>
-    {{ form.idc|bootstrap_horizontal }}
-    {{ form.groups|bootstrap_horizontal }}
+    {% bootstrap_field form.idc layout="horizontal" %}
+    {% bootstrap_field form.groups layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Asset user' %}</h3>
-    {{ form.admin_user|bootstrap_horizontal }}
-    {{ form.system_users|bootstrap_horizontal }}
-
-    <div class="hr-line-dashed"></div>
-    <h3>{% trans 'Hardware' %}</h3>
-    {{ form.sn|bootstrap_horizontal }}
-    {{ form.brand|bootstrap_horizontal }}
-    {{ form.cpu|bootstrap_horizontal }}
-    {{ form.memory|bootstrap_horizontal }}
-    {{ form.disk|bootstrap_horizontal }}
-    {{ form.mac_address|bootstrap_horizontal }}
+    {% bootstrap_field form.admin_user layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Configuration' %}</h3>
-    {{ form.number|bootstrap_horizontal }}
-    {{ form.other_ip|bootstrap_horizontal }}
-    {{ form.remote_card_ip|bootstrap_horizontal }}
-    {{ form.os|bootstrap_horizontal }}
+    {% bootstrap_field form.number layout="horizontal" %}
+    {% bootstrap_field form.remote_card_ip layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Location' %}</h3>
-    {{ form.cabinet_no|bootstrap_horizontal }}
-    {{ form.cabinet_pos|bootstrap_horizontal }}
+    {% bootstrap_field form.cabinet_no layout="horizontal" %}
+    {% bootstrap_field form.cabinet_pos layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Other' %}</h3>
-    {{ form.status|bootstrap_horizontal }}
-    {{ form.env|bootstrap_horizontal }}
-    {{ form.tags|bootstrap_horizontal }}
-    {{ form.comment|bootstrap_horizontal }}
+    {% bootstrap_field form.status layout="horizontal" %}
+    {% bootstrap_field form.env layout="horizontal" %}
+    {% bootstrap_field form.comment layout="horizontal" %}
+    {% bootstrap_field form.is_active layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
     <div class="form-group">

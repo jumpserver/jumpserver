@@ -1,0 +1,264 @@
+{% extends '_base_list.html' %}
+{% load i18n %}
+{% load static %}
+{% block custom_head_css_js %}
+<link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+<script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
+
+<style>
+    .custom{
+        margin-right:5px;
+        }
+    #modal .modal-body { max-height: 200px; }
+</style>
+{% endblock %}
+{% block content_left_head %}{% endblock %}
+
+{% block table_search %}
+{#    <div class="html5buttons">#}
+{#        <div class="dt-buttons btn-group">#}
+{#            <a class="btn btn-default btn_export" tabindex="0">#}
+{#                <span>{% trans "Export" %}</span>#}
+{#            </a>#}
+{#        </div>#}
+{#    </div>#}
+{% endblock %}
+
+
+{% block table_container %}
+<table class="table table-striped table-bordered table-hover " id="asset_list_table" >
+    <thead>
+        <tr>
+            <th class="text-center"><input type="checkbox" class="ipt_check_all"></th>
+            <th class="text-center">{% trans 'Hostname' %}</th>
+            <th class="text-center">{% trans 'IP' %}</th>
+            <th class="text-center">{% trans 'Port' %}</th>
+            <th class="text-center">{% trans 'Type' %}</th>
+            <th class="text-center">{% trans 'Env' %}</th>
+            <th class="text-center">{% trans 'Hardware' %}</th>
+            <th class="text-center">{% trans 'Valid' %}</th>
+            <th class="text-center">{% trans 'Alive' %}</th>
+        </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+{% endblock %}
+
+{% block custom_foot_js %}
+<script src="{% static 'js/jquery.form.min.js' %}"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	var options = {
+		ele: $('#asset_list_table'),
+		columnDefs: [
+			{targets: 1, createdCell: function (td, cellData, rowData) {
+				var detail_btn = '<a href="{% url "assets:asset-detail" pk=99991937 %}">' + cellData + '</a>';
+				$(td).html(detail_btn.replace('99991937', rowData.id));
+			}},
+			{targets: 7, createdCell: function (td, cellData) {
+				if (!cellData) {
+					$(td).html('<i class="fa fa-times text-danger"></i>')
+				} else {
+					$(td).html('<i class="fa fa-check text-navy"></i>')
+				}
+			}},
+			{targets: 8, createdCell: function (td, cellData) {
+				if (!cellData) {
+					$(td).html('<i class="fa fa-circle text-danger"></i>')
+				} else {
+					$(td).html('<i class="fa fa-circle text-navy"></i>')
+				}
+			}}
+		],
+		ajax_url: '{% url "api-assets:asset-list" %}',
+		columns: [{data: "id"}, {data: "hostname" }, {data: "ip" }, {data: "port" },
+			{data: "get_type_display" }, {data: "get_env_display"}, {data: "hardware"},
+			{data: "is_active" }, {data: "is_active"}],
+	};
+	var table = jumpserver.initDataTable(options);
+	$('.btn_export').click(function () {
+		var assets = [];
+		var rows = table.rows('.selected').data();
+		$.each(rows, function (index, obj) {
+			assets.push(obj.id)
+		});
+		console.log(assets);
+		$.ajax({
+			url: "{% url "assets:asset-export" %}",
+			method: 'POST',
+			data: JSON.stringify({assets_id: assets}),
+			dataType: "json",
+			success: function (data, textStatus) {
+				window.open(data.redirect)
+			},
+			error: function () {
+				toastr.error('Export failed');
+			}
+		})
+	});
+ 	$('#btn_asset_import').click(function() {
+		var $form = $('#fm_asset_import');
+		$form.find('.help-block').remove();
+		function success (data) {
+			if (data.valid === false) {
+				$('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_assets'));
+			} else {
+				$('#id_created').html(data.created_info);
+				$('#id_created_detail').html(data.created.join(', '));
+				$('#id_updated').html(data.updated_info);
+				$('#id_updated_detail').html(data.updated.join(', '));
+				$('#id_failed').html(data.failed_info);
+				$('#id_failed_detail').html(data.failed.join(', '));
+				var $data_table = $('#asset_list_table').DataTable();
+				$data_table.ajax.reload();
+			}
+		}
+		$form.ajaxSubmit({success: success});
+	})
+})
+
+.on('click', '.btn_asset_delete', function () {
+	var $this = $(this);
+	var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
+	var uid = $this.data('uid');
+	var the_url = '{% url "api-assets:asset-detail" pk=99991937 %}'.replace('99991937', uid);
+	objectDelete($this, name, the_url);
+})
+
+.on('click', '#btn_bulk_update', function () {
+	var action = $('#slct_bulk_update').val();
+	var $data_table = $('#asset_list_table').DataTable();
+	var id_list = [];
+    var plain_id_list = [];
+    $data_table.rows({selected: true}).every(function(){
+        id_list.push({id: this.data().id});
+        plain_id_list.push(this.data().id);
+    });
+    if (plain_id_list.length == 0) {
+        return false;
+    }
+    var the_url = "{% url 'api-assets:asset-list' %}";
+    function doDeactive() {
+        var body = $.each(id_list, function(index, asset_object) {
+            asset_object['is_active'] = false;
+        });
+        APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(body)});
+        $data_table.ajax.reload();
+        jumpserver.checked = false;
+    }
+    function doActive() {
+        var body = $.each(id_list, function(index, asset_object) {
+            asset_object['is_active'] = true;
+        });
+        APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(body)});
+        $data_table.ajax.reload();
+        jumpserver.checked = false;
+    }
+    function doDelete() {
+        swal({
+            title: "{% trans 'Are you sure?' %}",
+            text: "{% trans 'This will delete the selected assets !!!' %}",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "{% trans 'Confirm' %}",
+            closeOnConfirm: false
+        }, function() {
+            var success = function() {
+                var msg = "{% trans 'Asset Deleted.' %}";
+                swal("{% trans 'Asset Delete' %}", msg, "success");
+                $('#asset_list_table').DataTable().ajax.reload();
+            };
+            var fail = function() {
+                var msg = "{% trans 'Asset Deleting failed.' %}";
+                swal("{% trans 'Asset Delete' %}", msg, "error");
+            };
+            var url_delete = the_url + '?id__in=' + JSON.stringify(plain_id_list);
+            APIUpdateAttr({url: url_delete, method: 'DELETE', success: success, error: fail});
+            $data_table.ajax.reload();
+            jumpserver.checked = false;
+        });
+    }
+    function doUpdate() {
+        $('#asset_bulk_update_modal').modal('show');
+    }
+    switch(action) {
+        case 'deactive':
+            doDeactive();
+            break;
+        case 'delete':
+            doDelete();
+            break;
+        case 'update':
+            doUpdate();
+            break;
+        case 'active':
+            doActive();
+            break;
+        default:
+            break;
+    }
+})
+
+.on('click', '#btn_asset_bulk_update', function () {
+	var json_data = $("#fm_asset_bulk_update").serializeObject();
+	var body = {};
+    body.enable_otp = (json_data.enable_otp === 'on')? true: false;
+    if (json_data.type != '') {
+        body.type = json_data.type;
+    }
+    if (json_data.groups != undefined) {
+        body.groups = json_data.groups;
+    }
+    if (typeof body.groups === 'string') {
+        body.groups = [parseInt(body.groups)]
+    } else if(typeof body.groups === 'array') {
+        var new_groups = body.groups.map(Number);
+        body.groups = new_groups;
+    }
+
+    if (json_data.system_users != undefined) {
+    	body.system_users = json_data.system_users;
+    }
+    if (typeof body.system_users === 'string') {
+    	body.system_users = [parseInt(body.system_users)]
+    } else if(typeof body.system_users === 'array') {
+    	var new_users = body.system_users.map(Number);
+    	body.system_users = new_users;
+    }
+
+    if (json_data.tags != undefined) {
+    	body.tags = json_data.tags;
+    }
+    if (typeof body.tags == 'string') {
+    	body.tags = [parseInt(body.tags)];
+    } else if (typeof body.tags === 'array') {
+    	var new_tags = body.tags.map(Number);
+    	body.tags = new_tags;
+    }
+
+    var $data_table = $('#asset_list_table').DataTable();
+    var post_list = [];
+    $data_table.rows({selected: true}).every(function(){
+        var content = Object.assign({id: this.data().id}, body);
+        post_list.push(content);
+    });
+    if (post_list === []) {
+        return false
+    }
+    var the_url = "{% url 'api-assets:asset-list' %}";
+    var success = function() {
+        var msg = "{% trans 'The selected assets has been updated successfully.' %}";
+        swal("{% trans 'Asset Updated' %}", msg, "success");
+        $('#asset_list_table').DataTable().ajax.reload();
+        jumpserver.checked = false;
+    };
+    console.log(JSON.stringify(post_list));
+    console.log(the_url);
+{#    APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(post_list), success: success});#}
+    $('#asset_bulk_update_modal').modal('hide');
+});
+
+</script>
+{% endblock %}

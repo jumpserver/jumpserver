@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from . import IDC, AssetGroup, AdminUser, SystemUser
 
-__all__ = ['Asset', 'Tag']
+__all__ = ['Asset']
 logger = logging.getLogger(__name__)
 
 
@@ -37,42 +37,60 @@ class Asset(models.Model):
         ('Test', 'Testing'),
     )
 
+    # Important
     ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
-    other_ip = models.CharField(max_length=255, null=True, blank=True, verbose_name=_('Other IP'))
-    remote_card_ip = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Remote card IP'))
     hostname = models.CharField(max_length=128, unique=True, verbose_name=_('Hostname'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
-    groups = models.ManyToManyField(AssetGroup, blank=True, related_name='assets', verbose_name=_('Asset groups'))
+    groups = models.ManyToManyField(AssetGroup, blank=True, related_name='assets',
+                                    verbose_name=_('Asset groups'))
     admin_user = models.ForeignKey(AdminUser, null=True, blank=True, related_name='assets',
                                    on_delete=models.SET_NULL, verbose_name=_("Admin user"))
-    system_users = models.ManyToManyField(SystemUser, blank=True, related_name='assets', verbose_name=_("System User"))
+    system_users = models.ManyToManyField(SystemUser, blank=True,
+                                          related_name='assets',
+                                          verbose_name=_("System User"))
     idc = models.ForeignKey(IDC, blank=True, null=True, related_name='assets',
                             on_delete=models.SET_NULL, verbose_name=_('IDC'),)
-    mac_address = models.CharField(max_length=20, null=True, blank=True, verbose_name=_("Mac address"))
-    brand = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Brand'))
-    cpu = models.CharField(max_length=64,  null=True, blank=True, verbose_name=_('CPU'))
-    memory = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Memory'))
-    disk = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_('Disk'))
-    os = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('OS'))
-    cabinet_no = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Cabinet number'))
-    cabinet_pos = models.IntegerField(null=True, blank=True, verbose_name=_('Cabinet position'))
-    number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
-    status = models.CharField(choices=STATUS_CHOICES, max_length=8, null=True, blank=True,
-                              default='In use', verbose_name=_('Asset status'))
+    is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     type = models.CharField(choices=TYPE_CHOICES, max_length=16, blank=True, null=True,
                             default='Server', verbose_name=_('Asset type'),)
     env = models.CharField(choices=ENV_CHOICES, max_length=8, blank=True, null=True,
                            default='Prod', verbose_name=_('Asset environment'),)
+    status = models.CharField(choices=STATUS_CHOICES, max_length=12, null=True, blank=True,
+                              default='In use', verbose_name=_('Asset status'))
+
+    # Some information
+    public_ip = models.GenericIPAddressField(max_length=32, blank=True,
+                                             null=True, verbose_name=_('Public IP'))
+    remote_card_ip = models.CharField(max_length=16, null=True, blank=True,
+                                      verbose_name=_('Remote control card IP'))
+    cabinet_no = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Cabinet number'))
+    cabinet_pos = models.IntegerField(null=True, blank=True, verbose_name=_('Cabinet position'))
+    number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
+
+    # Collect
+    vendor = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Vendor'))
+    model = models.CharField(max_length=54, null=True, blank=True, verbose_name=_('Model'))
     sn = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Serial number'))
+
+    cpu_model = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('CPU model'))
+    cpu_count = models.IntegerField(null=True, verbose_name=_('CPU count'))
+    cpu_cores = models.IntegerField(null=True, verbose_name=_('CPU cores'))
+    memory = models.CharField(max_length=64, null=True, blank=True, verbose_name=_('Memory'))
+    disk_total = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_('Disk total'))
+    disk_info = models.CharField(max_length=1024, null=True, blank=True, verbose_name=_('Disk info'))
+
+    platform = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('Platform'))
+    os = models.CharField(max_length=128, null=True, blank=True, verbose_name=_('OS'))
+    os_version = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('OS version'))
+    os_arch = models.CharField(max_length=16, blank=True, null=True, verbose_name=_('OS arch'))
+    hostname_raw = models.CharField(max_length=128, blank=True, null=True, verbose_name=_('Hostname raw'))
+
     created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
-    is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
-    date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date added'))
+    date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
-    tags = models.ManyToManyField('Tag', related_name='assets', blank=True, verbose_name=_('Tags'))
 
     def __unicode__(self):
         return '%s <%s: %s>' % (self.hostname, self.ip, self.port)
-
     __str__ = __unicode__
 
     @property
@@ -85,18 +103,29 @@ class Asset(models.Model):
         return False, warning
 
     def to_json(self):
-        pass
+        return {
+            'id': self.id,
+            'hostname': self.hostname,
+            'ip': self.ip,
+            'port': self.port,
+        }
 
     def _to_secret_json(self):
         """Ansible use it create inventory"""
         return {
+            'id': self.id,
             'hostname': self.hostname,
             'ip': self.ip,
             'port': self.port,
             'groups': [group.name for group in self.groups.all()],
-            'username': self.admin_user.username,
-            'password': self.admin_user.password,
-            'private_key': self.admin_user.private_key,
+            'username': self.admin_user.username if self.admin_user else '',
+            'password': self.admin_user.password if self.admin_user else '',
+            'private_key': self.admin_user.private_key_file if self.admin_user else None,
+            'become': {
+                'method': self.admin_user.become_method,
+                'user': self.admin_user.become_user,
+                'pass': self.admin_user.become_pass,
+            } if self.admin_user.become else {},
         }
 
     class Meta:
@@ -125,16 +154,3 @@ class Asset(models.Model):
                 print('Error continue')
                 continue
 
-
-class Tag(models.Model):
-    name = models.CharField(max_length=64, unique=True, verbose_name=_('Name'))
-    created_time = models.DateTimeField(auto_now_add=True, verbose_name=_('Create time'))
-    created_by = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Created by'))
-
-    def __unicode__(self):
-        return self.name
-
-    __str__ = __unicode__
-
-    class Meta:
-        db_table = 'tag'

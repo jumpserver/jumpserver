@@ -101,12 +101,12 @@ $(document).ready(function(){
             closeOnConfirm: false
         }, function() {
             var success = function() {
-                var msg = "{% trans 'Group Deleted.' %}";
+                var msg = "{% trans 'Group deleted' %}";
                 swal("{% trans 'Group Delete' %}", msg, "success");
                 $('#asset_groups_list_table').DataTable().ajax.reload();
             };
             var fail = function() {
-                var msg = "{% trans 'Group Deleting failed.' %}";
+                var msg = "{% trans 'Group deleting failed.' %}";
                 swal("{% trans 'Group Delete' %}", msg, "error");
             };
             var url_delete = the_url + '?id__in=' + JSON.stringify(plain_id_list);

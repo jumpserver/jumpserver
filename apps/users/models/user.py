@@ -33,7 +33,7 @@ class User(AbstractUser):
     email = models.EmailField(max_length=30, unique=True, verbose_name=_('Email'))
     groups = models.ManyToManyField(UserGroup, related_name='users', blank=True, verbose_name=_('User group'))
     role = models.CharField(choices=ROLE_CHOICES, default='User', max_length=10, blank=True, verbose_name=_('Role'))
-    avatar = models.ImageField(upload_to="avatar", verbose_name=_('Avatar'))
+    avatar = models.ImageField(upload_to="avatar", null=True, verbose_name=_('Avatar'))
     wechat = models.CharField(max_length=30, blank=True, verbose_name=_('Wechat'))
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name=_('Phone'))
     enable_otp = models.BooleanField(default=False, verbose_name=_('Enable OTP'))
@@ -99,6 +99,19 @@ class User(AbstractUser):
     @public_key.setter
     def public_key(self, public_key_raw):
         self._public_key = signer.sign(public_key_raw)
+
+    @property
+    def public_key_obj(self):
+        class PubKey(object):
+            def __getattr__(self, item):
+                return ''
+        if self.public_key:
+            import sshpubkeys
+            try:
+                return sshpubkeys.SSHKey(self.public_key)
+            except TabError:
+                pass
+        return PubKey()
 
     @property
     def is_superuser(self):
@@ -170,11 +183,9 @@ class User(AbstractUser):
         if self.avatar:
             return self.avatar.url
         else:
-            default_dir = os.path.join(settings.MEDIA_ROOT, 'avatar', 'default')
-            if os.path.isdir(default_dir):
-                default_avatar_list = os.listdir(default_dir)
-                default_avatar = default_avatar_list[len(self.username) % len(default_avatar_list)]
-                return os.path.join(settings.MEDIA_URL, 'avatar', 'default',  default_avatar)
+            avatar_dir = os.path.join(settings.MEDIA_ROOT, 'avatar')
+            if os.path.isdir(avatar_dir):
+                return os.path.join(settings.MEDIA_URL, 'avatar', 'default.png')
         return 'https://www.gravatar.com/avatar/c6812ab450230979465d7bf288eadce2a?s=120&d=identicon'
 
     def generate_reset_token(self):

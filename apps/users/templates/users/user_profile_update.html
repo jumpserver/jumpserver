@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/cropper/cropper.min.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+
+    <style>
+        .crop {
+            width: 200px;
+            height: 150px;
+            overflow: hidden;
+        }
+
+        .img-preview-sm img {
+            width: 64px;
+            height: 64px;
+            margin: -75px 0 0 -100px;
+        }
+
+        img {
+            max-width: 100%; /* This rule is very important, please do not ignore this! */
+        }
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li class="active">
+                                <a href="{% url 'users:user-profile-update' %}" class="text-center">{% trans 'Profile' %} </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'users:user-password-update' %}" class="text-center">{% trans 'Password' %} </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'users:user-pubkey-update' %}" class="text-center">{% trans 'Public key' %} </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content" style="background-color: #ffffff">
+                        <div class="wrapper wrapper-content animated fadeInRight">
+                                <form method="post" class="form-horizontal" action="" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <h3>{% trans 'Account' %}</h3>
+                                    {% bootstrap_field form.username layout="horizontal" %}
+                                    {% bootstrap_field form.name layout="horizontal" %}
+                                    {% bootstrap_field form.email layout="horizontal" %}
+
+                                    <div class="hr-line-dashed"></div>
+                                    <h3>{% trans 'Profile' %}</h3>
+                                    {% bootstrap_field form.phone layout="horizontal" %}
+                                    {% bootstrap_field form.wechat layout="horizontal" %}
+                                    <div class="hr-line-dashed"></div>
+                                    <div class="form-group">
+                                        <div class="col-sm-4 col-sm-offset-2">
+                                            <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+                                            <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block custom_foot_js %}
+    <script src="{% static 'js/plugins/cropper/cropper.min.js' %}"></script>
+    <script>
+    </script>
+{% endblock %}

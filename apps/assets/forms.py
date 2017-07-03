@@ -2,7 +2,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from .models import IDC, Asset, AssetGroup, AdminUser, SystemUser, Tag
+from .models import IDC, Asset, AssetGroup, AdminUser, SystemUser
 from common.utils import validate_ssh_private_key, ssh_pubkey_gen, ssh_key_gen, get_logger
 
 
@@ -10,61 +10,113 @@ logger = get_logger(__file__)
 
 
 class AssetCreateForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        instance = kwargs.get('instance', None)
-        if instance:
-            initial = kwargs.get('initial', {})
-            initial['tags'] = [t.pk for t in kwargs['instance'].tags.all()]
-        super(AssetCreateForm, self).__init__(*args, **kwargs)
-
-    def _save_m2m(self):
-        super(AssetCreateForm, self)._save_m2m()
-        tags = self.cleaned_data['tags']
-        self.instance.tags.clear()
-        self.instance.tags.add(*tuple(tags))
-
-    # def clean(self):
-    #     clean_data = super(AssetCreateForm, self).clean()
-    #     ip = clean_data.get('ip')
-    #     port = clean_data.get('port')
-    #     query = Asset.objects.filter(ip=ip, port=port)
-    #     if query:
-    #         raise forms.ValidationError('this asset has exists.')
-
     class Meta:
         model = Asset
-        tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all())
         fields = [
-            'hostname', 'ip', 'port', 'type', 'comment', 'admin_user', 'system_users', 'idc', 'groups',
-            'other_ip', 'remote_card_ip', 'mac_address', 'brand', 'cpu', 'memory', 'disk', 'os', 'cabinet_no',
-            'cabinet_pos', 'number', 'status', 'env', 'sn', 'tags',
+            'hostname', 'ip', 'public_ip', 'port', 'type', 'comment',
+            'admin_user', 'idc', 'groups', 'status', 'env', 'is_active'
         ]
         widgets = {
-            'groups': forms.SelectMultiple(attrs={'class': 'select2',
-                                                  'data-placeholder': _('Select asset groups')}),
-            'tags': forms.SelectMultiple(attrs={'class': 'select2',
-                                                'data-placeholder': _('Select asset tags')}),
-            'system_users': forms.SelectMultiple(attrs={'class': 'select2',
-                                                        'data-placeholder': _('Select asset system users')}),
-            'admin_user': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select asset admin user')}),
+            'groups': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select asset groups')}),
+            'admin_user': forms.Select(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select asset admin user')}),
         }
         help_texts = {
             'hostname': '* required',
             'ip': '* required',
-            'system_users': _('System user will be granted for user to login assets (using ansible create automatic)'),
-            'admin_user': _('Admin user should be exist on asset already, And have sudo ALL permission'),
-            'tags': '最多5个标签，单个标签最长8个汉字，按回车确认'
+            'system_users': _('System user will be granted for user to login '
+                              'assets (using ansible create automatic)'),
+            'admin_user': _('Admin user should be exist on asset already, '
+                            'And have sudo ALL permission'),
         }
+
+    def clean_admin_user(self):
+        if not self.cleaned_data['admin_user']:
+            raise forms.ValidationError(_('Select admin user'))
+        return self.cleaned_data['admin_user']
+
+
+class AssetUpdateForm(forms.ModelForm):
+    class Meta:
+        model = Asset
+        fields = [
+            'hostname', 'ip', 'port', 'groups', 'admin_user', 'idc', 'is_active',
+            'type', 'env', 'status', 'public_ip', 'remote_card_ip', 'cabinet_no',
+            'cabinet_pos', 'number', 'comment'
+        ]
+        widgets = {
+            'groups': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select asset groups')}),
+            'admin_user': forms.Select(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select asset admin user')}),
+        }
+        help_texts = {
+            'hostname': '* required',
+            'ip': '* required',
+            'system_users': _('System user will be granted for user '
+                              'to login assets (using ansible create automatic)'),
+            'admin_user': _('Admin user should be exist on asset '
+                            'already, And have sudo ALL permission'),
+        }
+
+
+class AssetBulkUpdateForm(forms.ModelForm):
+    assets = forms.MultipleChoiceField(
+        required=True,
+        help_text='* required',
+        label=_('Select assets'),
+        # choices=[(asset.id, asset.hostname) for asset in Asset.objects.all()],
+        widget=forms.SelectMultiple(
+            attrs={
+                'class': 'select2',
+                'data-placeholder': _('Select assets')
+            }
+        )
+    )
+    port = forms.IntegerField(min_value=1, max_value=65535,
+                              required=False, label=_('Port'))
+
+    class Meta:
+        model = Asset
+        fields = [
+            'assets', 'port', 'groups', 'admin_user', 'idc',
+            'type', 'env', 'status',
+        ]
+        widgets = {
+            'groups': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select asset groups')}),
+            'admin_user': forms.Select(
+                attrs={'class': 'select2',
+                       'data-placeholder': _('Select asset admin user')}),
+        }
+
+    def save(self, commit=True):
+        cleaned_data = {k: v for k, v in self.cleaned_data.items() if v is not None}
+        assets_id = cleaned_data.pop('assets')
+        groups = cleaned_data.pop('groups')
+        assets = Asset.objects.filter(id__in=assets_id)
+        assets.update(**cleaned_data)
+        if groups:
+            for asset in assets:
+                asset.groups.set(groups)
+        return assets
 
 
 class AssetGroupForm(forms.ModelForm):
     # See AdminUserForm comment same it
-    assets = forms.ModelMultipleChoiceField(queryset=Asset.objects.all(),
-                                            label=_('Asset'),
-                                            required=False,
-                                            widget=forms.SelectMultiple(
-                                                attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
-                                            )
+    assets = forms.ModelMultipleChoiceField(
+        queryset=Asset.objects.all(),
+        label=_('Asset'),
+        required=False,
+        widget=forms.SelectMultiple(
+            attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
+        )
 
     def __init__(self, *args, **kwargs):
         if kwargs.get('instance', None):
@@ -81,13 +133,8 @@ class AssetGroupForm(forms.ModelForm):
     class Meta:
         model = AssetGroup
         fields = [
-            "name", "comment","system_users",
+            "name", "comment",
         ]
-        widgets = {
-            'name' : forms.TextInput(attrs={}),
-            'system_users': forms.SelectMultiple(attrs={'class': 'select2-system-user', 'data-placeholder': _('Select asset system user')}),
-
-        }
         help_texts = {
             'name': '* required',
         }
@@ -95,12 +142,13 @@ class AssetGroupForm(forms.ModelForm):
 
 class IDCForm(forms.ModelForm):
     # See AdminUserForm comment same it
-    assets = forms.ModelMultipleChoiceField(queryset=Asset.objects.all(),
-                                            label=_('Asset'),
-                                            required=False,
-                                            widget=forms.SelectMultiple(
-                                                attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
-                                            )
+    assets = forms.ModelMultipleChoiceField(
+        queryset=Asset.objects.all(),
+        label=_('Asset'),
+        required=False,
+        widget=forms.SelectMultiple(
+            attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
+        )
 
     def __init__(self, *args, **kwargs):
         if kwargs.get('instance'):
@@ -116,7 +164,8 @@ class IDCForm(forms.ModelForm):
 
     class Meta:
         model = IDC
-        fields = ['name', "bandwidth", "operator", 'contact', 'phone', 'address', 'intranet', 'extranet','comment']
+        fields = ['name', "bandwidth", "operator", 'contact',
+                  'phone', 'address', 'intranet', 'extranet', 'comment']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
             'intranet': forms.Textarea(
@@ -130,14 +179,6 @@ class IDCForm(forms.ModelForm):
 
 
 class AdminUserForm(forms.ModelForm):
-    # Admin user assets define, let user select, save it in form not in view
-    assets = forms.ModelMultipleChoiceField(
-        queryset=Asset.objects.all(),
-        label=_('Asset'),
-        required=False,
-        widget=forms.SelectMultiple(
-            attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
-    )
     # Form field name can not start with `_`, so redefine it,
     password = forms.CharField(
         widget=forms.PasswordInput, max_length=100,
@@ -146,20 +187,6 @@ class AdminUserForm(forms.ModelForm):
     )
     # Need use upload private key file except paste private key content
     private_key_file = forms.FileField(required=False)
-
-    def __init__(self, *args, **kwargs):
-        # When update a admin user instance, initial it
-        if kwargs.get('instance'):
-            initial = kwargs.get('initial', {})
-            initial['assets'] = kwargs['instance'].assets.all()
-        super(AdminUserForm, self).__init__(*args, **kwargs)
-
-    def _save_m2m(self):
-        # Save assets relation with admin user
-        super(AdminUserForm, self)._save_m2m()
-        assets = self.cleaned_data['assets']
-        self.instance.assets.clear()
-        self.instance.assets.add(*tuple(assets))
 
     def save(self, commit=True):
         # Because we define custom field, so we need rewrite :method: `save`
@@ -195,7 +222,8 @@ class AdminUserForm(forms.ModelForm):
 
     class Meta:
         model = AdminUser
-        fields = ['name', 'username', 'password', 'private_key_file', 'comment']
+        fields = ['name', 'username', 'password',
+                  'private_key_file', 'comment']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
             'username': forms.TextInput(attrs={'placeholder': _('Username')}),
@@ -248,7 +276,7 @@ class SystemUserForm(forms.ModelForm):
                 key_string = self.cleaned_data['private_key_file'].read()
                 self.cleaned_data['private_key_file'].seek(0)
                 if not validate_ssh_private_key(key_string):
-                    raise forms.ValidationError(_('Private key invalid'))
+                    raise forms.ValidationError(_('Invalid private key'))
         return self.cleaned_data['private_key_file']
 
     def clean_password(self):
@@ -262,7 +290,7 @@ class SystemUserForm(forms.ModelForm):
         fields = [
             'name', 'username', 'protocol', 'auto_generate_key', 'password',
             'private_key_file', 'auth_method', 'auto_push', 'sudo',
-            'comment', 'shell', 'home', 'uid',
+            'comment', 'shell'
         ]
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
@@ -272,40 +300,6 @@ class SystemUserForm(forms.ModelForm):
             'name': '* required',
             'username': '* required',
             'auto_push': 'Auto push system user to asset',
-        }
-
-
-class AssetTagForm(forms.ModelForm):
-    assets = forms.ModelMultipleChoiceField(queryset=Asset.objects.all(),
-                                            label=_('Asset'),
-                                            required=False,
-                                            widget=forms.SelectMultiple(
-                                                attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
-                                            )
-
-    def __init__(self, *args, **kwargs):
-        if kwargs.get('instance', None):
-            initial = kwargs.get('initial', {})
-            initial['assets'] = kwargs['instance'].asset_set.all()
-        super(AssetTagForm, self).__init__(*args, **kwargs)
-
-    def _save_m2m(self):
-        assets = self.cleaned_data['assets']
-        self.instance.assets.clear()
-        self.instance.assets.add(*tuple(assets))
-        super(AssetTagForm, self)._save_m2m()
-
-    class Meta:
-        model = Tag
-        fields = [
-            "name",
-        ]
-        widgets = {
-            'name' : forms.TextInput(attrs={}),
-
-        }
-        help_texts = {
-            'name': '* required',
         }
 
 

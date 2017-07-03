@@ -90,8 +90,3 @@ class RecordLogViewSet(BulkModelViewSet):
         else:
             return record_store.all()
 
-
-
-
-
-

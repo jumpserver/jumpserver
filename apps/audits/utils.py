@@ -1,6 +1,5 @@
 # ~*~ coding: utf-8 ~*~
 #
-
 from __future__ import unicode_literals
 import requests
 import ipaddress
@@ -10,7 +9,7 @@ from .models import LoginLog
 
 def validate_ip(ip):
     try:
-        ipaddress.ip_address(ip.decode('utf-8'))
+        ipaddress.ip_address(ip)
         return True
     except ValueError:
         print('valid error')
@@ -35,7 +34,6 @@ def get_ip_city(ip, timeout=10):
     url = 'http://int.dpool.sina.com.cn/iplookup/iplookup.php?ip=%s&format=json' % ip
     try:
         r = requests.get(url, timeout=timeout)
-        print(r)
     except requests.Timeout:
         r = None
     city = 'Unknown'

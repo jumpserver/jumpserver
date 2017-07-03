@@ -47,7 +47,6 @@ class JSONResponseMixin(object):
 
 
 class IDInFilterMixin(object):
-
     def filter_queryset(self, queryset):
         id_list = self.request.query_params.get('id__in')
         if id_list:
@@ -55,7 +54,6 @@ class IDInFilterMixin(object):
             try:
                 ids = json.loads(id_list)
             except Exception as e:
-                print e
                 return queryset
             if isinstance(ids, list):
                 queryset = queryset.filter(id__in=ids)

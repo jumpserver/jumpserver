@@ -1,0 +1,69 @@
+{% extends '_base_create_update.html' %}
+{% load static %}
+{% load bootstrap3 %}
+{% load i18n %}
+
+{% block form %}
+<div class="ydxbd" id="formlists" style="display: block;">
+    <p id="tags_p" class="mgl-5 c02">选择需要修改属性</p>
+    <div class="tagBtnList">
+        <a class="label label-primary" id="change_all" value="1">全选</a>
+        {% for field in form %}
+            {% if field.name != 'assets' %}
+             <a data-id="{{ field.id_for_label }}" class="label label-default label-primary field-tag" value="1">{{ field.label }}</a>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+<form method="post" class="form-horizontal" id="add_form">
+    {% csrf_token %}
+    {% bootstrap_form form layout="horizontal" %}
+    <div class="form-group abc">
+        <div class="col-sm-4 col-sm-offset-2">
+            <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+            <button class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+        </div>
+    </div>
+</form>
+{% endblock %}
+
+{% block custom_foot_js %}
+<script>
+    $(document).ready(function () {
+        $('.select2').select2();
+    }).on('click', '.field-tag', function() {
+        changeField(this);
+    }).on('click', '#change_all', function () {
+        var tag_fields = $('.field-tag');
+        var $this = $(this);
+        var active = '1';
+        if ($this.attr('value') == '0'){
+            active = '0';
+            $this.attr('value', '1').addClass('label-primary')
+        } else {
+            active = '1';
+            $this.attr('value', '0').removeClass('label-primary')
+        }
+        $.each(tag_fields, function (k, v) {
+            changeField(v, active)
+        })
+    });
+
+    function changeField(obj, active) {
+        var $this = $(obj);
+        var field_id = $this.data('id');
+        if (!active) {
+            active = $this.attr('value');
+        }
+        if (active == '0') {
+            $this.attr('value', '1').addClass('label-primary');
+            var form_groups = $('#add_form .form-group:not(.abc)');
+            form_groups.filter(':has(#'  + field_id + ')').show().find('select,input').prop('disabled', false)
+        } else {
+            $this.attr('value', '0').removeClass('label-primary');
+            var form_groups = $('#add_form .form-group:not(.abc)');
+            form_groups.filter(':has(#'  + field_id + ')').hide().find('select,input').prop('disabled', true)
+        }
+    }
+</script>
+{% endblock %}

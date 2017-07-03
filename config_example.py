@@ -43,7 +43,7 @@ class Config:
 
     # Sqlite setting:
     DATABASE_ENGINE = 'sqlite3'
-    DB_NAME = os.path.join(BASE_DIR, 'db.sqlite3')
+    DB_NAME = os.path.join(BASE_DIR, 'data', 'db.sqlite3')
 
     # Mysql or postgres setting like:
     # DB_ENGINE = 'mysql'
@@ -72,6 +72,13 @@ class Config:
     # Api token expiration when create
     TOKEN_EXPIRATION = 3600
 
+    # Session and csrf domain settings, If you deploy jumpserver,coco,luna standby,
+    # So than share cookie, and you need use a same top-level domain name
+
+    # SESSION_COOKIE_DOMAIN = '.jms.com'
+    # CSRF_COOKIE_DOMAIN = '.jms.com'
+    SESSION_COOKIE_AGE = 3600*24
+
     # Email SMTP setting, we only support smtp send mail
     # EMAIL_HOST = 'smtp.qq.com'
     # EMAIL_PORT = 25
@@ -82,6 +89,9 @@ class Config:
     # EMAIL_SUBJECT_PREFIX = '[Jumpserver] '
 
     CAPTCHA_TEST_MODE = False
+
+    # You can set jumpserver usage url here, that when user submit wizard redirect to
+    USER_GUIDE_URL = ''
 
     def __init__(self):
         pass
@@ -94,11 +104,11 @@ class DevelopmentConfig(Config):
     DEBUG = True
     DISPLAY_PER_PAGE = 20
     DB_ENGINE = 'sqlite'
-    DB_NAME = os.path.join(BASE_DIR, 'db.sqlite3')
+    DB_NAME = os.path.join(BASE_DIR, 'data', 'db.sqlite3')
     EMAIL_HOST = 'smtp.exmail.qq.com'
     EMAIL_PORT = 465
-    EMAIL_HOST_USER = 'ask@jumpserver.org'
-    EMAIL_HOST_PASSWORD = 'xfDf4x1n'
+    EMAIL_HOST_USER = 'a@jumpserver.org'
+    EMAIL_HOST_PASSWORD = 'somepasswrd'
     EMAIL_USE_SSL = True
     EMAIL_USE_TLS = False
     EMAIL_SUBJECT_PREFIX = '[Jumpserver] '

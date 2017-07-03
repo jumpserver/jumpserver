@@ -23,15 +23,15 @@ def start_django():
     http_port = CONFIG.HTTP_LISTEN_PORT or '8080'
     os.chdir(apps_dir)
     print('start django')
-    subprocess.call('python2.7 ./manage.py runserver %s:%s' % (http_host, http_port), shell=True)
+    subprocess.call('python ./manage.py runserver %s:%s' % (http_host, http_port), shell=True)
 
 
 def start_celery():
     os.chdir(apps_dir)
     os.environ.setdefault('C_FORCE_ROOT', '1')
-    os.environ.setdefault('PYTHONOPTIMIZE', 1)
+    os.environ.setdefault('PYTHONOPTIMIZE', '1')
     print('start celery')
-    subprocess.call('celery -A common worker -s /tmp/celerybeat-schedule -l debug', shell=True)
+    subprocess.call('celery -A common worker -B -s /tmp/celerybeat-schedule -l debug', shell=True)
 
 
 def main():

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from __future__ import unicode_literals
+from collections import OrderedDict
 from six import string_types
 import base64
 import os
@@ -14,9 +14,9 @@ import hashlib
 from email.utils import formatdate
 import calendar
 import threading
+from six import StringIO
 
 import paramiko
-from passlib.hash import sha512_crypt
 import sshpubkeys
 from itsdangerous import TimedJSONWebSignatureSerializer, JSONWebSignatureSerializer, \
     BadSignature, SignatureExpired
@@ -24,10 +24,6 @@ from django.shortcuts import reverse as dj_reverse
 from django.conf import settings
 from django.utils import timezone
 
-try:
-    import cStringIO as StringIO
-except ImportError:
-    import StringIO
 
 from .compat import to_bytes, to_string
 
@@ -53,10 +49,13 @@ def get_object_or_none(model, **kwargs):
 
 
 class Signer(object):
+    """用来加密,解密,和基于时间戳的方式验证token"""
     def __init__(self, secret_key=SECRET_KEY):
         self.secret_key = secret_key
 
     def sign(self, value):
+        if isinstance(value, bytes):
+            value = value.decode("utf-8")
         s = JSONWebSignatureSerializer(self.secret_key)
         return s.dumps(value)
 
@@ -65,18 +64,18 @@ class Signer(object):
         try:
             return s.loads(value)
         except BadSignature:
-            return None
+            return {}
 
     def sign_t(self, value, expires_in=3600):
         s = TimedJSONWebSignatureSerializer(self.secret_key, expires_in=expires_in)
-        return s.dumps(value)
+        return str(s.dumps(value), encoding="utf8")
 
     def unsign_t(self, value):
         s = TimedJSONWebSignatureSerializer(self.secret_key)
         try:
             return s.loads(value)
         except (BadSignature, SignatureExpired):
-            return None
+            return {}
 
 
 def date_expired_default():
@@ -181,24 +180,24 @@ def timesince(dt, since='', default="just now"):
 
 
 def ssh_key_string_to_obj(text):
-    key_f = StringIO.StringIO(text)
     key = None
     try:
-        key = paramiko.RSAKey.from_private_key(key_f)
+        key = paramiko.RSAKey.from_private_key( StringIO(text) )
     except paramiko.SSHException:
         pass
 
     try:
-        key = paramiko.DSSKey.from_private_key(key_f)
+        key = paramiko.DSSKey.from_private_key( StringIO(text) )
     except paramiko.SSHException:
         pass
     return key
 
 
 def ssh_pubkey_gen(private_key=None, username='jumpserver', hostname='localhost'):
+    if isinstance(private_key, bytes):
+        private_key = private_key.decode("utf-8")
     if isinstance(private_key, string_types):
         private_key = ssh_key_string_to_obj(private_key)
-
     if not isinstance(private_key, (paramiko.RSAKey, paramiko.DSSKey)):
         raise IOError('Invalid private key')
 
@@ -221,7 +220,7 @@ def ssh_key_gen(length=2048, type='rsa', password=None, username='jumpserver', h
     if hostname is None:
         hostname = os.uname()[1]
 
-    f = StringIO.StringIO()
+    f = StringIO()
 
     try:
         if type == 'rsa':
@@ -239,6 +238,8 @@ def ssh_key_gen(length=2048, type='rsa', password=None, username='jumpserver', h
 
 
 def validate_ssh_private_key(text):
+    if isinstance(text, bytes):
+        text = text.decode("utf-8")
     key = ssh_key_string_to_obj(text)
     if key is None:
         return False
@@ -250,7 +251,7 @@ def validate_ssh_public_key(text):
     ssh = sshpubkeys.SSHKey(text)
     try:
         ssh.parse()
-    except sshpubkeys.InvalidKeyException:
+    except (sshpubkeys.InvalidKeyException, UnicodeDecodeError):
         return False
     except NotImplementedError as e:
         return False
@@ -279,6 +280,7 @@ _ISO8601_FORMAT = "%Y-%m-%dT%H:%M:%S.000Z"
 
 
 def to_unixtime(time_string, format_string):
+    time_string = time_string.decode("ascii")
     with _STRPTIME_LOCK:
         return int(calendar.timegm(time.strptime(time_string, format_string)))
 
@@ -303,15 +305,9 @@ def iso8601_to_unixtime(time_string):
     return to_unixtime(time_string, _ISO8601_FORMAT)
 
 
-def http_to_unixtime(time_string):
-    """把HTTP Date格式的字符串转换为UNIX时间（自1970年1月1日UTC零点的秒数）。
-
-    HTTP Date形如 `Sat, 05 Dec 2015 11:10:29 GMT` 。
-    """
-    return to_unixtime(time_string, "%a, %d %b %Y %H:%M:%S GMT")
-
-
 def make_signature(access_key_secret, date=None):
+    if isinstance(date, bytes):
+        date = bytes.decode(date)
     if isinstance(date, int):
         date_gmt = http_date(date)
     elif date is None:
@@ -328,6 +324,54 @@ def encrypt_password(password):
     if password:
         return sha512_crypt.using(rounds=5000).hash(password)
     return None
+
+
+
+
+def capacity_convert(size, expect='auto', rate=1000):
+    """
+    :param size: '100MB', '1G'
+    :param expect: 'K, M, G, T
+    :param rate: Default 1000, may be 1024
+    :return:
+    """
+    rate_mapping = (
+        ('K', rate),
+        ('KB', rate),
+        ('M', rate**2),
+        ('MB', rate**2),
+        ('G', rate**3),
+        ('GB', rate**3),
+        ('T', rate**4),
+        ('TB', rate**4),
+    )
+
+    rate_mapping = OrderedDict(rate_mapping)
+
+    std_size = 0  # To KB
+    for unit in rate_mapping:
+        if size.endswith(unit):
+            try:
+                std_size = float(size.strip(unit).strip()) * rate_mapping[unit]
+            except ValueError:
+                pass
+
+    if expect == 'auto':
+        for unit, rate_ in rate_mapping.items():
+            if rate > std_size/rate_ > 1:
+                expect = unit
+                break
+    expect_size = std_size / rate_mapping[expect]
+    return expect_size, expect
+
+
+def sum_capacity(cap_list):
+    total = 0
+    for cap in cap_list:
+        size, _ = capacity_convert(cap, expect='K')
+        total += size
+    total = '{} K'.format(total)
+    return capacity_convert(total, expect='auto')
 
 
 signer = Signer()

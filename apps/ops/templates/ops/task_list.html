@@ -1,0 +1,106 @@
+{% extends '_base_list.html' %}
+{% load i18n %}
+{% load static %}
+{% block content_left_head %}
+    <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
+    <style>
+        #search_btn {
+            margin-bottom: 0;
+        }
+    </style>
+{% endblock %}
+
+
+{% block table_search %}
+    <form id="search_form" method="get" action="" class="pull-right form-inline">
+        <div class="form-group" id="date">
+            <div class="input-daterange input-group" id="datepicker">
+                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_from" value="{{ date_from }}">
+                <span class="input-group-addon">to</span>
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_to" value="{{ date_to }}">
+            </div>
+        </div>
+        <div class="input-group">
+            <input type="text" class="form-control input-sm" name="keyword" placeholder="Keyword" value="{{ keyword }}">
+        </div>
+        <div class="input-group">
+            <div class="input-group-btn">
+                <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
+                    搜索
+                </button>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+
+{% block table_head %}
+    <th class="text-center"></th>
+    <th class="text-center">{% trans 'Name' %}</th>
+    <th class="text-center">{% trans 'Asset' %}</th>
+    <th class="text-center">{% trans 'Success' %}</th>
+    <th class="text-center">{% trans 'Finished' %}</th>
+    <th class="text-center">{% trans 'Date start' %}</th>
+    <th class="text-center">{% trans 'Time' %}</th>
+    <th class="text-center">{% trans 'Action' %}</th>
+{% endblock %}
+
+{% block table_body %}
+    {% for object in task_list %}
+        <tr class="gradeX">
+            <td class="text-center"><input type="checkbox" class="cbx-term"> </td>
+            <td class="text-center"><a href="{% url 'ops:task-detail' pk=object.uuid %}">{{ object.name }}</a></td>
+            <td class="text-center">{{ object.total_assets|length }}</td>
+            <td class="text-center">
+            {% if object.is_success %}
+                <i class="fa fa-check text-navy"></i>
+            {% else %}
+                <i class="fa fa-times text-danger"></i>
+            {% endif %}
+            </td>
+            <td class="text-center">
+            {% if object.is_finished %}
+                <i class="fa fa-check text-navy"></i>
+            {% else %}
+                <i class="fa fa-times text-danger"></i>
+            {% endif %}
+            </td>
+            <td class="text-center">{{ object.date_start }}</td>
+            <td class="text-center">{{ object.timedelta }} s</td>
+            <td class="text-center">
+                <a href="{% url 'ops:task-run' pk=object.uuid %}" class="btn btn-xs btn-info">{% trans "Run again" %}</a>
+                <a data-uid="{{ object.uuid }}" class="btn btn-xs btn-danger btn-del">{% trans "Delete" %}</a>
+            </td>
+        </tr>
+    {% endfor %}
+{% endblock %}
+
+{# comment #}
+{% block custom_foot_js %}
+    <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
+    <script>
+        $(document).ready(function() {
+            $('table').DataTable({
+                "searching": false,
+                "paging": false,
+                "bInfo" : false,
+                "order": []
+            });
+            $('.select2').select2();
+            $('#date .input-daterange').datepicker({
+                dateFormat: 'mm/dd/yy',
+                keyboardNavigation: false,
+                forceParse: false,
+                autoclose: true
+            });
+
+        }).on('click', '.btn-del', function () {
+	        var $this = $(this);
+	        var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
+	        var uid = $this.data('uid');
+	        var the_url = '{% url "api-ops:task-detail" pk=99991937 %}'.replace('99991937', uid);
+            objectDelete($this, name, the_url);
+        })
+    </script>
+{% endblock %}
+

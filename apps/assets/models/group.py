@@ -18,11 +18,12 @@ class AssetGroup(models.Model):
     name = models.CharField(max_length=64, unique=True, verbose_name=_('Name'))
     system_users = models.ManyToManyField(SystemUser, related_name='asset_groups', blank=True)
     created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
-    date_created = models.DateTimeField(auto_now_add=True, null=True, verbose_name=_('Date added'))
+    date_created = models.DateTimeField(auto_now_add=True, null=True, verbose_name=_('Date created'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
     def __unicode__(self):
         return self.name
+    __str__ = __unicode__
 
     class Meta:
         ordering = ['name']

@@ -1,0 +1,31 @@
+version: '2'
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+  jumpserver:
+    image: jumpserver/jumpserver:v0.4.0-beta1
+    container_name: jumpserver
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - redis
+  coco:
+    image: jumpserver/coco:v0.4.0-beta1
+    container_name: coco
+    restart: always
+    ports:
+      - 2222:2222
+    depends_on:
+      - jumpserver
+  luna:
+    image: jumpserver/luna:v0.4.0-beta1
+    container_name: luna
+    restart: always
+    ports:
+      - 5000:5000
+    depends_on:
+      - jumpserver
+

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+
+{% block custom_head_css_js %}
+{{ wizard.form.media }}
+<link href="{% static 'css/plugins/steps/jquery.steps.css' %}" rel="stylesheet">
+{% endblock %}
+{% block first_login_message %}{% endblock %}
+{% block content %}
+<div class="wrapper wrapper-content animated fadeInRight">
+  <div class="row">
+    <div class="col-lg-12">
+        <div class="ibox">
+            <div class="ibox-title">
+              <h5>{% trans 'First Login' %}</h5>
+                <div class="ibox-tools">
+                    <a class="collapse-link">
+                        <i class="fa fa-chevron-up"></i>
+                    </a>
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                        <i class="fa fa-wrench"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="ibox-content">
+                <div class="alert alert-success" id="messages">
+                    {% trans 'Welcome to use jumpserver, visit ' %}
+                    <a href="{{ user_guide_url }}" target="_blank">{% trans 'Use guide' %}</a> {% trans ' for more information' %}
+                </div>
+            </div>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block custom_foot_js %}
+<script>
+$(document).on('click', ".fl_goto", function(){
+  var $form = $('#fl_form');
+  $('<input />', {'name': 'wizard_goto_step', 'value': $(this).data('goto'), 'type': 'hidden'}).appendTo($form);
+  $form.submit();
+  return false;
+}).on('click', '#fl_submit', function(){
+  $('#fl_form').submit();
+  return false;
+})
+</script>
+{% endblock %}

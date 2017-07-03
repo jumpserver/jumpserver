@@ -59,7 +59,7 @@ INSTALLED_APPS = [
     'common.apps.CommonConfig',
     'applications.apps.ApplicationsConfig',
     'rest_framework',
-    'bootstrapform',
+    'bootstrap3',
     'captcha',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -79,6 +79,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'jumpserver.middleware.TimezoneMiddleware',
+    'jumpserver.middleware.DemoMiddleware',
 ]
 
 ROOT_URLCONF = 'jumpserver.urls'
@@ -108,6 +109,12 @@ TEMPLATES = [
 LOGIN_REDIRECT_URL = reverse_lazy('index')
 LOGIN_URL = reverse_lazy('users:login')
 
+SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN or None
+CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN or None
+SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600*24
+
+
+MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
@@ -115,7 +122,8 @@ if CONFIG.DB_ENGINE == 'sqlite':
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': CONFIG.DB_NAME or os.path.join(BASE_DIR, 'db.sqlite3'),
+            'NAME': CONFIG.DB_NAME or os.path.join(BASE_DIR, 'data', 'db.sqlite3'),
+            'ATOMIC_REQUESTS': True,
         }
     }
 else:
@@ -127,6 +135,7 @@ else:
             'PORT': CONFIG.DB_PORT,
             'USER': CONFIG.DB_USER,
             'PASSWORD': CONFIG.DB_PASSWORD,
+            'ATOMIC_REQUESTS': True,
         }
     }
 
@@ -254,7 +263,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media').replace('\\', '/') + '/'
 
 # Use django-bootstrap-form to format template, input max width arg
-BOOTSTRAP_COLUMN_COUNT = 11
+# BOOTSTRAP_COLUMN_COUNT = 11
 
 # Init data or generate fake data source for development
 FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures'), ]
@@ -320,9 +329,20 @@ CACHES = {
 }
 
 # Captcha settings, more see https://django-simple-captcha.readthedocs.io/en/latest/advanced.html
-CAPTCHA_IMAGE_SIZE = (75, 33)
+CAPTCHA_IMAGE_SIZE = (80, 33)
 CAPTCHA_FOREGROUND_COLOR = '#001100'
+CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
+CAPTCHA_TEST_MODE = CONFIG.CAPTCHA_TEST_MODE
 
 COMMAND_STORE_BACKEND = 'audits.backends.command.db'
 RECORD_STORE_BACKEND = 'audits.backends.record.db'
-CAPTCHA_TEST_MODE = CONFIG.CAPTCHA_TEST_MODE
+
+
+# Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
+BOOTSTRAP3 = {
+    'horizontal_label_class': 'col-md-2',
+    # Field class to use in horizontal forms
+    'horizontal_field_class': 'col-md-9',
+    # Set placeholder attributes to label if no placeholder is provided
+    'set_placeholder': True,
+}

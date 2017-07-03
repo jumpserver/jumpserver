@@ -1,59 +1,64 @@
 ## Jumpserver
 Jumpserver是一款使用Python, Django开发的开源跳板机系统, 助力互联网企业高效 用户、资产、权限、审计 管理
 
-### 开发环境
-   * Python 2.7  # 开发时需考虑兼容Python3
-   * Django 1.10
+### 环境
+   * Python 3.5  # 大部分功能兼容Python2.7
+   * Django 1.11
 
 ### 安装
-- 安装依赖库
-```
-   $ cd requirements
-   $ sudo yum -y install `cat rpm_requirements.txt`  # CentOS/RedHat
-   $ sudo apt-get  install `cat deb_requirements.txt`  # Ubuntu/Debian
-```
+使用docker compose 安装，一键完成，docker compose 安装见 docker官方
 
-- 安装Python依赖包
+   $ docker-compose up
 
-```
-# 请自行安装 Python2.7 和 pip, 以下运行是以python2.7和pip2.7开始
-$ pip2.7 install -r requirements.txt -i https://pypi.doubanio.com/simple
-
-# MacOS
-$ pip2.7 install -r requirements.txt -i https://pypi.doubanio.com/simple --user
-```
-	   
-- 配置文件
-
-```	
-$ cd ..
-$ cp config_example.py config.py
-```
-
-配置项 参考 config.py
-
-- 初始化数据库
-```
-# cd utils
-# sh make_migrations.sh
-# sh init_db.sh
-```
+### 使用
+   1. 访问 http://你的主机IP:8080 来访问 Jumpserver
+   
+   2. 左侧 应用程序接受 Coco和Luna的注册
+   
+   3. 添加 管理用户
+   
+   4. 添加 资产 
+   
+   5. 添加授权规则，授权给admin
+   
+   6. ssh -p2222 admin@你的主机IP 测试连接服务器
  
-- 依赖redis
-```
-$ yum -y install redis
-$ service redis start  # Run docker or redis-server &
-```
+   7. 访问 http://你的主机IP:5000 访问Luna，点击左侧服务器连接测试
+   
+   
+### 截图
 
-- 启动
+参见 https://github.com/jumpserver/jumpserver/issues/438
 
-```
-$ python2.7 run_server.py
-```
- 
+
+### Demo
+
+demo使用了开发者模式，并发只能为1 
+
+- Jumpserver: [访问](http://demo.jumpserver.org:8080)  账号: admin 密码: admin
+
+- Luna: [访问](http://demo.jumpserver.org:5000) 同Jumpserver认证
+
+- Coco: ssh -p 2222 admin@demo.jumpserver.org 密码: admin
+
+
 ### 开发者文档
 
 
    * [项目结构描述](https://github.com/jumpserver/jumpserver/blob/dev/docs/project_structure.md)
    * [Python代码规范](https://github.com/jumpserver/jumpserver/blob/dev/docs/python_style_guide.md)
    * [API设计规范](https://github.com/jumpserver/jumpserver/blob/dev/docs/api_style_guide.md)
+
+### 贡献者
+#### 0.4.0
+- ibuler <广宏伟>
+- 小彧 <李磊> Django资深开发者，为users模块贡献了很多代码
+- sofia <周小侠> 资深前端工程师, luna前端代码贡献者和现在维护者
+- liuz <刘正> 全栈工程师, 编写了luna大部分代码
+- jiaxiangkong <陈尚委> Jumpserver测试运营
+
+#### 0.3.2 
+- halcyon <王墉> DevOps 资深开发者, jassets开发者
+- yumaojun03 <喻茂峻> DevOps 资深开发者，jperm开发者，擅长Python, Go以及PAAS平台开发
+- kelianchun <柯连春> DevOps 资产开发者，fix了很多connect.py bug
+

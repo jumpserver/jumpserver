@@ -85,7 +85,7 @@ class UserToken(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request):
-        if not request.user:
+        if not request.user.is_authenticated:
             username = request.data.get('username', '')
             email = request.data.get('email', '')
             password = request.data.get('password', '')

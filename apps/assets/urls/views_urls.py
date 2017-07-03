@@ -15,7 +15,10 @@ urlpatterns = [
     url(r'^asset/(?P<pk>[0-9]+)/update/$', views.AssetUpdateView.as_view(), name='asset-update'),
     url(r'^asset/(?P<pk>[0-9]+)/delete/$', views.AssetDeleteView.as_view(), name='asset-delete'),
     url(r'^asset-modal$', views.AssetModalListView.as_view(), name='asset-modal-list'),
-    url(r'^asset-modal-update$', views.AssetModalCreateView.as_view(), name='asset-modal-update'),
+    url(r'^asset/update/$', views.AssetBulkUpdateView.as_view(), name='asset-bulk-update'),
+
+    # User asset view
+    url(r'^user-asset/$', views.UserAssetListView.as_view(), name='user-asset-list'),
 
     # Resource asset group url
     url(r'^asset-group/$', views.AssetGroupListView.as_view(), name='asset-group-list'),
@@ -23,13 +26,6 @@ urlpatterns = [
     url(r'^asset-group/(?P<pk>[0-9]+)/$', views.AssetGroupDetailView.as_view(), name='asset-group-detail'),
     url(r'^asset-group/(?P<pk>[0-9]+)/update/$', views.AssetGroupUpdateView.as_view(), name='asset-group-update'),
     url(r'^asset-group/(?P<pk>[0-9]+)/delete/$', views.AssetGroupDeleteView.as_view(), name='asset-group-delete'),
-
-    url(r'^tags/$', views.TagsListView.as_view(), name='asset-tag-list'),
-    url(r'^asset-by-tag/(?P<tag_id>[0-9]+)/$', views.TagView.as_view(), name='asset-tags'),
-    url(r'^tags/create/$', views.AssetTagCreateView.as_view(), name='asset-tag-create'),
-    url(r'^asset-tag/(?P<pk>[0-9]+)/$', views.AssetTagDetailView.as_view(), name='asset-tag-detail'),
-    url(r'^asset-tag/(?P<pk>[0-9]+)/update/$', views.AssetTagUpdateView.as_view(), name='asset-tag-update'),
-    url(r'^asset-tag/(?P<pk>[0-9]+)/delete/$', views.AssetTagDeleteView.as_view(), name='asset-tag-delete'),
 
     # Resource idc url
     url(r'^idc/$', views.IDCListView.as_view(), name='idc-list'),

@@ -1,15 +1,15 @@
 {% extends 'assets/_system_user.html' %}
 {% load i18n %}
 {% load static %}
-{% load bootstrap %}
+{% load bootstrap3 %}
 
 {% block auth %}
 <div class="password-auth hidden">
-    {{ form.password|bootstrap_horizontal }}
+    {% bootstrap_field form.password layout="horizontal" %}
 </div>
 <div class="public-key-auth">
     <div>
-        {{ form.private_key_file|bootstrap_horizontal }}
+        {% bootstrap_field form.private_key_file layout="horizontal" %}
     </div>
 </div>
 {% endblock %}

@@ -3,7 +3,7 @@
 from __future__ import absolute_import, unicode_literals
 
 from common.utils import setattr_bulk, get_logger
-from ops.tasks import push_users
+from .tasks import push_users
 from .hands import User, UserGroup, Asset, AssetGroup, SystemUser
 
 logger = get_logger(__file__)

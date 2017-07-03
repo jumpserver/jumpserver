@@ -3,7 +3,7 @@
 <li class="nav-header">
     <div class="dropdown profile-element">
         <span>
-            <img alt="image" class="img-circle" width="48" height="48" src="{% static "img/root.png" %}"/>
+            <img alt="image" class="img-circle" width="48" height="48" src="{{ user.avatar_url }}"/>
         </span>
         <a data-toggle="dropdown" class="dropdown-toggle" href="#">
             <span class="clear">
@@ -16,9 +16,10 @@
             </span>
         </a>
         <ul class="dropdown-menu animated fadeInRight m-t-xs">
-            <li><a value="">{% trans 'Profile' %}</a></li>
+            <li><a href="{% url 'users:user-profile' %}">{% trans 'Profile' %}</a></li>
+            <li><a href="{% url 'users:user-profile-update' %}">{% trans 'Profile settings' %}</a></li>
             <li class="divider"></li>
-            <li><a href="">{% trans 'Logout' %}</a></li>
+            <li><a href="{% url 'users:logout' %}">{% trans 'Logout' %}</a></li>
         </ul>
     </div>
     <div class="logo-element">

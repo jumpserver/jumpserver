@@ -5,7 +5,7 @@
 from . import User, UserGroup
 
 
-def initial_model():
+def init_model():
     for cls in [User, UserGroup]:
         if getattr(cls, 'initial'):
             cls.initial()

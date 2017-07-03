@@ -1,9 +1,0 @@
-FROM alpine:3.4
-MAINTAINER Jumpserver Team <ibuler@qq.com>
-
-RUN apk add --update python gcc python-dev py-pip musl-dev linux-headers \
-        libffi-dev openssl-dev jpeg-dev freetype-dev redis  && rm -rf /var/cache/apk/*
-COPY ./requirements.txt /tmp
-WORKDIR /tmp
-
-RUN pip install -r requirements.txt -i https://pypi.doubanio.com/simple

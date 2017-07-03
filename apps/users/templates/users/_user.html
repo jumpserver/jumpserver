@@ -1,7 +1,7 @@
 {% extends '_base_create_update.html' %}
 {% load i18n %}
 {% load static %}
-{% load bootstrap %}
+{% load bootstrap3 %}
 {% block form %}
     {% if form.non_field_errors %}
          <div class="alert alert-danger">
@@ -11,17 +11,17 @@
     <form method="post" class="form-horizontal" action="" enctype="multipart/form-data">
         {% csrf_token %}
         <h3>{% trans 'Account' %}</h3>
-        {{ form.username|bootstrap_horizontal }}
-        {{ form.name|bootstrap_horizontal }}
-        {{ form.email|bootstrap_horizontal }}
-        {{ form.groups|bootstrap_horizontal }}
+        {% bootstrap_field form.username layout="horizontal" %}
+        {% bootstrap_field form.name layout="horizontal" %}
+        {% bootstrap_field form.email layout="horizontal" %}
+        {% bootstrap_field form.groups layout="horizontal" %}
 
         <div class="hr-line-dashed"></div>
         {% block password %} {% endblock %}
 
         <div class="hr-line-dashed"></div>
         <h3>{% trans 'Security and Role' %}</h3>
-        {{ form.role|bootstrap_horizontal }}
+        {% bootstrap_field form.role layout="horizontal" %}
         <div class="form-group {% if form.date_expired.errors %} has-error {% endif %}" id="date_5">
             <label for="{{ form.date_expired.id_for_label }}" class="col-sm-2 control-label">{{ form.date_expired.label }}</label>
             <div class="col-sm-9">
@@ -40,9 +40,9 @@
         </div>
         <div class="hr-line-dashed"></div>
         <h3>{% trans 'Profile' %}</h3>
-        {{ form.phone|bootstrap_horizontal }}
-        {{ form.wechat|bootstrap_horizontal }}
-        {{ form.comment|bootstrap_horizontal }}
+        {% bootstrap_field form.phone layout="horizontal" %}
+        {% bootstrap_field form.wechat layout="horizontal" %}
+        {% bootstrap_field form.comment layout="horizontal" %}
         <div class="hr-line-dashed"></div>
         <div class="form-group">
             <div class="col-sm-4 col-sm-offset-2">
