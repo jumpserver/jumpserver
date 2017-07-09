@@ -126,7 +126,7 @@ class AssetPermissionUpdateView(AdminUserRequiredMixin, UpdateView):
         assets = form.cleaned_data['assets']
         asset_groups = form.cleaned_data['asset_groups']
         system_users = form.cleaned_data['system_users']
-        associate_system_users_and_assets(system_users, assets, asset_groups)
+        associate_system_users_and_assets(system_users, assets, asset_groups, force_push_user=True)
         return super(AssetPermissionUpdateView, self).form_valid(form)
 
 
