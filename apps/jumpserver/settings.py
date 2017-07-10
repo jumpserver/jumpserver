@@ -25,9 +25,9 @@ sys.path.append(PROJECT_DIR)
 try:
     from config import config as env_config, env
 
-    CONFIG = env_config.get(env, 'default')()
+    CONFIG = env_config.get(env or 'default')()
 except ImportError:
-    CONFIG = type('_', (), {'__getattr__': None})()
+    CONFIG = type('_', (), {'__getattr__': lambda arg1, arg2: None})()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
