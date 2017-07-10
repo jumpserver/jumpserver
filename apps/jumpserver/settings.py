@@ -25,7 +25,7 @@ sys.path.append(PROJECT_DIR)
 try:
     from config import config as env_config, env
 
-    CONFIG = env_config.get(env or 'default')()
+    CONFIG = env_config.get(env, 'default')()
 except ImportError:
     CONFIG = type('_', (), {'__getattr__': lambda arg1, arg2: None})()
 
