@@ -41,6 +41,9 @@ demo使用了开发者模式，并发只能为1
 
 - Coco: ssh -p 2222 admin@demo.jumpserver.org 密码: admin
 
+### ROADMAP
+
+参见 https://github.com/jumpserver/jumpserver/milestone/2
 
 ### 开发者文档
 
