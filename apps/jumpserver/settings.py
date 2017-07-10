@@ -59,6 +59,8 @@ INSTALLED_APPS = [
     'common.apps.CommonConfig',
     'applications.apps.ApplicationsConfig',
     'rest_framework',
+    'rest_framework_swagger',
+    'django_filters',
     'bootstrap3',
     'captcha',
     'django.contrib.auth',
@@ -289,11 +291,28 @@ REST_FRAMEWORK = {
         'users.authentication.PrivateTokenAuthentication',
         'users.authentication.SessionAuthentication',
     ),
-    # 'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
 }
+
+AUTHENTICATION_BACKENDS = [
+    'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # Custom User Auth model
 AUTH_USER_MODEL = 'users.User'
+
+
+# Auth LDAP settings
+if CONFIG.AUTH_LDAP:
+    AUTHENTICATION_BACKENDS.insert(0, 'django_auth_ldap.backend.LDAPBackend')
+AUTH_LDAP_SERVER_URI = CONFIG.AUTH_LDAP_SERVER_URI
+AUTH_LDAP_BIND_DN = CONFIG.AUTH_LDAP_BIND_DN
+AUTH_LDAP_BIND_PASSWORD = CONFIG.AUTH_LDAP_BIND_PASSWORD
+AUTH_LDAP_USER_DN_TEMPLATE = CONFIG.AUTH_LDAP_USER_DN_TEMPLATE
+AUTH_LDAP_START_TLS = CONFIG.AUTH_LDAP_START_TLS
+AUTH_LDAP_USER_ATTR_MAP = CONFIG.AUTH_LDAP_USER_ATTR_MAP
+
 
 # Celery using redis as broker
 BROKER_URL = 'redis://%(password)s%(host)s:%(port)s/3' % {

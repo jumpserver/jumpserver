@@ -8,14 +8,14 @@ app_name = 'assets'
 
 
 router = BulkRouter()
-router.register(r'v1/asset-groups', api.AssetGroupViewSet, 'asset-group')
+router.register(r'v1/groups', api.AssetGroupViewSet, 'asset-group')
 router.register(r'v1/assets', api.AssetViewSet, 'asset')
 router.register(r'v1/idc', api.IDCViewSet, 'idc')
 router.register(r'v1/admin-user', api.AdminUserViewSet, 'admin-user')
 router.register(r'v1/system-user', api.SystemUserViewSet, 'system-user')
 
 urlpatterns = [
-    url(r'^v1/assets_bulk/$', api.AssetListUpdateApi.as_view(), name='asset-bulk-update'),
+    url(r'^v1/assets-bulk/$', api.AssetListUpdateApi.as_view(), name='asset-bulk-update'),
     url(r'^v1/system-user/(?P<pk>[0-9]+)/auth-info/', api.SystemUserAuthInfoApi.as_view(),
         name='system-user-auth-info'),
     url(r'^v1/assets/(?P<pk>\d+)/groups/$',
@@ -29,14 +29,14 @@ urlpatterns = [
     url(r'^v1/assets/(?P<pk>\d+)/system-users/$',
         api.SystemUserUpdateApi.as_view(), name='asset-update-system-users'),
 
-    url(r'^v1/asset-groups/(?P<pk>\d+)/push-system-user/$',
+    url(r'^v1/groups/(?P<pk>\d+)/push-system-user/$',
         api.AssetGroupPushSystemUserView.as_view(), name='asset-group-push-system-user'),
 
     # update the system users, which add and delete the asset to the system user
-    url(r'^v1/system_user/(?P<pk>\d+)/assets/$',
+    url(r'^v1/system-user/(?P<pk>\d+)/assets/$',
         api.SystemUserUpdateAssetsApi.as_view(), name='systemuser-update-assets'),
 
-    url(r'^v1/system_user/(?P<pk>\d+)/groups/$',
+    url(r'^v1/system-user/(?P<pk>\d+)/groups/$',
         api.SystemUserUpdateAssetGroupApi.as_view(), name='systemuser-update-assetgroups'),
 
     # update the asset group, which add or delete the asset to the group

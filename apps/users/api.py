@@ -4,7 +4,9 @@ from rest_framework import generics
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework import viewsets
 from rest_framework_bulk import BulkModelViewSet
+from django_filters.rest_framework import DjangoFilterBackend
 
 from . import serializers
 from .hands import write_login_log_async
@@ -18,11 +20,37 @@ from common.utils import get_logger
 logger = get_logger(__name__)
 
 
-class UserViewSet(IDInFilterMixin, BulkModelViewSet):
+# class UserListView(generics.ListAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = serializers.UserSerializer
+#     filter_fields = ('username', 'email', 'name', 'id')
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    # class UserViewSet(IDInFilterMixin, BulkModelViewSet):
+    """
+    retrieve:
+        Return a user instance .
+
+    list:
+        Return all users except app user, ordered by most recently joined.
+
+    create:
+        Create a new user.
+
+    delete:
+        Remove an existing user.
+
+    partial_update:
+        Update one or more fields on an existing user.
+
+    update:
+        Update a user.
+    """
     queryset = User.objects.all()
+    # queryset = User.objects.all().exclude(role="App").order_by("date_joined")
     serializer_class = serializers.UserSerializer
     permission_classes = (IsSuperUser,)
-    # filter_backends = (DjangoFilterBackend,)
     filter_fields = ('username', 'email', 'name', 'id')
 
 

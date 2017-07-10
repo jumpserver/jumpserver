@@ -2,9 +2,6 @@
 # 
 
 from collections import OrderedDict
-from django.core.cache import cache
-from django.conf import settings
-from django.utils import timezone
 import copy
 from rest_framework.generics import ListCreateAPIView
 from rest_framework import viewsets

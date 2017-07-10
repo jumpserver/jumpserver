@@ -20,8 +20,9 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.generic import ListView
 from django.views.generic.base import TemplateView
-from django.views.generic.edit import (CreateView, UpdateView, FormMixin,
-                                       FormView)
+from django.views.generic.edit import (
+    CreateView, UpdateView, FormMixin, FormView
+)
 from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import logout as auth_logout
@@ -33,13 +34,14 @@ from common.mixins import JSONResponseMixin
 from common.utils import get_logger, get_object_or_none
 from perms.models import AssetPermission
 
-__all__ = ['UserListView', 'UserCreateView', 'UserDetailView',
-           'UserUpdateView', 'UserAssetPermissionCreateView',
-           'UserAssetPermissionView', 'UserGrantedAssetView',
-           'UserExportView',  'UserBulkImportView', 'UserProfileView',
-           'UserProfileUpdateView', 'UserPasswordUpdateView',
-           'UserPublicKeyUpdateView', 'UserBulkUpdateView',
-           ]
+__all__ = [
+    'UserListView', 'UserCreateView', 'UserDetailView',
+    'UserUpdateView', 'UserAssetPermissionCreateView',
+    'UserAssetPermissionView', 'UserGrantedAssetView',
+    'UserExportView',  'UserBulkImportView', 'UserProfileView',
+    'UserProfileUpdateView', 'UserPasswordUpdateView',
+    'UserPublicKeyUpdateView', 'UserBulkUpdateView',
+]
 
 logger = get_logger(__name__)
 
@@ -52,8 +54,6 @@ class UserListView(AdminUserRequiredMixin, TemplateView):
         context.update({
             'app': _('Users'),
             'action': _('User list'),
-            'groups': UserGroup.objects.all(),
-            'form': forms.UserBulkUpdateForm(),
         })
         return context
 

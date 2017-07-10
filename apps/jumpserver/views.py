@@ -4,8 +4,6 @@ from django.db.models import Count
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 
-
-from users.utils import AdminUserRequiredMixin
 from users.models import User
 from assets.models import Asset
 from audits.models import ProxyLog
@@ -26,10 +24,10 @@ class IndexView(LoginRequiredMixin, TemplateView):
         proxy_log_month = ProxyLog.objects.filter(date_start__gt=month_ago, is_failed=False)
         month_dates = proxy_log_month.dates('date_start', 'day')
         month_total_visit = [ProxyLog.objects.filter(date_start__date=d) for d in month_dates]
-        month_str = [d.strftime('%m-%d') for d in month_dates]
-        month_total_visit_count = [p.count() for p in month_total_visit]
-        month_user = [p.values('user').distinct().count() for p in month_total_visit]
-        month_asset = [p.values('asset').distinct().count() for p in month_total_visit]
+        month_str = [d.strftime('%m-%d') for d in month_dates] or ['0']
+        month_total_visit_count = [p.count() for p in month_total_visit] or [0]
+        month_user = [p.values('user').distinct().count() for p in month_total_visit] or [0]
+        month_asset = [p.values('asset').distinct().count() for p in month_total_visit] or [0]
         month_user_active = User.objects.filter(last_login__gt=month_ago).count()
         month_user_inactive = User.objects.filter(last_login__lt=month_ago).count()
         month_user_disabled = User.objects.filter(is_active=False).count()

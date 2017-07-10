@@ -191,6 +191,7 @@ class AssetAdminUserTestView(AssetRefreshHardwareView):
 class AssetGroupPushSystemUserView(generics.UpdateAPIView):
     queryset = AssetGroup.objects.all()
     permission_classes = (IsSuperUser,)
+    serializer_class = serializers.AssetSerializer
 
     def patch(self, request, *args, **kwargs):
         asset_group = self.get_object()
