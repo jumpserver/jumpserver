@@ -72,7 +72,7 @@ def test_admin_user_connective_period():
     for i in summary['success']:
         cache.set(i, '1', 2*60*60*60)
 
-    for i in summary['failed']:
+    for i, msg in summary['failed']:
         cache.set(i, '0', 60*60*60)
     return summary
 
