@@ -17,6 +17,7 @@ itsdangerous>=0.24
 eventlet
 django-filter>=1.0.2
 passlib>=1.7.1
+gssapi
 django-rest-swagger
 django-auth-ldap
 ldap3
