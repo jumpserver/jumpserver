@@ -73,7 +73,7 @@ class User(AbstractUser):
 
     @property
     def is_expired(self):
-        if self.date_expired < timezone.now():
+        if self.date_expired and self.date_expired < timezone.now():
             return True
         else:
             return False
@@ -189,7 +189,7 @@ class User(AbstractUser):
         return 'https://www.gravatar.com/avatar/c6812ab450230979465d7bf288eadce2a?s=120&d=identicon'
 
     def generate_reset_token(self):
-        return signer.sign_t({'reset': self.id, 'email': self.email}, expires_in=3600).decode('utf-8')
+        return signer.sign_t({'reset': self.id, 'email': self.email}, expires_in=3600)
 
     def to_json(self):
         return OrderedDict({

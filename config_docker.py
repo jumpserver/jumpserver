@@ -93,6 +93,19 @@ class Config:
     # You can set jumpserver usage url here, that when user submit wizard redirect to
     USER_GUIDE_URL = ''
 
+    # LDAP Auth settings
+    AUTH_LDAP = False
+    AUTH_LDAP_SERVER_URI = 'ldap://localhost:389'
+    AUTH_LDAP_BIND_DN = 'cn=admin,dc=jumpserver,dc=org'
+    AUTH_LDAP_BIND_PASSWORD = ''
+    AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,ou=people,dc=jumpserver,dc=org"
+    AUTH_LDAP_USER_ATTR_MAP = {
+        "username": "cn",
+        "name": "sn",
+        "email": "mail"
+    }
+    AUTH_LDAP_START_TLS = False
+
     def __init__(self):
         pass
 
