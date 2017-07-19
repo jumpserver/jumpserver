@@ -70,7 +70,6 @@ class AssetBulkUpdateForm(forms.ModelForm):
         required=True,
         help_text='* required',
         label=_('Select assets'),
-        # choices=[(asset.id, asset.hostname) for asset in Asset.objects.all()],
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',
@@ -182,7 +181,7 @@ class AdminUserForm(forms.ModelForm):
     # Form field name can not start with `_`, so redefine it,
     password = forms.CharField(
         widget=forms.PasswordInput, max_length=100,
-        min_length=8, strip=True, required=False,
+        strip=True, required=False,
         help_text=_('If also set private key, use that first'),
     )
     # Need use upload private key file except paste private key content
@@ -239,7 +238,7 @@ class SystemUserForm(forms.ModelForm):
     auto_generate_key = forms.BooleanField(initial=True, required=False)
     # Form field name can not start with `_`, so redefine it,
     password = forms.CharField(widget=forms.PasswordInput, required=False,
-                               max_length=100, min_length=8, strip=True)
+                               max_length=100, strip=True)
     # Need use upload private key file except paste private key content
     private_key_file = forms.FileField(required=False)
 

@@ -235,7 +235,7 @@ def push_system_user(assets, system_user):
     return task.id
 
 
-def associate_system_users_and_assets(system_users, assets, asset_groups):
+def associate_system_users_and_assets(system_users, assets, asset_groups, force=False):
     """关联系统用户和资产, 目的是保存它们的关系, 然后新加入的资产或系统
     用户时,推送系统用户到资产
 
@@ -250,12 +250,14 @@ def associate_system_users_and_assets(system_users, assets, asset_groups):
     for system_user in system_users:
         assets_need_push = []
         if system_user.auto_push:
-            assets_need_push.extend(
-                [asset for asset in assets_all
-                 if asset not in system_user.assets.all()
-                 ]
-            )
+            if force:
+                assets_need_push = assets_all
+            else:
+                assets_need_push.extend(
+                    [asset for asset in assets_all
+                     if asset not in system_user.assets.all()
+                     ]
+                )
         system_user.assets.add(*(tuple(assets_all)))
         push_system_user(assets_need_push, system_user)
-
 

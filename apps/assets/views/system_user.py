@@ -13,6 +13,8 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 from .. import forms
 from ..models import Asset, AssetGroup, AdminUser, IDC, SystemUser
 from ..hands import AdminUserRequiredMixin
+from perms.utils import associate_system_users_and_assets
+
 
 __all__ = ['SystemUserCreateView', 'SystemUserUpdateView',
            'SystemUserDetailView', 'SystemUserDeleteView',
@@ -73,6 +75,14 @@ class SystemUserUpdateView(AdminUserRequiredMixin, UpdateView):
         }
         kwargs.update(context)
         return super(SystemUserUpdateView, self).get_context_data(**kwargs)
+
+    def form_valid(self, form):
+        response = super(SystemUserUpdateView, self).form_valid(form)
+        system_user = self.object
+        assets = system_user.assets.all()
+        asset_groups = system_user.asset_groups.all()
+        associate_system_users_and_assets([system_user], assets, asset_groups, force=True)
+        return response
 
     def get_success_url(self):
         success_url = reverse_lazy('assets:system-user-detail',
