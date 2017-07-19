@@ -274,26 +274,18 @@ def get_role_info(role_id, type="all"):
         for asset_group in push.asset_group.all():
             asset_groups_obj.append(asset_group)
 
-    if type == "all":
-        return {"rules": set(rule_push_obj),
-                "users": set(users_obj),
-                "user_groups": set(user_groups_obj),
-                "assets": set(assets_obj),
-                "asset_groups": set(asset_groups_obj),
+    #修改代码
+    type_dict = {"all": {"rules": set(rule_push_obj), "users": set(users_obj), \
+                         "user_groups": set(user_groups_obj),"assets": set(assets_obj),\
+                         "asset_groups": set(asset_groups_obj)
+                        },
+                 "rule": set(rule_push_obj),
+                 "user": set(users_obj),
+                 "user_group": set(user_groups_obj),
+                 "asset": set(assets_obj),
+                 "asset_group": set(asset_groups_obj)
                 }
-
-    elif type == "rule":
-        return set(rule_push_obj)
-    elif type == "user":
-        return set(users_obj)
-    elif type == "user_group":
-        return set(user_groups_obj)
-    elif type == "asset":
-        return set(assets_obj)
-    elif type == "asset_group":
-        return set(asset_groups_obj)
-    else:
-        return u"不支持的查询"
+    return type_dict.get(type, u"不支持的查询")
 
 
 def get_role_push_host(role):
