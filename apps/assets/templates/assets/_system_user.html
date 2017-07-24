@@ -89,6 +89,7 @@
                 $('.public-key-auth').addClass('hidden');
                 $('#'+'{{ form.password.id_for_label }}').attr('required', 'required');
                 $('#'+'{{ form.password.id_for_label }}').removeAttr('disabled');
+                $('#'+'{{ form.private_key_file.id_for_label }}').removeAttr('required');
 
             } else if ($(auth_method).val() == 'K') {
                 $('.password-auth').addClass('hidden');
