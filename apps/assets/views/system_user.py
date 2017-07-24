@@ -4,14 +4,14 @@ from __future__ import absolute_import, unicode_literals
 from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.db import transaction
-from django.views.generic import TemplateView, ListView, View
-from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
+from django.views.generic import TemplateView, ListView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from .. import forms
-from ..models import Asset, AssetGroup, AdminUser, IDC, SystemUser
+from ..models import Asset, AssetGroup, SystemUser
 from ..hands import AdminUserRequiredMixin
 from perms.utils import associate_system_users_and_assets
 
@@ -65,7 +65,7 @@ class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVi
 
 class SystemUserUpdateView(AdminUserRequiredMixin, UpdateView):
     model = SystemUser
-    form_class = forms.SystemUserForm
+    form_class = forms.SystemUserUpdateForm
     template_name = 'assets/system_user_update.html'
 
     def get_context_data(self, **kwargs):

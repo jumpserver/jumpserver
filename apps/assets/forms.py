@@ -302,5 +302,60 @@ class SystemUserForm(forms.ModelForm):
         }
 
 
+class SystemUserUpdateForm(forms.ModelForm):
+    # Admin user assets define, let user select, save it in form not in view
+    auto_generate_key = forms.BooleanField(initial=False, required=False)
+    # Form field name can not start with `_`, so redefine it,
+    password = forms.CharField(widget=forms.PasswordInput, required=False,
+                               max_length=100, strip=True)
+    # Need use upload private key file except paste private key content
+    private_key_file = forms.FileField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(SystemUserUpdateForm, self).__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        # Because we define custom field, so we need rewrite :method: `save`
+        system_user = super(SystemUserUpdateForm, self).save(commit=commit)
+        password = self.cleaned_data['password']
+        private_key_file = self.cleaned_data.get('private_key_file')
+
+        if system_user.auth_method == 'P' and password:
+            system_user.password = password
+        elif system_user.auth_method == 'K' and private_key_file:
+            private_key = private_key_file.read().strip()
+            public_key = ssh_pubkey_gen(private_key=private_key)
+            system_user.private_key = private_key
+            system_user.public_key = public_key
+        system_user.save()
+        return self.instance
+
+    def clean_private_key_file(self):
+        if self.data['auth_method'] == 'K' and self.cleaned_data['private_key_file']:
+            key_string = self.cleaned_data['private_key_file'].read()
+            self.cleaned_data['private_key_file'].seek(0)
+            if not validate_ssh_private_key(key_string):
+                raise forms.ValidationError(_('Invalid private key'))
+        return self.cleaned_data['private_key_file']
+
+    class Meta:
+        model = SystemUser
+        fields = [
+            'name', 'username', 'protocol', 'auto_generate_key', 'password',
+            'private_key_file', 'auth_method', 'auto_push', 'sudo',
+            'comment', 'shell'
+        ]
+        widgets = {
+            'name': forms.TextInput(attrs={'placeholder': _('Name')}),
+            'username': forms.TextInput(attrs={'placeholder': _('Username')}),
+        }
+        help_texts = {
+            'name': '* required',
+            'username': '* required',
+            'auto_push': 'Auto push system user to asset',
+        }
+
+
+
 class FileForm(forms.Form):
     file = forms.FileField()
