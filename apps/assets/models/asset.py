@@ -125,7 +125,7 @@ class Asset(models.Model):
                 'method': self.admin_user.become_method,
                 'user': self.admin_user.become_user,
                 'pass': self.admin_user.become_pass,
-            } if self.admin_user.become else {},
+            } if self.admin_user and self.admin_user.become else {},
         }
 
     class Meta:

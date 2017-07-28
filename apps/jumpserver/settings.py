@@ -315,7 +315,7 @@ AUTH_LDAP_USER_ATTR_MAP = CONFIG.AUTH_LDAP_USER_ATTR_MAP
 
 
 # Celery using redis as broker
-BROKER_URL = 'redis://%(password)s%(host)s:%(port)s/3' % {
+BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/3' % {
     'password': CONFIG.REDIS_PASSWORD + ':' if CONFIG.REDIS_PASSWORD else '',
     'host': CONFIG.REDIS_HOST or '127.0.0.1',
     'port': CONFIG.REDIS_PORT or 6379,
@@ -339,7 +339,7 @@ CELERY_RESULT_BACKEND = BROKER_URL
 CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
-        'LOCATION': 'redis://%(password)s%(host)s:%(port)s/4' % {
+        'LOCATION': 'redis://:%(password)s@%(host)s:%(port)s/4' % {
             'password': CONFIG.REDIS_PASSWORD + '@' if CONFIG.REDIS_PASSWORD else '',
             'host': CONFIG.REDIS_HOST or '127.0.0.1',
             'port': CONFIG.REDIS_PORT or 6379,

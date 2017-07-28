@@ -239,7 +239,11 @@ def ssh_key_gen(length=2048, type='rsa', password=None, username='jumpserver', h
 
 def validate_ssh_private_key(text):
     if isinstance(text, bytes):
-        text = text.decode("utf-8")
+        try:
+            text = text.decode("utf-8")
+        except UnicodeDecodeError:
+            return False
+
     key = ssh_key_string_to_obj(text)
     if key is None:
         return False
