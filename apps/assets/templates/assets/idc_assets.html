@@ -62,19 +62,18 @@
                                         </tbody>
                                     </table>
 
-	                                <div id="actions" class="hide">
-									    <div class="input-group">
-									        <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
-									            <option value="delete">{% trans 'Delete selected' %}</option>
-									        </select>
-									        <div class="input-group-btn pull-left" style="padding-left: 5px;">
-									            <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-warning">
-									             {% trans 'Submit' %}
-									            </button>
-									        </div>
-									    </div>
-									</div>
-
+	                                  <div id="actions" class="hide">
+									                      <div class="input-group">
+									                          <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
+									                              <option value="delete">{% trans 'Remove selected' %}</option>
+									                          </select>
+									                          <div class="input-group-btn pull-left" style="padding-left: 5px;">
+									                              <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-warning">
+									                               {% trans 'Submit' %}
+									                              </button>
+									                          </div>
+									                      </div>
+									                  </div>
                                 </div>
                             </div>
                         </div>
@@ -254,28 +253,28 @@ $(document).ready(function () {
 		    	assets.remove(plain_id_list[j])
 		    }
 		    function doDelete() {
-				swal({
-		            title: "{% trans 'Are you sure?' %}",
-		            text: "{% trans 'This will delete the selected assets !!!' %}",
-		            type: "warning",
-		            showCancelButton: true,
-		            confirmButtonColor: "#DD6B55",
-		            confirmButtonText: "{% trans 'Confirm' %}",
-		            closeOnConfirm: false
-		        }, function() {
-		            var success = function() {
-		                var msg = "{% trans 'Asset Deleted.' %}";
-		                swal("{% trans 'Asset Delete' %}", msg, "success");
-		                $('#idc_assets_table').DataTable().ajax.reload();
-		            };
-		            var fail = function() {
-		                var msg = "{% trans 'Asset Deleting failed.' %}";
-		                swal("{% trans 'Asset Delete' %}", msg, "error");
-		            };
-		            var url_delete = "{% url 'api-assets:idc-update-assets' pk=idc.id %}";
-		            var body = {
-				        assets: Object.assign([], assets)
-				    };
+				    swal({
+		                title: "{% trans 'Are you sure?' %}",
+		                text: "{% trans 'This will delete the selected assets !!!' %}",
+		                type: "warning",
+		                showCancelButton: true,
+		                confirmButtonColor: "#DD6B55",
+		                confirmButtonText: "{% trans 'Confirm' %}",
+		                closeOnConfirm: false
+		            }, function() {
+		                var success = function() {
+		                    var msg = "{% trans 'Asset Deleted.' %}";
+		                    swal("{% trans 'Asset Delete' %}", msg, "success");
+		                    $('#idc_assets_table').DataTable().ajax.reload();
+		                };
+		                var fail = function() {
+		                    var msg = "{% trans 'Asset Deleting failed.' %}";
+		                    swal("{% trans 'Asset Delete' %}", msg, "error");
+		                };
+		                var url_delete = "{% url 'api-assets:idc-update-assets' pk=idc.id %}";
+		                var body = {
+				            assets: Object.assign([], assets)
+				        };
 		            APIUpdateAttr({url: url_delete, body: JSON.stringify(body),  method: 'PUT', success: success, error: fail});
 		            jumpserver.checked = false;
                 });

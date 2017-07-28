@@ -266,7 +266,7 @@ $(document).ready(function() {
             delete jumpserver.groups_selected[data.id]
         })
 })
-    .on('click', '#is_active', function() {
+.on('click', '#is_active', function() {
     var the_url = "{% url 'api-users:user-detail' pk=user_object.id %}";
     var checked = $(this).prop('checked');
     var body = {

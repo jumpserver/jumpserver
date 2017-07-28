@@ -243,7 +243,7 @@
                             </div>
                             <div class="panel panel-warning">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'System users' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Push system users' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table group_edit" id="add-asset2systemuser">
@@ -252,7 +252,7 @@
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
                                                     <select data-placeholder="{% trans 'Select system users' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for system_user in system_users_remain %}
+                                                        {% for system_user in system_users_all %}
                                                             <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user.name }}</option>
                                                         {% endfor %}
                                                     </select>

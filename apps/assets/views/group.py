@@ -67,7 +67,7 @@ class AssetGroupDetailView(AdminUserRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         assets_remain = Asset.objects.exclude(id__in=self.object.assets.all())
-        system_users = self.object.system_users.all()
+        system_users = SystemUser.objects.all()
         system_users_remain = SystemUser.objects.exclude(id__in=system_users)
         context = {
             'app': _('Assets'),

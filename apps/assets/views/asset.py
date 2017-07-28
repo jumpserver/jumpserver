@@ -189,8 +189,7 @@ class AssetDetailView(DetailView):
             'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all()
                                     if asset_group not in asset_groups],
             'asset_groups': asset_groups,
-            'system_users_remain': [system_user for system_user in SystemUser.objects.all()
-                                    if system_user not in system_users],
+            'system_users_all': SystemUser.objects.all(),
             'system_users': system_users,
         }
         kwargs.update(context)
@@ -315,7 +314,7 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                     failed.append('%s: %s' % (asset_dict['hostname'], str(e)))
 
         if assets:
-            update_assets_hardware_info.delay(assets)
+            update_assets_hardware_info.delay([asset._to_secret_json() for asset in assets])
 
         data = {
             'created': created,
