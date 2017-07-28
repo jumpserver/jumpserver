@@ -154,7 +154,7 @@ def check_user_valid(**kwargs):
     return None, _('Password or SSH public key invalid')
 
 
-def refresh_token(token, user, expiration=3600):
+def refresh_token(token, user, expiration=settings.CONFIG.TOKEN_EXPIRATION or 3600):
     cache.set(token, user.id, expiration)
 
 
