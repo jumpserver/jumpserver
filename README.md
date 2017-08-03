@@ -92,3 +92,7 @@ demo使用了开发者模式，并发只能为1
 - yumaojun03 <喻茂峻> DevOps 资深开发者，jperm开发者，擅长Python, Go以及PAAS平台开发
 - kelianchun <柯连春> DevOps 资产开发者，fix了很多connect.py bug
 
+### 开发者群
+如果你为Jumpserver贡献过代码，请加一下群 （需要验证一下你的github id）
+
+群号: 489385245
