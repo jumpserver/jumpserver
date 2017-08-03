@@ -88,7 +88,7 @@ demo使用了开发者模式，并发只能为1
 - jiaxiangkong <陈尚委> Jumpserver测试运营
 
 #### 0.3.2 
-- halcyon <王墉> DevOps 资深开发者, jassets开发者
+- halcyon <王墉> DevOps 资深开发者, 0.3.2 核心开发者之一
 - yumaojun03 <喻茂峻> DevOps 资深开发者，jperm开发者，擅长Python, Go以及PAAS平台开发
 - kelianchun <柯连春> DevOps 资产开发者，fix了很多connect.py bug
 
