@@ -90,7 +90,7 @@ class PreSetup(object):
 
     @property
     def _is_centos7(self):
-        if self.dist.startswith("centos") and self.version.startswith("7"):
+        if self.dist.startswith("centos") or self.dist.startswith("centos linux") and self.version.startswith("7"):
             return True
 
     @property
@@ -104,7 +104,7 @@ class PreSetup(object):
             return True
 
     def check_platform(self):
-        if not (self._is_redhat or self._is_ubuntu):
+        if not (self._is_redhat or self._is_ubuntu or self._is_centos7):
             print(u"支持的平台: CentOS, RedHat, Fedora, Oracle Linux, Debian, Ubuntu, Amazon Linux, 暂不支持其他平台安装.")
             exit()
 
