@@ -365,6 +365,8 @@ class MyTask(MyRunner):
         """
         if username == 'root':
             return {"status": "failed", "msg": "root cann't be delete"}
+        backup_home = "path=/home/%s dest=/home/%s.tar.bz2 format=bz2"
+        self.run("archive", backup_home, become=True)
         module_args = 'name=%s state=absent remove=yes move_home=yes force=yes' % username
         self.run("user", module_args, become=True)
         return self.results
