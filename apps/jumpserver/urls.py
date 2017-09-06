@@ -19,6 +19,7 @@ urlpatterns = [
     url(r'^audits/', include('audits.urls.views_urls', namespace='audits')),
     url(r'^applications/', include('applications.urls.views_urls', namespace='applications')),
     url(r'^ops/', include('ops.urls.view_urls', namespace='ops')),
+    url(r'^hybris/', include('hybris.urls.view_urls', namespace='hybris')),
 
     # Api url view map
     url(r'^api/users/', include('users.urls.api_urls', namespace='api-users')),
