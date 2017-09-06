@@ -71,7 +71,7 @@ class CommandLog(models.Model):
     asset = models.CharField(max_length=128, db_index=True)
     system_user = models.CharField(max_length=48, db_index=True)
     command_no = models.IntegerField()
-    command = models.CharField(max_length=767, blank=True, db_index=True)
+    command = models.TextField(max_length=767, blank=True)
     output = models.TextField(blank=True)
     timestamp = models.FloatField(db_index=True)
 
