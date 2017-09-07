@@ -75,4 +75,6 @@ def run_AdHoc(task_tuple, assets,
         else:
             record.is_success = False
         record.save()
+    logger.info(summary)
+    logger.info(result)
     return summary, result

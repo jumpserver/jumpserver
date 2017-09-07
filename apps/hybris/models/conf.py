@@ -1,8 +1,14 @@
+# -*- coding: utf-8 -*-
+#
+
 from django.db import models
 
-__all__ = ['HybrisConfig']
+__all__ = ['TaskConfig']
 
 
-class HybrisConfig(models.Model):
-    git_repo = models.CharField(max_length=1000, verbose_name='Git Repo')
-    hybris_path = models.CharField(max_length=200, verbose_name='HybrisSourceZip')
+class TaskConfig(models.Model):
+    name = models.CharField(max_length=200, verbose_name='Task Name')
+
+
+class DeployConfig(models.Model):
+    id = models.OneToOneField(to=TaskConfig, to_field='id', on_delete='CASCADE')

@@ -14,7 +14,7 @@ def update_assets_hardware_info(assets):
     task_tuple = (
         ('setup', ''),
     )
-    summary, result = run_AdHoc(task_tuple, assets, record=False)
+    summary, result = run_AdHoc(task_tuple, assets, record=True)
     for hostname, info in result['contacted'].items():
         if info:
             info = info[0]['ansible_facts']
@@ -68,7 +68,7 @@ def test_admin_user_connective_period():
     task_tuple = (
         ('ping', ''),
     )
-    summary, _ = run_AdHoc(task_tuple, assets, record=False)
+    summary, _ = run_AdHoc(task_tuple, assets, record=True)
     for i in summary['success']:
         cache.set(i, '1', 2*60*60*60)
 
