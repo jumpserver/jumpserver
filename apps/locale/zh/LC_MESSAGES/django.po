@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-06 17:02+0800\n"
+"POT-Creation-Date: 2017-09-07 11:27+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -158,6 +158,7 @@ msgstr "在线"
 #: assets/templates/assets/idc_list.html:23
 #: assets/templates/assets/system_user_asset.html:51
 #: assets/templates/assets/system_user_list.html:22
+#: hybris/templates/hybris/hybris_conf.html:18
 #: ops/templates/ops/task_list.html:45
 #: perms/templates/perms/asset_permission_list.html:18
 #: users/templates/users/user_group_list.html:15
@@ -174,6 +175,7 @@ msgstr "动作"
 #: assets/templates/assets/idc_list.html:55
 #: assets/templates/assets/system_user_asset.html:256
 #: assets/templates/assets/system_user_list.html:58
+#: hybris/templates/hybris/hybris_conf.html:28
 #: perms/templates/perms/asset_permission_list.html:44
 #: users/templates/users/user_group_list.html:50
 #: users/templates/users/user_list.html:92
@@ -1061,8 +1063,8 @@ msgstr "删除"
 msgid "Asset Deleting failed."
 msgstr "删除失败"
 
-#: assets/templates/assets/asset_update.html:36 hybris/views.py:15
-#: templates/_nav.html:60
+#: assets/templates/assets/asset_update.html:36 hybris/views/conf.py:21
+#: hybris/views/conf.py:36 templates/_nav.html:60
 msgid "Configuration"
 msgstr "配置"
 
@@ -1396,7 +1398,23 @@ msgstr ""
 msgid "discard time"
 msgstr ""
 
-#: hybris/views.py:14 templates/_nav.html:57
+#: hybris/templates/hybris/hybris_conf.html:10
+msgid "Create Configuration"
+msgstr "创建配置"
+
+#: hybris/templates/hybris/hybris_conf.html:15
+msgid "Id"
+msgstr ""
+
+#: hybris/templates/hybris/hybris_conf.html:16
+msgid "Git Repo"
+msgstr "Git仓库地址"
+
+#: hybris/templates/hybris/hybris_conf.html:17
+msgid "Hybris Path"
+msgstr "Hybris源文件路径"
+
+#: hybris/views/conf.py:20 hybris/views/conf.py:35 templates/_nav.html:57
 msgid "Hybris"
 msgstr "Hybris"
 

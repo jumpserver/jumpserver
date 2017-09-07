@@ -1,0 +1,62 @@
+{% extends '_base_list.html' %}
+{% load i18n %}
+{% load static %}
+
+
+
+{% block table_search %}
+    {% for object in hybris_conf %}
+    {% empty %}
+        <div class="uc pull-left m-l-5 m-r-5"><a href="{% url "hybris:conf-create" %}" class="btn btn-sm btn-primary"> {% trans "Create Configuration" %} </a></div>
+    {% endfor %}
+{% endblock %}
+
+{% block table_head %}
+    <th class="text-center">{% trans 'Id' %}</th>
+    <th class="text-center">{% trans 'Git Repo' %}</th>
+    <th class="text-center">{% trans 'Hybris Path' %}</th>
+     <th class="text-center">{% trans 'Action' %}</th>
+{% endblock %}
+
+{% block table_body %}
+    {% for object in hybris_conf %}
+        <tr class="gradeX">
+            <td class="text-center"><a href="#">{{ object.id }}</a></td>
+            <td class="text-center">{{ object.git_repo }}</td>
+            <td class="text-center">{{ object.hybris_path }}</td>
+            <td class="text-center">
+               <a href="#" class="btn btn-xs btn-info">{% trans "Update" %}</a>
+            </td>
+        </tr>
+    {% endfor %}
+{% endblock %}
+
+{# comment #}
+{% block custom_foot_js %}
+    <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('table').DataTable({
+                "searching": false,
+                "paging": false,
+                "bInfo": false,
+                "order": []
+            });
+            $('.select2').select2();
+            {#            $('#date .input-daterange').datepicker({#}
+            {#                dateFormat: 'mm/dd/yy',#}
+            {#                keyboardNavigation: false,#}
+            {#                forceParse: false,#}
+            {#                autoclose: true#}
+            {#            });#}
+
+        });
+        {#            .on('click', '.btn-del', function () {#}
+        {#	        var $this = $(this);#}
+        {#	        var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();#}
+        {#	        var uid = $this.data('uid');#}
+        {#	        var the_url = '{% url "api-ops:task-detail" pk=99991937 %}'.replace('99991937', uid);#}
+        {#            objectDelete($this, name, the_url);#}
+        {#        })#}
+    </script>
+{% endblock %}
