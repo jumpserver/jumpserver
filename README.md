@@ -15,7 +15,7 @@ Jumpserver是一款使用Python, Django开发的开源跳板机系统, 助力互
 
 
 ### Environment 环境
-   * Python 3.5  
+   * Python 3.6  
    * Django 1.11
 
 ### Install 安装 
@@ -96,3 +96,12 @@ demo使用了开发者模式，并发只能为1
 如果你为Jumpserver贡献过代码，请加一下群 （需要验证一下你的github id）
 
 群号: 489385245
+
+### License & Copyright
+Copyright (c) 2014-2017 Beijing Duizhan Tech, Inc., All rights reserved.
+
+Licensed under The GNU General Public License version 2 (GPLv2)  (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+
+https://www.gnu.org/licenses/gpl-2.0.html
+
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
