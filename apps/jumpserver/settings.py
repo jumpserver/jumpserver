@@ -340,7 +340,7 @@ CACHES = {
     'default': {
         'BACKEND': 'redis_cache.RedisCache',
         'LOCATION': 'redis://:%(password)s@%(host)s:%(port)s/4' % {
-            'password': CONFIG.REDIS_PASSWORD + '@' if CONFIG.REDIS_PASSWORD else '',
+            'password': CONFIG.REDIS_PASSWORD  if CONFIG.REDIS_PASSWORD else '',
             'host': CONFIG.REDIS_HOST or '127.0.0.1',
             'port': CONFIG.REDIS_PORT or 6379,
         }
