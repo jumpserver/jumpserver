@@ -28,6 +28,8 @@ class User(AbstractUser):
     # is_active = models.BooleanField(default=True)
     # last_login = models.DateTimeField(null=True)
     # date_joined = models.DateTimeField(null=True)
+    ssh_key_create_time = models.DateTimeField(null=True)
+    ssh_key_expired_days = models.CharField(max_length=80)
 
     def __unicode__(self):
         return self.username
