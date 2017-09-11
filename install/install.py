@@ -90,7 +90,7 @@ class PreSetup(object):
 
     @property
     def _is_centos7(self):
-        if self.dist.startswith("centos") or self.dist.startswith("centos linux") and self.version.startswith("7"):
+        if (self.dist.startswith("centos") or self.dist.startswith("centos linux")) and self.version.startswith("7"):
             return True
 
     @property
