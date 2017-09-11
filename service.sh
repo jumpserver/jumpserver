@@ -13,7 +13,7 @@ jumpserver_dir=
 
 base_dir=$(dirname $0)
 jumpserver_dir=${jumpserver_dir:-$base_dir}
-export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+export PATH=$PATH
 
 if [ -f ${jumpserver_dir}/install/functions ];then
     . ${jumpserver_dir}/install/functions
