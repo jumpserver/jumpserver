@@ -93,8 +93,8 @@ class Tty(object):
         self.remote_ip = ''
         self.login_type = login_type
         self.vim_flag = False
-        self.vim_end_pattern = re.compile(r'\x1b\[\?1049', re.X)
-        self.vim_data = ''
+        self.vim_begin_pattern = re.compile(r'\x1b\[\?1049h', re.X)
+        self.vim_end_pattern = re.compile(r'\x1b\[\?1049l', re.X)
         self.stream = None
         self.screen = None
         self.__init_screen_stream()
@@ -340,7 +340,11 @@ class SshTty(Tty):
                         pre_timestamp = now_timestamp
                         log_file_f.flush()
 
-                        self.vim_data += x
+                        if self.vim_begin_pattern.findall(x):
+                            self.vim_flag = True
+                        elif self.vim_end_pattern.findall(x):
+                            self.vim_flag = False
+
                         if input_mode:
                             data += x
 
@@ -358,19 +362,12 @@ class SshTty(Tty):
                         # 如果len(str(x)) > 1 说明是复制输入的
                         if len(str(x)) > 1:
                             data = x
-                        match = self.vim_end_pattern.findall(self.vim_data)
-                        if match:
-                            if self.vim_flag or len(match) == 2:
-                                self.vim_flag = False
-                            else:
-                                self.vim_flag = True
-                        elif not self.vim_flag:
+                        if not self.vim_flag:
                             self.vim_flag = False
                             data = self.deal_command(data)[0:200]
                             if data is not None:
                                 TtyLog(log=log, datetime=datetime.datetime.now(), cmd=data).save()
                         data = ''
-                        self.vim_data = ''
                         input_mode = False
 
                     if len(x) == 0:
