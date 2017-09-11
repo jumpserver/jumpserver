@@ -3,7 +3,7 @@
 
 from tempfile import NamedTemporaryFile
 import os.path
-
+import json
 from ansible.inventory.group import Group
 from ansible.inventory.host import Host
 from ansible.inventory import Inventory
@@ -143,9 +143,9 @@ class MyRunner(MyInventory):
                      become_pass=become_pass,
                      transport=transport
                      )
-        self.results_raw = hoc.run()
-        logger.debug(self.results_raw)
-        return self.results_raw
+        res = json.dumps(hoc.run(), indent=4)
+        logger.debug(res)
+        return res
 
     @property
     def results(self):
@@ -200,7 +200,7 @@ class Command(MyInventory):
                      pattern=pattern,
                      forks=forks,
                      )
-        self.results_raw = hoc.run()
+        json.dumps(hoc.run(), indent=4)
 
     @property
     def result(self):
