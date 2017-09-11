@@ -12,6 +12,7 @@ import subprocess
 import uuid
 import json
 import logging
+import urllib2
 
 from settings import *
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
@@ -506,5 +507,333 @@ def get_mac_address():
     return mac
 
 
+class zbx_api(object):
+
+    def __init__(self, url, username, password):
+        self.url = url
+        self.username = username
+        self.password = password
+
+    def requestJson(self, url, values):
+        '''
+        请求方法，错误返回dict：{"request_error" : "some errors."}
+        '''
+        data = json.dumps(values)
+        try:
+            req = urllib2.Request(url, data, {'Content-Type' : 'application/json-rpc'})
+            response = urllib2.urlopen(req, data=None, timeout=5)
+            data_get = response.read()
+            out_put = json.loads(data_get)
+            return out_put
+        except Exception as e:
+            '''
+            请求接口出错
+            '''
+            return {"request_error" : "request zabbix api error: %s" %e}
+
+    def __get_token(self):
+        '''
+        返回结果
+        {
+            "jsonrpc": "2.0",
+            "result": "0424bd59b807674191e7d77572075f33",
+            "id": 1
+        }
+
+        错误返回
+        {
+            "request_error" : "some errors."
+        }
+        '''
+        values = {
+            "jsonrpc" : "2.0",
+            "method" : "user.login",
+            "params" : {
+                "user" : self.username,
+                "password" : self.password
+            },
+            "id" : 1
+        }
+        idvalue = self.requestJson(self.url, values)
+        return idvalue
+
+
+    def create_host(self, hostname, ip, groupid):
+        '''
+        创建成功
+        {
+            "jsonrpc": "2.0",
+            "result": {
+                "hostids": [
+                    "107819"
+                ]
+            },
+            "id": 1
+        }
+
+        创建失败
+        {
+          "jsonrpc": "2.0",
+          "error": {
+            "code": -32602,
+            "message": "Invalid params.",
+            "data": "Host with the same name \"test\" already exists."
+          },
+          "id": 1
+        }
+        '''
+        token = self.__get_token()
+        if not token.get("request_error"):
+            values = {
+                "jsonrpc": "2.0",
+                "method": "host.create",
+                "params": {
+                    "host": hostname,
+                    "interfaces": [
+                        {
+                            "type": 1,
+                            "main": 1,
+                            "useip": 1,
+                            "ip": ip,
+                            "dns": "",
+                            "port": "10050"
+                        }
+                    ],
+                    "groups": [
+                        {
+                            "groupid": groupid
+                        }
+                    ],
+                },
+                "auth": token["result"],
+                "id": 5
+            }
+            idvalue = self.requestJson(self.url, values)
+            return idvalue
+
+    def delete_host(self, *hostids):
+        '''
+        成功
+        {
+            "jsonrpc": "2.0",
+            "result": {
+                "hostids": [
+                    "13",
+                    "32"
+                ]
+            },
+            "id": 1
+        }
+
+        失败
+        {
+          "jsonrpc": "2.0",
+          "error": {
+            "code": -32500,
+            "message": "Application error.",
+            "data": "No permissions to referred object or it does not exist!"
+          },
+          "id": 1
+        }
+        '''
+        token = self.__get_token()
+        if not token.get("request_error"):
+            '''
+            获取token成功
+            '''
+            values = {
+                "jsonrpc" : "2.0",
+                "method" : "host.delete",
+                "params" : list(hostids),
+                "auth" : token["result"],
+                "id" : 7
+            }
+            idvalue = self.requestJson(self.url, values)
+            return idvalue
+
+
+    def update_host(self, hostid, hostname):
+        '''
+        修改zabbix name
+
+        成功
+        {
+          "jsonrpc": "2.0",
+          "result": {
+            "hostids": [
+              "10151"
+            ]
+          },
+          "id": 1
+        }
+
+        失败
+        {
+          "jsonrpc": "2.0",
+          "error": {
+            "code": -32602,
+            "message": "Invalid params.",
+            "data": "No permissions to referred object or it does not exist!"
+          },
+          "id": 1
+        }
+        '''
+
+        token = self.__get_token()
+        if not token.get("request_error"):
+            '''
+            获取token成功
+            '''
+            values = {
+                "jsonrpc" : "2.0",
+                "method" : "host.update",
+                "params" : {
+                    "hostid" : hostid,
+                    "host" : hostname
+                },
+                "auth" : token["result"],
+                "id" : 8
+            }
+            idvalue = self.requestJson(self.url, values)
+            return idvalue
+
+    def create_hostgroup(self, hostgroup_name):
+        '''
+        创建成功
+        {
+            "jsonrpc": "2.0",
+            "result": {
+                "groupids": [
+                    "107819"
+                ]
+            },
+            "id": 1
+        }
+
+
+        创建失败
+        {
+            "jsonrpc": "2.0",
+            "error": {
+                "code" : -32602,
+                "message" : "Invalid params.",
+                "data" : "Host group \"Linux servers\" already exists."
+            },
+            "id": 1
+        }
+
+        '''
+        token = self.__get_token()
+        if not token.get("request_error"):
+            '''
+            获取token成功
+            '''
+            values = {
+                "jsonrpc" : "2.0",
+                "method" : "hostgroup.create",
+                "params" : {
+                    "name" : hostgroup_name
+                },
+                "auth" : token["result"],
+                "id" : 2
+            }
+            idvalue = self.requestJson(self.url, values)
+            return idvalue
+        #else:
+        #    print "get token error: %s" %token.get("request_error")
+
+
+    def delete_hostgroup(self, *args):
+
+        '''
+        请求成功
+                {
+            "jsonrpc": "2.0",
+            "result": {
+                "groupids": [
+                    "107824",
+                    "107825"
+                ]
+            },
+            "id": 1
+        }
+
+        请求失败
+        {
+          "jsonrpc": "2.0",
+          "error": {
+            "code": -32500,
+            "message": "Application error.",
+            "data": "No permissions to referred object or it does not exist!"
+          },
+          "id": 1
+        }
+        '''
+
+
+        token = self.__get_token()
+        if not token.get("request_error"):
+            values = {
+                "jsonrpc" : "2.0",
+                "method" : "hostgroup.delete",
+                "params" : list(args),
+                "auth" : token["result"],
+                "id" : 3
+            }
+            idvalue = self.requestJson(self.url, values)
+            return  idvalue
+
+
+
+
+    def hostgroup_get(self, *args):
+        '''
+        结果不为空：
+        {
+            "jsonrpc": "2.0",
+            "result": [
+                {
+                    "groupid": "2",
+                    "name": "Linux servers",
+                    "internal": "0"
+                },
+                {
+                    "groupid": "4",
+                    "name": "Zabbix servers",
+                    "internal": "0"
+                }
+            ],
+            "id": 1
+        }
+
+        结果为空：
+        {
+          "jsonrpc": "2.0",
+          "result": [],
+          "id": 1
+            }
+        '''
+
+        token = self.__get_token()
+        if not token.get("request_error"):
+            values = {
+                "jsonrpc" : "2.0",
+                "method" : "hostgroup.get",
+                "params" : {
+                    "output" : "extend",
+                    "filter" : {
+                        "name" : list(*args)
+                    }
+                },
+                "auth" : token["result"],
+                "id" : 4
+            }
+            idvalue = self.requestJson(self.url, values)
+            return idvalue
+
+
+
 CRYPTOR = PyCrypt(KEY)
 logger = set_log(LOG_LEVEL)
+
+ZABBIX_API = zbx_api(ZBX_URL, ZBX_USER, ZBX_PWD)

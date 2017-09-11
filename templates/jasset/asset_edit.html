@@ -83,6 +83,8 @@
                                                 </div>
                                         </div>
 
+                                        <input type="text" value="{{ asset.zbx_hostid }}" name="zbx_hostid" style="display:none">
+
                                         <div class="hr-line-dashed"></div>
                                         {{ af.group|bootstrap_horizontal }}
 
@@ -130,6 +132,7 @@
 
                                         <div class="hr-line-dashed"></div>
                                         {{ af.status|bootstrap_horizontal }}
+
 
 {#                                        <div class="hr-line-dashed"></div>#}
 {#                                        {{ af.is_active|bootstrap_horizontal }}#}

@@ -160,7 +160,22 @@ def asset_add(request):
                 asset_save.save()
                 af_post.save_m2m()
 
-                msg = u'主机 %s 添加成功' % hostname
+                #add host to zabbix
+                if IS_ZABBIX:
+                    #全局开启
+                    zbx_result = ZABBIX_API.create_host(hostname, ip, 5)
+                    if zbx_result.get('result'):
+                        #同步zabbix成功
+                        zbx_hostid = zbx_result['result']['hostids'][0]
+                        #更新asset数据库
+                        Asset.objects.filter(hostname=hostname).update(zbx_hostid=zbx_hostid)
+                        msg = u'主机 %s 添加成功,同步至zabbix成功，hostid: %s' %(hostname,zbx_hostid)
+                    else:
+                        #同步zabbix失败
+                        zbx_error = zbx_result.get('error')['data']
+                        msg = u'主机 %s 添加成功,同步至zabbix失败，失败原因：%s' %(hostname,zbx_error)
+                else:
+                    msg = u'主机 %s 添加成功' % hostname
             else:
                 esg = u'主机 %s 添加失败' % hostname
 
@@ -180,8 +195,17 @@ def asset_del(request):
     删除主机
     """
     asset_id = request.GET.get('id', '')
+    zbx_hostid = request.GET.get('zbx_hostid', '')
+
+
     if asset_id:
         Asset.objects.filter(id=asset_id).delete()
+
+    if zbx_hostid:
+        #同步删除zabbix
+        ZABBIX_API.delete_host(zbx_hostid)
+
+
 
     if request.method == 'POST':
         asset_batch = request.GET.get('arg', '')
@@ -190,6 +214,9 @@ def asset_del(request):
         if asset_batch:
             for asset_id in asset_id_all.split(','):
                 asset = get_object(Asset, id=asset_id)
+                #同步删除zabbix
+                batch_zbx_hostid = asset.zbx_hostid
+                ZABBIX_API.delete_host(batch_zbx_hostid)
                 asset.delete()
 
     return HttpResponse(u'删除成功')
@@ -204,6 +231,7 @@ def asset_edit(request):
     header_title, path1, path2 = u'修改资产', u'资产管理', u'修改资产'
 
     asset_id = request.GET.get('id', '')
+    zbx_hostid = request.GET.get('zbx_hostid', '')
     username = request.user.username
     asset = get_object(Asset, id=asset_id)
     if asset:
@@ -245,6 +273,11 @@ def asset_edit(request):
                     # asset_diff_one(asset_old, asset_new)
                     info = asset_diff(af_post.__dict__.get('initial'), request.POST)
                     db_asset_alert(asset, username, info)
+
+                    if zbx_hostid:
+                        #同步修改zabbix
+                        zbx_result = ZABBIX_API.update_host(zbx_hostid, hostname)
+                        #print zbx_result
 
                     smg = u'主机 %s 修改成功' % ip
                 else:
@@ -487,6 +520,32 @@ def asset_update_batch(request):
                 if asset:
                     asset_list.append(asset)
         asset_ansible_update(asset_list, name)
+        return HttpResponse(u'批量更新成功!')
+    return HttpResponse(u'批量更新成功!')
+
+
+
+@require_role('admin')
+def zabbix_update_batch(request):
+    if request.method == 'POST':
+        arg = request.GET.get('arg', '')
+        name = unicode(request.user.username) + ' - ' + u'自动更新'
+        if arg == 'all':
+            asset_list = Asset.objects.all()
+        else:
+            asset_id_all = unicode(request.POST.get('asset_id_all', ''))
+            asset_id_all = asset_id_all.split(',')
+            for asset_id in asset_id_all:
+                asset = get_object(Asset, id=asset_id)
+                if not asset.zbx_hostid:
+                    #同步zabbix
+                    hostname = asset.hostname
+                    ip = asset.ip
+                    zbx_result =  ZABBIX_API.create_host(hostname,ip,5)
+                    if zbx_result.get('result'):
+                        add_zbx_hostid = zbx_result['result']['hostids'][0]
+                        asset.zbx_hostid = add_zbx_hostid
+                        asset.save()
         return HttpResponse(u'批量更新成功!')
     return HttpResponse(u'批量更新成功!')
 

@@ -112,6 +112,7 @@
                                     <th class="text-center"> cpu核数 </th>
                                     <th class="text-center"> 内存 </th>
                                     <th class="text-center"> 硬盘 </th>
+                                    <th class="text-center"> zbx_hostid </th>
                                     <th class="text-center"> 操作 </th>
                                 </tr>
                             </thead>
@@ -130,10 +131,15 @@
                                     <td class="text-center"> {{ asset.cpu|get_cpu_core|default_if_none:"" }} </td>
                                     <td class="text-center"> {{ asset.memory|default_if_none:"" }}{% if asset.memory %}G{% endif %}</td>
                                     <td class="text-center"> {{ asset.disk|get_disk_info }}{% if asset.disk %}G{% endif %}</td>
+                                    {% if asset.zbx_hostid %}
+                                        <td class="text-center" bgcolor="#adff2f"> {{ asset.zbx_hostid }}</td>
+                                    {% else %}
+                                        <td class="text-center" bgcolor="#cd5c5c"> {{ asset.zbx_hostid }}</td>
+                                    {% endif %}
                                     <td class="text-center" data-editable='false'>
-                                        <a href="{% url 'asset_edit' %}?id={{ asset.id }}" class="btn btn-xs btn-info">编辑</a>
+                                        <a href="{% url 'asset_edit' %}?id={{ asset.id }}&zbx_hostid={{ asset.zbx_hostid }}" class="btn btn-xs btn-info">编辑</a>
                                         <a value="{{ asset.id }}" class="conn btn btn-xs btn-warning">连接</a>
-                                        <a value="{% url 'asset_del' %}?id={{ asset.id }}" class="btn btn-xs btn-danger asset_del">删除</a>
+                                        <a value="{% url 'asset_del' %}?id={{ asset.id }}&zbx_hostid={{ asset.zbx_hostid }}" class="btn btn-xs btn-danger asset_del">删除</a>
                                     </td>
                                 </tr>
                             {% endfor %}
@@ -144,6 +150,7 @@
                                 <input type="button" id="asset_del" class="btn btn-danger btn-sm"  name="del_button" value="删除"/>
                                 <a value="{% url 'asset_edit_batch' %}" type="button" class="btn btn-sm btn-warning iframe">修改</a>
                                 <input type="button" id="asset_update" class="btn btn-info btn-sm"  name="update_button" value="更新"/>
+                                <input type="button" id="zbx_update" class="btn btn-danger btn-sm"  name="update_zbx_button" value="更新zabbix"/>
 {#                                <input type="button" id="asset_update_all" class="btn btn-primary btn-sm"  name="update_button" value="更新全部"/>#}
                                 <input type="button" id="exec_cmd" class="btn btn-sm btn-primary"  name="exec_cmd" value="执行命令"/>
                             </div>
@@ -405,6 +412,22 @@
             });
         }
     });
+
+
+    $('#zbx_update').click(function () {
+        var asset_id_all = getIDall();
+{#            alert(asset_id_all);#}
+            layer.msg('玩命更新中...', {time: 200000});
+            $.ajax({
+                type: "post",
+                data: {asset_id_all: asset_id_all},
+                url: "{% url 'zabbix_update_batch' %}",
+                success: function () {
+                    parent.location.reload();
+                }
+            });
+    });
+
 
 {#    $('#asset_update_all').click(function () {#}
 {#        layer.msg('玩命更新中...', {time: 200000});#}
