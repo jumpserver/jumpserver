@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-07 11:27+0800\n"
+"POT-Creation-Date: 2017-09-09 18:05+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -30,7 +30,8 @@ msgstr ""
 #: assets/templates/assets/idc_list.html:18
 #: assets/templates/assets/system_user_detail.html:52
 #: assets/templates/assets/system_user_list.html:17 audits/models.py:18
-#: audits/templates/audits/login_log_list.html:49 ops/models.py:20
+#: audits/templates/audits/login_log_list.html:49 hybris/models/conf.py:16
+#: hybris/templates/hybris/task_list.html:18 ops/models.py:20
 #: ops/templates/ops/task_detail.html:50 ops/templates/ops/task_list.html:39
 #: perms/models.py:21
 #: perms/templates/perms/asset_permission_create_update.html:33
@@ -158,7 +159,7 @@ msgstr "在线"
 #: assets/templates/assets/idc_list.html:23
 #: assets/templates/assets/system_user_asset.html:51
 #: assets/templates/assets/system_user_list.html:22
-#: hybris/templates/hybris/hybris_conf.html:18
+#: hybris/templates/hybris/task_list.html:20
 #: ops/templates/ops/task_list.html:45
 #: perms/templates/perms/asset_permission_list.html:18
 #: users/templates/users/user_group_list.html:15
@@ -175,7 +176,7 @@ msgstr "动作"
 #: assets/templates/assets/idc_list.html:55
 #: assets/templates/assets/system_user_asset.html:256
 #: assets/templates/assets/system_user_list.html:58
-#: hybris/templates/hybris/hybris_conf.html:28
+#: hybris/templates/hybris/task_list.html:31
 #: perms/templates/perms/asset_permission_list.html:44
 #: users/templates/users/user_group_list.html:50
 #: users/templates/users/user_list.html:92
@@ -758,6 +759,7 @@ msgstr "创建管理用户"
 #: assets/templates/assets/idc_detail.html:17
 #: assets/templates/assets/system_user_asset.html:17
 #: assets/templates/assets/system_user_detail.html:17
+#: hybris/templates/hybris/install_task_detail.html:14
 #: perms/templates/perms/asset_permission_asset.html:18
 #: perms/templates/perms/asset_permission_detail.html:18
 #: perms/templates/perms/asset_permission_user.html:18
@@ -912,13 +914,15 @@ msgstr "确认"
 
 #: assets/templates/assets/asset_detail.html:246
 #: assets/templates/assets/asset_group_detail.html:63
+#: hybris/templates/hybris/install_task_detail.html:83
 #, fuzzy
 #| msgid "Repush system user"
 msgid "Push system users"
 msgstr "重新推送系统"
 
 #: assets/templates/assets/asset_detail.html:254
-#: assets/templates/assets/asset_group_detail.html:71 perms/forms.py:33
+#: assets/templates/assets/asset_group_detail.html:71
+#: hybris/templates/hybris/install_task_detail.html:91 perms/forms.py:33
 #: perms/templates/perms/asset_permission_detail.html:161 users/forms.py:190
 #: users/forms.py:216
 msgid "Select system users"
@@ -931,6 +935,7 @@ msgid "Update successfully!"
 msgstr "更新成功"
 
 #: assets/templates/assets/asset_group_detail.html:80
+#: hybris/templates/hybris/install_task_detail.html:103
 #: perms/templates/perms/asset_permission_detail.html:142
 msgid "Push"
 msgstr "推送"
@@ -1063,8 +1068,7 @@ msgstr "删除"
 msgid "Asset Deleting failed."
 msgstr "删除失败"
 
-#: assets/templates/assets/asset_update.html:36 hybris/views/conf.py:21
-#: hybris/views/conf.py:36 templates/_nav.html:60
+#: assets/templates/assets/asset_update.html:36
 msgid "Configuration"
 msgstr "配置"
 
@@ -1398,25 +1402,95 @@ msgstr ""
 msgid "discard time"
 msgstr ""
 
-#: hybris/templates/hybris/hybris_conf.html:10
-msgid "Create Configuration"
-msgstr "创建配置"
+#: hybris/models/conf.py:17 hybris/templates/hybris/task_list.html:19
+msgid "Description"
+msgstr "描述"
 
-#: hybris/templates/hybris/hybris_conf.html:15
-msgid "Id"
+#: hybris/models/conf.py:19
+msgid "Allowed Delete"
+msgstr "允许删除"
+
+#: hybris/models/conf.py:30
+#, fuzzy
+#| msgid "Hybris Path"
+msgid "Hybris Source Path"
+msgstr "Hybris源文件路径"
+
+#: hybris/models/conf.py:31
+#, fuzzy
+#| msgid "Hybris Path"
+msgid "Hybris Source Path Help"
+msgstr "Hybris源文件路径"
+
+#: hybris/models/conf.py:32 hybris/templates/hybris/install_task_detail.html:57
+msgid "Deploy Path"
+msgstr "Hybris安装路径"
+
+#: hybris/models/conf.py:33 hybris/templates/hybris/install_task_detail.html:61
+msgid "Deploy Jrebel"
+msgstr "是否部署Jrebel"
+
+#: hybris/models/conf.py:34
+msgid "Deploy Jrebel Help"
 msgstr ""
 
-#: hybris/templates/hybris/hybris_conf.html:16
+#: hybris/models/conf.py:35 hybris/templates/hybris/install_task_detail.html:66
+msgid "Jrebel Path"
+msgstr "Jrebel安装路径"
+
+#: hybris/models/conf.py:36 hybris/templates/hybris/install_task_detail.html:71
+msgid "Db Driver Url"
+msgstr "数据库驱动下载Url"
+
+#: hybris/models/conf.py:37
+msgid "Db Driver Url Help"
+msgstr ""
+
+#: hybris/models/conf.py:43
 msgid "Git Repo"
 msgstr "Git仓库地址"
 
-#: hybris/templates/hybris/hybris_conf.html:17
+#: hybris/models/conf.py:44
+#, fuzzy
+#| msgid "Reset private key"
+msgid "Git Private Key"
+msgstr "重置密钥"
+
+#: hybris/models/conf.py:45
+#, fuzzy
+#| msgid "Username"
+msgid "Git Username"
+msgstr "用户名"
+
+#: hybris/models/conf.py:46
+#, fuzzy
+#| msgid "Password"
+msgid "Git Password"
+msgstr "密码"
+
+#: hybris/models/conf.py:47 hybris/templates/hybris/install_task_detail.html:53
 msgid "Hybris Path"
 msgstr "Hybris源文件路径"
 
-#: hybris/views/conf.py:20 hybris/views/conf.py:35 templates/_nav.html:57
+#: hybris/templates/hybris/task_list.html:11
+msgid "Create Configuration"
+msgstr "创建配置"
+
+#: hybris/templates/hybris/task_list.html:17
+msgid "Id"
+msgstr ""
+
+#: hybris/views/tasks.py:26 hybris/views/tasks.py:50 templates/_nav.html:57
 msgid "Hybris"
 msgstr "Hybris"
+
+#: hybris/views/tasks.py:27 templates/_nav.html:60
+msgid "Task List"
+msgstr "任务列表"
+
+#: hybris/views/tasks.py:51
+msgid "Install Task Detail"
+msgstr "安装任务详情"
 
 #: ops/models.py:19 ops/templates/ops/task_detail.html:46
 msgid "UUID"
@@ -2376,9 +2450,14 @@ msgid "Invalid file."
 msgstr "文件错误"
 
 #, fuzzy
-#~| msgid "Task record detail"
-#~ msgid "Task record list"
-#~ msgstr "任务记录详情"
+#~| msgid "Configuration"
+#~ msgid "Config Description"
+#~ msgstr "配置"
+
+#, fuzzy
+#~| msgid "Confirm"
+#~ msgid "Config Name"
+#~ msgstr "确认"
 
 #~ msgid "Add asset to this group"
 #~ msgstr "添加资产到该组"

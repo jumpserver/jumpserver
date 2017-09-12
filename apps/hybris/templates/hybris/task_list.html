@@ -5,27 +5,33 @@
 
 
 {% block table_search %}
-    {% for object in hybris_conf %}
+    {% for object in task_list %}
     {% empty %}
-        <div class="uc pull-left m-l-5 m-r-5"><a href="{% url "hybris:conf-create" %}" class="btn btn-sm btn-primary"> {% trans "Create Configuration" %} </a></div>
+        <div class="uc pull-left m-l-5 m-r-5"><a href="{% url "hybris:conf-create" %}"
+                                                 class="btn btn-sm btn-primary"> {% trans "Create Configuration" %} </a>
+        </div>
     {% endfor %}
 {% endblock %}
 
 {% block table_head %}
     <th class="text-center">{% trans 'Id' %}</th>
-    <th class="text-center">{% trans 'Git Repo' %}</th>
-    <th class="text-center">{% trans 'Hybris Path' %}</th>
-     <th class="text-center">{% trans 'Action' %}</th>
+    <th class="text-center">{% trans 'Name' %}</th>
+    <th class="text-center">{% trans 'Description' %}</th>
+    <th class="text-center">{% trans 'Action' %}</th>
 {% endblock %}
 
 {% block table_body %}
-    {% for object in hybris_conf %}
+    {% for object in task_list %}
         <tr class="gradeX">
-            <td class="text-center"><a href="#">{{ object.id }}</a></td>
-            <td class="text-center">{{ object.git_repo }}</td>
-            <td class="text-center">{{ object.hybris_path }}</td>
+            <td class="text-center"><a
+                    href="{% url 'hybris:task-detail'  type=object.type pk=object.id %}">{{ object.id }}</a>
+            </td>
+            <td class="text-center">{{ object.name }}</td>
+{#            <td class="text-center"><a#}
+{#                    href="{% url 'hybris:task-detail'  type=object.type pk=object.id %}">{{ object.name }}</a></td>#}
+            <td class="text-center">{{ object.desc }}</td>
             <td class="text-center">
-               <a href="#" class="btn btn-xs btn-info">{% trans "Update" %}</a>
+                <a href="#" class="btn btn-xs btn-info">{% trans "Update" %}</a>
             </td>
         </tr>
     {% endfor %}
@@ -42,7 +48,7 @@
                 "bInfo": false,
                 "order": []
             });
-            $('.select2').select2();
+            {#            $('.select2').select2();#}
             {#            $('#date .input-daterange').datepicker({#}
             {#                dateFormat: 'mm/dd/yy',#}
             {#                keyboardNavigation: false,#}

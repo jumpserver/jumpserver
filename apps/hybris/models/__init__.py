@@ -1,4 +1,4 @@
 # -*- coding: utf-8 -*-
 #
 
-from .conf import *
+from .models import *
