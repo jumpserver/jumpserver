@@ -9,11 +9,13 @@ from .. import views
 app_name = 'hybris'
 
 urlpatterns = [
-    url(r'^tasks/$', views.TaskListView.as_view(), name='task-list'),
-    url(r'^task/opt/(?P<type>[A-Za-z]+)/(?P<pk>[0-9]+)/(?P<opt>.+)/$', view=views.TaskRedirectView.as_view(),
-        name='task-opt'),
-    url(r'^task/install/(?P<pk>[0-9]+)/$', views.InstallDetailView.as_view(), name='install-detail'),
-    url(r'^task/install/(?P<pk>[0-9]+)/update/$', views.InstallUpdateView.as_view(), name='install-update'),
+    url(r'^templates/$', views.TemplateListView.as_view(), name='template-list'),
+    url(r'^templates/opt/(?P<type>[A-Za-z]+)/(?P<pk>[0-9]+)/(?P<opt>.+)/$', view=views.TemplateRedirectView.as_view(),
+        name='template-opt'),
+    url(r'^templates/install/(?P<pk>[0-9]+)/$', views.InstallTemplateDetailView.as_view(),
+        name='template-install-detail'),
+    url(r'^templates/install/(?P<pk>[0-9]+)/update/$', views.InstallTemplateUpdateView.as_view(),
+        name='template-install-update'),
     # url(r'^task/(?P<pk>[0-9a-zA-Z-]+)/$', views.TaskDetailView.as_view(), name='task-detail'),
     # url(r'^task/(?P<pk>[0-9a-zA-Z-]+)/run/$', views.TaskRunView.as_view(), name='task-run'),
 ]

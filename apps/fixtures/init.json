@@ -71,7 +71,7 @@
     }
   },
   {
-    "model": "hybris.taskconfig",
+    "model": "hybris.template",
     "pk": 1,
     "fields": {
       "name": "安装任务",
@@ -81,11 +81,10 @@
     }
   },
   {
-    "model": "hybris.installconfig",
+    "model": "hybris.installtemplate",
     "pk": 1,
     "fields": {
       "config": 1,
-      "db_driver_url": "http://central.maven.org/maven2/mysql/mysql-connector-java/5.1.38/mysql-connector-java-5.1.38.jar",
       "deploy_jrebel": true
     }
   }

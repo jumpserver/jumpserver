@@ -7,7 +7,7 @@ from .models import *
 
 class InstallUpdateForm(forms.ModelForm):
     class Meta:
-        model = InstallConfig
+        model = InstallTemplate
         fields = [
             'hybris_path', 'deploy_path', 'deploy_jrebel', 'jrebel_path', 'db_driver_url',
         ]
