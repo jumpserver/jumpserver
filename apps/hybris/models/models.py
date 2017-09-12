@@ -27,7 +27,7 @@ class TaskConfig(models.Model):
 class InstallConfig(models.Model):
     """安装任务的具体配置"""
     config = models.OneToOneField(to=TaskConfig, on_delete=models.CASCADE, related_name='install_config')
-    hybris_path = models.CharField(max_length=50, editable=False, verbose_name=_('Hybris Source Path'),
+    hybris_path = models.CharField(max_length=50, verbose_name=_('Hybris Source Path'),
                                    help_text=_('Hybris Source Path Help'), default='/opt/binaries/hybris.zip')
     deploy_path = models.CharField(max_length=500, verbose_name=_('Deploy Path'), default='/opt/hybris')
     deploy_jrebel = models.BooleanField(default=False, verbose_name=_('Deploy Jrebel'),

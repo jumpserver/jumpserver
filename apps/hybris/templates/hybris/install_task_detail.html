@@ -13,7 +13,7 @@
                             <li class="active"><a href="" class="text-center"><i
                                     class="fa fa-laptop"></i> {% trans 'Detail' %} </a></li>
                             <li class="pull-right">
-                                <a class="btn btn-outline btn-default" href="{% url 'install-update' %}"><i class="fa fa-edit"></i>Update</a>
+                                <a class="btn btn-outline btn-default" href="{% url 'hybris:install-update'  pk=install_task.id %}"><i class="fa fa-edit"></i>Update</a>
                             </li>
                             {% if install_task.config.allowed_delete %}
                                 <li class="pull-right">

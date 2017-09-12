@@ -1,0 +1,42 @@
+{% extends '_base_create_update.html' %}
+{% load i18n %}
+{% load static %}
+{% load bootstrap3 %}
+{% block form %}
+    {% if form.non_field_errors %}
+         <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+         </div>
+    {% endif %}
+    <form method="post" class="form-horizontal" action="" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h3>{{ task.name }}</h3>
+        {% bootstrap_field form.hybris_path layout="horizontal" %}
+        {% bootstrap_field form.deploy_path layout="horizontal" %}
+        <div class="form-group">
+            <label for="{{ form.enable_otp.id_for_label }}" class="col-sm-2 control-label">{% trans 'Deploy Jrebel' %}</label>
+            <div class="col-sm-9">
+                {{ form.deploy_jrebel}}
+                 <div class="help-block">{% trans 'Deploy Jrebel Help' %}</div>
+            </div>
+
+        </div>
+        {% bootstrap_field form.jrebel_path layout="horizontal" %}
+        {% bootstrap_field form.db_driver_url layout="horizontal" %}
+
+        <div class="hr-line-dashed"></div>
+        <div class="form-group">
+            <div class="col-sm-4 col-sm-offset-2">
+                <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+                <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+            </div>
+        </div>
+    </form>
+{% endblock %}
+{% block custom_foot_js %}
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+        })
+    </script>
+{% endblock %}

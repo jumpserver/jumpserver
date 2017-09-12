@@ -5,20 +5,16 @@ from django.utils.translation import gettext_lazy as _
 from .models import *
 
 
-class UserCreateUpdateForm(forms.ModelForm):
+class InstallUpdateForm(forms.ModelForm):
     class Meta:
         model = InstallConfig
         fields = [
-            'username', 'name', 'email', 'groups', 'wechat',
-            'phone', 'enable_otp', 'role', 'date_expired', 'comment',
+            'hybris_path', 'deploy_path', 'deploy_jrebel', 'jrebel_path', 'db_driver_url',
         ]
         help_texts = {
-            'username': '* required',
-            'name': '* required',
-            'email': '* required',
+            'deploy_path': '* required',
+            'jrebel_path': '* required',
         }
         widgets = {
-            'groups': forms.SelectMultiple(
-                attrs={'class': 'select2',
-                       'data-placeholder': _('Join user groups')}),
+            'hybris_path': forms.TextInput(attrs={'readonly': True}),
         }

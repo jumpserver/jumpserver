@@ -34,19 +34,19 @@ class InstallDetailView(LoginRequiredMixin, DetailView):
 class InstallUpdateView(LoginRequiredMixin, UpdateView):
     """Install Task 的编辑视图"""
     model = InstallConfig
-    form_class = forms.UserCreateUpdateForm
+    form_class = forms.InstallUpdateForm
     template_name = 'hybris/install_task_update.html'
     context_object_name = 'task'
-    success_url = reverse_lazy('users:user-list')
+    success_url = reverse_lazy('hybris:task-list')
 
     def form_valid(self, form):
-        username = self.object.username
-        user = form.save(commit=False)
-        user.username = username
-        user.save()
-        password = self.request.POST.get('password', '')
-        if password:
-            user.set_password(password)
+        # username = self.object.username
+        # user = form.save(commit=False)
+        # user.username = username
+        # user.save()
+        # password = self.request.POST.get('password', '')
+        # if password:
+        #     user.set_password(password)
         return super(InstallUpdateView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):

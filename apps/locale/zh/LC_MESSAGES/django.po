@@ -1411,16 +1411,14 @@ msgid "Allowed Delete"
 msgstr "允许删除"
 
 #: hybris/models/conf.py:30
-#, fuzzy
 #| msgid "Hybris Path"
 msgid "Hybris Source Path"
 msgstr "Hybris源文件路径"
 
 #: hybris/models/conf.py:31
-#, fuzzy
 #| msgid "Hybris Path"
 msgid "Hybris Source Path Help"
-msgstr "Hybris源文件路径"
+msgstr "请将Hybris源文件映射到容器的此路径"
 
 #: hybris/models/conf.py:32 hybris/templates/hybris/install_task_detail.html:57
 msgid "Deploy Path"
@@ -1428,11 +1426,11 @@ msgstr "Hybris安装路径"
 
 #: hybris/models/conf.py:33 hybris/templates/hybris/install_task_detail.html:61
 msgid "Deploy Jrebel"
-msgstr "是否部署Jrebel"
+msgstr "部署Jrebel"
 
 #: hybris/models/conf.py:34
 msgid "Deploy Jrebel Help"
-msgstr ""
+msgstr "是否部署Jrebel到目标机器"
 
 #: hybris/models/conf.py:35 hybris/templates/hybris/install_task_detail.html:66
 msgid "Jrebel Path"
@@ -1444,7 +1442,7 @@ msgstr "数据库驱动下载Url"
 
 #: hybris/models/conf.py:37
 msgid "Db Driver Url Help"
-msgstr ""
+msgstr "如果要下载db驱动，请填写此字段，建议在Maven库中获取下载地址。如不填写，请自行将数据库驱动打包至hybris压缩包中。"
 
 #: hybris/models/conf.py:43
 msgid "Git Repo"

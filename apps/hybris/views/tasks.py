@@ -10,7 +10,7 @@ from django.utils.translation import ugettext as _
 from django.views.generic import ListView, RedirectView
 from ..models import *
 
-__all__ = ['TaskListView', 'DetailRedirectView']
+__all__ = ['TaskListView', 'TaskRedirectView']
 
 logger = logging.getLogger(__name__)
 
@@ -30,10 +30,10 @@ class TaskListView(LoginRequiredMixin, ListView):
         return super(TaskListView, self).get_context_data(**kwargs)
 
 
-class DetailRedirectView(LoginRequiredMixin, RedirectView):
+class TaskRedirectView(LoginRequiredMixin, RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         #: 重定向url的name
-        self.pattern_name = '%s:%s-%s' % ('hybris', kwargs['type'], 'detail')
+        self.pattern_name = '%s:%s-%s' % ('hybris', kwargs['type'], kwargs['opt'])
         context = {
             'pk': kwargs['pk']  #: 从url中获取参数
         }

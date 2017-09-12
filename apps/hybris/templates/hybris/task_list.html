@@ -24,14 +24,15 @@
     {% for object in task_list %}
         <tr class="gradeX">
             <td class="text-center"><a
-                    href="{% url 'hybris:task-detail'  type=object.type pk=object.id %}">{{ object.id }}</a>
+                    href="{% url 'hybris:task-opt'  type=object.type pk=object.id opt='detail' %}">{{ object.id }}</a>
             </td>
             <td class="text-center">{{ object.name }}</td>
-{#            <td class="text-center"><a#}
-{#                    href="{% url 'hybris:task-detail'  type=object.type pk=object.id %}">{{ object.name }}</a></td>#}
+            {#            <td class="text-center"><a#}
+            {#                    href="{% url 'hybris:task-detail'  type=object.type pk=object.id %}">{{ object.name }}</a></td>#}
             <td class="text-center">{{ object.desc }}</td>
             <td class="text-center">
-                <a href="#" class="btn btn-xs btn-info">{% trans "Update" %}</a>
+                <a href="{% url 'hybris:task-opt'  type=object.type pk=object.id opt='update' %}"
+                   class="btn btn-xs btn-info">{% trans "Update" %}</a>
             </td>
         </tr>
     {% endfor %}
