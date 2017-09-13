@@ -24,7 +24,7 @@ class TemplateListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Hybris'),
-            'action': _('Task List'),
+            'action': _('Templates'),
         }
         kwargs.update(context)
         return super(TemplateListView, self).get_context_data(**kwargs)

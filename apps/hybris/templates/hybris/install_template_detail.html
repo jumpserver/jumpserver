@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+{% endblock %}
 
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -13,7 +19,9 @@
                             <li class="active"><a href="" class="text-center"><i
                                     class="fa fa-laptop"></i> {% trans 'Detail' %} </a></li>
                             <li class="pull-right">
-                                <a class="btn btn-outline btn-default" href="{% url 'hybris:template-install-update'  pk=install_task.id %}"><i class="fa fa-edit"></i>Update</a>
+                                <a class="btn btn-outline btn-default"
+                                   href="{% url 'hybris:template-install-update'  pk=install_task.id %}"><i
+                                        class="fa fa-edit"></i>Update</a>
                             </li>
                             {% if install_task.config.allowed_delete %}
                                 <li class="pull-right">
@@ -80,7 +88,7 @@
                         <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Push system users' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Exec Task' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table">
@@ -88,11 +96,11 @@
                                         <form>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select system users' %}"
-                                                            class="select2 system-user-select" style="width: 100%"
-                                                            multiple="" tabindex="4">
-                                                        {% for system_user in system_users %}
-                                                            <option value="{{ system_user.id }}"> {{ system_user.name }} </option>
+                                                    <select data-placeholder="{% trans 'Select assets' %}"
+                                                            class="select2" style="width: 100%" multiple=""
+                                                            tabindex="4">
+                                                        {% for asset in assets %}
+                                                            <option value="{{ asset.id }}">{{ asset.hostname }}: {{ asset.ip }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
@@ -100,7 +108,38 @@
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
                                                     <button type="button"
-                                                            class="btn btn-primary btn-sm btn-push-system-user">{% trans 'Push' %}</button>
+                                                            class="btn btn-primary btn-sm">{% trans 'Confirm' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Exec Task' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table group_edit">
+                                        <tbody>
+                                        <form>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <select data-placeholder="{% trans 'Select asset groups' %}"
+                                                            class="select2" style="width: 100%" multiple=""
+                                                            tabindex="4">
+                                                        {% for asset_group in asset_groups %}
+                                                            <option value="{{ asset_group.id }}">{{ asset_group.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <button type="button" class="btn btn-info btn-small"
+                                                            id="btn_add_user_group">{% trans 'Confirm' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
@@ -115,5 +154,13 @@
         </div>
     </div>
 
+{% endblock %}
+
+{% block custom_foot_js %}
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+        });
+    </script>
 {% endblock %}
 

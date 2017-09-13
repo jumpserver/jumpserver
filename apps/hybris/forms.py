@@ -17,4 +17,5 @@ class InstallUpdateForm(forms.ModelForm):
         }
         widgets = {
             'hybris_path': forms.TextInput(attrs={'readonly': True}),
+            'db_driver_url': forms.URLInput()
         }
