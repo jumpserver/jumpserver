@@ -5,10 +5,9 @@ LABEL MAINTAINER Jumpserver Team <ibuler@qq.com>
 COPY . /opt/jumpserver
 WORKDIR /opt/jumpserver
 
-RUN yum -y install epel-release
-RUN cd requirements && yum -y install $(cat rpm_requirements.txt)
-RUN cd requirements && pip install -r requirements.txt
-RUN yum clean all
+RUN yum -y install epel-release && yum clean all -y
+RUN cd requirements && yum -y install $(cat rpm_requirements.txt) && yum clean all -y
+RUN cd requirements && pip install -r requirements.txt 
 
 RUN rm -f data/db.sqlite3
 RUN rm -r .git
