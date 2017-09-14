@@ -1,0 +1,1654 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"week",
+				"week_dir"
+			],
+			[
+				"o",
+				"office_dir"
+			],
+			[
+				"sw",
+				"swname"
+			],
+			[
+				"r",
+				"recv"
+			],
+			[
+				"image",
+				"image_format"
+			],
+			[
+				"ge",
+				"generate"
+			],
+			[
+				"fbase",
+				"fbase"
+			],
+			[
+				"last",
+				"last_orders"
+			],
+			[
+				"fb",
+				"fbase_source"
+			],
+			[
+				"fa",
+				"fbase_source"
+			],
+			[
+				"co",
+				"commission_sheet"
+			],
+			[
+				"su",
+				"suggestion"
+			],
+			[
+				"end",
+				"end_amount"
+			],
+			[
+				"start_",
+				"start_amount"
+			],
+			[
+				"to",
+				"to_f"
+			],
+			[
+				"sum",
+				"sum_amount"
+			],
+			[
+				"start",
+				"start_amount"
+			],
+			[
+				"get_",
+				"get_trades"
+			],
+			[
+				"em",
+				"email_id"
+			],
+			[
+				"lo",
+				"logger"
+			],
+			[
+				"wi",
+				"width"
+			],
+			[
+				"active",
+				"active"
+			],
+			[
+				"se",
+				"self"
+			],
+			[
+				"selec",
+				"selected"
+			],
+			[
+				"sele",
+				"selected"
+			],
+			[
+				"sec",
+				"secret"
+			],
+			[
+				"paragraph_tit",
+				"paragraph_title2"
+			],
+			[
+				"praa",
+				"paragraph2"
+			],
+			[
+				"para",
+				"paragraph1"
+			],
+			[
+				"p",
+				"paragraph10"
+			],
+			[
+				"be",
+				"before_action"
+			],
+			[
+				"create",
+				"create"
+			],
+			[
+				"mar",
+				"margin-bottom"
+			],
+			[
+				"pad",
+				"padding-bottom"
+			],
+			[
+				"en",
+				"enum"
+			],
+			[
+				"sub",
+				"sub_title1"
+			],
+			[
+				"new",
+				"new_gateway"
+			],
+			[
+				"con",
+				"convert_payment"
+			],
+			[
+				"save",
+				"save_change"
+			],
+			[
+				"part",
+				"part2"
+			],
+			[
+				"par",
+				"part1"
+			],
+			[
+				"gate",
+				"gateway"
+			],
+			[
+				"defa",
+				"default_currency"
+			],
+			[
+				"g",
+				"gateway"
+			],
+			[
+				"stat",
+				"status"
+			],
+			[
+				"data",
+				"data-placeholder"
+			],
+			[
+				"si",
+				"sign_up"
+			],
+			[
+				"Proc",
+				"processing"
+			],
+			[
+				"text",
+				"text-align"
+			],
+			[
+				"but",
+				"button"
+			],
+			[
+				"bu",
+				"buttonDisabled"
+			],
+			[
+				"button",
+				"buttonDisabled"
+			],
+			[
+				"re",
+				"registrations"
+			],
+			[
+				"user",
+				"user_id"
+			],
+			[
+				"up",
+				"update"
+			],
+			[
+				"skip_",
+				"skip_policy_scope"
+			],
+			[
+				"get",
+				"get"
+			],
+			[
+				"nam",
+				"namespace"
+			],
+			[
+				"col",
+				"collection"
+			],
+			[
+				"exc",
+				"exception"
+			],
+			[
+				"log",
+				"log-out"
+			],
+			[
+				"api",
+				"api_secret"
+			],
+			[
+				"cu",
+				"current"
+			],
+			[
+				"di",
+				"display"
+			],
+			[
+				"check",
+				"checkbox"
+			],
+			[
+				"res",
+				"respond_with"
+			],
+			[
+				"app",
+				"application"
+			],
+			[
+				"from",
+				"from_unit"
+			],
+			[
+				"pa",
+				"params"
+			],
+			[
+				"local",
+				"locals"
+			],
+			[
+				"amount",
+				"amount"
+			],
+			[
+				"a",
+				"alert"
+			],
+			[
+				"for",
+				"form_tag"
+			],
+			[
+				"amount_input_",
+				"amount_input_btc"
+			],
+			[
+				"mi",
+				"minutes"
+			],
+			[
+				"fn",
+				"function"
+			],
+			[
+				"or",
+				"order"
+			],
+			[
+				"X-",
+				"X-Nonce"
+			],
+			[
+				"fun",
+				"function"
+			],
+			[
+				"resouce",
+				"resources"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"contents": "Searching 266 files for \"is_first_login\"\n\n/home/seven/workspace/jumpserver4/jumpserver/apps/templates/base.html:\n   22          {% include '_message.html' %}\n   23          {% block first_login_message %}\n   24:             {% if user.is_authenticated and user.is_first_login %}\n   25              <div class=\"alert alert-danger\" style=\"margin: 20px auto 0px\">\n   26                  {% url 'users:user-first-login' as first_login_url %}\n\n/home/seven/workspace/jumpserver4/jumpserver/apps/users/migrations/0001_initial.py:\n   43                  ('_public_key', models.CharField(blank=True, max_length=1000, verbose_name='ssh public key')),\n   44                  ('comment', models.TextField(blank=True, max_length=200, verbose_name='Comment')),\n   45:                 ('is_first_login', models.BooleanField(default=False)),\n   46                  ('date_expired', models.DateTimeField(blank=True, default=common.utils.date_expired_default, null=True, verbose_name='Date expired')),\n   47                  ('created_by', models.CharField(default='', max_length=30, verbose_name='Created by')),\n\n/home/seven/workspace/jumpserver4/jumpserver/apps/users/models/user.py:\n   42      _public_key = models.CharField(max_length=1000, blank=True, verbose_name=_('ssh public key'))\n   43      comment = models.TextField(max_length=200, blank=True, verbose_name=_('Comment'))\n   44:     is_first_login = models.BooleanField(default=False)\n   45      date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True,\n   46                                          verbose_name=_('Date expired'))\n   ..\n  213          domain_name = settings.CONFIG.DOMAIN_NAME or 'jumpserver.org'\n  214          app = cls.objects.create(username=name, name=name, email='%s@%s' % (name, domain_name), is_active=False,\n  215:                                  role='App', enable_otp=False, comment=comment, is_first_login=False,\n  216                                   created_by='System')\n  217          access_key = AccessKey.objects.create(user=app)\n\n/home/seven/workspace/jumpserver4/jumpserver/apps/users/views/login.py:\n   56  \n   57      def get_success_url(self):\n   58:         if self.request.user.is_first_login:\n   59              return reverse('users:user-first-login')\n   60  \n   ..\n  161  \n  162      def dispatch(self, request, *args, **kwargs):\n  163:         if request.user.is_authenticated() and not request.user.is_first_login:\n  164              return redirect(reverse('index'))\n  165          return super(UserFirstLoginView, self).dispatch(request, *args, **kwargs)\n  ...\n  173                  if field.name == 'enable_otp':\n  174                      user.enable_otp = field.value()\n  175:         user.is_first_login = False\n  176          user.is_public_key_valid = True\n  177          user.save()\n\n7 matches across 4 files\n",
+			"settings":
+			{
+				"buffer_size": 2845,
+				"line_ending": "Unix",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"file": "apps/users/views/login.py",
+			"settings":
+			{
+				"buffer_size": 7734,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "docker-compose.yml",
+			"settings":
+			{
+				"buffer_size": 587,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/users/api.py",
+			"settings":
+			{
+				"buffer_size": 5325,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": ".gitignore",
+			"settings":
+			{
+				"buffer_size": 238,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "config_example.py",
+			"settings":
+			{
+				"buffer_size": 4410,
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"last_filter": "install",
+		"selected_items":
+		[
+			[
+				"install",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 485.0
+	},
+	"console":
+	{
+		"height": 56.0,
+		"history":
+		[
+			"import  urllib.request,os;pf='Package Control.sublime-package';ipp=sublime.installed_packages_path();urllib.request.install_opener(urllib.request.build_opener(urllib.request.ProxyHandler()));open(os.path.join(ipp,pf),'wb').write(urllib.request.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read())",
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/seven/workspace/jumpserver4/jumpserver",
+		"/home/seven/workspace/jumpserver4/jumpserver/__pycache__",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/jumpserver",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/urls"
+	],
+	"file_history":
+	[
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/static/js/webterminal.js",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/jumpserver/settings.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/templates/base.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/config.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/fixtures/fake.json",
+		"/home/seven/workspace/jumpserver3/static/js/term.js",
+		"/home/seven/workspace/jumpserver3/templates/skin_config.html",
+		"/home/seven/workspace/jumpserver3/jumpserver/settings.py",
+		"/home/seven/workspace/jumpserver3/static/js/webterminal.js",
+		"/home/seven/workspace/jumpserver3/templates/jlog/web_terminal.html",
+		"/home/seven/workspace/jumpserver3/jumpserver.conf",
+		"/home/seven/workspace/jumpserver/apps/assets/templates/assets/asset_modal_list.html",
+		"/home/seven/workspace/jumpserver/apps/locale/zh/LC_MESSAGES/django.po",
+		"/home/seven/workspace/jumpserver/apps/static/js/webterminal.js",
+		"/home/seven/workspace/jumpserver/apps/templates/base.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/applications/views.py",
+		"/home/seven/workspace/jumpserver4/luna/luna/views/websocket.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/templates/perms/asset_permission_asset.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/views.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/__init__.py",
+		"/home/seven/workspace/jumpserver4/luna/luna/service.py",
+		"/home/seven/workspace/jumpserver4/luna/config.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/applications/urls/api_urls.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/applications/api.py",
+		"/home/seven/workspace/jumpserver4/luna/luna/dist/ts/service.ts",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/jumpserver/urls.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/models/group.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/logs/jumpserver.log",
+		"/home/seven/workspace/jumpserver/run_server.py",
+		"/home/seven/.config/sublime-text-3/Packages/GoSublime/CHANGELOG.md",
+		"/home/seven/main.py",
+		"/home/seven/test.py",
+		"/home/seven/app/main.go",
+		"/home/seven/app/django/placeholder/placeholder.py",
+		"/home/seven/Documents/b.html",
+		"/home/seven/Documents/a.html",
+		"/home/seven/Documents/c.html",
+		"/home/seven/app/wordpress/wp-content/themes/llorix-one-lite/footer.php.dump",
+		"/home/seven/app/wordpress/wp-content/themes/llorix-one-lite/footer.php",
+		"/home/seven/app/wordpress/wp-config.php",
+		"/home/seven/app/wordpress/wp-content/themes/llorix-one-lite/functions.php",
+		"/home/seven/app/wordpress/wp-includes/class-smtp.php",
+		"/home/seven/app/wordpress/wp-login.php",
+		"/home/seven/app/wordpress/wp-content/plugins/akismet/views/config.php",
+		"/home/seven/app/bitcoin_payment_gateway/app/workers/forecast_ltc_price_by_last_order_worker.rb",
+		"/home/seven/app/bitcoin_payment_gateway/app/models/suggestion_email_result.rb",
+		"/home/seven/app/bitcoin_payment_gateway/app/models/exchange_rate.rb",
+		"/home/seven/app/bitcoin_payment_gateway/app/models/direction_data_diff.rb",
+		"/home/seven/app/bitcoin_payment_gateway/app/models/suggestion_email.rb",
+		"/home/seven/app/bitcoin_payment_gateway/app/workers/ltc_price_worker.rb",
+		"/home/seven/app/bitcoin_payment_gateway/config/sidekiq.yml",
+		"/home/seven/app/bitcoin_payment_gateway/config/deploy/production.rb",
+		"/home/seven/app/bitcoin_payment_gateway/app/workers/create_suggestion_email_result_worker.rb",
+		"/home/seven/app/bitcoin_payment_gateway/config/database.yml",
+		"/home/seven/app/bitcoin_payment_gateway/app/mailers/ltc_monitor_mailer.rb",
+		"/home/seven/app/bitcoin_payment_gateway/config/locales/alerts_errors_notices.zh-CN.yml",
+		"/home/seven/app/bitcoin_payment_gateway/Gemfile",
+		"/home/seven/app/bitcoin_payment_gateway/Capfile",
+		"/home/seven/app/bitcoin_payment_gateway/config/locales/alerts_errors_notices.en.yml",
+		"/home/seven/app/bitcoin_payment_gateway/config/deploy.rb",
+		"/home/seven/app/bitcoin_payment_gateway/config/environments/development.rb",
+		"/home/seven/app/bitcoin_payment_gateway/app/views/ltc_monitor_mailer/suggest_mail.html.erb",
+		"/home/seven/app/bitcoin_payment_gateway/app/workers/update_euggestion_email_worker.rb",
+		"/home/seven/app/payment_gateway_backend/db/migrate/20170604090239_add_timestamp_to_suggestion_emails.rb",
+		"/home/seven/app/payment_gateway_backend/db/migrate/20170603100808_create_suggestion_email.rb",
+		"/home/seven/app/payment_gateway_backend/app/views/users/shared/_links.html.erb",
+		"/home/seven/app/payment_gateway_backend/app/views/addressproviders/list.html.erb",
+		"/home/seven/app/payment_gateway_backend/app/views/users/sessions/new.html.erb",
+		"/home/seven/app/payment_gateway_backend/Capfile",
+		"/home/seven/app/payment_gateway_backend/app/models/suggestion_email.rb",
+		"/home/seven/app/payment_gateway_backend/app/models/user.rb",
+		"/home/seven/app/payment_gateway_backend/config/environments/production.rb",
+		"/home/seven/app/payment_gateway_backend/config/deploy/production.rb",
+		"/home/seven/app/payment_gateway_backend/Gemfile",
+		"/home/seven/app/payment_gateway_backend/config/locales/alerts_errors_notices.zh-CN.yml",
+		"/home/seven/app/payment_gateway_backend/tmp/cache/assets/sprockets/v3.0/Xn/XnX9nT5_WOMXphCmZ026-iT2u8f7PNFRwQxi8JFTbWY.cache.dump",
+		"/home/seven/app/payment_gateway_backend/app/views/admin/withdrawals/index.html.erb",
+		"/home/seven/app/payment_gateway_backend/app/controllers/admin/gateways_controller.rb",
+		"/home/seven/app/payment_gateway_backend/app/views/admin/orders/index.html.erb",
+		"/home/seven/app/payment_gateway_backend/app/views/admin/gateways/index.html.erb",
+		"/home/seven/app/payment_gateway_backend/app/controllers/home_controller.rb",
+		"/home/seven/app/bitcoin_payment_gateway/app/mailers/application_mailer.rb",
+		"/home/seven/app/bitcoin_payment_gateway/app/workers/send_mail_worker.rb",
+		"/home/seven/app/bitcoin_payment_gateway/config/environments.yml",
+		"/home/seven/app/bitcoin_payment_gateway/config/environments/production.rb",
+		"/home/seven/app/bitcoin_payment_gateway/config/application.rb",
+		"/home/seven/app/bitcoin_payment_gateway/app/workers/send_ltc_suggestion_mail_worker.rb",
+		"/home/seven/app/straight-server/examples/client/client.html",
+		"/home/seven/app/payment_gateway_backend/app/views/tos/index_cn.html.erb",
+		"/home/seven/app/payment_gateway_backend/app/views/tos/index_zh-CN.html.erb",
+		"/home/seven/app/payment_gateway_backend/config/locales/devise.en.yml",
+		"/home/seven/app/payment_gateway_backend/config/locales/zh-CN.yml",
+		"/home/seven/app/payment_gateway_backend/config/locales/en.yml",
+		"/home/seven/app/payment_gateway_backend/app/views/home/index.html.erb",
+		"/home/seven/app/payment_gateway_backend/app/views/layouts/devise.html.erb",
+		"/home/seven/app/payment_gateway_backend/app/views/layouts/admin.html.erb",
+		"/home/seven/app/payment_gateway_backend/app/views/share/_left_sidebar.html.erb",
+		"/home/seven/app/payment_gateway_backend/config/locales/log_sign_in_out.zh-CN.yml",
+		"/home/seven/app/payment_gateway_backend/config/locales/home.en.yml",
+		"/home/seven/app/payment_gateway_backend/app/views/users/passwords/new.html.erb",
+		"/home/seven/app/payment_gateway_backend/app/views/users/registrations/edit.html.erb",
+		"/home/seven/app/payment_gateway_backend/config/locales/alerts_errors_notices.en.yml",
+		"/home/seven/app/payment_gateway_backend/app/views/users/passwords/edit.html.erb",
+		"/home/seven/app/payment_gateway_backend/config/locales/devise.zh-CN.yml",
+		"/home/seven/app/payment_gateway_backend/config/locales/documentation.zh-CN.yml",
+		"/home/seven/app/payment_gateway_backend/config/locales/log_sign_in_out.en.yml",
+		"/home/seven/app/payment_gateway_backend/app/views/share/_topbar.html.erb",
+		"/home/seven/app/payment_gateway_backend/app/models/concerns/hashed_id.rb",
+		"/home/seven/app/payment_gateway_backend/app/models/concerns/uid.rb",
+		"/home/seven/app/payment_gateway_backend/app/controllers/tos_controller.rb",
+		"/home/seven/app/payment_gateway_backend/app/views/layouts/doc.html.erb",
+		"/home/seven/app/payment_gateway_backend/tmp/cache/assets/sprockets/v3.0/fD/fDoCjVBFOENprYu213UChvcYzrGkXqcl8jITQOOC_fY.cache.dump",
+		"/home/seven/app/payment_gateway_backend/config/routes.rb",
+		"/home/seven/app/payment_gateway_backend/app/controllers/admin/users_controller.rb",
+		"/home/seven/app/payment_gateway_backend/app/views/admin/gateways/new.html.erb",
+		"/home/seven/app/payment_gateway_backend/app/views/admin/users/edit.html.erb",
+		"/home/seven/app/payment_gateway_backend/config/locales/errors.zh-CN.yml",
+		"/home/seven/app/payment_gateway_backend/app/views/share/_export_bar.html.erb",
+		"/home/seven/app/payment_gateway_backend/config/locales/models/withdrawal.zh-CN.yml",
+		"/home/seven/app/payment_gateway_backend/config/locales/models/enum.en.yml",
+		"/home/seven/app/payment_gateway_backend/app/views/admin/withdrawals/index.xlsx.axlsx",
+		"/home/seven/app/payment_gateway_backend/app/controllers/application_controller.rb",
+		"/home/seven/app/payment_gateway_backend/app/controllers/admin/withdrawals_controller.rb",
+		"/home/seven/app/payment_gateway_backend/app/models/withdrawal.rb",
+		"/home/seven/app/payment_gateway_backend/app/policies/withdrawal_policy.rb",
+		"/home/seven/app/payment_gateway_backend/config/locales/models/user.zh-CN.yml",
+		"/home/seven/app/payment_gateway_backend/app/views/admin/withdrawals/withdrawal.zh-CN.yml",
+		"/home/seven/app/payment_gateway_backend/config/locales/models/withdrawal.zh-CN.yml.dump"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 90.0,
+		"where_history":
+		[
+			"",
+			"/home/seven/workspace/jumpserver4/jumpserver/apps",
+			"",
+			"/home/seven/workspace/jumpserver/",
+			"/home/seven/workspace/jumpserver/apps",
+			"/home/seven/workspace/jumpserver",
+			"/home/seven/workspace/jumpserver/apps/applications/templates/applications",
+			"/home/seven/workspace/jumpserver/apps/",
+			"/home/seven/workspace/jumpserver/apps/applications/templates/applications",
+			"/home/seven/workspace/jumpserver/apps/applications",
+			"/home/seven/workspace/jumpserver/",
+			"/home/seven/workspace/jumpserver/apps/",
+			"/home/seven/workspace/jumpserver/apps/applications/",
+			"/home/seven/workspace/jumpserver/apps/applications/templates",
+			"/home/seven/workspace/jumpserver/apps/applications/templates/applications",
+			"/home/seven/workspace/jumpserver4/jumpserver",
+			"/home/seven/workspace/jumpserver4/luna",
+			"<current file>",
+			"/home/seven/app/wordpress/wp-content/themes/llorix-one-lite",
+			"/home/seven/app/wordpress/wp-content/themes",
+			"/home/seven/app/bitcoin_payment_gateway/app/workers",
+			"/home/seven/app/bitcoin_payment_gateway/app/models",
+			"<current file>",
+			"/home/seven/app/bitcoin_payment_gateway/app",
+			"<current file>",
+			"/home/seven/app/bitcoin_payment_gateway/app/workers",
+			"/home/seven/app/bitcoin_payment_gateway/app/models",
+			"/home/seven/app/bitcoin_payment_gateway/app",
+			"/home/seven/app/payment_gateway_backend/config/locales",
+			"/home/seven/app/payment_gateway_backend/app/views",
+			"/home/seven/app/bitcoin_payment_gateway/config",
+			"/home/seven/app/bitcoin_payment_gateway/app",
+			"/home/seven/app/payment_gateway_backend/app",
+			"/home/seven/app/payment_gateway_backend/config/locales",
+			"/home/seven/app/payment_gateway_backend/app",
+			"/home/seven/app/payment_gateway_backend/app/controllers",
+			"<current file>",
+			"/home/seven/app/payment_gateway_backend/db/migrate",
+			"/home/seven/app/payment_gateway_backend/config/locales",
+			"/home/seven/app/payment_gateway_backend/db/migrate",
+			"/home/seven/app/payment_gateway_backend/config/locales",
+			"/home/seven/app/payment_gateway_backend/app/views",
+			"/home/seven/app/payment_gateway_backend/app/views/users",
+			"<current file>",
+			"/home/seven/app/payment_gateway_backend/app/views",
+			"<current file>",
+			"/home/seven/app/payment_gateway_backend/config/locales",
+			"<current file>",
+			"/home/seven/app/payment_gateway_backend/app/views",
+			"/home/seven/app/payment_gateway_backend/app/controllers",
+			"",
+			"/home/seven/app/payment_gateway_backend",
+			"/home/seven/app/payment_gateway_backend/config",
+			"/home/seven/app/payment_gateway_backend/app/views",
+			"/home/seven/app/bitcoin_payment_gateway/config",
+			"",
+			"/home/seven/app/bitapp/config",
+			"",
+			"/home/seven/app/payment_gateway_backend/config",
+			"/home/seven/app/landlord_backend/app/controllers",
+			"<current file>",
+			"/home/seven/app/bitapp/app/assets/javascripts",
+			"",
+			"/home/seven/app/bitapp/config",
+			"",
+			"/home/seven/app/bitapp/config/environments",
+			"/home/seven/app/bitapp/",
+			"/home/seven/app/bitapp/config/environments",
+			"",
+			"/home/seven/app/bitapp/config",
+			"/home/seven/app/bitapp/config/environments",
+			"/home/seven/workspace/bitapp/config",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"use_in_migrations",
+			"base",
+			"UserLoginForm",
+			"is_first_login",
+			"redis",
+			"DB",
+			"db",
+			"redis",
+			"is_first_login",
+			"DISPLAY_PER_PAGE",
+			"settings",
+			"AssetPermissionListView",
+			"DB_PASSWORD",
+			"DB_DATABASE",
+			"DATABASES",
+			"pyinotify",
+			"WSSHClient",
+			"terminal",
+			"#term",
+			"term",
+			"Accept",
+			"btn-accept",
+			"form_terminal_accept",
+			"Jumpserver Exec Terminal",
+			"Add asset to this permission",
+			"添加资产",
+			"asset_update",
+			"id=\"asset_update\"",
+			"exec_cmd",
+			"editable",
+			"conn",
+			"coon",
+			"窗口",
+			"Create asset",
+			"termChangBar",
+			"static",
+			"i18n",
+			"webterminal",
+			"id=\"term\"",
+			"term",
+			"webterminal.js",
+			"webterminal",
+			"termChangBar",
+			"修改",
+			"TemplateView",
+			"template",
+			"DetailView",
+			"get_queryset",
+			"asset_groups_remain",
+			"asset_groups",
+			"asset_groups_remain",
+			"asset_remain",
+			"asset",
+			"form",
+			"AssetPermissionCreateView",
+			"is_authenticated",
+			"class AppService",
+			"AppService",
+			"App auth failed",
+			"TerminalHeatbeatViewSet",
+			"connect",
+			"r'^$'",
+			"get_queryset",
+			"index",
+			"@keyframes",
+			"created_by",
+			"is_discard",
+			"__all__",
+			"Group",
+			"uuid",
+			"week_dir",
+			"host",
+			"officename",
+			"log_path",
+			"new_dir",
+			"PORT",
+			"PASSWORD",
+			"USERNAME",
+			"size",
+			"here",
+			"Skyluster",
+			"sky",
+			"skyluster",
+			"smtp_conn",
+			"3001",
+			"Llorix One Lite ",
+			"llorix",
+			"database",
+			"LtcMonitorMailer",
+			"suggest_mail",
+			"ERROR",
+			"@",
+			"/",
+			"get_detail_r",
+			"get_trades",
+			"give_suggestion_by_detail",
+			"forecast_ltc_price",
+			"suggestion",
+			"ticker",
+			"forecast_ltc_price",
+			"give_suggestion_by_detail",
+			"uid",
+			"Uid",
+			"last_order",
+			"give_suggestion_by_detail",
+			"commission_sheet",
+			"give_suggestion_by_detail",
+			"suggestion",
+			"give_suggestion_by_detail",
+			"get_depth_r",
+			"start_point",
+			"end_point",
+			"end_price",
+			"start_price",
+			"buy_or_sell",
+			"TICKER_API_URL",
+			"DEPTH_API_URL",
+			"interval",
+			"get_last_price",
+			"r",
+			"UpdateSuggestionEmailWorker",
+			"last_email",
+			"@",
+			"5",
+			"puma",
+			"perform_deliveries",
+			"email",
+			"find_by"
+		],
+		"highlight": false,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"day_dir",
+			"port",
+			"password",
+			"username",
+			"hashed_id",
+			"HashedId",
+			"start_amount",
+			"end_amount",
+			"start_amount",
+			"TICKER_LTC",
+			"DEPTH_LTC",
+			" ",
+			"withdrawal",
+			"withdrawals",
+			"@withdrawals",
+			"withdrawal",
+			"Withdrawal",
+			"withdrawal",
+			"withdraw",
+			"@withdraw",
+			"Withdraw",
+			"withdraw",
+			"tid",
+			"'",
+			"address_providers.cashila.login",
+			"cashila.login",
+			"https://admin.skyluster.com/",
+			"'",
+			"",
+			"'",
+			"create_orders",
+			"'",
+			"\"",
+			"'",
+			"explain",
+			"human_attribute_name",
+			"payment_gateway_backend"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": false
+	},
+	"groups":
+	[
+		{
+			"selected": 3,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2845,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										261,
+										275
+									],
+									[
+										772,
+										786
+									],
+									[
+										1377,
+										1391
+									],
+									[
+										1898,
+										1912
+									],
+									[
+										2199,
+										2213
+									],
+									[
+										2425,
+										2439
+									],
+									[
+										2722,
+										2736
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								2440,
+								2440
+							]
+						],
+						"settings":
+						{
+							"default_dir": "/home/seven/workspace/jumpserver4/jumpserver",
+							"detect_indentation": false,
+							"line_numbers": false,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([^ \t].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 108.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "apps/users/views/login.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7734,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1047,
+								1047
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 54.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "docker-compose.yml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 587,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								192,
+								192
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/YAML/YAML.sublime-syntax",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "apps/users/api.py",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 5325,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								340,
+								340
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": ".gitignore",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 238,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								104,
+								104
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "config_example.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4410,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3572,
+								3572
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1432.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 26.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 118.0
+	},
+	"pinned_build_system": "",
+	"project": "jumpserver.sublime-project",
+	"replace":
+	{
+		"height": 48.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"keys",
+				"docker-compose.yml"
+			],
+			[
+				"config",
+				"config_example.py"
+			],
+			[
+				"web",
+				"apps/static/js/webterminal.js"
+			],
+			[
+				"settings",
+				"jumpserver/settings.py"
+			],
+			[
+				"webterminal.js",
+				"static/js/webterminal.js"
+			],
+			[
+				"term.js",
+				"static/js/term.js"
+			],
+			[
+				"terminal",
+				"templates/jlog/web_terminal.html"
+			],
+			[
+				"asset",
+				"apps/assets/templates/assets/asset_list.html"
+			],
+			[
+				"base",
+				"apps/templates/base.html"
+			],
+			[
+				"/perms/asset",
+				"jumpserver/apps/perms/templates/perms/asset_permission_asset.html"
+			],
+			[
+				"/perms/",
+				"jumpserver/apps/perms/__init__.py"
+			],
+			[
+				"url",
+				"jumpserver/apps/jumpserver/urls.py"
+			],
+			[
+				"",
+				"~/app/django/placeholder/placeholder.py"
+			],
+			[
+				"wp-login",
+				"wp-login.php"
+			],
+			[
+				"class-smtp.php",
+				"wp-includes/class-smtp.php"
+			],
+			[
+				"functions.",
+				"wp-content/themes/llorix-one-lite/functions.php"
+			],
+			[
+				"locale",
+				"techdog/lib/python3.5/site-packages/django/middleware/locale.py"
+			],
+			[
+				"development.rb",
+				"config/environments/development.rb"
+			],
+			[
+				"sidekiq",
+				"config/sidekiq.yml"
+			],
+			[
+				"production",
+				"config/deploy/production.rb"
+			],
+			[
+				"side",
+				"config/sidekiq.yml"
+			],
+			[
+				"exchange",
+				"app/models/exchange_rate.rb"
+			],
+			[
+				"gemfie",
+				"Gemfile"
+			],
+			[
+				"deploy",
+				"config/deploy.rb"
+			],
+			[
+				"capfile",
+				"Capfile"
+			],
+			[
+				"deploy.rb",
+				"config/deploy.rb"
+			],
+			[
+				"cap",
+				"Capfile"
+			],
+			[
+				"gemfi",
+				"Gemfile"
+			],
+			[
+				"database",
+				"config/database.yml"
+			],
+			[
+				"gem",
+				"Gemfile"
+			],
+			[
+				"db/migrate/20170604090239_add_timestamp_to_suggestion_emails.rb",
+				"db/migrate/20170604090239_add_timestamp_to_suggestion_emails.rb"
+			],
+			[
+				"db/migrate/20170603100808_create_suggestion_email.rb",
+				"db/migrate/20170603100808_create_suggestion_email.rb"
+			],
+			[
+				"product",
+				"config/deploy/production.rb"
+			],
+			[
+				"user.rb",
+				"app/models/user.rb"
+			],
+			[
+				"home",
+				"app/controllers/home_controller.rb"
+			],
+			[
+				"gatewaycon",
+				"app/controllers/admin/gateways_controller.rb"
+			],
+			[
+				"gatewayindex",
+				"app/views/admin/gateways/index.html.erb"
+			],
+			[
+				"gemf",
+				"Gemfile"
+			],
+			[
+				"wor",
+				"app/workers/ltc_price_worker.rb"
+			],
+			[
+				"html",
+				"examples/client/client.html"
+			],
+			[
+				"application.css",
+				"app/assets/stylesheets/application.css"
+			],
+			[
+				"devise.h",
+				"app/views/layouts/devise.html.erb"
+			],
+			[
+				"admin",
+				"app/views/layouts/admin.html.erb"
+			],
+			[
+				"tos/",
+				"app/views/tos/index_cn.html.erb"
+			],
+			[
+				"tos",
+				"app/controllers/tos_controller.rb"
+			],
+			[
+				"homeinde",
+				"app/views/home/index.html.erb"
+			],
+			[
+				"left",
+				"app/views/share/_left_sidebar.html.erb"
+			],
+			[
+				"en.",
+				"config/locales/en.yml"
+			],
+			[
+				"uid",
+				"app/models/concerns/uid.rb"
+			],
+			[
+				"routes",
+				"config/routes.rb"
+			],
+			[
+				"exp",
+				"app/views/share/_export_bar.html.erb"
+			],
+			[
+				"sideb",
+				"app/views/share/_left_sidebar.html.erb"
+			],
+			[
+				"applicationcon",
+				"app/controllers/application_controller.rb"
+			],
+			[
+				"route",
+				"config/routes.rb"
+			],
+			[
+				"layout/amdin",
+				"app/views/layouts/admin.html.erb"
+			],
+			[
+				"draw",
+				"app/controllers/withdraws_controller.rb"
+			],
+			[
+				"en",
+				"config/locales/en.yml"
+			],
+			[
+				"order",
+				"app/models/order.rb"
+			],
+			[
+				"db/migrate/20170524092908_add_app_id_to_users.rb",
+				"db/migrate/20170524092908_add_app_id_to_users.rb"
+			],
+			[
+				"user",
+				"app/models/user.rb"
+			],
+			[
+				"gateway.rb",
+				"app/models/gateway.rb"
+			],
+			[
+				"gatewayinde",
+				"app/views/admin/gateways/index.html.erb"
+			],
+			[
+				"ordersinde",
+				"app/views/admin/orders/index.html.erb"
+			],
+			[
+				"rout",
+				"config/routes.rb"
+			],
+			[
+				"userscon",
+				"app/controllers/admin/users_controller.rb"
+			],
+			[
+				"users/edit",
+				"app/views/admin/users/edit.html.erb"
+			],
+			[
+				"usercon",
+				"app/controllers/admin/users_controller.rb"
+			],
+			[
+				"users/",
+				"app/views/admin/users/edit.html.erb"
+			],
+			[
+				"gate",
+				"app/models/gateway.rb"
+			],
+			[
+				"gatewaysinde",
+				"app/views/admin/gateways/index.html.erb"
+			],
+			[
+				"gateway",
+				"app/models/gateway.rb"
+			],
+			[
+				"gatewaysnew",
+				"app/views/admin/gateways/new.html.erb"
+			],
+			[
+				"sidekqi",
+				"config/sidekiq.yml"
+			],
+			[
+				"gatew",
+				"app/models/gateway.rb"
+			],
+			[
+				"gatewaynew",
+				"app/views/admin/gateways/new.html.erb"
+			],
+			[
+				"indx",
+				"app/views/payments/index.html.erb"
+			],
+			[
+				"user.",
+				"app/models/user.rb"
+			],
+			[
+				"payment",
+				"app/controllers/payments_controller.rb"
+			],
+			[
+				"exchage",
+				"app/models/exchange_rate.rb"
+			],
+			[
+				"ordersind",
+				"app/views/admin/orders/index.html.erb"
+			],
+			[
+				"production.rb",
+				"config/environments/production.rb"
+			],
+			[
+				"orders/in",
+				"app/views/admin/orders/index.html.erb"
+			],
+			[
+				"homeindex",
+				"app/views/home/index.html.erb"
+			],
+			[
+				"order.rb",
+				"app/models/order.rb"
+			],
+			[
+				"db/migrate/20170518075429_add_uid_to_users_gateways_orders.rb",
+				"db/migrate/20170518075429_add_uid_to_users_gateways_orders.rb"
+			],
+			[
+				"paym",
+				"app/controllers/payments_controller.rb"
+			],
+			[
+				"basic",
+				"app/views/developers_api/basic.html.erb"
+			],
+			[
+				"devi",
+				"config/initializers/devise.rb"
+			],
+			[
+				"devise",
+				"config/locales/devise.en.yml"
+			],
+			[
+				"ignore",
+				".gitignore"
+			],
+			[
+				"pum",
+				"config/deploy/templates/puma.rb.erb"
+			],
+			[
+				"igno",
+				".gitignore"
+			],
+			[
+				"gemfiel",
+				"Gemfile"
+			],
+			[
+				"layout/doc",
+				"app/views/layouts/doc.html.erb"
+			],
+			[
+				"application.cs",
+				"app/assets/stylesheets/application.css"
+			],
+			[
+				"top",
+				"app/views/share/_topbar.html.erb"
+			],
+			[
+				"application",
+				"app/views/layouts/application.html.erb"
+			],
+			[
+				"amdin.ht",
+				"app/views/layouts/admin.html.erb"
+			],
+			[
+				"gateway.zh",
+				"config/locales/models/gateway.zh-CN.yml"
+			],
+			[
+				"user/edit",
+				"app/views/admin/users/edit.html.erb"
+			],
+			[
+				"layout/a",
+				"app/views/layouts/admin.html.erb"
+			],
+			[
+				"export_bar",
+				"app/views/share/_export_bar.html.erb"
+			],
+			[
+				"zh-cn",
+				"config/locales/zh-CN.yml"
+			],
+			[
+				"zh-",
+				"config/locales/zh-CN.yml"
+			],
+			[
+				"application.rb",
+				"config/application.rb"
+			],
+			[
+				"applicationcontroller",
+				"app/controllers/application_controller.rb"
+			],
+			[
+				"homecon",
+				"app/controllers/home_controller.rb"
+			],
+			[
+				"deplo",
+				"config/deploy.rb"
+			],
+			[
+				"deloy",
+				"config/deploy.rb"
+			],
+			[
+				"dep",
+				"config/deploy.rb"
+			],
+			[
+				"devise.rb",
+				"config/initializers/devise.rb"
+			],
+			[
+				"paymentc",
+				"app/controllers/payments_controller.rb"
+			],
+			[
+				"devsie.ht",
+				"app/views/layouts/devise.html.erb"
+			],
+			[
+				"application.htm",
+				"app/views/layouts/application.html.erb"
+			],
+			[
+				"footer",
+				"app/views/share/_footer.html.erb"
+			],
+			[
+				"devise.ht",
+				"app/views/layouts/devise.html.erb"
+			],
+			[
+				"users/shared/links",
+				"app/views/users/shared/_links.html.erb"
+			],
+			[
+				"sessions/new",
+				"app/views/devise/sessions/new.html.erb"
+			],
+			[
+				"application.js",
+				"app/assets/javascripts/application.js"
+			],
+			[
+				"applica",
+				"app/views/layouts/application.html.erb"
+			],
+			[
+				"config/produ",
+				"config/deploy/production.rb"
+			],
+			[
+				"do",
+				"app/controllers/docs_controller.rb"
+			],
+			[
+				"introductioncon",
+				"app/controllers/introductions_controller.rb"
+			],
+			[
+				"environ",
+				"config/environments.yml"
+			],
+			[
+				"devise.htm",
+				"app/views/layouts/devise.html.erb"
+			],
+			[
+				"toscon",
+				"app/controllers/tos_controller.rb"
+			],
+			[
+				"develop",
+				"config/environments/development.rb"
+			],
+			[
+				"dump.rdb",
+				"dump.rdb"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 345.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
