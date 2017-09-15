@@ -328,53 +328,137 @@
 	"buffers":
 	[
 		{
-			"contents": "Searching 266 files for \"is_first_login\"\n\n/home/seven/workspace/jumpserver4/jumpserver/apps/templates/base.html:\n   22          {% include '_message.html' %}\n   23          {% block first_login_message %}\n   24:             {% if user.is_authenticated and user.is_first_login %}\n   25              <div class=\"alert alert-danger\" style=\"margin: 20px auto 0px\">\n   26                  {% url 'users:user-first-login' as first_login_url %}\n\n/home/seven/workspace/jumpserver4/jumpserver/apps/users/migrations/0001_initial.py:\n   43                  ('_public_key', models.CharField(blank=True, max_length=1000, verbose_name='ssh public key')),\n   44                  ('comment', models.TextField(blank=True, max_length=200, verbose_name='Comment')),\n   45:                 ('is_first_login', models.BooleanField(default=False)),\n   46                  ('date_expired', models.DateTimeField(blank=True, default=common.utils.date_expired_default, null=True, verbose_name='Date expired')),\n   47                  ('created_by', models.CharField(default='', max_length=30, verbose_name='Created by')),\n\n/home/seven/workspace/jumpserver4/jumpserver/apps/users/models/user.py:\n   42      _public_key = models.CharField(max_length=1000, blank=True, verbose_name=_('ssh public key'))\n   43      comment = models.TextField(max_length=200, blank=True, verbose_name=_('Comment'))\n   44:     is_first_login = models.BooleanField(default=False)\n   45      date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True,\n   46                                          verbose_name=_('Date expired'))\n   ..\n  213          domain_name = settings.CONFIG.DOMAIN_NAME or 'jumpserver.org'\n  214          app = cls.objects.create(username=name, name=name, email='%s@%s' % (name, domain_name), is_active=False,\n  215:                                  role='App', enable_otp=False, comment=comment, is_first_login=False,\n  216                                   created_by='System')\n  217          access_key = AccessKey.objects.create(user=app)\n\n/home/seven/workspace/jumpserver4/jumpserver/apps/users/views/login.py:\n   56  \n   57      def get_success_url(self):\n   58:         if self.request.user.is_first_login:\n   59              return reverse('users:user-first-login')\n   60  \n   ..\n  161  \n  162      def dispatch(self, request, *args, **kwargs):\n  163:         if request.user.is_authenticated() and not request.user.is_first_login:\n  164              return redirect(reverse('index'))\n  165          return super(UserFirstLoginView, self).dispatch(request, *args, **kwargs)\n  ...\n  173                  if field.name == 'enable_otp':\n  174                      user.enable_otp = field.value()\n  175:         user.is_first_login = False\n  176          user.is_public_key_valid = True\n  177          user.save()\n\n7 matches across 4 files\n",
+			"file": "apps/users/models/__init__.py",
 			"settings":
 			{
-				"buffer_size": 2845,
+				"buffer_size": 142,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/users/utils.py",
+			"settings":
+			{
+				"buffer_size": 5261,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/perms/models.py",
+			"settings":
+			{
+				"buffer_size": 3265,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/templates/base.html",
+			"settings":
+			{
+				"buffer_size": 1940,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/templates/_head_css_js.html",
+			"settings":
+			{
+				"buffer_size": 864,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/users/templates/users/user_list.html",
+			"settings":
+			{
+				"buffer_size": 9663,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/jumpserver/settings.py",
+			"settings":
+			{
+				"buffer_size": 11009,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/manage.py",
+			"settings":
+			{
+				"buffer_size": 887,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/templates/_base_list.html",
+			"settings":
+			{
+				"buffer_size": 3680,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/assets/templates/assets/user_asset_list.html",
+			"settings":
+			{
+				"buffer_size": 9003,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "Searching 266 files for \"Datatable\" (case sensitive)\n\n0 matches",
+			"settings":
+			{
+				"buffer_size": 63,
 				"line_ending": "Unix",
 				"name": "Find Results",
 				"scratch": true
 			}
 		},
 		{
-			"file": "apps/users/views/login.py",
+			"file": "jumpserver.sublime-project",
 			"settings":
 			{
-				"buffer_size": 7734,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "docker-compose.yml",
-			"settings":
-			{
-				"buffer_size": 587,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "apps/users/api.py",
-			"settings":
-			{
-				"buffer_size": 5325,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": ".gitignore",
-			"settings":
-			{
-				"buffer_size": 238,
+				"buffer_size": 357,
 				"encoding": "UTF-8",
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "config_example.py",
+			"file": "apps/perms/api.py",
 			"settings":
 			{
-				"buffer_size": 4410,
+				"buffer_size": 11349,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/perms/utils.py",
+			"settings":
+			{
+				"buffer_size": 8853,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/assets/serializers.py",
+			"settings":
+			{
+				"buffer_size": 6182,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/assets/models/asset.py",
+			"settings":
+			{
+				"buffer_size": 6946,
 				"line_ending": "Unix"
 			}
 		}
@@ -417,15 +501,26 @@
 	},
 	"expanded_folders":
 	[
-		"/home/seven/workspace/jumpserver4/jumpserver",
-		"/home/seven/workspace/jumpserver4/jumpserver/__pycache__",
-		"/home/seven/workspace/jumpserver4/jumpserver/apps",
-		"/home/seven/workspace/jumpserver4/jumpserver/apps/jumpserver",
-		"/home/seven/workspace/jumpserver4/jumpserver/apps/users",
-		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/urls"
+		"/home/seven/workspace/jumpserver4/jumpserver"
 	],
 	"file_history":
 	[
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/common/templatetags/common_tags.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/templates/assets/asset_list.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/models/group.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/config_example.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/.gitignore",
+		"/home/seven/workspace/jumpserver4/jumpserver/docker-compose.yml",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/templates/users/login.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/templates/users/first_login.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/urls/views_urls.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/views/login.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/applications/api.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/views/asset.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/api.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/views/system_user.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/models.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/models/user.py",
 		"/home/seven/workspace/jumpserver4/jumpserver/apps/static/js/webterminal.js",
 		"/home/seven/workspace/jumpserver4/jumpserver/apps/jumpserver/settings.py",
 		"/home/seven/workspace/jumpserver4/jumpserver/apps/templates/base.html",
@@ -449,7 +544,6 @@
 		"/home/seven/workspace/jumpserver4/luna/luna/service.py",
 		"/home/seven/workspace/jumpserver4/luna/config.py",
 		"/home/seven/workspace/jumpserver4/jumpserver/apps/applications/urls/api_urls.py",
-		"/home/seven/workspace/jumpserver4/jumpserver/apps/applications/api.py",
 		"/home/seven/workspace/jumpserver4/luna/luna/dist/ts/service.ts",
 		"/home/seven/workspace/jumpserver4/jumpserver/apps/jumpserver/urls.py",
 		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/models/group.py",
@@ -538,22 +632,7 @@
 		"/home/seven/app/payment_gateway_backend/app/controllers/tos_controller.rb",
 		"/home/seven/app/payment_gateway_backend/app/views/layouts/doc.html.erb",
 		"/home/seven/app/payment_gateway_backend/tmp/cache/assets/sprockets/v3.0/fD/fDoCjVBFOENprYu213UChvcYzrGkXqcl8jITQOOC_fY.cache.dump",
-		"/home/seven/app/payment_gateway_backend/config/routes.rb",
-		"/home/seven/app/payment_gateway_backend/app/controllers/admin/users_controller.rb",
-		"/home/seven/app/payment_gateway_backend/app/views/admin/gateways/new.html.erb",
-		"/home/seven/app/payment_gateway_backend/app/views/admin/users/edit.html.erb",
-		"/home/seven/app/payment_gateway_backend/config/locales/errors.zh-CN.yml",
-		"/home/seven/app/payment_gateway_backend/app/views/share/_export_bar.html.erb",
-		"/home/seven/app/payment_gateway_backend/config/locales/models/withdrawal.zh-CN.yml",
-		"/home/seven/app/payment_gateway_backend/config/locales/models/enum.en.yml",
-		"/home/seven/app/payment_gateway_backend/app/views/admin/withdrawals/index.xlsx.axlsx",
-		"/home/seven/app/payment_gateway_backend/app/controllers/application_controller.rb",
-		"/home/seven/app/payment_gateway_backend/app/controllers/admin/withdrawals_controller.rb",
-		"/home/seven/app/payment_gateway_backend/app/models/withdrawal.rb",
-		"/home/seven/app/payment_gateway_backend/app/policies/withdrawal_policy.rb",
-		"/home/seven/app/payment_gateway_backend/config/locales/models/user.zh-CN.yml",
-		"/home/seven/app/payment_gateway_backend/app/views/admin/withdrawals/withdrawal.zh-CN.yml",
-		"/home/seven/app/payment_gateway_backend/config/locales/models/withdrawal.zh-CN.yml.dump"
+		"/home/seven/app/payment_gateway_backend/config/routes.rb"
 	],
 	"find":
 	{
@@ -641,9 +720,62 @@
 	},
 	"find_state":
 	{
-		"case_sensitive": false,
+		"case_sensitive": true,
 		"find_history":
 		[
+			"Datatable",
+			"v",
+			"get_user_granted_assets_direct",
+			"get_user_granted_assets",
+			"MyGrantedAssetsApi",
+			"def get_user_granted_assets",
+			"User",
+			"get_env_display",
+			"99991937",
+			"def trans",
+			"trans",
+			"APP",
+			"APIUpdateAttr",
+			"def APIUpdateAttr",
+			"APIUpdateAttr",
+			"dev initDataTable",
+			"initDataTable",
+			"user_list_table",
+			"class UserPassesTestMixin",
+			"UserPassesTestMixin",
+			"class AdminUserRequiredMixin",
+			"initDataTable",
+			"jumpserver",
+			"asset_list_table",
+			"AssetListView",
+			"ManyToManyField",
+			"many",
+			"Remote address",
+			"trans",
+			"get_user_granted_assets_inherit_from_user_groups",
+			"associate_system_users_and_assets",
+			"Select assets",
+			"NULL",
+			"int",
+			"choice",
+			"date_expired_default",
+			"password",
+			"forms",
+			"Password",
+			"password",
+			"update",
+			"reset",
+			"reverse",
+			"first",
+			"Login",
+			"First",
+			"UserFirstLoginView",
+			"is_first_login",
+			"UserFirstLoginView",
+			"user-first-login",
+			"forgot-password",
+			"forgot-password\n",
+			"auth_login",
 			"use_in_migrations",
 			"base",
 			"UserLoginForm",
@@ -718,60 +850,7 @@
 			"host",
 			"officename",
 			"log_path",
-			"new_dir",
-			"PORT",
-			"PASSWORD",
-			"USERNAME",
-			"size",
-			"here",
-			"Skyluster",
-			"sky",
-			"skyluster",
-			"smtp_conn",
-			"3001",
-			"Llorix One Lite ",
-			"llorix",
-			"database",
-			"LtcMonitorMailer",
-			"suggest_mail",
-			"ERROR",
-			"@",
-			"/",
-			"get_detail_r",
-			"get_trades",
-			"give_suggestion_by_detail",
-			"forecast_ltc_price",
-			"suggestion",
-			"ticker",
-			"forecast_ltc_price",
-			"give_suggestion_by_detail",
-			"uid",
-			"Uid",
-			"last_order",
-			"give_suggestion_by_detail",
-			"commission_sheet",
-			"give_suggestion_by_detail",
-			"suggestion",
-			"give_suggestion_by_detail",
-			"get_depth_r",
-			"start_point",
-			"end_point",
-			"end_price",
-			"start_price",
-			"buy_or_sell",
-			"TICKER_API_URL",
-			"DEPTH_API_URL",
-			"interval",
-			"get_last_price",
-			"r",
-			"UpdateSuggestionEmailWorker",
-			"last_email",
-			"@",
-			"5",
-			"puma",
-			"perform_deliveries",
-			"email",
-			"find_by"
+			"new_dir"
 		],
 		"highlight": false,
 		"in_selection": false,
@@ -826,59 +905,329 @@
 	"groups":
 	[
 		{
-			"selected": 3,
+			"selected": 11,
 			"sheets":
 			[
 				{
 					"buffer": 0,
+					"file": "apps/users/models/__init__.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2845,
+						"buffer_size": 142,
 						"regions":
 						{
-							"match":
-							{
-								"flags": 112,
-								"regions":
-								[
-									[
-										261,
-										275
-									],
-									[
-										772,
-										786
-									],
-									[
-										1377,
-										1391
-									],
-									[
-										1898,
-										1912
-									],
-									[
-										2199,
-										2213
-									],
-									[
-										2425,
-										2439
-									],
-									[
-										2722,
-										2736
-									]
-								],
-								"scope": ""
-							}
 						},
 						"selection":
 						[
 							[
-								2440,
-								2440
+								120,
+								120
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/Python/Python.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 15,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "apps/users/utils.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5261,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								886,
+								886
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 65.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 14,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "apps/perms/models.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3265,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								401,
+								401
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 13,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "apps/templates/base.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1940,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								355,
+								355
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 11,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "apps/templates/_head_css_js.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 864,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								589,
+								589
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/HTML/HTML.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "apps/users/templates/users/user_list.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9663,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								337,
+								337
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "apps/jumpserver/settings.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 11009,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2270,
+								2270
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 594.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "apps/manage.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 887,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								887,
+								887
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"file": "apps/templates/_base_list.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3680,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								673,
+								673
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "apps/assets/templates/assets/user_asset_list.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 9003,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								957,
+								957
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 270.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 63,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								63,
+								63
 							]
 						],
 						"settings":
@@ -895,68 +1244,6 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 108.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 5,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "apps/users/views/login.py",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 7734,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1047,
-								1047
-							]
-						],
-						"settings":
-						{
-							"origin_encoding": "ASCII",
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 54.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "docker-compose.yml",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 587,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								192,
-								192
-							]
-						],
-						"settings":
-						{
-							"origin_encoding": "ASCII",
-							"syntax": "Packages/YAML/YAML.sublime-syntax",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
@@ -964,80 +1251,110 @@
 					"type": "text"
 				},
 				{
-					"buffer": 3,
-					"file": "apps/users/api.py",
-					"semi_transient": true,
+					"buffer": 11,
+					"file": "jumpserver.sublime-project",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5325,
+						"buffer_size": 357,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								340,
-								340
+								173,
+								173
 							]
 						],
 						"settings":
 						{
 							"origin_encoding": "ASCII",
-							"syntax": "Packages/Python/Python.sublime-syntax",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
+							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
-					"file": ".gitignore",
+					"buffer": 12,
+					"file": "apps/perms/api.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 238,
+						"buffer_size": 11349,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								104,
-								104
+								6351,
+								6351
 							]
 						],
 						"settings":
 						{
-							"origin_encoding": "ASCII",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 2279.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
-					"file": "config_example.py",
+					"buffer": 13,
+					"file": "apps/perms/utils.py",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4410,
+						"buffer_size": 8853,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								3572,
-								3572
+								5131,
+								5131
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2080.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 14,
+					"file": "apps/assets/serializers.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6182,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								829,
+								829
 							]
 						],
 						"settings":
@@ -1048,10 +1365,41 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1432.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 15,
+					"file": "apps/assets/models/asset.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6946,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								191,
+								191
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
 					"type": "text"
 				}
 			]
@@ -1106,6 +1454,70 @@
 		"selected_items":
 		[
 			[
+				"tags",
+				"apps/common/templatetags/common_tags.py"
+			],
+			[
+				"setting",
+				"apps/jumpserver/settings.py"
+			],
+			[
+				"mana",
+				"apps/manage.py"
+			],
+			[
+				"_head_css_js.html",
+				"apps/templates/_head_css_js.html"
+			],
+			[
+				"_base",
+				"apps/templates/_base_list.html"
+			],
+			[
+				"base",
+				"apps/templates/base.html"
+			],
+			[
+				"user/model.py",
+				"apps/users/models/__init__.py"
+			],
+			[
+				"api",
+				"apps/applications/api.py"
+			],
+			[
+				"asset_list.html",
+				"apps/assets/templates/assets/asset_list.html"
+			],
+			[
+				"user/",
+				"apps/users/models/user.py"
+			],
+			[
+				"user/mode",
+				"apps/users/models/user.py"
+			],
+			[
+				"perms/mode",
+				"apps/perms/models.py"
+			],
+			[
+				"users/url",
+				"apps/users/urls/views_urls.py"
+			],
+			[
+				"first_login.",
+				"apps/users/templates/users/first_login.html"
+			],
+			[
+				"users/first_login.html",
+				"apps/users/templates/users/first_login.html"
+			],
+			[
+				"users/login",
+				"apps/users/templates/users/login.html"
+			],
+			[
 				"keys",
 				"docker-compose.yml"
 			],
@@ -1136,10 +1548,6 @@
 			[
 				"asset",
 				"apps/assets/templates/assets/asset_list.html"
-			],
-			[
-				"base",
-				"apps/templates/base.html"
 			],
 			[
 				"/perms/asset",
@@ -1556,66 +1964,6 @@
 			[
 				"devsie.ht",
 				"app/views/layouts/devise.html.erb"
-			],
-			[
-				"application.htm",
-				"app/views/layouts/application.html.erb"
-			],
-			[
-				"footer",
-				"app/views/share/_footer.html.erb"
-			],
-			[
-				"devise.ht",
-				"app/views/layouts/devise.html.erb"
-			],
-			[
-				"users/shared/links",
-				"app/views/users/shared/_links.html.erb"
-			],
-			[
-				"sessions/new",
-				"app/views/devise/sessions/new.html.erb"
-			],
-			[
-				"application.js",
-				"app/assets/javascripts/application.js"
-			],
-			[
-				"applica",
-				"app/views/layouts/application.html.erb"
-			],
-			[
-				"config/produ",
-				"config/deploy/production.rb"
-			],
-			[
-				"do",
-				"app/controllers/docs_controller.rb"
-			],
-			[
-				"introductioncon",
-				"app/controllers/introductions_controller.rb"
-			],
-			[
-				"environ",
-				"config/environments.yml"
-			],
-			[
-				"devise.htm",
-				"app/views/layouts/devise.html.erb"
-			],
-			[
-				"toscon",
-				"app/controllers/tos_controller.rb"
-			],
-			[
-				"develop",
-				"config/environments/development.rb"
-			],
-			[
-				"dump.rdb",
-				"dump.rdb"
 			]
 		],
 		"width": 0.0
@@ -1646,7 +1994,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 345.0,
+	"side_bar_width": 426.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

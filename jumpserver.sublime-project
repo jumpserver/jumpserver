@@ -3,8 +3,8 @@
 	[
 		{
 			"path": ".",
-			"folder_exclude_patterns": ["logs", "tmp", "static", "docs", "data"],
-			"file_exclude_patterns":["*.json", "LICENSE", "*.sh"]
+			"folder_exclude_patterns": ["logs", "tmp", "plugins", "docs", "css", "fonts", "img", "data"],
+			"file_exclude_patterns":["*.json", "LICENSE"]
 		},
 	],
 	"settings":
