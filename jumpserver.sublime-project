@@ -3,7 +3,7 @@
 	[
 		{
 			"path": ".",
-			"folder_exclude_patterns": ["logs", "tmp", "plugins", "docs", "css", "fonts", "img", "data"],
+			"folder_exclude_patterns": ["logs", "tmp", "plugins", "docs", "css", "fonts", "img"],
 			"file_exclude_patterns":["*.json", "LICENSE"]
 		},
 	],
