@@ -69,7 +69,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_extensions',
-
+    'apply_perms.apps.ApplyPermsConfig',
 ]
 
 MIDDLEWARE = [

@@ -1,0 +1,63 @@
+{% extends '_base_list.html' %}
+{% load i18n %}
+{% block content_left_head %}
+    <a href="{% url 'apply-perms:apply-permission-create' %}" class="btn btn-sm btn-primary">
+        {% trans "Apply permission" %}
+    </a>
+{% endblock %}
+
+{% block table_head %}
+    <th class="text-center">{% trans 'ID' %}</th>
+    <th class="text-center">{% trans 'Name' %}</th>
+    <th class="text-center">{% trans 'Asset' %}</th>
+    <th class="text-center">{% trans 'Asset group' %}</th>
+    <th class="text-center">{% trans 'System user' %}</th>
+    <th class="text-center">{% trans 'Approver' %}</th>
+    <th class="text-center">{% trans 'Status' %}</th>
+    <th class="text-center">{% trans 'Date applied' %}</th>
+    <th class="text-center">{% trans 'Date approved' %}</th>
+    <th class="text-center">{% trans 'Action' %}</th>
+{% endblock %}
+
+{% block table_body %}
+     {% for apply_permission in apply_permission_list %}
+         <tr class="gradeX">
+             <td class="text-center">{{ apply_permission.id }}</td>
+             <td class="text-center">{{ apply_permission.name }}</td>
+             <td class="text-center">{{ apply_permission.assets }}</td>
+             <td class="text-center">{{ apply_permission.asset_groups }}</td>
+             <td class="text-center">{{ apply_permission.system_users }}</td>
+             <td class="text-center">{{ apply_permission.approver }}</td>
+             <td class="text-center">{{ apply_permission.status }}</td>
+             <td class="text-center">{{ apply_permission.date_applied }}</td>
+             <td class="text-center">{{ apply_permission.date_approved }}</td>
+             <td class="text-center">
+                 <a href="{% url 'perms:apply-permission-update' pk=apply_permission.id %}"
+                    class="btn btn-xs btn-info">{% trans 'Update' %}
+                 </a>
+                 <a class="btn btn-xs btn-danger btn-del" data-name="{{ apply_permission.name }}"
+                    data-uid="{{ apply_permission.id }}">{% trans 'Delete' %}
+                 </a>
+             </td>
+         </tr>
+     {% endfor %}
+{% endblock %}
+
+{% block custom_foot_js %}
+    <script>
+        $(document).ready(function() {
+            $('table').DataTable({
+                "searching": false,
+                "paging": false,
+                "order": []
+            })
+        }).on('click', '.btn-del', function () {
+            var $this = $(this);
+            var name = $this.data('name');
+            var uid = $this.data('uid');
+            var the_url = '{% url "api-apply-perms:apply-permission-detail" pk=99991937 %}'
+                    .replace('99991937', uid);
+            objectDelete($this, name, the_url);
+        })
+    </script>
+{% endblock %}

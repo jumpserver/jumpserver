@@ -1839,6 +1839,10 @@ msgstr "ssh密钥"
 msgid "Administrator"
 msgstr "管理员"
 
+#: users/models/user.py:26 users/models/user.py:
+msgid "GroupAdministrator"
+msgstr "群组管理员"
+
 #: users/models/user.py:28
 msgid "Application"
 msgstr "应用程序"
@@ -2372,3 +2376,40 @@ msgstr "文件错误"
 
 #~ msgid "User Updated"
 #~ msgstr "更新"
+
+
+#: apply_perms/models.py
+msgid "Applying"
+msgstr "申请中"
+
+#: apply_perms/models.py
+msgid "Approved"
+msgstr "通过"
+
+#: apply_perms/models.py
+msgid "Disapproved"
+msgstr "拒绝"
+
+#: apply_perms/models.py
+msgid "Approver"
+msgstr "审批人"
+
+#: apply_perms/models.py
+msgid "Status"
+msgstr "状态"
+
+#: apply_perms/models.py
+msgid "Date applied"
+msgstr "申请时间"
+
+#: apply_perms/models.py
+msgid "Date approved"
+msgstr "审批时间"
+
+#: apply_perms/templates/apply_perms/apply_permission_list.html
+msgid "Apply permission"
+msgstr "申请授权"
+
+#: apply_perms/templates/apply_perms/apply_permission_list.html
+msgid "Apply permission list"
+msgstr "申请授权列表"

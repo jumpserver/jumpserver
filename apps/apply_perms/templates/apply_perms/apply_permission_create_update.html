@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load static %}
+{% load bootstrap3 %}
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+    <link href="{% static "css/plugins/datepicker/datepicker3.css" %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>{% trans 'Create asset permission ' %}</h5>
+                        <div class="ibox-tools">
+                            <a class="collapse-link">
+                                <i class="fa fa-chevron-up"></i>
+                            </a>
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                <i class="fa fa-wrench"></i>
+                            </a>
+                            <a class="close-link">
+                                <i class="fa fa-times"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="ibox-content">
+                        <form method="post" class="form-horizontal" action="" >
+                            {% csrf_token %}
+                            <h3>{% trans 'Name' %}</h3>
+                            {% bootstrap_field form.name layout="horizontal" %}
+                            <div class="hr-line-dashed"></div>
+                            <h3>{% trans 'User' %}</h3>
+                            {% bootstrap_field form.users layout="horizontal" %}
+                            {% bootstrap_field form.user_groups layout="horizontal" %}
+                            <div class="hr-line-dashed"></div>
+                            <h3>{% trans 'Asset' %}</h3>
+                            {% bootstrap_field form.assets layout="horizontal" %}
+                            {% bootstrap_field form.asset_groups layout="horizontal" %}
+                            {% bootstrap_field form.system_users layout="horizontal" %}
+                            <div class="hr-line-dashed"></div>
+                            <h3>{% trans 'Other' %}</h3>
+                            <div class="form-group">
+                                <label for="{{ form.is_active.id_for_label }}" class="col-sm-2 control-label">{% trans 'Active' %}</label>
+                                <div class="col-sm-8">
+                                    {{ form.is_active }}
+                                </div>
+                            </div>
+
+                            <div class="form-group {% if form.date_expired.errors %} has-error {% endif %}" id="date_5">
+                                <label for="{{ form.date_expired.id_for_label }}" class="col-sm-2 control-label">{{ form.date_expired.label }}</label>
+                                <div class="col-sm-9">
+                                    <div class="input-group date">
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        <input id="{{ form.date_expired.id_for_label }}" name="{{ form.date_expired.html_name }}" type="text" class="form-control" value="{{ form.date_expired.value|date:'Y-m-d' }}">
+                                    </div>
+                                    <span class="help-block ">{{ form.date_expired.errors }}</span>
+                                </div>
+                             </div>
+                            {% bootstrap_field form.comment layout="horizontal" %}
+
+                            <div class="form-group">
+                                <div class="col-sm-4 col-sm-offset-2">
+                                    <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+                                    <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block custom_foot_js %}
+    <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2();
+
+            $('.input-group.date').datepicker({
+                format: "yyyy-mm-dd",
+                todayBtn: "linked",
+                keyboardNavigation: false,
+                forceParse: false,
+                calendarWeeks: true,
+                autoclose: true
+            })
+        })
+    </script>
+{% endblock %}

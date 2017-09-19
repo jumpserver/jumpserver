@@ -24,6 +24,7 @@ __all__ = ['User']
 class User(AbstractUser):
     ROLE_CHOICES = (
         ('Admin', _('Administrator')),
+        ('GroupAdmin', _('GroupAdministrator')),
         ('User', _('User')),
         ('App', _('Application'))
     )
