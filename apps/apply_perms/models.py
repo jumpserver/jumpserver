@@ -13,6 +13,7 @@ class ApplyPermission(models.Model):
     )
     name = models.CharField(
         max_length=128, unique=True, verbose_name=_('Name'))
+    user_groups = models.TextField(blank=True, verbose_name=_('User group'))
     assets = models.TextField(blank=True, verbose_name=_('Asset'))
     asset_groups = models.TextField(blank=True, verbose_name=_('Asset group'))
     system_users = models.TextField(blank=True, verbose_name=_('System user'))

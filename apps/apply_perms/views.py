@@ -4,8 +4,11 @@ from django.views.generic import ListView, CreateView, UpdateView
 from django.views.generic.edit import DeleteView
 from django.views.generic.detail import DetailView
 from .models import ApplyPermission
+from .forms import ApplyPermissionForm
 from django.conf import settings
-
+from django.contrib.messages.views import SuccessMessageMixin
+from django.urls import reverse_lazy
+from django.db import transaction
 class ApplyPermissionListView(ListView):
     model = ApplyPermission
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
@@ -36,8 +39,42 @@ class ApplyPermissionListView(ListView):
         return self.queryset
 
 
-class ApplyPermissionCreateView(CreateView):
-    pass
+class ApplyPermissionCreateView(SuccessMessageMixin,
+                                CreateView):
+    model = ApplyPermission
+    form_class = ApplyPermissionForm
+    template_name = 'apply_perms/apply_permission_create_update.html'
+    success_url = reverse_lazy('apply-perms:apply-permission-list')
+
+    @transaction.atomic
+    def post(self, request, *args, **kwargs):
+        return super(ApplyPermissionCreateView, self).post(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Apply permission'),
+            'action': _('Create apply permission'),
+        }
+        kwargs.update(context)
+        return super(ApplyPermissionCreateView, self).get_context_data(**kwargs)
+
+    def get_success_message(self, cleaned_data):
+        url = reverse_lazy('apply-perms:apply-permission-detail',
+                           kwargs={'pk': self.object.pk})
+        success_message = _(
+            'Create apply permission <a href="{url}"> {name} </a> '
+            'successfully.'.format(url=url, name=self.object.name))
+        return success_message
+
+    def form_valid(self, form):
+        assets = form.cleaned_data['assets']
+        asset_groups = form.cleaned_data['asset_groups']
+        system_users = form.cleaned_data['system_users']
+        associate_system_users_and_assets(system_users, assets, asset_groups)
+        response = super(AssetPermissionCreateView, self).form_valid(form)
+        self.object.created_by = self.request.user.name
+        self.object.save()
+        return response
 
 class ApplyPermissionUpdateView(UpdateView):
     pass

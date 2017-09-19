@@ -2407,9 +2407,30 @@ msgid "Date approved"
 msgstr "审批时间"
 
 #: apply_perms/templates/apply_perms/apply_permission_list.html
+msgid "Create apply permission"
+msgstr "创建授权申请"
+
+#: apply_perms/views.py
+msgid "Apply permission list"
+msgstr "申请授权列表"
+
+#: apply_perms/views.py
 msgid "Apply permission"
 msgstr "申请授权"
 
-#: apply_perms/templates/apply_perms/apply_permission_list.html
-msgid "Apply permission list"
-msgstr "申请授权列表"
+#: apply_perms/forms.py
+msgid "Select approver"
+msgstr "选择审批人"
+
+#: apply_perms/templates/apply_perms/apply_permission_create_update.html
+msgid "Audit"
+msgstr "审批"
+
+#: apply_perms/templates/apply_perms/apply_permission_create_update.html
+msgid "* Asset or Asset group at least one required"
+msgstr "* 资产和资产组必选其一"
+
+#: apply_perms/templates/apply_perms/apply_permission_create_update.html
+msgid "* required"
+msgstr "* 必填"
+
