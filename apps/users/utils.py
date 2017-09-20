@@ -44,6 +44,8 @@ def user_add_success_next(user):
     </br>
     Your account has been created successfully
     </br>
+    Please refer to <a href="http://123.57.69.21:9000/pages/viewpage.action?pageId=17339390">the document </a> use it
+    </br>
     <a href="%(rest_password_url)s?token=%(rest_password_token)s">click here to set your password</a>
     </br>
     This link is valid for 1 hour. After it expires, <a href="%(forget_password_url)s?email=%(email)s">request new one</a>
