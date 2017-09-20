@@ -1,5 +1,6 @@
 {% extends '_base_list.html' %}
 {% load i18n %}
+{% load apply_perms_tags %}
 {% block content_left_head %}
     <a href="{% url 'apply-perms:apply-permission-create' %}" class="btn btn-sm btn-primary">
         {% trans "Create apply permission" %}
@@ -9,6 +10,7 @@
 {% block table_head %}
     <th class="text-center">{% trans 'ID' %}</th>
     <th class="text-center">{% trans 'Name' %}</th>
+    <th class="text-center">{% trans 'User groups' %}</th>
     <th class="text-center">{% trans 'Asset' %}</th>
     <th class="text-center">{% trans 'Asset group' %}</th>
     <th class="text-center">{% trans 'System user' %}</th>
@@ -24,15 +26,16 @@
          <tr class="gradeX">
              <td class="text-center">{{ apply_permission.id }}</td>
              <td class="text-center">{{ apply_permission.name }}</td>
-             <td class="text-center">{{ apply_permission.assets }}</td>
-             <td class="text-center">{{ apply_permission.asset_groups }}</td>
-             <td class="text-center">{{ apply_permission.system_users }}</td>
+             <td class="text-center">{{ apply_permission | id_to_name:"user_groups" }}</td>
+             <td class="text-center">{{ apply_permission | id_to_name:"assets" }}</td>
+             <td class="text-center">{{ apply_permission | id_to_name:"asset_groups" }}</td>
+             <td class="text-center">{{ apply_permission | id_to_name:"system_users" }}</td>
              <td class="text-center">{{ apply_permission.approver }}</td>
-             <td class="text-center">{{ apply_permission.status }}</td>
+             <td class="text-center">{% trans apply_permission.status %}</td>
              <td class="text-center">{{ apply_permission.date_applied }}</td>
              <td class="text-center">{{ apply_permission.date_approved }}</td>
              <td class="text-center">
-                 <a href="{% url 'perms:apply-permission-update' pk=apply_permission.id %}"
+                 <a href="{% url 'apply-perms:apply-permission-update' pk=apply_permission.id %}"
                     class="btn btn-xs btn-info">{% trans 'Update' %}
                  </a>
                  <a class="btn btn-xs btn-danger btn-del" data-name="{{ apply_permission.name }}"

@@ -9,6 +9,10 @@ from django.conf import settings
 from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.db import transaction
+import json
+from django.utils import timezone
+from assets.models import Asset
+
 class ApplyPermissionListView(ListView):
     model = ApplyPermission
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
@@ -28,7 +32,6 @@ class ApplyPermissionListView(ListView):
         self.queryset = super(ApplyPermissionListView, self).get_queryset()
         self.keyword = keyword = self.request.GET.get('keyword', '')
         self.sort = sort = self.request.GET.get('sort', '-date_applied')
-
         if keyword:
             self.queryset = self.queryset\
                 .filter(Q(users__name__contains=keyword) |
@@ -67,14 +70,15 @@ class ApplyPermissionCreateView(SuccessMessageMixin,
         return success_message
 
     def form_valid(self, form):
-        assets = form.cleaned_data['assets']
-        asset_groups = form.cleaned_data['asset_groups']
-        system_users = form.cleaned_data['system_users']
-        associate_system_users_and_assets(system_users, assets, asset_groups)
-        response = super(AssetPermissionCreateView, self).form_valid(form)
-        self.object.created_by = self.request.user.name
-        self.object.save()
-        return response
+        obj = form.instance
+        obj.date_applied = timezone.localtime()
+        obj.user_groups = list(user_group.id for user_group in form.cleaned_data['user_groups'])
+        obj.assets = list(asset.id for asset in form.cleaned_data['assets'])
+        obj.asset_groups = list(asset_group.id for asset_group in form.cleaned_data['asset_groups'])
+        obj.system_users = list(system_user.id for system_user in form.cleaned_data['system_users'])
+        obj.save()
+        return super(ApplyPermissionCreateView, self).form_valid(form)
+
 
 class ApplyPermissionUpdateView(UpdateView):
     pass

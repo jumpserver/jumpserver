@@ -21,7 +21,7 @@ class ApplyPermission(models.Model):
         User, related_name="approval_tasks", verbose_name=_('Approver'))
     status = models.CharField(choices=STATUS_CHOICES, default='Applying', max_length=10, blank=True, verbose_name=_('Status'))
     date_applied = models.DateTimeField(auto_now=True, verbose_name=_('Date applied'))
-    date_approved = models.DateTimeField(blank=True, verbose_name=_('Date approved'))
+    date_approved = models.DateTimeField(blank=True, null=True, verbose_name=_('Date approved'))
 
     def __unicode__(self):
         return self.name

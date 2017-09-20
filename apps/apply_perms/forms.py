@@ -11,14 +11,13 @@ from users.models import UserGroup, User
 
 class ApplyPermissionForm(forms.ModelForm):
     name = forms.CharField(
-        required=False,
+        required=True,
         help_text=_('* required'),
         label=_('Name')
     )
     assets = forms.ModelMultipleChoiceField(
         queryset = Asset.objects.all(),
         required=False,
-        help_text=_('* required'),
         label=_('Select assets'),
         widget=forms.SelectMultiple(
             attrs={
@@ -58,12 +57,12 @@ class ApplyPermissionForm(forms.ModelForm):
             }
         )
     )
-    approver = forms.ModelMultipleChoiceField(
+    approver = forms.ModelChoiceField(
         queryset = User.objects.filter(role__in=['Admin', 'GroupAdmin']),
         required=True,
         help_text=_('* required'),
         label=_('Select approver'),
-        widget=forms.SelectMultiple(
+        widget=forms.Select(
             attrs={
                 'class': 'select2',
             }
