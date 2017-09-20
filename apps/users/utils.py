@@ -35,6 +35,14 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
             return False
         return True
 
+class ApplyUserRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        if not self.request.user.is_authenticated:
+            return False
+        elif not self.request.user.is_applier:
+            self.raise_exception = True
+            return False
+        return True
 
 def user_add_success_next(user):
     subject = _('Create account successfully')

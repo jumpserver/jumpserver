@@ -35,11 +35,13 @@
              <td class="text-center">{{ apply_permission.date_applied }}</td>
              <td class="text-center">{{ apply_permission.date_approved }}</td>
              <td class="text-center">
+                {% if apply_permission.is_updateable %}
                  <a href="{% url 'apply-perms:apply-permission-update' pk=apply_permission.id %}"
                     class="btn btn-xs btn-info">{% trans 'Update' %}
                  </a>
+                {% endif %}
                  <a class="btn btn-xs btn-danger btn-del" data-name="{{ apply_permission.name }}"
-                    data-uid="{{ apply_permission.id }}">{% trans 'Delete' %}
+                    data-uid="{{ apply_permission.id }}">{% trans 'Cancel Apply' %}
                  </a>
              </td>
          </tr>

@@ -2406,9 +2406,13 @@ msgstr "申请时间"
 msgid "Date approved"
 msgstr "审批时间"
 
-#: apply_perms/templates/apply_perms/apply_permission_list.html
+#: apply_perms/views.py
 msgid "Create apply permission"
 msgstr "创建授权申请"
+
+#: apply_perms/views.py
+msgid "Update apply permission"
+msgstr "更新授权申请"
 
 #: apply_perms/views.py
 msgid "Apply permission list"
@@ -2434,3 +2438,6 @@ msgstr "* 资产和资产组必选其一"
 msgid "* required"
 msgstr "* 必填"
 
+#: apply_perms/templates/apply_perms/apply_permission_list.html
+msgid "Cancel Apply"
+msgstr "取消申请"

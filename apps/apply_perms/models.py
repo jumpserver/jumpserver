@@ -26,8 +26,8 @@ class ApplyPermission(models.Model):
     def __unicode__(self):
         return self.name
 
-    # def super_user(self):
-    #     return User.objects.get(username='admin')
+    def is_updateable(self):
+        return self.status == 'Applying'
 
     class Meta:
         db_table = 'apply_permission'

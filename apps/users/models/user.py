@@ -116,10 +116,7 @@ class User(AbstractUser):
 
     @property
     def is_superuser(self):
-        if self.role == 'Admin':
-            return True
-        else:
-            return False
+        return self.role == 'Admin'
 
     @is_superuser.setter
     def is_superuser(self, value):
@@ -127,6 +124,10 @@ class User(AbstractUser):
             self.role = 'Admin'
         else:
             self.role = 'User'
+
+    @property
+    def is_applier(self):
+        return self.role in ['GroupAdmin', 'User']
 
     @property
     def is_app(self):
