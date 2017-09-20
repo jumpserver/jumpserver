@@ -130,6 +130,14 @@ class User(AbstractUser):
         return self.role in ['GroupAdmin', 'User']
 
     @property
+    def is_groupadmin(self):
+        return self.role == 'GroupAdmin'
+
+    @property
+    def is_commonuser(self):
+        return self.role == 'User'
+
+    @property
     def is_app(self):
         return self.role == 'App'
 

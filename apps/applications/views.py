@@ -66,7 +66,6 @@ class TerminalModelAccept(AdminUserRequiredMixin, JSONResponseMixin, UpdateView)
     template_name = 'applications/terminal_modal_test.html'
 
     def post(self, request, *args, **kwargs):
-        print(request.POST)
         return super(TerminalModelAccept, self).post(request, *args, **kwargs)
 
     def form_valid(self, form):

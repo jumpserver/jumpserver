@@ -15,7 +15,7 @@ from assets.models import Asset
 from users.utils import ApplyUserRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 
-class ApplyPermissionListView(ListView):
+class ApplyPermissionListView(LoginRequiredMixin, ListView):
     model = ApplyPermission
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'apply_permission_list'
@@ -31,7 +31,14 @@ class ApplyPermissionListView(ListView):
         return super(ApplyPermissionListView, self).get_context_data(**kwargs)
 
     def get_queryset(self):
-        self.queryset = super(ApplyPermissionListView, self).get_queryset()
+        usr = self.request.user
+        if usr.is_superuser:
+            self.queryset = super(ApplyPermissionListView, self).get_queryset()
+        elif usr.is_groupadmin:
+            self.queryset = usr.apply_permissions.all() | usr.approval_tasks.all()
+        elif usr.is_commonuser:
+            self.queryset = usr.apply_permissions.all()
+
         self.keyword = keyword = self.request.GET.get('keyword', '')
         self.sort = sort = self.request.GET.get('sort', '-date_applied')
         if keyword:
@@ -75,6 +82,7 @@ class ApplyPermissionCreateView(ApplyUserRequiredMixin,
     def form_valid(self, form):
         obj = form.instance
         obj.date_applied = timezone.localtime()
+        obj.applicant = self.request.user
         obj.user_groups = list(user_group.id for user_group in form.cleaned_data['user_groups'])
         obj.assets = list(asset.id for asset in form.cleaned_data['assets'])
         obj.asset_groups = list(asset_group.id for asset_group in form.cleaned_data['asset_groups'])
@@ -83,8 +91,7 @@ class ApplyPermissionCreateView(ApplyUserRequiredMixin,
         return super(ApplyPermissionCreateView, self).form_valid(form)
 
 
-class ApplyPermissionUpdateView(LoginRequiredMixin,
-                                UpdateView):
+class ApplyPermissionUpdateView(LoginRequiredMixin, UpdateView):
     model = ApplyPermission
     form_class = ApplyPermissionForm
     template_name = 'apply_perms/apply_permission_create_update.html'
@@ -107,10 +114,8 @@ class ApplyPermissionUpdateView(LoginRequiredMixin,
         obj.save()
         return super(ApplyPermissionUpdateView, self).form_valid(form)
 
-class ApplyPermissionDeleteView(LoginRequiredMixin,
-                                DeleteView):
+class ApplyPermissionDeleteView(LoginRequiredMixin, DeleteView):
     pass
 
-class ApplyPermissionDetailView(LoginRequiredMixin,
-                                DetailView):
+class ApplyPermissionDetailView(LoginRequiredMixin, DetailView):
     pass

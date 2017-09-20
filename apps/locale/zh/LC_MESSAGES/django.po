@@ -2391,6 +2391,10 @@ msgid "Disapproved"
 msgstr "拒绝"
 
 #: apply_perms/models.py
+msgid "Applicant"
+msgstr "申请人"
+
+#: apply_perms/models.py
 msgid "Approver"
 msgstr "审批人"
 

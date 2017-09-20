@@ -10,6 +10,7 @@
 {% block table_head %}
     <th class="text-center">{% trans 'ID' %}</th>
     <th class="text-center">{% trans 'Name' %}</th>
+    <th class="text-center">{% trans 'Applicant' %}</th>
     <th class="text-center">{% trans 'User groups' %}</th>
     <th class="text-center">{% trans 'Asset' %}</th>
     <th class="text-center">{% trans 'Asset group' %}</th>
@@ -26,6 +27,7 @@
          <tr class="gradeX">
              <td class="text-center">{{ apply_permission.id }}</td>
              <td class="text-center">{{ apply_permission.name }}</td>
+             <td class="text-center">{{ apply_permission.applicant }}</td>
              <td class="text-center">{{ apply_permission | id_to_name:"user_groups" }}</td>
              <td class="text-center">{{ apply_permission | id_to_name:"assets" }}</td>
              <td class="text-center">{{ apply_permission | id_to_name:"asset_groups" }}</td>
@@ -40,9 +42,19 @@
                     class="btn btn-xs btn-info">{% trans 'Update' %}
                  </a>
                 {% endif %}
+                {% if request.user.is_superuser or apply_permission.approver == request.user %}
+                 <a class="btn btn-xs btn-info btn-approve" data-name="{{ apply_permission.name }}"
+                    data-uid="{{ apply_permission.id }}">{% trans 'Approved' %}
+                 </a>
+                 <a class="btn btn-xs btn-danger btn-disapprove" data-name="{{ apply_permission.name }}"
+                    data-uid="{{ apply_permission.id }}">{% trans 'Disapproved' %}
+                 </a>
+                {% endif %}
+                {% if apply_permission.applicant == request.user %}
                  <a class="btn btn-xs btn-danger btn-del" data-name="{{ apply_permission.name }}"
                     data-uid="{{ apply_permission.id }}">{% trans 'Cancel Apply' %}
                  </a>
+                {% endif %}
              </td>
          </tr>
      {% endfor %}

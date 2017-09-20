@@ -17,6 +17,8 @@ class ApplyPermission(models.Model):
     assets = models.TextField(blank=True, verbose_name=_('Asset'))
     asset_groups = models.TextField(blank=True, verbose_name=_('Asset group'))
     system_users = models.TextField(blank=True, verbose_name=_('System user'))
+    applicant = models.ForeignKey(
+        User, related_name='apply_permissions', verbose_name=_('Applicant'))
     approver = models.ForeignKey(
         User, related_name="approval_tasks", verbose_name=_('Approver'))
     status = models.CharField(choices=STATUS_CHOICES, default='Applying', max_length=10, blank=True, verbose_name=_('Status'))
