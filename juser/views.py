@@ -451,6 +451,26 @@ def regen_ssh_key(request):
     gen_ssh_key(username, ssh_key_pass)
     return HttpResponse('ssh密钥已生成，密码为 %s, 请到下载页面下载' % ssh_key_pass)
 
+@require_role(role='user')
+def change_ssh_pub_key(request):
+########
+    header_title, path1, path2 = '修改公钥', '用户管理', '修改公钥'
+    if request.session.get('role_id') == 0:
+        user_id = request.user.id
+    else:
+        user_id = request.GET.get('id', '')
+    user = User.objects.get(id=user_id)
+    error = ''
+    if not user:
+        return HttpResponseRedirect(reverse('index'))
+
+    if request.method == 'POST':
+        key_content = request.POST.get('key', '')
+        username = user.username
+        add_ssh_key(username, key_content)
+        msg = '修改成功'
+
+    return my_render('juser/change_ssh_pub_key.html', locals(), request)
 
 @require_role(role='user')
 def down_key(request):
@@ -470,8 +490,8 @@ def down_key(request):
                 f.close()
                 response = HttpResponse(data, content_type='application/octet-stream')
                 response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(private_key_file)
-                if request.user.role == 'CU':
-                    os.unlink(private_key_file)
+                # if request.user.role == 'CU':
+                    # os.unlink(private_key_file)
                 return response
     return HttpResponse('No Key File. Contact Admin.')
 

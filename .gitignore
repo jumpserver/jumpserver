@@ -44,3 +44,5 @@ keys/*
 jumpserver.conf
 nohup.out
 tmp/*
+exclude-files
+rsync_from_jumpserver.sh

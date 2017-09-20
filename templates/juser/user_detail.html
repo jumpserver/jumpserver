@@ -49,13 +49,15 @@
                                         <td>{{ user.id | get_role }}</td>
                                     </tr>
                                     <tr>
-                                        <td class="text-navy">key</td>
+                                        <td class="text-navy">私钥</td>
                                         {% if user.username|key_exist %}
                                         <td><a  href="{% url 'key_down' %}?id={{ user.id }}" >下载</a></td>
                                         {% else %}
                                         <td><span style="color: #586b7d">NoKey</span></td>
                                         {% endif %}
                                     </tr>
+                                        <td class="text-navy">公钥</td>
+                                        <td><a href="{% url 'user_pubkey' %}?id={{ user.id }}">添加公钥</a></td>
                                     <tr>
                                         <td class="text-navy">Email</td>
                                         <td>{{ user.email }}</td>

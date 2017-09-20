@@ -50,7 +50,8 @@
                                 <th class="text-center">权限</th>
                                 <th class="text-center">主机数量</th>
                                 <th class="text-center">激活</th>
-                                <th class="text-center">下载密钥</th>
+                                <th class="text-center">下载私钥</th>
+                                <th class="text-center">添加公钥</th>
                                 <th class="text-center">操作</th>
                             </tr>
                         </thead>
@@ -73,6 +74,7 @@
                                         <a href="#" onclick="genSSH('{{ user.username }}','{% url 'key_gen' %}?uuid={{ user.uuid }}')">NoKey GenOne?</a>
                                     {% endif %}
                                 </td>
+                                <td class="text-center"><a href="{% url 'user_pubkey' %}?id={{ user.id }}">添加公钥</td>
                                 <td class="text-center">
                                     <a href="{% url 'user_edit' %}?id={{ user.id }}" class="btn btn-xs btn-info">编辑</a>
                                     <a value="{{ user.uuid }}" class="btn btn-xs btn-warning email">Email</a>
