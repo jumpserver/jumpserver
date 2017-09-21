@@ -1688,6 +1688,11 @@ msgstr "访问官网"
 msgid "My assets"
 msgstr "我的资产"
 
+#: templates/_nav.html
+msgid "Permission approval"
+msgstr "授权审批"
+
+
 #: templates/_nav_user.html:9 templates/_user_profile.html:19
 #: users/templates/users/_user.html:42
 #: users/templates/users/user_password_update.html:37
@@ -2445,3 +2450,9 @@ msgstr "* 必填"
 #: apply_perms/templates/apply_perms/apply_permission_list.html
 msgid "Cancel Apply"
 msgstr "取消申请"
+
+#: apply_perms/templates/apply_perms/apply_permission_list.html
+msgid "Approve Successfully"
+msgstr "审批成功"
+
+

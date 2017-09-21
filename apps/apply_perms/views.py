@@ -1,6 +1,6 @@
 from django.utils.translation import ugettext as _
 from django.shortcuts import render
-from django.views.generic import ListView, CreateView, UpdateView
+from django.views.generic import ListView, CreateView, UpdateView, View
 from django.views.generic.edit import DeleteView
 from django.views.generic.detail import DetailView
 from .models import ApplyPermission
@@ -14,6 +14,8 @@ from django.utils import timezone
 from assets.models import Asset
 from users.utils import ApplyUserRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db.models import Q
+import pdb
 
 class ApplyPermissionListView(LoginRequiredMixin, ListView):
     model = ApplyPermission
@@ -43,9 +45,9 @@ class ApplyPermissionListView(LoginRequiredMixin, ListView):
         self.sort = sort = self.request.GET.get('sort', '-date_applied')
         if keyword:
             self.queryset = self.queryset\
-                .filter(Q(users__name__contains=keyword) |
-                        Q(users__approver__contains=keyword) |
-                        Q(user_status__contains=keyword)).distinct()
+                .filter(Q(applicant__username__contains=keyword) |
+                        Q(approver__username__contains=keyword) |
+                        Q(status=keyword)).distinct()
         if sort:
             self.queryset = self.queryset.order_by(sort)
         return self.queryset

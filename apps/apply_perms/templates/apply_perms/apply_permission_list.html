@@ -2,9 +2,11 @@
 {% load i18n %}
 {% load apply_perms_tags %}
 {% block content_left_head %}
-    <a href="{% url 'apply-perms:apply-permission-create' %}" class="btn btn-sm btn-primary">
-        {% trans "Create apply permission" %}
-    </a>
+    {% if not request.user.is_superuser %}
+        <a href="{% url 'apply-perms:apply-permission-create' %}" class="btn btn-sm btn-primary">
+            {% trans "Create apply permission" %}
+        </a>
+    {% endif %}
 {% endblock %}
 
 {% block table_head %}
@@ -33,27 +35,40 @@
              <td class="text-center">{{ apply_permission | id_to_name:"asset_groups" }}</td>
              <td class="text-center">{{ apply_permission | id_to_name:"system_users" }}</td>
              <td class="text-center">{{ apply_permission.approver }}</td>
-             <td class="text-center">{% trans apply_permission.status %}</td>
+             <td class="text-center apply_status">
+                {% if apply_permission.status == 'Applying' %}
+                    {% trans apply_permission.status %}
+                {% elif apply_permission.status == 'Approved' %}
+                    <i class="fa fa-check text-navy"></i>
+                {% else %}
+                     <i class="fa fa-times text-danger"></i>
+                {% endif %}
+             </td>
              <td class="text-center">{{ apply_permission.date_applied }}</td>
              <td class="text-center">{{ apply_permission.date_approved }}</td>
              <td class="text-center">
                 {% if apply_permission.is_updateable %}
-                 <a href="{% url 'apply-perms:apply-permission-update' pk=apply_permission.id %}"
-                    class="btn btn-xs btn-info">{% trans 'Update' %}
-                 </a>
-                {% endif %}
-                {% if request.user.is_superuser or apply_permission.approver == request.user %}
-                 <a class="btn btn-xs btn-info btn-approve" data-name="{{ apply_permission.name }}"
-                    data-uid="{{ apply_permission.id }}">{% trans 'Approved' %}
-                 </a>
-                 <a class="btn btn-xs btn-danger btn-disapprove" data-name="{{ apply_permission.name }}"
-                    data-uid="{{ apply_permission.id }}">{% trans 'Disapproved' %}
-                 </a>
+                    {% if apply_permission.applicant == request.user %}
+                        <a href="{% url 'apply-perms:apply-permission-update' pk=apply_permission.id %}"
+                            class="btn btn-xs btn-info">{% trans 'Update' %}
+                        </a>
+                    {% endif %}
+
+                    {% if request.user.is_superuser or apply_permission.approver == request.user %}
+                        <span class="approve_disapprove">
+                            <a class="btn btn-xs btn-info btn-approve" data-name="{{ apply_permission.name }}"
+                                data-uid="{{ apply_permission.id }}">{% trans 'Approved' %}
+                            </a>
+                            <a class="btn btn-xs btn-danger btn-disapprove" data-name="{{ apply_permission.name }}"
+                                data-uid="{{ apply_permission.id }}">{% trans 'Disapproved' %}
+                            </a>
+                        </span>
+                    {% endif %}
                 {% endif %}
                 {% if apply_permission.applicant == request.user %}
-                 <a class="btn btn-xs btn-danger btn-del" data-name="{{ apply_permission.name }}"
-                    data-uid="{{ apply_permission.id }}">{% trans 'Cancel Apply' %}
-                 </a>
+                    <a class="btn btn-xs btn-danger btn-del" data-name="{{ apply_permission.name }}"
+                        data-uid="{{ apply_permission.id }}">{% trans 'Delete' %}
+                    </a>
                 {% endif %}
              </td>
          </tr>
@@ -75,6 +90,38 @@
             var the_url = '{% url "api-apply-perms:apply-permission-detail" pk=99991937 %}'
                     .replace('99991937', uid);
             objectDelete($this, name, the_url);
+        }).on('click', '.btn-approve', function(){
+            var $this = $(this)
+            var body = {
+                id: $this.data('uid'),
+                status: 'Approved'
+            };
+            APIUpdateAttr({
+                url: '{% url "api-apply-perms:approve-apply-permission" %}',
+                body: JSON.stringify(body),
+                method: 'PUT',
+                success_message: '{% trans "Approve Successfully!" %}',
+                success: function(){
+                    $this.parents().parents().siblings('.apply_status').html('<i class="fa fa-check text-navy"></i>')
+                    $this.parents('.approve_disapprove').remove()
+                },
+            });
+        }).on('click', '.btn-disapprove', function(){
+            var $this = $(this)
+            var body = {
+                id: $this.data('uid'),
+                status: 'Disapproved',
+            };
+            APIUpdateAttr({
+                url: '{% url "api-apply-perms:approve-apply-permission" %}',
+                body: JSON.stringify(body),
+                method: 'PUT',
+                success_message: '{% trans "Approve Successfully!" %}',
+                success: function(){
+                    $this.parents().parents().siblings('.apply_status').html('<i class="fa fa-times text-danger"></i>')
+                    $this.parents('.approve_disapprove').remove()
+                },
+            });
         })
     </script>
 {% endblock %}
