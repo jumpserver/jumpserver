@@ -65,7 +65,7 @@ class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     @staticmethod
     def get_managers(obj):
-        return obj.managers.all()
+        return " ".join([manager.username for manager in obj.managers.all()])
 
 
 class UserGroupUpdateMemeberSerializer(serializers.ModelSerializer):
