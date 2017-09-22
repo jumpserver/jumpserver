@@ -33,6 +33,7 @@ class User(AbstractUser):
     name = models.CharField(max_length=20, verbose_name=_('Name'))
     email = models.EmailField(max_length=30, unique=True, verbose_name=_('Email'))
     groups = models.ManyToManyField(UserGroup, related_name='users', blank=True, verbose_name=_('User group'))
+    managed_groups = models.ManyToManyField(UserGroup, related_name='managers', blank=True, verbose_name=_('Managed Group'))
     role = models.CharField(choices=ROLE_CHOICES, default='User', max_length=10, blank=True, verbose_name=_('Role'))
     avatar = models.ImageField(upload_to="avatar", null=True, verbose_name=_('Avatar'))
     wechat = models.CharField(max_length=30, blank=True, verbose_name=_('Wechat'))

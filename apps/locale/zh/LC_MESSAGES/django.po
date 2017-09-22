@@ -1848,6 +1848,10 @@ msgstr "管理员"
 msgid "GroupAdministrator"
 msgstr "群组管理员"
 
+#: users/models/user.py
+msgid "Managed Group"
+msgstr "我管理的群组"
+
 #: users/models/user.py:28
 msgid "Application"
 msgstr "应用程序"
