@@ -42,6 +42,8 @@ class AssetPermission(models.Model):
     def __unicode__(self):
         return self.name
 
+    __str__ = __unicode__
+
     @property
     def is_valid(self):
         if self.date_expired < timezone.now() and self.is_active:
