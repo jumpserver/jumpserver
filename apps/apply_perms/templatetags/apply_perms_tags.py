@@ -11,6 +11,11 @@ register = template.Library()
 def id_to_name(instance, member):
     attr = getattr(instance, member)
     result=""
+    if member == 'user_groups':
+        from users.models import UserGroup
+        for user_group in UserGroup.objects.filter(id__in=json.loads(attr)):
+            result += user_group.name + ','
+
     if member == 'assets':
         from assets.models import Asset
         for asset in Asset.objects.filter(id__in=json.loads(attr)):

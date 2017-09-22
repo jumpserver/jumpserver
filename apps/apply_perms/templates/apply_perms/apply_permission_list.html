@@ -102,8 +102,9 @@
                 method: 'PUT',
                 success_message: '{% trans "Approve Successfully!" %}',
                 success: function(){
-                    $this.parents().parents().siblings('.apply_status').html('<i class="fa fa-check text-navy"></i>')
-                    $this.parents('.approve_disapprove').remove()
+                    // $this.parents().parents().siblings('.apply_status').html('<i class="fa fa-check text-navy"></i>')
+                    // $this.parents('.approve_disapprove').remove()
+                    window.location.reload();
                 },
             });
         }).on('click', '.btn-disapprove', function(){
@@ -118,8 +119,9 @@
                 method: 'PUT',
                 success_message: '{% trans "Approve Successfully!" %}',
                 success: function(){
-                    $this.parents().parents().siblings('.apply_status').html('<i class="fa fa-times text-danger"></i>')
-                    $this.parents('.approve_disapprove').remove()
+                    // $this.parents().parents().siblings('.apply_status').html('<i class="fa fa-times text-danger"></i>')
+                    // $this.parents('.approve_disapprove').remove()
+                    window.location.reload();
                 },
             });
         })
