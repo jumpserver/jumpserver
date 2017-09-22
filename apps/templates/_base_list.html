@@ -36,7 +36,7 @@
                         <form id="search_form" method="get" action="" class="pull-right mail-search form-inline">
                             {% block search_form %}
                             <div class="input-group">
-                                <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="{{ keyword }}">
+                                <input type="text" class="form-control input-sm" name="keyword" placeholder="{% block search_column %}{% endblock %}" value="{{ keyword }}">
                             </div>
                             <div class="input-group">
                                 <div class="input-group-btn">
@@ -58,7 +58,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                        {% block table_body %} {% endblock %}
+                            {% block table_body %} {% endblock %}
                         </tbody>
                     </table>
                     {% endblock %}

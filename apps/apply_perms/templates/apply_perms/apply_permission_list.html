@@ -9,6 +9,8 @@
     {% endif %}
 {% endblock %}
 
+{% block search_column %}{% trans 'Applicant' %}\{% trans 'Approver' %}\{% trans 'Status' %}{% endblock %}
+
 {% block table_head %}
     <th class="text-center">{% trans 'ID' %}</th>
     <th class="text-center">{% trans 'Name' %}</th>
