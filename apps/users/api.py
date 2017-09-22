@@ -99,7 +99,7 @@ class UserUpdatePKApi(generics.UpdateAPIView):
 
 
 class UserGroupViewSet(IDInFilterMixin, BulkModelViewSet):
-    queryset = UserGroup.objects.all()
+    queryset = UserGroup.objects.prefetch_related('managers').all()
     serializer_class = serializers.UserGroupSerializer
 
 

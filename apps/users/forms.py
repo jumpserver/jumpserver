@@ -155,6 +155,20 @@ class UserBulkUpdateForm(forms.ModelForm):
 
 
 class UserGroupForm(forms.ModelForm):
+    managers = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        label=_('GroupAdministrator'),
+        required=False,
+        widget=forms.SelectMultiple(
+            attrs={'class': 'select2', 'data-placeholder': _('Select group managers')})
+    )
+    users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        label=_('User'),
+        required=False,
+        widget=forms.SelectMultiple(
+            attrs={'class': 'select2', 'data-placeholder': _('Select User')})
+    )
     class Meta:
         model = UserGroup
         fields = [

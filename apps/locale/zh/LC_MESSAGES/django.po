@@ -914,6 +914,10 @@ msgstr "确认"
 msgid "Select system users"
 msgstr "选择系统用户"
 
+#: users/forms.py:216
+msgid "Select group managers"
+msgstr "选择群组管理员"
+
 #: assets/templates/assets/asset_detail.html:374
 #: users/templates/users/user_detail.html:275
 #: users/templates/users/user_detail.html:288
