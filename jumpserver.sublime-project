@@ -4,7 +4,7 @@
 		{
 			"path": ".",
 			"folder_exclude_patterns": ["logs", "tmp", "plugins", "docs", "css", "fonts", "img", "fixtures"],
-			"file_exclude_patterns":["*.json", "LICENSE"]
+			"file_exclude_patterns":["*.json", "LICENSE", "*.min.js", "jquery*", "bootstrap-dialog.js"]
 		},
 	],
 	"settings":

@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load apply_perms_tags %}
 {% block content_left_head %}
-    {% if not request.user.is_superuser %}
+    {% if not user.is_superuser %}
         <a href="{% url 'apply-perms:apply-permission-create' %}" class="btn btn-sm btn-primary">
             {% trans "Create apply permission" %}
         </a>
@@ -48,13 +48,13 @@
              <td class="text-center">{{ apply_permission.date_approved }}</td>
              <td class="text-center">
                 {% if apply_permission.is_updateable %}
-                    {% if apply_permission.applicant == request.user %}
+                    {% if apply_permission.applicant == user %}
                         <a href="{% url 'apply-perms:apply-permission-update' pk=apply_permission.id %}"
                             class="btn btn-xs btn-info">{% trans 'Update' %}
                         </a>
                     {% endif %}
 
-                    {% if request.user.is_superuser or apply_permission.approver == request.user %}
+                    {% if user.is_superuser or apply_permission.approver == user %}
                         <span class="approve_disapprove">
                             <a class="btn btn-xs btn-info btn-approve" data-name="{{ apply_permission.name }}"
                                 data-uid="{{ apply_permission.id }}">{% trans 'Approved' %}
@@ -65,7 +65,7 @@
                         </span>
                     {% endif %}
                 {% endif %}
-                {% if apply_permission.applicant == request.user %}
+                {% if apply_permission.applicant == user %}
                     <a class="btn btn-xs btn-danger btn-del" data-name="{{ apply_permission.name }}"
                         data-uid="{{ apply_permission.id }}">{% trans 'Delete' %}
                     </a>
