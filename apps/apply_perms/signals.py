@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, post_delete
+from django.db.models.signals import post_save
 from django.dispatch import receiver
 from apply_perms.models import ApplyPermission
 from perms.models import AssetPermission
@@ -17,17 +17,11 @@ def create_asset_permission(sender, instance, created, **kwargs):
       associate_system_users_and_assets(system_users, assets, asset_groups)
       asset_permission = AssetPermission.objects.create(name=instance.name,
                                                         is_active=True,
-                                                        created_by=instance.approver.username)
-      instance.asset_permission=asset_permission
-      instance.save()
-
+                                                        created_by=instance.approver.username,
+                                                        apply_permission=instance)
       asset_permission.user_groups=user_groups
       asset_permission.assets=assets
       asset_permission.asset_groups=asset_groups
       asset_permission.system_users=system_users
       asset_permission.save()
 
-
-@receiver(post_delete, sender = ApplyPermission)
-def delete_asset_permission(sender, instance, **kwargs):
-    pass

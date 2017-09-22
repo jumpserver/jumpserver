@@ -9,7 +9,7 @@ from django.db.models.signals import m2m_changed
 from users.models import User, UserGroup
 from assets.models import Asset, AssetGroup, SystemUser
 from common.utils import date_expired_default, combine_seq
-
+from apply_perms.models import ApplyPermission
 
 class AssetPermission(models.Model):
     # PRIVATE_FOR_CHOICE = (
@@ -29,6 +29,7 @@ class AssetPermission(models.Model):
         AssetGroup, related_name='granted_by_permissions', blank=True)
     system_users = models.ManyToManyField(
         SystemUser, related_name='granted_by_permissions')
+    apply_permission = models.OneToOneField(ApplyPermission, on_delete=models.CASCADE, blank=True, null=True, related_name="asset_permission")
     is_active = models.BooleanField(
         default=True, verbose_name=_('Active'))
     date_expired = models.DateTimeField(
