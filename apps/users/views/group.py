@@ -46,14 +46,21 @@ class UserGroupCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
                         'users': users})
         return context
 
-    # 需要添加组下用户, 而user并不是group的多对多,所以需要手动建立关系
     def form_valid(self, form):
         user_group = form.save()
+
         users_id_list = self.request.POST.getlist('users', [])
+        managers_id_list = self.request.POST.getlist('managers', [])
+
         users = User.objects.filter(id__in=users_id_list)
-        user_group.created_by = self.request.user.username or 'Admin'
+        managers = User.objects.filter(id__in=managers_id_list)
+
         user_group.users.add(*users)
+        user_group.managers.add(*managers)
+
+        user_group.created_by = self.request.user.username or 'Admin'
         user_group.save()
+
         return super(UserGroupCreateView, self).form_valid(form)
 
     def get_success_message(self, cleaned_data):
@@ -72,7 +79,6 @@ class UserGroupUpdateView(AdminUserRequiredMixin, UpdateView):
     success_url = reverse_lazy('users:user-group-list')
 
     def get_context_data(self, **kwargs):
-        # self.object = self.get_object()
         context = super(UserGroupUpdateView, self).get_context_data(**kwargs)
         users = User.objects.all()
         group_users = [user.id for user in self.object.users.all()]
@@ -85,12 +91,17 @@ class UserGroupUpdateView(AdminUserRequiredMixin, UpdateView):
         return context
 
     def form_valid(self, form):
-        user_group = form.save()
+        obj = self.object
         users_id_list = self.request.POST.getlist('users', [])
+        managers_id_list = self.request.POST.getlist('managers', [])
+
         users = User.objects.filter(id__in=users_id_list)
-        user_group.users.clear()
-        user_group.users.add(*users)
-        user_group.save()
+        managers = User.objects.filter(id__in=managers_id_list)
+
+        obj.users=users
+        obj.managers=managers
+        obj.save()
+
         return super(UserGroupUpdateView, self).form_valid(form)
 
 
