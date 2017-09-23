@@ -46,6 +46,11 @@ class UserGroupCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
                         'users': users})
         return context
 
+    def get_form_kwargs(self):
+        kwargs = super(UserGroupCreateView, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
+
     def form_valid(self, form):
         user_group = form.save()
 

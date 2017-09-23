@@ -169,10 +169,20 @@ class UserGroupForm(forms.ModelForm):
         widget=forms.SelectMultiple(
             attrs={'class': 'select2', 'data-placeholder': _('Select User')})
     )
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if name.lower() in ['default', 'admin', 'administrator'] and not self.user.is_superuser:
+            raise forms.ValidationError(_("You can't use the name Default or Admin"))
+        return name
+
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super(UserGroupForm, self).__init__(*args, **kwargs)
+
     class Meta:
         model = UserGroup
         fields = [
-            'name', 'comment'
+            'name', 'managers', 'users', 'comment'
         ]
         help_texts = {
             'name': '* required'
