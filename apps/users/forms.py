@@ -156,7 +156,7 @@ class UserBulkUpdateForm(forms.ModelForm):
 
 class UserGroupForm(forms.ModelForm):
     managers = forms.ModelMultipleChoiceField(
-        queryset=User.objects.all(),
+        queryset=User.objects.filter(role__in=['Admin', 'GroupAdmin']),
         label=_('GroupAdministrator'),
         required=False,
         widget=forms.SelectMultiple(
