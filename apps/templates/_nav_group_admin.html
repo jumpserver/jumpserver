@@ -1,0 +1,47 @@
+{% load i18n %}
+<li id="users">
+    <a href="#">
+        <i class="fa fa-group"></i> <span class="nav-label">{% trans 'Users' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level active">
+        <li id="user"><a href="{% url 'users:user-list' %}">{% trans 'User' %}</a></li>
+        <li id="user-group"><a href="{% url 'users:user-group-list' %}">{% trans 'User group' %}</a></li>
+    </ul>
+</li>
+<li id="assets">
+    <a>
+        <i class="fa fa-inbox"></i> <span class="nav-label">{% trans 'Assets' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level">
+        <li id="asset"><a href="{% url 'assets:asset-list' %}">{% trans 'Asset' %}</a></li>
+        <li id="asset-group"><a href="{% url 'assets:asset-group-list' %}">{% trans 'Asset group' %}</a></li>
+        <li id="system-user"><a href="{% url 'assets:system-user-list' %}">{% trans 'System user' %}</a></li>
+    </ul>
+</li>
+<li id="perms">
+    <a href="#">
+        <i class="fa fa-edit"></i> <span class="nav-label">{% trans 'Perms' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level">
+        <li id="asset-permission">
+            <a href="{% url 'perms:asset-permission-list' %}">{% trans 'Asset permission' %}</a>
+        </li>
+        <li id="permission-approval">
+            <a href="{% url 'apply-perms:apply-permission-list' %}">{% trans 'Permission approval' %}</a>
+        </li>
+    </ul>
+</li>
+
+<li id="applications">
+    <a>
+        <i class="fa fa-rocket"></i> <span class="nav-label">{% trans 'Applications' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level">
+        <li id="terminal"><a href="{% url 'applications:terminal-list' %}">{% trans 'Terminal' %}</a></li>
+    </ul>
+</li>
+<li class="special_link">
+    <a href="http://www.jumpserver.org" target="_blank"><i class="fa fa-database"></i>
+        <span class="nav-label">{% trans 'Visit us' %}</span>
+    </a>
+</li>
