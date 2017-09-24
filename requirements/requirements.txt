@@ -21,3 +21,4 @@ gssapi
 django-rest-swagger
 django-auth-ldap
 ldap3
+chardet>=3.0.4
