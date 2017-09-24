@@ -24,3 +24,4 @@ tags
 jumpserver.iml
 .python-version
 tmp/*
+__pycache__
