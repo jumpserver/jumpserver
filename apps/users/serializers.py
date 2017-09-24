@@ -52,7 +52,7 @@ class UserUpdateGroupSerializer(serializers.ModelSerializer):
 
 class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     user_amount = serializers.SerializerMethodField()
-    managers = serializers.SerializerMethodField()
+    managers_display = serializers.SerializerMethodField()
 
     class Meta:
         model = UserGroup
@@ -64,7 +64,7 @@ class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         return obj.users.count()
 
     @staticmethod
-    def get_managers(obj):
+    def get_managers_display(obj):
         return " ".join([manager.username for manager in obj.managers.all()])
 
 

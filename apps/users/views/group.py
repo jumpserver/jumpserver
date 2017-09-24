@@ -14,7 +14,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from common.utils import get_logger
 from perms.models import AssetPermission
 from ..models import User, UserGroup
-from ..utils import AdminUserRequiredMixin
+from ..utils import AdminUserRequiredMixin, AdminOrGroupAdminRequiredMixin
 from .. import forms
 
 __all__ = ['UserGroupListView', 'UserGroupCreateView', 'UserGroupDetailView',
@@ -23,7 +23,7 @@ __all__ = ['UserGroupListView', 'UserGroupCreateView', 'UserGroupDetailView',
 logger = get_logger(__name__)
 
 
-class UserGroupListView(AdminUserRequiredMixin, TemplateView):
+class UserGroupListView(AdminOrGroupAdminRequiredMixin, TemplateView):
     template_name = 'users/user_group_list.html'
 
     def get_context_data(self, **kwargs):
@@ -94,6 +94,11 @@ class UserGroupUpdateView(AdminUserRequiredMixin, UpdateView):
             'group_users': group_users
         })
         return context
+
+    def get_form_kwargs(self):
+        kwargs = super(UserGroupUpdateView, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
 
     def form_valid(self, form):
         obj = self.object

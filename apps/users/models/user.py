@@ -131,6 +131,10 @@ class User(AbstractUser):
         return self.role in ['GroupAdmin', 'User']
 
     @property
+    def is_admin(self):
+        return self.role in ['GroupAdmin', 'Admin']
+
+    @property
     def is_groupadmin(self):
         return self.role == 'GroupAdmin'
 
@@ -166,6 +170,13 @@ class User(AbstractUser):
     @property
     def private_token(self):
         return self.create_private_token()
+
+    @property
+    def managed_users(self):
+        ids = list()
+        for i in self.managed_groups.values('id'):
+            ids.append(i['id'])
+        return User.objects.filter(groups__id__in=ids)
 
     def create_private_token(self):
         from .authentication import PrivateToken

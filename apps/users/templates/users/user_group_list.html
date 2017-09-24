@@ -64,7 +64,7 @@ $(document).ready(function() {
                 }
              }}],
         ajax_url: '{% url "api-users:user-group-list" %}',
-        columns: [{data: function(){return ""}}, {data: "name" }, {data: "user_amount"}, {data: 'managers'},
+        columns: [{data: function(){return ""}}, {data: "name" }, {data: "user_amount"}, {data: 'managers_display'},
                           {data: "comment"}, {data: "id" }],
         order: [5, 'asc'],
         op_html: $('#actions').html()

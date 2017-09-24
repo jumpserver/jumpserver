@@ -27,6 +27,13 @@ class IsSuperUser(IsValidUser):
         return super(IsSuperUser, self).has_permission(request, view) \
             and request.user.is_superuser
 
+class IsAdminUser(IsValidUser):
+    """Allows access to superuser or group admin"""
+
+    def has_permission(self, request, view):
+        return super(IsAdminUser, self).has_permission(request, view) \
+            and request.user.is_admin
+
 
 class IsSuperUserOrAppUser(IsValidUser):
     """Allows access between superuser and app user"""

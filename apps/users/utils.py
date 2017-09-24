@@ -35,6 +35,16 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
             return False
         return True
 
+class AdminOrGroupAdminRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        usr = self.request.user
+        if not usr.is_authenticated:
+            return False
+        elif not usr.is_admin:
+            self.raise_exception = True
+            return False
+        return True
+
 class ApplyUserRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         if not self.request.user.is_authenticated:
@@ -179,5 +189,4 @@ def generate_token(request, user):
         cache.set(token, user.id, expiration)
         cache.set('%s_%s' % (user.id, remote_addr), token, expiration)
     return token
-
 
