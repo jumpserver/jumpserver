@@ -36,6 +36,10 @@
 	$ sudo yum -y install `cat rpm_requirements.txt`
 	$ pip install -r requirements.txt -i https://pypi.doubanio.com/simple
 
+    // 解决Mac安装ldap提示 Modules/LDAPObject.c:18:10: fatal error: 'sasl.h' file not found
+     pip install python-ldap \
+        --global-option=build_ext \
+        --global-option="-I$(xcrun --show-sdk-path)/usr/include/sasl"
 
 ##### 2.3 准备配置文件
 

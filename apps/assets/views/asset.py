@@ -5,6 +5,7 @@ import csv
 import json
 import uuid
 import codecs
+import chardet
 from io import StringIO
 from collections import defaultdict
 
@@ -243,10 +244,11 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
     form_class = forms.FileForm
 
     def form_valid(self, form):
-        file = form.cleaned_data['file']
-        data = file.read().decode('utf-8').strip(
-            codecs.BOM_UTF8.decode('utf-8'))
-        csv_file = StringIO(data)
+        f = form.cleaned_data['file']
+        det_result = chardet.detect(f.read())
+        f.seek(0)  # reset file seek index
+        file_data = f.read().decode(det_result['encoding']).strip(codecs.BOM_UTF8.decode())
+        csv_file = StringIO(file_data)
         reader = csv.reader(csv_file)
         csv_data = [row for row in reader]
         fields = [
@@ -270,8 +272,15 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
         for row in csv_data[1:]:
             if set(row) == {''}:
                 continue
+
             asset_dict = dict(zip(attr, row))
             id_ = asset_dict.pop('id', 0)
+
+            try:
+                id_ = int(id_)
+            except ValueError:
+                id_ = 0
+
             asset = get_object_or_none(Asset, id=id_)
             for k, v in asset_dict.items():
                 if k == 'idc':
@@ -295,11 +304,13 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
             if not asset:
                 try:
                     groups = asset_dict.pop('groups')
+                    if len(Asset.objects.filter(hostname=asset_dict.get('hostname'))):
+                        raise Exception(_('already exists'))
                     asset = Asset.objects.create(**asset_dict)
                     asset.groups.set(groups)
                     created.append(asset_dict['hostname'])
                     assets.append(asset)
-                except IndexError as e:
+                except Exception as e:
                     failed.append('%s: %s' % (asset_dict['hostname'], str(e)))
             else:
                 for k, v in asset_dict.items():
@@ -316,6 +327,7 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
 
         if assets:
             update_assets_hardware_info.delay([asset._to_secret_json() for asset in assets])
+
 
         data = {
             'created': created,
