@@ -198,9 +198,10 @@ class AssetDetailView(DetailView):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class AssetExportView(View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request):
         spm = request.GET.get('spm', '')
-        assets_id = cache.get(spm, [Asset.objects.first().id])
+        assets_id_default = [Asset.objects.first().id] if Asset.objects.first() else [1]
+        assets_id = cache.get(spm, assets_id_default)
         fields = [
             field for field in Asset._meta.fields
             if field.name not in [
