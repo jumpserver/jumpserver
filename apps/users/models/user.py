@@ -173,10 +173,7 @@ class User(AbstractUser):
 
     @property
     def managed_users(self):
-        ids = list()
-        for i in self.managed_groups.values('id'):
-            ids.append(i['id'])
-        return User.objects.filter(groups__id__in=ids)
+        return User.objects.filter(groups__id__in=self.managed_groups.values_list('id',flat=True))
 
     def create_private_token(self):
         from .authentication import PrivateToken

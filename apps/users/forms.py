@@ -171,13 +171,27 @@ class UserGroupForm(forms.ModelForm):
     )
     def clean_name(self):
         name = self.cleaned_data['name']
-        if name.lower() in ['default', 'admin', 'administrator'] and not self.user.is_superuser:
+        if name.lower() in ['default', 'admin', 'administrator'] and not self.is_superuser:
             raise forms.ValidationError(_("You can't use the name Default or Admin"))
         return name
 
     def __init__(self, *args, **kwargs):
-        self.user = kwargs.pop('user', None)
+        self.is_superuser = kwargs.pop('user', None).is_superuser
         super(UserGroupForm, self).__init__(*args, **kwargs)
+        instance = kwargs['instance']
+        if instance:
+            self.fields['users'].initial= (
+                instance.users.values_list(
+                    'id', flat=True
+                )
+            )
+            self.fields['managers'].initial= (
+                instance.managers.values_list(
+                    'id', flat=True
+                )
+            )
+        self.fields['managers'].widget.attrs['disabled'] = not self.is_superuser
+        self.fields['name'].widget.attrs['readonly'] = not self.is_superuser
 
     class Meta:
         model = UserGroup

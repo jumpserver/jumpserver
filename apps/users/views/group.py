@@ -77,23 +77,11 @@ class UserGroupCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
         )
 
 
-class UserGroupUpdateView(AdminUserRequiredMixin, UpdateView):
+class UserGroupUpdateView(AdminOrGroupAdminRequiredMixin, UpdateView):
     model = UserGroup
     form_class = forms.UserGroupForm
     template_name = 'users/user_group_create_update.html'
     success_url = reverse_lazy('users:user-group-list')
-
-    def get_context_data(self, **kwargs):
-        context = super(UserGroupUpdateView, self).get_context_data(**kwargs)
-        users = User.objects.all()
-        group_users = [user.id for user in self.object.users.all()]
-        context.update({
-            'app': _('Users'),
-            'action': _('Update user group'),
-            'users': users,
-            'group_users': group_users
-        })
-        return context
 
     def get_form_kwargs(self):
         kwargs = super(UserGroupUpdateView, self).get_form_kwargs()
@@ -103,19 +91,18 @@ class UserGroupUpdateView(AdminUserRequiredMixin, UpdateView):
     def form_valid(self, form):
         obj = self.object
         users_id_list = self.request.POST.getlist('users', [])
-        managers_id_list = self.request.POST.getlist('managers', [])
+        obj.users = User.objects.filter(id__in=users_id_list)
 
-        users = User.objects.filter(id__in=users_id_list)
-        managers = User.objects.filter(id__in=managers_id_list)
+        if self.request.user.is_superuser:
+            managers_id_list = self.request.POST.getlist('managers', [])
+            obj.managers = User.objects.filter(id__in=managers_id_list)
 
-        obj.users=users
-        obj.managers=managers
         obj.save()
 
         return super(UserGroupUpdateView, self).form_valid(form)
 
 
-class UserGroupDetailView(AdminUserRequiredMixin, DetailView):
+class UserGroupDetailView(AdminOrGroupAdminRequiredMixin, DetailView):
     model = UserGroup
     context_object_name = 'user_group'
     template_name = 'users/user_group_detail.html'
