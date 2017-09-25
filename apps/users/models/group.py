@@ -26,7 +26,7 @@ class UserGroup(NoDeleteModelMixin):
     __str__ = __unicode__
 
     def delete(self, using=None, keep_parents=False):
-        self.group_ptr.delete()
+        #self.group_ptr.delete()
         if self.name != 'Default':
             self.users.clear()
             return super(UserGroup, self).delete()
