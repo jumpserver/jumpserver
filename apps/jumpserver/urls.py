@@ -19,7 +19,7 @@ urlpatterns = [
     url(r'^audits/', include('audits.urls.views_urls', namespace='audits')),
     url(r'^applications/', include('applications.urls.views_urls', namespace='applications')),
     url(r'^ops/', include('ops.urls.view_urls', namespace='ops')),
-    url(r'^hybris/', include('hybris.urls.view_urls', namespace='hybris')),
+    url(r'^devops/', include('devops.urls.view_urls', namespace='devops')),
 
     # Api url view map
     url(r'^api/users/', include('users.urls.api_urls', namespace='api-users')),
@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^api/applications/', include('applications.urls.api_urls', namespace='api-applications')),
     url(r'^api/ops/', include('ops.urls.api_urls', namespace='api-ops')),
     url(r'^captcha/', include('captcha.urls')),
+    url(r'^api/devops/', include('devops.urls.api_urls', namespace='api-devops')),
 
 ]
 

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import json
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -19,7 +20,7 @@ class Template(models.Model):
     allowed_delete = models.BooleanField(default=True, verbose_name=_('Allowed Delete'))
 
     def __unicode__(self):
-        return self.name
+        return str({'id': self.id, 'name': self.name})
 
     __str__ = __unicode__
 
@@ -35,5 +36,3 @@ class InstallTemplate(models.Model):
     jrebel_path = models.CharField(max_length=500, verbose_name=_('Jrebel Path'), default='/opt/jrebel')
     db_driver_url = models.CharField(max_length=2000, verbose_name=_('Db Driver Url'),
                                      help_text=_('Db Driver Url Help'))
-
-

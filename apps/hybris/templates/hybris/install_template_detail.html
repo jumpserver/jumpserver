@@ -97,6 +97,7 @@
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
                                                     <select data-placeholder="{% trans 'Select assets' %}"
+                                                            id="select-asset"
                                                             class="select2" style="width: 100%" multiple=""
                                                             tabindex="4">
                                                         {% for asset in assets %}
@@ -107,7 +108,7 @@
                                             </tr>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <button type="button"
+                                                    <button type="button" id="btn-asset-confirm"
                                                             class="btn btn-primary btn-sm">{% trans 'Confirm' %}</button>
                                                 </td>
                                             </tr>
@@ -129,6 +130,7 @@
                                                 <td colspan="2" class="no-borders">
                                                     <select data-placeholder="{% trans 'Select asset groups' %}"
                                                             class="select2" style="width: 100%" multiple=""
+                                                            id="select-group"
                                                             tabindex="4">
                                                         {% for asset_group in asset_groups %}
                                                             <option value="{{ asset_group.id }}">{{ asset_group.name }}</option>
@@ -139,6 +141,7 @@
                                             <tr>
                                                 <td colspan="2" class="no-borders">
                                                     <button type="button" class="btn btn-info btn-small"
+                                                            id="btn-group-confirm"
                                                             id="btn_add_user_group">{% trans 'Confirm' %}</button>
                                                 </td>
                                             </tr>
@@ -160,7 +163,54 @@
     <script>
         $(document).ready(function () {
             $('.select2').select2();
+
+        }).on('click', '#btn-asset-confirm', function () {
+            //找出选中的资产
+            let assets = [];
+            let res = $('#select-asset').select2('data')
+            $(res).each(function (index, element) {
+                assets.push(element.id)
+            })
+
+
+            SubmitAssetTask(assets)
+        }).on('click', '#btn-group-confirm', function () {
+            //找出选中的资产
+            let assets = [];
+            let res = $('#select-group').select2('data')
+            $(res).each(function (index, element) {
+                assets.push(element.id)
+            })
+
+
+            SubmitGroupTask(assets)
         });
+
+        function SubmitAssetTask(assets) {
+            let the_url = "{% url 'api-hybris:template-task' pk=install_task.id %}";
+            let success = function (data) {
+                alert(data)
+            };
+            let body = {assets: Object.assign([], assets), groups: []};
+            APIUpdateAttr({
+                url: the_url,
+                success: success,
+                body: JSON.stringify(body)
+            })
+        }
+
+        function SubmitGroupTask(groups) {
+            let the_url = "{% url 'api-hybris:template-task' pk=install_task.id %}";
+            let success = function (data) {
+                alert(data)
+            };
+            let body = {groups: Object.assign([], groups), assets: []};
+            APIUpdateAttr({
+                url: the_url,
+                success: success,
+                body: JSON.stringify(body)
+            })
+        }
     </script>
 {% endblock %}
 
