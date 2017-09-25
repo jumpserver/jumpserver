@@ -13,3 +13,4 @@ class Task(models.Model):
     tags = JSONField(verbose_name=_('Tags'))
     assets = models.ManyToManyField(Asset, verbose_name=_('Assets'), related_name='task')
     groups = models.ManyToManyField(AssetGroup, verbose_name=_('Asset Groups'), related_name='task')
+    user = models.ForeignKey(SystemUser, verbose_name=_('System User'), related_name='task')

@@ -19,8 +19,9 @@ logger = logging.getLogger(__name__)
 class TaskListView(LoginRequiredMixin, ListView):
     model = Task
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    template_name = 'devops/tasks.html'
+    template_name = 'devops/task_list.html'
     context_object_name = 'tasks'
+    ordering = 'id'
 
     def get_context_data(self, **kwargs):
         context = {
@@ -29,4 +30,3 @@ class TaskListView(LoginRequiredMixin, ListView):
         }
         kwargs.update(context)
         return super(TaskListView, self).get_context_data(**kwargs)
-

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-25 14:53+0800\n"
+"POT-Creation-Date: 2017-09-25 22:23+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -31,9 +31,10 @@ msgstr ""
 #: assets/templates/assets/system_user_detail.html:52
 #: assets/templates/assets/system_user_list.html:17 audits/models.py:18
 #: audits/templates/audits/login_log_list.html:49 devops/models.py:10
-#: hybris/models/models.py:17 hybris/templates/hybris/templates.html:18
-#: ops/models.py:20 ops/templates/ops/task_detail.html:50
-#: ops/templates/ops/task_list.html:39 perms/models.py:21
+#: devops/templates/devops/task_list.html:21 hybris/models/models.py:17
+#: hybris/templates/hybris/templates.html:18 ops/models.py:20
+#: ops/templates/ops/task_detail.html:50 ops/templates/ops/task_list.html:39
+#: perms/models.py:21
 #: perms/templates/perms/asset_permission_create_update.html:33
 #: perms/templates/perms/asset_permission_detail.html:62
 #: perms/templates/perms/asset_permission_list.html:11
@@ -159,6 +160,7 @@ msgstr "在线"
 #: assets/templates/assets/idc_list.html:23
 #: assets/templates/assets/system_user_asset.html:51
 #: assets/templates/assets/system_user_list.html:22
+#: devops/templates/devops/task_list.html:26
 #: hybris/templates/hybris/templates.html:20
 #: ops/templates/ops/task_list.html:45
 #: perms/templates/perms/asset_permission_list.html:18
@@ -467,7 +469,7 @@ msgstr "资产组"
 msgid "Admin user"
 msgstr "管理用户"
 
-#: assets/models/asset.py:50
+#: assets/models/asset.py:50 devops/models.py:16
 msgid "System User"
 msgstr "系统用户"
 
@@ -1404,16 +1406,16 @@ msgstr ""
 msgid "discard time"
 msgstr ""
 
-#: devops/models.py:11 hybris/models/models.py:18
-#: hybris/templates/hybris/templates.html:19
+#: devops/models.py:11 devops/templates/devops/task_list.html:22
+#: hybris/models/models.py:18 hybris/templates/hybris/templates.html:19
 msgid "Description"
 msgstr ""
 
-#: devops/models.py:12
+#: devops/models.py:12 devops/templates/devops/task_list.html:23
 msgid "Ansible Role"
 msgstr ""
 
-#: devops/models.py:13
+#: devops/models.py:13 devops/templates/devops/task_list.html:24
 msgid "Tags"
 msgstr ""
 
@@ -1423,16 +1425,25 @@ msgstr ""
 msgid "Asset Groups"
 msgstr "资产组"
 
-#: devops/templates/devops/tasks.html:7
-#| msgid "Create asset"
+#: devops/templates/devops/task_list.html:7
 msgid "Create Task"
 msgstr "创建任务"
 
-#: devops/views.py:27 templates/_nav.html:57
+#: devops/templates/devops/task_list.html:20
+#: hybris/templates/hybris/templates.html:17
+msgid "Id"
+msgstr ""
+
+#: devops/templates/devops/task_list.html:25
+#| msgid "Select User"
+msgid "Execute User"
+msgstr "执行用户"
+
+#: devops/views.py:28 templates/_nav.html:57
 msgid "Ansible"
 msgstr ""
 
-#: devops/views.py:28 templates/_nav.html:60
+#: devops/views.py:29 templates/_nav.html:60
 #, fuzzy
 #| msgid "Task"
 msgid "Tasks"
@@ -1498,10 +1509,6 @@ msgstr "任务"
 #| msgid "Configuration"
 msgid "Create Configuration"
 msgstr "配置"
-
-#: hybris/templates/hybris/templates.html:17
-msgid "Id"
-msgstr ""
 
 #: hybris/views/install_templates.py:27 hybris/views/install_templates.py:50
 #: hybris/views/templates.py:26
