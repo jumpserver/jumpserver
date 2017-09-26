@@ -14,18 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from rest_framework import viewsets, generics, mixins
-
-
+from rest_framework import generics
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework_bulk import BulkModelViewSet, BulkDestroyAPIView
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin, ListBulkCreateUpdateDestroyAPIView
+from rest_framework_bulk import BulkModelViewSet
+from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 from django.shortcuts import get_object_or_404
 
 from common.mixins import IDInFilterMixin
-from common.utils import get_object_or_none, signer
+from common.utils import get_object_or_none
 from .hands import IsSuperUser, IsAppUser, IsValidUser, \
     get_user_granted_assets, push_users
 from .models import AssetGroup, Asset, IDC, SystemUser, AdminUser
@@ -61,54 +57,66 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
 
 
 class AssetGroupViewSet(IDInFilterMixin, BulkModelViewSet):
+    """Asset group api set, for add,delete,update,list,retrieve resource"""
     queryset = AssetGroup.objects.all()
     serializer_class = serializers.AssetGroupSerializer
     permission_classes = (IsSuperUser,)
 
 
 class AssetUpdateGroupApi(generics.RetrieveUpdateAPIView):
+    """Asset update it's group api"""
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetUpdateGroupSerializer
     permission_classes = (IsSuperUser,)
 
 
 class AssetGroupUpdateApi(generics.RetrieveUpdateAPIView):
+    """Asset group, update it's asset member"""
     queryset = AssetGroup.objects.all()
     serializer_class = serializers.AssetGroupUpdateSerializer
     permission_classes = (IsSuperUser,)
 
 
 class AssetGroupUpdateSystemUserApi(generics.RetrieveUpdateAPIView):
+    """Asset group push system user"""
     queryset = AssetGroup.objects.all()
     serializer_class = serializers.AssetGroupUpdateSystemUserSerializer
     permission_classes = (IsSuperUser,)
 
 
 class IDCUpdateAssetsApi(generics.RetrieveUpdateAPIView):
+    """IDC update asset member"""
     queryset = IDC.objects.all()
     serializer_class = serializers.IDCUpdateAssetsSerializer
     permission_classes = (IsSuperUser,)
 
 
 class IDCViewSet(IDInFilterMixin, BulkModelViewSet):
+    """IDC api set, for add,delete,update,list,retrieve resource"""
     queryset = IDC.objects.all()
     serializer_class = serializers.IDCSerializer
     permission_classes = (IsSuperUser,)
 
 
 class AdminUserViewSet(IDInFilterMixin, BulkModelViewSet):
+    """Admin user api set, for add,delete,update,list,retrieve resource"""
     queryset = AdminUser.objects.all()
     serializer_class = serializers.AdminUserSerializer
     permission_classes = (IsSuperUser,)
 
 
 class SystemUserViewSet(IDInFilterMixin, BulkModelViewSet):
+    """System user api set, for add,delete,update,list,retrieve resource"""
     queryset = SystemUser.objects.all()
     serializer_class = serializers.SystemUserSerializer
     permission_classes = (IsSuperUser,)
 
 
 class SystemUserUpdateApi(generics.RetrieveUpdateAPIView):
+    """Asset update it's system user
+
+    when update then push system user to asset.
+    """
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetUpdateSystemUserSerializer
     permission_classes = (IsSuperUser,)
@@ -125,24 +133,28 @@ class SystemUserUpdateApi(generics.RetrieveUpdateAPIView):
 
 
 class SystemUserUpdateAssetsApi(generics.RetrieveUpdateAPIView):
+    """System user update it's assets"""
     queryset = SystemUser.objects.all()
     serializer_class = serializers.SystemUserUpdateAssetsSerializer
     permission_classes = (IsSuperUser,)
 
 
 class SystemUserUpdateAssetGroupApi(generics.RetrieveUpdateAPIView):
+    """System user update asset group"""
     queryset = SystemUser.objects.all()
     serializer_class = serializers.SystemUserUpdateAssetGroupSerializer
     permission_classes = (IsSuperUser,)
 
 
 class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
+    """Asset bulk update api"""
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
     permission_classes = (IsSuperUser,)
 
 
 class SystemUserAuthInfoApi(generics.RetrieveAPIView):
+    """Get system user auth info"""
     queryset = SystemUser.objects.all()
     permission_classes = (IsAppUser,)
 
@@ -160,6 +172,7 @@ class SystemUserAuthInfoApi(generics.RetrieveAPIView):
 
 
 class AssetRefreshHardwareView(generics.RetrieveAPIView):
+    """Refresh asset hardware info"""
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
     permission_classes = (IsSuperUser,)
@@ -175,6 +188,7 @@ class AssetRefreshHardwareView(generics.RetrieveAPIView):
 
 
 class AssetAdminUserTestView(AssetRefreshHardwareView):
+    """Test asset admin user connectivity"""
     queryset = Asset.objects.all()
     permission_classes = (IsSuperUser,)
 
@@ -189,6 +203,7 @@ class AssetAdminUserTestView(AssetRefreshHardwareView):
 
 
 class AssetGroupPushSystemUserView(generics.UpdateAPIView):
+    """Asset group push system user api"""
     queryset = AssetGroup.objects.all()
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.AssetSerializer
