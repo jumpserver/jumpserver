@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404, reverse, redirect
 
 from .. import forms
 from ..models import Asset, AssetGroup, AdminUser, IDC, SystemUser
-from ..hands import AdminUserRequiredMixin
+from ..hands import AdminOrGroupAdminRequiredMixin
 
 
 __all__ = ['AssetGroupCreateView', 'AssetGroupDetailView',
@@ -18,8 +18,43 @@ __all__ = ['AssetGroupCreateView', 'AssetGroupDetailView',
            'AssetGroupDeleteView',
            ]
 
+class AssetGroupListView(AdminOrGroupAdminRequiredMixin, TemplateView):
+    template_name = 'assets/asset_group_list.html'
 
-class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Assets'),
+            'action': _('Asset group list'),
+            'assets': Asset.objects.all(),
+            'system_users': SystemUser.objects.all(),
+            'keyword': self.request.GET.get('keyword', '')
+        }
+        kwargs.update(context)
+        return super(AssetGroupListView, self).get_context_data(**kwargs)
+
+
+class AssetGroupDetailView(AdminOrGroupAdminRequiredMixin, DetailView):
+    model = AssetGroup
+    template_name = 'assets/asset_group_detail.html'
+    context_object_name = 'asset_group'
+
+    def get_context_data(self, **kwargs):
+        assets_remain = Asset.objects.exclude(id__in=self.object.assets.all())
+        system_users = SystemUser.objects.all()
+        system_users_remain = SystemUser.objects.exclude(id__in=system_users)
+        context = {
+            'app': _('Assets'),
+            'action': _('Asset group detail'),
+            'assets_remain': assets_remain,
+            'assets': [asset for asset in Asset.objects.all()
+                       if asset not in assets_remain],
+            'system_users': system_users,
+            'system_users_remain': system_users_remain,
+        }
+        kwargs.update(context)
+        return super(AssetGroupDetailView, self).get_context_data(**kwargs)
+
+class AssetGroupCreateView(AdminOrGroupAdminRequiredMixin, CreateView):
     model = AssetGroup
     form_class = forms.AssetGroupForm
     template_name = 'assets/asset_group_create.html'
@@ -45,44 +80,7 @@ class AssetGroupCreateView(AdminUserRequiredMixin, CreateView):
         return super(AssetGroupCreateView, self).form_valid(form)
 
 
-class AssetGroupListView(AdminUserRequiredMixin, TemplateView):
-    template_name = 'assets/asset_group_list.html'
-
-    def get_context_data(self, **kwargs):
-        context = {
-            'app': _('Assets'),
-            'action': _('Asset group list'),
-            'assets': Asset.objects.all(),
-            'system_users': SystemUser.objects.all(),
-            'keyword': self.request.GET.get('keyword', '')
-        }
-        kwargs.update(context)
-        return super(AssetGroupListView, self).get_context_data(**kwargs)
-
-
-class AssetGroupDetailView(AdminUserRequiredMixin, DetailView):
-    model = AssetGroup
-    template_name = 'assets/asset_group_detail.html'
-    context_object_name = 'asset_group'
-
-    def get_context_data(self, **kwargs):
-        assets_remain = Asset.objects.exclude(id__in=self.object.assets.all())
-        system_users = SystemUser.objects.all()
-        system_users_remain = SystemUser.objects.exclude(id__in=system_users)
-        context = {
-            'app': _('Assets'),
-            'action': _('Asset group detail'),
-            'assets_remain': assets_remain,
-            'assets': [asset for asset in Asset.objects.all()
-                       if asset not in assets_remain],
-            'system_users': system_users,
-            'system_users_remain': system_users_remain,
-        }
-        kwargs.update(context)
-        return super(AssetGroupDetailView, self).get_context_data(**kwargs)
-
-
-class AssetGroupUpdateView(AdminUserRequiredMixin, UpdateView):
+class AssetGroupUpdateView(AdminOrGroupAdminRequiredMixin, UpdateView):
     model = AssetGroup
     form_class = forms.AssetGroupForm
     template_name = 'assets/asset_group_create.html'
@@ -105,7 +103,7 @@ class AssetGroupUpdateView(AdminUserRequiredMixin, UpdateView):
         return super(AssetGroupUpdateView, self).get_context_data(**kwargs)
 
 
-class AssetGroupDeleteView(AdminUserRequiredMixin, DeleteView):
+class AssetGroupDeleteView(AdminOrGroupAdminRequiredMixin, DeleteView):
     template_name = 'assets/delete_confirm.html'
     model = AssetGroup
     success_url = reverse_lazy('assets:asset-group-list')

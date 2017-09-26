@@ -26,7 +26,7 @@ from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none
 from .. import forms
 from ..models import Asset, AssetGroup, AdminUser, IDC, SystemUser
-from ..hands import AdminUserRequiredMixin
+from ..hands import AdminUserRequiredMixin, AdminOrGroupAdminRequiredMixin
 from ..tasks import update_assets_hardware_info
 
 

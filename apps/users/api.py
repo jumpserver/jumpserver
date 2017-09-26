@@ -54,7 +54,7 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_fields = ('username', 'email', 'name', 'id')
 
     def get_queryset(self):
-        if not self.request.user.is_groupadmin:
+        if self.request.user.is_groupadmin:
             return self.request.user.managed_users.order_by("date_joined")
         else:
             return User.objects.order_by("date_joined")
@@ -117,7 +117,7 @@ class UserGroupViewSet(IDInFilterMixin, BulkModelViewSet):
 class UserGroupUpdateUserApi(generics.RetrieveUpdateAPIView):
     queryset = UserGroup.objects.all()
     serializer_class = serializers.UserGroupUpdateMemeberSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsAdminUser,)
 
 
 class UserToken(APIView):

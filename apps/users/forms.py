@@ -19,6 +19,8 @@ class UserLoginForm(AuthenticationForm):
 
 
 class UserCreateUpdateForm(forms.ModelForm):
+    email = forms.EmailField(required=False, label=_('Email'),)
+    name = forms.CharField(required=False, label=_('Name'),)
     class Meta:
         model = User
         fields = [
@@ -27,8 +29,6 @@ class UserCreateUpdateForm(forms.ModelForm):
         ]
         help_texts = {
             'username': '* required',
-            'name': '* required',
-            'email': '* required',
         }
         widgets = {
             'groups': forms.SelectMultiple(
@@ -91,10 +91,7 @@ class UserPublicKeyForm(forms.Form):
         help_text=_('Paste your id_rsa.pub here.'))
 
     def __init__(self, *args, **kwargs):
-        if 'instance' in kwargs:
-            self.instance = kwargs.pop('instance')
-        else:
-            self.instance = None
+        self.instance = kwargs.pop('instance')
         super(UserPublicKeyForm, self).__init__(*args, **kwargs)
 
     def clean_public_key(self):

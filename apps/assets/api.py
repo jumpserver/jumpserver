@@ -27,7 +27,7 @@ from django.shortcuts import get_object_or_404
 from common.mixins import IDInFilterMixin
 from common.utils import get_object_or_none, signer
 from .hands import IsSuperUser, IsAppUser, IsValidUser, \
-    get_user_granted_assets, push_users
+    get_user_granted_assets, push_users, IsAdminUser
 from .models import AssetGroup, Asset, IDC, SystemUser, AdminUser
 from . import serializers
 from .tasks import update_assets_hardware_info
@@ -63,19 +63,19 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
 class AssetGroupViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = AssetGroup.objects.all()
     serializer_class = serializers.AssetGroupSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsAdminUser,)
 
 
 class AssetUpdateGroupApi(generics.RetrieveUpdateAPIView):
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetUpdateGroupSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsAdminUser,)
 
 
 class AssetGroupUpdateApi(generics.RetrieveUpdateAPIView):
     queryset = AssetGroup.objects.all()
     serializer_class = serializers.AssetGroupUpdateSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsAdminUser,)
 
 
 class AssetGroupUpdateSystemUserApi(generics.RetrieveUpdateAPIView):

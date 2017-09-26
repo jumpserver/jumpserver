@@ -2013,6 +2013,10 @@ msgstr "创建用户"
 msgid "Reset link will be generated and sent to the user. "
 msgstr "生成重置密码连接，通过邮件发送给用户"
 
+#: users/templates/users/user_create.html:13
+msgid "Initial password is 123456. User should change it at first login."
+msgstr "初始密码为123456，用户第一次登录时更换密码"
+
 #: users/templates/users/user_detail.html:109
 #: users/templates/users/user_profile.html:92
 msgid "Last login"

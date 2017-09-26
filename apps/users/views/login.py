@@ -139,7 +139,7 @@ class UserResetPasswordView(TemplateView):
         return super(UserResetPasswordView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        password = request.POST.get('password')
+        old_password = request.POST.get('2-old_password')
         password_confirm = request.POST.get('password-confirm')
         token = request.GET.get('token')
 
@@ -156,7 +156,7 @@ class UserResetPasswordView(TemplateView):
 
 class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
     template_name = 'users/first_login.html'
-    form_list = [forms.UserProfileForm, forms.UserPublicKeyForm]
+    form_list = [forms.UserProfileForm, forms.UserPublicKeyForm, forms.UserPasswordForm,]
     file_storage = default_storage
 
     def dispatch(self, request, *args, **kwargs):
@@ -164,14 +164,10 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
             return redirect(reverse('index'))
         return super(UserFirstLoginView, self).dispatch(request, *args, **kwargs)
 
-    def done(self, form_list, **kwargs):
+    def done(self, form_list, form_dict, **kwargs):
         user = self.request.user
-        for form in form_list:
-            for field in form:
-                if field.value():
-                    setattr(user, field.name, field.value())
-                if field.name == 'enable_otp':
-                    user.enable_otp = field.value()
+        for f in ['0', '1', '2']:
+            form_dict[f].save()
         user.is_first_login = False
         user.is_public_key_valid = True
         user.save()
@@ -185,6 +181,9 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
         context.update({'app': _('Users'), 'action': _('First login')})
         return context
 
+    def get_form_kwargs(self, step):
+        return {'instance': self.request.user}
+
     def get_form_initial(self, step):
         user = self.request.user
         if step == '0':
@@ -193,12 +192,11 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
                 'name': user.name or user.username,
                 'email': user.email or '',
                 'wechat': user.wechat or '',
-                'phone': user.phone or ''
+                'phone': user.phone or '',
+            }
+        if step == '1':
+            return {
+                'public_key': user.public_key or '',
             }
         return super(UserFirstLoginView, self).get_form_initial(step)
 
-    def get_form(self, step=None, data=None, files=None):
-        form = super(UserFirstLoginView, self).get_form(step, data, files)
-
-        form.instance = self.request.user
-        return form

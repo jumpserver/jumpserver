@@ -71,10 +71,12 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        user = form.save(commit=False)
+        user = form.instance # or self.object
         user.created_by = self.request.user.username or 'System'
         user.save()
-        user_add_success_next(user)
+        user.set_password('123456')
+        # if you need to send email to created user, use this:
+        # user_add_success_next(user)
         return super(UserCreateView, self).form_valid(form)
 
     def get_success_message(self, cleaned_data):
