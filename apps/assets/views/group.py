@@ -75,6 +75,7 @@ class AssetGroupCreateView(AdminOrGroupAdminRequiredMixin, CreateView):
         assets = [get_object_or_404(Asset, id=int(asset_id))
                   for asset_id in assets_id_list]
         asset_group.created_by = self.request.user.username or 'Admin'
+        asset_group.creater = self.request.user
         asset_group.assets.add(*tuple(assets))
         asset_group.save()
         return super(AssetGroupCreateView, self).form_valid(form)

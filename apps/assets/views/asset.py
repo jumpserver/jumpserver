@@ -42,8 +42,8 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Assets',
-            'action': 'Asset list',
+            'app': _('Assets'),
+            'action': _('Asset list'),
             'groups': AssetGroup.objects.all(),
             'system_users': SystemUser.objects.all(),
             # 'form': forms.AssetBulkUpdateForm(),
@@ -57,8 +57,8 @@ class UserAssetListView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Assets',
-            'action': 'Asset list',
+            'app': _('Assets'),
+            'action': _('Asset list'),
             'system_users': SystemUser.objects.all(),
         }
         kwargs.update(context)
@@ -80,8 +80,8 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Assets',
-            'action': 'Create asset',
+            'app': _('Assets'),
+            'action': _('Create asset'),
         }
         kwargs.update(context)
         return super(AssetCreateView, self).get_context_data(**kwargs)
@@ -91,14 +91,19 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
         return super(AssetCreateView, self).get_success_url()
 
 
-class AssetModalListView(AdminUserRequiredMixin, ListView):
+class AssetModalListView(AdminOrGroupAdminRequiredMixin, ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     model = Asset
     context_object_name = 'asset_modal_list'
     template_name = 'assets/asset_modal_list.html'
 
     def get_context_data(self, **kwargs):
-        assets = Asset.objects.all()
+        usr = self.request.user
+        if usr.is_superuser:
+            assets = Asset.objects.all()
+        else:
+            assets = usr.managed_assets
+
         assets_id = self.request.GET.get('assets_id', '')
         assets_id_list = [i for i in assets_id.split(',') if i.isdigit()]
         context = {
@@ -140,8 +145,8 @@ class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         # assets_list = Asset.objects.filter(id__in=self.assets_id_list)
         context = {
-            'app': 'Assets',
-            'action': 'Bulk update asset',
+            'app': _('Assets'),
+            'action': _('Bulk update asset'),
             'form': self.form,
             'assets_selected': self.assets_id_list,
             'assets': Asset.objects.all(),
@@ -158,8 +163,8 @@ class AssetUpdateView(AdminUserRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Assets',
-            'action': 'Update asset',
+            'app': _('Assets'),
+            'action': _('Update asset'),
         }
         kwargs.update(context)
         return super(AssetUpdateView, self).get_context_data(**kwargs)
@@ -184,8 +189,8 @@ class AssetDetailView(DetailView):
         asset_groups = self.object.groups.all()
         system_users = self.object.system_users.all()
         context = {
-            'app': 'Assets',
-            'action': 'Asset detail',
+            'app': _('Assets'),
+            'action': _('Asset detail'),
             'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all()
                                     if asset_group not in asset_groups],
             'asset_groups': asset_groups,

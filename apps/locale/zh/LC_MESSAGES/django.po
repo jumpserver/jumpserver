@@ -1022,6 +1022,10 @@ msgstr "导出"
 msgid "Create asset"
 msgstr "创建资产"
 
+#: assets/templates/assets/asset_list.html:32
+msgid "Asset list"
+msgstr "资产列表"
+
 #: assets/templates/assets/asset_list.html:41
 #: assets/templates/assets/user_asset_list.html:37
 msgid "Env"

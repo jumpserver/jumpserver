@@ -38,33 +38,39 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
     """API endpoint that allows Asset to be viewed or edited."""
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
-    permission_classes = (IsValidUser,)
+    permission_classes = (IsAdminUser,)
 
     def get_queryset(self):
         if self.request.user.is_superuser:
             queryset = super(AssetViewSet, self).get_queryset()
         else:
             queryset = get_user_granted_assets(self.request.user)
+
         idc_id = self.request.query_params.get('idc_id', '')
         system_users_id = self.request.query_params.get('system_user_id', '')
         asset_group_id = self.request.query_params.get('asset_group_id', '')
         admin_user_id = self.request.query_params.get('admin_user_id', '')
         if idc_id:
-            queryset = queryset.filter(idc__id=idc_id)
+            queryset = IDC.objects.get(id=idc_id).assets
         if system_users_id:
-            queryset = queryset.filter(system_users__id=system_users_id)
+            queryset = SystemUser.get(id=system_users_id).assets
         if admin_user_id:
-            queryset = queryset.filter(admin_user__id=admin_user_id)
+            queryset = AdminUser.get(id=admin_user_id).assets
         if asset_group_id:
-            queryset = queryset.filter(groups__id=asset_group_id)
+            queryset = AssetGroup.objects.get(id=asset_group_id).assets
         return queryset
 
 
 class AssetGroupViewSet(IDInFilterMixin, BulkModelViewSet):
-    queryset = AssetGroup.objects.all()
+
     serializer_class = serializers.AssetGroupSerializer
     permission_classes = (IsAdminUser,)
-
+    def get_queryset(self):
+        if self.request.user.is_superuser:
+            queryset = AssetGroup.objects.all()
+        else:
+            queryset = self.request.user.managed_asset_groups
+        return queryset
 
 class AssetUpdateGroupApi(generics.RetrieveUpdateAPIView):
     queryset = Asset.objects.all()

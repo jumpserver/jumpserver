@@ -179,6 +179,12 @@ class User(AbstractUser):
     def managed_users(self):
         return User.objects.filter(groups__id__in=self.managed_groups.values_list('id',flat=True))
 
+    @property
+    def managed_assets(self):
+        from assets.models import Asset
+        return  (Asset.objects.filter(granted_by_permissions__id__in=self.asset_permissions.values_list('id', flat=True))\
+                    |  Asset.objects.filter(groups__id__in=self.groups.values_list('id', flat=True))).distinct()
+
     def create_private_token(self):
         from .authentication import PrivateToken
         try:
