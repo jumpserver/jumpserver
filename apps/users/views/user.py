@@ -147,7 +147,7 @@ class UserBulkUpdateView(AdminUserRequiredMixin, ListView):
         return super(UserBulkUpdateView, self).get_context_data(**kwargs)
 
 
-class UserDetailView(AdminUserRequiredMixin, DetailView):
+class UserDetailView(AdminOrGroupAdminRequiredMixin, DetailView):
     model = User
     template_name = 'users/user_detail.html'
     context_object_name = "user_object"
