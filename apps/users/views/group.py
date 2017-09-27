@@ -77,7 +77,7 @@ class UserGroupCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
         )
 
 
-class UserGroupUpdateView(AdminOrGroupAdminRequiredMixin, UpdateView):
+class UserGroupUpdateView(AdminUserRequiredMixin, UpdateView):
     model = UserGroup
     form_class = forms.UserGroupForm
     template_name = 'users/user_group_create_update.html'

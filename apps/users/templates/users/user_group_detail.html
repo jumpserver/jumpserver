@@ -83,6 +83,7 @@
                                 <div class="panel-body">
                                     <table class="table user_edit">
                                         <tbody>
+                                        {% if user.is_superuser %}
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
@@ -99,13 +100,17 @@
                                                 </td>
                                             </tr>
                                         </form>
-
+                                        {% endif %}
                                         {% for user in user_group.users.all %}
                                         <tr>
                                           <td ><b class="bdg_user" data-uid={{ user.id }}>{{ user.name }}</b></td>
-                                          <td>
-                                              <button class="btn btn-danger pull-right btn-xs btn_remove_user" type="button"><i class="fa fa-minus"></i></button>
-                                          </td>
+                                          {% if user.is_superuser %}
+                                              <td>
+                                                  <button class="btn btn-danger pull-right btn-xs btn_remove_user" type="button">
+                                                    <i class="fa fa-minus"></i>
+                                                  </button>
+                                              </td>
+                                          {% endif %}
                                         </tr>
                                         {% endfor %}
                                         </tbody>

@@ -15,7 +15,6 @@
     <ul class="nav nav-second-level">
         <li id="asset"><a href="{% url 'assets:user-asset-list' %}">{% trans 'Asset' %}</a></li>
         <li id="asset-group"><a href="{% url 'assets:asset-group-list' %}">{% trans 'Asset group' %}</a></li>
-        <li id="system-user"><a href="{% url 'assets:system-user-list' %}">{% trans 'System user' %}</a></li>
     </ul>
 </li>
 <li id="perms">
@@ -23,11 +22,8 @@
         <i class="fa fa-edit"></i> <span class="nav-label">{% trans 'Perms' %}</span><span class="fa arrow"></span>
     </a>
     <ul class="nav nav-second-level">
-        <li id="asset-permission">
-            <a href="{% url 'perms:asset-permission-list' %}">{% trans 'Asset permission' %}</a>
-        </li>
-        <li id="permission-approval">
-            <a href="{% url 'apply-perms:apply-permission-list' %}">{% trans 'Permission approval' %}</a>
+        <li id="apply-permission">
+            <a href="{% url 'apply-perms:apply-permission-list' %}">{% trans 'Apply permission' %}</a>
         </li>
     </ul>
 </li>

@@ -117,7 +117,7 @@ class UserGroupViewSet(IDInFilterMixin, BulkModelViewSet):
 class UserGroupUpdateUserApi(generics.RetrieveUpdateAPIView):
     queryset = UserGroup.objects.all()
     serializer_class = serializers.UserGroupUpdateMemeberSerializer
-    permission_classes = (IsAdminUser,)
+    permission_classes = (IsSuperUser,)
 
 
 class UserToken(APIView):
