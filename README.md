@@ -1,9 +1,9 @@
 ## Jumpserver
 
-![Python3](https://img.shields.io/badge/python-3.6-green.svg?style=plastic)
-![Django](https://img.shields.io/badge/django-1.11-brightgreen.svg?style=plastic)
-![Ansible](https://img.shields.io/badge/ansible-2.2.2.0-blue.svg?style=plastic)
-![Paramiko](https://img.shields.io/badge/paramiko-2.1.2-green.svg?style=plastic)
+[![Python3](https://img.shields.io/badge/python-3.6-green.svg?style=plastic)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/django-1.11-brightgreen.svg?style=plastic)](https://www.djangoproject.com/)
+[![Ansible](https://img.shields.io/badge/ansible-2.2.2.0-blue.svg?style=plastic)](https://www.ansible.com/)
+[![Paramiko](https://img.shields.io/badge/paramiko-2.1.2-green.svg?style=plastic)](http://www.paramiko.org/)
 
 Jumpserver is a open source proxy server, developed by `Python` and `Django`, aim to help 
 companies to efficiently user, assets, authority and audit management
