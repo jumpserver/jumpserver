@@ -204,7 +204,7 @@ class User(AbstractUser):
             'wechat': self.wechat,
             'phone': self.phone,
             'comment': self.comment,
-            'date_expired': self.date_expired.strftime('%Y-%m-%d %H:%M:%S')
+            'date_expired': self.date_expired.strftime('%Y-%m-%d %H:%M:%S') if self.date_expired is not None else None
         })
 
     @classmethod

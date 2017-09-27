@@ -3,11 +3,12 @@
 {% load i18n %}
 
 {% block custom_head_css_js %}
-    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
-    <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
-    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
-    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+    <link href='{% static "css/plugins/select2/select2.min.css" %}' rel="stylesheet">
+    <link href='{% static "css/plugins/sweetalert/sweetalert.css" %}' rel="stylesheet">
+    <script src='{% static "js/plugins/select2/select2.full.min.js" %}'></script>
+    <script src='{% static "js/plugins/sweetalert/sweetalert.min.js" %}'></script>
 {% endblock %}
+
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
@@ -215,7 +216,7 @@
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Join asset groups' %}" id="groups_selected" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Join asset groups' %}" id="groups_selected" class="select2 groups" style="width: 100%" multiple="" tabindex="4">
                                                         {% for asset_group in asset_groups_remain %}
                                                         <option value="{{ asset_group.id }}" id="opt_{{ asset_group.id }}" >{{ asset_group.name }}</option>
                                                         {% endfor %}
@@ -251,7 +252,7 @@
                                         <form>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select system users' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Select system users' %}" class="select2 system-user" style="width: 100%" multiple="" tabindex="4">
                                                         {% for system_user in system_users_all %}
                                                             <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user.name }}</option>
                                                         {% endfor %}
@@ -287,6 +288,7 @@
 {% block custom_foot_js %}
 <script>
 jumpserver.groups_selected = {};
+jumpserver.system_user_selected = {};
 function updateAssetGroups(groups) {
     var the_url = "{% url 'api-assets:asset-update-group' pk=asset.id %}";
     var body = {
@@ -316,7 +318,7 @@ function updateAssetGroups(groups) {
     });
 }
 
-function updateAssetSystem(system_users) {
+function updateAssetSystemUser(system_users) {
     var the_url = "{% url 'api-assets:asset-update-system-users' pk=asset.id %}";
     var body = {
         system_users: Object.assign([], system_users)
@@ -324,7 +326,7 @@ function updateAssetSystem(system_users) {
     var success = function(data) {
         $('.select2-selection__rendered').empty();
         $('#groups_selected').val('');
-        $.map(jumpserver.groups_selected, function(name, index) {
+        $.map(jumpserver.system_user_selected, function(name, index) {
             $('#opt_' + index).remove();
 
             $('#add-asset2systemuser tbody').append(
@@ -335,7 +337,7 @@ function updateAssetSystem(system_users) {
             )
         });
         // clear jumpserver.groups_selected
-        jumpserver.groups_selected = {};
+        jumpserver.system_user_selected = {};
     };
     APIUpdateAttr({
         url: the_url,
@@ -358,12 +360,19 @@ function refreshAssetHardware() {
 
 
 $(document).ready(function () {
-    $('.select2').select2().on('select2:select', function(evt) {
+    $('.select2.groups').select2().on('select2:select', function(evt) {
         var data = evt.params.data;
         jumpserver.groups_selected[data.id] = data.text;
     }).on('select2:unselect', function(evt) {
         var data = evt.params.data;
         delete jumpserver.groups_selected[data.id]
+    });
+    $('.select2.system-user').select2().on('select2:select', function(evt) {
+        var data = evt.params.data;
+        jumpserver.system_user_selected[data.id] = data.text;
+    }).on('select2:unselect', function(evt) {
+        var data = evt.params.data;
+        delete jumpserver.system_user_selected[data.id]
     })
 }).on('click', '#is_active', function () {
     var the_url = '{% url "api-assets:asset-detail" pk=asset.id %}';
@@ -410,17 +419,17 @@ $(document).ready(function () {
     }).get();
     updateAssetGroups(groups)
 }).on('click', '.btn-system-user', function () {
-    if (Object.keys(jumpserver.groups_selected).length === 0) {
+    if (Object.keys(jumpserver.system_user_selected).length === 0) {
         return false;
     }
     var system_users = $('.bdg_group').map(function() {
             return $(this).data('sid');
     }).get();
-    $.map(jumpserver.groups_selected, function(value, index) {
+    $.map(jumpserver.system_user_selected, function(value, index) {
         system_users.push(parseInt(index));
         $('#opt_' + index).remove();
     });
-    updateAssetSystem(system_users)
+    updateAssetSystemUser(system_users)
 
 }).on('click', '.btn_leave_system', function () {
     var $this = $(this);
@@ -435,7 +444,7 @@ $(document).ready(function () {
     var system_users = $('.bdg_group').map(function () {
             return $(this).data('sid');
         }).get();
-        updateAssetSystem(system_users)
+    updateAssetSystemUser(system_users)
 
 }).on('click', '.btn-delete-asset', function () {
     var $this = $(this);
