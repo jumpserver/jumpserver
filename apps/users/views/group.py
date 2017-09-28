@@ -118,7 +118,7 @@ class UserGroupDetailView(AdminOrGroupAdminRequiredMixin, DetailView):
         return super(UserGroupDetailView, self).get_context_data(**kwargs)
 
 
-class UserGroupAssetPermissionView(AdminUserRequiredMixin, FormMixin,
+class UserGroupAssetPermissionView(AdminOrGroupAdminRequiredMixin, FormMixin,
                                    SingleObjectMixin, ListView):
     model = UserGroup
     template_name = 'users/user_group_asset_permission.html'
@@ -169,7 +169,7 @@ class UserGroupAssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
                        kwargs={'pk': self.user_group.id})
 
 
-class UserGroupGrantedAssetView(AdminUserRequiredMixin, DetailView):
+class UserGroupGrantedAssetView(AdminOrGroupAdminRequiredMixin, DetailView):
     model = User
     template_name = 'users/user_group_granted_asset.html'
     context_object_name = 'user_group'

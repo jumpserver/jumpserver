@@ -1,11 +1,11 @@
 # ~*~ coding: utf-8 ~*~
-# 
+#
 
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView, Response
 from rest_framework.generics import ListAPIView, get_object_or_404
 from rest_framework import viewsets
-from users.permissions import IsValidUser, IsSuperUser, IsAppUser
+from users.permissions import IsValidUser, IsSuperUser, IsAppUser, IsAdminUser
 from common.utils import get_object_or_none
 from .utils import get_user_granted_assets, get_user_granted_asset_groups, \
     get_user_asset_permissions, get_user_group_asset_permissions, \
@@ -20,7 +20,7 @@ from .utils import associate_system_users_and_assets
 class AssetPermissionViewSet(viewsets.ModelViewSet):
     queryset = AssetPermission.objects.all()
     serializer_class = serializers.AssetPermissionSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsAdminUser,)
 
     def get_queryset(self):
         queryset = super(AssetPermissionViewSet, self).get_queryset()
@@ -64,7 +64,7 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
 
 
 class RevokeUserAssetPermission(APIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsAdminUser,)
 
     def put(self, request, *args, **kwargs):
         permission_id = str(request.data.get('id', ''))
@@ -82,7 +82,7 @@ class RevokeUserAssetPermission(APIView):
 
 class RemoveSystemUserAssetPermission(APIView):
     """将系统用户从授权中移除, Detail页面会调用"""
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsAdminUser,)
 
     def put(self, request, *args, **kwargs):
         response = []
@@ -102,7 +102,7 @@ class RemoveSystemUserAssetPermission(APIView):
 
 
 class RevokeUserGroupAssetPermission(APIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsAdminUser,)
 
     def put(self, request, *args, **kwargs):
         permission_id = str(request.data.get('id', ''))
@@ -119,7 +119,7 @@ class RevokeUserGroupAssetPermission(APIView):
 
 
 class UserGrantedAssetsApi(ListAPIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsAdminUser,)
     serializer_class = AssetGrantedSerializer
 
     def get_queryset(self):
@@ -135,7 +135,7 @@ class UserGrantedAssetsApi(ListAPIView):
 
 
 class UserGrantedAssetGroupsApi(ListAPIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsAdminUser,)
     serializer_class = AssetGroupSerializer
 
     def get_queryset(self):
@@ -154,7 +154,7 @@ class MyGrantedAssetsApi(ListAPIView):
     [{'hostname': 'x','ip': 'x', ..,
       'system_users_granted': [{'name': 'x', .}, ...]
     """
-    permission_classes = (IsValidUser,)
+    permission_classes = (IsAdminUser,)
     serializer_class = AssetGrantedSerializer
 
     def get_queryset(self):
@@ -253,7 +253,7 @@ class MyAssetGroupOfAssetsApi(ListAPIView):
 
 
 class UserGroupGrantedAssetsApi(ListAPIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsAdminUser,)
     serializer_class = AssetGrantedSerializer
 
     def get_queryset(self):
@@ -268,7 +268,7 @@ class UserGroupGrantedAssetsApi(ListAPIView):
 
 
 class UserGroupGrantedAssetGroupsApi(ListAPIView):
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsAdminUser,)
     serializer_class = AssetGroupSerializer
 
     def get_queryset(self):

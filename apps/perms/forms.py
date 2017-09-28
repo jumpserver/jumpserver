@@ -9,6 +9,16 @@ from .models import AssetPermission
 
 
 class AssetPermissionForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        self.current_user = kwargs.pop('user', None)
+        super(AssetPermissionForm, self).__init__(*args, **kwargs)
+        if not self.current_user.is_superuser:
+            self.fields['user_groups'].required = False
+            self.fields['user_groups'].widget.attrs['disabled'] = True
+            self.fields['users'].queryset = self.current_user.managed_users
+            self.fields['system_users'].queryset =  self.current_user.managed_system_users
+
     class Meta:
         model = AssetPermission
         fields = [

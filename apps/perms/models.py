@@ -47,9 +47,9 @@ class AssetPermission(models.Model):
 
     @property
     def is_valid(self):
-        if self.date_expired < timezone.now() and self.is_active:
+        if self.date_expired > timezone.now() and self.is_active:
             return True
-        return True
+        return False
 
     def get_granted_users(self):
         return list(set(self.users.all()) | self.get_granted_user_groups_member())

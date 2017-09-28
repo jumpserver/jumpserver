@@ -54,10 +54,8 @@ class UserViewSet(viewsets.ModelViewSet):
     filter_fields = ('username', 'email', 'name', 'id')
 
     def get_queryset(self):
-        if self.request.user.is_groupadmin:
-            return self.request.user.managed_users.order_by("date_joined")
-        else:
-            return User.objects.order_by("date_joined")
+        return self.request.user.managed_users
+
 
 class UserUpdateGroupApi(generics.RetrieveUpdateAPIView):
     queryset = User.objects.all()

@@ -7,6 +7,40 @@ from common.mixins import IDInFilterMixin
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin
 
 
+class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+    # system_users = SystemUserSerializer(many=True, read_only=True)
+    # admin_user = AdminUserSerializer(many=False, read_only=True)
+    hardware = serializers.SerializerMethodField()
+    is_online = serializers.SerializerMethodField()
+
+    class Meta(object):
+        model = Asset
+        list_serializer_class = BulkListSerializer
+        fields = '__all__'
+
+    @staticmethod
+    def get_hardware(obj):
+        if obj.cpu_count:
+            return '{} Core {} {}'.format(obj.cpu_count*obj.cpu_cores, obj.memory, obj.disk_total)
+        else:
+            return ''
+
+    @staticmethod
+    def get_is_online(obj):
+        hostname = obj.hostname
+        if cache.get(hostname) == '1':
+            return True
+        elif cache.get(hostname) == '0':
+            return False
+        else:
+            return 'Unknown'
+
+    def get_field_names(self, declared_fields, info):
+        fields = super(AssetSerializer, self).get_field_names(declared_fields, info)
+        fields.extend(['get_type_display', 'get_env_display'])
+        return fields
+
+
 class AssetGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     assets_amount = serializers.SerializerMethodField()
     assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
@@ -112,40 +146,6 @@ class SystemUserSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUser
         fields = ('id', 'name', 'username')
-
-
-class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
-    # system_users = SystemUserSerializer(many=True, read_only=True)
-    # admin_user = AdminUserSerializer(many=False, read_only=True)
-    hardware = serializers.SerializerMethodField()
-    is_online = serializers.SerializerMethodField()
-
-    class Meta(object):
-        model = Asset
-        list_serializer_class = BulkListSerializer
-        fields = '__all__'
-
-    @staticmethod
-    def get_hardware(obj):
-        if obj.cpu_count:
-            return '{} Core {} {}'.format(obj.cpu_count*obj.cpu_cores, obj.memory, obj.disk_total)
-        else:
-            return ''
-
-    @staticmethod
-    def get_is_online(obj):
-        hostname = obj.hostname
-        if cache.get(hostname) == '1':
-            return True
-        elif cache.get(hostname) == '0':
-            return False
-        else:
-            return 'Unknown'
-
-    def get_field_names(self, declared_fields, info):
-        fields = super(AssetSerializer, self).get_field_names(declared_fields, info)
-        fields.extend(['get_type_display', 'get_env_display'])
-        return fields
 
 
 class AssetGrantedSerializer(serializers.ModelSerializer):

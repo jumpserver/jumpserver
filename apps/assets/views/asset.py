@@ -99,10 +99,7 @@ class AssetModalListView(AdminOrGroupAdminRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         usr = self.request.user
-        if usr.is_superuser:
-            assets = Asset.objects.all()
-        else:
-            assets = usr.managed_assets
+        assets = usr.managed_assets
 
         assets_id = self.request.GET.get('assets_id', '')
         assets_id_list = [i for i in assets_id.split(',') if i.isdigit()]
