@@ -164,7 +164,7 @@ class AssetPermissionDeleteView(AdminOrGroupAdminRequiredMixin, DeleteView):
     success_url = reverse_lazy('perms:asset-permission-list')
 
 
-class AssetPermissionUserView(AdminUserRequiredMixin,
+class AssetPermissionUserView(AdminOrGroupAdminRequiredMixin,
                               SingleObjectMixin,
                               ListView):
     template_name = 'perms/asset_permission_user.html'

@@ -41,7 +41,7 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
     permission_classes = (IsAdminUser,)
 
     def get_queryset(self):
-        queryset = self.request.user.managed_assets
+        queryset = self.request.user.assets
 
         idc_id = self.request.query_params.get('idc_id', '')
         system_users_id = self.request.query_params.get('system_user_id', '')
@@ -63,7 +63,7 @@ class AssetGroupViewSet(IDInFilterMixin, BulkModelViewSet):
     serializer_class = serializers.AssetGroupSerializer
     permission_classes = (IsAdminUser,)
     def get_queryset(self):
-        queryset = self.request.user.managed_asset_groups
+        return self.request.user.asset_groups
 
 
 class AssetUpdateGroupApi(generics.RetrieveUpdateAPIView):

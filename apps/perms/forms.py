@@ -13,11 +13,28 @@ class AssetPermissionForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.current_user = kwargs.pop('user', None)
         super(AssetPermissionForm, self).__init__(*args, **kwargs)
+        self.fields['user_groups'].required = False
+        self.fields['user_groups'].widget.attrs['disabled'] = True
+
         if not self.current_user.is_superuser:
-            self.fields['user_groups'].required = False
-            self.fields['user_groups'].widget.attrs['disabled'] = True
-            self.fields['users'].queryset = self.current_user.managed_users
-            self.fields['system_users'].queryset =  self.current_user.managed_system_users
+            self.fields['users'].queryset = self.current_user.managed_users.exclude(id=self.current_user.id)
+            self.fields['system_users'].queryset =  self.current_user.system_users
+            self.fields['asset_groups'].queryset = self.current_user.asset_groups
+
+    def clean_users(self):
+        users = self.cleaned_data['users']
+        if not (set(self.current_user.managed_users.exclude(id=self.current_user.id)) >= set(users)):
+            raise forms.ValidationError('Data Error.')
+        return users
+
+    # def clean_user_groups(self):
+
+
+    # def clean_system_users(self):
+
+
+    # def clean_asset_groups(self):
+
 
     class Meta:
         model = AssetPermission

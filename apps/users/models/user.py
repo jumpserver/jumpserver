@@ -31,7 +31,7 @@ class User(AbstractUser):
 
     username = models.CharField(max_length=20, unique=True, verbose_name=_('Username'))
     name = models.CharField(max_length=20, verbose_name=_('Name'))
-    email = models.EmailField(max_length=30, unique=True, verbose_name=_('Email'))
+    email = models.EmailField(max_length=30, blank=True, verbose_name=_('Email'))
     groups = models.ManyToManyField(UserGroup, related_name='users', blank=True, verbose_name=_('User group'))
     managed_groups = models.ManyToManyField(UserGroup, related_name='managers', blank=True, verbose_name=_('Managed Group'))
     role = models.CharField(choices=ROLE_CHOICES, default='User', max_length=10, blank=True, verbose_name=_('Role'))
@@ -185,7 +185,7 @@ class User(AbstractUser):
             return self
 
     @property
-    def managed_assets(self):
+    def assets(self):
         from assets.models import Asset
         if self.is_superuser:
             return Asset.objects.all()
@@ -195,12 +195,17 @@ class User(AbstractUser):
             return self.granted_assets_direct()
 
     @property
-    def managed_asset_groups(self):
+    def asset_groups(self):
         if self.is_superuser:
             from assets.models import AssetGroup
             return AssetGroup.objects.all()
         else:
             return (self.granted_asset_groups_direct() | self.granted_asset_groups_inherit_from_user_groups()).distinct()
+
+    @property
+    def system_users(self):
+        from assets.models import SystemUser
+        return SystemUser.objects.filter(assets__id__in=self.assets.values_list('id', flat=True))
 
     def granted_assets_direct(self):
         from assets.models import Asset
@@ -218,6 +223,7 @@ class User(AbstractUser):
 
     def granted_asset_groups_direct(self):
         from assets.models import AssetGroup
+
         return AssetGroup.objects.filter(granted_by_permissions__id__in=self.asset_permissions.values_list('id', flat=True))
 
     def granted_asset_groups_inherit_from_user_groups(self):
