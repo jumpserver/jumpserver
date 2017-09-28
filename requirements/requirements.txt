@@ -23,3 +23,4 @@ django-auth-ldap
 ldap3
 chardet>=3.0.4
 jsonfield
+django-separatedvaluesfield

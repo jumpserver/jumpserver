@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'audits.apps.AuditsConfig',
     'common.apps.CommonConfig',
     'applications.apps.ApplicationsConfig',
+    'devops.apps.DevopsConfig',
     'rest_framework',
     'rest_framework_swagger',
     'django_filters',
@@ -68,7 +69,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'devops.apps.DevopsConfig',
 
 ]
 
