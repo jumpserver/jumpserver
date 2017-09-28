@@ -15,7 +15,6 @@ from assets.models import Asset
 from users.utils import ApplyUserRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
-import pdb
 
 class ApplyPermissionListView(LoginRequiredMixin, ListView):
     model = ApplyPermission

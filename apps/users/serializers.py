@@ -24,7 +24,7 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     @staticmethod
     def get_groups_display(obj):
-        return " ".join([group.name for group in obj.groups.all()])
+        return ", ".join([group.name for group in obj.groups.all()])
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):

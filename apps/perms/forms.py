@@ -23,18 +23,36 @@ class AssetPermissionForm(forms.ModelForm):
 
     def clean_users(self):
         users = self.cleaned_data['users']
-        if not (set(self.current_user.managed_users.exclude(id=self.current_user.id)) >= set(users)):
-            raise forms.ValidationError('Data Error.')
+        for user in users:
+            if not user in self.current_user.managed_users.exclude(id=self.current_user.id):
+                raise forms.ValidationError(
+                                _('Invalid value: %(name)s'),
+                                code='Invalid',
+                                params={'name': user.name}
+                            )
         return users
 
-    # def clean_user_groups(self):
+    def clean_asset_groups(self):
+        asset_groups = self.cleaned_data['asset_groups']
+        for asset_group in asset_groups:
+            if not asset_group in self.current_user.asset_groups:
+                raise forms.ValidationError(
+                          _('Invalid value: %(name)s'),
+                          code='Invalid',
+                          params={'name': asset_group.name}
+                      )
+        return asset_groups
 
-
-    # def clean_system_users(self):
-
-
-    # def clean_asset_groups(self):
-
+    def clean_system_users(self):
+        system_users = self.cleaned_data['system_users']
+        for system_user in system_users:
+            if not system_user in self.current_user.system_users:
+                raise forms.ValidationError(
+                          _('Invalid value: %(name)s'),
+                          code='Invalid',
+                          params={'name': system_user.name}
+                      )
+        return system_users
 
     class Meta:
         model = AssetPermission

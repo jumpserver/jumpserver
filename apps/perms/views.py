@@ -150,7 +150,7 @@ class AssetPermissionDetailView(AdminOrGroupAdminRequiredMixin, DetailView):
             'app': _('Perms'),
             'action': _('Asset permission detail'),
             'system_users_remain': [
-                system_user for system_user in SystemUser.objects.all()
+                system_user for system_user in self.request.user.system_users
                 if system_user not in self.object.system_users.all()],
             'system_users': self.object.system_users.all(),
         }
@@ -190,15 +190,16 @@ class AssetPermissionUserView(AdminOrGroupAdminRequiredMixin,
     def get_context_data(self, **kwargs):
         users_granted = self.get_queryset()
         user_groups_granted = self.object.user_groups.all()
+        current_user = self.request.user
         context = {
             'app': _('Perms'),
             'action': _('Asset permission user list'),
             'users_remain': [
-                user for user in User.objects.all()
+                user for user in current_user.managed_users
                 if user not in users_granted],
             'user_groups': self.object.user_groups.all(),
             'user_groups_remain': [
-                user_group for user_group in UserGroup.objects.all()
+                user_group for user_group in current_user.groups.all()
                 if user_group not in user_groups_granted],
             'keyword': self.keyword,
         }
@@ -232,15 +233,16 @@ class AssetPermissionAssetView(AdminOrGroupAdminRequiredMixin,
     def get_context_data(self, **kwargs):
         assets_granted = self.get_queryset()
         asset_groups_granted = self.object.user_groups.all()
+        current_user = self.request.user
         context = {
             'app': _('Perms'),
             'action': _('Asset permission asset list'),
             'assets_remain': [
-                asset for asset in Asset.objects.all()
+                asset for asset in current_user.assets
                 if asset not in assets_granted],
             'asset_groups': self.object.asset_groups.all(),
             'asset_groups_remain': [
-                asset_group for asset_group in AssetGroup.objects.all()
+                asset_group for asset_group in current_user.asset_groups
                 if asset_group not in asset_groups_granted],
             'keyword': self.keyword,
         }
