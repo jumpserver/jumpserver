@@ -12,7 +12,9 @@
     <table class="table table-striped table-bordered table-hover" id="task_table">
         <thead>
         <tr>
-            <th class="text-center">{% trans 'Id' %}</th>
+            <th class="text-center">
+                <input id="" type="checkbox" class="ipt_check_all">
+            </th>
             <th class="text-center">{% trans 'Name' %}</th>
             <th class="text-center">{% trans 'Description' %}</th>
             <th class="text-center">{% trans 'Ansible Role' %}</th>
@@ -32,8 +34,40 @@
         $(document).ready(function () {
             let options = {
                 ele: $('#task_table'),
+                columnDefs: [
+                    {
+                        targets: 1,
+                        /**
+                         *
+                         * @param td  行元素
+                         * @param cellData  数据值
+                         * @param rowData  该条记录值
+                         */
+                        createdCell: function (td, cellData, rowData) {
+                            var detail_btn = '<a href="{% url "users:user-detail" pk=99991937 %}">' + cellData + '</a>';
+                            $(td).html(detail_btn.replace('99991937', rowData.id));
+                        }
+                    },
+                    {
+                        targets: 2,
+                        createdCell: function (td, cellData) {
+                            let innerHtml = cellData.length > 20 ? cellData.substring(0, 20) + '...' : cellData;
+                            $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
+                        }
+                    },
+                    {
+                        targets: 6,
+                        createdCell: function (td, cellData, rowData) {
+                            var update_btn = '<a href="{% url "users:user-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
+                            var del_btn = '<a class="btn btn-xs btn-danger m-l-xs" data-uid="99991937" data-name="99991938">{% trans "Delete" %}</a>'
+                                .replace('99991937', cellData)
+                                .replace('99991938', rowData.name);
+                            $(td).html(update_btn + del_btn)
+                        }
+                    }
+                ],
                 columns: [{data: "id"}, {data: "name"}, {data: "desc"}, {data: "ansible_role"},
-                    {data: "tags"}, {data: "system_user"}, {data: "id"}],
+                    {data: "tags"}, {data: "user"}, {data: "id"}],
                 ajax_url: '{% url "api-devops:task-list" %}'
             }
             jumpserver.initDataTable(options);
