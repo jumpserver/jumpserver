@@ -51,7 +51,6 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
             assets.extend(list(instance.assets.all()))
             asset_groups.extend(list(instance.asset_groups.all()))
             system_users.extend(list(instance.system_users.all()))
-        print('Run')
         associate_system_users_and_assets(system_users, assets, asset_groups)
 
     def perform_create(self, serializer):
