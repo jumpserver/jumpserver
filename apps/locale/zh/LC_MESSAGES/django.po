@@ -716,14 +716,12 @@ msgid "Download"
 msgstr "下载"
 
 #: assets/templates/assets/_asset_import_modal.html:13
-#, fuzzy
-#| msgid "Asset excel file"
 msgid "Asset csv file"
-msgstr "资产excel"
+msgstr "资产csv文件"
 
 #: assets/templates/assets/_asset_import_modal.html:16
 msgid "If set id, will use this id update asset existed"
-msgstr ""
+msgstr "如果设置了id，则会使用该行信息更新该id的资产"
 
 #: assets/templates/assets/_system_user.html:16
 #: assets/templates/assets/system_user_list.html:9
@@ -1888,16 +1886,16 @@ msgid "Import user"
 msgstr "导入"
 
 #: users/templates/users/_user_import_modal.html:6
-msgid "Download template or use export excel format"
+msgid "Download template or use export csv format"
 msgstr "下载模板"
 
 #: users/templates/users/_user_import_modal.html:14
-msgid "Users excel file"
-msgstr "用户excel"
+msgid "Users csv file"
+msgstr "用户csv文件"
 
 #: users/templates/users/_user_import_modal.html:16
-msgid "If set id, will use this id update existed"
-msgstr ""
+msgid "If set id, will use this id update user existed"
+msgstr "如果设置了id，则会使用该行信息更新该id的用户"
 
 #: users/templates/users/_user_update_pk_modal.html:4
 msgid "Update User SSH Public Key"

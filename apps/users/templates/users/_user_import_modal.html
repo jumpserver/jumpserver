@@ -3,7 +3,7 @@
 {% block modal_id %}user_import_modal{% endblock %}
 {% block modal_title%}{% trans "Import user" %}{% endblock %}
 {% block modal_body %}
-<p class="text-success">{% trans "Download template or use export excel format" %}</p>
+<p class="text-success">{% trans "Download template or use export csv format" %}</p>
 <form method="post" action="{% url 'users:user-import' %}" id="fm_user_import" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="form-group">
@@ -11,9 +11,9 @@
         <a href="{% url 'users:user-export' %}" style="display: block">{% trans 'Download' %}</a>
     </div>
     <div class="form-group">
-        <label class="control-label" for="id_users">{% trans "Users excel file" %}</label>
+        <label class="control-label" for="id_users">{% trans "Users csv file" %}</label>
         <input id="id_users" type="file" name="file" />
-        <span class="help-block">{% trans 'If set id, will use this id update existed' %}</span>
+        <span class="help-block red-fonts">{% trans 'If set id, will use this id update user existed' %}</span>
     </div>
 </form>
 <p>
