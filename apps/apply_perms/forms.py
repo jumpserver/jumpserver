@@ -8,6 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from .models import ApplyPermission
 from assets.models import Asset, AssetGroup, SystemUser
 from users.models import UserGroup, User
+import json
 
 class ApplyPermissionForm(forms.ModelForm):
     name = forms.CharField(
@@ -15,6 +16,7 @@ class ApplyPermissionForm(forms.ModelForm):
         help_text=_('* required'),
         label=_('Name')
     )
+
     assets = forms.ModelMultipleChoiceField(
         queryset = Asset.objects.all(),
         required=False,
@@ -25,6 +27,7 @@ class ApplyPermissionForm(forms.ModelForm):
             }
         )
     )
+
     asset_groups = forms.ModelMultipleChoiceField(
         queryset = AssetGroup.objects.all(),
         required=False,
@@ -36,9 +39,11 @@ class ApplyPermissionForm(forms.ModelForm):
             }
         )
     )
+
     user_groups = forms.ModelMultipleChoiceField(
         queryset = UserGroup.objects.all(),
         required=False,
+        disabled=True,
         label=_('Select user groups'),
         widget=forms.SelectMultiple(
             attrs={
@@ -46,6 +51,7 @@ class ApplyPermissionForm(forms.ModelForm):
             }
         )
     )
+
     system_users = forms.ModelMultipleChoiceField(
         queryset = SystemUser.objects.all(),
         required=True,
@@ -57,6 +63,7 @@ class ApplyPermissionForm(forms.ModelForm):
             }
         )
     )
+
     approver = forms.ModelChoiceField(
         queryset = User.objects.filter(role__in=['Admin', 'GroupAdmin']),
         required=True,
@@ -68,6 +75,16 @@ class ApplyPermissionForm(forms.ModelForm):
             }
         )
     )
+
+    def __init__(self, *args, **kwargs):
+        current_user = kwargs.pop('user', None)
+        super(ApplyPermissionForm, self).__init__(*args, **kwargs)
+        if current_user:
+            self.fields['assets'].queryset = current_user.can_apply_assets
+            self.fields['asset_groups'].queryset = current_user.can_apply_asset_groups
+            self.fields['system_users'].queryset = current_user.can_apply_system_users
+            self.fields['approver'].queryset = current_user.group_managers
+
     class Meta:
         model = ApplyPermission
         fields = [

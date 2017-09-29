@@ -15,6 +15,7 @@ from assets.models import Asset
 from users.utils import ApplyUserRequiredMixin
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
+from django.shortcuts import reverse, redirect
 
 class ApplyPermissionListView(LoginRequiredMixin, ListView):
     model = ApplyPermission
@@ -80,6 +81,11 @@ class ApplyPermissionCreateView(ApplyUserRequiredMixin,
             'successfully.'.format(url=url, name=self.object.name))
         return success_message
 
+    def get_form_kwargs(self):
+        kwargs = super(ApplyPermissionCreateView, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
+
     def form_valid(self, form):
         obj = form.instance
         obj.date_applied = timezone.localtime()
@@ -91,8 +97,12 @@ class ApplyPermissionCreateView(ApplyUserRequiredMixin,
         obj.save()
         return super(ApplyPermissionCreateView, self).form_valid(form)
 
+    # def form_invalid(self, form):
+    #     form.add_error('name', 'Invalid Data.')
+    #     return super(ApplyPermissionCreateView, self).form_invalid(form)
 
-class ApplyPermissionUpdateView(LoginRequiredMixin, UpdateView):
+class ApplyPermissionUpdateView(LoginRequiredMixin,
+                                UpdateView):
     model = ApplyPermission
     form_class = ApplyPermissionForm
     template_name = 'apply_perms/apply_permission_create_update.html'
@@ -105,6 +115,13 @@ class ApplyPermissionUpdateView(LoginRequiredMixin, UpdateView):
         }
         kwargs.update(context)
         return super(ApplyPermissionUpdateView, self).get_context_data(**kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super(ApplyPermissionUpdateView, self).get_form_kwargs()
+        kwargs.update({
+            'user': self.request.user,
+        })
+        return kwargs
 
     def form_valid(self, form):
         obj = form.instance

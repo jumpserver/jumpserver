@@ -98,7 +98,7 @@ class AssetPermissionCreateView(AdminOrGroupAdminRequiredMixin,
         system_users = form.cleaned_data['system_users']
         associate_system_users_and_assets(system_users, assets, asset_groups)
         response = super(AssetPermissionCreateView, self).form_valid(form)
-        self.object.created_by = self.request.user.name
+        self.object.created_by = self.request.user.username
         self.object.save()
         return response
 
@@ -177,7 +177,7 @@ class AssetPermissionUserView(AdminOrGroupAdminRequiredMixin,
         return super(AssetPermissionUserView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
-        queryset = self.object.get_granted_users()
+        queryset = self.object.granted_users
         if self.keyword:
             search_func = functools.partial(
                 search_object_attr,
@@ -221,7 +221,7 @@ class AssetPermissionAssetView(AdminOrGroupAdminRequiredMixin,
             .get(request, *args, **kwargs)
 
     def get_queryset(self):
-        queryset = self.object.get_granted_assets()
+        queryset = self.object.granted_assets
         if self.keyword:
             search_func = functools.partial(
                 search_object_attr, value=self.keyword,

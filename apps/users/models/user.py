@@ -16,7 +16,7 @@ from django.shortcuts import reverse
 
 from . import UserGroup
 from common.utils import signer, date_expired_default
-
+from django.db.models import Q
 
 __all__ = ['User']
 
@@ -173,14 +173,15 @@ class User(AbstractUser):
 
     @property
     def private_token(self):
-        return self.create_private_token()
+        return self.create_private_token
 
     @property
     def managed_users(self):
         if self.is_superuser:
             return User.objects.all()
         elif self.is_groupadmin:
-            return User.objects.filter(groups__id__in=self.managed_groups.values_list('id',flat=True))
+            group_list = self.managed_groups.values_list('id',flat=True)
+            return User.objects.filter(groups__id__in=list(group_list))
         else:
             return self
 
@@ -190,9 +191,10 @@ class User(AbstractUser):
         if self.is_superuser:
             return Asset.objects.all()
         elif self.is_groupadmin:
-            return (self.granted_assets_direct() | self.granted_assets_inherit_from_user_groups()).distinct()
+            return self.granted_assets_direct | \
+                self.granted_assets_inherit_from_user_groups
         else:
-            return self.granted_assets_direct()
+            return self.granted_assets_direct
 
     @property
     def asset_groups(self):
@@ -200,39 +202,105 @@ class User(AbstractUser):
             from assets.models import AssetGroup
             return AssetGroup.objects.all()
         else:
-            return (self.granted_asset_groups_direct() | self.granted_asset_groups_inherit_from_user_groups()).distinct()
+            return self.created_asset_groups.all() | \
+                self.granted_asset_groups_direct | \
+                self.granted_asset_groups_inherit_from_user_groups
 
     @property
     def system_users(self):
         from assets.models import SystemUser
-        return SystemUser.objects.filter(assets__id__in=self.assets.values_list('id', flat=True))
+        asset_list = self.assets.values_list('id', flat=True)
+        return SystemUser.objects.filter(assets__id__in=list(asset_list)).distinct()
 
+    @property
+    def can_apply_assets(self):
+        from assets.models import Asset
+        valid_assets = Asset.valid_assets()
+        assets = Asset.objects.none()
+        if self.is_groupadmin:
+            return valid_assets
+        elif self.is_commonuser:
+            for manager in self.group_managers:
+                assets |= manager.assets
+        return assets
+
+    @property
+    def can_apply_asset_groups(self):
+        from assets.models import AssetGroup
+        if self.is_groupadmin:
+            return AssetGroup.objects.filter(creater__role='Admin')
+        elif self.is_commonuser:
+            manager_list = self.group_managers.values_list('id', flat=True)
+            return AssetGroup.objects.filter(creater__id__in=list(manager_list))
+        return AssetGroup.objects.none()
+
+    @property
+    def can_apply_system_users(self):
+        from assets.models import SystemUser
+        system_users = SystemUser.objects.none()
+        if self.is_groupadmin:
+            return SystemUser.objects.all()
+        elif self.is_commonuser:
+            for manager in self.group_managers:
+                system_users |= manager.system_users
+        return system_users
+
+    @property
+    def group_managers(self):
+        if self.is_commonuser:
+            group_list = self.groups.values_list('id', flat=True)
+            return User.objects.filter(
+                role='GroupAdmin',
+                groups__id__in=list(group_list))
+        return User.objects.filter(role='Admin')
+
+    @property
     def granted_assets_direct(self):
         from assets.models import Asset
-        asset_perms = self.asset_permissions.filter(is_active=True, date_expired__gt=timezone.now())
-        return (Asset.objects.filter(is_active=True, granted_by_permissions__id__in=asset_perms.values_list('id', flat=True)) \
-                   | Asset.objects.filter(is_active=True, groups__id__in=self.granted_asset_groups_direct().values_list('id', flat=True))).distinct()
+        valid_assets = Asset.valid_assets()
+        asset_perms_list = self.asset_permissions.filter(
+            is_active=True,
+            date_expired__gt=timezone.now(),
+        ).values_list('id', flat=True)
+        asset_group_list = self.granted_asset_groups_direct.values_list('id', flat=True)
+        return valid_assets.filter(
+            Q(granted_by_permissions__id__in=list(asset_perms_list)) |
+            Q(groups__id__in=list(asset_group_list))
+        ).distinct()
 
+    @property
     def granted_assets_inherit_from_user_groups(self):
         from assets.models import Asset
         from perms.models import AssetPermission
+        valid_assets = Asset.valid_assets()
+        group_list = self.groups.values_list('id', flat=True)
+        asset_perms_list = AssetPermission.valid_asset_perms().filter(
+            user_groups__id__in=list(group_list)
+        ).values_list('id', flat=True)
+        asset_group_list = self.granted_asset_groups_inherit_from_user_groups \
+            .values_list('id', flat=True)
+        return valid_assets.filter(
+            Q(granted_by_permissions__id__in=list(asset_perms_list)) |
+            Q(groups__id__in=list(asset_group_list))
+        ).distinct()
 
-        asset_perms = AssetPermission.objects.filter(is_active=True, date_expired__gt=timezone.now(), user_groups__id__in=self.groups.values_list('id', flat=True))
-        return (Asset.objects.filter(is_active=True, granted_by_permissions__id__in=asset_perms.values_list('id', flat=True)) \
-                   | Asset.objects.filter(groups__id__in=self.granted_asset_groups_inherit_from_user_groups().values_list('id', flat=True))).distinct()
-
+    @property
     def granted_asset_groups_direct(self):
         from assets.models import AssetGroup
+        asset_perms_list = self.asset_permissions.values_list('id', flat=True)
+        return AssetGroup.objects.filter(granted_by_permissions__id__in=list(asset_perms_list))
 
-        return AssetGroup.objects.filter(granted_by_permissions__id__in=self.asset_permissions.values_list('id', flat=True))
-
+    @property
     def granted_asset_groups_inherit_from_user_groups(self):
         from assets.models import AssetGroup
         from perms.models import AssetPermission
+        group_list= self.groups.values_list('id', flat=True)
+        asset_perms_list = AssetPermission.valid_asset_perms().filter(
+            user_groups__id__in=list(group_list)
+        ).values_list('id', flat=True)
+        return AssetGroup.objects.filter(granted_by_permissions__id__in=list(asset_perms_list))
 
-        asset_perms = AssetPermission.objects.filter(is_active=True, date_expired__gt=timezone.now(), user_groups__id__in=self.groups.values_list('id', flat=True))
-        return AssetGroup.objects.filter(granted_by_permissions__id__in= asset_perms.values_list('id', flat=True))
-
+    @property
     def create_private_token(self):
         from .authentication import PrivateToken
         try:

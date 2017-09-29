@@ -38,7 +38,7 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
     """API endpoint that allows Asset to be viewed or edited."""
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
-    permission_classes = (IsAdminUser,)
+    permission_classes = (IsValidUser,)
 
     def get_queryset(self):
         queryset = self.request.user.assets

@@ -19,6 +19,8 @@ def create_asset_permission(sender, instance, created, **kwargs):
                                                         is_active=True,
                                                         created_by=instance.approver.username,
                                                         apply_permission=instance)
+
+      asset_permission.users.add(instance.applicant)
       asset_permission.user_groups=user_groups
       asset_permission.assets=assets
       asset_permission.asset_groups=asset_groups

@@ -42,7 +42,7 @@
              </td>
              <td class="text-center">{{ asset_permission.created_by }}</td>
              <td class="text-center">
-                {% if user.username == asset_permission.created_by %}
+                {% if user.is_superuser or user.username == asset_permission.created_by %}
                      <a href="{% url 'perms:asset-permission-update' pk=asset_permission.id %}"
                         class="btn btn-xs btn-info">{% trans 'Update' %}
                      </a>

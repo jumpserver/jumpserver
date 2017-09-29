@@ -42,9 +42,11 @@ class AssetGroupDetailView(AdminOrGroupAdminRequiredMixin, DetailView):
         assets_remain = Asset.objects.exclude(id__in=self.object.assets.all())
         system_users = SystemUser.objects.all()
         system_users_remain = SystemUser.objects.exclude(id__in=system_users)
+        is_owner = self.request.user == self.object.creater
         context = {
             'app': _('Assets'),
             'action': _('Asset group detail'),
+            'is_owner': is_owner,
             'assets_remain': assets_remain,
             'assets': [asset for asset in Asset.objects.all()
                        if asset not in assets_remain],
@@ -87,6 +89,12 @@ class AssetGroupUpdateView(AdminOrGroupAdminRequiredMixin, UpdateView):
     template_name = 'assets/asset_group_create.html'
     success_url = reverse_lazy('assets:asset-group-list')
 
+    def dispatch(self, request, *args, **kwargs):
+        instance = AssetGroup.objects.get(pk=kwargs.get('pk'))
+        if(request.user != instance.creater):
+            return redirect(success_url)
+        return super(AssetGroupUpdateView, self).dispatch(request, *args, **kwargs)
+
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=AssetGroup.objects.all())
         return super(AssetGroupUpdateView, self).get(request, *args, **kwargs)
@@ -108,3 +116,9 @@ class AssetGroupDeleteView(AdminOrGroupAdminRequiredMixin, DeleteView):
     template_name = 'assets/delete_confirm.html'
     model = AssetGroup
     success_url = reverse_lazy('assets:asset-group-list')
+
+    def dispatch(self, request, *args, **kwargs):
+        instance = AssetGroup.objects.get(pk=kwargs.get('pk'))
+        if(request.user != instance.creater):
+            return redirect(reverse('assets:asset-group-list'))
+        return super(AssetGroupDeleteView, self).dispatch(request, *args, **kwargs)

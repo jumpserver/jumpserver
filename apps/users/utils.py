@@ -16,7 +16,6 @@ from common.tasks import send_mail_async
 from common.utils import reverse, get_object_or_none
 from .models import User
 
-
 # try:
 #     from io import StringIO
 # except ImportError:
@@ -189,4 +188,3 @@ def generate_token(request, user):
         cache.set(token, user.id, expiration)
         cache.set('%s_%s' % (user.id, remote_addr), token, expiration)
     return token
-

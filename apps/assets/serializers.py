@@ -48,7 +48,7 @@ class AssetGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     class Meta:
         model = AssetGroup
         list_serializer_class = BulkListSerializer
-        fields = ['id', 'name', 'comment', 'assets_amount', 'assets']
+        fields = '__all__'
 
     @staticmethod
     def get_assets_amount(obj):

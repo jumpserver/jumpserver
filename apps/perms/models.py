@@ -51,10 +51,16 @@ class AssetPermission(models.Model):
             return True
         return False
 
-    def get_granted_users(self):
-        return list(set(self.users.all()) | self.get_granted_user_groups_member())
+    @classmethod
+    def valid_asset_perms(cls):
+        return cls.objects.filter(is_active=True, date_expired__gt=timezone.now())
 
-    def get_granted_user_groups_member(self):
+    @property
+    def granted_users(self):
+        return list(set(self.users.all()) | self.granted_user_groups_member)
+
+    @property
+    def granted_user_groups_member(self):
         users = set()
         for user_group in self.user_groups.all():
             for user in user_group.users.all():
@@ -64,10 +70,12 @@ class AssetPermission(models.Model):
                 users.add(user)
         return users
 
-    def get_granted_assets(self):
-        return list(set(self.assets.all()) | self.get_granted_asset_groups_member())
+    @property
+    def granted_assets(self):
+        return list(set(self.assets.all()) | self.granted_asset_groups_member)
 
-    def get_granted_asset_groups_member(self):
+    @property
+    def granted_asset_groups_member(self):
         assets = set()
         for asset_group in self.asset_groups.all():
             for asset in asset_group.assets.all():

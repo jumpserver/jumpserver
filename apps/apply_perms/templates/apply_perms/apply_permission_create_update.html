@@ -28,6 +28,7 @@
                             </a>
                         </div>
                     </div>
+                    {% bootstrap_form_errors form  error_types='all'%}
                     <div class="ibox-content">
                         <form method="post" class="form-horizontal" action="" >
                             {% csrf_token %}

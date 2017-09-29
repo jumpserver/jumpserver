@@ -19,6 +19,7 @@ class AssetPermissionForm(forms.ModelForm):
         if not self.current_user.is_superuser:
             self.fields['users'].queryset = self.current_user.managed_users.exclude(id=self.current_user.id)
             self.fields['system_users'].queryset =  self.current_user.system_users
+            self.fields['assets'].queryset = self.current_user.assets
             self.fields['asset_groups'].queryset = self.current_user.asset_groups
 
     def clean_users(self):
