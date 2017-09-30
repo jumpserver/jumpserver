@@ -59,9 +59,9 @@ except (ConfigParser.NoSectionError, ConfigParser.NoOptionError):
 SECRET_KEY = '!%=t81uof5rhmtpi&(zr=q^fah#$enny-c@mswz49l42j0o49-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-TEMPLATE_DEBUG = True
+TEMPLATE_DEBUG = False
 
 ALLOWED_HOSTS = ['0.0.0.0/8']
 
