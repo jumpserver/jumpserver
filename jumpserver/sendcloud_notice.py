@@ -50,6 +50,6 @@ def send(title, msg, email_to):
         result = r.json()
         print("sendcloud:", result)
     except Exception, ex:
-        print("sendcloud:ex:", ex)
+        print("sendcloud:ex:", ex, param)
 
     return result['statusCode'] == 200
