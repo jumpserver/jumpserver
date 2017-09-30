@@ -1,31 +1,31 @@
 # coding: utf-8
 
-import os, sys, time, re
-from Crypto.Cipher import AES
 import crypt
-import pwd
-from binascii import b2a_hex, a2b_hex
-import hashlib
 import datetime
+import hashlib
+import json
+import logging
+import pwd
 import random
 import subprocess
 import uuid
-import json
-import logging
+from binascii import b2a_hex, a2b_hex
 
-from settings import *
+from Crypto.Cipher import AES
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
-from django.http import HttpResponse, Http404
-from django.template import RequestContext
-from juser.models import User, UserGroup
-from jlog.models import Log, TtyLog
-from jasset.models import Asset, AssetGroup
-from jperm.models import PermRule, PermRole
-from jumpserver.models import Setting
+from django.core.urlresolvers import reverse
+from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
-from django.core.mail import send_mail
-from django.core.urlresolvers import reverse
+from django.template import RequestContext
+
+from jlog.models import Log
+from jumpserver.models import Setting
+from juser.models import User, UserGroup
+from settings import *
+from jumpserver.sendcloud_notice import send_mail
+
+
 
 
 def set_log(level, filename='jumpserver.log'):
@@ -497,6 +497,7 @@ def defend_attack(func):
         request.session['visit'] = request.session.get('visit', 1) + 1
         request.session.set_expiry(300)
         return func(request, *args, **kwargs)
+
     return _deco
 
 
