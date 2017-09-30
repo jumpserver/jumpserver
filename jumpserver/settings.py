@@ -8,16 +8,19 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/1.7/ref/settings/
 """
 
+import ConfigParser
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-import ConfigParser
-import getpass
 
 config = ConfigParser.ConfigParser()
 
 BASE_DIR = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
 config.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
 KEY_DIR = os.path.join(BASE_DIR, 'keys')
+
+# sendcloud config
+SENDCLOUD_ACCESS_KEY = config.get('sendcloud', 'access_key')
+SENDCLOUD_SECRET_KEY = config.get('sendcloud', 'secret_key')
 
 AUTH_USER_MODEL = 'juser.User'
 # mail config
@@ -95,11 +98,10 @@ ROOT_URLCONF = 'jumpserver.urls'
 
 WSGI_APPLICATION = 'jumpserver.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
 DATABASES = {}
-if config.get('db', 'engine') == 'mysql': 
+if config.get('db', 'engine') == 'mysql':
     DB_HOST = config.get('db', 'host')
     DB_PORT = config.getint('db', 'port')
     DB_USER = config.get('db', 'user')
@@ -161,7 +163,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = False
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.7/howto/static-files/

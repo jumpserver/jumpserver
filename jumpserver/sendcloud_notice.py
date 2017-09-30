@@ -1,16 +1,13 @@
 # coding: utf-8
 
 import hashlib
-import os
 
 import requests
 
-from settings import config, BASE_DIR
+from settings import SENDCLOUD_ACCESS_KEY, SENDCLOUD_SECRET_KEY
 
-config.read(os.path.join(BASE_DIR, 'jumpserver.conf'))
-
-accessKey = config.read('sendcloud', 'access_key')
-secretKey = config.read('sendcloud', 'secret_key')
+accessKey = SENDCLOUD_ACCESS_KEY
+secretKey = SENDCLOUD_SECRET_KEY
 
 mail_url = 'http://api.notice.sendcloud.net/mailapi/send'
 
