@@ -7,8 +7,6 @@ from settings import SENDCLOUD_ACCESS_KEY, SENDCLOUD_SECRET_KEY
 accessKey = SENDCLOUD_ACCESS_KEY
 secretKey = SENDCLOUD_SECRET_KEY
 
-sendcloud_api_url = 'https://api.notice.sendcloud.net'
-
 
 def _signature(param):
     param_keys = list(param.keys())
@@ -29,17 +27,22 @@ def _signature(param):
 
 def get_user(mail):
     param = {
-
+        'nickname': mail
     }
-
     call_sendcloud_api('/linkmanMember/list', param)
 
 
 def add_user(mail):
+    param = {
+        'nickname': mail
+    }
     pass
 
 
 def update_user(mail):
+    param = {
+        'nickname': mail
+    }
     pass
 
 
@@ -55,12 +58,12 @@ def call_sendcloud_api(path, param):
 
     param['signature'] = _signature(param)
 
-    url = 'http://api.notice.sendcloud.net' + path
+    url = 'http://api.notice.sendcloud.net' + ('' if path.startswith('/') else '/') + path
 
-    r = requests.get(url, params=param)
+    response = requests.get(url, params=param)
 
     try:
-        result = r.json()
+        result = response.json()
         print("sendcloud:", result, param)
     except Exception, ex:
         print("sendcloud:ex:", ex)
@@ -84,4 +87,4 @@ def send_mail(title, msg, mail_from=None, email_to=None, fail_silently=True):
         'content': msg,
     }
 
-    call_sendcloud_api('/mailapi/send', param)
+    return call_sendcloud_api('/mailapi/send', param)
