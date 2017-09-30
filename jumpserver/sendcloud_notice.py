@@ -2,14 +2,12 @@
 
 import hashlib
 
-import requests
-
 from settings import SENDCLOUD_ACCESS_KEY, SENDCLOUD_SECRET_KEY
 
 accessKey = SENDCLOUD_ACCESS_KEY
 secretKey = SENDCLOUD_SECRET_KEY
 
-mail_url = 'http://api.notice.sendcloud.net/mailapi/send'
+sendcloud_api_url = 'https://api.notice.sendcloud.net'
 
 
 def _signature(param):
@@ -29,27 +27,61 @@ def _signature(param):
     return signature
 
 
-def send_mail(title, msg, mail_from=None, email_to=None, fail_silently=True):
-    send(title, msg, email_to[0])
+def get_user(mail):
+    param = {
+
+    }
+
+    call_sendcloud_api('/linkmanMember/list', param)
+
+
+def add_user(mail):
     pass
 
 
-def send(title, msg, email_to):
+def update_user(mail):
+    pass
+
+
+def call_sendcloud_api(path, param):
+    """
+    调用 sendcloud 通知
+    :param path:
+    :param param:
+    :return:
+    """
+
+    param['accessKey'] = accessKey
+
+    param['signature'] = _signature(param)
+
+    url = 'http://api.notice.sendcloud.net' + path
+
+    r = requests.get(url, params=param)
+
+    try:
+        result = r.json()
+        print("sendcloud:", result, param)
+    except Exception, ex:
+        print("sendcloud:ex:", ex)
+
+    return result['statusCode'] == 200
+
+
+def send_mail(title, msg, mail_from=None, email_to=None, fail_silently=True):
+    """
+    发送邮件
+    :param title:
+    :param msg:
+    :param mail_from:
+    :param email_to:
+    :param fail_silently:
+    :return:
+    """
     param = {
         'nickNames': ';'.join(email_to),
-        'accessKey': accessKey,
         'subject': title,
         'content': msg,
     }
 
-    param['signature'] = _signature(param)
-
-    r = requests.get(mail_url, params=param)
-
-    try:
-        result = r.json()
-        print("sendcloud:", result)
-    except Exception, ex:
-        print("sendcloud:ex:", ex, param)
-
-    return result['statusCode'] == 200
+    call_sendcloud_api('/mailapi/send', param)
