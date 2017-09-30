@@ -173,7 +173,7 @@ def user_add_mail(user, kwargs):
     """ % (user.name, user.username, user_role.get(user.role, u'普通用户'),
            kwargs.get('password'), kwargs.get('ssh_key_pwd'), URL, user.uuid)
 
-    add_notice_user([user.email])
+    add_notice_user(user.email)
     send_mail(mail_title, mail_msg, MAIL_FROM, [user.email], fail_silently=False)
 
 

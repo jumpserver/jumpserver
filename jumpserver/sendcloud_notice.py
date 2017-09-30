@@ -1,6 +1,7 @@
 # coding: utf-8
 
 import hashlib
+import json
 
 import requests
 
@@ -59,13 +60,13 @@ def call_sendcloud_api(path, param):
 
     response = requests.get(url, params=param)
 
-    print("sendcloud", url, param)
+    print("sendcloud", url, json.dumps(param))
 
     try:
         result = response.json()
-        print("sendcloud", result)
+        print("sendcloud", json.dumps(result))
     except Exception, ex:
-        print("sendcloud", result, ex)
+        print("sendcloud", json.dumps(result), ex)
 
     return result['statusCode'] == 200
 
