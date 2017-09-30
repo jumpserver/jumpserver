@@ -5,7 +5,7 @@ import json
 
 import requests
 
-from api import logger
+from api import *
 from settings import SENDCLOUD_ACCESS_KEY, SENDCLOUD_SECRET_KEY
 
 accessKey = SENDCLOUD_ACCESS_KEY
