@@ -1,9 +1,11 @@
 # coding: utf-8
 
 import hashlib
+import json
 
 import requests
 
+from api import logger
 from settings import SENDCLOUD_ACCESS_KEY, SENDCLOUD_SECRET_KEY
 
 accessKey = SENDCLOUD_ACCESS_KEY
@@ -59,11 +61,13 @@ def call_sendcloud_api(path, param):
 
     response = requests.get(url, params=param)
 
+    logger.info("sendcloud", url, json.dumps(param))
+
     try:
         result = response.json()
-        print("sendcloud:", result, param)
+        logger.info("sendcloud", result)
     except Exception, ex:
-        print("sendcloud:ex:", ex)
+        logger.error("sendcloud", result, ex)
 
     return result['statusCode'] == 200
 
