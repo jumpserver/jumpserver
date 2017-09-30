@@ -45,4 +45,11 @@ def send(title, msg, email_to):
     param['signature'] = _signature(param)
 
     r = requests.get(mail_url, params=param)
-    return r.status_code == 200
+
+    try:
+        result = r.json()
+        print("sendcloud:", result)
+    except Exception, ex:
+        print("sendcloud:ex:", ex)
+
+    return result['statusCode'] == 200
