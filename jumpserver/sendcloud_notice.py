@@ -2,6 +2,8 @@
 
 import hashlib
 
+import requests
+
 from settings import SENDCLOUD_ACCESS_KEY, SENDCLOUD_SECRET_KEY
 
 accessKey = SENDCLOUD_ACCESS_KEY
@@ -25,25 +27,20 @@ def _signature(param):
     return signature
 
 
-def get_user(mail):
+def add_notice_user(mail):
     param = {
-        'nickname': mail
+        'nickName': mail,
+        'email': mail
     }
-    call_sendcloud_api('/linkmanMember/list', param)
-
-
-def add_user(mail):
-    param = {
-        'nickname': mail
-    }
-    pass
+    return call_sendcloud_api('/linkmanMember/add', param)
 
 
 def update_user(mail):
     param = {
-        'nickname': mail
+        'nickName': mail,
+        'email': mail
     }
-    pass
+    return call_sendcloud_api('/linkmanMember/modify', param)
 
 
 def call_sendcloud_api(path, param):
