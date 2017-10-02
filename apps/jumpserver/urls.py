@@ -31,6 +31,8 @@ urlpatterns = [
     url(r'^api/ops/', include('ops.urls.api_urls', namespace='api-ops')),
     url(r'^captcha/', include('captcha.urls')),
 
+    #google two-factor authentication
+    url(r'', include('two_factor.urls', 'two_factor')),
 ]
 
 
