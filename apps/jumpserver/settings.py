@@ -114,10 +114,10 @@ TEMPLATES = [
 
 # WSGI_APPLICATION = 'jumpserver.wsgi.applications'
 
-# LOGIN_REDIRECT_URL = reverse_lazy('index')
-# LOGIN_URL = reverse_lazy('users:login')
+LOGIN_REDIRECT_URL = reverse_lazy('index')
+# LOGIN_URL = reverse_lazy('two_factor:login')
 LOGIN_URL = 'two_factor:login'
-LOGIN_REDIRECT_URL = 'two_factor:profile'
+# LOGIN_REDIRECT_URL = 'two_factor:profile'
 
 SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN or None
 CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN or None

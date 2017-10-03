@@ -78,7 +78,7 @@ def user_add_success_next(user):
         'rest_password_token': user.generate_reset_token(),
         'forget_password_url': reverse('users:forgot-password', external=True),
         'email': user.email,
-        'login_url': reverse('users:login', external=True),
+        'login_url': reverse('two_factor:login', external=True),
     }
 
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
@@ -109,7 +109,7 @@ def send_reset_password_mail(user):
         'rest_password_token': user.generate_reset_token(),
         'forget_password_url': reverse('users:forgot-password', external=True),
         'email': user.email,
-        'login_url': reverse('users:login', external=True),
+        'login_url': reverse('two_factor:login', external=True),
     }
     if settings.DEBUG:
         logger.debug(message)
@@ -131,7 +131,7 @@ def send_reset_ssh_key_mail(user):
     </br>
     """) % {
         'name': user.name,
-        'login_url': reverse('users:login', external=True),
+        'login_url': reverse('two_factor:login', external=True),
     }
     if settings.DEBUG:
         logger.debug(message)

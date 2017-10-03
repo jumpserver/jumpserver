@@ -75,7 +75,7 @@ class UserLogoutView(TemplateView):
         context = {
             'title': _('Logout success'),
             'messages': _('Logout success, return login page'),
-            'redirect_url': reverse('users:login'),
+            'redirect_url': reverse('two_factor:login'),
             'auto_redirect': True,
         }
         kwargs.update(context)
@@ -105,7 +105,7 @@ class UserForgotPasswordSendmailSuccessView(TemplateView):
             'title': _('Send reset password message'),
             'messages': _('Send reset password mail success, '
                           'login your mail box and follow it '),
-            'redirect_url': reverse('users:login'),
+            'redirect_url': reverse('two_factor:login'),
         }
         kwargs.update(context)
         return super(UserForgotPasswordSendmailSuccessView, self)\
@@ -119,7 +119,7 @@ class UserResetPasswordSuccessView(TemplateView):
         context = {
             'title': _('Reset password success'),
             'messages': _('Reset password success, return to login page'),
-            'redirect_url': reverse('users:login'),
+            'redirect_url': reverse('two_factor:login'),
             'auto_redirect': True,
         }
         kwargs.update(context)
