@@ -20,7 +20,7 @@ from django.conf import settings
 
 from common.utils import get_object_or_none
 from ..models import User
-from ..utils import send_reset_password_mail
+from ..utils import send_reset_password_mail, default_device
 from ..hands import write_login_log_async
 from .. import forms
 
@@ -160,8 +160,13 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
     file_storage = default_storage
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated() and not request.user.is_first_login:
-            return redirect(reverse('index'))
+        usr = request.user
+        if usr.is_authenticated() and not usr.is_first_login:
+            if usr.enable_otp and not default_device(usr):
+                return redirect(reverse('two_factor:setup'))
+            else:
+                return redirect(reverse('index'))
+
         return super(UserFirstLoginView, self).dispatch(request, *args, **kwargs)
 
     def done(self, form_list, form_dict, **kwargs):

@@ -2510,3 +2510,6 @@ msgstr "使用这个用备用验证码登录的表单。\n这些验证码曾经�
 msgid "Or, alternatively, use one of your backup phones:"
 msgstr "或者，使用您的备用电话："
 
+#: setup.html
+msgid "Enable Two-Factor Authentication"
+msgstr "启用谷歌两步验证"

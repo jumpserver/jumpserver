@@ -16,6 +16,7 @@ from common.tasks import send_mail_async
 from common.utils import reverse, get_object_or_none
 from .models import User
 
+from django_otp import devices_for_user
 # try:
 #     from io import StringIO
 # except ImportError:
@@ -52,6 +53,14 @@ class ApplyUserRequiredMixin(UserPassesTestMixin):
             self.raise_exception = True
             return False
         return True
+
+def default_device(user):
+    if not user or user.is_anonymous():
+        return
+    for device in devices_for_user(user):
+        if device.name == 'default':
+            return device
+
 
 def user_add_success_next(user):
     subject = _('Create account successfully')
