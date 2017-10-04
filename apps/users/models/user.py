@@ -217,22 +217,25 @@ class User(AbstractUser):
         from assets.models import Asset
         valid_assets = Asset.valid_assets()
         assets = Asset.objects.none()
+        my_assets = self.assets.values_list('id', flat=True)
         if self.is_groupadmin:
-            return valid_assets
+            assets |= valid_assets
         elif self.is_commonuser:
             for manager in self.group_managers:
                 assets |= manager.assets
-        return assets
+        return assets.exclude(id__in=list(my_assets))
 
     @property
     def can_apply_asset_groups(self):
         from assets.models import AssetGroup
+        asset_groups = AssetGroup.objects.none()
+        my_asset_groups = self.asset_groups.values_list('id', flat=True)
         if self.is_groupadmin:
-            return AssetGroup.objects.filter(creater__role='Admin')
+            asset_groups |= AssetGroup.objects.filter(creater__role='Admin')
         elif self.is_commonuser:
             manager_list = self.group_managers.values_list('id', flat=True)
-            return AssetGroup.objects.filter(creater__id__in=list(manager_list))
-        return AssetGroup.objects.none()
+            asset_groups |= AssetGroup.objects.filter(creater__id__in=list(manager_list))
+        return asset_groups.exclude(id__in=list(my_asset_groups))
 
     @property
     def can_apply_system_users(self):
