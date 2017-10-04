@@ -174,21 +174,14 @@ class UserGroupForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.is_superuser = kwargs.pop('user', None).is_superuser
+        instance = kwargs.get('instance', None)
         super(UserGroupForm, self).__init__(*args, **kwargs)
-        instance = kwargs['instance']
-        if instance:
-            self.fields['users'].initial= (
-                instance.users.values_list(
-                    'id', flat=True
-                )
-            )
-            self.fields['managers'].initial= (
-                instance.managers.values_list(
-                    'id', flat=True
-                )
-            )
         self.fields['managers'].widget.attrs['disabled'] = not self.is_superuser
         self.fields['name'].widget.attrs['readonly'] = not self.is_superuser
+        if instance:
+            self.fields['users'].initial= instance.users.values_list('id', flat=True)
+            self.fields['managers'].initial= instance.managers.values_list('id', flat=True)
+
 
     class Meta:
         model = UserGroup

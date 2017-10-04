@@ -83,7 +83,9 @@ class ApplyPermissionCreateView(ApplyUserRequiredMixin,
 
     def get_form_kwargs(self):
         kwargs = super(ApplyPermissionCreateView, self).get_form_kwargs()
-        kwargs.update({'user': self.request.user})
+        kwargs.update({
+            'user': self.request.user,
+        })
         return kwargs
 
     def form_valid(self, form):

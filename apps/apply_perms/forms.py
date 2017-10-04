@@ -18,7 +18,7 @@ class ApplyPermissionForm(forms.ModelForm):
     )
 
     assets = forms.ModelMultipleChoiceField(
-        queryset = Asset.objects.all(),
+        queryset = Asset.objects.none(),
         required=False,
         label=_('Select assets'),
         widget=forms.SelectMultiple(
@@ -29,7 +29,7 @@ class ApplyPermissionForm(forms.ModelForm):
     )
 
     asset_groups = forms.ModelMultipleChoiceField(
-        queryset = AssetGroup.objects.all(),
+        queryset = AssetGroup.objects.none(),
         required=False,
         help_text=_('* Asset or Asset group at least one required'),
         label=_('Select asset groups'),
@@ -41,7 +41,7 @@ class ApplyPermissionForm(forms.ModelForm):
     )
 
     user_groups = forms.ModelMultipleChoiceField(
-        queryset = UserGroup.objects.all(),
+        queryset = UserGroup.objects.none(),
         required=False,
         disabled=True,
         label=_('Select user groups'),
@@ -53,7 +53,7 @@ class ApplyPermissionForm(forms.ModelForm):
     )
 
     system_users = forms.ModelMultipleChoiceField(
-        queryset = SystemUser.objects.all(),
+        queryset = SystemUser.objects.none(),
         required=True,
         help_text=_('* required'),
         label=_('Select system users'),
@@ -65,7 +65,7 @@ class ApplyPermissionForm(forms.ModelForm):
     )
 
     approver = forms.ModelChoiceField(
-        queryset = User.objects.filter(role__in=['Admin', 'GroupAdmin']),
+        queryset = User.objects.none(),
         required=True,
         help_text=_('* required'),
         label=_('Select approver'),
@@ -78,6 +78,13 @@ class ApplyPermissionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         current_user = kwargs.pop('user', None)
+        instance = kwargs.get('instance', None)
+        initial = kwargs.pop('initial', {})
+        if instance:
+            initial['assets'] = json.loads(instance.assets)
+            initial['asset_groups'] = json.loads(instance.asset_groups)
+            initial['system_users'] = json.loads(instance.system_users)
+        kwargs['initial'] = initial
         super(ApplyPermissionForm, self).__init__(*args, **kwargs)
         if current_user:
             self.fields['assets'].queryset = current_user.can_apply_assets
