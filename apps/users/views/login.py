@@ -2,12 +2,11 @@
 
 from __future__ import unicode_literals
 from django import forms
-from django.shortcuts import render
+from django.shortcuts import render, resolve_url, reverse, redirect
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.storage import default_storage
 from django.http import HttpResponseRedirect
-from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
@@ -19,11 +18,14 @@ from formtools.wizard.views import SessionWizardView
 from django.conf import settings
 
 from common.utils import get_object_or_none
-from ..models import User
-from ..utils import send_reset_password_mail, default_device
+from ..models import User, AuthDevice
+from ..utils import send_reset_password_mail
 from ..hands import write_login_log_async
 from .. import forms
-
+from two_factor.views.core import LoginView
+from two_factor.utils import default_device
+from django.utils.http import is_safe_url
+from two_factor import signals
 
 __all__ = ['UserLoginView', 'UserLogoutView',
            'UserForgotPasswordView', 'UserForgotPasswordSendmailSuccessView',
@@ -34,33 +36,76 @@ __all__ = ['UserLoginView', 'UserLogoutView',
 @method_decorator(sensitive_post_parameters(), name='dispatch')
 @method_decorator(csrf_protect, name='dispatch')
 @method_decorator(never_cache, name='dispatch')
-class UserLoginView(FormView):
-    template_name = 'users/login.html'
-    form_class = forms.UserLoginForm
-    redirect_field_name = 'next'
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_staff:
-            return redirect(self.get_success_url())
-        return super(UserLoginView, self).get(request, *args, **kwargs)
 
-    def form_valid(self, form):
-        auth_login(self.request, form.get_user())
-        login_ip = self.request.META.get('REMOTE_ADDR', '')
-        user_agent = self.request.META.get('HTTP_USER_AGENT', '')
-        write_login_log_async.delay(self.request.user.username,
-                                    self.request.user.name,
-                                    login_type='W', login_ip=login_ip,
-                                    user_agent=user_agent)
-        return redirect(self.get_success_url())
+# class UserLoginView(FormView):
+#     template_name = 'users/login.html'
+#     form_class = forms.UserLoginForm
+#     redirect_field_name = 'next'
 
-    def get_success_url(self):
-        if self.request.user.is_first_login:
-            return reverse('users:user-first-login')
+#     def get(self, request, *args, **kwargs):
+#         if request.user.is_staff:
+#             return redirect(self.get_success_url())
+#         return super(UserLoginView, self).get(request, *args, **kwargs)
 
-        return self.request.POST.get(
+#     def form_valid(self, form):
+#         auth_login(self.request, form.get_user())
+#         login_ip = self.request.META.get('REMOTE_ADDR', '')
+#         user_agent = self.request.META.get('HTTP_USER_AGENT', '')
+#         write_login_log_async.delay(self.request.user.username,
+#                                     self.request.user.name,
+#                                     login_type='W', login_ip=login_ip,
+#                                     user_agent=user_agent)
+#         return redirect(self.get_success_url())
+
+#     def get_success_url(self):
+#         if self.request.user.is_first_login:
+#             return reverse('users:user-first-login')
+
+#         return self.request.POST.get(
+#             self.redirect_field_name,
+#             self.request.GET.get(self.redirect_field_name, reverse('index')))
+
+
+class UserLoginView(LoginView):
+
+    def has_token_step(self):
+        usr = self.get_user()
+        return default_device(usr) and not usr.auth_devices.filter(ip=self.request.META['REMOTE_ADDR'])
+
+    def has_backup_step(self):
+        usr = self.get_user()
+        return default_device(usr) and \
+            'token' not in self.storage.validated_step_data and \
+            not usr.auth_devices.filter(ip=self.request.META['REMOTE_ADDR'])
+
+    condition_dict = {
+        'token': has_token_step,
+        'backup': has_backup_step,
+    }
+
+    def done(self, form_list, **kwargs):
+        """
+        Login the user and redirect to the desired page.
+        """
+        auth_login(self.request, self.get_user())
+
+        redirect_to = self.request.POST.get(
             self.redirect_field_name,
-            self.request.GET.get(self.redirect_field_name, reverse('index')))
+            self.request.GET.get(self.redirect_field_name, '')
+        )
+        if not is_safe_url(url=redirect_to, host=self.request.get_host()):
+            redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
+
+        device = getattr(self.get_user(), 'otp_device', None)
+        if device:
+            signals.user_verified.send(sender=__name__, request=self.request,
+                                       user=self.get_user(), device=device)
+
+        self.request.user.auth_devices.get_or_create(
+            ip=self.request.META['REMOTE_ADDR']
+        )
+        return redirect(redirect_to)
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -75,7 +120,7 @@ class UserLogoutView(TemplateView):
         context = {
             'title': _('Logout success'),
             'messages': _('Logout success, return login page'),
-            'redirect_url': reverse('two_factor:login'),
+            'redirect_url': reverse('users:login'),
             'auto_redirect': True,
         }
         kwargs.update(context)
@@ -105,7 +150,7 @@ class UserForgotPasswordSendmailSuccessView(TemplateView):
             'title': _('Send reset password message'),
             'messages': _('Send reset password mail success, '
                           'login your mail box and follow it '),
-            'redirect_url': reverse('two_factor:login'),
+            'redirect_url': reverse('users:login'),
         }
         kwargs.update(context)
         return super(UserForgotPasswordSendmailSuccessView, self)\
@@ -119,7 +164,7 @@ class UserResetPasswordSuccessView(TemplateView):
         context = {
             'title': _('Reset password success'),
             'messages': _('Reset password success, return to login page'),
-            'redirect_url': reverse('two_factor:login'),
+            'redirect_url': reverse('users:login'),
             'auto_redirect': True,
         }
         kwargs.update(context)

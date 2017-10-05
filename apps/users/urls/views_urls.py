@@ -8,7 +8,7 @@ app_name = 'users'
 
 urlpatterns = [
     # Login view
-    # url(r'^login$', views.UserLoginView.as_view(), name='login'),
+    url(r'^login$', views.UserLoginView.as_view(), name='login'),
     url(r'^logout$', views.UserLogoutView.as_view(), name='logout'),
     url(r'^password/forgot$', views.UserForgotPasswordView.as_view(),
         name='forgot-password'),

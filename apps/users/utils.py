@@ -16,7 +16,6 @@ from common.tasks import send_mail_async
 from common.utils import reverse, get_object_or_none
 from .models import User
 
-from django_otp import devices_for_user
 # try:
 #     from io import StringIO
 # except ImportError:
@@ -54,14 +53,6 @@ class ApplyUserRequiredMixin(UserPassesTestMixin):
             return False
         return True
 
-def default_device(user):
-    if not user or user.is_anonymous():
-        return
-    for device in devices_for_user(user):
-        if device.name == 'default':
-            return device
-
-
 def user_add_success_next(user):
     subject = _('Create account successfully')
     recipient_list = [user.email]
@@ -87,7 +78,7 @@ def user_add_success_next(user):
         'rest_password_token': user.generate_reset_token(),
         'forget_password_url': reverse('users:forgot-password', external=True),
         'email': user.email,
-        'login_url': reverse('two_factor:login', external=True),
+        'login_url': reverse('users:login', external=True),
     }
 
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
@@ -118,7 +109,7 @@ def send_reset_password_mail(user):
         'rest_password_token': user.generate_reset_token(),
         'forget_password_url': reverse('users:forgot-password', external=True),
         'email': user.email,
-        'login_url': reverse('two_factor:login', external=True),
+        'login_url': reverse('users:login', external=True),
     }
     if settings.DEBUG:
         logger.debug(message)
@@ -140,7 +131,7 @@ def send_reset_ssh_key_mail(user):
     </br>
     """) % {
         'name': user.name,
-        'login_url': reverse('two_factor:login', external=True),
+        'login_url': reverse('users:login', external=True),
     }
     if settings.DEBUG:
         logger.debug(message)
