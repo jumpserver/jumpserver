@@ -35,7 +35,7 @@
             <div class="alert alert-danger" style="margin: 20px auto 0px">
                 {% url 'users:user-pubkey-update' as user_pubkey_update %}
                 {% blocktrans %}
-                Your ssh-public-key has been expired. Please click <a href="{{ user_pubkey_update }}"> this link </a>to update your ssh-public-key.
+                Your ssh public key not set or expired. Please click <a href="{{ user_pubkey_update }}"> this link </a>to update your
                 {% endblocktrans %}
             </div>
             {% endif %}
