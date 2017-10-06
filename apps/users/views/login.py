@@ -70,14 +70,14 @@ __all__ = ['UserLoginView', 'UserLogoutView',
 class UserLoginView(LoginView):
 
     def has_token_step(self):
-        usr = self.get_user()
-        return default_device(usr) and not usr.auth_devices.filter(ip=self.request.META['REMOTE_ADDR'])
+        current_user = self.get_user()
+        return default_device(current_user) and not current_user.auth_devices.filter(ip=self.request.META['REMOTE_ADDR'])
 
     def has_backup_step(self):
-        usr = self.get_user()
-        return default_device(usr) and \
+        current_user = self.get_user()
+        return default_device(current_user) and \
             'token' not in self.storage.validated_step_data and \
-            not usr.auth_devices.filter(ip=self.request.META['REMOTE_ADDR'])
+            not current_user.auth_devices.filter(ip=self.request.META['REMOTE_ADDR'])
 
     condition_dict = {
         'token': has_token_step,
@@ -88,7 +88,8 @@ class UserLoginView(LoginView):
         """
         Login the user and redirect to the desired page.
         """
-        auth_login(self.request, self.get_user())
+        current_user = self.get_user()
+        auth_login(self.request, current_user)
 
         redirect_to = self.request.POST.get(
             self.redirect_field_name,
@@ -97,14 +98,15 @@ class UserLoginView(LoginView):
         if not is_safe_url(url=redirect_to, host=self.request.get_host()):
             redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
 
-        device = getattr(self.get_user(), 'otp_device', None)
+        device = getattr(current_user, 'otp_device', None)
         if device:
             signals.user_verified.send(sender=__name__, request=self.request,
-                                       user=self.get_user(), device=device)
+                                       user=current_user, device=device)
 
-        self.request.user.auth_devices.get_or_create(
-            ip=self.request.META['REMOTE_ADDR']
-        )
+        if self.has_token_step() or self.has_backup_step():
+            current_user.auth_devices.get_or_create(
+                ip=self.request.META['REMOTE_ADDR']
+            )
         return redirect(redirect_to)
 
 
