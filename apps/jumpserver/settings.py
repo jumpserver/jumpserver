@@ -229,6 +229,10 @@ LOGGING = {
         'ops.ansible_api': {
             'handlers': ['console', 'ansible_logs'],
             'level': LOG_LEVEL,
+        },
+        'django_auth_ldap': {
+            'handlers': ['console', 'ansible_logs'],
+            'level': LOG_LEVEL,
         }
     }
 }
@@ -311,7 +315,6 @@ AUTH_LDAP_BIND_PASSWORD = CONFIG.AUTH_LDAP_BIND_PASSWORD
 AUTH_LDAP_USER_DN_TEMPLATE = CONFIG.AUTH_LDAP_USER_DN_TEMPLATE
 AUTH_LDAP_START_TLS = CONFIG.AUTH_LDAP_START_TLS
 AUTH_LDAP_USER_ATTR_MAP = CONFIG.AUTH_LDAP_USER_ATTR_MAP
-
 
 # Celery using redis as broker
 BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/3' % {
