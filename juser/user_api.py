@@ -172,6 +172,8 @@ def user_add_mail(user, kwargs):
         说明： 请登陆跳板机后台下载密钥, 然后使用密钥登陆跳板机！
     """ % (user.name, user.username, user_role.get(user.role, u'普通用户'),
            kwargs.get('password'), kwargs.get('ssh_key_pwd'), URL, user.uuid)
+
+    add_notice_user(user.email)
     send_mail(mail_title, mail_msg, MAIL_FROM, [user.email], fail_silently=False)
 
 

@@ -24,8 +24,10 @@ from jperm.models import PermRule, PermRole
 from jumpserver.models import Setting
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
-from django.core.mail import send_mail
+from sendcloud_notice import send_mail,add_notice_user
 from django.core.urlresolvers import reverse
+
+
 
 
 def set_log(level, filename='jumpserver.log'):
