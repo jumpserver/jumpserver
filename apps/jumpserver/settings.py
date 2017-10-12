@@ -13,7 +13,11 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 import sys
 
+import ldap
+from django_auth_ldap.config import LDAPSearch
+
 from django.urls import reverse_lazy
+
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -232,14 +236,13 @@ LOGGING = {
         },
         'django_auth_ldap': {
             'handlers': ['console', 'ansible_logs'],
-            'level': LOG_LEVEL,
+            'level': "INFO",
         }
     }
 }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
-
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Shanghai'
@@ -312,7 +315,12 @@ if CONFIG.AUTH_LDAP:
 AUTH_LDAP_SERVER_URI = CONFIG.AUTH_LDAP_SERVER_URI
 AUTH_LDAP_BIND_DN = CONFIG.AUTH_LDAP_BIND_DN
 AUTH_LDAP_BIND_PASSWORD = CONFIG.AUTH_LDAP_BIND_PASSWORD
-AUTH_LDAP_USER_DN_TEMPLATE = CONFIG.AUTH_LDAP_USER_DN_TEMPLATE
+# AUTH_LDAP_USER_DN_TEMPLATE = CONFIG.AUTH_LDAP_USER_DN_TEMPLATE
+AUTH_LDAP_USER_SEARCH = LDAPSearch(
+    CONFIG.AUTH_LDAP_SEARCH_OU,
+    ldap.SCOPE_SUBTREE,
+    CONFIG.AUTH_LDAP_SEARCH_FILTER
+)
 AUTH_LDAP_START_TLS = CONFIG.AUTH_LDAP_START_TLS
 AUTH_LDAP_USER_ATTR_MAP = CONFIG.AUTH_LDAP_USER_ATTR_MAP
 
