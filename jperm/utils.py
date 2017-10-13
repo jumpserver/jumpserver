@@ -42,7 +42,7 @@ def gen_keys(key="", key_path_dir=""):
         key_path_dir = os.path.join(KEY_DIR, 'role_key', key_basename)
     private_key = os.path.join(key_path_dir, 'id_rsa')
     public_key = os.path.join(key_path_dir, 'id_rsa.pub')
-    mkdir(key_path_dir, mode=0755)
+    mkdir(key_path_dir, mode=755)
     if not key:
         key = RSAKey.generate(2048)
         key.write_private_key_file(private_key)
@@ -67,6 +67,12 @@ def gen_keys(key="", key_path_dir=""):
             content_file.write(data)
     return key_path_dir
 
+
+def trans_all(str):
+    if str.strip().lower() == "all":
+        return str.upper()
+    else:
+        return str
 
 if __name__ == "__main__":
     print gen_keys()

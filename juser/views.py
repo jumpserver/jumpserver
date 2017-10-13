@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from juser.user_api import *
 from jperm.perm_api import get_group_user_perm
+import re
 
 MAIL_FROM = EMAIL_HOST_USER
 
@@ -142,7 +143,7 @@ def user_add(request):
     group_all = UserGroup.objects.all()
 
     if request.method == 'POST':
-        username = request.POST.get('username', '')
+        username = request.POST.get('username', '')      
         password = PyCrypt.gen_rand_pass(16)
         name = request.POST.get('name', '')
         email = request.POST.get('email', '')
@@ -153,22 +154,29 @@ def user_add(request):
         ssh_key_pwd = PyCrypt.gen_rand_pass(16)
         extra = request.POST.getlist('extra', [])
         is_active = False if '0' in extra else True
-        ssh_key_login_need = True
-        send_mail_need = True if '2' in extra else False
+        send_mail_need = True if '1' in extra else False
 
         try:
             if '' in [username, password, ssh_key_pwd, name, role]:
                 error = u'带*内容不能为空'
                 raise ServerError
+                
             check_user_is_exist = User.objects.filter(username=username)
             if check_user_is_exist:
                 error = u'用户 %s 已存在' % username
+                raise ServerError
+            
+            if username in ['root']:
+                error = u'用户不能为root'
                 raise ServerError
 
         except ServerError:
             pass
         else:
             try:
+                if not re.match(r"^\w+$",username):
+                    error = u'用户名不合法'
+                    raise ServerError(error)
                 user = db_add_user(username=username, name=name,
                                    password=password,
                                    email=email, role=role, uuid=uuid_r,
@@ -176,7 +184,7 @@ def user_add(request):
                                    ssh_key_pwd=ssh_key_pwd,
                                    is_active=is_active,
                                    date_joined=datetime.datetime.now())
-                server_add_user(username, password, ssh_key_pwd, ssh_key_login_need)
+                server_add_user(username=username, ssh_key_pwd=ssh_key_pwd)
                 user = get_object(User, username=username)
                 if groups:
                     user_groups = []
@@ -193,7 +201,7 @@ def user_add(request):
             else:
                 if MAIL_ENABLE and send_mail_need:
                     user_add_mail(user, kwargs=locals())
-                msg = get_display_msg(user, password, ssh_key_pwd, ssh_key_login_need, send_mail_need)
+                msg = get_display_msg(user, password=password, ssh_key_pwd=ssh_key_pwd, send_mail_need=send_mail_need)
     return my_render('juser/user_add.html', locals(), request)
 
 
@@ -255,7 +263,7 @@ def user_del(request):
         user = get_object(User, id=user_id)
         if user and user.username != 'admin':
             logger.debug(u"删除用户 %s " % user.username)
-            bash('userdel -r %s' % user.username)
+            server_del_user(user.username)
             user.delete()
     return HttpResponse('删除成功')
 
@@ -324,7 +332,7 @@ def reset_password(request):
         else:
             user = get_object(User, uuid=uuid_r)
             if user:
-                user.password = PyCrypt.md5_crypt(password)
+                user.set_password(password)
                 user.save()
                 return http_success(request, u'密码重设成功')
             else:
@@ -361,18 +369,13 @@ def user_edit(request):
         admin_groups = request.POST.getlist('admin_groups', [])
         extra = request.POST.getlist('extra', [])
         is_active = True if '0' in extra else False
-        email_need = True if '2' in extra else False
+        email_need = True if '1' in extra else False
         user_role = {'SU': u'超级管理员', 'GA': u'部门管理员', 'CU': u'普通用户'}
 
         if user_id:
             user = get_object(User, id=user_id)
         else:
             return HttpResponseRedirect(reverse('user_list'))
-
-        if password != '':
-            password_decode = password
-        else:
-            password_decode = None
 
         db_update_user(user_id=user_id,
                        password=password,
@@ -392,7 +395,7 @@ def user_edit(request):
                 密码：%s (如果密码为None代表密码为原密码)
                 权限：：%s
 
-            """ % (user.name, URL, user.username, password_decode, user_role.get(role_post, u''))
+            """ % (user.name, URL, user.username, password, user_role.get(role_post, u''))
             send_mail('您的信息已修改', msg, MAIL_FROM, [email], fail_silently=False)
 
         return HttpResponseRedirect(reverse('user_list'))
@@ -425,7 +428,9 @@ def change_info(request):
             error = '不能为空'
 
         if not error:
-            User.objects.filter(id=user_id).update(name=name, email=email)
+            user.name = name
+            user.email = email
+            user.save()
             if len(password) > 0:
                 user.set_password(password)
                 user.save()
@@ -453,7 +458,6 @@ def down_key(request):
         uuid_r = request.GET.get('uuid', '')
     else:
         uuid_r = request.user.uuid
-
     if uuid_r:
         user = get_object(User, uuid=uuid_r)
         if user:
@@ -466,6 +470,8 @@ def down_key(request):
                 f.close()
                 response = HttpResponse(data, content_type='application/octet-stream')
                 response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(private_key_file)
+                if request.user.role == 'CU':
+                    os.unlink(private_key_file)
                 return response
     return HttpResponse('No Key File. Contact Admin.')
 

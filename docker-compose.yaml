@@ -1,0 +1,25 @@
+version: '2'
+services:
+  jumpserver:
+    build: .
+    container_name: jumpserver
+    restart: always
+    ports:
+      - "8888:80"
+      - "2222:22"
+    # environment:
+    #   - USE_MYSQL=true
+    #   - MYSQL_ENGINE=mysql
+    #   - MYSQL_HOST=192.168.50.143
+    #   - MYSQL_PORT=3306
+    #   - MYSQL_USER=jumpserver
+    #   - MYSQL_PASS=love1314
+    #   - MYSQL_NAME=jumpserver
+    #   - USE_MAIL=true
+    #   - MAIL_ENABLED=1
+    #   - MAIL_HOST=smtp.163.com
+    #   - MAIL_PORT=25
+    #   - MAIL_USER=jumpserver@163.com
+    #   - MAIL_PASS=123456
+    #   - MAIL_USE_TLS=False
+    #   - MAIL_USE_SSL=False

@@ -1,19 +1,34 @@
 /**
- * tty.js - an xterm emulator
- * Christopher Jeffrey (https://github.com/chjj/tty.js)
+ * term.js - an xterm emulator
+ * Copyright (c) 2012-2013, Christopher Jeffrey (MIT License)
+ * https://github.com/chjj/term.js
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
  *
  * Originally forked from (with the author's permission):
- *
- * Fabrice Bellard's javascript vt100 for jslinux:
- * http://bellard.org/jslinux/
- * Copyright (c) 2011 Fabrice Bellard
- * (Redistribution or commercial use is prohibited
- *  without the author's permission.)
- *
- * The original design remains. The terminal itself
- * has been extended to include xterm CSI codes, among
- * other features.
-*/
+ *   Fabrice Bellard's javascript vt100 for jslinux:
+ *   http://bellard.org/jslinux/
+ *   Copyright (c) 2011 Fabrice Bellard
+ *   The original design remains. The terminal itself
+ *   has been extended to include xterm CSI codes, among
+ *   other features.
+ */
 
 ;(function() {
 
@@ -42,7 +57,7 @@ var window = this
  */
 
 function EventEmitter() {
-  this._events = {};
+  this._events = this._events || {};
 }
 
 EventEmitter.prototype.addListener = function(type, listener) {
@@ -100,6 +115,54 @@ EventEmitter.prototype.listeners = function(type) {
 };
 
 /**
+ * Stream
+ */
+
+function Stream() {
+  EventEmitter.call(this);
+}
+
+inherits(Stream, EventEmitter);
+
+Stream.prototype.pipe = function(dest, options) {
+  var src = this
+    , ondata
+    , onerror
+    , onend;
+
+  function unbind() {
+    src.removeListener('data', ondata);
+    src.removeListener('error', onerror);
+    src.removeListener('end', onend);
+    dest.removeListener('error', onerror);
+    dest.removeListener('close', unbind);
+  }
+
+  src.on('data', ondata = function(data) {
+    dest.write(data);
+  });
+
+  src.on('error', onerror = function(err) {
+    unbind();
+    if (!this.listeners('error').length) {
+      throw err;
+    }
+  });
+
+  src.on('end', onend = function() {
+    dest.end();
+    unbind();
+  });
+
+  dest.on('error', onerror);
+  dest.on('close', unbind);
+
+  dest.emit('pipe', src);
+
+  return dest;
+};
+
+/**
  * States
  */
 
@@ -109,33 +172,75 @@ var normal = 0
   , osc = 3
   , charset = 4
   , dcs = 5
-  , ignore = 6;
+  , ignore = 6
+  , UDK = { type: 'udk' };
 
 /**
  * Terminal
  */
 
-function Terminal(cols, rows, handler) {
-  EventEmitter.call(this);
+function Terminal(options) {
+  var self = this;
 
-  var options;
-  if (typeof cols === 'object') {
-    options = cols;
-    cols = options.cols;
-    rows = options.rows;
-    handler = options.handler;
+  if (!(this instanceof Terminal)) {
+    return new Terminal(arguments[0], arguments[1], arguments[2]);
   }
-  this._options = options || {};
 
-  this.cols = cols || Terminal.geometry[0];
-  this.rows = rows || Terminal.geometry[1];
+  Stream.call(this);
 
-  //if (handler) {
-  //  this.on('data', handler);
-  //}
-  this.handler = handler;
-  if (this.handler){
-    this.on('data', this.handler);
+  if (typeof options === 'number') {
+    options = {
+      cols: arguments[0],
+      rows: arguments[1],
+      handler: arguments[2]
+    };
+  }
+
+  options = options || {};
+
+  each(keys(Terminal.defaults), function(key) {
+    if (options[key] == null) {
+      options[key] = Terminal.options[key];
+      // Legacy:
+      if (Terminal[key] !== Terminal.defaults[key]) {
+        options[key] = Terminal[key];
+      }
+    }
+    self[key] = options[key];
+  });
+
+  if (options.colors.length === 8) {
+    options.colors = options.colors.concat(Terminal._colors.slice(8));
+  } else if (options.colors.length === 16) {
+    options.colors = options.colors.concat(Terminal._colors.slice(16));
+  } else if (options.colors.length === 10) {
+    options.colors = options.colors.slice(0, -2).concat(
+      Terminal._colors.slice(8, -2), options.colors.slice(-2));
+  } else if (options.colors.length === 18) {
+    options.colors = options.colors.slice(0, -2).concat(
+      Terminal._colors.slice(16, -2), options.colors.slice(-2));
+  }
+  this.colors = options.colors;
+
+  this.options = options;
+
+  // this.context = options.context || window;
+  // this.document = options.document || document;
+  this.parent = options.body || options.parent
+    || (document ? document.getElementsByTagName('body')[0] : null);
+
+  this.cols = options.cols || options.geometry[0];
+  this.rows = options.rows || options.geometry[1];
+
+  // Act as though we are a node TTY stream:
+  this.setRawMode;
+  this.isTTY = true;
+  this.isRaw = true;
+  this.columns = this.cols;
+  this.rows = this.rows;
+
+  if (options.handler) {
+    this.on('data', options.handler);
   }
 
   this.ybase = 0;
@@ -144,7 +249,7 @@ function Terminal(cols, rows, handler) {
   this.y = 0;
   this.cursorState = 0;
   this.cursorHidden = false;
-  this.convertEol = false;
+  this.convertEol;
   this.state = 0;
   this.queue = '';
   this.scrollTop = 0;
@@ -152,10 +257,23 @@ function Terminal(cols, rows, handler) {
 
   // modes
   this.applicationKeypad = false;
+  this.applicationCursor = false;
   this.originMode = false;
   this.insertMode = false;
   this.wraparoundMode = false;
   this.normal = null;
+
+  // select modes
+  this.prefixMode = false;
+  this.selectMode = false;
+  this.visualMode = false;
+  this.searchMode = false;
+  this.searchDown;
+  this.entry = '';
+  this.entryPrefix = 'Search: ';
+  this._real;
+  this._selected;
+  this._textarea;
 
   // charset
   this.charset = null;
@@ -188,7 +306,7 @@ function Terminal(cols, rows, handler) {
   this.readable = true;
   this.writable = true;
 
-  this.defAttr = (257 << 9) | 256;
+  this.defAttr = (0 << 18) | (257 << 9) | (256 << 0);
   this.curAttr = this.defAttr;
 
   this.params = [];
@@ -206,14 +324,14 @@ function Terminal(cols, rows, handler) {
   this.setupStops();
 }
 
-inherits(Terminal, EventEmitter);
+inherits(Terminal, Stream);
 
 /**
  * Colors
  */
 
 // Colors 0-15
-Terminal.colors = [
+Terminal.tangoColors = [
   // dark:
   '#2e3436',
   '#cc0000',
@@ -234,10 +352,31 @@ Terminal.colors = [
   '#eeeeec'
 ];
 
-// Colors 16-255
+Terminal.xtermColors = [
+  // dark:
+  '#000000', // black
+  '#cd0000', // red3
+  '#00cd00', // green3
+  '#cdcd00', // yellow3
+  '#0000ee', // blue2
+  '#cd00cd', // magenta3
+  '#00cdcd', // cyan3
+  '#e5e5e5', // gray90
+  // bright:
+  '#7f7f7f', // gray50
+  '#ff0000', // red
+  '#00ff00', // green
+  '#ffff00', // yellow
+  '#5c5cff', // rgb:5c/5c/ff
+  '#ff00ff', // magenta
+  '#00ffff', // cyan
+  '#ffffff'  // white
+];
+
+// Colors 0-15 + 16-255
 // Much thanks to TooTallNate for writing this.
 Terminal.colors = (function() {
-  var colors = Terminal.colors
+  var colors = Terminal.tangoColors.slice()
     , r = [0x00, 0x5f, 0x87, 0xaf, 0xd7, 0xff]
     , i;
 
@@ -267,27 +406,55 @@ Terminal.colors = (function() {
 })();
 
 // Default BG/FG
-Terminal.defaultColors = {
-  bg: '#000000',
-  fg: '#f0f0f0'
-};
+Terminal.colors[256] = '#000000';
+Terminal.colors[257] = '#f0f0f0';
 
-Terminal.colors[256] = Terminal.defaultColors.bg;
-Terminal.colors[257] = Terminal.defaultColors.fg;
+Terminal._colors = Terminal.colors.slice();
+
+Terminal.vcolors = (function() {
+  var out = []
+    , colors = Terminal.colors
+    , i = 0
+    , color;
+
+  for (; i < 256; i++) {
+    color = parseInt(colors[i].substring(1), 16);
+    out.push([
+      (color >> 16) & 0xff,
+      (color >> 8) & 0xff,
+      color & 0xff
+    ]);
+  }
+
+  return out;
+})();
 
 /**
  * Options
  */
 
-Terminal.termName = 'xterm';
-Terminal.geometry = [80, 30];
-Terminal.cursorBlink = true;
-Terminal.visualBell = false;
-Terminal.popOnBell = false;
-Terminal.scrollback = 1000;
-Terminal.screenKeys = false;
-Terminal.programFeatures = false;
-Terminal.debug = false;
+Terminal.defaults = {
+  colors: Terminal.colors,
+  convertEol: false,
+  termName: 'xterm',
+  geometry: [80, 24],
+  cursorBlink: true,
+  visualBell: false,
+  popOnBell: false,
+  scrollback: 1000,
+  screenKeys: false,
+  debug: false,
+  useStyle: false
+  // programFeatures: false,
+  // focusKeys: false,
+};
+
+Terminal.options = {};
+
+each(keys(Terminal.defaults), function(key) {
+  Terminal[key] = Terminal.defaults[key];
+  Terminal.options[key] = Terminal.defaults[key];
+});
 
 /**
  * Focused Terminal
@@ -296,114 +463,639 @@ Terminal.debug = false;
 Terminal.focus = null;
 
 Terminal.prototype.focus = function() {
-  if (Terminal.focus === this) return;
-  if (Terminal.focus) {
-    Terminal.focus.cursorState = 0;
-    Terminal.focus.refresh(Terminal.focus.y, Terminal.focus.y);
-    if (Terminal.focus.sendFocus) Terminal.focus.send('\x1b[O');
+  if (this._textarea) {
+    this._textarea.focus();
   }
-  Terminal.focus = this;
+
+  if (Terminal.focus === this) return;
+
+  if (Terminal.focus) {
+    Terminal.focus.blur();
+  }
+
   if (this.sendFocus) this.send('\x1b[I');
   this.showCursor();
+
+  // try {
+  //   this.element.focus();
+  // } catch (e) {
+  //   ;
+  // }
+
+  // this.emit('focus');
+
+  Terminal.focus = this;
+};
+
+Terminal.prototype.blur = function() {
+  if (Terminal.focus !== this) return;
+
+  this.cursorState = 0;
+  this.refresh(this.y, this.y);
+  if (this.sendFocus) this.send('\x1b[O');
+
+  // try {
+  //   this.element.blur();
+  // } catch (e) {
+  //   ;
+  // }
+
+  // this.emit('blur');
+
+  Terminal.focus = null;
+};
+
+/**
+ * Initialize global behavior
+ */
+
+Terminal.prototype.initGlobal = function() {
+  var document = this.document;
+
+  Terminal._boundDocs = Terminal._boundDocs || [];
+  if (~indexOf(Terminal._boundDocs, document)) {
+    return;
+  }
+  Terminal._boundDocs.push(document);
+
+  Terminal.bindPaste(document);
+
+  Terminal.bindKeys(document);
+
+  Terminal.bindCopy(document);
+
+  if (this.useStyle) {
+    Terminal.insertStyle(document, this.colors[256], this.colors[257]);
+  }
+};
+
+/**
+ * Bind to paste event
+ */
+
+Terminal.bindPaste = function(document) {
+  // This seems to work well for ctrl-V and middle-click,
+  // even without the contentEditable workaround.
+  var window = document.defaultView;
+  on(window, 'paste', function(ev) {
+    var term = Terminal.focus;
+    if (!term) return;
+    if (term._textarea) return;
+    if (ev.clipboardData) {
+      term.send(ev.clipboardData.getData('text/plain'));
+    } else if (term.context.clipboardData) {
+      term.send(term.context.clipboardData.getData('Text'));
+    }
+    // Not necessary. Do it anyway for good measure.
+    term.element.contentEditable = 'inherit';
+    return cancel(ev);
+  });
 };
 
 /**
  * Global Events for key handling
  */
 
-Terminal.bindKeys = function() {
-  if (Terminal.focus) return;
-
-  // We could put an "if (Terminal.focus)" check
-  // here, but it shouldn't be necessary.
+Terminal.bindKeys = function(document) {
+  // We should only need to check `target === body` below,
+  // but we can check everything for good measure.
   on(document, 'keydown', function(ev) {
-    return Terminal.focus.keyDown(ev);
+    if (!Terminal.focus) return;
+    var target = ev.target || ev.srcElement;
+    if (!target) return;
+    if (target === Terminal.focus.element
+        || target === Terminal.focus.context
+        || target === Terminal.focus.document
+        || target === Terminal.focus.body
+        || target === Terminal.focus._textarea
+        || target === Terminal.focus.parent) {
+      return Terminal.focus.keyDown(ev);
+    }
   }, true);
 
   on(document, 'keypress', function(ev) {
-    return Terminal.focus.keyPress(ev);
+    if (!Terminal.focus) return;
+    var target = ev.target || ev.srcElement;
+    if (!target) return;
+    if (target === Terminal.focus.element
+        || target === Terminal.focus.context
+        || target === Terminal.focus.document
+        || target === Terminal.focus.body
+        || target === Terminal.focus._textarea
+        || target === Terminal.focus.parent) {
+      return Terminal.focus.keyPress(ev);
+    }
   }, true);
+
+  // If we click somewhere other than a
+  // terminal, unfocus the terminal.
+  on(document, 'mousedown', function(ev) {
+    if (!Terminal.focus) return;
+
+    var el = ev.target || ev.srcElement;
+    if (!el) return;
+    if (!el.parentNode) return;
+    if (!el.parentNode.parentNode) return;
+
+    do {
+      if (el === Terminal.focus.element) return;
+    } while (el = el.parentNode);
+
+    Terminal.focus.blur();
+  });
+};
+
+/**
+ * Copy Selection w/ Ctrl-C (Select Mode)
+ */
+
+Terminal.bindCopy = function(document) {
+  var window = document.defaultView;
+
+  // if (!('onbeforecopy' in document)) {
+  //   // Copies to *only* the clipboard.
+  //   on(window, 'copy', function fn(ev) {
+  //     var term = Terminal.focus;
+  //     if (!term) return;
+  //     if (!term._selected) return;
+  //     var text = term.grabText(
+  //       term._selected.x1, term._selected.x2,
+  //       term._selected.y1, term._selected.y2);
+  //     term.emit('copy', text);
+  //     ev.clipboardData.setData('text/plain', text);
+  //   });
+  //   return;
+  // }
+
+  // Copies to primary selection *and* clipboard.
+  // NOTE: This may work better on capture phase,
+  // or using the `beforecopy` event.
+  on(window, 'copy', function(ev) {
+    var term = Terminal.focus;
+    if (!term) return;
+    if (!term._selected) return;
+    var textarea = term.getCopyTextarea();
+    var text = term.grabText(
+      term._selected.x1, term._selected.x2,
+      term._selected.y1, term._selected.y2);
+    term.emit('copy', text);
+    textarea.focus();
+    textarea.textContent = text;
+    textarea.value = text;
+    textarea.setSelectionRange(0, text.length);
+    setTimeout(function() {
+      term.element.focus();
+      term.focus();
+    }, 1);
+  });
+};
+
+/**
+ * Fix Mobile
+ */
+
+Terminal.prototype.getTextarea = function(document) {
+  var self = this;
+
+  var textarea = document.createElement('textarea');
+  textarea.style.position = 'absolute';
+  textarea.style.left = '-32000px';
+  textarea.style.top = '-32000px';
+  textarea.style.width = '100em';
+  textarea.style.height = '2em';
+  textarea.style.padding = '0';
+  textarea.style.opacity = '0';
+  textarea.style.color = 'inherit';
+  textarea.style.font = 'inherit';
+  textarea.style.textIndent = '-1em'; /* Hide text cursor on IE */
+  textarea.style.backgroundColor = 'transparent';
+  textarea.style.borderStyle = 'none';
+  textarea.style.outlineStyle = 'none';
+  textarea.autocapitalize = 'none';
+  textarea.autocorrect = 'off';
+
+  var onInputTimestamp;
+
+  var onInput = function(ev){
+    if(ev.timeStamp && ev.timeStamp === onInputTimestamp){
+      return;
+    }
+    onInputTimestamp = ev.timeStamp;
+
+    var value = textarea.textContent || textarea.value;
+    if (typeof self.select.startPos !== 'undefined'){
+      self.select = {};
+      self.clearSelectedText();
+      self.refresh(0, self.rows - 1);
+    }
+    if (!self.compositionStatus) {
+      textarea.value = '';
+      textarea.textContent = '';
+      self.send(value);
+    }
+  };
+
+  on(textarea, 'compositionstart', function() {
+    textarea.style.opacity = "1.0";
+    textarea.style.textIndent = "0";
+    self.compositionStatus = true;
+  });
+  on(textarea, 'compositionend', function(ev) {
+    textarea.style.opacity = "0.0";
+    textarea.style.textIndent = "-1em";
+    self.compositionStatus = false;
+    setTimeout(function(){
+      onInput(ev); // for IE that does not trigger 'input' after the IME composition.
+    }, 1);
+  });
+
+  on(textarea, 'keydown', function(){
+    var value = textarea.textContent || textarea.value;
+  });
+
+  on(textarea, 'input', onInput);
+
+  if (Terminal.isAndroid) {
+    on(textarea, 'change', function() {
+      var value = textarea.textContent || textarea.value;
+      textarea.value = '';
+      textarea.textContent = '';
+      self.send(value + '\r');
+    });
+  }
+  return textarea;
+};
+
+/**
+ * Insert a default style
+ */
+
+Terminal.insertStyle = function(document, bg, fg) {
+  var style = document.getElementById('term-style');
+  if (style) return;
+
+  var head = document.getElementsByTagName('head')[0];
+  if (!head) return;
+
+  var style = document.createElement('style');
+  style.id = 'term-style';
+
+  // textContent doesn't work well with IE for <style> elements.
+  style.innerHTML = ''
+    + '.terminal {\n'
+    + '  float: left;\n'
+    + '  border: ' + bg + ' solid 5px;\n'
+    + '  font-family: "DejaVu Sans Mono", "Liberation Mono", monospace;\n'
+    + '  font-size: 11px;\n'
+    + '  color: ' + fg + ';\n'
+    + '  background: ' + bg + ';\n'
+    + '}\n'
+    + '\n'
+    + '.terminal-cursor {\n'
+    + '  color: ' + bg + ';\n'
+    + '  background: ' + fg + ';\n'
+    + '}\n';
+
+  // var out = '';
+  // each(Terminal.colors, function(color, i) {
+  //   if (i === 256) {
+  //     out += '\n.term-bg-color-default { background-color: ' + color + '; }';
+  //   }
+  //   if (i === 257) {
+  //     out += '\n.term-fg-color-default { color: ' + color + '; }';
+  //   }
+  //   out += '\n.term-bg-color-' + i + ' { background-color: ' + color + '; }';
+  //   out += '\n.term-fg-color-' + i + ' { color: ' + color + '; }';
+  // });
+  // style.innerHTML += out + '\n';
+
+  head.insertBefore(style, head.firstChild);
 };
 
 /**
  * Open Terminal
  */
 
-Terminal.prototype.open = function() {
+Terminal.prototype.open = function(parent) {
   var self = this
     , i = 0
     , div;
 
-  this.element = document.createElement('div');
-  this.element.className = 'terminal';
-  this.children = [];
+  this.parent = parent || this.parent;
 
+  if (!this.parent) {
+    throw new Error('Terminal requires a parent element.');
+  }
+
+  // Grab global elements.
+  this.context = this.parent.ownerDocument.defaultView;
+  this.document = this.parent.ownerDocument;
+  this.body = this.document.getElementsByTagName('body')[0];
+
+  // Parse user-agent strings.
+  if (this.context.navigator && this.context.navigator.userAgent) {
+    this.isMac = !!~this.context.navigator.userAgent.indexOf('Mac');
+    this.isIpad = !!~this.context.navigator.userAgent.indexOf('iPad');
+    this.isIphone = !!~this.context.navigator.userAgent.indexOf('iPhone');
+    this.isAndroid = !!~this.context.navigator.userAgent.indexOf('Android');
+    this.isMobile = this.isIpad || this.isIphone || this.isAndroid;
+    this.isMSIE = !!~this.context.navigator.userAgent.indexOf('MSIE');
+  }
+
+  // Create our main terminal element.
+  this.element = this.document.createElement('div');
+  this.element.className = 'terminal';
+  this.element.style.outline = 'none';
+  this.element.setAttribute('tabindex', 0);
+  this.element.setAttribute('spellcheck', 'false');
+  this.element.style.backgroundColor = this.colors[256];
+  this.element.style.color = this.colors[257];
+
+  // Create the lines for our terminal.
+  this.children = [];
   for (; i < this.rows; i++) {
-    div = document.createElement('div');
+    div = this.document.createElement('div');
     this.element.appendChild(div);
     this.children.push(div);
   }
 
-  document.body.appendChild(this.element);
+  this._textarea = this.getTextarea(this.document);
+  this.element.appendChild(this._textarea);
 
+  this.parent.appendChild(this.element);
+
+  this.select = {};
+
+  // Draw the screen.
   this.refresh(0, this.rows - 1);
 
-  Terminal.bindKeys();
-  this.focus();
 
-  this.startBlink();
+  var updateSelect = function(){
+    var startPos = self.select.startPos;
+    var endPos = self.select.endPos;
+    if(endPos.y < startPos.y || (startPos.y == endPos.y && endPos.x < startPos.x)){
+      var tmp = startPos;
+      startPos = endPos;
+      endPos = tmp;
+    }
+    if (self.select.clicks === 2){
+      var j = i;
+      var isMark = function(ch){
+        var code = ch.charCodeAt(0);
+        return (code <= 0x2f) || (0x3a <= code && code <= 0x40) || (0x5b <= code && code < 0x60) || (0x7b <= code && code <= 0x7f);
+      }
+      while (startPos.x > 0 && !isMark(self.lines[startPos.y][startPos.x-1][1])){
+        startPos.x--;
+      }
+      while (endPos.x < self.cols && !isMark(self.lines[endPos.y][endPos.x][1])){
+        endPos.x++;
+      }
+    }else if(self.select.clicks === 3){
+      startPos.x = 0;
+      endPos.y ++;
+      endPos.x = 0;
+    }
 
-  on(this.element, 'mousedown', function() {
-    self.focus();
-  });
+    if (startPos.x === endPos.x && startPos.y === endPos.y){
+      self.clearSelectedText();
+    }else{
+      var x2 = endPos.x;
+      var y2 = endPos.y;
+      x2 --;
+      if(x2<0){
+        y2--;
+        x2 = self.cols - 1;
+      }
+      self.selectText(startPos.x, x2, startPos.y, y2);
+    }
+  };
+  var copySelectToTextarea = function (){
+      var textarea = self._textarea;
+      if (textarea) {
 
-  // This probably shouldn't work,
-  // ... but it does. Firefox's paste
-  // event seems to only work for textareas?
+        if (self.select.startPos.x === self.select.endPos.x && self.select.startPos.y === self.select.endPos.y){
+          textarea.value = "";
+          textarea.select();
+          return;
+        }
+
+        var x2 = self.select.endPos.x;
+        var y2 = self.select.endPos.y;
+        x2 --;
+        if(x2<0){
+          y2--;
+          x2 = self.cols - 1;
+        }
+
+        var value = self.grabText(self.select.startPos.x, x2, self.select.startPos.y, y2);
+        textarea.value = value;
+        textarea.select();
+      }
+  };
   on(this.element, 'mousedown', function(ev) {
-    var button = ev.button != null
-      ? +ev.button
-      : ev.which != null
-        ? ev.which - 1
-        : null;
 
-    // Does IE9 do this?
-    if (~navigator.userAgent.indexOf('MSIE')) {
-      button = button === 1 ? 0 : button === 4 ? 1 : button;
+    if(ev.button === 2){
+
+      var r = self.element.getBoundingClientRect();
+
+      var x = ev.pageX - r.left  + self.element.offsetLeft;
+      var y = ev.pageY - r.top  + self.element.offsetTop;
+
+      self._textarea.style.left = x  + 'px';
+      self._textarea.style.top = y  + 'px';
+      return;
     }
 
-    if (button !== 2) return;
-
-    self.element.contentEditable = 'true';
-    setTimeout(function() {
-      self.element.contentEditable = 'inherit'; // 'false';
-    }, 1);
-  }, true);
-
-  on(this.element, 'paste', function(ev) {
-    if (ev.clipboardData) {
-      self.send(ev.clipboardData.getData('text/plain'));
-    } else if (window.clipboardData) {
-      self.send(window.clipboardData.getData('Text'));
+    if (ev.button != 0){
+      return;
     }
-    // Not necessary. Do it anyway for good measure.
-    self.element.contentEditable = 'inherit';
-    return cancel(ev);
+    if (navigator.userAgent.indexOf("Trident")){
+      /* IE does not hold click number as "detail" property. */
+      if (self.select.timer){
+        self.select.clicks ++;
+        clearTimeout(self.select.timer);
+        self.select.timer = null;
+      }else{
+        self.select.clicks = 1;
+      }
+      self.select.timer = setTimeout(function(){
+        self.select.timer = null;
+      }, 600);
+    }else{
+      self.select.clicks = ev.detail;
+    }
+
+    if (! ev.shiftKey){
+      self.clearSelectedText();
+
+      self.select.startPos = self.getCoords(ev);
+      self.select.startPos.y += self.ydisp;
+    }
+    self.select.endPos = self.getCoords(ev);
+    self.select.endPos.y += self.ydisp;
+    updateSelect();
+    copySelectToTextarea();
+    self.refresh(0, self.rows - 1);
+    self.select.selecting = true;
+  });
+  on(this.element, 'mousemove', function(ev) {
+    if(self.select.selecting){
+      self.select.endPos = self.getCoords(ev);
+      self.select.endPos.y += self.ydisp;
+      updateSelect();
+      self.refresh(0, self.rows - 1);
+    }
+  });
+  on(document, 'mouseup', function(ev) {
+    if(ev.button === 2){
+
+      var r = self.element.getBoundingClientRect();
+
+      var x = ev.pageX - r.left  + self.element.offsetLeft;
+      var y = ev.pageY - r.top  + self.element.offsetTop;
+
+      self._textarea.style.left = x - 1  + 'px';
+      self._textarea.style.top = y - 1 + 'px';
+      return;
+    }
+    if(self.select.selecting){
+      self.select.selecting = false;
+      copySelectToTextarea();
+    }
   });
 
-  this.bindMouse();
 
-  // XXX - hack, move this somewhere else.
-  if (Terminal.brokenBold == null) {
-    Terminal.brokenBold = isBoldBroken();
+  if (!('useEvents' in this.options) || this.options.useEvents) {
+    // Initialize global actions that
+    // need to be taken on the document.
+    this.initGlobal();
   }
 
-  // sync default bg/fg colors
-  this.element.style.backgroundColor = Terminal.defaultColors.bg;
-  this.element.style.color = Terminal.defaultColors.fg;
+  if (!('useFocus' in this.options) || this.options.useFocus) {
+    // Ensure there is a Terminal.focus.
+    this.focus();
 
-  //this.emit('open');
+    // Start blinking the cursor.
+    this.startBlink();
+
+    // Bind to DOM events related
+    // to focus and paste behavior.
+    on(this.element, 'focus', function() {
+      self.focus();
+    });
+
+    // This causes slightly funky behavior.
+    // on(this.element, 'blur', function() {
+    //   self.blur();
+    // });
+
+    on(this.element, 'mousedown', function() {
+      self.focus();
+    });
+
+    // Clickable paste workaround, using contentEditable.
+    // This probably shouldn't work,
+    // ... but it does. Firefox's paste
+    // event seems to only work for textareas?
+    on(this.element, 'mousedown', function(ev) {
+      var button = ev.button != null
+        ? +ev.button
+        : ev.which != null
+          ? ev.which - 1
+          : null;
+
+      // Does IE9 do this?
+      if (self.isMSIE) {
+        button = button === 1 ? 0 : button === 4 ? 1 : button;
+      }
+
+      if (button !== 2) return;
+
+      self.element.contentEditable = 'true';
+      setTimeout(function() {
+        self.element.contentEditable = 'inherit'; // 'false';
+      }, 1);
+    }, true);
+  }
+
+  if (!('useMouse' in this.options) || this.options.useMouse) {
+    // Listen for mouse events and translate
+    // them into terminal mouse protocols.
+    this.bindMouse();
+  }
+
+  // this.emit('open');
+
+  if (!('useFocus' in this.options) || this.options.useFocus) {
+      // This can be useful for pasting,
+      // as well as the iPad fix.
+      setTimeout(function() {
+        self.element.focus();
+        self.focus();
+      }, 100);
+  }
+
+  // Figure out whether boldness affects
+  // the character width of monospace fonts.
+  if (Terminal.brokenBold == null) {
+    Terminal.brokenBold = isBoldBroken(this.document);
+  }
+
+  this.emit('open');
 };
+
+Terminal.prototype.setRawMode = function(value) {
+  this.isRaw = !!value;
+};
+
+Terminal.prototype.getCoords = function(ev) {
+  var x, y, w, h, el;
+
+  var self = this;
+
+  // ignore browsers without pageX for now
+  if (ev.pageX == null) return;
+
+  x = ev.pageX;
+  y = ev.pageY;
+  el = self.element;
+
+  x -= el.clientLeft;
+  y -= el.clientTop;
+
+  // should probably check offsetParent
+  // but this is more portable
+  while (el && el !== self.document.documentElement) {
+    x -= el.offsetLeft;
+    y -= el.offsetTop;
+    el = 'offsetParent' in el
+      ? el.offsetParent
+      : el.parentNode;
+  }
+
+  // convert to cols/rows
+  w = self.element.clientWidth;
+  h = self.element.clientHeight;
+  var cols = Math.floor((x / w) * self.cols);
+  var rows = Math.floor((y / h) * self.rows);
+
+  // be sure to avoid sending
+  // bad positions to the program
+  if (cols < 0) cols = 0;
+  if (cols > self.cols) cols = self.cols;
+  if (rows < 0) rows = 0;
+  if (rows > self.rows) rows = self.rows;
+
+  // xterm sends raw bytes and
+  // starts at 32 (SP) for each.
+  //x += 32;
+  //y += 32;
+
+  return {
+    x: cols,
+    y: rows,
+  };
+}
 
 // XTerm mouse events
 // http://invisible-island.net/xterm/ctlseqs/ctlseqs.html#Mouse%20Tracking
@@ -418,7 +1110,7 @@ Terminal.prototype.bindMouse = function() {
     , self = this
     , pressed = 32;
 
-  var wheelEvent = 'onmousewheel' in window
+  var wheelEvent = 'onmousewheel' in this.context
     ? 'mousewheel'
     : 'DOMMouseScroll';
 
@@ -596,7 +1288,7 @@ Terminal.prototype.bindMouse = function() {
             ? ev.which - 1
             : null;
 
-        if (~navigator.userAgent.indexOf('MSIE')) {
+        if (self.isMSIE) {
           button = button === 1 ? 0 : button === 4 ? 1 : button;
         }
         break;
@@ -649,17 +1341,19 @@ Terminal.prototype.bindMouse = function() {
 
     // should probably check offsetParent
     // but this is more portable
-    while (el !== document.documentElement) {
+    while (el && el !== self.document.documentElement) {
       x -= el.offsetLeft;
       y -= el.offsetTop;
-      el = el.parentNode;
+      el = 'offsetParent' in el
+        ? el.offsetParent
+        : el.parentNode;
     }
 
     // convert to cols/rows
     w = self.element.clientWidth;
     h = self.element.clientHeight;
-    x = ((x / w) * self.cols) | 0;
-    y = ((y / h) * self.rows) | 0;
+    x = Math.round((x / w) * self.cols);
+    y = Math.round((y / h) * self.rows);
 
     // be sure to avoid sending
     // bad positions to the program
@@ -676,10 +1370,9 @@ Terminal.prototype.bindMouse = function() {
     return {
       x: x,
       y: y,
-      down: ev.type === 'mousedown',
-      up: ev.type === 'mouseup',
-      wheel: ev.type === wheelEvent,
-      move: ev.type === 'mousemove'
+      type: ev.type === wheelEvent
+        ? 'mousewheel'
+        : ev.type
     };
   }
 
@@ -693,26 +1386,32 @@ Terminal.prototype.bindMouse = function() {
     self.focus();
 
     // fix for odd bug
-    if (self.vt200Mouse) {
-      sendButton({ __proto__: ev, type: 'mouseup' });
-      return cancel(ev);
-    }
+    //if (self.vt200Mouse && !self.normalMouse) {
+    // XXX This seems to break certain programs.
+    // if (self.vt200Mouse) {
+    //   sendButton({ __proto__: ev, type: 'mouseup' });
+    //   return cancel(ev);
+    // }
 
     // bind events
-    if (self.normalMouse) on(document, 'mousemove', sendMove);
+    if (self.normalMouse) on(self.document, 'mousemove', sendMove);
 
     // x10 compatibility mode can't send button releases
     if (!self.x10Mouse) {
-      on(document, 'mouseup', function up(ev) {
+      on(self.document, 'mouseup', function up(ev) {
         sendButton(ev);
-        if (self.normalMouse) off(document, 'mousemove', sendMove);
-        off(document, 'mouseup', up);
+        if (self.normalMouse) off(self.document, 'mousemove', sendMove);
+        off(self.document, 'mouseup', up);
         return cancel(ev);
       });
     }
 
     return cancel(ev);
   });
+
+  //if (self.normalMouse) {
+  //  on(self.document, 'mousemove', sendMove);
+  //}
 
   on(el, wheelEvent, function(ev) {
     if (!self.mouseEvents) return;
@@ -741,13 +1440,35 @@ Terminal.prototype.bindMouse = function() {
  * Destroy Terminal
  */
 
+Terminal.prototype.close =
+Terminal.prototype.destroySoon =
 Terminal.prototype.destroy = function() {
+  if (this.destroyed) {
+    return;
+  }
+
+  if (this._blink) {
+    clearInterval(this._blink);
+    delete this._blink;
+  }
+
   this.readable = false;
   this.writable = false;
+  this.destroyed = true;
   this._events = {};
+
   this.handler = function() {};
   this.write = function() {};
-  //this.emit('close');
+  this.end = function() {};
+
+  if (this.element.parentNode) {
+    this.element.parentNode.removeChild(this.element);
+  }
+
+  this.emit('end');
+  this.emit('close');
+  this.emit('finish');
+  this.emit('destroy');
 };
 
 /**
@@ -762,7 +1483,7 @@ Terminal.prototype.destroy = function() {
 // Next 9 bits: background color (0-511).
 // Next 9 bits: foreground color (0-511).
 // Next 14 bits: a mask for misc. flags:
-//   1=bold, 2=underline, 4=inverse
+//   1=bold, 2=underline, 4=blink, 8=inverse, 16=invisible
 
 Terminal.prototype.refresh = function(start, end) {
   var x
@@ -774,19 +1495,29 @@ Terminal.prototype.refresh = function(start, end) {
     , width
     , data
     , attr
-    , fgColor
-    , bgColor
+    , bg
+    , fg
     , flags
     , row
     , parent;
 
+  var characterWidth = this.element.clientWidth / this.cols;
+  var characterHeight = this.element.clientHeight / this.rows;
+  var focused;
+
   if (end - start >= this.rows / 2) {
+    focused = (Terminal.focus == this);
     parent = this.element.parentNode;
     if (parent) parent.removeChild(this.element);
   }
 
   width = this.cols;
   y = start;
+
+  if (end >= this.lines.length) {
+    this.log('`end` is too large. Most likely a bad CSR.');
+    end = this.lines.length - 1;
+  }
 
   for (; y <= end; y++) {
     row = y + this.ydisp;
@@ -796,7 +1527,7 @@ Terminal.prototype.refresh = function(start, end) {
 
     if (y === this.y
         && this.cursorState
-        && this.ydisp === this.ybase
+        && (this.ydisp === this.ybase || this.selectMode)
         && !this.cursorHidden) {
       x = this.x;
     } else {
@@ -818,35 +1549,67 @@ Terminal.prototype.refresh = function(start, end) {
         }
         if (data !== this.defAttr) {
           if (data === -1) {
-            out += '<span class="reverse-video">';
+            out += '<span class="reverse-video terminal-cursor">';
           } else {
             out += '<span style="';
 
-            bgColor = data & 0x1ff;
-            fgColor = (data >> 9) & 0x1ff;
+            bg = data & 0x1ff;
+            fg = (data >> 9) & 0x1ff;
             flags = data >> 18;
 
+            // bold
             if (flags & 1) {
               if (!Terminal.brokenBold) {
                 out += 'font-weight:bold;';
               }
-              // see: XTerm*boldColors
-              if (fgColor < 8) fgColor += 8;
+              // See: XTerm*boldColors
+              if (fg < 8) fg += 8;
             }
 
+            // underline
             if (flags & 2) {
               out += 'text-decoration:underline;';
             }
 
-            if (bgColor !== 256) {
+            // blink
+            if (flags & 4) {
+              if (flags & 2) {
+                out = out.slice(0, -1);
+                out += ' blink;';
+              } else {
+                out += 'text-decoration:blink;';
+              }
+            }
+
+            // inverse
+            if (flags & 8) {
+              bg = (data >> 9) & 0x1ff;
+              fg = data & 0x1ff;
+              // Should inverse just be before the
+              // above boldColors effect instead?
+              if ((flags & 1) && fg < 8) fg += 8;
+            }
+
+            // invisible
+            if (flags & 16) {
+              out += 'visibility:hidden;';
+            }
+
+            // out += '" class="'
+            //   + 'term-bg-color-' + bg
+            //   + ' '
+            //   + 'term-fg-color-' + fg
+            //   + '">';
+
+            if (bg !== 256) {
               out += 'background-color:'
-                + Terminal.colors[bgColor]
+                + this.colors[bg]
                 + ';';
             }
 
-            if (fgColor !== 257) {
+            if (fg !== 257) {
               out += 'color:'
-                + Terminal.colors[fgColor]
+                + this.colors[fg]
                 + ';';
             }
 
@@ -869,7 +1632,12 @@ Terminal.prototype.refresh = function(start, end) {
           if (ch <= ' ') {
             out += '&nbsp;';
           } else {
-            out += ch;
+            if (isWide(ch)) {
+              i++;
+              out += '<span style="display:inline-block; width:' + characterWidth * 2 + 'px; height:' + characterHeight + 'px; line-height:' + characterHeight + 'px;">' + ch + '</span>';
+            } else {
+              out += ch;
+            }
           }
           break;
       }
@@ -884,10 +1652,26 @@ Terminal.prototype.refresh = function(start, end) {
     this.children[y].innerHTML = out;
   }
 
-  if (parent) parent.appendChild(this.element);
+  if (parent) {
+    parent.appendChild(this.element);
+    if (focused) {
+      this.focus();
+    }
+  }
+
+  if (this._textarea) {
+    var cursorElement = this.element.querySelector('.terminal-cursor');
+    if(cursorElement){
+      var cursor_x = cursorElement.offsetLeft;
+      var cursor_y = cursorElement.offsetTop;
+      this._textarea.style.left = cursor_x + 'px';
+      this._textarea.style.top = cursor_y + 'px';
+    }
+  }
+
 };
 
-Terminal.prototype.cursorBlink = function() {
+Terminal.prototype._cursorBlink = function() {
   if (Terminal.focus !== this) return;
   this.cursorState ^= 1;
   this.refresh(this.y, this.y);
@@ -904,16 +1688,16 @@ Terminal.prototype.showCursor = function() {
 };
 
 Terminal.prototype.startBlink = function() {
-  if (!Terminal.cursorBlink) return;
+  if (!this.cursorBlink) return;
   var self = this;
   this._blinker = function() {
-    self.cursorBlink();
+    self._cursorBlink();
   };
   this._blink = setInterval(this._blinker, 500);
 };
 
 Terminal.prototype.refreshBlink = function() {
-  if (!Terminal.cursorBlink) return;
+  if (!this.cursorBlink || !this._blink) return;
   clearInterval(this._blink);
   this._blink = setInterval(this._blinker, 500);
 };
@@ -921,7 +1705,7 @@ Terminal.prototype.refreshBlink = function() {
 Terminal.prototype.scroll = function() {
   var row;
 
-  if (++this.ybase === Terminal.scrollback) {
+  if (++this.ybase === this.scrollback) {
     this.ybase = this.ybase / 2 | 0;
     this.lines = this.lines.slice(-(this.ybase + this.rows) + 1);
   }
@@ -973,6 +1757,7 @@ Terminal.prototype.scrollDisp = function(disp) {
 Terminal.prototype.write = function(data) {
   var l = data.length
     , i = 0
+    , j
     , cs
     , ch;
 
@@ -986,13 +1771,14 @@ Terminal.prototype.write = function(data) {
 
   // this.log(JSON.stringify(data.replace(/\x1b/g, '^[')));
 
-  for (; i < l; i++) {
+  for (; i < l; i++, this.lch = ch) {
     ch = data[i];
     switch (this.state) {
       case normal:
         switch (ch) {
           // '\0'
           // case '\0':
+          // case '\200':
           //   break;
 
           // '\a'
@@ -1007,6 +1793,9 @@ Terminal.prototype.write = function(data) {
             if (this.convertEol) {
               this.x = 0;
             }
+            // TODO: Implement eat_newline_glitch.
+            // if (this.realX >= this.cols) break;
+            // this.realX = 0;
             this.y++;
             if (this.y > this.scrollBottom) {
               this.y--;
@@ -1052,6 +1841,7 @@ Terminal.prototype.write = function(data) {
               if (this.charset && this.charset[ch]) {
                 ch = this.charset[ch];
               }
+
               if (this.x >= this.cols) {
                 this.x = 0;
                 this.y++;
@@ -1060,9 +1850,20 @@ Terminal.prototype.write = function(data) {
                   this.scroll();
                 }
               }
+
               this.lines[this.y + this.ybase][this.x] = [this.curAttr, ch];
               this.x++;
               this.updateRange(this.y);
+
+              if (isWide(ch)) {
+                j = this.y + this.ybase;
+                if (this.cols < 2 || this.x >= this.cols) {
+                  this.lines[j][this.x - 1] = [this.curAttr, ' '];
+                  break;
+                }
+                this.lines[j][this.x] = [this.curAttr, ' '];
+                this.x++;
+              }
             }
             break;
         }
@@ -1086,7 +1887,8 @@ Terminal.prototype.write = function(data) {
           // ESC P Device Control String ( DCS is 0x90).
           case 'P':
             this.params = [];
-            this.currentParam = 0;
+            this.prefix = '';
+            this.currentParam = '';
             this.state = dcs;
             break;
 
@@ -1309,8 +2111,14 @@ Terminal.prototype.write = function(data) {
         // OSC Ps ; Pt ST
         // OSC Ps ; Pt BEL
         //   Set Text Parameters.
-        if (ch === '\x1b' || ch === '\x07') {
-          if (ch === '\x1b') i++;
+        if ((this.lch === '\x1b' && ch === '\\') || ch === '\x07') {
+          if (this.lch === '\x1b') {
+            if (typeof this.currentParam === 'string') {
+              this.currentParam = this.currentParam.slice(0, -1);
+            } else if (typeof this.currentParam == 'number') {
+              this.currentParam = (this.currentParam - ('\x1b'.charCodeAt(0) - 48)) / 10;
+            }
+          }
 
           this.params.push(this.currentParam);
 
@@ -1457,12 +2265,16 @@ Terminal.prototype.write = function(data) {
 
           // CSI Pm m  Character Attributes (SGR).
           case 'm':
-            this.charAttributes(this.params);
+            if (!this.prefix) {
+              this.charAttributes(this.params);
+            }
             break;
 
           // CSI Ps n  Device Status Report (DSR).
           case 'n':
-            this.deviceStatus(this.params);
+            if (!this.prefix) {
+              this.deviceStatus(this.params);
+            }
             break;
 
           /**
@@ -1838,94 +2650,158 @@ Terminal.prototype.write = function(data) {
         break;
 
       case dcs:
-        if (ch === '\x1b' || ch === '\x07') {
-          if (ch === '\x1b') i++;
+        if ((this.lch === '\x1b' && ch === '\\') || ch === '\x07') {
+          // Workarounds:
+          if (this.prefix === 'tmux;\x1b') {
+            // `DCS tmux; Pt ST` may contain a Pt with an ST
+            // XXX Does tmux work this way?
+            // if (this.lch === '\x1b' & data[i + 1] === '\x1b' && data[i + 2] === '\\') {
+            //   this.currentParam += ch;
+            //   continue;
+            // }
+            // Tmux only accepts ST, not BEL:
+            if (ch === '\x07') {
+              this.currentParam += ch;
+              continue;
+            }
+          }
+
+          if (this.lch === '\x1b') {
+            if (typeof this.currentParam === 'string') {
+              this.currentParam = this.currentParam.slice(0, -1);
+            } else if (typeof this.currentParam == 'number') {
+              this.currentParam = (this.currentParam - ('\x1b'.charCodeAt(0) - 48)) / 10;
+            }
+          }
+
+          this.params.push(this.currentParam);
+
+          var pt = this.params[this.params.length - 1];
 
           switch (this.prefix) {
             // User-Defined Keys (DECUDK).
-            case '':
+            // DCS Ps; Ps| Pt ST
+            case UDK:
+              this.emit('udk', {
+                clearAll: this.params[0] === 0,
+                eraseBelow: this.params[0] === 1,
+                lockKeys: this.params[1] === 0,
+                dontLockKeys: this.params[1] === 1,
+                keyList: (this.params[2] + '').split(';').map(function(part) {
+                  part = part.split('/');
+                  return {
+                    keyCode: part[0],
+                    hexKeyValue: part[1]
+                  };
+                })
+              });
               break;
 
             // Request Status String (DECRQSS).
+            // DCS $ q Pt ST
             // test: echo -e '\eP$q"p\e\\'
             case '$q':
-              var pt = this.currentParam
-                , valid = false;
+              var valid = 0;
 
               switch (pt) {
                 // DECSCA
+                // CSI Ps " q
                 case '"q':
                   pt = '0"q';
+                  valid = 1;
                   break;
 
                 // DECSCL
+                // CSI Ps ; Ps " p
                 case '"p':
-                  pt = '61"p';
+                  pt = '61;0"p';
+                  valid = 1;
                   break;
 
                 // DECSTBM
+                // CSI Ps ; Ps r
                 case 'r':
                   pt = ''
                     + (this.scrollTop + 1)
                     + ';'
                     + (this.scrollBottom + 1)
                     + 'r';
+                  valid = 1;
                   break;
 
                 // SGR
+                // CSI Pm m
                 case 'm':
-                  pt = '0m';
+                  // TODO: Parse this.curAttr here.
+                  // pt = '0m';
+                  // valid = 1;
+                  valid = 0; // Not implemented.
                   break;
 
                 default:
                   this.error('Unknown DCS Pt: %s.', pt);
-                  pt = '';
+                  valid = 0; // unimplemented
                   break;
               }
 
-              this.send('\x1bP' + +valid + '$r' + pt + '\x1b\\');
+              this.send('\x1bP' + valid + '$r' + pt + '\x1b\\');
               break;
 
             // Set Termcap/Terminfo Data (xterm, experimental).
+            // DCS + p Pt ST
             case '+p':
+              this.emit('set terminfo', {
+                name: this.params[0]
+              });
               break;
 
             // Request Termcap/Terminfo String (xterm, experimental)
             // Regular xterm does not even respond to this sequence.
             // This can cause a small glitch in vim.
+            // DCS + q Pt ST
             // test: echo -ne '\eP+q6b64\e\\'
             case '+q':
-              var pt = this.currentParam
-                , valid = false;
-
+              var valid = false;
               this.send('\x1bP' + +valid + '+r' + pt + '\x1b\\');
               break;
 
+            // Implement tmux sequence forwarding is
+            // someone uses term.js for a multiplexer.
+            // DCS tmux; ESC Pt ST
+            case 'tmux;\x1b':
+              this.emit('passthrough', pt);
+              break;
+
             default:
-              this.error('Unknown DCS prefix: %s.', this.prefix);
+              this.error('Unknown DCS prefix: %s.', pt);
               break;
           }
 
           this.currentParam = 0;
           this.prefix = '';
           this.state = normal;
-        } else if (!this.currentParam) {
-          if (!this.prefix && ch !== '$' && ch !== '+') {
-            this.currentParam = ch;
-          } else if (this.prefix.length === 2) {
-            this.currentParam = ch;
-          } else {
-            this.prefix += ch;
-          }
         } else {
           this.currentParam += ch;
+          if (!this.prefix) {
+            if (/^\d*;\d*\|/.test(this.currentParam)) {
+              this.prefix = UDK;
+              this.params = this.currentParam.split(/[;|]/).map(function(n) {
+                if (!n.length) return 0;
+                return +n;
+              }).slice(0, -1);
+              this.currentParam = '';
+            } else if (/^[$+][a-zA-Z]/.test(this.currentParam)
+                || /^\w+;\x1b/.test(this.currentParam)) {
+              this.prefix = this.currentParam;
+              this.currentParam = '';
+            }
+          }
         }
         break;
 
       case ignore:
         // For PM and APC.
-        if (ch === '\x1b' || ch === '\x07') {
-          if (ch === '\x1b') i++;
+        if ((this.lch === '\x1b' && ch === '\\') || ch === '\x07') {
           this.state = normal;
         }
         break;
@@ -1934,18 +2810,44 @@ Terminal.prototype.write = function(data) {
 
   this.updateRange(this.y);
   this.refresh(this.refreshStart, this.refreshEnd);
+
+  return true;
 };
 
 Terminal.prototype.writeln = function(data) {
-  this.write(data + '\r\n');
+  return this.write(data + '\r\n');
 };
 
+Terminal.prototype.end = function(data) {
+  var ret = true;
+  if (data) {
+    ret = this.write(data);
+  }
+  this.destroySoon();
+  return ret;
+};
+
+Terminal.prototype.resume = function() {
+  ;
+};
+
+Terminal.prototype.pause = function() {
+  ;
+};
+
+// Key Resources:
+// https://developer.mozilla.org/en-US/docs/DOM/KeyboardEvent
 Terminal.prototype.keyDown = function(ev) {
-  var key;
+  var self = this
+    , key;
 
   switch (ev.keyCode) {
     // backspace
     case 8:
+      if (ev.altKey) {
+        key = '\x17';
+        break;
+      }
       if (ev.shiftKey) {
         key = '\x08'; // ^H
         break;
@@ -1970,24 +2872,32 @@ Terminal.prototype.keyDown = function(ev) {
       break;
     // left-arrow
     case 37:
-      if (this.applicationKeypad) {
+      if (this.applicationCursor) {
         key = '\x1bOD'; // SS3 as ^[O for 7-bit
         //key = '\x8fD'; // SS3 as 0x8f for 8-bit
+        break;
+      }
+      if (ev.ctrlKey) {
+        key = '\x1b[5D';
         break;
       }
       key = '\x1b[D';
       break;
     // right-arrow
     case 39:
-      if (this.applicationKeypad) {
+      if (this.applicationCursor) {
         key = '\x1bOC';
+        break;
+      }
+      if (ev.ctrlKey) {
+        key = '\x1b[5C';
         break;
       }
       key = '\x1b[C';
       break;
     // up-arrow
     case 38:
-      if (this.applicationKeypad) {
+      if (this.applicationCursor) {
         key = '\x1bOA';
         break;
       }
@@ -2000,7 +2910,7 @@ Terminal.prototype.keyDown = function(ev) {
       break;
     // down-arrow
     case 40:
-      if (this.applicationKeypad) {
+      if (this.applicationCursor) {
         key = '\x1bOB';
         break;
       }
@@ -2105,6 +3015,27 @@ Terminal.prototype.keyDown = function(ev) {
       // a-z and space
       if (ev.ctrlKey) {
         if (ev.keyCode >= 65 && ev.keyCode <= 90) {
+          // Ctrl-A
+          if (this.screenKeys) {
+            if (!this.prefixMode && !this.selectMode && ev.keyCode === 65) {
+              this.enterPrefix();
+              return cancel(ev);
+            }
+          }
+          // Ctrl-V
+          if (this.prefixMode && ev.keyCode === 86) {
+            this.leavePrefix();
+            return;
+          }
+          // Ctrl-C
+          if ((this.prefixMode || this.selectMode) && ev.keyCode === 67) {
+            if (this.visualMode) {
+              setTimeout(function() {
+                self.leaveVisual();
+              }, 1);
+            }
+            return;
+          }
           key = String.fromCharCode(ev.keyCode - 64);
         } else if (ev.keyCode === 32) {
           // NUL
@@ -2122,7 +3053,7 @@ Terminal.prototype.keyDown = function(ev) {
           // ^] - group sep
           key = String.fromCharCode(29);
         }
-      } else if ((!isMac && ev.altKey) || (isMac && ev.metaKey)) {
+      } else if (ev.altKey) {
         if (ev.keyCode >= 65 && ev.keyCode <= 90) {
           key = '\x1b' + String.fromCharCode(ev.keyCode + 32);
         } else if (ev.keyCode === 192) {
@@ -2134,18 +3065,25 @@ Terminal.prototype.keyDown = function(ev) {
       break;
   }
 
-  this.emit('keydown', ev);
+  if (!key) return true;
 
-  if (key) {
-    this.emit('key', key, ev);
-
-    this.showCursor();
-    this.handler(key);
-
+  if (this.prefixMode) {
+    this.leavePrefix();
     return cancel(ev);
   }
 
-  return true;
+  if (this.selectMode) {
+    this.keySelect(ev, key);
+    return cancel(ev);
+  }
+
+  this.emit('keydown', ev);
+  this.emit('key', key, ev);
+
+  this.showCursor();
+  this.handler(key);
+
+  return cancel(ev);
 };
 
 Terminal.prototype.setgLevel = function(g) {
@@ -2162,6 +3100,9 @@ Terminal.prototype.setgCharset = function(g, charset) {
 
 Terminal.prototype.keyPress = function(ev) {
   var key;
+  if (this._textarea) {
+    return;
+  }
 
   cancel(ev);
 
@@ -2178,6 +3119,17 @@ Terminal.prototype.keyPress = function(ev) {
   if (!key || ev.ctrlKey || ev.altKey || ev.metaKey) return false;
 
   key = String.fromCharCode(key);
+
+  if (this.prefixMode) {
+    this.leavePrefix();
+    this.keyPrefix(ev, key);
+    return false;
+  }
+
+  if (this.selectMode) {
+    this.keySelect(ev, key);
+    return false;
+  }
 
   this.emit('keypress', key, ev);
   this.emit('key', key, ev);
@@ -2202,27 +3154,28 @@ Terminal.prototype.send = function(data) {
 };
 
 Terminal.prototype.bell = function() {
-  if (!Terminal.visualBell) return;
+  this.emit('bell');
+  if (!this.visualBell) return;
   var self = this;
   this.element.style.borderColor = 'white';
   setTimeout(function() {
     self.element.style.borderColor = '';
   }, 10);
-  if (Terminal.popOnBell) this.focus();
+  if (this.popOnBell) this.focus();
 };
 
 Terminal.prototype.log = function() {
-  if (!Terminal.debug) return;
-  if (!window.console || !window.console.log) return;
+  if (!this.debug) return;
+  if (!this.context.console || !this.context.console.log) return;
   var args = Array.prototype.slice.call(arguments);
-  window.console.log.apply(window.console, args);
+  this.context.console.log.apply(this.context.console, args);
 };
 
 Terminal.prototype.error = function() {
-  if (!Terminal.debug) return;
-  if (!window.console || !window.console.error) return;
+  if (!this.debug) return;
+  if (!this.context.console || !this.context.console.error) return;
   var args = Array.prototype.slice.call(arguments);
-  window.console.error.apply(window.console, args);
+  this.context.console.error.apply(this.context.console, args);
 };
 
 Terminal.prototype.resize = function(x, y) {
@@ -2238,7 +3191,7 @@ Terminal.prototype.resize = function(x, y) {
   // resize cols
   j = this.cols;
   if (j < x) {
-    ch = [this.defAttr, ' '];
+    ch = [this.defAttr, ' ']; // does xterm use the default attr?
     i = this.lines.length;
     while (i--) {
       while (this.lines[i].length < x) {
@@ -2255,6 +3208,7 @@ Terminal.prototype.resize = function(x, y) {
   }
   this.setupStops(j);
   this.cols = x;
+  this.columns = x;
 
   // resize rows
   j = this.rows;
@@ -2265,7 +3219,7 @@ Terminal.prototype.resize = function(x, y) {
         this.lines.push(this.blankLine());
       }
       if (this.children.length < y) {
-        line = document.createElement('div');
+        line = this.document.createElement('div');
         el.appendChild(line);
         this.children.push(line);
       }
@@ -2298,11 +3252,20 @@ Terminal.prototype.resize = function(x, y) {
   // screen buffer. just set it
   // to null for now.
   this.normal = null;
+
+  // Act as though we are a node TTY stream:
+  this.emit('resize');
 };
 
 Terminal.prototype.updateRange = function(y) {
   if (y < this.refreshStart) this.refreshStart = y;
   if (y > this.refreshEnd) this.refreshEnd = y;
+  // if (y > this.refreshEnd) {
+  //   this.refreshEnd = y;
+  //   if (y > this.rows - 1) {
+  //     this.refreshEnd = this.rows - 1;
+  //   }
+  // }
 };
 
 Terminal.prototype.maxRange = function() {
@@ -2341,9 +3304,16 @@ Terminal.prototype.nextStop = function(x) {
     : x < 0 ? 0 : x;
 };
 
+// back_color_erase feature for xterm.
+Terminal.prototype.eraseAttr = function() {
+  // if (this.is('screen')) return this.defAttr;
+  return (this.defAttr & ~0x1ff) | (this.curAttr & 0x1ff);
+};
+
 Terminal.prototype.eraseRight = function(x, y) {
   var line = this.lines[this.ybase + y]
-    , ch = [this.curAttr, ' ']; // xterm
+    , ch = [this.eraseAttr(), ' ']; // xterm
+
 
   for (; x < this.cols; x++) {
     line[x] = ch;
@@ -2354,7 +3324,7 @@ Terminal.prototype.eraseRight = function(x, y) {
 
 Terminal.prototype.eraseLeft = function(x, y) {
   var line = this.lines[this.ybase + y]
-    , ch = [this.curAttr, ' ']; // xterm
+    , ch = [this.eraseAttr(), ' ']; // xterm
 
   x++;
   while (x--) line[x] = ch;
@@ -2368,7 +3338,7 @@ Terminal.prototype.eraseLine = function(y) {
 
 Terminal.prototype.blankLine = function(cur) {
   var attr = cur
-    ? this.curAttr
+    ? this.eraseAttr()
     : this.defAttr;
 
   var ch = [attr, ' ']
@@ -2384,12 +3354,12 @@ Terminal.prototype.blankLine = function(cur) {
 
 Terminal.prototype.ch = function(cur) {
   return cur
-    ? [this.curAttr, ' ']
+    ? [this.eraseAttr(), ' ']
     : [this.defAttr, ' '];
 };
 
 Terminal.prototype.is = function(term) {
-  var name = this.termName || Terminal.termName;
+  var name = this.termName;
   return (name + '').indexOf(term) === 0;
 };
 
@@ -2436,8 +3406,9 @@ Terminal.prototype.reverseIndex = function() {
 
 // ESC c Full Reset (RIS).
 Terminal.prototype.reset = function() {
-  //Terminal.call(this, this.cols, this.rows);
-  Terminal.call(this, this.cols, this.rows, this.handler);
+  this.options.rows = this.rows;
+  this.options.cols = this.cols;
+  Terminal.call(this, this.options);
   this.refresh(0, this.rows - 1);
 };
 
@@ -2643,84 +3614,120 @@ Terminal.prototype.eraseInLine = function(params) {
 //     Ps = 4 8  ; 5  ; Ps -> Set background color to the second
 //     Ps.
 Terminal.prototype.charAttributes = function(params) {
+  // Optimize a single SGR0.
+  if (params.length === 1 && params[0] === 0) {
+    this.curAttr = this.defAttr;
+    return;
+  }
+
   var l = params.length
     , i = 0
-    , bg
-    , fg
+    , flags = this.curAttr >> 18
+    , fg = (this.curAttr >> 9) & 0x1ff
+    , bg = this.curAttr & 0x1ff
     , p;
 
   for (; i < l; i++) {
     p = params[i];
     if (p >= 30 && p <= 37) {
       // fg color 8
-      this.curAttr = (this.curAttr & ~(0x1ff << 9)) | ((p - 30) << 9);
+      fg = p - 30;
     } else if (p >= 40 && p <= 47) {
       // bg color 8
-      this.curAttr = (this.curAttr & ~0x1ff) | (p - 40);
+      bg = p - 40;
     } else if (p >= 90 && p <= 97) {
       // fg color 16
       p += 8;
-      this.curAttr = (this.curAttr & ~(0x1ff << 9)) | ((p - 90) << 9);
+      fg = p - 90;
     } else if (p >= 100 && p <= 107) {
       // bg color 16
       p += 8;
-      this.curAttr = (this.curAttr & ~0x1ff) | (p - 100);
+      bg = p - 100;
     } else if (p === 0) {
       // default
-      this.curAttr = this.defAttr;
+      flags = this.defAttr >> 18;
+      fg = (this.defAttr >> 9) & 0x1ff;
+      bg = this.defAttr & 0x1ff;
+      // flags = 0;
+      // fg = 0x1ff;
+      // bg = 0x1ff;
     } else if (p === 1) {
       // bold text
-      this.curAttr = this.curAttr | (1 << 18);
+      flags |= 1;
     } else if (p === 4) {
       // underlined text
-      this.curAttr = this.curAttr | (2 << 18);
-    } else if (p === 7 || p === 27) {
+      flags |= 2;
+    } else if (p === 5) {
+      // blink
+      flags |= 4;
+    } else if (p === 7) {
       // inverse and positive
       // test with: echo -e '\e[31m\e[42mhello\e[7mworld\e[27mhi\e[m'
-      if (p === 7) {
-        if ((this.curAttr >> 18) & 4) continue;
-        this.curAttr = this.curAttr | (4 << 18);
-      } else if (p === 27) {
-        if (~(this.curAttr >> 18) & 4) continue;
-        this.curAttr = this.curAttr & ~(4 << 18);
-      }
-
-      bg = this.curAttr & 0x1ff;
-      fg = (this.curAttr >> 9) & 0x1ff;
-
-      this.curAttr = (this.curAttr & ~0x3ffff) | ((bg << 9) | fg);
+      flags |= 8;
+    } else if (p === 8) {
+      // invisible
+      flags |= 16;
     } else if (p === 22) {
       // not bold
-      this.curAttr = this.curAttr & ~(1 << 18);
+      flags &= ~1;
     } else if (p === 24) {
       // not underlined
-      this.curAttr = this.curAttr & ~(2 << 18);
+      flags &= ~2;
+    } else if (p === 25) {
+      // not blink
+      flags &= ~4;
+    } else if (p === 27) {
+      // not inverse
+      flags &= ~8;
+    } else if (p === 28) {
+      // not invisible
+      flags &= ~16;
     } else if (p === 39) {
       // reset fg
-      this.curAttr = this.curAttr & ~(0x1ff << 9);
-      this.curAttr = this.curAttr | (((this.defAttr >> 9) & 0x1ff) << 9);
+      fg = (this.defAttr >> 9) & 0x1ff;
     } else if (p === 49) {
       // reset bg
-      this.curAttr = this.curAttr & ~0x1ff;
-      this.curAttr = this.curAttr | (this.defAttr & 0x1ff);
+      bg = this.defAttr & 0x1ff;
     } else if (p === 38) {
       // fg color 256
-      if (params[i+1] !== 5) continue;
-      i += 2;
-      p = params[i] & 0xff;
-      // convert 88 colors to 256
-      // if (this.is('rxvt-unicode') && p < 88) p = p * 2.9090 | 0;
-      this.curAttr = (this.curAttr & ~(0x1ff << 9)) | (p << 9);
+      if (params[i + 1] === 2) {
+        i += 2;
+        fg = matchColor(
+          params[i] & 0xff,
+          params[i + 1] & 0xff,
+          params[i + 2] & 0xff);
+        if (fg === -1) fg = 0x1ff;
+        i += 2;
+      } else if (params[i + 1] === 5) {
+        i += 2;
+        p = params[i] & 0xff;
+        fg = p;
+      }
     } else if (p === 48) {
       // bg color 256
-      if (params[i+1] !== 5) continue;
-      i += 2;
-      p = params[i] & 0xff;
-      // convert 88 colors to 256
-      // if (this.is('rxvt-unicode') && p < 88) p = p * 2.9090 | 0;
-      this.curAttr = (this.curAttr & ~0x1ff) | p;
+      if (params[i + 1] === 2) {
+        i += 2;
+        bg = matchColor(
+          params[i] & 0xff,
+          params[i + 1] & 0xff,
+          params[i + 2] & 0xff);
+        if (bg === -1) bg = 0x1ff;
+        i += 2;
+      } else if (params[i + 1] === 5) {
+        i += 2;
+        p = params[i] & 0xff;
+        bg = p;
+      }
+    } else if (p === 100) {
+      // reset fg/bg
+      fg = (this.defAttr >> 9) & 0x1ff;
+      bg = this.defAttr & 0x1ff;
+    } else {
+      this.error('Unknown SGR attribute: %d.', p);
     }
   }
+
+  this.curAttr = (flags << 18) | (fg << 9) | bg;
 };
 
 // CSI Ps n  Device Status Report (DSR).
@@ -2777,7 +3784,7 @@ Terminal.prototype.deviceStatus = function(params) {
         // this.send('\x1b[?11n');
         break;
       case 25:
-        // dont support user defined role_keys
+        // dont support user defined keys
         // this.send('\x1b[?21n');
         break;
       case 26:
@@ -2806,7 +3813,7 @@ Terminal.prototype.insertChars = function(params) {
 
   row = this.y + this.ybase;
   j = this.x;
-  ch = [this.curAttr, ' ']; // xterm
+  ch = [this.eraseAttr(), ' ']; // xterm
 
   while (param-- && j < this.cols) {
     this.lines[row].splice(j++, 0, ch);
@@ -2903,7 +3910,7 @@ Terminal.prototype.deleteChars = function(params) {
   if (param < 1) param = 1;
 
   row = this.y + this.ybase;
-  ch = [this.curAttr, ' ']; // xterm
+  ch = [this.eraseAttr(), ' ']; // xterm
 
   while (param--) {
     this.lines[row].splice(this.x, 1);
@@ -2921,7 +3928,7 @@ Terminal.prototype.eraseChars = function(params) {
 
   row = this.y + this.ybase;
   j = this.x;
-  ch = [this.curAttr, ' ']; // xterm
+  ch = [this.eraseAttr(), ' ']; // xterm
 
   while (param-- && j < this.cols) {
     this.lines[row][j++] = ch;
@@ -2964,7 +3971,7 @@ Terminal.prototype.HPositionRelative = function(params) {
 //     Ps = 1  -> 132-columns.
 //     Ps = 2  -> Printer.
 //     Ps = 6  -> Selective erase.
-//     Ps = 8  -> User-defined role_keys.
+//     Ps = 8  -> User-defined keys.
 //     Ps = 9  -> National replacement character sets.
 //     Ps = 1 5  -> Technical characters.
 //     Ps = 2 2  -> ANSI color, e.g., VT525.
@@ -3105,7 +4112,7 @@ Terminal.prototype.HVPosition = function(params) {
 //     Ps = 1 0 3 4  -> Interpret "meta" key, sets eighth bit.
 //     (enables the eightBitInput resource).
 //     Ps = 1 0 3 5  -> Enable special modifiers for Alt and Num-
-//     Lock role_keys.  (This enables the numLock resource).
+//     Lock keys.  (This enables the numLock resource).
 //     Ps = 1 0 3 6  -> Send ESC   when Meta modifies a key.  (This
 //     enables the metaSendsEscape resource).
 //     Ps = 1 0 3 7  -> Send DEL from the editing-keypad Delete
@@ -3163,7 +4170,7 @@ Terminal.prototype.setMode = function(params) {
   } else if (this.prefix === '?') {
     switch (params) {
       case 1:
-        this.applicationKeypad = true;
+        this.applicationCursor = true;
         break;
       case 2:
         this.setgCharset(0, Terminal.charsets.US);
@@ -3184,6 +4191,10 @@ Terminal.prototype.setMode = function(params) {
         break;
       case 12:
         // this.cursorBlink = true;
+        break;
+      case 66:
+        this.log('Serial port requested application keypad.');
+        this.applicationKeypad = true;
         break;
       case 9: // X10 Mouse
         // no release, no motion, no wheel, no modifiers.
@@ -3304,7 +4315,7 @@ Terminal.prototype.setMode = function(params) {
 //     Ps = 1 0 3 4  -> Don't interpret "meta" key.  (This disables
 //     the eightBitInput resource).
 //     Ps = 1 0 3 5  -> Disable special modifiers for Alt and Num-
-//     Lock role_keys.  (This disables the numLock resource).
+//     Lock keys.  (This disables the numLock resource).
 //     Ps = 1 0 3 6  -> Don't send ESC  when Meta modifies a key.
 //     (This disables the metaSendsEscape resource).
 //     Ps = 1 0 3 7  -> Send VT220 Remove from the editing-keypad
@@ -3361,7 +4372,7 @@ Terminal.prototype.resetMode = function(params) {
   } else if (this.prefix === '?') {
     switch (params) {
       case 1:
-        this.applicationKeypad = false;
+        this.applicationCursor = false;
         break;
       case 3:
         if (this.cols === 132 && this.savedCols) {
@@ -3377,6 +4388,10 @@ Terminal.prototype.resetMode = function(params) {
         break;
       case 12:
         // this.cursorBlink = false;
+        break;
+      case 66:
+        this.log('Switching back to normal keypad.');
+        this.applicationKeypad = false;
         break;
       case 9: // X10 Mouse
       case 1000: // vt200 mouse
@@ -3588,7 +4603,7 @@ Terminal.prototype.setResources = function(params) {
 //     Ps = 4  -> modifyOtherKeys.
 //   If the parameter is omitted, modifyFunctionKeys is disabled.
 //   When modifyFunctionKeys is disabled, xterm uses the modifier
-//   role_keys to make an extended sequence of functions rather than
+//   keys to make an extended sequence of functions rather than
 //   adding a parameter to each function key to denote the modi-
 //   fiers.
 Terminal.prototype.disableModifiers = function(params) {
@@ -3615,6 +4630,7 @@ Terminal.prototype.softReset = function(params) {
   this.originMode = false;
   this.wraparoundMode = false; // autowrap
   this.applicationKeypad = false; // ?
+  this.applicationCursor = false;
   this.scrollTop = 0;
   this.scrollBottom = this.rows - 1;
   this.curAttr = this.defAttr;
@@ -3933,7 +4949,7 @@ Terminal.prototype.eraseRectangle = function(params) {
     , i
     , ch;
 
-  ch = [this.curAttr, ' ']; // xterm?
+  ch = [this.eraseAttr(), ' ']; // xterm?
 
   for (; t < b + 1; t++) {
     line = this.lines[this.ybase + t];
@@ -4019,7 +5035,7 @@ Terminal.prototype.requestLocatorPosition = function(params) {
 Terminal.prototype.insertColumns = function() {
   var param = params[0]
     , l = this.ybase + this.rows
-    , ch = [this.curAttr, ' '] // xterm?
+    , ch = [this.eraseAttr(), ' '] // xterm?
     , i;
 
   while (param--) {
@@ -4038,7 +5054,7 @@ Terminal.prototype.insertColumns = function() {
 Terminal.prototype.deleteColumns = function() {
   var param = params[0]
     , l = this.ybase + this.rows
-    , ch = [this.curAttr, ' '] // xterm?
+    , ch = [this.eraseAttr(), ' '] // xterm?
     , i;
 
   while (param--) {
@@ -4049,6 +5065,961 @@ Terminal.prototype.deleteColumns = function() {
   }
 
   this.maxRange();
+};
+
+/**
+ * Prefix/Select/Visual/Search Modes
+ */
+
+Terminal.prototype.enterPrefix = function() {
+  this.prefixMode = true;
+};
+
+Terminal.prototype.leavePrefix = function() {
+  this.prefixMode = false;
+};
+
+Terminal.prototype.enterSelect = function() {
+  this._real = {
+    x: this.x,
+    y: this.y,
+    ydisp: this.ydisp,
+    ybase: this.ybase,
+    cursorHidden: this.cursorHidden,
+    lines: this.copyBuffer(this.lines),
+    write: this.write
+  };
+  this.write = function() {};
+  this.selectMode = true;
+  this.visualMode = false;
+  this.cursorHidden = false;
+  this.refresh(this.y, this.y);
+};
+
+Terminal.prototype.leaveSelect = function() {
+  this.x = this._real.x;
+  this.y = this._real.y;
+  this.ydisp = this._real.ydisp;
+  this.ybase = this._real.ybase;
+  this.cursorHidden = this._real.cursorHidden;
+  this.lines = this._real.lines;
+  this.write = this._real.write;
+  delete this._real;
+  this.selectMode = false;
+  this.visualMode = false;
+  this.refresh(0, this.rows - 1);
+};
+
+Terminal.prototype.enterVisual = function() {
+  this._real.preVisual = this.copyBuffer(this.lines);
+  this.selectText(this.x, this.x, this.ydisp + this.y, this.ydisp + this.y);
+  this.visualMode = true;
+};
+
+Terminal.prototype.leaveVisual = function() {
+  this.lines = this._real.preVisual;
+  delete this._real.preVisual;
+  delete this._selected;
+  this.visualMode = false;
+  this.refresh(0, this.rows - 1);
+};
+
+Terminal.prototype.enterSearch = function(down) {
+  this.entry = '';
+  this.searchMode = true;
+  this.searchDown = down;
+  this._real.preSearch = this.copyBuffer(this.lines);
+  this._real.preSearchX = this.x;
+  this._real.preSearchY = this.y;
+
+  var bottom = this.ydisp + this.rows - 1;
+  for (var i = 0; i < this.entryPrefix.length; i++) {
+    //this.lines[bottom][i][0] = (this.defAttr & ~0x1ff) | 4;
+    //this.lines[bottom][i][1] = this.entryPrefix[i];
+    this.lines[bottom][i] = [
+      (this.defAttr & ~0x1ff) | 4,
+      this.entryPrefix[i]
+    ];
+  }
+
+  this.y = this.rows - 1;
+  this.x = this.entryPrefix.length;
+
+  this.refresh(this.rows - 1, this.rows - 1);
+};
+
+Terminal.prototype.leaveSearch = function() {
+  this.searchMode = false;
+
+  if (this._real.preSearch) {
+    this.lines = this._real.preSearch;
+    this.x = this._real.preSearchX;
+    this.y = this._real.preSearchY;
+    delete this._real.preSearch;
+    delete this._real.preSearchX;
+    delete this._real.preSearchY;
+  }
+
+  this.refresh(this.rows - 1, this.rows - 1);
+};
+
+Terminal.prototype.copyBuffer = function(lines) {
+  var lines = lines || this.lines
+    , out = [];
+
+  for (var y = 0; y < lines.length; y++) {
+    out[y] = [];
+    for (var x = 0; x < lines[y].length; x++) {
+      out[y][x] = [lines[y][x][0], lines[y][x][1]];
+    }
+  }
+
+  return out;
+};
+
+Terminal.prototype.getCopyTextarea = function(text) {
+  var textarea = this._copyTextarea
+    , document = this.document;
+
+  if (!textarea) {
+    textarea = document.createElement('textarea');
+    textarea.style.position = 'absolute';
+    textarea.style.left = '-32000px';
+    textarea.style.top = '-32000px';
+    textarea.style.width = '0px';
+    textarea.style.height = '0px';
+    textarea.style.opacity = '0';
+    textarea.style.backgroundColor = 'transparent';
+    textarea.style.borderStyle = 'none';
+    textarea.style.outlineStyle = 'none';
+
+    document.getElementsByTagName('body')[0].appendChild(textarea);
+
+    this._copyTextarea = textarea;
+  }
+
+  return textarea;
+};
+
+// NOTE: Only works for primary selection on X11.
+// Non-X11 users should use Ctrl-C instead.
+Terminal.prototype.copyText = function(text) {
+  var self = this
+    , textarea = this.getCopyTextarea();
+
+  this.emit('copy', text);
+
+  textarea.focus();
+  textarea.textContent = text;
+  textarea.value = text;
+  textarea.setSelectionRange(0, text.length);
+
+  setTimeout(function() {
+    self.element.focus();
+    self.focus();
+  }, 1);
+};
+
+Terminal.prototype.clearSelectedText = function() {
+  if (this._selected) {
+    var ox1
+      , ox2
+      , oy1
+      , oy2
+      , tmp
+      , x
+      , y
+      , xl
+      , attr;
+
+    ox1 = this._selected.x1;
+    ox2 = this._selected.x2;
+    oy1 = this._selected.y1;
+    oy2 = this._selected.y2;
+
+    if (oy2 < oy1) {
+      tmp = ox2;
+      ox2 = ox1;
+      ox1 = tmp;
+      tmp = oy2;
+      oy2 = oy1;
+      oy1 = tmp;
+    }
+
+    if (ox2 < ox1 && oy1 === oy2) {
+      tmp = ox2;
+      ox2 = ox1;
+      ox1 = tmp;
+    }
+
+    for (y = oy1; y <= oy2; y++) {
+      x = 0;
+      xl = this.cols - 1;
+      if (y === oy1) {
+        x = ox1;
+      }
+      if (y === oy2) {
+        xl = ox2;
+      }
+      for (; x <= xl; x++) {
+        if (this.lines[y][x].old != null) {
+          //this.lines[y][x][0] = this.lines[y][x].old;
+          //delete this.lines[y][x].old;
+          attr = this.lines[y][x].old;
+          delete this.lines[y][x].old;
+          this.lines[y][x] = [attr, this.lines[y][x][1]];
+        }
+      }
+    }
+    delete this._selected;
+  }
+};
+
+
+Terminal.prototype.selectText = function(x1, x2, y1, y2) {
+  var tmp
+    , x
+    , y
+    , xl
+    , attr;
+
+  if (this._selected) {
+    this.clearSelectedText();
+  }
+
+  y1 = Math.max(y1, 0);
+  y1 = Math.min(y1, this.ydisp + this.rows - 1);
+
+  y2 = Math.max(y2, 0);
+  y2 = Math.min(y2, this.ydisp + this.rows - 1);
+
+  this._selected = { x1: x1, x2: x2, y1: y1, y2: y2 };
+
+  if (y2 < y1) {
+    tmp = x2;
+    x2 = x1;
+    x1 = tmp;
+    tmp = y2;
+    y2 = y1;
+    y1 = tmp;
+  }
+
+  if (x2 < x1 && y1 === y2) {
+    tmp = x2;
+    x2 = x1;
+    x1 = tmp;
+  }
+  for (y = y1; y <= y2; y++) {
+    x = 0;
+    xl = this.cols - 1;
+    if (y === y1) {
+      x = x1;
+    }
+    if (y === y2) {
+      xl = x2;
+    }
+    for (; x <= xl; x++) {
+      //this.lines[y][x].old = this.lines[y][x][0];
+      //this.lines[y][x][0] &= ~0x1ff;
+      //this.lines[y][x][0] |= (0x1ff << 9) | 4;
+      attr = this.lines[y][x][0];
+      this.lines[y][x] = [
+        (attr & ~0x1ff) | ((0x1ff << 9) | 4),
+        this.lines[y][x][1]
+      ];
+      this.lines[y][x].old = attr;
+    }
+  }
+
+  y1 = y1 - this.ydisp;
+  y2 = y2 - this.ydisp;
+
+  y1 = Math.max(y1, 0);
+  y1 = Math.min(y1, this.rows - 1);
+
+  y2 = Math.max(y2, 0);
+  y2 = Math.min(y2, this.rows - 1);
+
+  //this.refresh(y1, y2);
+  this.refresh(0, this.rows - 1);
+};
+
+Terminal.prototype.grabText = function(x1, x2, y1, y2) {
+  var out = ''
+    , buf = ''
+    , ch
+    , x
+    , y
+    , xl
+    , tmp;
+
+  if (y2 < y1) {
+    tmp = x2;
+    x2 = x1;
+    x1 = tmp;
+    tmp = y2;
+    y2 = y1;
+    y1 = tmp;
+  }
+
+  if (x2 < x1 && y1 === y2) {
+    tmp = x2;
+    x2 = x1;
+    x1 = tmp;
+  }
+
+  for (y = y1; y <= y2; y++) {
+    x = 0;
+    xl = this.cols - 1;
+    if (y === y1) {
+      x = x1;
+    }
+    if (y === y2) {
+      xl = x2;
+    }
+    for (; x <= xl; x++) {
+      ch = this.lines[y][x][1];
+      if (ch === ' ') {
+        buf += ch;
+        continue;
+      }
+      if (buf) {
+        out += buf;
+        buf = '';
+      }
+      out += ch;
+      if (isWide(ch)) x++;
+    }
+    buf = '';
+    out += '\n';
+  }
+
+  // If we're not at the end of the
+  // line, don't add a newline.
+  for (x = x2, y = y2; x < this.cols; x++) {
+    if (this.lines[y][x][1] !== ' ') {
+      out = out.slice(0, -1);
+      break;
+    }
+  }
+
+  return out;
+};
+
+Terminal.prototype.keyPrefix = function(ev, key) {
+  if (key === 'k' || key === '&') {
+    this.destroy();
+  } else if (key === 'p' || key === ']') {
+    this.emit('request paste');
+  } else if (key === 'c') {
+    this.emit('request create');
+  } else if (key >= '0' && key <= '9') {
+    key = +key - 1;
+    if (!~key) key = 9;
+    this.emit('request term', key);
+  } else if (key === 'n') {
+    this.emit('request term next');
+  } else if (key === 'P') {
+    this.emit('request term previous');
+  } else if (key === ':') {
+    this.emit('request command mode');
+  } else if (key === '[') {
+    this.enterSelect();
+  }
+};
+
+Terminal.prototype.keySelect = function(ev, key) {
+  this.showCursor();
+
+  if (this.searchMode || key === 'n' || key === 'N') {
+    return this.keySearch(ev, key);
+  }
+
+  if (key === '\x04') { // ctrl-d
+    var y = this.ydisp + this.y;
+    if (this.ydisp === this.ybase) {
+      // Mimic vim behavior
+      this.y = Math.min(this.y + (this.rows - 1) / 2 | 0, this.rows - 1);
+      this.refresh(0, this.rows - 1);
+    } else {
+      this.scrollDisp((this.rows - 1) / 2 | 0);
+    }
+    if (this.visualMode) {
+      this.selectText(this.x, this.x, y, this.ydisp + this.y);
+    }
+    return;
+  }
+
+  if (key === '\x15') { // ctrl-u
+    var y = this.ydisp + this.y;
+    if (this.ydisp === 0) {
+      // Mimic vim behavior
+      this.y = Math.max(this.y - (this.rows - 1) / 2 | 0, 0);
+      this.refresh(0, this.rows - 1);
+    } else {
+      this.scrollDisp(-(this.rows - 1) / 2 | 0);
+    }
+    if (this.visualMode) {
+      this.selectText(this.x, this.x, y, this.ydisp + this.y);
+    }
+    return;
+  }
+
+  if (key === '\x06') { // ctrl-f
+    var y = this.ydisp + this.y;
+    this.scrollDisp(this.rows - 1);
+    if (this.visualMode) {
+      this.selectText(this.x, this.x, y, this.ydisp + this.y);
+    }
+    return;
+  }
+
+  if (key === '\x02') { // ctrl-b
+    var y = this.ydisp + this.y;
+    this.scrollDisp(-(this.rows - 1));
+    if (this.visualMode) {
+      this.selectText(this.x, this.x, y, this.ydisp + this.y);
+    }
+    return;
+  }
+
+  if (key === 'k' || key === '\x1b[A') {
+    var y = this.ydisp + this.y;
+    this.y--;
+    if (this.y < 0) {
+      this.y = 0;
+      this.scrollDisp(-1);
+    }
+    if (this.visualMode) {
+      this.selectText(this.x, this.x, y, this.ydisp + this.y);
+    } else {
+      this.refresh(this.y, this.y + 1);
+    }
+    return;
+  }
+
+  if (key === 'j' || key === '\x1b[B') {
+    var y = this.ydisp + this.y;
+    this.y++;
+    if (this.y >= this.rows) {
+      this.y = this.rows - 1;
+      this.scrollDisp(1);
+    }
+    if (this.visualMode) {
+      this.selectText(this.x, this.x, y, this.ydisp + this.y);
+    } else {
+      this.refresh(this.y - 1, this.y);
+    }
+    return;
+  }
+
+  if (key === 'h' || key === '\x1b[D') {
+    var x = this.x;
+    this.x--;
+    if (this.x < 0) {
+      this.x = 0;
+    }
+    if (this.visualMode) {
+      this.selectText(x, this.x, this.ydisp + this.y, this.ydisp + this.y);
+    } else {
+      this.refresh(this.y, this.y);
+    }
+    return;
+  }
+
+  if (key === 'l' || key === '\x1b[C') {
+    var x = this.x;
+    this.x++;
+    if (this.x >= this.cols) {
+      this.x = this.cols - 1;
+    }
+    if (this.visualMode) {
+      this.selectText(x, this.x, this.ydisp + this.y, this.ydisp + this.y);
+    } else {
+      this.refresh(this.y, this.y);
+    }
+    return;
+  }
+
+  if (key === 'v' || key === ' ') {
+    if (!this.visualMode) {
+      this.enterVisual();
+    } else {
+      this.leaveVisual();
+    }
+    return;
+  }
+
+  if (key === 'y') {
+    if (this.visualMode) {
+      var text = this.grabText(
+        this._selected.x1, this._selected.x2,
+        this._selected.y1, this._selected.y2);
+      this.copyText(text);
+      this.leaveVisual();
+      // this.leaveSelect();
+    }
+    return;
+  }
+
+  if (key === 'q' || key === '\x1b') {
+    if (this.visualMode) {
+      this.leaveVisual();
+    } else {
+      this.leaveSelect();
+    }
+    return;
+  }
+
+  if (key === 'w' || key === 'W') {
+    var ox = this.x;
+    var oy = this.y;
+    var oyd = this.ydisp;
+
+    var x = this.x;
+    var y = this.y;
+    var yb = this.ydisp;
+    var saw_space = false;
+
+    for (;;) {
+      var line = this.lines[yb + y];
+      while (x < this.cols) {
+        if (line[x][1] <= ' ') {
+          saw_space = true;
+        } else if (saw_space) {
+          break;
+        }
+        x++;
+      }
+      if (x >= this.cols) x = this.cols - 1;
+      if (x === this.cols - 1 && line[x][1] <= ' ') {
+        x = 0;
+        if (++y >= this.rows) {
+          y--;
+          if (++yb > this.ybase) {
+            yb = this.ybase;
+            x = this.x;
+            break;
+          }
+        }
+        continue;
+      }
+      break;
+    }
+
+    this.x = x, this.y = y;
+    this.scrollDisp(-this.ydisp + yb);
+
+    if (this.visualMode) {
+      this.selectText(ox, this.x, oy + oyd, this.ydisp + this.y);
+    }
+    return;
+  }
+
+  if (key === 'b' || key === 'B') {
+    var ox = this.x;
+    var oy = this.y;
+    var oyd = this.ydisp;
+
+    var x = this.x;
+    var y = this.y;
+    var yb = this.ydisp;
+
+    for (;;) {
+      var line = this.lines[yb + y];
+      var saw_space = x > 0 && line[x][1] > ' ' && line[x - 1][1] > ' ';
+      while (x >= 0) {
+        if (line[x][1] <= ' ') {
+          if (saw_space && (x + 1 < this.cols && line[x + 1][1] > ' ')) {
+            x++;
+            break;
+          } else {
+            saw_space = true;
+          }
+        }
+        x--;
+      }
+      if (x < 0) x = 0;
+      if (x === 0 && (line[x][1] <= ' ' || !saw_space)) {
+        x = this.cols - 1;
+        if (--y < 0) {
+          y++;
+          if (--yb < 0) {
+            yb++;
+            x = 0;
+            break;
+          }
+        }
+        continue;
+      }
+      break;
+    }
+
+    this.x = x, this.y = y;
+    this.scrollDisp(-this.ydisp + yb);
+
+    if (this.visualMode) {
+      this.selectText(ox, this.x, oy + oyd, this.ydisp + this.y);
+    }
+    return;
+  }
+
+  if (key === 'e' || key === 'E') {
+    var x = this.x + 1;
+    var y = this.y;
+    var yb = this.ydisp;
+    if (x >= this.cols) x--;
+
+    for (;;) {
+      var line = this.lines[yb + y];
+      while (x < this.cols) {
+        if (line[x][1] <= ' ') {
+          x++;
+        } else {
+          break;
+        }
+      }
+      while (x < this.cols) {
+        if (line[x][1] <= ' ') {
+          if (x - 1 >= 0 && line[x - 1][1] > ' ') {
+            x--;
+            break;
+          }
+        }
+        x++;
+      }
+      if (x >= this.cols) x = this.cols - 1;
+      if (x === this.cols - 1 && line[x][1] <= ' ') {
+        x = 0;
+        if (++y >= this.rows) {
+          y--;
+          if (++yb > this.ybase) {
+            yb = this.ybase;
+            break;
+          }
+        }
+        continue;
+      }
+      break;
+    }
+
+    this.x = x, this.y = y;
+    this.scrollDisp(-this.ydisp + yb);
+
+    if (this.visualMode) {
+      this.selectText(ox, this.x, oy + oyd, this.ydisp + this.y);
+    }
+    return;
+  }
+
+  if (key === '^' || key === '0') {
+    var ox = this.x;
+
+    if (key === '0') {
+      this.x = 0;
+    } else if (key === '^') {
+      var line = this.lines[this.ydisp + this.y];
+      var x = 0;
+      while (x < this.cols) {
+        if (line[x][1] > ' ') {
+          break;
+        }
+        x++;
+      }
+      if (x >= this.cols) x = this.cols - 1;
+      this.x = x;
+    }
+
+    if (this.visualMode) {
+      this.selectText(ox, this.x, this.ydisp + this.y, this.ydisp + this.y);
+    } else {
+      this.refresh(this.y, this.y);
+    }
+    return;
+  }
+
+  if (key === '$') {
+    var ox = this.x;
+    var line = this.lines[this.ydisp + this.y];
+    var x = this.cols - 1;
+    while (x >= 0) {
+      if (line[x][1] > ' ') {
+        if (this.visualMode && x < this.cols - 1) x++;
+        break;
+      }
+      x--;
+    }
+    if (x < 0) x = 0;
+    this.x = x;
+    if (this.visualMode) {
+      this.selectText(ox, this.x, this.ydisp + this.y, this.ydisp + this.y);
+    } else {
+      this.refresh(this.y, this.y);
+    }
+    return;
+  }
+
+  if (key === 'g' || key === 'G') {
+    var ox = this.x;
+    var oy = this.y;
+    var oyd = this.ydisp;
+    if (key === 'g') {
+      this.x = 0, this.y = 0;
+      this.scrollDisp(-this.ydisp);
+    } else if (key === 'G') {
+      this.x = 0, this.y = this.rows - 1;
+      this.scrollDisp(this.ybase);
+    }
+    if (this.visualMode) {
+      this.selectText(ox, this.x, oy + oyd, this.ydisp + this.y);
+    }
+    return;
+  }
+
+  if (key === 'H' || key === 'M' || key === 'L') {
+    var ox = this.x;
+    var oy = this.y;
+    if (key === 'H') {
+      this.x = 0, this.y = 0;
+    } else if (key === 'M') {
+      this.x = 0, this.y = this.rows / 2 | 0;
+    } else if (key === 'L') {
+      this.x = 0, this.y = this.rows - 1;
+    }
+    if (this.visualMode) {
+      this.selectText(ox, this.x, this.ydisp + oy, this.ydisp + this.y);
+    } else {
+      this.refresh(oy, oy);
+      this.refresh(this.y, this.y);
+    }
+    return;
+  }
+
+  if (key === '{' || key === '}') {
+    var ox = this.x;
+    var oy = this.y;
+    var oyd = this.ydisp;
+
+    var line;
+    var saw_full = false;
+    var found = false;
+    var first_is_space = -1;
+    var y = this.y + (key === '{' ? -1 : 1);
+    var yb = this.ydisp;
+    var i;
+
+    if (key === '{') {
+      if (y < 0) {
+        y++;
+        if (yb > 0) yb--;
+      }
+    } else if (key === '}') {
+      if (y >= this.rows) {
+        y--;
+        if (yb < this.ybase) yb++;
+      }
+    }
+
+    for (;;) {
+      line = this.lines[yb + y];
+
+      for (i = 0; i < this.cols; i++) {
+        if (line[i][1] > ' ') {
+          if (first_is_space === -1) {
+            first_is_space = 0;
+          }
+          saw_full = true;
+          break;
+        } else if (i === this.cols - 1) {
+          if (first_is_space === -1) {
+            first_is_space = 1;
+          } else if (first_is_space === 0) {
+            found = true;
+          } else if (first_is_space === 1) {
+            if (saw_full) found = true;
+          }
+          break;
+        }
+      }
+
+      if (found) break;
+
+      if (key === '{') {
+        y--;
+        if (y < 0) {
+          y++;
+          if (yb > 0) yb--;
+          else break;
+        }
+      } else if (key === '}') {
+        y++;
+        if (y >= this.rows) {
+          y--;
+          if (yb < this.ybase) yb++;
+          else break;
+        }
+      }
+    }
+
+    if (!found) {
+      if (key === '{') {
+        y = 0;
+        yb = 0;
+      } else if (key === '}') {
+        y = this.rows - 1;
+        yb = this.ybase;
+      }
+    }
+
+    this.x = 0, this.y = y;
+    this.scrollDisp(-this.ydisp + yb);
+
+    if (this.visualMode) {
+      this.selectText(ox, this.x, oy + oyd, this.ydisp + this.y);
+    }
+    return;
+  }
+
+  if (key === '/' || key === '?') {
+    if (!this.visualMode) {
+      this.enterSearch(key === '/');
+    }
+    return;
+  }
+
+  return false;
+};
+
+Terminal.prototype.keySearch = function(ev, key) {
+  if (key === '\x1b') {
+    this.leaveSearch();
+    return;
+  }
+
+  if (key === '\r' || (!this.searchMode && (key === 'n' || key === 'N'))) {
+    this.leaveSearch();
+
+    var entry = this.entry;
+
+    if (!entry) {
+      this.refresh(0, this.rows - 1);
+      return;
+    }
+
+    var ox = this.x;
+    var oy = this.y;
+    var oyd = this.ydisp;
+
+    var line;
+    var found = false;
+    var wrapped = false;
+    var x = this.x + 1;
+    var y = this.ydisp + this.y;
+    var yb, i;
+    var up = key === 'N'
+      ? this.searchDown
+      : !this.searchDown;
+
+    for (;;) {
+      line = this.lines[y];
+
+      while (x < this.cols) {
+        for (i = 0; i < entry.length; i++) {
+          if (x + i >= this.cols) break;
+          if (line[x + i][1] !== entry[i]) {
+            break;
+          } else if (line[x + i][1] === entry[i] && i === entry.length - 1) {
+            found = true;
+            break;
+          }
+        }
+        if (found) break;
+        x += i + 1;
+      }
+      if (found) break;
+
+      x = 0;
+
+      if (!up) {
+        y++;
+        if (y > this.ybase + this.rows - 1) {
+          if (wrapped) break;
+          // this.setMessage('Search wrapped. Continuing at TOP.');
+          wrapped = true;
+          y = 0;
+        }
+      } else {
+        y--;
+        if (y < 0) {
+          if (wrapped) break;
+          // this.setMessage('Search wrapped. Continuing at BOTTOM.');
+          wrapped = true;
+          y = this.ybase + this.rows - 1;
+        }
+      }
+    }
+
+    if (found) {
+      if (y - this.ybase < 0) {
+        yb = y;
+        y = 0;
+        if (yb > this.ybase) {
+          y = yb - this.ybase;
+          yb = this.ybase;
+        }
+      } else {
+        yb = this.ybase;
+        y -= this.ybase;
+      }
+
+      this.x = x, this.y = y;
+      this.scrollDisp(-this.ydisp + yb);
+
+      if (this.visualMode) {
+        this.selectText(ox, this.x, oy + oyd, this.ydisp + this.y);
+      }
+      return;
+    }
+
+    // this.setMessage("No matches found.");
+    this.refresh(0, this.rows - 1);
+
+    return;
+  }
+
+  if (key === '\b' || key === '\x7f') {
+    if (this.entry.length === 0) return;
+    var bottom = this.ydisp + this.rows - 1;
+    this.entry = this.entry.slice(0, -1);
+    var i = this.entryPrefix.length + this.entry.length;
+    //this.lines[bottom][i][1] = ' ';
+    this.lines[bottom][i] = [
+      this.lines[bottom][i][0],
+      ' '
+    ];
+    this.x--;
+    this.refresh(this.rows - 1, this.rows - 1);
+    this.refresh(this.y, this.y);
+    return;
+  }
+
+  if (key.length === 1 && key >= ' ' && key <= '~') {
+    var bottom = this.ydisp + this.rows - 1;
+    this.entry += key;
+    var i = this.entryPrefix.length + this.entry.length - 1;
+    //this.lines[bottom][i][0] = (this.defAttr & ~0x1ff) | 4;
+    //this.lines[bottom][i][1] = key;
+    this.lines[bottom][i] = [
+      (this.defAttr & ~0x1ff) | 4,
+      key
+    ];
+    this.x++;
+    this.refresh(this.rows - 1, this.rows - 1);
+    this.refresh(this.y, this.y);
+    return;
+  }
+
+  return false;
 };
 
 /**
@@ -4141,18 +6112,22 @@ function inherits(child, parent) {
   child.prototype = new f;
 }
 
-var isMac = ~navigator.userAgent.indexOf('Mac');
-
 // if bold is broken, we can't
 // use it in the terminal.
-function isBoldBroken() {
+function isBoldBroken(document) {
+  var body = document.getElementsByTagName('body')[0];
+  var terminal = document.createElement('div');
+  terminal.className = 'terminal';
+  var line = document.createElement('div');
   var el = document.createElement('span');
   el.innerHTML = 'hello world';
-  document.body.appendChild(el);
+  line.appendChild(el);
+  terminal.appendChild(line);
+  body.appendChild(terminal);
   var w1 = el.scrollWidth;
   el.style.fontWeight = 'bold';
   var w2 = el.scrollWidth;
-  document.body.removeChild(el);
+  body.removeChild(terminal);
   return w1 !== w2;
 }
 
@@ -4160,12 +6135,128 @@ var String = this.String;
 var setTimeout = this.setTimeout;
 var setInterval = this.setInterval;
 
+function indexOf(obj, el) {
+  var i = obj.length;
+  while (i--) {
+    if (obj[i] === el) return i;
+  }
+  return -1;
+}
+
+/* Ref: https://github.com/ajaxorg/ace/blob/0c66e1eda418477a9efbd0d3ef61698478cc607f/lib/ace/edit_session.js#L2434 */
+function isFullWidth(c) {
+    if (c < 0x1100)
+        return false;
+    return c >= 0x1100 && c <= 0x115F ||
+           c >= 0x11A3 && c <= 0x11A7 ||
+           c >= 0x11FA && c <= 0x11FF ||
+           c >= 0x2329 && c <= 0x232A ||
+           c >= 0x2E80 && c <= 0x2E99 ||
+           c >= 0x2E9B && c <= 0x2EF3 ||
+           c >= 0x2F00 && c <= 0x2FD5 ||
+           c >= 0x2FF0 && c <= 0x2FFB ||
+           c >= 0x3000 && c <= 0x303E ||
+           c >= 0x3041 && c <= 0x3096 ||
+           c >= 0x3099 && c <= 0x30FF ||
+           c >= 0x3105 && c <= 0x312D ||
+           c >= 0x3131 && c <= 0x318E ||
+           c >= 0x3190 && c <= 0x31BA ||
+           c >= 0x31C0 && c <= 0x31E3 ||
+           c >= 0x31F0 && c <= 0x321E ||
+           c >= 0x3220 && c <= 0x3247 ||
+           c >= 0x3250 && c <= 0x32FE ||
+           c >= 0x3300 && c <= 0x4DBF ||
+           c >= 0x4E00 && c <= 0xA48C ||
+           c >= 0xA490 && c <= 0xA4C6 ||
+           c >= 0xA960 && c <= 0xA97C ||
+           c >= 0xAC00 && c <= 0xD7A3 ||
+           c >= 0xD7B0 && c <= 0xD7C6 ||
+           c >= 0xD7CB && c <= 0xD7FB ||
+           c >= 0xF900 && c <= 0xFAFF ||
+           c >= 0xFE10 && c <= 0xFE19 ||
+           c >= 0xFE30 && c <= 0xFE52 ||
+           c >= 0xFE54 && c <= 0xFE66 ||
+           c >= 0xFE68 && c <= 0xFE6B ||
+           c >= 0xFF01 && c <= 0xFF60 ||
+           c >= 0xFFE0 && c <= 0xFFE6;
+};
+
+function isWide(ch) {
+  var c = ch.charCodeAt(0);
+  return isFullWidth(c);
+}
+
+function matchColor(r1, g1, b1) {
+  var hash = (r1 << 16) | (g1 << 8) | b1;
+
+  if (matchColor._cache[hash] != null) {
+    return matchColor._cache[hash];
+  }
+
+  var ldiff = Infinity
+    , li = -1
+    , i = 0
+    , c
+    , r2
+    , g2
+    , b2
+    , diff;
+
+  for (; i < Terminal.vcolors.length; i++) {
+    c = Terminal.vcolors[i];
+    r2 = c[0];
+    g2 = c[1];
+    b2 = c[2];
+
+    diff = matchColor.distance(r1, g1, b1, r2, g2, b2);
+
+    if (diff === 0) {
+      li = i;
+      break;
+    }
+
+    if (diff < ldiff) {
+      ldiff = diff;
+      li = i;
+    }
+  }
+
+  return matchColor._cache[hash] = li;
+}
+
+matchColor._cache = {};
+
+// http://stackoverflow.com/questions/1633828
+matchColor.distance = function(r1, g1, b1, r2, g2, b2) {
+  return Math.pow(30 * (r1 - r2), 2)
+    + Math.pow(59 * (g1 - g2), 2)
+    + Math.pow(11 * (b1 - b2), 2);
+};
+
+function each(obj, iter, con) {
+  if (obj.forEach) return obj.forEach(iter, con);
+  for (var i = 0; i < obj.length; i++) {
+    iter.call(con, obj[i], i, obj);
+  }
+}
+
+function keys(obj) {
+  if (Object.keys) return Object.keys(obj);
+  var key, keys = [];
+  for (key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      keys.push(key);
+    }
+  }
+  return keys;
+}
+
 /**
  * Expose
  */
 
 Terminal.EventEmitter = EventEmitter;
-Terminal.isMac = isMac;
+Terminal.Stream = Stream;
 Terminal.inherits = inherits;
 Terminal.on = on;
 Terminal.off = off;

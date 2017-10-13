@@ -67,7 +67,7 @@ class Asset(models.Model):
     port = models.IntegerField(blank=True, null=True, verbose_name=u"端口号")
     group = models.ManyToManyField(AssetGroup, blank=True, verbose_name=u"所属主机组")
     username = models.CharField(max_length=16, blank=True, null=True, verbose_name=u"管理用户名")
-    password = models.CharField(max_length=64, blank=True, null=True, verbose_name=u"密码")
+    password = models.CharField(max_length=256, blank=True, null=True, verbose_name=u"密码")
     use_default_auth = models.BooleanField(default=True, verbose_name=u"使用默认管理账号")
     idc = models.ForeignKey(IDC, blank=True, null=True,  on_delete=models.SET_NULL, verbose_name=u'机房')
     mac = models.CharField(max_length=20, blank=True, null=True, verbose_name=u"MAC地址")

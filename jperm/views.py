@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 from django.db.models import Q
 from django.http import HttpResponseBadRequest, HttpResponseNotAllowed
@@ -10,10 +11,11 @@ from jasset.models import Asset, AssetGroup
 from jperm.models import PermRole, PermRule, PermSudo, PermPush
 from jumpserver.models import Setting
 
-from jperm.utils import gen_keys
+from jperm.utils import gen_keys, trans_all
 from jperm.ansible_api import MyTask
 from jperm.perm_api import get_role_info, get_role_push_host
 from jumpserver.api import my_render, get_object, CRYPTOR
+
 
 # 设置PERM APP Log
 from jumpserver.api import logger
@@ -37,7 +39,7 @@ def perm_rule_list(request):
         rules_list = rules_list.filter(id=rule_id)
 
     if keyword:
-        rules_list = rules_list.filter(Q(name=keyword))
+        rules_list = rules_list.filter(Q(name__icontains=keyword))
 
     rules_list, p, rules, page_range, current_page, show_first, show_end = pages(rules_list, request)
 
@@ -79,6 +81,7 @@ def perm_rule_detail(request):
     return my_render('jperm/perm_rule_detail.html', locals(), request)
 
 
+@require_role('admin')
 def perm_rule_add(request):
     """
     add rule page
@@ -289,6 +292,8 @@ def perm_role_add(request):
             if name == "root":
                 raise ServerError(u'禁止使用root用户作为系统用户，这样非常危险！')
             default = get_object(Setting, name='default')
+            if len(password) > 64:
+                raise ServerError(u'密码长度不能超过64位!')
 
             if password:
                 encrypt_pass = CRYPTOR.encrypt(password)
@@ -329,7 +334,6 @@ def perm_role_delete(request):
                 raise ServerError(u"role_id %s 无数据记录" % role_id)
             # 删除推送到主机上的role
             filter_type = request.GET.get("filter_type")
-            print filter_type
             if filter_type:
                 if filter_type == "recycle_assets":
                     recycle_assets = [push.asset for push in role.perm_push.all() if push.success]
@@ -413,6 +417,7 @@ def perm_role_detail(request):
             users = role_info.get("users")
             user_groups = role_info.get("user_groups")
             pushed_asset, need_push_asset = get_role_push_host(get_object(PermRole, id=role_id))
+
     except ServerError, e:
         logger.warning(e)
 
@@ -445,6 +450,8 @@ def perm_role_edit(request):
         role_sudo_names = request.POST.getlist("sudo_name")
         role_sudos = [PermSudo.objects.get(id=sudo_id) for sudo_id in role_sudo_names]
         key_content = request.POST.get("role_key", "")
+        if len(role_password) > 64:
+            raise ServerError(u'密码长度不能超过64位!')
 
         try:
             if not role:
@@ -512,21 +519,23 @@ def perm_role_push(request):
         task = MyTask(push_resource)
         ret = {}
 
-        # 因为要先建立用户，所以password 是必选项，而push key是在 password也完成的情况下的 可选项
+        # 因为要先建立用户，而push key是在 password也完成的情况下的 可选项
         # 1. 以秘钥 方式推送角色
         if key_push:
-            ret["pass_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
+            ret["pass_push"] = task.add_user(role.name)
             ret["key_push"] = task.push_key(role.name, os.path.join(role.key_path, 'id_rsa.pub'))
 
-        # 2. 推送账号密码
-        elif password_push:
-            ret["pass_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
+        # 2. 推送账号密码 <为了安全 系统用户统一使用秘钥进行通信， 不再提供密码方式的推送>
+        # elif password_push:
+        #     ret["pass_push"] = task.add_user(role.name, CRYPTOR.decrypt(role.password))
 
         # 3. 推送sudo配置文件
-        if password_push or key_push:
+        if key_push:
             sudo_list = set([sudo for sudo in role.sudo.all()])  # set(sudo1, sudo2, sudo3)
             if sudo_list:
                 ret['sudo'] = task.push_sudo_file([role], sudo_list)
+            else:
+                ret['sudo'] = task.recyle_cmd_alias(role.name)
 
         logger.debug('推送role结果: %s' % ret)
         success_asset = {}
@@ -570,7 +579,7 @@ def perm_role_push(request):
         if not failed_asset:
             msg = u'系统用户 %s 推送成功[ %s ]' % (role.name, ','.join(success_asset.keys()))
         else:
-            error = u'系统用户 %s 推送失败 [ %s ], 推送成功 [ %s ] 进入系统用户详情，查看失败原因' % (role.name,
+            error = u'系统用户 %s 推送失败 [ %s ], 推送成功 [ %s ] 请点系统用户->点对应名称->点失败，查看失败原因' % (role.name,
                                                                 ','.join(failed_asset.keys()),
                                                                 ','.join(success_asset.keys()))
     return my_render('jperm/perm_role_push.html', locals(), request)
@@ -619,7 +628,9 @@ def perm_sudo_add(request):
                 raise ServerError(u"sudo name 和 commands是必填项!")
 
             pattern = re.compile(r'[\n,\r]')
-            commands = ', '.join(list_drop_str(pattern.split(commands), u''))
+            deal_space_commands = list_drop_str(pattern.split(commands), u'')
+            deal_all_commands = map(trans_all, deal_space_commands)
+            commands = ', '.join(deal_all_commands)
             logger.debug(u'添加sudo %s: %s' % (name, commands))
 
             if get_object(PermSudo, name=name):
@@ -656,7 +667,9 @@ def perm_sudo_edit(request):
                 raise ServerError(u"sudo name 和 commands是必填项!")
 
             pattern = re.compile(r'[\n,\r]')
-            commands = ', '.join(list_drop_str(pattern.split(commands), u'')).strip()
+            deal_space_commands = list_drop_str(pattern.split(commands), u'')
+            deal_all_commands = map(trans_all, deal_space_commands)
+            commands = ', '.join(deal_all_commands).strip()
             logger.debug(u'添加sudo %s: %s' % (name, commands))
 
             sudo.name = name.strip()
@@ -701,8 +714,14 @@ def perm_role_recycle(request):
             recycle_assets.append(asset)
     recycle_resource = gen_resource(recycle_assets)
     task = MyTask(recycle_resource)
-    # TODO: 判断返回结果，处理异常
-    msg = task.del_user(get_object(PermRole, id=role_id).name)
+    try:
+        msg_del_user = task.del_user(get_object(PermRole, id=role_id).name)
+        msg_del_sudo = task.del_user_sudo(get_object(PermRole, id=role_id).name)
+        logger.info("recycle user msg: %s" % msg_del_user)
+        logger.info("recycle sudo msg: %s" % msg_del_sudo)
+    except Exception, e:
+        logger.warning("Recycle Role failed: %s" % e)
+        raise ServerError(u"回收已推送的系统用户失败: %s" % e)
 
     for asset_id in asset_ids:
         asset = get_object(Asset, id=asset_id)

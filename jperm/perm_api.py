@@ -182,8 +182,9 @@ def gen_resource(ob, perm=None):
                 info = {'hostname': asset.hostname,
                         'ip': asset.ip,
                         'port': asset_info.get('port', 22),
+                        'ansible_ssh_private_key_file': role_key,
                         'username': role.name,
-                        'password': CRYPTOR.decrypt(role.password)
+                        # 'password': CRYPTOR.decrypt(role.password)
                        }
 
                 if os.path.isfile(role_key):

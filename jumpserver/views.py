@@ -19,6 +19,7 @@ from jlog.models import Log, FileLog
 from jperm.perm_api import get_group_user_perm, gen_resource
 from jasset.models import Asset, IDC
 from jperm.ansible_api import MyRunner
+import zipfile
 
 
 def getDaysByNum(num):
@@ -220,41 +221,46 @@ def setting(request):
     setting_default = get_object(Setting, name='default')
 
     if request.method == "POST":
-        setting_raw = request.POST.get('setting', '')
-        if setting_raw == 'default':
-            username = request.POST.get('username', '')
-            port = request.POST.get('port', '')
-            password = request.POST.get('password', '')
-            private_key = request.POST.get('key', '')
+        try:
+            setting_raw = request.POST.get('setting', '')
+            if setting_raw == 'default':
+                username = request.POST.get('username', '')
+                port = request.POST.get('port', '')
+                password = request.POST.get('password', '')
+                private_key = request.POST.get('key', '')
 
-            if '' in [username, port]:
-                return HttpResponse('所填内容不能为空, 且密码和私钥填一个')
-            else:
-                private_key_dir = os.path.join(BASE_DIR, 'keys', 'default')
-                private_key_path = os.path.join(private_key_dir, 'admin_user.pem')
-                mkdir(private_key_dir)
+                if len(password) > 30:
+                    raise ServerError(u'秘密长度不能超过30位!')
 
-                if private_key:
-                    with open(private_key_path, 'w') as f:
-                            f.write(private_key)
-                    os.chmod(private_key_path, 0600)
-
-                if setting_default:
-                    if password:
-                        password_encode = CRYPTOR.encrypt(password)
-                    else:
-                        password_encode = password
-                    Setting.objects.filter(name='default').update(field1=username, field2=port,
-                                                                  field3=password_encode,
-                                                                  field4=private_key_path)
-
+                if '' in [username, port]:
+                    return ServerError(u'所填内容不能为空, 且密码和私钥填一个')
                 else:
-                    password_encode = CRYPTOR.encrypt(password)
-                    setting_r = Setting(name='default', field1=username, field2=port,
-                                        field3=password_encode,
-                                        field4=private_key_path).save()
+                    private_key_dir = os.path.join(BASE_DIR, 'keys', 'default')
+                    private_key_path = os.path.join(private_key_dir, 'admin_user.pem')
+                    mkdir(private_key_dir)
 
-            msg = "设置成功"
+                    if private_key:
+                        with open(private_key_path, 'w') as f:
+                                f.write(private_key)
+                        os.chmod(private_key_path, 0600)
+
+                    if setting_default:
+                        if password:
+                            password_encode = CRYPTOR.encrypt(password)
+                        else:
+                            password_encode = password
+                        Setting.objects.filter(name='default').update(field1=username, field2=port,
+                                                                      field3=password_encode,
+                                                                      field4=private_key_path)
+
+                    else:
+                        password_encode = CRYPTOR.encrypt(password)
+                        setting_r = Setting(name='default', field1=username, field2=port,
+                                            field3=password_encode,
+                                            field4=private_key_path).save()
+                        msg = "设置成功"
+        except ServerError as e:
+            error = e.message
     return my_render('setting.html', locals(), request)
 
 
@@ -286,7 +292,7 @@ def upload(request):
         res = gen_resource({'user': user, 'asset': asset_select})
         runner = MyRunner(res)
         runner.run('copy', module_args='src=%s dest=%s directory_mode'
-                                        % (upload_dir, upload_dir), pattern='*')
+                                        % (upload_dir, '/tmp'), pattern='*')
         ret = runner.results
         logger.debug(ret)
         FileLog(user=request.user.username, host=' '.join([asset.hostname for asset in asset_select]),
@@ -326,15 +332,19 @@ def download(request):
         FileLog(user=request.user.username, host=' '.join([asset.hostname for asset in asset_select]),
                 filename=file_path, type='download', remote_ip=remote_ip, result=runner.results).save()
         logger.debug(runner.results)
-        os.chdir('/tmp')
         tmp_dir_name = os.path.basename(upload_dir)
-        tar_file = '%s.tar.gz' % upload_dir
-        bash('tar czf %s %s' % (tar_file, tmp_dir_name))
-        f = open(tar_file)
+        file_zip = '/tmp/'+tmp_dir_name+'.zip'
+        zf = zipfile.ZipFile(file_zip, "w", zipfile.ZIP_DEFLATED)
+        for dirname, subdirs, files in os.walk(upload_dir):
+            zf.write(dirname)
+            for filename in files:
+                zf.write(os.path.join(dirname, filename))
+        zf.close()
+        f = open(file_zip)
         data = f.read()
         f.close()
         response = HttpResponse(data, content_type='application/octet-stream')
-        response['Content-Disposition'] = 'attachment; filename=%s' % os.path.basename(tar_file)
+        response['Content-Disposition'] = 'attachment; filename=%s.zip' % tmp_dir_name
         return response
 
     return render_to_response('download.html', locals(), context_instance=RequestContext(request))
@@ -344,7 +354,7 @@ def download(request):
 def exec_cmd(request):
     role = request.GET.get('role')
     check_assets = request.GET.get('check_assets', '')
-    web_terminal_uri = '%s/exec?role=%s' % (WEB_SOCKET_HOST, role)
+    web_terminal_uri = '/ws/exec?role=%s' % (role)
     return my_render('exec_cmd.html', locals(), request)
 
 
@@ -354,9 +364,7 @@ def web_terminal(request):
     role_name = request.GET.get('role')
     asset = get_object(Asset, id=asset_id)
     if asset:
-        print asset
         hostname = asset.hostname
-    web_terminal_uri = '%s/terminal?id=%s&role=%s' % (WEB_SOCKET_HOST, asset_id, role_name)
     return render_to_response('jlog/web_terminal.html', locals())
 
 
