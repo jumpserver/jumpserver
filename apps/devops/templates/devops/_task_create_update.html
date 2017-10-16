@@ -1,0 +1,102 @@
+{% extends '_base_create_update.html' %}
+{% load i18n %}
+{% load bootstrap3 %}
+{% load static %}
+
+
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+{% endblock %}
+
+{% block form %}
+    {#  没输入的field错误   #}
+    {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+            {{ form.non_field_errors }}
+        </div>
+    {% endif %}
+    <form method="post" class="form-horizontal" action="" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% block title %}{% endblock %}
+
+        <h3>{% trans 'basic' %}</h3>
+        {% bootstrap_field form.name layout="horizontal" %}
+        {% bootstrap_field form.desc layout="horizontal" %}
+        <div class="hr-line-dashed"></div>
+
+        <h3>{% trans 'Ansible' %}</h3>
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="role_install">{% trans 'Install Role' %}(Optional)</label>
+            <div class="col-md-9">
+                <input placeholder="请输入ansible-galaxy中的username.rolename" class="form-control" type="text"
+                       id="role_install" style="width: 84%;display: inline-block" tabindex="4">
+                <button class="btn btn-primary float-right" type="button" style="width: 15%;"
+                        id="role_install_btn">{% trans 'install' %}</button>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="role_selected">{% trans 'Role Name' %}</label>
+            <div class="col-md-9">
+                <select data-placeholder="请选择" id="role_selected" class="select2 form-control" tabindex="4">
+                </select>
+            </div>
+        </div>
+        {% bootstrap_field form.tags layout="horizontal" %}
+
+        <div class="hr-line-dashed"></div>
+        <h3>{% trans 'Play Options' %}</h3>
+        {% bootstrap_field form.admin_user layout="horizontal" %}
+        {% bootstrap_field form.system_user layout="horizontal" %}
+
+        <div class="hr-line-dashed"></div>
+        <div class="form-group">
+            <div class="col-sm-4 col-sm-offset-2">
+                <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+                <button id="submit_button" class="btn btn-primary" type="button">{% trans 'Submit' %}</button>
+            </div>
+        </div>
+    </form>
+
+{% endblock %}
+
+{% block  custom_foot_js %}
+    <script>
+        $(document).ready(function () {
+            $('.select2').select2({
+                multiple: false,
+                //ajax查询all role
+                ajax: {
+                    url: '{% url 'api-devops:role-list' %}',
+                    dataType: 'json',
+                    processResults: function (data) {
+                        let results = $(data).each(function (index, element) {
+                            element.text = element.name
+                        })
+                        return {results: results};//必须赋值给results并且必须返回一个obj
+                    }
+                },
+                minimumResultsForSearch: Infinity
+            });
+
+            $('#role_install_btn').click(function () {
+
+                let the_url = "{% url 'api-devops:role-install' %}";
+                let success = function (data) {
+                    toastr.success("安装"+data.name+"成功")
+                };
+                APIUpdateAttr({
+                    url: the_url,
+                    success: success,
+                    method: 'POST',
+                    success_message: '提交任务成功',
+                    body: JSON.stringify({name: $('#role_install').val()})
+                })
+            })
+        })
+
+
+    </script>
+{% endblock %}

@@ -3,7 +3,7 @@
 
 {% block content_left_head %}
     <div class="uc pull-left m-l-5 m-r-5">
-        <a href="#" class="btn btn-sm btn-primary">
+        <a href="{% url 'devops:task-create' %}" class="btn btn-sm btn-primary">
             {% trans "Create Task" %}
         </a>
     </div>{% endblock %}

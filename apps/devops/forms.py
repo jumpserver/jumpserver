@@ -5,17 +5,16 @@ from django.utils.translation import gettext_lazy as _
 from .models import *
 
 
-class InstallUpdateForm(forms.ModelForm):
+class TaskForm(forms.ModelForm):
     class Meta:
-        model = InstallTemplate
+        model = Task
         fields = [
-            'hybris_path', 'deploy_path', 'deploy_jrebel', 'jrebel_path', 'db_driver_url',
+            'name', 'desc', 'tags', 'ansible_role', 'system_user', 'admin_user'
         ]
         help_texts = {
             'deploy_path': '* required',
             'jrebel_path': '* required',
         }
         widgets = {
-            'hybris_path': forms.TextInput(attrs={'readonly': True}),
-            'db_driver_url': forms.URLInput()
+            'desc': forms.Textarea(),
         }

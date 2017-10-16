@@ -5,5 +5,5 @@ from ops.tasks import run_AdHoc
 
 
 @shared_task
-def submit_template_task(assets):
-    print(11)
+def ansible_install_role(role_name):
+    print(112)

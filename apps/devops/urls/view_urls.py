@@ -9,5 +9,6 @@ from .. import views
 app_name = 'devops'
 
 urlpatterns = [
-    url(r'^tasks/$', views.TaskListView.as_view(), name='task-list'),
+    url(r'^task/$', views.TaskListView.as_view(), name='task-list'),
+    url(r'^task/create$', views.TaskCreateView.as_view(), name='task-create'),
 ]
