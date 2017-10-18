@@ -201,13 +201,14 @@ function APIUpdateAttr(props) {
         toastr.success(success_message);
         if (typeof props.success === 'function') {
             return props.success(data);
-        } 
-      
+        }
+
     }).fail(function(jqXHR, textStatue, errorThrown) {
+        //此处让ajax显示详细的错误信息
         toastr.error(fail_message);
         if (typeof props.error === 'function') {
-            return props.error(errorThrown);
-        } 
+            return props.error(jqXHR);
+        }
     });
   // return true;
 }
@@ -245,7 +246,7 @@ function objectDelete(obj, name, url, redirectTo) {
         confirmButtonText: 'Confirm',
         closeOnConfirm: false
     }, function () {
-        doDelete()       
+        doDelete()
     });
 }
 

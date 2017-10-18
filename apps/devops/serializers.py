@@ -15,7 +15,8 @@ class AnsibleRoleSerializer(serializers.ModelSerializer):
 
 class TaskSerializer(serializers.ModelSerializer):
     ansible_role_name = serializers.SerializerMethodField()
-    tags = serializers.ListField()
+    tags = serializers.ListField(required=False, child=serializers.CharField())
+
     # system_user = SystemUserSerializer()
 
     class Meta:

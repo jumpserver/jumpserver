@@ -57,8 +57,8 @@
                     {
                         targets: 5,
                         createdCell: function (td, cellData, rowData) {
-                            var update_btn = '<a href="{% url "users:user-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
-                            var del_btn = '<a class="btn btn-xs btn-danger m-l-xs" data-uid="99991937" data-name="99991938">{% trans "Delete" %}</a>'
+                            let update_btn = '<a href="{% url "users:user-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
+                            let del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-task-delete" data-uid="99991937" data-name="99991938">{% trans "Delete" %}</a>'
                                 .replace('99991937', cellData)
                                 .replace('99991938', rowData.name);
                             $(td).html(update_btn + del_btn)
@@ -70,7 +70,18 @@
                 ajax_url: '{% url "api-devops:task-list" %}'
             }
             jumpserver.initDataTable(options);
-        });
+
+
+        })
+            .on('click','.btn-task-delete',function () {
+                //确认删除
+                let $this = $(this);
+                let name = $this.data('name');
+                let uid = $this.data('uid');
+                let the_url = '{% url "api-devops:task-detail" pk=99991937 %}'.replace('99991937', uid);
+                objectDelete($this, name, the_url);
+            })
+
 
     </script>
 

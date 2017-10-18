@@ -29,18 +29,18 @@
 
         <h3>{% trans 'Ansible' %}</h3>
         <div class="form-group">
-            <label class="col-md-2 control-label" for="role_install">{% trans 'Install Role' %}(Optional)</label>
+            <label class="col-md-2 control-label" for="id_role_install">{% trans 'Install Role' %}(Optional)</label>
             <div class="col-md-9">
                 <input placeholder="请输入ansible-galaxy中的username.rolename[,version]" class="form-control" type="text"
-                       id="role_install" style="width: 84%;display: inline-block" tabindex="4">
+                       id="id_role_install" style="width: 84%;display: inline-block" tabindex="4">
                 <button class="btn btn-primary float-right" type="button" style="width: 15%;"
                         id="role_install_btn">{% trans 'install' %}</button>
             </div>
         </div>
         <div class="form-group">
-            <label class="col-md-2 control-label" for="role_selected">{% trans 'Role Name' %}</label>
+            <label class="col-md-2 control-label" for="id_ansible_role">{% trans 'Role Name' %}</label>
             <div class="col-md-9">
-                <select data-placeholder="请选择" id="role_selected" name="ansible_role" class="select2 form-control"
+                <select data-placeholder="请选择" id="id_ansible_role" name="ansible_role" class="select2 form-control"
                         tabindex="4">
                 </select>
             </div>
@@ -48,7 +48,7 @@
         <div class="form-group">
             <label class="col-md-2 control-label" for="tags">{% trans 'Tags' %}</label>
             <div class="col-md-9">
-                <select data-placeholder="请输入要执行的Tag,按Enter输入" id="tags" name="tags" class="select2 form-control"
+                <select data-placeholder="请输入要执行的Tag,按Enter输入" id="id_tags" name="tags" class="select2 form-control"
                         tabindex="4">
                 </select>
             </div>
@@ -68,7 +68,7 @@
 {% block  custom_foot_js %}
     <script>
         $(document).ready(function () {
-            $('#role_selected').select2({
+            $('#id_ansible_role').select2({
                 //ajax查询all role
                 ajax: {
                     url: '{% url 'api-devops:role-list' %}',
@@ -83,7 +83,7 @@
                 minimumResultsForSearch: Infinity //禁止输入
             });
 
-            $('#tags').select2({
+            $('#id_tags').select2({
                 tags: true,
                 multiple: true
             });
@@ -119,19 +119,31 @@
             $('#submit_button').click(function () {
                 let the_url = "{% url 'api-devops:task-list' %}";
                 let data = JSON.stringify($('#form').serializeObject());
-                let success = function (data) {
-                    location.href = "{% url 'devops:task-list' %}";
+                let success = function () {
+{#                    location.href = "{% url 'devops:task-list' %}";#}
+                }
+                let error = function (data) {
+                    APIFormError(data.responseJSON)
                 }
                 APIUpdateAttr({
                     url: the_url,
                     method: 'POST',
                     success_message: "保存成功",
                     success: success,
+                    error: error,
                     body: data
                 })
             })
         })
 
+        function APIFormError(data) {
+            Object.keys(data).forEach((key, i) => {
+                $form_group = $('#id_' + key).parents('.form-group')
+                $form_group.find('.error').remove()
+                $form_group.addClass('has-error')
+                $('#id_' + key).parent().append('<div class="help-block error">'+data[key]+'</div>')
+            })
+        }
 
     </script>
 {% endblock %}
