@@ -8,7 +8,7 @@ import uuid
 from paramiko.rsakey import RSAKey
 from django.conf import settings
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.urls import reverse_lazy
+from django.contrib.auth import authenticate
 from django.utils.translation import ugettext as _
 from django.core.cache import cache
 
@@ -140,7 +140,7 @@ def check_user_valid(**kwargs):
     elif not user.is_valid:
         return None, _('Disabled or expired')
 
-    if password and user.password and user.check_password(password):
+    if password and authenticate(username=username, password=password):
         return user, ''
 
     if public_key and user.public_key:

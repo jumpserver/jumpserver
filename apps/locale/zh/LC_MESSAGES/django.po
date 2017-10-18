@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-10-16 11:22+0800\n"
+"POT-Creation-Date: 2017-09-28 07:10+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -317,8 +317,7 @@ msgid ""
 msgstr "你可以使用ssh客户端工具连接终端"
 
 #: assets/forms.py:22 assets/forms.py:53 assets/forms.py:92
-#: assets/templates/assets/admin_user_detail.html:199
-#: hybris/templates/hybris/install_template_detail.html:131 perms/forms.py:30
+#: assets/templates/assets/admin_user_detail.html:199 perms/forms.py:30
 #: perms/templates/perms/asset_permission_asset.html:137 users/forms.py:187
 #: users/forms.py:213
 msgid "Select asset groups"
@@ -345,9 +344,9 @@ msgid "Select admin user"
 msgstr "选择管理用户"
 
 #: assets/forms.py:72 assets/forms.py:76 assets/forms.py:117
-#: assets/forms.py:149 hybris/templates/hybris/install_template_detail.html:99
-#: perms/forms.py:27 perms/templates/perms/asset_permission_asset.html:109
-#: users/forms.py:184 users/forms.py:210
+#: assets/forms.py:149 perms/forms.py:27
+#: perms/templates/perms/asset_permission_asset.html:109 users/forms.py:184
+#: users/forms.py:210
 msgid "Select assets"
 msgstr "选择资产"
 
@@ -694,7 +693,7 @@ msgstr ""
 #: assets/views/group.py:53 assets/views/group.py:73 assets/views/group.py:98
 #: assets/views/idc.py:22 assets/views/idc.py:87 assets/views/system_user.py:30
 #: assets/views/system_user.py:49 assets/views/system_user.py:73
-#: assets/views/system_user.py:100 devops/models.py:21 templates/_nav.html:18
+#: assets/views/system_user.py:100 templates/_nav.html:18
 msgid "Assets"
 msgstr "资产管理"
 
@@ -729,14 +728,12 @@ msgid "Download"
 msgstr "下载"
 
 #: assets/templates/assets/_asset_import_modal.html:13
-#, fuzzy
-#| msgid "Asset excel file"
 msgid "Asset csv file"
-msgstr "资产excel"
+msgstr "资产csv文件"
 
 #: assets/templates/assets/_asset_import_modal.html:16
 msgid "If set id, will use this id update asset existed"
-msgstr ""
+msgstr "如果设置了id，则会使用该行信息更新该id的资产"
 
 #: assets/templates/assets/_system_user.html:16
 #: assets/templates/assets/system_user_list.html:9
@@ -769,7 +766,6 @@ msgstr "创建管理用户"
 #: assets/templates/assets/idc_detail.html:17
 #: assets/templates/assets/system_user_asset.html:17
 #: assets/templates/assets/system_user_detail.html:18
-#: hybris/templates/hybris/install_template_detail.html:20
 #: perms/templates/perms/asset_permission_asset.html:18
 #: perms/templates/perms/asset_permission_detail.html:18
 #: perms/templates/perms/asset_permission_user.html:18
@@ -1912,15 +1908,14 @@ msgstr ""
 "                "
 
 #: templates/base.html:37
-#, python-format
 msgid ""
 "\n"
-"                Your ssh-public-key has been expired. Please click <a href="
-"\"%(user_pubkey_update)s\"> this link </a>to update your ssh-public-key.\n"
+"                Your ssh public key not set or expired. Please click <a href="
+"\"%(user_pubkey_update)s\"> this link </a>to update your\n"
 "                "
 msgstr ""
 "\n"
-"                你的SSH key已经过期,点击  <a href=\"%(user_pubkey_update)s"
+"                你的SSH Key没有设置或已经过期,点击  <a href=\"%(user_pubkey_update)s"
 "\"> 链接 </a>更新 \n"
 "                "
 
@@ -2079,16 +2074,16 @@ msgid "Import user"
 msgstr "导入"
 
 #: users/templates/users/_user_import_modal.html:6
-msgid "Download template or use export excel format"
+msgid "Download template or use export csv format"
 msgstr "下载模板"
 
 #: users/templates/users/_user_import_modal.html:14
-msgid "Users excel file"
-msgstr "用户excel"
+msgid "Users csv file"
+msgstr "用户csv文件"
 
 #: users/templates/users/_user_import_modal.html:16
-msgid "If set id, will use this id update existed"
-msgstr ""
+msgid "If set id, will use this id update user existed"
+msgstr "如果设置了id，则会使用该行信息更新该id的用户"
 
 #: users/templates/users/_user_update_pk_modal.html:4
 msgid "Update User SSH Public Key"

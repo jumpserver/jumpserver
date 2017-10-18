@@ -70,7 +70,7 @@ class TaskDetailView(DetailView):
         context = {
             'app': 'Ops',
             'action': 'Task record detail',
-            'results': json.loads(self.object.summary),
+            'results': json.loads(self.object.summary or '{}'),
         }
         kwargs.update(context)
         return super(TaskDetailView, self).get_context_data(**kwargs)

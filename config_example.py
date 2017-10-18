@@ -100,7 +100,8 @@ class Config:
     AUTH_LDAP_SERVER_URI = 'ldap://localhost:389'
     AUTH_LDAP_BIND_DN = 'cn=admin,dc=jumpserver,dc=org'
     AUTH_LDAP_BIND_PASSWORD = ''
-    AUTH_LDAP_USER_DN_TEMPLATE = "uid=%(user)s,ou=people,dc=jumpserver,dc=org"
+    AUTH_LDAP_SEARCH_OU = 'ou=tech,dc=jumpserver,dc=org'
+    AUTH_LDAP_SEARCH_FILTER = '(cn=%(user)s)'
     AUTH_LDAP_USER_ATTR_MAP = {
         "username": "cn",
         "name": "sn",
