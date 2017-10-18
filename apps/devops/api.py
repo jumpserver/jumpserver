@@ -1,15 +1,13 @@
 # ~*~ coding: utf-8 ~*~
 
 
-from rest_framework import viewsets, generics
-
-from .tasks import ansible_install_role
-from .hands import IsSuperUserOrAppUser
-from .models import *
-from .serializers import *
-from django.core.exceptions import ValidationError
 from rest_framework import status
+from rest_framework import viewsets, generics
 from rest_framework.response import Response
+
+from .hands import IsSuperUserOrAppUser
+from .serializers import *
+from .tasks import ansible_install_role
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -54,9 +52,7 @@ class InstallRoleView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        #: 安装成功返回数据库中存在的Role  不成功的数据没有id
-        if self.result:
-            name = str(serializer.data['name']).split(',')[0]
-            serializer = AnsibleRoleSerializer(self.get_queryset().get(name=name))
-            headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        headers = self.get_success_headers(serializer.data)
+        #: 安装失败返回错误
+        return Response(serializer.data, status=status.HTTP_201_CREATED if self.result else status.HTTP_400_BAD_REQUEST,
+                        headers=headers)

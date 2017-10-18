@@ -9,11 +9,10 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = [
-            'name', 'desc', 'tags', 'ansible_role', 'system_user', 'admin_user'
+            'name', 'desc', 'tags', 'ansible_role'
         ]
         help_texts = {
-            'deploy_path': '* required',
-            'jrebel_path': '* required',
+
         }
         widgets = {
             'desc': forms.Textarea(),

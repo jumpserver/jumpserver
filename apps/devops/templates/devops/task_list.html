@@ -19,7 +19,6 @@
             <th class="text-center">{% trans 'Description' %}</th>
             <th class="text-center">{% trans 'Ansible Role' %}</th>
             <th class="text-center">{% trans 'Tags' %}</th>
-            <th class="text-center">{% trans 'Execute User' %}</th>
             <th class="text-center">{% trans 'Action' %}</th>
         </tr>
         </thead>
@@ -56,7 +55,7 @@
                         }
                     },
                     {
-                        targets: 6,
+                        targets: 5,
                         createdCell: function (td, cellData, rowData) {
                             var update_btn = '<a href="{% url "users:user-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
                             var del_btn = '<a class="btn btn-xs btn-danger m-l-xs" data-uid="99991937" data-name="99991938">{% trans "Delete" %}</a>'
@@ -66,8 +65,8 @@
                         }
                     }
                 ],
-                columns: [{data: "id"}, {data: "name"}, {data: "desc"}, {data: "ansible_role"},
-                    {data: "tags"}, {data: "user"}, {data: "id"}],
+                columns: [{data: "id"}, {data: "name"}, {data: "desc"}, {data: "ansible_role_name"},
+                    {data: "tags"}, {data: "id"}],
                 ajax_url: '{% url "api-devops:task-list" %}'
             }
             jumpserver.initDataTable(options);

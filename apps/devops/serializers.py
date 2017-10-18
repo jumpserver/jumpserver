@@ -4,30 +4,25 @@ from __future__ import unicode_literals
 from rest_framework import serializers
 
 from .models import *
+from assets.serializers import SystemUserSerializer
+
+
+class AnsibleRoleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AnsibleRole
+        fields = '__all__'
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    user = serializers.SerializerMethodField()
-    ansible_role = serializers.SerializerMethodField()
+    ansible_role_name = serializers.SerializerMethodField()
+    tags = serializers.ListField()
+    # system_user = SystemUserSerializer()
 
     class Meta:
         model = Task
         fields = '__all__'
+        exclude = ('assets', 'groups',)
 
     @staticmethod
-    def get_user(obj):
-        if obj.admin_user:
-            return obj.admin_user.username
-        if obj.system_user:
-            return obj.system_user.username
-
-    @staticmethod
-    def get_ansible_role(obj):
+    def get_ansible_role_name(obj):
         return obj.ansible_role.name
-
-
-class AnsibleRoleSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = AnsibleRole
-        fields = '__all__'

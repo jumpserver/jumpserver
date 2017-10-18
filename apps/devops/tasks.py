@@ -1,7 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 from celery import shared_task
 import json
-from .utils import local_AdHoc
+from .utils import run_AdHoc
 from ansible.cli.galaxy import GalaxyCLI
 
 
@@ -15,8 +15,8 @@ def ansible_install_role(role_name):
     #: Task Name
     task_name = 'ansible-galaxy Install Role {}'.format(role_name)
 
-    summary, result = local_AdHoc(task_tuple, pattern='all',
-                                  task_name=task_name)
+    summary, result = run_AdHoc(task_tuple, pattern='all',
+                                task_name=task_name)
     #: 失败返回0 成功返回1
     if summary['failed']:
         return False

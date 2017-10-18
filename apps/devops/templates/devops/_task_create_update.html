@@ -18,7 +18,7 @@
             {{ form.non_field_errors }}
         </div>
     {% endif %}
-    <form method="post" class="form-horizontal" action="" enctype="multipart/form-data">
+    <form method="post" id="form" class="form-horizontal" action="" enctype="multipart/form-data">
         {% csrf_token %}
         {% block title %}{% endblock %}
 
@@ -40,16 +40,19 @@
         <div class="form-group">
             <label class="col-md-2 control-label" for="role_selected">{% trans 'Role Name' %}</label>
             <div class="col-md-9">
-                <select data-placeholder="请选择" id="role_selected" class="select2 form-control" tabindex="4">
+                <select data-placeholder="请选择" id="role_selected" name="ansible_role" class="select2 form-control"
+                        tabindex="4">
                 </select>
             </div>
         </div>
-        {% bootstrap_field form.tags layout="horizontal" %}
-
-        <div class="hr-line-dashed"></div>
-        <h3>{% trans 'Play Options' %}</h3>
-        {% bootstrap_field form.admin_user layout="horizontal" %}
-        {% bootstrap_field form.system_user layout="horizontal" %}
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="tags">{% trans 'Tags' %}</label>
+            <div class="col-md-9">
+                <select data-placeholder="请输入要执行的Tag,按Enter输入" id="tags" name="tags" class="select2 form-control"
+                        tabindex="4">
+                </select>
+            </div>
+        </div>
 
         <div class="hr-line-dashed"></div>
         <div class="form-group">
@@ -65,8 +68,7 @@
 {% block  custom_foot_js %}
     <script>
         $(document).ready(function () {
-            $('.select2').select2({
-                multiple: false,
+            $('#role_selected').select2({
                 //ajax查询all role
                 ajax: {
                     url: '{% url 'api-devops:role-list' %}',
@@ -78,21 +80,54 @@
                         return {results: results};//必须赋值给results并且必须返回一个obj
                     }
                 },
-                minimumResultsForSearch: Infinity
+                minimumResultsForSearch: Infinity //禁止输入
             });
 
-            $('#role_install_btn').click(function () {
+            $('#tags').select2({
+                tags: true,
+                multiple: true
+            });
 
+            {% comment %} $('#system_user').select2({
+                 //ajax查询all role
+                 ajax: {
+                     url: '{% url 'api-assets:system-user-list' %}',
+                     dataType: 'json',
+                     processResults: function (data) {
+                         let results = $(data).each(function (index, element) {
+                             element.text = element.name
+                         })
+                         return {results: results};//必须赋值给results并且必须返回一个obj
+                     }
+                 },
+                 minimumResultsForSearch: Infinity //禁止输入
+             });{% endcomment %}
+
+            $('#role_install_btn').click(function () {
+                toastr.info("安装中，请稍候。。。")
                 let the_url = "{% url 'api-devops:role-install' %}";
-                let success = function (data) {
-                    toastr.success("安装"+data.name+"成功")
-                };
+                const name = $('#role_install').val();
                 APIUpdateAttr({
                     url: the_url,
-                    success: success,
                     method: 'POST',
-                    success_message: '提交任务成功',
-                    body: JSON.stringify({name: $('#role_install').val()})
+                    success_message: "安装" + name + "成功",
+                    fail_message: "安装" + name + "失败,请检查输入或查看任务详情。",
+                    body: JSON.stringify({name: name})
+                })
+            });
+
+            $('#submit_button').click(function () {
+                let the_url = "{% url 'api-devops:task-list' %}";
+                let data = JSON.stringify($('#form').serializeObject());
+                let success = function (data) {
+                    location.href = "{% url 'devops:task-list' %}";
+                }
+                APIUpdateAttr({
+                    url: the_url,
+                    method: 'POST',
+                    success_message: "保存成功",
+                    success: success,
+                    body: data
                 })
             })
         })
