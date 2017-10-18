@@ -176,7 +176,11 @@ class AdHocRunner(object):
                                                            options=self.options)
         self.variable_manager.options_vars = load_options_vars(self.options)
         self.passwords = passwords or {}
-        self.inventory = JMSInventory(hosts)
+        if hosts is C.DEFAULT_HOST_LIST:
+            from ansible.inventory import Inventory
+            self.inventory = Inventory(loader=self.loader, variable_manager=self.variable_manager, host_list=hosts)
+        else:
+            self.inventory = JMSInventory(hosts)
         self.variable_manager.set_inventory(self.inventory)
         self.tasks = []
         self.play_source = None
