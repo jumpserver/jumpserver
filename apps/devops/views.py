@@ -6,12 +6,12 @@ import logging
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import ugettext as _
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView,UpdateView
 
 from .forms import TaskForm
+from .models import *
 from .hands import *
 
-__all__ = ['TaskListView', 'TaskCreateView']
 
 logger = logging.getLogger(__name__)
 
@@ -39,3 +39,17 @@ class TaskCreateView(AdminUserRequiredMixin, TemplateView):
         }
         kwargs.update(context)
         return super(TaskCreateView, self).get_context_data(**kwargs)
+
+
+class TaskUpdateView(AdminUserRequiredMixin, TemplateView):
+    template_name = 'devops/task_update.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Ansible'),
+            'action': _('Update Tasks'),
+            'form': TaskForm,
+            'id': kwargs['pk'],
+        }
+        kwargs.update(context)
+        return super(TaskUpdateView, self).get_context_data(**kwargs)

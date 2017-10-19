@@ -57,7 +57,7 @@
                     {
                         targets: 5,
                         createdCell: function (td, cellData, rowData) {
-                            let update_btn = '<a href="{% url "users:user-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
+                            let update_btn = '<a href="{% url "devops:task-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
                             let del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-task-delete" data-uid="99991937" data-name="99991938">{% trans "Delete" %}</a>'
                                 .replace('99991937', cellData)
                                 .replace('99991938', rowData.name);

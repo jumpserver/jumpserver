@@ -1,0 +1,66 @@
+{% extends 'devops/_task_create_update.html' %}
+{% block custom_create_update_js %}
+    <script>
+        let the_url = '{% url 'api-devops:task-detail' pk=id %}';
+
+        function load_data() {
+
+
+            let success = function (data) {
+                Object.keys(data).forEach((key, i) => {
+                    //渲染 input和textarea的值
+                    $('input[id="id_' + key + '"]').val(data[key]);
+                    $('textarea[id="id_' + key + '"]').val(data[key]);
+
+                });
+                //渲染select
+                $('#id_ansible_role').val(null).trigger('change');
+                let role = new Option(data.ansible_role_name, data.ansible_role, true, true);
+                $('#id_ansible_role').append(role).trigger('change');
+
+                $('#id_tags').empty();
+                data.tags.forEach((value, i) => {
+                    let tag = new Option(value, value, true, true)
+                    $('#id_tags').append(tag).trigger('change');
+                })
+            };
+
+            APIUpdateAttr({
+                url: the_url,
+                method: 'GET',
+                success_message: '读取成功',
+                success: success
+            })
+        }
+
+        function update_task() {
+            let form = $('#form').serializeObject()
+            if (typeof(form.tags) === "string") {
+                let tag = form.tags;
+                form.tags = new Array(tag);
+            }
+            let success = function () {
+                location.href = "{% url 'devops:task-list' %}";
+            }
+            let error = function (data) {
+                APIFormError(data.responseJSON)
+            }
+            APIUpdateAttr({
+                url: the_url,
+                method: 'PUT',
+                success_message: "更新成功",
+                success: success,
+                error: error,
+                body: JSON.stringify(form)
+            })
+        }
+
+        $(document).ready(function () {
+            //查询数据并且填充到
+            load_data();
+            $('#reset_btn').click(load_data);
+            $('#submit_btn').click(update_task);
+        })
+        ;
+    </script>
+{% endblock %}

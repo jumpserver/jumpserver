@@ -1,1 +1,28 @@
 {% extends 'devops/_task_create_update.html' %}
+{% block custom_create_update_js %}
+    <script>
+        $('#submit_btn').click(function () {
+            let the_url = "{% url 'api-devops:task-list' %}";
+            let form = $('#form').serializeObject()
+            if (typeof(form.tags)==="string") {
+                let tag = form.tags;
+                form.tags = new Array(tag);
+            }
+            let success = function () {
+                location.href = "{% url 'devops:task-list' %}";
+            }
+            let error = function (data) {
+                APIFormError(data.responseJSON)
+            }
+            APIUpdateAttr({
+                url: the_url,
+                method: 'POST',
+                success_message: "保存成功",
+                success: success,
+                error: error,
+                body: JSON.stringify(form)
+            })
+        })
+
+    </script>
+{% endblock %}

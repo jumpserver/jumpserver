@@ -41,9 +41,9 @@ class InstallRoleView(generics.CreateAPIView):
         #: 获取role name
 
         #: 执行role 安装操作
-        self.result = ansible_install_role(serializer.data['name'])
+        self.result = ansible_install_role(self.request.data['name'])
         #: 去掉参数中的版本
-        name = str(serializer.data['name']).split(',')[0]
+        name = str(self.request.data['name']).split(',')[0]
         #: 当执行成功且Role不存在时才保存
         if self.result and not self.get_queryset().filter(name=name).exists():
             serializer.save()

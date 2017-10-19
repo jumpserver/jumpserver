@@ -42,6 +42,7 @@
             <div class="col-md-9">
                 <select data-placeholder="请选择" id="id_ansible_role" name="ansible_role" class="select2 form-control"
                         tabindex="4">
+
                 </select>
             </div>
         </div>
@@ -57,8 +58,8 @@
         <div class="hr-line-dashed"></div>
         <div class="form-group">
             <div class="col-sm-4 col-sm-offset-2">
-                <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
-                <button id="submit_button" class="btn btn-primary" type="button">{% trans 'Submit' %}</button>
+                <button id="reset_btn" class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+                <button id="submit_btn" class="btn btn-primary" type="button">{% trans 'Submit' %}</button>
             </div>
         </div>
     </form>
@@ -83,6 +84,7 @@
                 minimumResultsForSearch: Infinity //禁止输入
             });
 
+
             $('#id_tags').select2({
                 tags: true,
                 multiple: true
@@ -106,7 +108,7 @@
             $('#role_install_btn').click(function () {
                 toastr.info("安装中，请稍候。。。")
                 let the_url = "{% url 'api-devops:role-install' %}";
-                const name = $('#role_install').val();
+                const name = $('#id_role_install').val();
                 APIUpdateAttr({
                     url: the_url,
                     method: 'POST',
@@ -116,34 +118,21 @@
                 })
             });
 
-            $('#submit_button').click(function () {
-                let the_url = "{% url 'api-devops:task-list' %}";
-                let data = JSON.stringify($('#form').serializeObject());
-                let success = function () {
-{#                    location.href = "{% url 'devops:task-list' %}";#}
-                }
-                let error = function (data) {
-                    APIFormError(data.responseJSON)
-                }
-                APIUpdateAttr({
-                    url: the_url,
-                    method: 'POST',
-                    success_message: "保存成功",
-                    success: success,
-                    error: error,
-                    body: data
-                })
-            })
+
         })
 
         function APIFormError(data) {
+            $('.form-group').removeClass('has-error');
+            $('div.error').remove()
             Object.keys(data).forEach((key, i) => {
-                $form_group = $('#id_' + key).parents('.form-group')
-                $form_group.find('.error').remove()
-                $form_group.addClass('has-error')
-                $('#id_' + key).parent().append('<div class="help-block error">'+data[key]+'</div>')
+                $form_group = $('#id_' + key).parents('.form-group');
+                $form_group.find('.error').remove();
+                $form_group.addClass('has-error');
+                $('#id_' + key).parent().append('<div class="help-block error">' + data[key] + '</div>')
             })
         }
 
     </script>
+    {% block custom_create_update_js %}
+    {% endblock %}
 {% endblock %}
