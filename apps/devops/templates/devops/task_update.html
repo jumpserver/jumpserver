@@ -39,8 +39,11 @@
                 let tag = form.tags;
                 form.tags = new Array(tag);
             }
+             if (typeof(form.tags) === "undefined") {
+                form.tags = [];
+            }
             let success = function () {
-                location.href = "{% url 'devops:task-list' %}";
+{#                location.href = "{% url 'devops:task-list' %}";#}
             }
             let error = function (data) {
                 APIFormError(data.responseJSON)
