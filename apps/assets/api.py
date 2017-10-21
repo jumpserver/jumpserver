@@ -23,7 +23,7 @@ from django.shortcuts import get_object_or_404
 from common.mixins import IDInFilterMixin
 from common.utils import get_object_or_none
 from .hands import IsSuperUser, IsAppUser, IsValidUser, \
-    get_user_granted_assets, push_users
+    get_user_granted_assets, push_users, IsAdminUser
 from .models import AssetGroup, Asset, IDC, SystemUser, AdminUser
 from . import serializers
 from .tasks import update_assets_hardware_info
@@ -37,10 +37,8 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
     permission_classes = (IsValidUser,)
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
-            queryset = super(AssetViewSet, self).get_queryset()
-        else:
-            queryset = get_user_granted_assets(self.request.user)
+        queryset = self.request.user.assets
+
         idc_id = self.request.query_params.get('idc_id', '')
         system_users_id = self.request.query_params.get('system_user_id', '')
         asset_group_id = self.request.query_params.get('asset_group_id', '')
@@ -58,23 +56,24 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
 
 class AssetGroupViewSet(IDInFilterMixin, BulkModelViewSet):
     """Asset group api set, for add,delete,update,list,retrieve resource"""
-    queryset = AssetGroup.objects.all()
     serializer_class = serializers.AssetGroupSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsAdminUser,)
+    def get_queryset(self):
+        return self.request.user.asset_groups
 
 
 class AssetUpdateGroupApi(generics.RetrieveUpdateAPIView):
     """Asset update it's group api"""
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetUpdateGroupSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsAdminUser,)
 
 
 class AssetGroupUpdateApi(generics.RetrieveUpdateAPIView):
     """Asset group, update it's asset member"""
     queryset = AssetGroup.objects.all()
     serializer_class = serializers.AssetGroupUpdateSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsAdminUser,)
 
 
 class AssetGroupUpdateSystemUserApi(generics.RetrieveUpdateAPIView):

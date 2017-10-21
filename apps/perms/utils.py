@@ -42,7 +42,7 @@ def get_user_group_granted_assets(user_group):
     for asset_permission in asset_permissions:
         if not asset_permission.is_valid:
             continue
-        for asset in asset_permission.get_granted_assets():
+        for asset in asset_permission.granted_assets:
             if not asset.is_active:
                 continue
             if asset in assets:
@@ -137,7 +137,7 @@ def get_user_granted_assets_direct(user):
     for asset_permission in asset_permissions_direct:
         if not asset_permission.is_valid:
             continue
-        for asset in asset_permission.get_granted_assets():
+        for asset in asset_permission.granted_assets:
             if not asset.is_active:
                 continue
             if asset in assets:

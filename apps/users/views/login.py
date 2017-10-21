@@ -2,12 +2,11 @@
 
 from __future__ import unicode_literals
 from django import forms
-from django.shortcuts import render
+from django.shortcuts import render, resolve_url, reverse, redirect
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.files.storage import default_storage
 from django.http import HttpResponseRedirect
-from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
 from django.views.decorators.cache import never_cache
@@ -19,11 +18,14 @@ from formtools.wizard.views import SessionWizardView
 from django.conf import settings
 
 from common.utils import get_object_or_none
-from ..models import User
+from ..models import User, AuthDevice
 from ..utils import send_reset_password_mail
 from ..hands import write_login_log_async
 from .. import forms
-
+from two_factor.views.core import LoginView
+from two_factor.utils import default_device
+from django.utils.http import is_safe_url
+from two_factor import signals
 
 __all__ = ['UserLoginView', 'UserLogoutView',
            'UserForgotPasswordView', 'UserForgotPasswordSendmailSuccessView',
@@ -34,33 +36,78 @@ __all__ = ['UserLoginView', 'UserLogoutView',
 @method_decorator(sensitive_post_parameters(), name='dispatch')
 @method_decorator(csrf_protect, name='dispatch')
 @method_decorator(never_cache, name='dispatch')
-class UserLoginView(FormView):
-    template_name = 'users/login.html'
-    form_class = forms.UserLoginForm
-    redirect_field_name = 'next'
 
-    def get(self, request, *args, **kwargs):
-        if request.user.is_staff:
-            return redirect(self.get_success_url())
-        return super(UserLoginView, self).get(request, *args, **kwargs)
 
-    def form_valid(self, form):
-        auth_login(self.request, form.get_user())
-        login_ip = self.request.META.get('REMOTE_ADDR', '')
-        user_agent = self.request.META.get('HTTP_USER_AGENT', '')
-        write_login_log_async.delay(self.request.user.username,
-                                    self.request.user.name,
-                                    login_type='W', login_ip=login_ip,
-                                    user_agent=user_agent)
-        return redirect(self.get_success_url())
+# class UserLoginView(FormView):
+#     template_name = 'users/login.html'
+#     form_class = forms.UserLoginForm
+#     redirect_field_name = 'next'
 
-    def get_success_url(self):
-        if self.request.user.is_first_login:
-            return reverse('users:user-first-login')
+#     def get(self, request, *args, **kwargs):
+#         if request.user.is_staff:
+#             return redirect(self.get_success_url())
+#         return super(UserLoginView, self).get(request, *args, **kwargs)
 
-        return self.request.POST.get(
+#     def form_valid(self, form):
+#         auth_login(self.request, form.get_user())
+#         login_ip = self.request.META.get('REMOTE_ADDR', '')
+#         user_agent = self.request.META.get('HTTP_USER_AGENT', '')
+#         write_login_log_async.delay(self.request.user.username,
+#                                     self.request.user.name,
+#                                     login_type='W', login_ip=login_ip,
+#                                     user_agent=user_agent)
+#         return redirect(self.get_success_url())
+
+#     def get_success_url(self):
+#         if self.request.user.is_first_login:
+#             return reverse('users:user-first-login')
+
+#         return self.request.POST.get(
+#             self.redirect_field_name,
+#             self.request.GET.get(self.redirect_field_name, reverse('index')))
+
+
+class UserLoginView(LoginView):
+
+    def has_token_step(self):
+        current_user = self.get_user()
+        return default_device(current_user) and not current_user.auth_devices.filter(ip=self.request.META['REMOTE_ADDR'])
+
+    def has_backup_step(self):
+        current_user = self.get_user()
+        return default_device(current_user) and \
+            'token' not in self.storage.validated_step_data and \
+            not current_user.auth_devices.filter(ip=self.request.META['REMOTE_ADDR'])
+
+    condition_dict = {
+        'token': has_token_step,
+        'backup': has_backup_step,
+    }
+
+    def done(self, form_list, **kwargs):
+        """
+        Login the user and redirect to the desired page.
+        """
+        current_user = self.get_user()
+        auth_login(self.request, current_user)
+
+        redirect_to = self.request.POST.get(
             self.redirect_field_name,
-            self.request.GET.get(self.redirect_field_name, reverse('index')))
+            self.request.GET.get(self.redirect_field_name, '')
+        )
+        if not is_safe_url(url=redirect_to, host=self.request.get_host()):
+            redirect_to = resolve_url(settings.LOGIN_REDIRECT_URL)
+
+        device = getattr(current_user, 'otp_device', None)
+        if device:
+            signals.user_verified.send(sender=__name__, request=self.request,
+                                       user=current_user, device=device)
+
+        if self.has_token_step() or self.has_backup_step():
+            current_user.auth_devices.get_or_create(
+                ip=self.request.META['REMOTE_ADDR']
+            )
+        return redirect(redirect_to)
 
 
 @method_decorator(never_cache, name='dispatch')
@@ -139,7 +186,7 @@ class UserResetPasswordView(TemplateView):
         return super(UserResetPasswordView, self).get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
-        password = request.POST.get('password')
+        old_password = request.POST.get('2-old_password')
         password_confirm = request.POST.get('password-confirm')
         token = request.GET.get('token')
 
@@ -156,22 +203,23 @@ class UserResetPasswordView(TemplateView):
 
 class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
     template_name = 'users/first_login.html'
-    form_list = [forms.UserProfileForm, forms.UserPublicKeyForm]
+    form_list = [forms.UserProfileForm, forms.UserPublicKeyForm, forms.UserPasswordForm,]
     file_storage = default_storage
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated() and not request.user.is_first_login:
-            return redirect(reverse('index'))
+        usr = request.user
+        if usr.is_authenticated() and not usr.is_first_login:
+            if usr.enable_otp and not default_device(usr):
+                return redirect(reverse('two_factor:setup'))
+            else:
+                return redirect(reverse('index'))
+
         return super(UserFirstLoginView, self).dispatch(request, *args, **kwargs)
 
-    def done(self, form_list, **kwargs):
+    def done(self, form_list, form_dict, **kwargs):
         user = self.request.user
-        for form in form_list:
-            for field in form:
-                if field.value():
-                    setattr(user, field.name, field.value())
-                if field.name == 'enable_otp':
-                    user.enable_otp = field.value()
+        for f in ['0', '1', '2']:
+            form_dict[f].save()
         user.is_first_login = False
         user.is_public_key_valid = True
         user.save()
@@ -185,6 +233,9 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
         context.update({'app': _('Users'), 'action': _('First login')})
         return context
 
+    def get_form_kwargs(self, step):
+        return {'instance': self.request.user}
+
     def get_form_initial(self, step):
         user = self.request.user
         if step == '0':
@@ -193,12 +244,11 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
                 'name': user.name or user.username,
                 'email': user.email or '',
                 'wechat': user.wechat or '',
-                'phone': user.phone or ''
+                'phone': user.phone or '',
+            }
+        if step == '1':
+            return {
+                'public_key': user.public_key or '',
             }
         return super(UserFirstLoginView, self).get_form_initial(step)
 
-    def get_form(self, step=None, data=None, files=None):
-        form = super(UserFirstLoginView, self).get_form(step, data, files)
-
-        form.instance = self.request.user
-        return form

@@ -32,6 +32,8 @@ class Task(models.Model):
     def __unicode__(self):
         return "%s" % self.uuid
 
+    __str__ = __unicode__
+
     @property
     def total_assets(self):
         assets_id = [i for i in self.assets.split(',') if i.isdigit()]

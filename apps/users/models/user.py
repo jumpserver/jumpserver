@@ -16,7 +16,7 @@ from django.shortcuts import reverse
 
 from . import UserGroup
 from common.utils import signer, date_expired_default
-
+from django.db.models import Q
 
 __all__ = ['User']
 
@@ -24,14 +24,16 @@ __all__ = ['User']
 class User(AbstractUser):
     ROLE_CHOICES = (
         ('Admin', _('Administrator')),
+        ('GroupAdmin', _('GroupAdministrator')),
         ('User', _('User')),
         ('App', _('Application'))
     )
 
     username = models.CharField(max_length=20, unique=True, verbose_name=_('Username'))
     name = models.CharField(max_length=20, verbose_name=_('Name'))
-    email = models.EmailField(max_length=30, unique=True, verbose_name=_('Email'))
+    email = models.EmailField(max_length=30, blank=True, verbose_name=_('Email'))
     groups = models.ManyToManyField(UserGroup, related_name='users', blank=True, verbose_name=_('User group'))
+    managed_groups = models.ManyToManyField(UserGroup, related_name='managers', blank=True, verbose_name=_('Managed Group'))
     role = models.CharField(choices=ROLE_CHOICES, default='User', max_length=10, blank=True, verbose_name=_('Role'))
     avatar = models.ImageField(upload_to="avatar", null=True, verbose_name=_('Avatar'))
     wechat = models.CharField(max_length=30, blank=True, verbose_name=_('Wechat'))
@@ -42,10 +44,14 @@ class User(AbstractUser):
     _private_key = models.CharField(max_length=5000, blank=True, verbose_name=_('ssh private key'))
     _public_key = models.CharField(max_length=5000, blank=True, verbose_name=_('ssh public key'))
     comment = models.TextField(max_length=200, blank=True, verbose_name=_('Comment'))
-    is_first_login = models.BooleanField(default=False)
+    is_first_login = models.BooleanField(default=True)
     date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True,
                                         verbose_name=_('Date expired'))
     created_by = models.CharField(max_length=30, default='', verbose_name=_('Created by'))
+
+    def __unicode__(self):
+        return self.username
+    __str__ = __unicode__
 
     @property
     def password_raw(self):
@@ -116,10 +122,7 @@ class User(AbstractUser):
 
     @property
     def is_superuser(self):
-        if self.role == 'Admin':
-            return True
-        else:
-            return False
+        return self.role == 'Admin'
 
     @is_superuser.setter
     def is_superuser(self, value):
@@ -127,6 +130,22 @@ class User(AbstractUser):
             self.role = 'Admin'
         else:
             self.role = 'User'
+
+    @property
+    def is_applier(self):
+        return self.role in ['GroupAdmin', 'User']
+
+    @property
+    def is_admin(self):
+        return self.role in ['GroupAdmin', 'Admin']
+
+    @property
+    def is_groupadmin(self):
+        return self.role == 'GroupAdmin'
+
+    @property
+    def is_commonuser(self):
+        return self.role == 'User'
 
     @property
     def is_app(self):
@@ -155,8 +174,137 @@ class User(AbstractUser):
 
     @property
     def private_token(self):
-        return self.create_private_token()
+        return self.create_private_token
 
+    @property
+    def managed_users(self):
+        if self.is_superuser:
+            return User.objects.all()
+        elif self.is_groupadmin:
+            group_list = self.managed_groups.values_list('id',flat=True)
+            return User.objects.filter(groups__id__in=list(group_list))
+        else:
+            return self
+
+    @property
+    def assets(self):
+        from assets.models import Asset
+        if self.is_superuser:
+            return Asset.objects.all()
+        elif self.is_groupadmin:
+            return self.granted_assets_direct | \
+                self.granted_assets_inherit_from_user_groups
+        else:
+            return self.granted_assets_direct
+
+    @property
+    def asset_groups(self):
+        if self.is_superuser:
+            from assets.models import AssetGroup
+            return AssetGroup.objects.all()
+        else:
+            return self.created_asset_groups.all() | \
+                self.granted_asset_groups_direct | \
+                self.granted_asset_groups_inherit_from_user_groups
+
+    @property
+    def system_users(self):
+        from assets.models import SystemUser
+        asset_list = self.assets.values_list('id', flat=True)
+        return SystemUser.objects.filter(assets__id__in=list(asset_list)).distinct()
+
+    @property
+    def can_apply_assets(self):
+        from assets.models import Asset
+        valid_assets = Asset.valid_assets()
+        assets = Asset.objects.none()
+        my_assets = self.assets.values_list('id', flat=True)
+        if self.is_groupadmin:
+            assets |= valid_assets
+        elif self.is_commonuser:
+            for manager in self.group_managers:
+                assets |= manager.assets
+        return assets.exclude(id__in=list(my_assets))
+
+    @property
+    def can_apply_asset_groups(self):
+        from assets.models import AssetGroup
+        asset_groups = AssetGroup.objects.none()
+        my_asset_groups = self.asset_groups.values_list('id', flat=True)
+        if self.is_groupadmin:
+            asset_groups |= AssetGroup.objects.filter(creater__role='Admin')
+        elif self.is_commonuser:
+            manager_list = self.group_managers.values_list('id', flat=True)
+            asset_groups |= AssetGroup.objects.filter(creater__id__in=list(manager_list))
+        return asset_groups.exclude(id__in=list(my_asset_groups))
+
+    @property
+    def can_apply_system_users(self):
+        from assets.models import SystemUser
+        system_users = SystemUser.objects.none()
+        if self.is_groupadmin:
+            return SystemUser.objects.all()
+        elif self.is_commonuser:
+            for manager in self.group_managers:
+                system_users |= manager.system_users
+        return system_users
+
+    @property
+    def group_managers(self):
+        if self.is_commonuser:
+            group_list = self.groups.values_list('id', flat=True)
+            return User.objects.filter(
+                role='GroupAdmin',
+                groups__id__in=list(group_list))
+        return User.objects.filter(role='Admin')
+
+    @property
+    def granted_assets_direct(self):
+        from assets.models import Asset
+        valid_assets = Asset.valid_assets()
+        asset_perms_list = self.asset_permissions.filter(
+            is_active=True,
+            date_expired__gt=timezone.now(),
+        ).values_list('id', flat=True)
+        asset_group_list = self.granted_asset_groups_direct.values_list('id', flat=True)
+        return valid_assets.filter(
+            Q(granted_by_permissions__id__in=list(asset_perms_list)) |
+            Q(groups__id__in=list(asset_group_list))
+        ).distinct()
+
+    @property
+    def granted_assets_inherit_from_user_groups(self):
+        from assets.models import Asset
+        from perms.models import AssetPermission
+        valid_assets = Asset.valid_assets()
+        group_list = self.groups.values_list('id', flat=True)
+        asset_perms_list = AssetPermission.valid_asset_perms().filter(
+            user_groups__id__in=list(group_list)
+        ).values_list('id', flat=True)
+        asset_group_list = self.granted_asset_groups_inherit_from_user_groups \
+            .values_list('id', flat=True)
+        return valid_assets.filter(
+            Q(granted_by_permissions__id__in=list(asset_perms_list)) |
+            Q(groups__id__in=list(asset_group_list))
+        ).distinct()
+
+    @property
+    def granted_asset_groups_direct(self):
+        from assets.models import AssetGroup
+        asset_perms_list = self.asset_permissions.values_list('id', flat=True)
+        return AssetGroup.objects.filter(granted_by_permissions__id__in=list(asset_perms_list))
+
+    @property
+    def granted_asset_groups_inherit_from_user_groups(self):
+        from assets.models import AssetGroup
+        from perms.models import AssetPermission
+        group_list= self.groups.values_list('id', flat=True)
+        asset_perms_list = AssetPermission.valid_asset_perms().filter(
+            user_groups__id__in=list(group_list)
+        ).values_list('id', flat=True)
+        return AssetGroup.objects.filter(granted_by_permissions__id__in=list(asset_perms_list))
+
+    @property
     def create_private_token(self):
         from .authentication import PrivateToken
         try:

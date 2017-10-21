@@ -1,0 +1,1672 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"a",
+				"asset"
+			],
+			[
+				"m",
+				"member"
+			],
+			[
+				"asset",
+				"asset_permission"
+			],
+			[
+				"ass",
+				"asset_groups"
+			],
+			[
+				"user",
+				"user_groups"
+			],
+			[
+				"App",
+				"Approved"
+			],
+			[
+				"data",
+				"data-uid"
+			],
+			[
+				"app",
+				"approved"
+			],
+			[
+				"apply",
+				"apply-perms"
+			],
+			[
+				"bt",
+				"btn-del"
+			],
+			[
+				"mo",
+				"models"
+			],
+			[
+				"cl",
+				"cleaned_data"
+			],
+			[
+				"User",
+				"UserGroup"
+			],
+			[
+				"SE",
+				"SECRET_KEY"
+			],
+			[
+				"week",
+				"week_dir"
+			],
+			[
+				"o",
+				"office_dir"
+			],
+			[
+				"sw",
+				"swname"
+			],
+			[
+				"r",
+				"recv"
+			],
+			[
+				"image",
+				"image_format"
+			],
+			[
+				"ge",
+				"generate"
+			],
+			[
+				"fbase",
+				"fbase"
+			],
+			[
+				"last",
+				"last_orders"
+			],
+			[
+				"fb",
+				"fbase_source"
+			],
+			[
+				"fa",
+				"fbase_source"
+			],
+			[
+				"co",
+				"commission_sheet"
+			],
+			[
+				"su",
+				"suggestion"
+			],
+			[
+				"end",
+				"end_amount"
+			],
+			[
+				"start_",
+				"start_amount"
+			],
+			[
+				"to",
+				"to_f"
+			],
+			[
+				"sum",
+				"sum_amount"
+			],
+			[
+				"start",
+				"start_amount"
+			],
+			[
+				"get_",
+				"get_trades"
+			],
+			[
+				"em",
+				"email_id"
+			],
+			[
+				"lo",
+				"logger"
+			],
+			[
+				"wi",
+				"width"
+			],
+			[
+				"active",
+				"active"
+			],
+			[
+				"se",
+				"self"
+			],
+			[
+				"selec",
+				"selected"
+			],
+			[
+				"sele",
+				"selected"
+			],
+			[
+				"sec",
+				"secret"
+			],
+			[
+				"paragraph_tit",
+				"paragraph_title2"
+			],
+			[
+				"praa",
+				"paragraph2"
+			],
+			[
+				"para",
+				"paragraph1"
+			],
+			[
+				"p",
+				"paragraph10"
+			],
+			[
+				"be",
+				"before_action"
+			],
+			[
+				"create",
+				"create"
+			],
+			[
+				"mar",
+				"margin-bottom"
+			],
+			[
+				"pad",
+				"padding-bottom"
+			],
+			[
+				"en",
+				"enum"
+			],
+			[
+				"sub",
+				"sub_title1"
+			],
+			[
+				"new",
+				"new_gateway"
+			],
+			[
+				"con",
+				"convert_payment"
+			],
+			[
+				"save",
+				"save_change"
+			],
+			[
+				"part",
+				"part2"
+			],
+			[
+				"par",
+				"part1"
+			],
+			[
+				"gate",
+				"gateway"
+			],
+			[
+				"defa",
+				"default_currency"
+			],
+			[
+				"g",
+				"gateway"
+			],
+			[
+				"stat",
+				"status"
+			],
+			[
+				"si",
+				"sign_up"
+			],
+			[
+				"Proc",
+				"processing"
+			],
+			[
+				"text",
+				"text-align"
+			],
+			[
+				"but",
+				"button"
+			],
+			[
+				"bu",
+				"buttonDisabled"
+			],
+			[
+				"button",
+				"buttonDisabled"
+			],
+			[
+				"re",
+				"registrations"
+			],
+			[
+				"up",
+				"update"
+			],
+			[
+				"skip_",
+				"skip_policy_scope"
+			],
+			[
+				"get",
+				"get"
+			],
+			[
+				"nam",
+				"namespace"
+			],
+			[
+				"col",
+				"collection"
+			],
+			[
+				"exc",
+				"exception"
+			],
+			[
+				"log",
+				"log-out"
+			],
+			[
+				"api",
+				"api_secret"
+			],
+			[
+				"cu",
+				"current"
+			],
+			[
+				"di",
+				"display"
+			],
+			[
+				"check",
+				"checkbox"
+			],
+			[
+				"res",
+				"respond_with"
+			],
+			[
+				"from",
+				"from_unit"
+			],
+			[
+				"pa",
+				"params"
+			],
+			[
+				"local",
+				"locals"
+			],
+			[
+				"amount",
+				"amount"
+			],
+			[
+				"for",
+				"form_tag"
+			],
+			[
+				"amount_input_",
+				"amount_input_btc"
+			],
+			[
+				"mi",
+				"minutes"
+			],
+			[
+				"fn",
+				"function"
+			],
+			[
+				"or",
+				"order"
+			],
+			[
+				"X-",
+				"X-Nonce"
+			],
+			[
+				"fun",
+				"function"
+			],
+			[
+				"resouce",
+				"resources"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "apps/perms/models.py",
+			"settings":
+			{
+				"buffer_size": 3481,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "jumpserver.sublime-project",
+			"settings":
+			{
+				"buffer_size": 441,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/static/js/inspinia.js",
+			"settings":
+			{
+				"buffer_size": 4636,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/templates/_nav.html",
+			"settings":
+			{
+				"buffer_size": 4167,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/apply_perms/templates/apply_perms/apply_permission_list.html",
+			"settings":
+			{
+				"buffer_size": 6128,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "apps/templates/_base_list.html",
+			"settings":
+			{
+				"buffer_size": 3717,
+				"encoding": "UTF-8",
+				"line_ending": "Unix"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"last_filter": "install",
+		"selected_items":
+		[
+			[
+				"install",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 485.0
+	},
+	"console":
+	{
+		"height": 56.0,
+		"history":
+		[
+			"import  urllib.request,os;pf='Package Control.sublime-package';ipp=sublime.installed_packages_path();urllib.request.install_opener(urllib.request.build_opener(urllib.request.ProxyHandler()));open(os.path.join(ipp,pf),'wb').write(urllib.request.urlopen('http://sublime.wbond.net/'+pf.replace(' ','%20')).read())",
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/seven/workspace/jumpserver4/jumpserver",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/static",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/static/js",
+		"/home/seven/workspace/jumpserver4/jumpserver/data"
+	],
+	"file_history":
+	[
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/static/js/angular.min.js",
+		"/home/seven/workspace/jumpserver4/jumpserver/jumpserver.sublime-project",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/templates/perms/asset_permission_list.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/apply_perms/models.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/audits/backends/record/db.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/forms.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/apply_perms/signals.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/apply_perms/templatetags/apply_perms_tags.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/apply_perms/templates/apply_perms/apply_permission_list.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/static/js/jumpserver.js",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/templates/users/user_asset_permission.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/urls/views_urls.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/templates/perms/asset_permission_asset.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/templates/perms/asset_permission_detail.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/views.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/api.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/utils.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/ops/models.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/audits/models.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/models/asset.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/applications/models.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/models/group.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/models.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/apply_perms/apps.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/ops/templates/ops/task_list.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/templates/_nav.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/apply_perms/api.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/locale/zh/LC_MESSAGES/django.po",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/apply_perms/views.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/apply_perms/urls/views_urls.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/ops/views.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/apply_perms/urls/api_urls.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/jumpserver/urls.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/applications/templates/applications/terminal_modal_accept.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/applications/templates/applications/terminal_list.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/templates/assets/asset_group_detail.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/templates/assets/asset_detail.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/templates/assets/system_user_asset.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/applications/templates/applications/terminal_modal_test.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/applications/views.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/.gitignore",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/templates/assets/delete_confirm.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/templates/users/user_delete_confirm.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/applications/urls/views_urls.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/models/user.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/audits/tasks.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/authentication.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/models/idc.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/templates/assets/asset_list.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/templates/assets/user_asset_list.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/urls/views_urls.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/urls/api_urls.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/apply_perms/migrations/0005_applypermission_applicant.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/permissions.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/utils.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/common/templatetags/common_tags.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/api.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/serializers.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/applications/serializers.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/templatetags/asset_tags.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/docs/project_structure.md",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/serializers.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/jumpserver/settings.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/templates/assets/admin_user_detail.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/forms.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/views/login.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/apply_perms/forms.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/migrations/0001_initial.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/views/admin_user.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/apply_perms/templates/apply_perms/apply_permission_create_update.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/forms.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/templates/_base_list.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/templates/_nav_user.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/utils/export_init_data.sh",
+		"/home/seven/workspace/jumpserver4/jumpserver/utils/clear_migration_history.sh",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/templates/base.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/applications/urls/api_urls.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/migrations/0001_initial.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/config.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/models/user.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/migrations/0002_auto_20170918_1427.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/utils/init_db.sh",
+		"/home/seven/workspace/jumpserver4/jumpserver/utils/clean_migrations.sh",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/applications/migrations/0002_terminal_user.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/apply_perms/migrations/0002_applypermission_approver.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/apply_perms/serializers.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/urls/api_urls.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/apply_perms/templates/apply_perms/confirm.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/templates/perms/asset_permission_user.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/manage.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/run_server.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/views/asset.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/Dockerfile",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/models/__init__.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/common/utils.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/config_docker.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/templates/_head_css_js.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/templates/users/user_list.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/static/css/colorbox.css",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/static/js/plugins/validate/jquery.validate.min.js.dump",
+		"/home/seven/workspace/jumpserver4/jumpserver/config_example.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/docker-compose.yml",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/templates/users/login.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/templates/users/first_login.html",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/urls/views_urls.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/applications/api.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/views/system_user.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/static/js/webterminal.js",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/fixtures/fake.json",
+		"/home/seven/workspace/jumpserver3/static/js/term.js",
+		"/home/seven/workspace/jumpserver3/templates/skin_config.html",
+		"/home/seven/workspace/jumpserver3/jumpserver/settings.py",
+		"/home/seven/workspace/jumpserver3/static/js/webterminal.js",
+		"/home/seven/workspace/jumpserver3/templates/jlog/web_terminal.html",
+		"/home/seven/workspace/jumpserver3/jumpserver.conf",
+		"/home/seven/workspace/jumpserver/apps/assets/templates/assets/asset_modal_list.html",
+		"/home/seven/workspace/jumpserver/apps/locale/zh/LC_MESSAGES/django.po",
+		"/home/seven/workspace/jumpserver/apps/static/js/webterminal.js",
+		"/home/seven/workspace/jumpserver/apps/templates/base.html",
+		"/home/seven/workspace/jumpserver4/luna/luna/views/websocket.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/perms/__init__.py",
+		"/home/seven/workspace/jumpserver4/luna/luna/service.py",
+		"/home/seven/workspace/jumpserver4/luna/config.py",
+		"/home/seven/workspace/jumpserver4/luna/luna/dist/ts/service.ts",
+		"/home/seven/workspace/jumpserver4/jumpserver/apps/users/models/group.py",
+		"/home/seven/workspace/jumpserver4/jumpserver/logs/jumpserver.log",
+		"/home/seven/workspace/jumpserver/run_server.py",
+		"/home/seven/.config/sublime-text-3/Packages/GoSublime/CHANGELOG.md"
+	],
+	"find":
+	{
+		"height": 34.0
+	},
+	"find_in_files":
+	{
+		"height": 90.0,
+		"where_history":
+		[
+			"/home/seven/workspace/jumpserver4/jumpserver/apps/",
+			"/home/seven/workspace/jumpserver4/jumpserver/",
+			"/home/seven/workspace/jumpserver4/jumpserver/apps/",
+			"/home/seven/workspace/jumpserver4/jumpserver/apps/*/*.html",
+			"/home/seven/workspace/jumpserver4/jumpserver/apps/*.html",
+			"/home/seven/workspace/jumpserver4/jumpserver/apps/",
+			"/home/seven/workspace/jumpserver4/jumpserver/apps/assets/views",
+			"/home/seven/workspace/jumpserver4/jumpserver/apps",
+			"/home/seven/workspace/jumpserver4/jumpserver/",
+			"/home/seven/workspace/jumpserver4/jumpserver/apps",
+			"/home/seven/workspace/jumpserver4/jumpserver/apps/assets",
+			"",
+			"<current file>",
+			"",
+			"/home/seven/workspace/jumpserver4/jumpserver/apps",
+			"",
+			"/home/seven/workspace/jumpserver/",
+			"/home/seven/workspace/jumpserver/apps",
+			"/home/seven/workspace/jumpserver",
+			"/home/seven/workspace/jumpserver/apps/applications/templates/applications",
+			"/home/seven/workspace/jumpserver/apps/",
+			"/home/seven/workspace/jumpserver/apps/applications/templates/applications",
+			"/home/seven/workspace/jumpserver/apps/applications",
+			"/home/seven/workspace/jumpserver/",
+			"/home/seven/workspace/jumpserver/apps/",
+			"/home/seven/workspace/jumpserver/apps/applications/",
+			"/home/seven/workspace/jumpserver/apps/applications/templates",
+			"/home/seven/workspace/jumpserver/apps/applications/templates/applications",
+			"/home/seven/workspace/jumpserver4/jumpserver",
+			"/home/seven/workspace/jumpserver4/luna",
+			"<current file>",
+			"/home/seven/app/wordpress/wp-content/themes/llorix-one-lite",
+			"/home/seven/app/wordpress/wp-content/themes",
+			"/home/seven/app/bitcoin_payment_gateway/app/workers",
+			"/home/seven/app/bitcoin_payment_gateway/app/models",
+			"<current file>",
+			"/home/seven/app/bitcoin_payment_gateway/app",
+			"<current file>",
+			"/home/seven/app/bitcoin_payment_gateway/app/workers",
+			"/home/seven/app/bitcoin_payment_gateway/app/models",
+			"/home/seven/app/bitcoin_payment_gateway/app",
+			"/home/seven/app/payment_gateway_backend/config/locales",
+			"/home/seven/app/payment_gateway_backend/app/views",
+			"/home/seven/app/bitcoin_payment_gateway/config",
+			"/home/seven/app/bitcoin_payment_gateway/app",
+			"/home/seven/app/payment_gateway_backend/app",
+			"/home/seven/app/payment_gateway_backend/config/locales",
+			"/home/seven/app/payment_gateway_backend/app",
+			"/home/seven/app/payment_gateway_backend/app/controllers",
+			"<current file>",
+			"/home/seven/app/payment_gateway_backend/db/migrate",
+			"/home/seven/app/payment_gateway_backend/config/locales",
+			"/home/seven/app/payment_gateway_backend/db/migrate",
+			"/home/seven/app/payment_gateway_backend/config/locales",
+			"/home/seven/app/payment_gateway_backend/app/views",
+			"/home/seven/app/payment_gateway_backend/app/views/users",
+			"<current file>",
+			"/home/seven/app/payment_gateway_backend/app/views",
+			"<current file>",
+			"/home/seven/app/payment_gateway_backend/config/locales",
+			"<current file>",
+			"/home/seven/app/payment_gateway_backend/app/views",
+			"/home/seven/app/payment_gateway_backend/app/controllers",
+			"",
+			"/home/seven/app/payment_gateway_backend",
+			"/home/seven/app/payment_gateway_backend/config",
+			"/home/seven/app/payment_gateway_backend/app/views",
+			"/home/seven/app/bitcoin_payment_gateway/config",
+			"",
+			"/home/seven/app/bitapp/config",
+			"",
+			"/home/seven/app/payment_gateway_backend/config",
+			"/home/seven/app/landlord_backend/app/controllers",
+			"<current file>",
+			"/home/seven/app/bitapp/app/assets/javascripts",
+			"",
+			"/home/seven/app/bitapp/config",
+			"",
+			"/home/seven/app/bitapp/config/environments",
+			"/home/seven/app/bitapp/",
+			"/home/seven/app/bitapp/config/environments",
+			"",
+			"/home/seven/app/bitapp/config",
+			"/home/seven/app/bitapp/config/environments",
+			"/home/seven/workspace/bitapp/config",
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"request",
+			"search",
+			"def save",
+			"bdg-system-user",
+			"addSystemUser",
+			"api-perms:asset-permission-detail",
+			"asset-permission-detail",
+			"function objectDelete",
+			"delete",
+			"__unicode__",
+			"class UserGroup",
+			"associate_system_users_and_assets",
+			"def associate_system_users_and_assets",
+			"AssetPermissionSerializer",
+			"AssetPermissionViewSet",
+			"create",
+			"Delete",
+			"receiver",
+			"django.core.signals",
+			"asset-permission",
+			"# asset-permission",
+			"#asset-permission",
+			"'asset-permission'",
+			"\"asset-permission\"",
+			"#asset-permission",
+			"asset-permission",
+			"timezone",
+			"{% if",
+			"asset",
+			"IsSuperUser",
+			"revoke-user-asset-permission",
+			"RevokeUserAssetPermission",
+			"APIView",
+			"def put",
+			"btn-approve",
+			"Q",
+			"templates/_nav.html",
+			"toastr",
+			"form_terminal_accept",
+			"ajax",
+			"api-ops",
+			"APIUpdateAttr",
+			"function objectDelete",
+			"accept",
+			"TerminalDetailView",
+			"terminal-detail",
+			"print",
+			"class TerminalDetailView",
+			"terminal-detail",
+			"objectDelete",
+			"apply-permission-detail",
+			"session",
+			"def write_login_log_async",
+			"current_user",
+			"session",
+			"get_user_granted_assets",
+			"get_user_group_granted_assets",
+			"get_user_granted_assets_inherit_from_user_groups",
+			"fm_asset_bulk_update",
+			"btn_asset_bulk_update",
+			"fm_asset_bulk_update",
+			"system_users",
+			"UserAssetListView",
+			"user-asset",
+			"assets/user-asset",
+			"def get_user_granted_assets",
+			"user-asset",
+			"AssetViewSet",
+			"asset-list",
+			"api-assets",
+			"asset-list",
+			"asset",
+			"class IsSuperUser",
+			"assetlist",
+			"asset-list",
+			"userasset",
+			"LoginRequiredMixin",
+			"Profile",
+			"get_success_message",
+			"send_reset_ssh_key_mail",
+			"class AdminUserRequiredMixin",
+			"System user",
+			"User group",
+			"rule_member_name",
+			"templatetag",
+			"templatetags",
+			"templatetages",
+			"join_queryset_attr",
+			"AssetGroupSerializer",
+			"serializers.",
+			"date_",
+			"date",
+			"apply-permission-update",
+			"zone",
+			"form.instance",
+			"serializers",
+			"ChoiceField",
+			"admin_user",
+			"models.ForeignKey",
+			"timezone",
+			"self.object",
+			"self.objects",
+			"self.objects.",
+			"form.instance",
+			"):\n",
+			"Select user groups",
+			"clean_admin_user",
+			"require",
+			"required",
+			"require",
+			"审批",
+			"reverse_lazy",
+			"transaction",
+			"User group",
+			"ApplyPermissionForm",
+			"Apply permission",
+			"def associate_system_users_and_assets",
+			"success_url",
+			"SuccessMessageMixin",
+			"ApplicationsConfig",
+			"app",
+			"def is_authenticated",
+			"is_authenticated",
+			"class AdminUserRequiredMixin",
+			"asset",
+			"model",
+			"Status",
+			"apply-permission-create"
+		],
+		"highlight": false,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"apply",
+			"Apply",
+			"day_dir",
+			"port",
+			"password",
+			"username",
+			"hashed_id",
+			"HashedId",
+			"start_amount",
+			"end_amount",
+			"start_amount",
+			"TICKER_LTC",
+			"DEPTH_LTC",
+			" ",
+			"withdrawal",
+			"withdrawals",
+			"@withdrawals",
+			"withdrawal",
+			"Withdrawal",
+			"withdrawal",
+			"withdraw",
+			"@withdraw",
+			"Withdraw",
+			"withdraw",
+			"tid",
+			"'",
+			"address_providers.cashila.login",
+			"cashila.login",
+			"https://admin.skyluster.com/",
+			"'",
+			"",
+			"'",
+			"create_orders",
+			"'",
+			"\"",
+			"'",
+			"explain",
+			"human_attribute_name",
+			"payment_gateway_backend"
+		],
+		"reverse": false,
+		"show_context": false,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": false
+	},
+	"groups":
+	[
+		{
+			"selected": 4,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "apps/perms/models.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3481,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1355,
+								1355
+							]
+						],
+						"settings":
+						{
+							"is_init_dirty_state": false,
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 108.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "jumpserver.sublime-project",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 441,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								230,
+								230
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "apps/static/js/inspinia.js",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 4636,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								223,
+								223
+							]
+						],
+						"settings":
+						{
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/JavaScript/JavaScript.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "apps/templates/_nav.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 4167,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1544,
+								1544
+							]
+						],
+						"settings":
+						{
+							"is_init_dirty_state": false,
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "apps/apply_perms/templates/apply_perms/apply_permission_list.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 6128,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								301,
+								301
+							]
+						],
+						"settings":
+						{
+							"is_init_dirty_state": false,
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "apps/templates/_base_list.html",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3717,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2030,
+								2030
+							]
+						],
+						"settings":
+						{
+							"is_init_dirty_state": false,
+							"origin_encoding": "ASCII",
+							"syntax": "Packages/HTML/HTML.sublime-syntax",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 216.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 26.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 118.0
+	},
+	"pinned_build_system": "",
+	"project": "jumpserver.sublime-project",
+	"replace":
+	{
+		"height": 48.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"_base_list",
+				"apps/templates/_base_list.html"
+			],
+			[
+				"permissionlist",
+				"apps/apply_perms/templates/apply_perms/apply_permission_list.html"
+			],
+			[
+				"_nav",
+				"apps/templates/_nav.html"
+			],
+			[
+				"apply_permslist",
+				"apps/apply_perms/templates/apply_perms/apply_permission_list.html"
+			],
+			[
+				"signal",
+				"apps/apply_perms/signals.py"
+			],
+			[
+				"permslist",
+				"apps/perms/templates/perms/asset_permission_list.html"
+			],
+			[
+				"permsapi",
+				"apps/perms/api.py"
+			],
+			[
+				"perms/view",
+				"apps/perms/views.py"
+			],
+			[
+				"permvies",
+				"apps/perms/views.py"
+			],
+			[
+				"perms/model",
+				"apps/perms/models.py"
+			],
+			[
+				"perms/views",
+				"apps/perms/views.py"
+			],
+			[
+				"perms/mode",
+				"apps/perms/models.py"
+			],
+			[
+				"apply_permsmode",
+				"apps/apply_perms/models.py"
+			],
+			[
+				"/ops/task/",
+				"apps/ops/templates/ops/task_list.html"
+			],
+			[
+				".po",
+				"apps/locale/zh/LC_MESSAGES/django.po"
+			],
+			[
+				"jumpserver/url",
+				"apps/jumpserver/urls.py"
+			],
+			[
+				"ops/view",
+				"apps/ops/views.py"
+			],
+			[
+				"nav",
+				"apps/templates/_nav.html"
+			],
+			[
+				"terminal_modal_accept",
+				"apps/applications/templates/applications/terminal_modal_accept.html"
+			],
+			[
+				"apply_perms/view",
+				"apps/apply_perms/views.py"
+			],
+			[
+				"terminal_modal_test.html",
+				"apps/applications/templates/applications/terminal_modal_test.html"
+			],
+			[
+				"delete_confirm",
+				"apps/users/templates/users/user_delete_confirm.html"
+			],
+			[
+				"delete_confirm.html",
+				"apps/assets/templates/assets/delete_confirm.html"
+			],
+			[
+				"user.py",
+				"apps/users/models/user.py"
+			],
+			[
+				"templatetags/",
+				"apps/assets/templatetags/asset_tags.py"
+			],
+			[
+				"settings",
+				"apps/jumpserver/settings.py"
+			],
+			[
+				"form",
+				"apps/users/forms.py"
+			],
+			[
+				"user.y",
+				"apps/users/models/user.py"
+			],
+			[
+				"applylist",
+				"apps/apply_perms/templates/apply_perms/apply_permission_list.html"
+			],
+			[
+				"form.py",
+				"apps/assets/forms.py"
+			],
+			[
+				"applypermsview",
+				"apps/apply_perms/views.py"
+			],
+			[
+				"clear_migration_history.sh",
+				"utils/clear_migration_history.sh"
+			],
+			[
+				"export_init_data.sh",
+				"utils/export_init_data.sh"
+			],
+			[
+				"perms/api.py",
+				"apps/perms/api.py"
+			],
+			[
+				"nav_uer",
+				"apps/templates/_nav_user.html"
+			],
+			[
+				".git",
+				".gitignore"
+			],
+			[
+				"_basel",
+				"apps/templates/_base_list.html"
+			],
+			[
+				"perms",
+				"apps/perms/views.py"
+			],
+			[
+				"base.",
+				"apps/templates/base.html"
+			],
+			[
+				"jumpserver",
+				"apps/jumpserver/urls.py"
+			],
+			[
+				"use.py",
+				"apps/users/models/user.py"
+			],
+			[
+				"config",
+				"config.py"
+			],
+			[
+				"002",
+				"apps/applications/migrations/0002_terminal_user.py"
+			],
+			[
+				"init",
+				"utils/init_db.sh"
+			],
+			[
+				"migration",
+				"utils/clean_migrations.sh"
+			],
+			[
+				"locale",
+				"apps/locale/zh/LC_MESSAGES/django.po"
+			],
+			[
+				"user",
+				"apps/assets/models/user.py"
+			],
+			[
+				"perms/models",
+				"apps/perms/models.py"
+			],
+			[
+				"locale/",
+				"apps/locale/zh/LC_MESSAGES/django.po"
+			],
+			[
+				"login",
+				"apps/users/views/login.py"
+			],
+			[
+				"users/models/user",
+				"apps/users/models/user.py"
+			],
+			[
+				"run",
+				"run_server.py"
+			],
+			[
+				"manage",
+				"apps/manage.py"
+			],
+			[
+				"run_server.py",
+				"run_server.py"
+			],
+			[
+				"users/views/",
+				"apps/users/views/login.py"
+			],
+			[
+				".sh",
+				"utils/init_db.sh"
+			],
+			[
+				"static",
+				"apps/static/css/colorbox.css"
+			],
+			[
+				"tags",
+				"apps/common/templatetags/common_tags.py"
+			],
+			[
+				"setting",
+				"apps/jumpserver/settings.py"
+			],
+			[
+				"mana",
+				"apps/manage.py"
+			],
+			[
+				"_head_css_js.html",
+				"apps/templates/_head_css_js.html"
+			],
+			[
+				"_base",
+				"apps/templates/_base_list.html"
+			],
+			[
+				"base",
+				"apps/templates/base.html"
+			],
+			[
+				"user/model.py",
+				"apps/users/models/__init__.py"
+			],
+			[
+				"api",
+				"apps/applications/api.py"
+			],
+			[
+				"asset_list.html",
+				"apps/assets/templates/assets/asset_list.html"
+			],
+			[
+				"user/",
+				"apps/users/models/user.py"
+			],
+			[
+				"user/mode",
+				"apps/users/models/user.py"
+			],
+			[
+				"users/url",
+				"apps/users/urls/views_urls.py"
+			],
+			[
+				"first_login.",
+				"apps/users/templates/users/first_login.html"
+			],
+			[
+				"users/first_login.html",
+				"apps/users/templates/users/first_login.html"
+			],
+			[
+				"users/login",
+				"apps/users/templates/users/login.html"
+			],
+			[
+				"keys",
+				"docker-compose.yml"
+			],
+			[
+				"web",
+				"apps/static/js/webterminal.js"
+			],
+			[
+				"webterminal.js",
+				"static/js/webterminal.js"
+			],
+			[
+				"term.js",
+				"static/js/term.js"
+			],
+			[
+				"terminal",
+				"templates/jlog/web_terminal.html"
+			],
+			[
+				"asset",
+				"apps/assets/templates/assets/asset_list.html"
+			],
+			[
+				"/perms/asset",
+				"jumpserver/apps/perms/templates/perms/asset_permission_asset.html"
+			],
+			[
+				"/perms/",
+				"jumpserver/apps/perms/__init__.py"
+			],
+			[
+				"url",
+				"jumpserver/apps/jumpserver/urls.py"
+			],
+			[
+				"",
+				"~/app/django/placeholder/placeholder.py"
+			],
+			[
+				"wp-login",
+				"wp-login.php"
+			],
+			[
+				"class-smtp.php",
+				"wp-includes/class-smtp.php"
+			],
+			[
+				"functions.",
+				"wp-content/themes/llorix-one-lite/functions.php"
+			],
+			[
+				"development.rb",
+				"config/environments/development.rb"
+			],
+			[
+				"sidekiq",
+				"config/sidekiq.yml"
+			],
+			[
+				"production",
+				"config/deploy/production.rb"
+			],
+			[
+				"side",
+				"config/sidekiq.yml"
+			],
+			[
+				"exchange",
+				"app/models/exchange_rate.rb"
+			],
+			[
+				"gemfie",
+				"Gemfile"
+			],
+			[
+				"deploy",
+				"config/deploy.rb"
+			],
+			[
+				"capfile",
+				"Capfile"
+			],
+			[
+				"deploy.rb",
+				"config/deploy.rb"
+			],
+			[
+				"cap",
+				"Capfile"
+			],
+			[
+				"gemfi",
+				"Gemfile"
+			],
+			[
+				"database",
+				"config/database.yml"
+			],
+			[
+				"gem",
+				"Gemfile"
+			],
+			[
+				"db/migrate/20170604090239_add_timestamp_to_suggestion_emails.rb",
+				"db/migrate/20170604090239_add_timestamp_to_suggestion_emails.rb"
+			],
+			[
+				"db/migrate/20170603100808_create_suggestion_email.rb",
+				"db/migrate/20170603100808_create_suggestion_email.rb"
+			],
+			[
+				"product",
+				"config/deploy/production.rb"
+			],
+			[
+				"user.rb",
+				"app/models/user.rb"
+			],
+			[
+				"home",
+				"app/controllers/home_controller.rb"
+			],
+			[
+				"gatewaycon",
+				"app/controllers/admin/gateways_controller.rb"
+			],
+			[
+				"gatewayindex",
+				"app/views/admin/gateways/index.html.erb"
+			],
+			[
+				"gemf",
+				"Gemfile"
+			],
+			[
+				"wor",
+				"app/workers/ltc_price_worker.rb"
+			],
+			[
+				"html",
+				"examples/client/client.html"
+			],
+			[
+				"application.css",
+				"app/assets/stylesheets/application.css"
+			],
+			[
+				"devise.h",
+				"app/views/layouts/devise.html.erb"
+			],
+			[
+				"admin",
+				"app/views/layouts/admin.html.erb"
+			],
+			[
+				"tos/",
+				"app/views/tos/index_cn.html.erb"
+			],
+			[
+				"tos",
+				"app/controllers/tos_controller.rb"
+			],
+			[
+				"homeinde",
+				"app/views/home/index.html.erb"
+			],
+			[
+				"left",
+				"app/views/share/_left_sidebar.html.erb"
+			],
+			[
+				"en.",
+				"config/locales/en.yml"
+			],
+			[
+				"uid",
+				"app/models/concerns/uid.rb"
+			],
+			[
+				"routes",
+				"config/routes.rb"
+			],
+			[
+				"exp",
+				"app/views/share/_export_bar.html.erb"
+			],
+			[
+				"sideb",
+				"app/views/share/_left_sidebar.html.erb"
+			],
+			[
+				"applicationcon",
+				"app/controllers/application_controller.rb"
+			],
+			[
+				"route",
+				"config/routes.rb"
+			],
+			[
+				"layout/amdin",
+				"app/views/layouts/admin.html.erb"
+			],
+			[
+				"draw",
+				"app/controllers/withdraws_controller.rb"
+			],
+			[
+				"en",
+				"config/locales/en.yml"
+			],
+			[
+				"order",
+				"app/models/order.rb"
+			],
+			[
+				"db/migrate/20170524092908_add_app_id_to_users.rb",
+				"db/migrate/20170524092908_add_app_id_to_users.rb"
+			],
+			[
+				"gateway.rb",
+				"app/models/gateway.rb"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 395.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

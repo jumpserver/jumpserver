@@ -2,8 +2,10 @@
     <div class="sidebar-collapse">
         <ul class="nav" id="side-menu">
             {% include '_user_profile.html' %}
-            {% if request.user.is_superuser %}
+            {% if user.is_superuser %}
                 {% include '_nav.html' %}
+            {% elif user.is_groupadmin %}
+                {% include '_nav_group_admin.html' %}
             {% else %}
                 {% include '_nav_user.html' %}
             {% endif %}

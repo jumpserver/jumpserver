@@ -15,6 +15,7 @@
     <th class="text-center">{% trans 'Asset group' %}</th>
     <th class="text-center">{% trans 'System user' %}</th>
     <th class="text-center">{% trans 'Is valid' %}</th>
+    <th class="text-center">{% trans 'Created by' %}</th>
     <th class="text-center">{% trans 'Action' %}</th>
 {% endblock %}
 
@@ -39,13 +40,16 @@
                  <i class="fa fa-times text-danger"></i>
              {% endif %}
              </td>
+             <td class="text-center">{{ asset_permission.created_by }}</td>
              <td class="text-center">
-                 <a href="{% url 'perms:asset-permission-update' pk=asset_permission.id %}"
-                    class="btn btn-xs btn-info">{% trans 'Update' %}
-                 </a>
-                 <a class="btn btn-xs btn-danger btn-del" data-name="{{ asset_permission.name }}"
-                    data-uid="{{ asset_permission.id }}">{% trans 'Delete' %}
-                 </a>
+                {% if user.is_superuser or user.username == asset_permission.created_by %}
+                     <a href="{% url 'perms:asset-permission-update' pk=asset_permission.id %}"
+                        class="btn btn-xs btn-info">{% trans 'Update' %}
+                     </a>
+                     <a class="btn btn-xs btn-danger btn-del" data-name="{{ asset_permission.name }}"
+                        data-uid="{{ asset_permission.id }}">{% trans 'Delete' %}
+                     </a>
+                {% endif %}
              </td>
          </tr>
      {% endfor %}

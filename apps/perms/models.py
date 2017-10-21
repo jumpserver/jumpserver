@@ -9,7 +9,7 @@ from django.db.models.signals import m2m_changed
 from users.models import User, UserGroup
 from assets.models import Asset, AssetGroup, SystemUser
 from common.utils import date_expired_default, combine_seq
-
+from apply_perms.models import ApplyPermission
 
 class AssetPermission(models.Model):
     # PRIVATE_FOR_CHOICE = (
@@ -29,6 +29,7 @@ class AssetPermission(models.Model):
         AssetGroup, related_name='granted_by_permissions', blank=True)
     system_users = models.ManyToManyField(
         SystemUser, related_name='granted_by_permissions')
+    apply_permission = models.OneToOneField(ApplyPermission, on_delete=models.CASCADE, blank=True, null=True, related_name="asset_permission")
     is_active = models.BooleanField(
         default=True, verbose_name=_('Active'))
     date_expired = models.DateTimeField(
@@ -42,16 +43,24 @@ class AssetPermission(models.Model):
     def __unicode__(self):
         return self.name
 
+    __str__ = __unicode__
+
     @property
     def is_valid(self):
-        if self.date_expired < timezone.now() and self.is_active:
+        if self.date_expired > timezone.now() and self.is_active:
             return True
-        return True
+        return False
 
-    def get_granted_users(self):
-        return list(set(self.users.all()) | self.get_granted_user_groups_member())
+    @classmethod
+    def valid_asset_perms(cls):
+        return cls.objects.filter(is_active=True, date_expired__gt=timezone.now())
 
-    def get_granted_user_groups_member(self):
+    @property
+    def granted_users(self):
+        return list(set(self.users.all()) | self.granted_user_groups_member)
+
+    @property
+    def granted_user_groups_member(self):
         users = set()
         for user_group in self.user_groups.all():
             for user in user_group.users.all():
@@ -61,10 +70,12 @@ class AssetPermission(models.Model):
                 users.add(user)
         return users
 
-    def get_granted_assets(self):
-        return list(set(self.assets.all()) | self.get_granted_asset_groups_member())
+    @property
+    def granted_assets(self):
+        return list(set(self.assets.all()) | self.granted_asset_groups_member)
 
-    def get_granted_asset_groups_member(self):
+    @property
+    def granted_asset_groups_member(self):
         assets = set()
         for asset_group in self.asset_groups.all():
             for asset in asset_group.assets.all():

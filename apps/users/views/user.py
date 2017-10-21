@@ -29,7 +29,7 @@ from django.contrib.auth import logout as auth_logout
 
 from .. import forms
 from ..models import User, UserGroup
-from ..utils import AdminUserRequiredMixin, user_add_success_next
+from ..utils import AdminUserRequiredMixin, user_add_success_next, AdminOrGroupAdminRequiredMixin
 from common.mixins import JSONResponseMixin
 from common.utils import get_logger, get_object_or_none
 from perms.models import AssetPermission
@@ -46,7 +46,7 @@ __all__ = [
 logger = get_logger(__name__)
 
 
-class UserListView(AdminUserRequiredMixin, TemplateView):
+class UserListView(AdminOrGroupAdminRequiredMixin, TemplateView):
     template_name = 'users/user_list.html'
 
     def get_context_data(self, **kwargs):
@@ -71,10 +71,12 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         return context
 
     def form_valid(self, form):
-        user = form.save(commit=False)
+        user = form.instance # or self.object
         user.created_by = self.request.user.username or 'System'
         user.save()
-        user_add_success_next(user)
+        user.set_password('123456')
+        # if you need to send email to created user, use this:
+        # user_add_success_next(user)
         return super(UserCreateView, self).form_valid(form)
 
     def get_success_message(self, cleaned_data):

@@ -11,7 +11,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from . import serializers
 from .hands import write_login_log_async
 from .models import User, UserGroup
-from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly
+from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly, IsAdminUser
 from .utils import check_user_valid, generate_token
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
@@ -47,11 +47,14 @@ class UserViewSet(viewsets.ModelViewSet):
     update:
         Update a user.
     """
-    queryset = User.objects.all()
+    # queryset = User.objects.all()
     # queryset = User.objects.all().exclude(role="App").order_by("date_joined")
     serializer_class = serializers.UserSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsAdminUser,)
     filter_fields = ('username', 'email', 'name', 'id')
+
+    def get_queryset(self):
+        return self.request.user.managed_users
 
 
 class UserUpdateGroupApi(generics.RetrieveUpdateAPIView):
@@ -99,9 +102,15 @@ class UserUpdatePKApi(generics.UpdateAPIView):
 
 
 class UserGroupViewSet(IDInFilterMixin, BulkModelViewSet):
-    queryset = UserGroup.objects.all()
+    queryset = UserGroup.objects.prefetch_related('managers').all()
     serializer_class = serializers.UserGroupSerializer
+    permission_classes = (IsAdminUser,)
 
+    def get_queryset(self):
+        if self.request.user.is_groupadmin:
+            return self.request.user.managed_groups.order_by("date_created")
+        else:
+            return UserGroup.objects.order_by("date_created")
 
 class UserGroupUpdateUserApi(generics.RetrieveUpdateAPIView):
     queryset = UserGroup.objects.all()

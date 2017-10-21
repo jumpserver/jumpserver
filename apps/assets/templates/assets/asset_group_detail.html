@@ -14,9 +14,11 @@
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
                             <li class="active"><a href="" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a></li>
-                            <li class="pull-right">
-                                <a class="btn btn-outline btn-default" href="{% url 'assets:asset-group-update' pk=asset_group.id %}"><i class="fa fa-edit"></i>Update</a>
-                            </li>
+                            {% if is_owner %}
+                                <li class="pull-right">
+                                    <a class="btn btn-outline btn-default" href="{% url 'assets:asset-group-update' pk=asset_group.id %}"><i class="fa fa-edit"></i>Update</a>
+                                </li>
+                            {% endif %}
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -56,33 +58,34 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Push system users' %}
                                 </div>
                                 <div class="panel-body">
-                                    <table class="table">
-                                        <tbody>
-                                        <form>
-                                            <tr class="no-borders-tr">
-                                                <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select system users' %}" class="select2 system-user-select" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for system_user in system_users %}
-                                                            <option value="{{ system_user.id }}"> {{ system_user.name }} </option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                            <tr class="no-borders-tr">
-                                                <td colspan="2">
-                                                    <button type="button" class="btn btn-primary btn-sm btn-push-system-user">{% trans 'Push' %}</button>
-                                                </td>
-                                            </tr>
-                                        </form>
-                                        </tbody>
-                                    </table>
+                                    {% if user.is_superuser %}
+                                        <table class="table">
+                                            <tbody>
+                                            <form>
+                                                <tr class="no-borders-tr">
+                                                    <td colspan="2">
+                                                        <select data-placeholder="{% trans 'Select system users' %}" class="select2 system-user-select" style="width: 100%" multiple="" tabindex="4">
+                                                            {% for system_user in system_users %}
+                                                                <option value="{{ system_user.id }}"> {{ system_user.name }} </option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </td>
+                                                </tr>
+                                                <tr class="no-borders-tr">
+                                                    <td colspan="2">
+                                                        <button type="button" class="btn btn-primary btn-sm btn-push-system-user">{% trans 'Push' %}</button>
+                                                    </td>
+                                                </tr>
+                                            </form>
+                                            </tbody>
+                                        </table>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -220,9 +223,13 @@ $(document).ready(function () {
 				}
 			}},
 			{targets: 5, createdCell: function (td, cellData, rowData) {
-				var update_btn = '<a href="{% url "assets:asset-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', rowData.id);
-				var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-aid="99991937">{% trans "Remove" %}</a>'.replace('99991937', rowData.id);
-				$(td).html(update_btn + del_btn)
+                if("{{ is_owner }}" == "True"){
+                    var update_btn = '<a href="{% url "assets:asset-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', rowData.id);
+                    var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-aid="99991937">{% trans "Remove" %}</a>'.replace('99991937', rowData.id);
+                    $(td).html(update_btn + del_btn)
+                }else{
+                    $(td).html('')
+                }
 			}}
 		],
 		ajax_url: '{% url "api-assets:asset-list" %}?asset_group_id={{ asset_group.id }}',

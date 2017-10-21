@@ -12,18 +12,6 @@
     #modal .modal-body { max-height: 200px; }
 </style>
 {% endblock %}
-{% block content_left_head %}{% endblock %}
-
-{% block table_search %}
-{#    <div class="html5buttons">#}
-{#        <div class="dt-buttons btn-group">#}
-{#            <a class="btn btn-default btn_export" tabindex="0">#}
-{#                <span>{% trans "Export" %}</span>#}
-{#            </a>#}
-{#        </div>#}
-{#    </div>#}
-{% endblock %}
-
 
 {% block table_container %}
 <table class="table table-striped table-bordered table-hover " id="asset_list_table" >
@@ -74,7 +62,7 @@ $(document).ready(function(){
 		ajax_url: '{% url "api-assets:asset-list" %}',
 		columns: [{data: "id"}, {data: "hostname" }, {data: "ip" }, {data: "port" },
 			{data: "get_type_display" }, {data: "get_env_display"}, {data: "hardware"},
-			{data: "is_active" }, {data: "is_active"}],
+			{data: "is_active" }, {data: "is_online" },],
 	};
 	var table = jumpserver.initDataTable(options);
 	$('.btn_export').click(function () {

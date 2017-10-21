@@ -16,35 +16,16 @@
                         <h5>{{ action }}</h5>
                     </div>
                     <div class="ibox-content">
-                        {% if form.non_field_errors %}
-                            <div class="alert alert-danger">
-                               {{ form.non_field_errors }}
-                            </div>
-                       {% endif %}
+                        {% bootstrap_form_errors form  %}
                         <form method="post" class="form-horizontal" action="" >
                             {% csrf_token %}
-                            {% bootstrap_field form.name layout="horizontal" %}
-                            <div class="form-group">
-                              <label for="users" class="col-sm-2 control-label">{% trans 'Users' %}</label>
-                                <div class="col-sm-9">
-                                    <select name="users" id="id_users" data-placeholder="{% trans 'Select User' %}" class="select2 form-control m-b" multiple  tabindex="2">
-                                        {% for user in users %}
-                                            {% if user.id in group_users %}
-                                            <option value="{{ user.id }}" selected>{{ user.name }}</option>
-                                            {% else %}
-                                                <option value="{{ user.id }}">{{ user.name }}</option>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
-                            {% bootstrap_field form.comment layout="horizontal" %}
-                            <div class="form-group">
+                            {% bootstrap_form form layout="horizontal"%}
+                            {% buttons %}
                                 <div class="col-sm-4 col-sm-offset-2">
-                                    <button class="btn btn-white" type="reset">{% trans 'Cancel' %}</button>
-                                    <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Confirm' %}</button>
+                                    {% trans 'Confirm' as  submit_btn %}
+                                    {% bootstrap_button submit_btn button_type="submit" button_class="btn-primary" %}
                                 </div>
-                            </div>
+                            {% endbuttons %}
                         </form>
                     </div>
                 </div>

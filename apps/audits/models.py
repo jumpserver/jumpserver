@@ -57,6 +57,8 @@ class ProxyLog(models.Model):
     def __unicode__(self):
         return '%s-%s-%s' % (self.user, self.asset, self.system_user)
 
+    __str__ = __unicode__
+
     def commands(self):
         from audits.backends import command_store
         return command_store.filter(proxy_log_id=self.id)
@@ -78,6 +80,8 @@ class CommandLog(models.Model):
     def __unicode__(self):
         return '%s: %s' % (self.id, self.command)
 
+    __str__ = __unicode__
+
     class Meta:
         ordering = ['command_no', 'command']
 
@@ -89,6 +93,8 @@ class RecordLog(models.Model):
 
     def __unicode__(self):
         return 'Record: %s' % self.proxy_log_id
+
+    __str__ = __unicode__
 
     class Meta:
         ordering = ['timestamp']

@@ -16,7 +16,6 @@ from common.tasks import send_mail_async
 from common.utils import reverse, get_object_or_none
 from .models import User
 
-
 # try:
 #     from io import StringIO
 # except ImportError:
@@ -35,6 +34,24 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
             return False
         return True
 
+class AdminOrGroupAdminRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        usr = self.request.user
+        if not usr.is_authenticated:
+            return False
+        elif not usr.is_admin:
+            self.raise_exception = True
+            return False
+        return True
+
+class ApplyUserRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        if not self.request.user.is_authenticated:
+            return False
+        elif not self.request.user.is_applier:
+            self.raise_exception = True
+            return False
+        return True
 
 def user_add_success_next(user):
     subject = _('Create account successfully')
@@ -171,5 +188,3 @@ def generate_token(request, user):
         cache.set(token, user.id, expiration)
         cache.set('%s_%s' % (user.id, remote_addr), token, expiration)
     return token
-
-

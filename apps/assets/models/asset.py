@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 
 from __future__ import unicode_literals
 
@@ -101,6 +101,10 @@ class Asset(models.Model):
         else:
             return True, ''
         return False, warning
+
+    @classmethod
+    def valid_assets(cls):
+        return cls.objects.filter(is_active=True)
 
     def to_json(self):
         return {

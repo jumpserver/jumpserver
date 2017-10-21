@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-# 
+#
 
 from __future__ import unicode_literals
 
 from django.db import models
 import logging
 from django.utils.translation import ugettext_lazy as _
-
+from users.models import User
 from . import SystemUser
 
 __all__ = ['AssetGroup']
@@ -18,6 +18,7 @@ class AssetGroup(models.Model):
     name = models.CharField(max_length=64, unique=True, verbose_name=_('Name'))
     system_users = models.ManyToManyField(SystemUser, related_name='asset_groups', blank=True)
     created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
+    creater = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, related_name='created_asset_groups', verbose_name=_('Created by'))
     date_created = models.DateTimeField(auto_now_add=True, null=True, verbose_name=_('Date created'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 

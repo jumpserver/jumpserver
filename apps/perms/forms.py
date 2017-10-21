@@ -9,6 +9,52 @@ from .models import AssetPermission
 
 
 class AssetPermissionForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        self.current_user = kwargs.pop('user', None)
+        super(AssetPermissionForm, self).__init__(*args, **kwargs)
+        self.fields['user_groups'].required = False
+        self.fields['user_groups'].widget.attrs['disabled'] = True
+
+        if not self.current_user.is_superuser:
+            self.fields['users'].queryset = self.current_user.managed_users.exclude(id=self.current_user.id)
+            self.fields['system_users'].queryset =  self.current_user.system_users
+            self.fields['assets'].queryset = self.current_user.assets
+            self.fields['asset_groups'].queryset = self.current_user.asset_groups
+
+    def clean_users(self):
+        users = self.cleaned_data['users']
+        for user in users:
+            if not user in self.current_user.managed_users.exclude(id=self.current_user.id):
+                raise forms.ValidationError(
+                                _('Invalid value: %(name)s'),
+                                code='Invalid',
+                                params={'name': user.name}
+                            )
+        return users
+
+    def clean_asset_groups(self):
+        asset_groups = self.cleaned_data['asset_groups']
+        for asset_group in asset_groups:
+            if not asset_group in self.current_user.asset_groups:
+                raise forms.ValidationError(
+                          _('Invalid value: %(name)s'),
+                          code='Invalid',
+                          params={'name': asset_group.name}
+                      )
+        return asset_groups
+
+    def clean_system_users(self):
+        system_users = self.cleaned_data['system_users']
+        for system_user in system_users:
+            if not system_user in self.current_user.system_users:
+                raise forms.ValidationError(
+                          _('Invalid value: %(name)s'),
+                          code='Invalid',
+                          params={'name': system_user.name}
+                      )
+        return system_users
+
     class Meta:
         model = AssetPermission
         fields = [

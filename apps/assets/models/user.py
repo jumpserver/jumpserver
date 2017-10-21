@@ -199,8 +199,7 @@ class SystemUser(models.Model):
         return assets
 
     def get_assets(self):
-        assets = set(self.assets.all()
-                     ) | self.get_assets_inherit_from_asset_groups()
+        assets = set(self.assets.all()) | self.get_assets_inherit_from_asset_groups()
         return list(assets)
 
     def _to_secret_json(self):

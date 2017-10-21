@@ -14,7 +14,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from common.utils import get_logger
 from perms.models import AssetPermission
 from ..models import User, UserGroup
-from ..utils import AdminUserRequiredMixin
+from ..utils import AdminUserRequiredMixin, AdminOrGroupAdminRequiredMixin
 from .. import forms
 
 __all__ = ['UserGroupListView', 'UserGroupCreateView', 'UserGroupDetailView',
@@ -23,7 +23,7 @@ __all__ = ['UserGroupListView', 'UserGroupCreateView', 'UserGroupDetailView',
 logger = get_logger(__name__)
 
 
-class UserGroupListView(AdminUserRequiredMixin, TemplateView):
+class UserGroupListView(AdminOrGroupAdminRequiredMixin, TemplateView):
     template_name = 'users/user_group_list.html'
 
     def get_context_data(self, **kwargs):
@@ -46,14 +46,26 @@ class UserGroupCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
                         'users': users})
         return context
 
-    # 需要添加组下用户, 而user并不是group的多对多,所以需要手动建立关系
+    def get_form_kwargs(self):
+        kwargs = super(UserGroupCreateView, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
+
     def form_valid(self, form):
         user_group = form.save()
+
         users_id_list = self.request.POST.getlist('users', [])
+        managers_id_list = self.request.POST.getlist('managers', [])
+
         users = User.objects.filter(id__in=users_id_list)
-        user_group.created_by = self.request.user.username or 'Admin'
+        managers = User.objects.filter(id__in=managers_id_list)
+
         user_group.users.add(*users)
+        user_group.managers.add(*managers)
+
+        user_group.created_by = self.request.user.username or 'Admin'
         user_group.save()
+
         return super(UserGroupCreateView, self).form_valid(form)
 
     def get_success_message(self, cleaned_data):
@@ -71,30 +83,26 @@ class UserGroupUpdateView(AdminUserRequiredMixin, UpdateView):
     template_name = 'users/user_group_create_update.html'
     success_url = reverse_lazy('users:user-group-list')
 
-    def get_context_data(self, **kwargs):
-        # self.object = self.get_object()
-        context = super(UserGroupUpdateView, self).get_context_data(**kwargs)
-        users = User.objects.all()
-        group_users = [user.id for user in self.object.users.all()]
-        context.update({
-            'app': _('Users'),
-            'action': _('Update user group'),
-            'users': users,
-            'group_users': group_users
-        })
-        return context
+    def get_form_kwargs(self):
+        kwargs = super(UserGroupUpdateView, self).get_form_kwargs()
+        kwargs.update({'user': self.request.user})
+        return kwargs
 
     def form_valid(self, form):
-        user_group = form.save()
+        obj = self.object
         users_id_list = self.request.POST.getlist('users', [])
-        users = User.objects.filter(id__in=users_id_list)
-        user_group.users.clear()
-        user_group.users.add(*users)
-        user_group.save()
+        obj.users = User.objects.filter(id__in=users_id_list)
+
+        if self.request.user.is_superuser:
+            managers_id_list = self.request.POST.getlist('managers', [])
+            obj.managers = User.objects.filter(id__in=managers_id_list)
+
+        obj.save()
+
         return super(UserGroupUpdateView, self).form_valid(form)
 
 
-class UserGroupDetailView(AdminUserRequiredMixin, DetailView):
+class UserGroupDetailView(AdminOrGroupAdminRequiredMixin, DetailView):
     model = UserGroup
     context_object_name = 'user_group'
     template_name = 'users/user_group_detail.html'
@@ -110,7 +118,7 @@ class UserGroupDetailView(AdminUserRequiredMixin, DetailView):
         return super(UserGroupDetailView, self).get_context_data(**kwargs)
 
 
-class UserGroupAssetPermissionView(AdminUserRequiredMixin, FormMixin,
+class UserGroupAssetPermissionView(AdminOrGroupAdminRequiredMixin, FormMixin,
                                    SingleObjectMixin, ListView):
     model = UserGroup
     template_name = 'users/user_group_asset_permission.html'
@@ -161,7 +169,7 @@ class UserGroupAssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
                        kwargs={'pk': self.user_group.id})
 
 
-class UserGroupGrantedAssetView(AdminUserRequiredMixin, DetailView):
+class UserGroupGrantedAssetView(AdminOrGroupAdminRequiredMixin, DetailView):
     model = User
     template_name = 'users/user_group_granted_asset.html'
     context_object_name = 'user_group'

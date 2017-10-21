@@ -11,7 +11,6 @@ from .models import User, UserGroup
 
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     groups_display = serializers.SerializerMethodField()
-    groups = serializers.PrimaryKeyRelatedField(many=True, queryset=UserGroup.objects.all())
 
     class Meta:
         model = User
@@ -25,7 +24,7 @@ class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     @staticmethod
     def get_groups_display(obj):
-        return " ".join([group.name for group in obj.groups.all()])
+        return ", ".join([group.name for group in obj.groups.all()])
 
 
 class UserPKUpdateSerializer(serializers.ModelSerializer):
@@ -52,6 +51,7 @@ class UserUpdateGroupSerializer(serializers.ModelSerializer):
 
 class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     user_amount = serializers.SerializerMethodField()
+    managers_display = serializers.SerializerMethodField()
 
     class Meta:
         model = UserGroup
@@ -61,6 +61,10 @@ class UserGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     @staticmethod
     def get_user_amount(obj):
         return obj.users.count()
+
+    @staticmethod
+    def get_managers_display(obj):
+        return " ".join([manager.username for manager in obj.managers.all()])
 
 
 class UserGroupUpdateMemeberSerializer(serializers.ModelSerializer):

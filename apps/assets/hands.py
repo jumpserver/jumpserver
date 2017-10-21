@@ -11,8 +11,8 @@
 """
 
 
-from users.utils import AdminUserRequiredMixin
-from users.permissions import IsAppUser, IsSuperUser, IsValidUser
+from users.utils import AdminUserRequiredMixin, AdminOrGroupAdminRequiredMixin
+from users.permissions import IsAppUser, IsSuperUser, IsValidUser, IsAdminUser
 from users.models import User, UserGroup
 from perms.utils import get_user_granted_assets
 from perms.tasks import push_users

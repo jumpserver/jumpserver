@@ -1,0 +1,23 @@
+{
+	"folders":
+	[
+		{
+			"path": ".",
+			"folder_exclude_patterns": ["logs", "tmp", "plugins", "docs", "css", "fonts", "img", "fixtures"],
+			"file_exclude_patterns":["*.json", "LICENSE", "*.min.js", "jquery*", "bootstrap-dialog.js"]
+		},
+	],
+	"settings":
+	{
+		"tab_size": 2,
+		"translate_tabs_to_spaces": true,
+		"trim_trailing_white_space_on_save": true
+	},
+	"build_systems":
+	[
+		{
+		    "name": "List",
+		    "shell_cmd": "ls -l"
+		}
+	]
+}

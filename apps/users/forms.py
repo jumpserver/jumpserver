@@ -19,6 +19,8 @@ class UserLoginForm(AuthenticationForm):
 
 
 class UserCreateUpdateForm(forms.ModelForm):
+    email = forms.EmailField(required=False, label=_('Email'),)
+    name = forms.CharField(required=False, label=_('Name'),)
     class Meta:
         model = User
         fields = [
@@ -27,8 +29,6 @@ class UserCreateUpdateForm(forms.ModelForm):
         ]
         help_texts = {
             'username': '* required',
-            'name': '* required',
-            'email': '* required',
         }
         widgets = {
             'groups': forms.SelectMultiple(
@@ -91,10 +91,7 @@ class UserPublicKeyForm(forms.Form):
         help_text=_('Paste your id_rsa.pub here.'))
 
     def __init__(self, *args, **kwargs):
-        if 'instance' in kwargs:
-            self.instance = kwargs.pop('instance')
-        else:
-            self.instance = None
+        self.instance = kwargs.pop('instance')
         super(UserPublicKeyForm, self).__init__(*args, **kwargs)
 
     def clean_public_key(self):
@@ -155,10 +152,41 @@ class UserBulkUpdateForm(forms.ModelForm):
 
 
 class UserGroupForm(forms.ModelForm):
+    managers = forms.ModelMultipleChoiceField(
+        queryset=User.objects.filter(role__in=['Admin', 'GroupAdmin']),
+        label=_('GroupAdministrator'),
+        required=False,
+        widget=forms.SelectMultiple(
+            attrs={'class': 'select2', 'data-placeholder': _('Select group managers')})
+    )
+    users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        label=_('User'),
+        required=False,
+        widget=forms.SelectMultiple(
+            attrs={'class': 'select2', 'data-placeholder': _('Select User')})
+    )
+    def clean_name(self):
+        name = self.cleaned_data['name']
+        if name.lower() in ['default', 'admin', 'administrator'] and not self.is_superuser:
+            raise forms.ValidationError(_("You can't use the name Default or Admin"))
+        return name
+
+    def __init__(self, *args, **kwargs):
+        self.is_superuser = kwargs.pop('user', None).is_superuser
+        instance = kwargs.get('instance', None)
+        super(UserGroupForm, self).__init__(*args, **kwargs)
+        self.fields['managers'].widget.attrs['disabled'] = not self.is_superuser
+        self.fields['name'].widget.attrs['readonly'] = not self.is_superuser
+        if instance:
+            self.fields['users'].initial= instance.users.values_list('id', flat=True)
+            self.fields['managers'].initial= instance.managers.values_list('id', flat=True)
+
+
     class Meta:
         model = UserGroup
         fields = [
-            'name', 'comment'
+            'name', 'managers', 'users', 'comment'
         ]
         help_texts = {
             'name': '* required'
