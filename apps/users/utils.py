@@ -64,7 +64,7 @@ def user_add_success_next(user):
         'login_url': reverse('users:login', external=True),
     }
 
-    send_mail_async.delay(subject, message, recipient_list, html_message=message)
+    send_mail_async.delay(subject, message, settings.EMAIL_HOST_USER, recipient_list, html_message=message)
 
 
 def send_reset_password_mail(user):
@@ -97,7 +97,7 @@ def send_reset_password_mail(user):
     if settings.DEBUG:
         logger.debug(message)
 
-    send_mail_async.delay(subject, message, recipient_list, html_message=message)
+    send_mail_async.delay(subject, message, settings.EMAIL_HOST_USER, recipient_list, html_message=message)
 
 
 def send_reset_ssh_key_mail(user):
@@ -119,7 +119,7 @@ def send_reset_ssh_key_mail(user):
     if settings.DEBUG:
         logger.debug(message)
 
-    send_mail_async.delay(subject, message, recipient_list, html_message=message)
+    send_mail_async.delay(subject, message, settings.EMAIL_HOST_USER, recipient_list, html_message=message)
 
 
 def check_user_valid(**kwargs):
