@@ -36,8 +36,6 @@ class UserPKUpdateSerializer(serializers.ModelSerializer):
     @staticmethod
     def validate__public_key(value):
         if not validate_ssh_public_key(value):
-            print('Not a valid key')
-            print(value)
             raise serializers.ValidationError(_('Not a valid ssh public key'))
         return value
 

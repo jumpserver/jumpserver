@@ -23,9 +23,9 @@ __all__ = ['User']
 
 class User(AbstractUser):
     ROLE_CHOICES = (
-        ('Admin', _('Administrator')),
-        ('User', _('User')),
-        ('App', _('Application'))
+        ('Admin', 'Administrator'),
+        ('User', 'User'),
+        ('App', 'Application')
     )
 
     username = models.CharField(max_length=20, unique=True, verbose_name=_('Username'))

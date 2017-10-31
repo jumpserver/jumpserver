@@ -274,8 +274,10 @@ def content_md5(data):
 
     返回值可以直接作为HTTP Content-Type头部的值
     """
-    m = hashlib.md5(to_bytes(data))
-    return to_string(base64.b64encode(m.digest()))
+    if isinstance(data, str):
+        data = hashlib.md5(data.encode('utf-8'))
+    value = base64.b64encode(data.digest())
+    return value.decode('utf-8')
 
 _STRPTIME_LOCK = threading.Lock()
 
@@ -328,8 +330,6 @@ def encrypt_password(password):
     if password:
         return sha512_crypt.using(rounds=5000).hash(password)
     return None
-
-
 
 
 def capacity_convert(size, expect='auto', rate=1000):

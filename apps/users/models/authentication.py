@@ -25,10 +25,8 @@ class AccessKey(models.Model):
     def get_secret(self):
         return str(self.secret)
 
-    def __unicode__(self):
+    def __str__(self):
         return str(self.id)
-
-    __str__ = __unicode__
 
 
 class PrivateToken(Token):

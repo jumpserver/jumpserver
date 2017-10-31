@@ -27,9 +27,10 @@
                 </div>
             </th>
             <th class="text-center">{% trans 'Name' %}</th>
-            <th class="text-center">{% trans 'IP' %}</th>
-            <th class="text-center">{% trans 'Type' %}</th>
-            <th class="text-center">{% trans 'Session online' %}</th>
+            <th class="text-center">{% trans 'Addr' %}</th>
+            <th class="text-center">{% trans 'SSH Port' %}</th>
+            <th class="text-center">{% trans 'Http Port' %}</th>
+            <th class="text-center">{% trans 'Connected' %}</th>
             <th class="text-center">{% trans 'Active' %}</th>
             <th class="text-center">{% trans 'Alive' %}</th>
             <th class="text-center">{% trans 'Action' %}</th>
@@ -53,21 +54,21 @@ $(document).ready(function(){
                 var detail_btn = '<a href="{% url "applications:terminal-detail" pk=99991937 %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('99991937', rowData.id));
              }},
-            {targets: 5, createdCell: function (td, cellData) {
+            {targets: 6, createdCell: function (td, cellData) {
                 if (!cellData) {
                     $(td).html('<i class="fa fa-times text-danger"></i>')
                 } else {
                     $(td).html('<i class="fa fa-check text-navy"></i>')
                 }
              }},
-            {targets: 6, createdCell: function (td, cellData) {
+            {targets: 7, createdCell: function (td, cellData) {
                 if (!cellData) {
                     $(td).html('<i class="fa fa-circle text-danger"></i>')
                 } else {
                     $(td).html('<i class="fa fa-circle text-navy"></i>')
                 }
             }},
-            {targets: 7, createdCell: function (td, cellData, rowData) {
+            {targets: 8, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "applications:terminal-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'
                         .replace('99991937', cellData);
                 var delete_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-id="99991937" data-name="99991938">{% trans "Delete" %}</a>'
@@ -94,8 +95,8 @@ $(document).ready(function(){
              }}
         ],
         ajax_url: '{% url "api-applications:terminal-list" %}',
-        columns: [{data: function(){return ""}}, {data: "name" }, {data: "remote_addr" }, {data: "get_type_display" },
-                  {data: "proxy_online"}, {data: "is_active" }, {data: 'is_active'}, {data: "id"}],
+        columns: [{data: function(){return ""}}, {data: "name" }, {data: "remote_addr" }, {data: "ssh_port"}, {data: "http_port"},
+                  {data: "session_connected"}, {data: "is_alive" }, {data: 'is_alive'}, {data: "id"}],
         op_html: $('#actions').html()
     };
     jumpserver.initDataTable(options);
@@ -131,7 +132,6 @@ $(document).ready(function(){
         success: function (data) {
             $('#id_name').val(data.name);
             $('#id_remote_addr').val(data.remote_addr);
-            $('#id_type').val(data.type);
             $('#id_url').val(data.url);
             $('#id_comment').val(data.comment);
             $('#form_terminal_accept').attr('action', post_url)

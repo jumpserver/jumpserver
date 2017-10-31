@@ -9,17 +9,17 @@ from .hands import ProxyLog
 
 
 class TerminalSerializer(serializers.ModelSerializer):
-    proxy_online = serializers.SerializerMethodField()
+    session_connected = serializers.SerializerMethodField()
     is_alive = serializers.SerializerMethodField()
 
     class Meta:
         model = Terminal
-        fields = ['id', 'name', 'remote_addr', 'type', 'url', 'comment',
-                  'is_accepted', 'is_active', 'get_type_display',
-                  'proxy_online', 'is_alive']
+        fields = ['id', 'name', 'remote_addr', 'http_port', 'ssh_port',
+                  'comment', 'is_accepted',
+                  'session_connected', 'is_alive']
 
     @staticmethod
-    def get_proxy_online(obj):
+    def get_session_connected(obj):
         return ProxyLog.objects.filter(terminal=obj.name, is_finished=False).count()
 
     @staticmethod
@@ -33,9 +33,10 @@ class TerminalSerializer(serializers.ModelSerializer):
 
 class TerminalHeatbeatSerializer(serializers.ModelSerializer):
     date_start = serializers.DateTimeField
+
     class Meta:
         model = TerminalHeatbeat
 
 
-if __name__ == '__main__':
-    pass
+
+
