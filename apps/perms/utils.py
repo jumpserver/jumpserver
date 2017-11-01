@@ -190,6 +190,11 @@ def get_user_granted_assets(user):
     return assets
 
 
+def get_user_granted_asset_groups(user):
+    pass
+
+
+
 def get_user_group_asset_permissions(user_group):
     permissions = user_group.asset_permissions.all()
     return permissions

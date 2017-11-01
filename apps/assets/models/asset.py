@@ -89,9 +89,8 @@ class Asset(models.Model):
     date_created = models.DateTimeField(auto_now_add=True, null=True, blank=True, verbose_name=_('Date created'))
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s <%s: %s>' % (self.hostname, self.ip, self.port)
-    __str__ = __unicode__
 
     @property
     def is_valid(self):

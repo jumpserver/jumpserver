@@ -167,7 +167,6 @@ def generate_token(request, user):
     token = cache.get('%s_%s' % (user.id, remote_addr))
     if not token:
         token = uuid.uuid4().hex
-        print('Set cache: %s' % token)
         cache.set(token, user.id, expiration)
         cache.set('%s_%s' % (user.id, remote_addr), token, expiration)
     return token

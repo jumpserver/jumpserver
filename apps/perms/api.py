@@ -140,11 +140,25 @@ class UserGrantedAssetGroupsApi(ListAPIView):
     def get_queryset(self):
         user_id = self.kwargs.get('pk', '')
 
-        if user_id:
-            user = get_object_or_404(User, id=user_id)
-            queryset = get_user_granted_asset_groups(user)
-        else:
-            queryset = []
+        if not user_id:
+            return []
+
+        user = get_object_or_404(User, id=user_id)
+        if user:
+            asset_groups = {}
+            for asset, system_ in get_user_granted_assets(user).items():
+                for asset_group in asset.groups.all():
+                    if asset_group.id in asset_groups:
+                        asset_groups[asset_group.id]['assets_amount'] += 1
+                    else:
+                        asset_groups[asset_group.id] = {
+                            'id': asset_group.id,
+                            'name': asset_group.name,
+                            'comment': asset_group.comment,
+                            'assets_amount': 1
+                        }
+        asset_groups_json = asset_groups.values()
+
         return queryset
 
 
@@ -166,10 +180,11 @@ class MyGrantedAssetsApi(ListAPIView):
         return queryset
 
 
-
 class MyGrantedAssetsGroupsApi(APIView):
-    """授权给用户的资产组列表, 非直接通过授权规则授权的资产组列表, 而是授权资产的所有
-    资产组之和"""
+    """
+    授权给用户的资产组列表, 非直接通过授权规则授权的资产组列表, 而是授权资产的所有
+    资产组之和
+    """
     permission_classes = (IsValidUser,)
 
     def get(self, request, *args, **kwargs):
@@ -201,13 +216,6 @@ class MyAssetGroupAssetsApi(ListAPIView):
         asset_groups[0] = {
             'id': 0, 'name': 'ungrouped', 'assets': []
         }
-        # asset_group = {
-        #     1: {'id': 1, 'name': 'hello',
-        #         'assets': [{
-        #                        'id': 'asset_id',
-        #                        'system_users': [{'id': 'system_user_id',...},]
-        #                     }],
-        #         'assets_id': set()}, 2: {}}
         user = request.user
 
         if user:
