@@ -14,6 +14,12 @@ router.register(r'v1/roles', api.AnsibleRoleViewSet, 'role')
 
 urlpatterns = [
     url(r'^v1/roles/install/$', api.InstallRoleView.as_view(), name='role-install'),
+    url(r'^v1/tasks/(?P<pk>\d+)/groups/$',
+        api.TaskUpdateGroupApi.as_view(), name='task-update-group'),
+    url(r'^v1/tasks/(?P<pk>\d+)/assets/$',
+        api.TaskUpdateAssetApi.as_view(), name='task-update-asset'),
+    url(r'^v1/tasks/(?P<pk>\d+)/system-user/$',
+        api.TaskUpdateSystemUserApi.as_view(), name='task-update-system-user'),
 ]
 
 urlpatterns += router.urls

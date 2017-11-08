@@ -5,7 +5,7 @@ from rest_framework import status
 from rest_framework import viewsets, generics
 from rest_framework.response import Response
 
-from .hands import IsSuperUserOrAppUser
+from .hands import IsSuperUser, IsSuperUserOrAppUser
 from .serializers import *
 from .tasks import ansible_install_role
 
@@ -25,7 +25,7 @@ class AnsibleRoleViewSet(viewsets.ModelViewSet):
     """
     queryset = AnsibleRole.objects.all()
     serializer_class = AnsibleRoleSerializer
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsSuperUser,)
 
 
 class InstallRoleView(generics.CreateAPIView):
@@ -34,7 +34,7 @@ class InstallRoleView(generics.CreateAPIView):
     """
     queryset = AnsibleRole.objects.all()
     serializer_class = AnsibleRoleSerializer
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsSuperUser,)
     result = None
 
     def perform_create(self, serializer):
@@ -56,3 +56,24 @@ class InstallRoleView(generics.CreateAPIView):
         #: 安装失败返回错误
         return Response(serializer.data, status=status.HTTP_201_CREATED if self.result else status.HTTP_400_BAD_REQUEST,
                         headers=headers)
+
+
+class TaskUpdateGroupApi(generics.RetrieveUpdateAPIView):
+    """Task update it's group api"""
+    queryset = Task.objects.all()
+    serializer_class = TaskUpdateGroupSerializer
+    permission_classes = (IsSuperUser,)
+
+
+class TaskUpdateAssetApi(generics.RetrieveUpdateAPIView):
+    """Task update it's asset api"""
+    queryset = Task.objects.all()
+    serializer_class = TaskUpdateAssetSerializer
+    permission_classes = (IsSuperUser,)
+
+
+class TaskUpdateSystemUserApi(generics.RetrieveUpdateAPIView):
+    """Task update it's asset api"""
+    queryset = Task.objects.all()
+    serializer_class = TaskUpdateSystemUserSerializer
+    permission_classes = (IsSuperUser,)

@@ -6,7 +6,7 @@ import logging
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import ugettext as _
-from django.views.generic import TemplateView, UpdateView
+from django.views.generic import TemplateView, DetailView
 
 from .forms import TaskForm
 from .models import *
@@ -54,14 +54,27 @@ class TaskUpdateView(AdminUserRequiredMixin, TemplateView):
         return super(TaskUpdateView, self).get_context_data(**kwargs)
 
 
-class TaskDetailView(AdminUserRequiredMixin, TemplateView):
+class TaskDetailView(AdminUserRequiredMixin, DetailView):
+    queryset = Task.objects.all()
+    context_object_name = 'task'
     template_name = 'devops/task_detail.html'
 
     def get_context_data(self, **kwargs):
+        assets = self.object.assets.all()
+        asset_groups = self.object.groups.all()
+        system_user = self.object.system_user
         context = {
             'app': _('Ansible'),
             'action': _('Task Detail'),
-            'id': kwargs['pk'],
+            'assets': assets,
+            'assets_remain': [asset for asset in Asset.objects.all()
+                              if asset not in assets],
+            'asset_groups': asset_groups,
+            'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all()
+                                    if asset_group not in asset_groups],
+
+            'system_users_all': SystemUser.objects.all(),
+            'system_users': system_user,
         }
         kwargs.update(context)
         return super(TaskDetailView, self).get_context_data(**kwargs)

@@ -26,3 +26,27 @@ class TaskSerializer(serializers.ModelSerializer):
     @staticmethod
     def get_ansible_role_name(obj):
         return obj.ansible_role.name
+
+
+class TaskUpdateGroupSerializer(serializers.ModelSerializer):
+    groups = serializers.PrimaryKeyRelatedField(many=True, queryset=AssetGroup.objects.all())
+
+    class Meta:
+        model = Task
+        fields = ['id', 'groups']
+
+
+class TaskUpdateAssetSerializer(serializers.ModelSerializer):
+    assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
+
+    class Meta:
+        model = Task
+        fields = ['id', 'assets']
+
+
+class TaskUpdateSystemUserSerializer(serializers.ModelSerializer):
+    system_user = serializers.PrimaryKeyRelatedField(many=False, queryset=SystemUser.objects.all())
+
+    class Meta:
+        model = Task
+        fields = ['id', 'system_user']

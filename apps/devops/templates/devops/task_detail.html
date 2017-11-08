@@ -19,8 +19,9 @@
                                 <a href="" class="text-center"><i
                                         class="fa fa-laptop"></i> {% trans 'Task Detail' %} </a>
                             </li>
-                             <li class="pull-right">
-                                <a class="btn btn-outline btn-default" href="{% url 'devops:task-update' pk=id %}"><i class="fa fa-edit"></i>Update</a>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default" href="{% url 'devops:task-update' pk=task.id %}"><i
+                                        class="fa fa-edit"></i>Update</a>
                             </li>
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-danger btn-delete-user">
@@ -29,10 +30,217 @@
                             </li>
                         </ul>
                     </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0">
+                            {#         详情展示       #}
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span class="label"><b>{% trans 'Task Detail' %}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr class="no-borders-tr">
+                                            <td width="20%">{% trans 'Name' %}:</td>
+                                            <td><b>{{ task.name }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Description' %}:</td>
+                                            <td><b>{{ task.desc }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Ansible Role' %}:</td>
+                                            <td><b>{{ task.ansible_role }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Tags' %}:</td>
+                                            <td><b>{{ task.tags }}</b></td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
 
 
+                            {#         TODO 最近执行记录       #}
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span class="label"><b>近期执行记录</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr class="no-borders-tr">
+                                            <td width="20%" colspan="2">Coming Soon。。。</td>
+                                            {#                                            <td><b>{{ task.name }}</b></td>#}
+                                        </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-5">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Add assets to' %} {{ idc.name }}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select asset' %}"
+                                                            class="select2-multiple" style="width: 100%" multiple=""
+                                                            tabindex="4">
+                                                        {% for asset in assets_remain %}
+                                                            <option value="{{ asset.id }}"
+                                                                    id="opt_{{ asset.id }}">{{ asset.ip }}:{{ asset.port }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button"
+                                                            class="btn btn-primary btn-sm btn_add_asset">{% trans 'Confirm' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+                                        {% for asset in assets %}
+                                            <tr>
+                                                <td><b class="bdg_group"
+                                                       data-gid={{ asset.id }}>{{ asset.hostname }}</b> - {{ asset.ip }}:{{ asset.port }}
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-danger pull-right btn-xs btn_delete_asset"
+                                                            type="button"><i class="fa fa-minus"></i></button>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Asset groups' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table group_edit" id="add-asset2group">
+                                        <tbody>
+                                        <form>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <select data-placeholder="{% trans 'Join asset groups' %}"
+                                                            id="groups_selected" class="select2-multiple groups"
+                                                            style="width: 100%" multiple="" tabindex="4">
+                                                        {% for asset_group in asset_groups_remain %}
+                                                            <option value="{{ asset_group.id }}"
+                                                                    id="opt_{{ asset_group.id }}">{{ asset_group.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <button type="button" class="btn btn-info btn-sm"
+                                                            id="btn_add_user_group">{% trans 'Confirm' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+
+                                        {% for asset_group in asset_groups %}
+                                            <tr>
+                                                <td><b class="bdg_group"
+                                                       data-gid={{ asset_group.id }}>{{ asset_group.name }}</b></td>
+                                                <td>
+                                                    <button class="btn btn-danger pull-right btn-xs btn_leave_group"
+                                                            type="button"><i class="fa fa-minus"></i></button>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="panel panel-warning">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Push system users' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table group_edit" id="add-asset2systemuser">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select system users' %}"
+                                                            class="select2 system-user" style="width: 100%" multiple=""
+                                                            tabindex="4">
+                                                        <option></option>
+                                                        {% for system_user in system_users_all %}
+                                                            <option value="{{ system_user.id }}"
+                                                                    id="opt_{{ system_user.id }}">{{ system_user.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button"
+                                                            class="btn btn-warning btn-sm btn-system-user">{% trans 'Confirm' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block custom_foot_js %}
+    <script>
+        $('.select2-multiple').select2({
+            multiple:true
+        })
+        $('.select2').select2({
+            multiple:false
+        })
+    </script>
 {% endblock %}

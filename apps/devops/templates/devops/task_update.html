@@ -43,7 +43,7 @@
                 form.tags = [];
             }
             let success = function () {
-{#                location.href = "{% url 'devops:task-list' %}";#}
+                location.href = "{% url 'devops:task-list' %}";
             }
             let error = function (data) {
                 APIFormError(data.responseJSON)
