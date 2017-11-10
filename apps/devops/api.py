@@ -2,21 +2,32 @@
 
 
 from rest_framework import status
-from rest_framework import viewsets, generics
+from rest_framework import viewsets, generics, mixins
 from rest_framework.response import Response
 
-from .hands import IsSuperUser, IsSuperUserOrAppUser
+from .hands import IsSuperUser, IsSuperUserOrAppUser, IsValidUser
 from .serializers import *
 from .tasks import ansible_install_role
 
 
-class TaskViewSet(viewsets.ModelViewSet):
+class TaskListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """
-        对Ansible的task提供的API操作
+        对Ansible的task list的 展示 API操作
     """
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = (IsSuperUserOrAppUser,)
+    permission_classes = (IsValidUser,)
+
+
+class TaskOperationViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
+                           mixins.UpdateModelMixin,mixins.DestroyModelMixin,
+                           viewsets.GenericViewSet):
+    """
+        对Ansible的task提供的 操作 API操作
+    """
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+    permission_classes = (IsSuperUser,)
 
 
 class AnsibleRoleViewSet(viewsets.ModelViewSet):

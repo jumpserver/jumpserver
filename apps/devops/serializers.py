@@ -45,7 +45,7 @@ class TaskUpdateAssetSerializer(serializers.ModelSerializer):
 
 
 class TaskUpdateSystemUserSerializer(serializers.ModelSerializer):
-    system_user = serializers.PrimaryKeyRelatedField(many=False, queryset=SystemUser.objects.all())
+    system_user = serializers.PrimaryKeyRelatedField(many=False, queryset=SystemUser.objects.all(), allow_null=True)
 
     class Meta:
         model = Task

@@ -9,7 +9,8 @@ from .. import api
 app_name = 'devops'
 
 router = routers.DefaultRouter()
-router.register(r'v1/tasks', api.TaskViewSet, 'task')
+router.register(r'v1/tasks', api.TaskListViewSet, 'task')
+router.register(r'v1/tasks', api.TaskOperationViewSet, 'task')
 router.register(r'v1/roles', api.AnsibleRoleViewSet, 'role')
 
 urlpatterns = [

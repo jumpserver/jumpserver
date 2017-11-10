@@ -10,17 +10,19 @@
 {% endblock %}
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
-        <div class="row">
-            <div class="col-sm-12">
-                <div class="ibox float-e-margins">
-                    <div class="panel-options">
-                        <ul class="nav nav-tabs">
-                            <li class="active">
-                                <a href="" class="text-center"><i
-                                        class="fa fa-laptop"></i> {% trans 'Task Detail' %} </a>
-                            </li>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="panel-options">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="" class="text-center"><i
+                                    class="fa fa-laptop"></i> {% trans 'Task Detail' %} </a>
+                        </li>
+                        {% if request.user.is_superuser %}
                             <li class="pull-right">
-                                <a class="btn btn-outline btn-default" href="{% url 'devops:task-update' pk=task.id %}"><i
+                                <a class="btn btn-outline btn-default"
+                                   href="{% url 'devops:task-update' pk=task.id %}"><i
                                         class="fa fa-edit"></i>Update</a>
                             </li>
                             <li class="pull-right">
@@ -28,117 +30,153 @@
                                     <i class="fa fa-edit"></i>Delete
                                 </a>
                             </li>
-                        </ul>
-                    </div>
-                    <div class="tab-content">
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="tab-content">
+                    {% if request.user.is_superuser %}
                         <div class="col-sm-7" style="padding-left: 0">
-                            {#         详情展示       #}
-                            <div class="ibox float-e-margins">
-                                <div class="ibox-title">
-                                    <span class="label"><b>{% trans 'Task Detail' %}</b></span>
-                                    <div class="ibox-tools">
-                                        <a class="collapse-link">
-                                            <i class="fa fa-chevron-up"></i>
-                                        </a>
-                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                            <i class="fa fa-wrench"></i>
-                                        </a>
-                                        <ul class="dropdown-menu dropdown-user">
-                                        </ul>
-                                        <a class="close-link">
-                                            <i class="fa fa-times"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="ibox-content">
-                                    <table class="table">
-                                        <tbody>
-                                        <tr class="no-borders-tr">
-                                            <td width="20%">{% trans 'Name' %}:</td>
-                                            <td><b>{{ task.name }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Description' %}:</td>
-                                            <td><b>{{ task.desc }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Ansible Role' %}:</td>
-                                            <td><b>{{ task.ansible_role }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Tags' %}:</td>
-                                            <td><b>{{ task.tags }}</b></td>
-                                        </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-
-                            {#         TODO 最近执行记录       #}
-                            <div class="ibox float-e-margins">
-                                <div class="ibox-title">
-                                    <span class="label"><b>近期执行记录</b></span>
-                                    <div class="ibox-tools">
-                                        <a class="collapse-link">
-                                            <i class="fa fa-chevron-up"></i>
-                                        </a>
-                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                            <i class="fa fa-wrench"></i>
-                                        </a>
-                                        <ul class="dropdown-menu dropdown-user">
-                                        </ul>
-                                        <a class="close-link">
-                                            <i class="fa fa-times"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="ibox-content">
-                                    <table class="table">
-                                        <tbody>
-                                        <tr class="no-borders-tr">
-                                            <td width="20%" colspan="2">Coming Soon。。。</td>
-                                            {#                                            <td><b>{{ task.name }}</b></td>#}
-                                        </tr>
-
-                                        </tbody>
-                                    </table>
-                                </div>
+                    {% else %}
+                        <div class="col-sm-12" style="padding-left: 0">
+                    {% endif %}
+                    {#         详情展示       #}
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <span class="label"><b>{% trans 'Task Detail' %}</b></span>
+                            <div class="ibox-tools">
+                                <a class="collapse-link">
+                                    <i class="fa fa-chevron-up"></i>
+                                </a>
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                    <i class="fa fa-wrench"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-user">
+                                </ul>
+                                <a class="close-link">
+                                    <i class="fa fa-times"></i>
+                                </a>
                             </div>
                         </div>
+                        <div class="ibox-content">
+                            <table class="table">
+                                <tbody>
+                                <tr class="no-borders-tr">
+                                    <td width="20%">{% trans 'Name' %}:</td>
+                                    <td><b>{{ task.name }}</b></td>
+                                </tr>
+                                <tr>
+                                    <td>{% trans 'Description' %}:</td>
+                                    <td><b>{{ task.desc }}</b></td>
+                                </tr>
+                                <tr>
+                                    <td>{% trans 'Ansible Role' %}:</td>
+                                    <td><b>{{ task.ansible_role }}</b></td>
+                                </tr>
+                                <tr>
+                                    <td>{% trans 'Tags' %}:</td>
+                                    <td><b>{{ task.tags }}</b></td>
+                                </tr>
+                                {% if not request.user.is_superuser %}
+                                    <tr>
+                                        <td>{% trans 'Task Assets' %}:</td>
+                                        <td>
+                                            {% for asset in assets %}
+                                                <b> {{ asset }} </b>
+                                                ﻿{% if not forloop.last %}<b>，</b>{% endif %}
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>{% trans 'Task Asset Groups' %}:</td>
+                                        <td>
+                                            {% for group in asset_groups %}
+                                                <b> {{ group }} </b>
+                                                ﻿{% if not forloop.last %}<b>，</b>{% endif %}
+                                            {% endfor %}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>{% trans 'Task System User' %}:</td>
+                                        <td>
+                                            {{ system_user.name }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
+
+                    {#         TODO 最近执行记录       #}
+                    <div class="ibox float-e-margins">
+                        <div class="ibox-title">
+                            <span class="label"><b>近期执行记录</b></span>
+                            <div class="ibox-tools">
+                                <a class="collapse-link">
+                                    <i class="fa fa-chevron-up"></i>
+                                </a>
+                                <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                    <i class="fa fa-wrench"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-user">
+                                </ul>
+                                <a class="close-link">
+                                    <i class="fa fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="ibox-content">
+                            <table class="table">
+                                <tbody>
+                                <tr class="no-borders-tr">
+                                    <td width="20%" colspan="2">Coming Soon。。。</td>
+                                    {#                                            <td><b>{{ task.name }}</b></td>#}
+                                </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    </div>
+                    {% if request.user.is_superuser %}
                         <div class="col-sm-5">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Add assets to' %} {{ idc.name }}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Task Assets' %} {{ idc.name }}
                                 </div>
                                 <div class="panel-body">
-                                    <table class="table">
+                                    <table class="table" id="add-asset2task">
                                         <tbody>
                                         <form>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select asset' %}"
-                                                            class="select2-multiple" style="width: 100%" multiple=""
+                                                    <select data-placeholder="{% trans 'Select assets' %}"
+                                                            id="assets_selected"
+                                                            class="select2-multiple assets" style="width: 100%"
+                                                            multiple=""
                                                             tabindex="4">
                                                         {% for asset in assets_remain %}
                                                             <option value="{{ asset.id }}"
-                                                                    id="opt_{{ asset.id }}">{{ asset.ip }}:{{ asset.port }}</option>
+                                                                    id="asset_opt_{{ asset.id }}">
+                                                                <b>{{ asset.hostname }}</b>
+                                                                - {{ asset.ip }}:{{ asset.port }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
                                             </tr>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <button type="button"
+                                                    <button type="button" id="btn_add_asset"
                                                             class="btn btn-primary btn-sm btn_add_asset">{% trans 'Confirm' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
                                         {% for asset in assets %}
                                             <tr>
-                                                <td><b class="bdg_group"
-                                                       data-gid={{ asset.id }}>{{ asset.hostname }}</b> - {{ asset.ip }}:{{ asset.port }}
+                                                <td><b class="bdg_asset"
+                                                       data-gid={{ asset.id }}>{{ asset.hostname }}
+                                                    - {{ asset.ip }}:{{ asset.port }}</b>
                                                 </td>
                                                 <td>
                                                     <button class="btn btn-danger pull-right btn-xs btn_delete_asset"
@@ -152,20 +190,21 @@
                             </div>
                             <div class="panel panel-info">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Asset groups' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Task Asset Groups' %}
                                 </div>
                                 <div class="panel-body">
-                                    <table class="table group_edit" id="add-asset2group">
+                                    <table class="table group_edit" id="add-group2task">
                                         <tbody>
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Join asset groups' %}"
+                                                    <select data-placeholder="{% trans 'Select asset groups' %}"
                                                             id="groups_selected" class="select2-multiple groups"
-                                                            style="width: 100%" multiple="" tabindex="4">
+                                                            multiple=""
+                                                            style="width: 100%" tabindex="4">
                                                         {% for asset_group in asset_groups_remain %}
                                                             <option value="{{ asset_group.id }}"
-                                                                    id="opt_{{ asset_group.id }}">{{ asset_group.name }}</option>
+                                                                    id="group_opt_{{ asset_group.id }}">{{ asset_group.name }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
@@ -173,7 +212,7 @@
                                             <tr>
                                                 <td colspan="2" class="no-borders">
                                                     <button type="button" class="btn btn-info btn-sm"
-                                                            id="btn_add_user_group">{% trans 'Confirm' %}</button>
+                                                            id="btn_add_group">{% trans 'Confirm' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
@@ -183,7 +222,7 @@
                                                 <td><b class="bdg_group"
                                                        data-gid={{ asset_group.id }}>{{ asset_group.name }}</b></td>
                                                 <td>
-                                                    <button class="btn btn-danger pull-right btn-xs btn_leave_group"
+                                                    <button class="btn btn-danger pull-right btn-xs btn_delete_group"
                                                             type="button"><i class="fa fa-minus"></i></button>
                                                 </td>
                                             </tr>
@@ -194,7 +233,7 @@
                             </div>
                             <div class="panel panel-warning">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Push system users' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Task System User' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table group_edit" id="add-asset2systemuser">
@@ -202,11 +241,18 @@
                                         <form>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select system users' %}"
-                                                            class="select2 system-user" style="width: 100%" multiple=""
+                                                    <select data-placeholder="{% trans 'Select system user' %}"
+                                                            class="select2 system-user" style="width: 100%"
+                                                            id="system_user_selected"
                                                             tabindex="4">
-                                                        <option></option>
-                                                        {% for system_user in system_users_all %}
+                                                        {% if system_user %}
+                                                            <option value="{{ system_user.id }}"
+                                                                    id="opt_{{ system_user.id }}">{{ system_user.name }}</option>
+                                                        {% else %}
+                                                            <option></option>
+                                                        {% endif %}
+
+                                                        {% for system_user in system_users_remain %}
                                                             <option value="{{ system_user.id }}"
                                                                     id="opt_{{ system_user.id }}">{{ system_user.name }}</option>
                                                         {% endfor %}
@@ -227,7 +273,8 @@
 
                         </div>
 
-                    </div>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -236,11 +283,148 @@
 
 {% block custom_foot_js %}
     <script>
-        $('.select2-multiple').select2({
-            multiple:true
+        jumpserver.groups_selected = [];
+        jumpserver.assets_selected = [];
+        $(document).ready(function () {
+            $('select.select2-multiple').select2();
+            $('select.select2').select2({
+                multiple: false
+            })
+        }).on('click', '#btn_add_group', function () {
+            jumpserver.groups_selected = $('#groups_selected').select2('data');
+            if (Object.keys(jumpserver.groups_selected).length === 0) {
+                return false;
+            }
+            var groups = $('.bdg_group').map(function () {
+                return $(this).data('gid');
+            }).get();
+            $.map(jumpserver.groups_selected, function (value) {
+                groups.push(parseInt(value.id));
+                $('#group_opt_' + value.id).remove();
+            });
+            updateTaskGroups(groups)
+        }).on('click', '.btn_delete_group', function () {
+            var $this = $(this);
+            var $tr = $this.closest('tr');
+            var $badge = $tr.find('.bdg_group');
+            var gid = $badge.data('gid');
+            var group_name = $badge.html() || $badge.text();
+            $('#groups_selected').append(
+                '<option value="' + gid + '" id="group_opt_' + gid + '">' + group_name + '</option>'
+            );
+            $tr.remove();
+            var groups = $('.bdg_group').map(function () {
+                return $(this).data('gid');
+            }).get();
+            updateTaskGroups(groups)
+        }).on('click', '#btn_add_asset', function () {
+            jumpserver.assets_selected = $('#assets_selected').select2('data');
+            if (Object.keys(jumpserver.assets_selected).length === 0) {
+                return false;
+            }
+            var assets = $('.bdg_asset').map(function () {
+                return $(this).data('gid');
+            }).get();
+            console.log(jumpserver.assets_selected)
+            $.map(jumpserver.assets_selected, function (value) {
+                assets.push(parseInt(value.id));
+                $('#asset_opt_' + value.id).remove();
+            });
+            updateTaskAssets(assets)
+        }).on('click', '.btn_delete_asset', function () {
+            var $this = $(this);
+            var $tr = $this.closest('tr');
+            var $badge = $tr.find('.bdg_asset');
+            var gid = $badge.data('gid');
+            var asset_name = $badge.html() || $badge.text();
+            $('#assets_selected').append(
+                '<option value="' + gid + '" id="asset_opt_' + gid + '">' + asset_name + '</option>'
+            );
+            $tr.remove();
+            var assets = $('.bdg_asset').map(function () {
+                return $(this).data('gid');
+            }).get();
+            updateTaskAssets(assets)
+        }).on('click', '.btn-system-user', function () {
+            var id = $('#system_user_selected').select2('data')[0].id;
+            console.log(id)
+            updateTaskSystemUser(id)
         })
-        $('.select2').select2({
-            multiple:false
-        })
+
+        function updateTaskGroups(groups) {
+            var the_url = "{% url 'api-devops:task-update-group' pk=task.id %}";
+            var body = {
+                groups: Object.assign([], groups)
+            };
+            var success = function (data) {
+                // remove all the selected groups from select > option and rendered ul element;
+                $('#groups_selected .select2-selection__rendered').empty();
+                $('#groups_selected').val('');
+                $.map(jumpserver.groups_selected, function (obj) {
+                    let group_name = obj.text;
+                    let group_id = obj.id;
+                    $('#group_opt_' +
+                        '' + group_id).remove();
+                    // change tr html of user groups.
+                    $('#add-group2task tbody').append(
+                        '<tr>' +
+                        '<td><b class="bdg_group" data-gid="' + group_id + '">' + group_name + '</b></td>' +
+                        '<td><button class="btn btn-danger btn-xs pull-right btn_delete_group" type="button"><i class="fa fa-minus"></i></button></td>' +
+                        '</tr>'
+                    )
+                });
+                // clear jumpserver.groups_selected
+                jumpserver.groups_selected = [];
+            };
+            APIUpdateAttr({
+                url: the_url,
+                body: JSON.stringify(body),
+                success: success
+            });
+        }
+
+        function updateTaskAssets(assets) {
+            var the_url = "{% url 'api-devops:task-update-asset' pk=task.id %}";
+            var body = {
+                assets: Object.assign([], assets)
+            };
+            var success = function (data) {
+                // remove all the selected groups from select > option and rendered ul element;
+                $('#assets_selected .select2-selection__rendered').empty();
+                $('#assets_selected').val('');
+                $.map(jumpserver.assets_selected, function (obj) {
+                    let asset_text = obj.text;
+                    let asset_id = obj.id;
+                    $('#asset_opt_' +
+                        '' + asset_id).remove();
+                    // change tr html of user groups.
+                    $('#add-asset2task tbody').append(
+                        '<tr>' +
+                        '<td><b class="bdg_group" data-gid="' + asset_text + '">' + asset_text + '</b></td>' +
+                        '<td><button class="btn btn-danger btn-xs pull-right btn_delete_asset" type="button"><i class="fa fa-minus"></i></button></td>' +
+                        '</tr>'
+                    )
+                });
+                // clear jumpserver.assets_selected
+                jumpserver.assets_selected = [];
+            };
+            APIUpdateAttr({
+                url: the_url,
+                body: JSON.stringify(body),
+                success: success
+            });
+        }
+
+
+        function updateTaskSystemUser(system_user) {
+            var the_url = "{% url 'api-devops:task-update-system-user' pk=task.id %}";
+            var body = {
+                system_user: system_user
+            };
+            APIUpdateAttr({
+                url: the_url,
+                body: JSON.stringify(body)
+            });
+        }
     </script>
 {% endblock %}

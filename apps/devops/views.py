@@ -54,7 +54,7 @@ class TaskUpdateView(AdminUserRequiredMixin, TemplateView):
         return super(TaskUpdateView, self).get_context_data(**kwargs)
 
 
-class TaskDetailView(AdminUserRequiredMixin, DetailView):
+class TaskDetailView(LoginRequiredMixin, DetailView):
     queryset = Task.objects.all()
     context_object_name = 'task'
     template_name = 'devops/task_detail.html'
@@ -63,6 +63,8 @@ class TaskDetailView(AdminUserRequiredMixin, DetailView):
         assets = self.object.assets.all()
         asset_groups = self.object.groups.all()
         system_user = self.object.system_user
+        print([asset for asset in Asset.objects.all()
+               if asset not in assets])
         context = {
             'app': _('Ansible'),
             'action': _('Task Detail'),
@@ -72,9 +74,9 @@ class TaskDetailView(AdminUserRequiredMixin, DetailView):
             'asset_groups': asset_groups,
             'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all()
                                     if asset_group not in asset_groups],
-
-            'system_users_all': SystemUser.objects.all(),
-            'system_users': system_user,
+            'system_user': system_user,
+            'system_users_remain': SystemUser.objects.exclude(
+                id=system_user.id) if system_user else SystemUser.objects.all(),
         }
         kwargs.update(context)
         return super(TaskDetailView, self).get_context_data(**kwargs)
