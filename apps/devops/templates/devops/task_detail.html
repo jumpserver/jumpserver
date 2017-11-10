@@ -21,16 +21,21 @@
                         </li>
                         {% if request.user.is_superuser %}
                             <li class="pull-right">
+                                <a class="btn btn-outline btn-danger btn-delete-task">
+                                    <i class="fa fa-remove"></i>Delete
+                                </a>
+                            </li>
+                            <li class="pull-right">
                                 <a class="btn btn-outline btn-default"
                                    href="{% url 'devops:task-update' pk=task.id %}"><i
                                         class="fa fa-edit"></i>Update</a>
                             </li>
-                            <li class="pull-right">
-                                <a class="btn btn-outline btn-danger btn-delete-user">
-                                    <i class="fa fa-edit"></i>Delete
-                                </a>
-                            </li>
                         {% endif %}
+                        <li class="pull-right">
+                            <a class="btn btn-outline btn-primary btn-execute-task">
+                                <i class="fa fa-cube"></i>Execute
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 <div class="tab-content">
@@ -272,7 +277,6 @@
                             </div>
 
                         </div>
-
                         </div>
                     {% endif %}
                 </div>
@@ -347,9 +351,15 @@
             updateTaskAssets(assets)
         }).on('click', '.btn-system-user', function () {
             var id = $('#system_user_selected').select2('data')[0].id;
-            console.log(id)
             updateTaskSystemUser(id)
-        })
+        }).on('click', '.btn-delete-task', function () {
+            let the_url = '{% url "api-devops:task-opt-detail" pk=task.id %}';
+            let redirectTo = '{% url 'devops:task-list' %}';
+            objectDelete(null, '{{ task.name }}', the_url, redirectTo);
+        }).on('click', '.btn-execute-task', function () {
+
+            executeTask('{{ task.id }}');
+        });
 
         function updateTaskGroups(groups) {
             var the_url = "{% url 'api-devops:task-update-group' pk=task.id %}";
@@ -424,6 +434,18 @@
             APIUpdateAttr({
                 url: the_url,
                 body: JSON.stringify(body)
+            });
+        }
+
+        function executeTask(id) {
+            let the_url = "{% url 'api-devops:task-execute' pk=99991937 %}".replace('99991937', id);
+            let success = function (data) {
+                console.log(data)
+            }
+            APIUpdateAttr({
+                url: the_url,
+                method: 'GET',
+                success: success
             });
         }
     </script>

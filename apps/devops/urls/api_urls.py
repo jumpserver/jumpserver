@@ -10,7 +10,7 @@ app_name = 'devops'
 
 router = routers.DefaultRouter()
 router.register(r'v1/tasks', api.TaskListViewSet, 'task')
-router.register(r'v1/tasks', api.TaskOperationViewSet, 'task')
+router.register(r'v1/tasks-opt', api.TaskOperationViewSet, 'task-opt')
 router.register(r'v1/roles', api.AnsibleRoleViewSet, 'role')
 
 urlpatterns = [
@@ -21,6 +21,9 @@ urlpatterns = [
         api.TaskUpdateAssetApi.as_view(), name='task-update-asset'),
     url(r'^v1/tasks/(?P<pk>\d+)/system-user/$',
         api.TaskUpdateSystemUserApi.as_view(), name='task-update-system-user'),
+    url(r'^v1/tasks/(?P<pk>\d+)/execute/$', api.TaskExecuteApi.as_view(), name='task-execute'),
 ]
 
 urlpatterns += router.urls
+
+print(urlpatterns)

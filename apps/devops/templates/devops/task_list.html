@@ -15,7 +15,7 @@
         <thead>
         <tr>
             <th class="text-center">
-                <input id="" type="checkbox" class="ipt_check_all">
+{#                <input id="" type="checkbox" class="ipt_check_all">#}
             </th>
             <th class="text-center">{% trans 'Name' %}</th>
             <th class="text-center">{% trans 'Description' %}</th>
@@ -36,6 +36,12 @@
             let options = {
                 ele: $('#task_table'),
                 columnDefs: [
+                    {
+                        targets: 0,
+                        createdCell: function (td, cellData, rowData) {
+                            $(td).html("");
+                        }
+                    },
                     {
                         targets: 1,
                         /**
@@ -59,15 +65,22 @@
                     {
                         targets: 5,
                         createdCell: function (td, cellData, rowData) {
+                            let update_btn;
+                            let del_btn;
+                            let exec_btn = '<a class="btn btn-xs btn-primary m-l-xs btn-task-exec" data-uid="99991937" data-name="99991938">{% trans "Execute" %}</a>'
+                                .replace('99991937', cellData)
+                                .replace('99991938', rowData.name);
                             {% if request.user.is_superuser %}
-                                let update_btn = '<a href="{% url "devops:task-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
-                                let del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-task-delete" data-uid="99991937" data-name="99991938">{% trans "Delete" %}</a>'
+                                update_btn = '<a href="{% url "devops:task-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
+
+                                del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-task-delete" data-uid="99991937" data-name="99991938">{% trans "Delete" %}</a>'
                                     .replace('99991937', cellData)
                                     .replace('99991938', rowData.name);
-                                $(td).html(update_btn + del_btn)
+
+                                $(td).html(update_btn + del_btn + exec_btn);
                             {% else %}
-                             $(td).html("");
-                            ${% endif %}
+                                $(td).html(exec_btn);
+                            {% endif %}
                         }
                     }
                 ],
@@ -84,7 +97,7 @@
                 let $this = $(this);
                 let name = $this.data('name');
                 let uid = $this.data('uid');
-                let the_url = '{% url "api-devops:task-detail" pk=99991937 %}'.replace('99991937', uid);
+                let the_url = '{% url "api-devops:task-opt-detail" pk=99991937 %}'.replace('99991937', uid);
                 objectDelete($this, name, the_url);
             })
 

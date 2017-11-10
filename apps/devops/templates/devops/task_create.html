@@ -2,7 +2,7 @@
 {% block custom_create_update_js %}
     <script>
         $('#submit_btn').click(function () {
-            let the_url = "{% url 'api-devops:task-list' %}";
+            let the_url = "{% url 'api-devops:task-opt-list' %}";
             let form = $('#form').serializeObject()
             if (typeof(form.tags)==="string") {
                 let tag = form.tags;

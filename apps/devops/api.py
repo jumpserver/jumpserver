@@ -8,6 +8,9 @@ from rest_framework.response import Response
 from .hands import IsSuperUser, IsSuperUserOrAppUser, IsValidUser
 from .serializers import *
 from .tasks import ansible_install_role
+import json
+import yaml
+import os
 
 
 class TaskListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -20,7 +23,7 @@ class TaskListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 
 class TaskOperationViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
-                           mixins.UpdateModelMixin,mixins.DestroyModelMixin,
+                           mixins.UpdateModelMixin, mixins.DestroyModelMixin,
                            viewsets.GenericViewSet):
     """
         对Ansible的task提供的 操作 API操作
@@ -28,6 +31,28 @@ class TaskOperationViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = (IsSuperUser,)
+
+    def update(self, request, *args, **kwargs):
+        response = super(TaskOperationViewSet, self).update(request, *args, **kwargs)
+        self.playbook(self.get_object().id)
+        return response
+
+    def create(self, request, *args, **kwargs):
+        response = super(TaskOperationViewSet, self).create(request, *args, **kwargs)
+        self.playbook(response.data['id'])
+        return response
+
+    """
+    组织任务的playbook
+    """
+
+    def playbook(self, task_id):
+        task = Task.objects.get(id=task_id)
+        playbook_json = [{'hosts': 'all', 'roles': [{'role': task.ansible_role.name}]}]
+        if not os.path.exists('../playbooks'):
+            os.makedirs('../playbooks')
+        with open("../playbooks/task_%s.yml" % task.id, "w") as f:
+            yaml.dump(playbook_json, f)
 
 
 class AnsibleRoleViewSet(viewsets.ModelViewSet):
@@ -88,3 +113,13 @@ class TaskUpdateSystemUserApi(generics.RetrieveUpdateAPIView):
     queryset = Task.objects.all()
     serializer_class = TaskUpdateSystemUserSerializer
     permission_classes = (IsSuperUser,)
+
+
+class TaskExecuteApi(generics.GenericAPIView):
+    """
+       Task Execute API
+    """
+
+    def get(self, request, *args, **kwargs):
+        id = kwargs['pk']
+        return Response(id)

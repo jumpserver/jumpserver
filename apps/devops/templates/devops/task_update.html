@@ -1,7 +1,7 @@
 {% extends 'devops/_task_create_update.html' %}
 {% block custom_create_update_js %}
     <script>
-        let the_url = '{% url 'api-devops:task-detail' pk=id %}';
+        let the_url = '{% url 'api-devops:task-opt-detail' pk=id %}';
 
         function load_data() {
 
