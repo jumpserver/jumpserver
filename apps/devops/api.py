@@ -8,7 +8,6 @@ from rest_framework.response import Response
 from .hands import IsSuperUser, IsSuperUserOrAppUser, IsValidUser
 from .serializers import *
 from .tasks import ansible_install_role
-import json
 import yaml
 import os
 
@@ -42,11 +41,8 @@ class TaskOperationViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
         self.playbook(response.data['id'])
         return response
 
-    """
-    组织任务的playbook
-    """
-
     def playbook(self, task_id):
+        """ 组织任务的playbook """
         task = Task.objects.get(id=task_id)
         playbook_json = [{'hosts': 'all', 'roles': [{'role': task.ansible_role.name}]}]
         if not os.path.exists('../playbooks'):
