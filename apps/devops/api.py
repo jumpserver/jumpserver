@@ -1,5 +1,5 @@
 # ~*~ coding: utf-8 ~*~
-
+import json
 
 from rest_framework import status
 from rest_framework import viewsets, generics, mixins
@@ -7,9 +7,10 @@ from rest_framework.response import Response
 
 from .hands import IsSuperUser, IsSuperUserOrAppUser, IsValidUser
 from .serializers import *
-from .tasks import ansible_install_role
+from .tasks import ansible_install_role, ansible_task_execute
 import yaml
 import os
+from perms import utils
 
 
 class TaskListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -44,11 +45,20 @@ class TaskOperationViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
     def playbook(self, task_id):
         """ 组织任务的playbook """
         task = Task.objects.get(id=task_id)
-        playbook_json = [{'hosts': 'all', 'roles': [{'role': task.ansible_role.name}]}]
+        playbook = {'hosts': 'all'}
+        #: system_user
+        if task.system_user is not None:
+            playbook.update({'become': 'True', 'become_user': task.system_user.username})
+
+        #: role
+        role = {'roles': [{'role': task.ansible_role.name}]}
+        playbook.update(role)
+
+        playbook_yml = [playbook]
         if not os.path.exists('../playbooks'):
             os.makedirs('../playbooks')
         with open("../playbooks/task_%s.yml" % task.id, "w") as f:
-            yaml.dump(playbook_json, f)
+            yaml.dump(playbook_yml, f)
 
 
 class AnsibleRoleViewSet(viewsets.ModelViewSet):
@@ -111,11 +121,32 @@ class TaskUpdateSystemUserApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsSuperUser,)
 
 
-class TaskExecuteApi(generics.GenericAPIView):
+class TaskExecuteApi(generics.RetrieveAPIView):
     """
        Task Execute API
     """
+    queryset = Task.objects.all()
 
     def get(self, request, *args, **kwargs):
-        id = kwargs['pk']
-        return Response(id)
+        task = self.get_object()
+        #: 计算assets
+        #: 超级用户直接取task所有assets
+
+        if request.user.is_superuser:
+            assets = task.assets.all()
+        else:
+            #: 普通用户取授权过的assets
+            granted_assets = utils.get_user_granted_assets(user=request.user)
+            #: 取交集
+            assets = [asset for asset in task.assets if asset in granted_assets]
+
+        if len(assets) == 0:
+            return Response("任务执行的资产为空", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        #: 系统用户不能为空
+        if task.system_user is None:
+            return Response("任务执行的系统用户为空", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        #: 没有assets和system_user不允许执行 #.delay
+        ansible_task_execute(task.id, [asset._to_secret_json() for asset in assets], task.system_user.username,
+                             "%s #%d" % (task.name, task.counts), task.tags)
+        return Response("success", status=status.HTTP_200_OK)

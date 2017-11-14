@@ -121,11 +121,11 @@ class Asset(models.Model):
             'username': self.admin_user.username if self.admin_user else '',
             'password': self.admin_user.password if self.admin_user else '',
             'private_key': self.admin_user.private_key_file if self.admin_user else None,
-            'become': {
-                'method': self.admin_user.become_method,
-                'user': self.admin_user.become_user,
-                'pass': self.admin_user.become_pass,
-            } if self.admin_user and self.admin_user.become else {},
+            # 'become': {
+            #     'method': self.admin_user.become_method,
+            #     'user': self.admin_user.become_user,
+            #     'pass': self.admin_user.become_pass,
+            # } if self.admin_user and self.admin_user.become else {},
         }
 
     class Meta:

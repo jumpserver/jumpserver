@@ -21,7 +21,7 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        exclude = ('assets', 'groups',)
+        exclude = ('assets', 'groups', 'counts')
 
     @staticmethod
     def get_ansible_role_name(obj):

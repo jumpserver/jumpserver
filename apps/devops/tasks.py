@@ -1,7 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 from celery import shared_task
 import json
-from .utils import run_AdHoc
+from .utils import run_AdHoc, run_playbook
 from ansible.cli.galaxy import GalaxyCLI
 
 
@@ -21,3 +21,9 @@ def ansible_install_role(role_name):
     if summary['failed']:
         return False
     return True
+
+
+@shared_task
+def ansible_task_execute(task_id, assets, system_user, task_name, tags):
+    run_playbook(playbook_path='../playbooks/task_%d.yml' % task_id, assets=assets, system_user=system_user,
+                 task_name=task_name, tags=tags)

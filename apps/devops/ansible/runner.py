@@ -1,8 +1,9 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
 
+import json
 import os
-from collections import namedtuple, defaultdict
+from collections import namedtuple
 
 from ansible.errors import AnsibleError
 from ansible.executor.task_queue_manager import TaskQueueManager
@@ -18,7 +19,6 @@ from .inventory import JMSInventory
 from .callback import AdHocResultCallback, PlaybookResultCallBack, \
     CommandResultCallback
 from common.utils import get_logger
-
 
 __all__ = ["AdHocRunner", "PlayBookRunner"]
 
@@ -37,10 +37,10 @@ class PlayBookRunner(object):
         'module_path', 'forks', 'remote_user', 'private_key_file', 'timeout',
         'ssh_common_args', 'ssh_extra_args', 'sftp_extra_args',
         'scp_extra_args', 'become', 'become_method', 'become_user',
-        'verbosity', 'check', 'extra_vars'])
+        'verbosity', 'check', 'extra_vars', 'tags'])
 
     def __init__(self,
-                 hosts=None,
+                 hosts=C.DEFAULT_HOST_LIST,
                  playbook_path=None,
                  forks=C.DEFAULT_FORKS,
                  listtags=False,
@@ -56,13 +56,14 @@ class PlayBookRunner(object):
                  scp_extra_args=None,
                  become=True,
                  become_method=None,
-                 become_user="root",
+                 become_user="test",
                  verbosity=None,
                  extra_vars=None,
                  connection_type="ssh",
                  passwords=None,
                  private_key_file=None,
-                 check=False):
+                 check=False,
+                 tags=None):
 
         C.RETRY_FILES_ENABLED = False
         self.callbackmodule = PlaybookResultCallBack()
@@ -73,7 +74,6 @@ class PlayBookRunner(object):
         self.loader = DataLoader()
         self.variable_manager = VariableManager()
         self.passwords = passwords or {}
-        self.inventory = JMSInventory(hosts)
 
         self.options = self.Options(
             listtags=listtags,
@@ -90,20 +90,25 @@ class PlayBookRunner(object):
             ssh_extra_args=ssh_extra_args or "",
             sftp_extra_args=sftp_extra_args,
             scp_extra_args=scp_extra_args,
-            become=become,
-            become_method=become_method,
-            become_user=become_user,
+            become=True,
+            become_method="sudo",
+            become_user="test",
             verbosity=verbosity,
             extra_vars=extra_vars or [],
-            check=check
+            check=check,
+            tags=tags or ['all']
         )
 
         self.variable_manager.extra_vars = load_extra_vars(loader=self.loader,
                                                            options=self.options)
         self.variable_manager.options_vars = load_options_vars(self.options)
+        if hosts is C.DEFAULT_HOST_LIST:
+            from ansible.inventory import Inventory
+            self.inventory = Inventory(loader=self.loader, variable_manager=self.variable_manager, host_list=hosts)
+        else:
+            self.inventory = JMSInventory(hosts)
 
         self.variable_manager.set_inventory(self.inventory)
-
         # 初始化playbook的executor
         self.runner = PlaybookExecutor(
             playbooks=[self.playbook_path],
@@ -112,7 +117,6 @@ class PlayBookRunner(object):
             loader=self.loader,
             options=self.options,
             passwords=self.passwords)
-
         if self.runner._tqm:
             self.runner._tqm._stdout_callback = self.callbackmodule
 
@@ -123,6 +127,28 @@ class PlayBookRunner(object):
         self.runner._tqm.cleanup()
         return self.callbackmodule.output
 
+    def clean_result(self):
+        """
+        :return: {
+            "success": ['hostname',],
+            "failed": [('hostname', 'msg'), {}],
+        }
+        """
+        result = "{'success': [], 'failed': []}"
+        print("results:"+json.dumps(self.callbackmodule.results))
+        print("item_results:"+json.dumps(self.callbackmodule.item_results))
+        print("output:"+json.dumps(self.callbackmodule.output))
+        # for host in self.callbackmodule.results['contacted']:
+        #     result['success'].append(host)
+        #
+        # for host, msgs in self.callbackmodule.results['dark'].items():
+        #     msg = '\n'.join(['{} {}: {}'.format(
+        #         msg.get('module_stdout', ''),
+        #         msg.get('invocation', {}).get('module_name'),
+        #         msg.get('msg', '')) for msg in msgs])
+        #     result['failed'].append((host, msg))
+        return result
+
 
 class AdHocRunner(object):
     """
@@ -132,8 +158,8 @@ class AdHocRunner(object):
         'connection', 'module_path', 'private_key_file', "remote_user",
         'timeout', 'forks', 'become', 'become_method', 'become_user',
         'check', 'extra_vars',
-        ]
-    )
+    ]
+                         )
 
     results_callback_class = AdHocResultCallback
 
@@ -277,11 +303,11 @@ class AdHocRunner(object):
 def test_run():
     assets = [
         {
-                "hostname": "192.168.244.129",
-                "ip": "192.168.244.129",
-                "port": 22,
-                "username": "root",
-                "password": "redhat",
+            "hostname": "192.168.244.129",
+            "ip": "192.168.244.129",
+            "port": 22,
+            "username": "root",
+            "password": "redhat",
         },
     ]
     task_tuple = (('shell', 'ls'),)
@@ -290,7 +316,7 @@ def test_run():
     ret = hoc.run(task_tuple)
     print(ret)
 
-    #play = PlayBookRunner(assets, playbook_path='/tmp/some.yml')
+    # play = PlayBookRunner(assets, playbook_path='/tmp/some.yml')
     """
     # /tmp/some.yml
     ---
@@ -302,7 +328,7 @@ def test_run():
        - name: exec uptime
          shell: uptime
     """
-    #play.run()
+    # play.run()
 
 
 if __name__ == "__main__":
