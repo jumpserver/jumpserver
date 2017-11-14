@@ -153,16 +153,21 @@ class UserAuthApi(APIView):
         login_ip = request.data.get('remote_addr', None)
         user_agent = request.data.get('HTTP_USER_AGENT', '')
 
+        if not login_ip:
+            login_ip = request.META.get("REMOTE_ADDR")
+
         user, msg = check_user_valid(
             username=username, password=password,
-            public_key=public_key)
+            public_key=public_key
+        )
 
         if user:
             token = generate_token(request, user)
             write_login_log_async.delay(
                 user.username, name=user.name,
                 user_agent=user_agent, login_ip=login_ip,
-                login_type=login_type)
+                login_type=login_type
+            )
             return Response({'token': token, 'user': user.to_json()})
         else:
             return Response({'msg': msg}, status=401)

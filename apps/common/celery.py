@@ -31,6 +31,11 @@ app.conf.update(
             'task': 'assets.tasks.test_admin_user_connective_period',
             'schedule': 60*60*60,
             'args': (),
+        },
+        'clean_terminal_history': {
+            'task': 'applications.tasks.clean_terminal_history',
+            'schedule': 60*60*60,
+            'args': (),
         }
     }
 )

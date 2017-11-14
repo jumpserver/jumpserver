@@ -4,7 +4,7 @@
 from django.utils import timezone
 from rest_framework import serializers
 
-from .models import Terminal, TerminalHeatbeat
+from .models import Terminal, TerminalStatus, TerminalSession, TerminalTask
 from .hands import ProxyLog
 
 
@@ -15,8 +15,7 @@ class TerminalSerializer(serializers.ModelSerializer):
     class Meta:
         model = Terminal
         fields = ['id', 'name', 'remote_addr', 'http_port', 'ssh_port',
-                  'comment', 'is_accepted',
-                  'session_connected', 'is_alive']
+                  'comment', 'is_accepted', 'session_connected', 'is_alive']
 
     @staticmethod
     def get_session_connected(obj):
@@ -31,12 +30,22 @@ class TerminalSerializer(serializers.ModelSerializer):
             return False
 
 
-class TerminalHeatbeatSerializer(serializers.ModelSerializer):
-    date_start = serializers.DateTimeField
+class TerminalSessionSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = TerminalHeatbeat
+        model = TerminalSession
+        fields = '__all__'
 
 
+class TerminalStatusSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = '__all__'
+        model = TerminalStatus
 
 
+class TerminalTaskSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        fields = '__all__'
+        model = TerminalTask

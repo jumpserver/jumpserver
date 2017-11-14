@@ -12,7 +12,7 @@ from .utils import get_user_granted_assets, get_user_granted_asset_groups, \
     get_user_group_granted_assets, get_user_group_granted_asset_groups
 from .models import AssetPermission
 from .hands import AssetGrantedSerializer, User, UserGroup, AssetGroup, Asset, \
-    AssetGroup, AssetGroupSerializer, SystemUser
+    AssetGroup, AssetGroupGrantedSerializer, SystemUser
 from . import serializers
 from .utils import associate_system_users_and_assets
 
@@ -135,30 +135,24 @@ class UserGrantedAssetsApi(ListAPIView):
 
 class UserGrantedAssetGroupsApi(ListAPIView):
     permission_classes = (IsSuperUserOrAppUser,)
-    serializer_class = AssetGroupSerializer
+    serializer_class = AssetGroupGrantedSerializer
 
     def get_queryset(self):
         user_id = self.kwargs.get('pk', '')
-
         if not user_id:
             return []
 
         user = get_object_or_404(User, id=user_id)
-        if user:
-            asset_groups = {}
-            for asset, system_ in get_user_granted_assets(user).items():
-                for asset_group in asset.groups.all():
-                    if asset_group.id in asset_groups:
-                        asset_groups[asset_group.id]['assets_amount'] += 1
-                    else:
-                        asset_groups[asset_group.id] = {
-                            'id': asset_group.id,
-                            'name': asset_group.name,
-                            'comment': asset_group.comment,
-                            'assets_amount': 1
-                        }
-        asset_groups_json = asset_groups.values()
+        asset_groups = get_user_granted_asset_groups(user)
 
+        queryset = []
+        for asset_group, assets_system_users in asset_groups.items():
+            assets = []
+            for asset, system_users in assets_system_users:
+                asset.system_users_granted = system_users
+                assets.append(asset)
+            asset_group.assets_granted = assets
+            queryset.append(asset_group)
         return queryset
 
 
@@ -277,7 +271,7 @@ class UserGroupGrantedAssetsApi(ListAPIView):
 
 class UserGroupGrantedAssetGroupsApi(ListAPIView):
     permission_classes = (IsSuperUser,)
-    serializer_class = AssetGroupSerializer
+    serializer_class = AssetGroupGrantedSerializer
 
     def get_queryset(self):
         user_group_id = self.kwargs.get('pk', '')

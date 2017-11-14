@@ -7,7 +7,6 @@ import uuid
 import codecs
 import chardet
 from io import StringIO
-from collections import defaultdict
 
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _

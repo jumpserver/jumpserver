@@ -13,6 +13,7 @@ class Terminal(models.Model):
     http_port = models.IntegerField(verbose_name=_('HTTP Port'), default=5000)
     user = models.OneToOneField(User, related_name='terminal', verbose_name='Application User', null=True, on_delete=models.CASCADE)
     is_accepted = models.BooleanField(default=False, verbose_name='Is Accepted')
+    is_deleted = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
@@ -28,7 +29,7 @@ class Terminal(models.Model):
             self.user.is_active = active
             self.user.save()
 
-    def create_related_app_user(self):
+    def create_app_user(self):
         user, access_key = User.create_app_user(name=self.name, comment=self.comment)
         self.user = user
         self.save()
@@ -37,19 +38,71 @@ class Terminal(models.Model):
     def delete(self, using=None, keep_parents=False):
         if self.user:
             self.user.delete()
-        return super(Terminal, self).delete(using=using, keep_parents=keep_parents)
+        self.is_deleted = True
+        self.save()
+        return
 
     def __str__(self):
-        active = 'Active' if self.user and self.user.is_active else 'Disabled'
-        return '%s: %s' % (self.name, active)
+        status = "Active"
+        if not self.is_accepted:
+            status = "NotAccept"
+        elif self.is_deleted:
+            status = "Deleted"
+        elif not self.is_active:
+            status = "Disable"
+        return '%s: %s' % (self.name, status)
 
     class Meta:
         ordering = ('is_accepted',)
 
 
-class TerminalHeatbeat(models.Model):
-    terminal = models.ForeignKey(Terminal, on_delete=models.CASCADE)
+class TerminalStatus(models.Model):
+    session_online = models.IntegerField(verbose_name=_("Session Online"), default=0)
+    cpu_used = models.FloatField(verbose_name=_("CPU Usage"))
+    memory_used = models.FloatField(verbose_name=_("Memory Used"))
+    connections = models.IntegerField(verbose_name=_("Connections"))
+    threads = models.IntegerField(verbose_name=_("Threads"))
+    boot_time = models.FloatField(verbose_name=_("Boot Time"))
+    terminal = models.ForeignKey(Terminal, null=True, on_delete=models.CASCADE)
     date_created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'terminal_heatbeat'
+        db_table = 'terminal_status'
+
+    # def __str__(self):
+    #     return "<{} status>".format(self.terminal.name)
+
+
+class TerminalSession(models.Model):
+    LOGIN_FROM_CHOICES = (
+        ('ST', 'SSH Terminal'),
+        ('WT', 'Web Terminal'),
+    )
+
+    id = models.UUIDField(primary_key=True)
+    user = models.CharField(max_length=128, verbose_name=_("User"))
+    asset = models.CharField(max_length=1024, verbose_name=_("Asset"))
+    system_user = models.CharField(max_length=128, verbose_name=_("System User"))
+    login_from = models.CharField(max_length=2, choices=LOGIN_FROM_CHOICES, default="ST")
+    is_finished = models.BooleanField(default=False)
+    terminal = models.IntegerField(null=True, verbose_name=_("Terminal"))
+    date_start = models.DateTimeField(verbose_name=_("Date Start"))
+    date_end = models.DateTimeField(verbose_name=_("Date End"), null=True)
+
+    class Meta:
+        db_table = "terminal_session"
+
+    def __str__(self):
+        return "{0.id} of {0.user} to {0.asset}".format(self)
+
+
+class TerminalTask(models.Model):
+    name = models.CharField(max_length=128, verbose_name=_("Name"))
+    args = models.CharField(max_length=1024, verbose_name=_("Task Args"))
+    terminal = models.ForeignKey(Terminal, null=True, on_delete=models.CASCADE)
+    is_finished = models.BooleanField(default=False)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_finished = models.DateTimeField(null=True)
+
+    class Meta:
+        db_table = "terminal_task"

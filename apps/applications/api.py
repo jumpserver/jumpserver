@@ -1,22 +1,23 @@
 # -*- coding: utf-8 -*-
-# 
-
+#
 from collections import OrderedDict
 import copy
-from rest_framework import viewsets
+from rest_framework import viewsets, serializers
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
-from .models import Terminal, TerminalHeatbeat
-from .serializers import TerminalSerializer, TerminalHeatbeatSerializer
+from .models import Terminal, TerminalStatus, TerminalSession, TerminalTask
+from .serializers import TerminalSerializer, TerminalStatusSerializer, \
+    TerminalSessionSerializer, TerminalTaskSerializer
 from .hands import IsSuperUserOrAppUser, IsAppUser, ProxyLog, \
     IsSuperUserOrAppUserOrUserReadonly
 from common.utils import get_object_or_none
 
 
 class TerminalViewSet(viewsets.ModelViewSet):
-    queryset = Terminal.objects.all()
+    queryset = Terminal.objects.filter(is_deleted=False)
     serializer_class = TerminalSerializer
     permission_classes = (IsSuperUserOrAppUserOrUserReadonly,)
 
@@ -37,7 +38,7 @@ class TerminalViewSet(viewsets.ModelViewSet):
 
         if serializer.is_valid():
             terminal = serializer.save()
-            app_user, access_key = terminal.create_related_app_user()
+            app_user, access_key = terminal.create_app_user()
             data = OrderedDict()
             data['terminal'] = copy.deepcopy(serializer.data)
             data['user'] = app_user.to_json()
@@ -51,44 +52,86 @@ class TerminalViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         if self.action == "create":
             self.permission_classes = (AllowAny,)
-
         return super().get_permissions()
 
 
-tasks = OrderedDict()
-# tasks = {1: [{'name': 'kill_proxy', 'proxy_log_id': 23}]}
-
-
-class TerminalHeatbeatViewSet(viewsets.ModelViewSet):
-    queryset = TerminalHeatbeat.objects.all()
-    serializer_class = TerminalHeatbeatSerializer
-    permission_classes = (IsAppUser,)
+class TerminalStatusViewSet(viewsets.ModelViewSet):
+    queryset = TerminalStatus.objects.all()
+    serializer_class = TerminalStatusSerializer
+    permission_classes = (IsSuperUserOrAppUser,)
+    session_serializer_class = TerminalSessionSerializer
 
     def create(self, request, *args, **kwargs):
-        terminal = request.user.terminal
-        TerminalHeatbeat.objects.create(terminal=terminal)
-        task = tasks.get(terminal.name)
-        tasks[terminal.name] = []
-        return Response({'msg': 'Success',
-                         'tasks': task},
-                        status=201)
-
-
-class TerminateConnectionView(APIView):
-    def post(self, request, *args, **kwargs):
-        if isinstance(request.data, dict):
-            data = [request.data]
-        else:
-            data = request.data
-        for d in data:
-            proxy_log_id = d.get('proxy_log_id')
-            proxy_log = get_object_or_404(ProxyLog, id=proxy_log_id)
-            terminal_id = proxy_log.terminal
-            if terminal_id in tasks:
-                tasks[terminal_id].append({'name': 'kill_proxy',
-                                           'proxy_log_id': proxy_log_id})
+        sessions_active = []
+        for session_data in request.data.get("sessions", []):
+            session_data["terminal"] = self.request.user.terminal.id
+            _id = session_data["id"]
+            session = get_object_or_none(TerminalSession, id=_id)
+            if session:
+                serializer = TerminalSessionSerializer(data=session_data, instance=session)
             else:
-                tasks[terminal_id] = [{'name': 'kill_proxy',
-                                       'proxy_log_id': proxy_log_id}]
+                serializer = TerminalSessionSerializer(data=session_data)
 
-        return Response({'msg': 'get it'})
+            if serializer.is_valid():
+                serializer.save()
+
+            if session_data["is_finished"]:
+                sessions_active.append(session_data["id"])
+
+        sessions_in_db_active = TerminalSession.objects.filter(
+            is_finished=False, terminal=self.request.user.terminal.id
+        )
+
+        for session in sessions_in_db_active:
+            if session.id not in sessions_active:
+                session.is_finished = True
+                session.date_end = timezone.now()
+                session.save()
+
+        return super().create(request, *args, **kwargs)
+
+    def get_queryset(self):
+        terminal_id = self.kwargs.get("terminal", None)
+        if terminal_id:
+            terminal = get_object_or_404(Terminal, id=terminal_id)
+            self.queryset = terminal.terminalstatus_set.all()
+        return self.queryset
+
+    def perform_create(self, serializer):
+        serializer.validated_data["terminal"] = self.request.user.terminal
+        return super().perform_create(serializer)
+
+    def get_permissions(self):
+        if self.action == "create":
+            self.permission_classes = (IsAppUser,)
+        return super().get_permissions()
+
+
+class TerminalSessionViewSet(viewsets.ModelViewSet):
+    queryset = TerminalSession.objects.all()
+    serializers_class = TerminalSessionSerializer
+    permission_classes = (IsSuperUserOrAppUser,)
+
+    def get_queryset(self):
+        terminal_id = self.kwargs.get("terminal", None)
+        if terminal_id:
+            terminal = get_object_or_404(Terminal, id=terminal_id)
+            self.queryset = terminal.terminalstatus_set.all()
+        return self.queryset
+
+
+class TerminalTaskViewSet(viewsets.ModelViewSet):
+    queryset = TerminalTask.objects.all()
+    serializer_class = TerminalTaskSerializer
+    permission_classes = (IsSuperUserOrAppUser,)
+
+    def get_queryset(self):
+        terminal_id = self.kwargs.get("terminal", None)
+        if terminal_id:
+            terminal = get_object_or_404(Terminal, id=terminal_id)
+            self.queryset = terminal.terminalstatus_set.all()
+
+        if hasattr(self.request.user, "terminal"):
+            terminal = self.request.user.terminal
+            self.queryset = terminal.terminalstatus_set.all()
+        return self.queryset

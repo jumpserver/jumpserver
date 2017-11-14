@@ -187,3 +187,16 @@ class IDCSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         fields.append('assets_amount')
         return fields
 
+
+class AssetGroupGrantedSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+    assets_granted = AssetGrantedSerializer(many=True, read_only=True)
+    assets_amount = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AssetGroup
+        list_serializer_class = BulkListSerializer
+        fields = '__all__'
+
+    @staticmethod
+    def get_assets_amount(obj):
+        return len(obj.assets_granted)

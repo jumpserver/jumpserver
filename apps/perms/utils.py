@@ -1,6 +1,7 @@
 # coding: utf-8
 
 from __future__ import absolute_import, unicode_literals
+import collections
 
 from common.utils import setattr_bulk, get_logger
 from .tasks import push_users
@@ -52,77 +53,77 @@ def get_user_group_granted_assets(user_group):
     return assets
 
 
-def get_user_granted_asset_groups_direct(user):
-    """Return asset groups granted of the user direct nor inherit from user group
-
-        :param user: Instance of :class: ``User``
-        :return: {asset_group: {system_user1, },
-                  asset_group2: {system_user1, system_user2]}
-        """
-    asset_groups = {}
-    asset_permissions_direct = user.asset_permissions.all()
-
-    for asset_permission in asset_permissions_direct:
-        if not asset_permission.is_valid:
-            continue
-        for asset_group in asset_permission.asset_groups.all():
-            if asset_group in asset_groups:
-                asset_groups[asset_group] |= set(asset_permission.system_users.all())
-            else:
-                setattr(asset_group, 'inherited', False)
-                asset_groups[asset_group] = set(asset_permission.system_users.all())
-
-    return asset_groups
-
-
-def get_user_granted_asset_groups_inherit_from_user_groups(user):
-    """Return asset groups granted of the user and inherit from user group
-
-    :param user: Instance of :class: ``User``
-    :return: {asset_group: {system_user1, },
-              asset_group2: {system_user1, system_user2]}
-    """
-    asset_groups = {}
-    user_groups = user.groups.all()
-    asset_permissions = set()
-
-    # Get asset permission list of user groups for this user
-    for user_group in user_groups:
-        asset_permissions |= set(user_group.asset_permissions.all())
-
-    # Get asset groups granted from user groups
-    for asset_permission in asset_permissions:
-        if not asset_permission.is_valid:
-            continue
-        for asset_group in asset_permission.asset_groups.all():
-            if asset_group in asset_groups:
-                asset_groups[asset_group] |= set(asset_permission.system_users.all())
-            else:
-                setattr(asset_group, 'inherited', True)
-                asset_groups[asset_group] = set(asset_permission.system_users.all())
-
-    return asset_groups
+# def get_user_granted_asset_groups_direct(user):
+#     """Return asset groups granted of the user direct nor inherit from user group
+#
+#     :param user: Instance of :class: ``User``
+#     :return: {asset_group: {system_user1, },
+#               asset_group2: {system_user1, system_user2]}
+#     """
+#     asset_groups = {}
+#     asset_permissions_direct = user.asset_permissions.all()
+#
+#     for asset_permission in asset_permissions_direct:
+#         if not asset_permission.is_valid:
+#             continue
+#         for asset_group in asset_permission.asset_groups.all():
+#             if asset_group in asset_groups:
+#                 asset_groups[asset_group] |= set(asset_permission.system_users.all())
+#             else:
+#                 setattr(asset_group, 'inherited', False)
+#                 asset_groups[asset_group] = set(asset_permission.system_users.all())
+#
+#     return asset_groups
 
 
-def get_user_granted_asset_groups(user):
-    """Get user granted asset groups all, include direct and inherit from user group
+# def get_user_granted_asset_groups_inherit_from_user_groups(user):
+#     """Return asset groups granted of the user and inherit from user group
+#
+#     :param user: Instance of :class: ``User``
+#     :return: {asset_group: {system_user1, },
+#               asset_group2: {system_user1, system_user2]}
+#     """
+#     asset_groups = {}
+#     user_groups = user.groups.all()
+#     asset_permissions = set()
+#
+#     # Get asset permission list of user groups for this user
+#     for user_group in user_groups:
+#         asset_permissions |= set(user_group.asset_permissions.all())
+#
+#     # Get asset groups granted from user groups
+#     for asset_permission in asset_permissions:
+#         if not asset_permission.is_valid:
+#             continue
+#         for asset_group in asset_permission.asset_groups.all():
+#             if asset_group in asset_groups:
+#                 asset_groups[asset_group] |= set(asset_permission.system_users.all())
+#             else:
+#                 setattr(asset_group, 'inherited', True)
+#                 asset_groups[asset_group] = set(asset_permission.system_users.all())
+#
+#     return asset_groups
 
-    :param user: Instance of :class: ``User``
-    :return: {asset1: {system_user1, system_user2}, asset2: {...}}
-    """
 
-    asset_groups_inherit_from_user_groups = \
-        get_user_granted_asset_groups_inherit_from_user_groups(user)
-    asset_groups_direct = get_user_granted_asset_groups_direct(user)
-    asset_groups = asset_groups_inherit_from_user_groups
-
-    # Merge direct granted and inherit from user group
-    for asset_group, system_users in asset_groups_direct.items():
-        if asset_group in asset_groups:
-            asset_groups[asset_group] |= asset_groups_direct[asset_group]
-        else:
-            asset_groups[asset_group] = asset_groups_direct[asset_group]
-    return asset_groups
+# def get_user_granted_asset_groups(user):
+#     """Get user granted asset groups all, include direct and inherit from user group
+#
+#     :param user: Instance of :class: ``User``
+#     :return: {asset_group1: {system_user1, system_user2}, asset_group2: {...}}
+#     """
+#
+#     asset_groups_inherit_from_user_groups = \
+#         get_user_granted_asset_groups_inherit_from_user_groups(user)
+#     asset_groups_direct = get_user_granted_asset_groups_direct(user)
+#     asset_groups = asset_groups_inherit_from_user_groups
+#
+#     # Merge direct granted and inherit from user group
+#     for asset_group, system_users in asset_groups_direct.items():
+#         if asset_group in asset_groups:
+#             asset_groups[asset_group] |= asset_groups_direct[asset_group]
+#         else:
+#             asset_groups[asset_group] = asset_groups_direct[asset_group]
+#     return asset_groups
 
 
 def get_user_granted_assets_direct(user):
@@ -191,8 +192,21 @@ def get_user_granted_assets(user):
 
 
 def get_user_granted_asset_groups(user):
-    pass
+    """Return asset groups with assets and system users, it's not the asset
+    group direct permed in rules. We get all asset and then get it asset group
 
+    :param user: Instance of :class: ``User``
+    :return: {asset_group1: [asset1, asset2], asset_group2: []}
+    """
+    asset_groups = collections.defaultdict(list)
+    ungroups = [AssetGroup(name="UnGrouped")]
+    for asset, system_users in get_user_granted_assets(user).items():
+        groups = asset.groups.all()
+        if not groups:
+            groups = ungroups
+        for asset_group in groups:
+            asset_groups[asset_group].append((asset, system_users))
+    return asset_groups
 
 
 def get_user_group_asset_permissions(user_group):

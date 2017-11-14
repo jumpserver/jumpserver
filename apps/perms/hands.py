@@ -4,7 +4,7 @@
 from users.utils import AdminUserRequiredMixin
 from users.models import User, UserGroup
 from assets.models import Asset, AssetGroup, SystemUser
-from assets.serializers import AssetGrantedSerializer, AssetGroupSerializer
+from assets.serializers import AssetGrantedSerializer, AssetGroupGrantedSerializer
 
 
 
