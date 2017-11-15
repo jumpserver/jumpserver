@@ -147,8 +147,8 @@ class TaskExecuteApi(generics.RetrieveAPIView):
             return Response("任务执行的系统用户为空", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         #: 没有assets和system_user不允许执行 #.delay
-        ansible_task_execute(task.id, [asset._to_secret_json() for asset in assets], task.system_user.username,
+        uuid = ansible_task_execute(task.id, [asset._to_secret_json() for asset in assets], task.system_user.username,
                              "%s #%d" % (task.name, task.counts + 1), task.tags)
         task.counts += 1
         task.save()
-        return Response("success", status=status.HTTP_200_OK)
+        return Response(uuid, status=status.HTTP_200_OK)

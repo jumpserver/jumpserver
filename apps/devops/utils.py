@@ -134,4 +134,4 @@ def run_playbook(playbook_path, assets, system_user=None, task_name='Ansible Pla
         else:
             record.is_success = False
         record.save()
-    return summary, result
+    return summary, result, task_id

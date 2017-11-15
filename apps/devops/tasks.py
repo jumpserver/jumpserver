@@ -25,5 +25,7 @@ def ansible_install_role(role_name):
 
 @shared_task
 def ansible_task_execute(task_id, assets, system_user, task_name, tags):
-    run_playbook(playbook_path='../playbooks/task_%d.yml' % task_id, assets=assets, system_user=system_user,
-                 task_name=task_name, tags=tags)
+    summary, result, uuid = run_playbook(playbook_path='../playbooks/task_%d.yml' % task_id, assets=assets,
+                                         system_user=system_user,
+                                         task_name=task_name, tags=tags)
+    return uuid

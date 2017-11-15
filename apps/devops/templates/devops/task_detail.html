@@ -439,15 +439,19 @@
 
         function executeTask(id) {
             let the_url = "{% url 'api-devops:task-execute' pk=99991937 %}".replace('99991937', id);
-            let success_message = "提交执行中。。。"
+            let success_message = "正在执行中。。。"
             let error = function (data) {
                 toastr.error(data.responseJSON);
+            }
+            let success = function (data) {
+                location.href="{% url 'ops:task-detail' pk=99991937 %}".replace('99991937', data);
             }
             APIUpdateAttr({
                 url: the_url,
                 method: 'GET',
                 success_message: success_message,
-                error: error
+                error: error,
+                success: success
             });
         }
 

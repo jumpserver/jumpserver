@@ -15,7 +15,7 @@
         <thead>
         <tr>
             <th class="text-center">
-{#                <input id="" type="checkbox" class="ipt_check_all">#}
+                {#                <input id="" type="checkbox" class="ipt_check_all">#}
             </th>
             <th class="text-center">{% trans 'Name' %}</th>
             <th class="text-center">{% trans 'Description' %}</th>
@@ -99,8 +99,30 @@
                 let uid = $this.data('uid');
                 let the_url = '{% url "api-devops:task-opt-detail" pk=99991937 %}'.replace('99991937', uid);
                 objectDelete($this, name, the_url);
-            })
+            }).on('click', '.btn-task-exec', function () {
+            //确认删除
+            let $this = $(this);
+            let uid = $this.data('uid');
+            executeTask(uid);
+        });
 
+         function executeTask(id) {
+            let the_url = "{% url 'api-devops:task-execute' pk=99991937 %}".replace('99991937', id);
+            let success_message = "正在执行中。。。"
+            let error = function (data) {
+                toastr.error(data.responseJSON);
+            }
+            let success = function (data) {
+                location.href="{% url 'ops:task-detail' pk=99991937 %}".replace('99991937', data);
+            }
+            APIUpdateAttr({
+                url: the_url,
+                method: 'GET',
+                success_message: success_message,
+                error: error,
+                success: success
+            });
+        }
 
     </script>
 
