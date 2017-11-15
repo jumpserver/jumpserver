@@ -54,9 +54,9 @@ class PlayBookRunner(object):
                  ssh_extra_args=None,
                  sftp_extra_args=None,
                  scp_extra_args=None,
-                 become=True,
+                 become=False,
                  become_method=None,
-                 become_user="test",
+                 become_user="root",
                  verbosity=None,
                  extra_vars=None,
                  connection_type="ssh",
@@ -90,9 +90,9 @@ class PlayBookRunner(object):
             ssh_extra_args=ssh_extra_args or "",
             sftp_extra_args=sftp_extra_args,
             scp_extra_args=scp_extra_args,
-            become=True,
-            become_method="sudo",
-            become_user="test",
+            become=become,
+            become_method=become_method or "sudo",
+            become_user=become_user,
             verbosity=verbosity,
             extra_vars=extra_vars or [],
             check=check,
@@ -125,7 +125,7 @@ class PlayBookRunner(object):
             raise AnsibleError('Inventory is empty')
         self.runner.run()
         self.runner._tqm.cleanup()
-        return self.callbackmodule.output
+        return self.callbackmodule.results[0]
 
     def clean_result(self):
         """
@@ -134,19 +134,17 @@ class PlayBookRunner(object):
             "failed": [('hostname', 'msg'), {}],
         }
         """
-        result = "{'success': [], 'failed': []}"
-        print("results:"+json.dumps(self.callbackmodule.results))
-        print("item_results:"+json.dumps(self.callbackmodule.item_results))
-        print("output:"+json.dumps(self.callbackmodule.output))
-        # for host in self.callbackmodule.results['contacted']:
-        #     result['success'].append(host)
-        #
-        # for host, msgs in self.callbackmodule.results['dark'].items():
-        #     msg = '\n'.join(['{} {}: {}'.format(
-        #         msg.get('module_stdout', ''),
-        #         msg.get('invocation', {}).get('module_name'),
-        #         msg.get('msg', '')) for msg in msgs])
-        #     result['failed'].append((host, msg))
+        result = {'success': [], 'failed': []}
+
+        for task in self.callbackmodule.output['plays'][0]['tasks']:
+            for host, detail in task.get('hosts', {}).items():
+                if detail.get('unreachable', False) or detail.get('failed', False):
+                    msg = "[%s]： %s" % (task['task'].get('name', ''), detail.get('msg', ''))
+                    result['failed'].append((host, msg))
+
+        for host, stat in self.callbackmodule.output['stats'].items():
+            if stat['unreachable'] == 0 and stat['failures'] == 0:
+                result['success'].append(host)
         return result
 
 

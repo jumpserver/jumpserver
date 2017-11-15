@@ -24,15 +24,15 @@ class JMSHost(Host):
         if asset.get('private_key'):
             self.set_variable('ansible_ssh_private_key_file', asset['private_key'])
 
-        # 添加become支持
-        become = asset.get("become", False)
-        if become:
-            self.set_variable("ansible_become", True)
-            self.set_variable("ansible_become_method", become.get('method', 'sudo'))
-            self.set_variable("ansible_become_user", become.get('user', 'root'))
-            self.set_variable("ansible_become_pass", become.get('pass', ''))
-        else:
-            self.set_variable("ansible_become", False)
+        # 添加become支持   在playbook中设置become
+        # become = asset.get("become", False)
+        # if become:
+        #     self.set_variable("ansible_become", True)
+        #     self.set_variable("ansible_become_method", become.get('method', 'sudo'))
+        #     self.set_variable("ansible_become_user", become.get('user', 'root'))
+        #     self.set_variable("ansible_become_pass", become.get('pass', ''))
+        # else:
+        #     self.set_variable("ansible_become", False)
 
 
 class JMSInventory(Inventory):

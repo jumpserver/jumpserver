@@ -148,5 +148,7 @@ class TaskExecuteApi(generics.RetrieveAPIView):
 
         #: 没有assets和system_user不允许执行 #.delay
         ansible_task_execute(task.id, [asset._to_secret_json() for asset in assets], task.system_user.username,
-                             "%s #%d" % (task.name, task.counts), task.tags)
+                             "%s #%d" % (task.name, task.counts + 1), task.tags)
+        task.counts += 1
+        task.save()
         return Response("success", status=status.HTTP_200_OK)

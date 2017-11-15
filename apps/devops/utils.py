@@ -93,8 +93,8 @@ def run_playbook(playbook_path, assets, system_user=None, task_name='Ansible Pla
     :return: summary: {'success': [], 'failed': [{'192.168.1.1': 'msg'}]}
              result: {'contacted': {'hostname': [{''}, {''}], 'dark': []}
     """
-    print(system_user)
-    runner = PlayBookRunner(assets, playbook_path=playbook_path, tags=tags)
+    # print(system_user)
+    runner = PlayBookRunner(assets, playbook_path=playbook_path, tags=tags, become=True, become_user=system_user)
 
     task_id = str(uuid.uuid4())
 
@@ -117,21 +117,21 @@ def run_playbook(playbook_path, assets, system_user=None, task_name='Ansible Pla
             record.is_success = False
             record.save()
     ts_start = time.time()
-    # if verbose:
-    #     logger.debug('Start runner {}'.format(task_name))
+    if verbose:
+        logger.debug('Start runner {}'.format(task_name))
     result = runner.run()
-    # timedelta = round(time.time() - ts_start, 2)
+    timedelta = round(time.time() - ts_start, 2)
     summary = runner.clean_result()
-    # if record:
-    #     record.date_finished = timezone.now()
-    #     record.is_finished = True
-    #     if verbose:
-    #         record.result = json.dumps(result, indent=4, sort_keys=True)
-    #     record.summary = json.dumps(summary)
-    #     record.timedelta = timedelta
-    #     if len(summary['failed']) == 0:
-    #         record.is_success = True
-    #     else:
-    #         record.is_success = False
-    #     record.save()
+    if record:
+        record.date_finished = timezone.now()
+        record.is_finished = True
+        if verbose:
+            record.result = str(json.dumps(result, indent=4, ensure_ascii=False))
+        record.summary = json.dumps(summary)
+        record.timedelta = timedelta
+        if len(summary['failed']) == 0:
+            record.is_success = True
+        else:
+            record.is_success = False
+        record.save()
     return summary, result
