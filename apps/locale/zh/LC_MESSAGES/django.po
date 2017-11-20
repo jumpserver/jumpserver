@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-20 15:12+0800\n"
+"POT-Creation-Date: 2017-11-20 15:15+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -1506,7 +1506,7 @@ msgstr "安装"
 msgid "Role Name"
 msgstr "角色名称"
 
-#: devops/templates/devops/record_detail.html:19
+#: devops/templates/devops/record_detail.html:19 devops/views.py:145
 #: ops/templates/ops/task_detail.html:19
 msgid "Task record detail"
 msgstr "任务记录详情"
@@ -1586,6 +1586,10 @@ msgstr "任务"
 #: devops/views.py:53
 msgid "Update Task"
 msgstr "更新任务"
+
+#: devops/views.py:129
+msgid "Task record list"
+msgstr "任务历史记录"
 
 #: perms/forms.py:21 users/forms.py:125 users/forms.py:130
 msgid "Select users"
