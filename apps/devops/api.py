@@ -155,3 +155,9 @@ class TaskExecuteApi(generics.RetrieveAPIView):
         task.counts += 1
         task.save()
         return Response(uuid, status=status.HTTP_200_OK)
+
+
+class RecordViewSet(viewsets.ModelViewSet):
+    queryset = Record.objects.all()
+    serializer_class = RecordSerializer
+    permission_classes = (IsSuperUser,)

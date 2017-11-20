@@ -18,7 +18,7 @@ def ansible_install_role(role_name):
     summary, result = run_AdHoc(task_tuple, pattern='all',
                                 task_name=task_name)
     #: 失败返回0 成功返回1
-    if summary['failed']:
+    if len(summary['failed']) > 0:
         return False
     return True
 
@@ -27,5 +27,5 @@ def ansible_install_role(role_name):
 def ansible_task_execute(task_id, assets, system_user, task_name, tags):
     summary, result, uuid = run_playbook(playbook_path='../playbooks/task_%d.yml' % task_id, assets=assets,
                                          system_user=system_user,
-                                         task_name=task_name, tags=tags)
+                                         task_name=task_name, tags=tags, task_id=task_id)
     return uuid

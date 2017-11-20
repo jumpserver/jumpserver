@@ -445,7 +445,7 @@
                 toastr.error(data.responseJSON);
             }
             let success = function (data) {
-                location.href="{% url 'ops:task-detail' pk=99991937 %}".replace('99991937', data);
+                location.href="{% url 'devops:record-detail' pk=99991937 %}".replace('99991937', data);
             }
             APIUpdateAttr({
                 url: the_url,

@@ -50,3 +50,9 @@ class TaskUpdateSystemUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = ['id', 'system_user']
+
+
+class RecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Record
+        fields = '__all__'

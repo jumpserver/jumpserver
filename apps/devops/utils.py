@@ -11,6 +11,7 @@ from django.utils import timezone
 
 from assets.models import Asset
 from common.utils import get_logger
+from .models import Record
 from .ansible.runner import AdHocRunner, PlayBookRunner
 
 logger = get_logger(__file__)
@@ -19,7 +20,7 @@ logger = get_logger(__file__)
 def run_AdHoc(task_tuple, assets=None,
               task_name='Ansible AdHoc runner',
               task_id=None, pattern='all',
-              record=False, verbose=True):
+              record=True, verbose=True):
     """
     改造为不输入assets时为本地执行
     :param task_tuple:  (('module_name', 'module_args'), ('module_name', 'module_args'))
@@ -80,12 +81,12 @@ def run_AdHoc(task_tuple, assets=None,
 
 
 def run_playbook(playbook_path, assets, system_user=None, task_name='Ansible PlayBook Runner',
-                 tags=None, record=True, verbose=True):
+                 tags=None, record=True, verbose=True, task_id=None):
     """
     改造为不输入assets时为本地执行
     :param task_name:
     :param system_user: become system user
-    :param playbook_path:  ../task_id.yml
+    :param playbook_path:  ../record_id.yml
     :param assets: [{asset1}, {asset2}]
     :param tags: [tagA,tagB]
     :param record:
@@ -96,26 +97,29 @@ def run_playbook(playbook_path, assets, system_user=None, task_name='Ansible Pla
     # print(system_user)
     runner = PlayBookRunner(assets, playbook_path=playbook_path, tags=tags, become=True, become_user=system_user)
 
-    task_id = str(uuid.uuid4())
-
+    record_id = str(uuid.uuid4())
+    task_record = None
     if record:
-        from ops.models import Task
-        if not Task.objects.filter(uuid=task_id):
+        if not Record.objects.filter(uuid=record_id):
             with open(playbook_path) as f:
                 playbook_json = yaml.load(f)
-            record = Task(uuid=task_id,
-                          name=task_name,
-                          assets='localhost' if not assets else ','.join(str(asset['id']) for asset in assets),
-                          module_args=[('playbook', playbook_json)])
-            record.save()
+            task_record = Record(uuid=record_id,
+                                 name=task_name,
+                                 assets='localhost' if not assets else ','.join(str(asset['id']) for asset in assets),
+                                 module_args=[('playbook', playbook_json)])
+            from .models import Task
+            task_record.task = Task.objects.get(id=task_id)
+            task_record.save()
         else:
-            record = Task.objects.get(uuid=task_id)
-            record.date_start = timezone.now()
-            record.date_finished = None
-            record.timedelta = None
-            record.is_finished = False
-            record.is_success = False
-            record.save()
+            task_record = Record.objects.get(uuid=record_id)
+            task_record.date_start = timezone.now()
+            task_record.date_finished = None
+            task_record.timedelta = None
+            task_record.is_finished = False
+            task_record.is_success = False
+            from .models import Task
+            task_record.task = Task.objects.get(id=task_id)
+            task_record.save()
     ts_start = time.time()
     if verbose:
         logger.debug('Start runner {}'.format(task_name))
@@ -123,15 +127,15 @@ def run_playbook(playbook_path, assets, system_user=None, task_name='Ansible Pla
     timedelta = round(time.time() - ts_start, 2)
     summary = runner.clean_result()
     if record:
-        record.date_finished = timezone.now()
-        record.is_finished = True
+        task_record.date_finished = timezone.now()
+        task_record.is_finished = True
         if verbose:
-            record.result = str(json.dumps(result, indent=4, ensure_ascii=False))
-        record.summary = json.dumps(summary)
-        record.timedelta = timedelta
+            task_record.result = str(json.dumps(result, indent=4, ensure_ascii=False))
+        task_record.summary = json.dumps(summary)
+        task_record.timedelta = timedelta
         if len(summary['failed']) == 0:
-            record.is_success = True
+            task_record.is_success = True
         else:
-            record.is_success = False
-        record.save()
-    return summary, result, task_id
+            task_record.is_success = False
+        task_record.save()
+    return summary, result, record_id

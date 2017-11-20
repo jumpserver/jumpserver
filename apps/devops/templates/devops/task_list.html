@@ -100,7 +100,7 @@
                 let the_url = '{% url "api-devops:task-opt-detail" pk=99991937 %}'.replace('99991937', uid);
                 objectDelete($this, name, the_url);
             }).on('click', '.btn-task-exec', function () {
-            //确认删除
+            //执行任务
             let $this = $(this);
             let uid = $this.data('uid');
             executeTask(uid);
@@ -113,7 +113,7 @@
                 toastr.error(data.responseJSON);
             }
             let success = function (data) {
-                location.href="{% url 'ops:task-detail' pk=99991937 %}".replace('99991937', data);
+                location.href="{% url 'devops:record-detail' pk=99991937 %}".replace('99991937', data);
             }
             APIUpdateAttr({
                 url: the_url,
