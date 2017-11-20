@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-20 10:41+0800\n"
+"POT-Creation-Date: 2017-11-20 15:12+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -30,8 +30,11 @@ msgstr ""
 #: assets/templates/assets/idc_list.html:18
 #: assets/templates/assets/system_user_detail.html:53
 #: assets/templates/assets/system_user_list.html:17 audits/models.py:18
-#: audits/templates/audits/login_log_list.html:49 devops/models.py:10
-#: devops/models.py:17 devops/templates/devops/task_detail.html:69
+#: audits/templates/audits/login_log_list.html:49 devops/models.py:13
+#: devops/models.py:20 devops/models.py:34
+#: devops/templates/devops/record_detail.html:50
+#: devops/templates/devops/record_list.html:41
+#: devops/templates/devops/task_detail.html:69
 #: devops/templates/devops/task_list.html:20 ops/models.py:20
 #: ops/templates/ops/task_detail.html:50 ops/templates/ops/task_list.html:39
 #: perms/models.py:21
@@ -128,7 +131,7 @@ msgid "Type"
 msgstr "类型"
 
 #: applications/templates/applications/terminal_list.html:32
-#: templates/_nav.html:68
+#: templates/_nav.html:69
 msgid "Session online"
 msgstr "在线session"
 
@@ -160,6 +163,7 @@ msgstr "在线"
 #: assets/templates/assets/idc_list.html:23
 #: assets/templates/assets/system_user_asset.html:51
 #: assets/templates/assets/system_user_list.html:22
+#: devops/templates/devops/record_list.html:47
 #: devops/templates/devops/task_list.html:24
 #: ops/templates/ops/task_list.html:45
 #: perms/templates/perms/asset_permission_list.html:18
@@ -191,6 +195,7 @@ msgstr "更新"
 #: assets/templates/assets/idc_list.html:56
 #: assets/templates/assets/system_user_asset.html:257
 #: assets/templates/assets/system_user_list.html:59
+#: devops/templates/devops/record_list.html:74
 #: devops/templates/devops/task_list.html:76
 #: ops/templates/ops/task_list.html:72
 #: perms/templates/perms/asset_permission_list.html:47
@@ -368,6 +373,7 @@ msgstr "端口"
 #: audits/templates/audits/proxy_log_offline_list.html:65
 #: audits/templates/audits/proxy_log_online_list.html:34
 #: audits/templates/audits/proxy_log_online_list.html:65
+#: devops/templates/devops/record_list.html:42
 #: ops/templates/ops/task_list.html:40
 #: perms/templates/perms/asset_permission_create_update.html:40
 #: perms/templates/perms/asset_permission_list.html:14 templates/_nav.html:21
@@ -469,7 +475,7 @@ msgstr "资产组"
 msgid "Admin user"
 msgstr "管理用户"
 
-#: assets/models/asset.py:50 devops/models.py:24
+#: assets/models/asset.py:50 devops/models.py:27
 msgid "System User"
 msgstr "系统用户"
 
@@ -689,7 +695,7 @@ msgstr ""
 #: assets/views/group.py:53 assets/views/group.py:73 assets/views/group.py:98
 #: assets/views/idc.py:22 assets/views/idc.py:87 assets/views/system_user.py:30
 #: assets/views/system_user.py:49 assets/views/system_user.py:73
-#: assets/views/system_user.py:100 devops/models.py:21 templates/_nav.html:18
+#: assets/views/system_user.py:100 devops/models.py:24 templates/_nav.html:18
 msgid "Assets"
 msgstr "资产管理"
 
@@ -1223,6 +1229,7 @@ msgid "IDC list"
 msgstr "IDC列表"
 
 #: assets/views/idc.py:38 assets/views/idc.py:65
+#: devops/templates/devops/record_detail.html:84
 #: ops/templates/ops/task_detail.html:84
 msgid "assets"
 msgstr "资产管理"
@@ -1298,17 +1305,22 @@ msgstr "系统用户"
 msgid "Did connect failed"
 msgstr "连接失败"
 
-#: audits/models.py:51 ops/models.py:24 ops/templates/ops/task_detail.html:66
+#: audits/models.py:51 devops/models.py:38
+#: devops/templates/devops/record_detail.html:66 ops/models.py:24
+#: ops/templates/ops/task_detail.html:66
 msgid "Is finished"
 msgstr "结束"
 
 #: audits/models.py:53 audits/templates/audits/proxy_log_offline_list.html:72
 #: audits/templates/audits/proxy_log_online_list.html:72
+#: devops/templates/devops/record_detail.html:54
+#: devops/templates/devops/record_list.html:45
 #: ops/templates/ops/task_detail.html:54 ops/templates/ops/task_list.html:43
 msgid "Date start"
 msgstr "开始日期"
 
-#: audits/models.py:55 ops/templates/ops/task_detail.html:58
+#: audits/models.py:55 devops/templates/devops/record_detail.html:58
+#: ops/templates/ops/task_detail.html:58
 msgid "Date finished"
 msgstr "结束日期"
 
@@ -1355,12 +1367,14 @@ msgstr "命令"
 
 #: audits/templates/audits/proxy_log_offline_list.html:69
 #: audits/templates/audits/proxy_log_online_list.html:69
+#: devops/templates/devops/record_list.html:43
 #: ops/templates/ops/task_list.html:41
 msgid "Success"
 msgstr "成功"
 
 #: audits/templates/audits/proxy_log_offline_list.html:70
 #: audits/templates/audits/proxy_log_online_list.html:70
+#: devops/templates/devops/record_list.html:44
 #: ops/templates/ops/task_list.html:42
 msgid "Finished"
 msgstr "完成"
@@ -1370,7 +1384,8 @@ msgid "Play"
 msgstr "播放"
 
 #: audits/templates/audits/proxy_log_offline_list.html:73
-#: audits/templates/audits/proxy_log_online_list.html:73 ops/models.py:23
+#: audits/templates/audits/proxy_log_online_list.html:73 devops/models.py:37
+#: devops/templates/devops/record_list.html:46 ops/models.py:23
 #: ops/templates/ops/task_list.html:44
 msgid "Time"
 msgstr "时间"
@@ -1384,7 +1399,7 @@ msgid "Terminate selected"
 msgstr "终止所选"
 
 #: audits/views.py:72 audits/views.py:209 audits/views.py:263
-#: templates/_nav.html:65
+#: templates/_nav.html:66
 msgid "Audits"
 msgstr "审计"
 
@@ -1408,32 +1423,73 @@ msgstr ""
 msgid "discard time"
 msgstr ""
 
-#: devops/models.py:18 devops/templates/devops/task_detail.html:73
+#: devops/models.py:21 devops/templates/devops/task_detail.html:73
 #: devops/templates/devops/task_list.html:21
 msgid "Description"
 msgstr "描述"
 
-#: devops/models.py:19 devops/templates/devops/task_detail.html:77
+#: devops/models.py:22 devops/templates/devops/task_detail.html:77
 #: devops/templates/devops/task_list.html:22
 msgid "Ansible Role"
 msgstr "Ansible Role"
 
-#: devops/models.py:20 devops/templates/devops/_task_create_update.html:50
+#: devops/models.py:23 devops/templates/devops/_task_create_update.html:50
 #: devops/templates/devops/task_detail.html:81
 #: devops/templates/devops/task_list.html:23
 msgid "Tags"
 msgstr "执行Tags"
 
-#: devops/models.py:22
+#: devops/models.py:25
 msgid "Asset Groups"
 msgstr "资产组"
+
+#: devops/models.py:33 devops/templates/devops/record_detail.html:46
+#: ops/models.py:19 ops/templates/ops/task_detail.html:46
+msgid "UUID"
+msgstr "UUID"
+
+#: devops/models.py:35 ops/models.py:21
+msgid "Start time"
+msgstr "开始时间"
+
+#: devops/models.py:36 ops/models.py:22
+msgid "End time"
+msgstr "完成时间"
+
+#: devops/models.py:39 ops/models.py:25
+msgid "Is success"
+msgstr "是否成功"
+
+#: devops/models.py:40 ops/models.py:26
+msgid "Assets id"
+msgstr "资产id"
+
+#: devops/models.py:41 ops/models.py:27
+msgid "Task module and args json format"
+msgstr ""
+
+#: devops/models.py:42 ops/models.py:28
+msgid "Task run pattern"
+msgstr ""
+
+#: devops/models.py:43 ops/models.py:29
+msgid "Task raw result"
+msgstr ""
+
+#: devops/models.py:44 ops/models.py:30
+msgid "Task summary"
+msgstr ""
+
+#: devops/models.py:45 templates/_nav.html:51
+msgid "Task"
+msgstr "任务"
 
 #: devops/templates/devops/_task_create_update.html:25
 msgid "basic"
 msgstr "基本信息"
 
-#: devops/templates/devops/_task_create_update.html:30 devops/views.py:23
-#: devops/views.py:35 devops/views.py:48 devops/views.py:69
+#: devops/templates/devops/_task_create_update.html:30 devops/views.py:27
+#: devops/views.py:39 devops/views.py:52 devops/views.py:73
 #: templates/_nav.html:57 templates/_nav_user.html:24
 msgid "Ansible"
 msgstr "Ansible"
@@ -1450,8 +1506,45 @@ msgstr "安装"
 msgid "Role Name"
 msgstr "角色名称"
 
+#: devops/templates/devops/record_detail.html:19
+#: ops/templates/ops/task_detail.html:19
+msgid "Task record detail"
+msgstr "任务记录详情"
+
+#: devops/templates/devops/record_detail.html:62
+#: ops/templates/ops/task_detail.html:62
+msgid "Time delta"
+msgstr "运行时间"
+
+#: devops/templates/devops/record_detail.html:70
+#: ops/templates/ops/task_detail.html:70
+msgid "Is success "
+msgstr "成功"
+
+#: devops/templates/devops/record_detail.html:126
+#: ops/templates/ops/task_detail.html:126
+msgid "Failed assets"
+msgstr "失败资产"
+
+#: devops/templates/devops/record_detail.html:142
+#: devops/templates/devops/record_detail.html:167
+#: ops/templates/ops/task_detail.html:142
+#: ops/templates/ops/task_detail.html:167
+msgid "No assets"
+msgstr "没有资产"
+
+#: devops/templates/devops/record_detail.html:152
+#: ops/templates/ops/task_detail.html:152
+msgid "Success assets"
+msgstr "成功资产"
+
+#: devops/templates/devops/record_list.html:73
+#: ops/templates/ops/task_list.html:71
+msgid "Run again"
+msgstr "再次执行"
+
 #: devops/templates/devops/task_detail.html:20
-#: devops/templates/devops/task_detail.html:50 devops/views.py:70
+#: devops/templates/devops/task_detail.html:50 devops/views.py:74
 msgid "Task Detail"
 msgstr "任务详情"
 
@@ -1478,7 +1571,7 @@ msgstr "请确保系统用户已推送至目标资产"
 msgid "Select system user"
 msgstr "选择系统用户"
 
-#: devops/templates/devops/task_list.html:8 devops/views.py:36
+#: devops/templates/devops/task_list.html:8 devops/views.py:40
 msgid "Create Task"
 msgstr "创建任务"
 
@@ -1486,78 +1579,13 @@ msgstr "创建任务"
 msgid "Execute"
 msgstr "执行"
 
-#: devops/views.py:24 templates/_nav.html:60
+#: devops/views.py:28 templates/_nav.html:60 templates/_nav_user.html:27
 msgid "Tasks"
 msgstr "任务"
 
-#: devops/views.py:49
+#: devops/views.py:53
 msgid "Update Task"
 msgstr "更新任务"
-
-#: ops/models.py:19 ops/templates/ops/task_detail.html:46
-msgid "UUID"
-msgstr "UUID"
-
-#: ops/models.py:21
-msgid "Start time"
-msgstr "开始时间"
-
-#: ops/models.py:22
-msgid "End time"
-msgstr "完成时间"
-
-#: ops/models.py:25
-msgid "Is success"
-msgstr "是否成功"
-
-#: ops/models.py:26
-msgid "Assets id"
-msgstr "资产id"
-
-#: ops/models.py:27
-msgid "Task module and args json format"
-msgstr ""
-
-#: ops/models.py:28
-msgid "Task run pattern"
-msgstr ""
-
-#: ops/models.py:29
-msgid "Task raw result"
-msgstr ""
-
-#: ops/models.py:30
-msgid "Task summary"
-msgstr ""
-
-#: ops/templates/ops/task_detail.html:19
-msgid "Task record detail"
-msgstr "任务记录详情"
-
-#: ops/templates/ops/task_detail.html:62
-msgid "Time delta"
-msgstr "运行时间"
-
-#: ops/templates/ops/task_detail.html:70
-msgid "Is success "
-msgstr "成功"
-
-#: ops/templates/ops/task_detail.html:126
-msgid "Failed assets"
-msgstr "失败资产"
-
-#: ops/templates/ops/task_detail.html:142
-#: ops/templates/ops/task_detail.html:167
-msgid "No assets"
-msgstr "没有资产"
-
-#: ops/templates/ops/task_detail.html:152
-msgid "Success assets"
-msgstr "成功资产"
-
-#: ops/templates/ops/task_list.html:71
-msgid "Run again"
-msgstr "再次执行"
 
 #: perms/forms.py:21 users/forms.py:125 users/forms.py:130
 msgid "Select users"
@@ -1765,23 +1793,23 @@ msgstr "资产授权"
 msgid "Job Center"
 msgstr "作业中心"
 
-#: templates/_nav.html:51
-msgid "Task"
-msgstr "任务"
+#: templates/_nav.html:61 templates/_nav_user.html:28
+msgid "Records"
+msgstr "任务记录"
 
-#: templates/_nav.html:71
+#: templates/_nav.html:72
 msgid "Session history"
 msgstr "Session历史"
 
-#: templates/_nav.html:74
+#: templates/_nav.html:75
 msgid "Command log"
 msgstr "命令记录"
 
-#: templates/_nav.html:77
+#: templates/_nav.html:78
 msgid "Login log"
 msgstr "登录日志"
 
-#: templates/_nav.html:101
+#: templates/_nav.html:102
 msgid "Visit us"
 msgstr "访问官网"
 
