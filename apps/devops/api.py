@@ -1,6 +1,6 @@
 # ~*~ coding: utf-8 ~*~
-import json
 
+import uuid
 from rest_framework import status
 from rest_framework import viewsets, generics, mixins
 from rest_framework.response import Response
@@ -141,20 +141,35 @@ class TaskExecuteApi(generics.RetrieveAPIView):
             #: 普通用户取授权过的assets
             granted_assets = utils.get_user_granted_assets(user=request.user)
             #: 取交集
-            assets = [asset for asset in assets if asset in granted_assets]
+            assets = set(assets).intersection(set(granted_assets))
 
         if len(assets) == 0:
             return Response("任务执行的资产为空", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         #: 系统用户不能为空
         if task.system_user is None:
             return Response("任务执行的系统用户为空", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            #: 没有assets和system_user不允许执行
 
-        #: 没有assets和system_user不允许执行 #.delay
-        uuid = ansible_task_execute(task.id, [asset._to_secret_json() for asset in assets], task.system_user.username,
-                                    "%s #%d" % (task.name, task.counts + 1), task.tags)
+        #: 新建一个Record
+        uuid_str = str(uuid.uuid4())
+
+        playbook_path = '../playbooks/task_%d.yml' % task.id
+        task_name = "%s #%d" % (task.name, task.counts + 1)
+        with open(playbook_path) as f:
+            playbook_json = yaml.load(f)
+        task_record = Record(uuid=uuid_str,
+                             name=task_name,
+                             assets=','.join(str(asset._to_secret_json()['id']) for asset in assets),
+                             module_args=[('playbook', playbook_json)])
+        task_record.task = task
+        task_record.save()
+
+        ansible_task_execute.delay(task.id, [asset._to_secret_json() for asset in assets],
+                                   task.system_user.username, task_name, task.tags, uuid_str)
         task.counts += 1
         task.save()
-        return Response(uuid, status=status.HTTP_200_OK)
+
+        return Response(uuid_str, status=status.HTTP_200_OK)
 
 
 class RecordViewSet(viewsets.ModelViewSet):

@@ -81,61 +81,48 @@ def run_AdHoc(task_tuple, assets=None,
 
 
 def run_playbook(playbook_path, assets, system_user=None, task_name='Ansible PlayBook Runner',
-                 tags=None, record=True, verbose=True, task_id=None):
+                 tags=None, verbose=True, task_id=None, record_id=None):
     """
     改造为不输入assets时为本地执行
-    :param task_name:
+    :param record_id: uuid
+    :param task_id: task id
+    :param task_name: TaskName #count
     :param system_user: become system user
     :param playbook_path:  ../record_id.yml
     :param assets: [{asset1}, {asset2}]
     :param tags: [tagA,tagB]
-    :param record:
     :param verbose:
     :return: summary: {'success': [], 'failed': [{'192.168.1.1': 'msg'}]}
              result: {'contacted': {'hostname': [{''}, {''}], 'dark': []}
     """
-    # print(system_user)
     runner = PlayBookRunner(assets, playbook_path=playbook_path, tags=tags, become=True, become_user=system_user)
 
-    record_id = str(uuid.uuid4())
-    task_record = None
-    if record:
-        if not Record.objects.filter(uuid=record_id):
-            with open(playbook_path) as f:
-                playbook_json = yaml.load(f)
-            task_record = Record(uuid=record_id,
-                                 name=task_name,
-                                 assets='localhost' if not assets else ','.join(str(asset['id']) for asset in assets),
-                                 module_args=[('playbook', playbook_json)])
-            from .models import Task
-            task_record.task = Task.objects.get(id=task_id)
-            task_record.save()
-        else:
-            task_record = Record.objects.get(uuid=record_id)
-            task_record.date_start = timezone.now()
-            task_record.date_finished = None
-            task_record.timedelta = None
-            task_record.is_finished = False
-            task_record.is_success = False
-            from .models import Task
-            task_record.task = Task.objects.get(id=task_id)
-            task_record.save()
+    #: 开始执行记录
+    task_record = Record.objects.get(uuid=record_id)
+    task_record.date_start = timezone.now()
+    task_record.date_finished = None
+    task_record.timedelta = None
+    task_record.is_finished = False
+    task_record.is_success = False
+    task_record.save()
+
     ts_start = time.time()
     if verbose:
         logger.debug('Start runner {}'.format(task_name))
     result = runner.run()
     timedelta = round(time.time() - ts_start, 2)
     summary = runner.clean_result()
-    if record:
-        task_record.date_finished = timezone.now()
-        task_record.is_finished = True
-        if verbose:
-            task_record.result = str(json.dumps(result, indent=4, ensure_ascii=False))
-        task_record.summary = json.dumps(summary)
-        task_record.timedelta = timedelta
-        if len(summary['failed']) == 0:
-            task_record.is_success = True
-        else:
-            task_record.is_success = False
-        task_record.save()
-    return summary, result, record_id
+
+    #: 任务结束记录
+    task_record.date_finished = timezone.now()
+    task_record.is_finished = True
+    if verbose:
+        task_record.result = str(json.dumps(result, indent=4, ensure_ascii=False))
+    task_record.summary = json.dumps(summary)
+    task_record.timedelta = timedelta
+    if len(summary['failed']) == 0:
+        task_record.is_success = True
+    else:
+        task_record.is_success = False
+    task_record.save()
+    return summary, result

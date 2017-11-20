@@ -180,3 +180,14 @@
 {#    {% include 'users/_user_update_pk_modal.html' %}#}
 {% endblock %}
 
+{% block custom_foot_js %}
+    {% if not object.is_finished %}
+         <script>
+            setInterval(function () {
+                window.location.reload()
+            },2000)
+        </script>
+    {% endif %}
+
+{% endblock %}
+
