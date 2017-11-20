@@ -125,20 +125,23 @@ class TaskExecuteApi(generics.RetrieveAPIView):
     """
        Task Execute API
     """
+    permission_classes = (IsValidUser,)
     queryset = Task.objects.all()
 
     def get(self, request, *args, **kwargs):
         task = self.get_object()
         #: 计算assets
         #: 超级用户直接取task所有assets
+        assets = []
+        assets.extend(list(task.assets.all()))
+        for group in task.groups.all():
+            assets.extend(group.assets.all())
 
-        if request.user.is_superuser:
-            assets = task.assets.all()
-        else:
+        if not request.user.is_superuser:
             #: 普通用户取授权过的assets
             granted_assets = utils.get_user_granted_assets(user=request.user)
             #: 取交集
-            assets = [asset for asset in task.assets if asset in granted_assets]
+            assets = [asset for asset in assets if asset in granted_assets]
 
         if len(assets) == 0:
             return Response("任务执行的资产为空", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -148,7 +151,7 @@ class TaskExecuteApi(generics.RetrieveAPIView):
 
         #: 没有assets和system_user不允许执行 #.delay
         uuid = ansible_task_execute(task.id, [asset._to_secret_json() for asset in assets], task.system_user.username,
-                             "%s #%d" % (task.name, task.counts + 1), task.tags)
+                                    "%s #%d" % (task.name, task.counts + 1), task.tags)
         task.counts += 1
         task.save()
         return Response(uuid, status=status.HTTP_200_OK)

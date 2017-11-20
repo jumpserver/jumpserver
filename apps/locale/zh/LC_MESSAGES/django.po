@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-10 14:28+0800\n"
+"POT-Creation-Date: 2017-11-20 10:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -31,7 +31,7 @@ msgstr ""
 #: assets/templates/assets/system_user_detail.html:53
 #: assets/templates/assets/system_user_list.html:17 audits/models.py:18
 #: audits/templates/audits/login_log_list.html:49 devops/models.py:10
-#: devops/models.py:17 devops/templates/devops/task_detail.html:64
+#: devops/models.py:17 devops/templates/devops/task_detail.html:69
 #: devops/templates/devops/task_list.html:20 ops/models.py:20
 #: ops/templates/ops/task_detail.html:50 ops/templates/ops/task_list.html:39
 #: perms/models.py:21
@@ -177,7 +177,7 @@ msgstr "动作"
 #: assets/templates/assets/idc_list.html:55
 #: assets/templates/assets/system_user_asset.html:256
 #: assets/templates/assets/system_user_list.html:58
-#: devops/templates/devops/task_list.html:63
+#: devops/templates/devops/task_list.html:74
 #: perms/templates/perms/asset_permission_list.html:44
 #: users/templates/users/user_group_list.html:50
 #: users/templates/users/user_list.html:92
@@ -191,7 +191,7 @@ msgstr "更新"
 #: assets/templates/assets/idc_list.html:56
 #: assets/templates/assets/system_user_asset.html:257
 #: assets/templates/assets/system_user_list.html:59
-#: devops/templates/devops/task_list.html:64
+#: devops/templates/devops/task_list.html:76
 #: ops/templates/ops/task_list.html:72
 #: perms/templates/perms/asset_permission_list.html:47
 #: users/templates/users/user_group_list.html:52
@@ -313,7 +313,7 @@ msgstr "你可以使用ssh客户端工具连接终端"
 
 #: assets/forms.py:22 assets/forms.py:53 assets/forms.py:92
 #: assets/templates/assets/admin_user_detail.html:199
-#: devops/templates/devops/task_detail.html:201 perms/forms.py:30
+#: devops/templates/devops/task_detail.html:206 perms/forms.py:30
 #: perms/templates/perms/asset_permission_asset.html:137 users/forms.py:187
 #: users/forms.py:213
 msgid "Select asset groups"
@@ -340,7 +340,7 @@ msgid "Select admin user"
 msgstr "选择管理用户"
 
 #: assets/forms.py:72 assets/forms.py:76 assets/forms.py:117
-#: assets/forms.py:149 devops/templates/devops/task_detail.html:154
+#: assets/forms.py:149 devops/templates/devops/task_detail.html:159
 #: perms/forms.py:27 perms/templates/perms/asset_permission_asset.html:109
 #: users/forms.py:184 users/forms.py:210
 msgid "Select assets"
@@ -469,7 +469,7 @@ msgstr "资产组"
 msgid "Admin user"
 msgstr "管理用户"
 
-#: assets/models/asset.py:50 devops/models.py:23
+#: assets/models/asset.py:50 devops/models.py:24
 msgid "System User"
 msgstr "系统用户"
 
@@ -904,9 +904,9 @@ msgstr "添加到资产组"
 #: assets/templates/assets/system_user_asset.html:96
 #: assets/templates/assets/system_user_list.html:102
 #: assets/templates/assets/user_asset_list.html:165
-#: devops/templates/devops/task_detail.html:171
-#: devops/templates/devops/task_detail.html:215
-#: devops/templates/devops/task_detail.html:265 templates/_modal.html:16
+#: devops/templates/devops/task_detail.html:176
+#: devops/templates/devops/task_detail.html:220
+#: devops/templates/devops/task_detail.html:271 templates/_modal.html:16
 #: users/templates/users/user_detail.html:341
 #: users/templates/users/user_detail.html:366
 #: users/templates/users/user_detail.html:389
@@ -1408,18 +1408,18 @@ msgstr ""
 msgid "discard time"
 msgstr ""
 
-#: devops/models.py:18 devops/templates/devops/task_detail.html:68
+#: devops/models.py:18 devops/templates/devops/task_detail.html:73
 #: devops/templates/devops/task_list.html:21
 msgid "Description"
 msgstr "描述"
 
-#: devops/models.py:19 devops/templates/devops/task_detail.html:72
+#: devops/models.py:19 devops/templates/devops/task_detail.html:77
 #: devops/templates/devops/task_list.html:22
 msgid "Ansible Role"
 msgstr "Ansible Role"
 
 #: devops/models.py:20 devops/templates/devops/_task_create_update.html:50
-#: devops/templates/devops/task_detail.html:76
+#: devops/templates/devops/task_detail.html:81
 #: devops/templates/devops/task_list.html:23
 msgid "Tags"
 msgstr "执行Tags"
@@ -1434,7 +1434,7 @@ msgstr "基本信息"
 
 #: devops/templates/devops/_task_create_update.html:30 devops/views.py:23
 #: devops/views.py:35 devops/views.py:48 devops/views.py:69
-#: templates/_nav.html:57 templates/_nav_user.html:27
+#: templates/_nav.html:57 templates/_nav_user.html:24
 msgid "Ansible"
 msgstr "Ansible"
 
@@ -1451,31 +1451,30 @@ msgid "Role Name"
 msgstr "角色名称"
 
 #: devops/templates/devops/task_detail.html:20
-#: devops/templates/devops/task_detail.html:45 devops/views.py:70
-#| msgid "Detail"
+#: devops/templates/devops/task_detail.html:50 devops/views.py:70
 msgid "Task Detail"
 msgstr "任务详情"
 
-#: devops/templates/devops/task_detail.html:81
-#: devops/templates/devops/task_detail.html:146
-#| msgid "Assets"
+#: devops/templates/devops/task_detail.html:86
+#: devops/templates/devops/task_detail.html:151
 msgid "Task Assets"
 msgstr "任务资产"
 
-#: devops/templates/devops/task_detail.html:90
-#: devops/templates/devops/task_detail.html:193
-#| msgid "Asset Groups"
+#: devops/templates/devops/task_detail.html:95
+#: devops/templates/devops/task_detail.html:198
 msgid "Task Asset Groups"
 msgstr "任务资产组"
 
-#: devops/templates/devops/task_detail.html:99
-#: devops/templates/devops/task_detail.html:236
-#| msgid "System User"
+#: devops/templates/devops/task_detail.html:104
+#: devops/templates/devops/task_detail.html:241
 msgid "Task System User"
 msgstr "任务系统用户"
 
-#: devops/templates/devops/task_detail.html:244
-#| msgid "Select system users"
+#: devops/templates/devops/task_detail.html:249
+msgid "Task System User Help Text"
+msgstr "请确保系统用户已推送至目标资产"
+
+#: devops/templates/devops/task_detail.html:250
 msgid "Select system user"
 msgstr "选择系统用户"
 
@@ -1483,12 +1482,15 @@ msgstr "选择系统用户"
 msgid "Create Task"
 msgstr "创建任务"
 
-#: devops/views.py:24 templates/_nav.html:60 templates/_nav_user.html:30
+#: devops/templates/devops/task_list.html:70
+msgid "Execute"
+msgstr "执行"
+
+#: devops/views.py:24 templates/_nav.html:60
 msgid "Tasks"
 msgstr "任务"
 
 #: devops/views.py:49
-#| msgid "Create Task"
 msgid "Update Task"
 msgstr "更新任务"
 
@@ -1763,7 +1765,7 @@ msgstr "资产授权"
 msgid "Job Center"
 msgstr "作业中心"
 
-#: templates/_nav.html:51 templates/_nav_user.html:22
+#: templates/_nav.html:51
 msgid "Task"
 msgstr "任务"
 
@@ -2448,76 +2450,3 @@ msgstr "创建用户 <a href=\"{url}\">{name}</a> 成功"
 #: users/views/user.py:228
 msgid "Invalid file."
 msgstr "文件错误"
-
-#~ msgid "Admin User"
-#~ msgstr "管理用户"
-
-#~ msgid "Play Options"
-#~ msgstr "执行选项"
-
-#~ msgid "Execute User"
-#~ msgstr "执行用户"
-
-#~ msgid "Create Tasks"
-#~ msgstr "创建任务"
-
-#, fuzzy
-#~| msgid "Asset Delete"
-#~ msgid "Allowed Delete"
-#~ msgstr "删除"
-
-#, fuzzy
-#~| msgid "Reset private key"
-#~ msgid "Git Private Key"
-#~ msgstr "重置密钥"
-
-#, fuzzy
-#~| msgid "Username"
-#~ msgid "Git Username"
-#~ msgstr "用户名"
-
-#, fuzzy
-#~| msgid "Password"
-#~ msgid "Git Password"
-#~ msgstr "密码"
-
-#, fuzzy
-#~| msgid "Task"
-#~ msgid "Exec Task"
-#~ msgstr "任务"
-
-#, fuzzy
-#~| msgid "Configuration"
-#~ msgid "Create Configuration"
-#~ msgstr "配置"
-
-#, fuzzy
-#~| msgid "Template"
-#~ msgid "Templates"
-#~ msgstr "模板"
-
-#~ msgid "Add asset to this group"
-#~ msgstr "添加资产到该组"
-
-#, fuzzy
-#~| msgid "Add asset to this group"
-#~ msgid "Push system user to this group assets"
-#~ msgstr "添加资产到该组"
-
-#~ msgid "Update Asset"
-#~ msgstr "更新资产"
-
-#~ msgid "Select groups"
-#~ msgstr "选择组"
-
-#~ msgid "Update User"
-#~ msgstr "编辑用户"
-
-#~ msgid "Admin"
-#~ msgstr "管理用户"
-
-#~ msgid "Groups"
-#~ msgstr "组"
-
-#~ msgid "User Updated"
-#~ msgstr "更新"

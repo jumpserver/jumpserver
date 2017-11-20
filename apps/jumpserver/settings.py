@@ -18,7 +18,6 @@ from django_auth_ldap.config import LDAPSearch
 
 from django.urls import reverse_lazy
 
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PROJECT_DIR = os.path.dirname(BASE_DIR)
@@ -42,10 +41,8 @@ SECRET_KEY = CONFIG.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = CONFIG.DEBUG or False
 
-
 # Absolute url for some case, for example email link
 SITE_URL = CONFIG.SITE_URL or 'http://localhost'
-
 
 # LOG LEVEL
 LOG_LEVEL = 'DEBUG' if DEBUG else CONFIG.LOG_LEVEL or 'WARNING'
@@ -118,8 +115,7 @@ LOGIN_URL = reverse_lazy('users:login')
 
 SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN or None
 CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN or None
-SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600*24
-
+SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600 * 24
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database
@@ -194,7 +190,8 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'formatter': 'main',
-            'filename': os.path.join(PROJECT_DIR, 'logs', 'jumpserver.log')
+            'filename': os.path.join(PROJECT_DIR, 'logs', 'jumpserver.log'),
+            "encoding": "utf8"
         },
         'ansible_logs': {
             'level': 'DEBUG',
@@ -309,7 +306,6 @@ AUTHENTICATION_BACKENDS = [
 # Custom User Auth model
 AUTH_USER_MODEL = 'users.User'
 
-
 # Auth LDAP settings
 if CONFIG.AUTH_LDAP:
     AUTHENTICATION_BACKENDS.insert(0, 'django_auth_ldap.backend.LDAPBackend')
@@ -366,7 +362,6 @@ CAPTCHA_TEST_MODE = CONFIG.CAPTCHA_TEST_MODE
 
 COMMAND_STORE_BACKEND = 'audits.backends.command.db'
 RECORD_STORE_BACKEND = 'audits.backends.record.db'
-
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {
