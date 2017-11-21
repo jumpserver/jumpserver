@@ -70,7 +70,8 @@
             <td class="text-center">{{ object.date_start }}</td>
             <td class="text-center">{{ object.timedelta }} s</td>
             <td class="text-center">
-                <a class="btn btn-xs btn-primary m-l-xs btn-task-exec" data-uid="{{ object.task.id }}">{% trans "Run again" %}</a>
+                <a class="btn btn-xs btn-primary m-l-xs btn-task-exec"
+                   data-uid="{{ object.task.id }}">{% trans "Run again" %}</a>
                 <a data-uid="{{ object.uuid }}" class="btn btn-xs btn-danger btn-del">{% trans "Delete" %}</a>
             </td>
         </tr>
@@ -95,7 +96,6 @@
                 forceParse: false,
                 autoclose: true
             });
-
         }).on('click', '.btn-del', function () {
             var $this = $(this);
             var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();

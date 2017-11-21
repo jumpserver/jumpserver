@@ -15,4 +15,7 @@ urlpatterns = [
     url(r'^task/(?P<pk>[0-9]+)/detail/$', views.TaskDetailView.as_view(), name='task-detail'),
     url(r'^record/$', views.RecordListView.as_view(), name='record-list'),
     url(r'^record/(?P<pk>[0-9a-zA-Z-]+)/$', views.RecordDetailView.as_view(), name='record-detail'),
+    url(r'^variable/$', views.VariableListView.as_view(), name='variable-list'),
+    url(r'^variable/create$', views.VariableCreateView.as_view(), name='variable-create'),
+    url(r'^variable/(?P<pk>[0-9]+)/update/$', views.VariableUpdateView.as_view(), name='variable-update'),
 ]

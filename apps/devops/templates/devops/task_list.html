@@ -90,6 +90,9 @@
             }
             jumpserver.initDataTable(options);
 
+            setTimeout(function () {
+                $("[data-toggle='tooltip']").tooltip();
+            }, 1500);
 
         })
             .on('click', '.btn-task-delete', function () {

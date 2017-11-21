@@ -17,3 +17,17 @@ class TaskForm(forms.ModelForm):
         widgets = {
             'desc': forms.Textarea(),
         }
+
+
+class VariableForm(forms.ModelForm):
+    class Meta:
+        model = Variable
+        fields = [
+            'name', 'desc'
+        ]
+        help_texts = {
+
+        }
+        widgets = {
+            'desc': forms.Textarea(),
+        }

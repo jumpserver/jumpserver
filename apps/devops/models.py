@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from separatedvaluesfield.models import TextSeparatedValuesField
 from assets.models import *
 from collections import OrderedDict
+from jsonfield import JSONField
 
 
 class AnsibleRole(models.Model):
@@ -70,3 +71,11 @@ class Record(models.Model):
         for module, args in task_tuple:
             module_args_[module] = args
         self._modules_args = json.dumps(module_args_)
+
+
+class Variable(models.Model):
+    name = models.CharField(max_length=200, verbose_name=_('Name'))
+    desc = models.TextField(null=True, blank=True, verbose_name=_('Description'))
+    vars = JSONField(null=True, blank=True, verbose_name=_('Vars'))
+    assets = models.ManyToManyField(Asset, verbose_name=_('Assets'), related_name='variable', blank=True)
+    groups = models.ManyToManyField(AssetGroup, verbose_name=_('Asset Groups'), related_name='variable', blank=True)

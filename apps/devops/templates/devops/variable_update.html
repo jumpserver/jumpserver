@@ -1,0 +1,52 @@
+{% extends 'devops/_variable_create_update.html' %}
+{% block custom_create_update_js %}
+    <script>
+        let the_url = '{% url 'api-devops:variable-detail' pk=id %}';
+
+        function load_data() {
+
+
+            let success = function (data) {
+                Object.keys(data).forEach((key, i) => {
+                    //渲染 input和textarea的值
+                    $('input[id="id_' + key + '"]').val(data[key]);
+                    $('textarea[id="id_' + key + '"]').val(data[key]);
+
+                });
+            };
+
+            APIUpdateAttr({
+                url: the_url,
+                method: 'GET',
+                success_message: '读取成功',
+                success: success
+            })
+        }
+
+        function update_task() {
+            let form = $('#form').serializeObject()
+            let success = function () {
+                location.href = "{% url 'devops:variable-list' %}";
+            }
+            let error = function (data) {
+                APIFormError(data.responseJSON)
+            }
+            APIUpdateAttr({
+                url: the_url,
+                method: 'PUT',
+                success_message: "更新成功",
+                success: success,
+                error: error,
+                body: JSON.stringify(form)
+            })
+        }
+
+        $(document).ready(function () {
+            //查询数据并且填充到
+            load_data();
+            $('#reset_btn').click(load_data);
+            $('#submit_btn').click(update_task);
+        })
+        ;
+    </script>
+{% endblock %}

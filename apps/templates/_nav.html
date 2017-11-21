@@ -1,7 +1,8 @@
 {% load i18n %}
 <li id="index">
     <a href="{% url 'index' %}">
-        <i class="fa fa-dashboard"></i> <span class="nav-label">{% trans 'Dashboard' %}</span><span class="label label-info pull-right"></span>
+        <i class="fa fa-dashboard"></i> <span class="nav-label">{% trans 'Dashboard' %}</span><span
+            class="label label-info pull-right"></span>
     </a>
 </li>
 <li id="users">
@@ -26,7 +27,8 @@
     </ul>
 </li>
 <li id="perms">
-    <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">{% trans 'Perms' %}</span><span class="fa arrow"></span></a>
+    <a href="#"><i class="fa fa-edit"></i> <span class="nav-label">{% trans 'Perms' %}</span><span
+            class="fa arrow"></span></a>
     <ul class="nav nav-second-level">
         <li id="asset-permission">
             <a href="{% url 'perms:asset-permission-list' %}">{% trans 'Asset permission' %}</a>
@@ -36,7 +38,8 @@
 
 <li id="applications">
     <a>
-        <i class="fa fa-rocket"></i> <span class="nav-label">{% trans 'Applications' %}</span><span class="fa arrow"></span>
+        <i class="fa fa-rocket"></i> <span class="nav-label">{% trans 'Applications' %}</span><span
+            class="fa arrow"></span>
     </a>
     <ul class="nav nav-second-level">
         <li id="terminal"><a href="{% url 'applications:terminal-list' %}">{% trans 'Terminal' %}</a></li>
@@ -45,7 +48,8 @@
 
 <li id="ops">
     <a>
-        <i class="fa fa-coffee"></i> <span class="nav-label">{% trans 'Job Center' %}</span><span class="fa arrow"></span>
+        <i class="fa fa-coffee"></i> <span class="nav-label">{% trans 'Job Center' %}</span><span
+            class="fa arrow"></span>
     </a>
     <ul class="nav nav-second-level">
         <li id="task"><a href="{% url 'ops:task-list' %}">{% trans 'Task' %}</a></li>
@@ -58,12 +62,15 @@
     </a>
     <ul class="nav nav-second-level">
         <li id="task"><a href="{% url 'devops:task-list' %}">{% trans 'Tasks' %}</a></li>
+        <li id="record"><a href="{% url 'devops:variable-list' %}">{% trans 'Variables' %}</a></li>
         <li id="record"><a href="{% url 'devops:record-list' %}">{% trans 'Records' %}</a></li>
+
     </ul>
 </li>
 
 <li id="audits">
-    <a href="#"><i class="fa fa-files-o"></i> <span class="nav-label">{% trans 'Audits' %}</span><span class="fa arrow"></span></a>
+    <a href="#"><i class="fa fa-files-o"></i> <span class="nav-label">{% trans 'Audits' %}</span><span
+            class="fa arrow"></span></a>
     <ul class="nav nav-second-level">
         <li id="proxy-log-online">
             <a href="{% url 'audits:proxy-log-online-list' %}">{% trans 'Session online' %}</a>
@@ -77,9 +84,9 @@
         <li id="login-log">
             <a href="{% url 'audits:login-log-list' %}">{% trans 'Login log' %}</a>
         </li>
-{#        <li id="admin-log">#}
-{#            <a href="{% url 'perms:asset-permission-list' %}">{% trans 'Admin log' %}</a>#}
-{#        </li>#}
+        {#        <li id="admin-log">#}
+        {#            <a href="{% url 'perms:asset-permission-list' %}">{% trans 'Admin log' %}</a>#}
+        {#        </li>#}
 
     </ul>
 </li>

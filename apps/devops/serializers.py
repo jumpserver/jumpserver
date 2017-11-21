@@ -56,3 +56,11 @@ class RecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = Record
         fields = '__all__'
+
+
+class VariableSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Variable
+        exclude = ('assets', 'groups')
+

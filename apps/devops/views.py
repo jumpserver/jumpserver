@@ -2,21 +2,22 @@
 #
 from __future__ import unicode_literals
 
-import json
 import logging
 from datetime import datetime
 from django.utils import timezone
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import ugettext as _
-from django.views.generic import TemplateView, DetailView,ListView
+from django.views.generic import TemplateView, DetailView, ListView
 
 from django.conf import settings
-from .forms import TaskForm
+from .forms import *
 from .models import *
 from .hands import *
 
 logger = logging.getLogger(__name__)
+
+"""   Task   """
 
 
 class TaskListView(LoginRequiredMixin, TemplateView):
@@ -86,6 +87,9 @@ class TaskDetailView(LoginRequiredMixin, DetailView):
         return super(TaskDetailView, self).get_context_data(**kwargs)
 
 
+"""   Record     """
+
+
 class RecordListView(ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     model = Record
@@ -125,7 +129,7 @@ class RecordListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Ansible',
+            'app': _('Ansible'),
             'action': _('Task record list'),
             'date_from': self.date_from_s,
             'date_to': self.date_to_s,
@@ -141,9 +145,51 @@ class RecordDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Ansible',
+            'app': _('Ansible'),
             'action': _('Task record detail'),
             'results': json.loads(self.object.summary or '{}'),
         }
         kwargs.update(context)
         return super(RecordDetailView, self).get_context_data(**kwargs)
+
+
+"""   Variable     """
+
+
+class VariableListView(AdminUserRequiredMixin, TemplateView):
+    template_name = 'devops/variable_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Ansible'),
+            'action': _('Variables'),
+        }
+        kwargs.update(context)
+        return super(VariableListView, self).get_context_data(**kwargs)
+
+
+class VariableCreateView(AdminUserRequiredMixin, TemplateView):
+    template_name = 'devops/variable_create.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Ansible'),
+            'action': _('Create Variable'),
+            'form': VariableForm,
+        }
+        kwargs.update(context)
+        return super(VariableCreateView, self).get_context_data(**kwargs)
+
+
+class VariableUpdateView(AdminUserRequiredMixin, TemplateView):
+    template_name = 'devops/variable_update.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Ansible'),
+            'action': _('Update Variable'),
+            'form': VariableForm,
+            'id': kwargs['pk'],
+        }
+        kwargs.update(context)
+        return super(VariableUpdateView, self).get_context_data(**kwargs)

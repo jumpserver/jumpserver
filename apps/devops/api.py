@@ -176,3 +176,9 @@ class RecordViewSet(viewsets.ModelViewSet):
     queryset = Record.objects.all()
     serializer_class = RecordSerializer
     permission_classes = (IsSuperUser,)
+
+
+class VariableViewSet(viewsets.ModelViewSet):
+    queryset = Variable.objects.all()
+    serializer_class = VariableSerializer
+    permission_classes = (IsSuperUser,)

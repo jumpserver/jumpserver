@@ -1,0 +1,24 @@
+{% extends 'devops/_variable_create_update.html' %}
+{% block custom_create_update_js %}
+    <script>
+        $('#submit_btn').click(function () {
+            let the_url = "{% url 'api-devops:variable-list' %}";
+            let form = $('#form').serializeObject()
+            let success = function () {
+                location.href = "{% url 'devops:variable-list' %}";
+            }
+            let error = function (data) {
+                APIFormError(data.responseJSON)
+            }
+            APIUpdateAttr({
+                url: the_url,
+                method: 'POST',
+                success_message: "保存成功",
+                success: success,
+                error: error,
+                body: JSON.stringify(form)
+            })
+        })
+
+    </script>
+{% endblock %}

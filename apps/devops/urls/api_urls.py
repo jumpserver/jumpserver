@@ -13,6 +13,7 @@ router.register(r'v1/tasks', api.TaskListViewSet, 'task')
 router.register(r'v1/records', api.RecordViewSet, 'record')
 router.register(r'v1/tasks-opt', api.TaskOperationViewSet, 'task-opt')
 router.register(r'v1/roles', api.AnsibleRoleViewSet, 'role')
+router.register(r'v1/variables', api.VariableViewSet, 'variable')
 
 urlpatterns = [
     url(r'^v1/roles/install/$', api.InstallRoleView.as_view(), name='role-install'),
