@@ -1633,7 +1633,7 @@ msgstr "任务历史记录"
 
 #: devops/views.py:163 templates/_nav.html:65
 msgid "Variables"
-msgstr "变量组"
+msgstr "变量"
 
 #: devops/views.py:188
 msgid "Update Variable"
