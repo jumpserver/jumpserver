@@ -218,11 +218,10 @@ class VariableAssetView(AdminUserRequiredMixin, DetailView):
         context = {
             'app': _('Ansible'),
             'action': _('Task Detail'),
-            'assets': assets,
-            'assets_remain': [asset for asset in Asset.objects.all()
+            #: 资产和资产组都不允许重复选择
+            'assets_remain': [asset for asset in Asset.objects.all().filter(variable=None)
                               if asset not in assets],
-            'asset_groups': asset_groups,
-            'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all()
+            'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all().filter(variable=None)
                                     if asset_group not in asset_groups],
         }
         kwargs.update(context)

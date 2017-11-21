@@ -164,7 +164,7 @@ class TaskExecuteApi(generics.RetrieveAPIView):
         task_record.task = task
         task_record.save()
 
-        ansible_task_execute.delay(task.id, [asset._to_secret_json() for asset in assets],
+        ansible_task_execute(task.id, [asset._to_secret_json() for asset in assets],
                                    task.system_user.username, task_name, task.tags, uuid_str)
         task.counts += 1
         task.save()

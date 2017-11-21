@@ -76,6 +76,6 @@ class Record(models.Model):
 class Variable(models.Model):
     name = models.CharField(max_length=200, verbose_name=_('Name'))
     desc = models.TextField(null=True, blank=True, verbose_name=_('Description'))
-    vars = JSONField(null=True, blank=True, verbose_name=_('Vars'))
+    vars = JSONField(null=True, blank=True, default={}, verbose_name=_('Vars'))
     assets = models.ManyToManyField(Asset, verbose_name=_('Assets'), related_name='variable', blank=True)
     groups = models.ManyToManyField(AssetGroup, verbose_name=_('Asset Groups'), related_name='variable', blank=True)
