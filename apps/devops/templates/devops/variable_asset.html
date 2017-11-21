@@ -1,0 +1,325 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li>
+                                <a href="{% url 'devops:variable-detail' pk=variable.id %}" class="text-center"><i
+                                        class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
+                            </li>
+                            <li class="active">
+                                <a href="{% url 'devops:variable-asset' pk=variable.id %}" class="text-center">
+                                    <i class="fa fa-bar-chart-o"></i> {% trans 'Attached assets' %}
+                                </a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default"
+                                   href="{% url 'devops:variable-update' pk=variable.id %}"><i class="fa fa-edit"></i>Update</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-7" style="padding-left: 0;">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left">{% trans 'Assets of ' %}</span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table table-hover" id="asset_list">
+                                        <thead>
+                                        <tr>
+                                            <th>{% trans 'Hostname' %}</th>
+                                            <th>{% trans 'IP' %}</th>
+                                            <th>{% trans 'Port' %}</th>
+                                            <th>{% trans 'Type' %}</th>
+                                            <th>{% trans 'Env' %}</th>
+                                            <th>{% trans 'Action' %}</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left">{% trans 'Asset Groups' %}</span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table table-hover" id="group_list">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center">{% trans 'Name' %}</th>
+                                            <th class="text-center">{% trans 'Asset' %}</th>
+                                            <th class="text-center">{% trans 'Comment' %}</th>
+                                            <th class="text-center">{% trans 'Action' %}</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Attach to assets ' %} {{ idc.name }}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table" id="add-asset2var">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select assets' %}"
+                                                            id="assets_selected"
+                                                            class="select2-multiple assets" style="width: 100%"
+                                                            multiple=""
+                                                            tabindex="4">
+                                                        {% for asset in assets_remain %}
+                                                            <option value="{{ asset.id }}"
+                                                                    id="asset_opt_{{ asset.id }}">
+                                                                <b>{{ asset.hostname }}</b>
+                                                                - {{ asset.ip }}:{{ asset.port }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button" id="btn_add_asset"
+                                                            class="btn btn-primary btn-sm btn_add_asset">{% trans 'Confirm' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Attach to asset groups' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table group_edit" id="add-group2var">
+                                        <tbody>
+                                        <form>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <select data-placeholder="{% trans 'Select asset groups' %}"
+                                                            id="groups_selected" class="select2-multiple groups"
+                                                            multiple=""
+                                                            style="width: 100%" tabindex="4">
+                                                        {% for asset_group in asset_groups_remain %}
+                                                            <option value="{{ asset_group.id }}"
+                                                                    id="group_opt_{{ asset_group.id }}">{{ asset_group.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <button type="button" class="btn btn-info btn-sm"
+                                                            id="btn_add_group">{% trans 'Confirm' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block custom_foot_js %}
+    <script>
+        jumpserver.groups_selected = [];
+        jumpserver.assets_selected = [];
+        $(document).ready(function () {
+            $('select.select2-multiple').select2();
+            $('select.select2').select2({
+                multiple: false
+            });
+
+            let asset_options = {
+                ele: $('#asset_list'),
+                buttons: [],
+                order: [],
+                columnDefs: [
+                    {
+                        targets: 0, createdCell: function (td, cellData, rowData) {
+                        var detail_btn = '<a href="{% url "assets:asset-detail" pk=99991937 %}" data-aid="' + rowData.id + '">' + cellData + '</a>';
+                        $(td).html(detail_btn.replace('99991937', rowData.id));
+                    }
+                    },
+                    {
+                        targets: 5, createdCell: function (td, cellData, rowData) {
+                        var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-name="99991938"  data-aid="99991937">{% trans "Delete" %}</a>'
+                            .replace('99991937', rowData.id).replace('99991938', rowData.name);
+                        $(td).html(del_btn);
+                    }
+                    }
+                ],
+                ajax_url: '{% url "api-devops:variable-get-asset" pk=variable.id %}',
+                columns: [{data: "hostname"}, {data: "ip"}, {data: "port"}, {data: "get_type_display"}, {data: "get_env_display"}, {data: "id"}],
+            };
+            jumpserver.initDataTable(asset_options);
+
+            let group_options = {
+                ele: $('#group_list'),
+                buttons: [],
+                order: [],
+                columnDefs: [
+                    {
+                        targets: 0, createdCell: function (td, cellData, rowData) {
+                        var detail_btn = '<a href="{% url "assets:asset-group-detail" pk=99991937 %}" data-aid="' + rowData.id + '">' + cellData + '</a>';
+                        $(td).html(detail_btn.replace('99991937', rowData.id));
+                    }
+                    },
+                    {
+                        targets: 3, createdCell: function (td, cellData, rowData) {
+                        var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_group_delete" data-name="99991938" data-gid="99991937">{% trans "Delete" %}</a>'
+                            .replace('99991937', rowData.id).replace('99991938', rowData.name);
+                        $(td).html(del_btn)
+                    }
+                    }
+                ],
+                ajax_url: '{% url "api-devops:variable-get-group" pk=variable.id %}',
+                columns: [{data: "name"}, {data: "assets_amount"}, {data: "comment"}, {data: "id"}],
+            };
+            jumpserver.initDataTable(group_options);
+        }).on('click', '#btn_add_group', function () {
+            jumpserver.groups_selected = $('#groups_selected').select2('data');
+            if (Object.keys(jumpserver.groups_selected).length === 0) {
+                return false;
+            }
+            var groups = $('.btn_group_delete').map(function () {
+                return $(this).data('gid');
+            }).get();
+            $.map(jumpserver.groups_selected, function (value) {
+                groups.push(parseInt(value.id));
+                $('#group_opt_' + value.id).remove();
+            });
+            updateTaskGroups(groups)
+        }).on('click', '.btn_group_delete', function () {
+            var $this = $(this);
+            var $tr = $this.closest('tr');
+            var group_name = $this.data('name');
+            var gid = $this.data('gid');
+            $('#groups_selected').append(
+                '<option value="' + gid + '" id="group_opt_' + gid + '">' + group_name + '</option>'
+            );
+            $tr.remove();
+            var groups = $('.btn_group_delete').map(function () {
+                return $(this).data('gid');
+            }).get();
+            console.log(groups)
+            updateTaskGroups(groups)
+        }).on('click', '#btn_add_asset', function () {
+            jumpserver.assets_selected = $('#assets_selected').select2('data');
+            if (Object.keys(jumpserver.assets_selected).length === 0) {
+                return false;
+            }
+            var assets = $('.btn_asset_delete').map(function () {
+                return $(this).data('aid');
+            }).get();
+            $.map(jumpserver.assets_selected, function (value) {
+                assets.push(parseInt(value.id));
+                $('#asset_opt_' + value.id).remove();
+            });
+            updateTaskAssets(assets)
+        }).on('click', '.btn_asset_delete', function () {
+            var $this = $(this);
+            var $tr = $this.closest('tr');
+            var asset_name = $this.data('name');
+            var aid = $this.data('aid');
+            $('#assets_selected').append(
+                '<option value="' + gid + '" id="asset_opt_' + aid + '">' + asset_name + '</option>'
+            );
+            $tr.remove();
+            var assets = $('.btn_asset_delete').map(function () {
+                return $(this).data('aid');
+            }).get();
+            updateTaskAssets(assets)
+        });
+
+        function updateTaskGroups(groups) {
+            var the_url = "{% url 'api-devops:variable-update-group' pk=variable.id %}";
+            var body = {
+                groups: Object.assign([], groups)
+            };
+            var success = function (data) {
+                // remove all the selected groups from select > option and rendered ul element;
+                $('#groups_selected .select2-selection__rendered').empty();
+                $('#groups_selected').val('');
+                $('#group_list').DataTable().ajax.reload();
+                jumpserver.groups_selected = [];
+            };
+            APIUpdateAttr({
+                url: the_url,
+                body: JSON.stringify(body),
+                success: success
+            });
+        }
+
+        function updateTaskAssets(assets) {
+            var the_url = "{% url 'api-devops:variable-update-asset' pk=variable.id %}";
+            var body = {
+                assets: Object.assign([], assets)
+            };
+            var success = function (data) {
+                // remove all the selected groups from select > option and rendered ul element;
+                $('#assets_selected .select2-selection__rendered').empty();
+                $('#assets_selected').val('');
+                // clear jumpserver.assets_selected
+                $('#asset_list').DataTable().ajax.reload();
+                jumpserver.assets_selected = [];
+            };
+            APIUpdateAttr({
+                url: the_url,
+                body: JSON.stringify(body),
+                success: success
+            });
+        }
+
+    </script>
+{% endblock %}

@@ -4,7 +4,7 @@ from __future__ import unicode_literals
 from rest_framework import serializers
 
 from .models import *
-from assets.serializers import SystemUserSerializer
+from assets.serializers import AssetSerializer, AssetGroupSerializer
 
 
 class AnsibleRoleSerializer(serializers.ModelSerializer):
@@ -68,3 +68,21 @@ class VariableVarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Variable
         fields = ('id',)
+
+
+class VariableUpdateGroupSerializer(serializers.ModelSerializer):
+    groups = serializers.PrimaryKeyRelatedField(many=True, queryset=AssetGroup.objects.all())
+
+    class Meta:
+        model = Variable
+        fields = ['id', 'groups']
+
+
+class VariableUpdateAssetSerializer(serializers.ModelSerializer):
+    assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
+
+    class Meta:
+        model = Variable
+        fields = ['id', 'assets']
+
+

@@ -199,6 +199,20 @@ class VariableDetailView(AdminUserRequiredMixin, DetailView):
     template_name = 'devops/variable_detail.html'
 
     def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Ansible'),
+            'action': _('Task Detail'),
+        }
+        kwargs.update(context)
+        return super(VariableDetailView, self).get_context_data(**kwargs)
+
+
+class VariableAssetView(AdminUserRequiredMixin, DetailView):
+    queryset = Variable.objects.all()
+    context_object_name = 'variable'
+    template_name = 'devops/variable_asset.html'
+
+    def get_context_data(self, **kwargs):
         assets = self.object.assets.all()
         asset_groups = self.object.groups.all()
         context = {
@@ -212,4 +226,4 @@ class VariableDetailView(AdminUserRequiredMixin, DetailView):
                                     if asset_group not in asset_groups],
         }
         kwargs.update(context)
-        return super(VariableDetailView, self).get_context_data(**kwargs)
+        return super(VariableAssetView, self).get_context_data(**kwargs)

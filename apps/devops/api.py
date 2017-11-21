@@ -199,7 +199,7 @@ class VariableVarsApi(generics.RetrieveAPIView):
         return Response(result, status=status.HTTP_200_OK)
 
 
-class VariableAddVarsApi(generics.RetrieveUpdateAPIView):
+class VariableAddVarsApi(generics.UpdateAPIView):
     """
        Vars Add API
     """
@@ -224,7 +224,42 @@ class VariableDeleteVarsApi(generics.DestroyAPIView):
 
     def delete(self, request, *args, **kwargs):
         variable = self.get_object()
-        print(request.data)
         variable.vars.pop(request.data['key'])
         variable.save()
         return Response(variable.vars, status=status.HTTP_200_OK)
+
+
+class VariableUpdateGroupApi(generics.UpdateAPIView):
+    """Variable update it's group api"""
+    queryset = Variable.objects.all()
+    serializer_class = VariableUpdateGroupSerializer
+    permission_classes = (IsSuperUser,)
+
+
+class VariableUpdateAssetApi(generics.UpdateAPIView):
+    """Variable update it's asset api"""
+    queryset = Variable.objects.all()
+    serializer_class = VariableUpdateAssetSerializer
+    permission_classes = (IsSuperUser,)
+
+
+class VariableGetAssetApi(generics.RetrieveAPIView):
+    """Variable update it's asset api"""
+    queryset = Variable.objects.all()
+    serializer_class = AssetSerializer
+    permission_classes = (IsSuperUser,)
+
+    def retrieve(self, request, *args, **kwargs):
+        serializer = AssetSerializer(self.get_object().assets.all(), many=True)
+        return Response(serializer.data)
+
+
+class VariableGetGroupApi(generics.RetrieveAPIView):
+    """Variable update it's asset api"""
+    queryset = Variable.objects.all()
+    serializer_class = AssetGroupSerializer
+    permission_classes = (IsSuperUser,)
+
+    def retrieve(self, request, *args, **kwargs):
+        serializer = AssetGroupSerializer(self.get_object().groups.all(), many=True)
+        return Response(serializer.data)
