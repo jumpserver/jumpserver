@@ -24,7 +24,8 @@ urlpatterns = [
     url(r'^v1/tasks/(?P<pk>\d+)/system-user/$',
         api.TaskUpdateSystemUserApi.as_view(), name='task-update-system-user'),
     url(r'^v1/tasks/(?P<pk>\d+)/execute/$', api.TaskExecuteApi.as_view(), name='task-execute'),
+    url(r'^v1/variables/(?P<pk>\d+)/vars/$', api.VariableVarsApi.as_view(), name='variable-vars'),
+    url(r'^v1/variables/(?P<pk>\d+)/vars/add$', api.VariableAddVarsApi.as_view(), name='variable-add-vars'),
 ]
 
 urlpatterns += router.urls
-

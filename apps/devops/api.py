@@ -115,7 +115,7 @@ class TaskUpdateAssetApi(generics.RetrieveUpdateAPIView):
 
 
 class TaskUpdateSystemUserApi(generics.RetrieveUpdateAPIView):
-    """Task update it's asset api"""
+    """Task update it's system_user api"""
     queryset = Task.objects.all()
     serializer_class = TaskUpdateSystemUserSerializer
     permission_classes = (IsSuperUser,)
@@ -182,3 +182,34 @@ class VariableViewSet(viewsets.ModelViewSet):
     queryset = Variable.objects.all()
     serializer_class = VariableSerializer
     permission_classes = (IsSuperUser,)
+
+
+class VariableVarsApi(generics.RetrieveAPIView):
+    """
+       Vars Read API
+    """
+    permission_classes = (IsSuperUser,)
+    queryset = Variable.objects.all()
+
+    def retrieve(self, request, *args, **kwargs):
+        variable = self.get_object()
+        result = []
+        for key, value in variable.vars.items():
+            result.append({"key": key, "value": value})
+        return Response(result, status=status.HTTP_200_OK)
+
+
+class VariableAddVarsApi(generics.RetrieveUpdateAPIView):
+    """
+       Vars Add API
+    """
+    permission_classes = (IsSuperUser,)
+    queryset = Variable.objects.all()
+    serializer_class = VariableVarSerializer
+
+    def put(self, request, *args, **kwargs):
+        variable = self.get_object()
+        result = []
+        variable.vars.update({request.data['key']: request.data['value']})
+        variable.save()
+        return Response(result, status=status.HTTP_200_OK)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-21 10:05+0800\n"
+"POT-Creation-Date: 2017-11-21 14:41+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -36,7 +36,8 @@ msgstr ""
 #: devops/templates/devops/record_list.html:41
 #: devops/templates/devops/task_detail.html:69
 #: devops/templates/devops/task_list.html:20
-#: devops/templates/devops/variable_list.html:20 ops/models.py:20
+#: devops/templates/devops/variable_detail.html:55
+#: devops/templates/devops/variable_list.html:18 ops/models.py:20
 #: ops/templates/ops/task_detail.html:50 ops/templates/ops/task_list.html:39
 #: perms/models.py:21
 #: perms/templates/perms/asset_permission_create_update.html:33
@@ -166,7 +167,7 @@ msgstr "在线"
 #: assets/templates/assets/system_user_list.html:22
 #: devops/templates/devops/record_list.html:47
 #: devops/templates/devops/task_list.html:24
-#: devops/templates/devops/variable_list.html:22
+#: devops/templates/devops/variable_list.html:20
 #: ops/templates/ops/task_list.html:45
 #: perms/templates/perms/asset_permission_list.html:18
 #: users/templates/users/user_group_list.html:15
@@ -184,7 +185,7 @@ msgstr "动作"
 #: assets/templates/assets/system_user_asset.html:256
 #: assets/templates/assets/system_user_list.html:58
 #: devops/templates/devops/task_list.html:74
-#: devops/templates/devops/variable_list.html:72
+#: devops/templates/devops/variable_list.html:66
 #: perms/templates/perms/asset_permission_list.html:44
 #: users/templates/users/user_group_list.html:50
 #: users/templates/users/user_list.html:92
@@ -200,7 +201,7 @@ msgstr "更新"
 #: assets/templates/assets/system_user_list.html:59
 #: devops/templates/devops/record_list.html:75
 #: devops/templates/devops/task_list.html:76
-#: devops/templates/devops/variable_list.html:74
+#: devops/templates/devops/variable_list.html:68
 #: ops/templates/ops/task_list.html:72
 #: perms/templates/perms/asset_permission_list.html:47
 #: users/templates/users/user_group_list.html:52
@@ -775,6 +776,7 @@ msgstr "创建管理用户"
 #: assets/templates/assets/idc_detail.html:17
 #: assets/templates/assets/system_user_asset.html:17
 #: assets/templates/assets/system_user_detail.html:18
+#: devops/templates/devops/variable_detail.html:19
 #: perms/templates/perms/asset_permission_asset.html:18
 #: perms/templates/perms/asset_permission_detail.html:18
 #: perms/templates/perms/asset_permission_user.html:18
@@ -919,7 +921,8 @@ msgstr "添加到资产组"
 #: assets/templates/assets/user_asset_list.html:165
 #: devops/templates/devops/task_detail.html:176
 #: devops/templates/devops/task_detail.html:220
-#: devops/templates/devops/task_detail.html:271 templates/_modal.html:16
+#: devops/templates/devops/task_detail.html:271
+#: devops/templates/devops/variable_detail.html:128 templates/_modal.html:16
 #: users/templates/users/user_detail.html:341
 #: users/templates/users/user_detail.html:366
 #: users/templates/users/user_detail.html:389
@@ -1150,6 +1153,7 @@ msgstr "IDC删除失败"
 
 #: assets/templates/assets/system_user_asset.html:20
 #: assets/templates/assets/system_user_detail.html:22
+#: devops/templates/devops/variable_detail.html:23
 msgid "Attached assets"
 msgstr "关联的资产"
 
@@ -1433,7 +1437,8 @@ msgstr ""
 #: devops/models.py:22 devops/models.py:78
 #: devops/templates/devops/task_detail.html:73
 #: devops/templates/devops/task_list.html:21
-#: devops/templates/devops/variable_list.html:21
+#: devops/templates/devops/variable_detail.html:59
+#: devops/templates/devops/variable_list.html:19
 msgid "Description"
 msgstr "描述"
 
@@ -1493,9 +1498,9 @@ msgstr ""
 msgid "Task"
 msgstr "任务"
 
-#: devops/models.py:79
+#: devops/models.py:79 devops/templates/devops/variable_detail.html:69
 msgid "Vars"
-msgstr ""
+msgstr "变量"
 
 #: devops/templates/devops/_task_create_update.html:25
 #: devops/templates/devops/_variable_create_update.html:25
@@ -1503,9 +1508,10 @@ msgid "basic"
 msgstr "基本信息"
 
 #: devops/templates/devops/_task_create_update.html:30 devops/views.py:28
-#: devops/views.py:40 devops/views.py:53 devops/views.py:74 devops/views.py:132
-#: devops/views.py:148 devops/views.py:164 devops/views.py:176
-#: devops/views.py:189 templates/_nav.html:61 templates/_nav_user.html:24
+#: devops/views.py:40 devops/views.py:53 devops/views.py:72 devops/views.py:130
+#: devops/views.py:146 devops/views.py:162 devops/views.py:174
+#: devops/views.py:187 devops/views.py:205 templates/_nav.html:61
+#: templates/_nav_user.html:24
 msgid "Ansible"
 msgstr "Ansible"
 
@@ -1521,7 +1527,7 @@ msgstr "安装"
 msgid "Role Name"
 msgstr "角色名称"
 
-#: devops/templates/devops/record_detail.html:19 devops/views.py:149
+#: devops/templates/devops/record_detail.html:19 devops/views.py:147
 #: ops/templates/ops/task_detail.html:19
 msgid "Task record detail"
 msgstr "任务记录详情"
@@ -1559,7 +1565,8 @@ msgid "Run again"
 msgstr "再次执行"
 
 #: devops/templates/devops/task_detail.html:20
-#: devops/templates/devops/task_detail.html:50 devops/views.py:75
+#: devops/templates/devops/task_detail.html:50 devops/views.py:73
+#: devops/views.py:206
 msgid "Task Detail"
 msgstr "任务详情"
 
@@ -1591,11 +1598,24 @@ msgid "Create Task"
 msgstr "创建任务"
 
 #: devops/templates/devops/task_list.html:70
-#: devops/templates/devops/variable_list.html:68
 msgid "Execute"
 msgstr "执行"
 
-#: devops/templates/devops/variable_list.html:8 devops/views.py:177
+#: devops/templates/devops/variable_detail.html:89
+#: devops/templates/devops/variable_detail.html:110
+msgid "KEY"
+msgstr ""
+
+#: devops/templates/devops/variable_detail.html:90
+#: devops/templates/devops/variable_detail.html:119
+msgid "VALUE"
+msgstr ""
+
+#: devops/templates/devops/variable_detail.html:102
+msgid "Add Update Vars"
+msgstr "添加或更新变量"
+
+#: devops/templates/devops/variable_list.html:7 devops/views.py:175
 msgid "Create Variable"
 msgstr "创建变量组"
 
@@ -1607,15 +1627,15 @@ msgstr "任务"
 msgid "Update Task"
 msgstr "更新任务"
 
-#: devops/views.py:133
+#: devops/views.py:131
 msgid "Task record list"
 msgstr "任务历史记录"
 
-#: devops/views.py:165 templates/_nav.html:65
+#: devops/views.py:163 templates/_nav.html:65
 msgid "Variables"
-msgstr "任务变量组"
+msgstr "变量组"
 
-#: devops/views.py:190
+#: devops/views.py:188
 msgid "Update Variable"
 msgstr "更新变量组"
 
@@ -1828,7 +1848,7 @@ msgstr "作业中心"
 
 #: templates/_nav.html:66 templates/_nav_user.html:28
 msgid "Records"
-msgstr "任务记录"
+msgstr "执行记录"
 
 #: templates/_nav.html:79
 msgid "Session history"

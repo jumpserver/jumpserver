@@ -59,8 +59,12 @@ class RecordSerializer(serializers.ModelSerializer):
 
 
 class VariableSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Variable
         exclude = ('assets', 'groups')
 
+
+class VariableVarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Variable
+        fields = ('id',)

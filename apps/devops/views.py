@@ -68,8 +68,6 @@ class TaskDetailView(LoginRequiredMixin, DetailView):
         assets = self.object.assets.all()
         asset_groups = self.object.groups.all()
         system_user = self.object.system_user
-        print([asset for asset in Asset.objects.all()
-               if asset not in assets])
         context = {
             'app': _('Ansible'),
             'action': _('Task Detail'),
@@ -193,3 +191,25 @@ class VariableUpdateView(AdminUserRequiredMixin, TemplateView):
         }
         kwargs.update(context)
         return super(VariableUpdateView, self).get_context_data(**kwargs)
+
+
+class VariableDetailView(AdminUserRequiredMixin, DetailView):
+    queryset = Variable.objects.all()
+    context_object_name = 'variable'
+    template_name = 'devops/variable_detail.html'
+
+    def get_context_data(self, **kwargs):
+        assets = self.object.assets.all()
+        asset_groups = self.object.groups.all()
+        context = {
+            'app': _('Ansible'),
+            'action': _('Task Detail'),
+            'assets': assets,
+            'assets_remain': [asset for asset in Asset.objects.all()
+                              if asset not in assets],
+            'asset_groups': asset_groups,
+            'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all()
+                                    if asset_group not in asset_groups],
+        }
+        kwargs.update(context)
+        return super(VariableDetailView, self).get_context_data(**kwargs)

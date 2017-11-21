@@ -47,7 +47,7 @@
                          * @param rowData  该条记录值
                          */
                         createdCell: function (td, cellData, rowData) {
-                            let detail_btn = '<a href="{% url "devops:task-detail" pk=99991937 %}">' + cellData + '</a>';
+                            let detail_btn = '<a href="{% url "devops:variable-detail" pk=99991937 %}">' + cellData + '</a>';
                             $(td).html(detail_btn.replace('99991937', rowData.id));
                         }
                     },
