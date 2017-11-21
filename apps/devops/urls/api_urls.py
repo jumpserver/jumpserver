@@ -26,6 +26,7 @@ urlpatterns = [
     url(r'^v1/tasks/(?P<pk>\d+)/execute/$', api.TaskExecuteApi.as_view(), name='task-execute'),
     url(r'^v1/variables/(?P<pk>\d+)/vars/$', api.VariableVarsApi.as_view(), name='variable-vars'),
     url(r'^v1/variables/(?P<pk>\d+)/vars/add$', api.VariableAddVarsApi.as_view(), name='variable-add-vars'),
+    url(r'^v1/variables/(?P<pk>\d+)/vars/delete$', api.VariableDeleteVarsApi.as_view(), name='variable-delete-vars'),
 ]
 
 urlpatterns += router.urls

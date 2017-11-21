@@ -88,6 +88,7 @@
                                             <tr>
                                                 <th class="text-center">{% trans 'KEY' %}</th>
                                                 <th class="text-center">{% trans 'VALUE' %}</th>
+                                                <th class="text-center" width="70px">{% trans 'Action' %}</th>
                                             </tr>
                                             </thead>
                                         </table>
@@ -160,9 +161,19 @@
                         createdCell: function (td, cellData, rowData) {
                             $(td).html(cellData);
                         }
+                    },
+                    {
+                        targets: 2,
+                        orderable: false,
+                        createdCell: function (td, cellData, rowData) {
+                            let del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-vars-delete" data-uid="99991937" >{% trans "Delete" %}</a>'
+                                .replace('99991937', cellData);
+
+                            $(td).html(del_btn);
+                        }
                     }
                 ],
-                columns: [{data: "key"}, {data: "value"}],
+                columns: [{data: "key"}, {data: "value"}, {data: "key"}],
                 ajax_url: '{% url "api-devops:variable-vars" pk=variable.id %}',
                 order: [[0, 'asc']],
                 dom: '<"#uc.pull-left">ft<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
@@ -173,6 +184,7 @@
             let form = $('#form').serializeObject()
             let success = function () {
                 $('#vars_table').DataTable().ajax.reload();
+                $('#form')[0].reset()
             };
             APIUpdateAttr({
                 url: the_url,
@@ -180,8 +192,21 @@
                 success_message: "添加成功",
                 success: success,
                 body: JSON.stringify(form)
-            })
+            });
             return false;
+        }).on('click', '.btn-vars-delete', function () {
+            let key = $(this).data('uid')+"";
+            let the_url = '{% url "api-devops:variable-delete-vars" pk=variable.id %}';
+            let success = function () {
+                $('#vars_table').DataTable().ajax.reload();
+            }
+            APIUpdateAttr({
+                url: the_url,
+                method: 'DELETE',
+                success_message: "删除成功",
+                success: success,
+                body: JSON.stringify({"key": key})
+            })
         });
     </script>
 {% endblock %}

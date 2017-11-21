@@ -209,7 +209,22 @@ class VariableAddVarsApi(generics.RetrieveUpdateAPIView):
 
     def put(self, request, *args, **kwargs):
         variable = self.get_object()
-        result = []
         variable.vars.update({request.data['key']: request.data['value']})
         variable.save()
-        return Response(result, status=status.HTTP_200_OK)
+        return Response(variable.vars, status=status.HTTP_200_OK)
+
+
+class VariableDeleteVarsApi(generics.DestroyAPIView):
+    """
+       Vars Add API
+    """
+    permission_classes = (IsSuperUser,)
+    queryset = Variable.objects.all()
+    serializer_class = VariableVarSerializer
+
+    def delete(self, request, *args, **kwargs):
+        variable = self.get_object()
+        print(request.data)
+        variable.vars.pop(request.data['key'])
+        variable.save()
+        return Response(variable.vars, status=status.HTTP_200_OK)
