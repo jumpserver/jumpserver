@@ -12,11 +12,12 @@ app_name = 'applications'
 router = routers.DefaultRouter()
 router.register(r'v1/terminal/(?P<terminal>[0-9]+)?/?status', api.TerminalStatusViewSet, 'terminal-status')
 router.register(r'v1/terminal/(?P<terminal>[0-9]+)?/?sessions', api.TerminalSessionViewSet, 'terminal-sessions')
-router.register(r'v1/terminal$', api.TerminalViewSet, 'terminal')
+router.register(r'v1/terminal', api.TerminalViewSet, 'terminal')
 
 urlpatterns = [
 #     url(r'^v1/terminate/connection/$', api.TerminateConnectionView.as_view(),
 #         name='terminate-connection')
+    url(r'^v1/sessions/(?P<pk>[0-9a-zA-Z\-_]+)/replay/$', api.SessionReplayAPI.as_view(), name='session-replay'),
 ]
 
 urlpatterns += router.urls

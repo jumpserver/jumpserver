@@ -1375,7 +1375,7 @@ msgstr "终止所选"
 #: audits/views.py:72 audits/views.py:209 audits/views.py:263
 #: templates/_nav.html:56
 msgid "Audits"
-msgstr "审计"
+msgstr "审计中心"
 
 #: audits/views.py:73 audits/views.py:264
 msgid "Proxy log list"

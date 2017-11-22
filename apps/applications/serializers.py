@@ -19,11 +19,11 @@ class TerminalSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_session_connected(obj):
-        return ProxyLog.objects.filter(terminal=obj.name, is_finished=False).count()
+        return TerminalSession.objects.filter(terminal=obj.id, is_finished=False)
 
     @staticmethod
     def get_is_alive(obj):
-        log = obj.terminalheatbeat_set.last()
+        log = obj.terminalstatus_set.last()
         if log and timezone.now() - log.date_created < timezone.timedelta(seconds=600):
             return True
         else:

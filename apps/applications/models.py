@@ -69,9 +69,6 @@ class TerminalStatus(models.Model):
     class Meta:
         db_table = 'terminal_status'
 
-    # def __str__(self):
-    #     return "<{} status>".format(self.terminal.name)
-
 
 class TerminalSession(models.Model):
     LOGIN_FROM_CHOICES = (
@@ -85,6 +82,8 @@ class TerminalSession(models.Model):
     system_user = models.CharField(max_length=128, verbose_name=_("System User"))
     login_from = models.CharField(max_length=2, choices=LOGIN_FROM_CHOICES, default="ST")
     is_finished = models.BooleanField(default=False)
+    has_replay = models.BooleanField(default=False, verbose_name=_("Replay"))
+    has_command = models.BooleanField(default=False, verbose_name=_("Command"))
     terminal = models.IntegerField(null=True, verbose_name=_("Terminal"))
     date_start = models.DateTimeField(verbose_name=_("Date Start"))
     date_end = models.DateTimeField(verbose_name=_("Date End"), null=True)

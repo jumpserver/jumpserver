@@ -137,7 +137,7 @@
                     window.location.reload()
                 }, 300)
             }
-            var the_url = "{% url 'api-applications:terminate-connection' %}";
+            var the_url = "";
             APIUpdateAttr({url: the_url, method: 'POST', body: JSON.stringify(data), success: success, success_message: 'Terminate success'});
         }
         $(document).ready(function() {

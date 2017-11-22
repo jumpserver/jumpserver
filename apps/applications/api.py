@@ -2,11 +2,15 @@
 #
 from collections import OrderedDict
 import copy
+import logging
+
+import os
 from rest_framework import viewsets, serializers
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.conf import settings
 
 from .models import Terminal, TerminalStatus, TerminalSession, TerminalTask
 from .serializers import TerminalSerializer, TerminalStatusSerializer, \
@@ -14,6 +18,8 @@ from .serializers import TerminalSerializer, TerminalStatusSerializer, \
 from .hands import IsSuperUserOrAppUser, IsAppUser, ProxyLog, \
     IsSuperUserOrAppUserOrUserReadonly
 from common.utils import get_object_or_none
+
+logger = logging.getLogger(__file__)
 
 
 class TerminalViewSet(viewsets.ModelViewSet):
@@ -62,20 +68,28 @@ class TerminalStatusViewSet(viewsets.ModelViewSet):
     session_serializer_class = TerminalSessionSerializer
 
     def create(self, request, *args, **kwargs):
+        self.handle_sessions()
+        return super().create(request, *args, **kwargs)
+
+    def handle_sessions(self):
         sessions_active = []
-        for session_data in request.data.get("sessions", []):
+        for session_data in self.request.data.get("sessions", []):
             session_data["terminal"] = self.request.user.terminal.id
             _id = session_data["id"]
             session = get_object_or_none(TerminalSession, id=_id)
             if session:
-                serializer = TerminalSessionSerializer(data=session_data, instance=session)
+                serializer = TerminalSessionSerializer(data=session_data,
+                                                       instance=session)
             else:
                 serializer = TerminalSessionSerializer(data=session_data)
 
             if serializer.is_valid():
                 serializer.save()
+            else:
+                logger.error("session serializer is not valid {}".format(
+                    serializer.errors))
 
-            if session_data["is_finished"]:
+            if not session_data["is_finished"]:
                 sessions_active.append(session_data["id"])
 
         sessions_in_db_active = TerminalSession.objects.filter(
@@ -83,12 +97,10 @@ class TerminalStatusViewSet(viewsets.ModelViewSet):
         )
 
         for session in sessions_in_db_active:
-            if session.id not in sessions_active:
+            if str(session.id) not in sessions_active:
                 session.is_finished = True
                 session.date_end = timezone.now()
                 session.save()
-
-        return super().create(request, *args, **kwargs)
 
     def get_queryset(self):
         terminal_id = self.kwargs.get("terminal", None)
@@ -135,3 +147,29 @@ class TerminalTaskViewSet(viewsets.ModelViewSet):
             terminal = self.request.user.terminal
             self.queryset = terminal.terminalstatus_set.all()
         return self.queryset
+
+
+class SessionReplayAPI(APIView):
+    permission_classes = (IsSuperUserOrAppUser,)
+
+    def post(self, request, **kwargs):
+        session_id = kwargs.get("pk", None)
+        session = get_object_or_404(TerminalSession, id=session_id)
+        record_dir = settings.CONFIG.SESSION_RECORDE_DIR
+        date = session.date_start.strftime("%Y-%m-%d")
+        record_dir = os.path.join(record_dir, date)
+        record_filename = os.path.join(record_dir, str(session.id))
+
+        if not os.path.exists(record_dir):
+            os.makedirs(record_dir)
+
+        archive_stream = request.data.get("archive")
+        if not archive_stream:
+            return Response("None file upload", status=400)
+
+        with open(record_filename, 'wb') as f:
+            for chunk in archive_stream.chunks():
+                f.write(chunk)
+        session.has_replay = True
+        session.save()
+        return Response({"session_id": session.id}, status=201)

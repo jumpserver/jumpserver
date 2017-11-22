@@ -79,7 +79,7 @@ $(document).ready(function(){
                 var reject_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-id="99991937" data-name="99991938">{% trans "Reject" %}</a>'
                         .replace('99991937', cellData)
                         .replace('99991938', rowData.name);
-                var connect_btn = '<a href="{% url "applications:terminal-connect" pk=99991937 %}"" class="btn btn-xs btn-warning btn-connect" >{% trans "Connect" %}</a> '
+                var connect_btn = '<a href="" class="btn btn-xs btn-warning btn-connect" >{% trans "Connect" %}</a> '
                         .replace('99991937', cellData);
                 if (rowData.is_accepted) {
                     {% if user.is_superuser %}
@@ -96,7 +96,7 @@ $(document).ready(function(){
         ],
         ajax_url: '{% url "api-applications:terminal-list" %}',
         columns: [{data: function(){return ""}}, {data: "name" }, {data: "remote_addr" }, {data: "ssh_port"}, {data: "http_port"},
-                  {data: "session_connected"}, {data: "is_alive" }, {data: 'is_alive'}, {data: "id"}],
+                  {data: "session_connected"}, {data: "is_accepted" }, {data: 'is_alive'}, {data: "id"}],
         op_html: $('#actions').html()
     };
     jumpserver.initDataTable(options);
