@@ -7,7 +7,6 @@
 {% endblock %}
 
 {% block table_head %}
-    <th class="text-center">{% trans 'ID' %}</th>
     <th class="text-center">{% trans 'Name' %}</th>
     <th class="text-center">{% trans 'User' %}</th>
     <th class="text-center">{% trans 'User group' %}</th>
@@ -21,7 +20,6 @@
 {% block table_body %}
      {% for asset_permission in asset_permission_list %}
          <tr class="gradeX">
-             <td class="text-center">{{ asset_permission.id }}</td>
              <td class="text-center">
                  <a href="{% url 'perms:asset-permission-detail' pk=asset_permission.id %}">
                      {{ asset_permission.name }}

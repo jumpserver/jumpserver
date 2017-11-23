@@ -43,8 +43,7 @@ class User(AbstractUser):
     _public_key = models.CharField(max_length=5000, blank=True, verbose_name=_('ssh public key'))
     comment = models.TextField(max_length=200, blank=True, verbose_name=_('Comment'))
     is_first_login = models.BooleanField(default=False)
-    date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True,
-                                        verbose_name=_('Date expired'))
+    date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True, verbose_name=_('Date expired'))
     created_by = models.CharField(max_length=30, default='', verbose_name=_('Created by'))
 
     @property
