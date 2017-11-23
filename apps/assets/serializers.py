@@ -155,8 +155,8 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
 
     class Meta(object):
         model = Asset
-        fields = ("id", "hostname", "ip", "port", "system_users_granted", "is_inherited",
-                  "is_active", "system_users_join", "comment")
+        fields = ("id", "hostname", "ip", "port", "system_users_granted",
+                  "is_inherited", "is_active", "system_users_join", "comment")
 
     @staticmethod
     def get_is_inherited(obj):
@@ -167,7 +167,17 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_system_users_join(obj):
-        return ', '.join([system_user.username for system_user in obj.system_users_granted])
+        return ', '.join([system_user.username
+                          for system_user in obj.system_users_granted])
+
+
+class MyAssetGrantedSerializer(AssetGrantedSerializer):
+    """Remove ip and port from asset for security"""
+
+    class Meta(object):
+        model = Asset
+        fields = ("id", "hostname", "system_users_granted", "is_inherited",
+                  "is_active", "system_users_join", "comment")
 
 
 class IDCSerializer(BulkSerializerMixin, serializers.ModelSerializer):
@@ -190,6 +200,20 @@ class IDCSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
 class AssetGroupGrantedSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     assets_granted = AssetGrantedSerializer(many=True, read_only=True)
+    assets_amount = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AssetGroup
+        list_serializer_class = BulkListSerializer
+        fields = '__all__'
+
+    @staticmethod
+    def get_assets_amount(obj):
+        return len(obj.assets_granted)
+
+
+class MyAssetGroupGrantedSerializer(serializers.ModelSerializer):
+    assets_granted = MyAssetGrantedSerializer(many=True, read_only=True)
     assets_amount = serializers.SerializerMethodField()
 
     class Meta:

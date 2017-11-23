@@ -17,10 +17,10 @@ urlpatterns = [
         api.MyGrantedAssetsApi.as_view(),
         name='my-assets'),
     url(r'^v1/user/my/asset-groups/$',
-        api.MyGrantedAssetsGroupsApi.as_view(),
+        api.MyGrantedAssetGroupsApi.as_view(),
         name='my-asset-groups'),
     url(r'^v1/user/my/asset-groups-assets/$',
-        api.MyAssetGroupAssetsApi.as_view(),
+        api.MyGrantedAssetGroupsWithAssetsApi.as_view(),
         name='my-asset-group-assets'),
     url(r'^v1/user/my/asset-group/(?P<pk>[0-9]+)/assets/$',
         api.MyAssetGroupOfAssetsApi.as_view(),
@@ -32,6 +32,9 @@ urlpatterns = [
         name='user-assets'),
     url(r'^v1/user/(?P<pk>[0-9]+)/asset-groups/$',
         api.UserGrantedAssetGroupsApi.as_view(),
+        name='user-asset-groups'),
+    url(r'^v1/user/(?P<pk>[0-9]+)/asset-groups-assets/$',
+        api.UserGrantedAssetGroupsWithAssetsApi.as_view(),
         name='user-asset-groups'),
 
     # 查询某个用户组授权的资产和资产组

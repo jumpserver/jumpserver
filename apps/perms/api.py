@@ -12,12 +12,15 @@ from .utils import get_user_granted_assets, get_user_granted_asset_groups, \
     get_user_group_granted_assets, get_user_group_granted_asset_groups
 from .models import AssetPermission
 from .hands import AssetGrantedSerializer, User, UserGroup, AssetGroup, Asset, \
-    AssetGroup, AssetGroupGrantedSerializer, SystemUser
+    AssetGroup, AssetGroupGrantedSerializer, SystemUser, MyAssetGroupGrantedSerializer
 from . import serializers
 from .utils import associate_system_users_and_assets
 
 
 class AssetPermissionViewSet(viewsets.ModelViewSet):
+    """
+    资产授权列表的增删改查api
+    """
     queryset = AssetPermission.objects.all()
     serializer_class = serializers.AssetPermissionSerializer
     permission_classes = (IsSuperUser,)
@@ -63,6 +66,9 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
 
 
 class RevokeUserAssetPermission(APIView):
+    """
+    将用户从授权中移除，Detail页面会调用
+    """
     permission_classes = (IsSuperUser,)
 
     def put(self, request, *args, **kwargs):
@@ -80,7 +86,9 @@ class RevokeUserAssetPermission(APIView):
 
 
 class RemoveSystemUserAssetPermission(APIView):
-    """将系统用户从授权中移除, Detail页面会调用"""
+    """
+    将系统用户从授权中移除, Detail页面会调用
+    """
     permission_classes = (IsSuperUser,)
 
     def put(self, request, *args, **kwargs):
@@ -101,6 +109,9 @@ class RemoveSystemUserAssetPermission(APIView):
 
 
 class RevokeUserGroupAssetPermission(APIView):
+    """
+    将用户组从授权中删除
+    """
     permission_classes = (IsSuperUser,)
 
     def put(self, request, *args, **kwargs):
@@ -118,6 +129,9 @@ class RevokeUserGroupAssetPermission(APIView):
 
 
 class UserGrantedAssetsApi(ListAPIView):
+    """
+    用户授权的所有资产
+    """
     permission_classes = (IsSuperUserOrAppUser,)
     serializer_class = AssetGrantedSerializer
 
@@ -133,7 +147,58 @@ class UserGrantedAssetsApi(ListAPIView):
         return queryset
 
 
-class UserGrantedAssetGroupsApi(ListAPIView):
+class UserGrantedAssetGroupsApi(APIView):
+    permission_classes = (IsValidUser,)
+
+    def get(self, request, *args, **kwargs):
+        asset_groups = {}
+        user_id = kwargs.get('pk', '')
+        user = get_object_or_404(User, id=user_id)
+
+        assets = get_user_granted_assets(user)
+        for asset in assets:
+            for asset_group in asset.groups.all():
+                if asset_group.id in asset_groups:
+                    asset_groups[asset_group.id]['assets_amount'] += 1
+                else:
+                    asset_groups[asset_group.id] = {
+                        'id': asset_group.id,
+                        'name': asset_group.name,
+                        'comment': asset_group.comment,
+                        'assets_amount': 1
+                    }
+        asset_groups_json = asset_groups.values()
+        return Response(asset_groups_json, status=200)
+
+
+class UserGrantedAssetGroupsWithAssetsApi(ListAPIView):
+    """
+    授权用户的资产组，注：这里的资产组并非是授权列表中授权的，
+    而是把所有资产取出来，然后反查出所有资产组，然后合并得到，
+    结果里也包含资产组下授权的资产
+    数据结构如下：
+    [
+      {
+        "id": 1,
+        "name": "资产组1",
+        ... 其它属性
+        "assets_granted": [
+          {
+            "id": 1,
+            "hostname": "testserver",
+            "ip": "192.168.1.1",
+            "port": 22,
+            "system_users_granted": [
+              "id": 1,
+              "name": "web",
+              "username": "web",
+              "protocol": "ssh",
+            ]
+          }
+        ]
+      }
+    ]
+    """
     permission_classes = (IsSuperUserOrAppUser,)
     serializer_class = AssetGroupGrantedSerializer
 
@@ -157,9 +222,8 @@ class UserGrantedAssetGroupsApi(ListAPIView):
 
 
 class MyGrantedAssetsApi(ListAPIView):
-    """授权给用户的资产列表
-    [{'hostname': 'x','ip': 'x', ..,
-      'system_users_granted': [{'name': 'x', .}, ...]
+    """
+    用户自己查询授权的资产列表
     """
     permission_classes = (IsValidUser,)
     serializer_class = AssetGrantedSerializer
@@ -174,10 +238,9 @@ class MyGrantedAssetsApi(ListAPIView):
         return queryset
 
 
-class MyGrantedAssetsGroupsApi(APIView):
+class MyGrantedAssetGroupsApi(APIView):
     """
-    授权给用户的资产组列表, 非直接通过授权规则授权的资产组列表, 而是授权资产的所有
-    资产组之和
+    授权的所有资产组，并非是授权列表中的，而是经过计算得来的
     """
     permission_classes = (IsValidUser,)
 
@@ -202,36 +265,48 @@ class MyGrantedAssetsGroupsApi(APIView):
         return Response(asset_groups_json, status=200)
 
 
-class MyAssetGroupAssetsApi(ListAPIView):
+class MyGrantedAssetGroupsWithAssetsApi(ListAPIView):
+    """
+    授权当前用户的资产组，注：这里的资产组并非是授权列表中授权的，
+    而是把所有资产取出来，然后反查出所有资产组，然后合并得到，
+    结果里也包含资产组下授权的资产
+    数据结构如下：
+    [
+      {
+        "id": 1,
+        "name": "资产组1",
+        ... 其它属性
+        "assets_granted": [
+          {
+            "id": 1,
+            "hostname": "testserver",
+            "system_users_granted": [
+              "id": 1,
+              "name": "web",
+              "username": "web",
+              "protocol": "ssh",
+            ]
+          }
+        ]
+      }
+    ]
+    """
     permission_classes = (IsValidUser,)
+    serializer_class = MyAssetGroupGrantedSerializer
 
-    def get(self, request, *args, **kwargs):
-        asset_groups = dict()
-        asset_groups[0] = {
-            'id': 0, 'name': 'ungrouped', 'assets': []
-        }
-        user = request.user
+    def get_queryset(self):
+        user = self.request.user
+        asset_groups = get_user_granted_asset_groups(user)
 
-        if user:
-            assets = get_user_granted_assets(user)
-            for asset, system_users in assets.items():
-                asset_json = asset.to_json()
-                asset_json['system_users'] = [su.to_json() for su in system_users]
-                if not asset.groups.all():
-                    asset_groups[0]['assets'].append(asset_json)
-                    continue
-                for asset_group in asset.groups.all():
-                    if asset_group.id in asset_groups:
-                        asset_groups[asset_group.id]['assets'].append(asset_json)
-                    else:
-                        asset_groups[asset_group.id] = {
-                            'id': asset_group.id,
-                            'name': asset_group.name,
-                            'comment': asset_group.comment,
-                            'assets': [asset_json],
-                        }
-        asset_groups_json = asset_groups.values()
-        return Response(asset_groups_json, status=200)
+        queryset = []
+        for asset_group, assets_system_users in asset_groups.items():
+            assets = []
+            for asset, system_users in assets_system_users:
+                asset.system_users_granted = system_users
+                assets.append(asset)
+            asset_group.assets_granted = assets
+            queryset.append(asset_group)
+        return queryset
 
 
 class MyAssetGroupOfAssetsApi(ListAPIView):
