@@ -8,7 +8,7 @@ urlpatterns = [
         name='proxy-log-offline-list'),
     url(r'^proxy-log-online/$', views.ProxyLogOnlineListView.as_view(),
         name='proxy-log-online-list'),
-    url(r'^proxy-log/(?P<pk>\d+)/$', views.ProxyLogDetailView.as_view(),
+    url(r'^proxy-log/(?P<pk>[0-9a-zA-Z\-]+)/$', views.ProxyLogDetailView.as_view(),
         name='proxy-log-detail'),
     url(r'^command-log/$', views.CommandLogListView.as_view(),
         name='command-log-list'),

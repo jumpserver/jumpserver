@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 import os
-
+import uuid
 from collections import OrderedDict
 
 from django.conf import settings
@@ -27,7 +27,7 @@ class User(AbstractUser):
         ('User', 'User'),
         ('App', 'Application')
     )
-
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(max_length=20, unique=True, verbose_name=_('Username'))
     name = models.CharField(max_length=20, verbose_name=_('Name'))
     email = models.EmailField(max_length=30, unique=True, verbose_name=_('Email'))
@@ -234,7 +234,7 @@ class User(AbstractUser):
         self.set_password(new_password)
         self.save()
 
-    def delete(self):
+    def delete(self, using=None, keep_parents=False):
         if self.pk == 1 or self.username == 'admin':
             return
         return super(User, self).delete()
@@ -267,7 +267,7 @@ class User(AbstractUser):
                        email=forgery_py.internet.email_address(),
                        name=forgery_py.name.full_name(),
                        password=make_password(forgery_py.lorem_ipsum.word()),
-                       role=choice(dict(User.ROLE_CHOICES).keys()),
+                       role=choice(list(dict(User.ROLE_CHOICES).keys())),
                        wechat=forgery_py.internet.user_name(True),
                        comment=forgery_py.lorem_ipsum.sentence(),
                        created_by=choice(cls.objects.all()).username)

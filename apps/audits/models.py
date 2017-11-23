@@ -3,6 +3,8 @@
 
 from __future__ import unicode_literals
 
+import uuid
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -13,7 +15,7 @@ class LoginLog(models.Model):
         ('ST', 'SSH Terminal'),
         ('WT', 'Web Terminal')
     )
-
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(max_length=20, verbose_name=_('Username'))
     name = models.CharField(max_length=20, blank=True, verbose_name=_('Name'))
     login_type = models.CharField(choices=LOGIN_TYPE_CHOICE, max_length=2,
@@ -37,6 +39,7 @@ class ProxyLog(models.Model):
         ('WT', 'Web Terminal'),
     )
 
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=32,  verbose_name=_('User'))
     asset = models.CharField(max_length=32, verbose_name=_('Asset'))
     system_user = models.CharField(max_length=32, verbose_name=_('System user'))
@@ -66,6 +69,7 @@ class ProxyLog(models.Model):
 
 
 class CommandLog(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     proxy_log_id = models.IntegerField(db_index=True)
     user = models.CharField(max_length=48, db_index=True)
     asset = models.CharField(max_length=128, db_index=True)
@@ -83,6 +87,7 @@ class CommandLog(models.Model):
 
 
 class RecordLog(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     proxy_log_id = models.IntegerField(db_index=True)
     output = models.TextField(verbose_name=_('Output'))
     timestamp = models.FloatField(db_index=True)

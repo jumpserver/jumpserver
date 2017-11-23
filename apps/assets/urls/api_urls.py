@@ -18,37 +18,37 @@ urlpatterns = [
     url(r'^v1/assets-bulk/$', api.AssetListUpdateApi.as_view(), name='asset-bulk-update'),
     url(r'^v1/system-user/(?P<pk>[0-9]+)/auth-info/', api.SystemUserAuthInfoApi.as_view(),
         name='system-user-auth-info'),
-    url(r'^v1/assets/(?P<pk>\d+)/groups/$',
+    url(r'^v1/assets/(?P<pk>[0-9a-zA-Z\-]+)/groups/$',
         api.AssetUpdateGroupApi.as_view(), name='asset-update-group'),
 
-    url(r'^v1/assets/(?P<pk>\d+)/refresh/$',
+    url(r'^v1/assets/(?P<pk>[0-9a-zA-Z\-]+)/refresh/$',
         api.AssetRefreshHardwareView.as_view(), name='asset-refresh'),
-    url(r'^v1/assets/(?P<pk>\d+)/admin-user-test/$',
+    url(r'^v1/assets/(?P<pk>[0-9a-zA-Z\-]+)/admin-user-test/$',
         api.AssetAdminUserTestView.as_view(), name='asset-admin-user-test'),
 
-    url(r'^v1/assets/(?P<pk>\d+)/system-users/$',
+    url(r'^v1/assets/(?P<pk>[0-9a-zA-Z\-]+)/system-users/$',
         api.SystemUserUpdateApi.as_view(), name='asset-update-system-users'),
 
-    url(r'^v1/groups/(?P<pk>\d+)/push-system-user/$',
+    url(r'^v1/groups/(?P<pk>[0-9a-zA-Z\-]+)/push-system-user/$',
         api.AssetGroupPushSystemUserView.as_view(), name='asset-group-push-system-user'),
 
     # update the system users, which add and delete the asset to the system user
-    url(r'^v1/system-user/(?P<pk>\d+)/assets/$',
+    url(r'^v1/system-user/(?P<pk>[0-9a-zA-Z\-]+)/assets/$',
         api.SystemUserUpdateAssetsApi.as_view(), name='systemuser-update-assets'),
 
-    url(r'^v1/system-user/(?P<pk>\d+)/groups/$',
+    url(r'^v1/system-user/(?P<pk>[0-9a-zA-Z\-]+)/groups/$',
         api.SystemUserUpdateAssetGroupApi.as_view(), name='systemuser-update-assetgroups'),
 
     # update the asset group, which add or delete the asset to the group
-    url(r'^v1/groups/(?P<pk>\d+)/assets/$',
+    url(r'^v1/groups/(?P<pk>[0-9a-zA-Z\-]+)/assets/$',
         api.AssetGroupUpdateApi.as_view(), name='asset-groups-update'),
 
     # update the asset group, and add or delete the system_user to the group
-    url(r'^v1/groups/(?P<pk>\d+)/system-users/$',
+    url(r'^v1/groups/(?P<pk>[0-9a-zA-Z\-]+)/system-users/$',
         api.AssetGroupUpdateSystemUserApi.as_view(), name='asset-groups-update-systemusers'),
 
     # update the IDC, and add or delete the assets to the IDC
-    url(r'^v1/idc/(?P<pk>\d+)/assets/$',
+    url(r'^v1/idc/(?P<pk>[0-9a-zA-Z\-]+)/assets/$',
         api.IDCUpdateAssetsApi.as_view(), name='idc-update-assets'),
 
 ]

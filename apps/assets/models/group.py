@@ -4,6 +4,8 @@
 
 from __future__ import unicode_literals
 
+import uuid
+
 from django.db import models
 import logging
 from django.utils.translation import ugettext_lazy as _
@@ -15,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 
 class AssetGroup(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=64, unique=True, verbose_name=_('Name'))
     system_users = models.ManyToManyField(SystemUser, related_name='asset_groups', blank=True)
     created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))

@@ -5,6 +5,7 @@
 from __future__ import unicode_literals
 import os
 import logging
+import uuid
 from hashlib import md5
 
 from django.core.exceptions import ValidationError
@@ -31,6 +32,7 @@ class AdminUser(models.Model):
         ('sudo', 'sudo'),
         ('su', 'su'),
     )
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     username = models.CharField(max_length=16, verbose_name=_('Username'))
     _password = models.CharField(
@@ -131,6 +133,7 @@ class SystemUser(models.Model):
         ('P', 'Password'),
         ('K', 'Public key'),
     )
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True,
                             verbose_name=_('Name'))
     username = models.CharField(max_length=16, verbose_name=_('Username'))

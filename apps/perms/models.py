@@ -1,5 +1,6 @@
 from __future__ import unicode_literals, absolute_import
 import functools
+import uuid
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -17,6 +18,7 @@ class AssetPermission(models.Model):
     #     ('U', 'user'),
     #     ('G', 'user group'),
     # )
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(
         max_length=128, unique=True, verbose_name=_('Name'))
     users = models.ManyToManyField(

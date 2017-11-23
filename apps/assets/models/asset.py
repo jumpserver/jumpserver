@@ -4,6 +4,8 @@
 
 from __future__ import unicode_literals
 
+import uuid
+
 from django.db import models
 import logging
 from django.utils.translation import ugettext_lazy as _
@@ -38,6 +40,7 @@ class Asset(models.Model):
     )
 
     # Important
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
     hostname = models.CharField(max_length=128, unique=True, verbose_name=_('Hostname'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))

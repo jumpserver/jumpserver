@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import uuid
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -7,6 +9,7 @@ from users.models import User
 
 
 class Terminal(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=32, unique=True, verbose_name=_('Name'))
     remote_addr = models.CharField(max_length=128, verbose_name=_('Remote Address'))
     ssh_port = models.IntegerField(verbose_name=_('SSH Port'), default=2222)
@@ -57,6 +60,7 @@ class Terminal(models.Model):
 
 
 class TerminalStatus(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     session_online = models.IntegerField(verbose_name=_("Session Online"), default=0)
     cpu_used = models.FloatField(verbose_name=_("CPU Usage"))
     memory_used = models.FloatField(verbose_name=_("Memory Used"))
@@ -76,7 +80,7 @@ class TerminalSession(models.Model):
         ('WT', 'Web Terminal'),
     )
 
-    id = models.UUIDField(primary_key=True)
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_("User"))
     asset = models.CharField(max_length=1024, verbose_name=_("Asset"))
     system_user = models.CharField(max_length=128, verbose_name=_("System User"))
@@ -96,6 +100,7 @@ class TerminalSession(models.Model):
 
 
 class TerminalTask(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_("Name"))
     args = models.CharField(max_length=1024, verbose_name=_("Task Args"))
     terminal = models.ForeignKey(Terminal, null=True, on_delete=models.CASCADE)

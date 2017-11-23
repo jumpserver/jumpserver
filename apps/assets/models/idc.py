@@ -5,6 +5,7 @@
 from __future__ import unicode_literals
 
 import logging
+import uuid
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -15,6 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class IDC(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=32, verbose_name=_('Name'))
     bandwidth = models.CharField(
         max_length=32, blank=True, verbose_name=_('Bandwidth'))
