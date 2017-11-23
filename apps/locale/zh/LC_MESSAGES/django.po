@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-21 14:41+0800\n"
+"POT-Creation-Date: 2017-11-22 15:42+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -36,6 +36,7 @@ msgstr ""
 #: devops/templates/devops/record_list.html:41
 #: devops/templates/devops/task_detail.html:69
 #: devops/templates/devops/task_list.html:20
+#: devops/templates/devops/variable_asset.html:86
 #: devops/templates/devops/variable_detail.html:55
 #: devops/templates/devops/variable_list.html:18 ops/models.py:20
 #: ops/templates/ops/task_detail.html:50 ops/templates/ops/task_list.html:39
@@ -83,7 +84,8 @@ msgstr "登录地址"
 #: assets/templates/assets/asset_group_list.html:17
 #: assets/templates/assets/idc_detail.html:97
 #: assets/templates/assets/system_user_detail.html:99
-#: assets/templates/assets/system_user_list.html:21 perms/models.py:40
+#: assets/templates/assets/system_user_list.html:21
+#: devops/templates/devops/variable_asset.html:88 perms/models.py:40
 #: perms/templates/perms/asset_permission_detail.html:98
 #: users/models/group.py:19 users/models/user.py:44
 #: users/templates/users/user_detail.html:113
@@ -117,6 +119,7 @@ msgstr "创建日期"
 #: assets/templates/assets/system_user_asset.html:48
 #: assets/templates/assets/user_asset_list.html:34
 #: audits/templates/audits/login_log_list.html:52
+#: devops/templates/devops/variable_asset.html:55
 #: perms/templates/perms/asset_permission_asset.html:65
 #: users/templates/users/user_granted_asset.html:53
 #: users/templates/users/user_group_granted_asset.html:53
@@ -129,6 +132,7 @@ msgstr "IP"
 #: assets/templates/assets/idc_assets.html:57
 #: assets/templates/assets/user_asset_list.html:36
 #: audits/templates/audits/login_log_list.html:50
+#: devops/templates/devops/variable_asset.html:57
 msgid "Type"
 msgstr "类型"
 
@@ -167,6 +171,9 @@ msgstr "在线"
 #: assets/templates/assets/system_user_list.html:22
 #: devops/templates/devops/record_list.html:47
 #: devops/templates/devops/task_list.html:24
+#: devops/templates/devops/variable_asset.html:59
+#: devops/templates/devops/variable_asset.html:89
+#: devops/templates/devops/variable_detail.html:91
 #: devops/templates/devops/variable_list.html:20
 #: ops/templates/ops/task_list.html:45
 #: perms/templates/perms/asset_permission_list.html:18
@@ -201,6 +208,9 @@ msgstr "更新"
 #: assets/templates/assets/system_user_list.html:59
 #: devops/templates/devops/record_list.html:75
 #: devops/templates/devops/task_list.html:76
+#: devops/templates/devops/variable_asset.html:196
+#: devops/templates/devops/variable_asset.html:220
+#: devops/templates/devops/variable_detail.html:169
 #: devops/templates/devops/variable_list.html:68
 #: ops/templates/ops/task_list.html:72
 #: perms/templates/perms/asset_permission_list.html:47
@@ -246,7 +256,7 @@ msgstr "其它"
 #: assets/templates/assets/asset_update.html:55
 #: assets/templates/assets/idc_create_update.html:51
 #: assets/templates/assets/system_user_detail.html:138
-#: devops/templates/devops/_task_create_update.html:61
+#: devops/templates/devops/_task_create_update.html:78
 #: devops/templates/devops/_variable_create_update.html:33
 #: perms/templates/perms/asset_permission_create_update.html:67
 #: users/templates/users/_user.html:49
@@ -274,7 +284,7 @@ msgstr "重置"
 #: assets/templates/assets/idc_list.html:36
 #: assets/templates/assets/system_user_list.html:36
 #: audits/templates/audits/proxy_log_online_list.html:124
-#: devops/templates/devops/_task_create_update.html:62
+#: devops/templates/devops/_task_create_update.html:79
 #: devops/templates/devops/_variable_create_update.html:34
 #: perms/templates/perms/asset_permission_create_update.html:68
 #: users/templates/users/_user.html:50
@@ -325,7 +335,8 @@ msgstr "你可以使用ssh客户端工具连接终端"
 
 #: assets/forms.py:22 assets/forms.py:53 assets/forms.py:92
 #: assets/templates/assets/admin_user_detail.html:199
-#: devops/templates/devops/task_detail.html:206 perms/forms.py:30
+#: devops/templates/devops/task_detail.html:206
+#: devops/templates/devops/variable_asset.html:142 perms/forms.py:30
 #: perms/templates/perms/asset_permission_asset.html:137 users/forms.py:187
 #: users/forms.py:213
 msgid "Select asset groups"
@@ -353,8 +364,9 @@ msgstr "选择管理用户"
 
 #: assets/forms.py:72 assets/forms.py:76 assets/forms.py:117
 #: assets/forms.py:149 devops/templates/devops/task_detail.html:159
-#: perms/forms.py:27 perms/templates/perms/asset_permission_asset.html:109
-#: users/forms.py:184 users/forms.py:210
+#: devops/templates/devops/variable_asset.html:107 perms/forms.py:27
+#: perms/templates/perms/asset_permission_asset.html:109 users/forms.py:184
+#: users/forms.py:210
 msgid "Select assets"
 msgstr "选择资产"
 
@@ -366,6 +378,7 @@ msgstr "选择资产"
 #: assets/templates/assets/idc_assets.html:56
 #: assets/templates/assets/system_user_asset.html:49
 #: assets/templates/assets/user_asset_list.html:35
+#: devops/templates/devops/variable_asset.html:56
 #: perms/templates/perms/asset_permission_asset.html:66
 #: users/templates/users/user_granted_asset.html:54
 #: users/templates/users/user_group_granted_asset.html:54
@@ -381,6 +394,7 @@ msgstr "端口"
 #: audits/templates/audits/proxy_log_online_list.html:34
 #: audits/templates/audits/proxy_log_online_list.html:65
 #: devops/templates/devops/record_list.html:42
+#: devops/templates/devops/variable_asset.html:87
 #: ops/templates/ops/task_list.html:40
 #: perms/templates/perms/asset_permission_create_update.html:40
 #: perms/templates/perms/asset_permission_list.html:14 templates/_nav.html:22
@@ -466,6 +480,7 @@ msgstr "存储"
 #: assets/templates/assets/idc_assets.html:54
 #: assets/templates/assets/system_user_asset.html:47
 #: assets/templates/assets/user_asset_list.html:33
+#: devops/templates/devops/variable_asset.html:54
 #: perms/templates/perms/asset_permission_asset.html:64
 #: users/templates/users/user_granted_asset.html:52
 #: users/templates/users/user_group_granted_asset.html:52
@@ -776,6 +791,7 @@ msgstr "创建管理用户"
 #: assets/templates/assets/idc_detail.html:17
 #: assets/templates/assets/system_user_asset.html:17
 #: assets/templates/assets/system_user_detail.html:18
+#: devops/templates/devops/variable_asset.html:18
 #: devops/templates/devops/variable_detail.html:19
 #: perms/templates/perms/asset_permission_asset.html:18
 #: perms/templates/perms/asset_permission_detail.html:18
@@ -922,7 +938,9 @@ msgstr "添加到资产组"
 #: devops/templates/devops/task_detail.html:176
 #: devops/templates/devops/task_detail.html:220
 #: devops/templates/devops/task_detail.html:271
-#: devops/templates/devops/variable_detail.html:128 templates/_modal.html:16
+#: devops/templates/devops/variable_asset.html:124
+#: devops/templates/devops/variable_asset.html:156
+#: devops/templates/devops/variable_detail.html:129 templates/_modal.html:16
 #: users/templates/users/user_detail.html:341
 #: users/templates/users/user_detail.html:366
 #: users/templates/users/user_detail.html:389
@@ -1034,6 +1052,7 @@ msgstr "创建资产"
 
 #: assets/templates/assets/asset_list.html:41
 #: assets/templates/assets/user_asset_list.html:37
+#: devops/templates/devops/variable_asset.html:58
 msgid "Env"
 msgstr "环境"
 
@@ -1153,11 +1172,13 @@ msgstr "IDC删除失败"
 
 #: assets/templates/assets/system_user_asset.html:20
 #: assets/templates/assets/system_user_detail.html:22
+#: devops/templates/devops/variable_asset.html:22
 #: devops/templates/devops/variable_detail.html:23
 msgid "Attached assets"
 msgstr "关联的资产"
 
 #: assets/templates/assets/system_user_asset.html:28
+#: devops/templates/devops/variable_asset.html:35
 msgid "Assets of "
 msgstr "资产"
 
@@ -1166,10 +1187,12 @@ msgid "Reachable"
 msgstr "可连接"
 
 #: assets/templates/assets/system_user_asset.html:79
+#: devops/templates/devops/variable_asset.html:99
 msgid "Attach to assets "
 msgstr "关联资产"
 
 #: assets/templates/assets/system_user_asset.html:107
+#: devops/templates/devops/variable_asset.html:134
 msgid "Attach to asset groups"
 msgstr "关联资产组"
 
@@ -1447,13 +1470,14 @@ msgstr "描述"
 msgid "Ansible Role"
 msgstr "Ansible Role"
 
-#: devops/models.py:24 devops/templates/devops/_task_create_update.html:50
+#: devops/models.py:24 devops/templates/devops/_task_create_update.html:67
 #: devops/templates/devops/task_detail.html:81
 #: devops/templates/devops/task_list.html:23
 msgid "Tags"
 msgstr "执行Tags"
 
 #: devops/models.py:26 devops/models.py:81
+#: devops/templates/devops/variable_asset.html:67
 msgid "Asset Groups"
 msgstr "资产组"
 
@@ -1502,30 +1526,39 @@ msgstr "任务"
 msgid "Vars"
 msgstr "变量"
 
-#: devops/templates/devops/_task_create_update.html:25
+#: devops/templates/devops/_task_create_update.html:31
 #: devops/templates/devops/_variable_create_update.html:25
 msgid "basic"
 msgstr "基本信息"
 
-#: devops/templates/devops/_task_create_update.html:30 devops/views.py:28
-#: devops/views.py:40 devops/views.py:53 devops/views.py:72 devops/views.py:130
-#: devops/views.py:146 devops/views.py:162 devops/views.py:174
-#: devops/views.py:187 devops/views.py:205 templates/_nav.html:61
-#: templates/_nav_user.html:24
-msgid "Ansible"
-msgstr "Ansible"
+#: devops/templates/devops/_task_create_update.html:36
+msgid "Install Ansible Role"
+msgstr "安装角色"
 
-#: devops/templates/devops/_task_create_update.html:32
+#: devops/templates/devops/_task_create_update.html:38
+#: devops/templates/devops/_task_create_update.html:47
 msgid "Install Role"
 msgstr "安装角色"
 
-#: devops/templates/devops/_task_create_update.html:37
+#: devops/templates/devops/_task_create_update.html:43
 msgid "install"
 msgstr "安装"
 
-#: devops/templates/devops/_task_create_update.html:41
+#: devops/templates/devops/_task_create_update.html:56 devops/views.py:28
+#: devops/views.py:40 devops/views.py:53 devops/views.py:72 devops/views.py:130
+#: devops/views.py:146 devops/views.py:162 devops/views.py:174
+#: devops/views.py:187 devops/views.py:203 devops/views.py:219
+#: templates/_nav.html:61 templates/_nav_user.html:24
+msgid "Ansible"
+msgstr "Ansible"
+
+#: devops/templates/devops/_task_create_update.html:58
 msgid "Role Name"
 msgstr "角色名称"
+
+#: devops/templates/devops/_task_create_update.html:111
+msgid "Select Zip"
+msgstr "选择压缩包"
 
 #: devops/templates/devops/record_detail.html:19 devops/views.py:147
 #: ops/templates/ops/task_detail.html:19
@@ -1566,7 +1599,7 @@ msgstr "再次执行"
 
 #: devops/templates/devops/task_detail.html:20
 #: devops/templates/devops/task_detail.html:50 devops/views.py:73
-#: devops/views.py:206
+#: devops/views.py:204 devops/views.py:220
 msgid "Task Detail"
 msgstr "任务详情"
 
@@ -1602,16 +1635,16 @@ msgid "Execute"
 msgstr "执行"
 
 #: devops/templates/devops/variable_detail.html:89
-#: devops/templates/devops/variable_detail.html:110
+#: devops/templates/devops/variable_detail.html:111
 msgid "KEY"
 msgstr ""
 
 #: devops/templates/devops/variable_detail.html:90
-#: devops/templates/devops/variable_detail.html:119
+#: devops/templates/devops/variable_detail.html:120
 msgid "VALUE"
 msgstr ""
 
-#: devops/templates/devops/variable_detail.html:102
+#: devops/templates/devops/variable_detail.html:103
 msgid "Add Update Vars"
 msgstr "添加或更新变量"
 

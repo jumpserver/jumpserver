@@ -84,5 +84,3 @@ class VariableUpdateAssetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Variable
         fields = ['id', 'assets']
-
-

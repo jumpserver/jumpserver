@@ -6,11 +6,11 @@ from ansible.cli.galaxy import GalaxyCLI
 
 
 @shared_task
-def ansible_install_role(role_name):
+def ansible_install_role(role_name, roles_path):
     task_tuple = []
     #: 新建一个任务列表  执行shell 任务
     task_tuple.extend([
-        ('shell', 'ansible-galaxy install -f {}'.format(role_name))
+        ('shell', 'ansible-galaxy install --roles-path {} -f {}'.format(roles_path, role_name))
     ])
     #: Task Name
     task_name = 'ansible-galaxy Install Role {}'.format(role_name)

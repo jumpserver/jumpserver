@@ -19,10 +19,13 @@
                 $('#id_ansible_role').append(role).trigger('change');
 
                 $('#id_tags').empty();
-                data.tags.forEach((value, i) => {
-                    let tag = new Option(value, value, true, true)
-                    $('#id_tags').append(tag).trigger('change');
-                })
+                if (data.tags instanceof Array) {
+                    data.tags.forEach((value, i) => {
+                        let tag = new Option(value, value, true, true)
+                        $('#id_tags').append(tag).trigger('change');
+                    })
+                }
+
             };
 
             APIUpdateAttr({
@@ -39,7 +42,7 @@
                 let tag = form.tags;
                 form.tags = new Array(tag);
             }
-             if (typeof(form.tags) === "undefined") {
+            if (typeof(form.tags) === "undefined") {
                 form.tags = [];
             }
             let success = function () {

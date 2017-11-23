@@ -7,8 +7,11 @@
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
     <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/webupload/webuploader.css" %}" rel="stylesheet">
     <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
     <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+    <script src="{% static "js/plugins/webupload/webuploader.js" %}"></script>
 {% endblock %}
 
 {% block form %}
@@ -27,16 +30,38 @@
         {% bootstrap_field form.desc layout="horizontal" %}
         <div class="hr-line-dashed"></div>
 
-        <h3>{% trans 'Ansible' %}</h3>
+        <h3>{% trans 'Install Ansible Role' %}(Optional)</h3>
         <div class="form-group">
-            <label class="col-md-2 control-label" for="id_role_install">{% trans 'Install Role' %}(Optional)</label>
+            <label class="col-md-2 control-label" for="id_role_install">{% trans 'Install Role' %}(Galaxy)</label>
             <div class="col-md-9">
                 <input placeholder="请输入ansible-galaxy中的username.rolename[,version]" class="form-control" type="text"
-                       id="id_role_install" style="width: 84%;display: inline-block" tabindex="4">
-                <button class="btn btn-primary float-right" type="button" style="width: 15%;"
+                       id="id_role_install" style="width: 86%;display: inline-block">
+                <button class="btn btn-primary float-right" type="button" style="width: 13%;"
                         id="role_install_btn">{% trans 'install' %}</button>
             </div>
         </div>
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="id_role_install">{% trans 'Install Role' %}(Zip)</label>
+            <div class="col-md-9">
+                <input placeholder="请选择Ansible Role 压缩文件" readonly class="form-control" type="text"
+                       id="fileName" style="width: 73%;display: inline-block">
+                <div id="picker" class="btn btn-primary float-right" style="width: 13%;">{% trans 'Select Zip' %}
+                </div>
+                <button class="btn btn-primary float-right" type="button" style="width: 13%;"
+                        id="file_install_btn">{% trans 'install' %}</button>
+                <div class="progress progress-striped active" style="width: 100%;display: none">
+                    <div class="progress-bar" role="progressbar"
+                         aria-valuenow="60" aria-valuemin="0" aria-valuemax="100"
+                         style="width: 0">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="hr-line-dashed"></div>
+
+        <h3>{% trans 'Ansible' %}</h3>
         <div class="form-group">
             <label class="col-md-2 control-label" for="id_ansible_role">{% trans 'Role Name' %}</label>
             <div class="col-md-9">
@@ -90,20 +115,62 @@
                 multiple: true
             });
 
-            {% comment %} $('#system_user').select2({
-                 //ajax查询all role
-                 ajax: {
-                     url: '{% url 'api-assets:system-user-list' %}',
-                     dataType: 'json',
-                     processResults: function (data) {
-                         let results = $(data).each(function (index, element) {
-                             element.text = element.name
-                         })
-                         return {results: results};//必须赋值给results并且必须返回一个obj
-                     }
-                 },
-                 minimumResultsForSearch: Infinity //禁止输入
-             });{% endcomment %}
+            var uploader = WebUploader.create({
+                // 文件接收服务端。
+                server: "{% url 'api-devops:role-zip-install' %}",
+
+                // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+                pick: {
+                    id: '#picker',
+                    multiple: false
+                },
+
+                // 不压缩image, 默认如果是jpeg，文件上传前会压缩一把再上传！
+                resize: false,
+                accept: {
+                    title: 'Zip',
+                    extensions: 'zip,gz',
+                    mimeTypes: 'application/zip'
+                },
+                formData: {"csrfmiddlewaretoken": $("input[name='csrfmiddlewaretoken']").val()},  //额外的表单参数
+                fileVal: "file_data"
+            });
+
+
+            uploader.on('beforeFileQueued', function (file) {
+                if (file.ext === "zip" || file.ext === "gz") {
+                    uploader.reset()
+                }
+            });
+            // 当有文件被添加进队列的时候 显示文件名
+            uploader.on('fileQueued', function (file) {
+                $("#fileName").val(file.name);
+            });
+             uploader.on('uploadStart', function (file) {
+                file.name=file.name.replaceAll("."+file.ext,"")
+            });
+            uploader.on('uploadSuccess', function (file) {
+                toastr.info("安装" + file.name.substr(0, file.name.lastIndexOf(".")) + "成功");
+                uploader.reset();
+                $("#fileName").val("");
+            });
+            uploader.on('uploadError', function (file, reson) {
+                file.setStatus("inited")
+                toastr.error("安装失败，请稍后再试。");
+            });
+            uploader.on('uploadProgress', function (file, percentage) {
+                $(".progress").show()
+                $(".progress-bar").css("width", percentage * 100 + "%")
+                if (percentage === 1) {
+                    setTimeout(function () {
+                        $(".progress").hide()
+                    }, 1000)
+                }
+            });
+            $("#file_install_btn").click(function () {
+                uploader.upload()
+            })
+
 
             $('#role_install_btn').click(function () {
                 toastr.info("安装中，请稍候。。。")

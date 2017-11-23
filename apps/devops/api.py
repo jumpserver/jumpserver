@@ -11,6 +11,9 @@ from .tasks import ansible_install_role, ansible_task_execute
 import yaml
 import os
 from perms import utils
+from django.conf import settings
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 
 
 class TaskListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -80,10 +83,12 @@ class InstallRoleView(generics.CreateAPIView):
     result = None
 
     def perform_create(self, serializer):
+        #: 新建role安装文件夹
+        roles_path = os.path.join(settings.PROJECT_DIR, 'playbooks', 'roles')
         #: 获取role name
 
         #: 执行role 安装操作
-        self.result = ansible_install_role(self.request.data['name'])
+        self.result = ansible_install_role(self.request.data['name'], roles_path)
         #: 去掉参数中的版本
         name = str(self.request.data['name']).split(',')[0]
         #: 当执行成功且Role不存在时才保存
@@ -98,6 +103,52 @@ class InstallRoleView(generics.CreateAPIView):
         #: 安装失败返回错误
         return Response(serializer.data, status=status.HTTP_201_CREATED if self.result else status.HTTP_400_BAD_REQUEST,
                         headers=headers)
+
+
+class InstallZipRoleView(generics.CreateAPIView):
+    """
+        ansible-galaxy 安装 role
+    """
+    queryset = AnsibleRole.objects.all()
+    serializer_class = AnsibleRoleSerializer
+    permission_classes = (IsSuperUser,)
+
+    def perform_create(self, serializer):
+        #: 新建role安装文件夹
+        roles_path = os.path.join(settings.PROJECT_DIR, 'playbooks', 'roles')
+        #: 获取role name
+
+        #: 执行role 安装操作
+        self.result = ansible_install_role(self.request.data['name'], roles_path)
+        #: 去掉参数中的版本
+        name = str(self.request.data['name']).split(',')[0]
+        #: 当执行成功且Role不存在时才保存
+        if self.result and not self.get_queryset().filter(name=name).exists():
+            serializer.save()
+
+    def create(self, request, *args, **kwargs):
+        file = request.FILES['file_data']
+        serializer = self.get_serializer(data=request.data)
+
+        serializer.is_valid(raise_exception=True)
+        #: 保存
+        path = default_storage.save(os.path.join(settings.MEDIA_ROOT, 'tmp', '{}.zip'.format(file.name)),
+                                    ContentFile(file.read()))
+        #: 解压
+        import zipfile
+        f = zipfile.ZipFile(path, 'r')
+        for file in f.namelist():
+            f.extract(file, os.path.join(settings.PROJECT_DIR, 'playbooks', 'roles'))
+
+        #: 删除
+        default_storage.delete(path)
+
+        #: 保存实例
+        if not self.get_queryset().filter(name=request.data['name']).exists():
+            serializer.save()
+        headers = self.get_success_headers(serializer.data)
+        #: 返回
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class TaskUpdateGroupApi(generics.RetrieveUpdateAPIView):
@@ -165,7 +216,7 @@ class TaskExecuteApi(generics.RetrieveAPIView):
         task_record.save()
 
         ansible_task_execute(task.id, [asset._to_secret_json() for asset in assets],
-                                   task.system_user.username, task_name, task.tags, uuid_str)
+                             task.system_user.username, task_name, task.tags, uuid_str)
         task.counts += 1
         task.save()
 
