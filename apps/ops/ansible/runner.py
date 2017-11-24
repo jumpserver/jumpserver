@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 import os
 from collections import namedtuple, defaultdict
 
-from ansible.errors import AnsibleError
 from ansible.executor.task_queue_manager import TaskQueueManager
 from ansible.vars import VariableManager
 from ansible.parsing.dataloader import DataLoader
