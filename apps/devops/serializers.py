@@ -28,6 +28,19 @@ class TaskSerializer(serializers.ModelSerializer):
         return obj.ansible_role.name
 
 
+class TaskReadSerializer(serializers.ModelSerializer):
+    ansible_role_name = serializers.SerializerMethodField()
+    tags = serializers.ListField(required=False, child=serializers.CharField())
+
+    class Meta:
+        model = Task
+        exclude = ('assets', 'groups', 'counts', 'password')
+
+    @staticmethod
+    def get_ansible_role_name(obj):
+        return obj.ansible_role.name
+
+
 class TaskUpdateGroupSerializer(serializers.ModelSerializer):
     groups = serializers.PrimaryKeyRelatedField(many=True, queryset=AssetGroup.objects.all())
 
@@ -84,3 +97,11 @@ class VariableUpdateAssetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Variable
         fields = ['id', 'assets']
+
+
+class TaskWebhookSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(max_length=200)
+
+    class Meta:
+        model = Task
+        fields = ['password']

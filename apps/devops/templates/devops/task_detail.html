@@ -113,10 +113,9 @@
                     </div>
 
 
-                    {#         TODO 最近执行记录       #}
                     <div class="ibox float-e-margins">
                         <div class="ibox-title">
-                            <span class="label"><b>近期执行记录</b></span>
+                            <span class="label"><b>{% trans 'Recent Records' %}</b></span>
                             <div class="ibox-tools">
                                 <a class="collapse-link">
                                     <i class="fa fa-chevron-up"></i>
@@ -132,14 +131,18 @@
                             </div>
                         </div>
                         <div class="ibox-content">
-                            <table class="table">
-                                <tbody>
-                                <tr class="no-borders-tr">
-                                    <td width="20%" colspan="2">Coming Soon。。。</td>
-                                    {#                                            <td><b>{{ task.name }}</b></td>#}
+                            <table class="table table-striped table-hover"
+                                   id="record_list">
+                                <thead>
+                                <tr>
+                                    <th class="text-center" width="0"></th>
+                                    <th class="text-center">{% trans 'Name' %}</th>
+                                    <th class="text-center">{% trans 'Success' %}</th>
+                                    <th class="text-center">{% trans 'Finished' %}</th>
+                                    <th class="text-center">{% trans 'Date start' %}</th>
+                                    <th class="text-center">{% trans 'Time' %}</th>
                                 </tr>
-
-                                </tbody>
+                                </thead>
                             </table>
                         </div>
                     </div>
@@ -294,7 +297,57 @@
             $('select.select2-multiple').select2();
             $('select.select2').select2({
                 multiple: false
-            })
+            });
+            let options = {
+                ele: $('#record_list'),
+                buttons: [],
+                order: [],
+                columnDefs: [
+                    {
+                        targets: 0, createdCell: function (td, cellData, rowData) {
+                        $(td).html("");
+                    }
+                    },
+                    {
+                        targets: 1, createdCell: function (td, cellData, rowData) {
+                        var detail_btn = '<a href="{% url "devops:record-detail" pk=99991937 %}" >' + cellData + '</a>';
+                        $(td).html(detail_btn.replace('99991937', rowData.uuid));
+                    }
+                    },
+                    {
+                        targets: 2, createdCell: function (td, cellData, rowData) {
+                        if (cellData) {
+                            $(td).html(' <i class="fa fa-check text-navy"></i>')
+                        } else {
+                            $(td).html('<i class="fa fa-times text-danger"></i>')
+                        }
+                    }
+                    },
+                    {
+                        targets: 3, createdCell: function (td, cellData, rowData) {
+                        if (cellData) {
+                            $(td).html(' <i class="fa fa-check text-navy"></i>')
+                        } else {
+                            $(td).html('<i class="fa fa-times text-danger"></i>')
+                        }
+                    }
+                    },
+                    {
+                        targets: 4, createdCell: function (td, cellData, rowData) {
+                        $(td).html(new Date(cellData).format("yyyy-MM-dd hh:mm:ss"))
+                    }
+                    },
+                    {
+                        targets: 5, createdCell: function (td, cellData, rowData) {
+                        $(td).html(cellData + "s");
+                    }
+                    }
+                ],
+                ajax_url: '{% url "api-devops:record-list" %}?task={{ task.id }}',
+                columns: [{data: "uuid"}, {data: "name"}, {data: "is_success"}, {data: "is_finished"}, {data: "date_start"}, {data: "timedelta"}],
+                dom: '<"#uc.pull-left">t<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
+            };
+            jumpserver.initDataTable(options);
         }).on('click', '#btn_add_group', function () {
             jumpserver.groups_selected = $('#groups_selected').select2('data');
             if (Object.keys(jumpserver.groups_selected).length === 0) {
@@ -445,7 +498,7 @@
                 toastr.error(data.responseJSON);
             }
             let success = function (data) {
-                location.href="{% url 'devops:record-detail' pk=99991937 %}".replace('99991937', data);
+                location.href = "{% url 'devops:record-detail' pk=99991937 %}".replace('99991937', data);
             }
             APIUpdateAttr({
                 url: the_url,
@@ -456,5 +509,22 @@
             });
         }
 
+        Date.prototype.format = function (fmt) { //author: meizz
+            var o = {
+                "M+": this.getMonth() + 1,                 //月份
+                "d+": this.getDate(),                    //日
+                "h+": this.getHours(),                   //小时
+                "m+": this.getMinutes(),                 //分
+                "s+": this.getSeconds(),                 //秒
+                "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+                "S": this.getMilliseconds()             //毫秒
+            };
+            if (/(y+)/.test(fmt))
+                fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+            for (var k in o)
+                if (new RegExp("(" + k + ")").test(fmt))
+                    fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+            return fmt;
+        }
     </script>
 {% endblock %}

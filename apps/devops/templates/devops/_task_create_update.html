@@ -12,6 +12,8 @@
     <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
     <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
     <script src="{% static "js/plugins/webupload/webuploader.js" %}"></script>
+    <script src="{% static "js/hideShowPassword.min.js" %}"></script>
+
 {% endblock %}
 
 {% block form %}
@@ -28,6 +30,15 @@
         <h3>{% trans 'basic' %}</h3>
         {% bootstrap_field form.name layout="horizontal" %}
         {% bootstrap_field form.desc layout="horizontal" %}
+
+        <div class="form-group">
+            <label class="col-md-2 control-label" for="id_role_install">{% trans 'WebHook Password' %}</label>
+            <div class="col-md-9">
+                <input name="password" placeholder="请妥善保管WebHook密码" class="form-control" type="password"
+                       id="id_password">
+               <div class="login-option"><input type="checkbox" id="show-password"> <label for="show-password">Show password</label></div>
+            </div>
+        </div>
         <div class="hr-line-dashed"></div>
 
         <h3>{% trans 'Install Ansible Role' %}(Optional)</h3>
@@ -109,6 +120,10 @@
                 minimumResultsForSearch: Infinity //禁止输入
             });
 
+            $('#show-password').on('change', function () {
+                $('#id_password').hideShowPassword($(this).prop('checked'));
+            });
+
 
             $('#id_tags').select2({
                 tags: true,
@@ -146,8 +161,8 @@
             uploader.on('fileQueued', function (file) {
                 $("#fileName").val(file.name);
             });
-             uploader.on('uploadStart', function (file) {
-                file.name=file.name.replaceAll("."+file.ext,"")
+            uploader.on('uploadStart', function (file) {
+                file.name = file.name.replaceAll("." + file.ext, "")
             });
             uploader.on('uploadSuccess', function (file) {
                 toastr.info("安装" + file.name.substr(0, file.name.lastIndexOf(".")) + "成功");

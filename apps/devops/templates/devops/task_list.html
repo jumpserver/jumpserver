@@ -15,7 +15,7 @@
         <thead>
         <tr>
             <th class="text-center">
-                {#                <input id="" type="checkbox" class="ipt_check_all">#}
+                              {% trans 'Id' %}
             </th>
             <th class="text-center">{% trans 'Name' %}</th>
             <th class="text-center">{% trans 'Description' %}</th>
@@ -39,7 +39,7 @@
                     {
                         targets: 0,
                         createdCell: function (td, cellData, rowData) {
-                            $(td).html("");
+                            $(td).html(cellData);
                         }
                     },
                     {

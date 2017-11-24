@@ -1,6 +1,7 @@
 # ~*~ coding: utf-8 ~*~
 import json
 
+from django.contrib.auth.hashers import make_password, check_password
 from django.db import models
 
 from django.utils.translation import ugettext_lazy as _
@@ -18,8 +19,9 @@ class AnsibleRole(models.Model):
 
 
 class Task(models.Model):
-    name = models.CharField(max_length=200, verbose_name=_('Name'))
+    name = models.CharField(max_length=200, verbose_name=_('Name'), unique=True)
     desc = models.TextField(null=True, blank=True, verbose_name=_('Description'))
+    password = models.CharField(max_length=200, verbose_name=_('WebHook Password'), blank=True, null=True)
     ansible_role = models.ForeignKey(AnsibleRole, verbose_name=_('Ansible Role'), related_name='task')
     tags = TextSeparatedValuesField(verbose_name=_('Tags'), null=True, blank=True)
     assets = models.ManyToManyField(Asset, verbose_name=_('Assets'), related_name='task', blank=True)
@@ -27,6 +29,12 @@ class Task(models.Model):
     counts = models.IntegerField(default=0)
     system_user = models.ForeignKey(SystemUser, null=True, blank=True, verbose_name=_('System User'),
                                     related_name='task')
+
+    def check_password(self, password_raw_):
+        if self.password is None or self.password == "":
+            return True
+        else:
+            return password_raw_ == self.password
 
 
 class Record(models.Model):

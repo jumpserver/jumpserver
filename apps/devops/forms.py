@@ -9,7 +9,7 @@ class TaskForm(forms.ModelForm):
     class Meta:
         model = Task
         fields = [
-            'name', 'desc', 'tags', 'ansible_role'
+            'name', 'desc', 'tags', 'ansible_role', 'password'
         ]
         help_texts = {
 

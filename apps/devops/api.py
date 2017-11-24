@@ -2,10 +2,11 @@
 
 import uuid
 from rest_framework import status
-from rest_framework import viewsets, generics, mixins
+from rest_framework import viewsets, generics, mixins, views
 from rest_framework.response import Response
 
 from .hands import IsSuperUser, IsSuperUserOrAppUser, IsValidUser
+from rest_framework import permissions
 from .serializers import *
 from .tasks import ansible_install_role, ansible_task_execute
 import yaml
@@ -14,6 +15,7 @@ from perms import utils
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
+from django.contrib.auth.hashers import make_password, check_password
 
 
 class TaskListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -21,7 +23,7 @@ class TaskListViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         对Ansible的task list的 展示 API操作
     """
     queryset = Task.objects.all()
-    serializer_class = TaskSerializer
+    serializer_class = TaskReadSerializer
     permission_classes = (IsValidUser,)
 
 
@@ -37,7 +39,8 @@ class TaskOperationViewSet(mixins.CreateModelMixin, mixins.RetrieveModelMixin,
 
     def update(self, request, *args, **kwargs):
         response = super(TaskOperationViewSet, self).update(request, *args, **kwargs)
-        self.playbook(self.get_object().id)
+        task = self.get_object()
+        self.playbook(task.id)
         return response
 
     def create(self, request, *args, **kwargs):
@@ -112,19 +115,6 @@ class InstallZipRoleView(generics.CreateAPIView):
     queryset = AnsibleRole.objects.all()
     serializer_class = AnsibleRoleSerializer
     permission_classes = (IsSuperUser,)
-
-    def perform_create(self, serializer):
-        #: 新建role安装文件夹
-        roles_path = os.path.join(settings.PROJECT_DIR, 'playbooks', 'roles')
-        #: 获取role name
-
-        #: 执行role 安装操作
-        self.result = ansible_install_role(self.request.data['name'], roles_path)
-        #: 去掉参数中的版本
-        name = str(self.request.data['name']).split(',')[0]
-        #: 当执行成功且Role不存在时才保存
-        if self.result and not self.get_queryset().filter(name=name).exists():
-            serializer.save()
 
     def create(self, request, *args, **kwargs):
         file = request.FILES['file_data']
@@ -215,8 +205,8 @@ class TaskExecuteApi(generics.RetrieveAPIView):
         task_record.task = task
         task_record.save()
 
-        ansible_task_execute(task.id, [asset._to_secret_json() for asset in assets],
-                             task.system_user.username, task_name, task.tags, uuid_str)
+        ansible_task_execute.delay(task.id, [asset._to_secret_json() for asset in assets],
+                                   task.system_user.username, task_name, task.tags, uuid_str)
         task.counts += 1
         task.save()
 
@@ -226,7 +216,14 @@ class TaskExecuteApi(generics.RetrieveAPIView):
 class RecordViewSet(viewsets.ModelViewSet):
     queryset = Record.objects.all()
     serializer_class = RecordSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsValidUser,)
+
+    def get_queryset(self):
+        task = self.request.query_params.get('task', '')
+        queryset = self.queryset
+        if task:
+            queryset = queryset.filter(task_id=task).order_by('-date_start')[:10]
+        return queryset
 
 
 class VariableViewSet(viewsets.ModelViewSet):
@@ -314,3 +311,61 @@ class VariableGetGroupApi(generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         serializer = AssetGroupSerializer(self.get_object().groups.all(), many=True)
         return Response(serializer.data)
+
+
+class TaskWebhookApi(generics.GenericAPIView):
+    """
+       Task Execute API
+    """
+    permission_classes = (permissions.AllowAny,)
+    queryset = Task.objects.all()
+    serializer_class = TaskWebhookSerializer
+
+    def post(self, request, *args, **kwargs):
+        task = self.get_object()
+        #: 计算assets
+        #: 超级用户直接取task所有assets
+        assets = list(task.assets.all())
+
+        password_raw = request.data['password']
+
+        result = task.check_password(password_raw)  # check_password 返回值为一个Bool类型，验证密码的正确与否
+        #: 新建一个Record
+        uuid_str = str(uuid.uuid4())
+
+        playbook_path = '../playbooks/task_%d.yml' % task.id
+        task_name = "%s %s #%d" % (task.name, 'WebHook', task.counts + 1)
+        with open(playbook_path) as f:
+            playbook_json = yaml.load(f)
+        task_record = Record(uuid=uuid_str,
+                             name=task_name,
+                             assets=','.join(str(asset._to_secret_json()['id']) for asset in assets),
+                             module_args=[('playbook', playbook_json)])
+        task_record.task = task
+
+        if not result:
+            task_record.is_success = False
+            task_record.is_finished = False
+            task_record.result = {"msg": "任务密码不匹配", "data": kwargs}
+            return Response("任务密码不匹配", status=status.HTTP_400_BAD_REQUEST)
+        if len(assets) == 0:
+            task_record.is_success = False
+            task_record.is_finished = False
+            task_record.result = {"msg": "任务执行的资产为空", "data": kwargs}
+            return Response("任务执行的资产为空", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        #: 系统用户不能为空
+        if task.system_user is None:
+            task_record.is_success = False
+            task_record.is_finished = False
+            task_record.result = {"msg": "任务执行的系统用户为空", "data": kwargs}
+            return Response("任务执行的系统用户为空", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            #: 没有assets和system_user不允许执行
+
+        task_record.save()
+
+        ansible_task_execute.delay(task.id, [asset._to_secret_json() for asset in assets],
+                                   task.system_user.username, task_name, task.tags, uuid_str)
+        task.counts += 1
+        task.save()
+
+        return Response(uuid_str, status=status.HTTP_200_OK)

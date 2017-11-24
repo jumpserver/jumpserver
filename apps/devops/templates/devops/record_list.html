@@ -72,7 +72,9 @@
             <td class="text-center">
                 <a class="btn btn-xs btn-primary m-l-xs btn-task-exec"
                    data-uid="{{ object.task.id }}">{% trans "Run again" %}</a>
-                <a data-uid="{{ object.uuid }}" class="btn btn-xs btn-danger btn-del">{% trans "Delete" %}</a>
+                {% if request.user.is_superuser %}
+                    <a data-uid="{{ object.uuid }}" class="btn btn-xs btn-danger btn-del">{% trans "Delete" %}</a>
+                {% endif %}
             </td>
         </tr>
     {% endfor %}
