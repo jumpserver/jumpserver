@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-23 16:15+0800\n"
+"POT-Creation-Date: 2017-11-24 15:58+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -30,8 +30,8 @@ msgstr ""
 #: assets/templates/assets/idc_list.html:18
 #: assets/templates/assets/system_user_detail.html:53
 #: assets/templates/assets/system_user_list.html:17 audits/models.py:18
-#: audits/templates/audits/login_log_list.html:49 devops/models.py:14
-#: devops/models.py:21 devops/models.py:35 devops/models.py:77
+#: audits/templates/audits/login_log_list.html:49 devops/models.py:15
+#: devops/models.py:22 devops/models.py:43 devops/models.py:85
 #: devops/templates/devops/record_detail.html:50
 #: devops/templates/devops/record_list.html:41
 #: devops/templates/devops/task_detail.html:69
@@ -257,7 +257,7 @@ msgstr "其它"
 #: assets/templates/assets/asset_update.html:55
 #: assets/templates/assets/idc_create_update.html:51
 #: assets/templates/assets/system_user_detail.html:138
-#: devops/templates/devops/_task_create_update.html:86
+#: devops/templates/devops/_task_create_update.html:97
 #: devops/templates/devops/_variable_create_update.html:33
 #: perms/templates/perms/asset_permission_create_update.html:67
 #: users/templates/users/_user.html:49
@@ -285,7 +285,7 @@ msgstr "重置"
 #: assets/templates/assets/idc_list.html:36
 #: assets/templates/assets/system_user_list.html:36
 #: audits/templates/audits/proxy_log_online_list.html:124
-#: devops/templates/devops/_task_create_update.html:87
+#: devops/templates/devops/_task_create_update.html:98
 #: devops/templates/devops/_variable_create_update.html:34
 #: perms/templates/perms/asset_permission_create_update.html:68
 #: users/templates/users/_user.html:50
@@ -498,7 +498,7 @@ msgstr "资产组"
 msgid "Admin user"
 msgstr "管理用户"
 
-#: assets/models/asset.py:50 devops/models.py:28
+#: assets/models/asset.py:50 devops/models.py:30
 msgid "System User"
 msgstr "系统用户"
 
@@ -718,7 +718,7 @@ msgstr ""
 #: assets/views/group.py:53 assets/views/group.py:73 assets/views/group.py:98
 #: assets/views/idc.py:22 assets/views/idc.py:87 assets/views/system_user.py:30
 #: assets/views/system_user.py:49 assets/views/system_user.py:73
-#: assets/views/system_user.py:100 devops/models.py:25 devops/models.py:80
+#: assets/views/system_user.py:100 devops/models.py:27 devops/models.py:88
 #: templates/_nav.html:19
 msgid "Assets"
 msgstr "资产管理"
@@ -1340,7 +1340,7 @@ msgstr "系统用户"
 msgid "Did connect failed"
 msgstr "连接失败"
 
-#: audits/models.py:51 devops/models.py:39
+#: audits/models.py:51 devops/models.py:47
 #: devops/templates/devops/record_detail.html:66 ops/models.py:24
 #: ops/templates/ops/task_detail.html:66
 msgid "Is finished"
@@ -1422,7 +1422,7 @@ msgid "Play"
 msgstr "播放"
 
 #: audits/templates/audits/proxy_log_offline_list.html:73
-#: audits/templates/audits/proxy_log_online_list.html:73 devops/models.py:38
+#: audits/templates/audits/proxy_log_online_list.html:73 devops/models.py:46
 #: devops/templates/devops/record_list.html:46
 #: devops/templates/devops/task_detail.html:143 ops/models.py:23
 #: ops/templates/ops/task_list.html:44
@@ -1462,7 +1462,7 @@ msgstr ""
 msgid "discard time"
 msgstr ""
 
-#: devops/models.py:22 devops/models.py:78
+#: devops/models.py:23 devops/models.py:86
 #: devops/templates/devops/task_detail.html:73
 #: devops/templates/devops/task_list.html:21
 #: devops/templates/devops/variable_detail.html:59
@@ -1470,91 +1470,95 @@ msgstr ""
 msgid "Description"
 msgstr "描述"
 
-#: devops/models.py:23 devops/templates/devops/task_detail.html:77
+#: devops/models.py:24 devops/templates/devops/_task_create_update.html:35
+msgid "WebHook Password"
+msgstr "WebHook密码"
+
+#: devops/models.py:25 devops/templates/devops/task_detail.html:77
 #: devops/templates/devops/task_list.html:22
 msgid "Ansible Role"
 msgstr "Ansible Role"
 
-#: devops/models.py:24 devops/templates/devops/_task_create_update.html:75
+#: devops/models.py:26 devops/templates/devops/_task_create_update.html:86
 #: devops/templates/devops/task_detail.html:81
 #: devops/templates/devops/task_list.html:23
 msgid "Tags"
 msgstr "执行Tags"
 
-#: devops/models.py:26 devops/models.py:81
+#: devops/models.py:28 devops/models.py:89
 #: devops/templates/devops/variable_asset.html:67
 msgid "Asset Groups"
 msgstr "资产组"
 
-#: devops/models.py:34 devops/templates/devops/record_detail.html:46
+#: devops/models.py:42 devops/templates/devops/record_detail.html:46
 #: ops/models.py:19 ops/templates/ops/task_detail.html:46
 msgid "UUID"
 msgstr "UUID"
 
-#: devops/models.py:36 ops/models.py:21
+#: devops/models.py:44 ops/models.py:21
 msgid "Start time"
 msgstr "开始时间"
 
-#: devops/models.py:37 ops/models.py:22
+#: devops/models.py:45 ops/models.py:22
 msgid "End time"
 msgstr "完成时间"
 
-#: devops/models.py:40 ops/models.py:25
+#: devops/models.py:48 ops/models.py:25
 msgid "Is success"
 msgstr "是否成功"
 
-#: devops/models.py:41 ops/models.py:26
+#: devops/models.py:49 ops/models.py:26
 msgid "Assets id"
 msgstr "资产id"
 
-#: devops/models.py:42 ops/models.py:27
+#: devops/models.py:50 ops/models.py:27
 msgid "Task module and args json format"
 msgstr ""
 
-#: devops/models.py:43 ops/models.py:28
+#: devops/models.py:51 ops/models.py:28
 msgid "Task run pattern"
 msgstr ""
 
-#: devops/models.py:44 ops/models.py:29
+#: devops/models.py:52 ops/models.py:29
 msgid "Task raw result"
 msgstr ""
 
-#: devops/models.py:45 ops/models.py:30
+#: devops/models.py:53 ops/models.py:30
 msgid "Task summary"
 msgstr ""
 
-#: devops/models.py:46 templates/_nav.html:55
+#: devops/models.py:54 templates/_nav.html:55
 msgid "Task"
 msgstr "任务"
 
-#: devops/models.py:79 devops/templates/devops/variable_detail.html:69
+#: devops/models.py:87 devops/templates/devops/variable_detail.html:69
 msgid "Vars"
 msgstr "变量"
 
-#: devops/templates/devops/_task_create_update.html:28
+#: devops/templates/devops/_task_create_update.html:30
 #: devops/templates/devops/_variable_create_update.html:25
 msgid "basic"
 msgstr "基本信息"
 
-#: devops/templates/devops/_task_create_update.html:33
+#: devops/templates/devops/_task_create_update.html:44
 msgid "Install Ansible Role"
 msgstr "安装角色"
 
-#: devops/templates/devops/_task_create_update.html:35
-#: devops/templates/devops/_task_create_update.html:44
+#: devops/templates/devops/_task_create_update.html:46
+#: devops/templates/devops/_task_create_update.html:55
 msgid "Install Role"
 msgstr "安装角色"
 
-#: devops/templates/devops/_task_create_update.html:40
 #: devops/templates/devops/_task_create_update.html:51
+#: devops/templates/devops/_task_create_update.html:62
 msgid "install"
 msgstr "安装"
 
-#: devops/templates/devops/_task_create_update.html:48
+#: devops/templates/devops/_task_create_update.html:59
 msgid "Select Zip"
 msgstr "选择压缩包"
 
-#: devops/templates/devops/_task_create_update.html:64 devops/views.py:28
+#: devops/templates/devops/_task_create_update.html:75 devops/views.py:28
 #: devops/views.py:40 devops/views.py:53 devops/views.py:72 devops/views.py:130
 #: devops/views.py:146 devops/views.py:162 devops/views.py:174
 #: devops/views.py:187 devops/views.py:203 devops/views.py:219
@@ -1562,7 +1566,7 @@ msgstr "选择压缩包"
 msgid "Ansible"
 msgstr "Ansible"
 
-#: devops/templates/devops/_task_create_update.html:66
+#: devops/templates/devops/_task_create_update.html:77
 msgid "Role Name"
 msgstr "角色名称"
 
@@ -1625,7 +1629,6 @@ msgid "Task System User"
 msgstr "任务系统用户"
 
 #: devops/templates/devops/task_detail.html:118
-#| msgid "Records"
 msgid "Recent Records"
 msgstr "近期执行记录"
 
@@ -1640,6 +1643,10 @@ msgstr "选择系统用户"
 #: devops/templates/devops/task_list.html:8 devops/views.py:41
 msgid "Create Task"
 msgstr "创建任务"
+
+#: devops/templates/devops/task_list.html:18
+msgid "Id"
+msgstr ""
 
 #: devops/templates/devops/task_list.html:70
 msgid "Execute"
