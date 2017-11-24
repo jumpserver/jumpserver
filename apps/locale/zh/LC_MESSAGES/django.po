@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-24 15:58+0800\n"
+"POT-Creation-Date: 2017-11-24 16:21+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -1609,7 +1609,6 @@ msgstr "再次执行"
 
 #: devops/templates/devops/task_detail.html:20
 #: devops/templates/devops/task_detail.html:50 devops/views.py:73
-#: devops/views.py:204 devops/views.py:220
 msgid "Task Detail"
 msgstr "任务详情"
 
@@ -1689,6 +1688,10 @@ msgstr "变量"
 #: devops/views.py:188
 msgid "Update Variable"
 msgstr "更新变量组"
+
+#: devops/views.py:204 devops/views.py:220
+msgid "Variable Detail"
+msgstr "变量详情"
 
 #: perms/forms.py:21 users/forms.py:125 users/forms.py:130
 msgid "Select users"
@@ -1879,7 +1882,7 @@ msgstr "关闭"
 #: templates/_nav.html:10
 #: users/templates/users/user_group_create_update.html:28
 #: users/views/group.py:31 users/views/group.py:45 users/views/group.py:80
-#: users/views/group.py:105 users/views/login.py:185 users/views/user.py:55
+#: users/views/group.py:105 users/views/login.py:186 users/views/user.py:55
 #: users/views/user.py:70 users/views/user.py:106 users/views/user.py:158
 msgid "Users"
 msgstr "用户管理"
@@ -2529,44 +2532,44 @@ msgstr "用户组列表"
 msgid "Update user group"
 msgstr "编辑用户组"
 
-#: users/views/login.py:76
+#: users/views/login.py:77
 msgid "Logout success"
 msgstr "退出登录成功"
 
-#: users/views/login.py:77
+#: users/views/login.py:78
 msgid "Logout success, return login page"
 msgstr "退出登录成功，返回到登录页面"
 
-#: users/views/login.py:92
+#: users/views/login.py:93
 msgid "Email address invalid, please input again"
 msgstr "邮箱地址错误，重新输入"
 
-#: users/views/login.py:105
+#: users/views/login.py:106
 msgid "Send reset password message"
 msgstr "发送重置密码邮件"
 
-#: users/views/login.py:106
+#: users/views/login.py:107
 msgid "Send reset password mail success, login your mail box and follow it "
 msgstr ""
 "发送重置邮件成功, 请登录邮箱查看, 按照提示操作 (如果没收到,请等待3-5分钟)"
 
-#: users/views/login.py:120
+#: users/views/login.py:121
 msgid "Reset password success"
 msgstr "重置密码成功"
 
-#: users/views/login.py:121
+#: users/views/login.py:122
 msgid "Reset password success, return to login page"
 msgstr "重置密码成功，返回到登录页面"
 
-#: users/views/login.py:138 users/views/login.py:151
+#: users/views/login.py:139 users/views/login.py:152
 msgid "Token invalid or expired"
 msgstr "Token错误或失效"
 
-#: users/views/login.py:147
+#: users/views/login.py:148
 msgid "Password not same"
 msgstr "密码不一致"
 
-#: users/views/login.py:185
+#: users/views/login.py:186
 msgid "First login"
 msgstr "首次登陆"
 

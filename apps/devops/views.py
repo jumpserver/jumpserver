@@ -201,7 +201,7 @@ class VariableDetailView(AdminUserRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Ansible'),
-            'action': _('Task Detail'),
+            'action': _('Variable Detail'),
         }
         kwargs.update(context)
         return super(VariableDetailView, self).get_context_data(**kwargs)
@@ -217,7 +217,7 @@ class VariableAssetView(AdminUserRequiredMixin, DetailView):
         asset_groups = self.object.groups.all()
         context = {
             'app': _('Ansible'),
-            'action': _('Task Detail'),
+            'action': _('Variable Detail'),
             #: 资产和资产组都不允许重复选择
             'assets_remain': [asset for asset in Asset.objects.all().filter(variable=None)
                               if asset not in assets],
