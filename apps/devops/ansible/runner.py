@@ -162,7 +162,7 @@ class AdHocRunner(object):
     results_callback_class = AdHocResultCallback
 
     def __init__(self,
-                 hosts=C.DEFAULT_HOST_LIST,
+                 hosts=None,
                  forks=C.DEFAULT_FORKS,  # 5
                  timeout=C.DEFAULT_TIMEOUT,  # SSH timeout = 10s
                  remote_user=C.DEFAULT_REMOTE_USER,  # root
@@ -183,7 +183,7 @@ class AdHocRunner(object):
         self.gather_facts = gather_facts
         self.results_callback = AdHocRunner.results_callback_class()
         self.options = self.Options(
-            connection=connection_type,
+            connection="local" if hosts is None else connection_type,
             timeout=timeout,
             module_path=module_path,
             forks=forks,
@@ -200,11 +200,7 @@ class AdHocRunner(object):
                                                            options=self.options)
         self.variable_manager.options_vars = load_options_vars(self.options)
         self.passwords = passwords or {}
-        if hosts is C.DEFAULT_HOST_LIST:
-            from ansible.inventory import Inventory
-            self.inventory = Inventory(loader=self.loader, variable_manager=self.variable_manager, host_list=hosts)
-        else:
-            self.inventory = JMSInventory(hosts)
+        self.inventory = JMSInventory(hosts)
         self.variable_manager.set_inventory(self.inventory)
         self.tasks = []
         self.play_source = None

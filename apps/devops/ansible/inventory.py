@@ -12,13 +12,16 @@ class JMSHost(Host):
         self.port = port = asset.get('port') or 22
 
         super(JMSHost, self).__init__(name, port)
-        #: 找到id对应的Host Variable 设置Host Vars
-        variable = list(Variable.objects.filter(assets=Asset.objects.get(hostname=asset.get('hostname'))))
-        if len(variable) > 0:
-            for key, value in variable[0].vars.items():
-                self.set_variable(key, value)
 
-        self.set_all_variable()
+        if self.name == 'localhost':
+            self.ansible_connection = 'local'
+        else:
+            #: 找到id对应的Host Variable 设置Host Vars
+            variable = list(Variable.objects.filter(assets=Asset.objects.get(hostname=asset.get('hostname'))))
+            if len(variable) > 0:
+                for key, value in variable[0].vars.items():
+                    self.set_variable(key, value)
+            self.set_all_variable()
 
     def set_all_variable(self):
         asset = self.asset
@@ -50,7 +53,7 @@ class JMSInventory(Inventory):
 
     def __init__(self, host_list=None):
         if host_list is None:
-            host_list = []
+            host_list = [{"hostname": "localhost"}]
         assert isinstance(host_list, list)
         self.host_list = host_list
         self.loader = DataLoader()
