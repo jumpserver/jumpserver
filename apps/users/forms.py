@@ -119,11 +119,10 @@ class UserBulkUpdateForm(forms.ModelForm):
         label=_('Role'),
         choices=[('Admin', 'Administrator'), ('User', 'User')],
     )
-    users = forms.MultipleChoiceField(
-        required=True,
-        help_text='* required',
+    users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
         label=_('Select users'),
-        # choices=[(user.id, user.name) for user in User.objects.all()],
+        required=False,
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',
@@ -144,9 +143,8 @@ class UserBulkUpdateForm(forms.ModelForm):
     def save(self, commit=True):
         cleaned_data = {k: v for k, v in self.cleaned_data.items() if
                         v is not None}
-        users_id = cleaned_data.pop('users')
+        users = cleaned_data.pop('users')
         groups = cleaned_data.pop('groups')
-        users = User.objects.filter(id__in=users_id)
         users.update(**cleaned_data)
         if groups:
             for user in users:

@@ -66,10 +66,10 @@ class AssetUpdateForm(forms.ModelForm):
 
 
 class AssetBulkUpdateForm(forms.ModelForm):
-    assets = forms.MultipleChoiceField(
-        required=True,
-        help_text='* required',
-        label=_('Select assets'),
+    assets = forms.ModelMultipleChoiceField(
+        queryset=Asset.objects.all(),
+        label=_('Select Assets'),
+        required=False,
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',
@@ -97,9 +97,8 @@ class AssetBulkUpdateForm(forms.ModelForm):
 
     def save(self, commit=True):
         cleaned_data = {k: v for k, v in self.cleaned_data.items() if v is not None}
-        assets_id = cleaned_data.pop('assets')
+        assets = cleaned_data.pop('assets')
         groups = cleaned_data.pop('groups')
-        assets = Asset.objects.filter(id__in=assets_id)
         assets.update(**cleaned_data)
         if groups:
             for asset in assets:
