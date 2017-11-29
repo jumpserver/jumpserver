@@ -16,7 +16,7 @@ router.register(r'v1/system-user', api.SystemUserViewSet, 'system-user')
 
 urlpatterns = [
     url(r'^v1/assets-bulk/$', api.AssetListUpdateApi.as_view(), name='asset-bulk-update'),
-    url(r'^v1/system-user/(?P<pk>[0-9]+)/auth-info/', api.SystemUserAuthInfoApi.as_view(),
+    url(r'^v1/system-user/(?P<pk>[0-9a-zA-Z\-]+)/auth-info/', api.SystemUserAuthInfoApi.as_view(),
         name='system-user-auth-info'),
     url(r'^v1/assets/(?P<pk>[0-9a-zA-Z\-]+)/groups/$',
         api.AssetUpdateGroupApi.as_view(), name='asset-update-group'),

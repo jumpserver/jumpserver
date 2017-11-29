@@ -1434,7 +1434,7 @@ msgid "Task summary"
 msgstr ""
 
 #: ops/templates/ops/task_detail.html:19
-msgid "Task record detail"
+msgid "Task replay detail"
 msgstr "任务记录详情"
 
 #: ops/templates/ops/task_detail.html:62

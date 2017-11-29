@@ -6,6 +6,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from users.models import User
+from .backends.command.models import AbstractSessionCommand
 
 
 class Terminal(models.Model):
@@ -88,7 +89,7 @@ class TerminalSession(models.Model):
     is_finished = models.BooleanField(default=False)
     has_replay = models.BooleanField(default=False, verbose_name=_("Replay"))
     has_command = models.BooleanField(default=False, verbose_name=_("Command"))
-    terminal = models.IntegerField(null=True, verbose_name=_("Terminal"))
+    terminal = models.UUIDField(null=True, verbose_name=_("Terminal"))
     date_start = models.DateTimeField(verbose_name=_("Date Start"))
     date_end = models.DateTimeField(verbose_name=_("Date End"), null=True)
 
@@ -110,3 +111,9 @@ class TerminalTask(models.Model):
 
     class Meta:
         db_table = "terminal_task"
+
+
+class SessionCommand(AbstractSessionCommand):
+
+    class Meta:
+        db_table = "session_command"

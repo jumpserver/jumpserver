@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 #
+import base64
 from collections import OrderedDict
 import copy
 import logging
+import tarfile
 
 import os
 from rest_framework import viewsets, serializers
@@ -12,12 +14,13 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.conf import settings
 
+from common.utils import get_object_or_none
 from .models import Terminal, TerminalStatus, TerminalSession, TerminalTask
 from .serializers import TerminalSerializer, TerminalStatusSerializer, \
     TerminalSessionSerializer, TerminalTaskSerializer
 from .hands import IsSuperUserOrAppUser, IsAppUser, ProxyLog, \
     IsSuperUserOrAppUserOrUserReadonly
-from common.utils import get_object_or_none
+from .backends import get_command_store, get_replay_store, SessionCommandSerializer
 
 logger = logging.getLogger(__file__)
 
@@ -157,11 +160,14 @@ class SessionReplayAPI(APIView):
         session = get_object_or_404(TerminalSession, id=session_id)
         record_dir = settings.CONFIG.SESSION_RECORDE_DIR
         date = session.date_start.strftime("%Y-%m-%d")
-        record_dir = os.path.join(record_dir, date)
-        record_filename = os.path.join(record_dir, str(session.id))
+        record_dir = os.path.join(record_dir, date, str(session.id))
+        record_filename = os.path.join(record_dir, "replay.tar.gz2")
 
-        if not os.path.exists(record_dir):
-            os.makedirs(record_dir)
+        if not os.path.isdir(record_dir):
+            try:
+                os.makedirs(record_dir)
+            except FileExistsError:
+                pass
 
         archive_stream = request.data.get("archive")
         if not archive_stream:
@@ -173,3 +179,41 @@ class SessionReplayAPI(APIView):
         session.has_replay = True
         session.save()
         return Response({"session_id": session.id}, status=201)
+
+
+class SessionCommandViewSet(viewsets.ViewSet):
+    """接受app发送来的command log, 格式如下
+    {
+        "user": "admin",
+        "asset": "localhost",
+        "system_user": "web",
+        "session": "xxxxxx",
+        "input": "whoami",
+        "output": "d2hvbWFp",  # base64.b64encode(s)
+        "timestamp": 1485238673.0
+    }
+
+    """
+    command_store = get_command_store()
+    serializer_class = SessionCommandSerializer
+    permission_classes = (IsSuperUserOrAppUser,)
+
+    def get_queryset(self):
+        self.command_store.all()
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, many=True)
+        if serializer.is_valid():
+            ok = self.command_store.bulk_save(serializer.validated_data)
+            if ok:
+                return Response("ok", status=201)
+            else:
+                return Response("save error", status=500)
+        else:
+            print(serializer.errors)
+            return Response({"msg": "Not valid: {}".format(serializer.errors)}, status=401)
+
+    def list(self, request, *args, **kwargs):
+        queryset = list(self.command_store.all())
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)

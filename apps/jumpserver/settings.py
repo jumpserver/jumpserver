@@ -363,8 +363,8 @@ CAPTCHA_FOREGROUND_COLOR = '#001100'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 CAPTCHA_TEST_MODE = CONFIG.CAPTCHA_TEST_MODE
 
-COMMAND_STORE_BACKEND = 'audits.backends.command.db'
-RECORD_STORE_BACKEND = 'audits.backends.record.db'
+COMMAND_STORE_BACKEND = 'applications.backends.command.db'
+RECORD_STORE_BACKEND = 'applications.backends.replay.db'
 
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html

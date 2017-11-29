@@ -8,7 +8,7 @@ app_name = 'audits'
 router = routers.DefaultRouter()
 router.register(r'v1/proxy-log', api.ProxyLogViewSet, 'proxy-log')
 router.register(r'v1/command-log', api.CommandLogViewSet, 'command-log')
-router.register(r'v1/record-log', api.RecordLogViewSet, 'record-log')
+router.register(r'v1/replay-log', api.RecordLogViewSet, 'replay-log')
 
 urlpatterns = [
     url(r'^v1/proxy-log/receive/$', api.ProxyLogReceiveView.as_view(),
