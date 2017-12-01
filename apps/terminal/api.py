@@ -109,7 +109,7 @@ class TerminalStatusViewSet(viewsets.ModelViewSet):
         terminal_id = self.kwargs.get("terminal", None)
         if terminal_id:
             terminal = get_object_or_404(Terminal, id=terminal_id)
-            self.queryset = terminal.terminalstatus_set.all()
+            self.queryset = terminal.status_set.all()
         return self.queryset
 
     def perform_create(self, serializer):
@@ -131,7 +131,7 @@ class TerminalSessionViewSet(viewsets.ModelViewSet):
         terminal_id = self.kwargs.get("terminal", None)
         if terminal_id:
             terminal = get_object_or_404(Terminal, id=terminal_id)
-            self.queryset = terminal.terminalstatus_set.all()
+            self.queryset = terminal.status_set.all()
         return self.queryset
 
 
@@ -144,7 +144,7 @@ class TerminalTaskViewSet(viewsets.ModelViewSet):
         terminal_id = self.kwargs.get("terminal", None)
         if terminal_id:
             terminal = get_object_or_404(Terminal, id=terminal_id)
-            self.queryset = terminal.terminalstatus_set.all()
+            self.queryset = terminal.status_set.all()
 
         if hasattr(self.request.user, "terminal"):
             terminal = self.request.user.terminal

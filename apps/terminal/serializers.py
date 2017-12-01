@@ -23,7 +23,7 @@ class TerminalSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_is_alive(obj):
-        log = obj.terminalstatus_set.last()
+        log = obj.status_set.last()
         if log and timezone.now() - log.date_created < timezone.timedelta(seconds=600):
             return True
         else:
