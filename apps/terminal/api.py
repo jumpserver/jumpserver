@@ -78,19 +78,20 @@ class TerminalStatusViewSet(viewsets.ModelViewSet):
         sessions_active = []
         for session_data in self.request.data.get("sessions", []):
             session_data["terminal"] = self.request.user.terminal.id
-            _id = session_data["id"]
-            session = get_object_or_none(Session, id=_id)
+            _uuid = session_data["uuid"]
+            session = get_object_or_none(Session, uuid=_uuid)
             if session:
-                serializer = TerminalSessionSerializer(data=session_data,
-                                                       instance=session)
+                serializer = TerminalSessionSerializer(
+                    data=session_data, instance=session
+                )
             else:
                 serializer = TerminalSessionSerializer(data=session_data)
 
             if serializer.is_valid():
                 serializer.save()
             else:
-                logger.error("session serializer is not valid {}".format(
-                    serializer.errors))
+                msg = "session data is not valid {}".format(serializer.errors)
+                logger.error(msg)
 
             if not session_data["is_finished"]:
                 sessions_active.append(session_data["id"])

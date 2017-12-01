@@ -74,6 +74,10 @@ class Status(models.Model):
 
     class Meta:
         db_table = 'terminal_status'
+        get_latest_by = 'date_created'
+
+    def __str__(self):
+        return self.date_created.strftime("%Y-%m-%d %H:%M:%S")
 
 
 class Session(models.Model):
@@ -82,7 +86,7 @@ class Session(models.Model):
         ('WT', 'Web Terminal'),
     )
 
-    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    uuid = models.UUIDField(default=uuid.uuid4, db_index=True)
     user = models.CharField(max_length=128, verbose_name=_("User"))
     asset = models.CharField(max_length=1024, verbose_name=_("Asset"))
     system_user = models.CharField(max_length=128, verbose_name=_("System User"))

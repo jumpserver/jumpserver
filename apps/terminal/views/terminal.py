@@ -8,9 +8,15 @@ from django.utils.translation import ugettext as _
 from django.urls import reverse_lazy, reverse
 
 from common.mixins import JSONResponseMixin
-from .models import Terminal
-from .forms import TerminalForm
-from .hands import AdminUserRequiredMixin
+from ..models import Terminal
+from ..forms import TerminalForm
+from ..hands import AdminUserRequiredMixin
+
+
+__all__ = [
+    "TerminalListView", "TerminalUpdateView", "TerminalDetailView",
+    "TerminalDeleteView", "TerminalConnectView", "TerminalAcceptView",
+]
 
 
 class TerminalListView(LoginRequiredMixin, ListView):
@@ -60,7 +66,7 @@ class TerminalDeleteView(AdminUserRequiredMixin, DeleteView):
     success_url = reverse_lazy('terminal:terminal-list')
 
 
-class TerminalAccept(AdminUserRequiredMixin, JSONResponseMixin, UpdateView):
+class TerminalAcceptView(AdminUserRequiredMixin, JSONResponseMixin, UpdateView):
     model = Terminal
     form_class = TerminalForm
     template_name = 'Terminal/terminal_modal_test.html'
