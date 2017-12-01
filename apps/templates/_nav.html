@@ -11,6 +11,7 @@
     <ul class="nav nav-second-level active">
         <li id="user"><a href="{% url 'users:user-list' %}">{% trans 'User' %}</a></li>
         <li id="user-group"><a href="{% url 'users:user-group-list' %}">{% trans 'User group' %}</a></li>
+        <li id="user-group"><a href="{% url 'users:user-group-list' %}">{% trans 'Login logs' %}</a></li>
     </ul>
 </li>
 <li id="assets">
@@ -40,6 +41,8 @@
     </a>
     <ul class="nav nav-second-level">
         <li id="terminal"><a href="{% url 'terminal:terminal-list' %}">{% trans 'Terminal' %}</a></li>
+        <li id="terminal"><a href="">{% trans 'Sessions' %}</a></li>
+        <li id="terminal"><a href="">{% trans 'Command' %}</a></li>
     </ul>
 </li>
 
@@ -52,27 +55,6 @@
     </ul>
 </li>
 
-<li id="audits">
-    <a href="#"><i class="fa fa-files-o"></i> <span class="nav-label">{% trans 'Audits' %}</span><span class="fa arrow"></span></a>
-    <ul class="nav nav-second-level">
-        <li id="proxy-log-online">
-            <a href="{% url 'audits:proxy-log-online-list' %}">{% trans 'Session online' %}</a>
-        </li>
-        <li id="proxy-log-offline">
-            <a href="{% url 'audits:proxy-log-offline-list' %}">{% trans 'Session history' %}</a>
-        </li>
-        <li id="command-log">
-            <a href="{% url 'audits:command-log-list' %}">{% trans 'Command log' %}</a>
-        </li>
-        <li id="login-log">
-            <a href="{% url 'audits:login-log-list' %}">{% trans 'Login log' %}</a>
-        </li>
-{#        <li id="admin-log">#}
-{#            <a href="{% url 'perms:asset-permission-list' %}">{% trans 'Admin log' %}</a>#}
-{#        </li>#}
-
-    </ul>
-</li>
 {#<li id="">#}
 {#    <a href="#">#}
 {#        <i class="fa fa-download"></i> <span class="nav-label">{% trans 'File' %}</span><span class="fa arrow"></span>#}
