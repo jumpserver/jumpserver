@@ -60,7 +60,7 @@ class TerminalDeleteView(AdminUserRequiredMixin, DeleteView):
     success_url = reverse_lazy('terminal:terminal-list')
 
 
-class TerminalModelAccept(AdminUserRequiredMixin, JSONResponseMixin, UpdateView):
+class TerminalAccept(AdminUserRequiredMixin, JSONResponseMixin, UpdateView):
     model = Terminal
     form_class = TerminalForm
     template_name = 'Terminal/terminal_modal_test.html'

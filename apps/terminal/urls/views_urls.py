@@ -14,8 +14,8 @@ urlpatterns = [
         name='terminal-detail'),
     url(r'^terminal/(?P<pk>[0-9a-zA-Z\-]+)/connect/$', views.TerminalConnectView.as_view(),
         name='terminal-connect'),
-    url(r'^terminal/(?P<pk>[0-9a-zA-Z\-]+)/update$', views.TerminalUpdateView.as_view(),
+    url(r'^terminal/(?P<pk>[0-9a-zA-Z\-]+)/update/$', views.TerminalUpdateView.as_view(),
         name='terminal-update'),
-    url(r'^terminal/(?P<pk>[0-9a-zA-Z\-]+)/modal/accept$', views.TerminalModelAccept.as_view(),
-        name='terminal-modal-accept'),
+    url(r'^(?P<pk>[0-9a-zA-Z\-]+)/accept/$', views.TerminalAccept.as_view(),
+        name='terminal-accept'),
 ]

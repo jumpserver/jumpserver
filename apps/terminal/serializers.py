@@ -9,17 +9,17 @@ from .hands import ProxyLog
 
 
 class TerminalSerializer(serializers.ModelSerializer):
-    session_connected = serializers.SerializerMethodField()
+    session_online = serializers.SerializerMethodField()
     is_alive = serializers.SerializerMethodField()
 
     class Meta:
         model = Terminal
         fields = ['id', 'name', 'remote_addr', 'http_port', 'ssh_port',
-                  'comment', 'is_accepted', 'session_connected', 'is_alive']
+                  'comment', 'is_accepted', 'session_online', 'is_alive']
 
     @staticmethod
-    def get_session_connected(obj):
-        return Session.objects.filter(terminal=obj.id, is_finished=False)
+    def get_session_online(obj):
+        return Session.objects.filter(terminal=obj.id, is_finished=False).count()
 
     @staticmethod
     def get_is_alive(obj):
