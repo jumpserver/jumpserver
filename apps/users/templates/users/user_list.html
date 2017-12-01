@@ -74,8 +74,8 @@ function renderTable() {
         ele: $('#user_list_table'),
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
-                var detail_btn = '<a href="{% url "users:user-detail" pk=99991937 %}">' + cellData + '</a>';
-                $(td).html(detail_btn.replace('99991937', rowData.id));
+                var detail_btn = '<a href="{% url "users:user-detail" pk='00000000-0000-0000-0000-000000000000' %}">' + cellData + '</a>';
+                $(td).html(detail_btn.replace('00000000-0000-0000-0000-000000000000', rowData.id));
              }},
             {targets: 4, createdCell: function (td, cellData) {
                 var innerHtml = cellData.length > 20 ? cellData.substring(0, 20) + '...': cellData;
@@ -89,9 +89,9 @@ function renderTable() {
                 }
              }},
             {targets: 6, createdCell: function (td, cellData, rowData) {
-                var update_btn = '<a href="{% url "users:user-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
-                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="99991937" data-name="99991938">{% trans "Delete" %}</a>'
-                        .replace('99991937', cellData)
+                var update_btn = '<a href="{% url "users:user-update" pk='00000000-0000-0000-0000-000000000000' %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('00000000-0000-0000-0000-000000000000', cellData);
+                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="00000000-0000-0000-0000-000000000000" data-name="99991938">{% trans "Delete" %}</a>'
+                        .replace('00000000-0000-0000-0000-000000000000', cellData)
                         .replace('99991938', rowData.name);
                 if (rowData.id === 1 || rowData.username == "admin") {
                     $(td).html(update_btn)
@@ -230,7 +230,7 @@ $(document).ready(function(){
     var $this = $(this);
     var name = $this.data('name');
     var uid = $this.data('uid');
-    var the_url = '{% url "api-users:user-detail" pk=99991937 %}'.replace('99991937', uid);
+    var the_url = '{% url "api-users:user-detail" pk='00000000-0000-0000-0000-000000000000' %}'.replace('00000000-0000-0000-0000-000000000000', uid);
     objectDelete($this, name, the_url);
 })
 </script>

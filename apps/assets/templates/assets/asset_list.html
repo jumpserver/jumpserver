@@ -5,12 +5,6 @@
 <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
 <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
 
-{#<style>#}
-{#    .custom{#}
-{#        margin-right:5px;#}
-{#        }#}
-{#    #modal .modal-body { max-height: 200px; }#}
-{#</style>#}
 {% endblock %}
 {% block content_left_head %}{% endblock %}
 
@@ -26,7 +20,6 @@
         </div>
     </div>
 {% endblock %}
-
 
 {% block table_container %}
 <div class="uc pull-left m-l-5 m-r-5"><a href="{% url "assets:asset-create" %}" class="btn btn-sm btn-primary"> {% trans "Create asset" %} </a></div>

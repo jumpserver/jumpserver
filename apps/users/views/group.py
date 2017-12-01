@@ -162,14 +162,13 @@ class UserGroupAssetPermissionCreateView(AdminUserRequiredMixin, CreateView):
 
 
 class UserGroupGrantedAssetView(AdminUserRequiredMixin, DetailView):
-    model = User
+    model = UserGroup
     template_name = 'users/user_group_granted_asset.html'
     context_object_name = 'user_group'
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=UserGroup.objects.all())
-        return super(UserGroupGrantedAssetView, self)\
-            .get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = {
