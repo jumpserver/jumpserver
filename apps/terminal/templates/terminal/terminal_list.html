@@ -39,7 +39,7 @@
     <tbody>
     </tbody>
 </table>
-{% include 'applications/terminal_modal_accept.html' %}
+{% include 'terminal/terminal_modal_accept.html' %}
 
 {% endblock %}
 {% block custom_foot_js %}
@@ -51,7 +51,7 @@ $(document).ready(function(){
         buttons: [],
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
-                var detail_btn = '<a href="{% url "applications:terminal-detail" pk=99991937 %}">' + cellData + '</a>';
+                var detail_btn = '<a href="{% url "terminal:terminal-detail" pk=99991937 %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('99991937', rowData.id));
              }},
             {targets: 6, createdCell: function (td, cellData) {
@@ -69,7 +69,7 @@ $(document).ready(function(){
                 }
             }},
             {targets: 8, createdCell: function (td, cellData, rowData) {
-                var update_btn = '<a href="{% url "applications:terminal-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'
+                var update_btn = '<a href="{% url "terminal:terminal-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'
                         .replace('99991937', cellData);
                 var delete_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-id="99991937" data-name="99991938">{% trans "Delete" %}</a>'
                         .replace('99991937', cellData)
@@ -94,7 +94,7 @@ $(document).ready(function(){
                 }
              }}
         ],
-        ajax_url: '{% url "api-applications:terminal-list" %}',
+        ajax_url: '{% url "api-terminal:terminal-list" %}',
         columns: [{data: function(){return ""}}, {data: "name" }, {data: "remote_addr" }, {data: "ssh_port"}, {data: "http_port"},
                   {data: "session_connected"}, {data: "is_accepted" }, {data: 'is_alive'}, {data: "id"}],
         op_html: $('#actions').html()
@@ -117,13 +117,13 @@ $(document).ready(function(){
     var $this = $(this);
     var id = $this.data('id');
     var name = $(this).data('name');
-    var the_url = '{% url "api-applications:terminal-detail" pk=99991937 %}'.replace('99991937', id);
+    var the_url = '{% url "api-terminal:terminal-detail" pk=99991937 %}'.replace('99991937', id);
     objectDelete($this, name, the_url)
 
 }).on('click', '.btn-accept', function () {
     var $this = $(this);
     var terminal_id = $this.data('id');
-    var the_url = "{% url 'api-applications:terminal-detail' pk=99991937 %}".replace('99991937', terminal_id);
+    var the_url = "{% url 'api-terminal:terminal-detail' pk=99991937 %}".replace('99991937', terminal_id);
     var post_url = $('#form_terminal_accept').attr('action').replace('99991937', terminal_id);
     console.log(post_url);
     $.ajax({

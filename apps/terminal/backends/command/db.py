@@ -9,8 +9,8 @@ from .base import CommandBase
 class CommandStore(CommandBase):
 
     def __init__(self):
-        from applications.models import SessionCommand
-        self.model = SessionCommand
+        from terminal.models import Command
+        self.model = Command
 
     def save(self, command):
         """

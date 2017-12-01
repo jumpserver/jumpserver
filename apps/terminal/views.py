@@ -15,7 +15,7 @@ from .hands import AdminUserRequiredMixin
 
 class TerminalListView(LoginRequiredMixin, ListView):
     model = Terminal
-    template_name = 'applications/terminal_list.html'
+    template_name = 'terminal/terminal_list.html'
     form_class = TerminalForm
 
     def get_context_data(self, **kwargs):
@@ -31,24 +31,24 @@ class TerminalListView(LoginRequiredMixin, ListView):
 class TerminalUpdateView(AdminUserRequiredMixin, UpdateView):
     model = Terminal
     form_class = TerminalForm
-    template_name = 'applications/terminal_update.html'
-    success_url = reverse_lazy('applications:terminal-list')
+    template_name = 'terminal/terminal_update.html'
+    success_url = reverse_lazy('terminal:terminal-list')
 
     def get_context_data(self, **kwargs):
         context = super(TerminalUpdateView, self).get_context_data(**kwargs)
-        context.update({'app': _('Applications'), 'action': _('Update terminal')})
+        context.update({'app': _('Terminal'), 'action': _('Update terminal')})
         return context
 
 
 class TerminalDetailView(LoginRequiredMixin, DetailView):
     model = Terminal
-    template_name = 'applications/terminal_detail.html'
+    template_name = 'terminal/terminal_detail.html'
     context_object_name = 'terminal'
 
     def get_context_data(self, **kwargs):
         context = super(TerminalDetailView, self).get_context_data(**kwargs)
         context.update({
-            'app': _('Applications'),
+            'app': _('Terminal'),
             'action': _('Terminal detail')
         })
         return context
@@ -57,13 +57,13 @@ class TerminalDetailView(LoginRequiredMixin, DetailView):
 class TerminalDeleteView(AdminUserRequiredMixin, DeleteView):
     model = Terminal
     template_name = 'assets/delete_confirm.html'
-    success_url = reverse_lazy('applications:applications-list')
+    success_url = reverse_lazy('terminal:terminal-list')
 
 
 class TerminalModelAccept(AdminUserRequiredMixin, JSONResponseMixin, UpdateView):
     model = Terminal
     form_class = TerminalForm
-    template_name = 'applications/terminal_modal_test.html'
+    template_name = 'Terminal/terminal_modal_test.html'
 
     def form_valid(self, form):
         terminal = form.save()
@@ -103,7 +103,7 @@ class TerminalConnectView(LoginRequiredMixin, DetailView):
                 'messages': _('You should use your ssh client tools '
                               'connect terminal: {} <br /> <br />'
                               '{}'.format(self.object.name, self.object.url)),
-                'redirect_url': reverse('applications:terminal-list')
+                'redirect_url': reverse('terminal:terminal-list')
             }
 
         kwargs.update(context)

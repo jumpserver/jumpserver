@@ -7,7 +7,7 @@ from rest_framework import routers
 
 from .. import api
 
-app_name = 'applications'
+app_name = 'terminal'
 
 router = routers.DefaultRouter()
 router.register(r'v1/terminal/(?P<terminal>[0-9]+)?/?status', api.TerminalStatusViewSet, 'terminal-status')

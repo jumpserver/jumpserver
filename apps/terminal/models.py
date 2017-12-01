@@ -58,9 +58,10 @@ class Terminal(models.Model):
 
     class Meta:
         ordering = ('is_accepted',)
+        db_table = "terminal"
 
 
-class TerminalStatus(models.Model):
+class Status(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     session_online = models.IntegerField(verbose_name=_("Session Online"), default=0)
     cpu_used = models.FloatField(verbose_name=_("CPU Usage"))
@@ -75,7 +76,7 @@ class TerminalStatus(models.Model):
         db_table = 'terminal_status'
 
 
-class TerminalSession(models.Model):
+class Session(models.Model):
     LOGIN_FROM_CHOICES = (
         ('ST', 'SSH Terminal'),
         ('WT', 'Web Terminal'),
@@ -100,7 +101,7 @@ class TerminalSession(models.Model):
         return "{0.id} of {0.user} to {0.asset}".format(self)
 
 
-class TerminalTask(models.Model):
+class Task(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, verbose_name=_("Name"))
     args = models.CharField(max_length=1024, verbose_name=_("Task Args"))
@@ -113,7 +114,7 @@ class TerminalTask(models.Model):
         db_table = "terminal_task"
 
 
-class SessionCommand(AbstractSessionCommand):
+class Command(AbstractSessionCommand):
 
     class Meta:
-        db_table = "session_command"
+        db_table = "terminal_command"

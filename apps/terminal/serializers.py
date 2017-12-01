@@ -4,7 +4,7 @@
 from django.utils import timezone
 from rest_framework import serializers
 
-from .models import Terminal, TerminalStatus, TerminalSession, TerminalTask
+from .models import Terminal, Status, Session, Task
 from .hands import ProxyLog
 
 
@@ -19,7 +19,7 @@ class TerminalSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_session_connected(obj):
-        return TerminalSession.objects.filter(terminal=obj.id, is_finished=False)
+        return Session.objects.filter(terminal=obj.id, is_finished=False)
 
     @staticmethod
     def get_is_alive(obj):
@@ -33,7 +33,7 @@ class TerminalSerializer(serializers.ModelSerializer):
 class TerminalSessionSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = TerminalSession
+        model = Session
         fields = '__all__'
 
 
@@ -41,11 +41,11 @@ class TerminalStatusSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = '__all__'
-        model = TerminalStatus
+        model = Status
 
 
 class TerminalTaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = '__all__'
-        model = TerminalTask
+        model = Task

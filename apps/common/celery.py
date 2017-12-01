@@ -33,7 +33,7 @@ app.conf.update(
             'args': (),
         },
         'clean_terminal_history': {
-            'task': 'applications.tasks.clean_terminal_history',
+            'task': 'terminal.tasks.clean_terminal_history',
             'schedule': 60*60*60,
             'args': (),
         }

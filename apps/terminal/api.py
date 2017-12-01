@@ -15,7 +15,7 @@ from django.utils import timezone
 from django.conf import settings
 
 from common.utils import get_object_or_none
-from .models import Terminal, TerminalStatus, TerminalSession, TerminalTask
+from .models import Terminal, Status, Session, Task
 from .serializers import TerminalSerializer, TerminalStatusSerializer, \
     TerminalSessionSerializer, TerminalTaskSerializer
 from .hands import IsSuperUserOrAppUser, IsAppUser, ProxyLog, \
@@ -65,7 +65,7 @@ class TerminalViewSet(viewsets.ModelViewSet):
 
 
 class TerminalStatusViewSet(viewsets.ModelViewSet):
-    queryset = TerminalStatus.objects.all()
+    queryset = Status.objects.all()
     serializer_class = TerminalStatusSerializer
     permission_classes = (IsSuperUserOrAppUser,)
     session_serializer_class = TerminalSessionSerializer
@@ -79,7 +79,7 @@ class TerminalStatusViewSet(viewsets.ModelViewSet):
         for session_data in self.request.data.get("sessions", []):
             session_data["terminal"] = self.request.user.terminal.id
             _id = session_data["id"]
-            session = get_object_or_none(TerminalSession, id=_id)
+            session = get_object_or_none(Session, id=_id)
             if session:
                 serializer = TerminalSessionSerializer(data=session_data,
                                                        instance=session)
@@ -95,7 +95,7 @@ class TerminalStatusViewSet(viewsets.ModelViewSet):
             if not session_data["is_finished"]:
                 sessions_active.append(session_data["id"])
 
-        sessions_in_db_active = TerminalSession.objects.filter(
+        sessions_in_db_active = Session.objects.filter(
             is_finished=False, terminal=self.request.user.terminal.id
         )
 
@@ -123,7 +123,7 @@ class TerminalStatusViewSet(viewsets.ModelViewSet):
 
 
 class TerminalSessionViewSet(viewsets.ModelViewSet):
-    queryset = TerminalSession.objects.all()
+    queryset = Session.objects.all()
     serializers_class = TerminalSessionSerializer
     permission_classes = (IsSuperUserOrAppUser,)
 
@@ -136,7 +136,7 @@ class TerminalSessionViewSet(viewsets.ModelViewSet):
 
 
 class TerminalTaskViewSet(viewsets.ModelViewSet):
-    queryset = TerminalTask.objects.all()
+    queryset = Task.objects.all()
     serializer_class = TerminalTaskSerializer
     permission_classes = (IsSuperUserOrAppUser,)
 
@@ -157,7 +157,7 @@ class SessionReplayAPI(APIView):
 
     def post(self, request, **kwargs):
         session_id = kwargs.get("pk", None)
-        session = get_object_or_404(TerminalSession, id=session_id)
+        session = get_object_or_404(Session, id=session_id)
         record_dir = settings.CONFIG.SESSION_RECORDE_DIR
         date = session.date_start.strftime("%Y-%m-%d")
         record_dir = os.path.join(record_dir, date, str(session.id))
