@@ -10,7 +10,7 @@ class SessionCommandSerializer(serializers.Serializer):
     asset = serializers.CharField(max_length=128)
     system_user = serializers.CharField(max_length=64)
     input = serializers.CharField(max_length=128)
-    output = serializers.CharField(max_length=1024)
+    output = serializers.CharField(max_length=1024, allow_blank=True)
     session = serializers.CharField(max_length=36)
     timestamp = serializers.IntegerField()
 

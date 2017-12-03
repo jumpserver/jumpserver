@@ -14,9 +14,8 @@ class CommandBase(object):
         pass
 
     @abc.abstractmethod
-    def filter(self, date_from=None, date_to=None, user=None,
-               asset=None, system_user=None, command=None, session=None):
+    def filter(self, date_from=None, date_to=None,
+               user=None, asset=None, system_user=None,
+               input=None, session=None):
         pass
-
-
 

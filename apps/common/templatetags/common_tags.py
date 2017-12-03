@@ -2,7 +2,6 @@
 
 from django import template
 from django.utils import timezone
-from django.conf import settings
 from django.utils.html import escape
 from audits.backends import command_store
 

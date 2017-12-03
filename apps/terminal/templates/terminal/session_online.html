@@ -1,6 +1,7 @@
 {% extends '_base_list.html' %}
 {% load i18n %}
 {% load static %}
+{% load terminal_tags %}
 {% block content_left_head %}
     <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
     <style>
@@ -77,13 +78,13 @@
         <tr class="gradeX">
             <td class="text-center"><input type="checkbox" class="cbx-term" value="{{ session.id }}"></td>
             <td class="text-center">
-                <a href="">{{ session.id }}</a>
+                <a href="{% url 'terminal:session-detail' pk=session.id %}">{{ forloop.counter }}</a>
             </td>
             <td class="text-center">{{ session.user }}</td>
             <td class="text-center">{{ session.asset }}</td>
             <td class="text-center">{{ session.system_user }}</td>
             <td class="text-center">{{ session.terminal.name }}</td>
-            <td class="text-center">{{ session.commands.all|length}}</td>
+            <td class="text-center">{{ session.id | get_session_command_amount }}</td>
             {% if session.is_finished %}
                 <td class="text-center">
                     <i class="fa fa-check text-navy"></i>

@@ -84,7 +84,7 @@ class StatusViewSet(viewsets.ModelViewSet):
         for session_data in self.request.data.get("sessions", []):
             self.create_or_update_session(session_data)
             if not session_data["is_finished"]:
-                sessions_active.append(session_data["uuid"])
+                sessions_active.append(session_data["id"])
 
         sessions_in_db_active = Session.objects.filter(
             is_finished=False,
@@ -92,15 +92,15 @@ class StatusViewSet(viewsets.ModelViewSet):
         )
 
         for session in sessions_in_db_active:
-            if str(session.uuid) not in sessions_active:
+            if str(session.id) not in sessions_active:
                 session.is_finished = True
                 session.date_end = timezone.now()
                 session.save()
 
     def create_or_update_session(self, session_data):
         session_data["terminal"] = self.request.user.terminal.id
-        _uuid = session_data["uuid"]
-        session = get_object_or_none(Session, uuid=_uuid)
+        _id = session_data["id"]
+        session = get_object_or_none(Session, id=_id)
         if session:
             serializer = SessionSerializer(
                 data=session_data, instance=session
@@ -210,7 +210,7 @@ class CommandViewSet(viewsets.ViewSet):
     permission_classes = (IsSuperUserOrAppUser,)
 
     def get_queryset(self):
-        self.command_store.all()
+        self.command_store.filter(**dict(self.request.data))
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, many=True)
@@ -221,7 +221,6 @@ class CommandViewSet(viewsets.ViewSet):
             else:
                 return Response("save error", status=500)
         else:
-            print(serializer.errors)
             return Response({"msg": "Not valid: {}".format(serializer.errors)}, status=401)
 
     def list(self, request, *args, **kwargs):

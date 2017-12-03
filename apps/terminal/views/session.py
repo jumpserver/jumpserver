@@ -21,7 +21,10 @@ from ..backends import get_command_store
 
 __all__ = [
     'SessionOnlineListView', 'SessionOfflineListView',
+    'SessionDetailView',
 ]
+
+command_store = get_command_store()
 
 
 class SessionListView(AdminUserRequiredMixin, ListView):
@@ -101,6 +104,7 @@ class SessionOnlineListView(SessionListView):
 
     def get_context_data(self, **kwargs):
         context = {
+            'app': _('Terminal'),
             'action': _('Session online list'),
         }
         kwargs.update(context)
@@ -117,10 +121,26 @@ class SessionOfflineListView(SessionListView):
 
     def get_context_data(self, **kwargs):
         context = {
+            'app': _('Terminal'),
             'action': _('Session offline list'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
 
+class SessionDetailView(SingleObjectMixin, ListView):
+    template_name = 'terminal/session_detail.html'
+    model = Session
+
+    def get_queryset(self):
+        self.object = self.get_object(self.model.objects.all())
+        return command_store.filter(session=self.object.id)
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Terminal'),
+            'action': _('Session detail'),
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
 

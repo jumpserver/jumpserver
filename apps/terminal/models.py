@@ -86,7 +86,7 @@ class Session(models.Model):
         ('WT', 'Web Terminal'),
     )
 
-    uuid = models.UUIDField(default=uuid.uuid4, db_index=True)
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_("User"))
     asset = models.CharField(max_length=1024, verbose_name=_("Asset"))
     system_user = models.CharField(max_length=128, verbose_name=_("System User"))
@@ -126,3 +126,4 @@ class Command(AbstractSessionCommand):
 
     class Meta:
         db_table = "terminal_command"
+        ordering = ('timestamp',)

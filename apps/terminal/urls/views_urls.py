@@ -19,4 +19,5 @@ urlpatterns = [
     # Session view
     url(r'^session/online/$', views.SessionOnlineListView.as_view(), name='session-online-list'),
     url(r'^session/offline$', views.SessionOfflineListView.as_view(), name='session-offline-list'),
+    url(r'^session/(?P<pk>[0-9a-zA-Z\-]+)/$', views.SessionDetailView.as_view(), name='session-detail'),
 ]

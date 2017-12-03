@@ -22,7 +22,7 @@
                         <div class="col-sm-11" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span style="float: left">{% trans 'Command log list' %} <b>{{ user_object.name }}</b></span>
+                                    <span style="float: left">{% trans 'Command list' %} <b></b></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -43,17 +43,21 @@
                                         <tr>
                                             <th data-toggle="true">ID</th>
                                             <th>Command</th>
-                                            <th data-hide="all">Output</th>
+                                            <th data-hide="all"></th>
                                             <th>Datetime</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                         {% for command in object_list %}
                                             <tr>
-                                                <td>{{ command.command_no }}</td>
-                                                <td>{{ command.command }}</td>
-                                                <td><pre style="border: none;background: none">{{ command.output|to_html|safe}}</pre></td>
+                                                <td>{{ forloop.counter }}</td>
+                                                <td>{{ command.input }}</td>
+                                                <td><pre style="border: none;background: none">{{ command.output }}</pre></td>
                                                 <td>{{ command.timestamp|ts_to_date}}</td>
+                                            </tr>
+                                        {% empty %}
+                                            <tr>
+                                                <td colspan="3">{% trans "There is no command about this session" %}</td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>

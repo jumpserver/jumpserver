@@ -37,27 +37,26 @@ class CommandStore(CommandBase):
             ))
         return self.model.objects.bulk_create(_commands)
 
-    def filter(self, date_from=None, date_to=None, user=None,
-               asset=None, system_user=None, _input=None, session=None):
+    def filter(self, date_from=None, date_to=None,
+               user=None, asset=None, system_user=None,
+               input=None, session=None):
         filter_kwargs = {}
+        date_from_default = timezone.now() - datetime.timedelta(days=7)
+        date_to_default = timezone.now()
 
-        if date_from:
-            filter_kwargs['timestamp__gte'] = int(date_from.timestamp())
-        else:
-            week_ago = timezone.now() - datetime.timedelta(days=7)
-            filter_kwargs['timestamp__gte'] = int(week_ago.timestamp())
-        if date_to:
-            filter_kwargs['timestamp__lte'] = int(date_to.timestamp())
-        else:
-            filter_kwargs['timestamp__lte'] = int(timezone.now().timestamp())
+        date_from = date_from if date_from else date_from_default
+        date_to = date_to if date_to else date_to_default
+        filter_kwargs['timestamp__gte'] = int(date_from.timestamp())
+        filter_kwargs['timestamp__lte'] = int(date_to.timestamp())
+
         if user:
-            filter_kwargs['user'] = user
+            filter_kwargs["user"] = user
         if asset:
             filter_kwargs['asset'] = asset
         if system_user:
             filter_kwargs['system_user'] = system_user
-        if _input:
-            filter_kwargs['input__icontains'] = _input
+        if input:
+            filter_kwargs['input__icontains'] = input
         if session:
             filter_kwargs['session'] = session
 

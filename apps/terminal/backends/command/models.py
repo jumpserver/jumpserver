@@ -11,7 +11,7 @@ class AbstractSessionCommand(models.Model):
     asset = models.CharField(max_length=128, verbose_name=_("Asset"))
     system_user = models.CharField(max_length=64, verbose_name=_("System user"))
     input = models.CharField(max_length=128, db_index=True, verbose_name=_("Input"))
-    output = models.CharField(max_length=1024, verbose_name=_("Output"))
+    output = models.CharField(max_length=1024, blank=True, verbose_name=_("Output"))
     session = models.CharField(max_length=36, db_index=True, verbose_name=_("Session"))
     timestamp = models.IntegerField(db_index=True)
 
