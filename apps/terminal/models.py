@@ -94,7 +94,7 @@ class Session(models.Model):
     is_finished = models.BooleanField(default=False)
     has_replay = models.BooleanField(default=False, verbose_name=_("Replay"))
     has_command = models.BooleanField(default=False, verbose_name=_("Command"))
-    terminal = models.UUIDField(null=True, verbose_name=_("Terminal"))
+    terminal = models.ForeignKey(Terminal, null=True, on_delete=models.CASCADE)
     date_start = models.DateTimeField(verbose_name=_("Date Start"))
     date_end = models.DateTimeField(verbose_name=_("Date End"), null=True)
 
@@ -106,8 +106,12 @@ class Session(models.Model):
 
 
 class Task(models.Model):
+    NAME_CHOICES = (
+        ("kill_session", "Kill Session"),
+    )
+
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=128, verbose_name=_("Name"))
+    name = models.CharField(max_length=128, choices=NAME_CHOICES, verbose_name=_("Name"))
     args = models.CharField(max_length=1024, verbose_name=_("Task Args"))
     terminal = models.ForeignKey(Terminal, null=True, on_delete=models.CASCADE)
     is_finished = models.BooleanField(default=False)

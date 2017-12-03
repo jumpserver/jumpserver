@@ -35,21 +35,21 @@ class TerminalSerializer(serializers.ModelSerializer):
             return False
 
 
-class TerminalSessionSerializer(serializers.ModelSerializer):
+class SessionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Session
         fields = '__all__'
 
 
-class TerminalStatusSerializer(serializers.ModelSerializer):
+class StatusSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = '__all__'
         model = Status
 
 
-class TerminalTaskSerializer(serializers.ModelSerializer):
+class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         fields = '__all__'

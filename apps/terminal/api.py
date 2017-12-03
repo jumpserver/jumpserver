@@ -16,8 +16,8 @@ from django.conf import settings
 
 from common.utils import get_object_or_none
 from .models import Terminal, Status, Session, Task
-from .serializers import TerminalSerializer, TerminalStatusSerializer, \
-    TerminalSessionSerializer, TerminalTaskSerializer
+from .serializers import TerminalSerializer, StatusSerializer, \
+    SessionSerializer, TaskSerializer
 from .hands import IsSuperUserOrAppUser, IsAppUser, ProxyLog, \
     IsSuperUserOrAppUserOrUserReadonly
 from .backends import get_command_store, get_replay_store, SessionCommandSerializer
@@ -64,47 +64,57 @@ class TerminalViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
 
-class TerminalStatusViewSet(viewsets.ModelViewSet):
+class StatusViewSet(viewsets.ModelViewSet):
     queryset = Status.objects.all()
-    serializer_class = TerminalStatusSerializer
+    serializer_class = StatusSerializer
     permission_classes = (IsSuperUserOrAppUser,)
-    session_serializer_class = TerminalSessionSerializer
+    session_serializer_class = SessionSerializer
+    task_serializer_class = TaskSerializer
 
     def create(self, request, *args, **kwargs):
         self.handle_sessions()
-        return super().create(request, *args, **kwargs)
+        super().create(request, *args, **kwargs)
+        tasks = self.request.user.terminal.task_set.filter(is_finished=False)
+        serializer = self.task_serializer_class(tasks, many=True)
+        return Response(serializer.data, status=201)
 
     def handle_sessions(self):
         sessions_active = []
+
         for session_data in self.request.data.get("sessions", []):
-            session_data["terminal"] = self.request.user.terminal.id
-            _uuid = session_data["uuid"]
-            session = get_object_or_none(Session, uuid=_uuid)
-            if session:
-                serializer = TerminalSessionSerializer(
-                    data=session_data, instance=session
-                )
-            else:
-                serializer = TerminalSessionSerializer(data=session_data)
-
-            if serializer.is_valid():
-                serializer.save()
-            else:
-                msg = "session data is not valid {}".format(serializer.errors)
-                logger.error(msg)
-
+            self.create_or_update_session(session_data)
             if not session_data["is_finished"]:
-                sessions_active.append(session_data["id"])
+                sessions_active.append(session_data["uuid"])
 
         sessions_in_db_active = Session.objects.filter(
-            is_finished=False, terminal=self.request.user.terminal.id
+            is_finished=False,
+            terminal=self.request.user.terminal.id
         )
 
         for session in sessions_in_db_active:
-            if str(session.id) not in sessions_active:
+            if str(session.uuid) not in sessions_active:
                 session.is_finished = True
                 session.date_end = timezone.now()
                 session.save()
+
+    def create_or_update_session(self, session_data):
+        session_data["terminal"] = self.request.user.terminal.id
+        _uuid = session_data["uuid"]
+        session = get_object_or_none(Session, uuid=_uuid)
+        if session:
+            serializer = SessionSerializer(
+                data=session_data, instance=session
+            )
+        else:
+            serializer = SessionSerializer(data=session_data)
+
+        if serializer.is_valid():
+            session = serializer.save()
+            return session
+        else:
+            msg = "session data is not valid {}".format(serializer.errors)
+            logger.error(msg)
+            return None
 
     def get_queryset(self):
         terminal_id = self.kwargs.get("terminal", None)
@@ -123,9 +133,9 @@ class TerminalStatusViewSet(viewsets.ModelViewSet):
         return super().get_permissions()
 
 
-class TerminalSessionViewSet(viewsets.ModelViewSet):
+class SessionViewSet(viewsets.ModelViewSet):
     queryset = Session.objects.all()
-    serializers_class = TerminalSessionSerializer
+    serializers_class = SessionSerializer
     permission_classes = (IsSuperUserOrAppUser,)
 
     def get_queryset(self):
@@ -136,21 +146,21 @@ class TerminalSessionViewSet(viewsets.ModelViewSet):
         return self.queryset
 
 
-class TerminalTaskViewSet(viewsets.ModelViewSet):
+class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
-    serializer_class = TerminalTaskSerializer
+    serializer_class = TaskSerializer
     permission_classes = (IsSuperUserOrAppUser,)
 
-    def get_queryset(self):
-        terminal_id = self.kwargs.get("terminal", None)
-        if terminal_id:
-            terminal = get_object_or_404(Terminal, id=terminal_id)
-            self.queryset = terminal.status_set.all()
-
-        if hasattr(self.request.user, "terminal"):
-            terminal = self.request.user.terminal
-            self.queryset = terminal.terminalstatus_set.all()
-        return self.queryset
+    # def get_queryset(self):
+    #     terminal_id = self.kwargs.get("terminal", None)
+    #     if terminal_id:
+    #         terminal = get_object_or_404(Terminal, id=terminal_id)
+    #         self.queryset = terminal.status_set.all()
+    #
+    #     if hasattr(self.request.user, "terminal"):
+    #         terminal = self.request.user.terminal
+    #         self.queryset = terminal.status_set.all()
+    #     return self.queryset
 
 
 class SessionReplayAPI(APIView):
@@ -182,7 +192,7 @@ class SessionReplayAPI(APIView):
         return Response({"session_id": session.id}, status=201)
 
 
-class SessionCommandViewSet(viewsets.ViewSet):
+class CommandViewSet(viewsets.ViewSet):
     """接受app发送来的command log, 格式如下
     {
         "user": "admin",
