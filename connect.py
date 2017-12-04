@@ -331,7 +331,7 @@ class SshTty(Tty):
                                 if msg.errno == errno.EAGAIN:
                                     continue
                         now_timestamp = time.time()
-                        termlog.write(x)
+                        #termlog.write(x)
                         termlog.recoder = False
                         log_time_f.write('%s %s\n' % (round(now_timestamp-pre_timestamp, 4), len(x)))
                         log_time_f.flush()
