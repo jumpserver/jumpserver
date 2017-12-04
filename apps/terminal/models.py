@@ -100,6 +100,7 @@ class Session(models.Model):
 
     class Meta:
         db_table = "terminal_session"
+        ordering = ["-date_start"]
 
     def __str__(self):
         return "{0.id} of {0.user} to {0.asset}".format(self)
@@ -126,4 +127,4 @@ class Command(AbstractSessionCommand):
 
     class Meta:
         db_table = "terminal_command"
-        ordering = ('timestamp',)
+        ordering = ('-timestamp',)

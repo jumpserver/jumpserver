@@ -1,6 +1,7 @@
 {% extends '_base_list.html' %}
 {% load i18n %}
 {% load static %}
+{% load terminal_tags %}
 {% block content_left_head %}
     <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
     <style>
@@ -22,18 +23,18 @@
             </div>
         </div>
         <div class="input-group">
-            <select class="select2 form-control" name="username">
+            <select class="select2 form-control" name="user">
                 <option value="">{% trans 'User' %}</option>
                 {% for u in user_list %}
-                    <option value="{{ u }}" {% if u == username %} selected {% endif %}>{{ u }}</option>
+                    <option value="{{ u }}" {% if u == user %} selected {% endif %}>{{ u }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="input-group">
-            <select class="select2 form-control" name="ip">
+            <select class="select2 form-control" name="asset">
                 <option value="">{% trans 'Asset' %}</option>
                 {% for a in asset_list %}
-                    <option value="{{ a }}" {% if a == ip %} selected {% endif %}>{{ a }}</option>
+                    <option value="{{ a }}" {% if a == asset %} selected {% endif %}>{{ a }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -45,9 +46,9 @@
                 {% endfor %}
             </select>
         </div>
-        <div class="input-group">
-            <input type="text" class="form-control input-sm" name="keyword" placeholder="Keyword" value="{{ keyword }}">
-        </div>
+{#        <div class="input-group">#}
+{#            <input type="text" class="form-control input-sm" name="keyword" placeholder="Keyword" value="{{ keyword }}">#}
+{#        </div>#}
         <div class="input-group">
             <div class="input-group-btn">
                 <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
@@ -66,64 +67,48 @@
     <th class="text-center">{% trans 'System user' %}</th>
     <th class="text-center">{% trans 'Terminal' %}</th>
     <th class="text-center">{% trans 'Command' %}</th>
-    <th class="text-center">{% trans 'Success' %}</th>
-    <th class="text-center">{% trans 'Finished' %}</th>
-    <th class="text-center">{% trans 'Play' %}</th>
     <th class="text-center">{% trans 'Date start' %}</th>
-    <th class="text-center">{% trans 'Time' %}</th>
+    <th class="text-center">{% trans 'Duration' %}</th>
+    <th class="text-center">{% trans 'Action' %}</th>
 {% endblock %}
 
 {% block table_body %}
-    {% for proxy_log in proxy_log_list %}
+    {% for session in session_list %}
         <tr class="gradeX">
-            <td class="text-center"><input type="checkbox" class="cbx-term" value="{{ proxy_log.id }}"></td>
+            <td class="text-center"><input type="checkbox" class="cbx-term" value="{{ session.id }}"></td>
             <td class="text-center">
-                <a href="{% url 'audits:proxy-log-detail' pk=proxy_log.id %}">{{ proxy_log.id }}</a>
+                <a href="{% url 'terminal:session-detail' pk=session.id %}">{{ forloop.counter }}</a>
             </td>
-            <td class="text-center">{{ proxy_log.user }}</td>
-            <td class="text-center">{{ proxy_log.asset }}</td>
-            <td class="text-center">{{ proxy_log.system_user }}</td>
-            <td class="text-center">{{ proxy_log.terminal }}</td>
-            <td class="text-center">{{ proxy_log.commands.all|length}}</td>
-            <td class="text-center">
-            {% if proxy_log.is_failed %}
-                <i class="fa fa-times text-danger"></i>
-            {% else %}
-                <i class="fa fa-check text-navy"></i>
-            {% endif %}
+            <td class="text-center">{{ session.user }}</td>
+            <td class="text-center">{{ session.asset }}</td>
+            <td class="text-center">{{ session.system_user }}</td>
+            <td class="text-center">{{ session.terminal.name }}</td>
+            <td class="text-center">{{ session.id | get_session_command_amount }}</td>
+
+            <td class="text-center">{{ session.date_start }}</td>
+            <td class="text-center">{{ session.date_end|default_if_none:now|timeuntil:session.date_start }}</td>
+            <td>
+                {% if session.is_finished %}
+                <a href="" class="btn btn-xs btn-warning btn-replay" >{% trans "Replay" %}</a>
+                {% else %}
+                <a class="btn btn-xs btn-warning btn-monitor" >{% trans "Monitor" %}</a>
+                <a class="btn btn-xs btn-danger btn-term" value="{{ session.id }}" terminal="{{ session.terminal.id }}" >{% trans "Terminate" %}</a>
+                {% endif %}
             </td>
-            {% if proxy_log.is_finished %}
-                <td class="text-center">
-                    <i class="fa fa-check text-navy"></i>
-                </td>
-                <td class="text-center">
-                    <a><span class="text-navy"><i class="fa fa-play-circle"></i></span></a>
-                </td>
-            {% else %}
-                <td class="text-center">
-                    <a class="btn-term" value="{{ proxy_log.id }}"><i class="fa fa-times text-danger"></i></a>
-                </td>
-                <td class="text-center">
-                    <a><span class="text-danger"><i class="fa fa-eye"></i></span></a>
-                </td>
-            {% endif %}
-            <td class="text-center">{{ proxy_log.date_start }}</td>
-            <td class="text-center">{{ proxy_log.date_finished|timeuntil:proxy_log.date_start }}</td>
         </tr>
     {% endfor %}
 {% endblock %}
 
-
 {% block custom_foot_js %}
     <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
     <script>
-        function terminateConnection(data) {
+        function terminateSession(data) {
             function success() {
                 window.setTimeout(function () {
                     window.location.reload()
                 }, 300)
             }
-            var the_url = "";
+            var the_url = "{% url 'api-terminal:tasks-list' %}";
             APIUpdateAttr({url: the_url, method: 'POST', body: JSON.stringify(data), success: success, success_message: 'Terminate success'});
         }
         $(document).ready(function() {
@@ -142,17 +127,20 @@
             });
         }).on('click', '.btn-term', function () {
             var $this = $(this);
-            var proxy_log_id = $this.attr('value');
+            var session_id = $this.attr('value');
+            var terminal_id = $this.attr('terminal');
             var data = {
-                proxy_log_id: proxy_log_id
+                name: "kill_session",
+                args: session_id,
+                terminal: terminal_id
             };
-            terminateConnection(data)
+            terminateSession(data)
         }).on('click', '#btn_bulk_update', function () {
             var data = [];
             $('.cbx-term:checked').each(function () {
                 data.push({proxy_log_id: $(this).attr('value')})
             });
-            terminateConnection(data)
+            terminateSession(data)
         })
     </script>
 {% endblock %}

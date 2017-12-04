@@ -9,6 +9,5 @@ command_store = get_command_store()
 
 @register.filter
 def get_session_command_amount(session_id):
-    print(session_id)
     return len(command_store.filter(session=str(session_id)))
 

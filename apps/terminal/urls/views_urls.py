@@ -17,7 +17,11 @@ urlpatterns = [
     url(r'^(?P<pk>[0-9a-zA-Z\-]+)/accept/$', views.TerminalAcceptView.as_view(), name='terminal-accept'),
 
     # Session view
-    url(r'^session/online/$', views.SessionOnlineListView.as_view(), name='session-online-list'),
-    url(r'^session/offline$', views.SessionOfflineListView.as_view(), name='session-offline-list'),
+    url(r'^session-online/$', views.SessionOnlineListView.as_view(), name='session-online-list'),
+    url(r'^session-offline/$', views.SessionOfflineListView.as_view(), name='session-offline-list'),
     url(r'^session/(?P<pk>[0-9a-zA-Z\-]+)/$', views.SessionDetailView.as_view(), name='session-detail'),
+
+    # Command view
+    url(r'^command/$', views.CommandListView.as_view(), name='command-list'),
+
 ]

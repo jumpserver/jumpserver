@@ -26,7 +26,7 @@
             <select class="select2 form-control" name="username">
                 <option value="">{% trans 'User' %}</option>
                 {% for u in user_list %}
-                    <option value="{{ u.username }}" {% if username == u.username %} selected {% endif %}>{{ u.username }}</option>
+                    <option value="{{ u }}" {% if user == u %} selected {% endif %}>{{ u }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -34,7 +34,7 @@
             <select class="select2 form-control" name="ip">
                 <option value="">{% trans 'Asset' %}</option>
                 {% for a in asset_list %}
-                    <option value="{{ a.ip }}" {% if ip == a.ip %} selected {% endif %}>{{ a.ip }}</option>
+                    <option value="{{ a }}" {% if a == asset %} selected {% endif %}>{{ a }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -42,7 +42,7 @@
             <select class="select2 form-control" name="system_user">
                 <option value="">{% trans 'System user' %}</option>
                 {% for s in system_user_list %}
-                    <option value="{{ s.username }}" {% if s.username == system_user %} selected {% endif %}>{{ s.username }}</option>
+                    <option value="{{ s }}" {% if s == system_user %} selected {% endif %}>{{ s }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -67,22 +67,22 @@
             <th>Username</th>
             <th>IP</th>
             <th>System user</th>
-            <th>Proxy log</th>
+            <th>Session</th>
             <th>Datetime</th>
-            <th data-hide="all">Output</th>
+            <th data-hide="all"></th>
         </tr>
         </thead>
         <tbody>
         {% for command in command_list %}
             <tr>
-                <td>{{ command.id }}</td>
-                <td>{{ command.command }}</td>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ command.input }}</td>
                 <td>{{ command.user }}</td>
                 <td>{{ command.asset }}</td>
                 <td>{{ command.system_user }}</td>
-                <td><a href="{% url 'audits:proxy-log-detail' pk=command.proxy_log_id  %}">{{ command.proxy_log_id}}</a></td>
+                <td><a href="{% url 'terminal:session-detail' pk=command.session %}">{% trans "Goto" %}</a></td>
                 <td>{{ command.timestamp|ts_to_date }}</td>
-                <td><pre style="border: none; background: none">{{ command.output|to_html|safe }}</pre></td>
+                <td><pre style="border: none; background: none">{{ command.output }}</pre></td>
             </tr>
         {% endfor %}
         </tbody>

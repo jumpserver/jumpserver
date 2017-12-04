@@ -41,8 +41,9 @@
     </a>
     <ul class="nav nav-second-level">
         <li id="terminal"><a href="{% url 'terminal:terminal-list' %}">{% trans 'Terminal' %}</a></li>
-        <li id="session"><a href="{% url 'terminal:session-online-list' %}">{% trans 'Session' %}</a></li>
-        <li id="command"><a href="">{% trans 'Command' %}</a></li>
+        <li id="session-online"><a href="{% url 'terminal:session-online-list' %}">{% trans 'Session online' %}</a></li>
+        <li id="session-offline"><a href="{% url 'terminal:session-offline-list' %}">{% trans 'Session offline' %}</a></li>
+        <li id="command"><a href="{% url 'terminal:command-list' %}">{% trans 'Command' %}</a></li>
     </ul>
 </li>
 

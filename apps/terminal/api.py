@@ -219,7 +219,7 @@ class CommandViewSet(viewsets.ViewSet):
             if ok:
                 return Response("ok", status=201)
             else:
-                return Response("save error", status=500)
+                return Response("Save error", status=500)
         else:
             return Response({"msg": "Not valid: {}".format(serializer.errors)}, status=401)
 
