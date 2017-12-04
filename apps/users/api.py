@@ -9,7 +9,7 @@ from rest_framework_bulk import BulkModelViewSet
 from django_filters.rest_framework import DjangoFilterBackend
 
 from . import serializers
-from .hands import write_login_log_async
+from .tasks import write_login_log_async
 from .models import User, UserGroup
 from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly
 from .utils import check_user_valid, generate_token

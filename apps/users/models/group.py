@@ -24,9 +24,8 @@ class UserGroup(NoDeleteModelMixin):
                                         verbose_name=_('Date created'))
     created_by = models.CharField(max_length=100)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
-    __str__ = __unicode__
 
     def delete(self, using=None, keep_parents=False):
         if self.name != 'Default':

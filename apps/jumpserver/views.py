@@ -6,70 +6,146 @@ from django.shortcuts import redirect
 
 from users.models import User
 from assets.models import Asset
-from audits.models import ProxyLog
+from terminal.models import Session
 
 
 class IndexView(LoginRequiredMixin, TemplateView):
     template_name = 'index.html'
+
+    session_week = None
+    session_month = None
+    session_month_dates = []
+    session_month_dates_archive = []
 
     def get(self, request, *args, **kwargs):
         if not request.user.is_superuser:
             return redirect('assets:user-asset-list')
         return super(IndexView, self).get(request, *args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        seven_days_ago = timezone.now() - timezone.timedelta(days=7)
-        month_ago = timezone.now() - timezone.timedelta(days=30)
-        proxy_log_seven_days = ProxyLog.objects.filter(date_start__gt=seven_days_ago, is_failed=False)
-        proxy_log_month = ProxyLog.objects.filter(date_start__gt=month_ago, is_failed=False)
-        month_dates = proxy_log_month.dates('date_start', 'day')
-        month_total_visit = [ProxyLog.objects.filter(date_start__date=d) for d in month_dates]
-        month_str = [d.strftime('%m-%d') for d in month_dates] or ['0']
-        month_total_visit_count = [p.count() for p in month_total_visit] or [0]
-        month_user = [p.values('user').distinct().count() for p in month_total_visit] or [0]
-        month_asset = [p.values('asset').distinct().count() for p in month_total_visit] or [0]
-        month_user_active = User.objects.filter(last_login__gt=month_ago).count()
-        month_user_inactive = User.objects.filter(last_login__lt=month_ago).count()
-        month_user_disabled = User.objects.filter(is_active=False).count()
-        month_asset_active = proxy_log_month.values('asset').distinct().count()
-        month_asset_inactive = Asset.objects.all().count() - month_asset_active
-        month_asset_disabled = Asset.objects.filter(is_active=False).count()
-        week_asset_hot_ten = list(proxy_log_seven_days.values('asset').annotate(total=Count('asset')).order_by('-total')[:10])
-        for p in week_asset_hot_ten:
-            last_login = ProxyLog.objects.filter(asset=p['asset']).order_by('date_start').last()
-            p['last'] = last_login
-        last_login_ten = ProxyLog.objects.all().order_by('-date_start')[:10]
-        for p in last_login_ten:
+    @staticmethod
+    def get_user_count():
+        return User.objects.filter(role__in=('Admin', 'User')).count()
+
+    @staticmethod
+    def get_asset_count():
+        return Asset.objects.all().count()
+
+    @staticmethod
+    def get_online_user_count():
+        return len(set(Session.objects.filter(is_finished=False).values_list('user', flat=True)))
+
+    @staticmethod
+    def get_online_session_count():
+        return Session.objects.filter(is_finished=False).count()
+
+    def get_top5_user_a_week(self):
+        return self.session_week.values('user').annotate(total=Count('user')).order_by('-total')[:5]
+
+    def get_week_login_user_count(self):
+        return self.session_week.values('user').distinct().count()
+
+    def get_week_login_asset_count(self):
+        return self.session_week.values('asset').distinct().count()
+
+    def get_month_day_metrics(self):
+        month_str = [d.strftime('%m-%d') for d in self.session_month_dates] or ['0']
+        return month_str
+
+    def get_month_login_metrics(self):
+        return [self.session_month.filter(date_start__date=d).count()
+                for d in self.session_month_dates]
+
+    def get_month_active_user_metrics(self):
+        if self.session_month_dates_archive:
+            return [q.values('user').distinct().count()
+                    for q in self.session_month_dates_archive]
+        else:
+            return [0]
+
+    def get_month_active_asset_metrics(self):
+        if self.session_month_dates_archive:
+            return [q.values('asset').distinct().count()
+                    for q in self.session_month_dates_archive]
+        else:
+            return [0]
+
+    def get_month_active_user_total(self):
+        return self.session_month.values('user').distinct().count()
+
+    def get_month_inactive_user_total(self):
+        return User.objects.all().count() - self.get_month_active_user_total()
+
+    def get_month_active_asset_total(self):
+        return self.session_month.values('asset').distinct().count()
+
+    def get_month_inactive_asset_total(self):
+        return Asset.objects.all().count() - self.get_month_active_asset_total()
+
+    @staticmethod
+    def get_user_disabled_total():
+        return User.objects.filter(is_active=False).count()
+
+    @staticmethod
+    def get_asset_disabled_total():
+        return Asset.objects.filter(is_active=False).count()
+
+    def get_week_top10_asset(self):
+        assets = list(self.session_week.values('asset').annotate(total=Count('asset')).order_by('-total')[:10])
+        for asset in assets:
+            last_login = self.session_week.filter(asset=asset["asset"]).order_by('date_start').last()
+            asset['last'] = last_login
+            print(asset)
+        return assets
+
+    def get_week_top10_user(self):
+        users = list(self.session_week.values('user').annotate(
+            total=Count('asset')).order_by('-total')[:10])
+        for user in users:
+            last_login = self.session_week.filter(user=user["user"]).order_by('date_start').last()
+            user['last'] = last_login
+        return users
+
+    def get_last10_sessions(self):
+        sessions = self.session_week.order_by('-date_start')[:10]
+        for session in sessions:
             try:
-                p.avatar_url = User.objects.get(username=p.user).avatar_url()
+                session.avatar_url = User.objects.get(username=session.user).avatar_url()
             except User.DoesNotExist:
-                p.avatar_url = User.objects.first().avatar_url()
-        week_user_hot_ten = list(proxy_log_seven_days.values('user').annotate(total=Count('user')).order_by('-total')[:10])
-        for p in week_user_hot_ten:
-            last_login = ProxyLog.objects.filter(user=p['user']).order_by('date_start').last()
-            p['last'] = last_login
+                session.avatar_url = User.objects.first().avatar_url()
+        return sessions
+
+    def get_context_data(self, **kwargs):
+        week_ago = timezone.now() - timezone.timedelta(weeks=1)
+        month_ago = timezone.now() - timezone.timedelta(days=30)
+        self.session_week = Session.objects.filter(date_start__gt=week_ago)
+        self.session_month = Session.objects.filter(date_start__gt=month_ago)
+        self.session_month_dates = self.session_month.dates('date_start', 'day')
+        self.session_month_dates_archive = [
+            self.session_month.filter(date_start__date=d)
+            for d in self.session_month_dates
+        ]
 
         context = {
-            'assets_count': Asset.objects.count(),
-            'users_count': User.objects.filter(role__in=('Admin', 'User')).count(),
-            'online_user_count': ProxyLog.objects.filter(is_finished=False).values('user').distinct().count(),
-            'online_asset_count': ProxyLog.objects.filter(is_finished=False).values('asset').distinct().count(),
-            'user_visit_count_weekly': proxy_log_seven_days.values('user').distinct().count(),
-            'asset_visit_count_weekly': proxy_log_seven_days.count(),
-            'user_visit_count_top_five': proxy_log_seven_days.values('user').annotate(total=Count('user')).order_by('-total')[:5],
-            'month_str': month_str,
-            'month_total_visit_count': month_total_visit_count,
-            'month_user': month_user,
-            'mouth_asset': month_asset,
-            'month_user_active': month_user_active,
-            'month_user_inactive': month_user_inactive,
-            'month_user_disabled': month_user_disabled,
-            'month_asset_active': month_asset_active,
-            'month_asset_inactive': month_asset_inactive,
-            'month_asset_disabled': month_asset_disabled,
-            'week_asset_hot_ten': week_asset_hot_ten,
-            'last_login_ten': last_login_ten,
-            'week_user_hot_ten': week_user_hot_ten,
+            'assets_count': self.get_asset_count(),
+            'users_count': self.get_user_count(),
+            'online_user_count': self.get_online_user_count(),
+            'online_asset_count': self.get_online_session_count(),
+            'user_visit_count_weekly': self.get_week_login_user_count(),
+            'asset_visit_count_weekly': self.get_week_login_asset_count(),
+            'user_visit_count_top_five': self.get_top5_user_a_week(),
+            'month_str': self.get_month_day_metrics(),
+            'month_total_visit_count': self.get_month_login_metrics(),
+            'month_user': self.get_month_active_user_metrics(),
+            'mouth_asset': self.get_month_active_asset_metrics(),
+            'month_user_active': self.get_month_active_user_total(),
+            'month_user_inactive': self.get_month_inactive_user_total(),
+            'month_user_disabled': self.get_user_disabled_total(),
+            'month_asset_active': self.get_month_active_asset_total(),
+            'month_asset_inactive': self.get_month_inactive_asset_total(),
+            'month_asset_disabled': self.get_asset_disabled_total(),
+            'week_asset_hot_ten': self.get_week_top10_asset(),
+            'last_login_ten': self.get_last10_sessions(),
+            'week_user_hot_ten': self.get_week_top10_user(),
         }
 
         kwargs.update(context)

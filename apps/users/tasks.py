@@ -1,6 +1,5 @@
-#!/usr/bin/env python
-# ~*~ coding: utf-8 ~*~
-# 
+# -*- coding: utf-8 -*-
+#
 
 from celery import shared_task
 from .utils import write_login_log

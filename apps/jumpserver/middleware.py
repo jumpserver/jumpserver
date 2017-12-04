@@ -9,7 +9,7 @@ from django.shortcuts import HttpResponse
 
 
 DEMO_MODE = os.environ.get("DEMO_MODE", "")
-SAFE_URL = r'^/users/login|^/api/terminal/v1/.*|/api/audits/.*|/api/users/v1/auth/|/api/users/v1/profile/'
+SAFE_URL = r'^/users/login|^/api/terminal/v1/.*|/api/terminal/.*|/api/users/v1/auth/|/api/users/v1/profile/'
 
 
 class TimezoneMiddleware(MiddlewareMixin):

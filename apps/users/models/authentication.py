@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
 from . import User
 
-__all__ = ['AccessKey', 'PrivateToken']
+__all__ = ['AccessKey', 'PrivateToken', 'LoginLog']
 
 
 class AccessKey(models.Model):
@@ -34,3 +34,22 @@ class PrivateToken(Token):
 
     class Meta:
         verbose_name = _('Private Token')
+
+
+class LoginLog(models.Model):
+    LOGIN_TYPE_CHOICE = (
+        ('W', 'Web'),
+        ('ST', 'SSH Terminal'),
+        ('WT', 'Web Terminal')
+    )
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    username = models.CharField(max_length=20, verbose_name=_('Username'))
+    type = models.CharField(choices=LOGIN_TYPE_CHOICE, max_length=2, verbose_name=_('Login type'))
+    ip = models.GenericIPAddressField(verbose_name=_('Login ip'))
+    city = models.CharField(max_length=254, blank=True, null=True, verbose_name=_('Login city'))
+    user_agent = models.CharField(max_length=254, blank=True, null=True, verbose_name=_('User agent'))
+    datetime = models.DateTimeField(auto_now_add=True, verbose_name=_('Date login'))
+
+    class Meta:
+        db_table = 'login_log'
+        ordering = ['-datetime', 'username']

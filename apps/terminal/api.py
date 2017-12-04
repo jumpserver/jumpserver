@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-import base64
 from collections import OrderedDict
 import copy
 import logging
-import tarfile
 
 import os
 from rest_framework import viewsets, serializers
@@ -18,7 +16,7 @@ from common.utils import get_object_or_none
 from .models import Terminal, Status, Session, Task
 from .serializers import TerminalSerializer, StatusSerializer, \
     SessionSerializer, TaskSerializer
-from .hands import IsSuperUserOrAppUser, IsAppUser, ProxyLog, \
+from .hands import IsSuperUserOrAppUser, IsAppUser, \
     IsSuperUserOrAppUserOrUserReadonly
 from .backends import get_command_store, get_replay_store, SessionCommandSerializer
 
@@ -221,7 +219,9 @@ class CommandViewSet(viewsets.ViewSet):
             else:
                 return Response("Save error", status=500)
         else:
-            return Response({"msg": "Not valid: {}".format(serializer.errors)}, status=401)
+            msg = "Not valid: {}".format(serializer.errors)
+            logger.error(msg)
+            return Response({"msg": msg}, status=401)
 
     def list(self, request, *args, **kwargs):
         queryset = list(self.command_store.all())

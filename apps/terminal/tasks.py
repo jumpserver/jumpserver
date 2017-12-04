@@ -13,6 +13,7 @@ ASSETS_CACHE_KEY = "terminal__session__assets"
 USERS_CACHE_KEY = "terminal__session__users"
 SYSTEM_USER_CACHE_KEY = "terminal__session__system_users"
 CACHE_REFRESH_INTERVAL = 10
+RUNNING = False
 
 
 # Todo: 定期清理上报history
@@ -46,7 +47,16 @@ def set_cache():
 
 
 def main():
+    global RUNNING
+    if RUNNING:
+        return
+    threads = []
     thread = threading.Thread(target=set_cache)
-    thread.start()
+    threads.append(thread)
+
+    for t in threads:
+        t.daemon = True
+        t.start()
+        RUNNING = True
 
 main()

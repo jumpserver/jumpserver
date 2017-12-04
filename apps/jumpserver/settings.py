@@ -59,7 +59,7 @@ INSTALLED_APPS = [
     'assets.apps.AssetsConfig',
     'perms.apps.PermsConfig',
     'ops.apps.OpsConfig',
-    'audits.apps.AuditsConfig',
+    # 'audits.apps.AuditsConfig',
     'common.apps.CommonConfig',
     'terminal.apps.ApplicationsConfig',
     'rest_framework',
@@ -364,7 +364,7 @@ CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 CAPTCHA_TEST_MODE = CONFIG.CAPTCHA_TEST_MODE
 
 COMMAND_STORE_BACKEND = 'terminal.backends.command.db'
-RECORD_STORE_BACKEND = 'terminal.backends.replay.db'
+REPLAY_STORE_BACKEND = 'terminal.backends.replay.db'
 
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html

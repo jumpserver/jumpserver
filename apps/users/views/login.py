@@ -21,7 +21,7 @@ from django.conf import settings
 from common.utils import get_object_or_none
 from ..models import User
 from ..utils import send_reset_password_mail
-from ..hands import write_login_log_async
+from ..tasks import write_login_log_async
 from .. import forms
 
 

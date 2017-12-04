@@ -3,7 +3,6 @@
 from django import template
 from django.utils import timezone
 from django.utils.html import escape
-from audits.backends import command_store
 
 register = template.Library()
 
@@ -70,6 +69,6 @@ def to_html(s):
     return escape(s).replace('\n', '<br />')
 
 
-@register.filter
-def proxy_log_commands(log_id):
-    return command_store.filter(proxy_log_id=log_id)
+# @register.filter
+# def proxy_log_commands(log_id):
+#     return 1

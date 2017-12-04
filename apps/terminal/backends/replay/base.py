@@ -2,7 +2,7 @@
 import abc
 
 
-class RecordBase(object):
+class ReplayBase(object):
     __metaclass__ = abc.ABCMeta
 
     @abc.abstractmethod
