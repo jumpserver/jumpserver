@@ -5,7 +5,9 @@ from django import forms
 from django.shortcuts import render
 from django.contrib.auth import login as auth_login, logout as auth_logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView
 from django.core.files.storage import default_storage
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
@@ -17,9 +19,10 @@ from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
 from formtools.wizard.views import SessionWizardView
 from django.conf import settings
+from django.utils import timezone
 
 from common.utils import get_object_or_none
-from ..models import User
+from ..models import User, LoginLog
 from ..utils import send_reset_password_mail
 from ..tasks import write_login_log_async
 from .. import forms
@@ -28,7 +31,7 @@ from .. import forms
 __all__ = ['UserLoginView', 'UserLogoutView',
            'UserForgotPasswordView', 'UserForgotPasswordSendmailSuccessView',
            'UserResetPasswordView', 'UserResetPasswordSuccessView',
-           'UserFirstLoginView']
+           'UserFirstLoginView', 'LoginLogListView']
 
 
 @method_decorator(sensitive_post_parameters(), name='dispatch')
@@ -48,10 +51,10 @@ class UserLoginView(FormView):
         auth_login(self.request, form.get_user())
         login_ip = self.request.META.get('REMOTE_ADDR', '')
         user_agent = self.request.META.get('HTTP_USER_AGENT', '')
-        write_login_log_async.delay(self.request.user.username,
-                                    self.request.user.name,
-                                    login_type='W', login_ip=login_ip,
-                                    user_agent=user_agent)
+        write_login_log_async.delay(
+            self.request.user.username, type='W',
+            ip=login_ip, user_agent=user_agent
+        )
         return redirect(self.get_success_url())
 
     def get_success_url(self):
@@ -202,3 +205,60 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
 
         form.instance = self.request.user
         return form
+
+
+class LoginLogListView(ListView):
+    template_name = 'users/login_log_list.html'
+    model = LoginLog
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    username = keyword = date_from_s = date_to_s = ""
+    date_format = '%m/%d/%Y'
+
+    def get_queryset(self):
+        date_to_default = timezone.now()
+        date_from_default = timezone.now() - timezone.timedelta(7)
+        date_to_default_s = date_to_default.strftime(self.date_format)
+        date_from_default_s = date_from_default.strftime(self.date_format)
+
+        self.username = self.request.GET.get('username', '')
+        self.keyword = self.request.GET.get("keyword", '')
+        self.date_from_s = self.request.GET.get('date_from', date_from_default_s)
+        self.date_to_s = self.request.GET.get('date_to', date_to_default_s)
+
+        self.queryset = super().get_queryset()
+        if self.username:
+            self.queryset = self.queryset.filter(username=self.username)
+        if self.date_from_s:
+            date_from = timezone.datetime.strptime(self.date_from_s, '%m/%d/%Y')
+            date_from = date_from.replace(
+                tzinfo=timezone.get_current_timezone()
+            )
+            self.queryset = self.queryset.filter(datetime__gt=date_from)
+        if self.date_to_s:
+            date_to = timezone.datetime.strptime(
+                self.date_to_s + ' 23:59:59', '%m/%d/%Y %H:%M:%S'
+            )
+            date_to = date_to.replace(
+                tzinfo=timezone.get_current_timezone()
+            )
+            self.queryset = self.queryset.filter(datetime__lt=date_to)
+        if self.keyword:
+            self.queryset = self.queryset.filter(
+                Q(ip__contains=self.keyword) |
+                Q(city__contains=self.keyword) |
+                Q(username__contains=self.keyword)
+            )
+        return self.queryset
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': _('Users'),
+            'action': _('Login log list'),
+            'date_from': self.date_from_s,
+            'date_to': self.date_to_s,
+            'username': self.username,
+            'keyword': self.keyword,
+            'user_list': set(LoginLog.objects.all().values_list('username', flat=True))
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)

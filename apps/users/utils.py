@@ -9,7 +9,7 @@ import requests
 import ipaddress
 from django.conf import settings
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login as auth_login
 from django.utils.translation import ugettext as _
 from django.core.cache import cache
 

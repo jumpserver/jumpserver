@@ -164,9 +164,8 @@ class UserAuthApi(APIView):
         if user:
             token = generate_token(request, user)
             write_login_log_async.delay(
-                user.username, name=user.name,
-                user_agent=user_agent, login_ip=login_ip,
-                login_type=login_type
+                user.username, ip=login_ip,
+                type=login_type, user_agent=user_agent,
             )
             return Response({'token': token, 'user': user.to_json()})
         else:

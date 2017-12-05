@@ -1,4 +1,4 @@
-Django>=1.11
+Django==1.11
 django-bootstrap3>=8.2.2
 Pillow>=4.1.0
 djangorestframework>=3.6.2

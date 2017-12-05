@@ -43,4 +43,7 @@ urlpatterns = [
     url(r'^user-group/(?P<pk>[0-9a-zA-Z\-]+)/asset-permission$', views.UserGroupAssetPermissionView.as_view(), name='user-group-asset-permission'),
     url(r'^user-group/(?P<pk>[0-9a-zA-Z\-]+)/asset-permission/create$', views.UserGroupAssetPermissionCreateView.as_view(), name='user-group-asset-permission-create'),
     url(r'^user-group/(?P<pk>[0-9a-zA-Z\-]+)/assets', views.UserGroupGrantedAssetView.as_view(), name='user-group-granted-asset'),
+
+    # Login log
+    url(r'^login-log/$', views.LoginLogListView.as_view(), name='login-log-list'),
 ]

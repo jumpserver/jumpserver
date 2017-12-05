@@ -94,7 +94,6 @@ class IndexView(LoginRequiredMixin, TemplateView):
         for asset in assets:
             last_login = self.session_week.filter(asset=asset["asset"]).order_by('date_start').last()
             asset['last'] = last_login
-            print(asset)
         return assets
 
     def get_week_top10_user(self):
