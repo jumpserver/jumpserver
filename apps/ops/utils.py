@@ -3,6 +3,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import json
+import re
 import time
 import uuid
 
@@ -41,16 +42,16 @@ def run_AdHoc(task_tuple, assets,
 
     runner = AdHocRunner(assets)
     if record:
-        from .models import Task
-        if not Task.objects.filter(uuid=task_id):
-            record = Task(uuid=task_id,
-                          name=task_name,
-                          assets=','.join(str(asset['id']) for asset in assets),
-                          module_args=task_tuple,
-                          pattern=pattern)
+        from .models import Playbook
+        if not Playbook.objects.filter(uuid=task_id):
+            record = Playbook(uuid=task_id,
+                              name=task_name,
+                              assets=','.join(str(asset['id']) for asset in assets),
+                              module_args=task_tuple,
+                              pattern=pattern)
             record.save()
         else:
-            record = Task.objects.get(uuid=task_id)
+            record = Playbook.objects.get(uuid=task_id)
             record.date_start = timezone.now()
             record.date_finished = None
             record.timedelta = None
@@ -76,3 +77,14 @@ def run_AdHoc(task_tuple, assets,
             record.is_success = False
         record.save()
     return summary, result
+
+
+UUID_PATTERN = re.compile(r'[0-9a-zA-Z\-]{36}')
+
+
+def is_uuid(s):
+    if UUID_PATTERN.match(s):
+        return True
+    else:
+        return False
+

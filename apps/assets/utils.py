@@ -1,9 +1,10 @@
 # ~*~ coding: utf-8 ~*~
 #
-from ops.utils import run_AdHoc
+from .models import Asset
 
 
 def test_admin_user_connective_manual(asset):
+    from ops.utils import run_AdHoc
     if not isinstance(asset, list):
         asset = [asset]
     task_tuple = (
@@ -15,3 +16,6 @@ def test_admin_user_connective_manual(asset):
     else:
         return True
 
+
+def get_assets_by_id_list(id_list):
+    return Asset.objects.filter(id__in=id_list)

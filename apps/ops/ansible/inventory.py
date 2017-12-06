@@ -1,31 +1,52 @@
 # ~*~ coding: utf-8 ~*~
-from ansible.inventory import Inventory, Host, Group
-from ansible.vars import VariableManager
+from ansible.inventory.group import Group
+from ansible.inventory.host import Host
+from ansible.vars.manager import VariableManager
+from ansible.inventory.manager import InventoryManager
 from ansible.parsing.dataloader import DataLoader
 
 
 class JMSHost(Host):
-    def __init__(self, asset):
-        self.asset = asset
-        self.name = name = asset.get('hostname') or asset.get('ip')
-        self.port = port = asset.get('port') or 22
-        super(JMSHost, self).__init__(name, port)
-        self.set_all_variable()
+    def __init__(self, host_data):
+        """
+        初始化
+        :param host_data:  {
+            "hostname": "",
+            "ip": "",
+            "port": "",
+            "username": "",
+            "password": "",
+            "private_key": "",
+            "become": {
+                "method": "",
+                "user": "",
+                "pass": "",
+            }
+            "groups": [],
+            "vars": {},
+        }
+        """
+        self.host_data = host_data
+        hostname = host_data.get('hostname') or host_data.get('ip')
+        port = host_data.get('port') or 22
+        super(JMSHost, self).__init__(hostname, port)
+        self.__set_required_variables()
+        self.__set_extra_variables()
 
-    def set_all_variable(self):
-        asset = self.asset
-        self.set_variable('ansible_host', asset['ip'])
-        self.set_variable('ansible_port', asset['port'])
-        self.set_variable('ansible_user', asset['username'])
+    def __set_required_variables(self):
+        host_data = self.host_data
+        self.set_variable('ansible_host', host_data['ip'])
+        self.set_variable('ansible_port', host_data['port'])
+        self.set_variable('ansible_user', host_data['username'])
 
         # 添加密码和秘钥
-        if asset.get('password'):
-            self.set_variable('ansible_ssh_pass', asset['password'])
-        if asset.get('private_key'):
-            self.set_variable('ansible_ssh_private_key_file', asset['private_key'])
+        if host_data.get('password'):
+            self.set_variable('ansible_ssh_pass', host_data['password'])
+        if host_data.get('private_key'):
+            self.set_variable('ansible_ssh_private_key_file', host_data['private_key'])
 
         # 添加become支持
-        become = asset.get("become", False)
+        become = host_data.get("become", False)
         if become:
             self.set_variable("ansible_become", True)
             self.set_variable("ansible_become_method", become.get('method', 'sudo'))
@@ -34,58 +55,73 @@ class JMSHost(Host):
         else:
             self.set_variable("ansible_become", False)
 
+    def __set_extra_variables(self):
+        for k, v in self.host_data.get('vars', {}).items():
+            self.set_variable(k, v)
 
-class JMSInventory(Inventory):
+    def __repr__(self):
+        return self.name
+
+
+class JMSInventory(InventoryManager):
     """
     提供生成Ansible inventory对象的方法
     """
+    loader_class = DataLoader
+    variable_manager_class = VariableManager
+    host_manager_class = JMSHost
 
     def __init__(self, host_list=None):
         if host_list is None:
             host_list = []
-        assert isinstance(host_list, list)
         self.host_list = host_list
-        self.loader = DataLoader()
-        self.variable_manager = VariableManager()
-        super(JMSInventory, self).__init__(self.loader, self.variable_manager,
-                                           host_list=host_list)
+        assert isinstance(host_list, list)
+        self.loader = self.loader_class()
+        self.variable_manager = self.variable_manager_class()
+        super().__init__(self.loader)
 
-    def parse_inventory(self, host_list):
-        """用于生成动态构建Ansible Inventory.
-        self.host_list: [
-            {"name": "asset_name",
-             "ip": <ip>,
-             "port": <port>,
-             "user": <user>,
-             "pass": <pass>,
-             "key": <sshKey>,
-             "groups": ['group1', 'group2'],
-             "other_host_var": <other>},
-             {...},
+    def get_groups(self):
+        return self._inventory.groups
+
+    def get_group(self, name):
+        return self._inventory.groups.get(name, None)
+
+    def parse_sources(self, cache=False):
+        """
+        用于生成动态构建Ansible Inventory. super().__init__ 会自动调用
+        host_list: [{
+            "hostname": "",
+            "ip": "",
+            "port": "",
+            "username": "",
+            "password": "",
+            "private_key": "",
+            "become": {
+                "method": "",
+                "user": "",
+                "pass": "",
+            },
+            "groups": [],
+            "vars": {},
+          },
         ]
 
-        :return: 返回一个Ansible的inventory对象
+        :return: None
         """
+        group_all = self.get_group('all')
+        ungrouped = self.get_group('ungrouped')
 
-        # TODO: 验证输入
-        # 创建Ansible Group,如果没有则创建default组
-        ungrouped = Group('ungrouped')
-        all = Group('all')
-        all.add_child_group(ungrouped)
-        self.groups = dict(all=all, ungrouped=ungrouped)
-
-        for asset in host_list:
-            host = JMSHost(asset=asset)
-            asset_groups = asset.get('groups')
-            if asset_groups:
-                for group_name in asset_groups:
-                    if group_name not in self.groups:
+        for host_data in self.host_list:
+            host = self.host_manager_class(host_data=host_data)
+            self.hosts[host_data['hostname']] = host
+            groups_data = host_data.get('groups')
+            if groups_data:
+                for group_name in groups_data:
+                    group = self.get_group(group_name)
+                    if group is None:
                         group = Group(group_name)
-                        self.groups[group_name] = group
-                    else:
-                        group = self.groups[group_name]
+                        self.add_group(group)
                     group.add_host(host)
             else:
                 ungrouped.add_host(host)
-            all.add_host(host)
-
+            group_all.add_host(host)

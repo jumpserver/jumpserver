@@ -1,32 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 
-from collections import defaultdict
 from ansible.plugins.callback import CallbackBase
-
-
-class CommandResultCallback(CallbackBase):
-    def __init__(self, display=None):
-        self.result_q = dict(contacted={}, dark={})
-        super(CommandResultCallback, self).__init__(display)
-
-    def gather_result(self, n, res):
-        self.result_q[n][res._host.name] = {}
-        self.result_q[n][res._host.name]['cmd'] = res._result.get('cmd')
-        self.result_q[n][res._host.name]['stderr'] = res._result.get('stderr')
-        self.result_q[n][res._host.name]['stdout'] = res._result.get('stdout')
-        self.result_q[n][res._host.name]['rc'] = res._result.get('rc')
-
-    def v2_runner_on_ok(self, result):
-        self.gather_result("contacted", result)
-
-    def v2_runner_on_failed(self, result, ignore_errors=False):
-        self.gather_result("dark", result)
-
-    def v2_runner_on_unreachable(self, result):
-        self.gather_result("dark", result)
-
-    def v2_runner_on_skipped(self, result):
-        self.gather_result("dark", result)
 
 
 class AdHocResultCallback(CallbackBase):
@@ -34,32 +8,69 @@ class AdHocResultCallback(CallbackBase):
     AdHoc result Callback
     """
     def __init__(self, display=None):
-        self.result_q = dict(contacted={}, dark={})
-        super(AdHocResultCallback, self).__init__(display)
+        # result_raw example: {
+        #   "ok": {"hostname": []},
+        #   "failed": {"hostname": []},
+        #   "unreachable: {"hostname": []},
+        #   "skipped": {"hostname": []},
+        # }
+        # results_summary example: {
+        #   "contacted": {"hostname",...},
+        #   "dark": {"hostname": ["error",...],},
+        # }
+        self.results_raw = dict(ok={}, failed={}, unreachable={}, skipped={})
+        self.results_summary = dict(contacted=set(), dark={})
+        super().__init__(display)
 
-    def gather_result(self, n, res):
-        if res._host.name in self.result_q[n]:
-            self.result_q[n][res._host.name].append(res._result)
+    def gather_result(self, t, host, res):
+        if self.results_raw[t].get(host):
+            self.results_raw[t][host].append(res)
         else:
-            self.result_q[n][res._host.name] = [res._result]
+            self.results_raw[t][host] = [res]
+        self.clean_result(t, host, res)
 
-    def v2_runner_on_ok(self, result):
-        self.gather_result("contacted", result)
+    def clean_result(self, t, host, res):
+        contacted = self.results_summary["contacted"]
+        dark = self.results_summary["dark"]
+        if t in ("ok", "skipped") and host not in dark:
+            contacted.add(host)
+        else:
+            dark[host].append(res)
+            if host in contacted:
+                contacted.remove(dark)
 
-    def v2_runner_on_failed(self, result, ignore_errors=False):
-        self.gather_result("dark", result)
+    def runner_on_ok(self, host, res):
+        self.gather_result("ok", host, res)
 
-    def v2_runner_on_unreachable(self, result):
-        self.gather_result("dark", result)
+    def runner_on_failed(self, host, res, ignore_errors=False):
+        self.gather_result("failed", host, res)
 
-    def v2_runner_on_skipped(self, result):
-        self.gather_result("dark", result)
+    def runner_on_unreachable(self, host, res):
+        self.gather_result("unreachable", host, res)
 
-    def v2_playbook_on_task_start(self, task, is_conditional):
-        pass
+    def runner_on_skipped(self, host, item=None):
+        self.gather_result("skipped", host, item)
 
-    def v2_playbook_on_play_start(self, play):
-        pass
+
+class CommandResultCallback(AdHocResultCallback):
+    def __init__(self, display=None):
+        self.results_command = dict()
+        super().__init__(display)
+
+    def gather_result(self, t, host, res):
+        super().gather_result(t, host, res)
+        self.gather_cmd(t, host, res)
+
+    def gather_cmd(self, t, host, res):
+        cmd = {}
+        if t == "ok":
+            cmd['cmd'] = res.get('cmd')
+            cmd['stderr'] = res.get('stderr')
+            cmd['stdout'] = res.get('stdout')
+            cmd['rc'] = res.get('rc')
+        else:
+            cmd['err'] = "Error: {}".format(res)
+        self.results_command[host] = cmd
 
 
 class PlaybookResultCallBack(CallbackBase):

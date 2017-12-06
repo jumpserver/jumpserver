@@ -9,13 +9,13 @@ from django.views.generic import ListView, DetailView, View
 from django.utils import timezone
 from django.shortcuts import redirect, reverse
 
-from .models import Task
+from .models import Playbook
 from ops.tasks import rerun_task
 
 
 class TaskListView(ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    model = Task
+    model = Playbook
     ordering = ('-date_start',)
     context_object_name = 'task_list'
     template_name = 'ops/task_list.html'
@@ -53,7 +53,7 @@ class TaskListView(ListView):
     def get_context_data(self, **kwargs):
         context = {
             'app': 'Ops',
-            'action': 'Task record list',
+            'action': 'Playbook record list',
             'date_from': self.date_from_s,
             'date_to': self.date_to_s,
             'keyword': self.keyword,
@@ -63,13 +63,13 @@ class TaskListView(ListView):
 
 
 class TaskDetailView(DetailView):
-    model = Task
+    model = Playbook
     template_name = 'ops/task_detail.html'
 
     def get_context_data(self, **kwargs):
         context = {
             'app': 'Ops',
-            'action': 'Task record detail',
+            'action': 'Playbook record detail',
             'results': json.loads(self.object.summary or '{}'),
         }
         kwargs.update(context)

@@ -1418,23 +1418,23 @@ msgid "Assets id"
 msgstr "资产id"
 
 #: ops/models.py:27
-msgid "Task module and args json format"
+msgid "Playbook module and args json format"
 msgstr ""
 
 #: ops/models.py:28
-msgid "Task run pattern"
+msgid "Playbook run pattern"
 msgstr ""
 
 #: ops/models.py:29
-msgid "Task raw result"
+msgid "Playbook raw result"
 msgstr ""
 
 #: ops/models.py:30
-msgid "Task summary"
+msgid "Playbook summary"
 msgstr ""
 
 #: ops/templates/ops/task_detail.html:19
-msgid "Task replay detail"
+msgid "Playbook replay detail"
 msgstr "任务记录详情"
 
 #: ops/templates/ops/task_detail.html:62
@@ -1669,7 +1669,7 @@ msgid "Job Center"
 msgstr "作业中心"
 
 #: templates/_nav.html:51
-msgid "Task"
+msgid "Playbook"
 msgstr "任务"
 
 #: templates/_nav.html:62

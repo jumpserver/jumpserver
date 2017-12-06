@@ -12,8 +12,8 @@ logger = get_logger(__file__)
 
 @shared_task
 def rerun_task(task_id):
-    from .models import Task
-    record = Task.objects.get(uuid=task_id)
+    from .models import Playbook
+    record = Playbook.objects.get(uuid=task_id)
     assets = record.assets_json
     task_tuple = record.module_args
     pattern = record.pattern

@@ -7,40 +7,32 @@ import uuid
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from assets.models import Asset
 
-__all__ = ["Task"]
+__all__ = ["Playbook"]
 
 
 logger = logging.getLogger(__name__)
 
 
-class Task(models.Model):
+class AdHoc(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, blank=True, verbose_name=_('Name'))
-    date_start = models.DateTimeField(auto_now_add=True, verbose_name=_('Start time'))
-    date_finished = models.DateTimeField(blank=True, null=True, verbose_name=_('End time'))
-    timedelta = models.FloatField(default=0.0, verbose_name=_('Time'), null=True)
-    is_finished = models.BooleanField(default=False, verbose_name=_('Is finished'))
-    is_success = models.BooleanField(default=False, verbose_name=_('Is success'))
-    assets = models.TextField(blank=True, null=True, verbose_name=_('Assets id'))  # Asset inventory may be change
-    _modules_args = models.TextField(blank=True, null=True, verbose_name=_('Task module and args json format'))
-    pattern = models.CharField(max_length=64, default='all', verbose_name=_('Task run pattern'))
-    result = models.TextField(blank=True, null=True, verbose_name=_('Task raw result'))
-    summary = models.TextField(blank=True, null=True, verbose_name=_('Task summary'))
+    tasks = models.TextField(verbose_name=_('Tasks'))  # [{'name': 'task_name', 'module': '', 'args': ''}, ]
+    hosts = models.TextField(blank=True, null=True, verbose_name=_('Hosts'))  # Asset inventory may be change
+    pattern = models.CharField(max_length=64, default='all', verbose_name=_('Playbook run pattern'))
 
-    def __unicode__(self):
-        return "%s" % self.uuid
+    def __str__(self):
+        return "%s" % self.name
 
-    @property
-    def total_assets(self):
-        assets_id = [i for i in self.assets.split(',') if i.isdigit()]
-        assets = Asset.objects.filter(id__in=assets_id)
+    def get_hosts_mapped_assets(self):
+        from assets.utils import get_assets_by_id_list
+        assets_id = [i for i in self.hosts.split(',')]
+        assets = get_assets_by_id_list(assets_id)
         return assets
 
     @property
-    def assets_json(self):
-        return [asset._to_secret_json() for asset in self.total_assets]
+    def inventory(self):
+        return [asset._to_secret_json() for asset in self.get_hosts_mapped_assets()]
 
     @property
     def module_args(self):
@@ -57,3 +49,12 @@ class Task(models.Model):
         self._modules_args = json.dumps(module_args_)
 
 
+class History(models.Model):
+    uuid = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    date_start = models.DateTimeField(auto_now_add=True, verbose_name=_('Start time'))
+    date_finished = models.DateTimeField(blank=True, null=True, verbose_name=_('End time'))
+    timedelta = models.FloatField(default=0.0, verbose_name=_('Time'), null=True)
+    is_finished = models.BooleanField(default=False, verbose_name=_('Is finished'))
+    is_success = models.BooleanField(default=False, verbose_name=_('Is success'))
+    result = models.TextField(blank=True, null=True, verbose_name=_('Playbook raw result'))
+    summary = models.TextField(blank=True, null=True, verbose_name=_('Playbook summary'))
