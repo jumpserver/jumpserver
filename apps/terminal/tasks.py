@@ -5,8 +5,10 @@ import time
 
 from celery import shared_task
 from django.core.cache import cache
+from django.db.utils import ProgrammingError
 
 from .models import Session
+
 
 
 ASSETS_CACHE_KEY = "terminal__session__assets"
@@ -36,14 +38,18 @@ def get_session_system_user_list():
 
 def set_cache():
     while True:
-        assets = get_session_asset_list()
-        users = get_session_user_list()
-        system_users = get_session_system_user_list()
+        try:
+            assets = get_session_asset_list()
+            users = get_session_user_list()
+            system_users = get_session_system_user_list()
 
-        cache.set(ASSETS_CACHE_KEY, assets)
-        cache.set(USERS_CACHE_KEY, users)
-        cache.set(SYSTEM_USER_CACHE_KEY, system_users)
-        time.sleep(10)
+            cache.set(ASSETS_CACHE_KEY, assets)
+            cache.set(USERS_CACHE_KEY, users)
+            cache.set(SYSTEM_USER_CACHE_KEY, system_users)
+        except ProgrammingError:
+            pass
+        finally:
+            time.sleep(10)
 
 
 def main():
@@ -59,4 +65,5 @@ def main():
         t.start()
         RUNNING = True
 
+# Todo: 不能migrations了
 main()
