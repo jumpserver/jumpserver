@@ -9,13 +9,13 @@ from django.views.generic import ListView, DetailView, View
 from django.utils import timezone
 from django.shortcuts import redirect, reverse
 
-from .models import Playbook
+from .models import AdHoc, AdHocData, AdHocHistory
 from ops.tasks import rerun_task
 
 
 class TaskListView(ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    model = Playbook
+    model = AdHoc
     ordering = ('-date_start',)
     context_object_name = 'task_list'
     template_name = 'ops/task_list.html'
@@ -63,7 +63,7 @@ class TaskListView(ListView):
 
 
 class TaskDetailView(DetailView):
-    model = Playbook
+    model = AdHocHistory
     template_name = 'ops/task_detail.html'
 
     def get_context_data(self, **kwargs):

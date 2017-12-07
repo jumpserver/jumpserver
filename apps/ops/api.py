@@ -4,12 +4,12 @@
 from rest_framework import viewsets
 
 from .hands import IsSuperUser
-from .models import Playbook
+from .models import AdHoc
 from .serializers import TaskSerializer
 
 
 class TaskViewSet(viewsets.ModelViewSet):
-    queryset = Playbook.objects.all()
+    queryset = AdHoc.objects.all()
     serializer_class = TaskSerializer
     permission_classes = (IsSuperUser,)
 

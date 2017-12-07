@@ -170,6 +170,10 @@ class AdHocRunner:
                 "pattern: %s  dose not match any hosts." % pattern
             )
 
+    def set_option(self, k, v):
+        kwargs = {k: v}
+        self.options = self.options._replace(**kwargs)
+
     def run(self, tasks, pattern, play_name='Ansible Ad-hoc', gather_facts='no'):
         """
         :param tasks: [{'action': {'module': 'shell', 'args': 'ls'}, ...}, ]

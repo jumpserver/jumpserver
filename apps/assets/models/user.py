@@ -28,6 +28,9 @@ def private_key_validator(value):
 
 
 class AdminUser(models.Model):
+    """
+    Ansible use admin user as devops user to run adHoc and Playbook
+    """
     BECOME_METHOD_CHOICES = (
         ('sudo', 'sudo'),
         ('su', 'su'),
@@ -35,24 +38,19 @@ class AdminUser(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     username = models.CharField(max_length=16, verbose_name=_('Username'))
-    _password = models.CharField(
-        max_length=256, blank=True, null=True, verbose_name=_('Password'))
-    _private_key = models.TextField(max_length=4096, blank=True, null=True, verbose_name=_('SSH private key'),
-                                    validators=[private_key_validator,])
+    _password = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
+    _private_key = models.TextField(max_length=4096, blank=True, null=True, verbose_name=_('SSH private key'), validators=[private_key_validator,])
     become = models.BooleanField(default=True)
     become_method = models.CharField(choices=BECOME_METHOD_CHOICES, default='sudo', max_length=4)
     become_user = models.CharField(default='root', max_length=64)
     become_pass = models.CharField(default='', max_length=128)
-    _public_key = models.TextField(
-        max_length=4096, blank=True, verbose_name=_('SSH public key'))
+    _public_key = models.TextField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True, null=True)
-    created_by = models.CharField(
-        max_length=32, null=True, verbose_name=_('Created by'))
+    created_by = models.CharField(max_length=32, null=True, verbose_name=_('Created by'))
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
-    __str__ = __unicode__
 
     @property
     def password(self):
@@ -134,33 +132,22 @@ class SystemUser(models.Model):
         ('K', 'Public key'),
     )
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=128, unique=True,
-                            verbose_name=_('Name'))
+    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     username = models.CharField(max_length=16, verbose_name=_('Username'))
-    _password = models.CharField(
-        max_length=256, blank=True, verbose_name=_('Password'))
-    protocol = models.CharField(
-        max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
-    _private_key = models.TextField(
-        max_length=8192, blank=True, verbose_name=_('SSH private key'))
-    _public_key = models.TextField(
-        max_length=8192, blank=True, verbose_name=_('SSH public key'))
-    auth_method = models.CharField(choices=AUTH_METHOD_CHOICES, default='K',
-                                   max_length=1, verbose_name=_('Auth method'))
+    _password = models.CharField(max_length=256, blank=True, verbose_name=_('Password'))
+    protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
+    _private_key = models.TextField(max_length=8192, blank=True, verbose_name=_('SSH private key'))
+    _public_key = models.TextField(max_length=8192, blank=True, verbose_name=_('SSH public key'))
+    auth_method = models.CharField(choices=AUTH_METHOD_CHOICES, default='K', max_length=1, verbose_name=_('Auth method'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
-    sudo = models.TextField(
-        max_length=4096, default='/sbin/ifconfig', verbose_name=_('Sudo'))
-    shell = models.CharField(
-        max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
+    sudo = models.TextField(default='/sbin/ifconfig', verbose_name=_('Sudo'))
+    shell = models.CharField(max_length=64,  default='/bin/bash', verbose_name=_('Shell'))
     date_created = models.DateTimeField(auto_now_add=True)
-    created_by = models.CharField(
-        max_length=32, blank=True, verbose_name=_('Created by'))
-    comment = models.TextField(
-        max_length=128, blank=True, verbose_name=_('Comment'))
+    created_by = models.CharField(max_length=32, blank=True, verbose_name=_('Created by'))
+    comment = models.TextField(max_length=128, blank=True, verbose_name=_('Comment'))
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
-    __str__ = __unicode__
 
     @property
     def password(self):
@@ -183,8 +170,23 @@ class SystemUser(models.Model):
         self._private_key = signer.sign(private_key_raw)
 
     @property
+    def private_key_file(self):
+        if not self.private_key:
+            return None
+        project_dir = settings.PROJECT_DIR
+        tmp_dir = os.path.join(project_dir, 'tmp')
+        key_name = md5(self._private_key.encode()).hexdigest()
+        key_path = os.path.join(tmp_dir, key_name)
+        if not os.path.exists(key_path):
+            self.private_key.write_private_key_file(key_path)
+        return key_path
+
+    @property
     def public_key(self):
-        return signer.unsign(self._public_key)
+        if self._public_key:
+            return signer.unsign(self._public_key)
+        else:
+            return None
 
     @public_key.setter
     def public_key(self, public_key_raw):
@@ -213,7 +215,8 @@ class SystemUser(models.Model):
             'shell': self.shell,
             'sudo': self.sudo,
             'password': self.password,
-            'public_key': self.public_key
+            'public_key': self.public_key,
+            'private_key_file': self.private_key_file,
         }
 
     @property

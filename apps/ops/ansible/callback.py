@@ -9,65 +9,85 @@ class AdHocResultCallback(CallbackBase):
     """
     def __init__(self, display=None):
         # result_raw example: {
-        #   "ok": {"hostname": []},
-        #   "failed": {"hostname": []},
-        #   "unreachable: {"hostname": []},
-        #   "skipped": {"hostname": []},
+        #   "ok": {"hostname": [{"task_name": {}，...],..},
+        #   "failed": {"hostname": ["task_name": {}..], ..},
+        #   "unreachable: {"hostname": ["task_name": {}, ..]},
+        #   "skipped": {"hostname": ["task_name": {}, ..], ..},
         # }
         # results_summary example: {
         #   "contacted": {"hostname",...},
-        #   "dark": {"hostname": ["error",...],},
+        #   "dark": {"hostname": [{"task_name": "error"},...],},
         # }
         self.results_raw = dict(ok={}, failed={}, unreachable={}, skipped={})
         self.results_summary = dict(contacted=set(), dark={})
         super().__init__(display)
 
-    def gather_result(self, t, host, res):
-        if self.results_raw[t].get(host):
-            self.results_raw[t][host].append(res)
-        else:
-            self.results_raw[t][host] = [res]
-        self.clean_result(t, host, res)
+    def gather_result(self, t, res):
+        host = res._host.get_name()
+        task_name = res.task_name
+        task_result = res._result
 
-    def clean_result(self, t, host, res):
+        if self.results_raw[t].get(host):
+            self.results_raw[t][host].append({task_name: task_result})
+        else:
+            self.results_raw[t][host] = [{task_name: task_result}]
+        self.clean_result(t, host, task_name, task_result)
+
+    def clean_result(self, t, host, task_name, task_result):
         contacted = self.results_summary["contacted"]
         dark = self.results_summary["dark"]
         if t in ("ok", "skipped") and host not in dark:
             contacted.add(host)
         else:
-            dark[host].append(res)
+            if dark.get(host):
+                dark[host].append({task_name: task_result})
+            else:
+                dark[host] = [{task_name: task_result}]
             if host in contacted:
                 contacted.remove(dark)
 
-    def runner_on_ok(self, host, res):
-        self.gather_result("ok", host, res)
+    def v2_runner_on_failed(self, result, ignore_errors=False):
+        self.gather_result("failed", result)
 
-    def runner_on_failed(self, host, res, ignore_errors=False):
-        self.gather_result("failed", host, res)
+    def v2_runner_on_ok(self, result):
+        self.gather_result("ok", result)
 
-    def runner_on_unreachable(self, host, res):
-        self.gather_result("unreachable", host, res)
+    def v2_runner_on_skipped(self, result):
+        self.gather_result("skipped", result)
 
-    def runner_on_skipped(self, host, item=None):
-        self.gather_result("skipped", host, item)
+    def v2_runner_on_unreachable(self, result):
+        self.gather_result("unreachable", result)
 
 
 class CommandResultCallback(AdHocResultCallback):
+    """
+    Command result callback
+    """
     def __init__(self, display=None):
+        # results_command: {
+        #   "cmd": "",
+        #   "stderr": "",
+        #   "stdout": "",
+        #   "rc": 0,
+        #   "delta": 0:0:0.123
+        # }
+        #
         self.results_command = dict()
         super().__init__(display)
 
-    def gather_result(self, t, host, res):
-        super().gather_result(t, host, res)
-        self.gather_cmd(t, host, res)
+    def gather_result(self, t, res):
+        super().gather_result(t, res)
+        self.gather_cmd(t, res)
 
-    def gather_cmd(self, t, host, res):
+    def gather_cmd(self, t, res):
+        host = res._host.get_name()
         cmd = {}
         if t == "ok":
-            cmd['cmd'] = res.get('cmd')
-            cmd['stderr'] = res.get('stderr')
-            cmd['stdout'] = res.get('stdout')
-            cmd['rc'] = res.get('rc')
+            cmd['cmd'] = res._result.get('cmd')
+            cmd['stderr'] = res._result.get('stderr')
+            cmd['stdout'] = res._result.get('stdout')
+            cmd['rc'] = res._result.get('rc')
+            cmd['delta'] = res._result.get('delta')
         else:
             cmd['err'] = "Error: {}".format(res)
         self.results_command[host] = cmd

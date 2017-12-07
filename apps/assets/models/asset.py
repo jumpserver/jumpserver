@@ -44,28 +44,18 @@ class Asset(models.Model):
     ip = models.GenericIPAddressField(max_length=32, verbose_name=_('IP'), db_index=True)
     hostname = models.CharField(max_length=128, unique=True, verbose_name=_('Hostname'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
-    groups = models.ManyToManyField(AssetGroup, blank=True, related_name='assets',
-                                    verbose_name=_('Asset groups'))
-    admin_user = models.ForeignKey(AdminUser, null=True, blank=True, related_name='assets',
-                                   on_delete=models.SET_NULL, verbose_name=_("Admin user"))
-    system_users = models.ManyToManyField(SystemUser, blank=True,
-                                          related_name='assets',
-                                          verbose_name=_("System User"))
-    idc = models.ForeignKey(IDC, blank=True, null=True, related_name='assets',
-                            on_delete=models.SET_NULL, verbose_name=_('IDC'),)
+    groups = models.ManyToManyField(AssetGroup, blank=True, related_name='assets', verbose_name=_('Asset groups'))
+    admin_user = models.ForeignKey(AdminUser, null=True, blank=True, related_name='assets', on_delete=models.SET_NULL, verbose_name=_("Admin user"))
+    system_users = models.ManyToManyField(SystemUser, blank=True, related_name='assets', verbose_name=_("System User"))
+    idc = models.ForeignKey(IDC, blank=True, null=True, related_name='assets', on_delete=models.SET_NULL, verbose_name=_('IDC'),)
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
-    type = models.CharField(choices=TYPE_CHOICES, max_length=16, blank=True, null=True,
-                            default='Server', verbose_name=_('Asset type'),)
-    env = models.CharField(choices=ENV_CHOICES, max_length=8, blank=True, null=True,
-                           default='Prod', verbose_name=_('Asset environment'),)
-    status = models.CharField(choices=STATUS_CHOICES, max_length=12, null=True, blank=True,
-                              default='In use', verbose_name=_('Asset status'))
+    type = models.CharField(choices=TYPE_CHOICES, max_length=16, blank=True, null=True, default='Server', verbose_name=_('Asset type'),)
+    env = models.CharField(choices=ENV_CHOICES, max_length=8, blank=True, null=True, default='Prod', verbose_name=_('Asset environment'),)
+    status = models.CharField(choices=STATUS_CHOICES, max_length=12, null=True, blank=True, default='In use', verbose_name=_('Asset status'))
 
     # Some information
-    public_ip = models.GenericIPAddressField(max_length=32, blank=True,
-                                             null=True, verbose_name=_('Public IP'))
-    remote_card_ip = models.CharField(max_length=16, null=True, blank=True,
-                                      verbose_name=_('Remote control card IP'))
+    public_ip = models.GenericIPAddressField(max_length=32, blank=True, null=True, verbose_name=_('Public IP'))
+    remote_card_ip = models.CharField(max_length=16, null=True, blank=True, verbose_name=_('Remote control card IP'))
     cabinet_no = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Cabinet number'))
     cabinet_pos = models.IntegerField(null=True, blank=True, verbose_name=_('Cabinet position'))
     number = models.CharField(max_length=32, null=True, blank=True, verbose_name=_('Asset number'))
@@ -114,21 +104,26 @@ class Asset(models.Model):
 
     def _to_secret_json(self):
         """Ansible use it create inventory"""
-        return {
+        data = {
             'id': self.id,
             'hostname': self.hostname,
             'ip': self.ip,
             'port': self.port,
             'groups': [group.name for group in self.groups.all()],
-            'username': self.admin_user.username if self.admin_user else '',
-            'password': self.admin_user.password if self.admin_user else '',
-            'private_key': self.admin_user.private_key_file if self.admin_user else None,
-            'become': {
-                'method': self.admin_user.become_method,
-                'user': self.admin_user.become_user,
-                'pass': self.admin_user.become_pass,
-            } if self.admin_user and self.admin_user.become else {},
         }
+
+        if self.admin_user:
+            data.update({
+                'username': self.admin_user.username,
+                'password': self.admin_user.password,
+                'private_key': self.admin_user.private_key_file,
+                'become': {
+                    'method': self.admin_user.become_method,
+                    'user': self.admin_user.become_user,
+                    'pass': self.admin_user.become_pass,
+                }
+            })
+        return data
 
     class Meta:
         unique_together = ('ip', 'port')

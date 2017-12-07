@@ -88,3 +88,14 @@ def is_uuid(s):
     else:
         return False
 
+
+def asset_to_dict(asset):
+    return asset.to_json()
+
+
+def asset_to_dict_with_credential(asset):
+    return asset._to_secret_json()
+
+
+def system_user_to_dict_with_credential(system_user):
+    return system_user._to_secret_json()

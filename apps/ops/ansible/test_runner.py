@@ -24,8 +24,8 @@ class TestAdHocRunner(unittest.TestCase):
 
     def test_run(self):
         tasks = [
-            {"action": {"module": "shell", "args": "ls"}},
-            {"action": {"module": "shell", "args": "whoami"}},
+            {"action": {"module": "shell", "args": "ls"}, "name": "run_cmd"},
+            {"action": {"module": "shell", "args": "whoami"}, "name": "run_whoami"},
         ]
         ret = self.runner.run(tasks, "all")
         print(ret.results_summary)
@@ -48,6 +48,7 @@ class TestCommandRunner(unittest.TestCase):
     def test_execute(self):
         res = self.runner.execute('ls', 'all')
         print(res.results_command)
+        print(res.results_raw)
 
 
 if __name__ == "__main__":
