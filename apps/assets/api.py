@@ -24,7 +24,7 @@ from common.mixins import IDInFilterMixin
 from common.utils import get_object_or_none
 from .hands import IsSuperUser, IsAppUser, IsValidUser, \
     get_user_granted_assets, push_users
-from .models import AssetGroup, Asset, IDC, SystemUser, AdminUser
+from .models import AssetGroup, Asset, Cluster, SystemUser, AdminUser
 from . import serializers
 from .tasks import update_assets_hardware_info
 from .utils import test_admin_user_connective_manual
@@ -41,12 +41,12 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
             queryset = super(AssetViewSet, self).get_queryset()
         else:
             queryset = get_user_granted_assets(self.request.user)
-        idc_id = self.request.query_params.get('idc_id', '')
+        cluster_id = self.request.query_params.get('cluster_id', '')
         system_users_id = self.request.query_params.get('system_user_id', '')
         asset_group_id = self.request.query_params.get('asset_group_id', '')
         admin_user_id = self.request.query_params.get('admin_user_id', '')
-        if idc_id:
-            queryset = queryset.filter(idc__id=idc_id)
+        if cluster_id:
+            queryset = queryset.filter(cluster__id=cluster_id)
         if system_users_id:
             queryset = queryset.filter(system_users__id=system_users_id)
         if admin_user_id:
@@ -84,17 +84,17 @@ class AssetGroupUpdateSystemUserApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsSuperUser,)
 
 
-class IDCUpdateAssetsApi(generics.RetrieveUpdateAPIView):
-    """IDC update asset member"""
-    queryset = IDC.objects.all()
-    serializer_class = serializers.IDCUpdateAssetsSerializer
+class ClusterUpdateAssetsApi(generics.RetrieveUpdateAPIView):
+    """Cluster update asset member"""
+    queryset = Cluster.objects.all()
+    serializer_class = serializers.ClusterUpdateAssetsSerializer
     permission_classes = (IsSuperUser,)
 
 
-class IDCViewSet(IDInFilterMixin, BulkModelViewSet):
-    """IDC api set, for add,delete,update,list,retrieve resource"""
-    queryset = IDC.objects.all()
-    serializer_class = serializers.IDCSerializer
+class ClusterViewSet(IDInFilterMixin, BulkModelViewSet):
+    """Cluster api set, for add,delete,update,list,retrieve resource"""
+    queryset = Cluster.objects.all()
+    serializer_class = serializers.ClusterSerializer
     permission_classes = (IsSuperUser,)
 
 

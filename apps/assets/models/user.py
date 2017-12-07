@@ -29,7 +29,7 @@ def private_key_validator(value):
 
 class AdminUser(models.Model):
     """
-    Ansible use admin user as devops user to run adHoc and Playbook
+    A privileged user that ansible can use it to push system user and so on
     """
     BECOME_METHOD_CHOICES = (
         ('sudo', 'sudo'),
@@ -43,7 +43,7 @@ class AdminUser(models.Model):
     become = models.BooleanField(default=True)
     become_method = models.CharField(choices=BECOME_METHOD_CHOICES, default='sudo', max_length=4)
     become_user = models.CharField(default='root', max_length=64)
-    become_pass = models.CharField(default='', max_length=128)
+    _become_pass = models.CharField(default='', max_length=128)
     _public_key = models.TextField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
     date_created = models.DateTimeField(auto_now_add=True, null=True)
@@ -94,6 +94,15 @@ class AdminUser(models.Model):
     @public_key.setter
     def public_key(self, public_key_raw):
         self._public_key = signer.sign(public_key_raw)
+
+    @property
+    def become_pass(self):
+        return signer.unsign(self._become_pass)
+
+    @become_pass.setter
+    def become_pass(self, password):
+        self._become_pass = signer.sign(password)
+
 
     @property
     def assets_amount(self):

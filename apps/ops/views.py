@@ -9,7 +9,7 @@ from django.views.generic import ListView, DetailView, View
 from django.utils import timezone
 from django.shortcuts import redirect, reverse
 
-from .models import AdHoc, AdHocData, AdHocHistory
+from .models import AdHoc, AdHocData, AdHocRunHistory
 from ops.tasks import rerun_task
 
 
@@ -63,7 +63,7 @@ class TaskListView(ListView):
 
 
 class TaskDetailView(DetailView):
-    model = AdHocHistory
+    model = AdHocRunHistory
     template_name = 'ops/task_detail.html'
 
     def get_context_data(self, **kwargs):

@@ -27,13 +27,13 @@ urlpatterns = [
     url(r'^asset-group/(?P<pk>[0-9a-zA-Z\-]+)/update/$', views.AssetGroupUpdateView.as_view(), name='asset-group-update'),
     url(r'^asset-group/(?P<pk>[0-9a-zA-Z\-]+)/delete/$', views.AssetGroupDeleteView.as_view(), name='asset-group-delete'),
 
-    # Resource idc url
-    url(r'^idc/$', views.IDCListView.as_view(), name='idc-list'),
-    url(r'^idc/create/$', views.IDCCreateView.as_view(), name='idc-create'),
-    url(r'^idc/(?P<pk>[0-9a-zA-Z\-]+)/$', views.IDCDetailView.as_view(), name='idc-detail'),
-    url(r'^idc/(?P<pk>[0-9a-zA-Z\-]+)/update/', views.IDCUpdateView.as_view(), name='idc-update'),
-    url(r'^idc/(?P<pk>[0-9a-zA-Z\-]+)/delete/$', views.IDCDeleteView.as_view(), name='idc-delete'),
-    url(r'^idc/(?P<pk>[0-9a-zA-Z\-]+)/assets/$', views.IDCAssetsView.as_view(), name='idc-assets'),
+    # Resource cluster url
+    url(r'^cluster/$', views.ClusterListView.as_view(), name='cluster-list'),
+    url(r'^cluster/create/$', views.ClusterCreateView.as_view(), name='cluster-create'),
+    url(r'^cluster/(?P<pk>[0-9a-zA-Z\-]+)/$', views.ClusterDetailView.as_view(), name='cluster-detail'),
+    url(r'^cluster/(?P<pk>[0-9a-zA-Z\-]+)/update/', views.ClusterUpdateView.as_view(), name='cluster-update'),
+    url(r'^cluster/(?P<pk>[0-9a-zA-Z\-]+)/delete/$', views.ClusterDeleteView.as_view(), name='cluster-delete'),
+    url(r'^cluster/(?P<pk>[0-9a-zA-Z\-]+)/assets/$', views.ClusterAssetsView.as_view(), name='cluster-assets'),
 
     # Resource admin user url
     url(r'^admin-user/$', views.AdminUserListView.as_view(), name='admin-user-list'),

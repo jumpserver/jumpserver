@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # 
 
-from .idc import *
+from .cluster import *
 from .user import *
 from .group import *
 from .asset import *

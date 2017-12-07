@@ -9,7 +9,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
 from .. import forms
-from ..models import Asset, AssetGroup, AdminUser, IDC, SystemUser
+from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser
 from ..hands import AdminUserRequiredMixin
 
 __all__ = ['AdminUserCreateView', 'AdminUserDetailView',

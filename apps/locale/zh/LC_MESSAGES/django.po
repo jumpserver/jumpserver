@@ -467,7 +467,7 @@ msgstr "系统用户"
 
 #: assets/models/asset.py:52 assets/templates/assets/asset_detail.html:85
 #: templates/_nav.html:23
-msgid "IDC"
+msgid "Cluster"
 msgstr "机房"
 
 #: assets/models/asset.py:53 assets/templates/assets/asset_detail.html:129
@@ -618,8 +618,8 @@ msgid "System"
 msgstr "系统"
 
 #: assets/models/idc.py:43
-msgid "Default IDC"
-msgstr "默认IDC"
+msgid "Default Cluster"
+msgstr "默认Cluster"
 
 #: assets/models/user.py:24
 #, python-format
@@ -1080,8 +1080,8 @@ msgstr "您确定删除吗?"
 #: assets/templates/assets/idc_assets.html:23
 #: assets/templates/assets/idc_assets.html:31
 #: assets/templates/assets/idc_detail.html:21
-msgid "IDC assets"
-msgstr "IDC资产"
+msgid "Cluster assets"
+msgstr "Cluster资产"
 
 #: assets/templates/assets/idc_assets.html:68
 #, fuzzy
@@ -1104,25 +1104,25 @@ msgid "Asset Updated"
 msgstr "更新"
 
 #: assets/templates/assets/idc_list.html:10 assets/views/idc.py:39
-msgid "Create IDC"
-msgstr "创建IDC"
+msgid "Create Cluster"
+msgstr "创建Cluster"
 
 #: assets/templates/assets/idc_list.html:95
 msgid "This will delete the selected idc"
-msgstr "删除选择IDC"
+msgstr "删除选择Cluster"
 
 #: assets/templates/assets/idc_list.html:103
-msgid "IDC Deleted."
+msgid "Cluster Deleted."
 msgstr "已被删除"
 
 #: assets/templates/assets/idc_list.html:104
 #: assets/templates/assets/idc_list.html:109
-msgid "IDC Delete"
+msgid "Cluster Delete"
 msgstr "删除"
 
 #: assets/templates/assets/idc_list.html:108
-msgid "IDC Deleting failed."
-msgstr "IDC删除失败"
+msgid "Cluster Deleting failed."
+msgstr "Cluster删除失败"
 
 #: assets/templates/assets/system_user_asset.html:20
 #: assets/templates/assets/system_user_detail.html:22
@@ -1208,8 +1208,8 @@ msgid "Asset group detail"
 msgstr "资产组详情"
 
 #: assets/views/idc.py:23
-msgid "IDC list"
-msgstr "IDC列表"
+msgid "Cluster list"
+msgstr "Cluster列表"
 
 #: assets/views/idc.py:38 assets/views/idc.py:65
 #: ops/templates/ops/task_detail.html:84
@@ -1217,8 +1217,8 @@ msgid "assets"
 msgstr "资产管理"
 
 #: assets/views/idc.py:66
-msgid "Update IDC"
-msgstr "更新IDC"
+msgid "Update Cluster"
+msgstr "更新Cluster"
 
 #: assets/views/system_user.py:31
 msgid "System user list"

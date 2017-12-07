@@ -17,10 +17,10 @@
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
                             <li>
-                                <a href="{% url 'assets:idc-detail' pk=idc.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
+                                <a href="{% url 'assets:cluster-detail' pk=cluster.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
                             </li>
-                            <li class="active"><a href="{% url 'assets:idc-assets' pk=idc.id %}" class="text-center">
-                                <i class="fa fa-bar-chart-o"></i> {% trans 'IDC assets' %}</a>
+                            <li class="active"><a href="{% url 'assets:cluster-assets' pk=cluster.id %}" class="text-center">
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'Cluster assets' %}</a>
                             </li>
                         </ul>
                     </div>
@@ -28,7 +28,7 @@
                         <div class="col-sm-7" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span style="float: left">{% trans 'IDC assets' %} <b>{{ idc.name }} </b><span class="badge"></span></span>
+                                    <span style="float: left">{% trans 'Cluster assets' %} <b>{{ cluster.name }} </b><span class="badge"></span></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -45,7 +45,7 @@
                                 </div>
 
                                 <div class="ibox-content">
-                                    <table class="table table-striped table-bordered table-hover " id="idc_assets_table" >
+                                    <table class="table table-striped table-bordered table-hover " id="cluster_assets_table" >
                                         <thead>
                                             <tr>
                                                 <th class="text-center">
@@ -80,7 +80,7 @@
                         <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Add assets to' %} {{ idc.name }}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Add assets to' %} {{ cluster.name }}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table">
@@ -125,12 +125,12 @@ Array.prototype.remove = function(val) {
 	}
 };
 
-function updateIDCAssets(assets) {
-    var the_url = "{% url 'api-assets:idc-update-assets' pk=idc.id %}";
+function updateClusterAssets(assets) {
+    var the_url = "{% url 'api-assets:cluster-update-assets' pk=cluster.id %}";
     var body = {
         assets: Object.assign([], assets)
     };
-	var $data_table = $("#idc_assets_table").DataTable();
+	var $data_table = $("#cluster_assets_table").DataTable();
     var success = function(data) {
         $('.select2-selection__rendered').empty();
         $.map(jumpserver.assets_selected, function(asset_ip, index) {
@@ -147,12 +147,12 @@ function updateIDCAssets(assets) {
     });
 }
 
-function deleteIDCAssets(assets) {
-	var the_url = "{% url 'api-assets:idc-update-assets' pk=idc.id %}";
+function deleteClusterAssets(assets) {
+	var the_url = "{% url 'api-assets:cluster-update-assets' pk=cluster.id %}";
     var body = {
         assets: Object.assign([], assets)
     };
-	var $data_table = $("#idc_assets_table").DataTable();
+	var $data_table = $("#cluster_assets_table").DataTable();
 	var success = function(data) {
 		$data_table.ajax.reload();
     };
@@ -175,7 +175,7 @@ $(document).ready(function () {
 		delete jumpserver.assets_selected[data.id];
 	});
 	var options = {
-		ele: $('#idc_assets_table'),
+		ele: $('#cluster_assets_table'),
 		buttons: [],
 		order: [],
 		columnDefs: [
@@ -190,7 +190,7 @@ $(document).ready(function () {
 					$(td).html('<i class="fa fa-check text-navy"></i>')
 				}
 			}}],
-		ajax_url: '{% url "api-assets:asset-list" %}?idc_id={{ idc.id }}',
+		ajax_url: '{% url "api-assets:asset-list" %}?cluster_id={{ cluster.id }}',
 		columns: [{data: function(){return ""}}, {data: "hostname" }, {data: "ip" }, {data: "port" },
 			{data: "type" }, {data: "is_active" }],
 		op_html: $('#actions').html()
@@ -204,11 +204,11 @@ $(document).ready(function () {
 		return false;
 	}
 	var assets=[];
-	var $data_table = $("#idc_assets_table").DataTable();
+	var $data_table = $("#cluster_assets_table").DataTable();
 	$.ajax({
 		url: '{% url "api-assets:asset-list" %}',
 		method: 'GET',
-		data: {"idc_id": {{ idc.id }}},
+		data: {"cluster_id": {{ cluster.id }}},
 		dataType: 'json',
 		success: function (result) {
 			for(var i in result){
@@ -219,7 +219,7 @@ $(document).ready(function () {
 			$.map(jumpserver.assets_selected, function(value, index) {
 				assets.push(parseInt(index));
 			});
-			updateIDCAssets(assets);
+			updateClusterAssets(assets);
 
 		}
 	});
@@ -227,7 +227,7 @@ $(document).ready(function () {
 
 .on('click', '#btn_bulk_update', function () {
 	var action = $("#slct_bulk_update").val();
-	var $data_table = $("#idc_assets_table").DataTable();
+	var $data_table = $("#cluster_assets_table").DataTable();
 	var id_list = [];
 	var plain_id_list = [];
 	var assets = [];
@@ -240,7 +240,7 @@ $(document).ready(function () {
     }
     $.ajax({
     	url: '{% url "api-assets:asset-list" %}',
-	    data: {"idc_id": {{ idc.id }}},
+	    data: {"cluster_id": {{ cluster.id }}},
 	    dataType: 'json',
 	    method: 'GET',
 	    success: function (result) {
@@ -265,13 +265,13 @@ $(document).ready(function () {
 		                var success = function() {
 		                    var msg = "{% trans 'Asset Deleted.' %}";
 		                    swal("{% trans 'Asset Delete' %}", msg, "success");
-		                    $('#idc_assets_table').DataTable().ajax.reload();
+		                    $('#cluster_assets_table').DataTable().ajax.reload();
 		                };
 		                var fail = function() {
 		                    var msg = "{% trans 'Asset Deleting failed.' %}";
 		                    swal("{% trans 'Asset Delete' %}", msg, "error");
 		                };
-		                var url_delete = "{% url 'api-assets:idc-update-assets' pk=idc.id %}";
+		                var url_delete = "{% url 'api-assets:cluster-update-assets' pk=cluster.id %}";
 		                var body = {
 				            assets: Object.assign([], assets)
 				        };

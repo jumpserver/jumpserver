@@ -10,7 +10,7 @@ app_name = 'assets'
 router = BulkRouter()
 router.register(r'v1/groups', api.AssetGroupViewSet, 'asset-group')
 router.register(r'v1/assets', api.AssetViewSet, 'asset')
-router.register(r'v1/idc', api.IDCViewSet, 'idc')
+router.register(r'v1/clusters', api.ClusterViewSet, 'cluster')
 router.register(r'v1/admin-user', api.AdminUserViewSet, 'admin-user')
 router.register(r'v1/system-user', api.SystemUserViewSet, 'system-user')
 
@@ -47,9 +47,9 @@ urlpatterns = [
     url(r'^v1/groups/(?P<pk>[0-9a-zA-Z\-]+)/system-users/$',
         api.AssetGroupUpdateSystemUserApi.as_view(), name='asset-groups-update-systemusers'),
 
-    # update the IDC, and add or delete the assets to the IDC
-    url(r'^v1/idc/(?P<pk>[0-9a-zA-Z\-]+)/assets/$',
-        api.IDCUpdateAssetsApi.as_view(), name='idc-update-assets'),
+    # update the Cluster, and add or delete the assets to the Cluster
+    url(r'^v1/cluster/(?P<pk>[0-9a-zA-Z\-]+)/assets/$',
+        api.ClusterUpdateAssetsApi.as_view(), name='cluster-update-assets'),
 
 ]
 

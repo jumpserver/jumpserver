@@ -6,8 +6,9 @@ import uuid
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from common.utils import signer
 
-__all__ = ["AdHoc", "History"]
+__all__ = ["AdHoc", "AdHocRunHistory"]
 
 
 logger = logging.getLogger(__name__)
@@ -16,6 +17,8 @@ logger = logging.getLogger(__name__)
 class AdHoc(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, blank=True, verbose_name=_('Name'))
+    is_deleted = models.BooleanField(default=False)
+    date_create = models.DateTimeField(auto_created=True)
 
     @property
     def short_id(self):
@@ -39,7 +42,7 @@ class AdHocData(models.Model):
     become = models.BooleanField(default=False, verbose_name=_("Become"))
     become_method = models.CharField(choices=BECOME_METHOD_CHOICES, default='sudo', max_length=4)
     become_user = models.CharField(default='root', max_length=64)
-    become_pass = models.CharField(default='', max_length=128)
+    _become_pass = models.CharField(default='', max_length=128)
     pattern = models.CharField(max_length=64, default='', verbose_name=_('Pattern'))
     created_by = models.CharField(max_length=64, verbose_name=_('Create by'))
     date_created = models.DateTimeField(auto_created=True)
@@ -61,14 +64,28 @@ class AdHocData(models.Model):
         self._hosts = json.dumps(item)
 
     @property
+    def become_pass(self):
+        return signer.unsign(self._become_pass)
+
+    @become_pass.setter
+    def become_pass(self, password):
+        self._become_pass = signer.sign(password)
+
+    @property
     def short_version(self):
         return str(self.version).split('-')[-1]
+
+    def run(self):
+        pass
 
     def __str__(self):
         return "{} of {}".format(self.subject.name, self.short_version)
 
+    class Meta:
+        db_table = "ops_adhoc_data"
 
-class AdHocHistory(models.Model):
+
+class AdHocRunHistory(models.Model):
     uuid = models.UUIDField(default=uuid.uuid4, primary_key=True)
     adhoc = models.ForeignKey(AdHocData, on_delete=models.CASCADE)
     date_start = models.DateTimeField(auto_now_add=True, verbose_name=_('Start time'))
@@ -85,3 +102,6 @@ class AdHocHistory(models.Model):
 
     def __str__(self):
         return self.short_id
+
+    class Meta:
+        db_table = "ops_adhoc_history"

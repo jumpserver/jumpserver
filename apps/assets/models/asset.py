@@ -10,14 +10,14 @@ from django.db import models
 import logging
 from django.utils.translation import ugettext_lazy as _
 
-from . import IDC, AssetGroup, AdminUser, SystemUser
+from . import Cluster, AssetGroup, AdminUser, SystemUser
 
 __all__ = ['Asset']
 logger = logging.getLogger(__name__)
 
 
-def get_default_idc():
-    return IDC.initial()
+def get_default_cluster():
+    return Cluster.initial()
 
 
 class Asset(models.Model):
@@ -47,7 +47,7 @@ class Asset(models.Model):
     groups = models.ManyToManyField(AssetGroup, blank=True, related_name='assets', verbose_name=_('Asset groups'))
     admin_user = models.ForeignKey(AdminUser, null=True, blank=True, related_name='assets', on_delete=models.SET_NULL, verbose_name=_("Admin user"))
     system_users = models.ManyToManyField(SystemUser, blank=True, related_name='assets', verbose_name=_("System User"))
-    idc = models.ForeignKey(IDC, blank=True, null=True, related_name='assets', on_delete=models.SET_NULL, verbose_name=_('IDC'),)
+    cluster = models.ForeignKey(Cluster, blank=True, null=True, related_name='assets', on_delete=models.SET_NULL, verbose_name=_('Cluster'),)
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     type = models.CharField(choices=TYPE_CHOICES, max_length=16, blank=True, null=True, default='Server', verbose_name=_('Asset type'),)
     env = models.CharField(choices=ENV_CHOICES, max_length=8, blank=True, null=True, default='Prod', verbose_name=_('Asset environment'),)
@@ -100,18 +100,16 @@ class Asset(models.Model):
             'hostname': self.hostname,
             'ip': self.ip,
             'port': self.port,
-        }
-
-    def _to_secret_json(self):
-        """Ansible use it create inventory"""
-        data = {
-            'id': self.id,
-            'hostname': self.hostname,
-            'ip': self.ip,
-            'port': self.port,
             'groups': [group.name for group in self.groups.all()],
         }
 
+    def _to_secret_json(self):
+        """
+        Ansible use it create inventory
+
+        Todo: May be move to ops implements it
+        """
+        data = self.to_json()
         if self.admin_user:
             data.update({
                 'username': self.admin_user.username,
@@ -139,7 +137,7 @@ class Asset(models.Model):
             asset = cls(ip='%s.%s.%s.%s' % (i, i, i, i),
                         hostname=forgery_py.internet.user_name(True),
                         admin_user=choice(AdminUser.objects.all()),
-                        idc=choice(IDC.objects.all()),
+                        cluster=choice(Cluster.objects.all()),
                         port=22,
                         created_by='Fake')
             try:

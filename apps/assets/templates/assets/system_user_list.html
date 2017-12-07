@@ -69,7 +69,7 @@ $(document).ready(function(){
 
 .on('click', '.btn_admin_user_delete', function () {
     var $this = $(this);
-    var $data_table = $('#idc_list_table').DataTable();
+    var $data_table = $('#cluster_list_table').DataTable();
     var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
     var uid = $this.data('uid');
     var the_url = '{% url "api-assets:system-user-detail" pk=99991937 %}'.replace('99991937', uid);

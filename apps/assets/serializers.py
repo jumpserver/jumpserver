@@ -2,7 +2,7 @@
 from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 from rest_framework import viewsets, serializers, generics
-from .models import AssetGroup, Asset, IDC, AdminUser, SystemUser
+from .models import AssetGroup, Asset, Cluster, AdminUser, SystemUser
 from common.mixins import IDInFilterMixin
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin
 
@@ -54,11 +54,11 @@ class AssetGroupUpdateSystemUserSerializer(serializers.ModelSerializer):
         fields = ['id', 'system_users']
 
 
-class IDCUpdateAssetsSerializer(serializers.ModelSerializer):
+class ClusterUpdateAssetsSerializer(serializers.ModelSerializer):
     assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
 
     class Meta:
-        model = IDC
+        model = Cluster
         fields = ['id', 'assets']
 
 
@@ -180,12 +180,12 @@ class MyAssetGrantedSerializer(AssetGrantedSerializer):
                   "is_active", "system_users_join", "comment")
 
 
-class IDCSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+class ClusterSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     assets_amount = serializers.SerializerMethodField()
     assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
 
     class Meta:
-        model = IDC
+        model = Cluster
         fields = '__all__'
 
     @staticmethod
@@ -193,7 +193,7 @@ class IDCSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         return obj.assets.count()
 
     def get_field_names(self, declared_fields, info):
-        fields = super(IDCSerializer, self).get_field_names(declared_fields, info)
+        fields = super(ClusterSerializer, self).get_field_names(declared_fields, info)
         fields.append('assets_amount')
         return fields
 

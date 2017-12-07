@@ -29,7 +29,7 @@ Options = namedtuple('Options', [
     'ssh_common_args', 'ssh_extra_args', 'sftp_extra_args',
     'scp_extra_args', 'become', 'become_method', 'become_user',
     'verbosity', 'check', 'extra_vars', 'playbook_path', 'passwords',
-    'diff',
+    'diff', 'gathering'
 ])
 
 
@@ -58,6 +58,7 @@ def get_default_options():
         playbook_path='/etc/ansible/',
         passwords=None,
         diff=False,
+        gathering='implicit',
     )
     return options
 

@@ -2,7 +2,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from .models import IDC, Asset, AssetGroup, AdminUser, SystemUser
+from .models import Cluster, Asset, AssetGroup, AdminUser, SystemUser
 from common.utils import validate_ssh_private_key, ssh_pubkey_gen, ssh_key_gen, get_logger
 
 
@@ -14,7 +14,7 @@ class AssetCreateForm(forms.ModelForm):
         model = Asset
         fields = [
             'hostname', 'ip', 'public_ip', 'port', 'type', 'comment',
-            'admin_user', 'idc', 'groups', 'status', 'env', 'is_active'
+            'admin_user', "cluster", 'groups', 'status', 'env', 'is_active'
         ]
         widgets = {
             'groups': forms.SelectMultiple(
@@ -43,7 +43,7 @@ class AssetUpdateForm(forms.ModelForm):
     class Meta:
         model = Asset
         fields = [
-            'hostname', 'ip', 'port', 'groups', 'admin_user', 'idc', 'is_active',
+            'hostname', 'ip', 'port', 'groups', 'admin_user', "cluster", 'is_active',
             'type', 'env', 'status', 'public_ip', 'remote_card_ip', 'cabinet_no',
             'cabinet_pos', 'number', 'comment'
         ]
@@ -83,7 +83,7 @@ class AssetBulkUpdateForm(forms.ModelForm):
     class Meta:
         model = Asset
         fields = [
-            'assets', 'port', 'groups', 'admin_user', 'idc',
+            'assets', 'port', 'groups', 'admin_user', "cluster",
             'type', 'env', 'status',
         ]
         widgets = {
@@ -139,7 +139,7 @@ class AssetGroupForm(forms.ModelForm):
         }
 
 
-class IDCForm(forms.ModelForm):
+class ClusterForm(forms.ModelForm):
     # See AdminUserForm comment same it
     assets = forms.ModelMultipleChoiceField(
         queryset=Asset.objects.all(),
@@ -153,16 +153,16 @@ class IDCForm(forms.ModelForm):
         if kwargs.get('instance'):
             initial = kwargs.get('initial', {})
             initial['assets'] = kwargs['instance'].assets.all()
-        super(IDCForm, self).__init__(*args, **kwargs)
+        super(ClusterForm, self).__init__(*args, **kwargs)
 
     def _save_m2m(self):
-        super(IDCForm, self)._save_m2m()
+        super(ClusterForm, self)._save_m2m()
         assets = self.cleaned_data['assets']
         self.instance.assets.clear()
         self.instance.assets.add(*tuple(assets))
 
     class Meta:
-        model = IDC
+        model = Cluster
         fields = ['name', "bandwidth", "operator", 'contact',
                   'phone', 'address', 'intranet', 'extranet', 'comment']
         widgets = {
@@ -354,7 +354,6 @@ class SystemUserUpdateForm(forms.ModelForm):
             'username': '* required',
             'auto_push': 'Auto push system user to asset',
         }
-
 
 
 class FileForm(forms.Form):

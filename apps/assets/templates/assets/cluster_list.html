@@ -7,7 +7,7 @@
 {% block table_search %}{% endblock %}
 {% block table_container %}
 <div class="uc pull-left m-l-5 m-r-5">
-    <a href="{% url "assets:idc-create" %}" class="btn btn-sm btn-primary"> {% trans "Create IDC" %} </a>
+    <a href="{% url "assets:idc-create" %}" class="btn btn-sm btn-primary"> {% trans "Create Cluster" %} </a>
 </div>
 <table class="table table-striped table-bordered table-hover " id="idc_list_table" >
     <thead>
@@ -100,13 +100,13 @@ $(document).ready(function(){
             closeOnConfirm: false
         }, function() {
             var success = function() {
-                var msg = "{% trans 'IDC Deleted.' %}";
-                swal("{% trans 'IDC Delete' %}", msg, "success");
+                var msg = "{% trans 'Cluster Deleted.' %}";
+                swal("{% trans 'Cluster Delete' %}", msg, "success");
                 $('#idc_list_table').DataTable().ajax.reload();
             };
             var fail = function() {
-                var msg = "{% trans 'IDC Deleting failed.' %}";
-                swal("{% trans 'IDC Delete' %}", msg, "error");
+                var msg = "{% trans 'Cluster Deleting failed.' %}";
+                swal("{% trans 'Cluster Delete' %}", msg, "error");
             };
             var url_delete = the_url + '?id__in=' + JSON.stringify(plain_id_list);
             APIUpdateAttr({url: url_delete, method: 'DELETE', success: success, error: fail});

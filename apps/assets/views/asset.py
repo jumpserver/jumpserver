@@ -25,7 +25,7 @@ from django.shortcuts import get_object_or_404, redirect, reverse
 from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none
 from .. import forms
-from ..models import Asset, AssetGroup, AdminUser, IDC, SystemUser
+from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser
 from ..hands import AdminUserRequiredMixin
 from ..tasks import update_assets_hardware_info
 
@@ -283,7 +283,7 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
             asset = get_object_or_none(Asset, id=id_)
             for k, v in asset_dict.items():
                 if k == 'idc':
-                    v = get_object_or_none(IDC, name=v)
+                    v = get_object_or_none(Cluster, name=v)
                 elif k == 'is_active':
                     v = bool(v)
                 elif k == 'admin_user':

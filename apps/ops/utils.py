@@ -9,77 +9,16 @@ import uuid
 
 from django.utils import timezone
 
-from assets.models import Asset
-from common.utils import get_logger
-from .ansible.runner import AdHocRunner
+from common.utils import get_logger, get_object_or_none
+from .ansible import AdHocRunner
+from assets.utils import get_assets_by_hostname_list
 
 logger = get_logger(__file__)
-
-
-def run_AdHoc(task_tuple, assets,
-              task_name='Ansible AdHoc runner',
-              task_id=None, pattern='all',
-              record=True, verbose=True):
-    """
-    :param task_tuple:  (('module_name', 'module_args'), ('module_name', 'module_args'))
-    :param assets: [asset1, asset2]
-    :param task_name:
-    :param task_id:
-    :param pattern:
-    :param record:
-    :param verbose:
-    :return: summary: {'success': [], 'failed': [{'192.168.1.1': 'msg'}]}
-             result: {'contacted': {'hostname': [{''}, {''}], 'dark': []}
-    """
-
-    if not assets:
-        logger.warning('Empty assets, runner cancel')
-        return
-    if isinstance(assets[0], Asset):
-        assets = [asset._to_secret_json() for asset in assets]
-    if task_id is None:
-        task_id = str(uuid.uuid4())
-
-    runner = AdHocRunner(assets)
-    if record:
-        from .models import Playbook
-        if not Playbook.objects.filter(uuid=task_id):
-            record = Playbook(uuid=task_id,
-                              name=task_name,
-                              assets=','.join(str(asset['id']) for asset in assets),
-                              module_args=task_tuple,
-                              pattern=pattern)
-            record.save()
-        else:
-            record = Playbook.objects.get(uuid=task_id)
-            record.date_start = timezone.now()
-            record.date_finished = None
-            record.timedelta = None
-            record.is_finished = False
-            record.is_success = False
-            record.save()
-    ts_start = time.time()
-    if verbose:
-        logger.debug('Start runner {}'.format(task_name))
-    result = runner.run(task_tuple, pattern=pattern, task_name=task_name)
-    timedelta = round(time.time() - ts_start, 2)
-    summary = runner.clean_result()
-    if record:
-        record.date_finished = timezone.now()
-        record.is_finished = True
-        if verbose:
-            record.result = json.dumps(result, indent=4, sort_keys=True)
-        record.summary = json.dumps(summary)
-        record.timedelta = timedelta
-        if len(summary['failed']) == 0:
-            record.is_success = True
-        else:
-            record.is_success = False
-        record.save()
-    return summary, result
-
-
 UUID_PATTERN = re.compile(r'[0-9a-zA-Z\-]{36}')
+
+
+def run_AdHoc():
+    pass
 
 
 def is_uuid(s):
@@ -99,3 +38,60 @@ def asset_to_dict_with_credential(asset):
 
 def system_user_to_dict_with_credential(system_user):
     return system_user._to_secret_json()
+
+
+def get_hosts_with_admin(hostname_list):
+    assets = get_assets_by_hostname_list(hostname_list)
+    return [asset._to_secret_json for asset in assets]
+
+
+def get_hosts(hostname_list):
+    assets = get_assets_by_hostname_list(hostname_list)
+    return [asset.to_json for asset in assets]
+
+
+def get_run_user(name):
+    from assets.models import SystemUser
+    system_user = get_object_or_none(SystemUser, name=name)
+    if system_user is None:
+        return {}
+    else:
+        return system_user._to_secret_json()
+
+
+def get_hosts_with_run_user(hostname_list, run_as):
+    hosts_dict = get_hosts(hostname_list)
+    system_user_dct = get_run_user(run_as)
+
+    for host in hosts_dict:
+        host.update(system_user_dct)
+    return hosts_dict
+
+
+def hosts_add_become(hosts, adhoc_data):
+    if adhoc_data.become:
+        become_data = {
+            "become": {
+                "method": adhoc_data.become_method,
+                "user": adhoc_data.become_user,
+                "pass": adhoc_data.become_pass,
+            }
+        }
+        for host in hosts:
+            host.update(become_data)
+    return hosts
+
+
+def run_adhoc(adhoc_data, forks=10):
+    tasks = adhoc_data.tasks
+    hostname_list = adhoc_data.hosts
+    adhoc_name = adhoc_data.subject.name
+
+    if adhoc_data.run_as_admin:
+        hosts = get_hosts_with_admin(adhoc_data.hosts)
+    else:
+        hosts = get_hosts_with_run_user(hostname_list, adhoc_data.run_as)
+        hosts_add_become(hosts, adhoc_data)  # admin user 自带become
+
+    runner = AdHocRunner(hosts)
+    runner.set_option('forks', forks)
