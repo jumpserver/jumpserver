@@ -1,16 +1,13 @@
 # ~*~ coding: utf-8 ~*~
-
-from __future__ import absolute_import, unicode_literals
-
-import json
 import re
-import time
-import uuid
 
+import time
 from django.utils import timezone
 
 from common.utils import get_logger, get_object_or_none
 from .ansible import AdHocRunner
+from .ansible.exceptions import AnsibleError
+from .models import AdHocRunHistory
 from assets.utils import get_assets_by_hostname_list
 
 logger = get_logger(__file__)
@@ -82,16 +79,43 @@ def hosts_add_become(hosts, adhoc_data):
     return hosts
 
 
-def run_adhoc(adhoc_data, forks=10):
-    tasks = adhoc_data.tasks
+def run_adhoc(adhoc_data, **options):
+    """
+    :param adhoc_data: Instance of AdHocData
+    :param options: ansible support option, like forks ...
+    :return:
+    """
+    name = adhoc_data.subject.name
     hostname_list = adhoc_data.hosts
-    adhoc_name = adhoc_data.subject.name
-
     if adhoc_data.run_as_admin:
-        hosts = get_hosts_with_admin(adhoc_data.hosts)
+        hosts = get_hosts_with_admin(hostname_list)
     else:
         hosts = get_hosts_with_run_user(hostname_list, adhoc_data.run_as)
         hosts_add_become(hosts, adhoc_data)  # admin user 自带become
 
     runner = AdHocRunner(hosts)
-    runner.set_option('forks', forks)
+    for k, v in options:
+        runner.set_option(k, v)
+
+    record = AdHocRunHistory(adhoc=adhoc_data)
+    time_start = time.time()
+    try:
+        result = runner.run(adhoc_data.tasks, adhoc_data.pattern, name)
+        record.is_finished = True
+        if result.results_summary.get('dark'):
+            record.is_success = False
+        else:
+            record.is_success = True
+        record.result = result.results_raw
+        record.summary = result.results_summary
+        return result
+    except AnsibleError as e:
+        logger.error("Failed run adhoc {}, {}".format(name, e))
+        raise
+    finally:
+        record.date_finished = timezone.now()
+        record.timedelta = time.time() - time_start
+        record.save()
+
+
+

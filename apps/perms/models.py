@@ -1,18 +1,15 @@
-from __future__ import unicode_literals, absolute_import
-import functools
 import uuid
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-from django.db.models.signals import m2m_changed
 
-from users.models import User, UserGroup
-from assets.models import Asset, AssetGroup, SystemUser
 from common.utils import date_expired_default, combine_seq
 
 
 class AssetPermission(models.Model):
+    from users.models import User, UserGroup
+    from assets.models import Asset, AssetGroup, SystemUser
     # PRIVATE_FOR_CHOICE = (
     #     ('N', 'None'),
     #     ('U', 'user'),

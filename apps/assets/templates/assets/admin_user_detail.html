@@ -321,7 +321,7 @@ $(document).ready(function () {
             var body = {};
             var success = function() {
                 swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
-	            window.location.href="{% url 'assets:idc-list' %}";
+	            window.location.href="{% url 'assets:cluster-list' %}";
             };
             var fail = function() {
                 swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");

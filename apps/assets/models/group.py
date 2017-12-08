@@ -10,7 +10,7 @@ from django.db import models
 import logging
 from django.utils.translation import ugettext_lazy as _
 
-from . import SystemUser
+from .user import SystemUser
 
 __all__ = ['AssetGroup']
 logger = logging.getLogger(__name__)

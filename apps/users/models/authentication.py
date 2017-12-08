@@ -6,7 +6,7 @@ import uuid
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
-from . import User
+from .user import User
 
 __all__ = ['AccessKey', 'PrivateToken', 'LoginLog']
 

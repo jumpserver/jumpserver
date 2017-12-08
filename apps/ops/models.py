@@ -18,7 +18,8 @@ class AdHoc(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, blank=True, verbose_name=_('Name'))
     is_deleted = models.BooleanField(default=False)
-    date_create = models.DateTimeField(auto_created=True)
+    created_by = models.CharField(max_length=128, blank=True, default='')
+    date_create = models.DateTimeField(auto_now_add=True)
 
     @property
     def short_id(self):
@@ -45,7 +46,7 @@ class AdHocData(models.Model):
     _become_pass = models.CharField(default='', max_length=128)
     pattern = models.CharField(max_length=64, default='', verbose_name=_('Pattern'))
     created_by = models.CharField(max_length=64, verbose_name=_('Create by'))
-    date_created = models.DateTimeField(auto_created=True)
+    date_created = models.DateTimeField(auto_now_add=True)
 
     @property
     def tasks(self):

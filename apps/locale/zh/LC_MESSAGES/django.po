@@ -1108,7 +1108,7 @@ msgid "Create Cluster"
 msgstr "创建Cluster"
 
 #: assets/templates/assets/idc_list.html:95
-msgid "This will delete the selected idc"
+msgid "This will delete the selected cluster"
 msgstr "删除选择Cluster"
 
 #: assets/templates/assets/idc_list.html:103

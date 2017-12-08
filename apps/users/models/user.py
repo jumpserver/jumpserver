@@ -14,7 +14,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
-from . import UserGroup
+from .group import UserGroup
 from common.utils import signer, date_expired_default
 
 

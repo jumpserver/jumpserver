@@ -2,15 +2,15 @@
 # -*- coding: utf-8 -*-
 # 
 
-from __future__ import unicode_literals
-
 import uuid
 
 from django.db import models
 import logging
 from django.utils.translation import ugettext_lazy as _
 
-from . import Cluster, AssetGroup, AdminUser, SystemUser
+from .cluster import Cluster
+from .group import AssetGroup
+from .user import AdminUser, SystemUser
 
 __all__ = ['Asset']
 logger = logging.getLogger(__name__)

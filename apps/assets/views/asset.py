@@ -30,11 +30,12 @@ from ..hands import AdminUserRequiredMixin
 from ..tasks import update_assets_hardware_info
 
 
-__all__ = ['AssetListView', 'AssetCreateView', 'AssetUpdateView',
-           'UserAssetListView', 'AssetBulkUpdateView', 'AssetDetailView',
-           'AssetModalListView', 'AssetDeleteView', 'AssetExportView',
-           'BulkImportAssetView',
-           ]
+__all__ = [
+    'AssetListView', 'AssetCreateView', 'AssetUpdateView',
+    'UserAssetListView', 'AssetBulkUpdateView', 'AssetDetailView',
+    'AssetModalListView', 'AssetDeleteView', 'AssetExportView',
+    'BulkImportAssetView',
+]
 
 
 class AssetListView(AdminUserRequiredMixin, TemplateView):
@@ -282,7 +283,7 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
 
             asset = get_object_or_none(Asset, id=id_)
             for k, v in asset_dict.items():
-                if k == 'idc':
+                if k == 'cluster':
                     v = get_object_or_none(Cluster, name=v)
                 elif k == 'is_active':
                     v = bool(v)
