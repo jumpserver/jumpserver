@@ -15,6 +15,7 @@
         <th class="text-center">{% trans 'Name' %}</th>
         <th class="text-center">{% trans 'Username' %}</th>
         <th class="text-center">{% trans 'Asset num' %}</th>
+        <th class="text-center">{% trans 'Unreachable' %}</th>
         <th class="text-center">{% trans 'Comment' %}</th>
         <th class="text-center">{% trans 'Action' %}</th>
     </tr>
@@ -34,11 +35,7 @@ $(document).ready(function(){
                 var detail_btn = '<a href="{% url "assets:admin-user-detail" pk=99991937 %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('99991937', rowData.id));
              }},
-            {targets: 4, createdCell: function (td, cellData) {
-                var innerHtml = cellData.length > 8 ? cellData.substring(0, 24) + '...': cellData;
-                $(td).html('<a href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</a>');
-             }},
-            {targets: 5, createdCell: function (td, cellData, rowData) {
+            {targets: 6, createdCell: function (td, cellData, rowData) {
 {#                var script_btn = '<a href="{% url "assets:admin-user-update" pk=99991937 %}" class="btn btn-xs btn-primary">{% trans "Script" %}</a>'.replace('99991937', cellData);#}
                 var update_btn = '<a href="{% url "assets:admin-user-update" pk=99991937 %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_admin_user_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
@@ -47,7 +44,7 @@ $(document).ready(function(){
              }}],
         ajax_url: '{% url "api-assets:admin-user-list" %}',
         columns: [{data: function(){return ""}}, {data: "name" }, {data: "username" }, {data: "assets_amount" },
-                  {data: "comment" }, {data: "id" }],
+                  {data: "unreachable_amount"}, {data: "comment" }, {data: "id" }]
     };
     jumpserver.initDataTable(options);
 })

@@ -14,10 +14,10 @@
                 <div class="ibox float-e-margins">
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
-                            <li class="active">
+                            <li>
                                 <a href="{% url 'assets:admin-user-detail' pk=admin_user.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
                             </li>
-                            <li>
+                            <li class="active">
                                 <a href="{% url 'assets:admin-user-assets' pk=admin_user.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Assets list' %} </a>
                             </li>
                             <li class="pull-right">
@@ -31,10 +31,10 @@
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-sm-7" style="padding-left: 0;">
+                        <div class="col-sm-8" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span class="label"><b>{{ admin_user.name }}</b></span>
+                                    <span style="float: left">{% trans 'Asset list of ' %} <b>{{ admin_user.name }}</b> <span class="badge"> {{ total_amount }}</span> <span class="badge badge-danger">{{ unreachable_amount }}</span></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -50,34 +50,41 @@
                                     </div>
                                 </div>
                                 <div class="ibox-content">
-                                    <table class="table">
+                                    <table class="table table-hover" id="system_user_liste">
+                                        <thead>
+                                            <tr>
+                                                <th>{% trans 'Hostname' %}</th>
+                                                <th>{% trans 'IP' %}</th>
+                                                <th>{% trans 'Port' %}</th>
+                                                <th>{% trans 'Alive' %}</th>
+                                            </tr>
+                                        </thead>
                                         <tbody>
-                                        <tr class="no-borders-tr">
-                                            <td>{% trans 'Name' %}:</td>
-                                            <td><b>{{ admin_user.name }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Username' %}:</td>
-                                            <td><b>{{ admin_user.username }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Date created' %}:</td>
-                                            <td><b>{{ admin_user.date_created }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Created by' %}:</td>
-                                            <td><b>{{ asset_group.created_by  }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Comment' %}:</td>
-                                            <td><b>{{ admin_user.comment }}</b></td>
-                                        </tr>
+                                            {% for asset in page_obj %}
+                                            <tr>
+                                                <td>{{ asset.hostname }}</td>
+                                                <td>{{ asset.ip }}</td>
+                                                <td>{{ asset.port }}</td>
+                                                {% if asset.is_connective == '1' %}
+                                                <td>
+                                                    <i class="fa fa-check text-navy"></i>
+                                                </td>
+                                                {% else %}
+                                                <td>
+                                                    <i class="fa fa-times text-danger"></i>
+                                                </td>
+                                                {% endif %}
+                                            </tr>
+                                            {% endfor %}
                                         </tbody>
                                     </table>
+                                    <div class="row">
+                                        {% include '_pagination.html' %}
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Quick update' %}
@@ -86,21 +93,68 @@
                                     <table class="table">
                                         <tbody>
                                         <tr class="no-borders-tr">
-                                            <td width="50%">{% trans 'Reset private key' %}:</td>
+                                            <td width="50%">{% trans 'Retest connectivity' %}:</td>
                                             <td>
                                                 <span style="float: right">
-                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Reset' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Start' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td width="50%">{% trans 'Reset password' %}:</td>
-                                            <td>
-                                                <span style="float: right">
-                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Reset' %}</button>
-                                                </span>
-                                            </td>
-                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Replace asset admin user with this' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select asset' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for asset in assets_remain %}
+                                                            <option value="{{ asset.id }}">{{ asset.ip }}:{{ asset.port }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button" class="btn btn-info btn-sm btn-replace-asset-admin_user">{% trans 'Replace' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="panel panel-warning">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Replace asset group admin user with this' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        <form>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <select data-placeholder="{% trans 'Select asset groups' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for asset_group in asset_groups %}
+                                                            <option value="{{ asset_group.id }}">{{ asset_group.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
+                                                    <button type="button" class="btn btn-warning btn-sm btn-replace-asset_groups-admin_user">{% trans 'Replace' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
                                         </tbody>
                                     </table>
                                 </div>
@@ -290,7 +344,7 @@ $(document).ready(function () {
 				}
 			}
 			for (var z=0; z<assets.length; z++) {
-				data.push({"id":assets[z], "admin_user":{{admin_user.id}} });
+				data.push({"id":assets[z], "admin_user":"{{admin_user.id}}" });
 			}
 			APIUpdateAttr({
 				url: the_url,

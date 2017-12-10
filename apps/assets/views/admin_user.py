@@ -14,7 +14,7 @@ from ..hands import AdminUserRequiredMixin
 
 __all__ = ['AdminUserCreateView', 'AdminUserDetailView',
            'AdminUserDeleteView', 'AdminUserListView',
-           'AdminUserUpdateView',
+           'AdminUserUpdateView', 'AdminUserAssetsView',
            ]
 
 
@@ -102,6 +102,31 @@ class AdminUserDetailView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
         }
         kwargs.update(context)
         return super(AdminUserDetailView, self).get_context_data(**kwargs)
+
+
+class AdminUserAssetsView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
+    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+    template_name = 'assets/admin_user_assets.html'
+    context_object_name = 'admin_user'
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object(queryset=AdminUser.objects.all())
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        self.queryset = self.object.assets.all()
+        sorted(self.queryset, key=lambda x: x.is_connective() is False)
+        return self.queryset
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'assets',
+            'action': 'Admin user detail',
+            "total_amount": len(self.queryset),
+            'unreachable_amount': len([asset for asset in self.queryset if asset.is_connective() is False])
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
 
 
 class AdminUserDeleteView(AdminUserRequiredMixin, DeleteView):

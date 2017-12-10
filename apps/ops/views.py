@@ -9,40 +9,40 @@ from django.views.generic import ListView, DetailView, View
 from django.utils import timezone
 from django.shortcuts import redirect, reverse
 
-from .models import AdHoc, AdHocData, AdHocRunHistory
+from .models import Task, AdHoc, AdHocRunHistory
 from ops.tasks import rerun_task
 
 
 class TaskListView(ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    model = AdHoc
-    ordering = ('-date_start',)
+    model = Task
+    ordering = ('-date_created',)
     context_object_name = 'task_list'
     template_name = 'ops/task_list.html'
     date_format = '%m/%d/%Y'
     keyword = date_from_s = date_to_s = ''
 
     def get_queryset(self):
-        date_now = timezone.localtime(timezone.now())
-        date_to_default = date_now.strftime(self.date_format)
-        date_from_default = (date_now - timezone.timedelta(7)) \
-            .strftime(self.date_format)
+        date_to_default = timezone.now()
+        date_from_default = timezone.now() - timezone.timedelta(7)
+        date_from_default_s = date_from_default.strftime(self.date_format)
+        date_to_default_s = date_to_default.strftime(self.date_format)
 
-        self.queryset = super(TaskListView, self).get_queryset()
+        self.queryset = super().get_queryset()
         self.keyword = self.request.GET.get('keyword', '')
-        self.date_from_s = self.request.GET.get('date_from', date_from_default)
-        self.date_to_s = self.request.GET.get('date_to', date_to_default)
+        self.date_from_s = self.request.GET.get('date_from', date_from_default_s)
+        self.date_to_s = self.request.GET.get('date_to', date_to_default_s)
 
         if self.date_from_s:
             date_from = datetime.strptime(self.date_from_s, self.date_format)
             date_from = date_from.replace(tzinfo=timezone.get_current_timezone())
-            self.queryset = self.queryset.filter(date_start__gt=date_from)
+            self.queryset = self.queryset.filter(date_created__gt=date_from)
 
         if self.date_to_s:
             date_to = timezone.datetime.strptime(
                 self.date_to_s + ' 23:59:59', '%m/%d/%Y %H:%M:%S')
             date_to = date_to.replace(tzinfo=timezone.get_current_timezone())
-            self.queryset = self.queryset.filter(date_finished__lt=date_to)
+            self.queryset = self.queryset.filter(date_created__lt=date_to)
 
         if self.keyword:
             self.queryset = self.queryset.filter(
@@ -63,17 +63,42 @@ class TaskListView(ListView):
 
 
 class TaskDetailView(DetailView):
-    model = AdHocRunHistory
+    model = Task
     template_name = 'ops/task_detail.html'
 
     def get_context_data(self, **kwargs):
         context = {
             'app': 'Ops',
-            'action': 'Playbook record detail',
-            'results': json.loads(self.object.summary or '{}'),
+            'action': 'Task detail',
         }
         kwargs.update(context)
-        return super(TaskDetailView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
+
+
+class TaskAdhocView(DetailView):
+    model = Task
+    template_name = 'ops/task_adhoc.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'Ops',
+            'action': 'Task versions',
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class TaskHistoryView(DetailView):
+    model = Task
+    template_name = 'ops/task_history.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'Ops',
+            'action': 'Task run history',
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
 
 
 class TaskRunView(View):

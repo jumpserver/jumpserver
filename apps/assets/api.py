@@ -26,12 +26,13 @@ from .hands import IsSuperUser, IsAppUser, IsValidUser, \
     get_user_granted_assets, push_users
 from .models import AssetGroup, Asset, Cluster, SystemUser, AdminUser
 from . import serializers
-from .tasks import update_assets_hardware_info
-from .utils import test_admin_user_connective_manual
+from .tasks import update_assets_hardware_info, test_admin_user_connectability_manual
 
 
 class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
-    """API endpoint that allows Asset to be viewed or edited."""
+    """
+    API endpoint that allows Asset to be viewed or edited.
+    """
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
     permission_classes = (IsValidUser,)
@@ -195,7 +196,7 @@ class AssetAdminUserTestView(AssetRefreshHardwareView):
     def retrieve(self, request, *args, **kwargs):
         asset_id = kwargs.get('pk')
         asset = get_object_or_404(Asset, pk=asset_id)
-        result = test_admin_user_connective_manual([asset])
+        result = test_admin_user_connectability_manual(asset)
         if result:
             return Response('1')
         else:

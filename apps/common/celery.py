@@ -27,8 +27,8 @@ app.conf.update(
             'schedule': 60*60*60*24,
             'args': (),
         },
-        'test-admin-user-connective': {
-            'task': 'assets.tasks.test_admin_user_connective_period',
+        'test-admin-user-connectability_periode': {
+            'task': 'assets.tasks.test_admin_user_connectability_period',
             'schedule': 60*60*60,
             'args': (),
         },

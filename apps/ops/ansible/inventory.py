@@ -1,12 +1,16 @@
 # ~*~ coding: utf-8 ~*~
-from ansible.inventory.group import Group
 from ansible.inventory.host import Host
 from ansible.vars.manager import VariableManager
 from ansible.inventory.manager import InventoryManager
 from ansible.parsing.dataloader import DataLoader
 
 
-class JMSHost(Host):
+__all__ = [
+    'BaseHost', 'BaseInventory'
+]
+
+
+class BaseHost(Host):
     def __init__(self, host_data):
         """
         初始化
@@ -14,6 +18,7 @@ class JMSHost(Host):
             "hostname": "",
             "ip": "",
             "port": "",
+            # behind is not must be required
             "username": "",
             "password": "",
             "private_key": "",
@@ -29,7 +34,7 @@ class JMSHost(Host):
         self.host_data = host_data
         hostname = host_data.get('hostname') or host_data.get('ip')
         port = host_data.get('port') or 22
-        super(JMSHost, self).__init__(hostname, port)
+        super().__init__(hostname, port)
         self.__set_required_variables()
         self.__set_extra_variables()
 
@@ -37,7 +42,9 @@ class JMSHost(Host):
         host_data = self.host_data
         self.set_variable('ansible_host', host_data['ip'])
         self.set_variable('ansible_port', host_data['port'])
-        self.set_variable('ansible_user', host_data['username'])
+
+        if host_data.get('username'):
+            self.set_variable('ansible_user', host_data['username'])
 
         # 添加密码和秘钥
         if host_data.get('password'):
@@ -63,30 +70,15 @@ class JMSHost(Host):
         return self.name
 
 
-class JMSInventory(InventoryManager):
+class BaseInventory(InventoryManager):
     """
     提供生成Ansible inventory对象的方法
     """
     loader_class = DataLoader
     variable_manager_class = VariableManager
-    host_manager_class = JMSHost
+    host_manager_class = BaseHost
 
     def __init__(self, host_list=None):
-        if host_list is None:
-            host_list = []
-        self.host_list = host_list
-        assert isinstance(host_list, list)
-        self.loader = self.loader_class()
-        self.variable_manager = self.variable_manager_class()
-        super().__init__(self.loader)
-
-    def get_groups(self):
-        return self._inventory.groups
-
-    def get_group(self, name):
-        return self._inventory.groups.get(name, None)
-
-    def parse_sources(self, cache=False):
         """
         用于生成动态构建Ansible Inventory. super().__init__ 会自动调用
         host_list: [{
@@ -105,9 +97,23 @@ class JMSInventory(InventoryManager):
             "vars": {},
           },
         ]
-
-        :return: None
+        :param host_list:
         """
+        if host_list is None:
+            host_list = []
+        self.host_list = host_list
+        assert isinstance(host_list, list)
+        self.loader = self.loader_class()
+        self.variable_manager = self.variable_manager_class()
+        super().__init__(self.loader)
+
+    def get_groups(self):
+        return self._inventory.groups
+
+    def get_group(self, name):
+        return self._inventory.groups.get(name, None)
+
+    def parse_sources(self, cache=False):
         group_all = self.get_group('all')
         ungrouped = self.get_group('ungrouped')
 
@@ -119,9 +125,14 @@ class JMSInventory(InventoryManager):
                 for group_name in groups_data:
                     group = self.get_group(group_name)
                     if group is None:
-                        group = Group(group_name)
-                        self.add_group(group)
+                        self.add_group(group_name)
+                        group = self.get_group(group_name)
                     group.add_host(host)
             else:
                 ungrouped.add_host(host)
             group_all.add_host(host)
+
+    def get_matched_hosts(self, pattern):
+        return self.get_hosts(pattern)
+
+

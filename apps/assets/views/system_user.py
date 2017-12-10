@@ -117,25 +117,18 @@ class SystemUserAssetView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object(queryset=SystemUser.objects.all())
-        return super(SystemUserAssetView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
-    def get_asset_groups(self):
-        return self.object.asset_groups.all()
-
-    # Todo: queryset default order by connectivity, need ops support
     def get_queryset(self):
-        return list(self.object.get_assets())
+        return self.object.assets.all()
 
     def get_context_data(self, **kwargs):
-        asset_groups = self.get_asset_groups()
         assets = self.get_queryset()
         context = {
             'app': 'assets',
             'action': 'System user asset',
             'assets_remain': [asset for asset in Asset.objects.all() if asset not in assets],
-            'asset_groups': asset_groups,
-            'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all()
-                                    if asset_group not in asset_groups]
+            'asset_groups': AssetGroup.objects.all(),
         }
         kwargs.update(context)
         return super(SystemUserAssetView, self).get_context_data(**kwargs)

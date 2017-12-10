@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="panel-options">
+                        <ul class="nav nav-tabs">
+                            <li>
+                                <a href="{% url 'ops:task-detail' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Task detail' %} </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'ops:task-adhoc' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Task versions' %} </a>
+                            </li>
+                            <li class="active">
+                                <a href="{% url 'ops:task-history' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Run history' %} </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="tab-content">
+                        <div class="col-sm-12" style="padding-left: 0">
+                            <div class="ibox float-e-margins">
+                                <div class="ibox-title">
+                                    <span style="float: left">{% trans 'Versions of ' %} <b>{{ object.name }}</b></span>
+                                    <div class="ibox-tools">
+                                        <a class="collapse-link">
+                                            <i class="fa fa-chevron-up"></i>
+                                        </a>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                                            <i class="fa fa-wrench"></i>
+                                        </a>
+                                        <ul class="dropdown-menu dropdown-user">
+                                        </ul>
+                                        <a class="close-link">
+                                            <i class="fa fa-times"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="ibox-content">
+                                    <table class="table table-hover " id="task-history-list-table" >
+                                        <thead>
+                                            <tr>
+                                                <th class="text-center">
+                                                    <input type="checkbox" id="check_all" class="ipt_check_all" >
+                                                </th>
+                                                <th>{% trans 'Date start' %}</th>
+                                                <th>{% trans 'F/S/T' %}</th>
+                                                <th>{% trans 'Is finished' %}</th>
+                                                <th>{% trans 'Is success' %}</th>
+                                                <th>{% trans 'Time' %}</th>
+                                                <th></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block custom_foot_js %}
+    <script>
+        $(document).ready(function () {
+            var options = {
+                ele: $('#task-history-list-table'),
+                buttons: [],
+                order: [],
+                select: [],
+                columnDefs: [
+                    {targets: 1, createdCell: function (td, cellData, rowData) {
+{#                        var detail_btn = '<a href="' + cellData + '</a>';#}
+                        $(td).html(cellData);
+                     }},
+{#                    {targets: 2, createdCell: function (td, cellData, rowData) {#}
+{#                        var dataLength = cellData.length;#}
+{#                        $(td).html(dataLength);#}
+{#                    }},#}
+                    {targets: 3, createdCell: function (td, cellData) {
+                        if (!cellData) {
+                            $(td).html('<i class="fa fa-times text-danger"></i>')
+                        } else {
+                            $(td).html('<i class="fa fa-check text-navy"></i>')
+                        }
+                    }},
+                    {targets: 4, createdCell: function (td, cellData) {
+                        if (!cellData) {
+                            $(td).html('<i class="fa fa-times text-danger"></i>')
+                        } else {
+                            $(td).html('<i class="fa fa-check text-navy"></i>')
+                        }
+                    }},
+                    {targets: 5, createdCell: function (td, cellData) {
+                        if (cellData) {
+                            $(td).html(cellData.toFixed(2) + ' s')
+                        } else {
+                            $(td).html("0" + ' s')
+                        }
+
+                     }}
+                ],
+                ajax_url: '{% url "api-ops:history-list" %}?task={{ object.pk }}',
+                columns: [{data: function(){return ""}}, {data: "date_start"}, {data: "adhoc_short_id"},
+                          {data: "adhoc_short_id"}, {data: "adhoc_short_id"}, {data: "timedelta"}]
+            };
+            jumpserver.initDataTable(options);
+        })
+    </script>
+{% endblock %}

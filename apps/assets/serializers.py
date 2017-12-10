@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 from rest_framework import viewsets, serializers, generics
-from .models import AssetGroup, Asset, Cluster, AdminUser, SystemUser
-from common.mixins import IDInFilterMixin
 from rest_framework_bulk import BulkListSerializer, BulkSerializerMixin
+
+from .models import AssetGroup, Asset, Cluster, AdminUser, SystemUser
+from .tasks import SYSTEM_USER_CONN_CACHE_KEY_PREFIX, ADMIN_USER_CONN_CACHE_KEY_PREFIX
 
 
 class AssetGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
@@ -64,10 +64,19 @@ class ClusterUpdateAssetsSerializer(serializers.ModelSerializer):
 
 class AdminUserSerializer(serializers.ModelSerializer):
     assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
+    unreachable_amount = serializers.SerializerMethodField()
 
     class Meta:
         model = AdminUser
         fields = '__all__'
+
+    @staticmethod
+    def get_unreachable_amount(obj):
+        data = cache.get(ADMIN_USER_CONN_CACHE_KEY_PREFIX + obj.name)
+        if data:
+            return len(data.get('dark'))
+        else:
+            return 'Unknown'
 
     def get_field_names(self, declared_fields, info):
         fields = super(AdminUserSerializer, self).get_field_names(declared_fields, info)
@@ -76,9 +85,19 @@ class AdminUserSerializer(serializers.ModelSerializer):
 
 
 class SystemUserSerializer(serializers.ModelSerializer):
+    unreachable_amount = serializers.SerializerMethodField()
+
     class Meta:
         model = SystemUser
         exclude = ('_password', '_private_key', '_public_key')
+
+    @staticmethod
+    def get_unreachable_amount(obj):
+        data = cache.get(SYSTEM_USER_CONN_CACHE_KEY_PREFIX + obj.name)
+        if data:
+            return len(data.get('dark'))
+        else:
+            return "Unknown"
 
     def get_field_names(self, declared_fields, info):
         fields = super(SystemUserSerializer, self).get_field_names(declared_fields, info)
@@ -167,8 +186,7 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_system_users_join(obj):
-        return ', '.join([system_user.username
-                          for system_user in obj.system_users_granted])
+        return ', '.join([system_user.username for system_user in obj.system_users_granted])
 
 
 class MyAssetGrantedSerializer(AssetGrantedSerializer):

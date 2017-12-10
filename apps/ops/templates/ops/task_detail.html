@@ -15,8 +15,14 @@
                 <div class="ibox float-e-margins">
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
-                            <li class="active">
-                                <a href="" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Task replay detail' %} </a>
+                           <li class="active">
+                                <a href="{% url 'ops:task-detail' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Task detail' %} </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'ops:task-adhoc' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Task versions' %} </a>
+                            </li>
+                            <li>
+                                <a href="{% url 'ops:task-history' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Run history' %} </a>
                             </li>
                         </ul>
                     </div>
@@ -43,80 +49,53 @@
                                     <table class="table">
                                         <tbody>
                                         <tr class="no-borders-tr">
-                                            <td width="20%">{% trans 'UUID' %}:</td>
-                                            <td><b>{{ object.uuid }}</b></td>
+                                            <td width="20%">{% trans 'ID' %}:</td>
+                                            <td><b>{{ object.id }}</b></td>
                                         </tr>
                                         <tr>
                                             <td width="20%">{% trans 'Name' %}:</td>
                                             <td><b>{{ object.name }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Date start' %}:</td>
-                                            <td><b>{{ object.date_start }}</b></td>
+                                            <td>{% trans 'Date created' %}:</td>
+                                            <td><b>{{ object.date_created }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Date finished' %}:</td>
-                                            <td><b>{{ object.date_finished }}</b></td>
+                                            <td>{% trans 'Total versions' %}</td>
+                                            <td><b>{{ object.adhoc.all |length }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Last version' %}</td>
+                                            <td><b>{{ object.get_latest_adhoc.short_id }}</b></td>
+                                        </tr>
+                                        <tr>
+                                            <td>{% trans 'Latest run' %}:</td>
+                                            <td><b>{{ object.get_latest_history.date_start }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Time delta' %}:</td>
-                                            <td><b>{{ object.timedelta}} s</b></td>
+                                            <td><b>{{ object.get_latest_history.timedelta|floatformat}} s</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Is finished' %}:</td>
-                                            <td><b>{{ object.is_finished|yesno:"Yes,No,Unkown" }}</b></td>
+                                            <td><b>{{ object.get_latest_history.is_finished|yesno:"Yes,No,Unkown" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Is success ' %}:</td>
-                                            {% if object.is_finished %}
-                                            <td><b>{{ object.is_success|yesno:"Yes,No,Unkown" }}</b></td>
-                                            {% else %}
-                                            <td>
-                                                <div class="progress progress-striped active">
-                                                    <div style="width: 50%" aria-valuemax="100" aria-valuemin="0" aria-valuenow="75" role="progressbar" class="progress-bar progress-bar-primary">
-                                                        <span class="sr-only">40% Complete (success)</span>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            {% endif %}
+                                            <td><b>{{ object.get_latest_history.is_success|yesno:"Yes,No,Unkown" }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'assets' %}:</td>
+                                            <td>{% trans 'Conents' %}:</td>
                                             <td>
                                                 <b>
-                                                {% for asset in object.total_assets %}
-                                                {{ asset.hostname }} <br/>
+                                                {% for task in object.get_latest_adhoc.tasks %}
+                                                {{ task.name }} : {{ task.action.module }} <br/>
                                                 {% endfor %}
                                                 </b>
                                             </td>
                                         </tr>
                                         </tbody>
                                     </table>
-                                </div>
-                            </div>
-
-                            <div class="ibox float-e-margins">
-                                <div class="ibox-title">
-                                    <span><b>Result</b></span>
-                                    <div class="ibox-tools">
-                                        <a class="collapse-link">
-                                            <i class="fa fa-chevron-up"></i>
-                                        </a>
-                                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                                            <i class="fa fa-wrench"></i>
-                                        </a>
-                                        <ul class="dropdown-menu dropdown-user">
-                                        </ul>
-                                        <a class="close-link">
-                                            <i class="fa fa-times"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                                <div class="ibox-content">
-                                    <pre>
-{{ object.result }}
-                                    </pre>
-                                </div>
                                 </div>
                             </div>
                         </div>
@@ -154,7 +133,7 @@
                                 <div class="panel-body">
                                     <table class="table">
                                         <tbody>
-                                        {% for host in results.success %}
+                                        {% for host in object.get_latest_history.summary.contacted %}
                                         {% if forloop.first %}
                                         <tr class="no-borders-tr">
                                         {% else %}

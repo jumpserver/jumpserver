@@ -4,18 +4,14 @@ import re
 import time
 from django.utils import timezone
 
-from common.utils import get_logger, get_object_or_none
-from .ansible import AdHocRunner
+from common.utils import get_logger, get_object_or_none, get_short_uuid_str
+from .ansible import AdHocRunner, CommandResultCallback
+from .inventory import JMSInventory
 from .ansible.exceptions import AnsibleError
-from .models import AdHocRunHistory
-from assets.utils import get_assets_by_hostname_list
+from .models import AdHocRunHistory, Task, AdHoc
 
 logger = get_logger(__file__)
 UUID_PATTERN = re.compile(r'[0-9a-zA-Z\-]{36}')
-
-
-def run_AdHoc():
-    pass
 
 
 def is_uuid(s):
@@ -25,97 +21,133 @@ def is_uuid(s):
         return False
 
 
-def asset_to_dict(asset):
-    return asset.to_json()
+def record_adhoc(func):
+    def _deco(adhoc, **options):
+        record = AdHocRunHistory(adhoc=adhoc)
+        time_start = time.time()
+        try:
+            result = func(adhoc, **options)
+            record.is_finished = True
+            if result.results_summary.get('dark'):
+                record.is_success = False
+            else:
+                record.is_success = True
+            record.result = result.results_raw
+            record.summary = result.results_summary
+            return result
+        finally:
+            record.date_finished = timezone.now()
+            record.timedelta = time.time() - time_start
+            record.save()
+    return _deco
 
 
-def asset_to_dict_with_credential(asset):
-    return asset._to_secret_json()
-
-
-def system_user_to_dict_with_credential(system_user):
-    return system_user._to_secret_json()
-
-
-def get_hosts_with_admin(hostname_list):
-    assets = get_assets_by_hostname_list(hostname_list)
-    return [asset._to_secret_json for asset in assets]
-
-
-def get_hosts(hostname_list):
-    assets = get_assets_by_hostname_list(hostname_list)
-    return [asset.to_json for asset in assets]
-
-
-def get_run_user(name):
-    from assets.models import SystemUser
-    system_user = get_object_or_none(SystemUser, name=name)
-    if system_user is None:
-        return {}
-    else:
-        return system_user._to_secret_json()
-
-
-def get_hosts_with_run_user(hostname_list, run_as):
-    hosts_dict = get_hosts(hostname_list)
-    system_user_dct = get_run_user(run_as)
-
-    for host in hosts_dict:
-        host.update(system_user_dct)
-    return hosts_dict
-
-
-def hosts_add_become(hosts, adhoc_data):
-    if adhoc_data.become:
-        become_data = {
-            "become": {
-                "method": adhoc_data.become_method,
-                "user": adhoc_data.become_user,
-                "pass": adhoc_data.become_pass,
+def get_adhoc_inventory(adhoc):
+    if adhoc.become:
+        become_info = {
+            'become': {
+               adhoc.become
             }
         }
-        for host in hosts:
-            host.update(become_data)
-    return hosts
+    else:
+        become_info = None
+
+    inventory = JMSInventory(
+        adhoc.hosts, run_as_admin=adhoc.run_as_admin,
+        run_as=adhoc.run_as, become_info=become_info
+    )
+    return inventory
 
 
-def run_adhoc(adhoc_data, **options):
+def get_inventory(hostname_list, run_as_admin=False, run_as=None, become_info=None):
+    return JMSInventory(
+        hostname_list, run_as_admin=run_as_admin,
+        run_as=run_as, become_info=become_info
+    )
+
+
+def get_adhoc_runner(hostname_list, run_as_admin=False, run_as=None, become_info=None):
+    inventory = get_inventory(
+        hostname_list, run_as_admin=run_as_admin,
+        run_as=run_as, become_info=become_info
+    )
+    runner = AdHocRunner(inventory)
+    return runner
+
+
+@record_adhoc
+def run_adhoc_object(adhoc, **options):
     """
-    :param adhoc_data: Instance of AdHocData
+    :param adhoc: Instance of AdHoc
     :param options: ansible support option, like forks ...
     :return:
     """
-    name = adhoc_data.subject.name
-    hostname_list = adhoc_data.hosts
-    if adhoc_data.run_as_admin:
-        hosts = get_hosts_with_admin(hostname_list)
-    else:
-        hosts = get_hosts_with_run_user(hostname_list, adhoc_data.run_as)
-        hosts_add_become(hosts, adhoc_data)  # admin user 自带become
-
-    runner = AdHocRunner(hosts)
+    name = adhoc.task.name
+    inventory = get_adhoc_inventory(adhoc)
+    runner = AdHocRunner(inventory)
     for k, v in options:
         runner.set_option(k, v)
 
-    record = AdHocRunHistory(adhoc=adhoc_data)
-    time_start = time.time()
     try:
-        result = runner.run(adhoc_data.tasks, adhoc_data.pattern, name)
-        record.is_finished = True
-        if result.results_summary.get('dark'):
-            record.is_success = False
-        else:
-            record.is_success = True
-        record.result = result.results_raw
-        record.summary = result.results_summary
+        result = runner.run(adhoc.tasks, adhoc.pattern, name)
         return result
     except AnsibleError as e:
         logger.error("Failed run adhoc {}, {}".format(name, e))
         raise
-    finally:
-        record.date_finished = timezone.now()
-        record.timedelta = time.time() - time_start
-        record.save()
 
 
+def run_adhoc(hostname_list, pattern, tasks, name=None,
+              run_as_admin=False, run_as=None, become_info=None):
+    if name is None:
+        name = "Adhoc-task-{}-{}".format(
+            get_short_uuid_str(),
+            timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
+        )
 
+    inventory = get_inventory(
+        hostname_list, run_as_admin=run_as_admin,
+        run_as=run_as, become_info=become_info
+    )
+    runner = AdHocRunner(inventory)
+    return runner.run(tasks, pattern, play_name=name)
+
+
+def create_and_run_adhoc(hostname_list, pattern, tasks, name=None,
+                         run_as_admin=False, run_as=None, become_info=None):
+    if name is None:
+        name = "Adhoc-task-{}-{}".format(
+            get_short_uuid_str(),
+            timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
+        )
+    task = Task(name=name)
+    task.save()
+    adhoc = AdHoc(
+        task=task, pattern=pattern, name=name,
+        run_as_admin=run_as_admin, run_as=run_as
+    )
+    adhoc.hosts = hostname_list
+    adhoc.tasks = tasks
+    adhoc.become = become_info
+    adhoc.save()
+
+
+def get_task_by_name(name):
+    task = get_object_or_none(Task, name=name)
+    return task
+
+
+def create_task(name, created_by=""):
+    return Task.objects.create(name=name, created_by=created_by)
+
+
+def create_adhoc(task, hosts, tasks, pattern='all', options=None,
+                 run_as_admin=False, run_as="",
+                 become_info=None, created_by=""):
+    adhoc = AdHoc(task=task, pattern=pattern, run_as_admin=run_as_admin,
+                  run_as=run_as, created_by=created_by)
+    adhoc.hosts = hosts
+    adhoc.tasks = tasks
+    adhoc.options = options
+    adhoc.become = become_info
+    adhoc.save()
+    return adhoc

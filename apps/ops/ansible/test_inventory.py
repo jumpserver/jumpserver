@@ -6,7 +6,7 @@ import unittest
 
 
 sys.path.insert(0, '../..')
-from ops.ansible.inventory import JMSInventory
+from ops.ansible.inventory import BaseInventory
 
 
 class TestJMSInventory(unittest.TestCase):
@@ -41,7 +41,7 @@ class TestJMSInventory(unittest.TestCase):
             "vars": {"love": "yes"},
         }]
 
-        self.inventory = JMSInventory(host_list=host_list)
+        self.inventory = BaseInventory(host_list=host_list)
 
     def test_hosts(self):
         print("#"*10 + "Hosts" + "#"*10)

@@ -7,6 +7,7 @@ import uuid
 from django.db import models
 import logging
 from django.utils.translation import ugettext_lazy as _
+from django.core.cache import cache
 
 from .cluster import Cluster
 from .group import AssetGroup
@@ -21,6 +22,7 @@ def get_default_cluster():
 
 
 class Asset(models.Model):
+    # Todo: Move them to settings
     STATUS_CHOICES = (
         ('In use', _('In use')),
         ('Out of use', _('Out of use')),
@@ -102,6 +104,9 @@ class Asset(models.Model):
             'port': self.port,
             'groups': [group.name for group in self.groups.all()],
         }
+
+    def is_connective(self):
+        return cache.get(self.hostname)
 
     def _to_secret_json(self):
         """

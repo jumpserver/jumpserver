@@ -7,6 +7,8 @@ from .. import api
 
 router = DefaultRouter()
 router.register(r'v1/tasks', api.TaskViewSet, 'task')
+router.register(r'v1/adhoc', api.AdHocViewSet, 'adhoc')
+router.register(r'v1/history', api.AdHocRunHistorySet, 'history')
 
 urlpatterns = []
 

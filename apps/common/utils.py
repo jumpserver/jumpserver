@@ -15,6 +15,7 @@ from email.utils import formatdate
 import calendar
 import threading
 from six import StringIO
+import uuid
 
 import paramiko
 import sshpubkeys
@@ -376,6 +377,10 @@ def sum_capacity(cap_list):
         total += size
     total = '{} K'.format(total)
     return capacity_convert(total, expect='auto')
+
+
+def get_short_uuid_str():
+    return str(uuid.uuid4()).split('-')[-1]
 
 
 signer = Signer()

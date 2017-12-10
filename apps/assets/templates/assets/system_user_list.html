@@ -60,7 +60,7 @@ $(document).ready(function(){
                 $(td).html(update_btn + del_btn)
             }}],
         ajax_url: '{% url "api-assets:system-user-list" %}',
-        columns: [{data: "id" }, {data: "name" }, {data: "username" }, {data: "assets_amount" }, {data: function () { return "3"}},
+        columns: [{data: "id" }, {data: "name" }, {data: "username" }, {data: "assets_amount" }, {data: "unreachable_amount"},
             {data: "comment" }, {data: "id" }],
         op_html: $('#actions').html()
         };

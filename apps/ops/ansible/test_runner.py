@@ -7,6 +7,7 @@ import sys
 sys.path.insert(0, "../..")
 
 from ops.ansible.runner import AdHocRunner, CommandRunner
+from ops.ansible.inventory import BaseInventory
 
 
 class TestAdHocRunner(unittest.TestCase):
@@ -20,7 +21,8 @@ class TestAdHocRunner(unittest.TestCase):
                 "password": "redhat",
             },
         ]
-        self.runner = AdHocRunner(hosts=host_data)
+        inventory = BaseInventory(host_data)
+        self.runner = AdHocRunner(inventory)
 
     def test_run(self):
         tasks = [
@@ -43,7 +45,8 @@ class TestCommandRunner(unittest.TestCase):
                 "password": "redhat",
             },
         ]
-        self.runner = CommandRunner(hosts=host_data)
+        inventory = BaseInventory(host_data)
+        self.runner = CommandRunner(inventory)
 
     def test_execute(self):
         res = self.runner.execute('ls', 'all')

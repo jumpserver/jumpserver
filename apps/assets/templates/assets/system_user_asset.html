@@ -58,18 +58,16 @@
                                                 <td>{{ asset.ip }}</td>
                                                 <td>{{ asset.port }}</td>
                                                 <td>
+
                                                     <i class="fa fa-check text-navy"></i>
                                                 </td>
                                                 <td>
-                                                    <button class="btn btn-danger pull-right btn-xs {% if asset.is_inherit_from_asset_groups %} disabled {% endif %}" type="button"><i class="fa fa-minus"></i></button>
+                                                    <button class="btn btn-danger pull-right btn-xs" type="button"><i class="fa fa-minus"></i></button>
                                                 </td>
                                             </tr>
                                             {% endfor %}
                                         </tbody>
                                     </table>
-{#                                    <div class="row">#}
-{#                                        {% include '_pagination.html' %}#}
-{#                                    </div>#}
                                 </div>
                             </div>
                         </div>

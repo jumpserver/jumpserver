@@ -22,7 +22,7 @@
             </div>
         </div>
         <div class="input-group">
-            <input type="text" class="form-control input-sm" name="keyword" placeholder="Keyword" value="{{ keyword }}">
+            <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="{{ keyword }}">
         </div>
         <div class="input-group">
             <div class="input-group-btn">
@@ -37,10 +37,11 @@
 {% block table_head %}
     <th class="text-center"></th>
     <th class="text-center">{% trans 'Name' %}</th>
-    <th class="text-center">{% trans 'Asset' %}</th>
+    <th class="text-center">{% trans 'F/S/T' %}</th>
+    <th class="text-center">{% trans 'Versions' %}</th>
+    <th class="text-center">{% trans 'Hosts' %}</th>
     <th class="text-center">{% trans 'Success' %}</th>
-    <th class="text-center">{% trans 'Finished' %}</th>
-    <th class="text-center">{% trans 'Date start' %}</th>
+    <th class="text-center">{% trans 'Date' %}</th>
     <th class="text-center">{% trans 'Time' %}</th>
     <th class="text-center">{% trans 'Action' %}</th>
 {% endblock %}
@@ -49,26 +50,23 @@
     {% for object in task_list %}
         <tr class="gradeX">
             <td class="text-center"><input type="checkbox" class="cbx-term"> </td>
-            <td class="text-center"><a href="{% url 'ops:task-detail' pk=object.uuid %}">{{ object.name }}</a></td>
-            <td class="text-center">{{ object.total_assets|length }}</td>
+            <td class="text-center"><a href="{% url 'ops:task-detail' pk=object.id %}">{{ object.name }}</a></td>
             <td class="text-center">
-            {% if object.is_success %}
+                <span class="text-danger">{{ object.get_all_run_times.failed }}</span>/<span class="text-navy">{{ object.get_all_run_times.success}}</span>/{{ object.get_all_run_times.total}}
+            </td>
+            <td class="text-center">{{ object.adhoc.all | length}}</td>
+            <td class="text-center">{{ object.get_latest_adhoc.hosts | length}}</td>
+            <td class="text-center">
+            {% if object.get_latest_history.is_success %}
                 <i class="fa fa-check text-navy"></i>
             {% else %}
                 <i class="fa fa-times text-danger"></i>
             {% endif %}
             </td>
+            <td class="text-center">{{ object.get_latest_history.date_start }}</td>
+            <td class="text-center">{{ object.get_latest_history.timedelta|floatformat }} s</td>
             <td class="text-center">
-            {% if object.is_finished %}
-                <i class="fa fa-check text-navy"></i>
-            {% else %}
-                <i class="fa fa-times text-danger"></i>
-            {% endif %}
-            </td>
-            <td class="text-center">{{ object.date_start }}</td>
-            <td class="text-center">{{ object.timedelta }} s</td>
-            <td class="text-center">
-                <a href="{% url 'ops:task-run' pk=object.uuid %}" class="btn btn-xs btn-info">{% trans "Run again" %}</a>
+                <a href="{% url 'ops:task-run' pk=object.id %}" class="btn btn-xs btn-info">{% trans "Run" %}</a>
                 <a data-uid="{{ object.uuid }}" class="btn btn-xs btn-danger btn-del">{% trans "Delete" %}</a>
             </td>
         </tr>

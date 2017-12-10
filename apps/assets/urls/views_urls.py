@@ -41,6 +41,7 @@ urlpatterns = [
     url(r'^admin-user/(?P<pk>[0-9a-zA-Z\-]+)/$', views.AdminUserDetailView.as_view(), name='admin-user-detail'),
     url(r'^admin-user/(?P<pk>[0-9a-zA-Z\-]+)/update/$', views.AdminUserUpdateView.as_view(), name='admin-user-update'),
     url(r'^admin-user/(?P<pk>[0-9a-zA-Z\-]+)/delete/$', views.AdminUserDeleteView.as_view(), name='admin-user-delete'),
+    url(r'^admin-user/(?P<pk>[0-9a-zA-Z\-]+)/assets/$', views.AdminUserAssetsView.as_view(), name='admin-user-assets'),
 
     # Resource system user url
     url(r'^system-user/$', views.SystemUserListView.as_view(), name='system-user-list'),

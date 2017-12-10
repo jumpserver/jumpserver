@@ -299,6 +299,7 @@ REST_FRAMEWORK = {
         'users.authentication.SessionAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S',
 }
 
 AUTHENTICATION_BACKENDS = [

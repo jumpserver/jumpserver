@@ -1,5 +1,4 @@
 # ~*~ coding: utf-8 ~*~
-from __future__ import unicode_literals
 
 import os
 from collections import namedtuple
@@ -11,7 +10,6 @@ from ansible.executor.playbook_executor import PlaybookExecutor
 from ansible.playbook.play import Play
 import ansible.constants as C
 
-from .inventory import JMSInventory
 from .callback import AdHocResultCallback, PlaybookResultCallBack, \
     CommandResultCallback
 from common.utils import get_logger
@@ -71,36 +69,19 @@ class PlayBookRunner:
 
     # Default results callback
     results_callback_class = PlaybookResultCallBack
-    inventory_class = JMSInventory
     loader_class = DataLoader
     variable_manager_class = VariableManager
     options = get_default_options()
 
-    def __init__(self, hosts=None, options=None):
+    def __init__(self, inventory=None, options=None):
         """
         :param options: Ansible options like ansible.cfg
-        :param hosts: [
-          {
-            "hostname": "",
-            "ip": "",
-            "port": "",
-            "username": "",
-            "password": "",
-            "private_key": "",
-            "become": {
-              "method": "",
-              "user": "",
-              "pass": "",
-            },
-            "groups": [],
-            "vars": {},
-          },
-        ]
+        :param inventory: Ansible inventory
         """
         if options:
             self.options = options
         C.RETRY_FILES_ENABLED = False
-        self.inventory = self.inventory_class(hosts)
+        self.inventory = inventory
         self.loader = self.loader_class()
         self.results_callback = self.results_callback_class()
         self.playbook_path = options.playbook_path
@@ -141,20 +122,19 @@ class AdHocRunner:
     ADHoc Runner接口
     """
     results_callback_class = AdHocResultCallback
-    inventory_class = JMSInventory
     loader_class = DataLoader
     variable_manager_class = VariableManager
     options = get_default_options()
     default_options = get_default_options()
 
-    def __init__(self, hosts, options=None):
+    def __init__(self, inventory, options=None):
         if options:
             self.options = options
-
-        self.pattern = ''
+        self.inventory = inventory
         self.loader = DataLoader()
-        self.inventory = self.inventory_class(hosts)
-        self.variable_manager = VariableManager(loader=self.loader, inventory=self.inventory)
+        self.variable_manager = VariableManager(
+            loader=self.loader, inventory=self.inventory
+        )
 
     @staticmethod
     def check_module_args(module_name, module_args=''):
@@ -163,13 +143,21 @@ class AdHocRunner:
             raise AnsibleError(err)
 
     def check_pattern(self, pattern):
+        if not pattern:
+            raise AnsibleError("Pattern `{}` is not valid!".format(pattern))
         if not self.inventory.list_hosts("all"):
             raise AnsibleError("Inventory is empty.")
-
         if not self.inventory.list_hosts(pattern):
             raise AnsibleError(
                 "pattern: %s  dose not match any hosts." % pattern
             )
+
+    def clean_tasks(self, tasks):
+        cleaned_tasks = []
+        for task in tasks:
+            self.check_module_args(task['action']['module'], task['action'].get('args'))
+            cleaned_tasks.append(task)
+        return cleaned_tasks
 
     def set_option(self, k, v):
         kwargs = {k: v}
@@ -182,17 +170,15 @@ class AdHocRunner:
         :param play_name: The play name
         :return:
         """
+        self.check_pattern(pattern)
         results_callback = self.results_callback_class()
-        clean_tasks = []
-        for task in tasks:
-            self.check_module_args(task['action']['module'], task['action'].get('args'))
-            clean_tasks.append(task)
+        cleaned_tasks = self.clean_tasks(tasks)
 
         play_source = dict(
             name=play_name,
             hosts=pattern,
             gather_facts=gather_facts,
-            tasks=clean_tasks
+            tasks=cleaned_tasks
         )
 
         play = Play().load(
@@ -209,6 +195,9 @@ class AdHocRunner:
             stdout_callback=results_callback,
             passwords=self.options.passwords,
         )
+        logger.debug("Get inventory matched hosts: {}".format(
+            self.inventory.get_matched_hosts(pattern)
+        ))
 
         try:
             tqm.run(play)

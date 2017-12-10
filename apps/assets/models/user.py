@@ -201,21 +201,6 @@ class SystemUser(models.Model):
     def public_key(self, public_key_raw):
         self._public_key = signer.sign(public_key_raw)
 
-    def get_assets_inherit_from_asset_groups(self):
-        assets = set()
-        asset_groups = self.asset_groups.all()
-        for asset_group in asset_groups:
-            for asset in asset_group.assets.all():
-                setattr(asset, 'is_inherit_from_asset_groups', True)
-                setattr(asset, 'inherit_from_asset_groups',
-                        getattr(asset, 'inherit_from_asset_groups', set()).add(asset_group))
-                assets.add(asset)
-        return assets
-
-    def get_assets(self):
-        assets = set(self.assets.all()) | self.get_assets_inherit_from_asset_groups()
-        return list(assets)
-
     def _to_secret_json(self):
         """Push system user use it"""
         return {
@@ -231,10 +216,6 @@ class SystemUser(models.Model):
     @property
     def assets_amount(self):
         return self.assets.count()
-
-    @property
-    def asset_group_amount(self):
-        return self.asset_groups.count()
 
     def to_json(self):
         return {

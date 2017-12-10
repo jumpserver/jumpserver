@@ -5,21 +5,21 @@ from ansible.plugins.callback import CallbackBase
 
 class AdHocResultCallback(CallbackBase):
     """
-    AdHoc result Callback
+    Task result Callback
     """
     def __init__(self, display=None):
         # result_raw example: {
-        #   "ok": {"hostname": [{"task_name": {}，...],..},
-        #   "failed": {"hostname": ["task_name": {}..], ..},
-        #   "unreachable: {"hostname": ["task_name": {}, ..]},
-        #   "skipped": {"hostname": ["task_name": {}, ..], ..},
+        #   "ok": {"hostname": {"task_name": {}，...},..},
+        #   "failed": {"hostname": {"task_name": {}..}, ..},
+        #   "unreachable: {"hostname": {"task_name": {}, ..}},
+        #   "skipped": {"hostname": {"task_name": {}, ..}, ..},
         # }
         # results_summary example: {
         #   "contacted": {"hostname",...},
-        #   "dark": {"hostname": [{"task_name": "error"},...],},
+        #   "dark": {"hostname": {"task_name": {}, "task_name": {}},...,},
         # }
         self.results_raw = dict(ok={}, failed={}, unreachable={}, skipped={})
-        self.results_summary = dict(contacted=set(), dark={})
+        self.results_summary = dict(contacted=[], dark={})
         super().__init__(display)
 
     def gather_result(self, t, res):
@@ -28,23 +28,24 @@ class AdHocResultCallback(CallbackBase):
         task_result = res._result
 
         if self.results_raw[t].get(host):
-            self.results_raw[t][host].append({task_name: task_result})
+            self.results_raw[t][host][task_name] = task_result
         else:
-            self.results_raw[t][host] = [{task_name: task_result}]
+            self.results_raw[t][host] = {task_name: task_result}
         self.clean_result(t, host, task_name, task_result)
 
     def clean_result(self, t, host, task_name, task_result):
         contacted = self.results_summary["contacted"]
         dark = self.results_summary["dark"]
         if t in ("ok", "skipped") and host not in dark:
-            contacted.add(host)
+            if host not in contacted:
+                contacted.append(host)
         else:
             if dark.get(host):
-                dark[host].append({task_name: task_result})
+                dark[host][task_name] = task_result
             else:
-                dark[host] = [{task_name: task_result}]
+                dark[host] = {task_name: task_result}
             if host in contacted:
-                contacted.remove(dark)
+                contacted.remove(host)
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
         self.gather_result("failed", result)
