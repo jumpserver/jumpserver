@@ -39,21 +39,20 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
 
     def get_queryset(self):
         if self.request.user.is_superuser:
-            queryset = super(AssetViewSet, self).get_queryset()
+            queryset = super().get_queryset()
         else:
             queryset = get_user_granted_assets(self.request.user)
-        cluster_id = self.request.query_params.get('cluster_id', '')
-        system_users_id = self.request.query_params.get('system_user_id', '')
-        asset_group_id = self.request.query_params.get('asset_group_id', '')
-        admin_user_id = self.request.query_params.get('admin_user_id', '')
+        cluster_id = self.request.query_params.get('cluster_id')
+        asset_group_id = self.request.query_params.get('asset_group_id')
+        admin_user_id = self.request.query_params.get('admin_user_id')
         if cluster_id:
             queryset = queryset.filter(cluster__id=cluster_id)
-        if system_users_id:
-            queryset = queryset.filter(system_users__id=system_users_id)
-        if admin_user_id:
-            queryset = queryset.filter(admin_user__id=admin_user_id)
         if asset_group_id:
             queryset = queryset.filter(groups__id=asset_group_id)
+        if admin_user_id:
+            admin_user = get_object_or_404(AdminUser, id=admin_user_id)
+            clusters = [cluster.id for cluster in admin_user.cluster_set.all()]
+            queryset = queryset.filter(cluster__id__in=clusters)
         return queryset
 
 

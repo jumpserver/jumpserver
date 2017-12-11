@@ -63,7 +63,7 @@ class ClusterUpdateAssetsSerializer(serializers.ModelSerializer):
 
 
 class AdminUserSerializer(serializers.ModelSerializer):
-    assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
+    assets_amount = serializers.SerializerMethodField()
     unreachable_amount = serializers.SerializerMethodField()
 
     class Meta:
@@ -78,14 +78,18 @@ class AdminUserSerializer(serializers.ModelSerializer):
         else:
             return 'Unknown'
 
-    def get_field_names(self, declared_fields, info):
-        fields = super(AdminUserSerializer, self).get_field_names(declared_fields, info)
-        fields.append('assets_amount')
-        return fields
+    @staticmethod
+    def get_assets_amount(obj):
+        amount = 0
+        clusters = obj.cluster_set.all()
+        for cluster in clusters:
+            amount += len(cluster.assets.all())
+        return amount
 
 
 class SystemUserSerializer(serializers.ModelSerializer):
     unreachable_amount = serializers.SerializerMethodField()
+    assets_amount = serializers.SerializerMethodField()
 
     class Meta:
         model = SystemUser
@@ -99,10 +103,12 @@ class SystemUserSerializer(serializers.ModelSerializer):
         else:
             return "Unknown"
 
-    def get_field_names(self, declared_fields, info):
-        fields = super(SystemUserSerializer, self).get_field_names(declared_fields, info)
-        fields.extend(['assets_amount'])
-        return fields
+    @staticmethod
+    def get_assets_amount(obj):
+        amount = 0
+        for cluster in obj.cluster.all():
+            amount += cluster.assets.all().count()
+        return amount
 
 
 class AssetSystemUserSerializer(serializers.ModelSerializer):
@@ -200,6 +206,7 @@ class MyAssetGrantedSerializer(AssetGrantedSerializer):
 
 class ClusterSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     assets_amount = serializers.SerializerMethodField()
+    admin_user_name = serializers.SerializerMethodField()
     assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
 
     class Meta:
@@ -210,10 +217,9 @@ class ClusterSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     def get_assets_amount(obj):
         return obj.assets.count()
 
-    def get_field_names(self, declared_fields, info):
-        fields = super(ClusterSerializer, self).get_field_names(declared_fields, info)
-        fields.append('assets_amount')
-        return fields
+    @staticmethod
+    def get_admin_user_name(obj):
+        return obj.admin_user.name
 
 
 class AssetGroupGrantedSerializer(BulkSerializerMixin, serializers.ModelSerializer):

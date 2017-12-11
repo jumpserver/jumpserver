@@ -13,17 +13,17 @@
                 <div class="ibox float-e-margins">
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
-                            <li class="active"><a href="" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a></li>
+                            <li class="active"><a href="" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Group assets' %} </a></li>
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-default" href="{% url 'assets:asset-group-update' pk=asset_group.id %}"><i class="fa fa-edit"></i>Update</a>
                             </li>
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-sm-7" style="padding-left: 0">
+                        <div class="col-sm-8" style="padding-left: 0">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span style="float: left"></span>{% trans 'Asset list of ' %} <b>{{ asset_group.name }}</b></span>
+                                    <span style="float: left">{% trans 'Asset list of ' %} <b>{{ asset_group.name }} </b><span class="badge"> {{ asset_group.assets.all.count }}</span></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -45,9 +45,9 @@
                                                 <th>{% trans 'Hostname' %}</th>
                                                 <th>{% trans 'IP' %}</th>
                                                 <th>{% trans 'Port' %}</th>
-	                                              <th>{% trans 'Type' %}</th>
+	                                            <th>{% trans 'Type' %}</th>
                                                 <th>{% trans 'Alive' %}</th>
-	                                              <th>{% trans 'Action' %}</th>
+	                                            <th>{% trans 'Action' %}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -56,11 +56,10 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Push system users' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Add assets to this group' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table">
@@ -68,7 +67,7 @@
                                         <form>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select system users' %}" class="select2 system-user-select" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Select assets' %}" class="select2 system-user-select" style="width: 100%" multiple="" tabindex="4">
                                                         {% for system_user in system_users %}
                                                             <option value="{{ system_user.id }}"> {{ system_user.name }} </option>
                                                         {% endfor %}
@@ -91,8 +90,6 @@
             </div>
         </div>
     </div>
-{#    </div>#}
-
 {% endblock %}
 {% block custom_foot_js %}
 <script>
@@ -151,25 +148,6 @@ function leaveGroup(obj, name, url, data) {
     });
 }
 
-function pushSystemUser(sysUserID) {
-	var the_url = "{% url 'api-assets:asset-group-push-system-user' pk=asset_group.id %}";
-    var body = {
-        system_user: sysUserID
-    };
-    var success = function(data) {
-        var url = "{% url 'ops:task-detail' pk=234234234 %}".replace("234234234", data);
-        setTimeout(function () {
-          location.href = url
-        }, 1000);
-    };
-    APIUpdateAttr({
-        url: the_url,
-        method: 'PATCH',
-        body: JSON.stringify(body),
-        success: success
-    });
-}
-
 Array.prototype.remove = function(val) {
 	var index = this.indexOf(val);
 		if (index > -1) {
@@ -189,21 +167,8 @@ Array.prototype.unique = function(){
  	return res;
 };
 
-$(document).ready(function () {
-	$('.select2').select2();
-
-  $('.select2.asset-select').select2()
-    .on('select2:select', function(evt) {
-      var data = evt.params.data;
-      jumpserver.assets_selected[data.id] = data.text;
-      console.log(jumpserver.assets_selected)
-    })
-    .on('select2:unselect', function(evt) {
-      var data = evt.params.data;
-      delete jumpserver.assets_selected[data.id]
-    });
-
-	var options = {
+function initTable() {
+    var options = {
 		ele: $('#asset_list_table'),
 		buttons: [],
 		order: [],
@@ -231,6 +196,24 @@ $(document).ready(function () {
 		op_html: $('#actions').html()
 	};
 	jumpserver.initDataTable(options);
+
+}
+
+$(document).ready(function () {
+  $('.select2').select2();
+
+  $('.select2.asset-select').select2()
+    .on('select2:select', function(evt) {
+      var data = evt.params.data;
+      jumpserver.assets_selected[data.id] = data.text;
+      console.log(jumpserver.assets_selected)
+    })
+    .on('select2:unselect', function(evt) {
+      var data = evt.params.data;
+      delete jumpserver.assets_selected[data.id]
+    });
+  initTable();
+
 })
 
 .on('click', ".btn-asset-group-add-asset", function () {

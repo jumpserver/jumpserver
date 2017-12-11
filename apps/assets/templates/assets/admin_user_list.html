@@ -2,8 +2,15 @@
 {% load i18n static %}
 {% block table_search %}
 {% endblock %}
+
+{% block help_message %}
+    <div class="alert alert-info help-message">
+    管理用户是 服务器上已存在的特权用户，Jumpserver使用该用户来 `推送系统用户`、`获取资产硬件信息`等
+    </div>
+{% endblock %}
+
 {% block table_container %}
-<div class="uc pull-left m-l-5 m-r-5">
+<div class="uc pull-left m-r-5">
     <a href="{% url "assets:admin-user-create" %}" class="btn btn-sm btn-primary"> {% trans "Create admin user" %} </a>
 </div>
 <table class="table table-striped table-bordered table-hover " id="admin_user_list_table" >

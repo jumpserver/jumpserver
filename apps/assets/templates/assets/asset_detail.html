@@ -19,6 +19,9 @@
                             <li class="active">
                                 <a href="{% url 'assets:asset-detail' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset detail' %} </a>
                             </li>
+                            <li>
+                                <a href="{% url 'assets:asset-detail' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Auth' %} </a>
+                            </li>
                             {% if user.is_superuser %}
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-default" href="{% url 'assets:asset-update' pk=asset.id %}"><i class="fa fa-edit"></i>Update</a>
@@ -173,17 +176,19 @@
                                         <tbody>
                                         <tr class="no-borders-tr">
                                           <td width="50%">{% trans 'Active' %}:</td>
-                                            <td><span class="pull-right">
-                                                <div class="switch">
-                                                    <div class="onoffswitch">
-                                                        <input type="checkbox" {% if asset.is_active %} checked {% endif %}  class="onoffswitch-checkbox" id="is_active">
-                                                        <label class="onoffswitch-label" for="is_active">
-                                                            <span class="onoffswitch-inner"></span>
-                                                            <span class="onoffswitch-switch"></span>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </span></td>
+                                            <td>
+                                              <span class="pull-right">
+                                                  <div class="switch">
+                                                      <div class="onoffswitch">
+                                                          <input type="checkbox" {% if asset.is_active %} checked {% endif %}  class="onoffswitch-checkbox" id="is_active">
+                                                          <label class="onoffswitch-label" for="is_active">
+                                                              <span class="onoffswitch-inner"></span>
+                                                              <span class="onoffswitch-switch"></span>
+                                                          </label>
+                                                      </div>
+                                                  </div>
+                                              </span>
+                                          </td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Refresh hardware' %}:</td>
@@ -194,10 +199,10 @@
                                             </td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Test admin user' %}:</td>
+                                            <td>{% trans 'Reset auth' %}:</td>
                                             <td>
                                                 <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_test_admin_user" style="width: 54px;">{% trans 'Test' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_test_admin_user" style="width: 54px;">{% trans 'Reset' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
@@ -236,41 +241,6 @@
                                           <td>
                                               <button class="btn btn-danger pull-right btn-xs btn_leave_group" type="button"><i class="fa fa-minus"></i></button>
                                           </td>
-                                        </tr>
-                                        {% endfor %}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="panel panel-warning">
-                                <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Push system users' %}
-                                </div>
-                                <div class="panel-body">
-                                    <table class="table group_edit" id="add-asset2systemuser">
-                                        <tbody>
-                                        <form>
-                                            <tr class="no-borders-tr">
-                                                <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select system users' %}" class="select2 system-user" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for system_user in system_users_all %}
-                                                            <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user.name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                            <tr class="no-borders-tr">
-                                                <td colspan="2">
-                                                    <button type="button" class="btn btn-warning btn-sm btn-system-user">{% trans 'Confirm' %}</button>
-                                                </td>
-                                            </tr>
-                                        </form>
-                                        {% for system_user in system_users %}
-                                        <tr>
-                                            <td ><b class="bdg_group" data-sid={{ system_user.id }}>{{ system_user.name }}</b></td>
-                                            <td>
-                                                <button class="btn btn-danger btn-xs pull-right btn_leave_system" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
-                                            </td>
                                         </tr>
                                         {% endfor %}
                                         </tbody>

@@ -8,23 +8,16 @@ import logging
 import uuid
 from hashlib import md5
 
-from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from common.utils import signer, validate_ssh_private_key, ssh_key_string_to_obj
+from common.utils import signer, ssh_key_string_to_obj
+from .utils import private_key_validator
 
-__all__ = ['AdminUser', 'SystemUser', 'private_key_validator']
+
+__all__ = ['AdminUser', 'SystemUser',]
 logger = logging.getLogger(__name__)
-
-
-def private_key_validator(value):
-    if not validate_ssh_private_key(value):
-        raise ValidationError(
-            _('%(value)s is not an even number'),
-            params={'value': value},
-        )
 
 
 class AdminUser(models.Model):
@@ -103,10 +96,12 @@ class AdminUser(models.Model):
     def become_pass(self, password):
         self._become_pass = signer.sign(password)
 
-
     @property
     def assets_amount(self):
-        return self.assets.count()
+        amount = 0
+        for cluster in self.cluster_set.all():
+            amount += cluster.assets.all().count()
+        return amount
 
     class Meta:
         ordering = ['name']
@@ -143,6 +138,7 @@ class SystemUser(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     username = models.CharField(max_length=16, verbose_name=_('Username'))
+    cluster = models.ManyToManyField('assets.Cluster', verbose_name=_("Cluster"))
     _password = models.CharField(max_length=256, blank=True, verbose_name=_('Password'))
     protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
     _private_key = models.TextField(max_length=8192, blank=True, verbose_name=_('SSH private key'))

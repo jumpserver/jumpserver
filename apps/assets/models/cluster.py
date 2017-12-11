@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 class Cluster(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=32, verbose_name=_('Name'))
+    admin_user = models.ForeignKey('assets.AdminUser', on_delete=models.CASCADE, verbose_name=_("Admin user"))
     bandwidth = models.CharField(max_length=32, blank=True, verbose_name=_('Bandwidth'))
     contact = models.CharField(max_length=128, blank=True, verbose_name=_('Contact'))
     phone = models.CharField(max_length=32, blank=True, verbose_name=_('Phone'))

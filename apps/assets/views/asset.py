@@ -183,7 +183,6 @@ class AssetDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         asset_groups = self.object.groups.all()
-        system_users = self.object.system_users.all()
         context = {
             'app': 'Assets',
             'action': 'Asset detail',
@@ -191,7 +190,6 @@ class AssetDetailView(DetailView):
                                     if asset_group not in asset_groups],
             'asset_groups': asset_groups,
             'system_users_all': SystemUser.objects.all(),
-            'system_users': system_users,
         }
         kwargs.update(context)
         return super(AssetDetailView, self).get_context_data(**kwargs)

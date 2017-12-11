@@ -10,7 +10,7 @@ from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
-from .. import forms
+from ..forms import SystemUserForm, SystemUserUpdateForm
 from ..models import Asset, AssetGroup, SystemUser
 from ..hands import AdminUserRequiredMixin
 from perms.utils import associate_system_users_and_assets
@@ -36,7 +36,7 @@ class SystemUserListView(AdminUserRequiredMixin, TemplateView):
 
 class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = SystemUser
-    form_class = forms.SystemUserForm
+    form_class = SystemUserForm
     template_name = 'assets/system_user_create.html'
     success_url = reverse_lazy('assets:system-user-list')
 
@@ -65,7 +65,7 @@ class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVi
 
 class SystemUserUpdateView(AdminUserRequiredMixin, UpdateView):
     model = SystemUser
-    form_class = forms.SystemUserUpdateForm
+    form_class = SystemUserUpdateForm
     template_name = 'assets/system_user_update.html'
 
     def get_context_data(self, **kwargs):
@@ -110,31 +110,16 @@ class SystemUserDeleteView(AdminUserRequiredMixin, DeleteView):
     success_url = reverse_lazy('assets:system-user-list')
 
 
-class SystemUserAssetView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
+class SystemUserAssetView(AdminUserRequiredMixin, DetailView):
+    model = SystemUser
     template_name = 'assets/system_user_asset.html'
     context_object_name = 'system_user'
 
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object(queryset=SystemUser.objects.all())
-        return super().get(request, *args, **kwargs)
-
-    def get_queryset(self):
-        return self.object.assets.all()
-
     def get_context_data(self, **kwargs):
-        assets = self.get_queryset()
         context = {
             'app': 'assets',
             'action': 'System user asset',
-            'assets_remain': [asset for asset in Asset.objects.all() if asset not in assets],
-            'asset_groups': AssetGroup.objects.all(),
         }
         kwargs.update(context)
         return super(SystemUserAssetView, self).get_context_data(**kwargs)
-
-
-
-
-
 

@@ -6,7 +6,7 @@
 {% endblock %}
 {% block table_search %}{% endblock %}
 {% block table_container %}
-<div class="uc pull-left m-l-5 m-r-5">
+<div class="uc pull-left  m-r-5">
     <a href="{% url "assets:cluster-create" %}" class="btn btn-sm btn-primary"> {% trans "Create Cluster" %} </a>
 </div>
 <table class="table table-striped table-bordered table-hover " id="cluster_list_table" >
@@ -16,6 +16,7 @@
             <input type="checkbox" id="check_all" class="ipt_check_all" >
         </th>
         <th class="text-center"><a href="{% url 'assets:cluster-list' %}?sort=name">{% trans 'Name' %}</a></th>
+        <th class="text-center">{% trans 'Admin user' %}</th>
         <th class="text-center">{% trans 'Asset num' %}</th>
         <th class="text-center">{% trans 'Contact' %}</th>
         <th class="text-center">{% trans 'Phone' %}</th>
@@ -51,13 +52,13 @@ $(document).ready(function(){
                 $(td).html(detail_btn.replace('99991937', rowData.id));
              }},
 
-            {targets: 6, createdCell: function (td, cellData, rowData) {
+            {targets: 7, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:cluster-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_cluster_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
                 $(td).html(update_btn + del_btn)
              }}],
         ajax_url: '{% url "api-assets:cluster-list" %}',
-        columns: [{data: function(){return ""}}, {data: "name" }, {data: "assets_amount" }, {data: "contact" }, {data: "phone" },
+        columns: [{data: function(){return ""}}, {data: "name" }, {data: "admin_user_name"}, {data: "assets_amount" }, {data: "contact" }, {data: "phone" },
                   {data: "operator" }, {data: "id" }],
         op_html: $('#actions').html()
     };

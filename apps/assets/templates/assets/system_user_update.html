@@ -4,50 +4,12 @@
 {% load bootstrap3 %}
 
 {% block auth %}
-<div class="password-auth hidden">
-    {% bootstrap_field form.password layout="horizontal" %}
-</div>
-<div class="public-key-auth">
-    <div>
-        {% bootstrap_field form.private_key_file layout="horizontal" %}
-    </div>
-</div>
 {% endblock %}
 
 {% block custom_foot_js %}
 	<script>
-    var auth_method = '#'+'{{ form.auth_method.id_for_label }}';
-    var auto_generate_key = '#'+'{{ form.auto_generate_key.id_for_label }}';
-    function authMethodDisplay() {
-      if ($(auth_method).val() == 'P') {
-        $('.password-auth').removeClass('hidden');
-        $('.public-key-auth').addClass('hidden');
-        $('#'+'{{ form.password.id_for_label }}').removeAttr('disabled');
-
-      } else if ($(auth_method).val() == 'K') {
-        $('.password-auth').addClass('hidden');
-        $('.public-key-auth').removeClass('hidden');
-        $('#'+'{{ form.password.id_for_label }}').removeAttr('required');
-        $('#'+'{{ form.password.id_for_label }}').attr('disabled', 'disabled');
-
-        if ($(auto_generate_key).prop('checked')){
-          $('#'+'{{ form.private_key_file.id_for_label }}').closest('.form-group').addClass('hidden');
-        } else {
-          $('#'+'{{ form.private_key_file.id_for_label }}').closest('.form-group').removeClass('hidden');
-        }
-      }
-    }
     $(document).ready(function () {
-      $('.select2').select2();
-      authMethodDisplay();
-      $(auth_method).change(function () {
-        authMethodDisplay();
-      });
-      $(auto_generate_key).change(function () {
-        authMethodDisplay();
-      });
+        $('.select2').select2();
     })
-
-
 	</script>
 {% endblock %}

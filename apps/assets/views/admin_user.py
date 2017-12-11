@@ -89,7 +89,10 @@ class AdminUserDetailView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
         return super(AdminUserDetailView, self).get(request, *args, **kwargs)
 
     def get_queryset(self):
-        return self.object.assets.all()
+        queryset = []
+        for cluster in self.object.cluster_set.all():
+            queryset.extend(list(cluster.assets.all()))
+        return queryset
 
     def get_context_data(self, **kwargs):
         asset_groups = AssetGroup.objects.all()
@@ -114,9 +117,11 @@ class AdminUserAssetsView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
-        self.queryset = self.object.assets.all()
-        sorted(self.queryset, key=lambda x: x.is_connective() is False)
-        return self.queryset
+        queryset = []
+        for cluster in self.object.cluster_set.all():
+            queryset.extend(list(cluster.assets.all()))
+        self.queryset = queryset
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = {

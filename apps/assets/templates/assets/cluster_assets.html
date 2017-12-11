@@ -25,10 +25,10 @@
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-sm-7" style="padding-left: 0;">
+                        <div class="col-sm-8" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span style="float: left">{% trans 'Cluster assets' %} <b>{{ cluster.name }} </b><span class="badge"></span></span>
+                                    <span style="float: left">{% trans 'Cluster assets' %} <b>{{ cluster.name }} </b><span class="badge">{{ cluster.assets.all.count }}</span></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -61,23 +61,10 @@
                                         <tbody>
                                         </tbody>
                                     </table>
-
-	                                  <div id="actions" class="hide">
-									                      <div class="input-group">
-									                          <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
-									                              <option value="delete">{% trans 'Remove selected' %}</option>
-									                          </select>
-									                          <div class="input-group-btn pull-left" style="padding-left: 5px;">
-									                              <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-warning">
-									                               {% trans 'Submit' %}
-									                              </button>
-									                          </div>
-									                      </div>
-									                  </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Add assets to' %} {{ cluster.name }}
@@ -164,17 +151,8 @@ function deleteClusterAssets(assets) {
     });
 }
 
-$(document).ready(function () {
-	$('.select2').select2()
-	.on("select2:select", function (evt) {
-		var data = evt.params.data;
-		jumpserver.assets_selected[data.id] = data.text;
-	})
-	.on('select2:unselect', function(evt) {
-		var data = evt.params.data;
-		delete jumpserver.assets_selected[data.id];
-	});
-	var options = {
+function initTable() {
+    var options = {
 		ele: $('#cluster_assets_table'),
 		buttons: [],
 		order: [],
@@ -196,7 +174,19 @@ $(document).ready(function () {
 		op_html: $('#actions').html()
 	};
 	jumpserver.initDataTable(options);
+}
 
+$(document).ready(function () {
+	$('.select2').select2()
+	.on("select2:select", function (evt) {
+		var data = evt.params.data;
+		jumpserver.assets_selected[data.id] = data.text;
+	})
+	.on('select2:unselect', function(evt) {
+		var data = evt.params.data;
+		delete jumpserver.assets_selected[data.id];
+	});
+	initTable();
 })
 
 .on('click', '.btn-asset-attach', function () {

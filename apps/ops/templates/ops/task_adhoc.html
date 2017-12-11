@@ -58,7 +58,7 @@
                                                 <th>{% trans 'Run as' %}</th>
                                                 <th>{% trans 'Become' %}</th>
                                                 <th>{% trans 'Datetime' %}</th>
-                                                <th></th>
+                                                <th>{% trans 'Action' %}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -104,12 +104,17 @@
                         } else {
                             $(td).html(cellData.user)
                         }
-
-                     }}
+                    }},
+                    {targets: 7, createdCell: function (td, cellData, rowData) {
+                       var detail_btn = '<a class="btn btn-xs btn-primary m-l-xs btn-run" data-uid="99991937">{% trans "Detail" %}</a>'.replace('99991937', cellData);
+                       if (cellData) {
+                           $(td).html(detail_btn);
+                       }
+                    }}
                 ],
                 ajax_url: '{% url "api-ops:adhoc-list" %}?task={{ object.pk }}',
                 columns: [{data: function(){return ""}}, {data: "short_id" }, {data: "hosts"}, {data: "pattern"},
-                          {data: "run_as"}, {data: "become"}, {data: "date_created"}]
+                          {data: "run_as"}, {data: "become"}, {data: "date_created"}, {data: "id"}]
             };
             jumpserver.initDataTable(options);
         })

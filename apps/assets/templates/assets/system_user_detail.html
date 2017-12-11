@@ -28,7 +28,7 @@
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-sm-7" style="padding-left: 0;">
+                        <div class="col-sm-8" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
                                     <span class="label"><b>{{ system_user.name }}</b></span>
@@ -105,7 +105,7 @@
                             </div>
                         </div>
 
-                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Quick update' %}
@@ -114,25 +114,23 @@
                                     <table class="table">
                                         <tbody>
                                         <tr class="no-borders-tr">
-                                            <td width="50%">{% trans 'Get manual install script' %}:</td>
+                                            <td width="50%">{% trans 'Auto push' %}:</td>
                                             <td>
-                                                <span style="float: right">
-                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Get' %}</button>
+                                                <span class="pull-right">
+                                                    <div class="switch">
+                                                        <div class="onoffswitch">
+                                                            <input type="checkbox" {% if system_user.auto_push %} checked {% endif %} class="onoffswitch-checkbox" id="is_active">
+                                                            <label class="onoffswitch-label" for="is_active">
+                                                                <span class="onoffswitch-inner"></span>
+                                                                <span class="onoffswitch-switch"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
                                                 </span>
                                             </td>
                                         </tr>
-
                                         <tr>
-                                            <td width="50%">{% trans 'Retest asset connectivity' %}:</td>
-                                            <td>
-                                                <span style="float: right">
-                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Start' %}</button>
-                                                </span>
-                                            </td>
-                                        </tr>
-
-                                        <tr>
-                                            <td width="50%">{% trans 'Reset private key' %}:</td>
+                                            <td width="50%">{% trans 'Reset auth' %}:</td>
                                             <td>
                                                 <span style="float: right">
                                                     <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Reset' %}</button>
@@ -149,8 +147,6 @@
             </div>
         </div>
     </div>
-    </div>
-
 {% endblock %}
 {% block custom_foot_js %}
     <script>

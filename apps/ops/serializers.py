@@ -25,6 +25,7 @@ class AdHocSerializer(serializers.ModelSerializer):
 class AdHocRunHistorySerializer(serializers.ModelSerializer):
     task = serializers.SerializerMethodField()
     adhoc_short_id = serializers.SerializerMethodField()
+    stat = serializers.SerializerMethodField()
 
     class Meta:
         model = AdHocRunHistory
@@ -37,6 +38,14 @@ class AdHocRunHistorySerializer(serializers.ModelSerializer):
     @staticmethod
     def get_task(obj):
         return obj.adhoc.task.id
+
+    @staticmethod
+    def get_stat(obj):
+        return {
+            "total": len(obj.adhoc.hosts),
+            "success": len(obj.summary["contacted"]),
+            "failed": len(obj.summary["dark"]),
+        }
 
     def get_field_names(self, declared_fields, info):
         fields = super().get_field_names(declared_fields, info)

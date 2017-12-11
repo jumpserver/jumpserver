@@ -591,7 +591,7 @@ body.canvas-menu.mini-navbar nav.navbar-static-side {
   border-radius: 3px;
 }
 .float-e-margins .btn {
-  margin-bottom: 5px;
+  /*margin-bottom: 5px;*/
 }
 .btn-w-m {
   min-width: 120px;
@@ -3440,13 +3440,13 @@ video {
   overflow-x: hidden;
 }
 .wrapper {
-  padding: 0 20px;
+  padding: 0 10px;
 }
 .wrapper-content {
-  padding: 20px 10px 40px;
+  padding: 10px 10px 10px;
 }
 #page-wrapper {
-  padding: 0 15px;
+  padding: 0 10px;
   min-height: 568px;
   position: relative !important;
 }

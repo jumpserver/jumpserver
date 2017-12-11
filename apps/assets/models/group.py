@@ -23,9 +23,8 @@ class AssetGroup(models.Model):
     date_created = models.DateTimeField(auto_now_add=True, null=True, verbose_name=_('Date created'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
-    __str__ = __unicode__
 
     class Meta:
         ordering = ['name']

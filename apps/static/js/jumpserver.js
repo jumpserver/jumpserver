@@ -98,30 +98,6 @@ function move_left(from, to, from_o, to_o) {
     });
 }
 
-//function move_all(from, to) {
-//    $("#" + from).children().each(function () {
-//        $("#" + to).append(this);
-//    });
-//}
-//
-
-//function selectAllOption(){
-//         var checklist = document.getElementsByName ("selected");
-//            if(document.getElementById("select_all").checked)
-//            {
-//            for(var i=0;i<checklist.length;i++)
-//            {
-//              checklist[i].checked = 1;
-//            }
-//            }else{
-//            for(var j=0;j<checklist.length;j++)
-//            {
-//             checklist[j].checked = 0;
-//            }
-//            }
-//
-//        }
-
 
 function selectAll(){
     // Select all check box
@@ -130,15 +106,6 @@ function selectAll(){
     });
 }
 
-
-// function getIDall() {
-//     var check_array = [];
-//     $(".gradeX input:checked").each(function () {
-//         var id = $(this).attr("value");
-//         check_array.push(id);
-//     });
-//     return check_array.join(",");
-// }
 
 function getCookie(name) {
     var cookieValue = null;
@@ -289,7 +256,7 @@ jumpserver.initDataTable = function (options) {
       createdCell: function(td, cellData) {
           $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
       }},
-    {className: 'text-center', targets: '_all'}
+      {className: 'text-center', targets: '_all'}
   ];
   columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
   var table = ele.DataTable({

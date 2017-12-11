@@ -31,7 +31,7 @@
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-sm-7" style="padding-left: 0;">
+                        <div class="col-sm-8" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
                                     <span class="label"><b>{{ admin_user.name }}</b></span>
@@ -77,7 +77,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Quick update' %}
@@ -86,15 +86,7 @@
                                     <table class="table">
                                         <tbody>
                                         <tr class="no-borders-tr">
-                                            <td width="50%">{% trans 'Reset private key' %}:</td>
-                                            <td>
-                                                <span style="float: right">
-                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Reset' %}</button>
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td width="50%">{% trans 'Reset password' %}:</td>
+                                            <td width="50%">{% trans 'Reset auth' %}:</td>
                                             <td>
                                                 <span style="float: right">
                                                     <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Reset' %}</button>
@@ -164,164 +156,44 @@ function objectRemove(obj, name, url, data) {
         doRemove()
     });
 }
+
+function adminUserDelete(name, url) {
+   function doDelete() {
+       var body = {};
+       var success = function() {
+           swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
+           window.location.href="{% url 'assets:cluster-list' %}";
+       };
+       var fail = function() {
+           swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");
+       };
+       APIUpdateAttr({
+           url: url,
+           body: JSON.stringify(body),
+           method: 'DELETE',
+           success: success,
+           error: fail
+       });
+   }
+   swal({
+       title: 'Are you sure delete ?',
+       text: " [" + name + "] ",
+       type: "warning",
+       showCancelButton: true,
+       cancelButtonText: 'Cancel',
+       confirmButtonColor: "#DD6B55",
+       confirmButtonText: 'Confirm',
+       closeOnConfirm: false
+   }, function () {
+       doDelete()
+   });
+}
+
 jumpserver.assets_selected = {};
 jumpserver.asset_groups_selected = {};
 $(document).ready(function () {
-	$('.select2').select2()
-	.on("select2:select", function (evt) {
-		var data = evt.params.data;
-		jumpserver.assets_selected[data.id] = data.text;
-		jumpserver.asset_groups_selected[data.id] = data.text;
-	})
-	.on('select2:unselect', function(evt) {
-		var data = evt.params.data;
-		delete jumpserver.assets_selected[data.id];
-		delete jumpserver.asset_groups_selected[data.id]
-	});
-	var options = {
-		ele: $('#system_user_assets_table'),
-		buttons: [],
-		order: [],
-		columnDefs: [
-			{targets: 0, createdCell: function (td, cellData, rowData) {
-				var detail_btn = '<a href="{% url "assets:asset-detail" pk=99991937 %}" data-aid="'+rowData.id+'">' + cellData + '</a>';
-				$(td).html(detail_btn.replace('99991937', rowData.id));
-			}},
-			{targets: 3, createdCell: function (td, cellData) {
-				if (!cellData) {
-					$(td).html('<i class="fa fa-times text-danger"></i>')
-				} else {
-					$(td).html('<i class="fa fa-check text-navy"></i>')
-				}
-			}},
-			{targets: 4, createdCell: function (td, cellData, rowData) {
-				var update_btn = '<a href="{% url "assets:asset-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', rowData.id);
-				var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_remove" data-aid="99991937">{% trans "Remove" %}</a>'.replace('99991937', rowData.id);
-				$(td).html(update_btn + del_btn)
-			}}
-
-			],
-		ajax_url: '{% url "api-assets:asset-list" %}?admin_user_id={{ admin_user.id }}',
-		columns: [{data: "hostname" }, {data: "ip" }, {data: "port" },
-			{data: "is_active" }, {data: "id"}],
-		op_html: $('#actions').html()
-	};
-	jumpserver.initDataTable(options);
-
-    function adminUserDelete(name, url) {
-        function doDelete() {
-            var body = {};
-            var success = function() {
-                swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
-	            window.location.href="{% url 'assets:cluster-list' %}";
-            };
-            var fail = function() {
-                swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");
-            };
-            APIUpdateAttr({
-                url: url,
-                body: JSON.stringify(body),
-                method: 'DELETE',
-                success: success,
-                error: fail
-            });
-        }
-        swal({
-            title: 'Are you sure delete ?',
-            text: " [" + name + "] ",
-            type: "warning",
-            showCancelButton: true,
-            cancelButtonText: 'Cancel',
-            confirmButtonColor: "#DD6B55",
-            confirmButtonText: 'Confirm',
-            closeOnConfirm: false
-        }, function () {
-            doDelete()
-        });
-    }
 })
-
-.on('click', '.btn-replace-asset-admin_user', function () {
-	if (Object.keys(jumpserver.assets_selected).length === 0) {
-		return false;
-	}
-	jumpserver.asset_groups_selected = {};
-	var $data_table = $("#system_user_assets_table").DataTable();
-	var assets = [];
-	$.map(jumpserver.assets_selected, function(value, index) {
-		assets.push(parseInt(index));
-	});
-	assets.unique();
-	var data = [];
-	var admin_user_id = "{{ admin_user.id }}";
-	var the_url = '{% url "api-assets:asset-list" %}';
-	for (var i=0; i<assets.length; i++) {
-		data.push({"id": assets[i], "admin_user": admin_user_id});
-	}
-	APIUpdateAttr({
-		url: the_url,
-		body: JSON.stringify(data),
-		method: 'PATCH'
-	});
-	$data_table.ajax.reload();
-})
-
-.on('click', '.btn-replace-asset_groups-admin_user', function () {
-	if (Object.keys(jumpserver.asset_groups_selected).length === 0) {
-		return false;
-	}
-	jumpserver.assets_selected = {};
-	var $data_table = $("#system_user_assets_table").DataTable();
-	var asset_groups = [];
-	var assets = [];
-	var data = [];
-	var the_url = '{% url "api-assets:asset-list" %}';
-	$.map(jumpserver.asset_groups_selected, function(value, index) {
-		asset_groups.push(parseInt(index));
-	});
-	$.ajax({
-		url: '{% url "api-assets:asset-group-list" %}?id__in=['+asset_groups.join(',')+']',
-		method: 'GET',
-		dataType: 'json',
-		success: function (result) {
-			for (var i=0; i<result.length; i++) {
-				for (var j=0; j<result[i]['assets'].length; j++) {
-					assets.push(result[i]['assets'][j])
-				}
-			}
-			for (var z=0; z<assets.length; z++) {
-				data.push({"id":assets[z], "admin_user":{{admin_user.id}} });
-			}
-			APIUpdateAttr({
-				url: the_url,
-				body: JSON.stringify(data),
-				method: 'PATCH'
-			});
-			$data_table.ajax.reload();
-		}
-	});
-})
-	
-.on('click', '.btn_asset_remove', function () {
-	var $this = $(this);
-	var the_url = "{% url 'api-assets:admin-user-detail' pk=admin_user.id %}";
-	var name = $(this).closest("tr").find(":nth-child(1) > a").html();
-	var assets = [];
-	var delete_asset_id = $(this).data('aid');
-	$.ajax({
-		url: the_url,
-		method: 'GET',
-		dataType: 'json',
-		success: function (result) {
-			for (var i=0; i<result['assets'].length; i++) {
-				assets.push(result['assets'][i])
-			}
-			assets.remove(delete_asset_id);
-			var data = {"assets": assets};
-			objectRemove($this, name, the_url, data);
-		}
-	})
-}).on('click', '.btn-delete-admin-user', function () {
+.on('click', '.btn-delete-admin-user', function () {
     var $this = $(this);
     var name = "{{ admin_user.name }}";
     var uid = "{{ admin_user.id }}";

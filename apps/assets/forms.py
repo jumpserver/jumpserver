@@ -10,40 +10,60 @@ logger = get_logger(__file__)
 
 
 class AssetCreateForm(forms.ModelForm):
+    # Form field name can not start with `_`, so redefine it,
+    password = forms.CharField(
+        widget=forms.PasswordInput, max_length=100,
+        strip=True, required=False,
+        help_text=_('If also set private key, use that first'),
+    )
+    # Need use upload private key file except paste private key content
+    private_key_file = forms.FileField(required=False)
+
+    def save(self, commit=True):
+        # Because we define custom field, so we need rewrite :method: `save`
+        obj = super().save(commit=commit)
+        password = self.cleaned_data['password']
+        private_key = self.cleaned_data['private_key_file']
+
+        if password:
+            obj.password = password
+        if private_key:
+            obj.private_key = private_key
+        obj.save()
+        return obj
+
+    def clean_private_key_file(self):
+        private_key_file = self.cleaned_data['private_key_file']
+        if private_key_file:
+            private_key = private_key_file.read()
+            if not validate_ssh_private_key(private_key):
+                raise forms.ValidationError(_('Invalid private key'))
+            return private_key
+        return private_key_file
+
     class Meta:
         model = Asset
         fields = [
             'hostname', 'ip', 'public_ip', 'port', 'type', 'comment',
-            'admin_user', "cluster", 'groups', 'status', 'env', 'is_active'
+            'cluster', 'groups', 'status', 'env', 'is_active', 'username',
+
         ]
         widgets = {
             'groups': forms.SelectMultiple(
                 attrs={'class': 'select2',
                        'data-placeholder': _('Select asset groups')}),
-            'admin_user': forms.Select(
-                attrs={'class': 'select2',
-                       'data-placeholder': _('Select asset admin user')}),
         }
         help_texts = {
             'hostname': '* required',
             'ip': '* required',
-            'system_users': _('System user will be granted for user to login '
-                              'assets (using ansible create automatic)'),
-            'admin_user': _('Admin user should be exist on asset already, '
-                            'And have sudo ALL permission'),
         }
-
-    def clean_admin_user(self):
-        if not self.cleaned_data['admin_user']:
-            raise forms.ValidationError(_('Select admin user'))
-        return self.cleaned_data['admin_user']
 
 
 class AssetUpdateForm(forms.ModelForm):
     class Meta:
         model = Asset
         fields = [
-            'hostname', 'ip', 'port', 'groups', 'admin_user', "cluster", 'is_active',
+            'hostname', 'ip', 'port', 'groups', "cluster", 'is_active',
             'type', 'env', 'status', 'public_ip', 'remote_card_ip', 'cabinet_no',
             'cabinet_pos', 'number', 'comment'
         ]
@@ -51,17 +71,10 @@ class AssetUpdateForm(forms.ModelForm):
             'groups': forms.SelectMultiple(
                 attrs={'class': 'select2',
                        'data-placeholder': _('Select asset groups')}),
-            'admin_user': forms.Select(
-                attrs={'class': 'select2',
-                       'data-placeholder': _('Select asset admin user')}),
         }
         help_texts = {
             'hostname': '* required',
             'ip': '* required',
-            'system_users': _('System user will be granted for user '
-                              'to login assets (using ansible create automatic)'),
-            'admin_user': _('Admin user should be exist on asset '
-                            'already, And have sudo ALL permission'),
         }
 
 
@@ -77,22 +90,16 @@ class AssetBulkUpdateForm(forms.ModelForm):
             }
         )
     )
-    port = forms.IntegerField(min_value=1, max_value=65535,
-                              required=False, label=_('Port'))
+    port = forms.IntegerField(min_value=1, max_value=65535, required=False, label=_('Port'))
 
     class Meta:
         model = Asset
         fields = [
-            'assets', 'port', 'groups', 'admin_user', "cluster",
+            'assets', 'port', 'groups', "cluster",
             'type', 'env', 'status',
         ]
         widgets = {
-            'groups': forms.SelectMultiple(
-                attrs={'class': 'select2',
-                       'data-placeholder': _('Select asset groups')}),
-            'admin_user': forms.Select(
-                attrs={'class': 'select2',
-                       'data-placeholder': _('Select asset admin user')}),
+            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Select asset groups')}),
         }
 
     def save(self, commit=True):
@@ -140,40 +147,19 @@ class AssetGroupForm(forms.ModelForm):
 
 
 class ClusterForm(forms.ModelForm):
-    # See AdminUserForm comment same it
-    assets = forms.ModelMultipleChoiceField(
-        queryset=Asset.objects.all(),
-        label=_('Asset'),
-        required=False,
-        widget=forms.SelectMultiple(
-            attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
-        )
-
-    def __init__(self, *args, **kwargs):
-        if kwargs.get('instance'):
-            initial = kwargs.get('initial', {})
-            initial['assets'] = kwargs['instance'].assets.all()
-        super(ClusterForm, self).__init__(*args, **kwargs)
-
-    def _save_m2m(self):
-        super(ClusterForm, self)._save_m2m()
-        assets = self.cleaned_data['assets']
-        self.instance.assets.clear()
-        self.instance.assets.add(*tuple(assets))
 
     class Meta:
         model = Cluster
-        fields = ['name', "bandwidth", "operator", 'contact',
+        fields = ['name', "bandwidth", "operator", 'contact', 'admin_user',
                   'phone', 'address', 'intranet', 'extranet', 'comment']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
-            'intranet': forms.Textarea(
-                attrs={'placeholder': 'IP段之间用逗号隔开，如：192.168.1.0/24,192.168.1.0/24'}),
-            'extranet': forms.Textarea(
-                attrs={'placeholder': 'IP段之间用逗号隔开，如：201.1.32.1/24,202.2.32.1/24'})
+            'intranet': forms.Textarea(attrs={'placeholder': 'IP段之间用逗号隔开，如：192.168.1.0/24,192.168.1.0/24'}),
+            'extranet': forms.Textarea(attrs={'placeholder': 'IP段之间用逗号隔开，如：201.1.32.1/24,202.2.32.1/24'})
         }
         help_texts = {
-            'name': '* required'
+            'name': '* required',
+            'admin_user': 'The assets of this cluster will use this admin user as his admin user',
         }
 
 
@@ -237,8 +223,7 @@ class SystemUserForm(forms.ModelForm):
     # Admin user assets define, let user select, save it in form not in view
     auto_generate_key = forms.BooleanField(initial=True, required=False)
     # Form field name can not start with `_`, so redefine it,
-    password = forms.CharField(widget=forms.PasswordInput, required=False,
-                               max_length=100, strip=True)
+    password = forms.CharField(widget=forms.PasswordInput, required=False, max_length=100, strip=True)
     # Need use upload private key file except paste private key content
     private_key_file = forms.FileField(required=False)
 
@@ -289,15 +274,19 @@ class SystemUserForm(forms.ModelForm):
         fields = [
             'name', 'username', 'protocol', 'auto_generate_key', 'password',
             'private_key_file', 'auth_method', 'auto_push', 'sudo',
-            'comment', 'shell'
+            'comment', 'shell', 'cluster'
         ]
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
             'username': forms.TextInput(attrs={'placeholder': _('Username')}),
+            'cluster': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _(' Select clusters')}),
         }
         help_texts = {
             'name': '* required',
             'username': '* required',
+            'cluster': 'If auto push checked, then push system user to that cluster assets',
             'auto_push': 'Auto push system user to asset',
         }
 
@@ -306,8 +295,7 @@ class SystemUserUpdateForm(forms.ModelForm):
     # Admin user assets define, let user select, save it in form not in view
     auto_generate_key = forms.BooleanField(initial=False, required=False)
     # Form field name can not start with `_`, so redefine it,
-    password = forms.CharField(widget=forms.PasswordInput, required=False,
-                               max_length=100, strip=True)
+    password = forms.CharField(widget=forms.PasswordInput, required=False, max_length=100, strip=True)
     # Need use upload private key file except paste private key content
     private_key_file = forms.FileField(required=False)
 
@@ -341,17 +329,21 @@ class SystemUserUpdateForm(forms.ModelForm):
     class Meta:
         model = SystemUser
         fields = [
-            'name', 'username', 'protocol', 'auto_generate_key', 'password',
-            'private_key_file', 'auth_method', 'auto_push', 'sudo',
-            'comment', 'shell'
+            'name', 'username', 'protocol',
+            'auth_method', 'auto_push', 'sudo',
+            'comment', 'shell', 'cluster'
         ]
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
             'username': forms.TextInput(attrs={'placeholder': _('Username')}),
+            'cluster': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _(' Select clusters')}),
         }
         help_texts = {
             'name': '* required',
             'username': '* required',
+            'cluster': 'If auto push checked, then push system user to that cluster assets',
             'auto_push': 'Auto push system user to asset',
         }
 

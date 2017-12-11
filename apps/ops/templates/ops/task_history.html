@@ -30,7 +30,7 @@
                         <div class="col-sm-12" style="padding-left: 0">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span style="float: left">{% trans 'Versions of ' %} <b>{{ object.name }}</b></span>
+                                    <span style="float: left">{% trans 'History of ' %} <b>{{ object.name }}</b></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -57,7 +57,8 @@
                                                 <th>{% trans 'Is finished' %}</th>
                                                 <th>{% trans 'Is success' %}</th>
                                                 <th>{% trans 'Time' %}</th>
-                                                <th></th>
+                                                <th>{% trans 'Version' %}</th>
+                                                <th>{% trans 'Action' %}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -86,10 +87,12 @@
 {#                        var detail_btn = '<a href="' + cellData + '</a>';#}
                         $(td).html(cellData);
                      }},
-{#                    {targets: 2, createdCell: function (td, cellData, rowData) {#}
-{#                        var dataLength = cellData.length;#}
-{#                        $(td).html(dataLength);#}
-{#                    }},#}
+                    {targets: 2, createdCell: function (td, cellData) {
+                        var total = "<span>" + cellData.total + "</span>";
+                        var success = "<span class='text-navy'>" + cellData.success + "</span>";
+                        var failed = "<span class='text-danger'>" + cellData.failed + "</span>";
+                        $(td).html(failed + '/' + success + '/' + total );
+                    }},
                     {targets: 3, createdCell: function (td, cellData) {
                         if (!cellData) {
                             $(td).html('<i class="fa fa-times text-danger"></i>')
@@ -110,12 +113,17 @@
                         } else {
                             $(td).html("0" + ' s')
                         }
-
-                     }}
+                    }},
+                    {targets: 7, createdCell: function (td, cellData) {
+                       var run_btn = '<a class="btn btn-xs btn-primary m-l-xs btn-run" data-uid="99991937">{% trans "Detail" %}</a>'.replace('99991937', cellData);
+                       if (cellData) {
+                           $(td).html(run_btn);
+                       }
+                    }}
                 ],
                 ajax_url: '{% url "api-ops:history-list" %}?task={{ object.pk }}',
-                columns: [{data: function(){return ""}}, {data: "date_start"}, {data: "adhoc_short_id"},
-                          {data: "adhoc_short_id"}, {data: "adhoc_short_id"}, {data: "timedelta"}]
+                columns: [{data: function(){return ""}}, {data: "date_start"}, {data: "stat"}, {data: "adhoc_short_id"},
+                          {data: "adhoc_short_id"}, {data: "timedelta"}, {data: 'adhoc_short_id'}, {data: "id"}]
             };
             jumpserver.initDataTable(options);
         })

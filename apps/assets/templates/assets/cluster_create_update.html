@@ -35,6 +35,7 @@
                                         {% csrf_token %}
                                         <h3 class="widget-head-color-box">基本信息</h3>
                                         {% bootstrap_field form.name layout="horizontal" %}
+                                        {% bootstrap_field form.admin_user layout="horizontal" %}
                                         {% bootstrap_field form.address layout="horizontal" %}
                                         {% bootstrap_field form.contact layout="horizontal" %}
                                         {% bootstrap_field form.phone layout="horizontal" %}

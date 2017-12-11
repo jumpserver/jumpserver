@@ -22,7 +22,7 @@
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-sm-7" style="padding-left: 0;">
+                        <div class="col-sm-8" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
                                     <span style="float: left">{% trans 'Assets of ' %} <b>{{ system_user.name }} </b><span class="badge">{{ paginator.count }}</span></span>
@@ -48,90 +48,38 @@
                                                 <th>{% trans 'IP' %}</th>
                                                 <th>{% trans 'Port' %}</th>
                                                 <th>{% trans 'Reachable' %}</th>
-                                                <th>{% trans 'Action' %}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for asset in page_obj %}
-                                            <tr>
-                                                <td>{{ asset.hostname }}</td>
-                                                <td>{{ asset.ip }}</td>
-                                                <td>{{ asset.port }}</td>
-                                                <td>
-
-                                                    <i class="fa fa-check text-navy"></i>
-                                                </td>
-                                                <td>
-                                                    <button class="btn btn-danger pull-right btn-xs" type="button"><i class="fa fa-minus"></i></button>
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Attach to assets ' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Quick update' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table">
                                         <tbody>
-                                        <form>
-                                            <tr class="no-borders-tr">
-                                                <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select asset' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for asset in assets_remain %}
-                                                            <option value="{{ asset.id }}">{{ asset.ip}}:{{ asset.port }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                            <tr class="no-borders-tr">
-                                                <td colspan="2">
-                                                    <button type="button" class="btn btn-primary btn-sm btn-add-asset2system-user">{% trans 'Confirm' %}</button>
-                                                </td>
-                                            </tr>
-                                        </form>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <div class="panel panel-info">
-                                <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Attach to asset groups' %}
-                                </div>
-                                <div class="panel-body">
-                                    <table class="table group_edit">
-                                        <tbody>
-                                        <form>
-                                            <tr>
-                                                <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Add asset group' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for asset_group in asset_groups_remain %}
-                                                        <option value="{{ asset_group.id }}">{{ asset_group.name }}</option>
-                                                        {% endfor %}
-                                                    </select>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-sm" id="btn_add_user_group">{% trans 'Attach AssetGroup' %}</button>
-                                                </td>
-                                            </tr>
-                                        </form>
-
-                                        {% for asset_group in asset_groups %}
-                                        <tr>
-                                          <td ><b class="bdg_asset_groups" data-gid={{ asset_group.id }}>{{ asset_group.name }}</b></td>
-                                          <td>
-                                              <button class="btn btn-danger pull-right btn-xs btn-leave-system_user" type="button"><i class="fa fa-minus"></i></button>
-                                          </td>
+                                        <tr class="no-borders-tr">
+                                            <td width="50%">{% trans 'Push system user manually' %}:</td>
+                                            <td>
+                                                <span style="float: right">
+                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Push' %}</button>
+                                                </span>
+                                            </td>
                                         </tr>
-                                        {% endfor %}
+                                        <tr>
+                                            <td width="50%">{% trans 'Refresh assets connectivity' %}:</td>
+                                            <td>
+                                                <span style="float: right">
+                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Refresh' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -142,8 +90,6 @@
             </div>
         </div>
     </div>
-    </div>
-
 {% endblock %}
 {% block custom_foot_js %}
 <script>
@@ -166,6 +112,30 @@ Array.prototype.unique = function(){
  	}
  	return res;
 };
+function initAssetsTable() {
+    var options = {
+		ele: $('#system_user_list'),
+		buttons: [],
+		order: [],
+		columnDefs: [
+			{targets: 0, createdCell: function (td, cellData, rowData) {
+				var detail_btn = '<a href="{% url "assets:asset-detail" pk=99991937 %}" data-aid="'+rowData.id+'">' + cellData + '</a>';
+				$(td).html(detail_btn.replace('99991937', rowData.id));
+			}},
+			{targets: 3, createdCell: function (td, cellData) {
+				if (!cellData) {
+					$(td).html('<i class="fa fa-times text-danger"></i>')
+				} else {
+					$(td).html('<i class="fa fa-check text-navy"></i>')
+				}
+			}}
+		],
+		ajax_url: '{% url "api-assets:asset-list" %}?system_user_id={{ system_user.id }}',
+		columns: [{data: "hostname" }, {data: "ip" }, {data: "port" }, {data: "is_online" }],
+		op_html: $('#actions').html()
+	};
+	jumpserver.initDataTable(options);
+}
 function objectDelete(obj, name, url, data) {
     function doDelete() {
         var body = data;
@@ -234,33 +204,7 @@ $(document).ready(function () {
 		delete jumpserver.assets_selected[data.id];
 		delete jumpserver.asset_groups_selected[data.id];
 	});
-	var options = {
-		ele: $('#system_user_list'),
-		buttons: [],
-		order: [],
-		columnDefs: [
-			{targets: 0, createdCell: function (td, cellData, rowData) {
-				var detail_btn = '<a href="{% url "assets:asset-detail" pk=99991937 %}" data-aid="'+rowData.id+'">' + cellData + '</a>';
-				$(td).html(detail_btn.replace('99991937', rowData.id));
-			}},
-			{targets: 3, createdCell: function (td, cellData) {
-				if (!cellData) {
-					$(td).html('<i class="fa fa-times text-danger"></i>')
-				} else {
-					$(td).html('<i class="fa fa-check text-navy"></i>')
-				}
-			}},
-			{targets: 4, createdCell: function (td, cellData, rowData) {
-				var update_btn = '<a href="{% url "assets:asset-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', rowData.id);
-				var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-aid="99991937">{% trans "Delete" %}</a>'.replace('99991937', rowData.id);
-				$(td).html(update_btn + del_btn)
-			}}
-			],
-		ajax_url: '{% url "api-assets:asset-list" %}?system_user_id={{ system_user.id }}',
-		columns: [{data: "hostname" }, {data: "ip" }, {data: "port" }, {data: function () { return ""; } }, {data: "id"}],
-		op_html: $('#actions').html()
-	};
-	jumpserver.initDataTable(options);
+	initAssetsTable();
 })
 
 .on('click', '.btn-add-asset2system-user', function () {

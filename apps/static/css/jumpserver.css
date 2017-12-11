@@ -277,3 +277,16 @@ div.dataTables_wrapper div.dataTables_filter {
   margin-top: 5px;
   padding: 5px 12px;
 }
+
+#op.col-md-6{
+    padding-left: 0;
+}
+
+.help-message {
+    padding-left: 10px;
+    font-size: 12px;
+    line-height: 18px;
+    margin-bottom:0;
+    margin-left: 10px;
+    margin-right: 10px
+}
