@@ -61,7 +61,7 @@ INSTALLED_APPS = [
     'ops.apps.OpsConfig',
     # 'audits.apps.AuditsConfig',
     'common.apps.CommonConfig',
-    'terminal.apps.ApplicationsConfig',
+    'terminal.apps.TerminalConfig',
     'rest_framework',
     'rest_framework_swagger',
     'django_filters',
