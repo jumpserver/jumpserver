@@ -23,7 +23,10 @@ class TerminalSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_is_alive(obj):
-        status = obj.status_set.latest()
+        try:
+            status = obj.status_set.latest()
+        except Status.DoesNotExist:
+            status = None
 
         if not status:
             return False
