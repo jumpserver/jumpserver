@@ -28,6 +28,7 @@ from .. import forms
 from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser
 from ..hands import AdminUserRequiredMixin
 from ..tasks import update_assets_hardware_info
+from ..signals import on_asset_created
 
 
 __all__ = [
@@ -73,11 +74,12 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
     success_url = reverse_lazy('assets:asset-list')
 
     def form_valid(self, form):
-        self.asset = asset = form.save()
+        asset = form.save()
         asset.created_by = self.request.user.username or 'Admin'
         asset.date_created = timezone.now()
         asset.save()
-        return super(AssetCreateView, self).form_valid(form)
+        on_asset_created.send(sender=self.__class__, asset=asset)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = {
@@ -85,11 +87,11 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
             'action': 'Create asset',
         }
         kwargs.update(context)
-        return super(AssetCreateView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def get_success_url(self):
-        update_assets_hardware_info.delay([self.asset._to_secret_json()])
-        return super(AssetCreateView, self).get_success_url()
+        # update_assets_hardware_info.delay([self.asset._to_secret_json()])
+        return super().get_success_url()
 
 
 class AssetModalListView(AdminUserRequiredMixin, ListView):

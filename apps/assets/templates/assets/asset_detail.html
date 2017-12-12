@@ -19,9 +19,6 @@
                             <li class="active">
                                 <a href="{% url 'assets:asset-detail' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Asset detail' %} </a>
                             </li>
-                            <li>
-                                <a href="{% url 'assets:asset-detail' pk=asset.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Auth' %} </a>
-                            </li>
                             {% if user.is_superuser %}
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-default" href="{% url 'assets:asset-update' pk=asset.id %}"><i class="fa fa-edit"></i>Update</a>
@@ -198,14 +195,6 @@
                                                 </span>
                                             </td>
                                         </tr>
-                                        <tr>
-                                            <td>{% trans 'Reset auth' %}:</td>
-                                            <td>
-                                                <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_test_admin_user" style="width: 54px;">{% trans 'Reset' %}</button>
-                                                </span>
-                                            </td>
-                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -239,7 +228,7 @@
                                         <tr>
                                           <td ><b class="bdg_group" data-gid={{ asset_group.id }}>{{ asset_group.name }}</b></td>
                                           <td>
-                                              <button class="btn btn-danger pull-right btn-xs btn_leave_group" type="button"><i class="fa fa-minus"></i></button>
+                                              <button class="btn btn-danger pull-right btn-xs btn-leave-group" type="button"><i class="fa fa-minus"></i></button>
                                           </td>
                                         </tr>
                                         {% endfor %}
@@ -274,7 +263,7 @@ function updateAssetGroups(groups) {
             $('#add-asset2group tbody').append(
                 '<tr>' +
                 '<td><b class="bdg_group" data-gid="' + index + '">' + group_name + '</b></td>' +
-                '<td><button class="btn btn-danger btn-xs pull-right btn_leave_group" type="button"><i class="fa fa-minus"></i></button></td>' +
+                '<td><button class="btn btn-danger btn-xs pull-right btn-leave-group" type="button"><i class="fa fa-minus"></i></button></td>' +
                 '</tr>'
             )
         });
@@ -288,44 +277,20 @@ function updateAssetGroups(groups) {
     });
 }
 
-function updateAssetSystemUser(system_users) {
-    var the_url = "{% url 'api-assets:asset-update-system-users' pk=asset.id %}";
-    var body = {
-        system_users: Object.assign([], system_users)
-    };
-    var success = function(data) {
-        $('.select2-selection__rendered').empty();
-        $('#groups_selected').val('');
-        $.map(jumpserver.system_user_selected, function(name, index) {
-            $('#opt_' + index).remove();
-
-            $('#add-asset2systemuser tbody').append(
-                '<tr>' +
-                '<td><b class="bdg_group" data-sid="' + index + '">' + name + '</b></td>' +
-                '<td><button class="btn btn-danger btn-xs pull-right btn_leave_system" type="button"><i class="fa fa-minus"></i></button></td>' +
-                '</tr>'
-            )
-        });
-        // clear jumpserver.groups_selected
-        jumpserver.system_user_selected = {};
-    };
-    APIUpdateAttr({
-        url: the_url,
-        body: JSON.stringify(body),
-        success: success
-    });
-}
-
 function refreshAssetHardware() {
     var the_url = "{% url 'api-assets:asset-refresh' pk=asset.id %}";
     var success = function (data) {
         location.reload();
     };
+    var error = function (data) {
+        alert(data)
+    };
     APIUpdateAttr({
         url: the_url,
         success: success,
+        error: error,
         method: 'GET'
-    })
+    });
 }
 
 
@@ -337,13 +302,6 @@ $(document).ready(function () {
         var data = evt.params.data;
         delete jumpserver.groups_selected[data.id]
     });
-    $('.select2.system-user').select2().on('select2:select', function(evt) {
-        var data = evt.params.data;
-        jumpserver.system_user_selected[data.id] = data.text;
-    }).on('select2:unselect', function(evt) {
-        var data = evt.params.data;
-        delete jumpserver.system_user_selected[data.id]
-    })
 }).on('click', '#is_active', function () {
     var the_url = '{% url "api-assets:asset-detail" pk=asset.id %}';
     var checked = $(this).prop('checked');
@@ -370,11 +328,11 @@ $(document).ready(function () {
         return $(this).data('gid');
     }).get();
     $.map(jumpserver.groups_selected, function(value, index) {
-        groups.push(parseInt(index));
+        groups.push(index);
         $('#opt_' + index).remove();
     });
     updateAssetGroups(groups)
-}).on('click', '.btn_leave_group', function() {
+}).on('click', '.btn-leave-group', function() {
     var $this = $(this);
     var $tr = $this.closest('tr');
     var $badge = $tr.find('.bdg_group');
@@ -388,34 +346,6 @@ $(document).ready(function () {
         return $(this).data('gid');
     }).get();
     updateAssetGroups(groups)
-}).on('click', '.btn-system-user', function () {
-    if (Object.keys(jumpserver.system_user_selected).length === 0) {
-        return false;
-    }
-    var system_users = $('.bdg_group').map(function() {
-            return $(this).data('sid');
-    }).get();
-    $.map(jumpserver.system_user_selected, function(value, index) {
-        system_users.push(parseInt(index));
-        $('#opt_' + index).remove();
-    });
-    updateAssetSystemUser(system_users)
-
-}).on('click', '.btn_leave_system', function () {
-    var $this = $(this);
-    var $tr = $this.closest('tr');
-    var $badge = $tr.find('.bdg_group');
-    var sid = $badge.data('sid');
-    var name = $badge.html() || $badge.text();
-    $('#groups_selected').append(
-        '<option value="' + sid + '" id="opt_' + sid + '">' + name + '</option>'
-    );
-    $tr.remove();
-    var system_users = $('.bdg_group').map(function () {
-            return $(this).data('sid');
-        }).get();
-    updateAssetSystemUser(system_users)
-
 }).on('click', '.btn-delete-asset', function () {
     var $this = $(this);
     var name = "{{ asset.hostname }}";
@@ -424,7 +354,7 @@ $(document).ready(function () {
     var redirect_url = "{% url 'assets:asset-list' %}";
     objectDelete($this, name, the_url, redirect_url);
 }).on('click', '#btn_refresh_asset', function () {
-    alert('请等待几秒, 等待完成');
+    alert('关闭alert, 等待完成, 自动刷新页面');
     refreshAssetHardware()
 }).on('click', '#btn_test_admin_user', function () {
     $.ajax({
@@ -435,7 +365,6 @@ $(document).ready(function () {
         toastr.error('Error')
     })
 })
-
 
 </script>
 {% endblock %}

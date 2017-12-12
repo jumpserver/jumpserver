@@ -331,19 +331,15 @@ BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/3' % {
     'host': CONFIG.REDIS_HOST or '127.0.0.1',
     'port': CONFIG.REDIS_PORT or 6379,
 }
+CELERY_TASK_SERIALIZER = 'pickle'
+CELERY_RESULT_SERIALIZER = 'pickle'
 CELERY_RESULT_BACKEND = BROKER_URL
-
+CELERY_ACCEPT_CONTENT = ['json', 'pickle']
+CELERY_TASK_RESULT_EXPIRES = 3600
+CELERYD_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
+CELERYD_TASK_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
+CELERY_TIMEZONE = TIME_ZONE
 # TERMINAL_HEATBEAT_INTERVAL = CONFIG.TERMINAL_HEATBEAT_INTERVAL or 30
-
-# crontab job
-# CELERYBEAT_SCHEDULE = {
-#     Check applications is alive every 10m
-# 'check_terminal_alive': {
-#     'task': 'applications.tasks.check_terminal_alive',
-#     'schedule': timedelta(seconds=TERMINAL_HEATBEAT_INTERVAL),
-#     'args': (),
-# },
-# }
 
 
 # Cache use redis

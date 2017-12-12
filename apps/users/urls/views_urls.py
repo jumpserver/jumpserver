@@ -23,17 +23,18 @@ urlpatterns = [
 
     # User view
     url(r'^user$', views.UserListView.as_view(), name='user-list'),
-    url(r'^user/(?P<pk>[0-9a-zA-Z\-]+)$', views.UserDetailView.as_view(), name='user-detail'),
-    url(r'^user/(?P<pk>[0-9a-zA-Z\-]+)/asset-permission$', views.UserAssetPermissionView.as_view(), name='user-asset-permission'),
-    url(r'^user/(?P<pk>[0-9a-zA-Z\-]+)/asset-permission/create$', views.UserAssetPermissionCreateView.as_view(), name='user-asset-permission-create'),
-    url(r'^user/(?P<pk>[0-9a-zA-Z\-]+)/assets', views.UserGrantedAssetView.as_view(), name='user-granted-asset'),
-    url(r'^user/(?P<pk>[0-9a-zA-Z\-]+)/login-history', views.UserDetailView.as_view(), name='user-login-history'),
     url(r'^user/export/', views.UserExportView.as_view(), name='user-export'),
     url(r'^first-login/$', views.UserFirstLoginView.as_view(), name='user-first-login'),
     url(r'^user/import/$', views.UserBulkImportView.as_view(), name='user-import'),
     url(r'^user/create$', views.UserCreateView.as_view(), name='user-create'),
     url(r'^user/(?P<pk>[0-9a-zA-Z\-]{36})/update$', views.UserUpdateView.as_view(), name='user-update'),
     url(r'^user/update$', views.UserBulkUpdateView.as_view(), name='user-bulk-update'),
+    url(r'^user/(?P<pk>[0-9a-zA-Z\-]+)$', views.UserDetailView.as_view(), name='user-detail'),
+    url(r'^user/(?P<pk>[0-9a-zA-Z\-]+)/asset-permission$', views.UserAssetPermissionView.as_view(), name='user-asset-permission'),
+    url(r'^user/(?P<pk>[0-9a-zA-Z\-]+)/asset-permission/create$', views.UserAssetPermissionCreateView.as_view(), name='user-asset-permission-create'),
+    url(r'^user/(?P<pk>[0-9a-zA-Z\-]+)/assets', views.UserGrantedAssetView.as_view(), name='user-granted-asset'),
+    url(r'^user/(?P<pk>[0-9a-zA-Z\-]+)/login-history', views.UserDetailView.as_view(), name='user-login-history'),
+
 
     # User group view
     url(r'^user-group$', views.UserGroupListView.as_view(), name='user-group-list'),

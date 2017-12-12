@@ -21,6 +21,7 @@ def is_uuid(s):
         return False
 
 
+
 def record_adhoc(func):
     def _deco(adhoc, **options):
         record = AdHocRunHistory(adhoc=adhoc)

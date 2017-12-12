@@ -15,3 +15,5 @@ def get_assets_by_hostname_list(hostname_list):
 def get_system_user_by_name(name):
     system_user = get_object_or_none(SystemUser, name=name)
     return system_user
+
+

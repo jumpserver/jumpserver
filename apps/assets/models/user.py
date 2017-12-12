@@ -96,12 +96,16 @@ class AdminUser(models.Model):
     def become_pass(self, password):
         self._become_pass = signer.sign(password)
 
+    def get_related_assets(self):
+        assets = []
+        for cluster in self.cluster_set.all():
+            assets.extend(cluster.assets.all())
+        assets.extend(self.asset_set.all())
+        return list(set(assets))
+
     @property
     def assets_amount(self):
-        amount = 0
-        for cluster in self.cluster_set.all():
-            amount += cluster.assets.all().count()
-        return amount
+        return len(self.get_related_assets())
 
     class Meta:
         ordering = ['name']
@@ -209,9 +213,14 @@ class SystemUser(models.Model):
             'private_key_file': self.private_key_file,
         }
 
+    def get_clusters_assets(self):
+        from .asset import Asset
+        clusters = self.cluster.all()
+        return Asset.objects.filter(cluster__in=clusters)
+
     @property
     def assets_amount(self):
-        return self.assets.count()
+        return len(self.get_clusters_assets())
 
     def to_json(self):
         return {

@@ -10,52 +10,26 @@ logger = get_logger(__file__)
 
 
 class AssetCreateForm(forms.ModelForm):
-    # Form field name can not start with `_`, so redefine it,
-    password = forms.CharField(
-        widget=forms.PasswordInput, max_length=100,
-        strip=True, required=False,
-        help_text=_('If also set private key, use that first'),
-    )
-    # Need use upload private key file except paste private key content
-    private_key_file = forms.FileField(required=False)
-
-    def save(self, commit=True):
-        # Because we define custom field, so we need rewrite :method: `save`
-        obj = super().save(commit=commit)
-        password = self.cleaned_data['password']
-        private_key = self.cleaned_data['private_key_file']
-
-        if password:
-            obj.password = password
-        if private_key:
-            obj.private_key = private_key
-        obj.save()
-        return obj
-
-    def clean_private_key_file(self):
-        private_key_file = self.cleaned_data['private_key_file']
-        if private_key_file:
-            private_key = private_key_file.read()
-            if not validate_ssh_private_key(private_key):
-                raise forms.ValidationError(_('Invalid private key'))
-            return private_key
-        return private_key_file
 
     class Meta:
         model = Asset
         fields = [
             'hostname', 'ip', 'public_ip', 'port', 'type', 'comment',
-            'cluster', 'groups', 'status', 'env', 'is_active', 'username',
+            'cluster', 'groups', 'status', 'env', 'is_active',
+            'admin_user'
 
         ]
         widgets = {
-            'groups': forms.SelectMultiple(
-                attrs={'class': 'select2',
-                       'data-placeholder': _('Select asset groups')}),
+            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Select asset groups')}),
+            'cluster': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select cluster')}),
+            'admin_user': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select admin user')}),
         }
         help_texts = {
             'hostname': '* required',
             'ip': '* required',
+            'port': '* required',
+            'cluster': '* required',
+            'admin_user': _('Host level admin user, If not set using cluster admin user default')
         }
 
 
@@ -65,16 +39,18 @@ class AssetUpdateForm(forms.ModelForm):
         fields = [
             'hostname', 'ip', 'port', 'groups', "cluster", 'is_active',
             'type', 'env', 'status', 'public_ip', 'remote_card_ip', 'cabinet_no',
-            'cabinet_pos', 'number', 'comment'
+            'cabinet_pos', 'number', 'comment', 'admin_user',
         ]
         widgets = {
-            'groups': forms.SelectMultiple(
-                attrs={'class': 'select2',
-                       'data-placeholder': _('Select asset groups')}),
+            'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Select asset groups')}),
+            'admin_user': forms.Select(attrs={'class': 'select2', 'data-placeholder': _("Default using cluster admin user")})
         }
         help_texts = {
             'hostname': '* required',
             'ip': '* required',
+            'port': '* required',
+            'cluster': '* required',
+            'admin_user': _('Host level admin user, If not set using cluster admin user default')
         }
 
 

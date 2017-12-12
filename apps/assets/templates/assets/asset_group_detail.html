@@ -67,16 +67,16 @@
                                         <form>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select assets' %}" class="select2 system-user-select" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for system_user in system_users %}
-                                                            <option value="{{ system_user.id }}"> {{ system_user.name }} </option>
+                                                    <select data-placeholder="{% trans 'Select assets' %}" class="select2 asset-select" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for asset in assets_remain %}
+                                                            <option value="{{ asset.id }}"> {{ asset.hostname }} </option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
                                             </tr>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <button type="button" class="btn btn-primary btn-sm btn-push-system-user">{% trans 'Push' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-sm btn-add-asset">{% trans 'Add' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
@@ -93,28 +93,30 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-  jumpserver.assets_selected = {};
-  function updateGroupAssets(assets) {
+jumpserver.assets_selected = {};
+function updateGroupAssets(assets) {
     var the_url = "{}";
     var body = {
-      assets: Object.assign([], assets)
+        assets: Object.assign([], assets)
     };
     var $data_table = $("#asset_list_table").DataTable();
     var success = function(data) {
-      $('.select2-selection__rendered').empty();
-      $.map(jumpserver.assets_selected, function(asset_ip, index) {
-        $('#opt_' + index).remove();
-        $data_table.ajax.reload();
-      });
-      jumpserver.groups_selected = {};
-    };
-    APIUpdateAttr({
-      url: the_url,
-      body: JSON.stringify(body),
-      method: 'PUT',
-      success: success
+        $('.select2-selection__rendered').empty();
+        $.map(jumpserver.assets_selected, function(asset_ip, index) {
+            $('#opt_' + index).remove();
+            $data_table.ajax.reload();
     });
-  }
+    jumpserver.groups_selected = {};
+    };
+    console.log(body);
+
+    //APIUpdateAttr({
+    //    url: the_url,
+    //    body: JSON.stringify(body),
+    //    method: 'PUT',
+    //    success: success
+    //});
+}
 
 function leaveGroup(obj, name, url, data) {
     function doDelete() {
@@ -203,20 +205,21 @@ $(document).ready(function () {
   $('.select2').select2();
 
   $('.select2.asset-select').select2()
-    .on('select2:select', function(evt) {
-      var data = evt.params.data;
-      jumpserver.assets_selected[data.id] = data.text;
-      console.log(jumpserver.assets_selected)
-    })
-    .on('select2:unselect', function(evt) {
-      var data = evt.params.data;
-      delete jumpserver.assets_selected[data.id]
-    });
+      .on('select2:select', function(evt) {
+          var data = evt.params.data;
+          jumpserver.assets_selected[data.id] = data.text;
+          console.log(jumpserver.assets_selected)
+      })
+      .on('select2:unselect', function(evt) {
+          var data = evt.params.data;
+          delete jumpserver.assets_selected[data.id]
+      });
+
   initTable();
 
 })
 
-.on('click', ".btn-asset-group-add-asset", function () {
+.on('click', ".btn-add-asset", function () {
   if (Object.keys(jumpserver.assets_selected).length === 0) {
     return false;
   }
@@ -225,16 +228,8 @@ $(document).ready(function () {
 
 })
 
-.on('click', '.btn-push-system-user', function () {
-    var data = $('.system-user-select').select2();
-    var system_id = data.val()[0];
-    if (!system_id) {
-        return false
-    }
-    pushSystemUser(system_id)
-})
 
-.on('click', '.btn_asset_delete', function () {
+.on('click', '.btn-leave-group', function () {
 	var $this = $(this);
 	var the_url = "{% url 'api-assets:asset-groups-update' pk=asset_group.id %}";
 	var name = $(this).closest("tr").find(":nth-child(1) > a").html();

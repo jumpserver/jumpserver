@@ -3,17 +3,13 @@
 # 
 
 import uuid
-import os
 import logging
-from hashlib import md5
 
 from django.db import models
-from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 
-from common.utils import signer, ssh_key_string_to_obj
-from .utils import private_key_validator
+from ..const import ADMIN_USER_CONN_CACHE_KEY_PREFIX
 from .cluster import Cluster
 from .group import AssetGroup
 from .user import AdminUser, SystemUser
@@ -59,9 +55,7 @@ class Asset(models.Model):
     status = models.CharField(choices=STATUS_CHOICES, max_length=12, null=True, blank=True, default='In use', verbose_name=_('Asset status'))
 
     # Auth
-    username = models.CharField(max_length=16, blank=True, null=True, verbose_name=_('Username'))
-    _password = models.CharField(max_length=256, blank=True, null=True, verbose_name=_('Password'))
-    _private_key = models.TextField(max_length=4096, blank=True, null=True, verbose_name=_('SSH private key'), validators=[private_key_validator, ])
+    admin_user = models.ForeignKey('assets.AdminUser', null=True, blank=True, on_delete=models.SET_NULL, verbose_name=_("Admin user"))
 
     # Some information
     public_ip = models.GenericIPAddressField(max_length=32, blank=True, null=True, verbose_name=_('Public IP'))
@@ -105,39 +99,22 @@ class Asset(models.Model):
         return False, warning
 
     @property
-    def password(self):
-        if self._password:
-            return signer.unsign(self._password)
+    def hardware_info(self):
+        if self.cpu_count:
+            return '{} Core {} {}'.format(
+                self.cpu_count * self.cpu_cores,
+                self.memory, self.disk_total
+            )
         else:
             return ''
 
-    @password.setter
-    def password(self, password_raw):
-        self._password = signer.sign(password_raw)
-
     @property
-    def private_key(self):
-        if self._private_key:
-            key_str = signer.unsign(self._private_key)
-            return ssh_key_string_to_obj(key_str)
+    def is_connective(self):
+        val = cache.get(ADMIN_USER_CONN_CACHE_KEY_PREFIX + self.hostname)
+        if val == 1:
+            return True
         else:
-            return None
-
-    @private_key.setter
-    def private_key(self, private_key_raw):
-        self._private_key = signer.sign(private_key_raw)
-
-    @property
-    def private_key_file(self):
-        if not self.private_key:
-            return None
-        project_dir = settings.PROJECT_DIR
-        tmp_dir = os.path.join(project_dir, 'tmp')
-        key_name = md5(self._private_key.encode()).hexdigest()
-        key_path = os.path.join(tmp_dir, key_name)
-        if not os.path.exists(key_path):
-            self.private_key.write_private_key_file(key_path)
-        return key_path
+            return False
 
     def to_json(self):
         return {
@@ -148,25 +125,28 @@ class Asset(models.Model):
             'groups': [group.name for group in self.groups.all()],
         }
 
-    def is_connective(self):
-        return cache.get(self.hostname)
-
     def _to_secret_json(self):
         """
-        Ansible use it create inventory
+        Ansible use it create inventory, First using asset user,
+        otherwise using cluster admin user
 
         Todo: May be move to ops implements it
         """
         data = self.to_json()
-        if self.cluster and self.cluster.admin_user:
+        admin_user = None
+        if self.admin_user:
+            admin_user = self.admin_user
+        elif self.cluster and self.cluster.admin_user:
+            admin_user = self.cluster.admin_user
+        if admin_user:
             data.update({
-                'username': self.cluster.admin_user.username,
-                'password': self.cluster.admin_user.password,
-                'private_key': self.cluster.admin_user.private_key_file,
+                'username': admin_user.username,
+                'password': admin_user.password,
+                'private_key': admin_user.private_key_file,
                 'become': {
-                    'method': self.cluster.admin_user.become_method,
-                    'user': self.cluster.admin_user.become_user,
-                    'pass': self.cluster.admin_user.become_pass,
+                    'method': admin_user.become_method,
+                    'user': admin_user.become_user,
+                    'pass': admin_user.become_pass,
                 }
             })
         return data

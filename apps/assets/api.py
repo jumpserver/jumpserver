@@ -181,10 +181,11 @@ class AssetRefreshHardwareView(generics.RetrieveAPIView):
         asset_id = kwargs.get('pk')
         asset = get_object_or_404(Asset, pk=asset_id)
         summary = update_assets_hardware_info([asset])
-        if len(summary['failed']) == 0:
-            return super(AssetRefreshHardwareView, self).retrieve(request, *args, **kwargs)
+        print(summary)
+        if summary.get('dark'):
+            return Response(summary['dark'].values(), status=501)
         else:
-            return Response('', status=502)
+            return Response({"msg": "ok"})
 
 
 class AssetAdminUserTestView(AssetRefreshHardwareView):

@@ -29,7 +29,8 @@ from django.contrib.auth import logout as auth_logout
 
 from .. import forms
 from ..models import User, UserGroup
-from ..utils import AdminUserRequiredMixin, user_add_success_next
+from ..utils import AdminUserRequiredMixin, send_user_created_mail
+from ..signals import on_user_created
 from common.mixins import JSONResponseMixin
 from common.utils import get_logger, get_object_or_none
 from perms.models import AssetPermission
@@ -74,7 +75,7 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         user = form.save(commit=False)
         user.created_by = self.request.user.username or 'System'
         user.save()
-        user_add_success_next(user)
+        on_user_created.send(self.__class__, user=user)
         return super(UserCreateView, self).form_valid(form)
 
     def get_success_message(self, cleaned_data):
@@ -281,7 +282,7 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                     user = User.objects.create(**user_dict)
                     user.groups.set(groups)
                     created.append(user_dict['username'])
-                    user_add_success_next(user)
+                    on_user_created.send(self.__class__, user=user)
                 except Exception as e:
                     failed.append('%s: %s' % (user_dict['username'], str(e)))
             else:

@@ -156,7 +156,7 @@ function activeNav() {
 function APIUpdateAttr(props) {
     // props = {url: .., body: , success: , error: , method: ,}
     props = props || {};
-    var success_message = props.success_message || 'Update Successfully!';
+    var success_message = props.success_message || 'Update successfully!';
     var fail_message = props.fail_message || 'Error occurred while updating.';
     $.ajax({
         url: props.url,
@@ -169,11 +169,10 @@ function APIUpdateAttr(props) {
         if (typeof props.success === 'function') {
             return props.success(data);
         } 
-      
-    }).fail(function(jqXHR, textStatue, errorThrown) {
+    }).fail(function(jqXHR, textStatus, errorThrown) {
         toastr.error(fail_message);
         if (typeof props.error === 'function') {
-            return props.error(errorThrown);
+            return props.error(jqXHR.responseText);
         } 
     });
   // return true;
@@ -265,7 +264,7 @@ jumpserver.initDataTable = function (options) {
         language: {
             url: options.i18n_url || "/static/js/plugins/dataTables/i18n/zh-hans.json"
         },
-        order: options.order || [[ 1, 'asc' ]],
+        order: options.order || [],
         select: options.select || 'multi',
         buttons: [],
         columnDefs: columnDefs,

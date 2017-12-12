@@ -30,30 +30,31 @@
                     <div class="panel blank-panel">
                         <div class="panel-body">
                             <div class="tab-content">
-                                <div id="tab-1" class="ibox float-e-margins tab-pane active"></div>
-                                    <form id="ClusterForm" method="post" class="form-horizontal">
-                                        {% csrf_token %}
-                                        <h3 class="widget-head-color-box">基本信息</h3>
-                                        {% bootstrap_field form.name layout="horizontal" %}
-                                        {% bootstrap_field form.admin_user layout="horizontal" %}
-                                        {% bootstrap_field form.address layout="horizontal" %}
-                                        {% bootstrap_field form.contact layout="horizontal" %}
-                                        {% bootstrap_field form.phone layout="horizontal" %}
+                                <form id="ClusterForm" method="post" class="form-horizontal">
+                                    {% csrf_token %}
+                                    <h3 class="widget-head-color-box">{% trans 'Basic' %}</h3>
+                                    {% bootstrap_field form.name layout="horizontal" %}
+                                    {% bootstrap_field form.address layout="horizontal" %}
+                                    {% bootstrap_field form.contact layout="horizontal" %}
+                                    {% bootstrap_field form.phone layout="horizontal" %}
 
-                                        <div class="hr-line-dashed"></div>
-                                        <h3 class="widget-head-color-box">IP段</h3>
-                                        {% bootstrap_field form.operator layout="horizontal" %}
-                                        {% bootstrap_field form.intranet layout="horizontal" %}
-                                        {% bootstrap_field form.extranet layout="horizontal" %}
+                                    <h3 class="widget-head-color-box">{% trans 'Settings' %}</h3>
+                                    {% bootstrap_field form.admin_user layout="horizontal" %}
 
-                                        <div class="hr-line-dashed"></div>
-                                        <div class="form-group">
-                                            <div class="col-sm-4 col-sm-offset-2">
-                                                <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
-                                                <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
-                                            </div>
+                                    <div class="hr-line-dashed"></div>
+                                    <h3 class="widget-head-color-box">{% trans 'Other' %}</h3>
+                                    {% bootstrap_field form.operator layout="horizontal" %}
+                                    {% bootstrap_field form.intranet layout="horizontal" %}
+                                    {% bootstrap_field form.extranet layout="horizontal" %}
+
+                                    <div class="hr-line-dashed"></div>
+                                    <div class="form-group">
+                                        <div class="col-sm-4 col-sm-offset-2">
+                                            <button class="btn btn-default" type="reset"> {% trans 'Reset' %}</button>
+                                            <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
                                         </div>
-                                    </form>
+                                    </div>
+                                </form>
                                 </div>
                             </div>
                         </div>

@@ -31,7 +31,7 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
         return True
 
 
-def user_add_success_next(user):
+def send_user_created_mail(user):
     subject = _('Create account successfully')
     recipient_list = [user.email]
     message = _("""
@@ -58,6 +58,8 @@ def user_add_success_next(user):
         'email': user.email,
         'login_url': reverse('users:login', external=True),
     }
+    if settings.DEBUG:
+        print(message)
 
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 

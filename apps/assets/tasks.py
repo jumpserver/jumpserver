@@ -4,16 +4,14 @@ import json
 from celery import shared_task
 from django.core.cache import cache
 
-from assets.models import SystemUser, AdminUser
 from common.utils import get_object_or_none, capacity_convert, sum_capacity, encrypt_password, get_logger
-from .models import Asset
+from .models import SystemUser, AdminUser, Asset
+from .const import ADMIN_USER_CONN_CACHE_KEY_PREFIX, SYSTEM_USER_CONN_CACHE_KEY_PREFIX
 
 
 FORKS = 10
 TIMEOUT = 60
 logger = get_logger(__file__)
-ADMIN_USER_CONN_CACHE_KEY_PREFIX = "ADMIN_USER_CONN_"
-SYSTEM_USER_CONN_CACHE_KEY_PREFIX = 'SYSTEM_USER_CONN_'
 
 
 @shared_task
@@ -75,6 +73,12 @@ def update_assets_hardware_info(assets):
             if k.startswith('___'):
                 setattr(asset, k.strip('_'), v)
         asset.save()
+
+    for hostname, task in summary['dark'].items():
+        logger.warn("Update {} hardware info error: {}".format(
+            hostname, task[name],
+        ))
+
     return summary
 
 
@@ -96,8 +100,7 @@ def test_admin_user_connectability(admin_user):
     :return:
     """
     from ops.utils import run_adhoc
-    assets = admin_user.assets.all()
-    # assets = Asset.objects.filter(type__in=['Server', 'VM'])
+    assets = admin_user.get_related_assets()
     hosts = [asset.hostname for asset in assets]
     tasks = [
         {
@@ -126,6 +129,7 @@ def test_admin_user_connectability_period():
             cache.set(ADMIN_USER_CONN_CACHE_KEY_PREFIX + i, 0, 60*60*60)
 
 
+@shared_task
 def test_admin_user_connectability_manual(asset):
     from ops.utils import run_adhoc
     # assets = Asset.objects.filter(type__in=['Server', 'VM'])
@@ -140,8 +144,10 @@ def test_admin_user_connectability_manual(asset):
     ]
     result = run_adhoc(hosts, tasks=tasks, pattern="all", run_as_admin=True)
     if result.results_summary['dark']:
+        cache.set(ADMIN_USER_CONN_CACHE_KEY_PREFIX + asset.hostname, 0, 60*60*60)
         return False
     else:
+        cache.set(ADMIN_USER_CONN_CACHE_KEY_PREFIX + asset.hostname, 1, 60*60* 60)
         return True
 
 
@@ -153,7 +159,7 @@ def test_system_user_connectability(system_user):
     :return:
     """
     from ops.utils import run_adhoc
-    assets = system_user.assets.all()
+    assets = system_user.get_clusters_assets()
     hosts = [asset.hostname for asset in assets]
     tasks = [
         {
@@ -171,7 +177,7 @@ def test_system_user_connectability(system_user):
 def test_system_user_connectability_period():
     for system_user in SystemUser.objects.all():
         summary = test_system_user_connectability(system_user)
-        cache.set(SYSTEM_USER_CONN_CACHE_KEY_PREFIX + system_user.name , summary, 60*60*60)
+        cache.set(SYSTEM_USER_CONN_CACHE_KEY_PREFIX + system_user.name, summary, 60*60*60)
 
 
 def get_push_system_user_tasks(system_user):
@@ -207,19 +213,12 @@ def get_push_system_user_tasks(system_user):
                 )
             }
         }
-
     ]
     return tasks
 
 
-PUSH_SYSTEM_USER_PERIOD_TASK_NAME = 'PUSH SYSTEM USER {} PERIOD...'
-PUSH_SYSTEM_USER_TASK_NAME = 'PUSH SYSTEM USER {} ASSETS'
-
-
-def get_push_system_user_task(system_user):
-    from ops.utils import get_task_by_name
-    task = get_task_by_name(PUSH_SYSTEM_USER_PERIOD_TASK_NAME.format(system_user.name))
-    return task
+PUSH_SYSTEM_USER_PERIOD_TASK_NAME = 'PUSH SYSTEM USER [{}] PERIOD...'
+PUSH_SYSTEM_USER_TASK_NAME = 'PUSH SYSTEM USER [{}] ASSETS'
 
 
 def push_system_user(system_user, assets, name):
@@ -246,7 +245,7 @@ def push_system_user(system_user, assets, name):
 def push_system_user_period():
     logger.debug("Push system user period")
     for s in SystemUser.objects.filter(auto_push=True):
-        assets = s.assets.all()
+        assets = s.get_clusters_assets()
 
         name = PUSH_SYSTEM_USER_PERIOD_TASK_NAME.format(s.name)
         push_system_user(s, assets, name)

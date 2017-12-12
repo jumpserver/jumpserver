@@ -14,20 +14,18 @@
     <h3>{% trans 'Basic' %}</h3>
     {% bootstrap_field form.hostname layout="horizontal" %}
     {% bootstrap_field form.ip layout="horizontal" %}
-    {% bootstrap_field form.public_ip layout="horizontal" %}
     {% bootstrap_field form.port layout="horizontal" %}
+    {% bootstrap_field form.cluster layout="horizontal" %}
+    {% bootstrap_field form.public_ip layout="horizontal" %}
     {% bootstrap_field form.type layout="horizontal" %}
     {% bootstrap_field form.env layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
     <h3>{% trans 'Auth' %}</h3>
-    {% bootstrap_field form.username layout="horizontal" %}
-    {% bootstrap_field form.password layout="horizontal" %}
-    {% bootstrap_field form.private_key_file layout="horizontal" %}
+    {% bootstrap_field form.admin_user layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
-    <h3>{% trans 'Cluster and group' %}</h3>
-    {% bootstrap_field form.cluster layout="horizontal" %}
+    <h3>{% trans 'Group' %}</h3>
     {% bootstrap_field form.groups layout="horizontal" %}
 
     <div class="hr-line-dashed"></div>
@@ -50,11 +48,11 @@
     <script>
         $(document).ready(function () {
             $('.select2').select2();
-            $("#id_tags").select2({
-                tags: true,
-                maximumSelectionLength: 8  //最多能够选择的个数
-                //closeOnSelect: false
-            });
+{#            $("#id_tags").select2({#}
+{#                tags: true,#}
+{#                maximumSelectionLength: 8  //最多能够选择的个数#}
+{#                //closeOnSelect: false#}
+{#            });#}
         })
     </script>
 {% endblock %}
