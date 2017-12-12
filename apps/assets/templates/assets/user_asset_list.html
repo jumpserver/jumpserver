@@ -53,8 +53,8 @@ $(document).ready(function(){
 		ele: $('#asset_list_table'),
 		columnDefs: [
 			{targets: 1, createdCell: function (td, cellData, rowData) {
-				var detail_btn = '<a href="{% url "assets:asset-detail" pk=99991937 %}">' + cellData + '</a>';
-				$(td).html(detail_btn.replace('99991937', rowData.id));
+				var detail_btn = '<a href="{% url "assets:asset-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
+				$(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
 			}},
 			{targets: 7, createdCell: function (td, cellData) {
 				if (!cellData) {
@@ -122,7 +122,7 @@ $(document).ready(function(){
 	var $this = $(this);
 	var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
 	var uid = $this.data('uid');
-	var the_url = '{% url "api-assets:asset-detail" pk=99991937 %}'.replace('99991937', uid);
+	var the_url = '{% url "api-assets:asset-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
 	objectDelete($this, name, the_url);
 })
 

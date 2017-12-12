@@ -149,7 +149,7 @@ $(document).ready(function () {
 .on('click', '.btn-delete-cluster', function () {
 	var name = $('.cluster-details > tbody > tr').attr("data-name");
 	var id = {{ cluster.id }};
-	var the_url = '{% url "api-assets:cluster-detail" pk=99991937 %}'.replace(99991937, id);
+	var the_url = '{% url "api-assets:cluster-detail" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", id);
 	clusterDelete(name, the_url);
 });
 </script>

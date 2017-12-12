@@ -51,8 +51,8 @@ $(document).ready(function(){
         buttons: [],
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
-                var detail_btn = '<a href="{% url "terminal:terminal-detail" pk=99991937 %}">' + cellData + '</a>';
-                $(td).html(detail_btn.replace('99991937', rowData.id));
+                var detail_btn = '<a href="{% url "terminal:terminal-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
+                $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
              }},
             {targets: 6, createdCell: function (td, cellData) {
                 if (!cellData) {
@@ -69,18 +69,18 @@ $(document).ready(function(){
                 }
             }},
             {targets: 8, createdCell: function (td, cellData, rowData) {
-                var update_btn = '<a href="{% url "terminal:terminal-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'
-                        .replace('99991937', cellData);
-                var delete_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-id="99991937" data-name="99991938">{% trans "Delete" %}</a>'
-                        .replace('99991937', cellData)
+                var update_btn = '<a href="{% url "terminal:terminal-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'
+                        .replace('{{ DEFAULT_PK }}', cellData);
+                var delete_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-id="{{ DEFAULT_PK }}" data-name="99991938">{% trans "Delete" %}</a>'
+                        .replace('{{ DEFAULT_PK }}', cellData)
                         .replace('99991938', rowData.name);
-                var accept_btn = '<a class="btn btn-xs btn-primary btn-accept" data-id="99991937">{% trans "Accept" %}</a> '
-                        .replace('99991937', cellData);
-                var reject_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-id="99991937" data-name="99991938">{% trans "Reject" %}</a>'
-                        .replace('99991937', cellData)
+                var accept_btn = '<a class="btn btn-xs btn-primary btn-accept" data-id="{{ DEFAULT_PK }}">{% trans "Accept" %}</a> '
+                        .replace('{{ DEFAULT_PK }}', cellData);
+                var reject_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-id="{{ DEFAULT_PK }}" data-name="99991938">{% trans "Reject" %}</a>'
+                        .replace('{{ DEFAULT_PK }}', cellData)
                         .replace('99991938', rowData.name);
                 var connect_btn = '<a href="" class="btn btn-xs btn-warning btn-connect" >{% trans "Connect" %}</a> '
-                        .replace('99991937', cellData);
+                        .replace('{{ DEFAULT_PK }}', cellData);
                 if (rowData.is_accepted) {
                     {% if user.is_superuser %}
                     $(td).html(connect_btn + update_btn + delete_btn);
@@ -117,14 +117,14 @@ $(document).ready(function(){
     var $this = $(this);
     var id = $this.data('id');
     var name = $(this).data('name');
-    var the_url = '{% url "api-terminal:terminal-detail" pk=99991937 %}'.replace('99991937', id);
+    var the_url = '{% url "api-terminal:terminal-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', id);
     objectDelete($this, name, the_url)
 
 }).on('click', '.btn-accept', function () {
     var $this = $(this);
     var terminal_id = $this.data('id');
-    var the_url = "{% url 'api-terminal:terminal-detail' pk=99991937 %}".replace('99991937', terminal_id);
-    var post_url = $('#form_terminal_accept').attr('action').replace('99991937', terminal_id);
+    var the_url = "{% url 'api-terminal:terminal-detail' pk=DEFAULT_PK %}".replace('{{ DEFAULT_PK }}', terminal_id);
+    var post_url = $('#form_terminal_accept').attr('action').replace('{{ DEFAULT_PK }}', terminal_id);
     console.log(post_url);
     $.ajax({
         url: the_url,

@@ -5,7 +5,7 @@
 {% block modal_title%}{% trans "Accept terminal registration" %}{% endblock %}
 {% block modal_body %}
 {% load bootstrap3 %}
-<form action="{% url 'terminal:terminal-accept' pk="99991937" %}" method="post" class="form-horizontal" id="form_terminal_accept" enctype="multipart/form-data">
+<form action="{% url 'terminal:terminal-accept' pk="{{ DEFAULT_PK }}" %}" method="post" class="form-horizontal" id="form_terminal_accept" enctype="multipart/form-data">
     {% csrf_token %}
     <p class="alert alert-danger" id="modal-error" style="display: none"></p>
     {% bootstrap_field form.name layout="horizontal" %}

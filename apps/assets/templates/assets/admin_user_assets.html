@@ -156,8 +156,8 @@ function initTable() {
 		order: [],
 		columnDefs: [
 			{targets: 1, createdCell: function (td, cellData, rowData) {
-				var detail_btn = '<a href="{% url "assets:asset-detail" pk=99991937 %}" data-aid="'+rowData.id+'">' + cellData + '</a>';
-				$(td).html(detail_btn.replace('99991937', rowData.id));
+				var detail_btn = '<a href="{% url "assets:asset-detail" pk=DEFAULT_PK %}" data-aid="'+rowData.id+'">' + cellData + '</a>';
+				$(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
 			}},
 			{targets: 5, createdCell: function (td, cellData) {
 				if (!cellData) {
@@ -224,7 +224,7 @@ $(document).ready(function () {
     var $this = $(this);
     var name = "{{ admin_user.name }}";
     var uid = "{{ admin_user.id }}";
-    var the_url = '{% url "api-assets:admin-user-detail" pk=99991937 %}'.replace('99991937', uid);
+    var the_url = '{% url "api-assets:admin-user-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
     var redirect_url = "{% url 'assets:admin-user-list' %}";
     objectDelete($this, name, the_url, redirect_url);
 })

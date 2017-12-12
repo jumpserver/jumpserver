@@ -350,7 +350,7 @@ $(document).ready(function () {
     var $this = $(this);
     var name = "{{ asset.hostname }}";
     var uid = "{{ asset.id }}";
-    var the_url = '{% url "api-assets:asset-detail" pk=99991937 %}'.replace('99991937', uid);
+    var the_url = '{% url "api-assets:asset-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
     var redirect_url = "{% url 'assets:asset-list' %}";
     objectDelete($this, name, the_url, redirect_url);
 }).on('click', '#btn_refresh_asset', function () {

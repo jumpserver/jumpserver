@@ -74,8 +74,8 @@ function renderTable() {
         ele: $('#user_list_table'),
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
-                var detail_btn = '<a href="{% url "users:user-detail" pk='00000000-0000-0000-0000-000000000000' %}">' + cellData + '</a>';
-                $(td).html(detail_btn.replace('00000000-0000-0000-0000-000000000000', rowData.id));
+                var detail_btn = '<a href="{% url "users:user-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
+                $(td).html(detail_btn.replace("{{ DEFAULT_PK }}", rowData.id));
              }},
             {targets: 4, createdCell: function (td, cellData) {
                 var innerHtml = cellData.length > 20 ? cellData.substring(0, 20) + '...': cellData;
@@ -90,8 +90,8 @@ function renderTable() {
              }},
             {targets: 6, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "users:user-update" pk='00000000-0000-0000-0000-000000000000' %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('00000000-0000-0000-0000-000000000000', cellData);
-                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="00000000-0000-0000-0000-000000000000" data-name="99991938">{% trans "Delete" %}</a>'
-                        .replace('00000000-0000-0000-0000-000000000000', cellData)
+                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="{{ DEFAULT_PK }}" data-name="99991938">{% trans "Delete" %}</a>'
+                        .replace('{{ DEFAULT_PK }}', cellData)
                         .replace('99991938', rowData.name);
                 if (rowData.id === 1 || rowData.username == "admin") {
                     $(td).html(update_btn)

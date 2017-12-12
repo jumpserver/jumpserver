@@ -44,16 +44,16 @@ $(document).ready(function(){
         ele: $('#asset_groups_list_table'),
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
-                var detail_btn = '<a href="{% url "assets:asset-group-detail" pk=99991937 %}">' + cellData + '</a>';
-                $(td).html(detail_btn.replace('99991937', rowData.id));
+                var detail_btn = '<a href="{% url "assets:asset-group-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
+                $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
              }},
             {targets: 3, createdCell: function (td, cellData) {
                 var innerHtml = cellData.length > 30 ? cellData.substring(0, 30) + '...': cellData;
                 $(td).html('<a href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</a>');
              }},
             {targets: 4, createdCell: function (td, cellData, rowData) {
-                var update_btn = '<a href="{% url "assets:asset-group-update" pk=99991937 %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', cellData);
-                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_group_delete" data-uid="99991937">{% trans "Delete" %}</a>'.replace('99991937', cellData);
+                var update_btn = '<a href="{% url "assets:asset-group-update" pk=DEFAULT_PK %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_group_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(update_btn + del_btn)
              }}],
         ajax_url: '{% url "api-assets:asset-group-list" %}',
@@ -68,7 +68,7 @@ $(document).ready(function(){
 	var $data_table = $('#asset_groups_list_table').DataTable();
 	var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
 	var uid = $this.data('uid');
-	var the_url = '{% url "api-assets:asset-group-detail" pk=99991937 %}'.replace('99991937', uid);
+	var the_url = '{% url "api-assets:asset-group-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
 	objectDelete($this, name, the_url);
 	setTimeout( function () {
         $data_table.ajax.reload();

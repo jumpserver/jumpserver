@@ -124,8 +124,8 @@
                 select: [],
                 columnDefs: [
                     {targets: 1, createdCell: function (td, cellData, rowData) {
-                        var detail_btn = '<a href="{% url "perms:asset-permission-detail" pk=99991937 %}">' + cellData + '</a>';
-                        $(td).html(detail_btn.replace('99991937', rowData.id));
+                        var detail_btn = '<a href="{% url "perms:asset-permission-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
+                        $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
                      }},
                     {targets: 2, createdCell: function (td, cellData, rowData) {
                         var dataLength = cellData.length;
@@ -147,8 +147,8 @@
                         }
                     }},
                     {targets: 6, createdCell: function (td, cellData, rowData) {
-                        var btn = '<button class="btn btn-danger btn-xs btn_del_permission" id=99991937 type="button" style="float: right;"><i class="fa fa-minus"></i></button>';
-                        btn = btn.replace('99991937', cellData);
+                        var btn = '<button class="btn btn-danger btn-xs btn_del_permission" id="{{ DEFAULT_PK }}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>';
+                        btn = btn.replace('{{ DEFAULT_PK }}', cellData);
                         $(td).html(btn)
                      }}
                 ],

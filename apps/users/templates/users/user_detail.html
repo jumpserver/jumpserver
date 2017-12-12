@@ -398,7 +398,7 @@ $(document).ready(function() {
     var $this = $(this);
     var name = "{{ user.name }}";
     var uid = "{{ user.id }}";
-    var the_url = '{% url "api-users:user-detail" pk=99991937 %}'.replace('99991937', uid);
+    var the_url = '{% url "api-users:user-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
     var redirect_url = "{% url 'users:user-list' %}";
     objectDelete($this, name, the_url, redirect_url);
 })

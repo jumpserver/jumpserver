@@ -61,8 +61,8 @@
             var $this = $(this);
             var name = $this.data('name');
             var uid = $this.data('uid');
-            var the_url = '{% url "api-perms:asset-permission-detail" pk=99991937 %}'
-                    .replace('99991937', uid);
+            var the_url = '{% url "api-perms:asset-permission-detail" pk=DEFAULT_PK %}'
+                    .replace('{{ DEFAULT_PK }}', uid);
             objectDelete($this, name, the_url);
         })
     </script>

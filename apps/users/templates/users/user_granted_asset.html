@@ -113,8 +113,8 @@
                 select: [],
                 columnDefs: [
                     {targets: 1, createdCell: function (td, cellData, rowData) {
-                        var detail_btn = '<a href="{% url "assets:asset-detail" pk=99991937 %}">' + cellData + '</a>';
-                        $(td).html(detail_btn.replace('99991937', rowData.id));
+                        var detail_btn = '<a href="{% url "assets:asset-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
+                        $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
                      }},
                     {targets: 4, createdCell: function (td, cellData, rowData) {
                         if (cellData.length > 10){
@@ -142,8 +142,8 @@
                 select: [],
                 columnDefs: [
                     {targets: 1, createdCell: function (td, cellData, rowData) {
-                        var detail_btn = '<a href="{% url "assets:asset-group-detail" pk=99991937 %}">' + cellData + '</a>';
-                        $(td).html(detail_btn.replace('99991937', rowData.id));
+                        var detail_btn = '<a href="{% url "assets:asset-group-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
+                        $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
                      }}
                 ],
                 ajax_url: '{% url "api-perms:user-asset-groups" pk=user.id %}',

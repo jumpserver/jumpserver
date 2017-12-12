@@ -239,7 +239,7 @@
             var $this = $(this);
             var name = "{{ asset_permission.name }}";
             var uid = "{{ asset_permission.id }}";
-            var the_url = '{% url "api-perms:asset-permission-detail" pk=99991937 %}'.replace('99991937', uid);
+            var the_url = '{% url "api-perms:asset-permission-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
             var redirect_url = "{% url 'perms:asset-permission-list' %}";
             objectDelete($this, name, the_url, redirect_url);
         }).on('click', '#btn_add_system_user', function () {

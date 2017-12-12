@@ -96,7 +96,7 @@
 	        var $this = $(this);
 	        var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
 	        var uid = $this.data('uid');
-	        var the_url = '{% url "api-ops:task-detail" pk=99991937 %}'.replace('99991937', uid);
+	        var the_url = '{% url "api-ops:task-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
             objectDelete($this, name, the_url);
         })
     </script>

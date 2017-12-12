@@ -106,7 +106,7 @@
                         }
                     }},
                     {targets: 7, createdCell: function (td, cellData, rowData) {
-                       var detail_btn = '<a class="btn btn-xs btn-primary m-l-xs btn-run" data-uid="99991937">{% trans "Detail" %}</a>'.replace('99991937', cellData);
+                       var detail_btn = '<a class="btn btn-xs btn-primary m-l-xs btn-run" data-uid="{{ DEFAULT_PK }}">{% trans "Detail" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                        if (cellData) {
                            $(td).html(detail_btn);
                        }

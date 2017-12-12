@@ -119,8 +119,8 @@ function initAssetsTable() {
 		order: [],
 		columnDefs: [
 			{targets: 0, createdCell: function (td, cellData, rowData) {
-				var detail_btn = '<a href="{% url "assets:asset-detail" pk=99991937 %}" data-aid="'+rowData.id+'">' + cellData + '</a>';
-				$(td).html(detail_btn.replace('99991937', rowData.id));
+				var detail_btn = '<a href="{% url "assets:asset-detail" pk=DEFAULT_PK %}" data-aid="'+rowData.id+'">' + cellData + '</a>';
+				$(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
 			}},
 			{targets: 3, createdCell: function (td, cellData) {
 				if (!cellData) {

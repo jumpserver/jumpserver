@@ -39,18 +39,18 @@ $(document).ready(function() {
         buttons: [],
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
-                var detail_btn = '<a href="{% url "users:user-group-detail" pk=99991937 %}">' + cellData + '</a>';
-                $(td).html(detail_btn.replace('99991937', rowData.id));
+                var detail_btn = '<a href="{% url "users:user-group-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
+                $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
              }},
             {targets: 3, createdCell: function (td, cellData) {
                 var innerHtml = cellData.length > 30 ? cellData.substring(0, 30) + '...': cellData;
                 $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
              }},
             {targets: 4, createdCell: function (td, cellData, rowData) {
-                var update_btn = '<a href="{% url "users:user-group-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'
-                        .replace('99991937', cellData);
-                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_delete_user_group" data-gid="99991937" data-name="99991938">{% trans "Delete" %}</a>'
-                        .replace('99991937', cellData)
+                var update_btn = '<a href="{% url "users:user-group-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'
+                        .replace('{{ DEFAULT_PK }}', cellData);
+                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_delete_user_group" data-gid="{{ DEFAULT_PK }}" data-name="99991938">{% trans "Delete" %}</a>'
+                        .replace('{{ DEFAULT_PK }}', cellData)
                         .replace('99991938', rowData.name);
                 if (rowData.id === 1) {
                     $(td).html(update_btn)
@@ -69,7 +69,7 @@ $(document).ready(function() {
     var $this = $(this);
     var group_id = $this.data('gid');
     var name = $this.data('name');
-    var the_url = "{% url 'api-users:user-group-detail' pk=99991937 %}".replace('99991937', group_id);
+    var the_url = "{% url 'api-users:user-group-detail' pk=DEFAULT_PK %}".replace('{{ DEFAULT_PK }}', group_id);
     objectDelete($this, name, the_url)
 }).on('click', '#btn_bulk_update', function(){
     var action = $('#slct_bulk_update').val();

@@ -93,7 +93,7 @@ $(document).ready(function(){
             }},
             {targets: 9, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:asset-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
-                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('99991937', cellData);
+                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(update_btn + del_btn)
             }}
         ],
@@ -151,7 +151,7 @@ $(document).ready(function(){
     var $data_table = $("#asset_list_table").DataTable();
     var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
     var uid = $this.data('uid');
-    var the_url = '{% url "api-assets:asset-detail" pk=99991937 %}'.replace("{{ DEFAULT_PK }}", uid);
+    var the_url = '{% url "api-assets:asset-detail" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", uid);
     objectDelete($this, name, the_url);
     setTimeout( function () {
         $data_table.ajax.reload();
