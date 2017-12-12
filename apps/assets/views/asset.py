@@ -62,6 +62,7 @@ class UserAssetListView(LoginRequiredMixin, TemplateView):
             'app': 'Assets',
             'action': 'Asset list',
             'system_users': SystemUser.objects.all(),
+            'default_pk': '00000000-0000-0000-0000-000000000000',
         }
         kwargs.update(context)
         return super(UserAssetListView, self).get_context_data(**kwargs)

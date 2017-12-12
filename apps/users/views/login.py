@@ -17,7 +17,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.views.decorators.debug import sensitive_post_parameters
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import FormView
-from formtools.wizard.views import SessionWizardView
+# from formtools.wizard.views import SessionWizardView
 from django.conf import settings
 from django.utils import timezone
 
@@ -157,7 +157,8 @@ class UserResetPasswordView(TemplateView):
         return HttpResponseRedirect(reverse('users:reset-password-success'))
 
 
-class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
+class UserFirstLoginView(LoginRequiredMixin, ListView):
+#    class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
     template_name = 'users/first_login.html'
     form_list = [forms.UserProfileForm, forms.UserPublicKeyForm]
     file_storage = default_storage

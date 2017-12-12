@@ -7,6 +7,8 @@ from .. import views
 
 __all__ = ["urlpatterns"]
 
+app_name = "ops"
+
 urlpatterns = [
     # TResource Task url
     url(r'^task/$', views.TaskListView.as_view(), name='task-list'),
