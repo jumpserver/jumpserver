@@ -39,30 +39,29 @@
                             {% bootstrap_field form.username layout="horizontal" %}
                             {% bootstrap_field form.protocol layout="horizontal" %}
                             {% bootstrap_field form.cluster layout="horizontal" %}
-                            <h3>{% trans 'Auth' %}</h3>
-                            {% bootstrap_field form.auth_method layout="horizontal" %}
+
                             {% block auth %}
-                            <div class="password-auth hidden">
-                            {% bootstrap_field form.password layout="horizontal" %}
-                            </div>
-                            <div class="public-key-auth">
+                            <h3>{% trans 'Auth' %}</h3>
+                            <div class="auto-generate">
                                 <div class="form-group">
                                     <label for="{{ form.auto_generate_key.id_for_label }}" class="col-sm-2 control-label">{% trans 'Auto generate key' %}</label>
                                     <div class="col-sm-8">
                                         {{ form.auto_generate_key}}
                                     </div>
                                 </div>
-                                <div>
-                                    {% bootstrap_field form.private_key_file layout="horizontal" %}
-                                </div>
+
                             </div>
-                            {% endblock %}
+                            <div class="auth-fields">
+                                {% bootstrap_field form.private_key_file layout="horizontal" %}
+                                {% bootstrap_field form.password layout="horizontal" %}
+                            </div>
                             <div class="form-group">
                                 <label for="{{ form.as_push.id_for_label }}" class="col-sm-2 control-label">{% trans 'Auto push' %}</label>
                                 <div class="col-sm-8">
                                     {{ form.auto_push}}
                                 </div>
                             </div>
+                            {% endblock %}
                             <h3>{% trans 'Other' %}</h3>
                             {% bootstrap_field form.sudo layout="horizontal" %}
                             {% bootstrap_field form.shell layout="horizontal" %}
@@ -82,41 +81,20 @@
 {% endblock %}
 {% block custom_foot_js %}
     <script>
-        var auth_method = '#'+'{{ form.auth_method.id_for_label }}';
         var auto_generate_key = '#'+'{{ form.auto_generate_key.id_for_label }}';
-        function authMethodDisplay() {
-            if ($(auth_method).val() == 'P') {
-                $('.password-auth').removeClass('hidden');
-                $('.public-key-auth').addClass('hidden');
-                $('#'+'{{ form.password.id_for_label }}').attr('required', 'required');
-                $('#'+'{{ form.password.id_for_label }}').removeAttr('disabled');
-                $('#'+'{{ form.private_key_file.id_for_label }}').removeAttr('required');
-
-            } else if ($(auth_method).val() == 'K') {
-                $('.password-auth').addClass('hidden');
-                $('.public-key-auth').removeClass('hidden');
-                $('#'+'{{ form.password.id_for_label }}').removeAttr('required');
-                $('#'+'{{ form.password.id_for_label }}').attr('disabled', 'disabled');
-
-                if ($(auto_generate_key).prop('checked')){
-                    $('#'+'{{ form.private_key_file.id_for_label }}').closest('.form-group').addClass('hidden');
-                } else {
-                    $('#'+'{{ form.private_key_file.id_for_label }}').closest('.form-group').removeClass('hidden');
-                    $('#'+'{{ form.private_key_file.id_for_label }}').closest('.form-group input').attr('required', 'required');
-                }
+        function authFieldsDisplay() {
+            if ($(auto_generate_key).prop('checked')) {
+                $('.auth-fields').addClass('hidden');
+            } else {
+                $('.auth-fields').removeClass('hidden');
             }
         }
         $(document).ready(function () {
             $('.select2').select2();
-            authMethodDisplay();
-            $(auth_method).change(function () {
-                authMethodDisplay();
-            });
+            authFieldsDisplay();
             $(auto_generate_key).change(function () {
-                authMethodDisplay();
+                authFieldsDisplay();
             });
         })
-
-
     </script>
 {% endblock %}

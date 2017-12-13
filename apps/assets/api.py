@@ -22,7 +22,7 @@ from django.shortcuts import get_object_or_404
 
 from common.mixins import IDInFilterMixin
 from common.utils import get_object_or_none
-from .hands import IsSuperUser, IsAppUser, IsValidUser, \
+from .hands import IsSuperUser, IsAppUser, IsValidUser, IsSuperUserOrAppUser, \
     get_user_granted_assets, push_users
 from .models import AssetGroup, Asset, Cluster, SystemUser, AdminUser
 from . import serializers
@@ -156,7 +156,7 @@ class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
 class SystemUserAuthInfoApi(generics.RetrieveAPIView):
     """Get system user auth info"""
     queryset = SystemUser.objects.all()
-    permission_classes = (IsAppUser,)
+    permission_classes = (IsSuperUserOrAppUser,)
 
     def retrieve(self, request, *args, **kwargs):
         system_user = self.get_object()
@@ -166,7 +166,6 @@ class SystemUserAuthInfoApi(generics.RetrieveAPIView):
             'username': system_user.username,
             'password': system_user.password,
             'private_key': system_user.private_key,
-            'auth_method': system_user.auth_method,
         }
         return Response(data)
 

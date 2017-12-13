@@ -1,4 +1,5 @@
 # coding:utf-8
+import uuid
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
@@ -142,7 +143,7 @@ class ClusterForm(forms.ModelForm):
 class AdminUserForm(forms.ModelForm):
     # Form field name can not start with `_`, so redefine it,
     password = forms.CharField(
-        widget=forms.PasswordInput, max_length=100,
+        widget=forms.PasswordInput, max_length=128,
         strip=True, required=False,
         help_text=_('If also set private key, use that first'),
     )
@@ -199,114 +200,46 @@ class SystemUserForm(forms.ModelForm):
     # Admin user assets define, let user select, save it in form not in view
     auto_generate_key = forms.BooleanField(initial=True, required=False)
     # Form field name can not start with `_`, so redefine it,
-    password = forms.CharField(widget=forms.PasswordInput, required=False, max_length=100, strip=True)
+    password = forms.CharField(widget=forms.PasswordInput, required=False, max_length=128, strip=True)
     # Need use upload private key file except paste private key content
     private_key_file = forms.FileField(required=False)
 
-    def __init__(self, *args, **kwargs):
-        super(SystemUserForm, self).__init__(*args, **kwargs)
-
     def save(self, commit=True):
         # Because we define custom field, so we need rewrite :method: `save`
-        system_user = super(SystemUserForm, self).save(commit=commit)
-        password = self.cleaned_data['password']
+        system_user = super().save()
+        password = self.cleaned_data.get('password', None)
         private_key_file = self.cleaned_data.get('private_key_file')
+        auto_generate_key = self.cleaned_data.get('auto_generate_key')
 
-        if system_user.auth_method == 'P':
-            if password:
-                system_user.password = password
-        elif system_user.auth_method == 'K':
-            if self.cleaned_data['auto_generate_key']:
-                private_key, public_key = ssh_key_gen(username=system_user.name)
-                logger.info('Generate private key and public key')
-            else:
-                private_key = private_key_file.read().strip()
-                public_key = ssh_pubkey_gen(private_key=private_key)
-            system_user.private_key = private_key
-            system_user.public_key = public_key
-        system_user.save()
-        return self.instance
-
-    def clean_private_key_file(self):
-        if self.data['auth_method'] == 'K' and \
-                not self.cleaned_data['auto_generate_key']:
-            if not self.cleaned_data['private_key_file']:
-                raise forms.ValidationError(_('Private key required'))
-            else:
-                key_string = self.cleaned_data['private_key_file'].read()
-                self.cleaned_data['private_key_file'].seek(0)
-                if not validate_ssh_private_key(key_string):
-                    raise forms.ValidationError(_('Invalid private key'))
-        return self.cleaned_data['private_key_file']
-
-    def clean_password(self):
-        if self.data['auth_method'] == 'P':
-            if not self.cleaned_data.get('password'):
-                raise forms.ValidationError(_('Password required'))
-        return self.cleaned_data['password']
-
-    class Meta:
-        model = SystemUser
-        fields = [
-            'name', 'username', 'protocol', 'auto_generate_key', 'password',
-            'private_key_file', 'auth_method', 'auto_push', 'sudo',
-            'comment', 'shell', 'cluster'
-        ]
-        widgets = {
-            'name': forms.TextInput(attrs={'placeholder': _('Name')}),
-            'username': forms.TextInput(attrs={'placeholder': _('Username')}),
-            'cluster': forms.SelectMultiple(
-                attrs={'class': 'select2',
-                       'data-placeholder': _(' Select clusters')}),
-        }
-        help_texts = {
-            'name': '* required',
-            'username': '* required',
-            'cluster': 'If auto push checked, then push system user to that cluster assets',
-            'auto_push': 'Auto push system user to asset',
-        }
-
-
-class SystemUserUpdateForm(forms.ModelForm):
-    # Admin user assets define, let user select, save it in form not in view
-    auto_generate_key = forms.BooleanField(initial=False, required=False)
-    # Form field name can not start with `_`, so redefine it,
-    password = forms.CharField(widget=forms.PasswordInput, required=False, max_length=100, strip=True)
-    # Need use upload private key file except paste private key content
-    private_key_file = forms.FileField(required=False)
-
-    def __init__(self, *args, **kwargs):
-        super(SystemUserUpdateForm, self).__init__(*args, **kwargs)
-
-    def save(self, commit=True):
-        # Because we define custom field, so we need rewrite :method: `save`
-        system_user = super(SystemUserUpdateForm, self).save(commit=commit)
-        password = self.cleaned_data['password']
-        private_key_file = self.cleaned_data.get('private_key_file')
-
-        if system_user.auth_method == 'P' and password:
-            system_user.password = password
-        elif system_user.auth_method == 'K' and private_key_file:
-            private_key = private_key_file.read().strip()
+        if auto_generate_key:
+            logger.info('Auto set system user auth')
+            system_user.auto_gen_auth()
+        else:
+            private_key = private_key_file.read().strip().decode('utf-8')
             public_key = ssh_pubkey_gen(private_key=private_key)
-            system_user.private_key = private_key
-            system_user.public_key = public_key
-        system_user.save()
-        return self.instance
+            system_user.set_auth(password=password, private_key=private_key, public_key=public_key)
+        return system_user
 
     def clean_private_key_file(self):
-        if self.data['auth_method'] == 'K' and self.cleaned_data['private_key_file']:
+        if self.cleaned_data.get('private_key_file'):
             key_string = self.cleaned_data['private_key_file'].read()
             self.cleaned_data['private_key_file'].seek(0)
             if not validate_ssh_private_key(key_string):
                 raise forms.ValidationError(_('Invalid private key'))
         return self.cleaned_data['private_key_file']
 
+    def clean_password(self):
+        if not self.cleaned_data.get('password') and \
+                not self.cleaned_data.get('private_key_file') and \
+                not self.cleaned_data.get('auto_generate_key'):
+            raise forms.ValidationError(_('Auth info required, private_key or password'))
+        return self.cleaned_data['password']
+
     class Meta:
         model = SystemUser
         fields = [
-            'name', 'username', 'protocol',
-            'auth_method', 'auto_push', 'sudo',
+            'name', 'username', 'protocol', 'auto_generate_key',
+            'password', 'private_key_file', 'auto_push', 'sudo',
             'comment', 'shell', 'cluster'
         ]
         widgets = {
@@ -319,9 +252,63 @@ class SystemUserUpdateForm(forms.ModelForm):
         help_texts = {
             'name': '* required',
             'username': '* required',
-            'cluster': 'If auto push checked, then push system user to that cluster assets',
+            'cluster': 'If auto push checked, system user will be create at cluster assets',
             'auto_push': 'Auto push system user to asset',
         }
+
+
+class SystemUserUpdateForm(forms.ModelForm):
+    class Meta:
+        model = SystemUser
+        fields = [
+            'name', 'username', 'protocol',
+            'sudo', 'comment', 'shell', 'cluster'
+        ]
+        widgets = {
+            'name': forms.TextInput(attrs={'placeholder': _('Name')}),
+            'username': forms.TextInput(attrs={'placeholder': _('Username')}),
+            'cluster': forms.SelectMultiple(
+                attrs={'class': 'select2',
+                       'data-placeholder': _(' Select clusters')}),
+        }
+        help_texts = {
+            'name': '* required',
+            'username': '* required',
+            'cluster': 'If auto push checked, then push system user to that cluster assets',
+        }
+
+
+class SystemUserAuthForm(forms.Form):
+    password = forms.CharField(widget=forms.PasswordInput, required=False, max_length=128, strip=True)
+    private_key_file = forms.FileField(required=False)
+
+    def clean_private_key_file(self):
+        if self.cleaned_data.get('private_key_file'):
+            key_string = self.cleaned_data['private_key_file'].read()
+            self.cleaned_data['private_key_file'].seek(0)
+            if not validate_ssh_private_key(key_string):
+                raise forms.ValidationError(_('Invalid private key'))
+        return self.cleaned_data['private_key_file']
+
+    def clean_password(self):
+        if not self.cleaned_data.get('password') and \
+                not self.cleaned_data.get('private_key_file'):
+            msg = _('Auth info required, private_key or password')
+            raise forms.ValidationError(msg)
+        return self.cleaned_data['password']
+
+    def update(self, system_user):
+        password = self.cleaned_data.get('password')
+        private_key_file = self.cleaned_data.get('private_key_file')
+
+        if private_key_file:
+            private_key = private_key_file.read().strip()
+            public_key = ssh_pubkey_gen(private_key=private_key)
+        else:
+            private_key = None
+            public_key = None
+        system_user.set_auth(password=password, private_key=private_key, public_key=public_key)
+        return system_user
 
 
 class FileForm(forms.Form):

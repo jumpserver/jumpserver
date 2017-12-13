@@ -86,13 +86,49 @@
                                     <table class="table">
                                         <tbody>
                                         <tr class="no-borders-tr">
-                                            <td width="50%">{% trans 'Reset auth' %}:</td>
+                                            <td width="50%">{% trans 'Test auth all assets manual' %}:</td>
                                             <td>
                                                 <span style="float: right">
-                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Reset' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Run' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Using this as cluster admin user' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table group_edit" id="add-asset2group">
+                                        <tbody>
+                                        <form>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <select data-placeholder="{% trans 'Select cluster' %}"  class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for cluster in cluster_remain %}
+                                                        <option value="{{ cluster.id }}" id="opt_{{ cluster.id }}" >{{ cluster.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <button type="button" class="btn btn-info btn-sm" id="btn_add_user_group">{% trans 'Confirm' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
+
+                                        {% for cluster in admin_user.cluster_set.all %}
+                                        <tr>
+                                          <td ><b class="bdg_group" data-gid={{ cluster.id }}>{{ cluster.name }}</b></td>
+                                          <td>
+                                              <button class="btn btn-danger pull-right btn-xs btn-leave-group" type="button"><i class="fa fa-minus"></i></button>
+                                          </td>
+                                        </tr>
+                                        {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>
@@ -192,6 +228,7 @@ function adminUserDelete(name, url) {
 jumpserver.assets_selected = {};
 jumpserver.asset_groups_selected = {};
 $(document).ready(function () {
+    $('.select2').select2();
 })
 .on('click', '.btn-delete-admin-user', function () {
     var $this = $(this);

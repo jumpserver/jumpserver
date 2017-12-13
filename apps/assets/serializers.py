@@ -115,7 +115,7 @@ class SystemUserSerializer(serializers.ModelSerializer):
 class AssetSystemUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUser
-        fields = ('id', 'name', 'username', 'protocol', 'auth_method', 'comment')
+        fields = ('id', 'name', 'username', 'protocol',  'comment')
 
 
 class SystemUserUpdateAssetsSerializer(serializers.ModelSerializer):
@@ -202,7 +202,10 @@ class ClusterSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
     @staticmethod
     def get_admin_user_name(obj):
-        return obj.admin_user.name
+        try:
+            return obj.admin_user.name
+        except AttributeError:
+            return ''
 
 
 class AssetGroupGrantedSerializer(BulkSerializerMixin, serializers.ModelSerializer):

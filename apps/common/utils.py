@@ -14,7 +14,7 @@ import hashlib
 from email.utils import formatdate
 import calendar
 import threading
-from six import StringIO
+from io import StringIO
 import uuid
 
 import paramiko
@@ -180,15 +180,15 @@ def timesince(dt, since='', default="just now"):
     return default
 
 
-def ssh_key_string_to_obj(text):
+def ssh_key_string_to_obj(text, password=None):
     key = None
     try:
-        key = paramiko.RSAKey.from_private_key( StringIO(text) )
+        key = paramiko.RSAKey.from_private_key(StringIO(text), password=password)
     except paramiko.SSHException:
         pass
 
     try:
-        key = paramiko.DSSKey.from_private_key( StringIO(text) )
+        key = paramiko.DSSKey.from_private_key(StringIO(text), password=password)
     except paramiko.SSHException:
         pass
     return key
@@ -222,7 +222,6 @@ def ssh_key_gen(length=2048, type='rsa', password=None, username='jumpserver', h
         hostname = os.uname()[1]
 
     f = StringIO()
-
     try:
         if type == 'rsa':
             private_key_obj = paramiko.RSAKey.generate(length)

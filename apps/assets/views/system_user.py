@@ -1,24 +1,24 @@
 # ~*~ coding: utf-8 ~*~
 
-from __future__ import absolute_import, unicode_literals
+from django.contrib import messages
+from django.shortcuts import redirect, reverse
 from django.utils.translation import ugettext as _
-from django.conf import settings
 from django.db import transaction
-from django.views.generic import TemplateView, ListView
+from django.views.generic import TemplateView, ListView, FormView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
-from ..forms import SystemUserForm, SystemUserUpdateForm
-from ..models import Asset, AssetGroup, SystemUser
+from ..forms import SystemUserForm, SystemUserUpdateForm, SystemUserAuthForm
+from ..models import SystemUser, Cluster
 from ..hands import AdminUserRequiredMixin
-from perms.utils import associate_system_users_and_assets
 
 
 __all__ = ['SystemUserCreateView', 'SystemUserUpdateView',
            'SystemUserDetailView', 'SystemUserDeleteView',
            'SystemUserAssetView', 'SystemUserListView',
+           'SystemUserAuthView',
            ]
 
 
@@ -31,7 +31,7 @@ class SystemUserListView(AdminUserRequiredMixin, TemplateView):
             'action': _('System user list'),
         }
         kwargs.update(context)
-        return super(SystemUserListView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
@@ -50,11 +50,10 @@ class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVi
             'action': _('Create system user'),
         }
         kwargs.update(context)
-        return super(SystemUserCreateView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def get_success_message(self, cleaned_data):
-        url = reverse_lazy('assets:system-user-detail',
-                           kwargs={'pk': self.object.pk}),
+        url = reverse('assets:system-user-detail', kwargs={'pk': self.object.pk})
         success_message = _(
             'Create system user <a href="{url}">{name}</a> '
             'successfully.'.format(url=url, name=self.object.name)
@@ -74,15 +73,7 @@ class SystemUserUpdateView(AdminUserRequiredMixin, UpdateView):
             'action': _('Update system user')
         }
         kwargs.update(context)
-        return super(SystemUserUpdateView, self).get_context_data(**kwargs)
-
-    def form_valid(self, form):
-        response = super(SystemUserUpdateView, self).form_valid(form)
-        system_user = self.object
-        assets = system_user.assets.all()
-        asset_groups = system_user.asset_groups.all()
-        associate_system_users_and_assets([system_user], assets, asset_groups, force=True)
-        return response
+        return super().get_context_data(**kwargs)
 
     def get_success_url(self):
         success_url = reverse_lazy('assets:system-user-detail',
@@ -96,12 +87,14 @@ class SystemUserDetailView(AdminUserRequiredMixin, DetailView):
     model = SystemUser
 
     def get_context_data(self, **kwargs):
+        cluster_remain = Cluster.objects.exclude(systemuser=self.object)
         context = {
             'app': _('Assets'),
-            'action': _('System user detail')
+            'action': _('System user detail'),
+            'cluster_remain': cluster_remain,
         }
         kwargs.update(context)
-        return super(SystemUserDetailView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class SystemUserDeleteView(AdminUserRequiredMixin, DeleteView):
@@ -121,5 +114,36 @@ class SystemUserAssetView(AdminUserRequiredMixin, DetailView):
             'action': 'System user asset',
         }
         kwargs.update(context)
-        return super(SystemUserAssetView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
+
+class SystemUserAuthView(AdminUserRequiredMixin, SingleObjectMixin,
+                         SuccessMessageMixin, FormView):
+    model = SystemUser
+    template_name = 'assets/system_user_auth.html'
+    context_object_name = 'system_user'
+    form_class = SystemUserAuthForm
+    success_message = _("Update auth info success")
+    object = None
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return super().post(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        instance = form.update(self.object)
+        success_url = reverse('assets:system-user-detail', kwargs={"pk": instance.id})
+        messages.success(self.request, self.success_message)
+        return redirect(success_url)
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'assets',
+            'action': 'System user auth',
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)

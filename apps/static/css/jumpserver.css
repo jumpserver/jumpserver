@@ -34,8 +34,8 @@ th a {
 }
 
 .select2-container--default .select2-results__option--highlighted[aria-selected] {
-   background-color: #1ab394 !important;
-   color: white;
+   background-color: #d2d2d2 !important;
+   color: #333 !important;
  }
 
 .select2-selection--single,

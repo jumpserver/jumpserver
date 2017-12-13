@@ -50,6 +50,7 @@ urlpatterns = [
     url(r'^system-user/(?P<pk>[0-9a-zA-Z\-]{36})/update/$', views.SystemUserUpdateView.as_view(), name='system-user-update'),
     url(r'^system-user/(?P<pk>[0-9a-zA-Z\-]{36})/delete/$', views.SystemUserDeleteView.as_view(), name='system-user-delete'),
     url(r'^system-user/(?P<pk>[0-9a-zA-Z\-]{36})/asset/$', views.SystemUserAssetView.as_view(), name='system-user-asset'),
+    url(r'^system-user/(?P<pk>[0-9a-zA-Z\-]{36})/auth/$', views.SystemUserAuthView.as_view(), name='system-user-auth'),
     # url(r'^system-user/(?P<pk>[0-9a-zA-Z\-]{36})/asset-group$', views.SystemUserAssetGroupView.as_view(),
     #     name='system-user-asset-group'),
 

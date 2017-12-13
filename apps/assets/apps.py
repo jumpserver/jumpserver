@@ -8,5 +8,6 @@ class AssetsConfig(AppConfig):
 
     def ready(self):
         from .signals import on_app_ready
+        from . import tasks
         on_app_ready.send(self.__class__)
         super().ready()

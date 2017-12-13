@@ -1,3 +1,25 @@
+{% load i18n %}
+{% block first_login_message %}
+    {% if user.is_authenticated and user.is_first_login %}
+    <div class="alert alert-danger help-message">
+        {% url 'users:user-first-login' as first_login_url %}
+        {% blocktrans %}
+        Your information was incomplete. Please click <a href="{{ first_login_url }}"> this link </a>to complete your information.
+        {% endblocktrans %}
+    </div>
+    {% endif %}
+{% endblock %}
+{% block update_public_key_message %}
+    {% if user.is_authenticated and not user.is_public_key_valid %}
+    <div class="alert alert-danger help-message">
+        {% url 'users:user-pubkey-update' as user_pubkey_update %}
+        {% blocktrans %}
+        Your ssh public key not set or expired. Please click <a href="{{ user_pubkey_update }}"> this link </a>to update your
+        {% endblocktrans %}
+    </div>
+    {% endif %}
+{% endblock %}
+
 {% if messages %}
     {% for message in messages %}
         <div class="alert alert-{{ message.tags }} help-message" >

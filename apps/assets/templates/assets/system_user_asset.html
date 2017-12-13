@@ -16,8 +16,18 @@
                             <li>
                                 <a href="{% url 'assets:system-user-detail' pk=system_user.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a>
                             </li>
-                            <li class="active"><a href="{% url 'assets:system-user-asset' pk=system_user.id %}" class="text-center">
-                                <i class="fa fa-bar-chart-o"></i> {% trans 'Attached assets' %}</a>
+                            <li>
+                                <a href="{% url 'assets:system-user-auth' pk=system_user.id %}" class="text-center">
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'Auth' %}
+                                </a>
+                            </li>
+                            <li class="active">
+                                <a href="{% url 'assets:system-user-asset' pk=system_user.id %}" class="text-center">
+                                <i class="fa fa-bar-chart-o"></i> {% trans 'Assets' %}
+                                </a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-default" href="{% url 'assets:system-user-update' pk=system_user.id %}"><i class="fa fa-edit"></i>Update</a>
                             </li>
                         </ul>
                     </div>
@@ -131,7 +141,7 @@ function initAssetsTable() {
 			}}
 		],
 		ajax_url: '{% url "api-assets:asset-list" %}?system_user_id={{ system_user.id }}',
-		columns: [{data: "hostname" }, {data: "ip" }, {data: "port" }, {data: "is_online" }],
+		columns: [{data: "hostname" }, {data: "ip" }, {data: "port" }, {data: "is_connective" }],
 		op_html: $('#actions').html()
 	};
 	jumpserver.initDataTable(options);

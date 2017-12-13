@@ -124,7 +124,7 @@ class SessionDetailView(SingleObjectMixin, ListView):
     model = Session
 
     def get_queryset(self):
-        self.object = self.get_object(self.model.objects.all())
+        self.object = self.get_object()
         return command_store.filter(session=self.object.id)
 
     def get_context_data(self, **kwargs):
