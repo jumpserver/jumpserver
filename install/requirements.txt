@@ -1,4 +1,5 @@
 #sphinx-me==0.3
+PyYAML==3.10
 django==1.6
 pycrypto==2.4.1
 paramiko==1.16.0
