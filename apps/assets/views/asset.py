@@ -9,12 +9,13 @@ import chardet
 from io import StringIO
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured, FieldDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from django.urls import reverse_lazy
 from django.views.generic.detail import DetailView, SingleObjectMixin
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect
+from django.http import HttpResponse, JsonResponse, HttpResponseRedirect, Http404
 from django.views.decorators.csrf import csrf_protect, csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.cache import cache
@@ -22,8 +23,10 @@ from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import get_object_or_404, redirect, reverse
 
+
 from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none
+from common.imexp import ModelExportView
 from .. import forms
 from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser
 from ..hands import AdminUserRequiredMixin
@@ -169,7 +172,7 @@ class AssetUpdateView(AdminUserRequiredMixin, UpdateView):
 
 class AssetDeleteView(AdminUserRequiredMixin, DeleteView):
     model = Asset
-    template_name = 'assets/delete_confirm.html'
+    template_name = 'delete_confirm.html'
     success_url = reverse_lazy('assets:asset-list')
 
 
@@ -193,46 +196,11 @@ class AssetDetailView(DetailView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class AssetExportView(View):
-    def get(self, request):
-        spm = request.GET.get('spm', '')
-        assets_id_default = [Asset.objects.first().id] if Asset.objects.first() else [1]
-        assets_id = cache.get(spm, assets_id_default)
-        fields = [
-            field for field in Asset._meta.fields
-            if field.name not in [
-                'date_created'
-            ]
-        ]
-        filename = 'assets-{}.csv'.format(
-            timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S'))
-        response = HttpResponse(content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
-        response.write(codecs.BOM_UTF8)
-        assets = Asset.objects.filter(id__in=assets_id)
-        writer = csv.writer(response, dialect='excel',
-                            quoting=csv.QUOTE_MINIMAL)
-
-        header = [field.verbose_name for field in fields]
-        header.append(_('Asset groups'))
-        writer.writerow(header)
-
-        for asset in assets:
-            groups = ','.join([group.name for group in asset.groups.all()])
-            data = [getattr(asset, field.name) for field in fields]
-            data.append(groups)
-            writer.writerow(data)
-        return response
-
-    def post(self, request, *args, **kwargs):
-        try:
-            assets_id = json.loads(request.body).get('assets_id', [])
-        except ValueError:
-            return HttpResponse('Json object not valid', status=400)
-        spm = uuid.uuid4().hex
-        cache.set(spm, assets_id, 300)
-        url = reverse_lazy('assets:asset-export') + '?spm=%s' % spm
-        return JsonResponse({'redirect': url})
+class AssetExportView(ModelExportView):
+    filename_prefix = 'jumpserver'
+    redirect_url = reverse_lazy('assets:asset-export')
+    model = Asset
+    fields = ('hostname', 'ip')
 
 
 class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):

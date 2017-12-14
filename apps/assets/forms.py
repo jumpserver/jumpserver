@@ -9,6 +9,7 @@ from common.utils import validate_ssh_private_key, ssh_pubkey_gen, ssh_key_gen, 
 
 logger = get_logger(__file__)
 
+from rest_framework import serializers
 
 class AssetCreateForm(forms.ModelForm):
 
@@ -240,7 +241,7 @@ class SystemUserForm(forms.ModelForm):
         fields = [
             'name', 'username', 'protocol', 'auto_generate_key',
             'password', 'private_key_file', 'auto_push', 'sudo',
-            'comment', 'shell', 'cluster'
+            'comment', 'shell', 'cluster', 'priority',
         ]
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
@@ -254,6 +255,7 @@ class SystemUserForm(forms.ModelForm):
             'username': '* required',
             'cluster': 'If auto push checked, system user will be create at cluster assets',
             'auto_push': 'Auto push system user to asset',
+            'priority': 'High level will be using login asset as default, if user was granted more than 2 system user',
         }
 
 
@@ -261,7 +263,7 @@ class SystemUserUpdateForm(forms.ModelForm):
     class Meta:
         model = SystemUser
         fields = [
-            'name', 'username', 'protocol',
+            'name', 'username', 'protocol', 'priority',
             'sudo', 'comment', 'shell', 'cluster'
         ]
         widgets = {
@@ -275,6 +277,7 @@ class SystemUserUpdateForm(forms.ModelForm):
             'name': '* required',
             'username': '* required',
             'cluster': 'If auto push checked, then push system user to that cluster assets',
+            'priority': 'High level will be using login asset as default, if user was granted more than 2 system user',
         }
 
 

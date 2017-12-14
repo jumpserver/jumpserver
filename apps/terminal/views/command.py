@@ -70,7 +70,7 @@ class CommandListView(ListView):
             'command': self.command,
             'date_from': self.date_from_s,
             'date_to': self.date_to_s,
-            'user': self.user,
+            'username': self.user,
             'asset': self.asset,
             'system_user': self.system_user,
         }

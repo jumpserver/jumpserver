@@ -78,7 +78,7 @@ class SessionListView(AdminUserRequiredMixin, ListView):
             'system_user_list': utils.get_system_user_list_from_cache(),
             'date_from': self.date_from_s,
             'date_to': self.date_to_s,
-            'user': self.user,
+            'username': self.user,
             'asset': self.asset,
             'system_user': self.system_user,
         }
@@ -122,6 +122,7 @@ class SessionOfflineListView(SessionListView):
 class SessionDetailView(SingleObjectMixin, ListView):
     template_name = 'terminal/session_detail.html'
     model = Session
+    object = None
 
     def get_queryset(self):
         self.object = self.get_object()

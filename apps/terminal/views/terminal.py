@@ -62,14 +62,14 @@ class TerminalDetailView(LoginRequiredMixin, DetailView):
 
 class TerminalDeleteView(AdminUserRequiredMixin, DeleteView):
     model = Terminal
-    template_name = 'assets/delete_confirm.html'
+    template_name = 'delete_confirm.html'
     success_url = reverse_lazy('terminal:terminal-list')
 
 
 class TerminalAcceptView(AdminUserRequiredMixin, JSONResponseMixin, UpdateView):
     model = Terminal
     form_class = TerminalForm
-    template_name = 'Terminal/terminal_modal_test.html'
+    template_name = 'terminal/terminal_modal_accept.html'
 
     def form_valid(self, form):
         terminal = form.save()

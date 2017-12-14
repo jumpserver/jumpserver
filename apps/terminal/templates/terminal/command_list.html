@@ -2,7 +2,7 @@
 {% load i18n %}
 {% load static %}
 {% load common_tags %}
-{% block content_left_head %}
+{% block custom_head_css_js %}
     <link href="{% static "css/plugins/footable/footable.core.css" %}" rel="stylesheet">
     <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
     <style>
@@ -10,6 +10,10 @@
             margin-bottom: 0;
         }
     </style>
+{% endblock %}
+
+{% block content_left_head %}
+    123
 {% endblock %}
 
 {% block table_search %}
@@ -26,7 +30,7 @@
             <select class="select2 form-control" name="username">
                 <option value="">{% trans 'User' %}</option>
                 {% for u in user_list %}
-                    <option value="{{ u }}" {% if user == u %} selected {% endif %}>{{ u }}</option>
+                    <option value="{{ u }}" {% if u == username %} selected {% endif %}>{{ u }}</option>
                 {% endfor %}
             </select>
         </div>

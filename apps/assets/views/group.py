@@ -101,6 +101,6 @@ class AssetGroupUpdateView(AdminUserRequiredMixin, UpdateView):
 
 
 class AssetGroupDeleteView(AdminUserRequiredMixin, DeleteView):
-    template_name = 'assets/delete_confirm.html'
+    template_name = 'delete_confirm.html'
     model = AssetGroup
     success_url = reverse_lazy('assets:asset-group-list')

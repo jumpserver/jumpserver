@@ -7,6 +7,7 @@ import logging
 import uuid
 from hashlib import md5
 
+import sshpubkeys
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -27,7 +28,8 @@ class AssetUser(models.Model):
     _private_key = models.TextField(max_length=4096, blank=True, null=True, verbose_name=_('SSH private key'), validators=[private_key_validator, ])
     _public_key = models.TextField(max_length=4096, blank=True, verbose_name=_('SSH public key'))
     comment = models.TextField(blank=True, verbose_name=_('Comment'))
-    date_created = models.DateTimeField(auto_now_add=True, null=True)
+    date_created = models.DateTimeField(auto_now_add=True)
+    date_updated = models.DateTimeField(auto_now=True)
     created_by = models.CharField(max_length=32, null=True, verbose_name=_('Created by'))
 
     @property
@@ -45,15 +47,20 @@ class AssetUser(models.Model):
     @property
     def private_key(self):
         if self._private_key:
-            key_str = signer.unsign(self._private_key)
-            return ssh_key_string_to_obj(key_str, password=self.password)
-        else:
-            return None
+            return signer.unsign(self._private_key)
 
     @private_key.setter
     def private_key(self, private_key_raw):
         raise AttributeError("Using set_auth do that")
         # self._private_key = signer.sign(private_key_raw)
+
+    @property
+    def private_key_obj(self):
+        if self._private_key:
+            key_str = signer.unsign(self._private_key)
+            return ssh_key_string_to_obj(key_str, password=self.password)
+        else:
+            return None
 
     @property
     def private_key_file(self):
@@ -73,6 +80,15 @@ class AssetUser(models.Model):
     @property
     def public_key(self):
         return signer.unsign(self._public_key)
+
+    @property
+    def public_key_obj(self):
+        if self.public_key:
+            try:
+                return sshpubkeys.SSHKey(self.public_key)
+            except TabError:
+                pass
+        return None
 
     def set_auth(self, password=None, private_key=None, public_key=None):
         update_fields = []
@@ -170,6 +186,7 @@ class SystemUser(AssetUser):
         ('K', 'Public key'),
     )
     cluster = models.ManyToManyField('assets.Cluster', verbose_name=_("Cluster"))
+    priority = models.IntegerField(default=10, verbose_name=_("Priority"))  # Todo: If user granted more priority user, default will be login as the hign
     protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
     sudo = models.TextField(default='/sbin/ifconfig', verbose_name=_('Sudo'))
@@ -205,6 +222,7 @@ class SystemUser(AssetUser):
             'name': self.name,
             'username': self.username,
             'protocol': self.protocol,
+            'priority': self.priority,
             'auto_push': self.auto_push,
         }
 

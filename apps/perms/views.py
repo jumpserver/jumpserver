@@ -19,7 +19,7 @@ from .hands import AdminUserRequiredMixin, User, UserGroup, SystemUser, \
     Asset, AssetGroup
 from .models import AssetPermission
 from .forms import AssetPermissionForm
-from .utils import associate_system_users_and_assets
+# from .utils import associate_system_users_and_assets
 
 
 class AssetPermissionListView(AdminUserRequiredMixin, ListView):
@@ -87,15 +87,15 @@ class AssetPermissionCreateView(AdminUserRequiredMixin,
             'successfully.'.format(url=url, name=self.object.name))
         return success_message
 
-    def form_valid(self, form):
-        assets = form.cleaned_data['assets']
-        asset_groups = form.cleaned_data['asset_groups']
-        system_users = form.cleaned_data['system_users']
-        associate_system_users_and_assets(system_users, assets, asset_groups)
-        response = super(AssetPermissionCreateView, self).form_valid(form)
-        self.object.created_by = self.request.user.name
-        self.object.save()
-        return response
+    # Todo: When create push system user
+    # def form_valid(self, form):
+    #     assets = form.cleaned_data['assets']
+    #     asset_groups = form.cleaned_data['asset_groups']
+    #     system_users = form.cleaned_data['system_users']
+    #     response = super(AssetPermissionCreateView, self).form_valid(form)
+    #     self.object.created_by = self.request.user.name
+    #     self.object.save()
+    #     return response
 
 
 class AssetPermissionUpdateView(AdminUserRequiredMixin, UpdateView):
@@ -150,7 +150,7 @@ class AssetPermissionDetailView(AdminUserRequiredMixin, DetailView):
 
 class AssetPermissionDeleteView(AdminUserRequiredMixin, DeleteView):
     model = AssetPermission
-    template_name = 'perms/delete_confirm.html'
+    template_name = 'delete_confirm.html'
     success_url = reverse_lazy('perms:asset-permission-list')
 
 

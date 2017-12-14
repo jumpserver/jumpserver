@@ -1067,13 +1067,13 @@ msgstr "配置"
 msgid "Location"
 msgstr "位置"
 
-#: assets/templates/assets/delete_confirm.html:6
-#: perms/templates/perms/delete_confirm.html:6
+#: assets/templates/delete_confirm.html:6
+#: perms/templates/delete_confirm.html:6
 #: users/templates/users/user_delete_confirm.html:6
 msgid "Confirm delete"
 msgstr "确认删除"
 
-#: assets/templates/assets/delete_confirm.html:11
+#: assets/templates/delete_confirm.html:11
 msgid "Are you sure delete"
 msgstr "您确定删除吗?"
 

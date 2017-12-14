@@ -115,7 +115,7 @@ class SystemUserSerializer(serializers.ModelSerializer):
 class AssetSystemUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUser
-        fields = ('id', 'name', 'username', 'protocol',  'comment')
+        fields = ('id', 'name', 'username', 'priority', 'protocol',  'comment',)
 
 
 class SystemUserUpdateAssetsSerializer(serializers.ModelSerializer):

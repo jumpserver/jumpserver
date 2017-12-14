@@ -99,7 +99,7 @@ class SystemUserDetailView(AdminUserRequiredMixin, DetailView):
 
 class SystemUserDeleteView(AdminUserRequiredMixin, DeleteView):
     model = SystemUser
-    template_name = 'assets/delete_confirm.html'
+    template_name = 'delete_confirm.html'
     success_url = reverse_lazy('assets:system-user-list')
 
 

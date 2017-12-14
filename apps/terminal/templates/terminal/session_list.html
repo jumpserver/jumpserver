@@ -2,13 +2,16 @@
 {% load i18n %}
 {% load static %}
 {% load terminal_tags %}
-{% block content_left_head %}
+{% block custom_head_css_js %}
     <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
     <style>
         #search_btn {
             margin-bottom: 0;
         }
     </style>
+{% endblock %}
+
+{% block content_left_head %}
 {% endblock %}
 
 
@@ -26,7 +29,7 @@
             <select class="select2 form-control" name="user">
                 <option value="">{% trans 'User' %}</option>
                 {% for u in user_list %}
-                    <option value="{{ u }}" {% if u == user %} selected {% endif %}>{{ u }}</option>
+                    <option value="{{ u }}" {% if u == username %} selected {% endif %}>{{ u }}</option>
                 {% endfor %}
             </select>
         </div>
@@ -106,10 +109,17 @@
             function success() {
                 window.setTimeout(function () {
                     window.location.reload()
-                }, 300)
+                }, 1000)
             }
+            var success_message = '{% trans "Terminate task send, waiting ..." %}';
             var the_url = "{% url 'api-terminal:tasks-list' %}";
-            APIUpdateAttr({url: the_url, method: 'POST', body: JSON.stringify(data), success: success, success_message: 'Terminate success'});
+            APIUpdateAttr({
+                url: the_url,
+                method: 'POST',
+                body: JSON.stringify(data),
+                success: success,
+                success_message: success_message
+            });
         }
         $(document).ready(function() {
             $('table').DataTable({
@@ -118,7 +128,9 @@
                 "bInfo" : false,
                 "order": []
             });
-            $('.select2').select2();
+            $('.select2').select2({
+                dropdownAutoWidth: true
+            });
             $('#date .input-daterange').datepicker({
                 dateFormat: 'mm/dd/yy',
                 keyboardNavigation: false,
@@ -134,12 +146,6 @@
                 args: session_id,
                 terminal: terminal_id
             };
-            terminateSession(data)
-        }).on('click', '#btn_bulk_update', function () {
-            var data = [];
-            $('.cbx-term:checked').each(function () {
-                data.push({proxy_log_id: $(this).attr('value')})
-            });
             terminateSession(data)
         })
     </script>

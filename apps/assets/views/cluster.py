@@ -97,5 +97,5 @@ class ClusterAssetsView(AdminUserRequiredMixin, DetailView):
 
 class ClusterDeleteView(AdminUserRequiredMixin, DeleteView):
     model = Cluster
-    template_name = 'assets/delete_confirm.html'
+    template_name = 'delete_confirm.html'
     success_url = reverse_lazy('assets:cluster-list')

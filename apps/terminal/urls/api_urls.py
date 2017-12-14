@@ -10,8 +10,8 @@ from .. import api
 app_name = 'terminal'
 
 router = routers.DefaultRouter()
-router.register(r'v1/terminal/(?P<terminal>[0-9]+)?/?status', api.StatusViewSet, 'terminal-status')
-router.register(r'v1/terminal/(?P<terminal>[0-9]+)?/?sessions', api.SessionViewSet, 'terminal-sessions')
+router.register(r'v1/terminal/(?P<terminal>[a-zA-Z0-9\-]{36})?/?status', api.StatusViewSet, 'terminal-status')
+router.register(r'v1/terminal/(?P<terminal>a-zA-Z0-9\-]{36})?/?sessions', api.SessionViewSet, 'terminal-sessions')
 router.register(r'v1/tasks', api.TaskViewSet, 'tasks')
 router.register(r'v1/terminal', api.TerminalViewSet, 'terminal')
 router.register(r'v1/command', api.CommandViewSet, 'command')

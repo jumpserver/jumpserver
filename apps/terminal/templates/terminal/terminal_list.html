@@ -2,7 +2,6 @@
 {% load i18n static %}
 {% block custom_head_css_js %}
 {{ block.super }}
-
 <style>
     div.dataTables_wrapper div.dataTables_filter,
     .dataTables_length {
@@ -15,9 +14,10 @@
     #modal .modal-body { max-height: 200px; }
 </style>
 {% endblock %}
+
 {% block table_search %}{% endblock %}
+
 {% block table_container %}
-{#<div class="uc pull-left m-l-5 m-r-5"><a href="{% url "users:user-create" %}" class="btn btn-sm btn-primary"> {% trans "Create user" %} </a></div>#}
 <table class="table table-striped table-bordered table-hover " id="terminal_list_table" >
     <thead>
         <tr>
@@ -40,12 +40,11 @@
     </tbody>
 </table>
 {% include 'terminal/terminal_modal_accept.html' %}
-
 {% endblock %}
 {% block custom_foot_js %}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script>
-$(document).ready(function(){
+function initTable() {
     var options = {
         ele: $('#terminal_list_table'),
         buttons: [],
@@ -100,19 +99,20 @@ $(document).ready(function(){
         op_html: $('#actions').html()
     };
     jumpserver.initDataTable(options);
+}
+$(document).ready(function(){
+    initTable();
 
-    $('#btn_terminal_accept').click(function () {
-        var $form = $('#form_terminal_accept');
-        function success(data, textStatus, jqXHR) {
-            if (data.success === true) {
-                window.location.reload()
-            } else {
-                $('#modal-error').html(data.msg).css('display', 'block');
-            }
+}).on('click', '#btn-confirm',function () {
+    var $form = $('#form_terminal_accept');
+    function success(data, textStatus, jqXHR) {
+        if (data.success === true) {
+            window.location.reload()
+        } else {
+            $('#modal-error').html(data.msg).css('display', 'block');
         }
-        $form.ajaxSubmit({success: success});
-    })
-
+    }
+    $form.ajaxSubmit({success: success});
 }).on('click', '.btn-del', function(){
     var $this = $(this);
     var id = $this.data('id');
@@ -124,8 +124,7 @@ $(document).ready(function(){
     var $this = $(this);
     var terminal_id = $this.data('id');
     var the_url = "{% url 'api-terminal:terminal-detail' pk=DEFAULT_PK %}".replace('{{ DEFAULT_PK }}', terminal_id);
-    var post_url = $('#form_terminal_accept').attr('action').replace('{{ DEFAULT_PK }}', terminal_id);
-    console.log(post_url);
+    var post_url = "{% url 'terminal:terminal-accept' pk=DEFAULT_PK %}".replace('{{ DEFAULT_PK }}', terminal_id);
     $.ajax({
         url: the_url,
         method: 'GET',

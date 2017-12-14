@@ -49,5 +49,4 @@ class LoginLog(models.Model):
     datetime = models.DateTimeField(auto_now_add=True, verbose_name=_('Date login'))
 
     class Meta:
-        db_table = 'login_log'
         ordering = ['-datetime', 'username']

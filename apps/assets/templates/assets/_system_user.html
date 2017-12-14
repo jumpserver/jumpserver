@@ -37,6 +37,7 @@
                             <h3>{% trans 'Basic' %}</h3>
                             {% bootstrap_field form.name layout="horizontal" %}
                             {% bootstrap_field form.username layout="horizontal" %}
+                            {% bootstrap_field form.priority layout="horizontal" %}
                             {% bootstrap_field form.protocol layout="horizontal" %}
                             {% bootstrap_field form.cluster layout="horizontal" %}
 
@@ -49,7 +50,6 @@
                                         {{ form.auto_generate_key}}
                                     </div>
                                 </div>
-
                             </div>
                             <div class="auth-fields">
                                 {% bootstrap_field form.private_key_file layout="horizontal" %}
