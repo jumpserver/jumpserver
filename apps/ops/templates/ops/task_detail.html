@@ -65,7 +65,7 @@
                                             <td><b>{{ object.adhoc.all |length }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Last version' %}</td>
+                                            <td>{% trans 'Latest version' %}</td>
                                             <td><b>{{ object.get_latest_adhoc.short_id }}</b></td>
                                         </tr>
                                         <tr>
@@ -85,7 +85,7 @@
                                             <td><b>{{ object.get_latest_history.is_success|yesno:"Yes,No,Unkown" }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Conents' %}:</td>
+                                            <td>{% trans 'Contents' %}:</td>
                                             <td>
                                                 <b>
                                                 {% for task in object.get_latest_adhoc.tasks %}

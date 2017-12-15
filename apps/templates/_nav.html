@@ -35,6 +35,15 @@
     </ul>
 </li>
 
+<li id="ops">
+    <a>
+        <i class="fa fa-coffee"></i> <span class="nav-label">{% trans 'Job Center' %}</span><span class="fa arrow"></span>
+    </a>
+    <ul class="nav nav-second-level">
+        <li id="task"><a href="{% url 'ops:task-list' %}">{% trans 'Tasks' %}</a></li>
+    </ul>
+</li>
+
 <li id="terminal">
     <a>
         <i class="fa fa-rocket"></i> <span class="nav-label">{% trans 'Terminal' %}</span><span class="fa arrow"></span>
@@ -47,15 +56,6 @@
     </ul>
 </li>
 
-<li id="ops">
-    <a>
-        <i class="fa fa-coffee"></i> <span class="nav-label">{% trans 'Job Center' %}</span><span class="fa arrow"></span>
-    </a>
-    <ul class="nav nav-second-level">
-        <li id="task"><a href="{% url 'ops:task-list' %}">{% trans 'Tasks' %}</a></li>
-    </ul>
-</li>
-
 {#<li id="">#}
 {#    <a href="#">#}
 {#        <i class="fa fa-download"></i> <span class="nav-label">{% trans 'File' %}</span><span class="fa arrow"></span>#}
@@ -65,11 +65,11 @@
 {#        <li id="download"><a href="">{% trans 'File download' %}</a></li>#}
 {#    </ul>#}
 {#</li>#}
-{#<li id="">#}
-{#    <a href="">#}
-{#        <i class="fa fa-gears"></i> <span class="nav-label">{% trans 'Settings' %}</span><span class="label label-info pull-right"></span>#}
-{#    </a>#}
-{#</li>#}
+<li id="">
+    <a href="">
+        <i class="fa fa-gears"></i> <span class="nav-label">{% trans 'Settings' %}</span><span class="label label-info pull-right"></span>
+    </a>
+</li>
 <li class="special_link">
     <a href="http://www.jumpserver.org" target="_blank"><i class="fa fa-database"></i>
         <span class="nav-label">{% trans 'Visit us' %}</span>

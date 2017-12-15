@@ -89,14 +89,14 @@ class Session(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     user = models.CharField(max_length=128, verbose_name=_("User"))
     asset = models.CharField(max_length=1024, verbose_name=_("Asset"))
-    system_user = models.CharField(max_length=128, verbose_name=_("System User"))
+    system_user = models.CharField(max_length=128, verbose_name=_("System user"))
     login_from = models.CharField(max_length=2, choices=LOGIN_FROM_CHOICES, default="ST")
     is_finished = models.BooleanField(default=False)
     has_replay = models.BooleanField(default=False, verbose_name=_("Replay"))
     has_command = models.BooleanField(default=False, verbose_name=_("Command"))
     terminal = models.ForeignKey(Terminal, null=True, on_delete=models.CASCADE)
-    date_start = models.DateTimeField(verbose_name=_("Date Start"))
-    date_end = models.DateTimeField(verbose_name=_("Date End"), null=True)
+    date_start = models.DateTimeField(verbose_name=_("Date start"))
+    date_end = models.DateTimeField(verbose_name=_("Date end"), null=True)
 
     class Meta:
         db_table = "terminal_session"
@@ -113,7 +113,7 @@ class Task(models.Model):
 
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, choices=NAME_CHOICES, verbose_name=_("Name"))
-    args = models.CharField(max_length=1024, verbose_name=_("Playbook Args"))
+    args = models.CharField(max_length=1024, verbose_name=_("Args"))
     terminal = models.ForeignKey(Terminal, null=True, on_delete=models.CASCADE)
     is_finished = models.BooleanField(default=False)
     date_created = models.DateTimeField(auto_now_add=True)
