@@ -173,7 +173,10 @@ def test_admin_user_connectability_manual(asset, task_name=None):
         task_name = const.TEST_ASSET_CONN_TASK_NAME
     hosts = [asset.hostname]
     tasks = const.TEST_ADMIN_USER_CONN_TASKS
-    task = create_or_update_task(task_name, tasks=tasks, hosts=hosts)
+    task = create_or_update_task(
+        task_name, tasks=tasks, hosts=hosts, run_as_admin=True,
+        created_by='System', options=const.TASK_OPTIONS, pattern='all',
+    )
     result = task.run()
 
     if result.results_summary['dark']:
@@ -194,7 +197,7 @@ def test_system_user_connectability(system_user, force=False):
     """
     from ops.utils import create_or_update_task
     lock_key = const.TEST_SYSTEM_USER_CONN_LOCK_KEY.format(system_user.name)
-    task_name = const.TEST_SYSTEM_USER_CONN_TASK_NAME
+    task_name = const.TEST_SYSTEM_USER_CONN_TASK_NAME.format(system_user.name)
     if cache.get(lock_key, 0) == 1 and not force:
         logger.debug("Task {} is running or before long, passed this time".format(task_name))
         return {}
@@ -202,7 +205,8 @@ def test_system_user_connectability(system_user, force=False):
     hosts = [asset.hostname for asset in assets]
     tasks = const.TEST_SYSTEM_USER_CONN_TASKS
     task = create_or_update_task(
-        task_name, hosts=hosts, tasks=tasks, options=const.TASK_OPTIONS,
+        task_name, hosts=hosts, tasks=tasks, pattern='all',
+        options=const.TASK_OPTIONS,
         run_as=system_user.name, created_by="System",
     )
     cache.set(lock_key, 1, CACHE_MAX_TIME)

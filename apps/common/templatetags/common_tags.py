@@ -57,7 +57,7 @@ def int_to_str(value):
 def ts_to_date(ts):
     try:
         ts = float(ts)
-    except TypeError:
+    except ValueError:
         ts = 0
     dt = timezone.datetime.fromtimestamp(ts).\
         replace(tzinfo=timezone.get_current_timezone())

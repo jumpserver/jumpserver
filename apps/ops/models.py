@@ -23,7 +23,7 @@ class Task(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     is_deleted = models.BooleanField(default=False)
-    created_by = models.CharField(max_length=128, blank=True, default='')
+    created_by = models.CharField(max_length=128, blank=True, null=True, default='')
     date_created = models.DateTimeField(auto_now_add=True)
     __latest_adhoc = None
 
@@ -93,13 +93,13 @@ class AdHoc(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     task = models.ForeignKey(Task, related_name='adhoc', on_delete=models.CASCADE)
     _tasks = models.TextField(verbose_name=_('Tasks'))
-    pattern = models.CharField(max_length=64, default='', verbose_name=_('Pattern'))
+    pattern = models.CharField(max_length=64, default='{}', verbose_name=_('Pattern'))
     _options = models.CharField(max_length=1024, default='', verbose_name=_('Options'))
     _hosts = models.TextField(blank=True, verbose_name=_('Hosts'))  # ['hostname1', 'hostname2']
     run_as_admin = models.BooleanField(default=False, verbose_name=_('Run as admin'))
     run_as = models.CharField(max_length=128, default='', verbose_name=_("Run as"))
     _become = models.CharField(max_length=1024, default='', verbose_name=_("Become"))
-    created_by = models.CharField(max_length=64, default='', verbose_name=_('Create by'))
+    created_by = models.CharField(max_length=64, default='', null=True, verbose_name=_('Create by'))
     date_created = models.DateTimeField(auto_now_add=True)
 
     @property
@@ -147,9 +147,10 @@ class AdHoc(models.Model):
     @property
     def options(self):
         if self._options:
-            return json.loads(self._options)
-        else:
-            return {}
+            _options = json.loads(self._options)
+            if isinstance(_options, dict):
+                return _options
+        return {}
 
     @options.setter
     def options(self, item):

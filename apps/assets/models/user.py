@@ -114,6 +114,16 @@ class AssetUser(models.Model):
                       private_key=private_key,
                       public_key=public_key)
 
+    def _to_secret_json(self):
+        """Push system user use it"""
+        return {
+            'name': self.name,
+            'username': self.username,
+            'password': self.password,
+            'public_key': self.public_key,
+            'private_key': self.private_key_file,
+        }
+
     class Meta:
         abstract = True
 
@@ -194,18 +204,6 @@ class SystemUser(AssetUser):
 
     def __str__(self):
         return self.name
-
-    def _to_secret_json(self):
-        """Push system user use it"""
-        return {
-            'name': self.name,
-            'username': self.username,
-            'shell': self.shell,
-            'sudo': self.sudo,
-            'password': self.password,
-            'public_key': self.public_key,
-            'private_key_file': self.private_key_file,
-        }
 
     def get_clusters_assets(self):
         from .asset import Asset
