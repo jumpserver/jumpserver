@@ -57,7 +57,7 @@ def int_to_str(value):
 def ts_to_date(ts):
     try:
         ts = float(ts)
-    except ValueError:
+    except (TypeError, ValueError):
         ts = 0
     dt = timezone.datetime.fromtimestamp(ts).\
         replace(tzinfo=timezone.get_current_timezone())
@@ -67,8 +67,3 @@ def ts_to_date(ts):
 @register.filter
 def to_html(s):
     return escape(s).replace('\n', '<br />')
-
-
-# @register.filter
-# def proxy_log_commands(log_id):
-#     return 1
