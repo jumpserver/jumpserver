@@ -10,9 +10,7 @@ from common.utils import get_object_or_none, capacity_convert, \
     sum_capacity, encrypt_password, get_logger
 from common.celery import app as celery_app
 from .models import SystemUser, AdminUser, Asset
-from .const import ADMIN_USER_CONN_CACHE_KEY_PREFIX, SYSTEM_USER_CONN_CACHE_KEY_PREFIX, \
-    UPDATE_ASSETS_HARDWARE_PERIOD_LOCK_KEY, TEST_ADMIN_USER_CONNECTABILITY_PEROID_KEY, \
-    TEST_SYSTEM_USER_CONNECTABILITY_PEROID_KEY, PUSH_SYSTEM_USER_PERIOD_KEY
+from . import const
 from .signals import on_app_ready
 
 
@@ -22,32 +20,14 @@ logger = get_logger(__file__)
 CACHE_MAX_TIME = 60*60*60
 
 
-@shared_task
-def update_assets_hardware_info(assets):
-    """
-    Using ansible api to update asset hardware info
-    :param assets:  asset seq
-    :return: result summary ['contacted': {}, 'dark': {}]
-    """
-    from ops.utils import run_adhoc
-    name = "GET_ASSETS_HARDWARE_INFO"
-    tasks = [
-        {
-            'name': name,
-            'action': {
-                'module': 'setup'
-            }
-        }
-    ]
-    hostname_list = [asset.hostname for asset in assets]
-    result = run_adhoc(hostname_list, pattern='all', tasks=tasks,
-                       name=name, run_as_admin=True)
-    summary, result_raw = result.results_summary, result.results_raw
+def _update_asset_info(result_raw):
+    assets_updated = []
     for hostname, info in result_raw['ok'].items():
         if info:
-            info = info[name]['ansible_facts']
+            info = info[const.UPDATE_ASSETS_HARDWARE_TASK_NAME]['ansible_facts']
         else:
             continue
+
         asset = get_object_or_none(Asset, hostname=hostname)
         if not asset:
             continue
@@ -81,12 +61,31 @@ def update_assets_hardware_info(assets):
             if k.startswith('___'):
                 setattr(asset, k.strip('_'), v)
         asset.save()
+        assets_updated.append(asset)
+    return assets_updated
 
-    for hostname, task in summary['dark'].items():
-        logger.error("Update {} hardware info error: {}".format(
-            hostname, task[name],
-        ))
 
+@shared_task
+def update_assets_hardware_info(assets, task_name=None):
+    """
+    Using ansible api to update asset hardware info
+    :param assets:  asset seq
+    :param task_name: task_name running
+    :return: result summary ['contacted': {}, 'dark': {}]
+    """
+    from ops.utils import create_or_update_task
+    if task_name is None:
+        task_name = const.UPDATE_ASSETS_HARDWARE_TASK_NAME
+    tasks = const.UPDATE_ASSETS_HARDWARE_TASKS
+    hostname_list = [asset.hostname for asset in assets]
+    task = create_or_update_task(
+        task_name, hosts=hostname_list, tasks=tasks, pattern='all',
+        options=const.TASK_OPTIONS, run_as_admin=True, created_by='System',
+    )
+    result = task.run()
+    summary, result_raw = result.results_summary, result.results_raw
+    # TOdo: may be somewhere using
+    assets_updated = _update_asset_info(result_raw)
     return summary
 
 
@@ -96,129 +95,142 @@ def update_assets_hardware_period():
     Update asset hardware period task
     :return:
     """
-    if cache.get(UPDATE_ASSETS_HARDWARE_PERIOD_LOCK_KEY) == 1:
-        logger.debug("Update asset hardware period task is running, passed")
+    task_name = const.UPDATE_ASSETS_HARDWARE_PERIOD_TASK_NAME
+    if cache.get(const.UPDATE_ASSETS_HARDWARE_PERIOD_LOCK_KEY) == 1:
+        msg = "Task {} is running or before long, passed this time".format(
+            task_name
+        )
+        logger.debug(msg)
         return {}
-    try:
-        cache.set(UPDATE_ASSETS_HARDWARE_PERIOD_LOCK_KEY, 1, CACHE_MAX_TIME)
-        assets = Asset.objects.filter(type__in=['Server', 'VM'])
-        return update_assets_hardware_info(assets)
-    finally:
-        cache.set(UPDATE_ASSETS_HARDWARE_PERIOD_LOCK_KEY, 0)
+    # Todo: set cache but not update, because we want also set it to as a
+    # minimum update time too
+    cache.set(const.UPDATE_ASSETS_HARDWARE_PERIOD_LOCK_KEY, 1, CACHE_MAX_TIME)
+    assets = Asset.objects.filter(type__in=['Server', 'VM'])
+    return update_assets_hardware_info(assets, task_name=task_name)
 
 
 @shared_task
-def test_admin_user_connectability(admin_user):
+def test_admin_user_connectability(admin_user, force=False):
     """
     Test asset admin user can connect or not. Using ansible api do that
     :param admin_user:
+    :param force: Force update
     :return:
     """
-    from ops.utils import run_adhoc
+    from ops.utils import create_or_update_task
+
+    task_name = const.TEST_ADMIN_USER_CONN_TASK_NAME.format(admin_user.name)
+    lock_key = const.TEST_ADMIN_USER_CONN_LOCK_KEY.format(admin_user.name)
+
+    if cache.get(lock_key, 0) == 1 and not force:
+        logger.debug("Task {} is running or before along, passed this time")
+        return {}
 
     assets = admin_user.get_related_assets()
     hosts = [asset.hostname for asset in assets]
-    tasks = [
-        {
-            "name": "TEST_ADMIN_CONNECTIVE",
-            "action": {
-                "module": "ping",
-            }
-        }
-    ]
-    result = run_adhoc(hosts, tasks=tasks, pattern="all", run_as_admin=True)
+    tasks = const.TEST_ADMIN_USER_CONN_TASKS
+    task = create_or_update_task(
+        task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
+        options=const.TASK_OPTIONS, run_as_admin=True, created_by='System',
+    )
+    cache.set(lock_key, 1, CACHE_MAX_TIME)
+    result = task.run()
+    cache_key = const.ADMIN_USER_CONN_CACHE_KEY.format(admin_user.name)
+    cache.set(cache_key, result.results_summary, CACHE_MAX_TIME)
+
+    for i in result.results_summary.get('contacted', []):
+        asset_conn_cache_key = const.ASSET_ADMIN_CONN_CACHE_KEY.format(i)
+        cache.set(asset_conn_cache_key, 1, CACHE_MAX_TIME)
+
+    for i, msg in result.results_summary.get('dark', {}).items():
+        asset_conn_cache_key = const.ASSET_ADMIN_CONN_CACHE_KEY.format(i)
+        cache.set(asset_conn_cache_key, 0, CACHE_MAX_TIME)
+        logger.error(msg)
+
     return result.results_summary
 
 
 @shared_task
 def test_admin_user_connectability_period():
-    # assets = Asset.objects.filter(type__in=['Server', 'VM'])
-    if cache.get(TEST_ADMIN_USER_CONNECTABILITY_PEROID_KEY) == 1:
-        logger.debug("Test admin user connectablity period task is running, passed")
+    if cache.get(const.TEST_ADMIN_USER_CONN_PERIOD_LOCK_KEY) == 1:
+        msg = "{} task is running or before long, passed this time".format(
+            const.TEST_ADMIN_USER_CONN_PERIOD_TASK_NAME
+        )
+        logger.debug(msg)
         return
 
-    logger.debug("Test admin user connectablity period task start")
-    try:
-        cache.set(TEST_ADMIN_USER_CONNECTABILITY_PEROID_KEY, 1, CACHE_MAX_TIME)
-        admin_users = AdminUser.objects.all()
-        for admin_user in admin_users:
-            summary = test_admin_user_connectability(admin_user)
-
-            cache.set(ADMIN_USER_CONN_CACHE_KEY_PREFIX + admin_user.name, summary, 60*60*60)
-            for i in summary['contacted']:
-                cache.set(ADMIN_USER_CONN_CACHE_KEY_PREFIX + i, 1, 60*60*60)
-
-            for i, error in summary['dark'].items():
-                cache.set(ADMIN_USER_CONN_CACHE_KEY_PREFIX + i, 0, 60*60*60)
-                logger.error(error)
-    finally:
-        cache.set(TEST_ADMIN_USER_CONNECTABILITY_PEROID_KEY, 0)
+    logger.debug("Task {} start".format(const.TEST_ADMIN_USER_CONN_TASK_NAME))
+    cache.set(const.TEST_ADMIN_USER_CONN_PERIOD_LOCK_KEY, 1, CACHE_MAX_TIME)
+    admin_users = AdminUser.objects.all()
+    for admin_user in admin_users:
+        test_admin_user_connectability(admin_user)
 
 
 @shared_task
-def test_admin_user_connectability_manual(asset):
-    from ops.utils import run_adhoc
-    # assets = Asset.objects.filter(type__in=['Server', 'VM'])
+def test_admin_user_connectability_manual(asset, task_name=None):
+    from ops.utils import create_or_update_task
+    if task_name is None:
+        task_name = const.TEST_ASSET_CONN_TASK_NAME
     hosts = [asset.hostname]
-    tasks = [
-        {
-            "name": "TEST_ADMIN_CONNECTIVE",
-            "action": {
-                "module": "ping",
-            }
-        }
-    ]
-    result = run_adhoc(hosts, tasks=tasks, pattern="all", run_as_admin=True)
+    tasks = const.TEST_ADMIN_USER_CONN_TASKS
+    task = create_or_update_task(task_name, tasks=tasks, hosts=hosts)
+    result = task.run()
+
     if result.results_summary['dark']:
-        cache.set(ADMIN_USER_CONN_CACHE_KEY_PREFIX + asset.hostname, 0, 60*60*60)
+        cache.set(const.ASSET_ADMIN_CONN_CACHE_KEY.format(asset.hostname), 0, CACHE_MAX_TIME)
         return False
     else:
-        cache.set(ADMIN_USER_CONN_CACHE_KEY_PREFIX + asset.hostname, 1, 60*60* 60)
+        cache.set(const.ASSET_ADMIN_CONN_CACHE_KEY.format(asset.hostname), 1, CACHE_MAX_TIME)
         return True
 
 
 @shared_task
-def test_system_user_connectability(system_user):
+def test_system_user_connectability(system_user, force=False):
     """
     Test system cant connect his assets or not.
     :param system_user:
+    :param force
     :return:
     """
-    from ops.utils import run_adhoc
+    from ops.utils import create_or_update_task
+    lock_key = const.TEST_SYSTEM_USER_CONN_LOCK_KEY.format(system_user.name)
+    task_name = const.TEST_SYSTEM_USER_CONN_TASK_NAME
+    if cache.get(lock_key, 0) == 1 and not force:
+        logger.debug("Task {} is running or before long, passed this time".format(task_name))
+        return {}
     assets = system_user.get_clusters_assets()
     hosts = [asset.hostname for asset in assets]
-    tasks = [
-        {
-            "name": "TEST_SYSTEM_USER_CONNECTIVE",
-            "action": {
-                "module": "ping",
-            }
-        }
-    ]
-    result = run_adhoc(hosts, tasks=tasks, pattern="all", run_as=system_user.name)
+    tasks = const.TEST_SYSTEM_USER_CONN_TASKS
+    task = create_or_update_task(
+        task_name, hosts=hosts, tasks=tasks, options=const.TASK_OPTIONS,
+        run_as=system_user.name, created_by="System",
+    )
+    cache.set(lock_key, 1, CACHE_MAX_TIME)
+    result = task.run()
+    cache_key = const.SYSTEM_USER_CONN_CACHE_KEY
+    cache.set(cache_key, result.results_summary, CACHE_MAX_TIME)
     return result.results_summary
 
 
 @shared_task
 def test_system_user_connectability_period():
-    if cache.get(TEST_SYSTEM_USER_CONNECTABILITY_PEROID_KEY) == 1:
-        logger.debug("Test admin user connectablity period task is running, passed")
+    lock_key = const.TEST_SYSTEM_USER_CONN_LOCK_KEY
+    if cache.get(lock_key) == 1:
+        logger.debug("{} task is running, passed this time".format(
+            const.TEST_SYSTEM_USER_CONN_PERIOD_TASK_NAME
+        ))
         return
 
-    logger.debug("Test system user connectablity period task start")
-    try:
-        cache.set(TEST_SYSTEM_USER_CONNECTABILITY_PEROID_KEY, 1, CACHE_MAX_TIME)
-        for system_user in SystemUser.objects.all():
-            summary = test_system_user_connectability(system_user)
-            cache.set(SYSTEM_USER_CONN_CACHE_KEY_PREFIX + system_user.name, summary, 60*60*60)
-    finally:
-        cache.set(TEST_SYSTEM_USER_CONNECTABILITY_PEROID_KEY, 0)
+    logger.debug("Task {} start".format(const.TEST_SYSTEM_USER_CONN_PERIOD_TASK_NAME))
+    cache.set(lock_key, 1, CACHE_MAX_TIME)
+    for system_user in SystemUser.objects.all():
+        test_system_user_connectability(system_user)
 
 
 def get_push_system_user_tasks(system_user):
     tasks = [
         {
-            'name': 'Add user',
+            'name': 'Add user {}'.format(system_user.username),
             'action': {
                 'module': 'user',
                 'args': 'name={} shell={} state=present password={}'.format(
@@ -228,7 +240,7 @@ def get_push_system_user_tasks(system_user):
             }
         },
         {
-            'name': 'Set authorized key',
+            'name': 'Set {} authorized key'.format(system_user.username),
             'action': {
                 'module': 'authorized_key',
                 'args': "user={} state=present key='{}'".format(
@@ -237,7 +249,7 @@ def get_push_system_user_tasks(system_user):
             }
         },
         {
-            'name': 'Set sudoers',
+            'name': 'Set {} sudo setting'.format(system_user.username),
             'action': {
                 'module': 'lineinfile',
                 'args': "dest=/etc/sudoers state=present regexp='^{0} ALL=' "
@@ -252,101 +264,127 @@ def get_push_system_user_tasks(system_user):
     return tasks
 
 
+@shared_task
 def push_system_user(system_user, assets, task_name=None):
-    from ops.utils import get_task_by_name, run_adhoc_object, \
-        create_task, create_adhoc
+    from ops.utils import create_or_update_task
 
     if system_user.auto_push and assets:
         if task_name is None:
             task_name = 'PUSH-SYSTEM-USER-{}'.format(system_user.name)
 
-        task = get_task_by_name(task_name)
-        if not task:
-            logger.debug("Doesn't get task {}, create it".format(task_name))
-            task = create_task(task_name, created_by="System")
-            task.save()
-        tasks = get_push_system_user_tasks(system_user)
         hosts = [asset.hostname for asset in assets]
-        options = {'forks': FORKS, 'timeout': TIMEOUT}
+        tasks = get_push_system_user_tasks(system_user)
 
-        adhoc = task.get_latest_adhoc()
-        if not adhoc or adhoc.task != tasks or adhoc.hosts != hosts:
-            logger.debug("Task {} not exit or changed, create new version".format(task_name))
-            adhoc = create_adhoc(task=task, tasks=tasks, pattern='all',
-                                 options=options, hosts=hosts, run_as_admin=True)
-        logger.debug("Task {} start execute".format(task_name))
-        result = run_adhoc_object(adhoc)
+        task = create_or_update_task(
+            task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
+            options=const.TASK_OPTIONS, run_as_admin=True, created_by='System'
+        )
+        result = task.run()
+        for i in result.results_summary.get('contacted'):
+            logger.debug("Push system user {} to {}  [OK]".format(
+                system_user.name, i
+            ))
+        for i in result.results_summary.get('dark'):
+            logger.error("Push system user {} to {}  [FAILED]".format(
+                system_user.name, i
+            ))
         return result.results_summary
     else:
-        msg = "Task {} does'nt execute, because not auto_push " \
+        msg = "Task {} does'nt execute, because auto_push " \
               "is not True, or not assets".format(task_name)
         logger.debug(msg)
         return {}
 
 
 @shared_task
-def push_system_user_to_cluster_assets(system_user, task_name=None):
-    logger.debug("{} task start".format(task_name))
+def push_system_user_to_cluster_assets(system_user, force=False):
+    lock_key = const.PUSH_SYSTEM_USER_LOCK_KEY
+    task_name = const.PUSH_SYSTEM_USER_TASK_NAME.format(system_user.name)
+    if cache.get(lock_key, 0) == 1 and not force:
+        msg = "Task {} is running or before long, passed this time".format(
+            task_name
+        )
+        logger.debug(msg)
+        return {}
+
+    logger.debug("Task {} start".format(task_name))
     assets = system_user.get_clusters_assets()
     summary = push_system_user(system_user, assets, task_name)
-
-    for h in summary.get("contacted", []):
-        logger.debug("Push system user {} to {} success".format(system_user.name, h))
-    for h, msg in summary.get('dark', {}).items():
-        logger.error('Push system user {} to {} failed: {}'.format(
-            system_user.name, h, msg
-        ))
     return summary
 
 
 @shared_task
 def push_system_user_period():
-    if cache.get(PUSH_SYSTEM_USER_PERIOD_KEY) == 1:
-        logger.debug("push system user period task is running, passed")
+    task_name = const.PUSH_SYSTEM_USER_PERIOD_TASK_NAME
+    if cache.get(const.PUSH_SYSTEM_USER_PERIOD_LOCK_KEY) == 1:
+        msg = "Task {} is running or before long, passed this time".format(
+            task_name
+        )
+        logger.debug(msg)
         return
+    logger.debug("Task {} start".format(task_name))
+    cache.set(const.PUSH_SYSTEM_USER_PERIOD_LOCK_KEY, 1, timeout=CACHE_MAX_TIME)
 
-    logger.debug("Push system user period task start")
-    try:
-        cache.set(PUSH_SYSTEM_USER_PERIOD_KEY, 1, timeout=CACHE_MAX_TIME)
-        for system_user in SystemUser.objects.filter(auto_push=True):
-            task_name = 'PUSH-SYSTEM-USER-PERIOD'
-            push_system_user_to_cluster_assets(system_user, task_name)
-    finally:
-        cache.set(PUSH_SYSTEM_USER_PERIOD_KEY, 0)
+    for system_user in SystemUser.objects.filter(auto_push=True):
+        push_system_user_to_cluster_assets(system_user)
 
 
-# def push_system_user_to_assets_if_need(system_user, assets=None, asset_groups=None):
-#     assets_to_push = []
-#     system_user_assets = system_user.assets.all()
-#     if assets:
-#         assets_to_push.extend(assets)
-#     if asset_groups:
-#         for group in asset_groups:
-#             assets_to_push.extend(group.assets.all())
-#
-#     assets_need_push = set(assets_to_push) - set(system_user_assets)
-#     if not assets_need_push:
-#         return
-#     logger.debug("Push system user {} to {} assets".format(
-#         system_user.name, ', '.join([asset.hostname for asset in assets_need_push])
-#     ))
-#     result = push_system_user(system_user, assets_need_push, PUSH_SYSTEM_USER_TASK_NAME)
-#     system_user.assets.add(*tuple(assets_need_push))
-#     return result
+@shared_task
+def push_asset_system_users(asset, system_users=None, task_name=None):
+    from ops.utils import create_or_update_task
+    if task_name is None:
+        task_name = "PUSH-ASSET-SYSTEM-USER-{}".format(asset.hostname)
 
+    if system_users is None:
+        system_users = asset.cluster.systemuser_set.all()
 
-@receiver(post_save, sender=Asset, dispatch_uid="my_unique_identifier")
-def update_asset_info(sender, instance=None, created=False, **kwargs):
-    if instance and created:
-        logger.debug("Receive asset create signal, update asset hardware info")
-        update_assets_hardware_info.delay([instance])
+    tasks = []
+    for system_user in system_users:
+        if system_user.auto_push:
+            tasks.extend(get_push_system_user_tasks(system_user))
+
+    hosts = [asset.hostname]
+
+    task = create_or_update_task(
+        task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
+        options=const.TASK_OPTIONS, run_as_admin=True, created_by='System'
+    )
+    result = task.run()
+    return result.results_summary
 
 
 @receiver(post_save, sender=Asset, dispatch_uid="my_unique_identifier")
-def test_admin_user_connective(sender, instance=None, created=False, **kwargs):
+def update_asset_info_when_created(sender, instance=None, created=False, **kwargs):
     if instance and created:
-        logger.debug("Receive asset create signal, test admin user connectability")
-        test_admin_user_connectability_manual.delay(instance)
+        msg = "Receive asset {} create signal, update asset hardware info".format(
+            instance
+        )
+        logger.debug(msg)
+        task_name = "UPDATE-ASSET-HARDWARE-INFO-WHEN-CREATED"
+        update_assets_hardware_info.delay([instance], task_name)
+
+
+@receiver(post_save, sender=Asset, dispatch_uid="my_unique_identifier")
+def update_asset_conn_info_when_created(sender, instance=None, created=False, **kwargs):
+    if instance and created:
+        task_name = 'TEST-ASSET-CONN-WHEN-CREATED-{}'.format(instance)
+        msg = "Receive asset {} create signal, test asset connectability".format(
+            instance
+        )
+        logger.debug(msg)
+        test_admin_user_connectability_manual.delay(instance, task_name)
+
+
+@receiver(post_save, sender=Asset, dispatch_uid="my_unique_identifier")
+def push_system_user_when_created(sender, instance=None, created=False, **kwargs):
+    if instance and created:
+        task_name = 'PUSH-SYSTEM-USER-WHEN-ASSET-CREATED-{}'.format(instance)
+        system_users = instance.cluster.systemuser_set.all()
+        msg = "Receive asset {} create signal, push system users".format(
+            instance
+        )
+        logger.debug(msg)
+        push_asset_system_users.delay(instance, system_users, task_name=task_name)
 
 
 @receiver(post_save, sender=SystemUser)

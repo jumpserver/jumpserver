@@ -21,10 +21,9 @@ def is_uuid(s):
         return False
 
 
-
 def record_adhoc(func):
     def _deco(adhoc, **options):
-        record = AdHocRunHistory(adhoc=adhoc)
+        record = AdHocRunHistory(adhoc=adhoc, task=adhoc.task)
         time_start = time.time()
         try:
             result = func(adhoc, **options)
@@ -86,7 +85,7 @@ def run_adhoc_object(adhoc, **options):
     name = adhoc.task.name
     inventory = get_adhoc_inventory(adhoc)
     runner = AdHocRunner(inventory)
-    for k, v in options:
+    for k, v in options.items():
         runner.set_option(k, v)
 
     try:
@@ -113,42 +112,69 @@ def run_adhoc(hostname_list, pattern, tasks, name=None,
     return runner.run(tasks, pattern, play_name=name)
 
 
-def create_and_run_adhoc(hostname_list, pattern, tasks, name=None,
-                         run_as_admin=False, run_as=None, become_info=None):
-    if name is None:
-        name = "Adhoc-task-{}-{}".format(
-            get_short_uuid_str(),
-            timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
-        )
-    task = Task(name=name)
-    task.save()
-    adhoc = AdHoc(
-        task=task, pattern=pattern, name=name,
-        run_as_admin=run_as_admin, run_as=run_as
-    )
-    adhoc.hosts = hostname_list
-    adhoc.tasks = tasks
-    adhoc.become = become_info
-    adhoc.save()
+# def create_and_run_adhoc(hostname_list, pattern, tasks, name=None,
+#                          run_as_admin=False, run_as=None, become_info=None):
+#     if name is None:
+#         name = "Adhoc-task-{}-{}".format(
+#             get_short_uuid_str(),
+#             timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
+#         )
+#     task = Task(name=name)
+#     task.save()
+#     adhoc = AdHoc(
+#         task=task, pattern=pattern, name=name,
+#         run_as_admin=run_as_admin, run_as=run_as
+#     )
+#     adhoc.hosts = hostname_list
+#     adhoc.tasks = tasks
+#     adhoc.become = become_info
+#     adhoc.save()
 
 
-def get_task_by_name(name):
-    task = get_object_or_none(Task, name=name)
+# def get_task_by_name(name):
+#     task = get_object_or_none(Task, name=name)
+#     return task
+
+
+# def create_task(name, created_by=""):
+#     return Task.objects.create(name=name, created_by=created_by)
+#
+#
+# def create_adhoc(task, hosts, tasks, pattern='all', options=None,
+#                  run_as_admin=False, run_as="",
+#                  become_info=None, created_by=""):
+#     adhoc = AdHoc(task=task, pattern=pattern, run_as_admin=run_as_admin,
+#                   run_as=run_as, created_by=created_by)
+#     adhoc.hosts = hosts
+#     adhoc.tasks = tasks
+#     adhoc.options = options
+#     adhoc.become = become_info
+#     adhoc.save()
+#     return adhoc
+
+
+def create_or_update_task(
+        task_name, hosts, tasks, pattern='all', options=None,
+        run_as_admin=False, run_as="", become_info=None,
+        created_by=None
+    ):
+    task = get_object_or_none(Task, name=task_name)
+    if task is None:
+        task = Task(name=task_name, created_by=created_by)
+        task.save()
+
+    adhoc = task.get_latest_adhoc()
+    new_adhoc = AdHoc(task=task, pattern=pattern,
+                      run_as_admin=run_as_admin,
+                      run_as=run_as)
+    new_adhoc.hosts = hosts
+    new_adhoc.tasks = tasks
+    new_adhoc.options = options
+    new_adhoc.become = become_info
+    if not adhoc or adhoc != new_adhoc:
+        new_adhoc.save()
+        task.latest_adhoc = new_adhoc
     return task
 
 
-def create_task(name, created_by=""):
-    return Task.objects.create(name=name, created_by=created_by)
 
-
-def create_adhoc(task, hosts, tasks, pattern='all', options=None,
-                 run_as_admin=False, run_as="",
-                 become_info=None, created_by=""):
-    adhoc = AdHoc(task=task, pattern=pattern, run_as_admin=run_as_admin,
-                  run_as=run_as, created_by=created_by)
-    adhoc.hosts = hosts
-    adhoc.tasks = tasks
-    adhoc.options = options
-    adhoc.become = become_info
-    adhoc.save()
-    return adhoc

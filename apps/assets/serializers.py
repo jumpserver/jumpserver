@@ -5,7 +5,7 @@ from rest_framework_bulk.serializers import BulkListSerializer
 
 from common.mixins import BulkSerializerMixin
 from .models import AssetGroup, Asset, Cluster, AdminUser, SystemUser
-from .tasks import SYSTEM_USER_CONN_CACHE_KEY_PREFIX, ADMIN_USER_CONN_CACHE_KEY_PREFIX
+from .const import ADMIN_USER_CONN_CACHE_KEY, SYSTEM_USER_CONN_CACHE_KEY
 
 
 class AssetGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
@@ -73,7 +73,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_unreachable_amount(obj):
-        data = cache.get(ADMIN_USER_CONN_CACHE_KEY_PREFIX + obj.name)
+        data = cache.get(ADMIN_USER_CONN_CACHE_KEY.format(obj.name))
         if data:
             return len(data.get('dark'))
         else:
@@ -98,7 +98,7 @@ class SystemUserSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_unreachable_amount(obj):
-        data = cache.get(SYSTEM_USER_CONN_CACHE_KEY_PREFIX + obj.name)
+        data = cache.get(SYSTEM_USER_CONN_CACHE_KEY.format(obj.name))
         if data:
             return len(data.get('dark'))
         else:

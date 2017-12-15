@@ -9,24 +9,22 @@ import chardet
 from io import StringIO
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured, FieldDoesNotExist
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import TemplateView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from django.urls import reverse_lazy
-from django.views.generic.detail import DetailView, SingleObjectMixin
-from django.http import HttpResponse, JsonResponse, HttpResponseRedirect, Http404
-from django.views.decorators.csrf import csrf_protect, csrf_exempt
+from django.views.generic.detail import DetailView
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from django.core.cache import cache
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import get_object_or_404, redirect, reverse
+from django.shortcuts import redirect
 
 
 from common.mixins import JSONResponseMixin
-from common.utils import get_object_or_none
-from common.imexp import ModelExportView
+from common.utils import get_object_or_none, get_logger
 from .. import forms
 from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser
 from ..hands import AdminUserRequiredMixin
@@ -39,6 +37,7 @@ __all__ = [
     'AssetModalListView', 'AssetDeleteView', 'AssetExportView',
     'BulkImportAssetView',
 ]
+logger = get_logger(__file__)
 
 
 class AssetListView(AdminUserRequiredMixin, TemplateView):
@@ -48,12 +47,11 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
         context = {
             'app': 'Assets',
             'action': 'Asset list',
-            'groups': AssetGroup.objects.all(),
+            # 'groups': AssetGroup.objects.all(),
             'system_users': SystemUser.objects.all(),
-            # 'form': forms.AssetBulkUpdateForm(),
         }
         kwargs.update(context)
-        return super(AssetListView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class UserAssetListView(LoginRequiredMixin, TemplateView):
@@ -64,10 +62,9 @@ class UserAssetListView(LoginRequiredMixin, TemplateView):
             'app': 'Assets',
             'action': 'Asset list',
             'system_users': SystemUser.objects.all(),
-            'default_pk': '00000000-0000-0000-0000-000000000000',
         }
         kwargs.update(context)
-        return super(UserAssetListView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class AssetCreateView(AdminUserRequiredMixin, CreateView):
@@ -107,7 +104,7 @@ class AssetModalListView(AdminUserRequiredMixin, ListView):
             'assets': assets
         }
         kwargs.update(context)
-        return super(AssetModalListView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
@@ -128,7 +125,7 @@ class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
             )
         else:
             self.form = self.form_class()
-        return super(AssetBulkUpdateView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
@@ -148,7 +145,7 @@ class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
             'assets': Asset.objects.all(),
         }
         kwargs.update(context)
-        return super(AssetBulkUpdateView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class AssetUpdateView(AdminUserRequiredMixin, UpdateView):
@@ -166,8 +163,8 @@ class AssetUpdateView(AdminUserRequiredMixin, UpdateView):
         return super(AssetUpdateView, self).get_context_data(**kwargs)
 
     def form_invalid(self, form):
-        print(form.errors)
-        return super(AssetUpdateView, self).form_invalid(form)
+        logger.error(form.errors)
+        return super().form_invalid(form)
 
 
 class AssetDeleteView(AdminUserRequiredMixin, DeleteView):
@@ -196,11 +193,46 @@ class AssetDetailView(DetailView):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class AssetExportView(ModelExportView):
-    filename_prefix = 'jumpserver'
-    redirect_url = reverse_lazy('assets:asset-export')
-    model = Asset
-    fields = ('hostname', 'ip')
+class AssetExportView(View):
+    def get(self, request):
+        spm = request.GET.get('spm', '')
+        assets_id_default = [Asset.objects.first().id] if Asset.objects.first() else [1]
+        assets_id = cache.get(spm, assets_id_default)
+        fields = [
+            field for field in Asset._meta.fields
+            if field.name not in [
+                'date_created'
+            ]
+        ]
+        filename = 'assets-{}.csv'.format(
+            timezone.localtime(timezone.now()).strftime('%Y-%m-%d_%H-%M-%S'))
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+        response.write(codecs.BOM_UTF8)
+        assets = Asset.objects.filter(id__in=assets_id)
+        writer = csv.writer(response, dialect='excel',
+                            quoting=csv.QUOTE_MINIMAL)
+
+        header = [field.verbose_name for field in fields]
+        header.append(_('Asset groups'))
+        writer.writerow(header)
+
+        for asset in assets:
+            groups = ','.join([group.name for group in asset.groups.all()])
+            data = [getattr(asset, field.name) for field in fields]
+            data.append(groups)
+            writer.writerow(data)
+        return response
+
+    def post(self, request, *args, **kwargs):
+        try:
+            assets_id = json.loads(request.body).get('assets_id', [])
+        except ValueError:
+            return HttpResponse('Json object not valid', status=400)
+        spm = uuid.uuid4().hex
+        cache.set(spm, assets_id, 300)
+        url = reverse_lazy('assets:asset-export') + '?spm=%s' % spm
+        return JsonResponse({'redirect': url})
 
 
 class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
@@ -304,5 +336,4 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                 len(created), len(updated), len(failed))
         }
         return self.render_json_response(data)
-
 

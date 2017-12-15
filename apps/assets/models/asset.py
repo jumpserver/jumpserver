@@ -9,7 +9,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.cache import cache
 
-from ..const import ADMIN_USER_CONN_CACHE_KEY_PREFIX
+from ..const import ASSET_ADMIN_CONN_CACHE_KEY
 from .cluster import Cluster
 from .group import AssetGroup
 from .user import AdminUser, SystemUser
@@ -110,7 +110,7 @@ class Asset(models.Model):
 
     @property
     def is_connective(self):
-        val = cache.get(ADMIN_USER_CONN_CACHE_KEY_PREFIX + self.hostname)
+        val = cache.get(ASSET_ADMIN_CONN_CACHE_KEY.format(self.hostname))
         if val == 1:
             return True
         else:

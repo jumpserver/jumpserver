@@ -1,13 +1,14 @@
 # ~*~ coding: utf-8 ~*~
 
 from ansible.plugins.callback import CallbackBase
+from ansible.plugins.callback.default import CallbackModule
 
 
-class AdHocResultCallback(CallbackBase):
+class AdHocResultCallback(CallbackModule):
     """
     Task result Callback
     """
-    def __init__(self, display=None):
+    def __init__(self, display=None, options=None):
         # result_raw example: {
         #   "ok": {"hostname": {"task_name": {}，...},..},
         #   "failed": {"hostname": {"task_name": {}..}, ..},
@@ -20,9 +21,10 @@ class AdHocResultCallback(CallbackBase):
         # }
         self.results_raw = dict(ok={}, failed={}, unreachable={}, skipped={})
         self.results_summary = dict(contacted=[], dark={})
-        super().__init__(display)
+        super().__init__()
 
     def gather_result(self, t, res):
+        self._clean_results(res._result, res._task.action)
         host = res._host.get_name()
         task_name = res.task_name
         task_result = res._result
@@ -49,15 +51,19 @@ class AdHocResultCallback(CallbackBase):
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
         self.gather_result("failed", result)
+        super().v2_runner_on_failed(result, ignore_errors=ignore_errors)
 
     def v2_runner_on_ok(self, result):
         self.gather_result("ok", result)
+        super().v2_runner_on_ok(result)
 
     def v2_runner_on_skipped(self, result):
         self.gather_result("skipped", result)
+        super().v2_runner_on_skipped(result)
 
     def v2_runner_on_unreachable(self, result):
         self.gather_result("unreachable", result)
+        super().v2_runner_on_unreachable(result)
 
 
 class CommandResultCallback(AdHocResultCallback):

@@ -21,37 +21,62 @@ class Task(models.Model):
     One task can have some versions of adhoc, run a task only run the latest version adhoc
     """
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=128, blank=True, verbose_name=_('Name'))
+    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
     is_deleted = models.BooleanField(default=False)
     created_by = models.CharField(max_length=128, blank=True, default='')
     date_created = models.DateTimeField(auto_now_add=True)
+    __latest_adhoc = None
 
     @property
     def short_id(self):
         return str(self.id).split('-')[-1]
 
+    @property
+    def latest_adhoc(self):
+        if not self.__latest_adhoc:
+            self.__latest_adhoc = self.get_latest_adhoc()
+        return self.__latest_adhoc
+
+    @latest_adhoc.setter
+    def latest_adhoc(self, item):
+        self.__latest_adhoc = item
+
+    @property
+    def latest_history(self):
+        try:
+            return self.history.all().latest()
+        except AdHocRunHistory.DoesNotExist:
+            return None
+
+    def get_latest_adhoc(self):
+        try:
+            return self.adhoc.all().latest()
+        except AdHoc.DoesNotExist:
+            return None
+
+    @property
+    def history_summary(self):
+        history = self.get_run_history()
+        total = len(history)
+        success = len([history for history in history if history.is_success])
+        failed = len([history for history in history if not history.is_success])
+        return {'total': total, 'success': success, 'failed': failed}
+
+    def get_run_history(self):
+        return self.history.all()
+
+    def run(self):
+        if self.latest_adhoc:
+            return self.latest_adhoc.run()
+        else:
+            return {'error': 'No adhoc'}
+
     def __str__(self):
         return self.name
 
-    def get_latest_adhoc(self):
-        return self.adhoc.all().order_by('date_created').last()
-
-    def get_latest_history(self):
-        return self.get_latest_adhoc().get_latest_history()
-
-    def get_all_run_history(self):
-        adhocs = self.adhoc.all()
-        return AdHocRunHistory.objects.filter(adhoc__in=adhocs)
-
-    def get_all_run_times(self):
-        history_all = self.get_all_run_history()
-        total = len(history_all)
-        success = len([history for history in history_all if history.is_success])
-        failed = len([history for history in history_all if not history.is_success])
-        return {'total': total, 'success': success, 'failed': failed}
-
     class Meta:
         db_table = 'ops_task'
+        get_latest_by = 'date_created'
 
 
 class AdHoc(models.Model):
@@ -103,6 +128,10 @@ class AdHoc(models.Model):
         else:
             return {}
 
+    def run(self):
+        from .utils import run_adhoc_object
+        return run_adhoc_object(self, **self.options)
+
     @become.setter
     def become(self, item):
         """
@@ -130,14 +159,31 @@ class AdHoc(models.Model):
     def short_id(self):
         return str(self.id).split('-')[-1]
 
-    def get_latest_history(self):
-        return self.history.all().order_by('date_start').last()
+    @property
+    def latest_history(self):
+        try:
+            return self.history.all().latest()
+        except AdHocRunHistory.DoesNotExist:
+            return None
 
     def __str__(self):
         return "{} of {}".format(self.task.name, self.short_id)
 
+    def __eq__(self, other):
+        if not isinstance(other, self.__class__):
+            return False
+        fields_check = []
+        for field in self.__class__._meta.fields:
+            if field.name not in ['id', 'date_created']:
+                fields_check.append(field)
+        for field in fields_check:
+            if getattr(self, field.name) != getattr(other, field.name):
+                return False
+        return True
+
     class Meta:
         db_table = "ops_adhoc"
+        get_latest_by = 'date_created'
 
 
 class AdHocRunHistory(models.Model):
@@ -145,7 +191,8 @@ class AdHocRunHistory(models.Model):
     AdHoc running history.
     """
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    adhoc = models.ForeignKey(AdHoc, related_name='history', on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, related_name='history', on_delete=models.SET_NULL, null=True)
+    adhoc = models.ForeignKey(AdHoc, related_name='history', on_delete=models.SET_NULL, null=True)
     date_start = models.DateTimeField(auto_now_add=True, verbose_name=_('Start time'))
     date_finished = models.DateTimeField(blank=True, null=True, verbose_name=_('End time'))
     timedelta = models.FloatField(default=0.0, verbose_name=_('Time'), null=True)
@@ -179,3 +226,4 @@ class AdHocRunHistory(models.Model):
 
     class Meta:
         db_table = "ops_adhoc_history"
+        get_latest_by = 'date_start'
