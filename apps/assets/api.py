@@ -38,10 +38,11 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
     permission_classes = (IsValidUser,)
 
     def get_queryset(self):
-        if self.request.user.is_superuser:
+        if self.request.user.is_superuser or self.request.user.is_app:
             queryset = super().get_queryset()
         else:
-            queryset = get_user_granted_assets(self.request.user)
+            assets_granted = get_user_granted_assets(self.request.user)
+            queryset = self.queryset.filter(id__in=[asset.id for asset in assets_granted])
         cluster_id = self.request.query_params.get('cluster_id')
         asset_group_id = self.request.query_params.get('asset_group_id')
         admin_user_id = self.request.query_params.get('admin_user_id')

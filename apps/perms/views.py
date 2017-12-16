@@ -122,13 +122,6 @@ class AssetPermissionUpdateView(AdminUserRequiredMixin, UpdateView):
             url=url, name=self.object.name
         )
 
-    def form_valid(self, form):
-        assets = form.cleaned_data['assets']
-        asset_groups = form.cleaned_data['asset_groups']
-        system_users = form.cleaned_data['system_users']
-        associate_system_users_and_assets(system_users, assets, asset_groups)
-        return super(AssetPermissionUpdateView, self).form_valid(form)
-
 
 class AssetPermissionDetailView(AdminUserRequiredMixin, DetailView):
     template_name = 'perms/asset_permission_detail.html'

@@ -164,7 +164,8 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = Asset
         fields = ("id", "hostname", "ip", "port", "system_users_granted",
-                  "is_inherited", "is_active", "system_users_join", "comment")
+                  "is_inherited", "is_active", "system_users_join",
+                  "platform", "comment",)
 
     @staticmethod
     def get_is_inherited(obj):
