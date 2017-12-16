@@ -110,7 +110,7 @@ class SystemUserViewSet(IDInFilterMixin, BulkModelViewSet):
     """System user api set, for add,delete,update,list,retrieve resource"""
     queryset = SystemUser.objects.all()
     serializer_class = serializers.SystemUserSerializer
-    permission_classes = (IsSuperUser,)
+    permission_classes = (IsSuperUserOrAppUser,)
 
 
 class SystemUserUpdateApi(generics.RetrieveUpdateAPIView):
