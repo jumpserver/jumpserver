@@ -41,6 +41,7 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
         if self.request.user.is_superuser:
             queryset = super().get_queryset()
         else:
+            # TODO： Have bugs
             queryset = get_user_granted_assets(self.request.user)
         cluster_id = self.request.query_params.get('cluster_id')
         asset_group_id = self.request.query_params.get('asset_group_id')
