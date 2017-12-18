@@ -21,19 +21,6 @@
     <tbody>
     </tbody>
 </table>
-<div id="actions" class="hide">
-    <div class="input-group">
-        <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
-            <option value="delete">{% trans 'Delete selected' %}</option>
-            <option value="update">{% trans 'Update selected' %}</option>
-        </select>
-        <div class="input-group-btn pull-left" style="padding-left: 5px;">
-            <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
-             {% trans 'Submit' %}
-            </button>
-        </div>
-    </div>
-</div>
 {% include 'assets/_asset_group_bulk_update_modal.html' %}
 {% endblock %}
 {% block content_bottom_left %}{% endblock %}

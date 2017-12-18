@@ -47,7 +47,7 @@ class AssetUpdateSystemUserSerializer(serializers.ModelSerializer):
         fields = ['id', 'system_users']
 
 
-class AssetGroupUpdateSerializer(serializers.ModelSerializer):
+class GroupUpdateAssetsSerializer(serializers.ModelSerializer):
     """
     资产组更新需要的数据结构
     """
@@ -56,17 +56,6 @@ class AssetGroupUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssetGroup
         fields = ['id', 'assets']
-
-
-class AssetGroupUpdateSystemUserSerializer(serializers.ModelSerializer):
-    """
-    资产组更新系统用户定义的数据结构
-    """
-    system_users = serializers.PrimaryKeyRelatedField(many=True, queryset=SystemUser.objects.all())
-
-    class Meta:
-        model = AssetGroup
-        fields = ['id', 'system_users']
 
 
 class ClusterUpdateAssetsSerializer(serializers.ModelSerializer):
@@ -135,6 +124,17 @@ class SystemUserSerializer(serializers.ModelSerializer):
         return amount
 
 
+class AdminUserUpdateClusterSerializer(serializers.ModelSerializer):
+    """
+    管理用户更新关联到的集群
+    """
+    clusters = serializers.PrimaryKeyRelatedField(many=True, queryset=Cluster.objects.all())
+
+    class Meta:
+        model = AdminUser
+        fields = ['id', 'clusters']
+
+
 class AssetSystemUserSerializer(serializers.ModelSerializer):
     """
     查看授权的资产系统用户的数据结构，这个和AssetSerializer不同，字段少
@@ -142,28 +142,6 @@ class AssetSystemUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = SystemUser
         fields = ('id', 'name', 'username', 'priority', 'protocol',  'comment',)
-
-
-class SystemUserUpdateAssetsSerializer(serializers.ModelSerializer):
-    """
-    系统用户更新关联资产的数据结构
-    """
-    assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
-
-    class Meta:
-        model = SystemUser
-        fields = ['id', 'assets']
-
-
-class SystemUserUpdateAssetGroupSerializer(serializers.ModelSerializer):
-    """
-    系统用户更新资产组的api
-    """
-    asset_groups = serializers.PrimaryKeyRelatedField(many=True, queryset=AssetGroup.objects.all())
-
-    class Meta:
-        model = SystemUser
-        fields = ['id', 'asset_groups']
 
 
 class SystemUserSimpleSerializer(serializers.ModelSerializer):

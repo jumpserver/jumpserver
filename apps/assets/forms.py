@@ -61,6 +61,7 @@ class AssetBulkUpdateForm(forms.ModelForm):
         required=True,
         help_text='* required',
         label=_('Select assets'),
+        choices=[(asset.id, asset.hostname) for asset in Asset.objects.all()],
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',
@@ -68,7 +69,12 @@ class AssetBulkUpdateForm(forms.ModelForm):
             }
         )
     )
-    port = forms.IntegerField(min_value=1, max_value=65535, required=False, label=_('Port'))
+    port = forms.IntegerField(
+        label=_('Port'),
+        required=False,
+        min_value=1,
+        max_value=65535,
+    )
 
     class Meta:
         model = Asset
@@ -81,9 +87,16 @@ class AssetBulkUpdateForm(forms.ModelForm):
         }
 
     def save(self, commit=True):
-        cleaned_data = {k: v for k, v in self.cleaned_data.items() if v is not None}
+        changed_fields = []
+        for field in self._meta.fields:
+            if self.data.get(field) is not None:
+                changed_fields.append(field)
+
+        cleaned_data = {k: v for k, v in self.cleaned_data.items()
+                        if k in changed_fields}
+        print(cleaned_data)
         assets_id = cleaned_data.pop('assets')
-        groups = cleaned_data.pop('groups')
+        groups = cleaned_data.pop('groups', [])
         assets = Asset.objects.filter(id__in=assets_id)
         assets.update(**cleaned_data)
         if groups:
@@ -153,17 +166,18 @@ class AdminUserForm(forms.ModelForm):
 
     def save(self, commit=True):
         # Because we define custom field, so we need rewrite :method: `save`
-        admin_user = super(AdminUserForm, self).save(commit=commit)
+        admin_user = super().save(commit=commit)
         password = self.cleaned_data['password']
         private_key = self.cleaned_data['private_key_file']
+        public_key = None
 
-        if password:
-            admin_user.password = password
+        if not password:
+            password = None
+
         if private_key:
             public_key = ssh_pubkey_gen(private_key)
-            admin_user.private_key = private_key
-            admin_user.public_key = public_key
-        admin_user.save()
+
+        admin_user.set_auth(password=password, public_key=public_key, private_key=private_key)
         return admin_user
 
     def clean_private_key_file(self):

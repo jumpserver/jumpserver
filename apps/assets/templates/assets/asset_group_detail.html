@@ -94,39 +94,34 @@
 {% block custom_foot_js %}
 <script>
 jumpserver.assets_selected = {};
-function updateGroupAssets(assets) {
-    var the_url = "{}";
+function addAssets(assets) {
+    var the_url = "{% url 'api-assets:group-add-assets' pk=asset_group.id %}";
     var body = {
-        assets: Object.assign([], assets)
+        assets: assets
     };
+
     var $data_table = $("#asset_list_table").DataTable();
     var success = function(data) {
         $('.select2-selection__rendered').empty();
-        $.map(jumpserver.assets_selected, function(asset_ip, index) {
-            $('#opt_' + index).remove();
-            $data_table.ajax.reload();
-    });
-    jumpserver.groups_selected = {};
+        $data_table.ajax.reload();
+        jumpserver.groups_selected = {};
     };
-    console.log(body);
 
-    //APIUpdateAttr({
-    //    url: the_url,
-    //    body: JSON.stringify(body),
-    //    method: 'PUT',
-    //    success: success
-    //});
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        method: 'PUT',
+        success: success
+    });
 }
 
 function leaveGroup(obj, name, url, data) {
-    function doDelete() {
         var body = data;
         var success = function() {
-            swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
             $(obj).parent().parent().remove();
         };
         var fail = function() {
-            swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");
+            console.log("Remove failed")
         };
         APIUpdateAttr({
             url: url,
@@ -135,19 +130,6 @@ function leaveGroup(obj, name, url, data) {
             success: success,
             error: fail
         });
-    }
-    swal({
-        title: 'Are you sure delete ?',
-        text: " [" + name + "] ",
-        type: "warning",
-        showCancelButton: true,
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: 'Confirm',
-        closeOnConfirm: false
-    }, function () {
-        doDelete()
-    });
 }
 
 Array.prototype.remove = function(val) {
@@ -188,13 +170,13 @@ function initTable() {
 			}},
 			{targets: 5, createdCell: function (td, cellData, rowData) {
 				var update_btn = '<a href="{% url "assets:asset-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', rowData.id);
-				var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-aid="{{ DEFAULT_PK }}">{% trans "Remove" %}</a>'.replace('{{ DEFAULT_PK }}', rowData.id);
+				var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-leave-group" data-aid="{{ DEFAULT_PK }}">{% trans "Remove" %}</a>'.replace('{{ DEFAULT_PK }}', rowData.id);
 				$(td).html(update_btn + del_btn)
 			}}
 		],
 		ajax_url: '{% url "api-assets:asset-list" %}?asset_group_id={{ asset_group.id }}',
 		columns: [{data: "hostname" }, {data: "ip" }, {data: "port" },
-			{data: "type" }, {data: "is_active" }, {data: "id"}],
+			{data: "get_type_display" }, {data: "is_connective" }, {data: "id"}],
 		op_html: $('#actions').html()
 	};
 	jumpserver.initDataTable(options);
@@ -208,7 +190,6 @@ $(document).ready(function () {
       .on('select2:select', function(evt) {
           var data = evt.params.data;
           jumpserver.assets_selected[data.id] = data.text;
-          console.log(jumpserver.assets_selected)
       })
       .on('select2:unselect', function(evt) {
           var data = evt.params.data;
@@ -223,22 +204,26 @@ $(document).ready(function () {
   if (Object.keys(jumpserver.assets_selected).length === 0) {
     return false;
   }
+  var assets_id = [];
+  $.map(jumpserver.assets_selected, function(value, index) {
+      assets_id.push(index);
+  });
 
-  updateGroupAssets(jumpserver.assets_selected);
-
+  addAssets(assets_id);
 })
 
 
 .on('click', '.btn-leave-group', function () {
 	var $this = $(this);
-	var the_url = "{% url 'api-assets:asset-groups-update' pk=asset_group.id %}";
+	var the_url = "{% url 'api-assets:group-update-assets' pk=asset_group.id %}";
 	var name = $(this).closest("tr").find(":nth-child(1) > a").html();
 	var assets = [];
 	$('#asset_list_table > tbody > tr').map(function () {
-		assets.push(parseInt($(this).closest("tr").find(":nth-child(1) > a").attr("data-aid")))
+		assets.push($(this).closest("tr").find(":nth-child(1) > a").attr("data-aid"))
 	});
 	var delete_asset_id = $(this).data('aid');
 	assets.remove(delete_asset_id);
+	console.log(assets);
 	var data = {"assets": assets};
 	leaveGroup($this, name, the_url, data);
 })

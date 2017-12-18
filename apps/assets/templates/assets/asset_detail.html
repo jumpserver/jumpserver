@@ -247,7 +247,6 @@
 {% block custom_foot_js %}
 <script>
 jumpserver.groups_selected = {};
-jumpserver.system_user_selected = {};
 function updateAssetGroups(groups) {
     var the_url = "{% url 'api-assets:asset-update-group' pk=asset.id %}";
     var body = {

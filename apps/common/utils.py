@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-
+import re
 from collections import OrderedDict
 from six import string_types
 import base64
@@ -29,6 +29,7 @@ from django.utils import timezone
 from .compat import to_bytes, to_string
 
 SECRET_KEY = settings.SECRET_KEY
+UUID_PATTERN = re.compile(r'[0-9a-zA-Z\-]{36}')
 
 
 def reverse(view_name, urlconf=None, args=None, kwargs=None,
@@ -380,6 +381,13 @@ def sum_capacity(cap_list):
 
 def get_short_uuid_str():
     return str(uuid.uuid4()).split('-')[-1]
+
+
+def is_uuid(s):
+    if UUID_PATTERN.match(s):
+        return True
+    else:
+        return False
 
 
 signer = Signer()

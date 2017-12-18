@@ -24,7 +24,7 @@ from django.shortcuts import redirect
 
 
 from common.mixins import JSONResponseMixin
-from common.utils import get_object_or_none, get_logger
+from common.utils import get_object_or_none, get_logger, is_uuid
 from .. import forms
 from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser
 from ..hands import AdminUserRequiredMixin
@@ -112,16 +112,18 @@ class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
     form_class = forms.AssetBulkUpdateForm
     template_name = 'assets/asset_bulk_update.html'
     success_url = reverse_lazy('assets:asset-list')
+    id_list = None
+    form = None
 
     def get(self, request, *args, **kwargs):
         assets_id = self.request.GET.get('assets_id', '')
-        self.assets_id_list = [int(i) for i in assets_id.split(',') if i.isdigit()]
+        self.id_list = [i for i in assets_id.split(',')]
 
         if kwargs.get('form'):
             self.form = kwargs['form']
         elif assets_id:
             self.form = self.form_class(
-                initial={'assets': self.assets_id_list}
+                initial={'assets': self.id_list}
             )
         else:
             self.form = self.form_class()
@@ -136,13 +138,11 @@ class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
             return self.get(request, form=form, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        # assets_list = Asset.objects.filter(id__in=self.assets_id_list)
         context = {
             'app': 'Assets',
             'action': 'Bulk update asset',
             'form': self.form,
-            'assets_selected': self.assets_id_list,
-            'assets': Asset.objects.all(),
+            'assets_selected': self.id_list,
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -270,13 +270,6 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
 
             asset_dict = dict(zip(attr, row))
             id_ = asset_dict.pop('id', 0)
-
-            try:
-                id_ = int(id_)
-            except ValueError:
-                id_ = 0
-
-            asset = get_object_or_none(Asset, id=id_)
             for k, v in asset_dict.items():
                 if k == 'cluster':
                     v = get_object_or_none(Cluster, name=v)
@@ -296,6 +289,7 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                     continue
                 asset_dict[k] = v
 
+            asset = get_object_or_none(Asset, id=id_) if is_uuid(id_) else None
             if not asset:
                 try:
                     groups = asset_dict.pop('groups')

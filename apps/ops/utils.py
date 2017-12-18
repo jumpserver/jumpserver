@@ -11,14 +11,6 @@ from .ansible.exceptions import AnsibleError
 from .models import AdHocRunHistory, Task, AdHoc
 
 logger = get_logger(__file__)
-UUID_PATTERN = re.compile(r'[0-9a-zA-Z\-]{36}')
-
-
-def is_uuid(s):
-    if UUID_PATTERN.match(s):
-        return True
-    else:
-        return False
 
 
 def record_adhoc(func):
@@ -110,47 +102,6 @@ def run_adhoc(hostname_list, pattern, tasks, name=None,
     )
     runner = AdHocRunner(inventory)
     return runner.run(tasks, pattern, play_name=name)
-
-
-# def create_and_run_adhoc(hostname_list, pattern, tasks, name=None,
-#                          run_as_admin=False, run_as=None, become_info=None):
-#     if name is None:
-#         name = "Adhoc-task-{}-{}".format(
-#             get_short_uuid_str(),
-#             timezone.now().strftime("%Y-%m-%d %H:%M:%S"),
-#         )
-#     task = Task(name=name)
-#     task.save()
-#     adhoc = AdHoc(
-#         task=task, pattern=pattern, name=name,
-#         run_as_admin=run_as_admin, run_as=run_as
-#     )
-#     adhoc.hosts = hostname_list
-#     adhoc.tasks = tasks
-#     adhoc.become = become_info
-#     adhoc.save()
-
-
-# def get_task_by_name(name):
-#     task = get_object_or_none(Task, name=name)
-#     return task
-
-
-# def create_task(name, created_by=""):
-#     return Task.objects.create(name=name, created_by=created_by)
-#
-#
-# def create_adhoc(task, hosts, tasks, pattern='all', options=None,
-#                  run_as_admin=False, run_as="",
-#                  become_info=None, created_by=""):
-#     adhoc = AdHoc(task=task, pattern=pattern, run_as_admin=run_as_admin,
-#                   run_as=run_as, created_by=created_by)
-#     adhoc.hosts = hosts
-#     adhoc.tasks = tasks
-#     adhoc.options = options
-#     adhoc.become = become_info
-#     adhoc.save()
-#     return adhoc
 
 
 def create_or_update_task(

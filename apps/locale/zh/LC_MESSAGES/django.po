@@ -209,7 +209,7 @@ msgstr "资产组"
 #: assets/models/asset.py:51 assets/models/user.py:198
 #: assets/templates/assets/asset_detail.html:85 templates/_nav.html:24
 msgid "Cluster"
-msgstr "机房"
+msgstr "集群"
 
 #: assets/models/asset.py:52 assets/templates/assets/asset_detail.html:129
 msgid "Is active"

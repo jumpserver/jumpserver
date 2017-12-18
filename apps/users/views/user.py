@@ -19,7 +19,6 @@ from django.utils import timezone
 from django.utils.translation import ugettext as _
 from django.utils.decorators import method_decorator
 from django.views import View
-from django.views.generic import ListView
 from django.views.generic.base import TemplateView
 from django.views.generic.edit import (
     CreateView, UpdateView, FormMixin, FormView
@@ -33,7 +32,7 @@ from ..models import User, UserGroup
 from ..utils import AdminUserRequiredMixin
 from ..signals import on_user_created
 from common.mixins import JSONResponseMixin
-from common.utils import get_logger, get_object_or_none
+from common.utils import get_logger, get_object_or_none, is_uuid
 
 __all__ = [
     'UserListView', 'UserCreateView', 'UserDetailView',
@@ -92,16 +91,6 @@ class UserUpdateView(AdminUserRequiredMixin, UpdateView):
     context_object_name = 'user_object'
     success_url = reverse_lazy('users:user-list')
 
-    # def form_valid(self, form):
-    #     username = self.object.username
-    #     user = form.save(commit=False)
-    #     user.username = username
-    #     user.save()
-    #     password = self.request.POST.get('password', '')
-    #     if password:
-    #         user.set_password(password)
-    #     return super().form_valid(form)
-
     def get_context_data(self, **kwargs):
         context = {'app': _('Users'), 'action': _('Update user')}
         kwargs.update(context)
@@ -146,7 +135,6 @@ class UserBulkUpdateView(AdminUserRequiredMixin, TemplateView):
             'action': 'Bulk update asset',
             'form': self.form,
             'users_selected': self.id_list,
-            'users': User.objects.all(),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -255,9 +243,7 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
             if set(row) == {''}:
                 continue
             user_dict = dict(zip(attr, row))
-            print(user_dict)
-            id_ = user_dict.pop('id', 0)
-            user = get_object_or_none(User, id=id_)
+            id_ = user_dict.pop('id')
             for k, v in user_dict.items():
                 if k in ['is_active']:
                     if v.lower() == 'false':
@@ -271,6 +257,7 @@ class UserBulkImportView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                     continue
                 user_dict[k] = v
 
+            user = get_object_or_none(User, id=id_) if is_uuid(id_) else None
             if not user:
                 try:
                     groups = user_dict.pop('groups')

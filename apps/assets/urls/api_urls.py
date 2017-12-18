@@ -19,37 +19,22 @@ urlpatterns = [
         name='system-user-auth-info'),
     url(r'^v1/assets/(?P<pk>[0-9a-zA-Z\-]{36})/groups/$',
         api.AssetUpdateGroupApi.as_view(), name='asset-update-group'),
-
     url(r'^v1/assets/(?P<pk>[0-9a-zA-Z\-]{36})/refresh/$',
         api.AssetRefreshHardwareView.as_view(), name='asset-refresh'),
     url(r'^v1/assets/(?P<pk>[0-9a-zA-Z\-]{36})/admin-user-test/$',
         api.AssetAdminUserTestView.as_view(), name='asset-admin-user-test'),
-
-    url(r'^v1/assets/(?P<pk>[0-9a-zA-Z\-]{36})/system-users/$',
-        api.SystemUserUpdateApi.as_view(), name='asset-update-system-users'),
-
-    url(r'^v1/groups/(?P<pk>[0-9a-zA-Z\-]{36})/push-system-user/$',
-        api.AssetGroupPushSystemUserView.as_view(), name='asset-group-push-system-user'),
-
-    # update the system users, which add and delete the asset to the system user
-    url(r'^v1/system-user/(?P<pk>[0-9a-zA-Z\-]{36})/assets/$',
-        api.SystemUserUpdateAssetsApi.as_view(), name='systemuser-update-assets'),
-
-    url(r'^v1/system-user/(?P<pk>[0-9a-zA-Z\-]{36})/groups/$',
-        api.SystemUserUpdateAssetGroupApi.as_view(), name='systemuser-update-assetgroups'),
-
     # update the asset group, which add or delete the asset to the group
     url(r'^v1/groups/(?P<pk>[0-9a-zA-Z\-]{36})/assets/$',
-        api.AssetGroupUpdateApi.as_view(), name='asset-groups-update'),
-
-    # update the asset group, and add or delete the system_user to the group
-    url(r'^v1/groups/(?P<pk>[0-9a-zA-Z\-]{36})/system-users/$',
-        api.AssetGroupUpdateSystemUserApi.as_view(), name='asset-groups-update-systemusers'),
-
+        api.GroupUpdateAssetsApi.as_view(), name='group-update-assets'),
+    url(r'^v1/groups/(?P<pk>[0-9a-zA-Z\-]{36})/assets/add/$',
+        api.GroupAddAssetsApi.as_view(), name='group-add-assets'),
     # update the Cluster, and add or delete the assets to the Cluster
     url(r'^v1/cluster/(?P<pk>[0-9a-zA-Z\-]{36})/assets/$',
         api.ClusterUpdateAssetsApi.as_view(), name='cluster-update-assets'),
-
+    url(r'^v1/cluster/(?P<pk>[0-9a-zA-Z\-]{36})/assets/$',
+        api.ClusterAddAssetsApi.as_view(), name='cluster-add-assets'),
+    url(r'^v1/admin-user/(?P<pk>[0-9a-zA-Z\-]{36})/clusters/$',
+        api.AdminUserAddClustersApi.as_view(), name='admin-user-add-clusters'),
 ]
 
 urlpatterns += router.urls

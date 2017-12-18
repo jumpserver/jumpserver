@@ -181,10 +181,9 @@ $(document).ready(function () {
         return $(this).data('uid');
     }).get();
     $.map(jumpserver.users_selected, function(value, index) {
-        users.push(parseInt(index));
+        users.push(index);
         $('#opt_' + index).remove();
     });
-    console.log(users);
     updateGroupMember(users)
 }).on('click', '.btn-delete-user-group', function () {
     var $this = $(this);

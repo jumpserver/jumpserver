@@ -74,22 +74,29 @@ class AssetUpdateGroupApi(generics.RetrieveUpdateAPIView):
     permission_classes = (IsSuperUser,)
 
 
-class AssetGroupUpdateApi(generics.RetrieveUpdateAPIView):
+class GroupUpdateAssetsApi(generics.RetrieveUpdateAPIView):
     """
     Asset group, update it's asset member
     """
     queryset = AssetGroup.objects.all()
-    serializer_class = serializers.AssetGroupUpdateSerializer
+    serializer_class = serializers.GroupUpdateAssetsSerializer
     permission_classes = (IsSuperUser,)
 
 
-class AssetGroupUpdateSystemUserApi(generics.RetrieveUpdateAPIView):
-    """
-    Asset group push system user
-    """
+class GroupAddAssetsApi(generics.UpdateAPIView):
     queryset = AssetGroup.objects.all()
-    serializer_class = serializers.AssetGroupUpdateSystemUserSerializer
+    serializer_class = serializers.GroupUpdateAssetsSerializer
     permission_classes = (IsSuperUser,)
+
+    def update(self, request, *args, **kwargs):
+        group = self.get_object()
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            assets = serializer.validated_data['assets']
+            group.assets.add(*tuple(assets))
+            return Response({"msg": "ok"})
+        else:
+            return Response({'error': serializer.errors}, status=400)
 
 
 class ClusterUpdateAssetsApi(generics.RetrieveUpdateAPIView):
@@ -110,6 +117,24 @@ class ClusterViewSet(IDInFilterMixin, BulkModelViewSet):
     permission_classes = (IsSuperUser,)
 
 
+class ClusterAddAssetsApi(generics.UpdateAPIView):
+    queryset = Cluster.objects.all()
+    serializer_class = serializers.ClusterUpdateAssetsSerializer
+    permission_classes = (IsSuperUser,)
+
+    def update(self, request, *args, **kwargs):
+        cluster = self.get_object()
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            assets = serializer.validated_data['assets']
+            for asset in assets:
+                asset.cluster = cluster
+                asset.save()
+            return Response({"msg": "ok"})
+        else:
+            return Response({'error': serializer.errors}, status=400)
+
+
 class AdminUserViewSet(IDInFilterMixin, BulkModelViewSet):
     """
     Admin user api set, for add,delete,update,list,retrieve resource
@@ -119,6 +144,24 @@ class AdminUserViewSet(IDInFilterMixin, BulkModelViewSet):
     permission_classes = (IsSuperUser,)
 
 
+class AdminUserAddClustersApi(generics.UpdateAPIView):
+    queryset = AdminUser.objects.all()
+    serializer_class = serializers.AdminUserUpdateClusterSerializer
+    permission_classes = (IsSuperUser,)
+
+    def update(self, request, *args, **kwargs):
+        admin_user = self.get_object()
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            clusters = serializer.validated_data['clusters']
+            for cluster in clusters:
+                cluster.admin_user = admin_user
+                cluster.save()
+            return Response({"msg": "ok"})
+        else:
+            return Response({'error': serializer.errors}, status=400)
+
+
 class SystemUserViewSet(IDInFilterMixin, BulkModelViewSet):
     """
     System user api set, for add,delete,update,list,retrieve resource
@@ -126,45 +169,6 @@ class SystemUserViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = SystemUser.objects.all()
     serializer_class = serializers.SystemUserSerializer
     permission_classes = (IsSuperUserOrAppUser,)
-
-
-class SystemUserUpdateApi(generics.RetrieveUpdateAPIView):
-    """
-    Asset update it's system user
-
-    when update then push system user to asset.
-    """
-    queryset = Asset.objects.all()
-    serializer_class = serializers.AssetUpdateSystemUserSerializer
-    permission_classes = (IsSuperUser,)
-
-    def patch(self, request, *args, **kwargs):
-        asset = self.get_object()
-        old_system_users = set(asset.system_users.all())
-        response = super(SystemUserUpdateApi, self).patch(request, *args, **kwargs)
-        system_users_new = set(asset.system_users.all())
-        system_users = system_users_new - old_system_users
-        system_users = [system_user._to_secret_json() for system_user in system_users]
-        push_users.delay([asset._to_secret_json()], system_users)
-        return response
-
-
-class SystemUserUpdateAssetsApi(generics.RetrieveUpdateAPIView):
-    """
-    System user update it's assets
-    """
-    queryset = SystemUser.objects.all()
-    serializer_class = serializers.SystemUserUpdateAssetsSerializer
-    permission_classes = (IsSuperUser,)
-
-
-class SystemUserUpdateAssetGroupApi(generics.RetrieveUpdateAPIView):
-    """
-    System user update asset group
-    """
-    queryset = SystemUser.objects.all()
-    serializer_class = serializers.SystemUserUpdateAssetGroupSerializer
-    permission_classes = (IsSuperUser,)
 
 
 class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
@@ -229,22 +233,3 @@ class AssetAdminUserTestView(AssetRefreshHardwareView):
         else:
             return Response('0', status=502)
 
-
-class AssetGroupPushSystemUserView(generics.UpdateAPIView):
-    """
-    Asset group push system user api
-    """
-    queryset = AssetGroup.objects.all()
-    permission_classes = (IsSuperUser,)
-    serializer_class = serializers.AssetSerializer
-
-    def patch(self, request, *args, **kwargs):
-        asset_group = self.get_object()
-        assets = asset_group.assets.all()
-        system_user_id = self.request.data['system_user']
-        system_user = get_object_or_none(SystemUser, id=system_user_id)
-        if not assets or not system_user:
-            return Response('Invalid system user id or asset group id', status=404)
-        task = push_users.delay([asset._to_secret_json() for asset in assets],
-                                system_user._to_secret_json())
-        return Response(task.id)

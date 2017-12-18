@@ -102,12 +102,12 @@
                                     <i class="fa fa-info-circle"></i> {% trans 'Using this as cluster admin user' %}
                                 </div>
                                 <div class="panel-body">
-                                    <table class="table group_edit" id="add-asset2group">
+                                    <table class="table group_edit" id="table-clusters">
                                         <tbody>
                                         <form>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <select data-placeholder="{% trans 'Select cluster' %}"  class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                    <select data-placeholder="{% trans 'Select cluster' %}"  id="cluster_selected"  class="select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for cluster in cluster_remain %}
                                                         <option value="{{ cluster.id }}" id="opt_{{ cluster.id }}" >{{ cluster.name }}</option>
                                                         {% endfor %}
@@ -116,17 +116,14 @@
                                             </tr>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-sm" id="btn_add_user_group">{% trans 'Confirm' %}</button>
+                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-cluster">{% trans 'Confirm' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
 
                                         {% for cluster in admin_user.cluster_set.all %}
                                         <tr>
-                                          <td ><b class="bdg_group" data-gid={{ cluster.id }}>{{ cluster.name }}</b></td>
-                                          <td>
-                                              <button class="btn btn-danger pull-right btn-xs btn-leave-group" type="button"><i class="fa fa-minus"></i></button>
-                                          </td>
+                                          <td ><b class="bdg_cluster" data-gid={{ cluster.id }}>{{ cluster.name }}</b></td>
                                         </tr>
                                         {% endfor %}
                                         </tbody>
@@ -161,74 +158,48 @@ Array.prototype.unique = function(){
  	}
  	return res;
 };
-function objectRemove(obj, name, url, data) {
-    function doRemove() {
-        var body = data;
-        var success = function() {
-            swal('Remove!', "[ "+name+"]"+" has been deleted ", "success");
-            $(obj).parent().parent().remove();
-        };
-        var fail = function() {
-            swal("Failed", "Remove"+"[ "+name+" ]"+"failed", "error");
-        };
-        APIUpdateAttr({
-            url: url,
-            body: JSON.stringify(body),
-            method: 'PATCH',
-            success: success,
-            error: fail
+
+function bindToCluster(clusters) {
+    var the_url = "{% url 'api-assets:admin-user-add-clusters' pk=admin_user.id %}";
+    var body = {
+        clusters: clusters
+    };
+    var success = function(data) {
+        // remove all the selected groups from select > option and rendered ul element;
+        $('.select2-selection__rendered').empty();
+        $('#cluster_selected').val('');
+        $.map(jumpserver.cluster_selected, function(cluster_name, index) {
+            console.log(index);
+            $('#opt_' + index).remove();
+            // change tr html of user groups.
+            $('#table-clusters tbody').append(
+                '<tr>' +
+                '<td><b class="bdg_cluster" data-gid="' + index + '">' + cluster_name + '</b></td>' +
+                '</tr>'
+            )
         });
-    }
-    swal({
-        title: 'Are you sure remove ?',
-        text: " [" + name + "] ",
-        type: "warning",
-        showCancelButton: true,
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: 'Confirm',
-        closeOnConfirm: false
-    }, function () {
-        doRemove()
+        $.map(jumpserver.cluster_selected, function(value, index) {
+            $('#opt_' + index).remove();
+        });
+        // clear jumpserver.groups_selected
+    jumpserver.cluster_selected = {};
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success: success
     });
 }
 
-function adminUserDelete(name, url) {
-   function doDelete() {
-       var body = {};
-       var success = function() {
-           swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
-           window.location.href="{% url 'assets:cluster-list' %}";
-       };
-       var fail = function() {
-           swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");
-       };
-       APIUpdateAttr({
-           url: url,
-           body: JSON.stringify(body),
-           method: 'DELETE',
-           success: success,
-           error: fail
-       });
-   }
-   swal({
-       title: 'Are you sure delete ?',
-       text: " [" + name + "] ",
-       type: "warning",
-       showCancelButton: true,
-       cancelButtonText: 'Cancel',
-       confirmButtonColor: "#DD6B55",
-       confirmButtonText: 'Confirm',
-       closeOnConfirm: false
-   }, function () {
-       doDelete()
-   });
-}
-
-jumpserver.assets_selected = {};
-jumpserver.asset_groups_selected = {};
+jumpserver.cluster_selected = {};
 $(document).ready(function () {
-    $('.select2').select2();
+    $('.select2').select2().on('select2:select', function(evt) {
+        var data = evt.params.data;
+        jumpserver.cluster_selected[data.id] = data.text;
+    }).on('select2:unselect', function(evt) {
+        var data = evt.params.data;
+        delete jumpserver.cluster_selected[data.id]
+    });
 })
 .on('click', '.btn-delete-admin-user', function () {
     var $this = $(this);
@@ -237,6 +208,16 @@ $(document).ready(function () {
     var the_url = '{% url "api-assets:admin-user-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
     var redirect_url = "{% url 'assets:admin-user-list' %}";
     objectDelete($this, name, the_url, redirect_url);
+})
+.on('click', '#btn-add-cluster', function () {
+    if (Object.keys(jumpserver.cluster_selected).length === 0) {
+       return false;
+    }
+    var clusters = [];
+     $.map(jumpserver.cluster_selected, function(value, index) {
+        clusters.push(index);
+    });
+    bindToCluster(clusters)
 })
 </script>
 {% endblock %}
