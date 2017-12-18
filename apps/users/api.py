@@ -21,7 +21,7 @@ logger = get_logger(__name__)
 
 
 class UserViewSet(BulkModelViewSet):
-    queryset = User.objects.all()
+    queryset = User.objects.exclude(role="App")
     # queryset = User.objects.all().exclude(role="App").order_by("date_joined")
     serializer_class = UserSerializer
     permission_classes = (IsSuperUser,)

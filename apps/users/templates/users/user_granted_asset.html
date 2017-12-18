@@ -17,9 +17,6 @@
                             <li>
                                 <a href="{% url 'users:user-detail' pk=user.id %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'User detail' %} </a>
                             </li>
-                            <li>
-                                <a href="{% url 'users:user-asset-permission' pk=user.id %}" class="text-center"><i class="fa fa-bar-chart-o"></i> {% trans 'Asset permission' %}</a>
-                            </li>
                             <li class="active">
                                 <a href="{% url 'users:user-granted-asset' pk=user.id %}" class="text-center"><i class="fa fa-cubes"></i> {% trans 'Asset granted' %}</a>
                             </li>
@@ -48,12 +45,9 @@
                                     <table class="table table-hover " id="user_assets_table" >
                                         <thead>
                                             <tr>
-                                                <th class="text-center"></th>
                                                 <th>{% trans 'Hostname' %}</th>
                                                 <th>{% trans 'IP' %}</th>
-                                                <th>{% trans 'Port' %}</th>
                                                 <th>{% trans 'System user' %}</th>
-                                                <th>{% trans 'Valid' %}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -84,7 +78,6 @@
                                     <table class="table table-hover" id="user_asset_groups_table" >
                                         <thead>
                                             <tr>
-                                                <th></th>
                                                 <th>{% trans 'Name' %}</th>
                                                 <th>{% trans 'Asset' %}</th>
                                             </tr>
@@ -112,28 +105,15 @@
                 order: [],
                 select: [],
                 columnDefs: [
-                    {targets: 1, createdCell: function (td, cellData, rowData) {
+                    {targets: 0, createdCell: function (td, cellData, rowData) {
                         var detail_btn = '<a href="{% url "assets:asset-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
                         $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
-                     }},
-                    {targets: 4, createdCell: function (td, cellData, rowData) {
-                        if (cellData.length > 10){
-                            $(td).html(cellData.substring(1, 10) + '..')
-                        } else {
-                            $(td).html(cellData)
-                        }
-                    }},
-                    {targets: 5, createdCell: function (td, cellData) {
-                        if (!cellData) {
-                            $(td).html('<i class="fa fa-times text-danger"></i>')
-                        } else {
-                            $(td).html('<i class="fa fa-check text-navy"></i>')
-                        }
-                    }}
+                     }}
                 ],
                 ajax_url: '{% url "api-perms:user-assets" pk=user.id %}',
-                columns: [{data: function(){return ""}}, {data: "hostname" }, {data: "ip" }, {data: "port"},
-                    {data: "system_users_join"}, {data: "is_active"}]
+                columns: [{data: "hostname" }, {data: "ip" },
+                          {data: "system_users_join"}
+                ]
             };
             var options2 = {
                 ele: $('#user_asset_groups_table'),
@@ -141,13 +121,14 @@
                 order: [],
                 select: [],
                 columnDefs: [
-                    {targets: 1, createdCell: function (td, cellData, rowData) {
+                    {targets: 0, createdCell: function (td, cellData, rowData) {
                         var detail_btn = '<a href="{% url "assets:asset-group-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
                         $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
                      }}
                 ],
                 ajax_url: '{% url "api-perms:user-asset-groups" pk=user.id %}',
-                columns: [{data: function(){return ""}}, {data: "name" }, {data: "assets_amount" }]
+                columns: [{data: "name" }, {data: "assets_amount" }],
+                paging: false
             };
             jumpserver.initDataTable(options);
             jumpserver.initDataTable(options2);

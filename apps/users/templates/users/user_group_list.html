@@ -16,18 +16,7 @@
         </tr>
     </thead>
 </table>
-<div id="actions" class="hide">
-    <div class="input-group">
-        <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
-            <option value="delete">{% trans 'Delete selected' %}</option>
-        </select>
-        <div class="input-group-btn pull-left" style="padding-left: 5px;">
-            <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
-             {% trans 'Submit' %}
-            </button>
-        </div>
-    </div>
-</div>
+
 {% endblock %}
 
 {% block content_bottom_left %}{% endblock %}
@@ -57,11 +46,12 @@ $(document).ready(function() {
                 } else {
                     $(td).html(update_btn + del_btn)
                 }
-             }}],
+            }}
+        ],
         ajax_url: '{% url "api-users:user-group-list" %}',
         columns: [{data: function(){return ""}}, {data: "name" }, {data: "user_amount"},
                   {data: "comment"}, {data: "id" }],
-        order: [4, 'asc'],
+        order: [],
         op_html: $('#actions').html()
     };
     jumpserver.initDataTable(options);

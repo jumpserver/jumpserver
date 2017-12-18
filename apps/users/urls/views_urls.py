@@ -30,8 +30,6 @@ urlpatterns = [
     url(r'^user/(?P<pk>[0-9a-zA-Z\-]{36})/update$', views.UserUpdateView.as_view(), name='user-update'),
     url(r'^user/update$', views.UserBulkUpdateView.as_view(), name='user-bulk-update'),
     url(r'^user/(?P<pk>[0-9a-zA-Z\-]{36})$', views.UserDetailView.as_view(), name='user-detail'),
-    url(r'^user/(?P<pk>[0-9a-zA-Z\-]{36})/asset-permission$', views.UserAssetPermissionView.as_view(), name='user-asset-permission'),
-    url(r'^user/(?P<pk>[0-9a-zA-Z\-]{36})/asset-permission/create$', views.UserAssetPermissionCreateView.as_view(), name='user-asset-permission-create'),
     url(r'^user/(?P<pk>[0-9a-zA-Z\-]{36})/assets', views.UserGrantedAssetView.as_view(), name='user-granted-asset'),
     url(r'^user/(?P<pk>[0-9a-zA-Z\-]{36})/login-history', views.UserDetailView.as_view(), name='user-login-history'),
 
@@ -41,8 +39,6 @@ urlpatterns = [
     url(r'^user-group/(?P<pk>[0-9a-zA-Z\-]{36})$', views.UserGroupDetailView.as_view(), name='user-group-detail'),
     url(r'^user-group/create$', views.UserGroupCreateView.as_view(), name='user-group-create'),
     url(r'^user-group/(?P<pk>[0-9a-zA-Z\-]{36})/update$', views.UserGroupUpdateView.as_view(), name='user-group-update'),
-    url(r'^user-group/(?P<pk>[0-9a-zA-Z\-]{36})/asset-permission$', views.UserGroupAssetPermissionView.as_view(), name='user-group-asset-permission'),
-    url(r'^user-group/(?P<pk>[0-9a-zA-Z\-]{36})/asset-permission/create$', views.UserGroupAssetPermissionCreateView.as_view(), name='user-group-asset-permission-create'),
     url(r'^user-group/(?P<pk>[0-9a-zA-Z\-]{36})/assets', views.UserGroupGrantedAssetView.as_view(), name='user-group-granted-asset'),
 
     # Login log

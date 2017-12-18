@@ -52,24 +52,8 @@
 {% block custom_foot_js %}
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script>
-function changeField(obj, active) {
-    var $this = $(obj);
-    var field_id = $this.data('id');
-    if (!active) {
-        active = $this.attr('value');
-    }
-    if (active == '0') {
-        $this.attr('value', '1').addClass('label-primary');
-        var form_groups = $('#add_form .form-group:not(.abc)');
-        form_groups.filter(':has(#'  + field_id + ')').show().find('select,input').prop('disabled', false)
-    } else {
-        $this.attr('value', '0').removeClass('label-primary');
-        var form_groups = $('#add_form .form-group:not(.abc)');
-        form_groups.filter(':has(#'  + field_id + ')').hide().find('select,input').prop('disabled', true)
-    }
-}
 
-function renderTable() {
+function initTable() {
      var options = {
         ele: $('#user_list_table'),
         columnDefs: [
@@ -90,24 +74,30 @@ function renderTable() {
              }},
             {targets: 6, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "users:user-update" pk='00000000-0000-0000-0000-000000000000' %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('00000000-0000-0000-0000-000000000000', cellData);
-                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="{{ DEFAULT_PK }}" data-name="99991938">{% trans "Delete" %}</a>'
-                        .replace('{{ DEFAULT_PK }}', cellData)
-                        .replace('99991938', rowData.name);
-                if (rowData.id === 1 || rowData.username == "admin") {
-                    $(td).html(update_btn)
+
+                var del_btn = "";
+                if (rowData.id === 1 || rowData.username === "admin" || rowData.username === "{{ user.username }}") {
+                    del_btn = '<a class="btn btn-xs btn-danger m-l-xs" disabled>{% trans "Delete" %}</a>'
+                            .replace('{{ DEFAULT_PK }}', cellData)
+                            .replace('99991938', rowData.name);
                 } else {
-                    $(td).html(update_btn + del_btn)
+                    del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_user_delete" data-uid="{{ DEFAULT_PK }}" data-name="99991938">{% trans "Delete" %}</a>'
+                            .replace('{{ DEFAULT_PK }}', cellData)
+                            .replace('99991938', rowData.name);
                 }
+                $(td).html(update_btn + del_btn)
              }}],
         ajax_url: '{% url "api-users:user-list" %}',
         columns: [{data: "id"}, {data: "name" }, {data: "username" }, {data: "get_role_display" },
             {data: "groups_display" }, {data: "is_valid" }, {data: "id" }],
         op_html: $('#actions').html()
     };
-    var table = jumpserver.initDataTable(options);
+    table = jumpserver.initDataTable(options);
+    return table
 }
+
 $(document).ready(function(){
-    renderTable();
+    var table = initTable();
     var fields = $('#fm_user_bulk_update .form-group');
     $.each(fields, function (index, value) {
         console.log(value)
@@ -158,7 +148,7 @@ $(document).ready(function(){
     var id_list = [];
     var plain_id_list = [];
     $data_table.rows({selected: true}).every(function(){
-        id_list.push({id: this.data().id});
+        id_list.push({pk: this.data().id});
         plain_id_list.push(this.data().id);
     });
     if (id_list === []) {
@@ -169,6 +159,7 @@ $(document).ready(function(){
         var body = $.each(id_list, function(index, user_object) {
             user_object['is_active'] = false;
         });
+        console.log(body);
         APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(body)});
         $data_table.ajax.reload();
         jumpserver.checked = false;

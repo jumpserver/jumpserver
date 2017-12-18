@@ -6,7 +6,7 @@ from django.dispatch import Signal, receiver
 from common.utils import get_logger
 
 logger = get_logger(__file__)
-on_user_created = Signal(providing_args=['user'])
+on_user_created = Signal(providing_args=['user', 'request'])
 
 
 @receiver(on_user_created)

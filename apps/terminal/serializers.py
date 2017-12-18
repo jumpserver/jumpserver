@@ -62,3 +62,8 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         fields = '__all__'
         model = Task
+
+
+class ReplaySerializer(serializers.Serializer):
+    file = serializers.FileField()
+

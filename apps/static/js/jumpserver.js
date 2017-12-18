@@ -245,7 +245,8 @@ jumpserver.initDataTable = function (options) {
   //    buttons: ['excel', 'pdf', 'print'],
   //    columnDefs: [{target: 0, createdCell: ()=>{}}, ...],
   //    uc_html: '<a>header button</a>',
-  //    op_html: 'div.btn-group?'
+  //    op_html: 'div.btn-group?',
+  //    paging: true
   // }
   var ele = options.ele || $('.dataTable');
   var columnDefs = [

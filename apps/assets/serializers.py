@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core.cache import cache
-from rest_framework import viewsets, serializers, generics
+from rest_framework import serializers
 from rest_framework_bulk.serializers import BulkListSerializer
 
 from common.mixins import BulkSerializerMixin
@@ -9,6 +9,9 @@ from .const import ADMIN_USER_CONN_CACHE_KEY, SYSTEM_USER_CONN_CACHE_KEY
 
 
 class AssetGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+    """
+    资产组序列化数据模型
+    """
     assets_amount = serializers.SerializerMethodField()
     assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
 
@@ -23,6 +26,9 @@ class AssetGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
 
 class AssetUpdateGroupSerializer(serializers.ModelSerializer):
+    """
+    资产更新自己所在资产组的请求数据结构定义
+    """
     groups = serializers.PrimaryKeyRelatedField(many=True, queryset=AssetGroup.objects.all())
 
     class Meta:
@@ -31,6 +37,9 @@ class AssetUpdateGroupSerializer(serializers.ModelSerializer):
 
 
 class AssetUpdateSystemUserSerializer(serializers.ModelSerializer):
+    """
+    资产更新其系统用户请求的数据结构定义
+    """
     system_users = serializers.PrimaryKeyRelatedField(many=True, queryset=SystemUser.objects.all())
 
     class Meta:
@@ -39,7 +48,9 @@ class AssetUpdateSystemUserSerializer(serializers.ModelSerializer):
 
 
 class AssetGroupUpdateSerializer(serializers.ModelSerializer):
-    """update the asset group, and add or delete the asset to the group"""
+    """
+    资产组更新需要的数据结构
+    """
     assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
 
     class Meta:
@@ -48,6 +59,9 @@ class AssetGroupUpdateSerializer(serializers.ModelSerializer):
 
 
 class AssetGroupUpdateSystemUserSerializer(serializers.ModelSerializer):
+    """
+    资产组更新系统用户定义的数据结构
+    """
     system_users = serializers.PrimaryKeyRelatedField(many=True, queryset=SystemUser.objects.all())
 
     class Meta:
@@ -56,6 +70,9 @@ class AssetGroupUpdateSystemUserSerializer(serializers.ModelSerializer):
 
 
 class ClusterUpdateAssetsSerializer(serializers.ModelSerializer):
+    """
+    集群更新资产数据结构
+    """
     assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
 
     class Meta:
@@ -64,6 +81,9 @@ class ClusterUpdateAssetsSerializer(serializers.ModelSerializer):
 
 
 class AdminUserSerializer(serializers.ModelSerializer):
+    """
+    管理用户
+    """
     assets_amount = serializers.SerializerMethodField()
     unreachable_amount = serializers.SerializerMethodField()
 
@@ -89,6 +109,9 @@ class AdminUserSerializer(serializers.ModelSerializer):
 
 
 class SystemUserSerializer(serializers.ModelSerializer):
+    """
+    系统用户
+    """
     unreachable_amount = serializers.SerializerMethodField()
     assets_amount = serializers.SerializerMethodField()
 
@@ -113,12 +136,18 @@ class SystemUserSerializer(serializers.ModelSerializer):
 
 
 class AssetSystemUserSerializer(serializers.ModelSerializer):
+    """
+    查看授权的资产系统用户的数据结构，这个和AssetSerializer不同，字段少
+    """
     class Meta:
         model = SystemUser
         fields = ('id', 'name', 'username', 'priority', 'protocol',  'comment',)
 
 
 class SystemUserUpdateAssetsSerializer(serializers.ModelSerializer):
+    """
+    系统用户更新关联资产的数据结构
+    """
     assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
 
     class Meta:
@@ -127,6 +156,9 @@ class SystemUserUpdateAssetsSerializer(serializers.ModelSerializer):
 
 
 class SystemUserUpdateAssetGroupSerializer(serializers.ModelSerializer):
+    """
+    系统用户更新资产组的api
+    """
     asset_groups = serializers.PrimaryKeyRelatedField(many=True, queryset=AssetGroup.objects.all())
 
     class Meta:
@@ -135,12 +167,18 @@ class SystemUserUpdateAssetGroupSerializer(serializers.ModelSerializer):
 
 
 class SystemUserSimpleSerializer(serializers.ModelSerializer):
+    """
+    系统用户最基本信息的数据结构
+    """
     class Meta:
         model = SystemUser
         fields = ('id', 'name', 'username')
 
 
 class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+    """
+    资产的数据结构
+    """
     class Meta(object):
         model = Asset
         list_serializer_class = BulkListSerializer
@@ -157,6 +195,9 @@ class AssetSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
 
 class AssetGrantedSerializer(serializers.ModelSerializer):
+    """
+    被授权资产的数据结构
+    """
     system_users_granted = AssetSystemUserSerializer(many=True, read_only=True)
     is_inherited = serializers.SerializerMethodField()
     system_users_join = serializers.SerializerMethodField()
@@ -180,7 +221,9 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
 
 
 class MyAssetGrantedSerializer(AssetGrantedSerializer):
-    """Remove ip and port from asset for security"""
+    """
+    普通用户获取授权的资产定义的数据结构
+    """
 
     class Meta(object):
         model = Asset
@@ -189,6 +232,9 @@ class MyAssetGrantedSerializer(AssetGrantedSerializer):
 
 
 class ClusterSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+    """
+    cluster
+    """
     assets_amount = serializers.SerializerMethodField()
     admin_user_name = serializers.SerializerMethodField()
     assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
@@ -210,6 +256,9 @@ class ClusterSerializer(BulkSerializerMixin, serializers.ModelSerializer):
 
 
 class AssetGroupGrantedSerializer(BulkSerializerMixin, serializers.ModelSerializer):
+    """
+    授权资产组
+    """
     assets_granted = AssetGrantedSerializer(many=True, read_only=True)
     assets_amount = serializers.SerializerMethodField()
 
@@ -224,6 +273,9 @@ class AssetGroupGrantedSerializer(BulkSerializerMixin, serializers.ModelSerializ
 
 
 class MyAssetGroupGrantedSerializer(serializers.ModelSerializer):
+    """
+    普通用户授权资产组结构
+    """
     assets_granted = MyAssetGrantedSerializer(many=True, read_only=True)
     assets_amount = serializers.SerializerMethodField()
 

@@ -4,17 +4,12 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 
-from common.utils import date_expired_default, combine_seq
+from common.utils import date_expired_default
 
 
 class AssetPermission(models.Model):
     from users.models import User, UserGroup
     from assets.models import Asset, AssetGroup, SystemUser
-    # PRIVATE_FOR_CHOICE = (
-    #     ('N', 'None'),
-    #     ('U', 'user'),
-    #     ('G', 'user group'),
-    # )
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(
         max_length=128, unique=True, verbose_name=_('Name'))
@@ -38,14 +33,14 @@ class AssetPermission(models.Model):
         auto_now_add=True, verbose_name=_('Date created'))
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     @property
     def is_valid(self):
         if self.date_expired < timezone.now() and self.is_active:
             return True
-        return True
+        return False
 
     def get_granted_users(self):
         return list(set(self.users.all()) | self.get_granted_user_groups_member())
@@ -73,8 +68,8 @@ class AssetPermission(models.Model):
                 assets.add(asset)
         return assets
 
-    class Meta:
-        db_table = 'asset_permission'
+    # class Meta:
+    #     db_table = 'asset_permission'
 
 
 # def change_permission(sender, **kwargs):

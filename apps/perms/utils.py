@@ -13,9 +13,9 @@ logger = get_logger(__file__)
 def get_user_group_granted_asset_groups(user_group):
     """Return asset groups granted of the user group
 
-     :param user_group: Instance of :class: ``UserGroup``
-     :return: {asset_group1: {system_user1, },
-               asset_group2: {system_user1, system_user2}}
+    :param user_group: Instance of :class: ``UserGroup``
+    :return: {asset_group1: {system_user1, },
+              asset_group2: {system_user1, system_user2}}
     """
     asset_groups = {}
     asset_permissions = user_group.asset_permissions.all()
@@ -166,22 +166,6 @@ def get_user_granted_system_users(user):
             else:
                 system_users_dict[system_user] = [asset]
     return system_users_dict
-
-
-def get_user_groups_granted_in_asset(asset):
-    pass
-
-
-def get_users_granted_in_asset(asset):
-    pass
-
-
-def get_user_groups_granted_in_asset_group(asset):
-    pass
-
-
-def get_users_granted_in_asset_group(asset):
-    pass
 
 
 def push_system_user(assets, system_user):

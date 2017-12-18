@@ -8,17 +8,18 @@ import os
 from rest_framework import viewsets, serializers
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import AllowAny
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
-from django.conf import settings
+from django.core.files.storage import default_storage
+from django.http import HttpResponseNotFound
 
 from common.utils import get_object_or_none
 from .models import Terminal, Status, Session, Task
 from .serializers import TerminalSerializer, StatusSerializer, \
-    SessionSerializer, TaskSerializer
+    SessionSerializer, TaskSerializer, ReplaySerializer
 from .hands import IsSuperUserOrAppUser, IsAppUser, \
     IsSuperUserOrAppUserOrUserReadonly
-from .backends import get_command_store, get_replay_store, SessionCommandSerializer
+from .backends import get_command_store, SessionCommandSerializer
 
 logger = logging.getLogger(__file__)
 
@@ -149,46 +150,6 @@ class TaskViewSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
     permission_classes = (IsSuperUserOrAppUser,)
 
-    # def get_queryset(self):
-    #     terminal_id = self.kwargs.get("terminal", None)
-    #     if terminal_id:
-    #         terminal = get_object_or_404(Terminal, id=terminal_id)
-    #         self.queryset = terminal.status_set.all()
-    #
-    #     if hasattr(self.request.user, "terminal"):
-    #         terminal = self.request.user.terminal
-    #         self.queryset = terminal.status_set.all()
-    #     return self.queryset
-
-
-class SessionReplayAPI(APIView):
-    permission_classes = (IsSuperUserOrAppUser,)
-
-    def post(self, request, **kwargs):
-        session_id = kwargs.get("pk", None)
-        session = get_object_or_404(Session, id=session_id)
-        record_dir = settings.CONFIG.SESSION_RECORDE_DIR
-        date = session.date_start.strftime("%Y-%m-%d")
-        record_dir = os.path.join(record_dir, date, str(session.id))
-        record_filename = os.path.join(record_dir, "replay.tar.gz2")
-
-        if not os.path.isdir(record_dir):
-            try:
-                os.makedirs(record_dir)
-            except FileExistsError:
-                pass
-
-        archive_stream = request.data.get("archive")
-        if not archive_stream:
-            return Response("None file upload", status=400)
-
-        with open(record_filename, 'wb') as f:
-            for chunk in archive_stream.chunks():
-                f.write(chunk)
-        session.has_replay = True
-        session.save()
-        return Response({"session_id": session.id}, status=201)
-
 
 class CommandViewSet(viewsets.ViewSet):
     """接受app发送来的command log, 格式如下
@@ -208,7 +169,7 @@ class CommandViewSet(viewsets.ViewSet):
     permission_classes = (IsSuperUserOrAppUser,)
 
     def get_queryset(self):
-        self.command_store.filter(**dict(self.request.data))
+        self.command_store.filter(**dict(self.request.query_params))
 
     def create(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, many=True)
@@ -227,3 +188,43 @@ class CommandViewSet(viewsets.ViewSet):
         queryset = list(self.command_store.all())
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
+
+
+class SessionReplayViewSet(viewsets.ViewSet):
+    serializer_class = ReplaySerializer
+    permission_classes = ()
+    session = None
+
+    def gen_session_path(self):
+        date = self.session.date_start.strftime('%Y-%m-%d')
+        return os.path.join(date, str(self.session.id)+'.gz')
+
+    def create(self, request, *args, **kwargs):
+        session_id = kwargs.get('pk')
+        self.session = get_object_or_404(Session, id=session_id)
+        serializer = self.serializer_class(data=request.data)
+
+        if serializer.is_valid():
+            file = serializer.validated_data['file']
+            file_path = self.gen_session_path()
+            try:
+                default_storage.save(file_path, file)
+                return Response({'url': default_storage.url(file_path)},
+                                status=201)
+            except IOError:
+                return Response("Save error", status=500)
+        else:
+            logger.error(
+                'Update load data invalid: {}'.format(serializer.errors))
+            return Response({'msg': serializer.errors}, status=401)
+
+    def retrieve(self, request, *args, **kwargs):
+        session_id = kwargs.get('pk')
+        self.session = get_object_or_404(Session, id=session_id)
+        path = self.gen_session_path()
+
+        if default_storage.exists(path):
+            url = default_storage.url(path)
+            return redirect(url)
+        else:
+            return HttpResponseNotFound()

@@ -1,5 +1,4 @@
 # ~*~ coding: utf-8 ~*~
-
 # Copyright (C) 2014-2017 Beijing DuiZhan Technology Co.,Ltd. All Rights Reserved.
 #
 # Licensed under the GNU General Public License v2.0 (the "License");
@@ -22,7 +21,7 @@ from django.shortcuts import get_object_or_404
 
 from common.mixins import IDInFilterMixin
 from common.utils import get_object_or_none
-from .hands import IsSuperUser, IsAppUser, IsValidUser, IsSuperUserOrAppUser, \
+from .hands import IsSuperUser, IsValidUser, IsSuperUserOrAppUser, \
     get_user_granted_assets, push_users
 from .models import AssetGroup, Asset, Cluster, SystemUser, AdminUser
 from . import serializers
@@ -58,63 +57,80 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
 
 
 class AssetGroupViewSet(IDInFilterMixin, BulkModelViewSet):
-    """Asset group api set, for add,delete,update,list,retrieve resource"""
+    """
+    Asset group api set, for add,delete,update,list,retrieve resource
+    """
     queryset = AssetGroup.objects.all()
     serializer_class = serializers.AssetGroupSerializer
     permission_classes = (IsSuperUser,)
 
 
 class AssetUpdateGroupApi(generics.RetrieveUpdateAPIView):
-    """Asset update it's group api"""
+    """
+    Asset update it's group api
+    """
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetUpdateGroupSerializer
     permission_classes = (IsSuperUser,)
 
 
 class AssetGroupUpdateApi(generics.RetrieveUpdateAPIView):
-    """Asset group, update it's asset member"""
+    """
+    Asset group, update it's asset member
+    """
     queryset = AssetGroup.objects.all()
     serializer_class = serializers.AssetGroupUpdateSerializer
     permission_classes = (IsSuperUser,)
 
 
 class AssetGroupUpdateSystemUserApi(generics.RetrieveUpdateAPIView):
-    """Asset group push system user"""
+    """
+    Asset group push system user
+    """
     queryset = AssetGroup.objects.all()
     serializer_class = serializers.AssetGroupUpdateSystemUserSerializer
     permission_classes = (IsSuperUser,)
 
 
 class ClusterUpdateAssetsApi(generics.RetrieveUpdateAPIView):
-    """Cluster update asset member"""
+    """
+    Cluster update asset member
+    """
     queryset = Cluster.objects.all()
     serializer_class = serializers.ClusterUpdateAssetsSerializer
     permission_classes = (IsSuperUser,)
 
 
 class ClusterViewSet(IDInFilterMixin, BulkModelViewSet):
-    """Cluster api set, for add,delete,update,list,retrieve resource"""
+    """
+    Cluster api set, for add,delete,update,list,retrieve resource
+    """
     queryset = Cluster.objects.all()
     serializer_class = serializers.ClusterSerializer
     permission_classes = (IsSuperUser,)
 
 
 class AdminUserViewSet(IDInFilterMixin, BulkModelViewSet):
-    """Admin user api set, for add,delete,update,list,retrieve resource"""
+    """
+    Admin user api set, for add,delete,update,list,retrieve resource
+    """
     queryset = AdminUser.objects.all()
     serializer_class = serializers.AdminUserSerializer
     permission_classes = (IsSuperUser,)
 
 
 class SystemUserViewSet(IDInFilterMixin, BulkModelViewSet):
-    """System user api set, for add,delete,update,list,retrieve resource"""
+    """
+    System user api set, for add,delete,update,list,retrieve resource
+    """
     queryset = SystemUser.objects.all()
     serializer_class = serializers.SystemUserSerializer
     permission_classes = (IsSuperUserOrAppUser,)
 
 
 class SystemUserUpdateApi(generics.RetrieveUpdateAPIView):
-    """Asset update it's system user
+    """
+    Asset update it's system user
 
     when update then push system user to asset.
     """
@@ -134,28 +150,36 @@ class SystemUserUpdateApi(generics.RetrieveUpdateAPIView):
 
 
 class SystemUserUpdateAssetsApi(generics.RetrieveUpdateAPIView):
-    """System user update it's assets"""
+    """
+    System user update it's assets
+    """
     queryset = SystemUser.objects.all()
     serializer_class = serializers.SystemUserUpdateAssetsSerializer
     permission_classes = (IsSuperUser,)
 
 
 class SystemUserUpdateAssetGroupApi(generics.RetrieveUpdateAPIView):
-    """System user update asset group"""
+    """
+    System user update asset group
+    """
     queryset = SystemUser.objects.all()
     serializer_class = serializers.SystemUserUpdateAssetGroupSerializer
     permission_classes = (IsSuperUser,)
 
 
 class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
-    """Asset bulk update api"""
+    """
+    Asset bulk update api
+    """
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
     permission_classes = (IsSuperUser,)
 
 
 class SystemUserAuthInfoApi(generics.RetrieveAPIView):
-    """Get system user auth info"""
+    """
+    Get system user auth info
+    """
     queryset = SystemUser.objects.all()
     permission_classes = (IsSuperUserOrAppUser,)
 
@@ -172,7 +196,9 @@ class SystemUserAuthInfoApi(generics.RetrieveAPIView):
 
 
 class AssetRefreshHardwareView(generics.RetrieveAPIView):
-    """Refresh asset hardware info"""
+    """
+    Refresh asset hardware info
+    """
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
     permission_classes = (IsSuperUser,)
@@ -181,7 +207,6 @@ class AssetRefreshHardwareView(generics.RetrieveAPIView):
         asset_id = kwargs.get('pk')
         asset = get_object_or_404(Asset, pk=asset_id)
         summary = update_assets_hardware_info([asset])
-        print(summary)
         if summary.get('dark'):
             return Response(summary['dark'].values(), status=501)
         else:
@@ -189,7 +214,9 @@ class AssetRefreshHardwareView(generics.RetrieveAPIView):
 
 
 class AssetAdminUserTestView(AssetRefreshHardwareView):
-    """Test asset admin user connectivity"""
+    """
+    Test asset admin user connectivity
+    """
     queryset = Asset.objects.all()
     permission_classes = (IsSuperUser,)
 
@@ -204,7 +231,9 @@ class AssetAdminUserTestView(AssetRefreshHardwareView):
 
 
 class AssetGroupPushSystemUserView(generics.UpdateAPIView):
-    """Asset group push system user api"""
+    """
+    Asset group push system user api
+    """
     queryset = AssetGroup.objects.all()
     permission_classes = (IsSuperUser,)
     serializer_class = serializers.AssetSerializer
