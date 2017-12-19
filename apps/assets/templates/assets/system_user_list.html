@@ -30,7 +30,7 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-$(document).ready(function(){
+function initTable() {
     var options = {
         ele: $('#system_user_list_table'),
         columnDefs: [
@@ -74,7 +74,6 @@ $(document).ready(function(){
 
             }},
             {targets: 8, createdCell: function (td, cellData, rowData) {
-{#                var script_btn = '<a href="{% url "assets:system-user-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-primary">{% trans "Script" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);#}
                 var update_btn = '<a href="{% url "assets:system-user-update" pk=DEFAULT_PK %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_admin_user_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(update_btn + del_btn)
@@ -87,6 +86,10 @@ $(document).ready(function(){
         op_html: $('#actions').html()
         };
     jumpserver.initDataTable(options);
+}
+
+$(document).ready(function(){
+    initTable();
 })
 
 .on('click', '.btn_admin_user_delete', function () {

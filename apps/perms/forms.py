@@ -34,7 +34,7 @@ class AssetPermissionForm(forms.ModelForm):
         }
         help_texts = {
             'name': '* required',
-            'user_groups': '* User or user group at least one required',
-            'asset_groups': '* Asset or Asset group at least one required',
             'system_users': '* required',
+            'user_groups': _('User or user group at least one required'),
+            'asset_groups': _('Asset or Asset group at least one required'),
         }

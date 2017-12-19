@@ -179,31 +179,3 @@ def push_system_user(assets, system_user):
     system_user = system_user._to_secret_json()
     task = push_users.delay(assets, system_user)
     return task.id
-
-
-def associate_system_users_and_assets(system_users, assets, asset_groups, force=False):
-    """关联系统用户和资产, 目的是保存它们的关系, 然后新加入的资产或系统
-    用户时,推送系统用户到资产
-
-    Todo: 这里需要最终Api定下来更改一下, 现在策略是以系统用户为核心推送, 一个系统用户
-    推送一次
-    """
-    assets_all = set(assets)
-
-    for asset_group in asset_groups:
-        assets_all |= set(asset_group.assets.all())
-
-    for system_user in system_users:
-        assets_need_push = []
-        if system_user.auto_push:
-            if force:
-                assets_need_push = assets_all
-            else:
-                assets_need_push.extend(
-                    [asset for asset in assets_all
-                     if asset not in system_user.assets.all()
-                     ]
-                )
-        system_user.assets.add(*(tuple(assets_all)))
-        push_system_user(assets_need_push, system_user)
-

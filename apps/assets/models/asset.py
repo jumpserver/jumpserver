@@ -87,7 +87,7 @@ class Asset(models.Model):
     comment = models.TextField(max_length=128, default='', blank=True, verbose_name=_('Comment'))
 
     def __str__(self):
-        return '%s <%s: %s>' % (self.hostname, self.ip, self.port)
+        return self.hostname
 
     @property
     def is_valid(self):

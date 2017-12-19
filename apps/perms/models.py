@@ -9,28 +9,18 @@ from common.utils import date_expired_default
 
 class AssetPermission(models.Model):
     from users.models import User, UserGroup
-    from assets.models import Asset, AssetGroup, SystemUser
+    from assets.models import Asset, AssetGroup, SystemUser, Cluster
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(
-        max_length=128, unique=True, verbose_name=_('Name'))
-    users = models.ManyToManyField(
-        User, related_name='asset_permissions', blank=True)
-    user_groups = models.ManyToManyField(
-        UserGroup, related_name='asset_permissions', blank=True)
-    assets = models.ManyToManyField(
-        Asset, related_name='granted_by_permissions', blank=True)
-    asset_groups = models.ManyToManyField(
-        AssetGroup, related_name='granted_by_permissions', blank=True)
-    system_users = models.ManyToManyField(
-        SystemUser, related_name='granted_by_permissions')
-    is_active = models.BooleanField(
-        default=True, verbose_name=_('Active'))
-    date_expired = models.DateTimeField(
-        default=date_expired_default, verbose_name=_('Date expired'))
-    created_by = models.CharField(
-        max_length=128, blank=True, verbose_name=_('Created by'))
-    date_created = models.DateTimeField(
-        auto_now_add=True, verbose_name=_('Date created'))
+    name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
+    users = models.ManyToManyField(User, related_name='asset_permissions', blank=True, verbose_name=_("User"))
+    user_groups = models.ManyToManyField(UserGroup, related_name='asset_permissions', blank=True, verbose_name=_("User group"))
+    assets = models.ManyToManyField(Asset, related_name='granted_by_permissions', blank=True, verbose_name=_("Asset"))
+    asset_groups = models.ManyToManyField(AssetGroup, related_name='granted_by_permissions', blank=True, verbose_name=_("Asset group"))
+    system_users = models.ManyToManyField(SystemUser, related_name='granted_by_permissions', verbose_name=_("System user"))
+    is_active = models.BooleanField(default=True, verbose_name=_('Active'))
+    date_expired = models.DateTimeField(default=date_expired_default, verbose_name=_('Date expired'))
+    created_by = models.CharField(max_length=128, blank=True, verbose_name=_('Created by'))
+    date_created = models.DateTimeField(auto_now_add=True, verbose_name=_('Date created'))
     comment = models.TextField(verbose_name=_('Comment'), blank=True)
 
     def __str__(self):
@@ -38,7 +28,7 @@ class AssetPermission(models.Model):
 
     @property
     def is_valid(self):
-        if self.date_expired < timezone.now() and self.is_active:
+        if self.date_expired > timezone.now() and self.is_active:
             return True
         return False
 
@@ -68,18 +58,12 @@ class AssetPermission(models.Model):
                 assets.add(asset)
         return assets
 
-    # class Meta:
-    #     db_table = 'asset_permission'
-
-
-# def change_permission(sender, **kwargs):
-#     print('Sender: %s' % sender)
-#     for k, v in kwargs.items():
-#         print('%s: %s' % (k, v))
-#     print()
-
-#
-# m2m_changed.connect(change_permission, sender=AssetPermission.assets.through)
-
-
-
+    def check_system_user_in_assets(self):
+        errors = {}
+        assets = self.get_granted_assets()
+        clusters = set([asset.cluster for asset in assets])
+        for system_user in self.system_users.all():
+            cluster_remain = clusters - set(system_user.cluster.all())
+            if cluster_remain:
+                errors[system_user.name] = cluster_remain
+        return errors

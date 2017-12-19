@@ -198,7 +198,7 @@ class SystemUser(AssetUser):
         ('P', 'Password'),
         ('K', 'Public key'),
     )
-    cluster = models.ManyToManyField('assets.Cluster', null=True, blank=True, verbose_name=_("Cluster"))
+    cluster = models.ManyToManyField('assets.Cluster', blank=True, verbose_name=_("Cluster"))
     priority = models.IntegerField(default=10, verbose_name=_("Priority"))  # Todo: If user granted more priority user, default will be login as the hign
     protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))

@@ -227,7 +227,7 @@
                                             </tr>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-sm" id="btn_add_user_group">{% trans 'Confirm' %}</button>
+                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-user-group">{% trans 'Confirm' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
@@ -327,7 +327,7 @@ $(document).ready(function () {
     }else{
             $(".ibox-content > table > tbody > tr:nth-child(13) > td:last >b").html('False');
     }
-}).on('click', '#btn_add_user_group', function () {
+}).on('click', '#btn-add-user-group', function () {
     if (Object.keys(jumpserver.groups_selected).length === 0) {
        return false;
     }

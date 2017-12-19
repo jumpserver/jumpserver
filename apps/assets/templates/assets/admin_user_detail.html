@@ -123,24 +123,6 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-Array.prototype.remove = function(val) {
-	var index = this.indexOf(val);
-		if (index > -1) {
-		this.splice(index, 1);
-	}
-};
-Array.prototype.unique = function(){
-	var res = [];
-	var json = {};
- 	for(var i = 0; i < this.length; i++){
-  		if(!json[this[i]]){
-   			res.push(this[i]);
-   			json[this[i]] = 1;
-  		}
- 	}
- 	return res;
-};
-
 function bindToCluster(clusters) {
     var the_url = "{% url 'api-assets:admin-user-add-clusters' pk=admin_user.id %}";
     var body = {

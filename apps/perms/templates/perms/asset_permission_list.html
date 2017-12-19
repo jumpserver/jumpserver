@@ -1,69 +1,96 @@
 {% extends '_base_list.html' %}
 {% load i18n %}
-{% block content_left_head %}
-    <a href="{% url 'perms:asset-permission-create' %}" class="btn btn-sm btn-primary">
+
+{% block table_search %}
+{% endblock %}
+
+{% block table_container %}
+<div class="uc pull-left m-r-5">
+    <a href="{% url 'perms:asset-permission-create' %}" class="btn btn-sm btn-primary ">
         {% trans "Create permission" %}
     </a>
-{% endblock %}
-
-{% block table_head %}
-    <th class="text-center">{% trans 'Name' %}</th>
-    <th class="text-center">{% trans 'User' %}</th>
-    <th class="text-center">{% trans 'User group' %}</th>
-    <th class="text-center">{% trans 'Asset' %}</th>
-    <th class="text-center">{% trans 'Asset group' %}</th>
-    <th class="text-center">{% trans 'System user' %}</th>
-    <th class="text-center">{% trans 'Is valid' %}</th>
-    <th class="text-center">{% trans 'Action' %}</th>
-{% endblock %}
-
-{% block table_body %}
-     {% for asset_permission in asset_permission_list %}
-         <tr class="gradeX">
-             <td class="text-center">
-                 <a href="{% url 'perms:asset-permission-detail' pk=asset_permission.id %}">
-                     {{ asset_permission.name }}
-                 </a>
-             </td>
-             <td class="text-center">{{ asset_permission.users.count }}</td>
-             <td class="text-center">{{ asset_permission.user_groups.count }}</td>
-             <td class="text-center">{{ asset_permission.assets.count }}</td>
-             <td class="text-center">{{ asset_permission.asset_groups.count }}</td>
-             <td class="text-center">{{ asset_permission.system_users.count }}</td>
-             <td class="text-center">
-             {% if asset_permission.is_valid %}
-                 <i class="fa fa-check text-navy"></i>
-             {% else %}
-                 <i class="fa fa-times text-danger"></i>
-             {% endif %}
-             </td>
-             <td class="text-center">
-                 <a href="{% url 'perms:asset-permission-update' pk=asset_permission.id %}"
-                    class="btn btn-xs btn-info">{% trans 'Update' %}
-                 </a>
-                 <a class="btn btn-xs btn-danger btn-del" data-name="{{ asset_permission.name }}"
-                    data-uid="{{ asset_permission.id }}">{% trans 'Delete' %}
-                 </a>
-             </td>
-         </tr>
-     {% endfor %}
+</div>
+<table class="table table-striped table-bordered table-hover" id="permission_list_table" >
+    <thead>
+    <tr>
+      <th class="text-center">
+          <input type="checkbox" id="check_all" class="ipt_check_all" >
+      </th>
+      <th class="text-center">{% trans 'Name' %}</th>
+      <th class="text-center">{% trans 'User' %}</th>
+      <th class="text-center">{% trans 'User group' %}</th>
+      <th class="text-center">{% trans 'Asset' %}</th>
+      <th class="text-center">{% trans 'Asset group' %}</th>
+      <th class="text-center">{% trans 'System user' %}</th>
+      <th class="text-center">{% trans 'Is valid' %}</th>
+      <th class="text-center">{% trans 'Action' %}</th>
+    </tr>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
 {% endblock %}
 
 {% block custom_foot_js %}
-    <script>
-        $(document).ready(function() {
-            $('table').DataTable({
-                "searching": false,
-                "paging": false,
-                "order": []
-            })
-        }).on('click', '.btn-del', function () {
-            var $this = $(this);
-            var name = $this.data('name');
-            var uid = $this.data('uid');
-            var the_url = '{% url "api-perms:asset-permission-detail" pk=DEFAULT_PK %}'
-                    .replace('{{ DEFAULT_PK }}', uid);
-            objectDelete($this, name, the_url);
-        })
-    </script>
+<script>
+function initTable() {
+    var options = {
+        ele: $('#permission_list_table'),
+        columnDefs: [
+            {targets: 1, createdCell: function (td, cellData, rowData) {
+                var detail_btn = '<a href="{% url "perms:asset-permission-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
+                $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
+            }},
+            {targets: 2, createdCell: function (td, cellData) {
+                $(td).html(cellData.length);
+            }},
+            {targets: 3, createdCell: function (td, cellData) {
+                $(td).html(cellData.length);
+            }},
+            {targets: 4, createdCell: function (td, cellData) {
+                $(td).html(cellData.length);
+            }},
+            {targets: 5, createdCell: function (td, cellData) {
+                $(td).html(cellData.length);
+            }},
+            {targets: 6, createdCell: function (td, cellData) {
+                $(td).html(cellData.length);
+            }},
+            {targets: 7, createdCell: function (td, cellData) {
+                if (!cellData) {
+					$(td).html('<i class="fa fa-times text-danger"></i>')
+				} else {
+					$(td).html('<i class="fa fa-check text-navy"></i>')
+				}
+            }},
+            {targets: 8, createdCell: function (td, cellData) {
+                var update_btn = '<a href="{% url "perms:asset-permission-update" pk=DEFAULT_PK %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del-permission" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+				$(td).html(update_btn + del_btn);
+            }}
+
+        ],
+        ajax_url: '{% url "api-perms:asset-permission-list" %}',
+        columns: [
+            {data: "id" }, {data: "name"}, {data: "users_" }, {data: "user_groups_" }, {data: "assets_" },
+            {data: "asset_groups_"}, {data: "system_users_"}, {data: "is_active"},  {data: "id" }
+        ],
+        op_html: $('#actions').html()
+    };
+    jumpserver.initDataTable(options);
+}
+
+$(document).ready(function(){
+    initTable();
+})
+
+.on('click', '.btn-del', function () {
+    var $this = $(this);
+    var name = $this.data('name');
+    var uid = $this.data('uid');
+    var the_url = '{% url "api-perms:asset-permission-detail" pk=DEFAULT_PK %}'
+            .replace('{{ DEFAULT_PK }}', uid);
+    objectDelete($this, name, the_url);
+})
+</script>
 {% endblock %}
