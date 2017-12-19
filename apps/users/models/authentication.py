@@ -16,7 +16,7 @@ class AccessKey(models.Model):
                           default=uuid.uuid4, editable=False)
     secret = models.UUIDField(verbose_name='AccessKeySecret',
                               default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, verbose_name='User',
+    user = models.ForeignKey(User, verbose_name='User', on_delete=models.CASCADE,
                              related_name='access_key')
 
     def get_id(self):

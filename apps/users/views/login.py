@@ -46,7 +46,8 @@ class UserLoginView(FormView):
 
     def form_valid(self, form):
         auth_login(self.request, form.get_user())
-        login_ip = self.request.META.get('REMOTE_ADDR', '')
+        login_ip = self.request.META.get("HTTP_X_REAL_IP") or \
+                self.request.META.get('REMOTE_ADDR', '')
         user_agent = self.request.META.get('HTTP_USER_AGENT', '')
         write_login_log_async.delay(self.request.user.username,
                                     self.request.user.name,

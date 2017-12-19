@@ -24,7 +24,7 @@ class TerminalRegisterView(ListCreateAPIView):
 
     def create(self, request, *args, **kwargs):
         name = request.data.get('name', '')
-        remote_addr = request.META.get('X-Real-IP') or \
+        remote_addr = request.META.get('HTTP_X_REAL_IP') or \
                       request.META.get('REMOTE_ADDR')
         serializer = self.serializer_class(
             data={'name': name, 'remote_addr': remote_addr})
