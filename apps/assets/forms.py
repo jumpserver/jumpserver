@@ -273,26 +273,24 @@ class SystemUserForm(forms.ModelForm):
         }
 
 
-class SystemUserUpdateForm(forms.ModelForm):
-    class Meta:
-        model = SystemUser
-        fields = [
-            'name', 'username', 'protocol', 'priority',
-            'sudo', 'comment', 'shell', 'cluster'
-        ]
-        widgets = {
-            'name': forms.TextInput(attrs={'placeholder': _('Name')}),
-            'username': forms.TextInput(attrs={'placeholder': _('Username')}),
-            'cluster': forms.SelectMultiple(
-                attrs={'class': 'select2',
-                       'data-placeholder': _(' Select clusters')}),
-        }
-        help_texts = {
-            'name': '* required',
-            'username': '* required',
-            'cluster': 'If auto push checked, then push system user to that cluster assets',
-            'priority': 'High level will be using login asset as default, if user was granted more than 2 system user',
-        }
+class SystemUserUpdateForm(SystemUserForm):
+    def save(self, commit=True):
+        # Because we define custom field, so we need rewrite :method: `save`
+        password = self.cleaned_data.get('password', None)
+        private_key_file = self.cleaned_data.get('private_key_file')
+        system_user = super(forms.ModelForm, self).save()
+
+        if private_key_file:
+            print(private_key_file)
+            private_key = private_key_file.read().strip().decode('utf-8')
+            public_key = ssh_pubkey_gen(private_key=private_key)
+        else:
+            private_key = public_key = None
+        system_user.set_auth(password=password, private_key=private_key, public_key=public_key)
+        return system_user
+
+    def clean_password(self):
+        return self.cleaned_data['password']
 
 
 class SystemUserAuthForm(forms.Form):

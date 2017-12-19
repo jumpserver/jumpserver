@@ -102,6 +102,44 @@
                                 </div>
                             </div>
                         </div>
+{#                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">#}
+{#                            <div class="panel panel-primary">#}
+{#                                <div class="panel-heading">#}
+{#                                    <i class="fa fa-info-circle"></i> {% trans 'Update admin user' %}#}
+{#                                </div>#}
+{#                                <div class="panel-body">#}
+{#                                    <table class="table cluster_edit" id="add-asset2group">#}
+{#                                        <tbody>#}
+{#                                        <form>#}
+{#                                            <tr>#}
+{#                                                <td colspan="2" class="no-borders">#}
+{#                                                    <select data-placeholder="{% trans 'Select admin user' %}" id="cluster_selected" class="select2" style="width: 100%"  tabindex="4">#}
+{#                                                        {% for admin_user in admin_user_list %}#}
+{#                                                        <option value="{{ admin_user.id }}" id="opt_{{ admin_user.id }}" {% if admin_user.id == cluster.admin_user.id %} selected {% endif %} >{{ admin_user.name }}</option>#}
+{#                                                        {% endfor %}#}
+{#                                                    </select>#}
+{#                                                </td>#}
+{#                                            </tr>#}
+{#                                            <tr>#}
+{#                                                <td colspan="2" class="no-borders">#}
+{#                                                    <button type="button" class="btn btn-primary btn-sm" id="btn-add-to-cluster">{% trans 'Confirm' %}</button>#}
+{#                                                </td>#}
+{#                                            </tr>#}
+{#                                        </form>#}
+{##}
+{#                                        {% for cluster in system_user.cluster.all %}#}
+{#                                        <tr>#}
+{#                                          <td ><b class="bdg_cluster" data-gid={{ cluster.id }}>{{ cluster.name }}</b></td>#}
+{#                                          <td>#}
+{#                                              <button class="btn btn-danger pull-right btn-xs btn-remove-from-cluster" type="button"><i class="fa fa-minus"></i></button>#}
+{#                                          </td>#}
+{#                                        </tr>#}
+{#                                        {% endfor %}#}
+{#                                        </tbody>#}
+{#                                    </table>#}
+{#                                </div>#}
+{#                            </div>#}
+{#                        </div>#}
                     </div>
                 </div>
             </div>
@@ -111,46 +149,16 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-function clusterDelete(name, url) {
-    function doDelete() {
-        var body = {};
-        var success = function() {
-            swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
-	        window.location.href="{% url 'assets:cluster-list' %}";
-        };
-        var fail = function() {
-            swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");
-        };
-        APIUpdateAttr({
-            url: url,
-            body: JSON.stringify(body),
-            method: 'DELETE',
-            success: success,
-            error: fail
-        });
-    }
-    swal({
-        title: 'Are you sure delete ?',
-        text: " [" + name + "] ",
-        type: "warning",
-        showCancelButton: true,
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: 'Confirm',
-        closeOnConfirm: false
-    }, function () {
-        doDelete()
-    });
-}
 
 $(document).ready(function () {
 	$('.select2').select2();
 })
 .on('click', '.btn-delete-cluster', function () {
-	var name = $('.cluster-details > tbody > tr').attr("data-name");
-	var id = {{ cluster.id }};
+	var name = "{{ cluster.name }}";
+	var id = "{{ cluster.id }}";
 	var the_url = '{% url "api-assets:cluster-detail" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", id);
-	clusterDelete(name, the_url);
+	var redirect_url = "{% url 'assets:cluster-list' %}";
+	objectDelete(this, name, the_url, redirect_url);
 });
 </script>
 {% endblock %}

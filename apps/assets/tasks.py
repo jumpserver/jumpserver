@@ -181,10 +181,10 @@ def test_admin_user_connectability_manual(asset, task_name=None):
 
     if result.results_summary['dark']:
         cache.set(const.ASSET_ADMIN_CONN_CACHE_KEY.format(asset.hostname), 0, CACHE_MAX_TIME)
-        return False
+        return False, result.results_summary['dark']
     else:
         cache.set(const.ASSET_ADMIN_CONN_CACHE_KEY.format(asset.hostname), 1, CACHE_MAX_TIME)
-        return True
+        return True, ""
 
 
 @shared_task
@@ -211,7 +211,8 @@ def test_system_user_connectability(system_user, force=False):
     )
     cache.set(lock_key, 1, CACHE_MAX_TIME)
     result = task.run()
-    cache_key = const.SYSTEM_USER_CONN_CACHE_KEY
+    cache_key = const.SYSTEM_USER_CONN_CACHE_KEY.format(system_user.name)
+    print("Set cache: {} {}".format(cache_key, result.results_summary))
     cache.set(cache_key, result.results_summary, CACHE_MAX_TIME)
     return result.results_summary
 
@@ -369,7 +370,7 @@ def update_asset_info_when_created(sender, instance=None, created=False, **kwarg
 
 
 @receiver(post_save, sender=Asset, dispatch_uid="my_unique_identifier")
-def update_asset_conn_info_when_created(sender, instance=None, created=False, **kwargs):
+def update_asset_conn_info_on_created(sender, instance=None, created=False, **kwargs):
     if instance and created:
         task_name = 'TEST-ASSET-CONN-WHEN-CREATED-{}'.format(instance)
         msg = "Receive asset {} create signal, test asset connectability".format(
@@ -380,7 +381,7 @@ def update_asset_conn_info_when_created(sender, instance=None, created=False, **
 
 
 @receiver(post_save, sender=Asset, dispatch_uid="my_unique_identifier")
-def push_system_user_when_created(sender, instance=None, created=False, **kwargs):
+def push_system_user_on_created(sender, instance=None, created=False, **kwargs):
     if instance and created:
         task_name = 'PUSH-SYSTEM-USER-WHEN-ASSET-CREATED-{}'.format(instance)
         system_users = instance.cluster.systemuser_set.all()
@@ -392,15 +393,7 @@ def push_system_user_when_created(sender, instance=None, created=False, **kwargs
 
 
 @receiver(post_save, sender=SystemUser)
-def push_system_user_on_change(sender, instance=None, created=False, **kwargs):
-    if instance and instance.auto_push:
-        logger.debug("System user `{}` auth changed, push it".format(instance.name))
-        task_name = "PUSH-SYSTEM-USER-ON-CREATED-{}".format(instance.name)
-        push_system_user_to_cluster_assets.delay(instance, task_name)
-
-
-@receiver(post_save, sender=SystemUser)
-def push_system_user_on_change(sender, instance=None, update_fields=None, **kwargs):
+def push_system_user_on_auth_change(sender, instance=None, update_fields=None, **kwargs):
     fields_check = {'_password', '_private_key', '_public_key'}
     auth_changed = update_fields & fields_check if update_fields else None
     if instance and instance.auto_push and auth_changed:

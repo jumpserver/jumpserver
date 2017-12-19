@@ -60,7 +60,7 @@
                                                 <th>{% trans 'IP' %}</th>
                                                 <th>{% trans 'Port' %}</th>
                                                 <th>{% trans 'Type' %}</th>
-                                                <th>{% trans 'Valid' %}</th>
+                                                <th>{% trans 'Alive' %}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -78,10 +78,10 @@
                                     <table class="table">
                                         <tbody>
                                         <tr class="no-borders-tr">
-                                            <td width="50%">{% trans 'Retest connectivity' %}:</td>
+                                            <td width="50%">{% trans 'Test connective' %}:</td>
                                             <td>
                                                 <span style="float: right">
-                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Start' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs btn-test-connective" style="width: 54px">{% trans 'Test' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
@@ -98,56 +98,6 @@
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-Array.prototype.remove = function(val) {
-	var index = this.indexOf(val);
-		if (index > -1) {
-		this.splice(index, 1);
-	}
-};
-Array.prototype.unique = function(){
-	var res = [];
-	var json = {};
- 	for(var i = 0; i < this.length; i++){
-  		if(!json[this[i]]){
-   			res.push(this[i]);
-   			json[this[i]] = 1;
-  		}
- 	}
- 	return res;
-};
-function objectRemove(obj, name, url, data) {
-    function doRemove() {
-        var body = data;
-        var success = function() {
-            swal('Remove!', "[ "+name+"]"+" has been deleted ", "success");
-            $(obj).parent().parent().remove();
-        };
-        var fail = function() {
-            swal("Failed", "Remove"+"[ "+name+" ]"+"failed", "error");
-        };
-        APIUpdateAttr({
-            url: url,
-            body: JSON.stringify(body),
-            method: 'PATCH',
-            success: success,
-            error: fail
-        });
-    }
-    swal({
-        title: 'Are you sure remove ?',
-        text: " [" + name + "] ",
-        type: "warning",
-        showCancelButton: true,
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: 'Confirm',
-        closeOnConfirm: false
-    }, function () {
-        doRemove()
-    });
-}
-jumpserver.assets_selected = {};
-jumpserver.asset_groups_selected = {};
 
 function initTable() {
     var options = {
@@ -168,56 +118,13 @@ function initTable() {
 			}}],
 		ajax_url: '{% url "api-assets:asset-list" %}?admin_user_id={{ admin_user.id }}',
 		columns: [{data: function(){return ""}}, {data: "hostname" }, {data: "ip" }, {data: "port" },
-			{data: "type" }, {data: "is_active" }],
+			{data: "type" }, {data: "is_connective" }],
 		op_html: $('#actions').html()
 	};
 	jumpserver.initDataTable(options);
 }
 
-function adminUserDelete(name, url) {
-    function doDelete() {
-        var body = {};
-        var success = function() {
-            swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
-	        window.location.href="{% url 'assets:cluster-list' %}";
-        };
-        var fail = function() {
-            swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");
-        };
-        APIUpdateAttr({
-            url: url,
-            body: JSON.stringify(body),
-            method: 'DELETE',
-            success: success,
-            error: fail
-        });
-    }
-    swal({
-        title: 'Are you sure delete ?',
-        text: " [" + name + "] ",
-        type: "warning",
-        showCancelButton: true,
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: 'Confirm',
-        closeOnConfirm: false
-    }, function () {
-        doDelete()
-    });
-}
-
 $(document).ready(function () {
-	$('.select2').select2()
-	.on("select2:select", function (evt) {
-		var data = evt.params.data;
-		jumpserver.assets_selected[data.id] = data.text;
-		jumpserver.asset_groups_selected[data.id] = data.text;
-	})
-	.on('select2:unselect', function(evt) {
-		var data = evt.params.data;
-		delete jumpserver.assets_selected[data.id];
-		delete jumpserver.asset_groups_selected[data.id]
-	});
 	initTable();
 })
 .on('click', '.btn-delete-admin-user', function () {
@@ -227,6 +134,18 @@ $(document).ready(function () {
     var the_url = '{% url "api-assets:admin-user-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
     var redirect_url = "{% url 'assets:admin-user-list' %}";
     objectDelete($this, name, the_url, redirect_url);
+})
+.on('click', '.btn-test-connective', function () {
+    var the_url = "{% url 'api-assets:admin-user-connective' pk=admin_user.id %}";
+    var error = function (data) {
+        alert(data)
+    };
+    APIUpdateAttr({
+        url: the_url,
+        error: error,
+        method: 'GET',
+        success_message: "{% trans "Task has been send, seen left asset status" %}"
+    });
 })
 </script>
 {% endblock %}

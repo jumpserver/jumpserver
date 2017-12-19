@@ -24,7 +24,7 @@ class ClusterListView(AdminUserRequiredMixin, TemplateView):
             # 'keyword': self.request.GET.get('keyword', '')
         }
         kwargs.update(context)
-        return super(ClusterListView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class ClusterCreateView(AdminUserRequiredMixin, CreateView):
@@ -39,13 +39,13 @@ class ClusterCreateView(AdminUserRequiredMixin, CreateView):
             'action': _('Create Cluster'),
         }
         kwargs.update(context)
-        return super(ClusterCreateView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
         cluster = form.save(commit=False)
         cluster.created_by = self.request.user.username or 'System'
         cluster.save()
-        return super(ClusterCreateView, self).form_valid(form)
+        return super().form_valid(form)
 
 
 class ClusterUpdateView(AdminUserRequiredMixin, UpdateView):
@@ -58,7 +58,7 @@ class ClusterUpdateView(AdminUserRequiredMixin, UpdateView):
     def form_valid(self, form):
         cluster = form.save(commit=False)
         cluster.save()
-        return super(ClusterUpdateView, self).form_valid(form)
+        return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = {
@@ -66,13 +66,23 @@ class ClusterUpdateView(AdminUserRequiredMixin, UpdateView):
             'action': _('Update Cluster'),
         }
         kwargs.update(context)
-        return super(ClusterUpdateView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class ClusterDetailView(AdminUserRequiredMixin, DetailView):
     model = Cluster
     template_name = 'assets/cluster_detail.html'
     context_object_name = 'cluster'
+
+    def get_context_data(self, **kwargs):
+        admin_user_list = AdminUser.objects.exclude()
+        context = {
+            'app': _('Assets'),
+            'action': _('Cluster detail'),
+            'admin_user_list': admin_user_list,
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
 
 
 class ClusterAssetsView(AdminUserRequiredMixin, DetailView):
@@ -92,7 +102,7 @@ class ClusterAssetsView(AdminUserRequiredMixin, DetailView):
             'assets': [asset for asset in Asset.objects.all() if asset not in assets_remain],
         }
         kwargs.update(context)
-        return super(ClusterAssetsView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class ClusterDeleteView(AdminUserRequiredMixin, DeleteView):

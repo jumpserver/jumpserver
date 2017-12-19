@@ -18,7 +18,6 @@ from ..hands import AdminUserRequiredMixin
 __all__ = ['SystemUserCreateView', 'SystemUserUpdateView',
            'SystemUserDetailView', 'SystemUserDeleteView',
            'SystemUserAssetView', 'SystemUserListView',
-           'SystemUserAuthView',
            ]
 
 
@@ -112,38 +111,6 @@ class SystemUserAssetView(AdminUserRequiredMixin, DetailView):
         context = {
             'app': 'assets',
             'action': 'System user asset',
-        }
-        kwargs.update(context)
-        return super().get_context_data(**kwargs)
-
-
-class SystemUserAuthView(AdminUserRequiredMixin, SingleObjectMixin,
-                         SuccessMessageMixin, FormView):
-    model = SystemUser
-    template_name = 'assets/system_user_auth.html'
-    context_object_name = 'system_user'
-    form_class = SystemUserAuthForm
-    success_message = _("Update auth info success")
-    object = None
-
-    def get(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return super().get(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        return super().post(request, *args, **kwargs)
-
-    def form_valid(self, form):
-        instance = form.update(self.object)
-        success_url = reverse('assets:system-user-detail', kwargs={"pk": instance.id})
-        messages.success(self.request, self.success_message)
-        return redirect(success_url)
-
-    def get_context_data(self, **kwargs):
-        context = {
-            'app': 'assets',
-            'action': 'System user auth',
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

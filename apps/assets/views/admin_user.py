@@ -106,7 +106,7 @@ class AdminUserAssetsView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
     def get_queryset(self):
         queryset = []
         for cluster in self.object.cluster_set.all():
-            queryset.extend(list(cluster.assets.all()))
+            queryset.extend([asset for asset in cluster.assets.all() if not asset.admin_user])
         self.queryset = queryset
         return queryset
 
@@ -115,7 +115,7 @@ class AdminUserAssetsView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
             'app': 'assets',
             'action': 'Admin user detail',
             "total_amount": len(self.queryset),
-            'unreachable_amount': len([asset for asset in self.queryset if asset.is_connective() is False])
+            'unreachable_amount': len([asset for asset in self.queryset if asset.is_connective is False])
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

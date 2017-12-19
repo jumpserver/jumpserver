@@ -18,14 +18,16 @@ from rest_framework.response import Response
 from rest_framework_bulk import BulkModelViewSet
 from rest_framework_bulk import ListBulkCreateUpdateDestroyAPIView
 from django.shortcuts import get_object_or_404
+from django.db.models import Q
 
 from common.mixins import IDInFilterMixin
-from common.utils import get_object_or_none
 from .hands import IsSuperUser, IsValidUser, IsSuperUserOrAppUser, \
-    get_user_granted_assets, push_users
+    get_user_granted_assets
 from .models import AssetGroup, Asset, Cluster, SystemUser, AdminUser
 from . import serializers
-from .tasks import update_assets_hardware_info, test_admin_user_connectability_manual
+from .tasks import update_assets_hardware_info, test_admin_user_connectability, \
+    test_admin_user_connectability_manual, push_system_user_to_cluster_assets, \
+    test_system_user_connectability
 
 
 class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
@@ -51,8 +53,9 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
             queryset = queryset.filter(groups__id=asset_group_id)
         if admin_user_id:
             admin_user = get_object_or_404(AdminUser, id=admin_user_id)
+            assets_direct = [asset.id for asset in admin_user.asset_set.all()]
             clusters = [cluster.id for cluster in admin_user.cluster_set.all()]
-            queryset = queryset.filter(cluster__id__in=clusters)
+            queryset = queryset.filter(Q(cluster__id__in=clusters)|Q(id__in=assets_direct))
         return queryset
 
 
@@ -62,15 +65,6 @@ class AssetGroupViewSet(IDInFilterMixin, BulkModelViewSet):
     """
     queryset = AssetGroup.objects.all()
     serializer_class = serializers.AssetGroupSerializer
-    permission_classes = (IsSuperUser,)
-
-
-class AssetUpdateGroupApi(generics.RetrieveUpdateAPIView):
-    """
-    Asset update it's group api
-    """
-    queryset = Asset.objects.all()
-    serializer_class = serializers.AssetUpdateGroupSerializer
     permission_classes = (IsSuperUser,)
 
 
@@ -115,6 +109,18 @@ class ClusterViewSet(IDInFilterMixin, BulkModelViewSet):
     queryset = Cluster.objects.all()
     serializer_class = serializers.ClusterSerializer
     permission_classes = (IsSuperUser,)
+
+
+# TOdo
+class ClusterTestAssetsAliveApi(generics.RetrieveAPIView):
+    """
+    Test cluster asset can connect using admin user or not
+    """
+    queryset = Cluster.objects.all()
+    permission_classes = (IsSuperUser,)
+
+    def retrieve(self, request, *args, **kwargs):
+        cluster = self.get_object()
 
 
 class ClusterAddAssetsApi(generics.UpdateAPIView):
@@ -162,13 +168,17 @@ class AdminUserAddClustersApi(generics.UpdateAPIView):
             return Response({'error': serializer.errors}, status=400)
 
 
-class SystemUserViewSet(IDInFilterMixin, BulkModelViewSet):
+class SystemUserViewSet(BulkModelViewSet):
     """
     System user api set, for add,delete,update,list,retrieve resource
     """
     queryset = SystemUser.objects.all()
     serializer_class = serializers.SystemUserSerializer
     permission_classes = (IsSuperUserOrAppUser,)
+
+    def update(self, request, *args, **kwargs):
+        print(request.data)
+        return super().update(request, *args, **kwargs)
 
 
 class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
@@ -199,7 +209,7 @@ class SystemUserAuthInfoApi(generics.RetrieveAPIView):
         return Response(data)
 
 
-class AssetRefreshHardwareView(generics.RetrieveAPIView):
+class AssetRefreshHardwareApi(generics.RetrieveAPIView):
     """
     Refresh asset hardware info
     """
@@ -217,7 +227,7 @@ class AssetRefreshHardwareView(generics.RetrieveAPIView):
             return Response({"msg": "ok"})
 
 
-class AssetAdminUserTestView(AssetRefreshHardwareView):
+class AssetAdminUserTestApi(generics.RetrieveAPIView):
     """
     Test asset admin user connectivity
     """
@@ -227,9 +237,47 @@ class AssetAdminUserTestView(AssetRefreshHardwareView):
     def retrieve(self, request, *args, **kwargs):
         asset_id = kwargs.get('pk')
         asset = get_object_or_404(Asset, pk=asset_id)
-        result = test_admin_user_connectability_manual(asset)
-        if result:
-            return Response('1')
+        ok, msg = test_admin_user_connectability_manual(asset)
+        if ok:
+            return Response({"msg": "pong"})
         else:
-            return Response('0', status=502)
+            return Response({"error": msg}, status=502)
 
+
+class AdminUserTestConnectiveApi(generics.RetrieveAPIView):
+    """
+    Test asset admin user connectivity
+    """
+    queryset = AdminUser.objects.all()
+    permission_classes = (IsSuperUser,)
+
+    def retrieve(self, request, *args, **kwargs):
+        admin_user = self.get_object()
+        test_admin_user_connectability.delay(admin_user, force=True)
+        return Response({"msg": "Task created"})
+
+
+class SystemUserPushApi(generics.RetrieveAPIView):
+    """
+    Push system user to cluster assets api
+    """
+    queryset = SystemUser.objects.all()
+    permission_classes = (IsSuperUser,)
+
+    def retrieve(self, request, *args, **kwargs):
+        system_user = self.get_object()
+        push_system_user_to_cluster_assets.delay(system_user, force=True)
+        return Response({"msg": "Task created"})
+
+
+class SystemUserTestConnectiveApi(generics.RetrieveAPIView):
+    """
+    Push system user to cluster assets api
+    """
+    queryset = SystemUser.objects.all()
+    permission_classes = (IsSuperUser,)
+
+    def retrieve(self, request, *args, **kwargs):
+        system_user = self.get_object()
+        test_system_user_connectability.delay(system_user, force=True)
+        return Response({"msg": "Task created"})

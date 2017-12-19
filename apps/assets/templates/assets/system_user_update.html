@@ -4,6 +4,15 @@
 {% load bootstrap3 %}
 
 {% block auth %}
+    <h3>{% trans 'Auth' %}</h3>
+    {% bootstrap_field form.private_key_file layout="horizontal" %}
+    {% bootstrap_field form.password layout="horizontal" %}
+    <div class="form-group">
+        <label for="{{ form.as_push.id_for_label }}" class="col-sm-2 control-label">{% trans 'Auto push' %}</label>
+        <div class="col-sm-8">
+            {{ form.auto_push}}
+        </div>
+    </div>
 {% endblock %}
 
 {% block custom_foot_js %}

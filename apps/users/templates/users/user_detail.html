@@ -156,7 +156,7 @@
                                             <td>{% trans 'Send reset password mail' %}:</td>
                                             <td>
                                                 <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_password" style="width: 54px">{% trans 'Send' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn-reset-password" style="width: 54px">{% trans 'Send' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
@@ -164,7 +164,7 @@
                                             <td>{% trans 'Send reset ssh key mail' %}:</td>
                                             <td>
                                                 <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_pk" style="width: 54px;">{% trans 'Send' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn-reset-pk" style="width: 54px;">{% trans 'Send' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
@@ -315,7 +315,7 @@ $(document).ready(function() {
         return $(this).data('gid');
     }).get();
     updateUserGroups(groups)
-}).on('click', '#btn_reset_password', function() {
+}).on('click', '#btn-reset-password', function() {
     function doReset() {
         var the_url = '{% url "api-users:user-reset-password" pk=user_object.id %}';
         var body = {};
@@ -340,7 +340,7 @@ $(document).ready(function() {
     }, function() {
         doReset();
     });
-}).on('click', '#btn_reset_pk', function() {
+}).on('click', '#btn-reset-pk', function() {
     function doReset() {
         var the_url = '{% url "api-users:user-public-key-reset" pk=user_object.id %}';
         var body = {};

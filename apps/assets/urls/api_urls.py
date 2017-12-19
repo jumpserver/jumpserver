@@ -17,12 +17,10 @@ urlpatterns = [
     url(r'^v1/assets-bulk/$', api.AssetListUpdateApi.as_view(), name='asset-bulk-update'),
     url(r'^v1/system-user/(?P<pk>[0-9a-zA-Z\-]{36})/auth-info/', api.SystemUserAuthInfoApi.as_view(),
         name='system-user-auth-info'),
-    url(r'^v1/assets/(?P<pk>[0-9a-zA-Z\-]{36})/groups/$',
-        api.AssetUpdateGroupApi.as_view(), name='asset-update-group'),
     url(r'^v1/assets/(?P<pk>[0-9a-zA-Z\-]{36})/refresh/$',
-        api.AssetRefreshHardwareView.as_view(), name='asset-refresh'),
-    url(r'^v1/assets/(?P<pk>[0-9a-zA-Z\-]{36})/admin-user-test/$',
-        api.AssetAdminUserTestView.as_view(), name='asset-admin-user-test'),
+        api.AssetRefreshHardwareApi.as_view(), name='asset-refresh'),
+    url(r'^v1/assets/(?P<pk>[0-9a-zA-Z\-]{36})/alive/$',
+        api.AssetAdminUserTestApi.as_view(), name='asset-alive-test'),
     # update the asset group, which add or delete the asset to the group
     url(r'^v1/groups/(?P<pk>[0-9a-zA-Z\-]{36})/assets/$',
         api.GroupUpdateAssetsApi.as_view(), name='group-update-assets'),
@@ -35,6 +33,12 @@ urlpatterns = [
         api.ClusterAddAssetsApi.as_view(), name='cluster-add-assets'),
     url(r'^v1/admin-user/(?P<pk>[0-9a-zA-Z\-]{36})/clusters/$',
         api.AdminUserAddClustersApi.as_view(), name='admin-user-add-clusters'),
+    url(r'^v1/admin-user/(?P<pk>[0-9a-zA-Z\-]{36})/connective/$',
+        api.AdminUserTestConnectiveApi.as_view(), name='admin-user-connective'),
+    url(r'^v1/system-user/(?P<pk>[0-9a-zA-Z\-]{36})/push/$',
+        api.SystemUserPushApi.as_view(), name='system-user-push'),
+    url(r'^v1/system-user/(?P<pk>[0-9a-zA-Z\-]{36})/connective/$',
+        api.SystemUserTestConnectiveApi.as_view(), name='system-user-connective'),
 ]
 
 urlpatterns += router.urls

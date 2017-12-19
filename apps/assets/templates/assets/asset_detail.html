@@ -71,8 +71,8 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Admin user' %}:</td>
-                                            {% if asset.admin_user %}
-                                            <td><b>{{ asset.admin_user.name }}</b></td>
+                                            {% if asset.admin_user_avail %}
+                                            <td><b>{{ asset.admin_user_avail.name }}</b></td>
                                             {% else %}
                                             <td><b>None</b></td>
                                             {% endif %}
@@ -195,6 +195,14 @@
                                                 </span>
                                             </td>
                                         </tr>
+                                        <tr>
+                                            <td>{% trans 'Test is alive' %}:</td>
+                                            <td>
+                                                <span class="pull-right">
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn-test-is-alive" style="width: 54px">{% trans 'Test' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
                                         </tbody>
                                     </table>
                                 </div>
@@ -248,7 +256,7 @@
 <script>
 jumpserver.groups_selected = {};
 function updateAssetGroups(groups) {
-    var the_url = "{% url 'api-assets:asset-update-group' pk=asset.id %}";
+    var the_url = "{% url 'api-assets:asset-detail' pk=asset.id %}";
     var body = {
         groups: Object.assign([], groups)
     };
@@ -355,14 +363,18 @@ $(document).ready(function () {
 }).on('click', '#btn_refresh_asset', function () {
     alert('关闭alert, 等待完成, 自动刷新页面');
     refreshAssetHardware()
-}).on('click', '#btn_test_admin_user', function () {
-    $.ajax({
-        url: '{% url "api-assets:asset-admin-user-test" pk=asset.id %}'
-    }).done(function (data, textStatue, jqXHR) {
-        toastr.success('Success')
-    }).fail(function (data, textStaue, errorThrown) {
-        toastr.error('Error')
-    })
+}).on('click', '#btn-test-is-alive', function () {
+    var the_url = "{% url 'api-assets:asset-alive-test' pk=asset.id %}";
+    var error = function (data) {
+        alert(data)
+    };
+    alert('关闭alert, 等待完成');
+    APIUpdateAttr({
+        url: the_url,
+        error: error,
+        method: 'GET',
+        success_message: "{% trans "Pong" %}"
+    });
 })
 
 </script>

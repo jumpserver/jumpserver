@@ -116,6 +116,23 @@ class Asset(models.Model):
         else:
             return False
 
+    @property
+    def admin_user_avail(self):
+        if self.admin_user:
+            admin_user = self.admin_user
+        elif self.cluster and self.cluster.admin_user:
+            admin_user = self.cluster.admin_user
+        else:
+            return None
+        return admin_user
+
+    @property
+    def is_has_private_admin_user(self):
+        if self.admin_user:
+            return True
+        else:
+            return False
+
     def to_json(self):
         return {
             'id': self.id,
@@ -133,12 +150,8 @@ class Asset(models.Model):
         Todo: May be move to ops implements it
         """
         data = self.to_json()
-        admin_user = None
-        if self.admin_user:
-            admin_user = self.admin_user
-        elif self.cluster and self.cluster.admin_user:
-            admin_user = self.cluster.admin_user
-        if admin_user:
+        if self.admin_user_avail:
+            admin_user = self.admin_user_avail
             data.update({
                 'username': admin_user.username,
                 'password': admin_user.password,

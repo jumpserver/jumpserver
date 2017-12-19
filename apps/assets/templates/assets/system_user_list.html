@@ -17,7 +17,9 @@
         <th class="text-center">{% trans 'Name' %}</th>
         <th class="text-center">{% trans 'Username' %}</th>
         <th class="text-center">{% trans 'Asset' %}</th>
+        <th class="text-center">{% trans 'Reachable' %}</th>
         <th class="text-center">{% trans 'Unreachable' %}</th>
+        <th class="text-center">{% trans 'Ratio' %}</th>
         <th class="text-center">{% trans 'Comment' %}</th>
         <th class="text-center">{% trans 'Action' %}</th>
     </tr>
@@ -25,19 +27,6 @@
     <tbody>
     </tbody>
 </table>
-<div id="actions" class="hide">
-    <div class="input-group">
-        <select class="form-control m-b" style="width: auto" id="slct_bulk_update">
-            <option value="delete">{% trans 'Delete selected' %}</option>
-            <option value="update">{% trans 'Update selected' %}</option>
-        </select>
-        <div class="input-group-btn pull-left" style="padding-left: 5px;">
-            <button id='btn_bulk_update' style="height: 32px;"  class="btn btn-sm btn-primary">
-                {% trans 'Submit' %}
-            </button>
-        </div>
-    </div>
-</div>
 {% endblock %}
 {% block custom_foot_js %}
 <script>
@@ -49,19 +38,52 @@ $(document).ready(function(){
                 var detail_btn = '<a href="{% url "assets:system-user-detail" pk=DEFAULT_PK %}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
             }},
+            {targets: 4, createdCell: function (td, cellData) {
+                var innerHtml = "";
+                if (cellData !== 0) {
+                    innerHtml = "<span class='text-navy'>" + cellData + "</span>";
+                } else {
+                    innerHtml = "<span>" + cellData + "</span>";
+                }
+                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData +'">' + innerHtml + '</span>');
+            }},
             {targets: 5, createdCell: function (td, cellData) {
-                var innerHtml = cellData.length > 30 ? cellData.substring(0, 30) + '...': cellData;
+                var innerHtml = "";
+                if (cellData !== 0) {
+                    innerHtml = "<span class='text-danger'>" + cellData + "</span>";
+                } else {
+                    innerHtml = "<span>" + cellData + "</span>";
+                }
                 $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
             }},
             {targets: 6, createdCell: function (td, cellData, rowData) {
+                var val = 0;
+                var innerHtml = "";
+                var total = rowData.assets_amount;
+                var reachable = rowData.reachable_amount;
+                if (total !== 0) {
+                    val = reachable/total * 100;
+                }
+
+                if (val === 100) {
+                    innerHtml = "<span class='text-navy'>" + val + "% </span>";
+                } else {
+                    innerHtml = "<span class='text-danger'>" + val + "% </span>";
+                }
+                $(td).html('<span href="javascript:void(0);" data-toggle="tooltip" title="' + cellData + '">' + innerHtml + '</span>');
+
+            }},
+            {targets: 8, createdCell: function (td, cellData, rowData) {
 {#                var script_btn = '<a href="{% url "assets:system-user-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-primary">{% trans "Script" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);#}
                 var update_btn = '<a href="{% url "assets:system-user-update" pk=DEFAULT_PK %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_admin_user_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(update_btn + del_btn)
             }}],
         ajax_url: '{% url "api-assets:system-user-list" %}',
-        columns: [{data: "id" }, {data: "name" }, {data: "username" }, {data: "assets_amount" }, {data: "unreachable_amount"},
-            {data: "comment" }, {data: "id" }],
+        columns: [
+            {data: "id" }, {data: "name" }, {data: "username" }, {data: "assets_amount" },
+            {data: "reachable_amount"}, {data: "unreachable_amount"}, {data: "id"}, {data: "comment" }, {data: "id" }
+        ],
         op_html: $('#actions').html()
         };
     jumpserver.initDataTable(options);

@@ -65,6 +65,25 @@
                         <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Quick update' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table">
+                                        <tbody>
+                                        <tr class="no-borders-tr">
+                                            <td width="50%">{% trans 'Test assets alive' %}:</td>
+                                            <td>
+                                                <span style="float: right">
+                                                    <button type="button" class="btn btn-primary btn-xs" id="btn-test-assets" style="width: 54px">{% trans 'Run' %}</button>
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Add assets to' %} {{ cluster.name }}
                                 </div>
                                 <div class="panel-body">
@@ -173,7 +192,6 @@ $(document).ready(function () {
 	});
 	initTable();
 })
-
 .on('click', '.btn-add-assets', function () {
 	if (Object.keys(jumpserver.assets_selected).length === 0) {
 		return false;
@@ -184,6 +202,9 @@ $(document).ready(function () {
     });
 
     addAssets(assets_id);
+})
+.on('click', '#btn-test-assets', function () {
+    console.log('ok');
 })
 </script>
 {% endblock %}

@@ -8,12 +8,14 @@ import uuid
 from hashlib import md5
 
 import sshpubkeys
+from django.core.cache import cache
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
 from common.utils import signer, ssh_key_string_to_obj, ssh_key_gen
 from .utils import private_key_validator
+from ..const import SYSTEM_USER_CONN_CACHE_KEY
 
 
 __all__ = ['AdminUser', 'SystemUser',]
@@ -103,6 +105,7 @@ class AssetUser(models.Model):
             update_fields.append('_public_key')
 
         if update_fields:
+            print(update_fields)
             self.save(update_fields=update_fields)
 
     def auto_gen_auth(self):
@@ -195,7 +198,7 @@ class SystemUser(AssetUser):
         ('P', 'Password'),
         ('K', 'Public key'),
     )
-    cluster = models.ManyToManyField('assets.Cluster', verbose_name=_("Cluster"))
+    cluster = models.ManyToManyField('assets.Cluster', null=True, blank=True, verbose_name=_("Cluster"))
     priority = models.IntegerField(default=10, verbose_name=_("Priority"))  # Todo: If user granted more priority user, default will be login as the hign
     protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
@@ -223,6 +226,19 @@ class SystemUser(AssetUser):
             'priority': self.priority,
             'auto_push': self.auto_push,
         }
+
+    @property
+    def assets_connective(self):
+        _result = cache.get(SYSTEM_USER_CONN_CACHE_KEY.format(self.name), {})
+        return _result
+
+    @property
+    def unreachable_assets(self):
+        return list(self.assets_connective.get('dark', {}).keys())
+
+    @property
+    def reachable_assets(self):
+        return self.assets_connective.get('contacted', [])
 
     class Meta:
         ordering = ['name']

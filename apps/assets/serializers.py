@@ -25,17 +25,6 @@ class AssetGroupSerializer(BulkSerializerMixin, serializers.ModelSerializer):
         return obj.assets.count()
 
 
-class AssetUpdateGroupSerializer(serializers.ModelSerializer):
-    """
-    资产更新自己所在资产组的请求数据结构定义
-    """
-    groups = serializers.PrimaryKeyRelatedField(many=True, queryset=AssetGroup.objects.all())
-
-    class Meta:
-        model = Asset
-        fields = ['id', 'groups']
-
-
 class AssetUpdateSystemUserSerializer(serializers.ModelSerializer):
     """
     资产更新其系统用户请求的数据结构定义
@@ -90,11 +79,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_assets_amount(obj):
-        amount = 0
-        clusters = obj.cluster_set.all()
-        for cluster in clusters:
-            amount += len(cluster.assets.all())
-        return amount
+        return obj.assets_amount
 
 
 class SystemUserSerializer(serializers.ModelSerializer):
@@ -102,6 +87,9 @@ class SystemUserSerializer(serializers.ModelSerializer):
     系统用户
     """
     unreachable_amount = serializers.SerializerMethodField()
+    reachable_amount = serializers.SerializerMethodField()
+    unreachable_assets = serializers.SerializerMethodField()
+    reachable_assets = serializers.SerializerMethodField()
     assets_amount = serializers.SerializerMethodField()
 
     class Meta:
@@ -109,12 +97,18 @@ class SystemUserSerializer(serializers.ModelSerializer):
         exclude = ('_password', '_private_key', '_public_key')
 
     @staticmethod
-    def get_unreachable_amount(obj):
-        data = cache.get(SYSTEM_USER_CONN_CACHE_KEY.format(obj.name))
-        if data:
-            return len(data.get('dark'))
-        else:
-            return "Unknown"
+    def get_unreachable_assets(obj):
+        return obj.unreachable_assets
+
+    @staticmethod
+    def get_reachable_assets(obj):
+        return obj.reachable_assets
+
+    def get_unreachable_amount(self, obj):
+        return len(self.get_unreachable_assets(obj))
+
+    def get_reachable_amount(self, obj):
+        return len(self.get_reachable_assets(obj))
 
     @staticmethod
     def get_assets_amount(obj):
