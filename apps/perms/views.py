@@ -50,10 +50,11 @@ class MessageMixin:
 
     @staticmethod
     def get_warning_messages(errors):
-        message = "System user should in behind clusters, so that " \
-                  "system user auto push to cluster assets <br>"
-        for system_user, clusters in errors:
-            message += "{}: {} ".format(system_user.name, ", ".join(list(clusters)))
+        message = "<b><i class='fa fa-warning'></i>WARNING: System user " \
+                  "should in behind clusters, so that " \
+                  "system user cat auto push to the cluster assets:</b>  <br>"
+        for system_user, clusters in errors.items():
+            message += "    >>> {}: {} ".format(system_user.name, ", ".join((cluster.name for cluster in clusters)))
         return message
 
     def get_success_message(self, cleaned_data):

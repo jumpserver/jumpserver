@@ -22,7 +22,7 @@
             </div>
         </div>
         <div class="input-group">
-            <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="{{ keyword }}">
+            <input type="text" class="form-control input-sm" name="keyword" placeholder="{% trans "Search"  %}" value="{{ keyword }}">
         </div>
         <div class="input-group">
             <div class="input-group-btn">
@@ -50,7 +50,7 @@
     {% for object in task_list %}
         <tr class="gradeX">
             <td class="text-center"><input type="checkbox" class="cbx-term"> </td>
-            <td class="text-center"><a href="{% url 'ops:task-detail' pk=object.id %}">{{ object.name }}</a></td>
+            <td class="text-left"><a href="{% url 'ops:task-detail' pk=object.id %}">{{ object.name }}</a></td>
             <td class="text-center">
                 <span class="text-danger">{{ object.history_summary.failed }}</span>/<span class="text-navy">{{ object.history_summary.success}}</span>/{{ object.history_summary.total}}
             </td>
@@ -67,38 +67,37 @@
             <td class="text-center">{{ object.latest_history.timedelta|floatformat }} s</td>
             <td class="text-center">
                 <a href="{% url 'ops:task-run' pk=object.id %}" class="btn btn-xs btn-info">{% trans "Run" %}</a>
-                <a data-uid="{{ object.uuid }}" class="btn btn-xs btn-danger btn-del">{% trans "Delete" %}</a>
+                <a data-uid="{{ object.id }}" class="btn btn-xs btn-danger btn-del">{% trans "Delete" %}</a>
             </td>
         </tr>
     {% endfor %}
 {% endblock %}
 
-{# comment #}
 {% block custom_foot_js %}
-    <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
-    <script>
-        $(document).ready(function() {
-            $('table').DataTable({
-                "searching": false,
-                "paging": false,
-                "bInfo" : false,
-                "order": []
-            });
-            $('.select2').select2();
-            $('#date .input-daterange').datepicker({
-                dateFormat: 'mm/dd/yy',
-                keyboardNavigation: false,
-                forceParse: false,
-                autoclose: true
-            });
+<script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
+<script>
+$(document).ready(function() {
+    $('table').DataTable({
+        "searching": false,
+        "paging": false,
+        "bInfo" : false,
+        "order": []
+    });
+    $('.select2').select2();
+    $('#date .input-daterange').datepicker({
+        dateFormat: 'mm/dd/yy',
+        keyboardNavigation: false,
+        forceParse: false,
+        autoclose: true
+    });
 
-        }).on('click', '.btn-del', function () {
-	        var $this = $(this);
-	        var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
-	        var uid = $this.data('uid');
-	        var the_url = '{% url "api-ops:task-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
-            objectDelete($this, name, the_url);
-        })
-    </script>
+}).on('click', '.btn-del', function () {
+    var $this = $(this);
+    var name = $(this).closest("tr").find(":nth-child(2)").children('a').html();
+    var uid = $this.data('uid');
+    var the_url = '{% url "api-ops:task-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
+    objectDelete($this, name, the_url);
+})
+</script>
 {% endblock %}
 

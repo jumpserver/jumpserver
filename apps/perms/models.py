@@ -65,5 +65,5 @@ class AssetPermission(models.Model):
         for system_user in self.system_users.all():
             cluster_remain = clusters - set(system_user.cluster.all())
             if cluster_remain:
-                errors[system_user.name] = cluster_remain
+                errors[system_user] = cluster_remain
         return errors

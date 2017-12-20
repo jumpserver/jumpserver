@@ -35,8 +35,13 @@ class AdHocRunHistorySet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         task_id = self.request.query_params.get('task')
+        adhoc_id = self.request.query_params.get('adhoc')
         if task_id:
             task = get_object_or_404(Task, id=task_id)
             adhocs = task.adhoc.all()
             self.queryset = self.queryset.filter(adhoc__in=adhocs)
+
+        if adhoc_id:
+            adhoc = get_object_or_404(AdHoc, id=adhoc_id)
+            self.queryset = self.queryset.filter(adhoc=adhoc)
         return self.queryset

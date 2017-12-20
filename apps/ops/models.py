@@ -222,6 +222,14 @@ class AdHocRunHistory(models.Model):
     def summary(self, item):
         self._summary = json.dumps(item)
 
+    @property
+    def success_hosts(self):
+        return self.summary.get('contacted', [])
+
+    @property
+    def failed_hosts(self):
+        return self.summary.get('dark', {})
+
     def __str__(self):
         return self.short_id
 

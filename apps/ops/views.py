@@ -1,9 +1,9 @@
 # ~*~ coding: utf-8 ~*~
 from __future__ import unicode_literals
 import time
-import json
 from datetime import datetime
 
+from django.utils.translation import ugettext as _
 from django.conf import settings
 from django.views.generic import ListView, DetailView, View
 from django.utils import timezone
@@ -53,7 +53,7 @@ class TaskListView(ListView):
     def get_context_data(self, **kwargs):
         context = {
             'app': 'Ops',
-            'action': 'Playbook record list',
+            'action': _('Task list'),
             'date_from': self.date_from_s,
             'date_to': self.date_to_s,
             'keyword': self.keyword,
@@ -109,3 +109,42 @@ class TaskRunView(View):
         rerun_task.delay(pk)
         time.sleep(0.5)
         return redirect(reverse('ops:task-detail', kwargs={'pk': pk}))
+
+
+class AdHocDetailView(DetailView):
+    model = AdHoc
+    template_name = 'ops/adhoc_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'Ops',
+            'action': 'Task version detail',
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class AdHocHistoryView(DetailView):
+    model = AdHoc
+    template_name = 'ops/adhoc_history.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'Ops',
+            'action': 'Version run history',
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)
+
+
+class AdHocHistoryDetailView(DetailView):
+    model = AdHocRunHistory
+    template_name = 'ops/adhoc_history_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'Ops',
+            'action': 'Run history detail',
+        }
+        kwargs.update(context)
+        return super().get_context_data(**kwargs)

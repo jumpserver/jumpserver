@@ -16,13 +16,7 @@
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
                            <li class="active">
-                                <a href="{% url 'ops:task-detail' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Task detail' %} </a>
-                            </li>
-                            <li>
-                                <a href="{% url 'ops:task-adhoc' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Task versions' %} </a>
-                            </li>
-                            <li>
-                                <a href="{% url 'ops:task-history' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Run history' %} </a>
+                                <a href="{% url 'ops:adhoc-history-detail' pk=object.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Run history detail' %} </a>
                             </li>
                         </ul>
                     </div>
@@ -30,7 +24,7 @@
                         <div class="col-sm-7" style="padding-left: 0">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span class="label"><b>{{ object.name }}</b></span>
+                                    <span class="label"><b>{% trans 'History detail of' %} {{ object.task.name }}: {{ object.adhoc.short_id }} </b></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -53,46 +47,28 @@
                                             <td><b>{{ object.id }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td width="20%">{% trans 'Name' %}:</td>
-                                            <td><b>{{ object.name }}</b></td>
+                                            <td width="20%">{% trans 'Task name' %}:</td>
+                                            <td><b>{{ object.task.name }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Date created' %}:</td>
-                                            <td><b>{{ object.date_created }}</b></td>
+                                            <td>{% trans 'Version' %}:</td>
+                                            <td><b>{{ object.adhoc.short_id }}</b></td>
                                         </tr>
                                         <tr>
-                                            <td>{% trans 'Total versions' %}</td>
-                                            <td><b>{{ object.adhoc.all |length }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Latest version' %}</td>
-                                            <td><b><a href="{% url 'ops:adhoc-detail' pk=object.latest_adhoc.id %}">{{ object.latest_adhoc.short_id }}</a></b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Latest run' %}:</td>
-                                            <td><b>{{ object.latest_history.date_start }}</b></td>
+                                            <td>{% trans 'Date start' %}:</td>
+                                            <td><b>{{ object.date_start }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Time delta' %}:</td>
-                                            <td><b>{{ object.latest_history.timedelta|floatformat}} s</b></td>
+                                            <td><b>{{ object.timedelta|floatformat}} s</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Is finished' %}:</td>
-                                            <td><b>{{ object.latest_history.is_finished|yesno:"Yes,No,Unkown" }}</b></td>
+                                            <td><b>{{ object.is_finished|yesno:"Yes,No,Unkown" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Is success ' %}:</td>
-                                            <td><b>{{ object.latest_history.is_success|yesno:"Yes,No,Unkown" }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Contents' %}:</td>
-                                            <td>
-                                                <b>
-                                                {% for task in object.latest_adhoc.tasks %}
-                                                {{ forloop.counter }}. {{ task.name }} : {{ task.action.module }} <br/>
-                                                {% endfor %}
-                                                </b>
-                                            </td>
+                                            <td><b>{{ object.is_success|yesno:"Yes,No,Unkown" }}</b></td>
                                         </tr>
                                         </tbody>
                                     </table>
@@ -102,12 +78,12 @@
                         <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-danger">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Last run failed hosts' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Failed assets' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table">
                                         <tbody>
-                                        {% for host, task in object.latest_history.failed_hosts.items %}
+                                        {% for host, task in object.failed_hosts.items %}
                                         {% if forloop.first %}
                                         <tr class="no-borders-tr">
                                         {% else %}
@@ -122,7 +98,7 @@
                                         </tr>
                                         {% empty %}
                                             <tr class="no-borders-tr">
-                                                <td>{% trans 'No hosts' %}</td>
+                                                <td>{% trans 'No assets' %}</td>
                                             </tr>
                                         {% endfor %}
                                         </tbody>
@@ -132,12 +108,12 @@
 
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Last run success hosts' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Success assets' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table">
                                         <tbody>
-                                        {% for host in object.latest_history.success_hosts %}
+                                        {% for host in object.success_hosts %}
                                         {% if forloop.first %}
                                         <tr class="no-borders-tr">
                                         {% else %}
@@ -147,7 +123,7 @@
                                         </tr>
                                         {% empty %}
                                         <tr class="no-borders-tr">
-                                            <td>{% trans 'No hosts' %}</td>
+                                            <td>{% trans 'No assets' %}</td>
                                         </tr>
                                         {% endfor %}
                                         </tbody>
