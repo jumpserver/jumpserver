@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import base64
 import logging
 import uuid
+import pyotp
 
 from paramiko.rsakey import RSAKey
 from django.conf import settings
@@ -174,3 +175,14 @@ def generate_token(request, user):
     return token
 
 
+def generate_secret_key_otp():
+    return pyotp.random_base32()
+
+
+def verity_otp_token(secret_key_otp, otp_token, valid_window=settings.OTP_TOKEN_VALID_WINDOW):
+    totp = pyotp.TOTP(secret_key_otp)
+    return totp.verify(otp_token, valid_window=valid_window)
+
+
+def generate_otpauth_uri(username, secret_key_otp):
+    return pyotp.totp.TOTP(secret_key_otp).provisioning_uri(username, issuer_name=settings.SITE_URL)

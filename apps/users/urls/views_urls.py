@@ -9,6 +9,7 @@ app_name = 'users'
 urlpatterns = [
     # Login view
     url(r'^login$', views.UserLoginView.as_view(), name='login'),
+    url(r'^login-otp$', views.UserLoginOtpView.as_view(), name='login-otp'),
     url(r'^logout$', views.UserLogoutView.as_view(), name='logout'),
     url(r'^password/forgot$', views.UserForgotPasswordView.as_view(),
         name='forgot-password'),
@@ -31,6 +32,12 @@ urlpatterns = [
     url(r'^profile/pubkey/update/$',
         views.UserPublicKeyUpdateView.as_view(),
         name='user-pubkey-update'),
+    url(r'^profile/otp/binding/$',
+        views.UserOtpBindingView.as_view(),
+        name='user-otp-binding'),
+    url(r'^profile/otp/unbinding/$',
+        views.UserOtpUnbingingView.as_view(),
+        name='user-otp-unbinding'),
 
     # User view
     url(r'^user$', views.UserListView.as_view(), name='user-list'),

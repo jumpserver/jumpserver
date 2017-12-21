@@ -8,6 +8,7 @@ from captcha.fields import CaptchaField
 from common.utils import validate_ssh_public_key
 from perms.models import AssetPermission
 from .models import User, UserGroup
+from .utils import generate_secret_key_otp, verity_otp_token, generate_otpauth_uri
 
 
 class UserLoginForm(AuthenticationForm):
@@ -16,6 +17,11 @@ class UserLoginForm(AuthenticationForm):
         label=_('Password'), widget=forms.PasswordInput, max_length=100,
         strip=False)
     captcha = CaptchaField()
+
+    def confirm_login_allowed(self, user):
+        super(UserLoginForm, self).confirm_login_allowed(user)
+        if user.enable_otp:
+            raise forms.ValidationError(_('You are enable otp, please use otp login!'))
 
 
 class UserCreateUpdateForm(forms.ModelForm):
@@ -217,3 +223,77 @@ class UserGroupPrivateAssetPermissionForm(forms.ModelForm):
 
 class FileForm(forms.Form):
     file = forms.FileField()
+
+
+class UserLoginOtpForm(AuthenticationForm):
+    username = forms.CharField(label=_('Username'), max_length=100)
+    password = forms.CharField(
+        label=_('Password'), widget=forms.PasswordInput, max_length=100,
+        strip=False)
+    otp_token = forms.CharField(label=_('otp token'), max_length=8)
+
+    def confirm_login_allowed(self, user):
+        super(UserLoginOtpForm, self).confirm_login_allowed(user)
+        if not user.enable_otp:
+            raise forms.ValidationError(_('You are not enable otp, please use password login!'))
+        if user.secret_key_otp == '':
+            raise forms.ValidationError(_('You have not secret key, please contact administrator!'))
+        if not verity_otp_token(user.secret_key_otp, self.cleaned_data['otp_token']):
+            raise forms.ValidationError(_('Otp token verify error, please try again!'))
+
+
+class UserOtpBinding(forms.Form):
+    secret_key = generate_secret_key_otp()
+
+    secret_key_otp = forms.CharField(max_length=16, widget=forms.HiddenInput, initial = secret_key)
+    old_password = forms.CharField(max_length=128, widget=forms.PasswordInput, label=_('Password'))
+    otp_token = forms.CharField(max_length=8, label='Enter otp token')
+    
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.pop('instance')
+        self.__class__.qruri = generate_otpauth_uri(self.instance.username, self.__class__.secret_key)
+        super(UserOtpBinding, self).__init__(*args, **kwargs)
+
+    def clean_old_password(self):
+        old_password = self.cleaned_data['old_password']
+        if not self.instance.check_password(old_password):
+            raise forms.ValidationError(_('password error'))
+        return old_password
+
+
+    def clean_one_time_password(self):
+        secret_key_otp = self.cleaned_data['secret_key_otp']
+        otp_token = self.cleaned_data['otp_token']
+
+        if not verity_otp_token(secret_key_otp, otp_token):
+            raise forms.ValidationError(_('Not a valid otp token'))
+        return otp_token
+
+    def save(self):
+        secret_key_otp = self.cleaned_data['secret_key_otp']
+        self.instance.secret_key_otp = secret_key_otp
+        self.instance.enable_otp = 1
+        self.instance.save()
+        return self.instance
+
+
+class UserOtpUnBinding(forms.Form):
+    old_password = forms.CharField(
+        label=_('Password'), widget=forms.PasswordInput, max_length=100,
+        strip=False)
+
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.pop('instance')
+        super(UserOtpUnBinding, self).__init__(*args, **kwargs)
+
+    def clean_old_password(self):
+        old_password = self.cleaned_data['old_password']
+        if not self.instance.check_password(old_password):
+            raise forms.ValidationError(_('password error'))
+        return old_password
+
+    def save(self):
+        self.instance.secret_key_otp = ''
+        self.instance.enable_otp = 0
+        self.instance.save()
+        return self.instance
