@@ -8,10 +8,8 @@ from django.db.models.signals import post_save
 
 from common.utils import get_object_or_none, capacity_convert, \
     sum_capacity, encrypt_password, get_logger
-from common.celery import app as celery_app
 from .models import SystemUser, AdminUser, Asset
 from . import const
-from .signals import on_app_ready
 
 
 FORKS = 10
@@ -402,22 +400,28 @@ def push_system_user_on_auth_change(sender, instance=None, update_fields=None, *
         push_system_user_to_cluster_assets.delay(instance, task_name)
 
 
-celery_app.conf['CELERYBEAT_SCHEDULE'].update(
+periodic_tasks = (
     {
         'update_assets_hardware_period': {
             'task': 'assets.tasks.update_assets_hardware_period',
-            'schedule': 60*60*24,
+            'schedule': 60*60*60*24,
             'args': (),
         },
         'test-admin-user-connectability_period': {
             'task': 'assets.tasks.test_admin_user_connectability_period',
-            'schedule': 60*60,
+            'schedule': 60*60*60,
             'args': (),
         },
         'push_system_user_period': {
             'task': 'assets.tasks.push_system_user_period',
-            'schedule': 60*60,
+            'schedule': 60*60*60*24,
             'args': (),
         }
     }
 )
+
+
+def initial_periodic_tasks():
+    from ops.utils import create_periodic_tasks
+    create_periodic_tasks(periodic_tasks)
+

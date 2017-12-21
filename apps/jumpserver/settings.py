@@ -27,9 +27,7 @@ sys.path.append(PROJECT_DIR)
 
 # Import project config setting
 try:
-    from config import config as env_config, env
-
-    CONFIG = env_config.get(env, 'default')()
+    from config import config as CONFIG
 except ImportError:
     CONFIG = type('_', (), {'__getattr__': lambda arg1, arg2: None})()
 
@@ -66,12 +64,12 @@ INSTALLED_APPS = [
     'django_filters',
     'bootstrap3',
     'captcha',
+    'django_celery_beat',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
 ]
 
 MIDDLEWARE = [

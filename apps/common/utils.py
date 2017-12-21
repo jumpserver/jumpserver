@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 #
+import json
 import re
 from collections import OrderedDict
 from six import string_types

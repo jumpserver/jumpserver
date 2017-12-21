@@ -3,6 +3,7 @@
 import time
 from django.utils import timezone
 from django.db import transaction
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
 
 from common.utils import get_logger, get_object_or_none, get_short_uuid_str
 from .ansible import AdHocRunner, CommandResultCallback
@@ -131,4 +132,19 @@ def create_or_update_task(
     return task
 
 
+def create_periodic_tasks(tasks):
+    for name, detail in tasks.items():
+        schedule, _ = IntervalSchedule.objects.get_or_create(
+            every=detail['schedule'],
+            period=IntervalSchedule.SECONDS,
+        )
+
+        task = PeriodicTask.objects.create(
+            interval=schedule,
+            name=name,
+            task=detail['task'],
+            args=json.dumps(detail.get('args', [])),
+            kwargs=json.dumps(detail.get('kwargs', {})),
+        )
+        print("Create periodic task: {}".format(task))
 

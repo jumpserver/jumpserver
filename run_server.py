@@ -1,48 +1,64 @@
 #!/usr/bin/env python
-# ~*~ coding: utf-8 ~*~
 
-from threading import Thread
 import os
 import subprocess
+import time
+from threading import Thread
+
+from apps import __version__
 
 try:
-    from config import config as env_config, env
-
-    CONFIG = env_config.get(env, 'default')()
+    from config import config as CONFIG
 except ImportError:
     CONFIG = type('_', (), {'__getattr__': None})()
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+APPS_DIR = os.path.join(BASE_DIR, 'apps')
+HTTP_HOST = CONFIG.HTTP_BIND_HOST or '127.0.0.1'
+HTTP_PORT = CONFIG.HTTP_LISTEN_PORT or 8080
+LOG_LEVEL = CONFIG.LOG_LEVEL
+WORKERS = 4
 
-apps_dir = os.path.join(BASE_DIR, 'apps')
 
-
-def start_django():
-    http_host = CONFIG.HTTP_BIND_HOST or '127.0.0.1'
-    http_port = CONFIG.HTTP_LISTEN_PORT or '8080'
-    os.chdir(apps_dir)
-    print('start django')
-    subprocess.call('python ./manage.py runserver %s:%s' % (http_host, http_port), shell=True)
+def start_gunicorn():
+    print("- Start Gunicorn WSGI HTTP Server")
+    os.chdir(APPS_DIR)
+    cmd = "gunicorn jumpserver.wsgi -b {}:{} -w {}".format(HTTP_HOST, HTTP_PORT, WORKERS)
+    subprocess.call(cmd, shell=True)
 
 
 def start_celery():
-    os.chdir(apps_dir)
-    os.environ.setdefault('C_FORCE_ROOT', '1')
-    os.environ.setdefault('PYTHONOPTIMIZE', '1')
-    print('start celery')
-    subprocess.call('celery -A common worker -B -s /tmp/celerybeat-schedule -l debug', shell=True)
+    print("- Start Celery as Distributed Task Queue")
+    os.chdir(APPS_DIR)
+    # os.environ.setdefault('PYTHONOPTIMIZE', '1')
+    cmd = 'celery -A common worker -l {}'.format(LOG_LEVEL.lower())
+    subprocess.call(cmd, shell=True)
+
+
+def start_beat():
+    print("- Start Beat as Periodic Task Scheduler")
+    os.chdir(APPS_DIR)
+    # os.environ.setdefault('PYTHONOPTIMIZE', '1')
+    schduler = "django_celery_beat.schedulers:DatabaseScheduler"
+    cmd = 'celery -A common beat  -l {} --scheduler {}'.format(LOG_LEVEL, schduler)
+    subprocess.call(cmd, shell=True)
 
 
 def main():
-    t1 = Thread(target=start_django, args=())
-    t2 = Thread(target=start_celery, args=())
+    print(time.ctime())
+    print('Jumpserver version {}, more see https://www.jumpserver.org'.format(
+        __version__))
+    print('Quit the server with CONTROL-C.')
 
-    t1.start()
-    t2.start()
+    threads = []
+    for func in (start_gunicorn, start_celery, start_beat):
+        t = Thread(target=func, args=())
+        threads.append(t)
+        t.start()
 
-    t1.join()
-    t2.join()
+    for t in threads:
+        t.join()
 
 
 if __name__ == '__main__':
