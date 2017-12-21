@@ -1,5 +1,5 @@
-FROM jumpserver/python:v3.6.1
-LABEL MAINTAINER Jumpserver Team <ibuler@qq.com>
+FROM jumpserver/python:3
+MAINTAINER Jumpserver Team <ibuler@qq.com>
 
 
 COPY . /opt/jumpserver
@@ -7,9 +7,8 @@ WORKDIR /opt/jumpserver
 
 RUN yum -y install epel-release && yum clean all -y
 RUN cd requirements && yum -y install $(cat rpm_requirements.txt) && yum clean all -y
-RUN cd requirements && pip install -r requirements.txt 
+RUN cd requirements && pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
-RUN rm -f data/db.sqlite3
 RUN rm -r .git
 RUN rm -f config.py
 

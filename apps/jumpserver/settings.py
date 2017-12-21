@@ -119,31 +119,31 @@ SESSION_COOKIE_DOMAIN = CONFIG.SESSION_COOKIE_DOMAIN or None
 CSRF_COOKIE_DOMAIN = CONFIG.CSRF_COOKIE_DOMAIN or None
 SESSION_COOKIE_AGE = CONFIG.SESSION_COOKIE_AGE or 3600*24
 
-
 MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-if CONFIG.DB_ENGINE == 'sqlite':
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': CONFIG.DB_NAME or os.path.join(BASE_DIR, 'data', 'db.sqlite3'),
-            'ATOMIC_REQUESTS': True,
-        }
+# if CONFIG.DB_ENGINE == 'sqlite':
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': CONFIG.DB_NAME or os.path.join(BASE_DIR, 'data', 'db.sqlite3'),
+#             'ATOMIC_REQUESTS': True,
+#         }
+#     }
+
+print(CONFIG.DB_ENGINE)
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.{}'.format(CONFIG.DB_ENGINE),
+        'NAME': CONFIG.DB_NAME,
+        'HOST': CONFIG.DB_HOST,
+        'PORT': CONFIG.DB_PORT,
+        'USER': CONFIG.DB_USER,
+        'PASSWORD': CONFIG.DB_PASSWORD,
+        'ATOMIC_REQUESTS': True,
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.%s' % CONFIG.DB_ENGINE,
-            'NAME': CONFIG.DB_NAME,
-            'HOST': CONFIG.DB_HOST,
-            'PORT': CONFIG.DB_PORT,
-            'USER': CONFIG.DB_USER,
-            'PASSWORD': CONFIG.DB_PASSWORD,
-            'ATOMIC_REQUESTS': True,
-        }
-    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/1.10/ref/settings/#auth-password-validators
@@ -193,7 +193,7 @@ LOGGING = {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
             'formatter': 'main',
-            'filename': os.path.join(PROJECT_DIR, 'logs', 'jumpserver.log')
+            'filename': os.path.join(CONFIG.LOG_DIR, 'jumpserver.log')
         },
         'ansible_logs': {
             'level': 'DEBUG',
@@ -275,7 +275,7 @@ MEDIA_ROOT = os.path.join(PROJECT_DIR, 'data', 'media').replace('\\', '/') + '/'
 # BOOTSTRAP_COLUMN_COUNT = 11
 
 # Init data or generate fake data source for development
-FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures'), ]
+FIXTURE_DIRS = [os.path.join(BASE_DIR, 'fixtures'),]
 
 # Email config
 EMAIL_HOST = CONFIG.EMAIL_HOST
@@ -313,17 +313,16 @@ AUTH_USER_MODEL = 'users.User'
 # Auth LDAP settings
 if CONFIG.AUTH_LDAP:
     AUTHENTICATION_BACKENDS.insert(0, 'django_auth_ldap.backend.LDAPBackend')
-AUTH_LDAP_SERVER_URI = CONFIG.AUTH_LDAP_SERVER_URI
-AUTH_LDAP_BIND_DN = CONFIG.AUTH_LDAP_BIND_DN
-AUTH_LDAP_BIND_PASSWORD = CONFIG.AUTH_LDAP_BIND_PASSWORD
-# AUTH_LDAP_USER_DN_TEMPLATE = CONFIG.AUTH_LDAP_USER_DN_TEMPLATE
-AUTH_LDAP_USER_SEARCH = LDAPSearch(
-    CONFIG.AUTH_LDAP_SEARCH_OU,
-    ldap.SCOPE_SUBTREE,
-    CONFIG.AUTH_LDAP_SEARCH_FILTER
-)
-AUTH_LDAP_START_TLS = CONFIG.AUTH_LDAP_START_TLS
-AUTH_LDAP_USER_ATTR_MAP = CONFIG.AUTH_LDAP_USER_ATTR_MAP
+    AUTH_LDAP_SERVER_URI = CONFIG.AUTH_LDAP_SERVER_URI
+    AUTH_LDAP_BIND_DN = CONFIG.AUTH_LDAP_BIND_DN
+    AUTH_LDAP_BIND_PASSWORD = CONFIG.AUTH_LDAP_BIND_PASSWORD
+    AUTH_LDAP_USER_SEARCH = LDAPSearch(
+        CONFIG.AUTH_LDAP_SEARCH_OU,
+        ldap.SCOPE_SUBTREE,
+        CONFIG.AUTH_LDAP_SEARCH_FILTER
+    )
+    AUTH_LDAP_START_TLS = CONFIG.AUTH_LDAP_START_TLS
+    AUTH_LDAP_USER_ATTR_MAP = CONFIG.AUTH_LDAP_USER_ATTR_MAP
 
 # Celery using redis as broker
 BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/3' % {
@@ -360,9 +359,7 @@ CAPTCHA_FOREGROUND_COLOR = '#001100'
 CAPTCHA_NOISE_FUNCTIONS = ('captcha.helpers.noise_dots',)
 CAPTCHA_TEST_MODE = CONFIG.CAPTCHA_TEST_MODE
 
-COMMAND_STORE_BACKEND = 'terminal.backends.command.db'
-REPLAY_STORE_BACKEND = 'terminal.backends.replay.db'
-
+COMMAND_STORAGE_BACKEND = 'terminal.backends.command.db'
 
 # Django bootstrap3 setting, more see http://django-bootstrap3.readthedocs.io/en/latest/settings.html
 BOOTSTRAP3 = {

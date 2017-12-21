@@ -5,8 +5,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView, Response
 from rest_framework.generics import ListAPIView, get_object_or_404, RetrieveUpdateAPIView
 from rest_framework import viewsets
-from users.permissions import IsValidUser, IsSuperUser, IsAppUser, IsSuperUserOrAppUser
+
 from common.utils import get_object_or_none
+from users.permissions import IsValidUser, IsSuperUser, IsAppUser, IsSuperUserOrAppUser
 from .utils import get_user_granted_assets, get_user_granted_asset_groups, \
     get_user_asset_permissions, get_user_group_asset_permissions, \
     get_user_group_granted_assets, get_user_group_granted_asset_groups

@@ -25,3 +25,4 @@ jumpserver.iml
 .python-version
 tmp/*
 sessions/*
+media

@@ -6,7 +6,6 @@ import errno
 if __name__ == "__main__":
     try:
         os.makedirs('../logs')
-        os.makedirs('../sessions')
     except:
         pass
 

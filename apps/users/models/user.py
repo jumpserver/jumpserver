@@ -211,10 +211,11 @@ class User(AbstractUser):
     @classmethod
     def create_app_user(cls, name, comment):
         from . import AccessKey
-        domain_name = settings.CONFIG.DOMAIN_NAME or 'jumpserver.org'
-        app = cls.objects.create(username=name, name=name, email='%s@%s' % (name, domain_name), is_active=False,
-                                 role='App', enable_otp=False, comment=comment, is_first_login=False,
-                                 created_by='System')
+        app = cls.objects.create(
+            username=name, name=name, email='%s@local.domain'.format(),
+            is_active=False, role='App', enable_otp=False, comment=comment,
+            is_first_login=False, created_by='System'
+        )
         access_key = AccessKey.objects.create(user=app)
         return app, access_key
 
