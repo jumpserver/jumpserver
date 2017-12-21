@@ -243,15 +243,16 @@ class UserLoginOtpForm(AuthenticationForm):
 
 
 class UserOtpBinding(forms.Form):
-    secret_key = generate_secret_key_otp()
 
-    secret_key_otp = forms.CharField(max_length=16, widget=forms.HiddenInput, initial = secret_key)
+    secret_key_otp = forms.CharField(max_length=16, widget=forms.HiddenInput)
     old_password = forms.CharField(max_length=128, widget=forms.PasswordInput, label=_('Password'))
     otp_token = forms.CharField(max_length=8, label='Enter otp token')
     
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.pop('instance')
-        self.__class__.qruri = generate_otpauth_uri(self.instance.username, self.__class__.secret_key)
+        self.secret_key = generate_secret_key_otp()
+        self.qruri = generate_otpauth_uri(self.instance.username, self.secret_key)
+        self.base_fields['secret_key_otp'].initial = self.secret_key
         super(UserOtpBinding, self).__init__(*args, **kwargs)
 
     def clean_old_password(self):
@@ -260,8 +261,7 @@ class UserOtpBinding(forms.Form):
             raise forms.ValidationError(_('password error'))
         return old_password
 
-
-    def clean_one_time_password(self):
+    def clean_otp_token(self):
         secret_key_otp = self.cleaned_data['secret_key_otp']
         otp_token = self.cleaned_data['otp_token']
 
