@@ -66,16 +66,15 @@ class AssetUser(models.Model):
 
     @property
     def private_key_file(self):
-        if not self.private_key:
+        if not self.private_key_obj:
             return None
         project_dir = settings.PROJECT_DIR
         tmp_dir = os.path.join(project_dir, 'tmp')
         key_str = signer.unsign(self._private_key)
-        key_name = md5(key_str.encode('utf-8')).hexdigest()
+        key_name = '.' + md5(key_str.encode('utf-8')).hexdigest()
         key_path = os.path.join(tmp_dir, key_name)
         if not os.path.exists(key_path):
-            with open(key_path, 'w') as f:
-                f.write(key_str)
+            self.private_key_obj.write_private_key_file(key_path)
             os.chmod(key_path, 0o400)
         return key_path
 
@@ -105,7 +104,6 @@ class AssetUser(models.Model):
             update_fields.append('_public_key')
 
         if update_fields:
-            print(update_fields)
             self.save(update_fields=update_fields)
 
     def auto_gen_auth(self):
@@ -149,7 +147,11 @@ class AdminUser(AssetUser):
 
     @property
     def become_pass(self):
-        return signer.unsign(self._become_pass)
+        password = signer.unsign(self._become_pass)
+        if password:
+            return password
+        else:
+            return ""
 
     @become_pass.setter
     def become_pass(self, password):
@@ -199,7 +201,7 @@ class SystemUser(AssetUser):
         ('K', 'Public key'),
     )
     cluster = models.ManyToManyField('assets.Cluster', blank=True, verbose_name=_("Cluster"))
-    priority = models.IntegerField(default=10, verbose_name=_("Priority"))  # Todo: If user granted more priority user, default will be login as the hign
+    priority = models.IntegerField(default=10, verbose_name=_("Priority"))
     protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
     auto_push = models.BooleanField(default=True, verbose_name=_('Auto push'))
     sudo = models.TextField(default='/sbin/ifconfig', verbose_name=_('Sudo'))

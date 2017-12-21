@@ -4,6 +4,12 @@
 {% block table_search %}
 {% endblock %}
 
+{% block help_message %}
+    <div class="alert alert-info help-message">
+    提前规划好集群中的系统用户，授权时选择的资产(组内资产)必须存在该系统用户，否则可能无法成功登录
+    </div>
+{% endblock %}
+
 {% block table_container %}
 <div class="uc pull-left m-r-5">
     <a href="{% url 'perms:asset-permission-create' %}" class="btn btn-sm btn-primary ">

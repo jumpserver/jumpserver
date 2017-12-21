@@ -156,8 +156,8 @@ function activeNav() {
 function APIUpdateAttr(props) {
     // props = {url: .., body: , success: , error: , method: ,}
     props = props || {};
-    var success_message = props.success_message || 'Update successfully!';
-    var fail_message = props.fail_message || 'Error occurred while updating.';
+    var success_message = props.success_message || '更新成功!';
+    var fail_message = props.fail_message || '更新时发生未知错误.';
     $.ajax({
         url: props.url,
         type: props.method || "PATCH",
@@ -183,7 +183,7 @@ function objectDelete(obj, name, url, redirectTo) {
     function doDelete() {
         var body = {};
         var success = function() {
-            swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
+            // swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
             if (!redirectTo) {
                 $(obj).parent().parent().remove();
             } else {
@@ -191,7 +191,7 @@ function objectDelete(obj, name, url, redirectTo) {
             }
         };
         var fail = function() {
-            swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");
+            swal("错误", "删除"+"[ "+name+" ]"+"遇到错误", "error");
         };
         APIUpdateAttr({
             url: url,
@@ -202,14 +202,14 @@ function objectDelete(obj, name, url, redirectTo) {
         });
     }
     swal({
-        title: 'Are you sure delete ?',
+        title: '你确定删除吗 ?',
         text: " [" + name + "] ",
         type: "warning",
         showCancelButton: true,
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: 'Confirm',
-        closeOnConfirm: false
+        cancelButtonText: '取消',
+        confirmButtonColor: "#ed5565",
+        confirmButtonText: '确认',
+        closeOnConfirm: true,
     }, function () {
         doDelete()       
     });
@@ -334,3 +334,9 @@ String.prototype.format = function(args) {
     }
     return result;
 };
+
+function setCookie(key, value) {
+    var expires = new Date();
+    expires.setTime(expires.getTime() + (24 * 60 * 60 * 1000));
+    document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
+}

@@ -59,7 +59,6 @@ INSTALLED_APPS = [
     'assets.apps.AssetsConfig',
     'perms.apps.PermsConfig',
     'ops.apps.OpsConfig',
-    # 'audits.apps.AuditsConfig',
     'common.apps.CommonConfig',
     'terminal.apps.TerminalConfig',
     'rest_framework',

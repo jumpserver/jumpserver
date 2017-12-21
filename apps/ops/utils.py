@@ -1,8 +1,8 @@
 # ~*~ coding: utf-8 ~*~
-import re
 
 import time
 from django.utils import timezone
+from django.db import transaction
 
 from common.utils import get_logger, get_object_or_none, get_short_uuid_str
 from .ansible import AdHocRunner, CommandResultCallback
@@ -58,6 +58,7 @@ def get_inventory(hostname_list, run_as_admin=False, run_as=None, become_info=No
     )
 
 
+@record_adhoc
 def get_adhoc_runner(hostname_list, run_as_admin=False, run_as=None, become_info=None):
     inventory = get_inventory(
         hostname_list, run_as_admin=run_as_admin,
@@ -67,7 +68,6 @@ def get_adhoc_runner(hostname_list, run_as_admin=False, run_as=None, become_info
     return runner
 
 
-@record_adhoc
 def run_adhoc_object(adhoc, **options):
     """
     :param adhoc: Instance of AdHoc
@@ -109,6 +109,8 @@ def create_or_update_task(
         run_as_admin=False, run_as="", become_info=None,
         created_by=None
     ):
+    print(options)
+    print(task_name)
     task = get_object_or_none(Task, name=task_name)
     if task is None:
         task = Task(name=task_name, created_by=created_by)
@@ -125,6 +127,7 @@ def create_or_update_task(
     if not adhoc or adhoc != new_adhoc:
         new_adhoc.save()
         task.latest_adhoc = new_adhoc
+    print("Return task")
     return task
 
 

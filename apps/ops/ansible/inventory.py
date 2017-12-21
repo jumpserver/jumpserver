@@ -32,6 +32,7 @@ class BaseHost(Host):
         }
         """
         self.host_data = host_data
+        print(host_data)
         hostname = host_data.get('hostname') or host_data.get('ip')
         port = host_data.get('port') or 22
         super().__init__(hostname, port)

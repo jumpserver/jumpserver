@@ -63,7 +63,7 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Public IP' %}:</td>
-                                            <td><b>{{ asset.public_ip }}</b></td>
+                                            <td><b>{{ asset.public_ip|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Port' %}:</td>
@@ -74,12 +74,12 @@
                                             {% if asset.admin_user_avail %}
                                             <td><b>{{ asset.admin_user_avail.name }}</b></td>
                                             {% else %}
-                                            <td><b>None</b></td>
+                                            <td></td>
                                             {% endif %}
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Remote card IP' %}:</td>
-                                            <td><b>{{ asset.remote_card_ip }}</b></td>
+                                            <td><b>{{ asset.remote_card_ip|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Cluster' %}:</td>
@@ -87,39 +87,39 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Cabinet number' %}:</td>
-                                            <td><b>{{ asset.cabinet_no }}</b></td>
+                                            <td><b>{{ asset.cabinet_no|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Cabinet position' %}:</td>
-                                            <td><b>{{ asset.cabinet_pos }}</b></td>
+                                            <td><b>{{ asset.cabinet_pos|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Vendor' %}:</td>
-                                            <td><b>{{ asset.vendor }}</b></td>
+                                            <td><b>{{ asset.vendor|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Model' %}:</td>
-                                            <td><b>{{ asset.model }}</b></td>
+                                            <td><b>{{ asset.model|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'CPU' %}:</td>
-                                            <td><b>{{ asset.cpu_model }} {{ asset.cpu_count }}*{{ asset.cpu_cores }}</b></td>
+                                            <td><b>{{ asset.cpu_model|default:"" }} {{ asset.cpu_count|default:"" }}*{{ asset.cpu_cores|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Memory' %}:</td>
-                                            <td><b>{{ asset.memory }}</b></td>
+                                            <td><b>{{ asset.memory|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Disk' %}:</td>
-                                            <td><b>{{ asset.disk_total }}</b></td>
+                                            <td><b>{{ asset.disk_total|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Platform' %}:</td>
-                                            <td><b>{{ asset.platform }}</b></td>
+                                            <td><b>{{ asset.platform|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'OS' %}:</td>
-                                            <td><b>{{ asset.os }} {{ asset.os_version }} {{ asset.os_arch }}</b></td>
+                                            <td><b>{{ asset.os|default:"" }} {{ asset.os_version|default:"" }} {{ asset.os_arch|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Asset status' %}:</td>
@@ -127,7 +127,7 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Is active' %}:</td>
-                                            <td><b>{{ asset.is_active }}</b></td>
+                                            <td><b>{{ asset.is_active|yesno:"Yes,No" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Asset type' %}:</td>
@@ -139,11 +139,11 @@
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Serial number' %}:</td>
-                                            <td><b>{{ asset.sn }}</b></td>
+                                            <td><b>{{ asset.sn|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Asset number' %}:</td>
-                                            <td><b>{{ asset.number }}</b></td>
+                                            <td><b>{{ asset.number|default:"" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Created by' %}:</td>

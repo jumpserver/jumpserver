@@ -66,9 +66,7 @@ class MessageMixin:
         return success_message
 
 
-class AssetPermissionCreateView(AdminUserRequiredMixin,
-                                MessageMixin,
-                                CreateView):
+class AssetPermissionCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = AssetPermission
     form_class = AssetPermissionForm
     template_name = 'perms/asset_permission_create_update.html'
@@ -83,8 +81,19 @@ class AssetPermissionCreateView(AdminUserRequiredMixin,
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
+    def get_success_message(self, cleaned_data):
+        url = reverse_lazy(
+            'perms:asset-permission-detail',
+            kwargs={'pk': self.object.pk}
+        )
+        success_message = _(
+            'Create asset permission <a href="{url}"> {name} </a> '
+            'success.'.format(url=url, name=self.object.name)
+        )
+        return success_message
 
-class AssetPermissionUpdateView(AdminUserRequiredMixin, MessageMixin, UpdateView):
+
+class AssetPermissionUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     model = AssetPermission
     form_class = AssetPermissionForm
     template_name = 'perms/asset_permission_create_update.html'
@@ -97,6 +106,17 @@ class AssetPermissionUpdateView(AdminUserRequiredMixin, MessageMixin, UpdateView
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
+
+    def get_success_message(self, cleaned_data):
+        url = reverse_lazy(
+            'perms:asset-permission-detail',
+            kwargs={'pk': self.object.pk}
+        )
+        success_message = _(
+            'Update asset permission <a href="{url}"> {name} </a> '
+            'success.'.format(url=url, name=self.object.name)
+        )
+        return success_message
 
 
 class AssetPermissionDetailView(AdminUserRequiredMixin, DetailView):

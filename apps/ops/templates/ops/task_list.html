@@ -27,7 +27,7 @@
         <div class="input-group">
             <div class="input-group-btn">
                 <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
-                    搜索
+                    {% trans "Search"  %}
                 </button>
             </div>
         </div>
@@ -37,7 +37,7 @@
 {% block table_head %}
     <th class="text-center"></th>
     <th class="text-center">{% trans 'Name' %}</th>
-    <th class="text-center">{% trans 'F/S/T' %}</th>
+    <th class="text-center">{% trans 'Run times' %}</th>
     <th class="text-center">{% trans 'Versions' %}</th>
     <th class="text-center">{% trans 'Hosts' %}</th>
     <th class="text-center">{% trans 'Success' %}</th>

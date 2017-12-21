@@ -1,5 +1,4 @@
 # coding:utf-8
-import uuid
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
@@ -9,7 +8,6 @@ from common.utils import validate_ssh_private_key, ssh_pubkey_gen, ssh_key_gen, 
 
 logger = get_logger(__file__)
 
-from rest_framework import serializers
 
 class AssetCreateForm(forms.ModelForm):
 
@@ -57,11 +55,11 @@ class AssetUpdateForm(forms.ModelForm):
 
 
 class AssetBulkUpdateForm(forms.ModelForm):
-    assets = forms.MultipleChoiceField(
+    assets = forms.ModelMultipleChoiceField(
         required=True,
         help_text='* required',
         label=_('Select assets'),
-        choices=[(asset.id, asset.hostname) for asset in Asset.objects.all()],
+        queryset=Asset.objects.all(),
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',
@@ -94,10 +92,9 @@ class AssetBulkUpdateForm(forms.ModelForm):
 
         cleaned_data = {k: v for k, v in self.cleaned_data.items()
                         if k in changed_fields}
-        print(cleaned_data)
-        assets_id = cleaned_data.pop('assets')
+        assets = cleaned_data.pop('assets')
         groups = cleaned_data.pop('groups', [])
-        assets = Asset.objects.filter(id__in=assets_id)
+        assets = Asset.objects.filter(id__in=[asset.id for asset in assets])
         assets.update(**cleaned_data)
         if groups:
             for asset in assets:
@@ -175,16 +172,18 @@ class AdminUserForm(forms.ModelForm):
             password = None
 
         if private_key:
-            public_key = ssh_pubkey_gen(private_key)
+            public_key = ssh_pubkey_gen(private_key, password=password)
 
         admin_user.set_auth(password=password, public_key=public_key, private_key=private_key)
         return admin_user
 
     def clean_private_key_file(self):
         private_key_file = self.cleaned_data['private_key_file']
+        password = self.cleaned_data['password']
+
         if private_key_file:
             private_key = private_key_file.read()
-            if not validate_ssh_private_key(private_key):
+            if not validate_ssh_private_key(private_key, password):
                 raise forms.ValidationError(_('Invalid private key'))
             return private_key
         return private_key_file

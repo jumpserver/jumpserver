@@ -55,7 +55,7 @@
                                 <div class="col-sm-9">
                                     <div class="input-group date">
                                         <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                                        <input id="{{ form.date_expired.id_for_label }}" name="{{ form.date_expired.html_name }}" type="text" class="form-control" value="{{ form.date_expired.value|date:'Y-m-d' }}">
+                                        <input id="{{ form.date_expired.id_for_label }}" name="{{ form.date_expired.html_name }}" type="text" class="form-control" value="{{ form.date_expired.value|date:'Y-m-d'|default:form.date_expired.value }}">
                                     </div>
                                     <span class="help-block ">{{ form.date_expired.errors }}</span>
                                 </div>

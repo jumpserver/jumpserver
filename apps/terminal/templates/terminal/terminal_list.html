@@ -78,14 +78,8 @@ function initTable() {
                 var reject_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-id="{{ DEFAULT_PK }}" data-name="99991938">{% trans "Reject" %}</a>'
                         .replace('{{ DEFAULT_PK }}', cellData)
                         .replace('99991938', rowData.name);
-                var connect_btn = '<a href="" class="btn btn-xs btn-warning btn-connect" >{% trans "Connect" %}</a> '
-                        .replace('{{ DEFAULT_PK }}', cellData);
                 if (rowData.is_accepted) {
-                    {% if user.is_superuser %}
-                    $(td).html(connect_btn + update_btn + delete_btn);
-                    {% else %}
-                    $(td).html(connect_btn);
-                    {% endif %}
+                    $(td).html(update_btn + delete_btn);
                 } else {
                     {% if user.is_superuser %}
                     $(td).html(accept_btn + reject_btn);

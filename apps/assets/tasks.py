@@ -402,12 +402,6 @@ def push_system_user_on_auth_change(sender, instance=None, update_fields=None, *
         push_system_user_to_cluster_assets.delay(instance, task_name)
 
 
-@receiver(on_app_ready, dispatch_uid="my_unique_identifier")
-def test_admin_user_on_app_ready(sender, **kwargs):
-    logger.debug("Receive app ready signal, test admin connectability")
-    test_admin_user_connectability_period.delay()
-
-
 celery_app.conf['CELERYBEAT_SCHEDULE'].update(
     {
         'update_assets_hardware_period': {

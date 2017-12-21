@@ -67,15 +67,23 @@ class UserProfileForm(forms.ModelForm):
 
 class UserPasswordForm(forms.Form):
     old_password = forms.CharField(
-        max_length=128, widget=forms.PasswordInput)
+        max_length=128, widget=forms.PasswordInput,
+        label=_("Old password")
+    )
     new_password = forms.CharField(
-        min_length=5, max_length=128, widget=forms.PasswordInput)
+        min_length=5, max_length=128,
+        widget=forms.PasswordInput,
+        label=_("New password")
+    )
     confirm_password = forms.CharField(
-        min_length=5, max_length=128, widget=forms.PasswordInput)
+        min_length=5, max_length=128,
+        widget=forms.PasswordInput,
+        label=_("Confirm password")
+    )
 
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.pop('instance')
-        super(UserPasswordForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def clean_old_password(self):
         old_password = self.cleaned_data['old_password']
@@ -102,20 +110,21 @@ class UserPublicKeyForm(forms.Form):
     public_key = forms.CharField(
         label=_('ssh public key'), max_length=5000,
         widget=forms.Textarea(attrs={'placeholder': _('ssh-rsa AAAA...')}),
-        help_text=_('Paste your id_rsa.pub here.'))
+        help_text=_('Paste your id_rsa.pub here.')
+    )
 
     def __init__(self, *args, **kwargs):
         if 'instance' in kwargs:
             self.instance = kwargs.pop('instance')
         else:
             self.instance = None
-        super(UserPublicKeyForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def clean_public_key(self):
         public_key = self.cleaned_data['public_key']
         if self.instance.public_key and public_key == self.instance.public_key:
-            raise forms.ValidationError(_('Public key should not be the '
-                                          'same as your old one.'))
+            msg = _('Public key should not be the same as your old one.')
+            raise forms.ValidationError(msg)
 
         if not validate_ssh_public_key(public_key):
             raise forms.ValidationError(_('Not a valid ssh public key'))
@@ -129,11 +138,11 @@ class UserPublicKeyForm(forms.Form):
 
 
 class UserBulkUpdateForm(forms.ModelForm):
-    users = forms.MultipleChoiceField(
+    users = forms.ModelMultipleChoiceField(
         required=True,
         help_text='* required',
         label=_('Select users'),
-        choices=[(user.id, user.name) for user in User.objects.all()],
+        queryset=User.objects.all(),
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',
@@ -162,9 +171,9 @@ class UserBulkUpdateForm(forms.ModelForm):
 
         cleaned_data = {k: v for k, v in self.cleaned_data.items()
                         if k in changed_fields}
-        users_id = cleaned_data.pop('users', '')
+        users = cleaned_data.pop('users', '')
         groups = cleaned_data.pop('groups', [])
-        users = User.objects.filter(id__in=users_id)
+        users = User.objects.filter(id__in=[user.id for user in users])
         users.update(**cleaned_data)
         if groups:
             for user in users:

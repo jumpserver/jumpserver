@@ -1,6 +1,13 @@
 {% extends '_base_list.html' %}
 {% load i18n %}
 
+{% block help_message %}
+    <div class="alert alert-info help-message">
+    系统用户是 用户登录资产(服务器)时使用的用户，如 web, sa, dba等具有特殊功能的用户。系统用户创建时，如果选择了自动推送
+    Jumpserver会使用ansible自动推送到系统用户所在集群的资产中，如果资产(交换机)不支持ansible, 请手动填写账号密码。
+    </div>
+{% endblock %}
+
 {% block table_search %}
 {% endblock %}
 

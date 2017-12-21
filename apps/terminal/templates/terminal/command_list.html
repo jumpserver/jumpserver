@@ -13,7 +13,6 @@
 {% endblock %}
 
 {% block content_left_head %}
-    123
 {% endblock %}
 
 {% block table_search %}
@@ -51,12 +50,12 @@
             </select>
         </div>
         <div class="input-group">
-            <input type="text" class="form-control input-sm" name="command" placeholder="Command" value="{{ command }}">
+            <input type="text" class="form-control input-sm" name="command" placeholder="{% trans 'Command' %}" value="{{ command }}">
         </div>
         <div class="input-group">
             <div class="input-group-btn">
                 <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
-                    搜索
+                    {% trans 'Search' %}
                 </button>
             </div>
         </div>

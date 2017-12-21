@@ -64,8 +64,7 @@
 <script src="{% static 'js/jquery.form.min.js' %}"></script>
 <script type="text/javascript">
 
-
-$(document).ready(function(){
+function initTable() {
     var options = {
         ele: $('#asset_list_table'),
         columnDefs: [
@@ -103,47 +102,50 @@ $(document).ready(function(){
             {data: "is_active" }, {data: "is_connective"}, {data: "id" }],
         op_html: $('#actions').html()
     };
-    var table = jumpserver.initDataTable(options);
+    return jumpserver.initDataTable(options);
+}
 
-    $('.btn_export').click(function () {
-        var assets = [];
-        var rows = table.rows('.selected').data();
-        $.each(rows, function (index, obj) {
-            assets.push(obj.id)
-        });
-        console.log(assets);
-        $.ajax({
-            url: "{% url "assets:asset-export" %}",
-            method: 'POST',
-            data: JSON.stringify({assets_id: assets}),
-            dataType: "json",
-            success: function (data, textStatus) {
-                window.open(data.redirect)
-            },
-            error: function () {
-                toastr.error('Export failed');
-            }
-        })
+$(document).ready(function(){
+    initTable();
+})
+.on('click', '#btn_export', function () {
+    var $data_table = $('#asset_list_table').DataTable();
+    var rows = $data_table.rows('.selected').data();
+    var assets = [];
+    $.each(rows, function (index, obj) {
+        assets.push(obj.id)
     });
-     $('#btn_asset_import').click(function() {
-        var $form = $('#fm_asset_import');
-        $form.find('.help-block').remove();
-        function success (data) {
-            if (data.valid === false) {
-                $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_assets'));
-            } else {
-                $('#id_created').html(data.created_info);
-                $('#id_created_detail').html(data.created.join(', '));
-                $('#id_updated').html(data.updated_info);
-                $('#id_updated_detail').html(data.updated.join(', '));
-                $('#id_failed').html(data.failed_info);
-                $('#id_failed_detail').html(data.failed.join(', '));
-                var $data_table = $('#asset_list_table').DataTable();
-                $data_table.ajax.reload();
-            }
+    $.ajax({
+        url: "{% url "assets:asset-export" %}",
+        method: 'POST',
+        data: JSON.stringify({assets_id: assets}),
+        dataType: "json",
+        success: function (data, textStatus) {
+            window.open(data.redirect)
+        },
+        error: function () {
+            toastr.error('Export failed');
         }
-        $form.ajaxSubmit({success: success});
     })
+})
+.on('click', '#btn_import', function () {
+    var $form = $('#fm_asset_import');
+    $form.find('.help-block').remove();
+    function success (data) {
+        if (data.valid === false) {
+            $('<span />', {class: 'help-block text-danger'}).html(data.msg).insertAfter($('#id_assets'));
+        } else {
+            $('#id_created').html(data.created_info);
+            $('#id_created_detail').html(data.created.join(', '));
+            $('#id_updated').html(data.updated_info);
+            $('#id_updated_detail').html(data.updated.join(', '));
+            $('#id_failed').html(data.failed_info);
+            $('#id_failed_detail').html(data.failed.join(', '));
+            var $data_table = $('#asset_list_table').DataTable();
+            $data_table.ajax.reload();
+        }
+    }
+    $form.ajaxSubmit({success: success});
 })
 
 .on('click', '.btn_asset_delete', function () {

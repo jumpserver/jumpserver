@@ -44,9 +44,11 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
         else:
             assets_granted = get_user_granted_assets(self.request.user)
             queryset = self.queryset.filter(id__in=[asset.id for asset in assets_granted])
+
         cluster_id = self.request.query_params.get('cluster_id')
         asset_group_id = self.request.query_params.get('asset_group_id')
         admin_user_id = self.request.query_params.get('admin_user_id')
+
         if cluster_id:
             queryset = queryset.filter(cluster__id=cluster_id)
         if asset_group_id:

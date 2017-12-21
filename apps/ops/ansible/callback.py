@@ -1,7 +1,5 @@
 # ~*~ coding: utf-8 ~*~
 
-from collections import defaultdict
-
 from ansible.plugins.callback import CallbackBase
 from ansible.plugins.callback.default import CallbackModule
 
@@ -21,9 +19,8 @@ class AdHocResultCallback(CallbackModule):
         #   "contacted": {"hostname",...},
         #   "dark": {"hostname": {"task_name": {}, "task_name": {}},...,},
         # }
-        self.results_raw = dict(ok=defaultdict(dict), failed=defaultdict(dict),
-                                unreachable=defaultdict(dict), skipped=defaultdict(dict))
-        self.results_summary = dict(contacted=[], dark=defaultdict(dict))
+        self.results_raw = dict(ok={}, failed={}, unreachable={}, skipped={})
+        self.results_summary = dict(contacted=[], dark={})
         super().__init__()
 
     def gather_result(self, t, res):
@@ -34,8 +31,8 @@ class AdHocResultCallback(CallbackModule):
 
         if self.results_raw[t].get(host):
             self.results_raw[t][host][task_name] = task_result
-        # else:
-        #     self.results_raw[t][host] = {task_name: task_result}
+        else:
+            self.results_raw[t][host] = {task_name: task_result}
         self.clean_result(t, host, task_name, task_result)
 
     def clean_result(self, t, host, task_name, task_result):
@@ -45,10 +42,10 @@ class AdHocResultCallback(CallbackModule):
             if host not in contacted:
                 contacted.append(host)
         else:
-            # if dark.get(host):
-            dark[host][task_name] = task_result.values
-            # else:
-            #     dark[host] = {task_name: task_result}
+            if dark.get(host):
+                dark[host][task_name] = task_result.values
+            else:
+                dark[host] = {task_name: task_result}
             if host in contacted:
                 contacted.remove(host)
 

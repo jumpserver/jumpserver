@@ -195,11 +195,11 @@ def ssh_key_string_to_obj(text, password=None):
     return key
 
 
-def ssh_pubkey_gen(private_key=None, username='jumpserver', hostname='localhost'):
+def ssh_pubkey_gen(private_key=None, username='jumpserver', hostname='localhost', password=None):
     if isinstance(private_key, bytes):
         private_key = private_key.decode("utf-8")
     if isinstance(private_key, string_types):
-        private_key = ssh_key_string_to_obj(private_key)
+        private_key = ssh_key_string_to_obj(private_key, password=password)
     if not isinstance(private_key, (paramiko.RSAKey, paramiko.DSSKey)):
         raise IOError('Invalid private key')
 
@@ -238,14 +238,14 @@ def ssh_key_gen(length=2048, type='rsa', password=None, username='jumpserver', h
         raise IOError('These is error when generate ssh key.')
 
 
-def validate_ssh_private_key(text):
+def validate_ssh_private_key(text, password=None):
     if isinstance(text, bytes):
         try:
             text = text.decode("utf-8")
         except UnicodeDecodeError:
             return False
 
-    key = ssh_key_string_to_obj(text)
+    key = ssh_key_string_to_obj(text, password=password)
     if key is None:
         return False
     else:

@@ -146,7 +146,7 @@ class User(AbstractUser):
         if not self.name:
             self.name = self.username
 
-        super(User, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         # Add the current user to the default group.
         if not self.groups.count():
             group = UserGroup.initial()
@@ -180,13 +180,14 @@ class User(AbstractUser):
         return False
 
     def avatar_url(self):
+        admin_default = settings.STATIC_URL + "img/avatar/admin.png"
+        user_default = settings.STATIC_URL + "img/avatar/user.png"
         if self.avatar:
             return self.avatar.url
+        if self.is_superuser:
+            return admin_default
         else:
-            avatar_dir = os.path.join(settings.MEDIA_ROOT, 'avatar')
-            if os.path.isdir(avatar_dir):
-                return os.path.join(settings.MEDIA_URL, 'avatar', 'default.png')
-        return 'https://www.gravatar.com/avatar/c6812ab450230979465d7bf288eadce2a?s=120&d=identicon'
+            return user_default
 
     def generate_reset_token(self):
         return signer.sign_t({'reset': str(self.id), 'email': self.email}, expires_in=3600)

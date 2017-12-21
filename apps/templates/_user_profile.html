@@ -19,6 +19,13 @@
             <li><a href="{% url 'users:user-profile' %}">{% trans 'Profile' %}</a></li>
             <li><a href="{% url 'users:user-profile-update' %}">{% trans 'Profile settings' %}</a></li>
             <li class="divider"></li>
+            {% if request.user.is_superuser %}
+                {% if request.COOKIES.admin == 'No' %}
+                <li><a id="switch_admin">{% trans 'Admin page' %}</a></li>
+                {% else %}
+                <li><a id="switch_user">{% trans 'User page' %}</a></li>
+                {% endif %}
+            {% endif %}
             <li><a href="{% url 'users:logout' %}">{% trans 'Logout' %}</a></li>
         </ul>
     </div>
@@ -26,3 +33,15 @@
         JMS
     </div>
 </li>
+<script>
+$(document).ready(function () {
+})
+.on('click', '#switch_admin', function () {
+    setCookie("admin", "Yes");
+    window.location = "/"
+})
+.on('click', '#switch_user', function () {
+    setCookie("admin", "No");
+    window.location = "/"
+})
+</script>

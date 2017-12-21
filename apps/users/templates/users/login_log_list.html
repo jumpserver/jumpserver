@@ -31,12 +31,12 @@
             </select>
         </div>
         <div class="input-group">
-            <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="{{ keyword }}">
+            <input type="text" class="form-control input-sm" name="keyword" placeholder="{% trans "Search" %}" value="{{ keyword }}">
         </div>
         <div class="input-group">
             <div class="input-group-btn">
                 <button id='search_btn' type="submit" class="btn btn-sm btn-primary">
-                    搜索
+                    {% trans "Search" %}
                 </button>
             </div>
         </div>
@@ -85,7 +85,9 @@
                 forceParse: false,
                 autoclose: true
             });
-            $('.select2').select2();
+            $('.select2').select2({
+                dropdownAutoWidth: true
+            });
         })
     </script>
 {% endblock %}
