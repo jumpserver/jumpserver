@@ -19,7 +19,6 @@ from .forms import AssetPermissionForm
 
 class AssetPermissionListView(AdminUserRequiredMixin, ListView):
     model = AssetPermission
-    paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     context_object_name = 'asset_permission_list'
     template_name = 'perms/asset_permission_list.html'
 

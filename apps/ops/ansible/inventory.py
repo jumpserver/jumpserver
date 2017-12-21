@@ -62,6 +62,7 @@ class BaseHost(Host):
             self.set_variable("ansible_become_pass", become.get('pass', ''))
         else:
             self.set_variable("ansible_become", False)
+        print(self.get_vars())
 
     def __set_extra_variables(self):
         for k, v in self.host_data.get('vars', {}).items():

@@ -58,7 +58,6 @@ def get_inventory(hostname_list, run_as_admin=False, run_as=None, become_info=No
     )
 
 
-@record_adhoc
 def get_adhoc_runner(hostname_list, run_as_admin=False, run_as=None, become_info=None):
     inventory = get_inventory(
         hostname_list, run_as_admin=run_as_admin,
@@ -68,6 +67,7 @@ def get_adhoc_runner(hostname_list, run_as_admin=False, run_as=None, become_info
     return runner
 
 
+@record_adhoc
 def run_adhoc_object(adhoc, **options):
     """
     :param adhoc: Instance of AdHoc
