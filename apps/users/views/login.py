@@ -8,7 +8,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView
 from django.core.files.storage import default_storage
 from django.db.models import Q
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import reverse, redirect
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext as _
@@ -45,9 +45,12 @@ class UserLoginView(FormView):
     def get(self, request, *args, **kwargs):
         if request.user.is_staff:
             return redirect(self.get_success_url())
-        return super(UserLoginView, self).get(request, *args, **kwargs)
+        request.session.set_test_cookie()
+        return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
+        if not self.request.session.test_cookie_worked():
+            return HttpResponse(_("Please enable cookies and try again."))
         auth_login(self.request, form.get_user())
         login_ip = self.request.META.get('REMOTE_ADDR', '')
         user_agent = self.request.META.get('HTTP_USER_AGENT', '')
@@ -72,7 +75,7 @@ class UserLogoutView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         auth_logout(request)
-        return super(UserLogoutView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = {
@@ -82,7 +85,7 @@ class UserLogoutView(TemplateView):
             'auto_redirect': True,
         }
         kwargs.update(context)
-        return super(UserLogoutView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class UserForgotPasswordView(TemplateView):
@@ -111,7 +114,7 @@ class UserForgotPasswordSendmailSuccessView(TemplateView):
             'redirect_url': reverse('users:login'),
         }
         kwargs.update(context)
-        return super(UserForgotPasswordSendmailSuccessView, self)\
+        return super()\
             .get_context_data(**kwargs)
 
 
@@ -126,7 +129,7 @@ class UserResetPasswordSuccessView(TemplateView):
             'auto_redirect': True,
         }
         kwargs.update(context)
-        return super(UserResetPasswordSuccessView, self)\
+        return super()\
             .get_context_data(**kwargs)
 
 
@@ -139,7 +142,7 @@ class UserResetPasswordView(TemplateView):
 
         if not user:
             kwargs.update({'errors': _('Token invalid or expired')})
-        return super(UserResetPasswordView, self).get(request, *args, **kwargs)
+        return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
         password = request.POST.get('password')
@@ -166,7 +169,7 @@ class UserFirstLoginView(LoginRequiredMixin, ListView):
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated() and not request.user.is_first_login:
             return redirect(reverse('index'))
-        return super(UserFirstLoginView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
     def done(self, form_list, **kwargs):
         user = self.request.user
@@ -185,7 +188,7 @@ class UserFirstLoginView(LoginRequiredMixin, ListView):
         return render(self.request, 'users/first_login_done.html', context)
 
     def get_context_data(self, **kwargs):
-        context = super(UserFirstLoginView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update({'app': _('Users'), 'action': _('First login')})
         return context
 
@@ -199,10 +202,10 @@ class UserFirstLoginView(LoginRequiredMixin, ListView):
                 'wechat': user.wechat or '',
                 'phone': user.phone or ''
             }
-        return super(UserFirstLoginView, self).get_form_initial(step)
+        return super().get_form_initial(step)
 
     def get_form(self, step=None, data=None, files=None):
-        form = super(UserFirstLoginView, self).get_form(step, data, files)
+        form = super().get_form(step, data, files)
 
         form.instance = self.request.user
         return form
