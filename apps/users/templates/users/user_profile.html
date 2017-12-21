@@ -148,6 +148,18 @@
                                             </span>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td>{% trans 'Binding otp Device' %}:</td>
+                                        <td>
+                                            <span class="pull-right">
+                                                {% if user.enable_otp %}
+                                                    <a type="button" class="btn btn-primary btn-xs btn-danger" style="width: 108px" href="{% url 'users:user-otp-unbinding' %}">{% trans 'Cancel Binding' %}</a>
+                                                {% else %}
+                                                    <a type="button" class="btn btn-primary btn-xs" style="width: 54px" href="{% url 'users:user-otp-binding' %}">{% trans 'Binding' %}</a>
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                    </tr>
                                     </tbody>
                                 </table>
                             </div>

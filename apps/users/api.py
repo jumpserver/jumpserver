@@ -12,7 +12,7 @@ from . import serializers
 from .hands import write_login_log_async
 from .models import User, UserGroup
 from .permissions import IsSuperUser, IsValidUser, IsCurrentUserOrReadOnly
-from .utils import check_user_valid, generate_token
+from .utils import check_user_valid, generate_token, verity_otp_token
 from common.mixins import IDInFilterMixin
 from common.utils import get_logger
 
@@ -166,3 +166,34 @@ class UserAuthApi(APIView):
             return Response({'token': token, 'user': user.to_json()})
         else:
             return Response({'msg': msg}, status=401)
+
+class UserIsEnableOtp(APIView):
+    permission_classes = (IsValidUser,)
+
+    def get(self, request):
+        user = self.request.user
+        return Response({'enable_otp':user.enable_otp}, status=200)
+
+class UserVerifyToken(APIView):
+    permission_classes = (IsValidUser,)
+
+    def post(self, request):
+        otp_token = request.data.get('otp_token', '')
+        secret_key_otp = self.request.user.secret_key_otp
+
+        if secret_key_otp == '':
+            return Response({
+                'verify_token_result':False,
+                'error':'Enabled otp login, but this is not secret key!',
+                }, status=200)
+
+        if verity_otp_token(secret_key_otp, otp_token):
+            return Response({
+                'verify_token_result':True,
+                'error':'',
+                }, status=200)
+        else:
+            return Response({
+                'verify_token_result':False,
+                'error':'Verified otp token error, please try again!',
+                }, status=200)

@@ -60,6 +60,10 @@
                         </div>
                         <button type="submit" class="btn btn-primary block full-width m-b">{% trans 'Login' %}</button>
 
+                        <a href="{% url 'users:login-otp' %}">
+                            <small class="text-danger">{% trans 'Use otp login' %}</small>
+                        </a>　　
+
                         <a href="{% url 'users:forgot-password' %}">
                             <small>{% trans 'Forgot password' %}?</small>
                         </a>
