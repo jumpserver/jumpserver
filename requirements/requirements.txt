@@ -3,7 +3,7 @@ ansible==2.4.2.0
 asn1crypto==0.24.0
 bcrypt==3.1.4
 billiard==3.5.0.3
-celery==4.0.2
+celery==4.1.0
 certifi==2017.11.5
 cffi==1.11.2
 chardet==3.0.4

@@ -28,6 +28,7 @@ class AdHocResultCallback(CallbackModule):
         host = res._host.get_name()
         task_name = res.task_name
         task_result = res._result
+        print(task_result)
 
         if self.results_raw[t].get(host):
             self.results_raw[t][host][task_name] = task_result
@@ -50,6 +51,7 @@ class AdHocResultCallback(CallbackModule):
                 contacted.remove(host)
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
+        print("#######RUN FAILED" * 19)
         self.gather_result("failed", result)
         super().v2_runner_on_failed(result, ignore_errors=ignore_errors)
 

@@ -26,3 +26,6 @@ jumpserver.iml
 tmp/*
 sessions/*
 media
+celerybeat.pid
+django.db
+celerybeat-schedule.db

@@ -10,6 +10,7 @@ from common.utils import get_object_or_none, capacity_convert, \
     sum_capacity, encrypt_password, get_logger
 from .models import SystemUser, AdminUser, Asset
 from . import const
+from ops.decorators import register_as_period_task
 
 
 FORKS = 10
@@ -71,12 +72,12 @@ def update_assets_hardware_info(assets, task_name=None):
     :param task_name: task_name running
     :return: result summary ['contacted': {}, 'dark': {}]
     """
-    from ops.utils import create_or_update_task
+    from ops.utils import create_or_update_ansible_task
     if task_name is None:
         task_name = const.UPDATE_ASSETS_HARDWARE_TASK_NAME
     tasks = const.UPDATE_ASSETS_HARDWARE_TASKS
     hostname_list = [asset.hostname for asset in assets]
-    task = create_or_update_task(
+    task = create_or_update_ansible_task(
         task_name, hosts=hostname_list, tasks=tasks, pattern='all',
         options=const.TASK_OPTIONS, run_as_admin=True, created_by='System',
     )
@@ -88,11 +89,13 @@ def update_assets_hardware_info(assets, task_name=None):
 
 
 @shared_task
+@register_as_period_task(interval=60*60*60*24)
 def update_assets_hardware_period():
     """
     Update asset hardware period task
     :return:
     """
+    from ops.utils import create_or_update_ansible_task
     task_name = const.UPDATE_ASSETS_HARDWARE_PERIOD_TASK_NAME
     if cache.get(const.UPDATE_ASSETS_HARDWARE_PERIOD_LOCK_KEY) == 1:
         msg = "Task {} is running or before long, passed this time".format(
@@ -115,7 +118,7 @@ def test_admin_user_connectability(admin_user, force=False):
     :param force: Force update
     :return:
     """
-    from ops.utils import create_or_update_task
+    from ops.utils import create_or_update_ansible_task
 
     task_name = const.TEST_ADMIN_USER_CONN_TASK_NAME.format(admin_user.name)
     lock_key = const.TEST_ADMIN_USER_CONN_LOCK_KEY.format(admin_user.name)
@@ -127,7 +130,7 @@ def test_admin_user_connectability(admin_user, force=False):
     assets = admin_user.get_related_assets()
     hosts = [asset.hostname for asset in assets]
     tasks = const.TEST_ADMIN_USER_CONN_TASKS
-    task = create_or_update_task(
+    task = create_or_update_ansible_task(
         task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
         options=const.TASK_OPTIONS, run_as_admin=True, created_by='System',
     )
@@ -166,12 +169,12 @@ def test_admin_user_connectability_period():
 
 @shared_task
 def test_admin_user_connectability_manual(asset, task_name=None):
-    from ops.utils import create_or_update_task
+    from ops.utils import create_or_update_ansible_task
     if task_name is None:
         task_name = const.TEST_ASSET_CONN_TASK_NAME
     hosts = [asset.hostname]
     tasks = const.TEST_ADMIN_USER_CONN_TASKS
-    task = create_or_update_task(
+    task = create_or_update_ansible_task(
         task_name, tasks=tasks, hosts=hosts, run_as_admin=True,
         created_by='System', options=const.TASK_OPTIONS, pattern='all',
     )
@@ -193,7 +196,7 @@ def test_system_user_connectability(system_user, force=False):
     :param force
     :return:
     """
-    from ops.utils import create_or_update_task
+    from ops.utils import create_or_update_ansible_task
     lock_key = const.TEST_SYSTEM_USER_CONN_LOCK_KEY.format(system_user.name)
     task_name = const.TEST_SYSTEM_USER_CONN_TASK_NAME.format(system_user.name)
     if cache.get(lock_key, 0) == 1 and not force:
@@ -202,7 +205,7 @@ def test_system_user_connectability(system_user, force=False):
     assets = system_user.get_clusters_assets()
     hosts = [asset.hostname for asset in assets]
     tasks = const.TEST_SYSTEM_USER_CONN_TASKS
-    task = create_or_update_task(
+    task = create_or_update_ansible_task(
         task_name, hosts=hosts, tasks=tasks, pattern='all',
         options=const.TASK_OPTIONS,
         run_as=system_user.name, created_by="System",
@@ -269,7 +272,7 @@ def get_push_system_user_tasks(system_user):
 
 @shared_task
 def push_system_user(system_user, assets, task_name=None):
-    from ops.utils import create_or_update_task
+    from ops.utils import create_or_update_ansible_task
 
     if system_user.auto_push and assets:
         if task_name is None:
@@ -278,7 +281,7 @@ def push_system_user(system_user, assets, task_name=None):
         hosts = [asset.hostname for asset in assets]
         tasks = get_push_system_user_tasks(system_user)
 
-        task = create_or_update_task(
+        task = create_or_update_ansible_task(
             task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
             options=const.TASK_OPTIONS, run_as_admin=True, created_by='System'
         )
@@ -334,7 +337,7 @@ def push_system_user_period():
 
 @shared_task
 def push_asset_system_users(asset, system_users=None, task_name=None):
-    from ops.utils import create_or_update_task
+    from ops.utils import create_or_update_ansible_task
     if task_name is None:
         task_name = "PUSH-ASSET-SYSTEM-USER-{}".format(asset.hostname)
 
@@ -348,7 +351,7 @@ def push_asset_system_users(asset, system_users=None, task_name=None):
 
     hosts = [asset.hostname]
 
-    task = create_or_update_task(
+    task = create_or_update_ansible_task(
         task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
         options=const.TASK_OPTIONS, run_as_admin=True, created_by='System'
     )

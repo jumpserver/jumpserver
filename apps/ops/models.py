@@ -1,6 +1,5 @@
 # ~*~ coding: utf-8 ~*~
 
-import logging
 import json
 import uuid
 
@@ -8,16 +7,16 @@ import time
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-from django.core import serializers
 from django_celery_beat.models import CrontabSchedule, IntervalSchedule, PeriodicTask
 
-from common.utils import signer
+from common.utils import signer, get_logger
 from .ansible import AdHocRunner, AnsibleError
+from .inventory import JMSInventory
 
 __all__ = ["Task", "AdHoc", "AdHocRunHistory"]
 
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__file__)
 
 
 class Task(models.Model):
@@ -27,15 +26,10 @@ class Task(models.Model):
     """
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
-    interval = models.ForeignKey(
-        IntervalSchedule, on_delete=models.CASCADE,
-        null=True, blank=True, verbose_name=_('Interval'),
-    )
-    crontab = models.ForeignKey(
-        CrontabSchedule, on_delete=models.CASCADE, null=True, blank=True,
-        verbose_name=_('Crontab'), help_text=_('Use one of Interval/Crontab'),
-    )
+    interval = models.IntegerField(verbose_name=_("Interval"), null=True, blank=True, help_text=_("Units: seconds"))
+    crontab = models.CharField(verbose_name=_("Crontab"), null=True, blank=True, max_length=128, help_text=_("5 * * * *"))
     is_periodic = models.BooleanField(default=False)
+    callback = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Callback"))  # Callback must be a registered celery task
     is_deleted = models.BooleanField(default=False)
     comment = models.TextField(blank=True, verbose_name=_("Comment"))
     created_by = models.CharField(max_length=128, blank=True, null=True, default='')
@@ -88,23 +82,48 @@ class Task(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        instance = super().save(
+        from .utils import create_or_update_celery_periodic_tasks, \
+            disable_celery_periodic_task
+        from .tasks import run_ansible_task
+        super().save(
             force_insert=force_insert,  force_update=force_update,
             using=using, update_fields=update_fields,
         )
 
-        if instance.is_periodic:
-            PeriodicTask.objects.update_or_create(
-                interval=instance.interval,
-                crontab=instance.crontab,
-                name=self.name,
-                task='ops.run_task',
-                args=serializers.serialize('json', [instance]),
-            )
-        else:
-            PeriodicTask.objects.filter(name=self.name).delete()
+        if self.is_periodic:
+            interval = None
+            crontab = None
 
-        return instance
+            if self.interval:
+                interval = self.interval
+            elif self.crontab:
+                crontab = self.crontab
+
+            tasks = {
+                self.name: {
+                    "task": run_ansible_task.name,
+                    "interval": interval,
+                    "crontab": crontab,
+                    "args": (str(self.id),),
+                    "kwargs": {"callback": self.callback},
+                    "enabled": True,
+                }
+            }
+            create_or_update_celery_periodic_tasks(tasks)
+        else:
+            disable_celery_periodic_task(self.name)
+
+    def delete(self, using=None, keep_parents=False):
+        from .utils import delete_celery_periodic_task
+        super().delete(using=using, keep_parents=keep_parents)
+        delete_celery_periodic_task(self.name)
+
+    @property
+    def schedule(self):
+        try:
+            return PeriodicTask.objects.get(name=self.name)
+        except PeriodicTask.DoesNotExist:
+            return None
 
     def __str__(self):
         return self.name
@@ -157,6 +176,23 @@ class AdHoc(models.Model):
         self._hosts = json.dumps(item)
 
     @property
+    def inventory(self):
+        if self.become:
+            become_info = {
+                'become': {
+                    self.become
+                }
+            }
+        else:
+            become_info = None
+
+        inventory = JMSInventory(
+            self.hosts, run_as_admin=self.run_as_admin,
+            run_as=self.run_as, become_info=become_info
+        )
+        return inventory
+
+    @property
     def become(self):
         if self._become:
             return json.loads(signer.unsign(self._become))
@@ -173,30 +209,30 @@ class AdHoc(models.Model):
         history = AdHocRunHistory(adhoc=self, task=self.task)
         time_start = time.time()
         try:
-            result = self._run_only()
+            raw, summary = self._run_only()
             history.is_finished = True
-            if result.results_summary.get('dark'):
+            if summary.get('dark'):
                 history.is_success = False
             else:
                 history.is_success = True
-            history.result = result.results_raw
-            history.summary = result.results_summary
-            return result
+            history.result = raw
+            history.summary = summary
+            return raw, summary
+        except:
+            return {}, {}
         finally:
             history.date_finished = timezone.now()
             history.timedelta = time.time() - time_start
             history.save()
 
     def _run_only(self):
-        from .utils import get_adhoc_inventory
-        inventory = get_adhoc_inventory(self)
-        runner = AdHocRunner(inventory)
+        runner = AdHocRunner(self.inventory)
         for k, v in self.options.items():
             runner.set_option(k, v)
 
         try:
             result = runner.run(self.tasks, self.pattern, self.task.name)
-            return result
+            return result.results_raw, result.results_summary
         except AnsibleError as e:
             logger.error("Failed run adhoc {}, {}".format(self.task.name, e))
 
