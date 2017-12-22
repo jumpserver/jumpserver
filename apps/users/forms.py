@@ -9,7 +9,7 @@ from common.utils import validate_ssh_public_key
 from perms.models import AssetPermission
 from .models import User, UserGroup
 from .utils import generate_secret_key_otp, verity_otp_token, generate_otpauth_uri
-
+from django.core.cache import cache
 
 class UserLoginForm(AuthenticationForm):
     username = forms.CharField(label=_('Username'), max_length=100)
@@ -18,10 +18,15 @@ class UserLoginForm(AuthenticationForm):
         strip=False)
     captcha = CaptchaField()
 
+    user_enable_otp = False
+
     def confirm_login_allowed(self, user):
         super(UserLoginForm, self).confirm_login_allowed(user)
         if user.enable_otp:
-            raise forms.ValidationError(_('You are enable otp, please use otp login!'))
+            self.user_enable_otp = True
+
+    def get_user_enable_otp(self):
+        return self.user_enable_otp
 
 
 class UserCreateUpdateForm(forms.ModelForm):
@@ -242,8 +247,38 @@ class UserLoginOtpForm(AuthenticationForm):
             raise forms.ValidationError(_('Otp token verify error, please try again!'))
 
 
-class UserOtpBinding(forms.Form):
+class UserLoginOtpUseForm(forms.Form):
+    uuid = forms.CharField(max_length=32, widget=forms.HiddenInput)
+    otp_token = forms.CharField(label=_('otp token'), max_length=8)
 
+    def clean_otp_token(self):
+        otp_token = self.cleaned_data['otp_token']
+        uuid = self.cleaned_data['uuid']
+        
+        userid = cache.get(uuid, '')
+        if userid == '':
+            raise forms.ValidationError(_('Timeout, please login again!'))
+
+        user = User.objects.get(pk=userid)
+        if user is None:
+            raise forms.ValidationError(_('Bad request for get token!'))
+        if not user.enable_otp:
+            raise forms.ValidationError(_('You are not enable otp, please use password login!'))
+        if not user.is_active:
+            raise forms.ValidationError(_('User is inactive!'))
+        if user.secret_key_otp == '':
+            raise forms.ValidationError(_('You have not secret key, please contact administrator!'))
+
+        if not verity_otp_token(user.secret_key_otp, otp_token):
+             raise forms.ValidationError(_('Otp token verify error, please try again!'))
+
+        self.user_cache = user
+
+    def get_user(self):
+        return self.user_cache
+
+
+class UserOtpBinding(forms.Form):
     secret_key_otp = forms.CharField(max_length=16, widget=forms.HiddenInput)
     old_password = forms.CharField(max_length=128, widget=forms.PasswordInput, label=_('Password'))
     otp_token = forms.CharField(max_length=8, label='Enter otp token')

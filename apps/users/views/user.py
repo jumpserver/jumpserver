@@ -41,7 +41,7 @@ __all__ = [
     'UserExportView',  'UserBulkImportView', 'UserProfileView',
     'UserProfileUpdateView', 'UserPasswordUpdateView',
     'UserPublicKeyUpdateView', 'UserBulkUpdateView',
-    'UserOtpBindingView','UserOtpUnbingingView',
+    'UserOtpBindingView','UserOtpUnbingingView'
 ]
 
 logger = get_logger(__name__)

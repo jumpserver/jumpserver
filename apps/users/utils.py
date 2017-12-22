@@ -186,3 +186,9 @@ def verity_otp_token(secret_key_otp, otp_token, valid_window=settings.OTP_TOKEN_
 
 def generate_otpauth_uri(username, secret_key_otp):
     return pyotp.totp.TOTP(secret_key_otp).provisioning_uri(username, issuer_name=settings.SITE_URL)
+
+
+def generate_uuid_token_for_otp(userid):
+    uuid_token = uuid.uuid4().hex
+    cache.set(uuid_token, userid, 120)
+    return uuid_token

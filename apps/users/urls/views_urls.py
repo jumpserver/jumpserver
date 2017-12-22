@@ -10,6 +10,7 @@ urlpatterns = [
     # Login view
     url(r'^login$', views.UserLoginView.as_view(), name='login'),
     url(r'^login-otp$', views.UserLoginOtpView.as_view(), name='login-otp'),
+    url(r'^login-use-otp/(?P<uuid>[0-9a-f]{32})/$', views.UserLoginUseOtpView.as_view(), name='login-use-otp'),
     url(r'^logout$', views.UserLogoutView.as_view(), name='logout'),
     url(r'^password/forgot$', views.UserForgotPasswordView.as_view(),
         name='forgot-password'),
