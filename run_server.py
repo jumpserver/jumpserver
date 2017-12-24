@@ -23,7 +23,7 @@ WORKERS = 4
 
 
 def start_gunicorn():
-    print("- Start Gunicorn WSGI HTTP Server")
+    print("# Start Gunicorn WSGI HTTP Server")
     os.chdir(APPS_DIR)
     cmd = "gunicorn jumpserver.wsgi -b {}:{} -w {}".format(HTTP_HOST, HTTP_PORT, WORKERS)
     if DEBUG:
@@ -49,12 +49,35 @@ def start_beat():
     subprocess.call(cmd, shell=True)
 
 
+def make_migrations():
+    print("Check database change, make migrations")
+    os.chdir(os.path.join(BASE_DIR, 'utils'))
+    subprocess.call('bash make_migrations.sh', shell=True)
+
+
+def load_init_data():
+    print("Load init data, if need")
+    os.chdir(APPS_DIR)
+    print(os.listdir(APPS_DIR))
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
+    from users.models import User
+
+    was_initial = User.objects.all().count()
+    if not was_initial:
+        os.chdir(os.path.join(BASE_DIR, 'utils'))
+        subprocess.call('bash init_db.sh', shell=True)
+    else:
+        print("Has been initial, pass")
+
+
 def main():
+    make_migrations()
+    load_init_data()
+
     print(time.ctime())
     print('Jumpserver version {}, more see https://www.jumpserver.org'.format(
         __version__))
     print('Quit the server with CONTROL-C.')
-
     threads = []
     for func in (start_gunicorn, start_celery, start_beat):
         t = Thread(target=func, args=())

@@ -6,6 +6,7 @@ from functools import wraps
 
 from celery import Celery, subtask
 from celery.signals import worker_ready, worker_shutdown
+from django.db.utils import ProgrammingError
 
 from .utils import get_logger
 
@@ -43,6 +44,11 @@ def create_or_update_celery_periodic_tasks(tasks):
     for name, detail in tasks.items():
         interval = None
         crontab = None
+        try:
+            IntervalSchedule.objects.all().count()
+        except ProgrammingError:
+            return None
+
         if isinstance(detail.get("interval"), int):
             intervals = IntervalSchedule.objects.filter(
                 every=detail["interval"], period=IntervalSchedule.SECONDS
