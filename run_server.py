@@ -34,7 +34,7 @@ def start_gunicorn():
 def start_celery():
     print("- Start Celery as Distributed Task Queue")
     os.chdir(APPS_DIR)
-    # Todo: Must set this environment, if not no ansible result return
+    # Todo: Must set this environment, otherwise not no ansible result return
     os.environ.setdefault('PYTHONOPTIMIZE', '1')
     cmd = 'celery -A common worker -l {}'.format(LOG_LEVEL.lower())
     subprocess.call(cmd, shell=True)
@@ -55,24 +55,8 @@ def make_migrations():
     subprocess.call('bash make_migrations.sh', shell=True)
 
 
-def load_init_data():
-    print("Load init data, if need")
-    os.chdir(APPS_DIR)
-    print(os.listdir(APPS_DIR))
-    os.environ['DJANGO_SETTINGS_MODULE'] = 'jumpserver.settings'
-    from users.models import User
-
-    was_initial = User.objects.all().count()
-    if not was_initial:
-        os.chdir(os.path.join(BASE_DIR, 'utils'))
-        subprocess.call('bash init_db.sh', shell=True)
-    else:
-        print("Has been initial, pass")
-
-
 def main():
     make_migrations()
-    load_init_data()
 
     print(time.ctime())
     print('Jumpserver version {}, more see https://www.jumpserver.org'.format(
