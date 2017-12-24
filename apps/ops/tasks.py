@@ -21,9 +21,9 @@ def run_ansible_task(task_id, callback=None, **kwargs):
 
     task = get_object_or_none(Task, id=task_id)
     if task:
-        result = task.object.run()
+        result = task.run()
         if callback is not None:
-            subtask(callback).delay(result)
+            subtask(callback).delay(result, task_name=task.name)
         return result
     else:
         logger.error("No task found")

@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-import os
 import uuid
 from collections import OrderedDict
 
@@ -15,10 +14,11 @@ from django.utils import timezone
 from django.shortcuts import reverse
 
 from .group import UserGroup
-from common.utils import signer, date_expired_default
+from common.utils import get_signer, date_expired_default
 
 
 __all__ = ['User']
+signer = get_signer()
 
 
 class User(AbstractUser):

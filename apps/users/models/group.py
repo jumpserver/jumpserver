@@ -1,16 +1,9 @@
-#!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#
-
-from __future__ import unicode_literals
-
 import uuid
 
 from django.db import models, IntegrityError
-from django.contrib.auth.models import Group
 from django.utils.translation import ugettext_lazy as _
 
-from common.utils import signer, date_expired_default
 from common.mixins import NoDeleteModelMixin
 
 __all__ = ['UserGroup']

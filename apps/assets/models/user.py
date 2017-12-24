@@ -13,13 +13,14 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 
-from common.utils import signer, ssh_key_string_to_obj, ssh_key_gen
+from common.utils import get_signer, ssh_key_string_to_obj, ssh_key_gen
 from .utils import private_key_validator
 from ..const import SYSTEM_USER_CONN_CACHE_KEY
 
 
 __all__ = ['AdminUser', 'SystemUser',]
 logger = logging.getLogger(__name__)
+signer = get_signer()
 
 
 class AssetUser(models.Model):

@@ -2,7 +2,7 @@
     <div class="sidebar-collapse">
         <ul class="nav" id="side-menu">
             {% include '_user_profile.html' %}
-            {% if request.user.is_superuser and request.COOKIES.admin == "Yes" %}
+            {% if request.user.is_superuser and request.COOKIES.IN_ADMIN_PAGE != "No" %}
                 {% include '_nav.html' %}
             {% else %}
                 {% include '_nav_user.html' %}

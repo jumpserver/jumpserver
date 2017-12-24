@@ -45,7 +45,7 @@ def start_beat():
     os.chdir(APPS_DIR)
     os.environ.setdefault('PYTHONOPTIMIZE', '1')
     scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
-    cmd = 'celery -A common beat  -l {} --scheduler {} --max-interval 30 '.format(LOG_LEVEL, scheduler)
+    cmd = 'celery -A common beat  -l {} --scheduler {} --max-interval 5 '.format(LOG_LEVEL, scheduler)
     subprocess.call(cmd, shell=True)
 
 

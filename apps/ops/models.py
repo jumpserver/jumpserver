@@ -9,7 +9,9 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django_celery_beat.models import CrontabSchedule, IntervalSchedule, PeriodicTask
 
-from common.utils import signer, get_logger
+from common.utils import get_signer, get_logger
+from common.celery import delete_celery_periodic_task, create_or_update_celery_periodic_tasks, \
+     disable_celery_periodic_task
 from .ansible import AdHocRunner, AnsibleError
 from .inventory import JMSInventory
 
@@ -17,6 +19,7 @@ __all__ = ["Task", "AdHoc", "AdHocRunHistory"]
 
 
 logger = get_logger(__file__)
+signer = get_signer()
 
 
 class Task(models.Model):
@@ -82,8 +85,6 @@ class Task(models.Model):
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
-        from .utils import create_or_update_celery_periodic_tasks, \
-            disable_celery_periodic_task
         from .tasks import run_ansible_task
         super().save(
             force_insert=force_insert,  force_update=force_update,
@@ -114,7 +115,6 @@ class Task(models.Model):
             disable_celery_periodic_task(self.name)
 
     def delete(self, using=None, keep_parents=False):
-        from .utils import delete_celery_periodic_task
         super().delete(using=using, keep_parents=keep_parents)
         delete_celery_periodic_task(self.name)
 
@@ -246,7 +246,7 @@ class AdHoc(models.Model):
         }
         :return:
         """
-        self._become = signer.sign(json.dumps(item))
+        self._become = signer.sign(json.dumps(item)).decode('utf-8')
 
     @property
     def options(self):
@@ -270,6 +270,11 @@ class AdHoc(models.Model):
             return self.history.all().latest()
         except AdHocRunHistory.DoesNotExist:
             return None
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        super().save(force_insert=force_insert, force_update=force_update,
+                     using=using, update_fields=update_fields)
 
     def __str__(self):
         return "{} of {}".format(self.task.name, self.short_id)

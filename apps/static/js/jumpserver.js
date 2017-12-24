@@ -262,9 +262,6 @@ jumpserver.initDataTable = function (options) {
   var table = ele.DataTable({
         pageLength: options.pageLength || 15,
         dom: options.dom || '<"#uc.pull-left">flt<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
-        language: {
-            url: options.i18n_url || "/static/js/plugins/dataTables/i18n/zh-hans.json"
-        },
         order: options.order || [],
         select: options.select || 'multi',
         buttons: [],
