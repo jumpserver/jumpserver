@@ -11,7 +11,7 @@ from .backends.command.models import AbstractSessionCommand
 
 class Terminal(models.Model):
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    name = models.CharField(max_length=32, unique=True, verbose_name=_('Name'))
+    name = models.CharField(max_length=32, verbose_name=_('Name'))
     remote_addr = models.CharField(max_length=128, verbose_name=_('Remote Address'))
     ssh_port = models.IntegerField(verbose_name=_('SSH Port'), default=2222)
     http_port = models.IntegerField(verbose_name=_('HTTP Port'), default=5000)
@@ -34,7 +34,8 @@ class Terminal(models.Model):
             self.user.save()
 
     def create_app_user(self):
-        user, access_key = User.create_app_user(name=self.name, comment=self.comment)
+        random = uuid.uuid4().hex[:6]
+        user, access_key = User.create_app_user(name="{}-{}".format(self.name, random), comment=self.comment)
         self.user = user
         self.save()
         return user, access_key
@@ -42,6 +43,7 @@ class Terminal(models.Model):
     def delete(self, using=None, keep_parents=False):
         if self.user:
             self.user.delete()
+        self.user = None
         self.is_deleted = True
         self.save()
         return

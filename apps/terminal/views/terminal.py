@@ -73,6 +73,7 @@ class TerminalAcceptView(AdminUserRequiredMixin, JSONResponseMixin, UpdateView):
 
     def form_valid(self, form):
         terminal = form.save()
+        terminal.create_app_user()
         terminal.is_accepted = True
         terminal.is_active = True
         terminal.save()

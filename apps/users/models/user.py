@@ -28,13 +28,13 @@ class User(AbstractUser):
         ('App', 'Application')
     )
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
-    username = models.CharField(max_length=20, unique=True, verbose_name=_('Username'))
-    name = models.CharField(max_length=20, verbose_name=_('Name'))
-    email = models.EmailField(max_length=30, unique=True, verbose_name=_('Email'))
+    username = models.CharField(max_length=128, unique=True, verbose_name=_('Username'))
+    name = models.CharField(max_length=128, verbose_name=_('Name'))
+    email = models.EmailField(max_length=128, unique=True, verbose_name=_('Email'))
     groups = models.ManyToManyField(UserGroup, related_name='users', blank=True, verbose_name=_('User group'))
     role = models.CharField(choices=ROLE_CHOICES, default='User', max_length=10, blank=True, verbose_name=_('Role'))
     avatar = models.ImageField(upload_to="avatar", null=True, verbose_name=_('Avatar'))
-    wechat = models.CharField(max_length=30, blank=True, verbose_name=_('Wechat'))
+    wechat = models.CharField(max_length=128, blank=True, verbose_name=_('Wechat'))
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name=_('Phone'))
     enable_otp = models.BooleanField(default=False, verbose_name=_('Enable OTP'))
     secret_key_otp = models.CharField(max_length=16, blank=True)
@@ -212,7 +212,7 @@ class User(AbstractUser):
     def create_app_user(cls, name, comment):
         from . import AccessKey
         app = cls.objects.create(
-            username=name, name=name, email='%s@local.domain'.format(),
+            username=name, name=name, email='{}@local.domain'.format(name),
             is_active=False, role='App', enable_otp=False, comment=comment,
             is_first_login=False, created_by='System'
         )

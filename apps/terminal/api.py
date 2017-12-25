@@ -3,11 +3,13 @@
 from collections import OrderedDict
 import copy
 import logging
-
 import os
+import uuid
+
 from rest_framework import viewsets, serializers
 from rest_framework.views import APIView, Response
 from rest_framework.permissions import AllowAny
+from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone
 from django.core.files.storage import default_storage
@@ -35,7 +37,7 @@ class TerminalViewSet(viewsets.ModelViewSet):
         x_real_ip = request.META.get('X-Real-IP')
         remote_addr = x_real_ip or remote_ip
 
-        terminal = get_object_or_none(Terminal, name=name)
+        terminal = get_object_or_none(Terminal, name=name, is_deleted=False)
         if terminal:
             msg = 'Terminal name %s already used' % name
             return Response({'msg': msg}, status=409)
@@ -46,12 +48,11 @@ class TerminalViewSet(viewsets.ModelViewSet):
 
         if serializer.is_valid():
             terminal = serializer.save()
-            app_user, access_key = terminal.create_app_user()
-            data = OrderedDict()
-            data['terminal'] = copy.deepcopy(serializer.data)
-            data['user'] = app_user.to_json()
-            data['access_key'] = {'id': access_key.id,
-                                  'secret': access_key.secret}
+
+            # App should use id, token get access key, if accepted
+            token = uuid.uuid4().hex
+            cache.set(token, str(terminal.id), 3600)
+            data = {"id": str(terminal.id), "token": token, "msg": "Need accept"}
             return Response(data, status=201)
         else:
             data = serializer.errors
@@ -61,6 +62,36 @@ class TerminalViewSet(viewsets.ModelViewSet):
         if self.action == "create":
             self.permission_classes = (AllowAny,)
         return super().get_permissions()
+
+
+class TerminalTokenApi(APIView):
+    permission_classes = (AllowAny,)
+    queryset = Terminal.objects.filter(is_deleted=False)
+
+    def get(self, request, *args, **kwargs):
+        try:
+            terminal = self.queryset.get(id=kwargs.get('terminal'))
+        except Terminal.DoesNotExist:
+            terminal = None
+
+        token = request.query_params.get("token")
+
+        if terminal is None:
+            return Response('May be reject by administrator', status=401)
+
+        if token is None or cache.get(token, "") != str(terminal.id):
+            return Response('Token is not valid', status=401)
+
+        if not terminal.is_accepted:
+            return Response("Terminal was not accepted yet", status=400)
+
+        if not terminal.user or not terminal.user.access_key.all():
+            return Response("No access key generate", status=401)
+
+        access_key = terminal.user.access_key.first()
+        data = OrderedDict()
+        data['access_key'] = {'id': access_key.id, 'secret': access_key.secret}
+        return Response(data, status=200)
 
 
 class StatusViewSet(viewsets.ModelViewSet):

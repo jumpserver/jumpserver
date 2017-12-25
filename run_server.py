@@ -21,6 +21,11 @@ DEBUG = CONFIG.DEBUG
 LOG_LEVEL = CONFIG.LOG_LEVEL
 WORKERS = 4
 
+try:
+    os.makedirs(os.path.join(BASE_DIR, "data", "static"))
+    os.makedirs(os.path.join(BASE_DIR, "data", "media"))
+except:
+    pass
 
 def start_gunicorn():
     print("# Start Gunicorn WSGI HTTP Server")

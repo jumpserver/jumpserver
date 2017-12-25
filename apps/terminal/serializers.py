@@ -14,8 +14,11 @@ class TerminalSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Terminal
-        fields = ['id', 'name', 'remote_addr', 'http_port', 'ssh_port',
-                  'comment', 'is_accepted', 'session_online', 'is_alive']
+        fields = [
+            'id', 'name', 'remote_addr', 'http_port', 'ssh_port',
+            'comment', 'is_accepted', "is_active", 'session_online',
+            'is_alive'
+        ]
 
     @staticmethod
     def get_session_online(obj):

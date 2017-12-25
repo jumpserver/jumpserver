@@ -89,7 +89,7 @@ function initTable() {
         ],
         ajax_url: '{% url "api-terminal:terminal-list" %}',
         columns: [{data: function(){return ""}}, {data: "name" }, {data: "remote_addr" }, {data: "ssh_port"}, {data: "http_port"},
-                  {data: "session_online"}, {data: "is_accepted" }, {data: 'is_alive'}, {data: "id"}],
+                  {data: "session_online"}, {data: "is_active" }, {data: 'is_alive'}, {data: "id"}],
         op_html: $('#actions').html()
     };
     jumpserver.initDataTable(options);
