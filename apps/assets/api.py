@@ -222,7 +222,7 @@ class AssetRefreshHardwareApi(generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         asset_id = kwargs.get('pk')
         asset = get_object_or_404(Asset, pk=asset_id)
-        summary = update_assets_hardware_info_manual([asset])
+        summary = update_assets_hardware_info_manual([asset])[1]
         if summary.get('dark'):
             return Response(summary['dark'].values(), status=501)
         else:
@@ -255,7 +255,7 @@ class AdminUserTestConnectiveApi(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         admin_user = self.get_object()
-        test_admin_user_connectability_util.delay(admin_user, force=True)
+        test_admin_user_connectability_util.delay(admin_user)
         return Response({"msg": "Task created"})
 
 
@@ -268,7 +268,7 @@ class SystemUserPushApi(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         system_user = self.get_object()
-        push_system_user_to_cluster_assets_manual.delay(system_user, force=True)
+        push_system_user_to_cluster_assets_manual.delay(system_user)
         return Response({"msg": "Task created"})
 
 
@@ -281,5 +281,5 @@ class SystemUserTestConnectiveApi(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         system_user = self.get_object()
-        test_system_user_connectability_manual.delay(system_user, force=True)
+        test_system_user_connectability_manual.delay(system_user)
         return Response({"msg": "Task created"})

@@ -6,7 +6,7 @@ from functools import wraps
 
 from celery import Celery, subtask
 from celery.signals import worker_ready, worker_shutdown
-from django.db.utils import ProgrammingError
+from django.db.utils import ProgrammingError, OperationalError
 
 from .utils import get_logger
 
@@ -46,7 +46,7 @@ def create_or_update_celery_periodic_tasks(tasks):
         crontab = None
         try:
             IntervalSchedule.objects.all().count()
-        except ProgrammingError:
+        except (ProgrammingError, OperationalError):
             return None
 
         if isinstance(detail.get("interval"), int):
