@@ -12,18 +12,16 @@ def add_default_group(apps, schema_editor):
     group_model = apps.get_model("assets", "AssetGroup")
     db_alias = schema_editor.connection.alias
     group_model.objects.using(db_alias).create(
-        name="default"
+        name="Default"
     )
-    print("Add default group")
 
 
 def add_default_cluster(apps, schema_editor):
     cluster_model = apps.get_model("assets", "Cluster")
     db_alias = schema_editor.connection.alias
     cluster_model.objects.using(db_alias).create(
-        name="default"
+        name="Default"
     )
-    print("Add default cluster")
 
 
 class Migration(migrations.Migration):
