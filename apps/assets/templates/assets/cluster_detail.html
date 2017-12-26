@@ -151,7 +151,7 @@
 <script>
 
 $(document).ready(function () {
-	$('.select2').select2();
+	$('.select2').select2({            dropdownAutoWidth : true,            width: 'auto'        });
 })
 .on('click', '.btn-delete-cluster', function () {
 	var name = "{{ cluster.name }}";

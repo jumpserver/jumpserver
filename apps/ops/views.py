@@ -9,40 +9,27 @@ from django.views.generic import ListView, DetailView, View
 from django.utils import timezone
 from django.shortcuts import redirect, reverse
 
+from common.mixins import DatetimeSearchMixin
 from .models import Task, AdHoc, AdHocRunHistory
 from ops.tasks import rerun_task
 
 
-class TaskListView(ListView):
+class TaskListView(DatetimeSearchMixin, ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     model = Task
     ordering = ('-date_created',)
     context_object_name = 'task_list'
     template_name = 'ops/task_list.html'
     date_format = '%m/%d/%Y'
-    keyword = date_from_s = date_to_s = ''
+    keyword = ''
 
     def get_queryset(self):
-        date_to_default = timezone.now()
-        date_from_default = timezone.now() - timezone.timedelta(7)
-        date_from_default_s = date_from_default.strftime(self.date_format)
-        date_to_default_s = date_to_default.strftime(self.date_format)
-
         self.queryset = super().get_queryset()
         self.keyword = self.request.GET.get('keyword', '')
-        self.date_from_s = self.request.GET.get('date_from', date_from_default_s)
-        self.date_to_s = self.request.GET.get('date_to', date_to_default_s)
-
-        if self.date_from_s:
-            date_from = datetime.strptime(self.date_from_s, self.date_format)
-            date_from = date_from.replace(tzinfo=timezone.get_current_timezone())
-            self.queryset = self.queryset.filter(date_created__gt=date_from)
-
-        if self.date_to_s:
-            date_to = timezone.datetime.strptime(
-                self.date_to_s + ' 23:59:59', '%m/%d/%Y %H:%M:%S')
-            date_to = date_to.replace(tzinfo=timezone.get_current_timezone())
-            self.queryset = self.queryset.filter(date_created__lt=date_to)
+        self.queryset = self.queryset.filter(
+            date_created__gt=self.date_from,
+            date_created__lt=self.date_to
+        )
 
         if self.keyword:
             self.queryset = self.queryset.filter(
@@ -51,15 +38,16 @@ class TaskListView(ListView):
         return self.queryset
 
     def get_context_data(self, **kwargs):
+        print(self.date_from)
         context = {
             'app': 'Ops',
             'action': _('Task list'),
-            'date_from': self.date_from_s,
-            'date_to': self.date_to_s,
+            'date_from': self.date_from,
+            'date_to': self.date_to,
             'keyword': self.keyword,
         }
         kwargs.update(context)
-        return super(TaskListView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class TaskDetailView(DetailView):

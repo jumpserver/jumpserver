@@ -17,9 +17,10 @@
         <div class="form-group" id="date">
             <div class="input-daterange input-group" id="datepicker">
                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_from" value="{{ date_from }}">
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_from" value="{{ date_from|date:"m/d/Y"}}">
+{#                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_from" >#}
                 <span class="input-group-addon">to</span>
-                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_to" value="{{ date_to }}">
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_to" value="{{ date_to|date:"m/d/Y"}}">
             </div>
         </div>
         <div class="input-group">
@@ -80,10 +81,11 @@
                 "order": []
             });
             $('#date .input-daterange').datepicker({
-                dateFormat: 'mm/dd/yy',
+                  dateFormat:  "mm/dd/yyy",
                 keyboardNavigation: false,
                 forceParse: false,
                 autoclose: true
+
             });
             $('.select2').select2({
                 dropdownAutoWidth: true

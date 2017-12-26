@@ -157,7 +157,7 @@ function bindToCluster(clusters) {
 
 jumpserver.cluster_selected = {};
 $(document).ready(function () {
-    $('.select2').select2().on('select2:select', function(evt) {
+    $('.select2').select2({            dropdownAutoWidth : true,            width: 'auto'        });.on('select2:select', function(evt) {
         var data = evt.params.data;
         jumpserver.cluster_selected[data.id] = data.text;
     }).on('select2:unselect', function(evt) {
