@@ -224,13 +224,16 @@ class SystemUserForm(forms.ModelForm):
         password = self.cleaned_data.get('password', None)
         private_key_file = self.cleaned_data.get('private_key_file')
         auto_generate_key = self.cleaned_data.get('auto_generate_key')
+        private_key = None
+        public_key = None
 
         if auto_generate_key:
             logger.info('Auto set system user auth')
             system_user.auto_gen_auth()
         else:
-            private_key = private_key_file.read().strip().decode('utf-8')
-            public_key = ssh_pubkey_gen(private_key=private_key)
+            if private_key_file:
+                private_key = private_key_file.read().strip().decode('utf-8')
+                public_key = ssh_pubkey_gen(private_key=private_key)
             system_user.set_auth(password=password, private_key=private_key, public_key=public_key)
         return system_user
 

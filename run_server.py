@@ -6,6 +6,7 @@ import threading
 import time
 import argparse
 import platform
+import sys
 
 from apps import __version__
 
@@ -25,6 +26,7 @@ WORKERS = 4
 
 EXIT_EVENT = threading.Event()
 EXIT_MSGS = []
+
 
 
 try:
@@ -54,9 +56,8 @@ def start_gunicorn():
     cmd = "gunicorn jumpserver.wsgi -b {}:{} -w {}".format(HTTP_HOST, HTTP_PORT, WORKERS)
     if DEBUG:
         cmd += " --reload"
-    subprocess.call(cmd, shell=True)
-    EXIT_MSGS.append("Gunicorn start failed")
-    EXIT_EVENT.set()
+    p = subprocess.Popen(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
+    return p
 
 
 def start_celery():
@@ -68,16 +69,15 @@ def start_celery():
     if platform.platform().startswith("Linux"):
         cmd = """
         id jumpserver || useradd -s /sbin/nologin jumpserver;
-        su jumpserver -c 'celery -A common worker -l {}'
+        su jumpserver -c 'celery -A common worker -l {}';
         """.format(LOG_LEVEL.lower())
     else:
         cmd = """
-        export C_FORCE_ROOT=1;celery -A common worker -l {}'
+        export C_FORCE_ROOT=1;celery -A common worker -l {}
         """.format(LOG_LEVEL.lower())
 
-    subprocess.call(cmd, shell=True)
-    EXIT_MSGS.append("Celery start failed")
-    EXIT_EVENT.set()
+    p = subprocess.Popen(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
+    return p
 
 
 def start_beat():
@@ -86,40 +86,44 @@ def start_beat():
     os.environ.setdefault('PYTHONOPTIMIZE', '1')
     os.environ.setdefault('C_FORCE_ROOT', '1')
     scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
-    cmd = 'celery -A common beat  -l {} --scheduler {} --max-interval 5 '.format(LOG_LEVEL, scheduler)
-    subprocess.call(cmd, shell=True)
-    EXIT_MSGS.append("Beat start failed")
-    EXIT_EVENT.set()
+    cmd = 'celery -A common beat  -l {} --scheduler {} --max-interval 60 '.format(LOG_LEVEL, scheduler)
+    p = subprocess.Popen(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
+    return p
 
 
 def start_service(services):
-    make_migrations()
-
     print(time.ctime())
     print('Jumpserver version {}, more see https://www.jumpserver.org'.format(
         __version__))
     print('Quit the server with CONTROL-C.')
 
-    threads = []
-    if 'gunicorn' in args.services:
-        threads.append(threading.Thread(target=start_gunicorn, args=()))
-    if 'celery' in args.services:
-        threads.append(threading.Thread(target=start_celery, args=()))
-    if 'beat' in args.services:
-        threads.append(threading.Thread(target=start_beat, args=()))
-    if 'all' in args.services:
-        _threads = []
-        for func in (start_gunicorn, start_celery, start_beat):
-            t = threading.Thread(target=func, args=())
-            _threads.append(t)
-        threads = _threads
+    processes = {}
+    services_all = {
+         "gunicorn": start_gunicorn,
+         "celery": start_celery,
+         "beat": start_beat
+    }
 
-    for t in threads:
-        t.start()
+    if 'all' in services:
+        for name, func in services_all.items():
+            processes[name] = func()
+    else:
+        for name in services:
+            func = services_all.get(name)
+            processes[name] = func()
 
-    if EXIT_EVENT.wait():
-        print("\n\n" + "####" * 30)
-        print("\n".join(EXIT_MSGS))
+    stop_event = threading.Event()
+    while not stop_event.is_set():
+        for name, proc in processes.items():
+            if proc.poll() is not None:
+                print("\n\n" + "####"*10 + "  ERROR OCCUR  " + "####"*10)
+                print("Start service {} [FAILED]".format(name))
+                for _, p in processes.items():
+                    p.terminate()
+                stop_event.set()
+                print("Exited".format(name))
+                break
+        time.sleep(5)
 
 
 if __name__ == '__main__':

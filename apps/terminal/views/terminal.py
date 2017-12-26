@@ -1,10 +1,10 @@
 # ~*~ coding: utf-8 ~*~
 #
-
 from django.views.generic import ListView, UpdateView, DeleteView, \
-    DetailView, TemplateView
+    DetailView, View
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.utils.translation import ugettext as _
+from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 
 from common.mixins import JSONResponseMixin
@@ -16,6 +16,7 @@ from ..hands import AdminUserRequiredMixin
 __all__ = [
     "TerminalListView", "TerminalUpdateView", "TerminalDetailView",
     "TerminalDeleteView", "TerminalConnectView", "TerminalAcceptView",
+    "WebTerminalView",
 ]
 
 
@@ -115,3 +116,8 @@ class TerminalConnectView(LoginRequiredMixin, DetailView):
 
         kwargs.update(context)
         return super(TerminalConnectView, self).get_context_data(**kwargs)
+
+
+class WebTerminalView(LoginRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        return redirect('/luna/?' + request.GET.urlencode())
