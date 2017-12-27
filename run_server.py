@@ -38,8 +38,8 @@ except:
 
 def make_migrations():
     print("Check database change, make migrations")
-    os.chdir(os.path.join(BASE_DIR, 'utils'))
-    subprocess.call('bash make_migrations.sh', shell=True)
+    os.chdir(os.path.join(BASE_DIR, 'apps'))
+    subprocess.call('python manage.py migrate', shell=True)
 
 
 def collect_static():
