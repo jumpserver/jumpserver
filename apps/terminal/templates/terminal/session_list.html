@@ -94,9 +94,9 @@
             <td class="text-center">{{ session.date_end|default_if_none:now|timeuntil:session.date_start }}</td>
             <td>
                 {% if session.is_finished %}
-                <a href="" class="btn btn-xs btn-warning btn-replay" >{% trans "Replay" %}</a>
+                <a onclick="window.open('/luna/replay/{{ session.id }}','luna', 'height=600, width=800, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, location=no, status=no')" class="btn btn-xs btn-warning btn-replay" >{% trans "Replay" %}</a>
                 {% else %}
-                <a class="btn btn-xs btn-warning btn-monitor" >{% trans "Monitor" %}</a>
+                <a onclick="window.open('/luna/monitor/{{ session.id }}','luna', 'height=600, width=800, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, location=no, status=no')" class="btn btn-xs btn-warning btn-monitor" >{% trans "Monitor" %}</a>
                 <a class="btn btn-xs btn-danger btn-term" value="{{ session.id }}" terminal="{{ session.terminal.id }}" >{% trans "Terminate" %}</a>
                 {% endif %}
             </td>
