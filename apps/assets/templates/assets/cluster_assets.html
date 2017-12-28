@@ -181,7 +181,7 @@ function initTable() {
 }
 
 $(document).ready(function () {
-	$('.select2').select2();
+	$('.select2').select2()
 	.on("select2:select", function (evt) {
 		var data = evt.params.data;
 		jumpserver.assets_selected[data.id] = data.text;
