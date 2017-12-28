@@ -34,7 +34,7 @@ def update_assets_hardware_info(result, **kwargs):
     """
     result_raw = result[0]
     assets_updated = []
-    for hostname, info in result_raw['ok'].items():
+    for hostname, info in result_raw.get('ok', {}).items():
         if info:
             info = info[const.UPDATE_ASSETS_HARDWARE_TASK_NAME]['ansible_facts']
         else:
