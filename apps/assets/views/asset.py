@@ -28,7 +28,7 @@ from common.utils import get_object_or_none, get_logger, is_uuid
 from .. import forms
 from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser
 from ..hands import AdminUserRequiredMixin
-from ..tasks import update_assets_hardware_info
+from ..tasks import update_assets_hardware_info_util
 
 
 __all__ = [
@@ -313,10 +313,6 @@ class BulkImportAssetView(AdminUserRequiredMixin, JSONResponseMixin, FormView):
                     updated.append(asset_dict['hostname'])
                 except Exception as e:
                     failed.append('%s: %s' % (asset_dict['hostname'], str(e)))
-
-        if assets:
-            update_assets_hardware_info.delay([asset._to_secret_json() for asset in assets])
-
 
         data = {
             'created': created,

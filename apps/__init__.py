@@ -2,6 +2,4 @@
 # -*- coding: utf-8 -*-
 # 
 
-
-if __name__ == '__main__':
-    pass
+__version__ = "0.5.0"

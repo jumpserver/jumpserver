@@ -16,9 +16,9 @@
         <div class="form-group" id="date">
             <div class="input-daterange input-group" id="datepicker">
                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_from" value="{{ date_from }}">
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_from" value="{{ date_from|date:"m/d/Y" }}">
                 <span class="input-group-addon">to</span>
-                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_to" value="{{ date_to }}">
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_to" value="{{ date_to|date:"m/d/Y" }}">
             </div>
         </div>
         <div class="input-group">
@@ -57,14 +57,20 @@
             <td class="text-center">{{ object.adhoc.all | length}}</td>
             <td class="text-center">{{ object.latest_adhoc.hosts | length}}</td>
             <td class="text-center">
-            {% if object.latest_history.is_success %}
-                <i class="fa fa-check text-navy"></i>
-            {% else %}
-                <i class="fa fa-times text-danger"></i>
+            {% if object.latest_history %}
+                {% if object.latest_history.is_success %}
+                    <i class="fa fa-check text-navy"></i>
+                {% else %}
+                    <i class="fa fa-times text-danger"></i>
+                {% endif %}
             {% endif %}
             </td>
             <td class="text-center">{{ object.latest_history.date_start }}</td>
-            <td class="text-center">{{ object.latest_history.timedelta|floatformat }} s</td>
+            <td class="text-center">
+                {% if object.latest_history %}
+                {{ object.latest_history.timedelta|floatformat }} s
+                {% endif %}
+            </td>
             <td class="text-center">
                 <a href="{% url 'ops:task-run' pk=object.id %}" class="btn btn-xs btn-info">{% trans "Run" %}</a>
                 <a data-uid="{{ object.id }}" class="btn btn-xs btn-danger btn-del">{% trans "Delete" %}</a>
@@ -83,7 +89,10 @@ $(document).ready(function() {
         "bInfo" : false,
         "order": []
     });
-    $('.select2').select2();
+    $('.select2').select2({
+        dropdownAutoWidth : true,
+        width: 'auto'
+    });
     $('#date .input-daterange').datepicker({
         dateFormat: 'mm/dd/yy',
         keyboardNavigation: false,

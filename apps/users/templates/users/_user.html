@@ -56,7 +56,7 @@
     <script src="{% static 'js/plugins/datepicker/bootstrap-datepicker.js' %}"></script>
     <script>
         $(document).ready(function () {
-            $('.select2').select2();
+            $('.select2').select2({            dropdownAutoWidth : true,            width: 'auto'        });
 
             $('.input-group.date').datepicker({
                 format: "yyyy-mm-dd",

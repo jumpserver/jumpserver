@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.conf.urls import url, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve as static_serve
 
 from rest_framework.schemas import get_schema_view
 from rest_framework_swagger.renderers import SwaggerUIRenderer, OpenAPIRenderer
@@ -33,8 +34,8 @@ urlpatterns = [
 
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += [
         url(r'^docs/', schema_view, name="docs"),
-    ]
+    ] + static(settings.STATIC_URL, document_root=settings.STATIC_DIR) \
+      + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

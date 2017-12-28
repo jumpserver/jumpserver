@@ -47,7 +47,7 @@
 {% block custom_foot_js %}
     <script>
         $(document).ready(function () {
-            $('.select2').select2();
+            $('.select2').select2({            dropdownAutoWidth : true,            width: 'auto'        });
 {#            $("#id_tags").select2({#}
 {#                tags: true,#}
 {#                maximumSelectionLength: 8  //最多能够选择的个数#}

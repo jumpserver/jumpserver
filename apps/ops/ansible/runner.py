@@ -27,7 +27,7 @@ Options = namedtuple('Options', [
     'ssh_common_args', 'ssh_extra_args', 'sftp_extra_args',
     'scp_extra_args', 'become', 'become_method', 'become_user',
     'verbosity', 'check', 'extra_vars', 'playbook_path', 'passwords',
-    'diff', 'gathering'
+    'diff', 'gathering', 'remote_tmp',
 ])
 
 
@@ -57,6 +57,7 @@ def get_default_options():
         passwords=None,
         diff=False,
         gathering='implicit',
+        remote_tmp='/tmp/.ansible'
     )
     return options
 

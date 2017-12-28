@@ -5,9 +5,11 @@ from django.utils.translation import ugettext_lazy as _
 from rest_framework import serializers
 from rest_framework_bulk import BulkListSerializer
 
-from common.utils import signer, validate_ssh_public_key
+from common.utils import get_signer, validate_ssh_public_key
 from common.mixins import BulkSerializerMixin
 from .models import User, UserGroup
+
+signer = get_signer()
 
 
 class UserSerializer(BulkSerializerMixin, serializers.ModelSerializer):

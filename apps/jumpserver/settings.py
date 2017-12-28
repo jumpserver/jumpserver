@@ -27,9 +27,7 @@ sys.path.append(PROJECT_DIR)
 
 # Import project config setting
 try:
-    from config import config as env_config, env
-
-    CONFIG = env_config.get(env, 'default')()
+    from config import config as CONFIG
 except ImportError:
     CONFIG = type('_', (), {'__getattr__': lambda arg1, arg2: None})()
 
@@ -66,12 +64,12 @@ INSTALLED_APPS = [
     'django_filters',
     'bootstrap3',
     'captcha',
+    'django_celery_beat',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
 ]
 
 MIDDLEWARE = [
@@ -132,7 +130,6 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 #         }
 #     }
 
-print(CONFIG.DB_ENGINE)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.{}'.format(CONFIG.DB_ENGINE),
@@ -245,6 +242,7 @@ LOGGING = {
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 LANGUAGE_CODE = 'en-us'
 
+# TIME_ZONE = 'UTC'
 TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
@@ -260,6 +258,9 @@ LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'), ]
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(PROJECT_DIR, "data", "static")
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+
 
 STATICFILES_DIRS = (
     os.path.join(BASE_DIR, "static"),
@@ -325,20 +326,21 @@ if CONFIG.AUTH_LDAP:
     AUTH_LDAP_USER_ATTR_MAP = CONFIG.AUTH_LDAP_USER_ATTR_MAP
 
 # Celery using redis as broker
-BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/3' % {
+CELERY_BROKER_URL = 'redis://:%(password)s@%(host)s:%(port)s/3' % {
     'password': CONFIG.REDIS_PASSWORD if CONFIG.REDIS_PASSWORD else '',
     'host': CONFIG.REDIS_HOST or '127.0.0.1',
     'port': CONFIG.REDIS_PORT or 6379,
 }
 CELERY_TASK_SERIALIZER = 'pickle'
 CELERY_RESULT_SERIALIZER = 'pickle'
-CELERY_RESULT_BACKEND = BROKER_URL
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ['json', 'pickle']
-CELERY_TASK_RESULT_EXPIRES = 3600
-CELERYD_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
-CELERYD_TASK_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
-CELERY_TIMEZONE = TIME_ZONE
-# TERMINAL_HEATBEAT_INTERVAL = CONFIG.TERMINAL_HEATBEAT_INTERVAL or 30
+CELERY_RESULT_EXPIRES = 3600
+CELERY_WORKER_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
+CELERY_WORKER_TASK_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
+CELERY_TASK_EAGER_PROPAGATES = True
+# CELERY_TIMEZONE = TIME_ZONE
+# CELERY_ENABLE_UTC = True
 
 
 # Cache use redis

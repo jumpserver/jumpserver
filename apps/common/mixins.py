@@ -3,15 +3,14 @@
 import inspect
 from django.db import models
 from django.http import JsonResponse
-from django.utils.timezone import now
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
-
 
 
 class NoDeleteQuerySet(models.query.QuerySet):
 
     def delete(self):
-        return self.update(is_discard=True, discard_time=now())
+        return self.update(is_discard=True, discard_time=timezone.now())
 
 
 class NoDeleteManager(models.Manager):
@@ -37,7 +36,7 @@ class NoDeleteModelMixin(models.Model):
 
     def delete(self):
         self.is_discard = True
-        self.discard_time = now()
+        self.discard_time = timezone.now()
         return self.save()
 
 
@@ -88,3 +87,29 @@ class BulkSerializerMixin(object):
 
         return ret
 
+
+class DatetimeSearchMixin:
+    date_from = date_to = None
+
+    def get(self, request, *args, **kwargs):
+        date_from_s = self.request.GET.get('date_from')
+        date_to_s = self.request.GET.get('date_to')
+
+        if date_from_s:
+            date_from = timezone.datetime.strptime(date_from_s, '%m/%d/%Y')
+            self.date_from = date_from.replace(
+                tzinfo=timezone.get_current_timezone()
+            )
+        else:
+            self.date_from = timezone.now() - timezone.timedelta(7)
+
+        if date_to_s:
+            date_to = timezone.datetime.strptime(
+                date_to_s + ' 23:59:59', '%m/%d/%Y %H:%M:%S'
+            )
+            self.date_to = date_to.replace(
+                tzinfo=timezone.get_current_timezone()
+            )
+        else:
+            self.date_to = timezone.now()
+        return super().get(request, *args, **kwargs)

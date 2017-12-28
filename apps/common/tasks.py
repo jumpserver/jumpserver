@@ -1,6 +1,6 @@
 from django.core.mail import send_mail
 from django.conf import settings
-from common import celery_app as app
+from .celery import app
 from .utils import get_logger
 
 

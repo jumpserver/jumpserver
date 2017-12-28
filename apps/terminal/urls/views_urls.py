@@ -15,6 +15,7 @@ urlpatterns = [
     url(r'^terminal/(?P<pk>[0-9a-zA-Z\-]{36})/connect/$', views.TerminalConnectView.as_view(), name='terminal-connect'),
     url(r'^terminal/(?P<pk>[0-9a-zA-Z\-]{36})/update/$', views.TerminalUpdateView.as_view(), name='terminal-update'),
     url(r'^(?P<pk>[0-9a-zA-Z\-]{36})/accept/$', views.TerminalAcceptView.as_view(), name='terminal-accept'),
+    url(r'^web-terminal/$', views.WebTerminalView.as_view(), name='web-terminal'),
 
     # Session view
     url(r'^session-online/$', views.SessionOnlineListView.as_view(), name='session-online-list'),

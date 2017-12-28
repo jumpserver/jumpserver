@@ -22,6 +22,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from common.utils import get_object_or_none
+from common.mixins import DatetimeSearchMixin
 from ..models import User, LoginLog
 from ..utils import send_reset_password_mail
 from ..tasks import write_login_log_async
@@ -210,55 +211,38 @@ class UserFirstLoginView(LoginRequiredMixin, SessionWizardView):
         return form
 
 
-class LoginLogListView(ListView):
+class LoginLogListView(DatetimeSearchMixin, ListView):
     template_name = 'users/login_log_list.html'
     model = LoginLog
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    username = keyword = date_from_s = date_to_s = ""
+    username = keyword = ""
+    date_to = date_from = None
     date_format = '%m/%d/%Y'
 
     def get_queryset(self):
-        date_to_default = timezone.now()
-        date_from_default = timezone.now() - timezone.timedelta(7)
-        date_to_default_s = date_to_default.strftime(self.date_format)
-        date_from_default_s = date_from_default.strftime(self.date_format)
-
         self.username = self.request.GET.get('username', '')
         self.keyword = self.request.GET.get("keyword", '')
-        self.date_from_s = self.request.GET.get('date_from', date_from_default_s)
-        self.date_to_s = self.request.GET.get('date_to', date_to_default_s)
 
-        self.queryset = super().get_queryset()
+        queryset = super().get_queryset()
+        queryset = queryset.filter(
+            datetime__gt=self.date_from, datetime__lt=self.date_to
+        )
         if self.username:
-            self.queryset = self.queryset.filter(username=self.username)
-        if self.date_from_s:
-            date_from = timezone.datetime.strptime(self.date_from_s, '%m/%d/%Y')
-            date_from = date_from.replace(
-                tzinfo=timezone.get_current_timezone()
-            )
-            self.queryset = self.queryset.filter(datetime__gt=date_from)
-        if self.date_to_s:
-            date_to = timezone.datetime.strptime(
-                self.date_to_s + ' 23:59:59', '%m/%d/%Y %H:%M:%S'
-            )
-            date_to = date_to.replace(
-                tzinfo=timezone.get_current_timezone()
-            )
-            self.queryset = self.queryset.filter(datetime__lt=date_to)
+            queryset = self.queryset.filter(username=self.username)
         if self.keyword:
-            self.queryset = self.queryset.filter(
+            queryset = self.queryset.filter(
                 Q(ip__contains=self.keyword) |
                 Q(city__contains=self.keyword) |
                 Q(username__contains=self.keyword)
             )
-        return self.queryset
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Users'),
             'action': _('Login log list'),
-            'date_from': self.date_from_s,
-            'date_to': self.date_to_s,
+            'date_from': self.date_from,
+            'date_to': self.date_to,
             'username': self.username,
             'keyword': self.keyword,
             'user_list': set(LoginLog.objects.all().values_list('username', flat=True))

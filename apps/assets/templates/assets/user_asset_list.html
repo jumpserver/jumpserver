@@ -34,6 +34,7 @@
             <th class="text-center">{% trans 'Hardware' %}</th>
             <th class="text-center">{% trans 'Active' %}</th>
             <th class="text-center">{% trans 'Connective' %}</th>
+            <th class="text-center">{% trans 'Action' %}</th>
         </tr>
     </thead>
     <tbody>
@@ -70,12 +71,18 @@ function initTable() {
                 } else {
                     $(td).html('<i class="fa fa-circle text-navy"></i>')
                 }
+            }},
+            {targets: 9, createdCell: function (td, cellData, rowData) {
+                var conn_btn = '<a href="{% url "terminal:web-terminal" %}?id={{ DEFAULT_PK }}" class="btn btn-xs btn-info">{% trans "Connect" %}</a>'.replace("{{ DEFAULT_PK }}", cellData);
+                $(td).html(conn_btn)
             }}
         ],
         ajax_url: '{% url "api-assets:asset-list" %}',
-        columns: [{data: "id"}, {data: "hostname" }, {data: "ip" }, {data: "port" },
+        columns: [
+            {data: "id"}, {data: "hostname" }, {data: "ip" }, {data: "port" },
             {data: "get_type_display" }, {data: "get_env_display"}, {data: "hardware_info"},
-            {data: "is_active" }, {data: "is_connective"}],
+            {data: "is_active" }, {data: "is_connective"}, {data: "id"}
+        ],
         op_html: $('#actions').html()
     };
     return jumpserver.initDataTable(options);

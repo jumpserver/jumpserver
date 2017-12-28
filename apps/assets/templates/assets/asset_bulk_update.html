@@ -30,7 +30,7 @@
 {% block custom_foot_js %}
 <script>
     $(document).ready(function () {
-        $('.select2').select2();
+        $('.select2').select2({            dropdownAutoWidth : true,            width: 'auto'        });
     }).on('click', '.field-tag', function() {
         changeField(this);
     }).on('click', '#change_all', function () {

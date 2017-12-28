@@ -6,7 +6,6 @@ from six import string_types
 import base64
 import os
 from itertools import chain
-import string
 import logging
 import datetime
 import time
@@ -26,9 +25,6 @@ from django.conf import settings
 from django.utils import timezone
 
 
-from .compat import to_bytes, to_string
-
-SECRET_KEY = settings.SECRET_KEY
 UUID_PATTERN = re.compile(r'[0-9a-zA-Z\-]{36}')
 
 
@@ -50,9 +46,22 @@ def get_object_or_none(model, **kwargs):
     return obj
 
 
-class Signer(object):
+class Singleton(type):
+    def __init__(cls, *args, **kwargs):
+        cls.__instance = None
+        super().__init__(*args, **kwargs)
+
+    def __call__(cls, *args, **kwargs):
+        if cls.__instance is None:
+            cls.__instance = super().__call__(*args, **kwargs)
+            return cls.__instance
+        else:
+            return cls.__instance
+
+
+class Signer(metaclass=Singleton):
     """用来加密,解密,和基于时间戳的方式验证token"""
-    def __init__(self, secret_key=SECRET_KEY):
+    def __init__(self, secret_key=None):
         self.secret_key = secret_key
 
     def sign(self, value):
@@ -99,56 +108,8 @@ def combine_seq(s1, s2, callback=None):
     return seq
 
 
-def search_object_attr(obj, value='', attr_list=None, ignore_case=False):
-    """It's provide a method to search a object attribute equal some value
-
-    If object some attribute equal :param: value, return True else return False
-
-    class A():
-        name = 'admin'
-        age = 7
-
-    :param obj: A object
-    :param value: A string match object attribute
-    :param attr_list: Only match attribute in attr_list
-    :param ignore_case: Ignore case
-    :return: Boolean
-    """
-    if value == '':
-        return True
-
-    try:
-        object_attr = obj.__dict__
-    except AttributeError:
-        return False
-
-    if attr_list is not None:
-        new_object_attr = {}
-        for attr in attr_list:
-            new_object_attr[attr] = object_attr.pop(attr)
-        object_attr = new_object_attr
-
-    if ignore_case:
-        if not isinstance(value, string_types):
-            return False
-
-        if value.lower() in map(string.lower, map(str, object_attr.values())):
-            return True
-    else:
-        if value in object_attr.values():
-            return True
-    return False
-
-
 def get_logger(name=None):
     return logging.getLogger('jumpserver.%s' % name)
-
-
-def int_seq(seq):
-    try:
-        return map(int, seq)
-    except ValueError:
-        return seq
 
 
 def timesince(dt, since='', default="just now"):
@@ -390,4 +351,6 @@ def is_uuid(s):
         return False
 
 
-signer = Signer()
+def get_signer():
+    signer = Signer(settings.SECRET_KEY)
+    return signer

@@ -25,9 +25,9 @@ from .hands import IsSuperUser, IsValidUser, IsSuperUserOrAppUser, \
     get_user_granted_assets
 from .models import AssetGroup, Asset, Cluster, SystemUser, AdminUser
 from . import serializers
-from .tasks import update_assets_hardware_info, test_admin_user_connectability, \
-    test_admin_user_connectability_manual, push_system_user_to_cluster_assets, \
-    test_system_user_connectability
+from .tasks import update_assets_hardware_info_manual, test_admin_user_connectability_util, \
+    test_asset_connectability_manual, push_system_user_to_cluster_assets_manual, \
+    test_system_user_connectability_manual
 
 
 class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
@@ -222,7 +222,7 @@ class AssetRefreshHardwareApi(generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         asset_id = kwargs.get('pk')
         asset = get_object_or_404(Asset, pk=asset_id)
-        summary = update_assets_hardware_info([asset])
+        summary = update_assets_hardware_info_manual([asset])[1]
         if summary.get('dark'):
             return Response(summary['dark'].values(), status=501)
         else:
@@ -239,7 +239,7 @@ class AssetAdminUserTestApi(generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         asset_id = kwargs.get('pk')
         asset = get_object_or_404(Asset, pk=asset_id)
-        ok, msg = test_admin_user_connectability_manual(asset)
+        ok, msg = test_asset_connectability_manual(asset)
         if ok:
             return Response({"msg": "pong"})
         else:
@@ -255,7 +255,7 @@ class AdminUserTestConnectiveApi(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         admin_user = self.get_object()
-        test_admin_user_connectability.delay(admin_user, force=True)
+        test_admin_user_connectability_util.delay(admin_user)
         return Response({"msg": "Task created"})
 
 
@@ -268,7 +268,7 @@ class SystemUserPushApi(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         system_user = self.get_object()
-        push_system_user_to_cluster_assets.delay(system_user, force=True)
+        push_system_user_to_cluster_assets_manual.delay(system_user)
         return Response({"msg": "Task created"})
 
 
@@ -281,5 +281,5 @@ class SystemUserTestConnectiveApi(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         system_user = self.get_object()
-        test_system_user_connectability.delay(system_user, force=True)
+        test_system_user_connectability_manual.delay(system_user)
         return Response({"msg": "Task created"})

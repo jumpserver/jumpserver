@@ -190,7 +190,7 @@ function updateSystemUser(system_users) {
 }
 
 $(document).ready(function () {
-    $('.select2').select2()
+    $('.select2').select2({            dropdownAutoWidth : true,            width: 'auto'        });
         .on('select2:select', function(evt) {
              var data = evt.params.data;
              jumpserver.system_users_selected[data.id] = data.text;

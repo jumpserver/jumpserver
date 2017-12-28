@@ -1,18 +1,25 @@
 # ~*~ coding: utf-8 ~*~
 
-import logging
 import json
 import uuid
 
+import time
 from django.db import models
+from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
+from django_celery_beat.models import CrontabSchedule, IntervalSchedule, PeriodicTask
 
-from common.utils import signer
+from common.utils import get_signer, get_logger
+from common.celery import delete_celery_periodic_task, create_or_update_celery_periodic_tasks, \
+     disable_celery_periodic_task
+from .ansible import AdHocRunner, AnsibleError
+from .inventory import JMSInventory
 
 __all__ = ["Task", "AdHoc", "AdHocRunHistory"]
 
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__file__)
+signer = get_signer()
 
 
 class Task(models.Model):
@@ -22,7 +29,12 @@ class Task(models.Model):
     """
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     name = models.CharField(max_length=128, unique=True, verbose_name=_('Name'))
+    interval = models.IntegerField(verbose_name=_("Interval"), null=True, blank=True, help_text=_("Units: seconds"))
+    crontab = models.CharField(verbose_name=_("Crontab"), null=True, blank=True, max_length=128, help_text=_("5 * * * *"))
+    is_periodic = models.BooleanField(default=False)
+    callback = models.CharField(max_length=128, blank=True, null=True, verbose_name=_("Callback"))  # Callback must be a registered celery task
     is_deleted = models.BooleanField(default=False)
+    comment = models.TextField(blank=True, verbose_name=_("Comment"))
     created_by = models.CharField(max_length=128, blank=True, null=True, default='')
     date_created = models.DateTimeField(auto_now_add=True)
     __latest_adhoc = None
@@ -65,11 +77,53 @@ class Task(models.Model):
     def get_run_history(self):
         return self.history.all()
 
-    def run(self):
+    def run(self, record=True):
         if self.latest_adhoc:
-            return self.latest_adhoc.run()
+            return self.latest_adhoc.run(record=record)
         else:
             return {'error': 'No adhoc'}
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        from .tasks import run_ansible_task
+        super().save(
+            force_insert=force_insert,  force_update=force_update,
+            using=using, update_fields=update_fields,
+        )
+
+        if self.is_periodic:
+            interval = None
+            crontab = None
+
+            if self.interval:
+                interval = self.interval
+            elif self.crontab:
+                crontab = self.crontab
+
+            tasks = {
+                self.name: {
+                    "task": run_ansible_task.name,
+                    "interval": interval,
+                    "crontab": crontab,
+                    "args": (str(self.id),),
+                    "kwargs": {"callback": self.callback},
+                    "enabled": True,
+                }
+            }
+            create_or_update_celery_periodic_tasks(tasks)
+        else:
+            disable_celery_periodic_task(self.name)
+
+    def delete(self, using=None, keep_parents=False):
+        super().delete(using=using, keep_parents=keep_parents)
+        delete_celery_periodic_task(self.name)
+
+    @property
+    def schedule(self):
+        try:
+            return PeriodicTask.objects.get(name=self.name)
+        except PeriodicTask.DoesNotExist:
+            return None
 
     def __str__(self):
         return self.name
@@ -122,15 +176,65 @@ class AdHoc(models.Model):
         self._hosts = json.dumps(item)
 
     @property
+    def inventory(self):
+        if self.become:
+            become_info = {
+                'become': {
+                    self.become
+                }
+            }
+        else:
+            become_info = None
+
+        inventory = JMSInventory(
+            self.hosts, run_as_admin=self.run_as_admin,
+            run_as=self.run_as, become_info=become_info
+        )
+        return inventory
+
+    @property
     def become(self):
         if self._become:
             return json.loads(signer.unsign(self._become))
         else:
             return {}
 
-    def run(self):
-        from .utils import run_adhoc_object
-        return run_adhoc_object(self, **self.options)
+    def run(self, record=True):
+        if record:
+            return self._run_and_record()
+        else:
+            return self._run_only()
+
+    def _run_and_record(self):
+        history = AdHocRunHistory(adhoc=self, task=self.task)
+        time_start = time.time()
+        try:
+            raw, summary = self._run_only()
+            history.is_finished = True
+            if summary.get('dark'):
+                history.is_success = False
+            else:
+                history.is_success = True
+            history.result = raw
+            history.summary = summary
+            return raw, summary
+        except:
+            return {}, {}
+        finally:
+            history.date_finished = timezone.now()
+            history.timedelta = time.time() - time_start
+            history.save()
+
+    def _run_only(self):
+        runner = AdHocRunner(self.inventory)
+        for k, v in self.options.items():
+            runner.set_option(k, v)
+
+        try:
+            result = runner.run(self.tasks, self.pattern, self.task.name)
+            return result.results_raw, result.results_summary
+        except AnsibleError as e:
+            logger.error("Failed run adhoc {}, {}".format(self.task.name, e))
 
     @become.setter
     def become(self, item):
@@ -142,7 +246,7 @@ class AdHoc(models.Model):
         }
         :return:
         """
-        self._become = signer.sign(json.dumps(item))
+        self._become = signer.sign(json.dumps(item)).decode('utf-8')
 
     @property
     def options(self):
@@ -166,6 +270,11 @@ class AdHoc(models.Model):
             return self.history.all().latest()
         except AdHocRunHistory.DoesNotExist:
             return None
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        super().save(force_insert=force_insert, force_update=force_update,
+                     using=using, update_fields=update_fields)
 
     def __str__(self):
         return "{} of {}".format(self.task.name, self.short_id)

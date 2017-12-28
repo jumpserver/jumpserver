@@ -4,6 +4,8 @@
 {% load terminal_tags %}
 {% block custom_head_css_js %}
     <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
+    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
     <style>
         #search_btn {
             margin-bottom: 0;
@@ -20,9 +22,9 @@
         <div class="form-group" id="date">
             <div class="input-daterange input-group" id="datepicker">
                 <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_from" value="{{ date_from }}">
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_from" value="{{ date_from|date:"m/d/Y" }}">
                 <span class="input-group-addon">to</span>
-                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_to" value="{{ date_to }}">
+                <input type="text" class="input-sm form-control" style="width: 100px;" name="date_to" value="{{ date_to|date:"m/d/Y" }}">
             </div>
         </div>
         <div class="input-group">
@@ -129,7 +131,8 @@
                 "order": []
             });
             $('.select2').select2({
-                dropdownAutoWidth: true
+                dropdownAutoWidth: true,
+                width: "auto"
             });
             $('#date .input-daterange').datepicker({
                 dateFormat: 'mm/dd/yy',
