@@ -66,15 +66,9 @@ def start_celery():
     # Todo: Must set this environment, otherwise not no ansible result return
     os.environ.setdefault('PYTHONOPTIMIZE', '1')
 
-    if platform.platform().startswith("Linux"):
-        cmd = """
-        id jumpserver || useradd -s /sbin/nologin jumpserver;
-        su jumpserver -c 'celery -A common worker -l {}';
-        """.format(LOG_LEVEL.lower())
-    else:
-        cmd = """
-        export C_FORCE_ROOT=1;celery -A common worker -l {}
-        """.format(LOG_LEVEL.lower())
+    cmd = """
+    export C_FORCE_ROOT=1;celery -A common worker -l {}
+    """.format(LOG_LEVEL.lower())
 
     p = subprocess.Popen(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
     return p
