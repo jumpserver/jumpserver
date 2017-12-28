@@ -5,11 +5,11 @@
 {% block custom_head_css_js %}
     <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
     <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
-    <link href="{% static "css/plugins/dataTables/datatables.min.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/datatables/datatables.min.css" %}" rel="stylesheet">
     <link href="{% static "css/plugins/awesome-bootstrap-checkbox/awesome-bootstrap-checkbox.css" %}" rel="stylesheet">
     <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
     <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
-    <script src="{% static "js/plugins/dataTables/dataTables.min.js" %}"></script>
+    <script src="{% static "js/plugins/datatables/datatables.min.js" %}"></script>
 {% endblock %}
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -150,7 +150,7 @@ function updateGroupMember(users) {
 }
 
 $(document).ready(function () {
-   $('.select2').select2({            dropdownAutoWidth : true,            width: 'auto'        });
+   $('.select2').select2();
           .on('select2:select', function(evt) {
             var data = evt.params.data;
             jumpserver.users_selected[data.id] = data.text;
