@@ -80,6 +80,8 @@ def start_beat():
     os.environ.setdefault('PYTHONOPTIMIZE', '1')
     os.environ.setdefault('C_FORCE_ROOT', '1')
     pidfile = '/tmp/beat.pid '
+    if os.path.exists(pidfile):
+        os.unlink(pidfile)
     scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
     options = "--pidfile {}  -l {} --scheduler {} --max-interval 60".format(
         pidfile, LOG_LEVEL, scheduler,
