@@ -152,11 +152,7 @@ class Asset(models.Model):
                 'username': admin_user.username,
                 'password': admin_user.password,
                 'private_key': admin_user.private_key_file,
-                'become': {
-                    'method': admin_user.become_method,
-                    'user': admin_user.become_user,
-                    'pass': admin_user.become_pass,
-                }
+                'become': admin_user.become_info,
             })
         return data
 

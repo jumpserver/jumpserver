@@ -158,6 +158,19 @@ class AdminUser(AssetUser):
     def become_pass(self, password):
         self._become_pass = signer.sign(password)
 
+    @property
+    def become_info(self):
+        if self.become:
+            info = {
+                "method": self.become_method,
+                "user": self.become_user,
+                "pass": self.become_pass,
+            }
+        else:
+            info = None
+        return info
+
+
     def get_related_assets(self):
         assets = []
         for cluster in self.cluster_set.all():
