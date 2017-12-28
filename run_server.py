@@ -85,8 +85,12 @@ def start_beat():
     os.chdir(APPS_DIR)
     os.environ.setdefault('PYTHONOPTIMIZE', '1')
     os.environ.setdefault('C_FORCE_ROOT', '1')
+    pidfile = '/tmp/beat.pid '
     scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
-    cmd = 'celery -A common beat  -l {} --scheduler {} --max-interval 60 '.format(LOG_LEVEL, scheduler)
+    options = "--pidfile {}  -l {} --scheduler {} --max-interval 60".format(
+        pidfile, LOG_LEVEL, scheduler,
+    )
+    cmd = 'celery -A common beat {} '.format(options)
     p = subprocess.Popen(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
     return p
 
