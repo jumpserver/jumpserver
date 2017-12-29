@@ -61,6 +61,8 @@ class Signer(object):
 
     def unsign(self, value):
         s = JSONWebSignatureSerializer(self.secret_key)
+        if isinstance(value, str) and value.startswith("b'"):
+            value = value.split("'")[1]
         try:
             return s.loads(value)
         except BadSignature:
