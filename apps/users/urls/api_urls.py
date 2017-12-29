@@ -29,7 +29,7 @@ urlpatterns = [
         api.UserUpdateGroupApi.as_view(), name='user-update-group'),
     url(r'^v1/groups/(?P<pk>\d+)/users/$',
         api.UserGroupUpdateUserApi.as_view(), name='user-group-update-user'),
-    url(r'v1/is-enable-otp/', api.UserIsEnableOtp.as_view(), name='is-enable-otp'),
+    url(r'v1/is-check-otp/', api.UserIsCheckOtp.as_view(), name='is-check-otp'),
     url(r'v1/verify-token/', api.UserVerifyToken.as_view(), name='verify-token'),
 ]
 

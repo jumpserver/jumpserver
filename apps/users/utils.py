@@ -192,3 +192,13 @@ def generate_uuid_token_for_otp(userid):
     uuid_token = uuid.uuid4().hex
     cache.set(uuid_token, userid, 120)
     return uuid_token
+
+def cache_ssh_otp_auth_result(username, remote_addr, expiration=settings.OTP_SSH_TOKEN_EXPIRATION or 3600):
+    cache.set(username, remote_addr, expiration)
+
+def is_chach_ssh_otp_auth(username, remote_addr):
+    addr = cache.get(username, '')
+    if addr == remote_addr:
+        return True
+    else:
+        return False

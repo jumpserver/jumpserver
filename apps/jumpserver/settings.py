@@ -383,3 +383,6 @@ BOOTSTRAP3 = {
 # if set to 2, there 5 otp token is valid (before before current after after)
 OTP_TOKEN_VALID_WINDOW = 1
 
+
+# based on the ssh loging, the token is valid for second
+OTP_SSH_TOKEN_EXPIRATION = 3600
