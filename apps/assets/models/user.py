@@ -207,13 +207,11 @@ class AdminUser(AssetUser):
 
 
 class SystemUser(AssetUser):
+    SSH_PROTOCOL = 'ssh'
     PROTOCOL_CHOICES = (
-        ('ssh', 'ssh'),
+        (SSH_PROTOCOL, 'ssh'),
     )
-    AUTH_METHOD_CHOICES = (
-        ('P', 'Password'),
-        ('K', 'Public key'),
-    )
+
     cluster = models.ManyToManyField('assets.Cluster', blank=True, verbose_name=_("Cluster"))
     priority = models.IntegerField(default=10, verbose_name=_("Priority"))
     protocol = models.CharField(max_length=16, choices=PROTOCOL_CHOICES, default='ssh', verbose_name=_('Protocol'))
@@ -228,6 +226,12 @@ class SystemUser(AssetUser):
         from .asset import Asset
         clusters = self.cluster.all()
         return Asset.objects.filter(cluster__in=clusters)
+
+    def get_clusters(self):
+        return self.cluster.all()
+
+    def get_clusters_joined(self):
+        return ', '.join([cluster.name for cluster in self.get_clusters()])
 
     @property
     def assets_amount(self):

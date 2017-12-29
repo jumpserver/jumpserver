@@ -51,7 +51,6 @@ class AdHocResultCallback(CallbackModule):
                 contacted.remove(host)
 
     def v2_runner_on_failed(self, result, ignore_errors=False):
-        print("#######RUN FAILED" * 19)
         self.gather_result("failed", result)
         super().v2_runner_on_failed(result, ignore_errors=ignore_errors)
 

@@ -23,6 +23,7 @@ class AssetCreateForm(forms.ModelForm):
             'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Select asset groups')}),
             'cluster': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select cluster')}),
             'admin_user': forms.Select(attrs={'class': 'select2', 'data-placeholder': _('Select admin user')}),
+            'port': forms.TextInput()
         }
         help_texts = {
             'hostname': '* required',
@@ -31,6 +32,13 @@ class AssetCreateForm(forms.ModelForm):
             'cluster': '* required',
             'admin_user': _('Host level admin user, If not set using cluster admin user default')
         }
+
+    def clean_admin_user(self):
+        cluster = self.cleaned_data.get('cluster')
+        admin_user = self.cleaned_data.get('admin_user')
+        if not cluster.admin_user and not admin_user:
+            raise forms.ValidationError(_("You need set a admin user if cluster not have"))
+        return self.cleaned_data['admin_user']
 
 
 class AssetUpdateForm(forms.ModelForm):
@@ -52,6 +60,13 @@ class AssetUpdateForm(forms.ModelForm):
             'cluster': '* required',
             'admin_user': _('Host level admin user, If not set using cluster admin user default')
         }
+
+    def clean_admin_user(self):
+        cluster = self.cleaned_data.get('cluster')
+        admin_user = self.cleaned_data.get('admin_user')
+        if not cluster.admin_user and not admin_user:
+            raise forms.ValidationError(_("You need set a admin user if cluster not have"))
+        return self.cleaned_data['admin_user']
 
 
 class AssetBulkUpdateForm(forms.ModelForm):
@@ -283,7 +298,6 @@ class SystemUserUpdateForm(SystemUserForm):
         system_user = super(forms.ModelForm, self).save()
 
         if private_key_file:
-            print(private_key_file)
             private_key = private_key_file.read().strip().decode('utf-8')
             public_key = ssh_pubkey_gen(private_key=private_key)
         else:

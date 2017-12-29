@@ -7,7 +7,5 @@ class AssetsConfig(AppConfig):
     name = 'assets'
 
     def ready(self):
-        from .signals import on_app_ready
-        from . import tasks
-        on_app_ready.send(self.__class__)
+        from . import signals_handler
         super().ready()

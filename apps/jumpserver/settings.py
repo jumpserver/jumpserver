@@ -336,11 +336,15 @@ CELERY_RESULT_SERIALIZER = 'pickle'
 CELERY_RESULT_BACKEND = CELERY_BROKER_URL
 CELERY_ACCEPT_CONTENT = ['json', 'pickle']
 CELERY_RESULT_EXPIRES = 3600
-CELERY_WORKER_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
-CELERY_WORKER_TASK_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
+# CELERY_WORKER_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
+CELERY_WORKER_LOG_FORMAT = '%(message)s'
+# CELERY_WORKER_TASK_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
+CELERY_WORKER_TASK_LOG_FORMAT = '%(message)s'
+# CELERY_WORKER_LOG_FORMAT = '%(asctime)s [%(module)s %(levelname)s] %(message)s'
 CELERY_TASK_EAGER_PROPAGATES = True
-# CELERY_TIMEZONE = TIME_ZONE
-# CELERY_ENABLE_UTC = True
+CELERY_REDIRECT_STDOUTS = True
+CELERY_REDIRECT_STDOUTS_LEVEL = "INFO"
+CELERY_WORKER_HIJACK_ROOT_LOGGER = False
 
 
 # Cache use redis

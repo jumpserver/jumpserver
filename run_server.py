@@ -5,8 +5,8 @@ import subprocess
 import threading
 import time
 import argparse
-import platform
 import sys
+import signal
 
 from apps import __version__
 
@@ -25,9 +25,7 @@ LOG_LEVEL = CONFIG.LOG_LEVEL
 WORKERS = 4
 
 EXIT_EVENT = threading.Event()
-EXIT_MSGS = []
-
-
+processes = {}
 
 try:
     os.makedirs(os.path.join(BASE_DIR, "data", "static"))
@@ -97,7 +95,6 @@ def start_service(services):
         __version__))
     print('Quit the server with CONTROL-C.')
 
-    processes = {}
     services_all = {
          "gunicorn": start_gunicorn,
          "celery": start_celery,
@@ -126,6 +123,12 @@ def start_service(services):
         time.sleep(5)
 
 
+def stop_service():
+    for name, proc in processes.items():
+        print("Stop service {}".format(name))
+        proc.terminate()
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Jumpserver start tools")
     parser.add_argument("services", type=str, nargs='+', default="all",
@@ -133,6 +136,9 @@ if __name__ == '__main__':
                         help="The service to start",
                         )
     args = parser.parse_args()
-    start_service(args.services)
+    try:
+        start_service(args.services)
+    except KeyboardInterrupt:
+        stop_service()
 
 

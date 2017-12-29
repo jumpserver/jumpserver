@@ -28,7 +28,6 @@ from common.utils import get_object_or_none, get_logger, is_uuid
 from .. import forms
 from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser
 from ..hands import AdminUserRequiredMixin
-from ..tasks import update_assets_hardware_info_util
 
 
 __all__ = [
@@ -161,10 +160,6 @@ class AssetUpdateView(AdminUserRequiredMixin, UpdateView):
         }
         kwargs.update(context)
         return super(AssetUpdateView, self).get_context_data(**kwargs)
-
-    def form_invalid(self, form):
-        logger.error(form.errors)
-        return super().form_invalid(form)
 
 
 class AssetDeleteView(AdminUserRequiredMixin, DeleteView):

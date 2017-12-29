@@ -25,7 +25,7 @@ from .hands import IsSuperUser, IsValidUser, IsSuperUserOrAppUser, \
     get_user_granted_assets
 from .models import AssetGroup, Asset, Cluster, SystemUser, AdminUser
 from . import serializers
-from .tasks import update_assets_hardware_info_manual, test_admin_user_connectability_util, \
+from .tasks import update_asset_hardware_info_manual, test_admin_user_connectability_util, \
     test_asset_connectability_manual, push_system_user_to_cluster_assets_manual, \
     test_system_user_connectability_manual
 
@@ -222,7 +222,7 @@ class AssetRefreshHardwareApi(generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         asset_id = kwargs.get('pk')
         asset = get_object_or_404(Asset, pk=asset_id)
-        summary = update_assets_hardware_info_manual([asset])[1]
+        summary = update_asset_hardware_info_manual(asset)[1]
         if summary.get('dark'):
             return Response(summary['dark'].values(), status=501)
         else:
