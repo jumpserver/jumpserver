@@ -1,5 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 import json
+import re
 
 from celery import shared_task
 from django.core.cache import cache
@@ -18,6 +19,7 @@ FORKS = 10
 TIMEOUT = 60
 logger = get_logger(__file__)
 CACHE_MAX_TIME = 60*60*60
+disk_pattern = re.compile(r'^hd|sd')
 
 
 @shared_task
@@ -57,7 +59,7 @@ def set_assets_hardware_info(result, **kwargs):
         ___memory = '%s %s' % capacity_convert('{} MB'.format(info['ansible_memtotal_mb']))
         disk_info = {}
         for dev, dev_info in info['ansible_devices'].items():
-            if dev_info['removable'] == '0':
+            if disk_pattern.match(dev) and dev_info['removable'] == '0':
                 disk_info[dev] = dev_info['size']
         ___disk_total = '%s %s' % sum_capacity(disk_info.values())
         ___disk_info = json.dumps(disk_info)

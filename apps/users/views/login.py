@@ -220,7 +220,7 @@ class LoginLogListView(DatetimeSearchMixin, ListView):
     date_format = '%m/%d/%Y'
 
     def get_queryset(self):
-        self.username = self.request.GET.get('username', '')
+        self.username = self.request.GET.get('user', '')
         self.keyword = self.request.GET.get("keyword", '')
 
         queryset = super().get_queryset()
@@ -228,7 +228,7 @@ class LoginLogListView(DatetimeSearchMixin, ListView):
             datetime__gt=self.date_from, datetime__lt=self.date_to
         )
         if self.username:
-            queryset = self.queryset.filter(username=self.username)
+            queryset = queryset.filter(username=self.username)
         if self.keyword:
             queryset = self.queryset.filter(
                 Q(ip__contains=self.keyword) |

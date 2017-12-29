@@ -22,10 +22,14 @@ signer = get_signer()
 
 
 class User(AbstractUser):
+    ROLE_ADMIN = 'Admin'
+    ROLE_USER = 'User'
+    ROLE_APP = 'App'
+
     ROLE_CHOICES = (
-        ('Admin', 'Administrator'),
-        ('User', 'User'),
-        ('App', 'Application')
+        (ROLE_ADMIN, 'Administrator'),
+        (ROLE_USER, 'User'),
+        (ROLE_APP, 'Application')
     )
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(max_length=128, unique=True, verbose_name=_('Username'))

@@ -6,9 +6,17 @@ from django.utils.translation import ugettext_lazy as _
 
 # from .hands import User, UserGroup, Asset, AssetGroup, SystemUser
 from .models import AssetPermission
+from users.models import User
 
 
 class AssetPermissionForm(forms.ModelForm):
+    users = forms.ModelMultipleChoiceField(
+        queryset=User.objects.exclude(role=User.ROLE_APP),
+        widget=forms.SelectMultiple(
+            attrs={'class': 'select2', 'data-placeholder': _('Select users')},
+        )
+    )
+
     class Meta:
         model = AssetPermission
         fields = [
@@ -16,9 +24,6 @@ class AssetPermissionForm(forms.ModelForm):
             'system_users', 'is_active', 'date_expired', 'comment',
         ]
         widgets = {
-            'users': forms.SelectMultiple(
-                attrs={'class': 'select2',
-                       'data-placeholder': _('Select users')}),
             'user_groups': forms.SelectMultiple(
                 attrs={'class': 'select2',
                        'data-placeholder': _('Select user groups')}),

@@ -7,6 +7,5 @@ class TerminalConfig(AppConfig):
     name = 'terminal'
 
     def ready(self):
-        from .signals import on_app_ready
-        on_app_ready.send(self.__class__)
-        super().ready()
+        from . import signals_handler
+        return super().ready()

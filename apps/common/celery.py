@@ -16,6 +16,7 @@ logger = get_logger(__file__)
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'jumpserver.settings')
 
 from django.conf import settings
+from django.core.cache import cache
 
 app = Celery('jumpserver')
 
@@ -176,6 +177,9 @@ def after_app_shutdown_clean(func):
 
 @worker_ready.connect
 def on_app_ready(sender=None, headers=None, body=None, **kwargs):
+    if cache.get("CELERY_APP_READY", 0) == 1:
+        return
+    cache.set("CELERY_APP_READY", 1, 10)
     logger.debug("App ready signal recv")
     logger.debug("Start need start task: [{}]".format(
         ", ".join(__AFTER_APP_READY_RUN_TASKS))
@@ -186,6 +190,9 @@ def on_app_ready(sender=None, headers=None, body=None, **kwargs):
 
 @worker_shutdown.connect
 def after_app_shutdown(sender=None, headers=None, body=None, **kwargs):
+    if cache.get("CELERY_APP_SHUTDOWN", 0) == 1:
+        return
+    cache.set("CELERY_APP_SHUTDOWN", 1, 10)
     from django_celery_beat.models import PeriodicTask
     logger.debug("App shutdown signal recv")
     logger.debug("Clean need cleaned period tasks: [{}]".format(

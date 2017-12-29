@@ -28,15 +28,15 @@
             </div>
         </div>
         <div class="input-group">
-            <select class="select2 form-control" name="username">
+            <select class="select2 form-control" name="user">
                 <option value="">{% trans 'User' %}</option>
                 {% for u in user_list %}
-                    <option value="{{ u }}" {% if u == username %} selected {% endif %}>{{ u }}</option>
+                    <option value="{{ u }}" {% if u == user %} selected {% endif %}>{{ u }}</option>
                 {% endfor %}
             </select>
         </div>
         <div class="input-group">
-            <select class="select2 form-control" name="ip">
+            <select class="select2 form-control" name="asset">
                 <option value="">{% trans 'Asset' %}</option>
                 {% for a in asset_list %}
                     <option value="{{ a }}" {% if a == asset %} selected {% endif %}>{{ a }}</option>
@@ -68,12 +68,12 @@
         <thead>
         <tr>
             <th data-toggle="true">ID</th>
-            <th>Command</th>
-            <th>Username</th>
-            <th>IP</th>
-            <th>System user</th>
-            <th>Session</th>
-            <th>Datetime</th>
+            <th>{% trans 'Command' %}</th>
+            <th>{% trans 'User' %}</th>
+            <th>{% trans 'Asset' %}</th>
+            <th>{% trans 'System user'%}</th>
+            <th>{% trans 'Session' %}</th>
+            <th>{% trans 'Datetime' %}</th>
             <th data-hide="all"></th>
         </tr>
         </thead>

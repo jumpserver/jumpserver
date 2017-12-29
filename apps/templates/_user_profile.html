@@ -3,15 +3,15 @@
 <li class="nav-header">
     <div class="dropdown profile-element">
         <span>
-            <img alt="image" class="img-circle" width="48" height="48" src="{{ user.avatar_url }}"/>
+            <img alt="image" class="img-circle" width="48" height="48" src="{{ request.user.avatar_url }}"/>
         </span>
         <a data-toggle="dropdown" class="dropdown-toggle" href="#">
             <span class="clear">
                 <span class="block m-t-xs">
-                    <strong class="font-bold"> {{ user.name }}<span style="color: #8095a8"></span></strong>
+                    <strong class="font-bold"> {{ request.user.name }}<span style="color: #8095a8"></span></strong>
                 </span>
                 <span class="text-muted text-xs block">
-                     {{ user.get_role_display | default:_('User') }}<b class="caret"></b>
+                     {{ request.user.get_role_display | default:_('User') }}<b class="caret"></b>
                 </span>
             </span>
         </a>

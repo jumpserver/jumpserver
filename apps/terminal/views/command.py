@@ -25,6 +25,10 @@ class CommandListView(DatetimeSearchMixin, ListView):
     date_format = '%m/%d/%Y'
 
     def get_queryset(self):
+        self.command = self.request.GET.get('command', '')
+        self.user = self.request.GET.get("user", '')
+        self.asset = self.request.GET.get('asset', '')
+        self.system_user = self.request.GET.get('system_user', '')
         filter_kwargs = dict()
         filter_kwargs['date_from'] = self.date_from
         filter_kwargs['date_to'] = self.date_to
@@ -36,21 +40,20 @@ class CommandListView(DatetimeSearchMixin, ListView):
             filter_kwargs['system_user'] = self.system_user
         if self.command:
             filter_kwargs['input'] = self.command
-        if filter_kwargs:
-            self.queryset = command_store.filter(**filter_kwargs)
-        return self.queryset
+        queryset = command_store.filter(**filter_kwargs)
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('Terminal'),
             'action': _('Command list'),
-            'user_list': utils.get_user_list_from_cache(),
-            'asset_list': utils.get_asset_list_from_cache(),
-            'system_user_list': utils.get_system_user_list_from_cache(),
+            'user_list': utils.get_session_user_list(),
+            'asset_list': utils.get_session_asset_list(),
+            'system_user_list': utils.get_session_system_user_list(),
             'command': self.command,
             'date_from': self.date_from,
             'date_to': self.date_to,
-            'username': self.user,
+            'user': self.user,
             'asset': self.asset,
             'system_user': self.system_user,
         }

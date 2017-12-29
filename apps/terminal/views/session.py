@@ -59,7 +59,7 @@ class SessionListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
             'system_user_list': utils.get_system_user_list_from_cache(),
             'date_from': self.date_from,
             'date_to': self.date_to,
-            'username': self.user,
+            'user': self.user,
             'asset': self.asset,
             'system_user': self.system_user,
         }

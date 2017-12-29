@@ -31,7 +31,7 @@
             <select class="select2 form-control" name="user">
                 <option value="">{% trans 'User' %}</option>
                 {% for u in user_list %}
-                    <option value="{{ u }}" {% if u == username %} selected {% endif %}>{{ u }}</option>
+                    <option value="{{ u }}" {% if u == user %} selected {% endif %}>{{ u }}</option>
                 {% endfor %}
             </select>
         </div>
