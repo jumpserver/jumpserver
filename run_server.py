@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# coding: utf-8
 
 import os
 import subprocess
@@ -6,7 +7,6 @@ import threading
 import time
 import argparse
 import sys
-import signal
 import io
 
 from apps import __version__
@@ -146,6 +146,7 @@ if __name__ == '__main__':
                         choices=("all", "gunicorn", "celery", "beat"),
                         help="The service to start",
                         )
+    print("开始执行")
     args = parser.parse_args()
     try:
         start_service(args.services)
