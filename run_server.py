@@ -61,7 +61,7 @@ def start_gunicorn():
     cmd += log
     if DEBUG:
         cmd += " --reload"
-    p = subprocess.Popen(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
+    p = subprocess.call(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
     return p
 
 
@@ -146,7 +146,6 @@ if __name__ == '__main__':
                         choices=("all", "gunicorn", "celery", "beat"),
                         help="The service to start",
                         )
-    print("开始执行")
     args = parser.parse_args()
     try:
         start_service(args.services)
