@@ -7,6 +7,7 @@ import time
 import argparse
 import sys
 import signal
+import io
 
 from apps import __version__
 
@@ -26,6 +27,7 @@ WORKERS = 4
 
 EXIT_EVENT = threading.Event()
 processes = {}
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 try:
     os.makedirs(os.path.join(BASE_DIR, "data", "static"))
@@ -70,7 +72,8 @@ def start_celery():
     os.environ.setdefault('PYTHONOPTIMIZE', '1')
 
     cmd = """
-    export C_FORCE_ROOT=1;celery -A common worker -l {}
+    export C_FORCE_ROOT=1;
+    celery -A common worker -l {}
     """.format(LOG_LEVEL.lower())
 
     p = subprocess.Popen(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
@@ -132,6 +135,9 @@ def stop_service():
     for name, proc in processes.items():
         print("Stop service {}".format(name))
         proc.terminate()
+
+    if os.path.exists("/tmp/beat.pid"):
+        os.unlink('/tmp/beat.pid')
 
 
 if __name__ == '__main__':

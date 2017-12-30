@@ -317,7 +317,10 @@ class AdHocRunHistory(models.Model):
 
     @property
     def result(self):
-        return json.loads(self._result)
+        if self._result:
+            return json.loads(self._result)
+        else:
+            return {}
 
     @result.setter
     def result(self, item):
@@ -325,7 +328,10 @@ class AdHocRunHistory(models.Model):
 
     @property
     def summary(self):
-        return json.loads(self._summary)
+        if self._summary:
+            return json.loads(self._summary)
+        else:
+            return {"ok": {}, "dark": {}}
 
     @summary.setter
     def summary(self, item):

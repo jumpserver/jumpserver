@@ -28,7 +28,6 @@ class AdHocResultCallback(CallbackModule):
         host = res._host.get_name()
         task_name = res.task_name
         task_result = res._result
-        print(task_result)
 
         if self.results_raw[t].get(host):
             self.results_raw[t][host][task_name] = task_result

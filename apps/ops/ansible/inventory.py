@@ -32,7 +32,6 @@ class BaseHost(Host):
         }
         """
         self.host_data = host_data
-        print(host_data)
         hostname = host_data.get('hostname') or host_data.get('ip')
         port = host_data.get('port') or 22
         super().__init__(hostname, port)
@@ -62,7 +61,6 @@ class BaseHost(Host):
             self.set_variable("ansible_become_pass", become.get('pass', ''))
         else:
             self.set_variable("ansible_become", False)
-        print(self.get_vars())
 
     def __set_extra_variables(self):
         for k, v in self.host_data.get('vars', {}).items():

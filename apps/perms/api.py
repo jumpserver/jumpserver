@@ -94,7 +94,6 @@ class AssetPermissionRemoveAssetApi(RetrieveUpdateAPIView):
         perm = self.get_object()
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            print(serializer.data)
             assets = serializer.validated_data.get('assets')
             if assets:
                 perm.assets.remove(*tuple(assets))

@@ -21,6 +21,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
 from common.mixins import IDInFilterMixin
+from common.utils import get_logger
 from .hands import IsSuperUser, IsValidUser, IsSuperUserOrAppUser, \
     get_user_granted_assets
 from .models import AssetGroup, Asset, Cluster, SystemUser, AdminUser
@@ -28,6 +29,9 @@ from . import serializers
 from .tasks import update_asset_hardware_info_manual, test_admin_user_connectability_util, \
     test_asset_connectability_manual, push_system_user_to_cluster_assets_manual, \
     test_system_user_connectability_manual
+
+
+logger = get_logger(__file__)
 
 
 class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
@@ -178,10 +182,6 @@ class SystemUserViewSet(BulkModelViewSet):
     serializer_class = serializers.SystemUserSerializer
     permission_classes = (IsSuperUserOrAppUser,)
 
-    def update(self, request, *args, **kwargs):
-        print(request.data)
-        return super().update(request, *args, **kwargs)
-
 
 class AssetListUpdateApi(IDInFilterMixin, ListBulkCreateUpdateDestroyAPIView):
     """
@@ -223,6 +223,7 @@ class AssetRefreshHardwareApi(generics.RetrieveAPIView):
         asset_id = kwargs.get('pk')
         asset = get_object_or_404(Asset, pk=asset_id)
         summary = update_asset_hardware_info_manual(asset)[1]
+        logger.debug("Refresh summary: {}".format(summary))
         if summary.get('dark'):
             return Response(summary['dark'].values(), status=501)
         else:

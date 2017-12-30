@@ -38,7 +38,6 @@ class TaskListView(DatetimeSearchMixin, ListView):
         return self.queryset
 
     def get_context_data(self, **kwargs):
-        print(self.date_from)
         context = {
             'app': 'Ops',
             'action': _('Task list'),

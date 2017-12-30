@@ -100,7 +100,6 @@ class UserGroupGrantedAssetView(AdminUserRequiredMixin, DetailView):
     context_object_name = 'user_group'
 
     def get(self, request, *args, **kwargs):
-        print(kwargs.get('pk'))
         self.object = self.get_object(queryset=self.model.objects.all())
         return super().get(request, *args, **kwargs)
 
