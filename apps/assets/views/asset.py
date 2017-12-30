@@ -44,8 +44,8 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Assets',
-            'action': 'Asset list',
+            'app': _('Assets'),
+            'action': _('Asset list'),
             # 'groups': AssetGroup.objects.all(),
             'system_users': SystemUser.objects.all(),
         }
@@ -58,8 +58,8 @@ class UserAssetListView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Assets',
-            'action': 'Asset list',
+            'app': _('Assets'),
+            'action': _('Asset list'),
             'system_users': SystemUser.objects.all(),
         }
         kwargs.update(context)

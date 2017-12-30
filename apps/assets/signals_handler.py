@@ -76,7 +76,6 @@ def on_system_user_created_or_updated(sender, instance=None, **kwargs):
 
 @receiver(post_init, sender=Cluster, dispatch_uid="my_unique_identifier")
 def on_cluster_init(sender, instance, **kwargs):
-    logger.debug("On cluster init")
     instance.__original_assets = tuple(instance.assets.values_list('pk', flat=True))
     # instance.__origin_system_users = tuple(instance.systemuser_set.all())
 

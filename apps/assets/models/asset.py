@@ -33,9 +33,9 @@ class Asset(models.Model):
         ('Storage', _("Storage")),
     )
     ENV_CHOICES = (
-        ('Prod', 'Production'),
-        ('Dev', 'Development'),
-        ('Test', 'Testing'),
+        ('Prod', _('Production')),
+        ('Dev', _('Development')),
+        ('Test', _('Testing')),
     )
 
     # Important

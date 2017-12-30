@@ -51,7 +51,12 @@ def start_gunicorn():
     make_migrations()
     collect_static()
     os.chdir(APPS_DIR)
-    cmd = "gunicorn jumpserver.wsgi -b {}:{} -w {}".format(HTTP_HOST, HTTP_PORT, WORKERS)
+    cmd = "gunicorn jumpserver.wsgi -b {}:{} -w {} ".format(
+        HTTP_HOST, HTTP_PORT, WORKERS
+    )
+    log_format = '%(h)s %(t)s "%(r)s" %(s)s %(b)s '
+    log = " --access-logfile - --access-logformat '{}' ".format(log_format)
+    cmd += log
     if DEBUG:
         cmd += " --reload"
     p = subprocess.Popen(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
