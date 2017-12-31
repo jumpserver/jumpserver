@@ -2,6 +2,7 @@
 
 from django import template
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from django.utils.html import escape
 
 register = template.Library()
@@ -67,3 +68,18 @@ def ts_to_date(ts):
 @register.filter
 def to_html(s):
     return escape(s).replace('\n', '<br />')
+
+
+@register.filter
+def time_util_with_seconds(date_from, date_to):
+    if date_from and date_to:
+        delta = date_to - date_from
+        seconds = delta.seconds
+        if seconds < 60:
+            return '{} s'.format(seconds)
+        elif seconds < 60*60:
+            return '{} m'.format(seconds//60)
+        else:
+            return '{} h'.format(seconds//3600)
+    else:
+        return ''

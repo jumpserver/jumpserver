@@ -14,7 +14,8 @@ class AssetPermissionForm(forms.ModelForm):
         queryset=User.objects.exclude(role=User.ROLE_APP),
         widget=forms.SelectMultiple(
             attrs={'class': 'select2', 'data-placeholder': _('Select users')},
-        )
+        ),
+        label=_("User")
     )
 
     class Meta:

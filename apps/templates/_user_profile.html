@@ -37,11 +37,16 @@
 $(document).ready(function () {
 })
 .on('click', '#switch_admin', function () {
-    setCookie("IN_ADMIN_PAGE", "Yes");
-    window.location = "/"
+    setTimeout(function () {
+        setCookie("IN_ADMIN_PAGE", "Yes");
+        window.location = "/"
+    }, 100)
 })
 .on('click', '#switch_user', function () {
-    setCookie("IN_ADMIN_PAGE", "No");
-    window.location = "/"
+    setTimeout(function () {
+        console.log("Set to No");
+        setCookie("IN_ADMIN_PAGE", "No");
+        window.location = "/"
+    }, 100);
 })
 </script>

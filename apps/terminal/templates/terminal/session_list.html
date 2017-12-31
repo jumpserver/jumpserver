@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load static %}
 {% load terminal_tags %}
+{% load common_tags %}
 {% block custom_head_css_js %}
     <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
     <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
@@ -91,7 +92,7 @@
             <td class="text-center">{{ session.id | get_session_command_amount }}</td>
 
             <td class="text-center">{{ session.date_start }}</td>
-            <td class="text-center">{{ session.date_end|timeuntil:session.date_start }}</td>
+            <td class="text-center">{{ session.date_start|time_util_with_seconds:session.date_end }}</td>
             <td>
                 {% if session.is_finished %}
                 <a onclick="window.open('/luna/replay/{{ session.id }}','luna', 'height=600, width=800, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, location=no, status=no')" class="btn btn-xs btn-warning btn-replay" >{% trans "Replay" %}</a>
