@@ -250,12 +250,14 @@ jumpserver.initDataTable = function (options) {
   // }
   var ele = options.ele || $('.dataTable');
   var columnDefs = [
-    {
-      targets: 0,
-      orderable: false,
-      createdCell: function(td, cellData) {
-          $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
-      }},
+      {
+          targets: 0,
+          orderable: false,
+          createdCell: function (td, cellData) {
+              $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
+          }
+      },
+      // className: 'select-checkbox'
       {className: 'text-center', targets: '_all'}
   ];
   columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
@@ -263,7 +265,7 @@ jumpserver.initDataTable = function (options) {
         pageLength: options.pageLength || 15,
         dom: options.dom || '<"#uc.pull-left">flt<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
         order: options.order || [],
-        select: options.select || 'multi',
+        // select: options.select || 'multi',
         buttons: [],
         columnDefs: columnDefs,
         ajax: {
@@ -271,6 +273,10 @@ jumpserver.initDataTable = function (options) {
             dataSrc: ""
         },
         columns: options.columns || [],
+        select: {
+            style: 'multi',
+            selector: 'td:first-child'
+        },
         lengthMenu: [[15, 25, 50, -1], [15, 25, 50, "All"]]
     });
     table.on('select', function(e, dt, type, indexes) {
@@ -281,21 +287,22 @@ jumpserver.initDataTable = function (options) {
         var $node = table[ type ]( indexes ).nodes().to$();
         $node.find('input.ipt_check').prop('checked', false);
         jumpserver.selected[$node.find('input.ipt_check').prop('id')] = false
-    }).on('draw', function(){
+    }).
+    on('draw', function(){
         $('#op').html(options.op_html || '');
         $('#uc').html(options.uc_html || '');
     });
-    $('.ipt_check_all').on('click', function() {
-      if (!jumpserver.checked) {
-          $(this).closest('table').find('.ipt_check').prop('checked', true);
-          jumpserver.checked = true;
-          table.rows().select();
-      } else {
-          $(this).closest('table').find('.ipt_check').prop('checked', false);
-          jumpserver.checked = false;
-          table.rows().deselect();
-      }
-    });
+    // $('.ipt_check_all').on('click', function() {
+    //   if (!jumpserver.checked) {
+    //       $(this).closest('table').find('.ipt_check').prop('checked', true);
+    //       jumpserver.checked = true;
+    //       table.rows().select();
+    //   } else {
+    //       $(this).closest('table').find('.ipt_check').prop('checked', false);
+    //       jumpserver.checked = false;
+    //       table.rows().deselect();
+    //   }
+    // });
 
     return table;
 };
