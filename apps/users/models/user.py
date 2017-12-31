@@ -46,7 +46,7 @@ class User(AbstractUser):
     _private_key = models.CharField(max_length=5000, blank=True, verbose_name=_('Private key'))
     _public_key = models.CharField(max_length=5000, blank=True, verbose_name=_('Public key'))
     comment = models.TextField(max_length=200, blank=True, verbose_name=_('Comment'))
-    is_first_login = models.BooleanField(default=False)
+    is_first_login = models.BooleanField(default=True)
     date_expired = models.DateTimeField(default=date_expired_default, blank=True, null=True, verbose_name=_('Date expired'))
     created_by = models.CharField(max_length=30, default='', verbose_name=_('Created by'))
 

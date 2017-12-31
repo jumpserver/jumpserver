@@ -374,11 +374,11 @@ $(document).ready(function() {
         $('#txt_pk').val('');
         $this.closest('.modal').modal('hide');
         var msg = "{% trans 'Successfully updated the SSH public key.' %}";
-        swal("{% trans 'User SSH Public Key Update' %}", msg, "success");
+        swal("{% trans 'User SSH public key update' %}", msg, "success");
     };
     var fail = function(msg) {
         swal({
-            title: "{% trans 'User SSH Public Key Update' %}",
+            title: "{% trans 'User SSH public key update' %}",
             text: msg,
             type: "error",
             showCancelButton: false,

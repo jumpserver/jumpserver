@@ -91,12 +91,12 @@ $(document).ready(function(){
         }, function() {
             var success = function() {
                 var msg = "{% trans 'Cluster Deleted.' %}";
-                swal("{% trans 'Cluster Delete' %}", msg, "success");
+                swal("{% trans 'Cluster delete' %}", msg, "success");
                 $('#cluster_list_table').DataTable().ajax.reload();
             };
             var fail = function() {
-                var msg = "{% trans 'Cluster Deleting failed.' %}";
-                swal("{% trans 'Cluster Delete' %}", msg, "error");
+                var msg = "{% trans 'Cluster deleting failed.' %}";
+                swal("{% trans 'Cluster delete' %}", msg, "error");
             };
             var url_delete = the_url + '?id__in=' + JSON.stringify(plain_id_list);
             APIUpdateAttr({url: url_delete, method: 'DELETE', success: success, error: fail});
