@@ -305,8 +305,8 @@ class UserGrantedAssetView(AdminUserRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'User',
-            'action': 'User granted asset',
+            'app': _('Users'),
+            'action': _('User granted assets'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -319,8 +319,8 @@ class UserProfileView(LoginRequiredMixin, TemplateView):
         from perms.utils import get_user_granted_assets
         assets = get_user_granted_assets(self.request.user)
         context = {
-            'app': 'User',
-            'action': 'User Profile',
+            'app': _('Users'),
+            'action': _('Profile'),
             'assets': assets,
         }
         kwargs.update(context)
@@ -345,8 +345,8 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'User',
-            'action': 'Profile update',
+            'app': _('User'),
+            'action': _('Profile setting'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -363,8 +363,8 @@ class UserPasswordUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'User',
-            'action': 'Password update',
+            'app': _('Users'),
+            'action': _('Password update'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -385,8 +385,8 @@ class UserPublicKeyUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'User',
-            'action': 'Public key update',
+            'app': _('Users'),
+            'action': _('Public key update'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

@@ -216,6 +216,7 @@ class ClusterSerializer(BulkSerializerMixin, serializers.ModelSerializer):
     assets_amount = serializers.SerializerMethodField()
     admin_user_name = serializers.SerializerMethodField()
     assets = serializers.PrimaryKeyRelatedField(many=True, queryset=Asset.objects.all())
+    system_users = serializers.SerializerMethodField()
 
     class Meta:
         model = Cluster
@@ -231,6 +232,10 @@ class ClusterSerializer(BulkSerializerMixin, serializers.ModelSerializer):
             return obj.admin_user.name
         except AttributeError:
             return ''
+
+    @staticmethod
+    def get_system_users(obj):
+        return ', '.join(obj.name for obj in obj.systemuser_set.all())
 
 
 class AssetGroupGrantedSerializer(BulkSerializerMixin, serializers.ModelSerializer):

@@ -19,9 +19,7 @@
         <th class="text-center"><a href="{% url 'assets:cluster-list' %}?sort=name">{% trans 'Name' %}</a></th>
         <th class="text-center">{% trans 'Admin user' %}</th>
         <th class="text-center">{% trans 'Asset num' %}</th>
-        <th class="text-center">{% trans 'Contact' %}</th>
-        <th class="text-center">{% trans 'Phone' %}</th>
-        <th class="text-center">{% trans 'Operator' %}</th>
+        <th class="text-center">{% trans 'System users' %}</th>
         <th class="text-center">{% trans 'Action' %}</th>
     </tr>
     </thead>
@@ -41,14 +39,16 @@ $(document).ready(function(){
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
              }},
 
-            {targets: 7, createdCell: function (td, cellData, rowData) {
+            {targets: 5, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "assets:cluster-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_cluster_delete" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
                 $(td).html(update_btn + del_btn)
              }}],
         ajax_url: '{% url "api-assets:cluster-list" %}',
-        columns: [{data: function(){return ""}}, {data: "name" }, {data: "admin_user_name"}, {data: "assets_amount" }, {data: "contact" }, {data: "phone" },
-                  {data: "operator" }, {data: "id" }],
+        columns: [
+            {data: "id"}, {data: "name" }, {data: "admin_user_name"}, {data: "assets_amount" },
+            {data: "system_users" }, {data: "id" }
+        ],
         op_html: $('#actions').html()
     };
     jumpserver.initDataTable(options);

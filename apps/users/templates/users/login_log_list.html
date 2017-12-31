@@ -24,10 +24,10 @@
             </div>
         </div>
         <div class="input-group">
-            <select class="select2 form-control" name="username">
+            <select class="select2 form-control" name="user">
                 <option value="">{% trans 'Select user' %}</option>
                 {% for u in user_list %}
-                    <option value="{{ u }}" {% if u == username %} selected {% endif %}>{{ u }}</option>
+                    <option value="{{ u }}" {% if u == user %} selected {% endif %}>{{ u }}</option>
                 {% endfor %}
             </select>
         </div>

@@ -257,10 +257,13 @@ jumpserver.initDataTable = function (options) {
               $(td).html('<input type="checkbox" class="text-center ipt_check" id=99991937>'.replace('99991937', cellData));
           }
       },
-      // className: 'select-checkbox'
       {className: 'text-center', targets: '_all'}
   ];
   columnDefs = options.columnDefs ? options.columnDefs.concat(columnDefs) : columnDefs;
+  var select = {
+            style: 'multi',
+            selector: 'td:first-child'
+      };
   var table = ele.DataTable({
         pageLength: options.pageLength || 15,
         dom: options.dom || '<"#uc.pull-left">flt<"row m-t"<"col-md-8"<"#op.col-md-6"><"col-md-6 text-center"i>><"col-md-4"p>>',
@@ -273,9 +276,16 @@ jumpserver.initDataTable = function (options) {
             dataSrc: ""
         },
         columns: options.columns || [],
-        select: {
-            style: 'multi',
-            selector: 'td:first-child'
+        select: options.select || select,
+        language: {
+            search: "搜索",
+            lengthMenu: "每页  _MENU_",
+            paginate: {
+                first:      "第一页",
+                previous:   "上一页",
+                next:       "下一页",
+                last:       "最后"
+            }
         },
         lengthMenu: [[15, 25, 50, -1], [15, 25, 50, "All"]]
     });
@@ -292,17 +302,17 @@ jumpserver.initDataTable = function (options) {
         $('#op').html(options.op_html || '');
         $('#uc').html(options.uc_html || '');
     });
-    // $('.ipt_check_all').on('click', function() {
-    //   if (!jumpserver.checked) {
-    //       $(this).closest('table').find('.ipt_check').prop('checked', true);
-    //       jumpserver.checked = true;
-    //       table.rows().select();
-    //   } else {
-    //       $(this).closest('table').find('.ipt_check').prop('checked', false);
-    //       jumpserver.checked = false;
-    //       table.rows().deselect();
-    //   }
-    // });
+    $('.ipt_check_all').on('click', function() {
+      if (!jumpserver.checked) {
+          $(this).closest('table').find('.ipt_check').prop('checked', true);
+          jumpserver.checked = true;
+          table.rows().select();
+      } else {
+          $(this).closest('table').find('.ipt_check').prop('checked', false);
+          jumpserver.checked = false;
+          table.rows().deselect();
+      }
+    });
 
     return table;
 };

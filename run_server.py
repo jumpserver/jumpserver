@@ -61,7 +61,7 @@ def start_gunicorn():
     cmd += log
     if DEBUG:
         cmd += " --reload"
-    p = subprocess.call(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
+    p = subprocess.Popen(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
     return p
 
 

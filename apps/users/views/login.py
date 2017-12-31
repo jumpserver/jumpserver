@@ -215,20 +215,20 @@ class LoginLogListView(DatetimeSearchMixin, ListView):
     template_name = 'users/login_log_list.html'
     model = LoginLog
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
-    username = keyword = ""
+    user = keyword = ""
     date_to = date_from = None
     date_format = '%m/%d/%Y'
 
     def get_queryset(self):
-        self.username = self.request.GET.get('user', '')
+        self.user = self.request.GET.get('user', '')
         self.keyword = self.request.GET.get("keyword", '')
 
         queryset = super().get_queryset()
         queryset = queryset.filter(
             datetime__gt=self.date_from, datetime__lt=self.date_to
         )
-        if self.username:
-            queryset = queryset.filter(username=self.username)
+        if self.user:
+            queryset = queryset.filter(username=self.user)
         if self.keyword:
             queryset = self.queryset.filter(
                 Q(ip__contains=self.keyword) |
@@ -243,7 +243,7 @@ class LoginLogListView(DatetimeSearchMixin, ListView):
             'action': _('Login log list'),
             'date_from': self.date_from,
             'date_to': self.date_to,
-            'username': self.username,
+            'user': self.user,
             'keyword': self.keyword,
             'user_list': set(LoginLog.objects.all().values_list('username', flat=True))
         }
