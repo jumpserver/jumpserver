@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-01 14:59+0800\n"
+"POT-Creation-Date: 2018-01-01 15:33+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -495,6 +495,10 @@ msgstr "推送系统用户到资产: {}"
 #: assets/tasks.py:384
 msgid "Push system user to cluster assets period: {}->{}"
 msgstr "定期推送系统用户到资产: {}->{}"
+
+#: assets/templates/assets/_asset_group_bulk_update_modal.html:5
+msgid "Update asset group"
+msgstr "编辑用户组"
 
 #: assets/templates/assets/_asset_group_bulk_update_modal.html:8
 msgid "Hint: only change the field you want to update."
@@ -1292,7 +1296,7 @@ msgid "Version detail"
 msgstr "版本详情"
 
 #: ops/templates/ops/adhoc_detail.html:22
-#: ops/templates/ops/adhoc_history.html:22 ops/views.py:121
+#: ops/templates/ops/adhoc_history.html:22 ops/views.py:120
 msgid "Version run history"
 msgstr "执行历史"
 
@@ -1364,7 +1368,7 @@ msgstr "失败/成功/总"
 msgid "Version"
 msgstr "版本"
 
-#: ops/templates/ops/adhoc_history_detail.html:19 ops/views.py:134
+#: ops/templates/ops/adhoc_history_detail.html:19 ops/views.py:133
 msgid "Run history detail"
 msgstr "执行历史详情"
 
@@ -1390,12 +1394,12 @@ msgid "Success assets"
 msgstr "成功资产"
 
 #: ops/templates/ops/task_adhoc.html:19 ops/templates/ops/task_detail.html:19
-#: ops/templates/ops/task_history.html:19 ops/views.py:59
+#: ops/templates/ops/task_history.html:19 ops/views.py:58
 msgid "Task detail"
 msgstr "任务详情"
 
 #: ops/templates/ops/task_adhoc.html:22 ops/templates/ops/task_detail.html:22
-#: ops/templates/ops/task_history.html:22 ops/views.py:72
+#: ops/templates/ops/task_history.html:22 ops/views.py:71
 msgid "Task versions"
 msgstr "任务各版本"
 
@@ -1446,16 +1450,16 @@ msgstr "成功"
 msgid "Date"
 msgstr "日期"
 
-#: ops/views.py:42 ops/views.py:58 ops/views.py:71 ops/views.py:84
-#: ops/views.py:107 ops/views.py:120 ops/views.py:133
+#: ops/views.py:41 ops/views.py:57 ops/views.py:70 ops/views.py:83
+#: ops/views.py:106 ops/views.py:119 ops/views.py:132
 msgid "Ops"
 msgstr "作业中心"
 
-#: ops/views.py:43
+#: ops/views.py:42
 msgid "Task list"
 msgstr "任务列表"
 
-#: ops/views.py:85
+#: ops/views.py:84
 msgid "Task run history"
 msgstr "执行历史"
 
@@ -1736,10 +1740,10 @@ msgstr "任务"
 
 #: templates/_nav.html:47 templates/_nav.html:50
 #: terminal/templates/terminal/session_list.html:74
-#: terminal/views/command.py:47 terminal/views/session.py:77
-#: terminal/views/session.py:94 terminal/views/session.py:116
-#: terminal/views/terminal.py:31 terminal/views/terminal.py:46
-#: terminal/views/terminal.py:58
+#: terminal/views/command.py:47 terminal/views/session.py:54
+#: terminal/views/session.py:77 terminal/views/session.py:94
+#: terminal/views/session.py:116 terminal/views/terminal.py:31
+#: terminal/views/terminal.py:46 terminal/views/terminal.py:58
 msgid "Terminal"
 msgstr "终端"
 
@@ -1967,21 +1971,13 @@ msgstr "接受终端注册"
 msgid "Info"
 msgstr "信息"
 
-#: terminal/views/session.py:54
-msgid "Audits"
-msgstr "审计中心"
-
-#: terminal/views/session.py:55
-msgid "Proxy log list"
-msgstr "Session列表"
+#: terminal/views/session.py:55 terminal/views/session.py:95
+msgid "Session offline list"
+msgstr "离线会话"
 
 #: terminal/views/session.py:78
 msgid "Session online list"
 msgstr "在线会话"
-
-#: terminal/views/session.py:95
-msgid "Session offline list"
-msgstr "离线会话"
 
 #: terminal/views/terminal.py:32
 msgid "Terminal list"
@@ -2651,6 +2647,12 @@ msgstr "密码更新"
 #: users/views/user.py:389
 msgid "Public key update"
 msgstr "秘钥更新"
+
+#~ msgid "Audits"
+#~ msgstr "审计中心"
+
+#~ msgid "Proxy log list"
+#~ msgstr "Session列表"
 
 #~ msgid "If also set private key, use that first"
 #~ msgstr "如果设置私钥，则优先使用密钥"

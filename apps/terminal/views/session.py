@@ -51,8 +51,6 @@ class SessionListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': _('Audits'),
-            'action': _('Proxy log list'),
             'user_list': utils.get_user_list_from_cache(),
             'asset_list': utils.get_asset_list_from_cache(),
             'system_user_list': utils.get_system_user_list_from_cache(),
