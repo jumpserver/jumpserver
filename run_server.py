@@ -27,7 +27,6 @@ WORKERS = 4
 
 EXIT_EVENT = threading.Event()
 processes = {}
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 try:
     os.makedirs(os.path.join(BASE_DIR, "data", "static"))
@@ -85,34 +84,16 @@ def start_beat():
     os.chdir(APPS_DIR)
     os.environ.setdefault('PYTHONOPTIMIZE', '1')
     os.environ.setdefault('C_FORCE_ROOT', '1')
-    pidfile = '/tmp/beat.pid '
+    pidfile = '/tmp/beat.pid'
     if os.path.exists(pidfile):
-        print("Pid file `{}` exist, remove it".format(pidfile))
+        print("Beat pid file `` exist, remove it".format(pidfile))
         os.unlink(pidfile)
-        time.sleep(1)
+        time.sleep(0.5)
 
     if os.path.exists(pidfile):
-        print("Pid file `{}` exist yet, may be something wrong".format(pidfile))
+        print("Beat pid file `` exist yet, may be something wrong".format(pidfile))
         os.unlink(pidfile)
-
-    scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
-    options = "--pidfile {}  -l {} --scheduler {} --max-interval 60".format(
-        pidfile, LOG_LEVEL, scheduler,
-    )
-    cmd = 'celery -A common beat {} '.format(options)
-    p = subprocess.Popen(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
-    return p
-
-
-def start_service(services):
-    print(time.ctime())
-    print('Jumpserver version {}, more see https://www.jumpserver.org'.format(
-        __version__))
-    print('Quit the server with CONTROL-C.')
-
-    services_all = {
-        "gunicorn": start_gunicorn,
-        "celery": start_celery,
+        time.sleep(0.5)
 
     scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
     options = "--pidfile {}  -l {} --scheduler {} --max-interval 60".format(
@@ -173,6 +154,7 @@ if __name__ == '__main__':
                         help="The service to start",
                         )
     args = parser.parse_args()
+
     try:
         start_service(args.services)
     except KeyboardInterrupt:
