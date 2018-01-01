@@ -87,7 +87,33 @@ def start_beat():
     os.environ.setdefault('C_FORCE_ROOT', '1')
     pidfile = '/tmp/beat.pid '
     if os.path.exists(pidfile):
+        print("Pid file `{}` exist, remove it".format(pidfile))
         os.unlink(pidfile)
+        time.sleep(1)
+
+    if os.path.exists(pidfile):
+        print("Pid file `{}` exist yet, may be something wrong".format(pidfile))
+        os.unlink(pidfile)
+
+    scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
+    options = "--pidfile {}  -l {} --scheduler {} --max-interval 60".format(
+        pidfile, LOG_LEVEL, scheduler,
+    )
+    cmd = 'celery -A common beat {} '.format(options)
+    p = subprocess.Popen(cmd, shell=True, stdout=sys.stdout, stderr=sys.stderr)
+    return p
+
+
+def start_service(services):
+    print(time.ctime())
+    print('Jumpserver version {}, more see https://www.jumpserver.org'.format(
+        __version__))
+    print('Quit the server with CONTROL-C.')
+
+    services_all = {
+        "gunicorn": start_gunicorn,
+        "celery": start_celery,
+
     scheduler = "django_celery_beat.schedulers:DatabaseScheduler"
     options = "--pidfile {}  -l {} --scheduler {} --max-interval 60".format(
         pidfile, LOG_LEVEL, scheduler,
