@@ -89,6 +89,7 @@ class BulkSerializerMixin(object):
 
 
 class DatetimeSearchMixin:
+    date_format = '%Y-%m-%d'
     date_from = date_to = None
 
     def get(self, request, *args, **kwargs):
@@ -96,7 +97,7 @@ class DatetimeSearchMixin:
         date_to_s = self.request.GET.get('date_to')
 
         if date_from_s:
-            date_from = timezone.datetime.strptime(date_from_s, '%m/%d/%Y')
+            date_from = timezone.datetime.strptime(date_from_s, self.date_format)
             self.date_from = date_from.replace(
                 tzinfo=timezone.get_current_timezone()
             )
@@ -105,7 +106,7 @@ class DatetimeSearchMixin:
 
         if date_to_s:
             date_to = timezone.datetime.strptime(
-                date_to_s + ' 23:59:59', '%m/%d/%Y %H:%M:%S'
+                date_to_s + ' 23:59:59', self.date_format + ' %H:%M:%S'
             )
             self.date_to = date_to.replace(
                 tzinfo=timezone.get_current_timezone()

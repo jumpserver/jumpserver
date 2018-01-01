@@ -27,9 +27,9 @@ class User(AbstractUser):
     ROLE_APP = 'App'
 
     ROLE_CHOICES = (
-        (ROLE_ADMIN, 'Administrator'),
-        (ROLE_USER, 'User'),
-        (ROLE_APP, 'Application')
+        (ROLE_ADMIN, _('Administrator')),
+        (ROLE_USER, _('User')),
+        (ROLE_APP, _('Application'))
     )
     id = models.UUIDField(default=uuid.uuid4, primary_key=True)
     username = models.CharField(max_length=128, unique=True, verbose_name=_('Username'))

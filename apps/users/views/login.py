@@ -217,7 +217,6 @@ class LoginLogListView(DatetimeSearchMixin, ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     user = keyword = ""
     date_to = date_from = None
-    date_format = '%m/%d/%Y'
 
     def get_queryset(self):
         self.user = self.request.GET.get('user', '')

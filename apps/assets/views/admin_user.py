@@ -41,8 +41,8 @@ class AdminUserCreateView(AdminUserRequiredMixin,
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'assets',
-            'action': 'Create admin user'
+            'app': _('Assets'),
+            'action': _('Create admin user')
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -64,8 +64,8 @@ class AdminUserUpdateView(AdminUserRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'assets',
-            'action': 'Update admin user'
+            'app': _('Assets'),
+            'action': _('Update admin user'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -85,8 +85,8 @@ class AdminUserDetailView(AdminUserRequiredMixin, DetailView):
     def get_context_data(self, **kwargs):
         cluster_remain = Cluster.objects.exclude(admin_user=self.object)
         context = {
-            'app': 'assets',
-            'action': 'Admin user detail',
+            'app': _('Assets'),
+            'action': _('Admin user detail'),
             'cluster_remain': cluster_remain,
         }
         kwargs.update(context)
@@ -112,8 +112,8 @@ class AdminUserAssetsView(AdminUserRequiredMixin, SingleObjectMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'assets',
-            'action': 'Admin user detail',
+            'app': _('Assets'),
+            'action': _('Admin user detail'),
             "total_amount": len(self.queryset),
             'unreachable_amount': len([asset for asset in self.queryset if asset.is_connective is False])
         }

@@ -280,16 +280,16 @@ jumpserver.initDataTable = function (options) {
         language: {
             search: "搜索",
             lengthMenu: "每页  _MENU_",
-            info: "显示第 _START_ 到 _END_; 总共 _TOTAL_ ",
+            info: "显示第 _START_ 至 _END_ 项结果; 总共 _TOTAL_ 项",
             infoFiltered:   "",
             infoEmpty:      "",
-            zeroRecords:    "没有匹配记录",
+            zeroRecords:    "没有匹配项",
             emptyTable:     "没有记录",
             paginate: {
-                first:      "第一页",
-                previous:   "上一页",
-                next:       "下一页",
-                last:       "最后"
+                first:      "«",
+                previous:   "‹",
+                next:       "›",
+                last:       "»"
             }
         },
         lengthMenu: [[15, 25, 50, -1], [15, 25, 50, "All"]]

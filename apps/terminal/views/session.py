@@ -29,7 +29,6 @@ class SessionListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     user = asset = system_user = ''
     date_from = date_to = None
-    date_format = '%m/%d/%Y'
 
     def get_queryset(self):
         self.queryset = super().get_queryset()

@@ -20,7 +20,7 @@ __all__ = [
 ]
 
 
-class TerminalListView(LoginRequiredMixin, ListView):
+class TerminalListView(AdminUserRequiredMixin, ListView):
     model = Terminal
     template_name = 'terminal/terminal_list.html'
     form_class = TerminalForm

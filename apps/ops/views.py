@@ -20,7 +20,6 @@ class TaskListView(DatetimeSearchMixin, ListView):
     ordering = ('-date_created',)
     context_object_name = 'task_list'
     template_name = 'ops/task_list.html'
-    date_format = '%m/%d/%Y'
     keyword = ''
 
     def get_queryset(self):
@@ -39,7 +38,7 @@ class TaskListView(DatetimeSearchMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Ops',
+            'app': _('Ops'),
             'action': _('Task list'),
             'date_from': self.date_from,
             'date_to': self.date_to,
@@ -55,8 +54,8 @@ class TaskDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Ops',
-            'action': 'Task detail',
+            'app': _('Ops'),
+            'action': _('Task detail'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -68,8 +67,8 @@ class TaskAdhocView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Ops',
-            'action': 'Task versions',
+            'app': _('Ops'),
+            'action': _('Task versions'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -81,8 +80,8 @@ class TaskHistoryView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Ops',
-            'action': 'Task run history',
+            'app': _('Ops'),
+            'action': _('Task run history'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -104,7 +103,7 @@ class AdHocDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Ops',
+            'app': _('Ops'),
             'action': 'Task version detail',
         }
         kwargs.update(context)
@@ -117,8 +116,8 @@ class AdHocHistoryView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Ops',
-            'action': 'Version run history',
+            'app': _('Ops'),
+            'action': _('Version run history'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -130,8 +129,8 @@ class AdHocHistoryDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Ops',
-            'action': 'Run history detail',
+            'app': _('Ops'),
+            'action': _('Run history detail'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

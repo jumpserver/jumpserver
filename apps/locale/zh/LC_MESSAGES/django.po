@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-01 00:34+0800\n"
+"POT-Creation-Date: 2018-01-01 14:59+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -55,7 +55,7 @@ msgstr "选择资产"
 #: assets/templates/assets/asset_list.html:32
 #: assets/templates/assets/cluster_assets.html:53
 #: assets/templates/assets/system_user_asset.html:54
-#: assets/templates/assets/user_asset_list.html:31
+#: assets/templates/assets/user_asset_list.html:21
 #: perms/templates/perms/asset_permission_asset.html:56
 #: users/templates/users/user_group_granted_asset.html:51
 msgid "Port"
@@ -105,8 +105,8 @@ msgid "Name"
 msgstr "名称"
 
 #: assets/forms.py:174
-msgid "If also set private key, use that first"
-msgstr "如果设置私钥，则优先使用密钥"
+msgid "Password or private key password"
+msgstr "密码或秘钥不合法"
 
 #: assets/forms.py:202 assets/forms.py:260 assets/forms.py:321
 msgid "Invalid private key"
@@ -190,7 +190,7 @@ msgstr "测试环境"
 #: assets/templates/assets/asset_list.html:31
 #: assets/templates/assets/cluster_assets.html:52
 #: assets/templates/assets/system_user_asset.html:53
-#: assets/templates/assets/user_asset_list.html:30
+#: assets/templates/assets/user_asset_list.html:20
 #: perms/templates/perms/asset_permission_asset.html:55
 #: users/templates/users/login_log_list.html:52
 #: users/templates/users/user_granted_asset.html:49
@@ -204,7 +204,7 @@ msgstr "IP"
 #: assets/templates/assets/asset_list.html:30
 #: assets/templates/assets/cluster_assets.html:51
 #: assets/templates/assets/system_user_asset.html:52
-#: assets/templates/assets/user_asset_list.html:29
+#: assets/templates/assets/user_asset_list.html:19
 #: perms/templates/perms/asset_permission_asset.html:54
 #: users/templates/users/user_granted_asset.html:48
 #: users/templates/users/user_group_granted_asset.html:49
@@ -496,25 +496,23 @@ msgstr "推送系统用户到资产: {}"
 msgid "Push system user to cluster assets period: {}->{}"
 msgstr "定期推送系统用户到资产: {}->{}"
 
-#: assets/templates/assets/_asset_group_bulk_update_modal.html:5
-#, fuzzy
-#| msgid "Update asset group"
-msgid "Update asset sroup"
-msgstr "编辑资产组"
-
 #: assets/templates/assets/_asset_group_bulk_update_modal.html:8
 msgid "Hint: only change the field you want to update."
 msgstr "仅修改你需要更新的字段"
 
 #: assets/templates/assets/_asset_group_bulk_update_modal.html:12
 #: assets/templates/assets/system_user_asset.html:21
-#: assets/views/admin_user.py:27 assets/views/asset.py:47
-#: assets/views/asset.py:61 assets/views/cluster.py:22
-#: assets/views/cluster.py:80 assets/views/cluster.py:97
-#: assets/views/group.py:30 assets/views/group.py:53 assets/views/group.py:71
-#: assets/views/group.py:93 assets/views/system_user.py:29
-#: assets/views/system_user.py:48 assets/views/system_user.py:71
-#: assets/views/system_user.py:91 templates/_nav.html:19
+#: assets/views/admin_user.py:27 assets/views/admin_user.py:44
+#: assets/views/admin_user.py:67 assets/views/admin_user.py:88
+#: assets/views/admin_user.py:115 assets/views/asset.py:47
+#: assets/views/asset.py:61 assets/views/asset.py:84 assets/views/asset.py:141
+#: assets/views/asset.py:158 assets/views/asset.py:179
+#: assets/views/cluster.py:22 assets/views/cluster.py:80
+#: assets/views/cluster.py:97 assets/views/group.py:30 assets/views/group.py:53
+#: assets/views/group.py:71 assets/views/group.py:93
+#: assets/views/system_user.py:29 assets/views/system_user.py:48
+#: assets/views/system_user.py:71 assets/views/system_user.py:91
+#: templates/_nav.html:19
 msgid "Assets"
 msgstr "资产管理"
 
@@ -647,8 +645,6 @@ msgstr "详情"
 
 #: assets/templates/assets/admin_user_assets.html:21
 #: assets/templates/assets/admin_user_detail.html:21
-#, fuzzy
-#| msgid "Asset list of "
 msgid "Assets list"
 msgstr "资产列表"
 
@@ -662,7 +658,7 @@ msgstr "资产列表"
 #: assets/templates/assets/asset_group_detail.html:48
 #: assets/templates/assets/asset_list.html:34
 #: assets/templates/assets/cluster_assets.html:54
-#: assets/templates/assets/user_asset_list.html:32
+#: assets/templates/assets/user_asset_list.html:22
 #: users/templates/users/login_log_list.html:50
 msgid "Type"
 msgstr "类型"
@@ -699,6 +695,7 @@ msgstr "任务已下发，查看左侧资产状态"
 
 #: assets/templates/assets/admin_user_create_update.html:16
 #: assets/templates/assets/admin_user_list.html:14
+#: assets/views/admin_user.py:45
 msgid "Create admin user"
 msgstr "创建管理用户"
 
@@ -743,7 +740,7 @@ msgstr "不可达"
 #: assets/templates/assets/cluster_assets.html:56
 #: assets/templates/assets/cluster_list.html:23
 #: assets/templates/assets/system_user_list.html:31
-#: assets/templates/assets/user_asset_list.html:37
+#: assets/templates/assets/user_asset_list.html:27
 #: ops/templates/ops/adhoc_history.html:59 ops/templates/ops/task_adhoc.html:61
 #: ops/templates/ops/task_history.html:62 ops/templates/ops/task_list.html:46
 #: perms/templates/perms/asset_permission_list.html:32
@@ -787,7 +784,8 @@ msgstr "删除"
 msgid "Group"
 msgstr "组"
 
-#: assets/templates/assets/asset_detail.html:20 assets/views/cluster.py:98
+#: assets/templates/assets/asset_detail.html:20 assets/views/asset.py:180
+#: assets/views/cluster.py:98
 msgid "Asset detail"
 msgstr "资产详情"
 
@@ -818,7 +816,7 @@ msgstr "快速修改"
 
 #: assets/templates/assets/asset_detail.html:175
 #: assets/templates/assets/asset_list.html:37
-#: assets/templates/assets/user_asset_list.html:35 perms/models.py:20
+#: assets/templates/assets/user_asset_list.html:25 perms/models.py:20
 #: perms/templates/perms/asset_permission_create_update.html:47
 #: terminal/templates/terminal/terminal_list.html:34
 #: users/templates/users/_select_user_modal.html:18
@@ -916,28 +914,26 @@ msgid "AssetGroup Updated"
 msgstr "资产组更新"
 
 #: assets/templates/assets/asset_list.html:15
-#: assets/templates/assets/user_asset_list.html:15
 #: users/templates/users/user_list.html:7
 msgid "Import"
 msgstr "导入"
 
 #: assets/templates/assets/asset_list.html:18
-#: assets/templates/assets/user_asset_list.html:18
 #: users/templates/users/user_list.html:10
 msgid "Export"
 msgstr "导出"
 
-#: assets/templates/assets/asset_list.html:25
+#: assets/templates/assets/asset_list.html:25 assets/views/asset.py:85
 msgid "Create asset"
 msgstr "创建资产"
 
 #: assets/templates/assets/asset_list.html:35
-#: assets/templates/assets/user_asset_list.html:33
+#: assets/templates/assets/user_asset_list.html:23
 msgid "Env"
 msgstr "环境"
 
 #: assets/templates/assets/asset_list.html:36
-#: assets/templates/assets/user_asset_list.html:34
+#: assets/templates/assets/user_asset_list.html:24
 msgid "Hardware"
 msgstr "硬件"
 
@@ -1040,7 +1036,6 @@ msgstr "Cluster删除失败"
 
 #: assets/templates/assets/delete_confirm.html:6
 #: perms/templates/perms/delete_confirm.html:6 templates/delete_confirm.html:6
-#: users/templates/users/user_delete_confirm.html:6
 msgid "Confirm delete"
 msgstr "确认删除"
 
@@ -1112,11 +1107,11 @@ msgstr "删除系统用户"
 msgid "System Users Deleting failed."
 msgstr "系统用户删除失败"
 
-#: assets/templates/assets/user_asset_list.html:36
+#: assets/templates/assets/user_asset_list.html:26
 msgid "Connective"
 msgstr "连接性"
 
-#: assets/templates/assets/user_asset_list.html:76
+#: assets/templates/assets/user_asset_list.html:66
 msgid "Connect"
 msgstr "连接"
 
@@ -1129,9 +1124,25 @@ msgstr "管理用户列表"
 msgid "Create admin user <a href=\"{url}\">{name}</a> successfully."
 msgstr "创建管理用户 <a href=\"{url}\">{name}</a>  成功"
 
+#: assets/views/admin_user.py:68
+msgid "Update admin user"
+msgstr "更新管理用户"
+
+#: assets/views/admin_user.py:89 assets/views/admin_user.py:116
+msgid "Admin user detail"
+msgstr "管理用户详情"
+
 #: assets/views/asset.py:48 assets/views/asset.py:62
 msgid "Asset list"
 msgstr "资产列表"
+
+#: assets/views/asset.py:142
+msgid "Bulk update asset"
+msgstr "批量更新资产"
+
+#: assets/views/asset.py:159
+msgid "Update asset"
+msgstr "编辑资产"
 
 #: assets/views/asset.py:292
 msgid "already exists"
@@ -1281,7 +1292,7 @@ msgid "Version detail"
 msgstr "版本详情"
 
 #: ops/templates/ops/adhoc_detail.html:22
-#: ops/templates/ops/adhoc_history.html:22
+#: ops/templates/ops/adhoc_history.html:22 ops/views.py:121
 msgid "Version run history"
 msgstr "执行历史"
 
@@ -1353,7 +1364,7 @@ msgstr "失败/成功/总"
 msgid "Version"
 msgstr "版本"
 
-#: ops/templates/ops/adhoc_history_detail.html:19
+#: ops/templates/ops/adhoc_history_detail.html:19 ops/views.py:134
 msgid "Run history detail"
 msgstr "执行历史详情"
 
@@ -1379,12 +1390,12 @@ msgid "Success assets"
 msgstr "成功资产"
 
 #: ops/templates/ops/task_adhoc.html:19 ops/templates/ops/task_detail.html:19
-#: ops/templates/ops/task_history.html:19
+#: ops/templates/ops/task_history.html:19 ops/views.py:59
 msgid "Task detail"
 msgstr "任务详情"
 
 #: ops/templates/ops/task_adhoc.html:22 ops/templates/ops/task_detail.html:22
-#: ops/templates/ops/task_history.html:22
+#: ops/templates/ops/task_history.html:22 ops/views.py:72
 msgid "Task versions"
 msgstr "任务各版本"
 
@@ -1435,9 +1446,18 @@ msgstr "成功"
 msgid "Date"
 msgstr "日期"
 
+#: ops/views.py:42 ops/views.py:58 ops/views.py:71 ops/views.py:84
+#: ops/views.py:107 ops/views.py:120 ops/views.py:133
+msgid "Ops"
+msgstr "作业中心"
+
 #: ops/views.py:43
 msgid "Task list"
 msgstr "任务列表"
+
+#: ops/views.py:85
+msgid "Task run history"
+msgstr "执行历史"
 
 #: perms/forms.py:16 users/forms.py:144 users/forms.py:149 users/forms.py:161
 #: users/forms.py:190
@@ -1451,7 +1471,7 @@ msgstr "选择用户"
 #: terminal/models.py:92 terminal/templates/terminal/command_list.html:32
 #: terminal/templates/terminal/command_list.html:72
 #: terminal/templates/terminal/session_list.html:33
-#: terminal/templates/terminal/session_list.html:71
+#: terminal/templates/terminal/session_list.html:71 users/models/user.py:31
 #: users/templates/users/user_group_detail.html:78 users/views/user.py:348
 msgid "User"
 msgstr "用户"
@@ -1623,7 +1643,7 @@ msgid "Update asset permission"
 msgstr "更新资产授权"
 
 #: perms/views.py:115
-#, fuzzy, python-brace-format
+#, python-brace-format
 msgid "Update asset permission <a href=\"{url}\"> {name} </a> success."
 msgstr "更新授权 <a href=\"{url}\"> {name} </a>  成功"
 
@@ -1674,10 +1694,17 @@ msgstr ""
 "                "
 
 #: templates/_message.html:16
+#, python-format
 msgid ""
-"Your ssh public key not set or expired. Please click <a href="
-"\"{{ user_pubkey_update }}\"> this link </a>to update your"
-msgstr "您的ssh秘钥没有设置或已失效，请点击 <a href={{ user_pubkey_update}} > 链接 </a> 更新"
+"\n"
+"        Your ssh public key not set or expired. Please click <a href="
+"\"%(user_pubkey_update)s\"> this link </a>to update\n"
+"        "
+msgstr ""
+"\n"
+"                您的ssh秘钥没有设置或已失效，请点击 <a href="
+"\"%(user_pubkey_update)s\"> 链接 </a> 更新\n"
+"        "
 
 #: templates/_modal.html:15
 msgid "Close"
@@ -1685,7 +1712,7 @@ msgstr "关闭"
 
 #: templates/_nav.html:9 users/views/group.py:30 users/views/group.py:46
 #: users/views/group.py:72 users/views/group.py:89 users/views/login.py:192
-#: users/views/login.py:242 users/views/user.py:55 users/views/user.py:70
+#: users/views/login.py:241 users/views/user.py:55 users/views/user.py:70
 #: users/views/user.py:95 users/views/user.py:151 users/views/user.py:308
 #: users/views/user.py:322 users/views/user.py:366 users/views/user.py:388
 msgid "Users"
@@ -1704,15 +1731,13 @@ msgid "Job Center"
 msgstr "作业中心"
 
 #: templates/_nav.html:42
-#, fuzzy
-#| msgid "Tasks"
 msgid "Task"
 msgstr "任务"
 
-#: templates/_nav.html:47 templates/_nav.html:50 templates/_nav_user.html:14
+#: templates/_nav.html:47 templates/_nav.html:50
 #: terminal/templates/terminal/session_list.html:74
-#: terminal/views/command.py:48 terminal/views/session.py:78
-#: terminal/views/session.py:95 terminal/views/session.py:117
+#: terminal/views/command.py:47 terminal/views/session.py:77
+#: terminal/views/session.py:94 terminal/views/session.py:116
 #: terminal/views/terminal.py:31 terminal/views/terminal.py:46
 #: terminal/views/terminal.py:58
 msgid "Terminal"
@@ -1756,16 +1781,12 @@ msgid "Profile settings"
 msgstr "个人信息设置"
 
 #: templates/_user_profile.html:24
-#, fuzzy
-#| msgid "Admin user"
 msgid "Admin page"
-msgstr "管理用户"
+msgstr "管理页面"
 
 #: templates/_user_profile.html:26
-#, fuzzy
-#| msgid "User agent"
 msgid "User page"
-msgstr "Agent"
+msgstr "用户页面"
 
 #: templates/captcha/image.html:3
 msgid "Play CAPTCHA as audio file"
@@ -1845,10 +1866,8 @@ msgid "Replay"
 msgstr "回放"
 
 #: terminal/models.py:101
-#, fuzzy
-#| msgid "Date joined"
 msgid "Date end"
-msgstr "创建日期"
+msgstr "结束日期"
 
 #: terminal/models.py:118
 msgid "Args"
@@ -1859,12 +1878,12 @@ msgid "Goto"
 msgstr ""
 
 #: terminal/templates/terminal/session_detail.html:17
-#: terminal/views/session.py:118
+#: terminal/views/session.py:117
 msgid "Session detail"
 msgstr "会话详情"
 
 #: terminal/templates/terminal/session_detail.html:28
-#: terminal/views/command.py:49
+#: terminal/views/command.py:48
 msgid "Command list"
 msgstr "命令记录列表"
 
@@ -1948,19 +1967,19 @@ msgstr "接受终端注册"
 msgid "Info"
 msgstr "信息"
 
-#: terminal/views/session.py:55
+#: terminal/views/session.py:54
 msgid "Audits"
 msgstr "审计中心"
 
-#: terminal/views/session.py:56
+#: terminal/views/session.py:55
 msgid "Proxy log list"
 msgstr "Session列表"
 
-#: terminal/views/session.py:79
+#: terminal/views/session.py:78
 msgid "Session online list"
 msgstr "在线会话"
 
-#: terminal/views/session.py:96
+#: terminal/views/session.py:95
 msgid "Session offline list"
 msgstr "离线会话"
 
@@ -2104,6 +2123,14 @@ msgstr "Agent"
 msgid "Date login"
 msgstr "登录日期"
 
+#: users/models/user.py:30 users/models/user.py:255
+msgid "Administrator"
+msgstr "管理员"
+
+#: users/models/user.py:32
+msgid "Application"
+msgstr "应用程序"
+
 #: users/models/user.py:39 users/templates/users/_select_user_modal.html:15
 #: users/templates/users/user_detail.html:86
 #: users/templates/users/user_list.html:25
@@ -2133,10 +2160,6 @@ msgstr "ssh私钥"
 #: users/templates/users/user_pubkey_update.html:43
 msgid "Public key"
 msgstr "ssh公钥"
-
-#: users/models/user.py:255
-msgid "Administrator"
-msgstr "管理员"
 
 #: users/models/user.py:258
 msgid "Administrator is the super user of system"
@@ -2592,7 +2615,7 @@ msgstr "密码不一致"
 msgid "First login"
 msgstr "首次登陆"
 
-#: users/views/login.py:243
+#: users/views/login.py:242
 msgid "Login log list"
 msgstr "登录日志"
 
@@ -2628,3 +2651,6 @@ msgstr "密码更新"
 #: users/views/user.py:389
 msgid "Public key update"
 msgstr "秘钥更新"
+
+#~ msgid "If also set private key, use that first"
+#~ msgstr "如果设置私钥，则优先使用密钥"

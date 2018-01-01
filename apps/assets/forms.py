@@ -171,7 +171,7 @@ class AdminUserForm(forms.ModelForm):
     password = forms.CharField(
         widget=forms.PasswordInput, max_length=128,
         strip=True, required=False,
-        help_text=_('If also set private key, use that first'),
+        help_text=_('Password or private key password'),
     )
     # Need use upload private key file except paste private key content
     private_key_file = forms.FileField(required=False)

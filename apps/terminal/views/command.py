@@ -22,7 +22,6 @@ class CommandListView(DatetimeSearchMixin, ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     command = user = asset = system_user = ""
     date_from = date_to = None
-    date_format = '%m/%d/%Y'
 
     def get_queryset(self):
         self.command = self.request.GET.get('command', '')

@@ -81,8 +81,8 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Assets',
-            'action': 'Create asset',
+            'app': _('Assets'),
+            'action': _('Create asset'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
@@ -138,8 +138,8 @@ class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Assets',
-            'action': 'Bulk update asset',
+            'app': _('Assets'),
+            'action': _('Bulk update asset'),
             'form': self.form,
             'assets_selected': self.id_list,
         }
@@ -155,8 +155,8 @@ class AssetUpdateView(AdminUserRequiredMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'Assets',
-            'action': 'Update asset',
+            'app': _('Assets'),
+            'action': _('Update asset'),
         }
         kwargs.update(context)
         return super(AssetUpdateView, self).get_context_data(**kwargs)
@@ -176,8 +176,8 @@ class AssetDetailView(DetailView):
     def get_context_data(self, **kwargs):
         asset_groups = self.object.groups.all()
         context = {
-            'app': 'Assets',
-            'action': 'Asset detail',
+            'app': _('Assets'),
+            'action': _('Asset detail'),
             'asset_groups_remain': [asset_group for asset_group in AssetGroup.objects.all()
                                     if asset_group not in asset_groups],
             'asset_groups': asset_groups,
