@@ -147,17 +147,7 @@ def stop_service():
         os.unlink('/tmp/beat.pid')
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description="Jumpserver start tools")
-    parser.add_argument("services", type=str, nargs='+', default="all",
-                        choices=("all", "gunicorn", "celery", "beat"),
-                        help="The service to start",
-                        )
-    args = parser.parse_args()
+start_service('all')
 
-    try:
-        start_service(args.services)
-    except KeyboardInterrupt:
-        stop_service()
 
 
