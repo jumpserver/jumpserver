@@ -7,7 +7,6 @@ import threading
 import time
 import argparse
 import sys
-import io
 
 from apps import __version__
 
@@ -16,6 +15,7 @@ try:
 except ImportError:
     CONFIG = type('_', (), {'__getattr__': None})()
 
+os.environ["PYTHONIOENCODING"] = "UTF-8"
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 APPS_DIR = os.path.join(BASE_DIR, 'apps')
@@ -86,12 +86,12 @@ def start_beat():
     os.environ.setdefault('C_FORCE_ROOT', '1')
     pidfile = '/tmp/beat.pid'
     if os.path.exists(pidfile):
-        print("Beat pid file `` exist, remove it".format(pidfile))
+        print("Beat pid file `{}` exist, remove it".format(pidfile))
         os.unlink(pidfile)
         time.sleep(0.5)
 
     if os.path.exists(pidfile):
-        print("Beat pid file `` exist yet, may be something wrong".format(pidfile))
+        print("Beat pid file `{}` exist yet, may be something wrong".format(pidfile))
         os.unlink(pidfile)
         time.sleep(0.5)
 
@@ -147,7 +147,12 @@ def stop_service():
         os.unlink('/tmp/beat.pid')
 
 
-start_service('all')
-
-
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Jumpserver start tools")
+    parser.add_argument("services", type=str, nargs='+', default="all",
+                        choices=("all", "gunicorn", "celery", "beat"),
+                        help="The service to start",
+                        )
+    args = parser.parse_args()
+    start_service(args.services)
 
