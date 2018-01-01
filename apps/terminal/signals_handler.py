@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 #
-import threading
-import time
-
 from celery import shared_task
 from django.core.cache import cache
 from django.db.utils import ProgrammingError, OperationalError

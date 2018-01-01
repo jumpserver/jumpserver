@@ -1,17 +1,11 @@
 # ~*~ coding: utf-8 ~*~
-from __future__ import unicode_literals
-import time
-from datetime import datetime
 
 from django.utils.translation import ugettext as _
 from django.conf import settings
-from django.views.generic import ListView, DetailView, View
-from django.utils import timezone
-from django.shortcuts import redirect, reverse
+from django.views.generic import ListView, DetailView
 
 from common.mixins import DatetimeSearchMixin
 from .models import Task, AdHoc, AdHocRunHistory
-from ops.tasks import rerun_task
 
 
 class TaskListView(DatetimeSearchMixin, ListView):
@@ -85,16 +79,6 @@ class TaskHistoryView(DetailView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
-
-
-class TaskRunView(View):
-    pk_url_kwarg = 'pk'
-
-    def get(self, request, *args, **kwargs):
-        pk = kwargs.get(self.pk_url_kwarg)
-        rerun_task.delay(pk)
-        time.sleep(0.5)
-        return redirect(reverse('ops:task-detail', kwargs={'pk': pk}))
 
 
 class AdHocDetailView(DetailView):

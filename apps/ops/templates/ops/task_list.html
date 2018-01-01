@@ -3,11 +3,6 @@
 {% load static %}
 {% block content_left_head %}
     <link href="{% static 'css/plugins/datepicker/datepicker3.css' %}" rel="stylesheet">
-    <style>
-        #search_btn {
-            margin-bottom: 0;
-        }
-    </style>
 {% endblock %}
 
 
@@ -72,7 +67,6 @@
                 {% endif %}
             </td>
             <td class="text-center">
-                <a href="{% url 'ops:task-run' pk=object.id %}" class="btn btn-xs btn-info">{% trans "Run" %}</a>
                 <a data-uid="{{ object.id }}" class="btn btn-xs btn-danger btn-del">{% trans "Delete" %}</a>
             </td>
         </tr>

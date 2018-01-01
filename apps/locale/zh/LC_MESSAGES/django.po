@@ -1310,7 +1310,7 @@ msgstr "ID"
 
 #: ops/templates/ops/adhoc_detail.html:94 ops/templates/ops/task_list.html:40
 msgid "Run times"
-msgstr "执行时间"
+msgstr "执行次数"
 
 #: ops/templates/ops/adhoc_detail.html:98 ops/templates/ops/task_detail.html:72
 msgid "Last run"
