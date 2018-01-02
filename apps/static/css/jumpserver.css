@@ -290,3 +290,28 @@ div.dataTables_wrapper div.dataTables_filter {
     margin-left: 10px;
     margin-right: 10px
 }
+
+.navbar-default {
+    background-color: #2f4050;
+    border-color: #2f4050;
+}
+
+.nav-header {
+    padding: 0;
+    background: #202c37;
+}
+
+.profile-element {
+    margin-left: 20px;
+}
+
+.profile-element div {
+    line-height: 60px;
+    float: left;
+    font-size: 22px;
+    color: #1ab394;
+}
+
+.profile-element div + div {
+    margin-left: 5px;
+}

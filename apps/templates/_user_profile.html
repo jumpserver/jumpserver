@@ -2,36 +2,14 @@
 {% load i18n %}
 <li class="nav-header">
     <div class="dropdown profile-element">
-        <span>
-            <img alt="image" class="img-circle" width="48" height="48" src="{{ request.user.avatar_url }}"/>
-        </span>
-        <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-            <span class="clear">
-                <span class="block m-t-xs">
-                    <strong class="font-bold"> {{ request.user.name }}<span style="color: #8095a8"></span></strong>
-                </span>
-                <span class="text-muted text-xs block">
-                     {{ request.user.get_role_display | default:_('User') }}<b class="caret"></b>
-                </span>
-            </span>
-        </a>
-        <ul class="dropdown-menu animated fadeInRight m-t-xs">
-            <li><a href="{% url 'users:user-profile' %}">{% trans 'Profile' %}</a></li>
-            <li><a href="{% url 'users:user-profile-update' %}">{% trans 'Profile settings' %}</a></li>
-            <li class="divider"></li>
-            {% if request.user.is_superuser %}
-                {% if request.COOKIES.IN_ADMIN_PAGE == 'No' %}
-                <li><a id="switch_admin">{% trans 'Admin page' %}</a></li>
-                {% else %}
-                <li><a id="switch_user">{% trans 'User page' %}</a></li>
-                {% endif %}
-            {% endif %}
-            <li><a href="{% url 'users:logout' %}">{% trans 'Logout' %}</a></li>
-        </ul>
+        <div>
+            <img alt="image" height="40" src="/static/img/logo.png"/>
+        </div>
+        <div>
+            <span>Jumpserver</span>
+        </div>
     </div>
-    <div class="logo-element">
-        JMS
-    </div>
+    <div class="clearfix"></div>
 </li>
 <script>
 $(document).ready(function () {
