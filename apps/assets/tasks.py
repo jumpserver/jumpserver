@@ -19,7 +19,7 @@ FORKS = 10
 TIMEOUT = 60
 logger = get_logger(__file__)
 CACHE_MAX_TIME = 60*60*60
-disk_pattern = re.compile(r'^hd|sd')
+disk_pattern = re.compile(r'^hd|sd|xvd')
 
 
 @shared_task

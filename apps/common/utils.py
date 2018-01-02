@@ -327,6 +327,10 @@ def capacity_convert(size, expect='auto', rate=1000):
             if rate > std_size/rate_ > 1:
                 expect = unit
                 break
+
+    if expect not in rate_mapping:
+        expect = 'K'
+
     expect_size = std_size / rate_mapping[expect]
     return expect_size, expect
 

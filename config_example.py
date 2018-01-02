@@ -119,5 +119,5 @@ class ProductionConfig(Config):
 
 
 # Default using Config settings, you can write if/else for different env
-config = Config()
+config = DevelopmentConfig()
 
