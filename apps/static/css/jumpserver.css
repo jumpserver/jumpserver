@@ -296,22 +296,26 @@ div.dataTables_wrapper div.dataTables_filter {
     border-color: #2f4050;
 }
 
-.nav-header {
+.nav-header, body.mini-navbar .nav-header {
     padding: 0;
     background: #202c37;
 }
 
-.profile-element {
-    margin-left: 20px;
+.profile-element div:first-child {
+    line-height: 60px;
+    width: 70px;
+    float: left;
+    text-align: center;
 }
 
-.profile-element div {
+.profile-element div:last-child {
     line-height: 60px;
+    width: 150px;
     float: left;
     font-size: 22px;
     color: #1ab394;
 }
 
-.profile-element div + div {
-    margin-left: 5px;
+.logo-element {
+    padding: 10px 0;
 }
