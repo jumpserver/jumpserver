@@ -357,5 +357,16 @@ String.prototype.format = function(args) {
 function setCookie(key, value) {
     var expires = new Date();
     expires.setTime(expires.getTime() + (24 * 60 * 60 * 1000));
-    document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
+    document.cookie = key + '=' + value + ';expires=' + expires.toUTCString() + ';path=/';
+    console.log("Cookie: " + document.cookie)
+}
+
+
+function delCookie(key) {
+    var expires = new Date();
+    expires.setTime(expires.getTime() - 1);
+    var val = getCookie(key);
+    if (val !== null) {
+        document.cookie = key + '=' + val + ";expires" + expires.toUTCString() + ';path=/';
+    }
 }
