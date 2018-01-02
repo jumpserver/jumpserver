@@ -165,7 +165,7 @@ class StatusViewSet(viewsets.ModelViewSet):
 
 class SessionViewSet(viewsets.ModelViewSet):
     queryset = Session.objects.all()
-    serializers_class = SessionSerializer
+    serializer_class = SessionSerializer
     permission_classes = (IsSuperUserOrAppUser,)
 
     def get_queryset(self):

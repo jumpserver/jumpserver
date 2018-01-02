@@ -242,7 +242,6 @@ LOGGING = {
 # https://docs.djangoproject.com/en/1.10/topics/i18n/
 LANGUAGE_CODE = 'en-us'
 
-# TIME_ZONE = 'UTC'
 TIME_ZONE = 'Asia/Shanghai'
 
 USE_I18N = True
@@ -300,7 +299,8 @@ REST_FRAMEWORK = {
         'users.authentication.SessionAuthentication',
     ),
     'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
-    'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S',
+    'DATETIME_FORMAT': '%Y-%m-%d %H:%M:%S %z',
+    'DATETIME_INPUT_FORMATS': ['%Y-%m-%d %H:%M:%S %z'],
 }
 
 AUTHENTICATION_BACKENDS = [

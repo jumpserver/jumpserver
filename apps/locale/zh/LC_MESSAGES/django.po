@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-01 15:33+0800\n"
+"POT-Creation-Date: 2018-01-02 18:11+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: assets/forms.py:23 assets/forms.py:53 assets/forms.py:99 perms/forms.py:36
+#: assets/forms.py:23 assets/forms.py:53 assets/forms.py:99 perms/forms.py:37
 #: perms/templates/perms/asset_permission_asset.html:127 users/forms.py:240
 msgid "Select asset groups"
 msgstr "选择资产组"
@@ -43,7 +43,7 @@ msgid "Default using cluster admin user"
 msgstr "默认使用管理用户"
 
 #: assets/forms.py:76 assets/forms.py:81 assets/forms.py:127
-#: assets/templates/assets/asset_group_detail.html:70 perms/forms.py:33
+#: assets/templates/assets/asset_group_detail.html:70 perms/forms.py:34
 #: perms/templates/perms/asset_permission_asset.html:99 users/forms.py:237
 msgid "Select assets"
 msgstr "选择资产"
@@ -84,7 +84,7 @@ msgstr "资产"
 #: assets/templates/assets/cluster_list.html:19
 #: assets/templates/assets/system_user_detail.html:53
 #: assets/templates/assets/system_user_list.html:24 ops/models.py:31
-#: ops/templates/ops/task_detail.html:56 ops/templates/ops/task_list.html:39
+#: ops/templates/ops/task_detail.html:56 ops/templates/ops/task_list.html:34
 #: perms/models.py:14
 #: perms/templates/perms/asset_permission_create_update.html:33
 #: perms/templates/perms/asset_permission_detail.html:62
@@ -746,7 +746,7 @@ msgstr "不可达"
 #: assets/templates/assets/system_user_list.html:31
 #: assets/templates/assets/user_asset_list.html:27
 #: ops/templates/ops/adhoc_history.html:59 ops/templates/ops/task_adhoc.html:61
-#: ops/templates/ops/task_history.html:62 ops/templates/ops/task_list.html:46
+#: ops/templates/ops/task_history.html:62 ops/templates/ops/task_list.html:41
 #: perms/templates/perms/asset_permission_list.html:32
 #: terminal/templates/terminal/session_list.html:78
 #: terminal/templates/terminal/terminal_list.html:36
@@ -774,7 +774,7 @@ msgstr "更新"
 #: assets/templates/assets/asset_list.html:96
 #: assets/templates/assets/cluster_list.html:44
 #: assets/templates/assets/system_user_list.html:85
-#: ops/templates/ops/task_list.html:76
+#: ops/templates/ops/task_list.html:70
 #: perms/templates/perms/asset_permission_list.html:74
 #: terminal/templates/terminal/terminal_list.html:73
 #: users/templates/users/user_group_list.html:41
@@ -1000,7 +1000,6 @@ msgid "Test assets connective"
 msgstr "测试资产可连接性"
 
 #: assets/templates/assets/cluster_assets.html:77
-#: ops/templates/ops/task_list.html:75
 msgid "Run"
 msgstr "执行"
 
@@ -1235,7 +1234,7 @@ msgid "Options"
 msgstr "选项"
 
 #: ops/models.py:152 ops/templates/ops/adhoc_detail.html:53
-#: ops/templates/ops/task_adhoc.html:56 ops/templates/ops/task_list.html:42
+#: ops/templates/ops/task_adhoc.html:56 ops/templates/ops/task_list.html:37
 msgid "Hosts"
 msgstr "主机"
 
@@ -1257,36 +1256,36 @@ msgstr "Become"
 msgid "Create by"
 msgstr "创建者"
 
-#: ops/models.py:306
+#: ops/models.py:307
 msgid "Start time"
 msgstr "开始时间"
 
-#: ops/models.py:307
+#: ops/models.py:308
 msgid "End time"
 msgstr "完成时间"
 
-#: ops/models.py:308 ops/templates/ops/adhoc_history.html:57
-#: ops/templates/ops/task_history.html:60 ops/templates/ops/task_list.html:45
+#: ops/models.py:309 ops/templates/ops/adhoc_history.html:57
+#: ops/templates/ops/task_history.html:60 ops/templates/ops/task_list.html:40
 msgid "Time"
 msgstr "时间"
 
-#: ops/models.py:309 ops/templates/ops/adhoc_detail.html:106
+#: ops/models.py:310 ops/templates/ops/adhoc_detail.html:106
 #: ops/templates/ops/adhoc_history.html:55
 #: ops/templates/ops/adhoc_history_detail.html:66
 #: ops/templates/ops/task_detail.html:80 ops/templates/ops/task_history.html:58
 msgid "Is finished"
 msgstr "是否完成"
 
-#: ops/models.py:310 ops/templates/ops/adhoc_history.html:56
+#: ops/models.py:311 ops/templates/ops/adhoc_history.html:56
 #: ops/templates/ops/task_history.html:59
 msgid "Is success"
 msgstr "是否成功"
 
-#: ops/models.py:311
+#: ops/models.py:312
 msgid "Adhoc raw result"
 msgstr "结果"
 
-#: ops/models.py:312
+#: ops/models.py:313
 msgid "Adhoc result summary"
 msgstr "汇总"
 
@@ -1296,7 +1295,7 @@ msgid "Version detail"
 msgstr "版本详情"
 
 #: ops/templates/ops/adhoc_detail.html:22
-#: ops/templates/ops/adhoc_history.html:22 ops/views.py:120
+#: ops/templates/ops/adhoc_history.html:22 ops/views.py:104
 msgid "Version run history"
 msgstr "执行历史"
 
@@ -1308,7 +1307,7 @@ msgstr "执行历史"
 msgid "ID"
 msgstr "ID"
 
-#: ops/templates/ops/adhoc_detail.html:94 ops/templates/ops/task_list.html:40
+#: ops/templates/ops/adhoc_detail.html:94 ops/templates/ops/task_list.html:35
 msgid "Run times"
 msgstr "执行次数"
 
@@ -1368,7 +1367,7 @@ msgstr "失败/成功/总"
 msgid "Version"
 msgstr "版本"
 
-#: ops/templates/ops/adhoc_history_detail.html:19 ops/views.py:133
+#: ops/templates/ops/adhoc_history_detail.html:19 ops/views.py:117
 msgid "Run history detail"
 msgstr "执行历史详情"
 
@@ -1394,12 +1393,12 @@ msgid "Success assets"
 msgstr "成功资产"
 
 #: ops/templates/ops/task_adhoc.html:19 ops/templates/ops/task_detail.html:19
-#: ops/templates/ops/task_history.html:19 ops/views.py:58
+#: ops/templates/ops/task_history.html:19 ops/views.py:52
 msgid "Task detail"
 msgstr "任务详情"
 
 #: ops/templates/ops/task_adhoc.html:22 ops/templates/ops/task_detail.html:22
-#: ops/templates/ops/task_history.html:22 ops/views.py:71
+#: ops/templates/ops/task_history.html:22 ops/views.py:65
 msgid "Task versions"
 msgstr "任务各版本"
 
@@ -1429,7 +1428,7 @@ msgstr "最新版本"
 msgid "Contents"
 msgstr "内容"
 
-#: ops/templates/ops/task_list.html:25 ops/templates/ops/task_list.html:30
+#: ops/templates/ops/task_list.html:20 ops/templates/ops/task_list.html:25
 #: templates/_base_list.html:43 templates/_header_bar.html:8
 #: terminal/templates/terminal/command_list.html:60
 #: users/templates/users/login_log_list.html:35
@@ -1437,29 +1436,29 @@ msgstr "内容"
 msgid "Search"
 msgstr "搜索"
 
-#: ops/templates/ops/task_list.html:41
+#: ops/templates/ops/task_list.html:36
 msgid "Versions"
 msgstr "版本"
 
-#: ops/templates/ops/task_list.html:43
+#: ops/templates/ops/task_list.html:38
 msgid "Success"
 msgstr "成功"
 
-#: ops/templates/ops/task_list.html:44
+#: ops/templates/ops/task_list.html:39
 #: users/templates/users/login_log_list.html:54
 msgid "Date"
 msgstr "日期"
 
-#: ops/views.py:41 ops/views.py:57 ops/views.py:70 ops/views.py:83
-#: ops/views.py:106 ops/views.py:119 ops/views.py:132
+#: ops/views.py:35 ops/views.py:51 ops/views.py:64 ops/views.py:77
+#: ops/views.py:90 ops/views.py:103 ops/views.py:116
 msgid "Ops"
 msgstr "作业中心"
 
-#: ops/views.py:42
+#: ops/views.py:36
 msgid "Task list"
 msgstr "任务列表"
 
-#: ops/views.py:84
+#: ops/views.py:78
 msgid "Task run history"
 msgstr "执行历史"
 
@@ -1480,30 +1479,31 @@ msgstr "选择用户"
 msgid "User"
 msgstr "用户"
 
-#: perms/forms.py:30 perms/templates/perms/asset_permission_user.html:127
+#: perms/forms.py:31 perms/templates/perms/asset_permission_user.html:127
 msgid "Select user groups"
 msgstr "选择用户组"
 
-#: perms/forms.py:39 perms/templates/perms/asset_permission_detail.html:144
+#: perms/forms.py:40 perms/templates/perms/asset_permission_detail.html:144
 #: users/forms.py:243
 msgid "Select system users"
 msgstr "选择系统用户"
 
-#: perms/forms.py:44
-msgid "User or user group at least one required"
+#: perms/forms.py:52
+msgid "User or group at least one required"
 msgstr ""
 
-#: perms/forms.py:45
-msgid "Asset or Asset group at least one required"
-msgstr ""
+#: perms/forms.py:60
+msgid "Asset or group at least one required"
+msgstr "资产或组至少需要选择一个"
 
-#: perms/forms.py:59
-msgid "Asset {} not have [{}] system users, please check \n"
-msgstr ""
+#: perms/forms.py:78
+msgid "Asset {} of cluster {} not have [{}] system users, please check \n"
+msgstr "资产 {} 所在集群 {} 不包含系统用户 [{}] 请检查\n"
 
-#: perms/forms.py:67
-msgid "Asset {}: {} not have [{}] system users, please check"
-msgstr ""
+#: perms/forms.py:87
+msgid ""
+"Asset {}(group {}) of cluster {} not have [{}] system users, please check \n"
+msgstr "资产 {}(组 {}) 所在集群 {} 不包含系统用户 [{}] 请检查\n"
 
 #: perms/models.py:16 perms/templates/perms/asset_permission_list.html:27
 #: templates/_nav.html:13 users/models/user.py:38
@@ -1740,10 +1740,10 @@ msgstr "任务"
 
 #: templates/_nav.html:47 templates/_nav.html:50
 #: terminal/templates/terminal/session_list.html:74
-#: terminal/views/command.py:47 terminal/views/session.py:54
-#: terminal/views/session.py:77 terminal/views/session.py:94
-#: terminal/views/session.py:116 terminal/views/terminal.py:31
-#: terminal/views/terminal.py:46 terminal/views/terminal.py:58
+#: terminal/views/command.py:47 terminal/views/session.py:75
+#: terminal/views/session.py:92 terminal/views/session.py:114
+#: terminal/views/terminal.py:31 terminal/views/terminal.py:46
+#: terminal/views/terminal.py:58
 msgid "Terminal"
 msgstr "终端"
 
@@ -1882,7 +1882,7 @@ msgid "Goto"
 msgstr ""
 
 #: terminal/templates/terminal/session_detail.html:17
-#: terminal/views/session.py:117
+#: terminal/views/session.py:115
 msgid "Session detail"
 msgstr "会话详情"
 
@@ -1971,13 +1971,13 @@ msgstr "接受终端注册"
 msgid "Info"
 msgstr "信息"
 
-#: terminal/views/session.py:55 terminal/views/session.py:95
-msgid "Session offline list"
-msgstr "离线会话"
-
-#: terminal/views/session.py:78
+#: terminal/views/session.py:76
 msgid "Session online list"
 msgstr "在线会话"
+
+#: terminal/views/session.py:93
+msgid "Session offline list"
+msgstr "离线会话"
 
 #: terminal/views/terminal.py:32
 msgid "Terminal list"
