@@ -35,19 +35,25 @@ Jumpserver是一款使用Python, Django开发的开源跳板机系统, 助力互
     $ cd requirements && yum -y install $(cat rpm_requirements.txt) && pip install -r requirements.txt
     ```
 
-    3. 修改表结构
+    3. 修改配置文件
+
+    ```
+    $ cp config_example.py config.py
+    ```
+
+    4. 修改表结构
 
     ```
     $ cd apps && python manage.py makemigrations && python manage.py migrate
     ```
 
-    4. 运行
+    5. 运行
 
     ```
     $ python run_server.py
     ```
 
-    5. 其它
+    6. 其它
 
     整合luna,coco需要nginx来配合, 详见详细安装文档
 
