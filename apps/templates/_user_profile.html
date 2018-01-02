@@ -3,15 +3,15 @@
 <li class="nav-header">
     <div class="dropdown profile-element">
         <span>
-            <img alt="image" class="img-circle" width="48" height="48" src="{{ user.avatar_url }}"/>
+            <img alt="image" class="img-circle" width="48" height="48" src="{{ request.user.avatar_url }}"/>
         </span>
         <a data-toggle="dropdown" class="dropdown-toggle" href="#">
             <span class="clear">
                 <span class="block m-t-xs">
-                    <strong class="font-bold"> {{ user.name }}<span style="color: #8095a8"></span></strong>
+                    <strong class="font-bold"> {{ request.user.name }}<span style="color: #8095a8"></span></strong>
                 </span>
                 <span class="text-muted text-xs block">
-                     {{ user.get_role_display | default:_('User') }}<b class="caret"></b>
+                     {{ request.user.get_role_display | default:_('User') }}<b class="caret"></b>
                 </span>
             </span>
         </a>
@@ -19,6 +19,13 @@
             <li><a href="{% url 'users:user-profile' %}">{% trans 'Profile' %}</a></li>
             <li><a href="{% url 'users:user-profile-update' %}">{% trans 'Profile settings' %}</a></li>
             <li class="divider"></li>
+            {% if request.user.is_superuser %}
+                {% if request.COOKIES.IN_ADMIN_PAGE == 'No' %}
+                <li><a id="switch_admin">{% trans 'Admin page' %}</a></li>
+                {% else %}
+                <li><a id="switch_user">{% trans 'User page' %}</a></li>
+                {% endif %}
+            {% endif %}
             <li><a href="{% url 'users:logout' %}">{% trans 'Logout' %}</a></li>
         </ul>
     </div>
@@ -26,3 +33,20 @@
         JMS
     </div>
 </li>
+<script>
+$(document).ready(function () {
+})
+.on('click', '#switch_admin', function () {
+    setTimeout(function () {
+        setCookie("IN_ADMIN_PAGE", "Yes");
+        window.location = "/"
+    }, 100)
+})
+.on('click', '#switch_user', function () {
+    setTimeout(function () {
+        console.log("Set to No");
+        setCookie("IN_ADMIN_PAGE", "No");
+        window.location = "/"
+    }, 100);
+})
+</script>

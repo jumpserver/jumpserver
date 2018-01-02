@@ -5,22 +5,17 @@ import base64
 import logging
 import uuid
 
-from paramiko.rsakey import RSAKey
+import requests
+import ipaddress
 from django.conf import settings
 from django.contrib.auth.mixins import UserPassesTestMixin
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login as auth_login
 from django.utils.translation import ugettext as _
 from django.core.cache import cache
 
 from common.tasks import send_mail_async
 from common.utils import reverse, get_object_or_none
-from .models import User
-
-
-# try:
-#     from io import StringIO
-# except ImportError:
-#     from StringIO import StringIO
+from .models import User, LoginLog
 
 
 logger = logging.getLogger('jumpserver')
@@ -36,7 +31,7 @@ class AdminUserRequiredMixin(UserPassesTestMixin):
         return True
 
 
-def user_add_success_next(user):
+def send_user_created_mail(user):
     subject = _('Create account successfully')
     recipient_list = [user.email]
     message = _("""
@@ -63,6 +58,8 @@ def user_add_success_next(user):
         'email': user.email,
         'login_url': reverse('users:login', external=True),
     }
+    if settings.DEBUG:
+        print(message)
 
     send_mail_async.delay(subject, message, recipient_list, html_message=message)
 
@@ -168,9 +165,45 @@ def generate_token(request, user):
     token = cache.get('%s_%s' % (user.id, remote_addr))
     if not token:
         token = uuid.uuid4().hex
-        print('Set cache: %s' % token)
         cache.set(token, user.id, expiration)
         cache.set('%s_%s' % (user.id, remote_addr), token, expiration)
     return token
 
 
+def validate_ip(ip):
+    try:
+        ipaddress.ip_address(ip)
+        return True
+    except ValueError:
+        pass
+    return False
+
+
+def write_login_log(username, type='', ip='', user_agent=''):
+    if not (ip and validate_ip(ip)):
+        ip = '0.0.0.0'
+    city = get_ip_city(ip)
+    LoginLog.objects.create(
+        username=username, type=type,
+        ip=ip, city=city, user_agent=user_agent
+    )
+
+
+def get_ip_city(ip, timeout=10):
+    # Taobao ip api: http://ip.taobao.com//service/getIpInfo.php?ip=8.8.8.8
+    # Sina ip api: http://int.dpool.sina.com.cn/iplookup/iplookup.php?ip=8.8.8.8&format=json
+
+    url = 'http://int.dpool.sina.com.cn/iplookup/iplookup.php?ip=%s&format=json' % ip
+    try:
+        r = requests.get(url, timeout=timeout)
+    except requests.Timeout:
+        r = None
+    city = 'Unknown'
+    if r and r.status_code == 200:
+        try:
+            data = r.json()
+            if not isinstance(data, int) and data['ret'] == 1:
+                city = data['country'] + ' ' + data['city']
+        except ValueError:
+            pass
+    return city

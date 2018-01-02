@@ -2,7 +2,8 @@
 # -*- coding: utf-8 -*-
 # 
 
-from . import User, UserGroup
+from .user import User
+from .group import UserGroup
 
 
 def init_model():

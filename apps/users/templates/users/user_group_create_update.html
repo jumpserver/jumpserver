@@ -24,20 +24,21 @@
                         <form method="post" class="form-horizontal" action="" >
                             {% csrf_token %}
                             {% bootstrap_field form.name layout="horizontal" %}
-                            <div class="form-group">
-                              <label for="users" class="col-sm-2 control-label">{% trans 'Users' %}</label>
-                                <div class="col-sm-9">
-                                    <select name="users" id="id_users" data-placeholder="{% trans 'Select User' %}" class="select2 form-control m-b" multiple  tabindex="2">
-                                        {% for user in users %}
-                                            {% if user.id in group_users %}
-                                            <option value="{{ user.id }}" selected>{{ user.name }}</option>
-                                            {% else %}
-                                                <option value="{{ user.id }}">{{ user.name }}</option>
-                                            {% endif %}
-                                        {% endfor %}
-                                    </select>
-                                </div>
-                            </div>
+                            {% bootstrap_field form.users layout="horizontal" %}
+{#                            <div class="form-group">#}
+{#                              <label for="users" class="col-sm-2 control-label">{% trans 'Users' %}</label>#}
+{#                                <div class="col-sm-9">#}
+{#                                    <select name="users" id="id_users" data-placeholder="{% trans 'Select User' %}" class="select2 form-control m-b" multiple  tabindex="2">#}
+{#                                        {% for user in users %}#}
+{#                                            {% if user.id in group_users %}#}
+{#                                            <option value="{{ user.id }}" selected>{{ user.name }}</option>#}
+{#                                            {% else %}#}
+{#                                                <option value="{{ user.id }}">{{ user.name }}</option>#}
+{#                                            {% endif %}#}
+{#                                        {% endfor %}#}
+{#                                    </select>#}
+{#                                </div>#}
+{#                            </div>#}
                             {% bootstrap_field form.comment layout="horizontal" %}
                             <div class="form-group">
                                 <div class="col-sm-4 col-sm-offset-2">

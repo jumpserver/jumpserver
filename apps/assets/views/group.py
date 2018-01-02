@@ -9,7 +9,7 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.shortcuts import get_object_or_404, reverse, redirect
 
 from .. import forms
-from ..models import Asset, AssetGroup, AdminUser, IDC, SystemUser
+from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser
 from ..hands import AdminUserRequiredMixin
 
 
@@ -66,20 +66,15 @@ class AssetGroupDetailView(AdminUserRequiredMixin, DetailView):
     context_object_name = 'asset_group'
 
     def get_context_data(self, **kwargs):
-        assets_remain = Asset.objects.exclude(id__in=self.object.assets.all())
-        system_users = SystemUser.objects.all()
-        system_users_remain = SystemUser.objects.exclude(id__in=system_users)
+        assets_remain = Asset.objects.exclude(groups__in=[self.object])
         context = {
             'app': _('Assets'),
             'action': _('Asset group detail'),
             'assets_remain': assets_remain,
-            'assets': [asset for asset in Asset.objects.all()
-                       if asset not in assets_remain],
-            'system_users': system_users,
-            'system_users_remain': system_users_remain,
+            'assets': self.object.assets.all(),
         }
         kwargs.update(context)
-        return super(AssetGroupDetailView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class AssetGroupUpdateView(AdminUserRequiredMixin, UpdateView):
@@ -106,6 +101,6 @@ class AssetGroupUpdateView(AdminUserRequiredMixin, UpdateView):
 
 
 class AssetGroupDeleteView(AdminUserRequiredMixin, DeleteView):
-    template_name = 'assets/delete_confirm.html'
+    template_name = 'delete_confirm.html'
     model = AssetGroup
     success_url = reverse_lazy('assets:asset-group-list')

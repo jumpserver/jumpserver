@@ -26,16 +26,6 @@
                                 <a href="{% url 'perms:asset-permission-asset-list' pk=asset_permission.id  %}" class="text-center">
                                 <i class="fa fa-bar-chart-o"></i> {% trans 'Assets and asset groups' %}</a>
                             </li>
-                            <form id="search_form" method="get" action="" class="pull-right mail-search">
-                            <div class="input-group">
-                                <input type="text" class="form-control input-sm" name="keyword" placeholder="Search" value="{{ keyword }}">
-                                <div class="input-group-btn">
-                                    <button id="search_btn" type="submit" class="btn btn-sm btn-primary">
-                                        搜索
-                                    </button>
-                                </div>
-                            </div>
-                            </form>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -83,7 +73,7 @@
                                                 </td>
 
                                                 <td>
-                                                    <button class="btn btn-danger btn-xs btn_delete_user_group {% if user.is_inherit_from_user_groups %} disabled {% endif %}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                                    <button class="btn btn-danger btn-xs btn-remove-user {% if user.is_inherit_from_user_groups %} disabled {% endif %}" data-gid="{{ user.id }}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                                 </td>
                                             </tr>
                                             {% endfor %}
@@ -108,7 +98,7 @@
                                                 <td colspan="2">
                                                     <select data-placeholder="{% trans 'Select user' %}" class="select2 user" style="width: 100%" multiple="" tabindex="4">
                                                         {% for user in users_remain %}
-                                                            <option value="{{ user.id }}">{{ user.name }}: {{ user.username }}</option>
+                                                            <option value="{{ user.id }}">{{ user.name }}</option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
@@ -143,16 +133,16 @@
                                             </tr>
                                             <tr>
                                                 <td colspan="2" class="no-borders">
-                                                    <button type="button" class="btn btn-info btn-small" id="btn_add_user_group">{% trans 'Add' %}</button>
+                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-group">{% trans 'Add' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
 
                                         {% for user_group in user_groups %}
                                         <tr>
-                                          <td ><b class="bdg_user_group" data-gid={{ user_group.id }}>{{ user_group.name }}</b></td>
+                                          <td ><b class="bdg_group" data-gid={{ user_group.id }}>{{ user_group.name }}</b></td>
                                           <td>
-                                              <button class="btn btn-danger btn-xs btn_delete_user_group" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
+                                              <button class="btn btn-danger btn-xs btn-remove-group" type="button" data-gid="{{ user_group.id }}" style="float: right;"><i class="fa fa-minus"></i></button>
                                           </td>
                                         </tr>
                                         {% endfor %}
@@ -169,30 +159,118 @@
 
 {% endblock %}
 {% block custom_foot_js %}
-    <script>
-        jumpserver.users_selected = {};
-        jumpserver.user_groups_selected = {};
-        $(document).ready(function () {
-            $('.select2.user').select2()
-                .on('select2:select', function(evt) {
-                     var data = evt.params.data;
-                     jumpserver.users_selected[data.id] = data.text;
-                })
-                .on('select2:unselect', function(evt) {
-                    var data = evt.params.data;
-                    delete jumpserver.users_selected[data.id]
-                });
-            $('.select2.user-group').select2()
-                .on('select2:select', function(evt) {
-                     var data = evt.params.data;
-                     jumpserver.user_groups_selected[data.id] = data.text;
-                })
-                .on('select2:unselect', function(evt) {
-                    var data = evt.params.data;
-                    delete jumpserver.user_groups_selected[data.id]
-                })
-        }).on('click', '.btn-add-user', function () {
-            console.log(jumpserver.users_selected)
+<script>
+jumpserver.users_selected = {};
+jumpserver.groups_selected = {};
+
+function addUsers(users) {
+    var the_url = "{% url 'api-perms:asset-permission-add-user' pk=asset_permission.id %}";
+    var body = {
+        users: users
+    };
+    var success = function(data) {
+        location.reload();
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success: success
+    });
+}
+
+function removeUser(users) {
+    var the_url = "{% url 'api-perms:asset-permission-remove-user' pk=asset_permission.id %}";
+    var body = {
+        users: users
+    };
+    var success = function(data) {
+        location.reload();
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success: success
+    });
+}
+
+function updateGroup(groups) {
+    var the_url = "{% url 'api-perms:asset-permission-detail' pk=asset_permission.id %}";
+    var body = {
+        user_groups: groups
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body)
+    });
+}
+
+$(document).ready(function () {
+    $('.select2.user').select2()
+        .on('select2:select', function(evt) {
+             var data = evt.params.data;
+             jumpserver.users_selected[data.id] = data.text;
         })
-    </script>
+        .on('select2:unselect', function(evt) {
+            var data = evt.params.data;
+            delete jumpserver.users_selected[data.id]
+        });
+    $('.select2.user-group').select2()
+        .on('select2:select', function(evt) {
+             var data = evt.params.data;
+             jumpserver.groups_selected[data.id] = data.text;
+        })
+        .on('select2:unselect', function(evt) {
+            var data = evt.params.data;
+            delete jumpserver.groups_selected[data.id]
+        })
+}).on('click', '.btn-add-user', function () {
+    if (Object.keys(jumpserver.users_selected).length === 0) {
+		return false;
+	}
+	var users_id = [];
+    $.map(jumpserver.users_selected, function(value, index) {
+        users_id.push(index);
+    });
+    console.log(users_id);
+    addUsers(users_id);
+}).on('click', '.btn-remove-user', function () {
+    var user_id = $(this).data("gid");
+    if (user_id === "") {
+        return
+    }
+    var users = [user_id];
+    removeUser(users)
+}).on('click', '#btn-add-group', function () {
+    if (Object.keys(jumpserver.groups_selected).length === 0) {
+		return false;
+	}
+
+    var groups = $('.bdg_group').map(function() {
+        return $(this).data('gid');
+    }).get();
+
+    $.map(jumpserver.groups_selected, function(group_name, index) {
+        groups.push(index);
+        $('#opt_' + index).remove();
+        $('.group_edit tbody').append(
+           '<tr>' +
+           '<td><b class="bdg_group" data-gid="' + index + '">' + group_name + '</b></td>' +
+           '<td><button class="btn btn-danger btn-xs pull-right btn-leave-group" type="button"><i class="fa fa-minus"></i></button></td>' +
+           '</tr>'
+        )
+    });
+
+    updateGroup(groups);
+}).on('click', '.btn-remove-group', function () {
+    var $this = $(this);
+    var $tr = $this.closest('tr');
+    var groups = $('.bdg_group').map(function() {
+        if ($(this).data('gid') !== $this.data('gid')){
+            return $(this).data('gid');
+        }
+    }).get();
+    updateGroup(groups);
+    $tr.remove()
+})
+</script>
 {% endblock %}

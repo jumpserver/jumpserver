@@ -2,9 +2,8 @@
 
 from django import template
 from django.utils import timezone
-from django.conf import settings
+from django.utils.translation import gettext as _
 from django.utils.html import escape
-from audits.backends import command_store
 
 register = template.Library()
 
@@ -59,7 +58,7 @@ def int_to_str(value):
 def ts_to_date(ts):
     try:
         ts = float(ts)
-    except TypeError:
+    except (TypeError, ValueError):
         ts = 0
     dt = timezone.datetime.fromtimestamp(ts).\
         replace(tzinfo=timezone.get_current_timezone())
@@ -72,5 +71,15 @@ def to_html(s):
 
 
 @register.filter
-def proxy_log_commands(log_id):
-    return command_store.filter(proxy_log_id=log_id)
+def time_util_with_seconds(date_from, date_to):
+    if date_from and date_to:
+        delta = date_to - date_from
+        seconds = delta.seconds
+        if seconds < 60:
+            return '{} s'.format(seconds)
+        elif seconds < 60*60:
+            return '{} m'.format(seconds//60)
+        else:
+            return '{} h'.format(seconds//3600)
+    else:
+        return ''

@@ -3,21 +3,24 @@
 
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView, Response
-from rest_framework.generics import ListAPIView, get_object_or_404
+from rest_framework.generics import ListAPIView, get_object_or_404, RetrieveUpdateAPIView
 from rest_framework import viewsets
-from users.permissions import IsValidUser, IsSuperUser, IsAppUser, IsSuperUserOrAppUser
+
 from common.utils import get_object_or_none
+from users.permissions import IsValidUser, IsSuperUser, IsAppUser, IsSuperUserOrAppUser
 from .utils import get_user_granted_assets, get_user_granted_asset_groups, \
     get_user_asset_permissions, get_user_group_asset_permissions, \
     get_user_group_granted_assets, get_user_group_granted_asset_groups
 from .models import AssetPermission
 from .hands import AssetGrantedSerializer, User, UserGroup, AssetGroup, Asset, \
-    AssetGroup, AssetGroupSerializer, SystemUser
+    AssetGroup, AssetGroupGrantedSerializer, SystemUser, MyAssetGroupGrantedSerializer
 from . import serializers
-from .utils import associate_system_users_and_assets
 
 
 class AssetPermissionViewSet(viewsets.ModelViewSet):
+    """
+    资产授权列表的增删改查api
+    """
     queryset = AssetPermission.objects.all()
     serializer_class = serializers.AssetPermissionSerializer
     permission_classes = (IsSuperUser,)
@@ -36,88 +39,90 @@ class AssetPermissionViewSet(viewsets.ModelViewSet):
             queryset = get_user_group_asset_permissions(user_group)
         return queryset
 
-    # Todo: 忘记为何要重写get_serializer_class了
     def get_serializer_class(self):
         if getattr(self, 'user_id', ''):
             return serializers.UserAssetPermissionSerializer
         return serializers.AssetPermissionSerializer
 
-    def associate_system_users_and_assets(self, serializer):
-        assets = serializer.validated_data.get('assets', [])
-        asset_groups = serializer.validated_data.get('asset_groups', [])
-        system_users = serializer.validated_data.get('system_users', [])
-        if serializer.partial:
-            instance = self.get_object()
-            assets.extend(list(instance.assets.all()))
-            asset_groups.extend(list(instance.asset_groups.all()))
-            system_users.extend(list(instance.system_users.all()))
-        associate_system_users_and_assets(system_users, assets, asset_groups)
 
-    def perform_create(self, serializer):
-        self.associate_system_users_and_assets(serializer)
-        return super(AssetPermissionViewSet, self).perform_create(serializer)
-
-    def perform_update(self, serializer):
-        self.associate_system_users_and_assets(serializer)
-        return super(AssetPermissionViewSet, self).perform_update(serializer)
-
-
-class RevokeUserAssetPermission(APIView):
+class AssetPermissionRemoveUserApi(RetrieveUpdateAPIView):
+    """
+    将用户从授权中移除，Detail页面会调用
+    """
     permission_classes = (IsSuperUser,)
+    serializer_class = serializers.AssetPermissionUpdateUserSerializer
+    queryset = AssetPermission.objects.all()
 
-    def put(self, request, *args, **kwargs):
-        permission_id = str(request.data.get('id', ''))
-        user_id = str(request.data.get('user_id', ''))
-
-        if permission_id and user_id and permission_id.isdigit() and user_id.isdigit():
-            asset_permission = get_object_or_404(AssetPermission, id=int(permission_id))
-            user = get_object_or_404(User, id=int(user_id))
-
-            if asset_permission and user:
-                asset_permission.users.remove(user)
-                return Response({'msg': 'success'})
-        return Response({'msg': 'failed'}, status=404)
+    def update(self, request, *args, **kwargs):
+        perm = self.get_object()
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            users = serializer.validated_data.get('users')
+            if users:
+                perm.users.remove(*tuple(users))
+            return Response({"msg": "ok"})
+        else:
+            return Response({"error": serializer.errors})
 
 
-class RemoveSystemUserAssetPermission(APIView):
-    """将系统用户从授权中移除, Detail页面会调用"""
+class AssetPermissionAddUserApi(RetrieveUpdateAPIView):
     permission_classes = (IsSuperUser,)
+    serializer_class = serializers.AssetPermissionUpdateUserSerializer
+    queryset = AssetPermission.objects.all()
 
-    def put(self, request, *args, **kwargs):
-        response = []
-        asset_permission_id = kwargs.pop('pk')
-        system_users_id = request.data.get('system_users')
-        print(system_users_id)
-        asset_permission = get_object_or_404(
-            AssetPermission, id=asset_permission_id)
-        if not isinstance(system_users_id, list):
-            system_users_id = [system_users_id]
-        for system_user_id in system_users_id:
-            system_user = get_object_or_none(SystemUser, id=system_user_id)
-            if system_user:
-                asset_permission.system_users.remove(system_user)
-                response.append(system_user.to_json())
-        return Response(response, status=200)
+    def update(self, request, *args, **kwargs):
+        perm = self.get_object()
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            users = serializer.validated_data.get('users')
+            if users:
+                perm.users.add(*tuple(users))
+            return Response({"msg": "ok"})
+        else:
+            return Response({"error": serializer.errors})
 
 
-class RevokeUserGroupAssetPermission(APIView):
+class AssetPermissionRemoveAssetApi(RetrieveUpdateAPIView):
+    """
+    将用户从授权中移除，Detail页面会调用
+    """
     permission_classes = (IsSuperUser,)
+    serializer_class = serializers.AssetPermissionUpdateAssetSerializer
+    queryset = AssetPermission.objects.all()
 
-    def put(self, request, *args, **kwargs):
-        permission_id = str(request.data.get('id', ''))
-        user_group_id = str(request.data.get('user_group_id', ''))
+    def update(self, request, *args, **kwargs):
+        perm = self.get_object()
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            assets = serializer.validated_data.get('assets')
+            if assets:
+                perm.assets.remove(*tuple(assets))
+            return Response({"msg": "ok"})
+        else:
+            return Response({"error": serializer.errors})
 
-        if permission_id and user_group_id and permission_id.isdigit() and user_group_id.isdigit():
-            asset_permission = get_object_or_404(AssetPermission, id=int(permission_id))
-            user_group = get_object_or_404(UserGroup, id=int(user_group_id))
 
-            if asset_permission and user_group:
-                asset_permission.user_groups.remove(user_group)
-                return Response({'msg': 'success'})
-        return Response({'msg': 'failed'}, status=404)
+class AssetPermissionAddAssetApi(RetrieveUpdateAPIView):
+    permission_classes = (IsSuperUser,)
+    serializer_class = serializers.AssetPermissionUpdateAssetSerializer
+    queryset = AssetPermission.objects.all()
+
+    def update(self, request, *args, **kwargs):
+        perm = self.get_object()
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            assets = serializer.validated_data.get('assets')
+            if assets:
+                perm.assets.add(*tuple(assets))
+            return Response({"msg": "ok"})
+        else:
+            return Response({"error": serializer.errors})
 
 
 class UserGrantedAssetsApi(ListAPIView):
+    """
+    用户授权的所有资产
+    """
     permission_classes = (IsSuperUserOrAppUser,)
     serializer_class = AssetGrantedSerializer
 
@@ -133,25 +138,83 @@ class UserGrantedAssetsApi(ListAPIView):
         return queryset
 
 
-class UserGrantedAssetGroupsApi(ListAPIView):
+class UserGrantedAssetGroupsApi(APIView):
+    permission_classes = (IsValidUser,)
+
+    def get(self, request, *args, **kwargs):
+        asset_groups = {}
+        user_id = kwargs.get('pk', '')
+        user = get_object_or_404(User, id=user_id)
+
+        assets = get_user_granted_assets(user)
+        for asset in assets:
+            for asset_group in asset.groups.all():
+                if asset_group.id in asset_groups:
+                    asset_groups[asset_group.id]['assets_amount'] += 1
+                else:
+                    asset_groups[asset_group.id] = {
+                        'id': asset_group.id,
+                        'name': asset_group.name,
+                        'comment': asset_group.comment,
+                        'assets_amount': 1
+                    }
+        asset_groups_json = asset_groups.values()
+        return Response(asset_groups_json, status=200)
+
+
+class UserGrantedAssetGroupsWithAssetsApi(ListAPIView):
+    """
+    授权用户的资产组，注：这里的资产组并非是授权列表中授权的，
+    而是把所有资产取出来，然后反查出所有资产组，然后合并得到，
+    结果里也包含资产组下授权的资产
+    数据结构如下：
+    [
+      {
+        "id": 1,
+        "name": "资产组1",
+        ... 其它属性
+        "assets_granted": [
+          {
+            "id": 1,
+            "hostname": "testserver",
+            "ip": "192.168.1.1",
+            "port": 22,
+            "system_users_granted": [
+              "id": 1,
+              "name": "web",
+              "username": "web",
+              "protocol": "ssh",
+            ]
+          }
+        ]
+      }
+    ]
+    """
     permission_classes = (IsSuperUserOrAppUser,)
-    serializer_class = AssetGroupSerializer
+    serializer_class = AssetGroupGrantedSerializer
 
     def get_queryset(self):
         user_id = self.kwargs.get('pk', '')
+        if not user_id:
+            return []
 
-        if user_id:
-            user = get_object_or_404(User, id=user_id)
-            queryset = get_user_granted_asset_groups(user)
-        else:
-            queryset = []
+        user = get_object_or_404(User, id=user_id)
+        asset_groups = get_user_granted_asset_groups(user)
+
+        queryset = []
+        for asset_group, assets_system_users in asset_groups.items():
+            assets = []
+            for asset, system_users in assets_system_users:
+                asset.system_users_granted = system_users
+                assets.append(asset)
+            asset_group.assets_granted = assets
+            queryset.append(asset_group)
         return queryset
 
 
 class MyGrantedAssetsApi(ListAPIView):
-    """授权给用户的资产列表
-    [{'hostname': 'x','ip': 'x', ..,
-      'system_users_granted': [{'name': 'x', .}, ...]
+    """
+    用户自己查询授权的资产列表
     """
     permission_classes = (IsValidUser,)
     serializer_class = AssetGrantedSerializer
@@ -166,10 +229,10 @@ class MyGrantedAssetsApi(ListAPIView):
         return queryset
 
 
-
-class MyGrantedAssetsGroupsApi(APIView):
-    """授权给用户的资产组列表, 非直接通过授权规则授权的资产组列表, 而是授权资产的所有
-    资产组之和"""
+class MyGrantedAssetGroupsApi(APIView):
+    """
+    授权的所有资产组，并非是授权列表中的，而是经过计算得来的
+    """
     permission_classes = (IsValidUser,)
 
     def get(self, request, *args, **kwargs):
@@ -193,43 +256,48 @@ class MyGrantedAssetsGroupsApi(APIView):
         return Response(asset_groups_json, status=200)
 
 
-class MyAssetGroupAssetsApi(ListAPIView):
+class MyGrantedAssetGroupsWithAssetsApi(ListAPIView):
+    """
+    授权当前用户的资产组，注：这里的资产组并非是授权列表中授权的，
+    而是把所有资产取出来，然后反查出所有资产组，然后合并得到，
+    结果里也包含资产组下授权的资产
+    数据结构如下：
+    [
+      {
+        "id": 1,
+        "name": "资产组1",
+        ... 其它属性
+        "assets_granted": [
+          {
+            "id": 1,
+            "hostname": "testserver",
+            "system_users_granted": [
+              "id": 1,
+              "name": "web",
+              "username": "web",
+              "protocol": "ssh",
+            ]
+          }
+        ]
+      }
+    ]
+    """
     permission_classes = (IsValidUser,)
+    serializer_class = MyAssetGroupGrantedSerializer
 
-    def get(self, request, *args, **kwargs):
-        asset_groups = dict()
-        asset_groups[0] = {
-            'id': 0, 'name': 'ungrouped', 'assets': []
-        }
-        # asset_group = {
-        #     1: {'id': 1, 'name': 'hello',
-        #         'assets': [{
-        #                        'id': 'asset_id',
-        #                        'system_users': [{'id': 'system_user_id',...},]
-        #                     }],
-        #         'assets_id': set()}, 2: {}}
-        user = request.user
+    def get_queryset(self):
+        user = self.request.user
+        asset_groups = get_user_granted_asset_groups(user)
 
-        if user:
-            assets = get_user_granted_assets(user)
-            for asset, system_users in assets.items():
-                asset_json = asset.to_json()
-                asset_json['system_users'] = [su.to_json() for su in system_users]
-                if not asset.groups.all():
-                    asset_groups[0]['assets'].append(asset_json)
-                    continue
-                for asset_group in asset.groups.all():
-                    if asset_group.id in asset_groups:
-                        asset_groups[asset_group.id]['assets'].append(asset_json)
-                    else:
-                        asset_groups[asset_group.id] = {
-                            'id': asset_group.id,
-                            'name': asset_group.name,
-                            'comment': asset_group.comment,
-                            'assets': [asset_json],
-                        }
-        asset_groups_json = asset_groups.values()
-        return Response(asset_groups_json, status=200)
+        queryset = []
+        for asset_group, assets_system_users in asset_groups.items():
+            assets = []
+            for asset, system_users in assets_system_users:
+                asset.system_users_granted = system_users
+                assets.append(asset)
+            asset_group.assets_granted = assets
+            queryset.append(asset_group)
+        return queryset
 
 
 class MyAssetGroupOfAssetsApi(ListAPIView):
@@ -269,7 +337,7 @@ class UserGroupGrantedAssetsApi(ListAPIView):
 
 class UserGroupGrantedAssetGroupsApi(ListAPIView):
     permission_classes = (IsSuperUser,)
-    serializer_class = AssetGroupSerializer
+    serializer_class = AssetGroupGrantedSerializer
 
     def get_queryset(self):
         user_group_id = self.kwargs.get('pk', '')

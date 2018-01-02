@@ -28,7 +28,7 @@
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-sm-7" style="padding-left: 0;">
+                        <div class="col-sm-8" style="padding-left: 0;">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
                                     <span class="label"><b>{{ system_user.name }}</b></span>
@@ -60,10 +60,6 @@
                                         <tr>
                                             <td>{% trans 'Protocol' %}:</td>
                                             <td><b>{{ system_user.protocol }}</b></td>
-                                        </tr>
-                                        <tr>
-                                            <td>{% trans 'Auto push' %}:</td>
-                                            <td><b>{{ system_user.auto_push|yesno:"Yes,No,Unknown" }}</b></td>
                                         </tr>
                                         <tr>
                                             <td>{% trans 'Sudo' %}:</td>
@@ -105,7 +101,7 @@
                             </div>
                         </div>
 
-                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
                                     <i class="fa fa-info-circle"></i> {% trans 'Quick update' %}
@@ -114,31 +110,65 @@
                                     <table class="table">
                                         <tbody>
                                         <tr class="no-borders-tr">
-                                            <td width="50%">{% trans 'Get manual install script' %}:</td>
+                                            <td width="50%">{% trans 'Auto push' %}:</td>
                                             <td>
-                                                <span style="float: right">
-                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Get' %}</button>
+                                                <span class="pull-right">
+                                                    <div class="switch">
+                                                        <div class="onoffswitch">
+                                                            <input type="checkbox" {% if system_user.auto_push %} checked {% endif %} class="onoffswitch-checkbox" id="btn-auto-push">
+                                                            <label class="onoffswitch-label" for="btn-auto-push">
+                                                                <span class="onoffswitch-inner"></span>
+                                                                <span class="onoffswitch-switch"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
                                                 </span>
                                             </td>
                                         </tr>
+{#                                        <tr>#}
+{#                                            <td width="50%">{% trans 'Change auth period' %}:</td>#}
+{#                                            <td>#}
+{#                                                <span style="float: right">#}
+{#                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Reset' %}</button>#}
+{#                                                </span>#}
+{#                                            </td>#}
+{#                                        </tr>#}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="panel panel-info">
+                                <div class="panel-heading">
+                                    <i class="fa fa-info-circle"></i> {% trans 'Clusters' %}
+                                </div>
+                                <div class="panel-body">
+                                    <table class="table cluster_edit" id="add-asset2group">
+                                        <tbody>
+                                        <form>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <select data-placeholder="{% trans 'Add to cluster' %}" id="cluster_selected" class="select2" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for cluster in cluster_remain %}
+                                                        <option value="{{ cluster.id }}" id="opt_{{ cluster.id }}" >{{ cluster.name }}</option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2" class="no-borders">
+                                                    <button type="button" class="btn btn-info btn-sm" id="btn-add-to-cluster">{% trans 'Confirm' %}</button>
+                                                </td>
+                                            </tr>
+                                        </form>
 
+                                        {% for cluster in system_user.cluster.all %}
                                         <tr>
-                                            <td width="50%">{% trans 'Retest asset connectivity' %}:</td>
-                                            <td>
-                                                <span style="float: right">
-                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Start' %}</button>
-                                                </span>
-                                            </td>
+                                          <td ><b class="bdg_cluster" data-gid={{ cluster.id }}>{{ cluster.name }}</b></td>
+                                          <td>
+                                              <button class="btn btn-danger pull-right btn-xs btn-remove-from-cluster" type="button"><i class="fa fa-minus"></i></button>
+                                          </td>
                                         </tr>
-
-                                        <tr>
-                                            <td width="50%">{% trans 'Reset private key' %}:</td>
-                                            <td>
-                                                <span style="float: right">
-                                                    <button type="button" class="btn btn-primary btn-xs" style="width: 54px">{% trans 'Reset' %}</button>
-                                                </span>
-                                            </td>
-                                        </tr>
+                                        {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>
@@ -149,30 +179,86 @@
             </div>
         </div>
     </div>
-    </div>
-
 {% endblock %}
 {% block custom_foot_js %}
-    <script>
-{#        function switch_user_status(obj) {#}
-{#            var status = $(obj).prop('checked');#}
-{##}
-{#            $.ajax({#}
-{#                url: "{% url 'users:user-active-api' pk=user.id %}",#}
-{#                type: "PUT",#}
-{#                data: {#}
-{#                    'is_active': status#}
-{#                },#}
-{#                success: function (data, status) {#}
-{#                    console.log(data)#}
-{#                },#}
-{#                error: function () {#}
-{#                    console.log('error')#}
-{#                }#}
-{#            })#}
-{#        }#}
-        $(document).ready(function () {
-            $('.select2').select2();
+<script>
+function updateSystemUserCluster(clusters) {
+    var the_url = "{% url 'api-assets:system-user-detail' pk=system_user.id %}";
+    var body = {
+        cluster: Object.assign([], clusters)
+    };
+    var success = function(data) {
+        // remove all the selected groups from select > option and rendered ul element;
+        $('.select2-selection__rendered').empty();
+        $('#cluster_selected').val('');
+        $.map(jumpserver.cluster_selected, function(cluster_name, index) {
+            $('#opt_' + index).remove();
+            // change tr html of user groups.
+            $('.cluster_edit tbody').append(
+                '<tr>' +
+                '<td><b class="bdg_cluster" data-gid="' + index + '">' + cluster_name + '</b></td>' +
+                '<td><button class="btn btn-danger btn-xs pull-right btn-remove-from-cluster" type="button"><i class="fa fa-minus"></i></button></td>' +
+                '</tr>'
+            )
         });
-    </script>
+        // clear jumpserver.groups_selected
+        jumpserver.cluster_selected = {};
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body),
+        success: success
+    });
+}
+jumpserver.cluster_selected = {};
+$(document).ready(function () {
+    $('.select2').select2()
+    .on('select2:select', function(evt) {
+            var data = evt.params.data;
+            jumpserver.cluster_selected[data.id] = data.text;
+    })
+    .on('select2:unselect', function(evt) {
+        var data = evt.params.data;
+        delete jumpserver.cluster_selected[data.id];
+    });
+})
+.on('click', '#btn-auto-push', function () {
+    var checked = $(this).prop('checked');
+    var the_url = "{% url 'api-assets:system-user-detail' pk=system_user.id %}";
+    var body = {
+        'auto_push': checked
+    };
+    APIUpdateAttr({
+        url: the_url,
+        body: JSON.stringify(body)
+    });
+})
+.on('click', '#btn-add-to-cluster', function() {
+    if (Object.keys(jumpserver.cluster_selected).length === 0) {
+        return false;
+    }
+    var clusters = $('.bdg_cluster').map(function() {
+        return $(this).data('gid');
+    }).get();
+    $.map(jumpserver.cluster_selected, function(value, index) {
+        clusters.push(index);
+    });
+    updateSystemUserCluster(clusters);
+})
+.on('click', '.btn-remove-from-cluster', function() {
+    var $this = $(this);
+    var $tr = $this.closest('tr');
+    var $badge = $tr.find('.bdg_cluster');
+    var gid = $badge.data('gid');
+    var cluster_name = $badge.html() || $badge.text();
+    $('#groups_selected').append(
+        '<option value="' + gid + '" id="opt_' + gid + '">' + cluster_name + '</option>'
+    );
+    $tr.remove();
+    var clusters = $('.bdg_cluster').map(function () {
+        return $(this).data('gid');
+    }).get();
+    updateSystemUserCluster(clusters);
+})
+</script>
 {% endblock %}

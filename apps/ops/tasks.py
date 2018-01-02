@@ -1,22 +1,42 @@
 # coding: utf-8
+from celery import shared_task, subtask
 
-from __future__ import absolute_import, unicode_literals
-
-from celery import shared_task
-
-from common.utils import get_logger
-from .utils import run_AdHoc
+from common.utils import get_logger, get_object_or_none
+from .models import Task
 
 logger = get_logger(__file__)
 
 
+def rerun_task():
+    pass
+
+
 @shared_task
-def rerun_task(task_id):
-    from .models import Task
-    record = Task.objects.get(uuid=task_id)
-    assets = record.assets_json
-    task_tuple = record.module_args
-    pattern = record.pattern
-    task_name = record.name
-    return run_AdHoc(task_tuple, assets, pattern=pattern,
-                     task_name=task_name, task_id=task_id)
+def run_ansible_task(task_id, callback=None, **kwargs):
+    """
+    :param task_id: is the tasks serialized data
+    :param callback: callback function name
+    :return:
+    """
+
+    task = get_object_or_none(Task, id=task_id)
+    if task:
+        result = task.run()
+        if callback is not None:
+            subtask(callback).delay(result, task_name=task.name)
+        return result
+    else:
+        logger.error("No task found")
+
+
+@shared_task
+def hello(name, callback=None):
+    print("Hello {}".format(name))
+    if callback is not None:
+        subtask(callback).delay("Guahongwei")
+
+
+@shared_task
+def hello_callback(result):
+    print(result)
+    print("Hello callback")

@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from django.conf.urls import url, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.views.static import serve as static_serve
 
 from rest_framework.schemas import get_schema_view
 from rest_framework_swagger.renderers import SwaggerUIRenderer, OpenAPIRenderer
@@ -16,25 +17,25 @@ urlpatterns = [
     url(r'^users/', include('users.urls.views_urls', namespace='users')),
     url(r'^assets/', include('assets.urls.views_urls', namespace='assets')),
     url(r'^perms/', include('perms.urls.views_urls', namespace='perms')),
-    url(r'^audits/', include('audits.urls.views_urls', namespace='audits')),
-    url(r'^applications/', include('applications.urls.views_urls', namespace='applications')),
+    url(r'^terminal/', include('terminal.urls.views_urls', namespace='terminal')),
     url(r'^ops/', include('ops.urls.view_urls', namespace='ops')),
 
     # Api url view map
     url(r'^api/users/', include('users.urls.api_urls', namespace='api-users')),
     url(r'^api/assets/', include('assets.urls.api_urls', namespace='api-assets')),
     url(r'^api/perms/', include('perms.urls.api_urls', namespace='api-perms')),
-    url(r'^api/audits/', include('audits.urls.api_urls', namespace='api-audits')),
-    url(r'^api/applications/', include('applications.urls.api_urls', namespace='api-applications')),
+    url(r'^api/terminal/', include('terminal.urls.api_urls', namespace='api-terminal')),
     url(r'^api/ops/', include('ops.urls.api_urls', namespace='api-ops')),
+
+    # External apps url
     url(r'^captcha/', include('captcha.urls')),
 
 ]
 
 
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += [
         url(r'^docs/', schema_view, name="docs"),
-    ]
+    ] + static(settings.STATIC_URL, document_root=settings.STATIC_DIR) \
+      + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -1,0 +1,15 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% trans 'Confirm delete' %}</title>
+</head>
+<body>
+<form action="" method="post">
+    {% csrf_token %}
+    <p>{% trans 'Are you sure delete' %} <b>{{ object.name }} </b> ?</p>
+    <input type="submit" value="Confirm" />
+</form>
+</body>
+</html>

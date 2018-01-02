@@ -6,9 +6,9 @@ import uuid
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
-from . import User
+from .user import User
 
-__all__ = ['AccessKey', 'PrivateToken']
+__all__ = ['AccessKey', 'PrivateToken', 'LoginLog']
 
 
 class AccessKey(models.Model):
@@ -16,8 +16,7 @@ class AccessKey(models.Model):
                           default=uuid.uuid4, editable=False)
     secret = models.UUIDField(verbose_name='AccessKeySecret',
                               default=uuid.uuid4, editable=False)
-    user = models.ForeignKey(User, verbose_name='User',
-                             related_name='access_key')
+    user = models.ForeignKey(User, verbose_name='User', on_delete=models.CASCADE, related_name='access_key')
 
     def get_id(self):
         return str(self.id)
@@ -25,10 +24,8 @@ class AccessKey(models.Model):
     def get_secret(self):
         return str(self.secret)
 
-    def __unicode__(self):
+    def __str__(self):
         return str(self.id)
-
-    __str__ = __unicode__
 
 
 class PrivateToken(Token):
@@ -36,3 +33,20 @@ class PrivateToken(Token):
 
     class Meta:
         verbose_name = _('Private Token')
+
+
+class LoginLog(models.Model):
+    LOGIN_TYPE_CHOICE = (
+        ('W', 'Web'),
+        ('T', 'Terminal'),
+    )
+    id = models.UUIDField(default=uuid.uuid4, primary_key=True)
+    username = models.CharField(max_length=20, verbose_name=_('Username'))
+    type = models.CharField(choices=LOGIN_TYPE_CHOICE, max_length=2, verbose_name=_('Login type'))
+    ip = models.GenericIPAddressField(verbose_name=_('Login ip'))
+    city = models.CharField(max_length=254, blank=True, null=True, verbose_name=_('Login city'))
+    user_agent = models.CharField(max_length=254, blank=True, null=True, verbose_name=_('User agent'))
+    datetime = models.DateTimeField(auto_now_add=True, verbose_name=_('Date login'))
+
+    class Meta:
+        ordering = ['-datetime', 'username']

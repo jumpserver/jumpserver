@@ -13,17 +13,17 @@
                 <div class="ibox float-e-margins">
                     <div class="panel-options">
                         <ul class="nav nav-tabs">
-                            <li class="active"><a href="" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Detail' %} </a></li>
+                            <li class="active"><a href="" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Group assets' %} </a></li>
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-default" href="{% url 'assets:asset-group-update' pk=asset_group.id %}"><i class="fa fa-edit"></i>Update</a>
                             </li>
                         </ul>
                     </div>
                     <div class="tab-content">
-                        <div class="col-sm-7" style="padding-left: 0">
+                        <div class="col-sm-8" style="padding-left: 0">
                             <div class="ibox float-e-margins">
                                 <div class="ibox-title">
-                                    <span style="float: left"></span>{% trans 'Asset list of ' %} <b>{{ asset_group.name }}</b></span>
+                                    <span style="float: left">{% trans 'Asset list of ' %} <b>{{ asset_group.name }} </b><span class="badge"> {{ asset_group.assets.all.count }}</span></span>
                                     <div class="ibox-tools">
                                         <a class="collapse-link">
                                             <i class="fa fa-chevron-up"></i>
@@ -45,9 +45,9 @@
                                                 <th>{% trans 'Hostname' %}</th>
                                                 <th>{% trans 'IP' %}</th>
                                                 <th>{% trans 'Port' %}</th>
-	                                              <th>{% trans 'Type' %}</th>
+	                                            <th>{% trans 'Type' %}</th>
                                                 <th>{% trans 'Alive' %}</th>
-	                                              <th>{% trans 'Action' %}</th>
+	                                            <th>{% trans 'Action' %}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -56,11 +56,10 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="col-sm-5" style="padding-left: 0;padding-right: 0">
+                        <div class="col-sm-4" style="padding-left: 0;padding-right: 0">
                             <div class="panel panel-primary">
                                 <div class="panel-heading">
-                                    <i class="fa fa-info-circle"></i> {% trans 'Push system users' %}
+                                    <i class="fa fa-info-circle"></i> {% trans 'Add assets to this group' %}
                                 </div>
                                 <div class="panel-body">
                                     <table class="table">
@@ -68,16 +67,16 @@
                                         <form>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <select data-placeholder="{% trans 'Select system users' %}" class="select2 system-user-select" style="width: 100%" multiple="" tabindex="4">
-                                                        {% for system_user in system_users %}
-                                                            <option value="{{ system_user.id }}"> {{ system_user.name }} </option>
+                                                    <select data-placeholder="{% trans 'Select assets' %}" class="select2 asset-select" style="width: 100%" multiple="" tabindex="4">
+                                                        {% for asset in assets_remain %}
+                                                            <option value="{{ asset.id }}"> {{ asset.hostname }} </option>
                                                         {% endfor %}
                                                     </select>
                                                 </td>
                                             </tr>
                                             <tr class="no-borders-tr">
                                                 <td colspan="2">
-                                                    <button type="button" class="btn btn-primary btn-sm btn-push-system-user">{% trans 'Push' %}</button>
+                                                    <button type="button" class="btn btn-primary btn-sm btn-add-asset">{% trans 'Add' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
@@ -91,43 +90,38 @@
             </div>
         </div>
     </div>
-{#    </div>#}
-
 {% endblock %}
 {% block custom_foot_js %}
 <script>
-  jumpserver.assets_selected = {};
-  function updateGroupAssets(assets) {
-    var the_url = "{}";
+jumpserver.assets_selected = {};
+function addAssets(assets) {
+    var the_url = "{% url 'api-assets:group-add-assets' pk=asset_group.id %}";
     var body = {
-      assets: Object.assign([], assets)
+        assets: assets
     };
+
     var $data_table = $("#asset_list_table").DataTable();
     var success = function(data) {
-      $('.select2-selection__rendered').empty();
-      $.map(jumpserver.assets_selected, function(asset_ip, index) {
-        $('#opt_' + index).remove();
+        $('.select2-selection__rendered').empty();
         $data_table.ajax.reload();
-      });
-      jumpserver.groups_selected = {};
+        jumpserver.groups_selected = {};
     };
+
     APIUpdateAttr({
-      url: the_url,
-      body: JSON.stringify(body),
-      method: 'PUT',
-      success: success
+        url: the_url,
+        body: JSON.stringify(body),
+        method: 'PUT',
+        success: success
     });
-  }
+}
 
 function leaveGroup(obj, name, url, data) {
-    function doDelete() {
         var body = data;
         var success = function() {
-            swal('Deleted!', "[ "+name+"]"+" has been deleted ", "success");
             $(obj).parent().parent().remove();
         };
         var fail = function() {
-            swal("Failed", "Delete"+"[ "+name+" ]"+"failed", "error");
+            console.log("Remove failed")
         };
         APIUpdateAttr({
             url: url,
@@ -136,38 +130,6 @@ function leaveGroup(obj, name, url, data) {
             success: success,
             error: fail
         });
-    }
-    swal({
-        title: 'Are you sure delete ?',
-        text: " [" + name + "] ",
-        type: "warning",
-        showCancelButton: true,
-        cancelButtonText: 'Cancel',
-        confirmButtonColor: "#DD6B55",
-        confirmButtonText: 'Confirm',
-        closeOnConfirm: false
-    }, function () {
-        doDelete()
-    });
-}
-
-function pushSystemUser(sysUserID) {
-	var the_url = "{% url 'api-assets:asset-group-push-system-user' pk=asset_group.id %}";
-    var body = {
-        system_user: sysUserID
-    };
-    var success = function(data) {
-        var url = "{% url 'ops:task-detail' pk=234234234 %}".replace("234234234", data);
-        setTimeout(function () {
-          location.href = url
-        }, 1000);
-    };
-    APIUpdateAttr({
-        url: the_url,
-        method: 'PATCH',
-        body: JSON.stringify(body),
-        success: success
-    });
 }
 
 Array.prototype.remove = function(val) {
@@ -189,28 +151,15 @@ Array.prototype.unique = function(){
  	return res;
 };
 
-$(document).ready(function () {
-	$('.select2').select2();
-
-  $('.select2.asset-select').select2()
-    .on('select2:select', function(evt) {
-      var data = evt.params.data;
-      jumpserver.assets_selected[data.id] = data.text;
-      console.log(jumpserver.assets_selected)
-    })
-    .on('select2:unselect', function(evt) {
-      var data = evt.params.data;
-      delete jumpserver.assets_selected[data.id]
-    });
-
-	var options = {
+function initTable() {
+    var options = {
 		ele: $('#asset_list_table'),
 		buttons: [],
 		order: [],
 		columnDefs: [
 			{targets: 0, createdCell: function (td, cellData, rowData) {
-				var detail_btn = '<a href="{% url "assets:asset-detail" pk=99991937 %}" data-aid="'+rowData.id+'">' + cellData + '</a>';
-				$(td).html(detail_btn.replace('99991937', rowData.id));
+				var detail_btn = '<a href="{% url "assets:asset-detail" pk=DEFAULT_PK %}" data-aid="'+rowData.id+'">' + cellData + '</a>';
+				$(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
 			}},
 			{targets: 4, createdCell: function (td, cellData) {
 				if (!cellData) {
@@ -220,47 +169,61 @@ $(document).ready(function () {
 				}
 			}},
 			{targets: 5, createdCell: function (td, cellData, rowData) {
-				var update_btn = '<a href="{% url "assets:asset-update" pk=99991937 %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('99991937', rowData.id);
-				var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn_asset_delete" data-aid="99991937">{% trans "Remove" %}</a>'.replace('99991937', rowData.id);
+				var update_btn = '<a href="{% url "assets:asset-update" pk=DEFAULT_PK %}" class="btn btn-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', rowData.id);
+				var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-leave-group" data-aid="{{ DEFAULT_PK }}">{% trans "Remove" %}</a>'.replace('{{ DEFAULT_PK }}', rowData.id);
 				$(td).html(update_btn + del_btn)
 			}}
 		],
 		ajax_url: '{% url "api-assets:asset-list" %}?asset_group_id={{ asset_group.id }}',
 		columns: [{data: "hostname" }, {data: "ip" }, {data: "port" },
-			{data: "type" }, {data: "is_active" }, {data: "id"}],
+			{data: "get_type_display" }, {data: "is_connective" }, {data: "id"}],
 		op_html: $('#actions').html()
 	};
 	jumpserver.initDataTable(options);
+
+}
+
+$(document).ready(function () {
+  $('.select2').select2();
+
+  $('.select2.asset-select').select2()
+      .on('select2:select', function(evt) {
+          var data = evt.params.data;
+          jumpserver.assets_selected[data.id] = data.text;
+      })
+      .on('select2:unselect', function(evt) {
+          var data = evt.params.data;
+          delete jumpserver.assets_selected[data.id]
+      });
+
+  initTable();
+
 })
 
-.on('click', ".btn-asset-group-add-asset", function () {
+.on('click', ".btn-add-asset", function () {
   if (Object.keys(jumpserver.assets_selected).length === 0) {
     return false;
   }
+  var assets_id = [];
+  $.map(jumpserver.assets_selected, function(value, index) {
+      assets_id.push(index);
+  });
 
-  updateGroupAssets(jumpserver.assets_selected);
-
+  addAssets(assets_id);
 })
 
-.on('click', '.btn-push-system-user', function () {
-    var data = $('.system-user-select').select2();
-    var system_id = data.val()[0];
-    if (!system_id) {
-        return false
-    }
-    pushSystemUser(system_id)
-})
 
-.on('click', '.btn_asset_delete', function () {
+.on('click', '.btn-leave-group', function () {
 	var $this = $(this);
-	var the_url = "{% url 'api-assets:asset-groups-update' pk=asset_group.id %}";
+	var the_url = "{% url 'api-assets:group-update-assets' pk=asset_group.id %}";
 	var name = $(this).closest("tr").find(":nth-child(1) > a").html();
 	var assets = [];
 	$('#asset_list_table > tbody > tr').map(function () {
-		assets.push(parseInt($(this).closest("tr").find(":nth-child(1) > a").attr("data-aid")))
+		assets.push($(this).closest("tr").find(":nth-child(1) > a").attr("data-aid"))
 	});
 	var delete_asset_id = $(this).data('aid');
 	assets.remove(delete_asset_id);
+	console.log(assets);
 	var data = {"assets": assets};
 	leaveGroup($this, name, the_url, data);
 })
