@@ -18,11 +18,30 @@
                      <span class="m-r-sm text-muted welcome-message">{% trans 'Help' %}</span>
                 </a>
             </li>
-            <li>
+            <li class="dropdown">
                 {% if user.is_authenticated %}
-                <a href="{% url 'users:logout' %}">
-                    <i class="fa fa-sign-out"></i>{% trans 'Logout' %}
+                <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                    <span class="m-r-sm text-muted welcome-message">
+                        <img alt="image" class="img-circle" width="40" height="40" src="{{ request.user.avatar_url }}"/>
+                        <strong class="font-bold"> {{ request.user.name }}
+                            <span style="color: #8095a8"></span>
+                            <b class="caret"></b>
+                        </strong>
+                    </span>
                 </a>
+                <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                    <li><a href="{% url 'users:user-profile' %}">{% trans 'Profile' %}</a></li>
+                    <li><a href="{% url 'users:user-profile-update' %}">{% trans 'Profile settings' %}</a></li>
+                    <li class="divider"></li>
+                    {% if request.user.is_superuser %}
+                    {% if request.COOKIES.IN_ADMIN_PAGE == 'No' %}
+                    <li><a id="switch_admin">{% trans 'Admin page' %}</a></li>
+                    {% else %}
+                    <li><a id="switch_user">{% trans 'User page' %}</a></li>
+                    {% endif %}
+                    {% endif %}
+                    <li><a href="{% url 'users:logout' %}">{% trans 'Logout' %}</a></li>
+                </ul>
                 {% else %}
                 <a href="{% url 'users:login' %}">
                     <i class="fa fa-sign-in"></i>{% trans 'Login' %}
