@@ -24,18 +24,39 @@ Jumpserver是一款使用Python, Django开发的开源跳板机系统, 助力互
    * Python 3.6  
    * Django 1.11
 
-### Install 安装 
-Using docker compose to setup it
+### Install 安装
 
-使用docker compose 安装，一键完成，docker compose 安装见 docker官方
+    1. 安装 Python3
+       略
 
-   $ docker-compose up
+    2. 安装依赖
+
+    ```
+    $ cd requirements && yum -y install $(cat rpm_requirements.txt) && pip install -r requirements.txt
+    ```
+
+    3. 修改表结构
+
+    ```
+    $ cd apps && python manage.py makemigrations && python manage.py migrate
+    ```
+
+    4. 运行
+
+    ```
+    $ python run_server.py
+    ```
+
+    5. 其它
+
+    整合luna,coco需要nginx来配合, 详见详细安装文档
+
 
 ### Usage 使用
    1. Visit http://$HOST:8080 (访问 http://你的主机IP:8080 来访问 Jumpserver)
  
    2. Click left navigation visit Applications-Terminal and accept coco and luna register
-      (点击左侧 应用程序接受 Coco和Luna的注册)
+      (点击左侧 应用程序接受 Coco注册)
    
    3. Click Assets-Admin user, Create admin user
       (添加 管理用户)
@@ -53,11 +74,7 @@ Using docker compose to setup it
       
       ssh -p2222 $USER@$Host
  
-   8. Visit web terminal server Luna, click server test connection
-      (访问 访问Luna，点击左侧服务器连接测试)
-      
-      http://$HOST:5000
-   
+
    
 ### Snapshot 截图
 
@@ -69,8 +86,6 @@ Using docker compose to setup it
 demo使用了开发者模式，并发只能为1 
 
 - Jumpserver: [访问](http://demo.jumpserver.org:8080)  账号: admin 密码: admin
-
-- Luna: [访问](http://demo.jumpserver.org:5000) 同Jumpserver认证
 
 - Coco: ssh -p 2222 admin@demo.jumpserver.org 密码: admin
 
