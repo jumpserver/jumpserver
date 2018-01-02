@@ -319,3 +319,7 @@ div.dataTables_wrapper div.dataTables_filter {
 .logo-element {
     padding: 10px 0;
 }
+
+.welcome-message img {
+    margin: -12px 0;
+}
