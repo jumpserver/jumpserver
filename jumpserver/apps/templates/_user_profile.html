@@ -1,0 +1,30 @@
+{% load static %}
+{% load i18n %}
+<li class="nav-header">
+    <div class="dropdown profile-element">
+        <div>
+            <img alt="image" height="40" src="/static/img/logo.png"/>
+        </div>
+        <div>
+            <span>Jumpserver</span>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+</li>
+<script>
+$(document).ready(function () {
+})
+.on('click', '#switch_admin', function () {
+    setTimeout(function () {
+        setCookie("IN_ADMIN_PAGE", "Yes");
+        window.location = "/"
+    }, 100)
+})
+.on('click', '#switch_user', function () {
+    setTimeout(function () {
+        console.log("Set to No");
+        setCookie("IN_ADMIN_PAGE", "No");
+        window.location = "/"
+    }, 100);
+})
+</script>
