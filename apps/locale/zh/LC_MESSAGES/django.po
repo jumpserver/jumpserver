@@ -477,22 +477,27 @@ msgid "Update assets hardware info period"
 msgstr "定期更新资产硬件信息"
 
 #: assets/tasks.py:189
+#, python-format
 msgid "Test admin user connectability period: {}"
-msgstr "定期测试管理用户可以连接性"
+msgstr "定期测试管理用户可以连接性: {}"
 
 #: assets/tasks.py:203
+#, python-format
 msgid "Test admin user connectability: {}"
 msgstr "测试管理用户可连接性: {}"
 
 #: assets/tasks.py:289
+#, python-format
 msgid "Test system user connectability period: {}"
 msgstr "测试系统用户可连接性: {}"
 
 #: assets/tasks.py:363
+#, python-format
 msgid "Push system user to cluster assets: {}"
 msgstr "推送系统用户到资产: {}"
 
 #: assets/tasks.py:384
+#, python-format
 msgid "Push system user to cluster assets period: {}->{}"
 msgstr "定期推送系统用户到资产: {}->{}"
 
@@ -1490,7 +1495,7 @@ msgstr "选择系统用户"
 
 #: perms/forms.py:52
 msgid "User or group at least one required"
-msgstr ""
+msgstr "用户和组至少需要选一个"
 
 #: perms/forms.py:60
 msgid "Asset or group at least one required"

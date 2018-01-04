@@ -209,7 +209,7 @@ def test_asset_connectability_util(asset, task_name=None):
     from ops.utils import update_or_create_ansible_task
 
     if task_name is None:
-        task_name = "Test asset connectability"
+        task_name = _("Test asset connectability")
     hosts = [asset.hostname]
     tasks = const.TEST_ADMIN_USER_CONN_TASKS
     task, created = update_or_create_ansible_task(
