@@ -191,7 +191,7 @@ class AssetDetailView(DetailView):
 class AssetExportView(View):
     def get(self, request):
         spm = request.GET.get('spm', '')
-        assets_id_default = [Asset.objects.first().id] if Asset.objects.first() else [1]
+        assets_id_default = [Asset.objects.first().id] if Asset.objects.first() else []
         assets_id = cache.get(spm, assets_id_default)
         fields = [
             field for field in Asset._meta.fields
