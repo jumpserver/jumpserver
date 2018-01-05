@@ -308,7 +308,7 @@ div.dataTables_wrapper div.dataTables_filter {
     text-align: center;
 }
 
-.profile-element div:last-child {
+.profile-element div:last-child a {
     line-height: 60px;
     width: 150px;
     float: left;
