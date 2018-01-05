@@ -69,9 +69,11 @@ function initTable() {
 					$(td).html('<i class="fa fa-check text-navy"></i>')
 				}
             }},
-            {targets: 8, createdCell: function (td, cellData) {
+            {targets: 8, createdCell: function (td, cellData, rowData) {
                 var update_btn = '<a href="{% url "perms:asset-permission-update" pk=DEFAULT_PK %}" class="btn btn-xs m-l-xs btn-info">{% trans "Update" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
-                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del-permission" data-uid="{{ DEFAULT_PK }}">{% trans "Delete" %}</a>'.replace('{{ DEFAULT_PK }}', cellData);
+                var del_btn = '<a class="btn btn-xs btn-danger m-l-xs btn-del" data-uid="{{ DEFAULT_PK }}" data-name="99991938">{% trans "Delete" %}</a>'
+                    .replace('{{ DEFAULT_PK }}', cellData)
+                    .replace('99991938', rowData.name);
 				$(td).html(update_btn + del_btn);
             }}
 

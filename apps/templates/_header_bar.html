@@ -19,7 +19,7 @@
                 </a>
             </li>
             <li class="dropdown">
-                {% if user.is_authenticated %}
+                {% if request.user.is_authenticated %}
                 <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                     <span class="m-r-sm text-muted welcome-message">
                         <img alt="image" class="img-circle" width="40" height="40" src="{{ request.user.avatar_url }}"/>
@@ -34,11 +34,11 @@
                     <li><a href="{% url 'users:user-profile-update' %}">{% trans 'Profile settings' %}</a></li>
                     <li class="divider"></li>
                     {% if request.user.is_superuser %}
-                    {% if request.COOKIES.IN_ADMIN_PAGE == 'No' %}
-                    <li><a id="switch_admin">{% trans 'Admin page' %}</a></li>
-                    {% else %}
-                    <li><a id="switch_user">{% trans 'User page' %}</a></li>
-                    {% endif %}
+                        {% if request.COOKIES.IN_ADMIN_PAGE == 'No' %}
+                        <li><a id="switch_admin">{% trans 'Admin page' %}</a></li>
+                        {% else %}
+                        <li><a id="switch_user">{% trans 'User page' %}</a></li>
+                        {% endif %}
                     {% endif %}
                     <li><a href="{% url 'users:logout' %}">{% trans 'Logout' %}</a></li>
                 </ul>

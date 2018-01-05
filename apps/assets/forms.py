@@ -172,9 +172,10 @@ class AdminUserForm(forms.ModelForm):
         widget=forms.PasswordInput, max_length=128,
         strip=True, required=False,
         help_text=_('Password or private key password'),
+        label=_("Password"),
     )
     # Need use upload private key file except paste private key content
-    private_key_file = forms.FileField(required=False)
+    private_key_file = forms.FileField(required=False, label=_("Private key"))
 
     def save(self, commit=True):
         # Because we define custom field, so we need rewrite :method: `save`
@@ -204,12 +205,14 @@ class AdminUserForm(forms.ModelForm):
         return private_key_file
 
     def clean(self):
+        super().clean()
         password = self.cleaned_data['password']
         private_key_file = self.cleaned_data.get('private_key_file', '')
 
-        if not self.instance and not (password or private_key_file):
-            raise forms.ValidationError(
-                _('Password and private key file must be input one'))
+        if not password and not private_key_file:
+            raise forms.ValidationError(_(
+                'Password and private key file must be input one'
+            ))
 
     class Meta:
         model = AdminUser
@@ -284,9 +287,9 @@ class SystemUserForm(forms.ModelForm):
         help_texts = {
             'name': '* required',
             'username': '* required',
-            'cluster': 'If auto push checked, system user will be create at cluster assets',
-            'auto_push': 'Auto push system user to asset',
-            'priority': 'High level will be using login asset as default, if user was granted more than 2 system user',
+            'cluster': _('If auto push checked, system user will be create at cluster assets'),
+            'auto_push': _('Auto push system user to asset'),
+            'priority': _('High level will be using login asset as default, if user was granted more than 2 system user'),
         }
 
 
