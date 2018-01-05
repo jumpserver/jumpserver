@@ -110,7 +110,6 @@ class StatusViewSet(viewsets.ModelViewSet):
 
     def handle_sessions(self):
         sessions_active = []
-
         for session_data in self.request.data.get("sessions", []):
             self.create_or_update_session(session_data)
             if not session_data["is_finished"]:

@@ -93,6 +93,7 @@ class Session(models.Model):
     asset = models.CharField(max_length=1024, verbose_name=_("Asset"))
     system_user = models.CharField(max_length=128, verbose_name=_("System user"))
     login_from = models.CharField(max_length=2, choices=LOGIN_FROM_CHOICES, default="ST")
+    remote_addr = models.CharField(max_length=15, verbose_name=_("Remote addr"), blank=True, null=True)
     is_finished = models.BooleanField(default=False)
     has_replay = models.BooleanField(default=False, verbose_name=_("Replay"))
     has_command = models.BooleanField(default=False, verbose_name=_("Command"))
