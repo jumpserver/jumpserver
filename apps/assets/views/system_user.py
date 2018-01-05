@@ -109,8 +109,8 @@ class SystemUserAssetView(AdminUserRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'assets',
-            'action': 'System user asset',
+            'app': _('assets'),
+            'action': _('System user asset'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

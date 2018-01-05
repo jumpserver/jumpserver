@@ -60,7 +60,7 @@
                                                 <th>{% trans 'IP' %}</th>
                                                 <th>{% trans 'Port' %}</th>
                                                 <th>{% trans 'Type' %}</th>
-                                                <th>{% trans 'Alive' %}</th>
+                                                <th>{% trans 'Reachable' %}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -144,7 +144,7 @@ $(document).ready(function () {
         url: the_url,
         error: error,
         method: 'GET',
-        success_message: "{% trans "Task has been send, seen left asset status" %}"
+        success_message: "{% trans 'Task has been send, seen left asset status' %}"
     });
 })
 </script>

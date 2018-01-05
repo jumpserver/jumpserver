@@ -64,6 +64,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
     """
     assets_amount = serializers.SerializerMethodField()
     unreachable_amount = serializers.SerializerMethodField()
+    reachable_amount = serializers.SerializerMethodField()
 
     class Meta:
         model = AdminUser
@@ -75,7 +76,15 @@ class AdminUserSerializer(serializers.ModelSerializer):
         if data:
             return len(data.get('dark'))
         else:
-            return 'Unknown'
+            return 0
+
+    @staticmethod
+    def get_reachable_amount(obj):
+        data = cache.get(ADMIN_USER_CONN_CACHE_KEY.format(obj.name))
+        if data:
+            return len(data.get('contacted'))
+        else:
+            return 0
 
     @staticmethod
     def get_assets_amount(obj):

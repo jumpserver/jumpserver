@@ -28,9 +28,9 @@ urlpatterns = [
         api.GroupAddAssetsApi.as_view(), name='group-add-assets'),
     # update the Cluster, and add or delete the assets to the Cluster
     url(r'^v1/cluster/(?P<pk>[0-9a-zA-Z\-]{36})/assets/$',
-        api.ClusterUpdateAssetsApi.as_view(), name='cluster-update-assets'),
-    url(r'^v1/cluster/(?P<pk>[0-9a-zA-Z\-]{36})/assets/$',
         api.ClusterAddAssetsApi.as_view(), name='cluster-add-assets'),
+    url(r'^v1/cluster/(?P<pk>[0-9a-zA-Z\-]{36})/assets/connective/$',
+        api.ClusterTestAssetsAliveApi.as_view(), name='cluster-test-connective'),
     url(r'^v1/admin-user/(?P<pk>[0-9a-zA-Z\-]{36})/clusters/$',
         api.AdminUserAddClustersApi.as_view(), name='admin-user-add-clusters'),
     url(r'^v1/admin-user/(?P<pk>[0-9a-zA-Z\-]{36})/connective/$',

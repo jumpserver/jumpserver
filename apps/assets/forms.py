@@ -150,10 +150,19 @@ class AssetGroupForm(forms.ModelForm):
 
 
 class ClusterForm(forms.ModelForm):
+    system_users = forms.ModelMultipleChoiceField(
+        queryset=SystemUser.objects.all(),
+        widget=forms.SelectMultiple(
+            attrs={'class': 'select2', 'data-placeholder': _('Select system users')}
+        ),
+        label=_('System users'),
+        required=False,
+        help_text=_("Selected system users will be create at cluster assets"),
+    )
 
     class Meta:
         model = Cluster
-        fields = ['name', "bandwidth", "operator", 'contact', 'admin_user',
+        fields = ['name', "bandwidth", "operator", 'contact', 'admin_user', 'system_users',
                   'phone', 'address', 'intranet', 'extranet', 'comment']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
@@ -162,8 +171,20 @@ class ClusterForm(forms.ModelForm):
         }
         help_texts = {
             'name': '* required',
-            'admin_user': 'The assets of this cluster will use this admin user as his admin user',
+            'admin_user': _("Cluster level admin user"),
         }
+
+    def __init__(self, *args, **kwargs):
+        if kwargs.get('instance', None):
+            initial = kwargs.get('initial', {})
+            initial['system_users'] = kwargs['instance'].systemuser_set.all()
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        instance = super().save(commit=commit)
+        system_users = self.cleaned_data['system_users']
+        instance.systemuser_set.set(system_users)
+        return instance
 
 
 class AdminUserForm(forms.ModelForm):

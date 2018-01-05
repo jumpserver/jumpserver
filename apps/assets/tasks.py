@@ -211,6 +211,9 @@ def test_asset_connectability_util(asset, task_name=None):
     if task_name is None:
         task_name = _("Test asset connectability")
     hosts = [asset.hostname]
+    if not hosts:
+        logger.info("No hosts, passed")
+        return {}
     tasks = const.TEST_ADMIN_USER_CONN_TASKS
     task, created = update_or_create_ansible_task(
         task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
@@ -262,6 +265,9 @@ def test_system_user_connectability_util(system_user, task_name):
     assets = system_user.get_clusters_assets()
     hosts = [asset.hostname for asset in assets]
     tasks = const.TEST_SYSTEM_USER_CONN_TASKS
+    if not hosts:
+        logger.info("No hosts, passed")
+        return {}
     task, created = update_or_create_ansible_task(
         task_name, hosts=hosts, tasks=tasks, pattern='all',
         options=const.TASK_OPTIONS,
@@ -274,7 +280,7 @@ def test_system_user_connectability_util(system_user, task_name):
 
 @shared_task
 def test_system_user_connectability_manual(system_user):
-    task_name = "Test system user connectability: {}".format(system_user)
+    task_name = _("Test system user connectability: {}").format(system_user)
     return test_system_user_connectability_util(system_user, task_name)
 
 
@@ -346,11 +352,14 @@ def push_system_user_util(system_users, assets, task_name):
     for system_user in system_users:
         tasks.extend(get_push_system_user_tasks(system_user))
 
-    print("Task: ", tasks)
     if not tasks:
-        return
+        logger.info("Not tasks, passed")
+        return {}
 
     hosts = [asset.hostname for asset in assets]
+    if not hosts:
+        logger.info("Not hosts, passed")
+        return {}
     task, created = update_or_create_ansible_task(
         task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
         options=const.TASK_OPTIONS, run_as_admin=True, created_by='System'

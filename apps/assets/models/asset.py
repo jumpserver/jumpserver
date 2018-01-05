@@ -158,6 +158,7 @@ class Asset(models.Model):
 
     class Meta:
         unique_together = ('ip', 'port')
+        verbose_name = _("Asset")
 
     @classmethod
     def generate_fake(cls, count=100):

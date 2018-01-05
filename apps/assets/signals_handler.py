@@ -77,7 +77,7 @@ def on_system_user_created_or_updated(sender, instance=None, **kwargs):
 @receiver(post_init, sender=Cluster, dispatch_uid="my_unique_identifier")
 def on_cluster_init(sender, instance, **kwargs):
     instance.__original_assets = tuple(instance.assets.values_list('pk', flat=True))
-    # instance.__origin_system_users = tuple(instance.systemuser_set.all())
+    instance.__origin_system_users = tuple(instance.systemuser_set.values_list('pk', flat=True))
 
 
 @receiver(post_save, sender=Cluster, dispatch_uid="my_unique_identifier")
@@ -103,11 +103,11 @@ def on_cluster_assets_changed(sender, instance, **kwargs):
         push_system_user_util.delay(system_users, assets, task_name)
 
 
-@receiver(post_save, sender=Cluster, dispatch_uid="my_unique_identifier")
+@receiver(post_save, sender=Cluster, dispatch_uid="my_unique_identifier2")
 def on_cluster_system_user_changed(sender, instance, **kwargs):
     system_users_origin = instance.__origin_system_users
     system_user_new = instance.systemuser_set.values_list('pk', flat=True)
-    system_users_added = set(system_user_new) - system_users_origin
+    system_users_added = set(system_user_new) - set(system_users_origin)
     if system_users_added:
         logger.debug("Receive cluster change system users signal")
         system_users = []

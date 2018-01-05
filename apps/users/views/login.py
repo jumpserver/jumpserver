@@ -82,6 +82,7 @@ class UserLogoutView(TemplateView):
         context = {
             'title': _('Logout success'),
             'messages': _('Logout success, return login page'),
+            'interval': 1,
             'redirect_url': reverse('users:login'),
             'auto_redirect': True,
         }
