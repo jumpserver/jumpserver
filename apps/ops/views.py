@@ -6,9 +6,10 @@ from django.views.generic import ListView, DetailView
 
 from common.mixins import DatetimeSearchMixin
 from .models import Task, AdHoc, AdHocRunHistory
+from .hands import AdminUserRequiredMixin
 
 
-class TaskListView(DatetimeSearchMixin, ListView):
+class TaskListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
     paginate_by = settings.CONFIG.DISPLAY_PER_PAGE
     model = Task
     ordering = ('-date_created',)
@@ -42,7 +43,7 @@ class TaskListView(DatetimeSearchMixin, ListView):
         return super().get_context_data(**kwargs)
 
 
-class TaskDetailView(DetailView):
+class TaskDetailView(AdminUserRequiredMixin, DetailView):
     model = Task
     template_name = 'ops/task_detail.html'
 
@@ -55,7 +56,7 @@ class TaskDetailView(DetailView):
         return super().get_context_data(**kwargs)
 
 
-class TaskAdhocView(DetailView):
+class TaskAdhocView(AdminUserRequiredMixin, DetailView):
     model = Task
     template_name = 'ops/task_adhoc.html'
 
@@ -68,7 +69,7 @@ class TaskAdhocView(DetailView):
         return super().get_context_data(**kwargs)
 
 
-class TaskHistoryView(DetailView):
+class TaskHistoryView(AdminUserRequiredMixin, DetailView):
     model = Task
     template_name = 'ops/task_history.html'
 
@@ -81,7 +82,7 @@ class TaskHistoryView(DetailView):
         return super().get_context_data(**kwargs)
 
 
-class AdHocDetailView(DetailView):
+class AdHocDetailView(AdminUserRequiredMixin, DetailView):
     model = AdHoc
     template_name = 'ops/adhoc_detail.html'
 
@@ -94,7 +95,7 @@ class AdHocDetailView(DetailView):
         return super().get_context_data(**kwargs)
 
 
-class AdHocHistoryView(DetailView):
+class AdHocHistoryView(AdminUserRequiredMixin, DetailView):
     model = AdHoc
     template_name = 'ops/adhoc_history.html'
 
@@ -107,7 +108,7 @@ class AdHocHistoryView(DetailView):
         return super().get_context_data(**kwargs)
 
 
-class AdHocHistoryDetailView(DetailView):
+class AdHocHistoryDetailView(AdminUserRequiredMixin, DetailView):
     model = AdHocRunHistory
     template_name = 'ops/adhoc_history_detail.html'
 
