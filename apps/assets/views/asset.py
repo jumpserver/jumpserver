@@ -159,7 +159,7 @@ class AssetUpdateView(AdminUserRequiredMixin, UpdateView):
             'action': _('Update asset'),
         }
         kwargs.update(context)
-        return super(AssetUpdateView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 class AssetDeleteView(AdminUserRequiredMixin, DeleteView):
@@ -184,7 +184,7 @@ class AssetDetailView(DetailView):
             'system_users_all': SystemUser.objects.all(),
         }
         kwargs.update(context)
-        return super(AssetDetailView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 @method_decorator(csrf_exempt, name='dispatch')

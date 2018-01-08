@@ -390,8 +390,8 @@ def push_system_user_period():
         for system_user in system_users:
             tasks.extend(get_push_system_user_tasks(system_user))
 
-        task_name = _("Push system user to cluster assets period: {}->{}").format(
-            cluster.name, ', '.join(s.name for s in system_users)
+        task_name = _("Push cluster system users to assets period: {}").format(
+            cluster.name
         )
         hosts = [asset.hostname for asset in cluster.assets.all()]
         update_or_create_ansible_task(

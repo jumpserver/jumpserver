@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-from django.views.generic import ListView, UpdateView, DeleteView, DetailView, TemplateView
+from django.views.generic import ListView
 from django.views.generic.edit import SingleObjectMixin
 from django.utils.translation import ugettext as _
 from django.utils import timezone
@@ -51,9 +51,9 @@ class SessionListView(AdminUserRequiredMixin, DatetimeSearchMixin, ListView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'user_list': utils.get_user_list_from_cache(),
-            'asset_list': utils.get_asset_list_from_cache(),
-            'system_user_list': utils.get_system_user_list_from_cache(),
+            'user_list': utils.get_session_user_list(),
+            'asset_list': utils.get_session_asset_list(),
+            'system_user_list': utils.get_session_system_user_list(),
             'date_from': self.date_from,
             'date_to': self.date_to,
             'user': self.user,
