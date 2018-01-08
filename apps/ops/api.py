@@ -2,17 +2,30 @@
 
 
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
+from rest_framework import viewsets, generics
+from rest_framework.views import Response
 
 from .hands import IsSuperUser
 from .models import Task, AdHoc, AdHocRunHistory
 from .serializers import TaskSerializer, AdHocSerializer, AdHocRunHistorySerializer
+from .tasks import run_ansible_task
 
 
 class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = (IsSuperUser,)
+
+
+class TaskRun(generics.RetrieveAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskViewSet
+    permission_classes = (IsSuperUser,)
+
+    def retrieve(self, request, *args, **kwargs):
+        task = self.get_object()
+        run_ansible_task.delay(str(task.id))
+        return Response({"msg": "start"})
 
 
 class AdHocViewSet(viewsets.ModelViewSet):

@@ -27,11 +27,11 @@
                                 <i class="fa fa-bar-chart-o"></i> {% trans 'Assets and asset groups' %}</a>
                             </li>
                             <li class="pull-right">
-                                <a class="btn btn-outline btn-default" href="{% url 'perms:asset-permission-update' pk=asset_permission.id %}"><i class="fa fa-edit"></i>Update</a>
+                                <a class="btn btn-outline btn-default" href="{% url 'perms:asset-permission-update' pk=asset_permission.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
                             </li>
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-danger btn-delete-perm">
-                                    <i class="fa fa-edit"></i>Delete
+                                    <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
                                 </a>
                             </li>
                         </ul>

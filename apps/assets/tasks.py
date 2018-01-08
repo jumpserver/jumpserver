@@ -25,7 +25,7 @@ disk_pattern = re.compile(r'^hd|sd|xvd')
 @shared_task
 def set_assets_hardware_info(result, **kwargs):
     """
-    Unsing ops task run result, to update asset info
+    Using ops task run result, to update asset info
 
     @shared_task must be exit, because we using it as a task callback, is must
     be a celery task also
@@ -309,6 +309,10 @@ def test_system_user_connectability_period():
 ####  Push system user tasks ####
 
 def get_push_system_user_tasks(system_user):
+    # Set root as system user is dangerous
+    if system_user.username == "root":
+        return []
+
     tasks = [
         {
             'name': 'Add user {}'.format(system_user.username),
@@ -316,7 +320,7 @@ def get_push_system_user_tasks(system_user):
                 'module': 'user',
                 'args': 'name={} shell={} state=present password={}'.format(
                     system_user.username, system_user.shell,
-                    encrypt_password(system_user.password),
+                    encrypt_password(system_user.password, salt="K3mIlKK"),
                 ),
             }
         },

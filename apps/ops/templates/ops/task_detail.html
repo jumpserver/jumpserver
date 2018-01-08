@@ -89,7 +89,7 @@
                                             <td>
                                                 <b>
                                                 {% for task in object.latest_adhoc.tasks %}
-                                                {{ forloop.counter }}. {{ task.name }} : {{ task.action.module }} <br/>
+                                                {{ forloop.counter }}. {{ task.name }} ::: {{ task.action.module }} <br/>
                                                 {% endfor %}
                                                 </b>
                                             </td>

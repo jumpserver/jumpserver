@@ -81,7 +81,11 @@ class AssetUser(models.Model):
 
     @property
     def public_key(self):
-        return signer.unsign(self._public_key)
+        key = signer.unsign(self._public_key)
+        if key:
+            return key
+        else:
+            return None
 
     @property
     def public_key_obj(self):
