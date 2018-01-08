@@ -28,7 +28,6 @@ $(document).ready(function () {
 .on('click', '#switch_user', function () {
     var cookieName = "IN_ADMIN_PAGE";
     setTimeout(function () {
-        console.log("Set to No");
         delCookie(cookieName);
         setCookie(cookieName, "No");
         window.location = "/"

@@ -21,6 +21,8 @@ urlpatterns = [
         api.AssetRefreshHardwareApi.as_view(), name='asset-refresh'),
     url(r'^v1/assets/(?P<pk>[0-9a-zA-Z\-]{36})/alive/$',
         api.AssetAdminUserTestApi.as_view(), name='asset-alive-test'),
+    url(r'^v1/assets/user-assets/$',
+        api.UserAssetListView.as_view(), name='user-asset-list'),
     # update the asset group, which add or delete the asset to the group
     url(r'^v1/groups/(?P<pk>[0-9a-zA-Z\-]{36})/assets/$',
         api.GroupUpdateAssetsApi.as_view(), name='group-update-assets'),

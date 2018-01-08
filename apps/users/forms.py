@@ -184,12 +184,14 @@ class UserBulkUpdateForm(forms.ModelForm):
 class UserGroupForm(forms.ModelForm):
     users = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(),
+        label=_("User"),
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',
                 'data-placeholder': _('Select users')
             }
-        )
+        ),
+        required=False,
     )
 
     def __init__(self, **kwargs):

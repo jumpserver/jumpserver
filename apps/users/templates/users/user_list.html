@@ -223,7 +223,7 @@ $(document).ready(function(){
     var $this = $(this);
     var name = $this.data('name');
     var uid = $this.data('uid');
-    var the_url = '{% url "api-users:user-detail" pk="{{ DEFAULT_PK }}" %}'.replace("{{ DEFAULT_PK }}", uid);
+    var the_url = '{% url "api-users:user-detail" pk=DEFAULT_PK %}'.replace("{{ DEFAULT_PK }}", uid);
     objectDelete($this, name, the_url);
 })
 </script>

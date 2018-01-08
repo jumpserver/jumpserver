@@ -39,7 +39,9 @@ class UserGroupCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVie
     form_class = forms.UserGroupForm
     template_name = 'users/user_group_create_update.html'
     success_url = reverse_lazy('users:user-group-list')
-    success_message = '<a href={url}> {name} </a> was created successfully'
+    success_message = _(
+        'User group <a href={url}> {name} </a> was created successfully'
+    )
 
     def get_context_data(self, **kwargs):
         context = {

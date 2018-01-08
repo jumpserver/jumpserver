@@ -223,7 +223,6 @@ $(document).ready(function () {
 	});
 	var delete_asset_id = $(this).data('aid');
 	assets.remove(delete_asset_id);
-	console.log(assets);
 	var data = {"assets": assets};
 	leaveGroup($this, name, the_url, data);
 })

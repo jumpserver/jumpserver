@@ -113,7 +113,7 @@
                                     <table class="table">
                                         <tbody>
                                         <tr class="no-borders-tr">
-                                            <td width="50%">Active:</td>
+                                            <td width="50%">{% trans 'Active' %} :</td>
                                             <td><span style="float: right">
                                                 <div class="switch">
                                                     <div class="onoffswitch">
@@ -139,8 +139,8 @@
                                     <table class="table" id="system-user-table">
                                         <tbody>
                                         <form>
-                                            <tr>
-                                                <td colspan="2" class="no-borders">
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
                                                     <select data-placeholder="{% trans 'Select system users' %}" class="select2" style="width: 100%" multiple="" tabindex="4">
                                                         {% for system_user in system_users_remain %}
                                                         <option value="{{ system_user.id }}" id="opt_{{ system_user.id }}">{{ system_user.name }}</option>
@@ -148,15 +148,15 @@
                                                     </select>
                                                 </td>
                                             </tr>
-                                            <tr>
-                                                <td colspan="2" class="no-borders">
+                                            <tr class="no-borders-tr">
+                                                <td colspan="2">
                                                     <button type="button" class="btn btn-info btn-small" id="btn-add-system-user">{% trans 'Add' %}</button>
                                                 </td>
                                             </tr>
                                         </form>
 
                                         {% for system_user in system_users %}
-                                        <tr>
+                                        <tr {% if forloop.counter == 1 %} class="no-borders-tr" {% endif %} >
                                           <td ><b class="bdg-system-user" data-uid={{ system_user.id }}>{{ system_user.name }}</b></td>
                                           <td>
                                               <button class="btn btn-danger btn-xs btn-remove-user" data-uid="{{ system_user.id }}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>

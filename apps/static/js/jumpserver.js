@@ -61,7 +61,6 @@ function GetTableDataBox() {
             id_list.push(i);
          }
         }
-    console.log(id_list);
     for (i in id_list) {
         console.log(tabProduct);
         tableData.push(GetRowData(tabProduct.rows[id_list[i]]));
@@ -358,7 +357,6 @@ function setCookie(key, value) {
     var expires = new Date();
     expires.setTime(expires.getTime() + (24 * 60 * 60 * 1000));
     document.cookie = key + '=' + value + ';expires=' + expires.toUTCString() + ';path=/';
-    console.log("Cookie: " + document.cookie)
 }
 
 

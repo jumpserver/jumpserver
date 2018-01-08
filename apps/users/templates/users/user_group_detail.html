@@ -171,7 +171,6 @@ $(document).ready(function () {
     var users = $('.bdg_user').map(function() {
         return $(this).data('uid');
     }).get();
-    console.log(users);
     updateGroupMember(users)
 }).on('click', '#btn_add_user', function() {
     if (Object.keys(jumpserver.users_selected).length === 0) {

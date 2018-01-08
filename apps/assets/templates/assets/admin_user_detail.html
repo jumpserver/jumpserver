@@ -133,7 +133,6 @@ function bindToCluster(clusters) {
         $('.select2-selection__rendered').empty();
         $('#cluster_selected').val('');
         $.map(jumpserver.cluster_selected, function(cluster_name, index) {
-            console.log(index);
             $('#opt_' + index).remove();
             // change tr html of user groups.
             $('#table-clusters tbody').append(

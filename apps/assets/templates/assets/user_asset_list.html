@@ -42,7 +42,6 @@ function initTable() {
         columnDefs: [
             {targets: 1, createdCell: function (td, cellData, rowData) {
                 {% url 'assets:asset-detail' pk=DEFAULT_PK as the_url  %}
-                console.log('{{ the_url }}');
                 var detail_btn = '<a href="{{ the_url }}">' + cellData + '</a>';
                 $(td).html(detail_btn.replace('{{ DEFAULT_PK }}', rowData.id));
             }},
@@ -67,7 +66,7 @@ function initTable() {
                 $(td).html(conn_btn)
             }}
         ],
-        ajax_url: '{% url "api-assets:asset-list" %}',
+        ajax_url: '{% url "api-assets:user-asset-list" %}',
         columns: [
             {data: "id"}, {data: "hostname" }, {data: "ip" }, {data: "port" },
             {data: "get_type_display" }, {data: "get_env_display"}, {data: "hardware_info"},
