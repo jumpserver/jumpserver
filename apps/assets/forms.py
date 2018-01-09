@@ -258,9 +258,10 @@ class SystemUserForm(forms.ModelForm):
     # Admin user assets define, let user select, save it in form not in view
     auto_generate_key = forms.BooleanField(initial=True, required=False)
     # Form field name can not start with `_`, so redefine it,
-    password = forms.CharField(widget=forms.PasswordInput, required=False, max_length=128, strip=True)
+    password = forms.CharField(widget=forms.PasswordInput, required=False,
+                               max_length=128, strip=True, label=_("Password"))
     # Need use upload private key file except paste private key content
-    private_key_file = forms.FileField(required=False)
+    private_key_file = forms.FileField(required=False, label=_("Private key"))
 
     def save(self, commit=True):
         # Because we define custom field, so we need rewrite :method: `save`
@@ -307,8 +308,11 @@ class SystemUserForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
             'username': forms.TextInput(attrs={'placeholder': _('Username')}),
             'cluster': forms.SelectMultiple(
-                attrs={'class': 'select2',
-                       'data-placeholder': _(' Select clusters')}),
+                attrs={
+                    'class': 'select2',
+                    'data-placeholder': _(' Select clusters')
+                }
+            ),
         }
         help_texts = {
             'name': '* required',

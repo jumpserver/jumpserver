@@ -329,16 +329,9 @@ class UserProfileUpdateView(LoginRequiredMixin, UpdateView):
     model = User
     form_class = forms.UserProfileForm
     success_url = reverse_lazy('users:user-profile')
-    success_message = _('Create user <a href="{url}">{name}</a> successfully.')
 
     def get_object(self, queryset=None):
         return self.request.user
-
-    def get_success_message(self, cleaned_data):
-        url = reverse_lazy('users:user-detail', kwargs={'pk': self.object.pk})
-        return self.success_message.format(
-            url=url, name=self.object.name
-        )
 
     def get_context_data(self, **kwargs):
         context = {

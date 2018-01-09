@@ -1,8 +1,6 @@
 # ~*~ coding: utf-8 ~*~
 
-from django.shortcuts import reverse
 from django.utils.translation import ugettext as _
-from django.db import transaction
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.urls import reverse_lazy
