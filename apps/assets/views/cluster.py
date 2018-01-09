@@ -40,7 +40,7 @@ class ClusterCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView)
     def get_context_data(self, **kwargs):
         context = {
             'app': _('assets'),
-            'action': _('Create Cluster'),
+            'action': _('Create cluster'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

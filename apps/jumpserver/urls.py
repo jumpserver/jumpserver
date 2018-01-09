@@ -36,6 +36,6 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += [
         url(r'^docs/', schema_view, name="docs"),
-    ] + static(settings.STATIC_URL, document_root=settings.STATIC_DIR) \
+    ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) \
       + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

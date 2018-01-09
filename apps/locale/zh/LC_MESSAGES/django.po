@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Jumpserver 0.3.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-09 23:01+0800\n"
+"POT-Creation-Date: 2018-01-10 00:30+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: ibuler <ibuler@qq.com>\n"
 "Language-Team: Jumpserver team<ibuler@qq.com>\n"
@@ -48,7 +48,7 @@ msgstr "默认使用管理用户"
 msgid "Select assets"
 msgstr "选择资产"
 
-#: assets/forms.py:86 assets/models/asset.py:45
+#: assets/forms.py:86 assets/models/asset.py:55
 #: assets/templates/assets/admin_user_assets.html:61
 #: assets/templates/assets/asset_detail.html:69
 #: assets/templates/assets/asset_group_detail.html:47
@@ -60,7 +60,7 @@ msgstr "选择资产"
 msgid "Port"
 msgstr "端口"
 
-#: assets/forms.py:124 assets/models/asset.py:161
+#: assets/forms.py:124 assets/models/asset.py:171
 #: assets/templates/assets/admin_user_list.html:24
 #: assets/templates/assets/asset_group_list.html:16
 #: assets/templates/assets/system_user_list.html:26 perms/models.py:17
@@ -91,7 +91,7 @@ msgstr "系统用户"
 msgid "Selected system users will be create at cluster assets"
 msgstr "选择的系统用户将会在该集群资产上创建"
 
-#: assets/forms.py:173 assets/forms.py:248 assets/forms.py:307
+#: assets/forms.py:173 assets/forms.py:248 assets/forms.py:308
 #: assets/models/cluster.py:18 assets/models/group.py:20
 #: assets/models/user.py:28 assets/templates/assets/admin_user_detail.html:56
 #: assets/templates/assets/admin_user_list.html:22
@@ -128,8 +128,8 @@ msgstr "集群级别管理用户"
 msgid "Password or private key password"
 msgstr "密码或秘钥不合法"
 
-#: assets/forms.py:201 assets/models/user.py:30 users/forms.py:16
-#: users/forms.py:24 users/templates/users/login.html:56
+#: assets/forms.py:201 assets/forms.py:262 assets/models/user.py:30
+#: users/forms.py:16 users/forms.py:24 users/templates/users/login.html:56
 #: users/templates/users/reset_password.html:52
 #: users/templates/users/user_create.html:11
 #: users/templates/users/user_password_update.html:40
@@ -138,11 +138,11 @@ msgstr "密码或秘钥不合法"
 msgid "Password"
 msgstr "密码"
 
-#: assets/forms.py:204 users/models/user.py:46
+#: assets/forms.py:204 assets/forms.py:264 users/models/user.py:46
 msgid "Private key"
 msgstr "ssh私钥"
 
-#: assets/forms.py:229 assets/forms.py:289 assets/forms.py:350
+#: assets/forms.py:229 assets/forms.py:290 assets/forms.py:354
 msgid "Invalid private key"
 msgstr "ssh密钥不合法"
 
@@ -150,7 +150,7 @@ msgstr "ssh密钥不合法"
 msgid "Password and private key file must be input one"
 msgstr "密码和私钥, 必须输入一个"
 
-#: assets/forms.py:249 assets/forms.py:308 assets/models/user.py:29
+#: assets/forms.py:249 assets/forms.py:309 assets/models/user.py:29
 #: assets/templates/assets/admin_user_detail.html:60
 #: assets/templates/assets/admin_user_list.html:23
 #: assets/templates/assets/system_user_detail.html:57
@@ -166,73 +166,73 @@ msgstr "密码和私钥, 必须输入一个"
 msgid "Username"
 msgstr "用户名"
 
-#: assets/forms.py:296 assets/forms.py:356
+#: assets/forms.py:297 assets/forms.py:360
 msgid "Auth info required, private_key or password"
 msgstr "密钥和密码必须填写一个"
 
-#: assets/forms.py:311
+#: assets/forms.py:313
 msgid " Select clusters"
 msgstr "选择集群"
 
-#: assets/forms.py:316
+#: assets/forms.py:320
 msgid "If auto push checked, system user will be create at cluster assets"
 msgstr "如果选择了自动推送，系统用户将会创建在集群资产上"
 
-#: assets/forms.py:317
+#: assets/forms.py:321
 msgid "Auto push system user to asset"
 msgstr "自动推送系统用户到资产"
 
-#: assets/forms.py:318
+#: assets/forms.py:322
 msgid ""
 "High level will be using login asset as default, if user was granted more "
 "than 2 system user"
 msgstr "高优先级的系统用户将会作为默认登录用户"
 
-#: assets/models/asset.py:24
+#: assets/models/asset.py:34
 msgid "In use"
 msgstr "使用中"
 
-#: assets/models/asset.py:25
+#: assets/models/asset.py:35
 msgid "Out of use"
 msgstr "未使用"
 
-#: assets/models/asset.py:28
+#: assets/models/asset.py:38
 msgid "Server"
 msgstr "物理机"
 
-#: assets/models/asset.py:29
+#: assets/models/asset.py:39
 msgid "VM"
 msgstr "虚拟机"
 
-#: assets/models/asset.py:30
+#: assets/models/asset.py:40
 msgid "Switch"
 msgstr "交换机"
 
-#: assets/models/asset.py:31
+#: assets/models/asset.py:41
 msgid "Router"
 msgstr "路由器"
 
-#: assets/models/asset.py:32
+#: assets/models/asset.py:42
 msgid "Firewall"
 msgstr "防火墙"
 
-#: assets/models/asset.py:33
+#: assets/models/asset.py:43
 msgid "Storage"
 msgstr "存储"
 
-#: assets/models/asset.py:36
+#: assets/models/asset.py:46
 msgid "Production"
 msgstr "生产环境"
 
-#: assets/models/asset.py:37
+#: assets/models/asset.py:47
 msgid "Development"
 msgstr "开发环境"
 
-#: assets/models/asset.py:38
+#: assets/models/asset.py:48
 msgid "Testing"
 msgstr "测试环境"
 
-#: assets/models/asset.py:43 assets/templates/assets/admin_user_assets.html:60
+#: assets/models/asset.py:53 assets/templates/assets/admin_user_assets.html:60
 #: assets/templates/assets/asset_detail.html:61
 #: assets/templates/assets/asset_group_detail.html:46
 #: assets/templates/assets/asset_list.html:31
@@ -246,7 +246,7 @@ msgstr "测试环境"
 msgid "IP"
 msgstr "IP"
 
-#: assets/models/asset.py:44 assets/templates/assets/admin_user_assets.html:59
+#: assets/models/asset.py:54 assets/templates/assets/admin_user_assets.html:59
 #: assets/templates/assets/asset_detail.html:57
 #: assets/templates/assets/asset_group_detail.html:45
 #: assets/templates/assets/asset_list.html:30
@@ -259,116 +259,116 @@ msgstr "IP"
 msgid "Hostname"
 msgstr "主机名"
 
-#: assets/models/asset.py:46 assets/templates/assets/asset_detail.html:213
+#: assets/models/asset.py:56 assets/templates/assets/asset_detail.html:213
 #: assets/views/asset.py:218 assets/views/asset.py:258
 msgid "Asset groups"
 msgstr "资产组"
 
-#: assets/models/asset.py:47 assets/models/cluster.py:40
+#: assets/models/asset.py:57 assets/models/cluster.py:40
 #: assets/models/user.py:219 assets/templates/assets/asset_detail.html:85
 #: assets/templates/assets/asset_list.html:33 templates/_nav.html:24
 msgid "Cluster"
 msgstr "集群"
 
-#: assets/models/asset.py:48 assets/templates/assets/asset_detail.html:129
+#: assets/models/asset.py:58 assets/templates/assets/asset_detail.html:129
 msgid "Is active"
 msgstr "激活"
 
-#: assets/models/asset.py:49 assets/templates/assets/asset_detail.html:133
+#: assets/models/asset.py:59 assets/templates/assets/asset_detail.html:133
 msgid "Asset type"
 msgstr "系统类型"
 
-#: assets/models/asset.py:50 assets/templates/assets/asset_detail.html:137
+#: assets/models/asset.py:60 assets/templates/assets/asset_detail.html:137
 msgid "Asset environment"
 msgstr "资产环境"
 
-#: assets/models/asset.py:51 assets/templates/assets/asset_detail.html:125
+#: assets/models/asset.py:61 assets/templates/assets/asset_detail.html:125
 msgid "Asset status"
 msgstr "资产状态"
 
-#: assets/models/asset.py:54 assets/models/cluster.py:19
+#: assets/models/asset.py:64 assets/models/cluster.py:19
 #: assets/models/user.py:190 assets/templates/assets/asset_detail.html:73
 #: assets/templates/assets/cluster_list.html:20 templates/_nav.html:25
 msgid "Admin user"
 msgstr "管理用户"
 
-#: assets/models/asset.py:57 assets/templates/assets/asset_detail.html:65
+#: assets/models/asset.py:67 assets/templates/assets/asset_detail.html:65
 msgid "Public IP"
 msgstr "公网IP"
 
-#: assets/models/asset.py:58
+#: assets/models/asset.py:68
 msgid "Remote control card IP"
 msgstr "远控卡IP"
 
-#: assets/models/asset.py:59 assets/templates/assets/asset_detail.html:89
+#: assets/models/asset.py:69 assets/templates/assets/asset_detail.html:89
 msgid "Cabinet number"
 msgstr "机柜编号"
 
-#: assets/models/asset.py:60 assets/templates/assets/asset_detail.html:93
+#: assets/models/asset.py:70 assets/templates/assets/asset_detail.html:93
 msgid "Cabinet position"
 msgstr "机柜层号"
 
-#: assets/models/asset.py:61 assets/templates/assets/asset_detail.html:145
+#: assets/models/asset.py:71 assets/templates/assets/asset_detail.html:145
 msgid "Asset number"
 msgstr "资产编号"
 
-#: assets/models/asset.py:64 assets/templates/assets/asset_detail.html:97
+#: assets/models/asset.py:74 assets/templates/assets/asset_detail.html:97
 msgid "Vendor"
 msgstr "制造商"
 
-#: assets/models/asset.py:65 assets/templates/assets/asset_detail.html:101
+#: assets/models/asset.py:75 assets/templates/assets/asset_detail.html:101
 msgid "Model"
 msgstr "型号"
 
-#: assets/models/asset.py:66 assets/templates/assets/asset_detail.html:141
+#: assets/models/asset.py:76 assets/templates/assets/asset_detail.html:141
 msgid "Serial number"
 msgstr "序列号"
 
-#: assets/models/asset.py:68
+#: assets/models/asset.py:78
 msgid "CPU model"
 msgstr "CPU型号"
 
-#: assets/models/asset.py:69
+#: assets/models/asset.py:79
 msgid "CPU count"
 msgstr "CPU数量"
 
-#: assets/models/asset.py:70
+#: assets/models/asset.py:80
 msgid "CPU cores"
 msgstr "CPU核数"
 
-#: assets/models/asset.py:71 assets/templates/assets/asset_detail.html:109
+#: assets/models/asset.py:81 assets/templates/assets/asset_detail.html:109
 msgid "Memory"
 msgstr "内存"
 
-#: assets/models/asset.py:72
+#: assets/models/asset.py:82
 msgid "Disk total"
 msgstr "硬盘大小"
 
-#: assets/models/asset.py:73
+#: assets/models/asset.py:83
 msgid "Disk info"
 msgstr "硬盘信息"
 
-#: assets/models/asset.py:75 assets/templates/assets/asset_detail.html:117
+#: assets/models/asset.py:85 assets/templates/assets/asset_detail.html:117
 msgid "Platform"
 msgstr "系统平台"
 
-#: assets/models/asset.py:76 assets/templates/assets/asset_detail.html:121
+#: assets/models/asset.py:86 assets/templates/assets/asset_detail.html:121
 msgid "OS"
 msgstr "操作系统"
 
-#: assets/models/asset.py:77
+#: assets/models/asset.py:87
 msgid "OS version"
 msgstr "系统版本"
 
-#: assets/models/asset.py:78
+#: assets/models/asset.py:88
 msgid "OS arch"
 msgstr "系统架构"
 
-#: assets/models/asset.py:79
+#: assets/models/asset.py:89
 msgid "Hostname raw"
 msgstr "主机名原始"
 
-#: assets/models/asset.py:81 assets/models/cluster.py:28
+#: assets/models/asset.py:91 assets/models/cluster.py:28
 #: assets/models/group.py:21 assets/models/user.py:36
 #: assets/templates/assets/admin_user_detail.html:68
 #: assets/templates/assets/asset_detail.html:149
@@ -380,7 +380,7 @@ msgstr "主机名原始"
 msgid "Created by"
 msgstr "创建者"
 
-#: assets/models/asset.py:82 assets/models/cluster.py:26
+#: assets/models/asset.py:92 assets/models/cluster.py:26
 #: assets/models/group.py:22 assets/templates/assets/admin_user_detail.html:64
 #: assets/templates/assets/cluster_detail.html:89
 #: assets/templates/assets/system_user_detail.html:87
@@ -391,7 +391,7 @@ msgstr "创建者"
 msgid "Date created"
 msgstr "创建日期"
 
-#: assets/models/asset.py:83 assets/models/cluster.py:29
+#: assets/models/asset.py:93 assets/models/cluster.py:29
 #: assets/models/group.py:23 assets/models/user.py:33
 #: assets/templates/assets/admin_user_detail.html:72
 #: assets/templates/assets/admin_user_list.html:28
@@ -578,8 +578,8 @@ msgstr "仅修改你需要更新的字段"
 #: assets/views/cluster.py:26 assets/views/cluster.py:85
 #: assets/views/cluster.py:102 assets/views/group.py:34
 #: assets/views/group.py:52 assets/views/group.py:69 assets/views/group.py:87
-#: assets/views/system_user.py:30 assets/views/system_user.py:46
-#: assets/views/system_user.py:62 assets/views/system_user.py:77
+#: assets/views/system_user.py:28 assets/views/system_user.py:44
+#: assets/views/system_user.py:60 assets/views/system_user.py:75
 #: templates/_nav.html:19
 msgid "Assets"
 msgstr "资产管理"
@@ -620,7 +620,7 @@ msgstr "如果设置了id，则会使用该行信息更新该id的资产"
 
 #: assets/templates/assets/_system_user.html:16
 #: assets/templates/assets/system_user_list.html:16
-#: assets/views/system_user.py:47
+#: assets/views/system_user.py:45
 msgid "Create system user"
 msgstr "创建系统用户"
 
@@ -1104,10 +1104,6 @@ msgstr "任务已下发，查看左侧资产状态"
 msgid "Settings"
 msgstr "设置"
 
-#: assets/templates/assets/cluster_list.html:11 assets/views/cluster.py:43
-msgid "Create Cluster"
-msgstr "创建Cluster"
-
 #: assets/templates/assets/cluster_list.html:21
 #: users/templates/users/_select_user_modal.html:17
 msgid "Asset num"
@@ -1234,9 +1230,13 @@ msgid "Cluster list"
 msgstr "集群列表"
 
 #: assets/views/cluster.py:42 assets/views/cluster.py:70
-#: assets/views/system_user.py:98
+#: assets/views/system_user.py:96
 msgid "assets"
 msgstr "资产管理"
+
+#: assets/views/cluster.py:43
+msgid "Create cluster"
+msgstr "创建集群"
 
 #: assets/views/cluster.py:71
 msgid "Update Cluster"
@@ -1254,25 +1254,24 @@ msgstr "资产组列表"
 msgid "Asset group detail"
 msgstr "资产组详情"
 
-#: assets/views/system_user.py:31
+#: assets/views/system_user.py:29
 msgid "System user list"
 msgstr "系统用户列表"
 
-#: assets/views/system_user.py:63
+#: assets/views/system_user.py:61
 msgid "Update system user"
 msgstr "更新系统用户"
 
-#: assets/views/system_user.py:78
+#: assets/views/system_user.py:76
 msgid "System user detail"
 msgstr "系统用户详情"
 
-#: assets/views/system_user.py:99
+#: assets/views/system_user.py:97
 msgid "System user asset"
 msgstr "系统用户集群资产"
 
 #: common/const.py:6
 #, python-format
-#| msgid "User group <a href={url}> {name} </a> was created successfully"
 msgid "<b>%(name)s</b> was created successfully"
 msgstr "<b>%(name)s</b> 创建成功"
 
@@ -1570,7 +1569,7 @@ msgstr "选择用户"
 #: terminal/templates/terminal/session_list.html:33
 #: terminal/templates/terminal/session_list.html:71 users/forms.py:187
 #: users/models/user.py:31 users/templates/users/user_group_detail.html:78
-#: users/views/user.py:345
+#: users/views/user.py:338
 msgid "User"
 msgstr "用户"
 
@@ -1786,7 +1785,7 @@ msgstr "关闭"
 #: users/views/group.py:62 users/views/group.py:79 users/views/login.py:193
 #: users/views/login.py:242 users/views/user.py:57 users/views/user.py:72
 #: users/views/user.py:92 users/views/user.py:148 users/views/user.py:305
-#: users/views/user.py:319 users/views/user.py:363 users/views/user.py:385
+#: users/views/user.py:319 users/views/user.py:356 users/views/user.py:378
 msgid "Users"
 msgstr "用户管理"
 
@@ -2672,20 +2671,16 @@ msgstr "文件不合法"
 msgid "User granted assets"
 msgstr "用户授权资产"
 
-#: users/views/user.py:332
-#, python-brace-format
-msgid "Create user <a href=\"{url}\">{name}</a> successfully."
-msgstr "创建用户 <a href=\"{url}\">{name}</a> 成功"
-
-#: users/views/user.py:346
+#: users/views/user.py:339
 msgid "Profile setting"
 msgstr "个人信息设置"
 
-#: users/views/user.py:364
+#: users/views/user.py:357
 msgid "Password update"
 msgstr "密码更新"
 
-#: users/views/user.py:386
+#: users/views/user.py:379
 msgid "Public key update"
 msgstr "秘钥更新"
+
 
