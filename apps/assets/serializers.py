@@ -192,7 +192,7 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
     class Meta(object):
         model = Asset
         fields = ("id", "hostname", "ip", "port", "system_users_granted",
-                  "is_inherited", "is_active", "system_users_join",
+                  "is_inherited", "is_active", "system_users_join", "os",
                   "platform", "comment",)
 
     @staticmethod

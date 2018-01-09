@@ -168,6 +168,11 @@ class User(AbstractUser):
             token = PrivateToken.objects.create(user=self)
         return token.key
 
+    def create_access_key(self):
+        from . import AccessKey
+        access_key = AccessKey.objects.create(user=self)
+        return access_key
+
     def refresh_private_token(self):
         from .authentication import PrivateToken
         PrivateToken.objects.filter(user=self).delete()
@@ -214,13 +219,12 @@ class User(AbstractUser):
 
     @classmethod
     def create_app_user(cls, name, comment):
-        from . import AccessKey
         app = cls.objects.create(
             username=name, name=name, email='{}@local.domain'.format(name),
             is_active=False, role='App', enable_otp=False, comment=comment,
             is_first_login=False, created_by='System'
         )
-        access_key = AccessKey.objects.create(user=app)
+        access_key = app.create_access_key()
         return app, access_key
 
     @classmethod

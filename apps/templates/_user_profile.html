@@ -30,7 +30,7 @@ $(document).ready(function () {
     setTimeout(function () {
         delCookie(cookieName);
         setCookie(cookieName, "No");
-        window.location = "/"
+        window.location = "{% url 'assets:user-asset-list' %}"
     }, 100);
 })
 </script>

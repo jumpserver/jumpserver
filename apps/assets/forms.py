@@ -36,7 +36,7 @@ class AssetCreateForm(forms.ModelForm):
     def clean_admin_user(self):
         cluster = self.cleaned_data.get('cluster')
         admin_user = self.cleaned_data.get('admin_user')
-        if not cluster.admin_user and not admin_user:
+        if not admin_user and (cluster and not cluster.admin_user):
             raise forms.ValidationError(_("You need set a admin user if cluster not have"))
         return self.cleaned_data['admin_user']
 
@@ -64,7 +64,7 @@ class AssetUpdateForm(forms.ModelForm):
     def clean_admin_user(self):
         cluster = self.cleaned_data.get('cluster')
         admin_user = self.cleaned_data.get('admin_user')
-        if not cluster.admin_user and not admin_user:
+        if not admin_user and (cluster and not cluster.admin_user):
             raise forms.ValidationError(_("You need set a admin user if cluster not have"))
         return self.cleaned_data['admin_user']
 
