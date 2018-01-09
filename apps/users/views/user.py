@@ -27,12 +27,14 @@ from django.views.generic.detail import DetailView, SingleObjectMixin
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import logout as auth_logout
 
+from common.const import create_success_msg, update_success_msg
+from common.mixins import JSONResponseMixin
+from common.utils import get_logger, get_object_or_none, is_uuid
 from .. import forms
 from ..models import User, UserGroup
 from ..utils import AdminUserRequiredMixin
 from ..signals import on_user_created
-from common.mixins import JSONResponseMixin
-from common.utils import get_logger, get_object_or_none, is_uuid
+
 
 __all__ = [
     'UserListView', 'UserCreateView', 'UserDetailView',
@@ -63,7 +65,7 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     form_class = forms.UserCreateUpdateForm
     template_name = 'users/user_create.html'
     success_url = reverse_lazy('users:user-list')
-    success_message = _('Create user <a href="{url}">{name}</a> successfully.')
+    success_message = create_success_msg
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -77,19 +79,14 @@ class UserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
         on_user_created.send(self.__class__, user=user)
         return super().form_valid(form)
 
-    def get_success_message(self, cleaned_data):
-        url = reverse_lazy('users:user-detail', kwargs={'pk': self.object.pk})
-        return self.success_message.format(
-            url=url, name=self.object.name
-        )
 
-
-class UserUpdateView(AdminUserRequiredMixin, UpdateView):
+class UserUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     model = User
     form_class = forms.UserCreateUpdateForm
     template_name = 'users/user_update.html'
     context_object_name = 'user_object'
     success_url = reverse_lazy('users:user-list')
+    success_message = update_success_msg
 
     def get_context_data(self, **kwargs):
         context = {'app': _('Users'), 'action': _('Update user')}

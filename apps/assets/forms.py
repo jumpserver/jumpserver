@@ -124,20 +124,25 @@ class AssetGroupForm(forms.ModelForm):
         label=_('Asset'),
         required=False,
         widget=forms.SelectMultiple(
-            attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
+            attrs={'class': 'select2', 'data-placeholder': _('Select assets')}
         )
+    )
 
-    def __init__(self, *args, **kwargs):
-        if kwargs.get('instance', None):
+    def __init__(self, **kwargs):
+        instance = kwargs.get('instance')
+        if instance:
             initial = kwargs.get('initial', {})
-            initial['assets'] = kwargs['instance'].assets.all()
-        super(AssetGroupForm, self).__init__(*args, **kwargs)
+            initial.update({
+                'assets': instance.assets.all(),
+            })
+            kwargs['initial'] = initial
+        super().__init__(**kwargs)
 
-    def _save_m2m(self):
-        super(AssetGroupForm, self)._save_m2m()
-        assets = self.cleaned_data['assets']
-        self.instance.assets.clear()
-        self.instance.assets.add(*tuple(assets))
+    def save(self, commit=True):
+        group = super().save(commit=commit)
+        assets= self.cleaned_data['assets']
+        group.assets.set(assets)
+        return group
 
     class Meta:
         model = AssetGroup

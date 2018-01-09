@@ -27,10 +27,11 @@ def test_asset_conn_on_created(asset):
 
 
 def push_cluster_system_users_to_asset(asset):
-    logger.info("Push cluster system user to asset: {}".format(asset))
-    task_name = _("Push cluster system users to asset")
-    system_users = asset.cluster.systemuser_set.all()
-    push_system_user_util.delay(system_users, [asset], task_name)
+    if asset.cluster:
+        logger.info("Push cluster system user to asset: {}".format(asset))
+        task_name = _("Push cluster system users to asset")
+        system_users = asset.cluster.systemuser_set.all()
+        push_system_user_util.delay(system_users, [asset], task_name)
 
 
 @receiver(post_save, sender=Asset, dispatch_uid="my_unique_identifier")

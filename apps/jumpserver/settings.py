@@ -374,4 +374,5 @@ BOOTSTRAP3 = {
     'horizontal_field_class': 'col-md-9',
     # Set placeholder attributes to label if no placeholder is provided
     'set_placeholder': True,
+    'success_css_class': '',
 }
