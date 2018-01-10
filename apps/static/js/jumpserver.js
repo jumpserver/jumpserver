@@ -310,11 +310,11 @@ jumpserver.initDataTable = function (options) {
       if (!jumpserver.checked) {
           $(this).closest('table').find('.ipt_check').prop('checked', true);
           jumpserver.checked = true;
-          table.rows().select();
+          table.rows({search:'applied'}).select();
       } else {
           $(this).closest('table').find('.ipt_check').prop('checked', false);
           jumpserver.checked = false;
-          table.rows().deselect();
+          table.rows({search:'applied'}).deselect();
       }
     });
 
