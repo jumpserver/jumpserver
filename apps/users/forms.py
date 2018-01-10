@@ -46,7 +46,7 @@ class UserCreateUpdateForm(forms.ModelForm):
         }
 
     def save(self, commit=True):
-        password = self.cleaned_data.pop('password')
+        password = self.cleaned_data.get('password')
         user = super().save(commit=commit)
         if password:
             user.set_password(password)

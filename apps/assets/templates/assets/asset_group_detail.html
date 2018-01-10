@@ -17,6 +17,11 @@
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-default" href="{% url 'assets:asset-group-update' pk=asset_group.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
                             </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-danger btn-del">
+                                    <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
+                                </a>
+                            </li>
                         </ul>
                     </div>
                     <div class="tab-content">
@@ -212,7 +217,6 @@ $(document).ready(function () {
   addAssets(assets_id);
 })
 
-
 .on('click', '.btn-leave-group', function () {
 	var $this = $(this);
 	var the_url = "{% url 'api-assets:group-update-assets' pk=asset_group.id %}";
@@ -225,6 +229,13 @@ $(document).ready(function () {
 	assets.remove(delete_asset_id);
 	var data = {"assets": assets};
 	leaveGroup($this, name, the_url, data);
+}).on('click', '.btn-del', function () {
+    var $this = $(this);
+    var name = "{{ asset_group.name}}";
+    var uid = "{{ asset_group.id }}";
+    var the_url = '{% url "api-assets:asset-group-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
+    var redirect_url = "{% url 'assets:asset-group-list' %}";
+    objectDelete($this, name, the_url, redirect_url);
 })
 
 

@@ -37,7 +37,7 @@ def push_cluster_system_users_to_asset(asset):
 @receiver(post_save, sender=Asset, dispatch_uid="my_unique_identifier")
 def on_asset_created(sender, instance=None, created=False, **kwargs):
     if instance and created:
-        logger.info("Asset `` create signal received".format(instance))
+        logger.info("Asset `{}` create signal received".format(instance))
         update_asset_hardware_info_on_created(instance)
         test_asset_conn_on_created(instance)
         push_cluster_system_users_to_asset(instance)

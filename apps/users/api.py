@@ -128,7 +128,7 @@ class UserAuthApi(APIView):
         user_agent = request.data.get('HTTP_USER_AGENT', '')
 
         if not login_ip:
-            login_ip = request.META.get('HTTP_X_REAL_IP') or request.META.get("REMOTE_ADDR")
+            login_ip = request.META.get('HTTP_X_FORWARDED_FOR') or request.META.get("REMOTE_ADDR")
 
         user, msg = check_user_valid(
             username=username, password=password,
