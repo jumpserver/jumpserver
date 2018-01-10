@@ -25,7 +25,7 @@ def default_cluster():
     cluster, created = Cluster.objects.get_or_create(
         defaults=defaults, name=name
     )
-    return cluster
+    return cluster.id
 
 
 class Asset(models.Model):
