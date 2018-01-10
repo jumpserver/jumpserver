@@ -218,8 +218,8 @@ class AdHoc(models.Model):
             history.result = raw
             history.summary = summary
             return raw, summary
-        except:
-            return {}, {}
+        except Exception as e:
+            return {}, {"dark": {"all": str(e)}, "contacted": []}
         finally:
             history.date_finished = timezone.now()
             history.timedelta = time.time() - time_start

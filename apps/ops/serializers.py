@@ -43,8 +43,8 @@ class AdHocRunHistorySerializer(serializers.ModelSerializer):
     def get_stat(obj):
         return {
             "total": len(obj.adhoc.hosts),
-            "success": len(obj.summary["contacted"]),
-            "failed": len(obj.summary["dark"]),
+            "success": len(obj.summary.get("contacted", [])),
+            "failed": len(obj.summary.get("dark", [])),
         }
 
     def get_field_names(self, declared_fields, info):
