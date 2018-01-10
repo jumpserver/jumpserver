@@ -178,9 +178,15 @@ $(document).ready(function(){
             var obj = {"pk": object_id, "is_active": false};
             data.push(obj);
         });
-        APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(data)});
-        $data_table.ajax.reload();
-        jumpserver.checked = false;
+        function success() {
+            location.reload()
+        }
+        APIUpdateAttr({
+            url: the_url,
+            method: 'PATCH',
+            body: JSON.stringify(data),
+            success: success
+        });
     }
     function doActive() {
         var data = [];
@@ -188,9 +194,15 @@ $(document).ready(function(){
             var obj = {"pk": object_id, "is_active": true};
             data.push(obj);
         });
-        APIUpdateAttr({url: the_url, method: 'PATCH', body: JSON.stringify(data)});
-        $data_table.ajax.reload();
-        jumpserver.checked = false;
+        function success() {
+            location.reload();
+        }
+        APIUpdateAttr({
+            url: the_url,
+            method: 'PATCH',
+            body: JSON.stringify(data),
+            success: success
+        });
     }
     function doDelete() {
         swal({

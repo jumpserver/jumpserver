@@ -156,7 +156,7 @@ class UserBulkUpdateForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['users', 'role', 'groups', 'date_expired', 'is_active']
+        fields = ['users', 'role', 'groups', 'date_expired']
         widgets = {
             "groups": forms.SelectMultiple(
                 attrs={
@@ -172,6 +172,7 @@ class UserBulkUpdateForm(forms.ModelForm):
             if self.data.get(field) is not None:
                 changed_fields.append(field)
 
+        print(changed_fields)
         cleaned_data = {k: v for k, v in self.cleaned_data.items()
                         if k in changed_fields}
         users = cleaned_data.pop('users', '')
@@ -186,7 +187,7 @@ class UserBulkUpdateForm(forms.ModelForm):
 
 class UserGroupForm(forms.ModelForm):
     users = forms.ModelMultipleChoiceField(
-        queryset=User.objects.all(),
+        queryset=User.objects.exclude(role=User.ROLE_APP),
         label=_("User"),
         widget=forms.SelectMultiple(
             attrs={

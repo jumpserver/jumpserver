@@ -93,7 +93,7 @@ class AssetBulkUpdateForm(forms.ModelForm):
         model = Asset
         fields = [
             'assets', 'port', 'groups', "cluster",
-            'type', 'env', 'status',
+            'type', 'env',
         ]
         widgets = {
             'groups': forms.SelectMultiple(attrs={'class': 'select2', 'data-placeholder': _('Select asset groups')}),
