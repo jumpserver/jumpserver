@@ -45,9 +45,9 @@
                                         <thead>
                                         <tr>
                                             <th data-toggle="true">ID</th>
-                                            <th>Command</th>
+                                            <th>{% trans 'Command' %}</th>
                                             <th data-hide="all"></th>
-                                            <th>Datetime</th>
+                                            <th>{% trans 'Datetime' %}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -84,24 +84,24 @@
                                     <table class="table">
                                         <tbody>
                                         {% if object.is_finished %}
-                                        <tr>
-                                            <td class="no-borders">{% trans 'Replay session' %}:</td>
-                                            <td class="no-borders">
+                                        <tr class="no-borders-tr">
+                                            <td>{% trans 'Replay session' %}:</td>
+                                            <td>
                                                 <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs" id="btn_reset_password" style="width: 54px">{% trans 'Go' %}</button>
+                                                    <button type="button" onclick="window.open('/luna/replay/{{ object.id }}','luna', 'height=600, width=800, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, location=no, status=no')" class="btn btn-primary btn-xs" id="btn_reset_password" style="width: 54px">{% trans 'Go' %}</button>
                                                 </span>
                                             </td>
                                         </tr>
                                         {% else %}
-                                        <tr>
-                                            <td class="no-borders" >{% trans 'Monitor session' %}:</td>
-                                            <td class="no-borders" >
-                                                <span class="pull-right">
-                                                    <button type="button" class="btn btn-primary btn-xs " style="width: 54px">{% trans 'Go' %}</button>
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        <tr>
+                                        <!--<tr>-->
+                                            <!--<td class="no-borders" >{% trans 'Monitor session' %}:</td>-->
+                                            <!--<td class="no-borders" >-->
+                                                <!--<span class="pull-right">-->
+                                                    <!--<button type="button" class="btn btn-primary btn-xs " style="width: 54px">{% trans 'Go' %}</button>-->
+                                                <!--</span>-->
+                                            <!--</td>-->
+                                        <!--</tr>-->
+                                        <tr class="no-borders-tr">
                                             <td>{% trans 'Terminate session' %}:</td>
                                             <td>
                                                 <span class="pull-right">

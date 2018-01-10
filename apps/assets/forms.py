@@ -36,7 +36,7 @@ class AssetCreateForm(forms.ModelForm):
     def clean_admin_user(self):
         cluster = self.cleaned_data.get('cluster')
         admin_user = self.cleaned_data.get('admin_user')
-        if not cluster.admin_user and not admin_user:
+        if not admin_user and (cluster and not cluster.admin_user):
             raise forms.ValidationError(_("You need set a admin user if cluster not have"))
         return self.cleaned_data['admin_user']
 
@@ -64,7 +64,7 @@ class AssetUpdateForm(forms.ModelForm):
     def clean_admin_user(self):
         cluster = self.cleaned_data.get('cluster')
         admin_user = self.cleaned_data.get('admin_user')
-        if not cluster.admin_user and not admin_user:
+        if not admin_user and (cluster and not cluster.admin_user):
             raise forms.ValidationError(_("You need set a admin user if cluster not have"))
         return self.cleaned_data['admin_user']
 
@@ -124,20 +124,25 @@ class AssetGroupForm(forms.ModelForm):
         label=_('Asset'),
         required=False,
         widget=forms.SelectMultiple(
-            attrs={'class': 'select2', 'data-placeholder': _('Select assets')})
+            attrs={'class': 'select2', 'data-placeholder': _('Select assets')}
         )
+    )
 
-    def __init__(self, *args, **kwargs):
-        if kwargs.get('instance', None):
+    def __init__(self, **kwargs):
+        instance = kwargs.get('instance')
+        if instance:
             initial = kwargs.get('initial', {})
-            initial['assets'] = kwargs['instance'].assets.all()
-        super(AssetGroupForm, self).__init__(*args, **kwargs)
+            initial.update({
+                'assets': instance.assets.all(),
+            })
+            kwargs['initial'] = initial
+        super().__init__(**kwargs)
 
-    def _save_m2m(self):
-        super(AssetGroupForm, self)._save_m2m()
-        assets = self.cleaned_data['assets']
-        self.instance.assets.clear()
-        self.instance.assets.add(*tuple(assets))
+    def save(self, commit=True):
+        group = super().save(commit=commit)
+        assets= self.cleaned_data['assets']
+        group.assets.set(assets)
+        return group
 
     class Meta:
         model = AssetGroup
@@ -150,10 +155,19 @@ class AssetGroupForm(forms.ModelForm):
 
 
 class ClusterForm(forms.ModelForm):
+    system_users = forms.ModelMultipleChoiceField(
+        queryset=SystemUser.objects.all(),
+        widget=forms.SelectMultiple(
+            attrs={'class': 'select2', 'data-placeholder': _('Select system users')}
+        ),
+        label=_('System users'),
+        required=False,
+        help_text=_("Selected system users will be create at cluster assets"),
+    )
 
     class Meta:
         model = Cluster
-        fields = ['name', "bandwidth", "operator", 'contact', 'admin_user',
+        fields = ['name', "bandwidth", "operator", 'contact', 'admin_user', 'system_users',
                   'phone', 'address', 'intranet', 'extranet', 'comment']
         widgets = {
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
@@ -162,8 +176,20 @@ class ClusterForm(forms.ModelForm):
         }
         help_texts = {
             'name': '* required',
-            'admin_user': 'The assets of this cluster will use this admin user as his admin user',
+            'admin_user': _("Cluster level admin user"),
         }
+
+    def __init__(self, *args, **kwargs):
+        if kwargs.get('instance', None):
+            initial = kwargs.get('initial', {})
+            initial['system_users'] = kwargs['instance'].systemuser_set.all()
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        instance = super().save(commit=commit)
+        system_users = self.cleaned_data['system_users']
+        instance.systemuser_set.set(system_users)
+        return instance
 
 
 class AdminUserForm(forms.ModelForm):
@@ -172,9 +198,10 @@ class AdminUserForm(forms.ModelForm):
         widget=forms.PasswordInput, max_length=128,
         strip=True, required=False,
         help_text=_('Password or private key password'),
+        label=_("Password"),
     )
     # Need use upload private key file except paste private key content
-    private_key_file = forms.FileField(required=False)
+    private_key_file = forms.FileField(required=False, label=_("Private key"))
 
     def save(self, commit=True):
         # Because we define custom field, so we need rewrite :method: `save`
@@ -204,12 +231,14 @@ class AdminUserForm(forms.ModelForm):
         return private_key_file
 
     def clean(self):
+        super().clean()
         password = self.cleaned_data['password']
         private_key_file = self.cleaned_data.get('private_key_file', '')
 
-        if not self.instance and not (password or private_key_file):
-            raise forms.ValidationError(
-                _('Password and private key file must be input one'))
+        if not password and not private_key_file:
+            raise forms.ValidationError(_(
+                'Password and private key file must be input one'
+            ))
 
     class Meta:
         model = AdminUser
@@ -229,9 +258,10 @@ class SystemUserForm(forms.ModelForm):
     # Admin user assets define, let user select, save it in form not in view
     auto_generate_key = forms.BooleanField(initial=True, required=False)
     # Form field name can not start with `_`, so redefine it,
-    password = forms.CharField(widget=forms.PasswordInput, required=False, max_length=128, strip=True)
+    password = forms.CharField(widget=forms.PasswordInput, required=False,
+                               max_length=128, strip=True, label=_("Password"))
     # Need use upload private key file except paste private key content
-    private_key_file = forms.FileField(required=False)
+    private_key_file = forms.FileField(required=False, label=_("Private key"))
 
     def save(self, commit=True):
         # Because we define custom field, so we need rewrite :method: `save`
@@ -278,15 +308,18 @@ class SystemUserForm(forms.ModelForm):
             'name': forms.TextInput(attrs={'placeholder': _('Name')}),
             'username': forms.TextInput(attrs={'placeholder': _('Username')}),
             'cluster': forms.SelectMultiple(
-                attrs={'class': 'select2',
-                       'data-placeholder': _(' Select clusters')}),
+                attrs={
+                    'class': 'select2',
+                    'data-placeholder': _(' Select clusters')
+                }
+            ),
         }
         help_texts = {
             'name': '* required',
             'username': '* required',
-            'cluster': 'If auto push checked, system user will be create at cluster assets',
-            'auto_push': 'Auto push system user to asset',
-            'priority': 'High level will be using login asset as default, if user was granted more than 2 system user',
+            'cluster': _('If auto push checked, system user will be create at cluster assets'),
+            'auto_push': _('Auto push system user to asset'),
+            'priority': _('High level will be using login asset as default, if user was granted more than 2 system user'),
         }
 
 

@@ -1,24 +1,23 @@
 # ~*~ coding: utf-8 ~*~
 
-from django.contrib import messages
-from django.shortcuts import redirect, reverse
 from django.utils.translation import ugettext as _
-from django.db import transaction
-from django.views.generic import TemplateView, ListView, FormView
+from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.urls import reverse_lazy
 from django.contrib.messages.views import SuccessMessageMixin
-from django.views.generic.detail import DetailView, SingleObjectMixin
+from django.views.generic.detail import DetailView
 
-from ..forms import SystemUserForm, SystemUserUpdateForm, SystemUserAuthForm
+from common.const import create_success_msg, update_success_msg
+from ..forms import SystemUserForm, SystemUserUpdateForm
 from ..models import SystemUser, Cluster
 from ..hands import AdminUserRequiredMixin
 
 
-__all__ = ['SystemUserCreateView', 'SystemUserUpdateView',
-           'SystemUserDetailView', 'SystemUserDeleteView',
-           'SystemUserAssetView', 'SystemUserListView',
-           ]
+__all__ = [
+    'SystemUserCreateView', 'SystemUserUpdateView',
+    'SystemUserDetailView', 'SystemUserDeleteView',
+    'SystemUserAssetView', 'SystemUserListView',
+]
 
 
 class SystemUserListView(AdminUserRequiredMixin, TemplateView):
@@ -38,10 +37,7 @@ class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVi
     form_class = SystemUserForm
     template_name = 'assets/system_user_create.html'
     success_url = reverse_lazy('assets:system-user-list')
-
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        return super(SystemUserCreateView, self).post(request, *args, **kwargs)
+    success_message = create_success_msg
 
     def get_context_data(self, **kwargs):
         context = {
@@ -51,20 +47,13 @@ class SystemUserCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateVi
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
-    def get_success_message(self, cleaned_data):
-        url = reverse('assets:system-user-detail', kwargs={'pk': self.object.pk})
-        success_message = _(
-            'Create system user <a href="{url}">{name}</a> '
-            'successfully.'.format(url=url, name=self.object.name)
-        )
 
-        return success_message
-
-
-class SystemUserUpdateView(AdminUserRequiredMixin, UpdateView):
+class SystemUserUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     model = SystemUser
     form_class = SystemUserUpdateForm
     template_name = 'assets/system_user_update.html'
+    success_url = reverse_lazy('assets:system-user-list')
+    success_message = update_success_msg
 
     def get_context_data(self, **kwargs):
         context = {
@@ -73,11 +62,6 @@ class SystemUserUpdateView(AdminUserRequiredMixin, UpdateView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
-
-    def get_success_url(self):
-        success_url = reverse_lazy('assets:system-user-detail',
-                                   kwargs={'pk': self.object.pk})
-        return success_url
 
 
 class SystemUserDetailView(AdminUserRequiredMixin, DetailView):
@@ -109,8 +93,8 @@ class SystemUserAssetView(AdminUserRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = {
-            'app': 'assets',
-            'action': 'System user asset',
+            'app': _('assets'),
+            'action': _('System user asset'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)

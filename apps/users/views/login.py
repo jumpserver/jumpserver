@@ -53,7 +53,8 @@ class UserLoginView(FormView):
         if not self.request.session.test_cookie_worked():
             return HttpResponse(_("Please enable cookies and try again."))
         auth_login(self.request, form.get_user())
-        login_ip = self.request.META.get('REMOTE_ADDR', '')
+        login_ip = self.request.META.get('HTTP_X_FORWARDED_FOR') or \
+                   self.request.META.get('REMOTE_ADDR', '')
         user_agent = self.request.META.get('HTTP_USER_AGENT', '')
         write_login_log_async.delay(
             self.request.user.username, type='W',
@@ -82,6 +83,7 @@ class UserLogoutView(TemplateView):
         context = {
             'title': _('Logout success'),
             'messages': _('Logout success, return login page'),
+            'interval': 1,
             'redirect_url': reverse('users:login'),
             'auto_redirect': True,
         }

@@ -3,11 +3,11 @@
     <nav class="navbar navbar-static-top white-bg" role="navigation" style="margin-bottom: 0">
         <div class="navbar-header">
             <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
-            <form role="search" class="navbar-form-custom" method="get" action="">
-                <div class="form-group">
-                    <input type="text" placeholder="{% trans 'Search' %}..." class="form-control" name="search" id="top-search">
-                </div>
-            </form>
+            <!--<form role="search" class="navbar-form-custom" method="get" action="">-->
+                <!--<div class="form-group">-->
+                    <!--<input type="text" placeholder="{% trans 'Search' %}..." class="form-control" name="search" id="top-search">-->
+                <!--</div>-->
+            <!--</form>-->
         </div>
         <ul class="nav navbar-top-links navbar-right">
             <li>
@@ -19,7 +19,7 @@
                 </a>
             </li>
             <li class="dropdown">
-                {% if user.is_authenticated %}
+                {% if request.user.is_authenticated %}
                 <a data-toggle="dropdown" class="dropdown-toggle" href="#">
                     <span class="m-r-sm text-muted welcome-message">
                         <img alt="image" class="img-circle" width="40" height="40" src="{{ request.user.avatar_url }}"/>
@@ -30,17 +30,16 @@
                     </span>
                 </a>
                 <ul class="dropdown-menu animated fadeInRight m-t-xs">
-                    <li><a href="{% url 'users:user-profile' %}">{% trans 'Profile' %}</a></li>
-                    <li><a href="{% url 'users:user-profile-update' %}">{% trans 'Profile settings' %}</a></li>
+                    <li><a href="{% url 'users:user-profile' %}"><i class="fa fa-cogs">  </i><span> {% trans 'Profile' %}</span></a></li>
                     <li class="divider"></li>
                     {% if request.user.is_superuser %}
-                    {% if request.COOKIES.IN_ADMIN_PAGE == 'No' %}
-                    <li><a id="switch_admin">{% trans 'Admin page' %}</a></li>
-                    {% else %}
-                    <li><a id="switch_user">{% trans 'User page' %}</a></li>
+                        {% if request.COOKIES.IN_ADMIN_PAGE == 'No' %}
+                            <li><a id="switch_admin"><i class="fa fa-exchange"></i><span> {% trans 'Admin page' %}</span></a></li>
+                        {% else %}
+                            <li><a id="switch_user"><i class="fa fa-exchange"></i><span> {% trans 'User page' %}</span></a></li>
+                        {% endif %}
                     {% endif %}
-                    {% endif %}
-                    <li><a href="{% url 'users:logout' %}">{% trans 'Logout' %}</a></li>
+                    <li><a href="{% url 'users:logout' %}"><i class="fa fa-sign-out"></i> {% trans 'Logout' %}</a></li>
                 </ul>
                 {% else %}
                 <a href="{% url 'users:login' %}">

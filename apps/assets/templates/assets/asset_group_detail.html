@@ -3,8 +3,8 @@
 {% load i18n %}
 
 {% block custom_head_css_js %}
-    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
-    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
 {% endblock %}
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -15,7 +15,12 @@
                         <ul class="nav nav-tabs">
                             <li class="active"><a href="" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Group assets' %} </a></li>
                             <li class="pull-right">
-                                <a class="btn btn-outline btn-default" href="{% url 'assets:asset-group-update' pk=asset_group.id %}"><i class="fa fa-edit"></i>Update</a>
+                                <a class="btn btn-outline btn-default" href="{% url 'assets:asset-group-update' pk=asset_group.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
+                            </li>
+                            <li class="pull-right">
+                                <a class="btn btn-outline btn-danger btn-del">
+                                    <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
+                                </a>
                             </li>
                         </ul>
                     </div>
@@ -212,7 +217,6 @@ $(document).ready(function () {
   addAssets(assets_id);
 })
 
-
 .on('click', '.btn-leave-group', function () {
 	var $this = $(this);
 	var the_url = "{% url 'api-assets:group-update-assets' pk=asset_group.id %}";
@@ -223,9 +227,15 @@ $(document).ready(function () {
 	});
 	var delete_asset_id = $(this).data('aid');
 	assets.remove(delete_asset_id);
-	console.log(assets);
 	var data = {"assets": assets};
 	leaveGroup($this, name, the_url, data);
+}).on('click', '.btn-del', function () {
+    var $this = $(this);
+    var name = "{{ asset_group.name}}";
+    var uid = "{{ asset_group.id }}";
+    var the_url = '{% url "api-assets:asset-group-detail" pk=DEFAULT_PK %}'.replace('{{ DEFAULT_PK }}', uid);
+    var redirect_url = "{% url 'assets:asset-group-list' %}";
+    objectDelete($this, name, the_url, redirect_url);
 })
 
 

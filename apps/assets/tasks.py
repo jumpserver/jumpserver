@@ -25,7 +25,7 @@ disk_pattern = re.compile(r'^hd|sd|xvd')
 @shared_task
 def set_assets_hardware_info(result, **kwargs):
     """
-    Unsing ops task run result, to update asset info
+    Using ops task run result, to update asset info
 
     @shared_task must be exit, because we using it as a task callback, is must
     be a celery task also
@@ -209,8 +209,11 @@ def test_asset_connectability_util(asset, task_name=None):
     from ops.utils import update_or_create_ansible_task
 
     if task_name is None:
-        task_name = "Test asset connectability"
+        task_name = _("Test asset connectability")
     hosts = [asset.hostname]
+    if not hosts:
+        logger.info("No hosts, passed")
+        return {}
     tasks = const.TEST_ADMIN_USER_CONN_TASKS
     task, created = update_or_create_ansible_task(
         task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
@@ -262,6 +265,9 @@ def test_system_user_connectability_util(system_user, task_name):
     assets = system_user.get_clusters_assets()
     hosts = [asset.hostname for asset in assets]
     tasks = const.TEST_SYSTEM_USER_CONN_TASKS
+    if not hosts:
+        logger.info("No hosts, passed")
+        return {}
     task, created = update_or_create_ansible_task(
         task_name, hosts=hosts, tasks=tasks, pattern='all',
         options=const.TASK_OPTIONS,
@@ -274,7 +280,7 @@ def test_system_user_connectability_util(system_user, task_name):
 
 @shared_task
 def test_system_user_connectability_manual(system_user):
-    task_name = "Test system user connectability: {}".format(system_user)
+    task_name = _("Test system user connectability: {}").format(system_user)
     return test_system_user_connectability_util(system_user, task_name)
 
 
@@ -303,6 +309,10 @@ def test_system_user_connectability_period():
 ####  Push system user tasks ####
 
 def get_push_system_user_tasks(system_user):
+    # Set root as system user is dangerous
+    if system_user.username == "root":
+        return []
+
     tasks = [
         {
             'name': 'Add user {}'.format(system_user.username),
@@ -310,7 +320,7 @@ def get_push_system_user_tasks(system_user):
                 'module': 'user',
                 'args': 'name={} shell={} state=present password={}'.format(
                     system_user.username, system_user.shell,
-                    encrypt_password(system_user.password),
+                    encrypt_password(system_user.password, salt="K3mIlKK"),
                 ),
             }
         },
@@ -346,11 +356,14 @@ def push_system_user_util(system_users, assets, task_name):
     for system_user in system_users:
         tasks.extend(get_push_system_user_tasks(system_user))
 
-    print("Task: ", tasks)
     if not tasks:
-        return
+        logger.info("Not tasks, passed")
+        return {}
 
     hosts = [asset.hostname for asset in assets]
+    if not hosts:
+        logger.info("Not hosts, passed")
+        return {}
     task, created = update_or_create_ansible_task(
         task_name=task_name, hosts=hosts, tasks=tasks, pattern='all',
         options=const.TASK_OPTIONS, run_as_admin=True, created_by='System'
@@ -381,8 +394,8 @@ def push_system_user_period():
         for system_user in system_users:
             tasks.extend(get_push_system_user_tasks(system_user))
 
-        task_name = _("Push system user to cluster assets period: {}->{}").format(
-            cluster.name, ', '.join(s.name for s in system_users)
+        task_name = _("Push cluster system users to assets period: {}").format(
+            cluster.name
         )
         hosts = [asset.hostname for asset in cluster.assets.all()]
         update_or_create_ansible_task(

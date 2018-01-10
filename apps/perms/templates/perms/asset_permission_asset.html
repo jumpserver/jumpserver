@@ -3,8 +3,8 @@
 {% load i18n %}
 
 {% block custom_head_css_js %}
-    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
-    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
 {% endblock %}
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -53,8 +53,6 @@
                                             <tr>
                                                 <th>{% trans 'Hostname' %}</th>
                                                 <th>{% trans 'IP' %}</th>
-                                                <th>{% trans 'Port' %}</th>
-                                                <th>{% trans 'Is valid' %}</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
@@ -63,15 +61,6 @@
                                             <tr>
                                                 <td>{{ asset.hostname }}</td>
                                                 <td>{{ asset.ip }}</td>
-                                                <td>{{ user.port }}</td>
-                                                <td>
-                                                    {% if asset.is_active %}
-                                                    <i class="fa fa-times text-danger"></i>
-                                                    {% else %}
-                                                    <i class="fa fa-check text-navy"></i>
-                                                    {% endif %}
-                                                </td>
-
                                                 <td>
                                                     <button title="{{ asset.inherit_from_asset_groups }}" data-gid="{{ asset.id }}" class="btn btn-danger btn-xs btn-remove-asset {% if asset.is_inherit_from_asset_groups %} disabled {% endif %}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                                 </td>

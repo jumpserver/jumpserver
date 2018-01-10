@@ -61,7 +61,6 @@ function GetTableDataBox() {
             id_list.push(i);
          }
         }
-    console.log(id_list);
     for (i in id_list) {
         console.log(tabProduct);
         tableData.push(GetRowData(tabProduct.rows[id_list[i]]));
@@ -357,5 +356,15 @@ String.prototype.format = function(args) {
 function setCookie(key, value) {
     var expires = new Date();
     expires.setTime(expires.getTime() + (24 * 60 * 60 * 1000));
-    document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
+    document.cookie = key + '=' + value + ';expires=' + expires.toUTCString() + ';path=/';
+}
+
+
+function delCookie(key) {
+    var expires = new Date();
+    expires.setTime(expires.getTime() - 1);
+    var val = getCookie(key);
+    if (val !== null) {
+        document.cookie = key + '=' + val + ";expires" + expires.toUTCString() + ';path=/';
+    }
 }

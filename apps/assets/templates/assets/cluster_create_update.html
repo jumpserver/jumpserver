@@ -3,8 +3,8 @@
 {% load static %}
 {% load bootstrap3 %}
 {% block custom_head_css_js %}
-    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
-    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
 {% endblock %}
 {% block content %}
 <div class="wrapper wrapper-content animated fadeInRight">
@@ -40,6 +40,7 @@
 
                                     <h3 class="widget-head-color-box">{% trans 'Settings' %}</h3>
                                     {% bootstrap_field form.admin_user layout="horizontal" %}
+                                    {% bootstrap_field form.system_users layout="horizontal" %}
 
                                     <div class="hr-line-dashed"></div>
                                     <h3 class="widget-head-color-box">{% trans 'Other' %}</h3>
@@ -69,10 +70,7 @@
 {% block custom_foot_js %}
     <script>
         $(document).ready(function () {
-            $('.select2').select2({
-                dropdownAutoWidth : true,
-                width: 'auto'
-            });
-        })
+            $('.select2').select2();
+        });
     </script>
 {% endblock %}

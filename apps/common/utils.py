@@ -287,10 +287,10 @@ def make_signature(access_key_secret, date=None):
     return content_md5(data)
 
 
-def encrypt_password(password):
+def encrypt_password(password, salt=None):
     from passlib.hash import sha512_crypt
     if password:
-        return sha512_crypt.using(rounds=5000).hash(password)
+        return sha512_crypt.using(rounds=5000).hash(password, salt=salt)
     return None
 
 

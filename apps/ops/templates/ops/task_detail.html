@@ -3,9 +3,9 @@
 {% load i18n %}
 
 {% block custom_head_css_js %}
-    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
     <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
-    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
     <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
 {% endblock %}
 {% block content %}
@@ -89,7 +89,7 @@
                                             <td>
                                                 <b>
                                                 {% for task in object.latest_adhoc.tasks %}
-                                                {{ forloop.counter }}. {{ task.name }} : {{ task.action.module }} <br/>
+                                                {{ forloop.counter }}. {{ task.name }} ::: {{ task.action.module }} <br/>
                                                 {% endfor %}
                                                 </b>
                                             </td>

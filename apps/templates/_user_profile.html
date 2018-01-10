@@ -18,16 +18,19 @@
 $(document).ready(function () {
 })
 .on('click', '#switch_admin', function () {
+    var cookieName = "IN_ADMIN_PAGE";
     setTimeout(function () {
-        setCookie("IN_ADMIN_PAGE", "Yes");
+        delCookie(cookieName);
+        setCookie(cookieName, "Yes");
         window.location = "/"
     }, 100)
 })
 .on('click', '#switch_user', function () {
+    var cookieName = "IN_ADMIN_PAGE";
     setTimeout(function () {
-        console.log("Set to No");
-        setCookie("IN_ADMIN_PAGE", "No");
-        window.location = "/"
+        delCookie(cookieName);
+        setCookie(cookieName, "No");
+        window.location = "{% url 'assets:user-asset-list' %}"
     }, 100);
 })
 </script>

@@ -12,7 +12,6 @@ class TerminalForm(forms.ModelForm):
         model = Terminal
         fields = ['name', 'remote_addr', 'ssh_port', 'http_port', 'comment']
         help_texts = {
-            'remote_addr': _('A unique addr of every terminal, user browser can arrive it'),
             'ssh_port': _("Coco ssh listen port"),
             'http_port': _("Coco http/ws listen port"),
         }

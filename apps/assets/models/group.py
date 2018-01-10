@@ -27,6 +27,7 @@ class AssetGroup(models.Model):
 
     class Meta:
         ordering = ['name']
+        verbose_name = _("Asset group")
 
     @classmethod
     def initial(cls):

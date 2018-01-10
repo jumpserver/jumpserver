@@ -3,8 +3,8 @@
 {% load i18n %}
 
 {% block custom_head_css_js %}
-    <link href="{% static "css/plugins/select2/select2.min.css" %}" rel="stylesheet">
-    <script src="{% static "js/plugins/select2/select2.full.min.js" %}"></script>
+    <link href="{% static 'css/plugins/select2/select2.min.css' %}" rel="stylesheet">
+    <script src="{% static 'js/plugins/select2/select2.full.min.js' %}"></script>
 {% endblock %}
 {% block content %}
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -53,8 +53,6 @@
                                             <tr>
                                                 <th>{% trans 'Name' %}</th>
                                                 <th>{% trans 'Username' %}</th>
-                                                <th>{% trans 'Email' %}</th>
-                                                <th>{% trans 'Is valid' %}</th>
                                                 <th></th>
                                             </tr>
                                         </thead>
@@ -63,15 +61,6 @@
                                             <tr>
                                                 <td>{{ user.name }}</td>
                                                 <td>{{ user.username }}</td>
-                                                <td>{{ user.email }}</td>
-                                                <td>
-                                                    {% if user.is_expired and user.is_active %}
-                                                    <i class="fa fa-times text-danger"></i>
-                                                    {% else %}
-                                                    <i class="fa fa-check text-navy"></i>
-                                                    {% endif %}
-                                                </td>
-
                                                 <td>
                                                     <button class="btn btn-danger btn-xs btn-remove-user {% if user.is_inherit_from_user_groups %} disabled {% endif %}" data-gid="{{ user.id }}" type="button" style="float: right;"><i class="fa fa-minus"></i></button>
                                                 </td>
@@ -231,7 +220,6 @@ $(document).ready(function () {
     $.map(jumpserver.users_selected, function(value, index) {
         users_id.push(index);
     });
-    console.log(users_id);
     addUsers(users_id);
 }).on('click', '.btn-remove-user', function () {
     var user_id = $(this).data("gid");

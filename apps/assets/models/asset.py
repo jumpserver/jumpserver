@@ -18,6 +18,16 @@ __all__ = ['Asset']
 logger = logging.getLogger(__name__)
 
 
+def default_cluster():
+    from .cluster import Cluster
+    name = "Default"
+    defaults = {"name": name}
+    cluster, created = Cluster.objects.get_or_create(
+        defaults=defaults, name=name
+    )
+    return cluster.id
+
+
 class Asset(models.Model):
     # Todo: Move them to settings
     STATUS_CHOICES = (
@@ -44,7 +54,7 @@ class Asset(models.Model):
     hostname = models.CharField(max_length=128, unique=True, verbose_name=_('Hostname'))
     port = models.IntegerField(default=22, verbose_name=_('Port'))
     groups = models.ManyToManyField(AssetGroup, blank=True, related_name='assets', verbose_name=_('Asset groups'))
-    cluster = models.ForeignKey(Cluster, blank=True, null=True, related_name='assets', on_delete=models.SET_NULL, verbose_name=_('Cluster'))
+    cluster = models.ForeignKey(Cluster, related_name='assets', default=default_cluster, on_delete=models.SET_DEFAULT, verbose_name=_('Cluster'))
     is_active = models.BooleanField(default=True, verbose_name=_('Is active'))
     type = models.CharField(choices=TYPE_CHOICES, max_length=16, blank=True, null=True, default='Server', verbose_name=_('Asset type'),)
     env = models.CharField(choices=ENV_CHOICES, max_length=8, blank=True, null=True, default='Prod', verbose_name=_('Asset environment'),)
@@ -158,6 +168,7 @@ class Asset(models.Model):
 
     class Meta:
         unique_together = ('ip', 'port')
+        verbose_name = _("Asset")
 
     @classmethod
     def generate_fake(cls, count=100):

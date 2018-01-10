@@ -71,6 +71,7 @@
     <th class="text-center">{% trans 'User' %}</th>
     <th class="text-center">{% trans 'Asset' %}</th>
     <th class="text-center">{% trans 'System user' %}</th>
+    <th class="text-center">{% trans 'Remote addr' %}</th>
     <th class="text-center">{% trans 'Terminal' %}</th>
     <th class="text-center">{% trans 'Command' %}</th>
     <th class="text-center">{% trans 'Date start' %}</th>
@@ -88,6 +89,7 @@
             <td class="text-center">{{ session.user }}</td>
             <td class="text-center">{{ session.asset }}</td>
             <td class="text-center">{{ session.system_user }}</td>
+            <td class="text-center">{{ session.remote_addr|default:"" }}</td>
             <td class="text-center">{{ session.terminal.name }}</td>
             <td class="text-center">{{ session.id | get_session_command_amount }}</td>
 
@@ -97,7 +99,7 @@
                 {% if session.is_finished %}
                 <a onclick="window.open('/luna/replay/{{ session.id }}','luna', 'height=600, width=800, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, location=no, status=no')" class="btn btn-xs btn-warning btn-replay" >{% trans "Replay" %}</a>
                 {% else %}
-                <a onclick="window.open('/luna/monitor/{{ session.id }}','luna', 'height=600, width=800, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, location=no, status=no')" class="btn btn-xs btn-warning btn-monitor" >{% trans "Monitor" %}</a>
+                <!--<a onclick="window.open('/luna/monitor/{{ session.id }}','luna', 'height=600, width=800, top=0, left=0, toolbar=no, menubar=no, scrollbars=no, location=no, status=no')" class="btn btn-xs btn-warning btn-monitor" >{% trans "Monitor" %}</a>-->
                 <a class="btn btn-xs btn-danger btn-term" value="{{ session.id }}" terminal="{{ session.terminal.id }}" >{% trans "Terminate" %}</a>
                 {% endif %}
             </td>

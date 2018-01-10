@@ -26,7 +26,7 @@ from .hands import IsSuperUser, IsValidUser, IsSuperUserOrAppUser, \
     get_user_granted_assets
 from .models import AssetGroup, Asset, Cluster, SystemUser, AdminUser
 from . import serializers
-from .tasks import update_asset_hardware_info_manual, test_admin_user_connectability_util, \
+from .tasks import update_asset_hardware_info_manual, test_admin_user_connectability_manual, \
     test_asset_connectability_manual, push_system_user_to_cluster_assets_manual, \
     test_system_user_connectability_manual
 
@@ -40,18 +40,14 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
     """
     queryset = Asset.objects.all()
     serializer_class = serializers.AssetSerializer
-    permission_classes = (IsValidUser,)
+    permission_classes = (IsSuperUserOrAppUser,)
 
     def get_queryset(self):
-        if self.request.user.is_superuser or self.request.user.is_app:
-            queryset = super().get_queryset()
-        else:
-            assets_granted = get_user_granted_assets(self.request.user)
-            queryset = self.queryset.filter(id__in=[asset.id for asset in assets_granted])
-
+        queryset = super().get_queryset()
         cluster_id = self.request.query_params.get('cluster_id')
         asset_group_id = self.request.query_params.get('asset_group_id')
         admin_user_id = self.request.query_params.get('admin_user_id')
+        system_user_id = self.request.query_params.get('system_user_id')
 
         if cluster_id:
             queryset = queryset.filter(cluster__id=cluster_id)
@@ -62,6 +58,23 @@ class AssetViewSet(IDInFilterMixin, BulkModelViewSet):
             assets_direct = [asset.id for asset in admin_user.asset_set.all()]
             clusters = [cluster.id for cluster in admin_user.cluster_set.all()]
             queryset = queryset.filter(Q(cluster__id__in=clusters)|Q(id__in=assets_direct))
+        if system_user_id:
+            system_user = get_object_or_404(SystemUser, id=system_user_id)
+            clusters = system_user.get_clusters()
+            queryset = queryset.filter(cluster__in=clusters)
+        return queryset
+
+
+class UserAssetListView(generics.ListAPIView):
+    queryset = Asset.objects.all()
+    serializer_class = serializers.AssetSerializer
+    permission_classes = (IsValidUser,)
+
+    def get_queryset(self):
+        assets_granted = get_user_granted_assets(self.request.user)
+        queryset = self.queryset.filter(
+            id__in=[asset.id for asset in assets_granted]
+        )
         return queryset
 
 
@@ -99,15 +112,6 @@ class GroupAddAssetsApi(generics.UpdateAPIView):
             return Response({'error': serializer.errors}, status=400)
 
 
-class ClusterUpdateAssetsApi(generics.RetrieveUpdateAPIView):
-    """
-    Cluster update asset member
-    """
-    queryset = Cluster.objects.all()
-    serializer_class = serializers.ClusterUpdateAssetsSerializer
-    permission_classes = (IsSuperUser,)
-
-
 class ClusterViewSet(IDInFilterMixin, BulkModelViewSet):
     """
     Cluster api set, for add,delete,update,list,retrieve resource
@@ -117,7 +121,6 @@ class ClusterViewSet(IDInFilterMixin, BulkModelViewSet):
     permission_classes = (IsSuperUser,)
 
 
-# TOdo
 class ClusterTestAssetsAliveApi(generics.RetrieveAPIView):
     """
     Test cluster asset can connect using admin user or not
@@ -127,6 +130,9 @@ class ClusterTestAssetsAliveApi(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         cluster = self.get_object()
+        admin_user = cluster.admin_user
+        test_admin_user_connectability_manual.delay(admin_user)
+        return Response("Task has been send, seen left assets status")
 
 
 class ClusterAddAssetsApi(generics.UpdateAPIView):
@@ -256,7 +262,7 @@ class AdminUserTestConnectiveApi(generics.RetrieveAPIView):
 
     def retrieve(self, request, *args, **kwargs):
         admin_user = self.get_object()
-        test_admin_user_connectability_util.delay(admin_user)
+        test_admin_user_connectability_manual.delay(admin_user)
         return Response({"msg": "Task created"})
 
 

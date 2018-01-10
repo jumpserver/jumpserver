@@ -37,6 +37,7 @@ class Cluster(models.Model):
 
     class Meta:
         ordering = ['name']
+        verbose_name = _("Cluster")
 
     @classmethod
     def generate_fake(cls, count=5):

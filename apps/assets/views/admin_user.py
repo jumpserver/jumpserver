@@ -2,20 +2,22 @@
 from __future__ import absolute_import, unicode_literals
 from django.utils.translation import ugettext as _
 from django.conf import settings
-from django.views.generic import TemplateView, ListView, View
-from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from django.urls import reverse_lazy
+from django.views.generic import TemplateView, ListView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.contrib.messages.views import SuccessMessageMixin
 from django.views.generic.detail import DetailView, SingleObjectMixin
 
+from common.const import create_success_msg, update_success_msg
 from .. import forms
-from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser
+from ..models import AdminUser, Cluster
 from ..hands import AdminUserRequiredMixin
 
-__all__ = ['AdminUserCreateView', 'AdminUserDetailView',
-           'AdminUserDeleteView', 'AdminUserListView',
-           'AdminUserUpdateView', 'AdminUserAssetsView',
-           ]
+__all__ = [
+    'AdminUserCreateView', 'AdminUserDetailView',
+    'AdminUserDeleteView', 'AdminUserListView',
+    'AdminUserUpdateView', 'AdminUserAssetsView',
+]
 
 
 class AdminUserListView(AdminUserRequiredMixin, TemplateView):
@@ -38,6 +40,7 @@ class AdminUserCreateView(AdminUserRequiredMixin,
     form_class = forms.AdminUserForm
     template_name = 'assets/admin_user_create_update.html'
     success_url = reverse_lazy('assets:admin-user-list')
+    success_message = create_success_msg
 
     def get_context_data(self, **kwargs):
         context = {
@@ -47,20 +50,13 @@ class AdminUserCreateView(AdminUserRequiredMixin,
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
-    def get_success_message(self, cleaned_data):
-        success_message = _(
-            'Create admin user <a href="{url}">{name}</a> successfully.'.format(
-                url=reverse_lazy('assets:admin-user-detail',
-                                 kwargs={'pk': self.object.pk}),
-                name=self.object.name,
-            ))
-        return success_message
 
-
-class AdminUserUpdateView(AdminUserRequiredMixin, UpdateView):
+class AdminUserUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     model = AdminUser
     form_class = forms.AdminUserForm
     template_name = 'assets/admin_user_create_update.html'
+    success_url = reverse_lazy('assets:admin-user-list')
+    success_message = update_success_msg
 
     def get_context_data(self, **kwargs):
         context = {
@@ -69,11 +65,6 @@ class AdminUserUpdateView(AdminUserRequiredMixin, UpdateView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
-
-    def get_success_url(self):
-        success_url = reverse_lazy('assets:admin-user-detail',
-                                   kwargs={'pk': self.object.pk})
-        return success_url
 
 
 class AdminUserDetailView(AdminUserRequiredMixin, DetailView):

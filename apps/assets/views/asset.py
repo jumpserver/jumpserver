@@ -21,10 +21,11 @@ from django.core.cache import cache
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
-
+from django.contrib.messages.views import SuccessMessageMixin
 
 from common.mixins import JSONResponseMixin
 from common.utils import get_object_or_none, get_logger, is_uuid
+from common.const import create_success_msg, update_success_msg
 from .. import forms
 from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser
 from ..hands import AdminUserRequiredMixin
@@ -46,7 +47,6 @@ class AssetListView(AdminUserRequiredMixin, TemplateView):
         context = {
             'app': _('Assets'),
             'action': _('Asset list'),
-            # 'groups': AssetGroup.objects.all(),
             'system_users': SystemUser.objects.all(),
         }
         kwargs.update(context)
@@ -66,7 +66,7 @@ class UserAssetListView(LoginRequiredMixin, TemplateView):
         return super().get_context_data(**kwargs)
 
 
-class AssetCreateView(AdminUserRequiredMixin, CreateView):
+class AssetCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = Asset
     form_class = forms.AssetCreateForm
     template_name = 'assets/asset_create.html'
@@ -86,6 +86,9 @@ class AssetCreateView(AdminUserRequiredMixin, CreateView):
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
+
+    def get_success_message(self, cleaned_data):
+        return create_success_msg % ({"name": cleaned_data["hostname"]})
 
 
 class AssetModalListView(AdminUserRequiredMixin, ListView):
@@ -147,7 +150,7 @@ class AssetBulkUpdateView(AdminUserRequiredMixin, ListView):
         return super().get_context_data(**kwargs)
 
 
-class AssetUpdateView(AdminUserRequiredMixin, UpdateView):
+class AssetUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Asset
     form_class = forms.AssetUpdateForm
     template_name = 'assets/asset_update.html'
@@ -159,7 +162,10 @@ class AssetUpdateView(AdminUserRequiredMixin, UpdateView):
             'action': _('Update asset'),
         }
         kwargs.update(context)
-        return super(AssetUpdateView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
+
+    def get_success_message(self, cleaned_data):
+        return update_success_msg % ({"name": cleaned_data["hostname"]})
 
 
 class AssetDeleteView(AdminUserRequiredMixin, DeleteView):
@@ -184,14 +190,14 @@ class AssetDetailView(DetailView):
             'system_users_all': SystemUser.objects.all(),
         }
         kwargs.update(context)
-        return super(AssetDetailView, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
 
 @method_decorator(csrf_exempt, name='dispatch')
 class AssetExportView(View):
     def get(self, request):
         spm = request.GET.get('spm', '')
-        assets_id_default = [Asset.objects.first().id] if Asset.objects.first() else [1]
+        assets_id_default = [Asset.objects.first().id] if Asset.objects.first() else []
         assets_id = cache.get(spm, assets_id_default)
         fields = [
             field for field in Asset._meta.fields

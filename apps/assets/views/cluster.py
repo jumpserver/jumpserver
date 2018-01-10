@@ -1,17 +1,21 @@
 # coding:utf-8
-from __future__ import absolute_import, unicode_literals
 from django.utils.translation import ugettext as _
 from django.views.generic import TemplateView, ListView, View
 from django.views.generic.edit import CreateView, DeleteView, FormView, UpdateView
 from django.urls import reverse_lazy
 from django.views.generic.detail import DetailView, SingleObjectMixin
+from django.contrib.messages.views import SuccessMessageMixin
+
+from common.const import create_success_msg, update_success_msg
 from .. import forms
 from ..models import Asset, AssetGroup, AdminUser, Cluster, SystemUser
 from ..hands import AdminUserRequiredMixin
 
 
-__all__ = ['ClusterListView', 'ClusterCreateView', 'ClusterUpdateView',
-           'ClusterDetailView', 'ClusterDeleteView', 'ClusterAssetsView']
+__all__ = [
+    'ClusterListView', 'ClusterCreateView', 'ClusterUpdateView',
+    'ClusterDetailView', 'ClusterDeleteView', 'ClusterAssetsView',
+]
 
 
 class ClusterListView(AdminUserRequiredMixin, TemplateView):
@@ -21,39 +25,40 @@ class ClusterListView(AdminUserRequiredMixin, TemplateView):
         context = {
             'app': _('Assets'),
             'action': _('Cluster list'),
-            # 'keyword': self.request.GET.get('keyword', '')
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
 
-class ClusterCreateView(AdminUserRequiredMixin, CreateView):
+class ClusterCreateView(AdminUserRequiredMixin, SuccessMessageMixin, CreateView):
     model = Cluster
     form_class = forms.ClusterForm
     template_name = 'assets/cluster_create_update.html'
     success_url = reverse_lazy('assets:cluster-list')
+    success_message = create_success_msg
 
     def get_context_data(self, **kwargs):
         context = {
             'app': _('assets'),
-            'action': _('Create Cluster'),
+            'action': _('Create cluster'),
         }
         kwargs.update(context)
         return super().get_context_data(**kwargs)
 
     def form_valid(self, form):
         cluster = form.save(commit=False)
-        cluster.created_by = self.request.user.username or 'System'
+        cluster.created_by = self.request.user.username
         cluster.save()
         return super().form_valid(form)
 
 
-class ClusterUpdateView(AdminUserRequiredMixin, UpdateView):
+class ClusterUpdateView(AdminUserRequiredMixin, SuccessMessageMixin, UpdateView):
     model = Cluster
     form_class = forms.ClusterForm
     template_name = 'assets/cluster_create_update.html'
     context_object_name = 'cluster'
     success_url = reverse_lazy('assets:cluster-list')
+    success_message = update_success_msg
 
     def form_valid(self, form):
         cluster = form.save(commit=False)

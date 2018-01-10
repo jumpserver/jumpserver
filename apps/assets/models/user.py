@@ -81,7 +81,11 @@ class AssetUser(models.Model):
 
     @property
     def public_key(self):
-        return signer.unsign(self._public_key)
+        key = signer.unsign(self._public_key)
+        if key:
+            return key
+        else:
+            return None
 
     @property
     def public_key_obj(self):
@@ -170,7 +174,6 @@ class AdminUser(AssetUser):
             info = None
         return info
 
-
     def get_related_assets(self):
         assets = []
         for cluster in self.cluster_set.all():
@@ -184,6 +187,7 @@ class AdminUser(AssetUser):
 
     class Meta:
         ordering = ['name']
+        verbose_name = _("Admin user")
 
     @classmethod
     def generate_fake(cls, count=10):
@@ -224,7 +228,7 @@ class SystemUser(AssetUser):
 
     def get_clusters_assets(self):
         from .asset import Asset
-        clusters = self.cluster.all()
+        clusters = self.get_clusters()
         return Asset.objects.filter(cluster__in=clusters)
 
     def get_clusters(self):
@@ -262,6 +266,7 @@ class SystemUser(AssetUser):
 
     class Meta:
         ordering = ['name']
+        verbose_name = _("System user")
 
     @classmethod
     def generate_fake(cls, count=10):

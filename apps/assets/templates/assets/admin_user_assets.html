@@ -21,11 +21,11 @@
                                 <a href="{% url 'assets:admin-user-assets' pk=admin_user.pk %}" class="text-center"><i class="fa fa-laptop"></i> {% trans 'Assets list' %} </a>
                             </li>
                             <li class="pull-right">
-                                <a class="btn btn-outline btn-default" href="{% url 'assets:admin-user-update' pk=admin_user.id %}"><i class="fa fa-edit"></i>Update</a>
+                                <a class="btn btn-outline btn-default" href="{% url 'assets:admin-user-update' pk=admin_user.id %}"><i class="fa fa-edit"></i>{% trans 'Update' %}</a>
                             </li>
                             <li class="pull-right">
                                 <a class="btn btn-outline btn-danger btn-delete-admin-user">
-                                    <i class="fa fa-edit"></i>Delete
+                                    <i class="fa fa-trash-o"></i>{% trans 'Delete' %}
                                 </a>
                             </li>
                         </ul>
@@ -60,7 +60,7 @@
                                                 <th>{% trans 'IP' %}</th>
                                                 <th>{% trans 'Port' %}</th>
                                                 <th>{% trans 'Type' %}</th>
-                                                <th>{% trans 'Alive' %}</th>
+                                                <th>{% trans 'Reachable' %}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
@@ -144,7 +144,7 @@ $(document).ready(function () {
         url: the_url,
         error: error,
         method: 'GET',
-        success_message: "{% trans "Task has been send, seen left asset status" %}"
+        success_message: "{% trans 'Task has been send, seen left asset status' %}"
     });
 })
 </script>

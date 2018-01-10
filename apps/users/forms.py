@@ -29,7 +29,7 @@ class UserCreateUpdateForm(forms.ModelForm):
         model = User
         fields = [
             'username', 'name', 'email', 'groups', 'wechat',
-            'phone', 'role', 'date_expired', 'comment', 'password'
+            'phone', 'role', 'date_expired', 'comment',
         ]
         help_texts = {
             'username': '* required',
@@ -38,13 +38,16 @@ class UserCreateUpdateForm(forms.ModelForm):
         }
         widgets = {
             'groups': forms.SelectMultiple(
-                attrs={'class': 'select2',
-                       'data-placeholder': _('Join user groups')}),
+                attrs={
+                    'class': 'select2',
+                    'data-placeholder': _('Join user groups')
+                }
+            ),
         }
 
     def save(self, commit=True):
-        user = super().save(commit=commit)
         password = self.cleaned_data.get('password')
+        user = super().save(commit=commit)
         if password:
             user.set_password(password)
             user.save()
@@ -184,12 +187,14 @@ class UserBulkUpdateForm(forms.ModelForm):
 class UserGroupForm(forms.ModelForm):
     users = forms.ModelMultipleChoiceField(
         queryset=User.objects.all(),
+        label=_("User"),
         widget=forms.SelectMultiple(
             attrs={
                 'class': 'select2',
                 'data-placeholder': _('Select users')
             }
-        )
+        ),
+        required=False,
     )
 
     def __init__(self, **kwargs):
