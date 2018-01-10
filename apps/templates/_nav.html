@@ -51,8 +51,14 @@
         <li id="session-online"><a href="{% url 'terminal:session-online-list' %}">{% trans 'Session online' %}</a></li>
         <li id="session-offline"><a href="{% url 'terminal:session-offline-list' %}">{% trans 'Session offline' %}</a></li>
         <li id="command"><a href="{% url 'terminal:command-list' %}">{% trans 'Command' %}</a></li>
+        <li>
+            <a href="{% url 'terminal:web-terminal' %}" target="_blank">
+                {% trans 'Web terminal' %}
+            </a>
+        </li>
     </ul>
 </li>
+
 
 {#<li id="">#}
 {#    <a href="#">#}

@@ -191,9 +191,11 @@ class AssetGrantedSerializer(serializers.ModelSerializer):
 
     class Meta(object):
         model = Asset
-        fields = ("id", "hostname", "ip", "port", "system_users_granted",
-                  "is_inherited", "is_active", "system_users_join", "os",
-                  "platform", "comment",)
+        fields = (
+            "id", "hostname", "ip", "port", "system_users_granted",
+            "is_inherited", "is_active", "system_users_join", "os",
+            "platform", "comment"
+        )
 
     @staticmethod
     def get_is_inherited(obj):
@@ -214,8 +216,11 @@ class MyAssetGrantedSerializer(AssetGrantedSerializer):
 
     class Meta(object):
         model = Asset
-        fields = ("id", "hostname", "system_users_granted", "is_inherited",
-                  "is_active", "system_users_join", "comment")
+        fields = (
+            "id", "hostname", "system_users_granted",
+            "is_inherited", "is_active", "system_users_join",
+            "os", "platform", "comment",
+        )
 
 
 class ClusterSerializer(BulkSerializerMixin, serializers.ModelSerializer):
