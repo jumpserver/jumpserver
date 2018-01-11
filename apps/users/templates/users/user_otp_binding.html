@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+{% load bootstrap3 %}
+
+{% block custom_head_css_js %}
+    <link href="{% static "css/plugins/cropper/cropper.min.css" %}" rel="stylesheet">
+    <link href="{% static "css/plugins/sweetalert/sweetalert.css" %}" rel="stylesheet">
+    <script src="{% static "js/plugins/sweetalert/sweetalert.min.js" %}"></script>
+    <script src="{% static "js/plugins/qrious/qrious.min.js" %}"></script>
+
+    <style>
+        .crop {
+            width: 200px;
+            height: 150px;
+            overflow: hidden;
+        }
+
+        .img-preview-sm img {
+            width: 64px;
+            height: 64px;
+            margin: -75px 0 0 -100px;
+        }
+
+        img {
+            max-width: 100%; /* This rule is very important, please do not ignore this! */
+        }
+    </style>
+{% endblock %}
+{% block content %}
+
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    
+                    <div class="tab-content" style="background-color: #ffffff">
+
+                        <div class="wrapper wrapper-content animated fadeInRight">
+                                <form method="post" class="form-horizontal" action="" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <h3>OTP</h3>
+                                    <div class="form-group">
+                                    <div class="col-sm-4 col-sm-offset-2">
+                                        <canvas id="qr" class="text-center"></canvas>
+                                        <script>
+                                          (function() {
+                                            var qr = new QRious({
+                                              size: 250,
+                                              element: document.getElementById('qr'),
+                                              value: '{{ form.qruri }}'
+                                            });
+                                          })();
+                                        </script>
+                                    </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="control-label col-sm-2 col-lg-2" style="padding-top: 0" >{% trans 'Enable otp' %}</label>
+                                        <div class=" col-sm-9 col-lg-9">
+                                            <li>{% trans 'You must have a Google Authentication-liked software on your smartphone before you can continue;' %}</li>
+                                            <li>{% trans 'After the OTP device is bound, login to the account again needs to use the OTP-based login method;' %}</li>
+                                            <li>{% trans 'If your smartphone is lost and you can not get otp token, contact your administrator.' %}</li>
+                                        </div>
+                                    </div>
+                                    {% bootstrap_field form.old_password layout="horizontal" %}
+                                    {% bootstrap_field form.otp_token layout="horizontal" %}
+                                    {% bootstrap_field form.secret_key_otp layout="horizontal" %}
+                                    <div class="hr-line-dashed"></div>
+                                    <div class="form-group">
+                                        <div class="col-sm-4 col-sm-offset-2">
+                                            <button class="btn btn-white" type="reset">{% trans 'Reset' %}</button>
+                                            <button id="submit_button" class="btn btn-primary" type="submit">{% trans 'Submit' %}</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}
+
+{% block custom_foot_js %}
+    <script src="{% static 'js/plugins/cropper/cropper.min.js' %}"></script>
+    <script>
+    </script>
+{% endblock %}

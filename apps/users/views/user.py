@@ -43,6 +43,7 @@ __all__ = [
     'UserExportView',  'UserBulkImportView', 'UserProfileView',
     'UserProfileUpdateView', 'UserPasswordUpdateView',
     'UserPublicKeyUpdateView', 'UserBulkUpdateView',
+    'UserOtpBindingView','UserOtpUnbingingView'
 ]
 
 logger = get_logger(__name__)
@@ -379,4 +380,47 @@ class UserPublicKeyUpdateView(LoginRequiredMixin, UpdateView):
             'action': _('Public key update'),
         }
         kwargs.update(context)
+<<<<<<< HEAD
+        return super(UserPublicKeyUpdateView, self).get_context_data(**kwargs)
+
+class UserOtpBindingView(LoginRequiredMixin, UpdateView):
+    template_name = 'users/user_otp_binding.html'
+    model = User
+    form_class = forms.UserOtpBinding
+    success_url = reverse_lazy('users:user-profile')
+
+    def get(self, request, *args, **kwargs):
+        if request.user.enable_otp:
+            return redirect(self.success_url)
+        return super(UserOtpBindingView, self).get(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'User',
+            'action': 'Otp Binding',
+        }
+        kwargs.update(context)
+        return super(UserOtpBindingView, self).get_context_data(**kwargs)
+
+class UserOtpUnbingingView(LoginRequiredMixin, UpdateView):
+    template_name = 'users/user_otp_unbinding.html'
+    model = User
+    form_class = forms.UserOtpUnBinding
+    success_url = reverse_lazy('users:user-profile')
+
+    def get_object(self, queryset=None):
+        return self.request.user
+
+    def get_context_data(self, **kwargs):
+        context = {
+            'app': 'User',
+            'action': 'Otp Unbinding',
+        }
+        kwargs.update(context)
+        return super(UserOtpUnbingingView, self).get_context_data(**kwargs)
+=======
         return super().get_context_data(**kwargs)
+>>>>>>> upstream/dev

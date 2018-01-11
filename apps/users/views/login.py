@@ -22,17 +22,27 @@ from django.conf import settings
 from django.utils import timezone
 
 from common.utils import get_object_or_none
+<<<<<<< HEAD
+from ..models import User
+from ..utils import send_reset_password_mail, generate_uuid_token_for_otp
+from ..hands import write_login_log_async
+=======
 from common.mixins import DatetimeSearchMixin
 from ..models import User, LoginLog
 from ..utils import send_reset_password_mail
 from ..tasks import write_login_log_async
+>>>>>>> upstream/dev
 from .. import forms
 
 
-__all__ = ['UserLoginView', 'UserLogoutView',
+__all__ = ['UserLoginView', 'UserLoginOtpView', 'UserLogoutView',
            'UserForgotPasswordView', 'UserForgotPasswordSendmailSuccessView',
            'UserResetPasswordView', 'UserResetPasswordSuccessView',
+<<<<<<< HEAD
+           'UserFirstLoginView','UserLoginUseOtpView']
+=======
            'UserFirstLoginView', 'LoginLogListView']
+>>>>>>> upstream/dev
 
 
 @method_decorator(sensitive_post_parameters(), name='dispatch')
@@ -50,11 +60,86 @@ class UserLoginView(FormView):
         return super().get(request, *args, **kwargs)
 
     def form_valid(self, form):
+<<<<<<< HEAD
+        if not form.get_user_enable_otp():
+            auth_login(self.request, form.get_user())
+            login_ip = self.request.META.get("HTTP_X_REAL_IP") or \
+                    self.request.META.get('REMOTE_ADDR', '')
+            user_agent = self.request.META.get('HTTP_USER_AGENT', '')
+            write_login_log_async.delay(self.request.user.username,
+                                        self.request.user.name,
+                                        login_type='W', login_ip=login_ip,
+                                        user_agent=user_agent)
+            return redirect(self.get_success_url())
+        else:
+            return HttpResponseRedirect(
+                reverse('users:login-use-otp', kwargs={'uuid': generate_uuid_token_for_otp(form.get_user().id)}))
+
+    def get_success_url(self):
+        if self.request.user.is_first_login:
+            return reverse('users:user-first-login')
+
+        return self.request.POST.get(
+            self.redirect_field_name,
+            self.request.GET.get(self.redirect_field_name, reverse('index')))
+
+
+@method_decorator(sensitive_post_parameters(), name='dispatch')
+@method_decorator(csrf_protect, name='dispatch')
+@method_decorator(never_cache, name='dispatch')
+class UserLoginOtpView(FormView):
+    template_name = 'users/login-otp.html'
+    form_class = forms.UserLoginOtpForm
+    redirect_field_name = 'next'
+
+    def get(self, request, *args, **kwargs):
+        if request.user.is_staff:
+            return redirect(self.get_success_url())
+        return super(UserLoginOtpView, self).get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        auth_login(self.request, form.get_user())
+        login_ip = self.request.META.get("HTTP_X_REAL_IP") or \
+                self.request.META.get('REMOTE_ADDR', '')
+        user_agent = self.request.META.get('HTTP_USER_AGENT', '')
+        write_login_log_async.delay(self.request.user.username,
+                                    self.request.user.name,
+                                    login_type='W', login_ip=login_ip,
+                                    user_agent=user_agent)
+        return redirect(self.get_success_url())
+
+    def get_success_url(self):
+        if self.request.user.is_first_login:
+            return reverse('users:user-first-login')
+
+        return self.request.POST.get(
+            self.redirect_field_name,
+            self.request.GET.get(self.redirect_field_name, reverse('index')))
+
+
+@method_decorator(sensitive_post_parameters(), name='dispatch')
+@method_decorator(csrf_protect, name='dispatch')
+@method_decorator(never_cache, name='dispatch')
+class UserLoginUseOtpView(FormView):
+    template_name = 'users/login-use-otp.html'
+    form_class = forms.UserLoginOtpUseForm
+    redirect_field_name = 'next'
+
+    def get(self, request, *args, **kwargs):
+        self.initial['uuid'] = self.kwargs['uuid']
+        return super(UserLoginUseOtpView, self).get(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        auth_login(self.request, form.get_user())
+        login_ip = self.request.META.get("HTTP_X_REAL_IP") or \
+                self.request.META.get('REMOTE_ADDR', '')
+=======
         if not self.request.session.test_cookie_worked():
             return HttpResponse(_("Please enable cookies and try again."))
         auth_login(self.request, form.get_user())
         login_ip = self.request.META.get('HTTP_X_FORWARDED_FOR') or \
                    self.request.META.get('REMOTE_ADDR', '')
+>>>>>>> upstream/dev
         user_agent = self.request.META.get('HTTP_USER_AGENT', '')
         write_login_log_async.delay(
             self.request.user.username, type='W',

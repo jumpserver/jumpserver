@@ -16,7 +16,12 @@ class AccessKey(models.Model):
                           default=uuid.uuid4, editable=False)
     secret = models.UUIDField(verbose_name='AccessKeySecret',
                               default=uuid.uuid4, editable=False)
+<<<<<<< HEAD
+    user = models.ForeignKey(User, verbose_name='User', on_delete=models.CASCADE,
+                             related_name='access_key')
+=======
     user = models.ForeignKey(User, verbose_name='User', on_delete=models.CASCADE, related_name='access_key')
+>>>>>>> upstream/dev
 
     def get_id(self):
         return str(self.id)

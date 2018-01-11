@@ -9,6 +9,8 @@ app_name = 'users'
 urlpatterns = [
     # Login view
     url(r'^login$', views.UserLoginView.as_view(), name='login'),
+    url(r'^login-otp$', views.UserLoginOtpView.as_view(), name='login-otp'),
+    url(r'^login-use-otp/(?P<uuid>[0-9a-f]{32})/$', views.UserLoginUseOtpView.as_view(), name='login-use-otp'),
     url(r'^logout$', views.UserLogoutView.as_view(), name='logout'),
     url(r'^password/forgot$', views.UserForgotPasswordView.as_view(), name='forgot-password'),
     url(r'^password/forgot/sendmail-success$', views.UserForgotPasswordSendmailSuccessView.as_view(), name='forgot-password-sendmail-success'),
@@ -16,10 +18,28 @@ urlpatterns = [
     url(r'^password/reset/success$', views.UserResetPasswordSuccessView.as_view(), name='reset-password-success'),
 
     # Profile
+<<<<<<< HEAD
+    url(r'^profile/$', views.UserProfileView.as_view(),
+        name='user-profile'),
+    url(r'^profile/update/$', views.UserProfileUpdateView.as_view(),
+        name='user-profile-update'),
+    url(r'^profile/password/update/$', views.UserPasswordUpdateView.as_view(),
+        name='user-password-update'),
+    url(r'^profile/pubkey/update/$',
+        views.UserPublicKeyUpdateView.as_view(),
+        name='user-pubkey-update'),
+    url(r'^profile/otp/binding/$',
+        views.UserOtpBindingView.as_view(),
+        name='user-otp-binding'),
+    url(r'^profile/otp/unbinding/$',
+        views.UserOtpUnbingingView.as_view(),
+        name='user-otp-unbinding'),
+=======
     url(r'^profile/$', views.UserProfileView.as_view(), name='user-profile'),
     url(r'^profile/update/$', views.UserProfileUpdateView.as_view(), name='user-profile-update'),
     url(r'^profile/password/update/$', views.UserPasswordUpdateView.as_view(), name='user-password-update'),
     url(r'^profile/pubkey/update/$', views.UserPublicKeyUpdateView.as_view(), name='user-pubkey-update'),
+>>>>>>> upstream/dev
 
     # User view
     url(r'^user$', views.UserListView.as_view(), name='user-list'),

@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 import base64
 import logging
 import uuid
+import pyotp
 
 import requests
 import ipaddress
@@ -157,7 +158,8 @@ def refresh_token(token, user, expiration=settings.CONFIG.TOKEN_EXPIRATION or 36
 
 def generate_token(request, user):
     expiration = settings.CONFIG.TOKEN_EXPIRATION or 3600
-    remote_addr = request.META.get('REMOTE_ADDR', '')
+    remote_addr = request.META.get("X_HTTP_REAL_IP") or \
+            request.META.get('REMOTE_ADDR', '')
     if not isinstance(remote_addr, bytes):
         remote_addr = remote_addr.encode("utf-8")
     remote_addr = base64.b16encode(remote_addr) #.replace(b'=', '')
@@ -169,6 +171,35 @@ def generate_token(request, user):
     return token
 
 
+<<<<<<< HEAD
+def generate_secret_key_otp():
+    return pyotp.random_base32()
+
+
+def verity_otp_token(secret_key_otp, otp_token, valid_window=settings.OTP_TOKEN_VALID_WINDOW):
+    totp = pyotp.TOTP(secret_key_otp)
+    return totp.verify(otp_token, valid_window=valid_window)
+
+
+def generate_otpauth_uri(username, secret_key_otp):
+    return pyotp.totp.TOTP(secret_key_otp).provisioning_uri(username, issuer_name=settings.SITE_URL)
+
+
+def generate_uuid_token_for_otp(userid):
+    uuid_token = uuid.uuid4().hex
+    cache.set(uuid_token, userid, 120)
+    return uuid_token
+
+def cache_ssh_otp_auth_result(username, remote_addr, expiration=settings.OTP_SSH_TOKEN_EXPIRATION or 3600):
+    cache.set(username, remote_addr, expiration)
+
+def is_chach_ssh_otp_auth(username, remote_addr):
+    addr = cache.get(username, '')
+    if addr == remote_addr:
+        return True
+    else:
+        return False
+=======
 def validate_ip(ip):
     try:
         ipaddress.ip_address(ip)
@@ -206,3 +237,4 @@ def get_ip_city(ip, timeout=10):
         except ValueError:
             pass
     return city
+>>>>>>> upstream/dev
