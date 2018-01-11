@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 
-
-from django.db.models.signals import post_save, post_init, m2m_changed, pre_save
+from django.db.models.signals import post_save, post_init
 from django.dispatch import receiver
 from django.utils.translation import gettext as _
 

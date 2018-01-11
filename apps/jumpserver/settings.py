@@ -121,15 +121,6 @@ MESSAGE_STORAGE = 'django.contrib.messages.storage.cookie.CookieStorage'
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
 
-# if CONFIG.DB_ENGINE == 'sqlite':
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': CONFIG.DB_NAME or os.path.join(BASE_DIR, 'data', 'db.sqlite3'),
-#             'ATOMIC_REQUESTS': True,
-#         }
-#     }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.{}'.format(CONFIG.DB_ENGINE),

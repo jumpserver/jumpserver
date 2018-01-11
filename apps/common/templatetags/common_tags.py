@@ -4,6 +4,7 @@ from django import template
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.utils.html import escape
+from django import forms
 
 register = template.Library()
 
@@ -83,3 +84,11 @@ def time_util_with_seconds(date_from, date_to):
             return '{} h'.format(seconds//3600)
     else:
         return ''
+
+
+@register.filter
+def is_bool_field(field):
+    if isinstance(field, forms.BooleanField):
+        return True
+    else:
+        return False

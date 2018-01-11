@@ -13,7 +13,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.shortcuts import reverse
 
-from .group import UserGroup
 from common.utils import get_signer, date_expired_default
 
 
@@ -35,7 +34,7 @@ class User(AbstractUser):
     username = models.CharField(max_length=128, unique=True, verbose_name=_('Username'))
     name = models.CharField(max_length=128, verbose_name=_('Name'))
     email = models.EmailField(max_length=128, unique=True, verbose_name=_('Email'))
-    groups = models.ManyToManyField(UserGroup, related_name='users', blank=True, verbose_name=_('User group'))
+    groups = models.ManyToManyField('users.UserGroup', related_name='users', blank=True, verbose_name=_('User group'))
     role = models.CharField(choices=ROLE_CHOICES, default='User', max_length=10, blank=True, verbose_name=_('Role'))
     avatar = models.ImageField(upload_to="avatar", null=True, verbose_name=_('Avatar'))
     wechat = models.CharField(max_length=128, blank=True, verbose_name=_('Wechat'))

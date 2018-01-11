@@ -19,6 +19,8 @@ urlpatterns = [
     url(r'^perms/', include('perms.urls.views_urls', namespace='perms')),
     url(r'^terminal/', include('terminal.urls.views_urls', namespace='terminal')),
     url(r'^ops/', include('ops.urls.view_urls', namespace='ops')),
+    url(r'^settings/', include('common.urls.view_urls', namespace='settings')),
+    url(r'^common/', include('common.urls.view_urls', namespace='common')),
 
     # Api url view map
     url(r'^api/users/', include('users.urls.api_urls', namespace='api-users')),
@@ -26,12 +28,11 @@ urlpatterns = [
     url(r'^api/perms/', include('perms.urls.api_urls', namespace='api-perms')),
     url(r'^api/terminal/', include('terminal.urls.api_urls', namespace='api-terminal')),
     url(r'^api/ops/', include('ops.urls.api_urls', namespace='api-ops')),
+    url(r'^api/common/', include('common.urls.api_urls', namespace='api-common')),
 
     # External apps url
     url(r'^captcha/', include('captcha.urls')),
-
 ]
-
 
 if settings.DEBUG:
     urlpatterns += [
